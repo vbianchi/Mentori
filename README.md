@@ -1,121 +1,136 @@
 # Manus AI UI Clone & Basic Backend
 
-This project is a functional clone of the user interface for an AI agent system, inspired by a screenshot of Manus AI (see below). It features a three-panel layout (Tasks, Chat, Monitor) and connects via WebSockets to a basic Python backend capable of handling initial task descriptions and executing shell commands.
+This project is a functional clone of the user interface for an AI agent system, inspired by a screenshot of Manus AI. It features a three-panel layout (Tasks, Chat, Monitor) and connects via WebSockets to a Python backend capable of generating task plans using AI (Google Gemini or local Ollama) and executing shell commands.
 
 ## Project Goal
 
-The initial goal was to replicate the UI structure and basic functionality shown in the screenshot. The project has now progressed to include a live WebSocket connection to a simple backend, laying the groundwork for building a more complex AI agent system.
+The initial goal was to replicate the UI structure. The project has now progressed to include a live WebSocket connection to a backend that can leverage LLMs for basic task planning and execute simple commands, laying the groundwork for a more complex AI agent system.
+
+## Screenshot (Target UI)
+
+(Please place the `image_917c03.jpg` file in the root of this repository for the image below to display correctly)
+
+![Manus AI Screenshot](./image_917c03.jpg)
 
 ## Current Features
 
 * **Three-Panel UI:** Replicates the Task List (left), Chat/Interaction (center), and Agent Monitor (right) panels.
-* **Styling:** Dark theme implemented with CSS, approximating the look and feel of the screenshot.
-* **Basic Interactivity:**
-    * Clickable task list items.
-    * Functional chat input area (sends messages to backend).
-    * Placeholder buttons log actions to the console.
-* **Dynamic Content:** Chat and Monitor panels are updated dynamically with content received from the backend.
-* **WebSocket Communication:** Real-time, bidirectional communication between the frontend (browser) and the Python backend using the `websockets` library.
-* **Basic Backend Logic:**
-    * Accepts WebSocket connections.
-    * Handles initial `user_message` as a task goal.
-    * Handles subsequent `user_message`s as follow-ups (basic acknowledgment).
-    * Handles `run_command` messages to execute shell commands asynchronously using `asyncio.subprocess`.
-    * Streams `stdout` and `stderr` from executed commands back to the frontend Monitor panel.
-    * Acknowledges other basic message types (`context_switch`, `new_task`, `action_command`).
-* **Dependency Management:** Python dependencies managed using `requirements.txt` and `uv` virtual environments.
+* **Styling:** Dark theme implemented with CSS.
+* **Basic Interactivity:** Clickable task list, functional chat input, basic button actions.
+* **Dynamic Content:** Chat and Monitor panels updated dynamically via WebSockets.
+* **WebSocket Communication:** Real-time connection between frontend and backend.
+* **AI Planning:**
+    * Accepts initial user message as a task goal.
+    * Calls a configured LLM (Google Gemini or Ollama) to generate a step-by-step plan.
+    * Displays the generated plan in the chat.
+    * Configurable via `.env` file / environment variables.
+* **Command Execution:** Handles `run_command` messages to execute shell commands asynchronously, streaming output to the Monitor panel.
+* **Dependency Management:** Uses `uv` and `requirements.txt`.
 
 ## Tech Stack
 
 * **Frontend:** HTML5, CSS3, Vanilla JavaScript (ES6+)
-* **Backend:** Python 3.x, `asyncio`, `websockets` library
-* **Environment:** `uv` (for Python virtual environment and package installation)
+* **Backend:** Python 3.x, `asyncio`, `websockets`, `google-generativeai`, `python-dotenv`, `httpx`
+* **Environment:** `uv`
 * **Protocol:** WebSockets (WS)
 
 ## Project Structure
+
 ```
 manus-ai-ui-clone/
 ├── backend/
+│   ├── init.py       # Makes 'backend' a package
+│   ├── config.py         # Loads configuration (.env, env vars)
+│   ├── llm_planners.py   # LLM interaction logic (Gemini, Ollama)
 │   └── server.py         # Python WebSocket backend server
 ├── css/
 │   └── style.css         # Frontend CSS styling
 ├── js/
 │   └── script.js         # Frontend JavaScript logic
-├── .venv/                # Python virtual environment (Created by uv, ignored by Git)
-├── .gitignore            # Files/directories ignored by Git
-├── image_917c03.jpg      # Screenshot image file (Add this manually)
+├── .venv/                # Python virtual environment (Ignored by Git)
+├── .gitignore            # Files ignored by Git
+├── image_917c03.jpg      # Screenshot image file (Optional)
 ├── index.html            # Main HTML structure for the UI
 ├── README.md             # This file
 └── requirements.txt      # Python dependencies
 ```
+
 ## Setup Instructions
 
-1.  **Clone the Repository:**
+1.  **Clone Repository:**
     ```bash
     git clone <your-repository-url>
     cd manus-ai-ui-clone
     ```
-    (Replace `<your-repository-url>` with the actual URL if you host it on GitHub/GitLab etc.)
-
-2.  **Install `uv` (if needed):**
-    Follow the official instructions: [https://astral.sh/uv#installation](https://astral.sh/uv#installation)
-    (Usually `curl -LsSf https://astral.sh/uv/install.sh | sh` or `pip install uv`)
-
-3.  **Create Virtual Environment:**
-    Make sure you are in the project root directory (`manus-ai-ui-clone`).
+2.  **Install `uv` (if needed):** See [https://astral.sh/uv#installation](https://astral.sh/uv#installation).
+3.  **Create `.env` File:**
+    * Create a file named `.env` in the project root (`manus-ai-ui-clone/`).
+    * Add your Google Gemini API key:
+        ```env
+        GOOGLE_API_KEY=YOUR_ACTUAL_GOOGLE_API_KEY
+        ```
+    * **(Optional)** Add other configuration variables to override defaults (see Configuration section below).
+    * **Important:** Do NOT commit the `.env` file to Git. Ensure it's listed in `.gitignore`.
+4.  **Create Virtual Environment:**
     ```bash
     uv venv
     ```
-
-4.  **Activate Virtual Environment:**
+5.  **Activate Virtual Environment:**
     ```bash
-    # On Linux/macOS/WSL
     source .venv/bin/activate
     ```
-    (Your terminal prompt should change to indicate the active environment, e.g., `(.venv)`)
-
-5.  **Install Python Dependencies:**
+6.  **Install Dependencies:**
     ```bash
     uv pip install -r requirements.txt
     ```
+7.  **(If using Ollama)** Ensure your Ollama instance is running and the desired model (e.g., `gemma:2b`, `llama3:8b`) is pulled (`ollama pull gemma:2b`).
+8.  **Create Backend Package Marker:** *(Added Step)*
+    ```bash
+    touch backend/__init__.py
+    ```
 
-6.  **(Optional) Add Screenshot:** Place the `image_917c03.jpg` file into the root directory of the project.
+## Configuration
+
+The backend behaviour can be configured using environment variables or by setting them in the `.env` file:
+
+* `GOOGLE_API_KEY` (Required if using Gemini): Your API key from Google AI Studio or Google Cloud.
+* `AI_PROVIDER` (Optional): Set to `gemini` (default) or `ollama` to choose the planning LLM.
+* `GEMINI_MODEL` (Optional): Specify the Gemini model name (default: `gemini-1.5-flash-latest`).
+* `OLLAMA_BASE_URL` (Optional): The base URL for your running Ollama instance (default: `http://localhost:11434`).
+* `OLLAMA_MODEL` (Optional): The name of the Ollama model to use (default: `gemma:2b`). Make sure this model is available in your Ollama instance.
 
 ## Running the Application
 
-You need to run two servers simultaneously in separate terminals: the backend WebSocket server and the frontend HTTP server.
+Run the backend and frontend servers in separate terminals from the **project root directory** (`manus-ai-ui-clone/`).
 
 1.  **Terminal 1: Start Backend Server**
-    * Navigate to the project root: `cd /path/to/manus-ai-ui-clone`
-    * Activate the virtual environment: `source .venv/bin/activate`
-    * Navigate to the backend directory: `cd backend`
-    * Run the server: `python server.py`
-    * Keep this terminal running. You should see output like `WebSocket server started on ws://localhost:8765`.
+    * Make sure you are in the project root directory (`manus-ai-ui-clone/`).
+    * Activate environment: `source .venv/bin/activate`
+    * **Run server as a module:** *(Changed Command)*
+      ```bash
+      python -m backend.server
+      ```
+    * Keep running.
 
 2.  **Terminal 2: Start Frontend HTTP Server**
-    * Navigate to the project root: `cd /path/to/manus-ai-ui-clone`
-    * (Optional but recommended) Activate the virtual environment: `source .venv/bin/activate`
-    * Run the simple Python HTTP server (serves `index.html`, `css`, `js`): `python3 -m http.server 8000`
-    * Keep this terminal running.
+    * Make sure you are in the project root directory (`manus-ai-ui-clone/`).
+    * (Optional) Activate environment: `source .venv/bin/activate`
+    * Run server: `python3 -m http.server 8000`
+    * Keep running.
 
-3.  **Access the UI:**
-    * Open your web browser (Chrome, Firefox, Edge) and navigate to: `http://localhost:8000`
+3.  **Access the UI:** Open browser to `http://localhost:8000`.
 
 ## Basic Testing
 
-* Send a chat message through the UI input. Observe the backend logs and the UI updates indicating the task was received.
-* Send subsequent chat messages to see the follow-up logic.
+* Send your first chat message. This will be treated as the task goal. Observe the status messages and monitor logs. The backend should call the configured AI (Gemini by default) to generate a plan, which will then be displayed in the chat.
 * (Requires Browser Console) Test command execution:
-    1.  Open browser developer console (F12).
-    2.  Ensure WebSocket is connected by typing `socket.readyState` (should return `1`).
-    3.  Send a command: `socket.send(JSON.stringify({ type: "run_command", command: "ls -l" }));` (use appropriate commands for your OS).
-    4.  Observe the command output streamed to the Monitor panel in the UI.
+    1.  Check connection: `socket.readyState` (should be `1`).
+    2.  Send command: `socket.send(JSON.stringify({ type: "run_command", command: "ls -la" }));`
+    3.  Observe output streamed to the Monitor panel.
 
 ## Future Development
 
-The next steps involve enhancing the backend server's agent logic:
-
-* Implementing a proper planning module (potentially using an LLM API like Claude, Gemini, or OpenAI).
-* Building out the execution module for different step types (e.g., web Browse with Playwright, file I/O, API calls).
-* Developing more robust state management for tasks and plans.
-* Implementing error handling and replanning capabilities.
+* Implement plan execution logic (iterate through steps generated by AI).
+* Add more execution capabilities (web browsing via Playwright, file I/O).
+* Improve state management and error handling.
+* Refine AI interaction and prompt engineering.

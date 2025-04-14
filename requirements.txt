@@ -1,2 +1,8 @@
-# manus-ai-ui-clone/requirements.txt
-websockets>=11.0 # Or specify a version you prefer, >=11 is generally good.
+# Existing dependencies (if any)
+websockets>=11.0 # Keep existing or update as needed
+
+# Added for AI Planning
+google-generativeai>=0.5 # Or latest version
+python-dotenv>=1.0
+httpx>=0.25 # Async HTTP client for Ollama
+

@@ -1,7 +1,15 @@
-node_modules/
-.env
-*.log
-.DS_Store
-
 # Python virtual environment
 .venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# Environment variables file
+.env
+
+# IDE/OS specific files (examples)
+.vscode/
+.idea/
+*.DS_Store
+
