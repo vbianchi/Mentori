@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent Interface</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <nav class="panel left-panel">
+            <div class="panel-header">
+                <button class="new-task-btn">+ New Task</button>
+                {/* Placeholder icons for search/filter */}
+            </div>
+            <ul class="task-list">
+                <li class="task-item active">Comprehensive Dataset on Cattle and...</li>
+                <li class="task-item">Cattle and Dairy Farming Data Analysis i...</li>
+                <li class="task-item">AI Pipeline for Creating YouTube Shorts</li>
+                <li class="task-item">Become Richer with Passive Income fro...</li>
+                <li class="task-item">Global Cattle and Dairy Farming Data C...</li>
+                <li class="task-item">Avian Flu Spread Estimation in Netherla...</li>
+                <li class="task-item">Creating an AI Agent Using Open Sourc...</li>
+                <li class="task-item">Install AI Scientist with Ollama API for B...</li>
+                {/* Add more tasks as needed */}
+            </ul>
+            <div class="panel-footer">
+                {/* Placeholder for user profile/settings */}
+                User Profile | Settings
+            </div>
+        </nav>
+
+        <main class="panel center-panel">
+            <div class="panel-header chat-header">
+                <h3>Cattle and Dairy Farming Data Analysis in Netherlands</h3>
+                {/* Placeholder icons for share/options */}
+                <span>Share | Options</span>
+            </div>
+            <div class="chat-messages">
+                <div class="message agent-message">
+                    Continuing to explore alternative sources for North Holland dairy data despite technical challenges with accessing the CBS dataset.
+                </div>
+                 <div class="message agent-status">
+                    Manus has stopped because the context is too long, please start a new chat. Get support with the issue.
+                </div>
+                <div class="message agent-suggestion">
+                    In here there is the link to an excel file with some numbers. Check if you get anything from there.
+                 </div>
+                <div class="action-prompt">
+                    <p>Try alternative approaches for North Holland data collection</p>
+                    <div class="message agent-status">
+                        Manus has stopped because the context is too long, please start a new chat. Get support with the issue.
+                    </div>
+                     <button class="action-btn">Can you retry this task?</button>
+                </div>
+                 <div class="action-prompt">
+                    <p>Try alternative approaches for North Holland data collection</p>
+                    <div class="message agent-status">
+                         Manus has stopped because the context is too long, please start a new chat. Get support with the issue.
+                    </div>
+                     <div class="message agent-warning">
+                        The current task context has reached its limit and cannot continue. Manus can invert the compressed context and start fresh with a new task to proceed.
+                    </div>
+                     <button class="action-btn">Invert and continue</button>
+                </div>
+                {/* More messages will go here */}
+            </div>
+            <div class="chat-input-area">
+                <textarea placeholder="Type your message here..."></textarea>
+                <button>Send</button>
+            </div>
+        </main>
+
+        <aside class="panel right-panel">
+            <div class="panel-header monitor-header">
+                <h3>Manus's Computer</h3>
+                {/* Placeholder icons */}
+                 <span>Executing command...</span>
+            </div>
+            <div class="monitor-content">
+                <pre><code>$ sh-4.4# wget -O cbs_dataset.html 'https://opendata.cbs.nl/statline/portal.html?_la=en&_catalog=CBS&tableId=...'
+--2025-03-27 08:00:22-- https://opendata.cbs.nl/...
+Resolving opendata.cbs.nl (opendata.cbs.nl)... 87.213.xx.xx, 2a01:...:...:xxxx
+Connecting to opendata.cbs.nl (opendata.cbs.nl)|87.213.xx.xx|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: unspecified [text/html]
+Saving to: 'cbs_dataset.html'
+
+cbs_dataset.html      [ <=>                ]   7.89K  --.-KB/s    in 0s
+
+2025-03-27 08:00:22 (54.0 MB/s) - 'cbs_dataset.html' saved [7148]
+sh-4.4# 
+# Agent activity appears here (terminal output, browser view, etc.)
+</code></pre>
+            </div>
+            <div class="monitor-footer">
+                 <span>Try alternative approaches for North Holland data collection</span>
+                 <button class="jump-live-btn">> Jump to live</button>
+            </div>
+        </aside>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
