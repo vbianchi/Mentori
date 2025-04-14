@@ -1,8 +1,19 @@
-# Existing dependencies (if any)
-websockets>=11.0 # Keep existing or update as needed
+# WebSocket server
+websockets>=12.0
 
-# Added for AI Planning
-google-generativeai>=0.5 # Or latest version
+# Configuration
 python-dotenv>=1.0
-httpx>=0.25 # Async HTTP client for Ollama
+
+# HTTP Client
+httpx>=0.25
+
+# --- LangChain Core and Integrations ---
+langchain>=0.1.0
+langchain-google-genai>=1.0
+langchain-community>=0.0.20
+langchainhub>=0.1.15
+langchain-experimental>=0.0.50 # Added dependency for ShellTool
+
+# Optional: Add other dependencies needed for specific tools later
+# e.g., beautifulsoup4, duckduckgo-search, wikipedia, etc.
 

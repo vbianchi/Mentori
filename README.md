@@ -1,10 +1,10 @@
-# Manus AI UI Clone & Basic Backend
+# Manus AI UI Clone & LangChain Backend
 
-This project is a functional clone of the user interface for an AI agent system, inspired by a screenshot of Manus AI. It features a three-panel layout (Tasks, Chat, Monitor) and connects via WebSockets to a Python backend capable of generating task plans using AI (Google Gemini or local Ollama) and executing shell commands.
+This project is a functional clone of the user interface for an AI agent system, inspired by a screenshot of Manus AI. It features a three-panel layout (Tasks, Chat, Monitor) and connects via WebSockets to a Python backend powered by **LangChain** to create a basic AI agent. The agent can use LLMs (Google Gemini or local Ollama) for reasoning and tools (currently a shell tool) to perform actions.
 
 ## Project Goal
 
-The initial goal was to replicate the UI structure. The project has now progressed to include a live WebSocket connection to a backend that can leverage LLMs for basic task planning and execute simple commands, laying the groundwork for a more complex AI agent system.
+The goal is to replicate the UI structure and build a functional backend agent capable of planning and executing tasks using LLMs and tools, laying the groundwork for a more complex AI agent system for specific domains like bioinformatics.
 
 ## Screenshot (Target UI)
 
@@ -16,21 +16,29 @@ The initial goal was to replicate the UI structure. The project has now progress
 
 * **Three-Panel UI:** Replicates the Task List (left), Chat/Interaction (center), and Agent Monitor (right) panels.
 * **Styling:** Dark theme implemented with CSS.
-* **Basic Interactivity:** Clickable task list, functional chat input, basic button actions.
-* **Dynamic Content:** Chat and Monitor panels updated dynamically via WebSockets.
+* **Basic Interactivity:** Clickable task list, functional chat input.
+* **Dynamic Content:** Chat and Monitor panels updated dynamically via WebSockets with agent steps and outputs.
 * **WebSocket Communication:** Real-time connection between frontend and backend.
-* **AI Planning:**
-    * Accepts initial user message as a task goal.
-    * Calls a configured LLM (Google Gemini or Ollama) to generate a step-by-step plan.
-    * Displays the generated plan in the chat.
-    * Configurable via `.env` file / environment variables.
-* **Command Execution:** Handles `run_command` messages to execute shell commands asynchronously, streaming output to the Monitor panel.
+* **LangChain Agent Backend:**
+    * Uses LangChain framework for agent logic.
+    * Initializes an LLM wrapper (Gemini or Ollama) based on configuration.
+    * Defines tools the agent can use (currently `ShellTool`).
+    * Uses a LangChain Agent Executor (ReAct based) to process user tasks.
+    * Streams agent actions, tool inputs/outputs, and final answers back to the UI via WebSockets.
+    * Configurable LLM provider and models via `.env` file / environment variables.
 * **Dependency Management:** Uses `uv` and `requirements.txt`.
 
 ## Tech Stack
 
 * **Frontend:** HTML5, CSS3, Vanilla JavaScript (ES6+)
-* **Backend:** Python 3.x, `asyncio`, `websockets`, `google-generativeai`, `python-dotenv`, `httpx`
+* **Backend:**
+    * Python 3.x, `asyncio`, `websockets`
+    * **LangChain Core:** `langchain`
+    * **LLM Integrations:** `langchain-google-genai`, `langchain-community` (for Ollama)
+    * **Tools:** `langchain-community` (for ShellTool, etc.)
+    * **Prompts:** `langchainhub`
+    * **Config:** `python-dotenv`
+    * **HTTP:** `httpx` (used internally by some LangChain components)
 * **Environment:** `uv`
 * **Protocol:** WebSockets (WS)
 
@@ -40,9 +48,11 @@ The initial goal was to replicate the UI structure. The project has now progress
 manus-ai-ui-clone/
 ├── backend/
 │   ├── init.py       # Makes 'backend' a package
+│   ├── agent.py          # Creates the LangChain agent executor
 │   ├── config.py         # Loads configuration (.env, env vars)
-│   ├── llm_planners.py   # LLM interaction logic (Gemini, Ollama)
-│   └── server.py         # Python WebSocket backend server
+│   ├── llm_setup.py      # Initializes LangChain LLM wrappers
+│   ├── server.py         # Python WebSocket server (using LangChain agent)
+│   └── tools.py          # Defines LangChain tools for the agent
 ├── css/
 │   └── style.css         # Frontend CSS styling
 ├── js/
@@ -55,6 +65,8 @@ manus-ai-ui-clone/
 └── requirements.txt      # Python dependencies
 ```
 
+*(Note: `backend/llm_planners.py` has been replaced by `llm_setup.py`, `tools.py`, and `agent.py`)*
+
 ## Setup Instructions
 
 1.  **Clone Repository:**
@@ -64,56 +76,35 @@ manus-ai-ui-clone/
     ```
 2.  **Install `uv` (if needed):** See [https://astral.sh/uv#installation](https://astral.sh/uv#installation).
 3.  **Create `.env` File:**
-    * Create a file named `.env` in the project root (`manus-ai-ui-clone/`).
-    * Add your Google Gemini API key:
-        ```env
-        GOOGLE_API_KEY=YOUR_ACTUAL_GOOGLE_API_KEY
-        ```
-    * **(Optional)** Add other configuration variables to override defaults (see Configuration section below).
-    * **Important:** Do NOT commit the `.env` file to Git. Ensure it's listed in `.gitignore`.
-4.  **Create Virtual Environment:**
-    ```bash
-    uv venv
-    ```
-5.  **Activate Virtual Environment:**
-    ```bash
-    source .venv/bin/activate
-    ```
-6.  **Install Dependencies:**
-    ```bash
-    uv pip install -r requirements.txt
-    ```
-7.  **(If using Ollama)** Ensure your Ollama instance is running and the desired model (e.g., `gemma:2b`, `llama3:8b`) is pulled (`ollama pull gemma:2b`).
-8.  **Create Backend Package Marker:** *(Added Step)*
-    ```bash
-    touch backend/__init__.py
-    ```
+    * Create `.env` in the project root. Add `GOOGLE_API_KEY=YOUR_ACTUAL_GOOGLE_API_KEY`.
+    * See Configuration section for optional variables (`AI_PROVIDER`, etc.).
+    * Ensure `.env` is in `.gitignore`.
+4.  **Create Virtual Environment:** `uv venv`
+5.  **Activate Virtual Environment:** `source .venv/bin/activate`
+6.  **Install Dependencies:** `uv pip install -r requirements.txt`
+7.  **(If using Ollama)** Ensure Ollama is running and the desired model is pulled.
+8.  **Create Backend Package Marker:** `touch backend/__init__.py` (if not already present).
 
 ## Configuration
 
-The backend behaviour can be configured using environment variables or by setting them in the `.env` file:
+Configure via environment variables or the `.env` file:
 
-* `GOOGLE_API_KEY` (Required if using Gemini): Your API key from Google AI Studio or Google Cloud.
-* `AI_PROVIDER` (Optional): Set to `gemini` (default) or `ollama` to choose the planning LLM.
-* `GEMINI_MODEL` (Optional): Specify the Gemini model name (default: `gemini-1.5-flash-latest`).
-* `OLLAMA_BASE_URL` (Optional): The base URL for your running Ollama instance (default: `http://localhost:11434`).
-* `OLLAMA_MODEL` (Optional): The name of the Ollama model to use (default: `gemma:2b`). Make sure this model is available in your Ollama instance.
+* `GOOGLE_API_KEY` (Required if using Gemini)
+* `AI_PROVIDER` (Optional): `gemini` (default) or `ollama`.
+* `GEMINI_MODEL` (Optional): Default `gemini-1.5-flash-latest`.
+* `OLLAMA_BASE_URL` (Optional): Default `http://localhost:11434`.
+* `OLLAMA_MODEL` (Optional): Default `gemma:2b`. Ensure model exists in Ollama.
 
 ## Running the Application
 
-Run the backend and frontend servers in separate terminals from the **project root directory** (`manus-ai-ui-clone/`).
+Run from the **project root directory** (`manus-ai-ui-clone/`).
 
 1.  **Terminal 1: Start Backend Server**
-    * Make sure you are in the project root directory (`manus-ai-ui-clone/`).
     * Activate environment: `source .venv/bin/activate`
-    * **Run server as a module:** *(Changed Command)*
-      ```bash
-      python -m backend.server
-      ```
-    * Keep running.
+    * Run server as module: `python -m backend.server`
+    * Keep running. Observe logs for agent activity.
 
 2.  **Terminal 2: Start Frontend HTTP Server**
-    * Make sure you are in the project root directory (`manus-ai-ui-clone/`).
     * (Optional) Activate environment: `source .venv/bin/activate`
     * Run server: `python3 -m http.server 8000`
     * Keep running.
@@ -122,15 +113,14 @@ Run the backend and frontend servers in separate terminals from the **project ro
 
 ## Basic Testing
 
-* Send your first chat message. This will be treated as the task goal. Observe the status messages and monitor logs. The backend should call the configured AI (Gemini by default) to generate a plan, which will then be displayed in the chat.
-* (Requires Browser Console) Test command execution:
-    1.  Check connection: `socket.readyState` (should be `1`).
-    2.  Send command: `socket.send(JSON.stringify({ type: "run_command", command: "ls -la" }));`
-    3.  Observe output streamed to the Monitor panel.
+* Send a chat message with a task (e.g., "What is the capital of France?", "List files in the current directory.").
+* Observe the Monitor panel in the UI for detailed steps: Agent thoughts, tool calls (e.g., ShellTool input), tool outputs (observations).
+* Observe the Chat panel for status updates and the final answer from the agent.
 
 ## Future Development
 
-* Implement plan execution logic (iterate through steps generated by AI).
-* Add more execution capabilities (web browsing via Playwright, file I/O).
-* Improve state management and error handling.
-* Refine AI interaction and prompt engineering.
+* Add more tools (web search, Python REPL, file I/O, custom bioinformatics tools).
+* Implement more sophisticated agent types or prompt engineering.
+* Add memory to the agent.
+* Improve error handling and robustness.
+* Enhance UI feedback based on agent state.
