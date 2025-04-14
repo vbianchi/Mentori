@@ -2,64 +2,67 @@
 import logging
 from langchain import hub # To pull standard prompts
 from langchain.agents import AgentExecutor, create_react_agent
+# *** CORRECTED IMPORT for BaseMemory ***
+from langchain_core.memory import BaseMemory # Import from langchain_core
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.tools import BaseTool
 from typing import List
 
 logger = logging.getLogger(__name__)
 
-def create_agent_executor(llm: BaseChatModel, tools: List[BaseTool]) -> AgentExecutor:
-    """Creates and returns a LangChain AgentExecutor."""
-    logger.info("Creating LangChain agent executor...")
+# Modified to accept a memory object
+def create_agent_executor(llm: BaseChatModel, tools: List[BaseTool], memory: BaseMemory) -> AgentExecutor:
+    """Creates and returns a LangChain AgentExecutor with memory."""
+    logger.info("Creating LangChain agent executor with memory...")
 
-    # Get the ReAct prompt template
-    # Ensure you have internet access when the server starts, or pull it manually beforehand
-    # You can explore other prompts on Langchain Hub: https://smith.langchain.com/hub
+    # Get the ReAct Chat prompt template - requires 'chat_history' input variable
     try:
-        # prompt = hub.pull("hwchase17/react") # A common ReAct prompt
-        prompt = hub.pull("hwchase17/react-chat") # A chat-optimized ReAct prompt
+        prompt = hub.pull("hwchase17/react-chat")
     except Exception as e:
-        logger.error(f"Failed to pull prompt from Langchain Hub: {e}. Using a basic fallback.", exc_info=True)
-        # Define a very basic fallback prompt if hub fails
+        logger.error(f"Failed to pull prompt 'hwchase17/react-chat' from Langchain Hub: {e}. Using a basic fallback.", exc_info=True)
+        # Define a fallback prompt that includes chat_history
         from langchain_core.prompts import PromptTemplate
-        template = """Answer the following questions as best you can. You have access to the following tools:
+        template = """Assistant is a large language model trained by Google.
+
+Assistant is designed to be able to assist with a wide range of tasks, from answering simple questions to providing in-depth explanations and discussions on a wide range of topics. As a language model, Assistant is able to communicate and generate human-like text in response to a wide range of prompts and questions.
+
+Assistant has access to the following tools:
 
 {tools}
 
 Use the following format:
 
-Question: the input question you must answer
-Thought: you should always think about what to do
+Thought: Do I need to use a tool? Yes
 Action: the action to take, should be one of [{tool_names}]
 Action Input: the input to the action
 Observation: the result of the action
-... (this Thought/Action/Action Input/Observation can repeat N times)
-Thought: I now know the final answer
-Final Answer: the final answer to the original input question
+Thought: Do I need to use a tool? No
+Final Answer: [your response here]
 
 Begin!
 
-Question: {input}
-Thought:{agent_scratchpad}"""
+Previous conversation history:
+{chat_history}
+
+New input: {input}
+{agent_scratchpad}"""
         prompt = PromptTemplate.from_template(template)
 
 
     # Create the ReAct agent
-    # This agent uses the ReAct framework (Reasoning + Acting)
     agent = create_react_agent(llm, tools, prompt)
-    logger.info("ReAct agent created.")
+    logger.info("ReAct chat agent created.")
 
-    # Create the Agent Executor
-    # verbose=True prints detailed agent steps to the console (good for debugging)
-    # handle_parsing_errors=True helps prevent crashes if the LLM output isn't formatted perfectly
+    # Create the Agent Executor, passing the memory object
     agent_executor = AgentExecutor(
         agent=agent,
         tools=tools,
+        memory=memory, # Pass the memory object here
         verbose=True,
-        handle_parsing_errors=True,
-        max_iterations=10 # Limit the number of steps to prevent infinite loops
+        handle_parsing_errors="Check your output and make sure it conforms!",
+        max_iterations=10
     )
-    logger.info("Agent Executor created.")
+    logger.info("Agent Executor with memory created.")
 
     return agent_executor
 
