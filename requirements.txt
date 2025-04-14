@@ -1,0 +1,2 @@
+# manus-ai-ui-clone/requirements.txt
+websockets>=11.0 # Or specify a version you prefer, >=11 is generally good.
