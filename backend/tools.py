@@ -126,7 +126,7 @@ async def fetch_and_parse_url(url: str) -> str:
         return f"Error: Failed to process the content of the URL. Error: {e}"
 
 
-# *** Custom function for writing files using simple string input ***
+# *** Updated custom function for writing files ***
 async def write_to_file_in_workspace(input_str: str) -> str:
     """
     Writes text content to a specified file within the workspace.
@@ -156,6 +156,7 @@ async def write_to_file_in_workspace(input_str: str) -> str:
 
         # Decode escaped sequences like \\n into actual newlines \n
         try:
+            # Decode potential escape sequences like \\n, \\t etc.
             text_content = codecs.decode(raw_text_content, 'unicode_escape')
             logger.info("Decoded escaped sequences in text content.")
         except Exception as decode_err:
@@ -174,6 +175,7 @@ async def write_to_file_in_workspace(input_str: str) -> str:
              return f"Error: Invalid file path '{relative_path_str}'. Must be relative within workspace."
 
         full_path = WORKSPACE_ROOT.joinpath(relative_path).resolve()
+        # Double-check it's still within the workspace after resolving symlinks etc.
         if WORKSPACE_ROOT not in full_path.parents and full_path != WORKSPACE_ROOT:
              logger.error(f"Security Error: Attempted write outside workspace! Resolved path: {full_path}")
              return "Error: File path resolves outside the designated workspace."
@@ -191,7 +193,7 @@ async def write_to_file_in_workspace(input_str: str) -> str:
         return f"Error: Failed to write file '{relative_path_str}'. Reason: {type(e).__name__}"
 
 
-# *** NEW: Custom Shell Tool operating in Workspace ***
+# *** Custom Shell Tool operating in Workspace (Handles specific shell error) ***
 class WorkspaceShellTool(BaseTool):
     name: str = "workspace_shell"
     description: str = (
@@ -204,28 +206,25 @@ class WorkspaceShellTool(BaseTool):
     # Optional: Define args_schema if needed for more complex inputs using Pydantic
 
     def _run(self, command: str) -> str:
-        """Synchronous execution wrapper (less ideal for async backend)."""
-        # This sync wrapper is needed if the agent framework expects _run
-        # but it blocks the main asyncio loop. _arun is preferred.
-        logger.warning("Running WorkspaceShellTool synchronously using _run. Consider async.")
+        """Synchronous execution wrapper."""
+        logger.warning("Running WorkspaceShellTool synchronously using _run.")
         try:
-            # Try to get existing loop or run a new one
             loop = asyncio.get_running_loop()
-            # Schedule coroutine and wait for result (blocks here)
             result = loop.run_until_complete(self._arun_internal(command))
         except RuntimeError: # No running event loop
              result = asyncio.run(self._arun_internal(command))
         return result
 
     async def _arun(self, command: str) -> str:
-         """Asynchronous execution of the shell command within the workspace."""
-         # This is the preferred method for LangChain's async agent executor
+         """Asynchronous execution entry point."""
          return await self._arun_internal(command)
 
     async def _arun_internal(self, command: str) -> str:
         """Internal async helper for running the command in the workspace."""
         logger.info(f"WorkspaceShellTool executing command: '{command}' in CWD: {WORKSPACE_ROOT}")
         process = None # Ensure process is defined for finally block
+        stdout_str = "" # Initialize
+        stderr_str = "" # Initialize
         try:
             process = await asyncio.create_subprocess_shell(
                 command,
@@ -237,27 +236,38 @@ class WorkspaceShellTool(BaseTool):
             stdout_str = stdout.decode(errors='replace').strip()
             stderr_str = stderr.decode(errors='replace').strip()
 
-            # Combine output for the agent's observation
             result = ""
             if stdout_str:
                 result += f"STDOUT:\n{stdout_str}\n"
             if stderr_str:
-                # Log stderr but potentially don't return it fully unless needed
-                logger.warning(f"WorkspaceShellTool command '{command}' produced STDERR: {stderr_str}")
-                result += f"STDERR:\n{stderr_str}\n"
-            if process.returncode is None:
-                 # Should not happen after communicate, but as safety
-                 logger.error(f"WorkspaceShellTool command '{command}' finished without return code.")
-                 result += "ERROR: Command finished without exit code."
-                 return result[:3000] # Truncate potentially long results
+                result += f"STDERR:\n{stderr_str}\n" # Include stderr in result
 
-            if process.returncode != 0:
+            # Check for the specific harmless shell error
+            harmless_shell_error = "/bin/sh: 2: Syntax error: EOF in backquote substitution"
+            is_harmless_error = stderr_str == harmless_shell_error
+            command_failed = process.returncode != 0
+
+            # Determine overall status message and potentially modify result string
+            if command_failed and not (is_harmless_error and stdout_str):
+                 # Real failure or harmless error occurred but no stdout produced
                  result += f"ERROR: Command failed with exit code {process.returncode}"
-                 logger.warning(f"WorkspaceShellTool command '{command}' failed with exit code {process.returncode}. Result: {result}")
+                 logger.warning(f"WorkspaceShellTool command '{command}' failed. Exit: {process.returncode}. Stderr: {stderr_str}")
+            elif is_harmless_error and stdout_str:
+                 # Harmless error occurred, but we got stdout, treat as success for agent
+                 logger.warning(f"WorkspaceShellTool command '{command}' produced harmless shell error in stderr but had stdout. Treating as success.")
+                 # Remove the harmless error from the result string sent back to agent for clarity
+                 result = result.replace(f"STDERR:\n{harmless_shell_error}\n", "").strip() # Remove STDERR line entirely
+                 # Add a note about success despite shell error? Optional.
+                 # result += "\n(Note: Command executed successfully despite minor shell completion error.)"
+            elif command_failed:
+                 # Failed for other reasons (non-zero exit code but no specific stderr)
+                 result += f"ERROR: Command failed with exit code {process.returncode}"
+                 logger.warning(f"WorkspaceShellTool command '{command}' failed. Exit: {process.returncode}. Stderr: {stderr_str}")
+            # else: command succeeded with exit code 0 and no stderr (or harmless stderr handled above)
 
             logger.info(f"WorkspaceShellTool command finished. Exit code: {process.returncode}. Output length: {len(result)}")
             # Truncate potentially long results before returning to agent
-            return result[:3000] + "..." if len(result) > 3000 else result
+            return result[:3000] + "..." if len(result) > 3000 else result.strip() # Strip trailing newline
 
         except FileNotFoundError:
             cmd_part = command.split()[0] if command else "Unknown"
@@ -280,7 +290,7 @@ class WorkspaceShellTool(BaseTool):
 # --- Initialize Tools ---
 
 # 1. Custom Workspace Shell Tool
-workspace_shell_tool = WorkspaceShellTool()
+workspace_shell_tool = WorkspaceShellTool() # Use the custom tool
 
 # 2. Web Search Tool
 search_tool = DuckDuckGoSearchRun()
@@ -325,8 +335,9 @@ write_file_tool = Tool.from_function(
 
 
 # --- List of Tools for the Agent ---
+# Use the new workspace_shell_tool instead of the old shell_tool
 agent_tools = [
-    workspace_shell_tool, # Use the new workspace shell tool
+    workspace_shell_tool,
     search_tool,
     web_reader_tool,
     read_file_tool,
@@ -335,3 +346,4 @@ agent_tools = [
 
 logger.info(f"Initialized tools: {[tool.name for tool in agent_tools]}")
 logger.info(f"File tools & Shell tool restricted to workspace: {WORKSPACE_ROOT}") # Log updated info
+
