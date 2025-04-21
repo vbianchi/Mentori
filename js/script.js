@@ -1,27 +1,37 @@
 // js/script.js
 /**
  * This script handles the frontend logic for the AI Agent UI,
- * including WebSocket communication, DOM manipulation, and event handling.
+ * including WebSocket communication, DOM manipulation, event handling,
+ * and task history management using localStorage.
  */
 document.addEventListener('DOMContentLoaded', () => {
     console.log("AI Agent UI Script Loaded and DOM ready!");
 
     // --- Get references to UI elements ---
-    const taskListContainer = document.querySelector('.task-list');
-    const chatMessagesContainer = document.querySelector('.chat-messages');
-    const monitorCodeElement = document.querySelector('.monitor-content pre code');
-    const monitorContentElement = document.querySelector('.monitor-content'); // For scrolling
+    // Use IDs assigned in index.html for reliability
+    const taskListUl = document.getElementById('task-list');
+    const newTaskButton = document.getElementById('new-task-button');
+    const chatMessagesContainer = document.getElementById('chat-messages'); // Assuming ID was added
+    const monitorCodeElement = document.getElementById('monitor-log-content'); // Use ID of <code>
+    const monitorContentElement = document.querySelector('.monitor-content'); // Parent div for scrolling
     const chatTextarea = document.querySelector('.chat-input-area textarea');
     const chatSendButton = document.querySelector('.chat-input-area button');
-    const newTaskButton = document.querySelector('.new-task-btn');
     const jumpToLiveButton = document.querySelector('.jump-live-btn');
+    const currentTaskTitleElement = document.getElementById('current-task-title');
+    const monitorStatusElement = document.getElementById('monitor-status'); // Added ID
+    const monitorFooterStatusElement = document.getElementById('monitor-footer-status'); // Added ID
+
+    // --- State Variables ---
+    let tasks = []; // Array to hold task objects {id: string, title: string, timestamp: number}
+    let currentTaskId = null; // ID of the currently selected task
+    let taskCounter = 0; // Counter for default task names
+    const STORAGE_KEY = 'aiAgentTasks'; // Key for localStorage
+    const COUNTER_KEY = 'aiAgentTaskCounter'; // Key for counter
 
     // --- WebSocket Setup ---
     const wsUrl = 'ws://localhost:8765';
-    let socket; // Declare socket variable in this scope
-
-    // Assign socket to window for console access - Initialized to null
-    window.socket = null;
+    let socket; // Declare socket variable
+    window.socket = null; // Assign to window for console access, initialized to null
     console.log("Initialized window.socket to null.");
 
     /**
@@ -38,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Ensure previous socket is closed if reconnecting
             if (window.socket && window.socket.readyState !== WebSocket.CLOSED) {
                 console.log("Closing previous WebSocket connection before reconnecting.");
-                window.socket.close(1000, "Reconnecting");
+                window.socket.close(1000, "Reconnecting"); // Close normally
             }
 
             // Create new WebSocket connection
@@ -47,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("WebSocket object created. Assigning to window.socket.");
 
         } catch (error) {
+            // Handle fatal errors during WebSocket object creation
             console.error("Fatal Error creating WebSocket object:", error);
             addChatMessage("FATAL: Failed to initialize WebSocket connection.", "status");
             addMonitorLog(`[SYSTEM] FATAL Error creating WebSocket: ${error.message}`);
@@ -60,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.onopen = (event) => {
             console.log("WebSocket connection opened successfully. Ready state:", socket.readyState);
             addMonitorLog(`[SYSTEM] WebSocket connection established to ${wsUrl}. Ready to send.`);
-            addChatMessage("Connected to backend.", "status");
+            addChatMessage("Connected to backend.", "status"); // Use 'status' type
         };
 
         /**
@@ -129,6 +140,9 @@ document.addEventListener('DOMContentLoaded', () => {
             addChatMessage(`Connection to backend closed.${advice}`, "status");
             addMonitorLog(`[SYSTEM] WebSocket disconnected. ${reason}`);
             window.socket = null; // Reset global socket on close
+            // Optional: Attempt to reconnect after a delay
+            // console.log("Attempting to reconnect in 5 seconds...");
+            // setTimeout(connectWebSocket, 5000);
         };
     };
 
@@ -162,16 +176,21 @@ document.addEventListener('DOMContentLoaded', () => {
          messageElement.classList.add(`message-${type}`); // e.g., message-status, message-agent
 
          // Add connection-status class specifically for status messages about connection
-         if (type === 'status' && (text.toLowerCase().includes("connect") || text.toLowerCase().includes("clos") || text.toLowerCase().includes("error"))) {
-            messageElement.classList.add('connection-status');
+         // Also add error class for status messages containing "error"
+         if (type === 'status') {
+             if (text.toLowerCase().includes("connect") || text.toLowerCase().includes("clos")) {
+                 messageElement.classList.add('connection-status');
+             }
+             if (text.toLowerCase().includes("error")) {
+                  messageElement.classList.add('error-message'); // Add an error class for styling
+             }
          }
 
          // Apply type-specific classes and potentially structure
          switch (type) {
             case 'user':
                 messageElement.classList.add('user-message'); // For CSS styling
-                // Example inline style (better to define in CSS)
-                messageElement.style.cssText = 'align-self: flex-end; background-color: var(--accent-color); color: white; border: 1px solid var(--accent-color);';
+                messageElement.style.cssText = 'align-self: flex-end; background-color: var(--accent-color); color: white; border: 1px solid var(--accent-color);'; // Keep style for now
                 break;
             case 'status':
                 messageElement.classList.add('agent-status'); // Use the existing CSS class
@@ -192,8 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'agent':
             default:
                 messageElement.classList.add('agent-message');
-                 // Example inline style (better to define in CSS)
-                 messageElement.style.border = '1px solid var(--border-color)';
+                 messageElement.style.border = '1px solid var(--border-color)'; // Keep style for now
                 break;
         }
 
@@ -219,46 +237,231 @@ document.addEventListener('DOMContentLoaded', () => {
         scrollToBottom(monitorContentElement); // Scroll down after adding
      };
 
+    // --- Task History Functions ---
 
-    // --- Event Listeners ---
+    /**
+     * Loads tasks and counter from localStorage.
+     */
+    const loadTasks = () => {
+        // Load counter
+        const storedCounter = localStorage.getItem(COUNTER_KEY);
+        taskCounter = storedCounter ? parseInt(storedCounter, 10) : 0;
+        if (isNaN(taskCounter)) taskCounter = 0; // Reset if invalid
 
-    // Task Selection in Left Panel
-     if (taskListContainer) {
-         taskListContainer.addEventListener('click', (event) => {
-            // Handle clicks only on actual task items
-            if (event.target.matches('.task-item')) {
-                 // Remove active class from previous item
-                 const currentActive = taskListContainer.querySelector('.task-item.active');
-                 if (currentActive) { currentActive.classList.remove('active'); }
-                 // Add active class to clicked item
-                const clickedItem = event.target;
-                clickedItem.classList.add('active');
-                const taskText = clickedItem.textContent.trim();
-                console.log(`Task selected: ${taskText}`);
+        // Load tasks
+        const storedTasks = localStorage.getItem(STORAGE_KEY);
+        if (storedTasks) {
+            try {
+                tasks = JSON.parse(storedTasks);
+                if (!Array.isArray(tasks)) { tasks = []; } // Ensure it's an array
+                // Sort tasks by timestamp descending (newest first)
+                tasks.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                console.log(`Loaded ${tasks.length} tasks. Next Task #: ${taskCounter + 1}`);
+            } catch (e) { console.error("Failed to parse tasks:", e); tasks = []; localStorage.removeItem(STORAGE_KEY); }
+        } else { tasks = []; console.log("No tasks found."); }
 
-                 // Clear main panels for context switch
-                 chatMessagesContainer.innerHTML = '';
-                 monitorCodeElement.textContent = ''; // Clear monitor text
-                 addChatMessage(`Switched to task: ${taskText}`, 'status');
+        // Load last active task ID, validate it exists
+        const lastActiveId = localStorage.getItem(`${STORAGE_KEY}_active`);
+        if (lastActiveId && tasks.some(task => task.id === lastActiveId)) {
+             currentTaskId = lastActiveId;
+        } else if (tasks.length > 0) {
+             currentTaskId = tasks[0].id; // Default to newest task if last active is invalid or null
+        } else {
+             currentTaskId = null; // No tasks, no active task
+        }
+        console.log("Initial currentTaskId:", currentTaskId);
+    };
 
-                 // Notify backend of context switch
-                 if (socket && socket.readyState === WebSocket.OPEN) {
-                     try {
-                        socket.send(JSON.stringify({ type: "context_switch", task: taskText }));
-                     } catch (error) {
-                         console.error("Failed to send context_switch message:", error);
-                         addMonitorLog("[SYSTEM] Error sending context switch to backend.");
-                     }
-                 } else {
-                    addMonitorLog("[SYSTEM] Cannot notify backend of context switch: WebSocket not connected.");
-                 }
+    /**
+     * Saves tasks and counter to localStorage.
+     */
+    const saveTasks = () => {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+            localStorage.setItem(COUNTER_KEY, taskCounter.toString()); // Save counter
+            if (currentTaskId) { localStorage.setItem(`${STORAGE_KEY}_active`, currentTaskId); }
+            else { localStorage.removeItem(`${STORAGE_KEY}_active`); }
+             // console.log(`Saved ${tasks.length} tasks. Active: ${currentTaskId}`); // Optional verbose log
+        } catch (e) { console.error("Failed to save tasks:", e); alert("Error saving tasks."); }
+    };
+
+    /**
+     * Renders the list of tasks in the left panel UI.
+     */
+    const renderTaskList = () => {
+        // *** ADDED LOGGING ***
+        console.log(`--- Rendering Task List ---`);
+        console.log(`Current tasks array (${tasks.length} items):`, JSON.stringify(tasks));
+        console.log(`Current selected task ID: ${currentTaskId}`);
+
+        if (!taskListUl) { console.error("Task list UL element not found! Cannot render."); return; }
+
+        taskListUl.innerHTML = ''; // Clear existing list items
+        if (tasks.length === 0) {
+            console.log("No tasks to render, showing placeholder.");
+            taskListUl.innerHTML = '<li class="task-item-placeholder">No tasks yet. Click "+ New Task".</li>';
+        } else {
+            console.log("Rendering task items...");
+            tasks.forEach((task, index) => {
+                // *** ADDED LOGGING ***
+                console.log(`Rendering task ${index + 1}: ID=${task.id}, Title=${task.title}`);
+                const li = document.createElement('li');
+                li.className = 'task-item';
+                // Truncate long titles for display
+                const displayTitle = task.title.length > 35 ? task.title.substring(0, 32) + '...' : task.title;
+                li.textContent = displayTitle; // Display task title
+                li.title = task.title; // Show full title on hover
+                li.dataset.taskId = task.id; // Store task ID in data attribute
+
+                if (task.id === currentTaskId) {
+                    console.log(`Marking task ${task.id} as active.`);
+                    li.classList.add('active'); // Highlight the active task
+                }
+                taskListUl.appendChild(li);
+            });
+            console.log("Finished appending task items.");
+        }
+        // Update the main title header based on the selected task
+        updateCurrentTaskTitle();
+        console.log(`--- Finished Rendering Task List ---`); // Log exit
+    };
+
+    /**
+     * Updates the title in the center panel header based on currentTaskId.
+     */
+    const updateCurrentTaskTitle = () => {
+         if (!currentTaskTitleElement) { console.error("Task title element not found!"); return; }
+         const currentTask = tasks.find(task => task.id === currentTaskId);
+         const title = currentTask ? currentTask.title : "No Task Selected";
+         console.log(`Updating center panel title to: ${title}`);
+         currentTaskTitleElement.textContent = title;
+         // Also update monitor status examples
+         if(monitorStatusElement) monitorStatusElement.textContent = currentTask ? "Agent Idle" : "No Task";
+         if(monitorFooterStatusElement) monitorFooterStatusElement.textContent = currentTask ? `Task: ${title}` : "No Task Selected";
+    };
+
+    /**
+     * Clears the main chat and monitor areas, adding a system message.
+     */
+    const clearChatAndMonitor = () => {
+         if (chatMessagesContainer) chatMessagesContainer.innerHTML = '';
+         if (monitorCodeElement) monitorCodeElement.textContent = ''; // Clear monitor text
+         addMonitorLog("[SYSTEM] Cleared context for selected task."); // Log clearing reason
+         console.log("Cleared chat and monitor.");
+    };
+
+    /**
+     * Selects a task, updates UI, saves state, and notifies backend.
+     * @param {string | null} taskId The ID of the task to select, or null to deselect.
+     */
+    const selectTask = (taskId) => {
+        console.log(`Attempting to select task ID: ${taskId}`); // Log entry
+        // Avoid redundant actions if already selected
+        if (currentTaskId === taskId && taskId !== null) {
+             console.log(`Task ${taskId} already selected.`);
+             return;
+        }
+
+        const task = tasks.find(t => t.id === taskId);
+        if (!task && taskId !== null) {
+            // If task ID is invalid, deselect
+            console.error(`Task with ID ${taskId} not found in tasks array:`, JSON.stringify(tasks));
+            currentTaskId = null;
+        } else {
+             currentTaskId = taskId; // Set the new task ID (can be null)
+        }
+
+        console.log(`Selecting task ID: ${currentTaskId}`); // Log selection confirmed
+        saveTasks(); // Save state (including active ID)
+
+        // *** ADDED LOGGING AROUND renderTaskList CALL ***
+        console.log(">>> Calling renderTaskList...");
+        try {
+            renderTaskList(); // Update UI list and title
+            console.log("<<< Finished renderTaskList call.");
+        } catch (renderError) {
+             console.error("!!! ERROR during renderTaskList call:", renderError);
+        }
+
+        console.log(">>> Calling clearChatAndMonitor..."); // Also added log around this
+        clearChatAndMonitor(); // Clear main panels
+        console.log("<<< Finished clearChatAndMonitor call.");
+
+
+        // Notify backend
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            const messageType = task ? "context_switch" : "new_task"; // Determine message type
+            const payload = task ? { type: messageType, task: task.title, taskId: task.id } : { type: "new_task" }; // Construct payload
+            try {
+                console.log(`Attempting to send ${messageType} message to backend...`);
+                socket.send(JSON.stringify(payload));
+                console.log(`Sent ${messageType} message to backend.`);
+                // Add status message to chat AFTER clearing
+                addChatMessage(task ? `Switched to task: ${task.title}` : "New task context ready.", "status");
+            } catch (error) {
+                 console.error(`Failed to send ${messageType} message:`, error);
+                 addMonitorLog(`[SYSTEM] Error sending ${messageType} notification.`);
             }
-        });
-     }
+        } else {
+            addMonitorLog(`[SYSTEM] Cannot notify backend of ${task ? 'context switch' : 'new task'}: WebSocket not connected.`);
+        }
+        console.log(`Finished selecting task ID: ${currentTaskId}`); // Log exit
+    };
 
-     // Chat Input Area Logic
+    /**
+     * Handles clicks on the "+ New Task" button - USES DEFAULT NAMING.
+     */
+    const handleNewTaskClick = () => {
+        console.log("'+ New Task' button clicked."); // Log entry
+        taskCounter++; // Increment counter
+        const taskTitle = `Task - ${taskCounter}`; // Generate default title
+        console.log(`Creating new task with default title: ${taskTitle}`); // Log title
+
+        const newTask = {
+            // Generate a simple unique ID
+            id: `task-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+            title: taskTitle, // Use generated title
+            timestamp: Date.now() // Store creation time
+        };
+        console.log("New task object created:", newTask);
+        tasks.unshift(newTask); // Add to beginning of the array
+        console.log("Task added to array, tasks:", JSON.stringify(tasks));
+        selectTask(newTask.id); // Select the new task
+        console.log("handleNewTaskClick finished."); // Log exit
+    };
+
+    /**
+     * Handles clicks within the task list area (uses event delegation).
+     */
+    const handleTaskItemClick = (event) => {
+        const clickedLi = event.target.closest('.task-item'); // Find the clicked LI element
+        if (clickedLi && clickedLi.dataset.taskId) {
+            console.log(`Task item clicked: ${clickedLi.dataset.taskId}`);
+            selectTask(clickedLi.dataset.taskId);
+        }
+    };
+
+
+    // --- Event Listeners Setup ---
+
+    // New Task Button Click
+    if (newTaskButton) {
+        newTaskButton.addEventListener('click', handleNewTaskClick);
+    } else { console.error("New task button element not found!"); }
+
+    // Task List Clicks (Event Delegation)
+    if (taskListUl) {
+        taskListUl.addEventListener('click', handleTaskItemClick);
+    } else { console.error("Task list UL element not found!"); }
+
+    // Chat Input Sending Logic
     const handleSendMessage = () => {
         const messageText = chatTextarea.value.trim();
+        // ** Ensure a task is selected before sending **
+        if (!currentTaskId){
+             alert("Please select or create a task before sending a message.");
+             return;
+        }
         if (messageText) {
             addChatMessage(messageText, 'user'); // Display user message immediately
 
@@ -292,80 +495,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         chatTextarea.focus(); // Keep focus on input
     };
+    // Attach listeners for chat input
+    if (chatSendButton) { chatSendButton.addEventListener('click', handleSendMessage); }
+    if (chatTextarea) {
+        chatTextarea.addEventListener('keydown', (event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); handleSendMessage(); } });
+        chatTextarea.addEventListener('input', () => { chatTextarea.style.height = 'auto'; chatTextarea.style.height = chatTextarea.scrollHeight + 'px'; });
+    }
 
-     // Attach listeners for chat input
-     if (chatSendButton) { chatSendButton.addEventListener('click', handleSendMessage); }
-     if (chatTextarea) {
-        // Send on Enter (but not Shift+Enter)
-        chatTextarea.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault(); // Prevent newline
-                handleSendMessage();
-            }
-        });
-        // Auto-resize textarea on input
-        chatTextarea.addEventListener('input', () => {
-            chatTextarea.style.height = 'auto'; // Temporarily shrink
-            chatTextarea.style.height = chatTextarea.scrollHeight + 'px'; // Grow to content
-        });
-     }
-
-      // New Task Button
-      if (newTaskButton) {
-         newTaskButton.addEventListener('click', () => {
-             console.log("'+ New Task' button clicked.");
-             // Clear UI elements
-             chatMessagesContainer.innerHTML = '';
-             monitorCodeElement.textContent = '';
-             addChatMessage("New task started. Please provide the goal.", "status");
-             // Notify backend
-             if (socket && socket.readyState === WebSocket.OPEN) {
-                 try {
-                    socket.send(JSON.stringify({ type: "new_task" }));
-                 } catch (error) {
-                     console.error("Failed to send new_task message:", error);
-                     addMonitorLog("[SYSTEM] Error sending new task notification.");
-                 }
-             } else {
-                 addMonitorLog("[SYSTEM] Cannot notify backend of new task: WebSocket not connected.");
-             }
-         });
-      }
-
-      // Action Button Clicks (using event delegation on body)
-      document.body.addEventListener('click', event => {
-        // Check if the clicked element has the 'action-btn' class
+    // Action Button Clicks (Event Delegation on body)
+     document.body.addEventListener('click', event => {
         if (event.target.classList.contains('action-btn')) {
              const commandText = event.target.textContent.trim();
              console.log(`Action button clicked: ${commandText}`);
              addMonitorLog(`User clicked action: ${commandText}`);
              // Send action command to backend
              if (socket && socket.readyState === WebSocket.OPEN) {
-                 try {
-                    socket.send(JSON.stringify({ type: "action_command", command: commandText }));
-                 } catch (error) {
-                     console.error("Failed to send action_command message:", error);
-                     addMonitorLog(`[SYSTEM] Error sending action '${commandText}'.`);
-                 }
-             } else {
-                 addMonitorLog(`[SYSTEM] Cannot send action '${commandText}': WebSocket not connected.`);
-             }
+                 try { socket.send(JSON.stringify({ type: "action_command", command: commandText })); }
+                 catch (error) { console.error("Failed to send action_command:", error); addMonitorLog(`[SYSTEM] Error sending action.`); }
+             } else { addMonitorLog(`[SYSTEM] Cannot send action: WS not connected.`); }
          }
-      });
+    });
 
-      // Jump to Live Button (Scroll Monitor)
-      if (jumpToLiveButton) {
+    // Jump to Live Button
+     if (jumpToLiveButton) {
          jumpToLiveButton.addEventListener('click', () => {
             console.log("'> Jump to live' button clicked.");
-            if(monitorContentElement){
-                // Force scroll to bottom
-                monitorContentElement.scrollTop = monitorContentElement.scrollHeight;
-            }
+            if(monitorContentElement){ monitorContentElement.scrollTop = monitorContentElement.scrollHeight; }
         });
-      }
+     }
 
 
-    // --- Initialize WebSocket Connection ---
-    connectWebSocket();
+    // --- Initial Load Actions ---
+    loadTasks(); // Load tasks & counter from localStorage
+    renderTaskList(); // Render the initial list
+    connectWebSocket(); // Establish WebSocket connection
+
+    // // Optionally send context switch for the initially loaded task on connect
+    // // Requires moving this logic inside socket.onopen
+    // if (currentTaskId) {
+    //     const currentTask = tasks.find(task => task.id === currentTaskId);
+    //     // TODO: Send initial context if needed, maybe via onopen
+    // }
 
 }); // End of DOMContentLoaded listener
+

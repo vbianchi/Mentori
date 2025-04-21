@@ -4,56 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Agent Interface</title>
+    <!-- Link to the CSS file -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <!-- Main application container using Flexbox -->
     <div class="app-container">
 
+        <!-- Left Panel: Task History -->
         <nav class="panel left-panel">
             <div class="panel-header">
-                <button class="new-task-btn">+ New Task</button>
-                </div>
-            <ul class="task-list scrollable-content">
-                <li class="task-item active">Comprehensive Dataset on Cattle and...</li>
-                <li class="task-item">Cattle and Dairy Farming Data Analysis i...</li>
-                <li class="task-item">AI Pipeline for Creating YouTube Shorts</li>
-                <li class="task-item">Become Richer with Passive Income fro...</li>
-                <li class="task-item">Global Cattle and Dairy Farming Data C...</li>
-                <li class="task-item">Avian Flu Spread Estimation in Netherla...</li>
-                <li class="task-item">Creating an AI Agent Using Open Sourc...</li>
-                <li class="task-item">Install AI Scientist with Ollama API for B...</li>
+                <!-- *** ADDED ID to button *** -->
+                <button class="new-task-btn" id="new-task-button">+ New Task</button>
+            </div>
+            <!-- Scrollable list for tasks -->
+            <!-- *** ADDED ID to list *** -->
+            <ul class="task-list scrollable-content" id="task-list">
+                <!-- Task items will be populated dynamically by JavaScript -->
+                <!-- Removed static placeholder task items -->
             </ul>
             <div class="panel-footer">
                 User Profile | Settings
             </div>
         </nav>
 
+        <!-- Center Panel: Chat Interaction -->
         <main class="panel center-panel">
             <div class="panel-header chat-header">
-                <h3>Cattle and Dairy Farming Data Analysis in Netherlands</h3>
+                 <!-- *** ADDED ID to task title header *** -->
+                <h3 id="current-task-title">Select or Create a Task</h3>
                 <span>Share | Options</span>
             </div>
-            <div class="chat-messages scrollable-content">
-                </div>
+            <!-- Scrollable container for chat messages -->
+            <div class="chat-messages scrollable-content" id="chat-messages">
+                <!-- Messages will be added here dynamically by JavaScript -->
+            </div>
+            <!-- Chat input area at the bottom -->
             <div class="chat-input-area">
                 <textarea placeholder="Type your message here..."></textarea>
                 <button>Send</button>
             </div>
         </main>
 
+        <!-- Right Panel: Agent Workspace (Monitor) -->
         <aside class="panel right-panel">
             <div class="panel-header monitor-header">
                 <h3>Agent Workspace</h3>
-                <span>Agent Idle</span>
+                 <!-- *** ADDED ID to monitor status *** -->
+                 <span id="monitor-status">Agent Idle</span>
             </div>
+            <!-- Scrollable container for monitor logs -->
             <div class="monitor-content scrollable-content">
-                <pre><code></code></pre> </div>
+                <!-- Monitor logs added dynamically -->
+                <pre><code id="monitor-log-content"></code></pre> <!-- Added ID to code block -->
+            </div>
             <div class="monitor-footer">
-                 <span>Current Status: Idle</span>
+                 <!-- *** ADDED ID to monitor footer status *** -->
+                 <span id="monitor-footer-status">Current Status: Idle</span>
                  <button class="jump-live-btn">> Jump to live</button>
             </div>
         </aside>
 
-    </div><script src="js/script.js"></script>
+    </div><!-- End of app-container -->
+
+    <!-- Link to the JavaScript file -->
+    <script src="js/script.js"></script>
 </body>
 </html>

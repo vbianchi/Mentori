@@ -21,4 +21,6 @@ beautifulsoup4>=4.12
 lxml>=5.0
 aiofiles>=23.0
 matplotlib>=3.0
-pandas>=1.0 # Added missing dependency for data handling
+
+# --- Database ---
+aiosqlite>=0.19 # Added for async SQLite operations
