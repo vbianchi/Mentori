@@ -8,12 +8,12 @@
 </head>
 <body>
     <div class="app-container">
+
         <nav class="panel left-panel">
             <div class="panel-header">
                 <button class="new-task-btn">+ New Task</button>
                 </div>
             <ul class="task-list scrollable-content">
-                {/* Keep task items as they are for now, or they could also be dynamic later */}
                 <li class="task-item active">Comprehensive Dataset on Cattle and...</li>
                 <li class="task-item">Cattle and Dairy Farming Data Analysis i...</li>
                 <li class="task-item">AI Pipeline for Creating YouTube Shorts</li>
@@ -33,10 +33,8 @@
                 <h3>Cattle and Dairy Farming Data Analysis in Netherlands</h3>
                 <span>Share | Options</span>
             </div>
-            {/* Chat messages container is now initially empty */}
             <div class="chat-messages scrollable-content">
-                {/* Messages will be added here dynamically by JavaScript */}
-            </div>
+                </div>
             <div class="chat-input-area">
                 <textarea placeholder="Type your message here..."></textarea>
                 <button>Send</button>
@@ -45,21 +43,17 @@
 
         <aside class="panel right-panel">
             <div class="panel-header monitor-header">
-                <h3>Manus's Computer</h3>
-                 <span>Executing command...</span>
+                <h3>Agent Workspace</h3>
+                <span>Agent Idle</span>
             </div>
-            {/* Monitor content container */}
             <div class="monitor-content scrollable-content">
-                {/* Monitor logs will be added here dynamically */}
-                <pre><code></code></pre> {/* Code block is initially empty */}
-            </div>
+                <pre><code></code></pre> </div>
             <div class="monitor-footer">
-                 <span>Try alternative approaches for North Holland data collection</span>
+                 <span>Current Status: Idle</span>
                  <button class="jump-live-btn">> Jump to live</button>
             </div>
         </aside>
-    </div>
 
-    <script src="js/script.js"></script>
+    </div><script src="js/script.js"></script>
 </body>
 </html>

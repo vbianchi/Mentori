@@ -8,8 +8,10 @@ __pycache__/
 # Environment variables file
 .env
 
+# Agent workspace directory
+workspace/
+
 # IDE/OS specific files (examples)
 .vscode/
 .idea/
 *.DS_Store
-

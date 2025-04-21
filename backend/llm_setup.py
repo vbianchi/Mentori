@@ -1,13 +1,15 @@
 # backend/llm_setup.py
 import logging
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_community.llms import Ollama
-from langchain_core.language_models.chat_models import BaseChatModel # For type hinting
+# *** CORRECTED IMPORT and CLASS NAME: Use OllamaLLM ***
+from langchain_ollama import OllamaLLM
+# from langchain_community.llms import Ollama # Old import removed
+from langchain_core.language_models.base import BaseLanguageModel
 from backend.config import Settings
 
 logger = logging.getLogger(__name__)
 
-def get_llm(settings: Settings) -> BaseChatModel:
+def get_llm(settings: Settings) -> BaseLanguageModel: # Use BaseLanguageModel for broader compatibility
     """Initializes and returns the appropriate LangChain LLM wrapper."""
     provider = settings.ai_provider
     logger.info(f"Initializing LangChain LLM for provider: {provider}")
@@ -20,10 +22,8 @@ def get_llm(settings: Settings) -> BaseChatModel:
             llm = ChatGoogleGenerativeAI(
                 model=settings.gemini_model_name,
                 google_api_key=settings.google_api_key,
-                # Adjust temperature, top_p etc. as needed
                 temperature=0.7,
-                # Consider safety settings if default is too restrictive
-                # convert_system_message_to_human=True # Sometimes needed depending on model/task
+                # convert_system_message_to_human=True # Might be needed for some prompts/models
             )
             logger.info(f"Initialized ChatGoogleGenerativeAI with model: {settings.gemini_model_name}")
             return llm
@@ -33,20 +33,16 @@ def get_llm(settings: Settings) -> BaseChatModel:
 
     elif provider == "ollama":
         try:
-            llm = Ollama(
+            # *** Use the corrected class name OllamaLLM ***
+            llm = OllamaLLM(
                 base_url=settings.ollama_base_url,
                 model=settings.ollama_model_name,
-                # Adjust temperature, top_k, etc. as needed
                 temperature=0.5,
+                # Add other parameters like num_ctx, top_k, top_p if needed
+                # num_ctx=4096 # Example context window
             )
-            # Optional: Add a quick check to see if Ollama is reachable
-            # try:
-            #     llm.invoke("Hi") # Simple test invocation
-            # except Exception as ollama_e:
-            #      logger.error(f"Failed to connect/invoke Ollama at {settings.ollama_base_url} with model {settings.ollama_model_name}: {ollama_e}")
-            #      raise ConnectionError(f"Failed to connect to Ollama: {ollama_e}") from ollama_e
-
-            logger.info(f"Initialized Ollama LLM: Model='{settings.ollama_model_name}', URL='{settings.ollama_base_url}'")
+            logger.info(f"Initialized OllamaLLM: Model='{settings.ollama_model_name}', URL='{settings.ollama_base_url}'")
+            # Optional: Add a quick check here if needed, but the agent call will test it
             return llm
         except Exception as e:
             logger.error(f"Failed to initialize Ollama LLM: {e}", exc_info=True)

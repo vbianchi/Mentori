@@ -13,7 +13,12 @@ langchain-google-genai>=1.0
 langchain-community>=0.0.20
 langchainhub>=0.1.15
 langchain-experimental>=0.0.50 # Added dependency for ShellTool
+langchain-ollama>=0.1.0 # Added new Ollama package
 
 # Optional: Add other dependencies needed for specific tools later
 # e.g., beautifulsoup4, duckduckgo-search, wikipedia, etc.
 
+# --- Tool Dependencies ---
+duckduckgo-search>=5.0
+beautifulsoup4>=4.12
+lxml>=5.0
