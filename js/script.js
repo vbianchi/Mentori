@@ -67,19 +67,22 @@ document.addEventListener('DOMContentLoaded', () => {
          * Handles incoming messages from the WebSocket server.
          */
         socket.onmessage = (event) => {
-            // console.log("WebSocket message received:", event.data); // Can be noisy, uncomment for deep debugging
+            // console.log("WebSocket message received:", event.data); // Uncomment for deep debugging
             try {
                 const message = JSON.parse(event.data);
                 // Process message based on its type
                 switch (message.type) {
                     case 'agent_message':
+                        // *** Log receipt of agent_message ***
+                        console.log("Received agent_message:", message.content);
                         addChatMessage(message.content, 'agent');
                         break;
                     case 'status_message':
+                        // console.log("Received status_message:", message.content); // Optional log
                         addChatMessage(message.content, 'status');
                         break;
                     case 'monitor_log':
-                        // *** CONSOLE LOG TO CONFIRM RECEIPT ***
+                        // Log receipt of monitor_log
                         console.log("Received monitor_log:", message.content);
                         addMonitorLog(message.content); // Call the function to display it
                         break;
@@ -126,9 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
             addChatMessage(`Connection to backend closed.${advice}`, "status");
             addMonitorLog(`[SYSTEM] WebSocket disconnected. ${reason}`);
             window.socket = null; // Reset global socket on close
-            // Optional: Attempt to reconnect after a delay
-            // console.log("Attempting to reconnect in 5 seconds...");
-            // setTimeout(connectWebSocket, 5000);
         };
     };
 
@@ -140,7 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     const scrollToBottom = (element) => {
         if (!element) return;
-        const isScrolledToBottom = element.scrollHeight - element.clientHeight <= element.scrollTop + 50; // 50px tolerance
+        // Only scroll if user is within 50px of the bottom
+        const isScrolledToBottom = element.scrollHeight - element.clientHeight <= element.scrollTop + 50;
         if (isScrolledToBottom) {
             element.scrollTop = element.scrollHeight;
         }
@@ -207,13 +208,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * Adds a log entry to the monitor panel display.
-     * @param {string} text The log text content (backend should include timestamp/prefix).
+     * @param {string} text The log text content (backend includes timestamp/prefix).
      */
     const addMonitorLog = (text) => {
         if (!monitorCodeElement) { console.error("Monitor code element not found!"); return; }
         // Backend now sends timestamped logs, just display the text received
         // Using textNode is safer than manipulating textContent directly for large logs
-        const logLine = document.createTextNode(`${text}\n`);
+        const logLine = document.createTextNode(`${text}\n`); // Add newline for display
         monitorCodeElement.appendChild(logLine);
         scrollToBottom(monitorContentElement); // Scroll down after adding
      };
