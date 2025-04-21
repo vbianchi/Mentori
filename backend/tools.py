@@ -209,7 +209,9 @@ class WorkspaceShellTool(BaseTool):
         """Synchronous execution wrapper."""
         logger.warning("Running WorkspaceShellTool synchronously using _run.")
         try:
+            # Try to get existing loop or run a new one
             loop = asyncio.get_running_loop()
+            # Schedule coroutine and wait for result (blocks here)
             result = loop.run_until_complete(self._arun_internal(command))
         except RuntimeError: # No running event loop
              result = asyncio.run(self._arun_internal(command))
@@ -235,37 +237,41 @@ class WorkspaceShellTool(BaseTool):
             stdout, stderr = await process.communicate() # Wait for process and get all output
             stdout_str = stdout.decode(errors='replace').strip()
             stderr_str = stderr.decode(errors='replace').strip()
+            return_code = process.returncode # Get exit code BEFORE potentially modifying result
 
             result = ""
             if stdout_str:
                 result += f"STDOUT:\n{stdout_str}\n"
-            if stderr_str:
-                result += f"STDERR:\n{stderr_str}\n" # Include stderr in result
 
-            # Check for the specific harmless shell error
+            # *** Handle specific harmless shell error ***
             harmless_shell_error = "/bin/sh: 2: Syntax error: EOF in backquote substitution"
-            is_harmless_error = stderr_str == harmless_shell_error
-            command_failed = process.returncode != 0
+            # Check if stderr ONLY contains the harmless error (or is empty)
+            is_harmless_error_only = stderr_str == harmless_shell_error or not stderr_str
+            command_failed_exit_code = return_code != 0
 
             # Determine overall status message and potentially modify result string
-            if command_failed and not (is_harmless_error and stdout_str):
+            if command_failed_exit_code and not (is_harmless_error_only and stdout_str):
                  # Real failure or harmless error occurred but no stdout produced
+                 if stderr_str: result += f"STDERR:\n{stderr_str}\n" # Include actual stderr
                  result += f"ERROR: Command failed with exit code {process.returncode}"
                  logger.warning(f"WorkspaceShellTool command '{command}' failed. Exit: {process.returncode}. Stderr: {stderr_str}")
-            elif is_harmless_error and stdout_str:
-                 # Harmless error occurred, but we got stdout, treat as success for agent
-                 logger.warning(f"WorkspaceShellTool command '{command}' produced harmless shell error in stderr but had stdout. Treating as success.")
-                 # Remove the harmless error from the result string sent back to agent for clarity
-                 result = result.replace(f"STDERR:\n{harmless_shell_error}\n", "").strip() # Remove STDERR line entirely
-                 # Add a note about success despite shell error? Optional.
-                 # result += "\n(Note: Command executed successfully despite minor shell completion error.)"
-            elif command_failed:
-                 # Failed for other reasons (non-zero exit code but no specific stderr)
-                 result += f"ERROR: Command failed with exit code {process.returncode}"
-                 logger.warning(f"WorkspaceShellTool command '{command}' failed. Exit: {process.returncode}. Stderr: {stderr_str}")
+            elif command_failed_exit_code and is_harmless_error_only and not stdout_str:
+                 # Harmless error occurred, non-zero exit, but NO stdout -> Treat as failure
+                 if stderr_str: result += f"STDERR:\n{stderr_str}\n" # Show the harmless error
+                 result += f"ERROR: Command failed with exit code {process.returncode} and produced no output."
+                 logger.warning(f"WorkspaceShellTool command '{command}' failed (exit code {process.returncode}) with harmless shell error but no stdout.")
+            elif is_harmless_error_only and stdout_str:
+                 # Harmless error (or no stderr), possibly non-zero exit, but got stdout -> Treat as SUCCESS for agent
+                 logger.warning(f"WorkspaceShellTool command '{command}' finished with exit code {process.returncode} but produced stdout and only harmless/no stderr. Reporting success to agent.")
+                 # Result already contains STDOUT. Remove the harmless error from the result string sent back to agent.
+                 result = result.replace(f"STDERR:\n{harmless_shell_error}\n", "").strip()
+                 # Add a note about success
+                 result += "\n(Command executed successfully - minor shell completion error ignored.)"
+            elif stderr_str: # Include stderr if it exists and isn't the harmless one we ignored
+                 result += f"STDERR:\n{stderr_str}\n"
             # else: command succeeded with exit code 0 and no stderr (or harmless stderr handled above)
 
-            logger.info(f"WorkspaceShellTool command finished. Exit code: {process.returncode}. Output length: {len(result)}")
+            logger.info(f"WorkspaceShellTool command finished. Exit code: {process.returncode}. Reporting result length: {len(result)}")
             # Truncate potentially long results before returning to agent
             return result[:3000] + "..." if len(result) > 3000 else result.strip() # Strip trailing newline
 
@@ -326,8 +332,10 @@ write_file_tool = Tool.from_function(
         f"Use this tool ONLY to write or overwrite text content to a file within the agent's designated workspace ('{WORKSPACE_ROOT.name}'). "
         f"Input MUST be a single string formatted as 'file_path:::text_content'. "
         f"'file_path' MUST be relative to the workspace root (e.g., 'script.py'). Do NOT include '{WORKSPACE_ROOT.name}/'. Subdirectories will be created if needed. "
-        f"'text_content' is the exact string content to write (newlines should be represented as '\\n' by the AI). The separator MUST be ':::'. "
+        f"'text_content' is the exact string content to write (newlines should be represented as '\\n' by the AI). **Do NOT include quotes like \\\" or ' around simple data strings unless they are explicitly part of the desired file content.** " # Added instruction
+        f"The separator MUST be ':::'. "
         f"Example input: 'output.log:::Agent execution finished.\\nStatus: OK.' "
+        f"Another example: 'script.py:::import os\\nprint(os.getcwd())' "
         f"WARNING: This tool OVERWRITES the file if it already exists."
     ),
     coroutine=write_to_file_in_workspace
@@ -346,4 +354,3 @@ agent_tools = [
 
 logger.info(f"Initialized tools: {[tool.name for tool in agent_tools]}")
 logger.info(f"File tools & Shell tool restricted to workspace: {WORKSPACE_ROOT}") # Log updated info
-
