@@ -47,6 +47,8 @@ def get_task_workspace_path(task_id: Optional[str]) -> Path:
         logger.warning(f"Invalid or missing task_id ('{task_id}') provided for workspace path. Using base workspace.")
         # Fallback to base workspace if task_id is missing or invalid
         return BASE_WORKSPACE_ROOT
+    # Sanitize task_id to prevent path traversal or invalid characters if needed
+    # For now, assume task_id is reasonably safe (e.g., UUID-like)
     task_workspace = BASE_WORKSPACE_ROOT / task_id
     try:
         os.makedirs(task_workspace, exist_ok=True)
@@ -152,7 +154,7 @@ async def write_to_file_in_task_workspace(input_str: str, task_workspace: Path) 
     """
     Writes text content to a specified file within the workspace.
     Input format: 'file_path:::text_content'
-    Handles newline characters correctly and strips common markdown.
+    Handles newline characters correctly and strips common markdown/quotes.
     """
     logger.info(f"Write tool received input: {input_str[:100]}... for workspace {task_workspace.name}")
     relative_path_str = "" # Initialize for error logging
@@ -163,19 +165,17 @@ async def write_to_file_in_task_workspace(input_str: str, task_workspace: Path) 
             logger.warning(f"Invalid input format for write_file: {input_str[:100]}...")
             return "Error: Invalid input format for write_file. Expected 'file_path:::text_content'."
 
-        relative_path_str = parts[0].strip()
+        # *** Sanitize file path part ***
+        relative_path_str = parts[0].strip().strip('\'"`') # Strip whitespace AND quotes/backticks
+
         raw_text_content = parts[1] # Content exactly as provided by LLM
 
         # Strip leading 'workspace/' prefix from path if agent included it
-        # Also handle potential backticks if LLM wrapped path in them
-        relative_path_str = relative_path_str.strip('`')
         if relative_path_str.startswith(("workspace/", "workspace\\")):
              relative_path_str = re.sub(r"^[\\/]?(workspace[\\/])+", "", relative_path_str)
              logger.info(f"Stripped 'workspace/' prefix, using relative path: {relative_path_str}")
 
-        # Prevent empty file paths after stripping
-        if not relative_path_str:
-            return "Error: File path cannot be empty."
+        if not relative_path_str: return "Error: File path cannot be empty after cleaning."
 
         # Decode escaped sequences like \\n into actual newlines \n
         try:
@@ -332,22 +332,19 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
     stateless_tools = [
         DuckDuckGoSearchRun(description=( # Use refined description
             "Use this tool ONLY when you need to find current information, real-time data (like weather), or answer questions about recent events or topics not covered by your training data. "
-            "Input MUST be a concise search query string. Do NOT use it if you already know the answer or if the user provides a specific URL to read."
+            "Input MUST be a concise search query string."
         )),
         Tool.from_function( # Web reader
-            func=fetch_and_parse_url,
-            name="web_page_reader",
+            func=fetch_and_parse_url, name="web_page_reader",
             description=(
                 "Use this tool ONLY to fetch and extract the main text content from a specific web page, given its URL. "
                 "Input MUST be a single, valid URL string (whitespace and newlines will be removed). "
-                "Use this tool *after* a web search has provided a relevant URL, or when the user explicitly asks you to read or summarize a specific URL they provided. "
-            ),
-            coroutine=fetch_and_parse_url
+            ), coroutine=fetch_and_parse_url
         )
     ]
 
     if not current_task_id:
-        logger.warning("No active task ID, returning only stateless tools (search, web_reader).")
+        logger.warning("No active task ID, returning only stateless tools.")
         return stateless_tools
 
     # Get the specific workspace path for the current task
@@ -359,9 +356,9 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
         TaskWorkspaceShellTool(task_workspace=task_workspace), # Pass workspace path
         ReadFileTool(root_dir=str(task_workspace), description=( # Configure root_dir
             f"Use this tool ONLY to read the entire contents of a file located within the current task's workspace ('{task_workspace.name}'). "
-            f"Input MUST be a file path relative to this workspace (e.g., 'my_data.csv'). Do NOT include path prefixes."
+            f"Input MUST be a file path relative to this workspace (e.g., 'my_data.csv')."
         )),
-        Tool.from_function( # Custom Write Tool needs workspace path passed somehow
+        Tool.from_function( # Custom Write Tool
             # Use lambda to capture the current task_workspace for the function call
             func=lambda input_str: write_to_file_in_task_workspace(input_str, task_workspace),
             name="write_file",
@@ -369,11 +366,8 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
                 f"Use this tool ONLY to write or overwrite text content to a file within the current task's workspace ('{task_workspace.name}'). "
                 f"Input MUST be a single string formatted as 'file_path:::text_content'. "
                 f"'file_path' MUST be relative to the task workspace root (e.g., 'script.py'). Subdirectories will be created. "
-                f"'text_content' is the exact string content to write (newlines should be represented as '\\n' by the AI). "
-                f"**Do NOT include quotes like \" or ' around simple data strings unless they are explicitly part of the desired file content.** " # Added instruction
-                f"The separator MUST be ':::'. "
-                f"Example input: 'output.log:::Agent execution finished.\\nStatus: OK.' "
-                f"Another example: 'data.csv:::header1,header2\\nvalue1,value2' "
+                f"'text_content' is the exact string content to write (newlines should be represented as '\\n' by the AI). The separator MUST be ':::'. "
+                f"Example: 'output.log:::Agent execution finished.\\nStatus: OK.' "
                 f"WARNING: This tool OVERWRITES files."
             ),
             # Wrap async func in lambda to pass task_workspace
