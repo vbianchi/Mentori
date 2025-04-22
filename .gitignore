@@ -11,6 +11,9 @@ __pycache__/
 # Agent workspace directory
 workspace/
 
+# Database directory
+database/
+
 # IDE/OS specific files (examples)
 .vscode/
 .idea/
