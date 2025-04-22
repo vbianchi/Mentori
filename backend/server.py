@@ -6,7 +6,7 @@ import datetime
 import logging
 import shlex
 import uuid
-from typing import Optional # For type hinting
+from typing import Optional, List, Dict, Any # Added List, Dict, Any
 
 # LangChain Imports
 from langchain.agents import AgentExecutor
@@ -21,8 +21,8 @@ from backend.llm_setup import get_llm
 from backend.tools import agent_tools # WORKSPACE_ROOT not needed here now
 from backend.agent import create_agent_executor
 from backend.callbacks import WebSocketCallbackHandler
-# *** ADDED Import for DB Utils ***
-from backend.db_utils import init_db, add_task, add_message, get_messages_for_task
+# Import DB Utils
+from backend.db_utils import init_db, add_task, add_message, get_messages_for_task, delete_task_and_messages
 # ----------------------
 
 # Setup logging
@@ -30,18 +30,15 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 logger = logging.getLogger(__name__)
 
 # --- Load Settings, Initialize LLM (at startup) ---
-# Keep LLM initialization global as it's usually stateless
 try:
     settings: Settings = load_settings()
     llm = get_llm(settings)
     logger.info("Base LLM initialized successfully.")
-    # DB initialization moved to main() async context
 except Exception as e:
     logger.critical(f"FATAL: Failed during startup initialization: {e}", exc_info=True); exit(1)
 
 # --- Global state ---
 connected_clients = {} # Maps session_id -> websocket
-# Store agent executor, callback handler, and current_task_id per session ID
 session_data = {} # Maps session_id -> {"agent_executor": AgentExecutor, "callback_handler": WebSocketCallbackHandler, "current_task_id": str | None}
 
 
@@ -67,8 +64,8 @@ async def read_stream(stream, stream_name, session_id, send_ws_message_func, db_
         await send_ws_message_func("monitor_log", f"[{timestamp}]{log_prefix_base} {log_content}")
         # Save to DB
         if current_task_id:
-             # Log type distinguishes stdout/stderr, content is the line
              try:
+                 # Log type distinguishes stdout/stderr, content is the line
                  await db_add_message_func(current_task_id, session_id, f"monitor_{stream_name}", line_content)
              except Exception as db_err:
                   logger.error(f"[{session_id}] Failed to save {stream_name} log to DB: {db_err}")
@@ -83,16 +80,19 @@ async def execute_shell_command(command: str, session_id, send_ws_message_func, 
     logger.info(f"[{session_id}] {start_log_content}")
     await send_ws_message_func("monitor_log", f"[{timestamp_start}]{log_prefix_base} {start_log_content}")
     await send_ws_message_func("status_message", f"Running direct command: {command[:60]}...")
+
     # Save command start to DB
     if current_task_id:
-        try: await db_add_message_func(current_task_id, session_id, "monitor_direct_cmd_start", command)
-        except Exception as db_err: logger.error(f"[{session_id}] Failed to save direct cmd start to DB: {db_err}")
+        try:
+            await db_add_message_func(current_task_id, session_id, "monitor_direct_cmd_start", command)
+        except Exception as db_err:
+            logger.error(f"[{session_id}] Failed to save direct cmd start to DB: {db_err}")
 
     process = None
     success = False # Default to failure
     status_msg = "failed"
     try:
-        # Note: Runs from project root.
+        # Note: Runs from project root. Consider using WorkspaceShellTool logic if workspace execution is needed here.
         process = await asyncio.create_subprocess_shell(
             command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
         )
@@ -111,9 +111,13 @@ async def execute_shell_command(command: str, session_id, send_ws_message_func, 
          timestamp_end = datetime.datetime.now().isoformat(timespec='milliseconds')
          finish_log_content = f"[Direct Command] Finished '{command[:60]}...', {status_msg}."
          await send_ws_message_func("monitor_log", f"[{timestamp_end}]{log_prefix_base} {finish_log_content}")
+
+         # Save command end to DB
          if current_task_id:
-             try: await db_add_message_func(current_task_id, session_id, "monitor_direct_cmd_end", f"Command: {command} | Status: {status_msg}")
-             except Exception as db_err: logger.error(f"[{session_id}] Failed to save direct cmd end to DB: {db_err}")
+             try:
+                 await db_add_message_func(current_task_id, session_id, "monitor_direct_cmd_end", f"Command: {command} | Status: {status_msg}")
+             except Exception as db_err:
+                 logger.error(f"[{session_id}] Failed to save direct cmd end to DB: {db_err}")
 
          if not success and status_msg.startswith("failed"): await send_ws_message_func("status_message", f"Error: Direct command {status_msg}")
 
@@ -126,13 +130,10 @@ async def handler(websocket):
     session_id = str(uuid.uuid4())
     logger.info(f"Client connected from {websocket.remote_address}. Assigning Session ID: {session_id}")
     connected_clients[session_id] = websocket
-    # Initialize current_task_id for this session
-    current_task_id: Optional[str] = None # This will be set by context_switch
+    current_task_id: Optional[str] = None # Track active task for this handler/session
 
     # --- Helper to send messages safely (bound to this handler's websocket and session_id) ---
     async def send_ws_message(msg_type: str, content: str):
-        # Check if the specific websocket for this handler is still connected and known
-        # Relies on exception handling within the try block for closed connections
         if session_id in connected_clients and connected_clients[session_id] == websocket:
             try:
                 await websocket.send(json.dumps({"type": msg_type, "content": content}))
@@ -143,10 +144,6 @@ async def handler(websocket):
                 if session_id in session_data: del session_data[session_id]
             except Exception as e:
                 logger.error(f"[{session_id}] Error sending WebSocket message (in helper): {e}", exc_info=True)
-        else:
-             # Only log warning if we expected the client to be there
-             # logger.warning(f"[{session_id}] Attempted to send message but WebSocket is not connected/valid in registry.")
-             pass
 
     # --- Helper to add timestamped monitor log AND save to DB ---
     async def add_monitor_log_and_save(text: str, log_type: str = "monitor_log"):
@@ -154,15 +151,10 @@ async def handler(websocket):
          log_prefix = f"[{timestamp}][{session_id[:8]}]"
          full_content = f"{log_prefix} {text}"
          await send_ws_message("monitor_log", full_content) # Send to UI
-         # Save to DB if associated with a task
-         # Use the 'current_task_id' tracked directly in the handler's scope
-         if current_task_id: # Check if a task context is active
-             try:
-                 # Pass the handler-scoped current_task_id
-                 await add_message(current_task_id, session_id, log_type, text) # Save original text
-             except Exception as db_err:
-                 logger.error(f"[{session_id}] Failed to save monitor log to DB for task {current_task_id}: {db_err}")
-         #else: logger.debug(f"[{session_id}] Monitor log not saved to DB (no active task).") # Optional debug
+         # Use the handler-scoped current_task_id
+         if current_task_id:
+             try: await add_message(current_task_id, session_id, log_type, text) # Save original text
+             except Exception as db_err: logger.error(f"[{session_id}] Failed to save monitor log to DB for task {current_task_id}: {db_err}")
 
     # --- Create Session-Specific Memory, Callback Handler, and Agent ---
     agent_executor: AgentExecutor = None # Initialize
@@ -171,12 +163,8 @@ async def handler(websocket):
         memory = ConversationBufferWindowMemory(
             k=5, memory_key="chat_history", input_key="input", output_key="output", return_messages=True
         )
-        # Pass the database add_message function (imported from db_utils) to the callback handler
         ws_callback_handler = WebSocketCallbackHandler(session_id, send_ws_message, add_message)
-
-        # Create agent executor, passing memory
         agent_executor = create_agent_executor(llm, agent_tools, memory)
-        # Store executor, handler, and initialize current_task_id
         session_data[session_id] = {
             "agent_executor": agent_executor,
             "callback_handler": ws_callback_handler,
@@ -185,18 +173,15 @@ async def handler(websocket):
         logger.info(f"[{session_id}] Created AgentExecutor with session memory and WebSocket callback handler.")
     except Exception as e:
         logger.error(f"[{session_id}] Failed to create agent/memory/callback for session: {e}", exc_info=True)
-        try: await websocket.close(code=1011, reason="Agent setup failed") # Attempt to notify client
-        except: pass # Ignore errors if already closed
-        if session_id in connected_clients: del connected_clients[session_id] # Clean up client entry
-        # Don't clean session_data here, it wasn't fully added
-        return # End handler for this connection
-
+        try: await websocket.close(code=1011, reason="Agent setup failed")
+        except: pass
+        if session_id in connected_clients: del connected_clients[session_id]
+        return
 
     # --- Main Try Block for Handler ---
     try:
-        # Send initial connection messages
         await send_ws_message("status_message", f"Connected (Session: {session_id[:8]}...). Agent Ready with LLM: {settings.ai_provider}.")
-        await add_monitor_log_and_save(f"New client connection: {websocket.remote_address}", "system_connect") # Uses helper
+        await add_monitor_log_and_save(f"New client connection: {websocket.remote_address}", "system_connect")
 
         # --- Message Processing Loop ---
         async for message in websocket:
@@ -205,94 +190,139 @@ async def handler(websocket):
                 data = json.loads(message)
                 message_type = data.get("type")
                 content = data.get("content") # Used by user_message
-                task_id_from_frontend = data.get("taskId") # Sent by context_switch
+                task_id_from_frontend = data.get("taskId") # Sent by context_switch/delete_task
                 task_title_from_frontend = data.get("task") # Sent by context_switch
 
-                # Update current task ID for the session based on frontend messages
+                # --- CONTEXT SWITCH: Load and Send History ---
                 if message_type == "context_switch" and task_id_from_frontend:
+                     logger.info(f"[{session_id}] Switching context to Task ID: {task_id_from_frontend}")
                      current_task_id = task_id_from_frontend # Update handler's tracked task ID
+
                      if session_id in session_data:
                          session_data[session_id]["current_task_id"] = current_task_id
-                         # Also update the task ID in the callback handler instance
                          session_data[session_id]["callback_handler"].set_task_id(current_task_id)
-                         # Lazily add task to DB if it doesn't exist (using IGNORE)
                          await add_task(task_id_from_frontend, task_title_from_frontend or f"Task {task_id_from_frontend}", datetime.datetime.now(datetime.timezone.utc).isoformat())
                          await add_monitor_log_and_save(f"Switched context to task ID: {current_task_id} ('{task_title_from_frontend}')", "system_context_switch")
-                         # Clear memory for the new task context
+
                          if "agent_executor" in session_data[session_id]:
-                             try:
-                                 session_data[session_id]["agent_executor"].memory.clear()
-                                 logger.info(f"[{session_id}] Cleared conversation memory for agent.")
-                                 await send_ws_message("status_message", "Context cleared. Ready for task.")
-                             except Exception as mem_e: logger.error(f"[{session_id}] Failed to clear memory: {mem_e}"); await send_ws_message("status_message", "Error clearing memory.")
-                         # TODO (Phase 2): Load history for this task_id here
+                             try: session_data[session_id]["agent_executor"].memory.clear(); logger.info(f"[{session_id}] Cleared agent memory for context switch.")
+                             except Exception as mem_e: logger.error(f"[{session_id}] Failed to clear memory: {mem_e}")
+
+                         await send_ws_message("status_message", "Loading history...")
+                         history_messages = await get_messages_for_task(current_task_id)
+                         if history_messages:
+                             logger.info(f"[{session_id}] Sending {len(history_messages)} history messages to client.")
+                             await send_ws_message("history_start", f"Loading {len(history_messages)} messages...")
+
+                             # *** UPDATED HISTORY TYPE MAPPING ***
+                             for i, msg in enumerate(history_messages):
+                                 db_msg_type = msg['message_type']
+                                 db_content = msg['content']
+                                 db_timestamp = msg['timestamp'] # Get timestamp from DB
+                                 ui_msg_type = None
+                                 content_to_send = db_content
+
+                                 # Map DB types to UI types
+                                 if db_msg_type == "user_input":
+                                     ui_msg_type = "user"
+                                 # --- Map both agent_finish AND agent to agent_message ---
+                                 elif db_msg_type == "agent_finish" or db_msg_type == "agent":
+                                     ui_msg_type = "agent_message"
+                                 elif db_msg_type.startswith("monitor_") or db_msg_type.startswith("error_") or db_msg_type.startswith("system_") or db_msg_type in ["tool_input", "tool_output", "tool_error"]:
+                                     ui_msg_type = "monitor_log"
+                                     # Reconstruct log format for monitor panel
+                                     log_prefix = f"[{db_timestamp}][{session_id[:8]}]"
+                                     # Add a type indicator for clarity in monitor history
+                                     log_type_indicator = f"[{db_msg_type.upper()}]" if not db_msg_type.startswith("monitor_") else ""
+                                     content_to_send = f"{log_prefix} [History]{log_type_indicator} {db_content}"
+                                 # Add more specific mappings if needed
+
+                                 if ui_msg_type:
+                                     logger.info(f"[{session_id}] Sending history msg {i+1}/{len(history_messages)}: Type='{ui_msg_type}', Content='{content_to_send[:50]}...'")
+                                     await send_ws_message(ui_msg_type, content_to_send)
+                                     await asyncio.sleep(0.01) # Keep small delay
+                                 else:
+                                     logger.warning(f"[{session_id}] Skipping history message with unmapped type: {db_msg_type}")
+                                 # --- END UPDATED MAPPING ---
+
+                             await send_ws_message("history_end", "History loaded.")
+                             await send_ws_message("status_message", "History loaded. Ready for input.")
+                         else:
+                             await send_ws_message("status_message", "No history found for this task. Ready for input.")
+                             logger.info(f"[{session_id}] No history found for task {current_task_id}.")
                      else:
                           logger.error(f"[{session_id}] Received context_switch but session data missing!")
 
 
                 elif message_type == "new_task":
-                     # Frontend handles creating task in UI/localStorage.
-                     # Backend just clears context here. Selection via context_switch sets the active task.
-                     current_task_id = None # No task active until selected
+                     current_task_id = None
                      if session_id in session_data:
                          session_data[session_id]["current_task_id"] = None
                          session_data[session_id]["callback_handler"].set_task_id(None)
                          if "agent_executor" in session_data[session_id]: session_data[session_id]["agent_executor"].memory.clear()
-                     await add_monitor_log_and_save("Received 'new_task'. Cleared context.", "system_new_task")
+                     await add_monitor_log_and_save("Received 'new_task'. Clearing context.", "system_new_task")
                      await send_ws_message("status_message", "Ready for new task goal.")
 
 
                 # --- USER MESSAGE -> Trigger Agent ---
                 elif message_type == "user_message":
-                    # Use the task_id tracked in the handler's scope
-                    active_task_id = current_task_id # Use the variable directly available in this scope
+                    active_task_id = current_task_id
                     if not active_task_id:
                          logger.warning(f"[{session_id}] Received user message but no task is active.")
                          await send_ws_message("status_message", "Please select or create a task first.")
-                         continue # Skip processing
+                         continue
 
-                    # Save user message to DB
-                    await add_message(active_task_id, session_id, "user", content)
+                    await add_message(active_task_id, session_id, "user_input", content) # Save as 'user_input'
                     await add_monitor_log_and_save(f"Received user input: {content}", "user_input") # Log receipt
                     await send_ws_message("status_message", f"Processing input: '{content[:60]}...'")
 
-                    if session_id not in session_data: continue # Safety check
+                    if session_id not in session_data: continue
 
                     current_agent_executor = session_data[session_id]["agent_executor"]
                     current_callback_handler = session_data[session_id]["callback_handler"]
 
                     try:
-                        # Run agent asynchronously with the callback handler
+                        # Use astream_log to get intermediate steps via callbacks
                         async for chunk in current_agent_executor.astream_log(
-                            {"input": content}, # Pass input to the agent
-                            config={"callbacks": [current_callback_handler]}, # Crucial for WS updates & DB saving
+                            {"input": content},
+                            config={"callbacks": [current_callback_handler]},
                         ):
-                            # Callbacks handle UI updates and DB saving for tool/LLM/finish events
-                            pass # Just consume the stream
+                            pass # Callbacks handle everything
 
-                        # Log stream completion (Callback handler handles final answer message)
-                        await add_monitor_log_and_save("Agent stream finished.", "system_agent_end")
+                        await add_monitor_log_and_save("Agent invocation complete.", "system_agent_end")
 
                     except Exception as e:
-                        # Handle errors during the agent execution itself
                         error_msg = f"CRITICAL Error during agent execution: {e}"
                         logger.error(f"[{session_id}] {error_msg}", exc_info=True)
-                        await add_monitor_log_and_save(error_msg, "error_agent") # Save error log
+                        await add_monitor_log_and_save(error_msg, "error_agent")
                         await send_ws_message("status_message", "Error during task processing.")
-                        # Send specific error to user if helpful, otherwise generic
-                        await send_ws_message("agent_message", f"Sorry, an internal error occurred while processing your request: {type(e).__name__}")
-                        # Save agent error message to DB
-                        if active_task_id: # Ensure task id exists before saving error
-                            await add_message(active_task_id, session_id, "error_agent", f"{type(e).__name__}: {e}")
+                        await send_ws_message("agent_message", f"Sorry, an internal error occurred: {type(e).__name__}")
+                        if active_task_id: await add_message(active_task_id, session_id, "error_agent", f"{type(e).__name__}: {e}")
+
+
+                # --- DELETE TASK ---
+                elif message_type == "delete_task" and task_id_from_frontend:
+                     logger.warning(f"[{session_id}] Received request to delete task: {task_id_from_frontend}")
+                     await add_monitor_log_and_save(f"Received request to delete task: {task_id_from_frontend}", "system_delete_request")
+                     deleted = await delete_task_and_messages(task_id_from_frontend)
+                     if deleted:
+                         await send_ws_message("status_message", f"Task {task_id_from_frontend[:8]}... deleted.")
+                         await add_monitor_log_and_save(f"Task {task_id_from_frontend} deleted successfully.", "system_delete_success")
+                         if current_task_id == task_id_from_frontend:
+                             current_task_id = None
+                             if session_id in session_data: session_data[session_id]["current_task_id"] = None; session_data[session_id]["callback_handler"].set_task_id(None)
+                             await send_ws_message("status_message", "Active task deleted. Select or create a new task.")
+                     else:
+                         await send_ws_message("status_message", f"Failed to delete task {task_id_from_frontend[:8]}...")
+                         await add_monitor_log_and_save(f"Failed to delete task {task_id_from_frontend}.", "error_delete")
 
 
                 # --- Other message types ---
                 elif message_type == "run_command": # Direct command execution
                      command = data.get("command")
-                     active_task_id = current_task_id # Get current task for logging
+                     active_task_id = current_task_id
                      await add_monitor_log_and_save(f"Received direct 'run_command'. Executing: {command}", "system_direct_cmd")
                      if command:
-                          # Pass add_message for logging within execute_shell_command
                           await execute_shell_command(command, session_id, send_ws_message, add_message, active_task_id)
                      else:
                           await add_monitor_log_and_save("Error: Received 'run_command' with no command.", "error_direct_cmd")
@@ -300,62 +330,42 @@ async def handler(websocket):
                 elif message_type == "action_command": # Placeholder for UI actions
                      await add_monitor_log_and_save(f"Received action command: {data.get('command')} (Not implemented).", "system_action_cmd")
 
-                # Note: new_task and context_switch handled above before user_message check
-
                 else: # Unknown message type
                      logger.warning(f"[{session_id}] Unknown message type received: {message_type}")
                      await add_monitor_log_and_save(f"Received unknown message type: {message_type}", "error_unknown_msg")
 
             # --- Error handling for message processing ---
-            except json.JSONDecodeError:
-                 logger.error(f"[{session_id}] Non-JSON message: {message}")
-                 await add_monitor_log_and_save("Error: Received invalid message format.", "error_json")
-            except Exception as e:
-                 logger.error(f"[{session_id}] Error processing message: {e}", exc_info=True)
-                 await add_monitor_log_and_save(f"Error processing message: {e}", "error_processing")
+            except json.JSONDecodeError: logger.error(f"[{session_id}] Non-JSON message: {message}"); await add_monitor_log_and_save("Error: Received invalid message format.", "error_json")
+            except Exception as e: logger.error(f"[{session_id}] Error processing message: {e}", exc_info=True); await add_monitor_log_and_save(f"Error processing message: {e}", "error_processing")
 
     # --- Connection Closed Handling ---
-    except websockets.exceptions.ConnectionClosedOK:
-        logger.info(f"Client disconnected: {websocket.remote_address} (Session: {session_id})")
-    except websockets.exceptions.ConnectionClosedError as e:
-        logger.warning(f"Connection closed error: {websocket.remote_address} (Session: {session_id}) - {e}")
+    except websockets.exceptions.ConnectionClosedOK: logger.info(f"Client disconnected: {websocket.remote_address} (Session: {session_id})")
+    except websockets.exceptions.ConnectionClosedError as e: logger.warning(f"Connection closed error: {websocket.remote_address} (Session: {session_id}) - {e}")
     except Exception as e:
-        # Catch any unexpected errors in the handler's main try block
         logger.error(f"Unhandled error in handler: {websocket.remote_address} (Session: {session_id}): {e}", exc_info=True)
-        # Try to inform client if possible before cleaning up
-        try:
-            await websocket.close(code=1011, reason="Internal server error")
-        except:
-            pass # Ignore errors during close if already closed
-    finally:
-        # --- Cleanup session data on disconnect ---
+        try: await websocket.close(code=1011, reason="Internal server error")
+        except Exception as close_e: logger.error(f"[{session_id}] Error closing websocket: {close_e}")
+    finally: # Cleanup
         logger.info(f"Cleaning up for session {session_id}")
-        if session_id in connected_clients:
-            del connected_clients[session_id]
-        if session_id in session_data:
-            # Potentially add cleanup for agent resources if needed (e.g., closing browser for playwright)
-            del session_data[session_id]
-            logger.info(f"Cleaned up session data for {session_id}.")
-        logger.info(f"Client removed: {websocket.remote_address} (Session: {session_id})")
+        if session_id in connected_clients: del connected_clients[session_id]
+        if session_id in session_data: del session_data[session_id]
+        logger.info(f"Cleaned up session data for {session_id}. Client removed: {websocket.remote_address}")
 
 
 async def main():
     host = "localhost"; port = 8765;
     logger.info("Initializing database...")
-    # *** Initialize DB within the async main function ***
-    await init_db()
+    await init_db() # Initialize DB before starting server
     logger.info(f"Starting WebSocket server on ws://{host}:{port}")
     async with websockets.serve(handler, host, port):
         await asyncio.Future()  # Run forever
 
 if __name__ == "__main__":
     try:
-        # Setup logging only if run directly
         logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         asyncio.run(main())
     except KeyboardInterrupt:
         logger.info("Server stopped manually.")
     except Exception as e:
-        # Log critical errors during startup
         logger.critical(f"Server failed to start or encountered critical error: {e}", exc_info=True)
 
