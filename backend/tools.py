@@ -8,6 +8,7 @@ import re # Import regex for scheme check
 import aiofiles # Import aiofiles for async file operations
 import codecs # Import codecs for decoding escaped sequences
 import asyncio # Import asyncio for subprocess
+from typing import List, Optional # Import List and Optional
 
 # LangChain Tool Imports
 # Import BaseTool for custom tool creation
@@ -19,21 +20,41 @@ from langchain_community.tools.file_management import ReadFileTool
 
 logger = logging.getLogger(__name__)
 
-# --- Define Workspace Path ---
+# --- Define Base Workspace Path ---
 try:
     # Resolve path relative to this file's location
     PROJECT_ROOT = Path(__file__).resolve().parent.parent
-    WORKSPACE_ROOT = PROJECT_ROOT / "workspace"
+    BASE_WORKSPACE_ROOT = PROJECT_ROOT / "workspace"
     # Ensure workspace directory exists on startup
-    os.makedirs(WORKSPACE_ROOT, exist_ok=True)
-    logger.info(f"Workspace directory ensured at: {WORKSPACE_ROOT}")
+    os.makedirs(BASE_WORKSPACE_ROOT, exist_ok=True)
+    logger.info(f"Base workspace directory ensured at: {BASE_WORKSPACE_ROOT}")
 except OSError as e:
-    logger.error(f"Could not create workspace directory at {WORKSPACE_ROOT}: {e}", exc_info=True)
+    logger.error(f"Could not create base workspace directory at {BASE_WORKSPACE_ROOT}: {e}", exc_info=True)
     # Handle error appropriately - maybe raise an exception or disable file tools
-    raise OSError(f"Required workspace directory {WORKSPACE_ROOT} could not be created.") from e
+    raise OSError(f"Required base workspace directory {BASE_WORKSPACE_ROOT} could not be created.") from e
 except Exception as e:
     logger.error(f"Error resolving project/workspace path: {e}", exc_info=True)
     raise
+
+
+# --- Helper Function to get Task-Specific Workspace ---
+def get_task_workspace_path(task_id: Optional[str]) -> Path:
+    """
+    Constructs and ensures the path for a specific task's workspace.
+    Returns BASE_WORKSPACE_ROOT if task_id is None or invalid.
+    """
+    if not task_id or not isinstance(task_id, str):
+        logger.warning(f"Invalid or missing task_id ('{task_id}') provided for workspace path. Using base workspace.")
+        # Fallback to base workspace if task_id is missing or invalid
+        return BASE_WORKSPACE_ROOT
+    task_workspace = BASE_WORKSPACE_ROOT / task_id
+    try:
+        os.makedirs(task_workspace, exist_ok=True)
+    except OSError as e:
+        logger.error(f"Could not create task workspace directory at {task_workspace}: {e}", exc_info=True)
+        # Fallback to base workspace if task-specific creation fails
+        return BASE_WORKSPACE_ROOT
+    return task_workspace
 
 
 # --- Tool Implementation Functions ---
@@ -127,13 +148,14 @@ async def fetch_and_parse_url(url: str) -> str:
 
 
 # *** Updated custom function for writing files ***
-async def write_to_file_in_workspace(input_str: str) -> str:
+async def write_to_file_in_task_workspace(input_str: str, task_workspace: Path) -> str:
     """
     Writes text content to a specified file within the workspace.
     Input format: 'file_path:::text_content'
     Handles newline characters correctly and strips common markdown.
     """
-    logger.info(f"Write tool received input: {input_str[:100]}...") # Log truncated input
+    logger.info(f"Write tool received input: {input_str[:100]}... for workspace {task_workspace.name}")
+    relative_path_str = "" # Initialize for error logging
     try:
         # Parse the input string: split only on the first occurrence of :::
         parts = input_str.split(':::', 1)
@@ -145,8 +167,9 @@ async def write_to_file_in_workspace(input_str: str) -> str:
         raw_text_content = parts[1] # Content exactly as provided by LLM
 
         # Strip leading 'workspace/' prefix from path if agent included it
+        # Also handle potential backticks if LLM wrapped path in them
+        relative_path_str = relative_path_str.strip('`')
         if relative_path_str.startswith(("workspace/", "workspace\\")):
-             # Use regex to remove potentially multiple leading workspace/ prefixes
              relative_path_str = re.sub(r"^[\\/]?(workspace[\\/])+", "", relative_path_str)
              logger.info(f"Stripped 'workspace/' prefix, using relative path: {relative_path_str}")
 
@@ -174,11 +197,11 @@ async def write_to_file_in_workspace(input_str: str) -> str:
              logger.warning(f"Attempted file write with non-relative or traversal path: {relative_path_str}")
              return f"Error: Invalid file path '{relative_path_str}'. Must be relative within workspace."
 
-        full_path = WORKSPACE_ROOT.joinpath(relative_path).resolve()
+        full_path = task_workspace.joinpath(relative_path).resolve()
         # Double-check it's still within the workspace after resolving symlinks etc.
-        if WORKSPACE_ROOT not in full_path.parents and full_path != WORKSPACE_ROOT:
-             logger.error(f"Security Error: Attempted write outside workspace! Resolved path: {full_path}")
-             return "Error: File path resolves outside the designated workspace."
+        if task_workspace not in full_path.parents and full_path != task_workspace:
+             logger.error(f"Security Error: Attempted write outside task workspace! Task: {task_workspace.name}, Resolved: {full_path}")
+             return "Error: File path resolves outside the designated task workspace."
 
         # Create parent directories and write file
         full_path.parent.mkdir(parents=True, exist_ok=True)
@@ -186,32 +209,30 @@ async def write_to_file_in_workspace(input_str: str) -> str:
             await f.write(text_content) # Write the processed content
 
         logger.info(f"Successfully wrote {len(text_content)} bytes to {full_path}")
-        return f"Successfully wrote content to '{relative_path_str}' in the workspace."
+        return f"Successfully wrote content to '{relative_path_str}' in the task workspace."
 
     except Exception as e:
         logger.error(f"Error writing file (input path '{relative_path_str}'): {e}", exc_info=True)
         return f"Error: Failed to write file '{relative_path_str}'. Reason: {type(e).__name__}"
 
 
-# *** Custom Shell Tool operating in Workspace (Handles specific shell error) ***
-class WorkspaceShellTool(BaseTool):
+# *** Custom Shell Tool operating in Task Workspace (Handles specific shell error) ***
+class TaskWorkspaceShellTool(BaseTool):
     name: str = "workspace_shell"
     description: str = (
-        f"Use this tool ONLY to execute **non-interactive** shell commands directly within the agent's dedicated workspace ('{WORKSPACE_ROOT.name}'). "
+        f"Use this tool ONLY to execute **non-interactive** shell commands directly within the **current task's dedicated workspace**. "
         "Useful for running scripts located in the workspace (e.g., 'python my_script.py'), listing workspace files (`ls -l`), checking file details (`wc`, `head`, `tail`), or creating directories (`mkdir results`). "
         "Input MUST be a valid shell command string. "
-        "The command automatically runs inside the workspace directory. Do NOT include 'workspace/' in the command path unless referring to a sub-directory *within* the workspace. "
+        "The command automatically runs inside the correct task workspace directory. Do NOT include path prefixes like 'workspace/' or the task ID in the command itself unless referring to a sub-directory *within* the task workspace. "
         "**DO NOT use this for 'pip install' or environment modifications.**"
     )
-    # Optional: Define args_schema if needed for more complex inputs using Pydantic
+    task_workspace: Path # Add attribute to store the workspace path
 
     def _run(self, command: str) -> str:
         """Synchronous execution wrapper."""
-        logger.warning("Running WorkspaceShellTool synchronously using _run.")
+        logger.warning("Running TaskWorkspaceShellTool synchronously using _run.")
         try:
-            # Try to get existing loop or run a new one
             loop = asyncio.get_running_loop()
-            # Schedule coroutine and wait for result (blocks here)
             result = loop.run_until_complete(self._arun_internal(command))
         except RuntimeError: # No running event loop
              result = asyncio.run(self._arun_internal(command))
@@ -222,17 +243,24 @@ class WorkspaceShellTool(BaseTool):
          return await self._arun_internal(command)
 
     async def _arun_internal(self, command: str) -> str:
-        """Internal async helper for running the command in the workspace."""
-        logger.info(f"WorkspaceShellTool executing command: '{command}' in CWD: {WORKSPACE_ROOT}")
+        """Internal async helper for running the command in the specific task workspace."""
+        # Use the task_workspace stored in the instance
+        cwd = str(self.task_workspace)
+        logger.info(f"TaskWorkspaceShellTool executing command: '{command}' in CWD: {cwd}")
         process = None # Ensure process is defined for finally block
         stdout_str = "" # Initialize
         stderr_str = "" # Initialize
         try:
+            # Clean command input - remove potential markdown backticks
+            clean_command = command.strip().strip('`')
+            if not clean_command:
+                 return "Error: Received empty command."
+
             process = await asyncio.create_subprocess_shell(
-                command,
+                clean_command, # Use cleaned command
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
-                cwd=str(WORKSPACE_ROOT) # *** Set Current Working Directory to Workspace ***
+                cwd=cwd # *** Set Current Working Directory to Workspace ***
             )
             stdout, stderr = await process.communicate() # Wait for process and get all output
             stdout_str = stdout.decode(errors='replace').strip()
@@ -254,32 +282,34 @@ class WorkspaceShellTool(BaseTool):
                  # Real failure or harmless error occurred but no stdout produced
                  if stderr_str: result += f"STDERR:\n{stderr_str}\n" # Include actual stderr
                  result += f"ERROR: Command failed with exit code {return_code}"
-                 logger.warning(f"WorkspaceShellTool command '{command}' failed. Exit: {return_code}. Stderr: {stderr_str}")
+                 logger.warning(f"TaskWorkspaceShellTool command '{clean_command}' failed. Exit: {return_code}. Stderr: {stderr_str}")
             elif command_failed_exit_code and is_harmless_error_only and not stdout_str:
                  # Harmless error occurred, non-zero exit, but NO stdout -> Treat as failure
                  if stderr_str: result += f"STDERR:\n{stderr_str}\n" # Show the harmless error
                  result += f"ERROR: Command failed with exit code {return_code} and produced no output."
-                 logger.warning(f"WorkspaceShellTool command '{command}' failed (exit code {return_code}) with harmless shell error but no stdout.")
+                 logger.warning(f"TaskWorkspaceShellTool command '{clean_command}' failed (exit {return_code}) with harmless/no stderr but no stdout.")
             elif is_harmless_error_only and stdout_str:
                  # Harmless error (or no stderr), possibly non-zero exit, but got stdout -> Treat as SUCCESS for agent
-                 logger.warning(f"WorkspaceShellTool command '{command}' finished with exit code {return_code} but produced stdout and only harmless/no stderr. Reporting success to agent.")
+                 logger.warning(f"TaskWorkspaceShellTool command '{clean_command}' finished (exit {return_code}) with stdout but only harmless/no stderr. Reporting success.")
                  # Result already contains STDOUT. Remove the harmless error from the result string sent back to agent.
                  result = result.replace(f"STDERR:\n{harmless_shell_error}\n", "").strip()
-                 result += "\n(Command executed successfully - minor shell error ignored)" # Add note
+                 # Add note only if exit code was non-zero but we ignored it
+                 if command_failed_exit_code:
+                     result += "\n(Command executed successfully - minor shell error ignored)"
             elif stderr_str: # Include stderr if it exists and isn't the harmless one we ignored
                  result += f"STDERR:\n{stderr_str}\n"
             # else: command succeeded with exit code 0 and no stderr (or harmless stderr handled above)
 
-            logger.info(f"WorkspaceShellTool command finished. Exit code: {process.returncode}. Reporting result length: {len(result)}")
+            logger.info(f"TaskWorkspaceShellTool command finished. Exit code: {process.returncode}. Reporting result length: {len(result)}")
             # Truncate potentially long results before returning to agent
             return result[:3000] + "..." if len(result) > 3000 else result.strip() # Strip trailing newline
 
         except FileNotFoundError:
-            cmd_part = command.split()[0] if command else "Unknown"
-            logger.warning(f"WorkspaceShellTool command not found: {cmd_part}")
+            cmd_part = clean_command.split()[0] if clean_command else "Unknown"
+            logger.warning(f"TaskWorkspaceShellTool command not found: {cmd_part}")
             return f"Error: Command not found within the environment: {cmd_part}"
         except Exception as e:
-            logger.error(f"Error executing command '{command}' in workspace: {e}", exc_info=True)
+            logger.error(f"Error executing command '{clean_command}' in task workspace: {e}", exc_info=True)
             return f"Error executing command in workspace: {type(e).__name__}"
         finally:
             # Ensure process is cleaned up if it exists and hasn't finished
@@ -287,71 +317,71 @@ class WorkspaceShellTool(BaseTool):
                 try:
                     process.terminate()
                     await process.wait()
-                    logger.warning(f"Terminated workspace shell process for command: {command}")
+                    logger.warning(f"Terminated task workspace shell process for command: {clean_command}")
                 except ProcessLookupError: pass # Already finished
                 except Exception as term_e: logger.error(f"Error terminating process: {term_e}")
 
 
-# --- Initialize Tools ---
+# --- Tool Factory Function ---
+def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
+    """
+    Creates tool instances dynamically, configured for the current task's workspace.
+    Returns only non-file tools if current_task_id is None.
+    """
+    # Always include stateless tools
+    stateless_tools = [
+        DuckDuckGoSearchRun(description=( # Use refined description
+            "Use this tool ONLY when you need to find current information, real-time data (like weather), or answer questions about recent events or topics not covered by your training data. "
+            "Input MUST be a concise search query string. Do NOT use it if you already know the answer or if the user provides a specific URL to read."
+        )),
+        Tool.from_function( # Web reader
+            func=fetch_and_parse_url,
+            name="web_page_reader",
+            description=(
+                "Use this tool ONLY to fetch and extract the main text content from a specific web page, given its URL. "
+                "Input MUST be a single, valid URL string (whitespace and newlines will be removed). "
+                "Use this tool *after* a web search has provided a relevant URL, or when the user explicitly asks you to read or summarize a specific URL they provided. "
+            ),
+            coroutine=fetch_and_parse_url
+        )
+    ]
 
-# 1. Custom Workspace Shell Tool
-workspace_shell_tool = WorkspaceShellTool() # Use the custom tool
+    if not current_task_id:
+        logger.warning("No active task ID, returning only stateless tools (search, web_reader).")
+        return stateless_tools
 
-# 2. Web Search Tool
-search_tool = DuckDuckGoSearchRun()
-search_tool.description = (
-    "Use this tool ONLY when you need to find current information, real-time data (like weather), or answer questions about recent events or topics not covered by your training data. "
-    "Input MUST be a concise search query string."
-)
+    # Get the specific workspace path for the current task
+    task_workspace = get_task_workspace_path(current_task_id)
+    logger.info(f"Configuring file/shell tools for workspace: {task_workspace}")
 
-# 3. Web Page Reader Tool
-web_reader_tool = Tool.from_function(
-    func=fetch_and_parse_url,
-    name="web_page_reader",
-    description=(
-        "Use this tool ONLY to fetch and extract the main text content from a specific web page, given its URL. "
-        "Input MUST be a single, valid URL string (whitespace and newlines will be removed). "
-        "Use this tool *after* a web search has provided a relevant URL, or when the user explicitly asks you to read or summarize a specific URL they provided. "
-    ),
-    coroutine=fetch_and_parse_url
-)
+    # Create instances of tools that depend on the task workspace
+    task_specific_tools = [
+        TaskWorkspaceShellTool(task_workspace=task_workspace), # Pass workspace path
+        ReadFileTool(root_dir=str(task_workspace), description=( # Configure root_dir
+            f"Use this tool ONLY to read the entire contents of a file located within the current task's workspace ('{task_workspace.name}'). "
+            f"Input MUST be a file path relative to this workspace (e.g., 'my_data.csv'). Do NOT include path prefixes."
+        )),
+        Tool.from_function( # Custom Write Tool needs workspace path passed somehow
+            # Use lambda to capture the current task_workspace for the function call
+            func=lambda input_str: write_to_file_in_task_workspace(input_str, task_workspace),
+            name="write_file",
+            description=(
+                f"Use this tool ONLY to write or overwrite text content to a file within the current task's workspace ('{task_workspace.name}'). "
+                f"Input MUST be a single string formatted as 'file_path:::text_content'. "
+                f"'file_path' MUST be relative to the task workspace root (e.g., 'script.py'). Subdirectories will be created. "
+                f"'text_content' is the exact string content to write (newlines should be represented as '\\n' by the AI). "
+                f"**Do NOT include quotes like \" or ' around simple data strings unless they are explicitly part of the desired file content.** " # Added instruction
+                f"The separator MUST be ':::'. "
+                f"Example input: 'output.log:::Agent execution finished.\\nStatus: OK.' "
+                f"Another example: 'data.csv:::header1,header2\\nvalue1,value2' "
+                f"WARNING: This tool OVERWRITES files."
+            ),
+            # Wrap async func in lambda to pass task_workspace
+            coroutine=lambda input_str: write_to_file_in_task_workspace(input_str, task_workspace)
+        )
+    ]
 
-# 4. Read File Tool
-read_file_tool = ReadFileTool(root_dir=str(WORKSPACE_ROOT))
-read_file_tool.description = (
-    f"Use this tool ONLY to read the entire contents of a file located within the agent's designated workspace ('{WORKSPACE_ROOT.name}'). "
-    f"Input MUST be a file path relative to the workspace root (e.g., 'my_data.csv'). Do NOT include '{WORKSPACE_ROOT.name}/'."
-)
-
-# 5. Custom Write File Tool
-write_file_tool = Tool.from_function(
-    func=write_to_file_in_workspace,
-    name="write_file",
-    description=(
-        f"Use this tool ONLY to write or overwrite text content to a file within the agent's designated workspace ('{WORKSPACE_ROOT.name}'). "
-        f"Input MUST be a single string formatted as 'file_path:::text_content'. "
-        f"'file_path' MUST be relative to the workspace root (e.g., 'script.py'). Do NOT include '{WORKSPACE_ROOT.name}/'. Subdirectories will be created if needed. "
-        f"'text_content' is the exact string content to write (newlines should be represented as '\\n' by the AI). "
-        f"**Do NOT include quotes like \" or ' around simple data strings unless they are explicitly part of the desired file content.** " # Added instruction
-        f"The separator MUST be ':::'. "
-        f"Example input: 'output.log:::Agent execution finished.\\nStatus: OK.' "
-        f"Another example: 'data.csv:::header1,header2\\nvalue1,value2' "
-        f"WARNING: This tool OVERWRITES the file if it already exists."
-    ),
-    coroutine=write_to_file_in_workspace
-)
-
-
-# --- List of Tools for the Agent ---
-# Use the new workspace_shell_tool instead of the old shell_tool
-agent_tools = [
-    workspace_shell_tool,
-    search_tool,
-    web_reader_tool,
-    read_file_tool,
-    write_file_tool,
-]
-
-logger.info(f"Initialized tools: {[tool.name for tool in agent_tools]}")
-logger.info(f"File tools & Shell tool restricted to workspace: {WORKSPACE_ROOT}") # Log updated info
+    all_tools = stateless_tools + task_specific_tools
+    logger.info(f"Returning tools for task {current_task_id}: {[tool.name for tool in all_tools]}")
+    return all_tools
 
