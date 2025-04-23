@@ -6,7 +6,8 @@ python-dotenv>=1.0
 
 # HTTP Client & Server
 httpx>=0.25
-aiohttp>=3.9 # Added for file server
+aiohttp>=3.9 # For file server
+aiohttp-cors>=0.7 # Added for CORS handling
 
 # --- LangChain Core and Integrations ---
 langchain>=0.1.0

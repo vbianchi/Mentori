@@ -7,12 +7,14 @@ import logging
 import shlex
 import uuid
 from typing import Optional, List, Dict, Any
-from pathlib import Path # Import Path
-import os # Import os
+from pathlib import Path
+import os
 
 # --- Web Server Imports ---
 from aiohttp import web
 from aiohttp.web import FileResponse
+# *** ADDED: Import aiohttp-cors ***
+import aiohttp_cors
 # -------------------------
 
 # LangChain Imports
@@ -20,7 +22,6 @@ from langchain.agents import AgentExecutor
 from langchain.memory import ConversationBufferWindowMemory
 from langchain_core.messages import AIMessage
 from langchain_core.agents import AgentAction, AgentFinish
-# Import RunnableConfig
 from langchain_core.runnables import RunnableConfig
 # -------------------------
 
@@ -28,10 +29,10 @@ from langchain_core.runnables import RunnableConfig
 from backend.config import load_settings, Settings
 from backend.llm_setup import get_llm
 # Import the factory function and helpers
-from backend.tools import get_dynamic_tools, get_task_workspace_path, BASE_WORKSPACE_ROOT
+# *** Import TEXT_EXTENSIONS from tools ***
+from backend.tools import get_dynamic_tools, get_task_workspace_path, BASE_WORKSPACE_ROOT, TEXT_EXTENSIONS
 from backend.agent import create_agent_executor
 from backend.callbacks import WebSocketCallbackHandler
-# Import DB Utils
 from backend.db_utils import init_db, add_task, add_message, get_messages_for_task, delete_task_and_messages
 # ----------------------
 
@@ -39,7 +40,7 @@ from backend.db_utils import init_db, add_task, add_message, get_messages_for_ta
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# --- Load Settings, Initialize LLM (at startup) ---
+# --- Load Settings, Initialize LLM ---
 try:
     settings: Settings = load_settings()
     llm = get_llm(settings)
@@ -48,15 +49,13 @@ except Exception as e:
     logger.critical(f"FATAL: Failed during startup initialization: {e}", exc_info=True); exit(1)
 
 # --- Global state ---
-connected_clients = {} # Maps session_id -> websocket
-session_data = {} # Maps session_id -> {"memory": BaseMemory, "callback_handler": WebSocketCallbackHandler, "current_task_id": str | None}
+connected_clients = {}
+session_data = {}
 
 # --- File Server Constants ---
 FILE_SERVER_HOST = "localhost"
-FILE_SERVER_PORT = 8766 # Different port from WebSocket
-# Define recognizable text extensions
-TEXT_EXTENSIONS = {".txt", ".py", ".js", ".css", ".html", ".json", ".csv", ".md", ".log", ".yaml", ".yml"}
-
+FILE_SERVER_PORT = 8766
+# TEXT_EXTENSIONS defined in tools.py, imported above
 
 # --- Helper: Read Stream from Subprocess ---
 async def read_stream(stream, stream_name, session_id, send_ws_message_func, db_add_message_func, current_task_id):
@@ -153,8 +152,32 @@ async def handle_workspace_file(request: web.Request) -> web.Response:
 
 # --- Setup File Server ---
 async def setup_file_server():
-    # ... (setup_file_server remains the same) ...
-    app = web.Application(); app.router.add_get('/workspace_files/{task_id}/{filename}', handle_workspace_file); runner = web.AppRunner(app); await runner.setup(); site = web.TCPSite(runner, FILE_SERVER_HOST, FILE_SERVER_PORT); logger.info(f"Starting file server on http://{FILE_SERVER_HOST}:{FILE_SERVER_PORT}"); return site, runner
+    """Sets up and returns the aiohttp file server runner with CORS."""
+    app = web.Application()
+
+    # Configure CORS
+    cors = aiohttp_cors.setup(app, defaults={
+        "http://localhost:8000": aiohttp_cors.ResourceOptions(
+            allow_credentials=True,
+            expose_headers="*",
+            allow_headers="*",
+            allow_methods="*" # Allow GET requests for files
+        ),
+         # Add other origins if needed
+    })
+
+    # Add the route and apply CORS
+    resource = app.router.add_resource('/workspace_files/{task_id}/{filename}')
+    route = resource.add_route('GET', handle_workspace_file)
+    cors.add(route)
+
+    # Setup runner and site
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, FILE_SERVER_HOST, FILE_SERVER_PORT)
+    logger.info(f"Starting file server with CORS on http://{FILE_SERVER_HOST}:{FILE_SERVER_PORT}")
+    return site, runner
+
 
 # --- WebSocket Handler ---
 async def handler(websocket):
@@ -346,8 +369,7 @@ async def handler(websocket):
                     task_workspace_path = get_task_workspace_path(active_task_id)
                     artifact_patterns = ['*.png'] + [f'*{ext}' for ext in TEXT_EXTENSIONS]
                     files_before_run = set()
-                    for pattern in artifact_patterns:
-                        files_before_run.update(f.name for f in task_workspace_path.glob(pattern) if f.is_file())
+                    for pattern in artifact_patterns: files_before_run.update(f.name for f in task_workspace_path.glob(pattern) if f.is_file())
 
 
                     try:
@@ -361,41 +383,29 @@ async def handler(websocket):
                         # Check for ALL relevant artifact files after successful run
                         artifacts = []
                         all_files_after = []
-                        for pattern in artifact_patterns:
-                            all_files_after.extend(task_workspace_path.glob(pattern))
-
+                        for pattern in artifact_patterns: all_files_after.extend(task_workspace_path.glob(pattern))
                         # Sort by modification time to get newest first if needed
-                        sorted_files = sorted(all_files_after, key=os.path.getmtime, reverse=True)
-
+                        sorted_files = sorted(all_files_after, key=os.path.getmtime, reverse=True) # Newest first
                         latest_new_artifact_filename = None # Track the last *new* one saved in this run
-
                         for file_path in sorted_files:
                              if file_path.is_file():
                                  filename = file_path.name
                                  artifact_type = 'unknown'
-                                 if file_path.suffix.lower() == '.png':
-                                     artifact_type = 'image'
-                                 elif file_path.suffix.lower() in TEXT_EXTENSIONS:
-                                     artifact_type = 'text'
-
+                                 if file_path.suffix.lower() == '.png': artifact_type = 'image'
+                                 elif file_path.suffix.lower() in TEXT_EXTENSIONS: artifact_type = 'text'
                                  if artifact_type != 'unknown':
                                      artifact_url = f"http://{FILE_SERVER_HOST}:{FILE_SERVER_PORT}/workspace_files/{active_task_id}/{filename}"
                                      artifacts.append({"type": artifact_type, "url": artifact_url, "filename": filename})
-
                                      # Save artifact generated event to DB only if it's new this run
                                      if filename not in files_before_run and latest_new_artifact_filename is None:
                                          await add_message(active_task_id, session_id, "artifact_generated", filename)
                                          await add_monitor_log_and_save(f"Artifact generated: {filename}", "system_artifact_generated")
-                                         latest_new_artifact_filename = filename # Ensure we only save one DB record per run
-
-
+                                         latest_new_artifact_filename = filename
                         # Send the full list of current artifacts
                         if artifacts:
                             logger.info(f"[{session_id}] Sending update with {len(artifacts)} artifacts.")
                             await send_ws_message("update_artifacts", artifacts) # Use new message type
-                        # else: # Optionally send empty list if no artifacts found
-                        #     await send_ws_message("update_artifacts", [])
-
+                        # else: await send_ws_message("update_artifacts", []) # Optionally send empty list
 
                     except Exception as e:
                         error_msg = f"CRITICAL Error during agent execution: {e}"
@@ -444,12 +454,8 @@ async def handler(websocket):
     except websockets.exceptions.ConnectionClosedError as e: logger.warning(f"Connection closed error: {websocket.remote_address} (Session: {session_id}) - {e}")
     except Exception as e:
         logger.error(f"Unhandled error in handler: {websocket.remote_address} (Session: {session_id}): {e}", exc_info=True)
-        # *** CORRECTED SYNTAX: Indent try/except block ***
-        try:
-            await websocket.close(code=1011, reason="Internal server error")
-        except Exception as close_e:
-            logger.error(f"[{session_id}] Error closing websocket during exception handling: {close_e}")
-            pass
+        try: await websocket.close(code=1011, reason="Internal server error");
+        except Exception as close_e: logger.error(f"[{session_id}] Error closing websocket: {close_e}"); pass
     finally: # Cleanup
         logger.info(f"Cleaning up for session {session_id}")
         if session_id in connected_clients: del connected_clients[session_id]
