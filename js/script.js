@@ -2,7 +2,8 @@
 /**
  * This script handles the frontend logic for the AI Agent UI,
  * including WebSocket communication, DOM manipulation, event handling,
- * task history management, chat input history, and Markdown formatting.
+ * task history management, chat input history, structured monitor logging,
+ * and image display in the monitor.
  */
 document.addEventListener('DOMContentLoaded', () => {
     console.log("AI Agent UI Script Loaded and DOM ready!");
@@ -11,8 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const taskListUl = document.getElementById('task-list');
     const newTaskButton = document.getElementById('new-task-button');
     const chatMessagesContainer = document.getElementById('chat-messages');
-    const monitorCodeElement = document.getElementById('monitor-log-content');
-    const monitorContentElement = document.querySelector('.monitor-content');
+    const monitorContentElement = document.getElementById('monitor-content');
     const chatTextarea = document.querySelector('.chat-input-area textarea');
     const chatSendButton = document.querySelector('.chat-input-area button');
     const jumpToLiveButton = document.querySelector('.jump-live-btn');
@@ -81,16 +81,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         const loadingMsg = chatMessagesContainer.querySelector('.message-status:last-child');
                         if (loadingMsg && loadingMsg.textContent.startsWith("Loading history...")) { loadingMsg.remove(); } break;
 
-                    // Handle Token Streaming with Formatting
                     case 'agent_token_chunk':
                         if (!currentStreamingMessageElement) {
                             console.log("Creating new message element for streaming.");
                             currentStreamingMessageElement = addChatMessage("", 'agent', false);
                         }
                         if (currentStreamingMessageElement) {
-                            // Append raw text first (important for accurate formatting later)
                             currentStreamingMessageElement.textContent += message.content;
-                            // Re-apply formatting to the entire accumulated text
                             currentStreamingMessageElement.innerHTML = formatMessageContent(currentStreamingMessageElement.textContent);
                             scrollToBottom(chatMessagesContainer);
                         } else { console.warn("Received token chunk but no streaming element."); }
@@ -115,12 +112,25 @@ document.addEventListener('DOMContentLoaded', () => {
                         break;
                     case 'monitor_log':
                         console.log("Received monitor_log:", message.content);
-                        addMonitorLog(message.content);
+                        addMonitorLog(message.content); // Use the updated function
                         break;
+
+                    // *** Handle Image Display ***
+                    case 'display_image':
+                        console.log("Received display_image message:", message.content);
+                        if (message.content && message.content.url && message.content.filename) {
+                             displayMonitorImage(message.content.url, message.content.filename);
+                        } else {
+                             console.warn("Invalid display_image message received:", message.content);
+                             addMonitorLog("[SYSTEM] Received request to display image, but data was invalid.");
+                        }
+                        break;
+                    // --- End Image Display ---
+
                     case 'user_message': break; // Ignore live echo
                     default:
                         console.warn("Received unknown message type:", message.type);
-                        addMonitorLog(`[SYSTEM] Unknown message type: ${message.type}`);
+                        addMonitorLog(`[SYSTEM] Unknown message type: ${message.type}`); // Log unknown types to monitor
                         currentStreamingMessageElement = null;
                 }
             } catch (error) { console.error("Failed to parse/process WS message:", error, "Data:", event.data); addMonitorLog(`[SYSTEM] Error processing message: ${error.message}.`); currentStreamingMessageElement = null; }
@@ -132,90 +142,90 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Helper Functions ---
     const scrollToBottom = (element) => { if (!element) return; const isScrolledToBottom = element.scrollHeight - element.clientHeight <= element.scrollTop + 50; if (isScrolledToBottom) { element.scrollTop = element.scrollHeight; } };
+    const formatMessageContent = (text) => { /* ... (remains the same) ... */ let escapedText = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); const segments = []; let lastIndex = 0; const codeBlockRegex = /```(\w*)\n([\s\S]*?)\n?```/g; let match; while ((match = codeBlockRegex.exec(escapedText)) !== null) { if (match.index > lastIndex) { segments.push({ type: 'text', content: escapedText.substring(lastIndex, match.index) }); } segments.push({ type: 'code', lang: match[1] || '', content: match[2] }); lastIndex = codeBlockRegex.lastIndex; } if (lastIndex < escapedText.length) { segments.push({ type: 'text', content: escapedText.substring(lastIndex) }); } let htmlContent = ""; segments.forEach(segment => { if (segment.type === 'code') { const escapedCode = segment.content.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); const langClass = segment.lang ? ` class="language-${segment.lang}"` : ''; htmlContent += `<pre><code${langClass}>${escapedCode}</code></pre>`; } else { let processedText = segment.content; processedText = processedText.replace(/(\*\*\*|___)(.*?)\1/g, '<strong><em>$2</em></strong>'); processedText = processedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); processedText = processedText.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>'); processedText = processedText.replace(/\n/g, '<br>'); htmlContent += processedText; } }); return htmlContent; };
+    const addChatMessage = (text, type = 'agent', doScroll = true) => { /* ... (remains the same) ... */ if (!chatMessagesContainer) { console.error("Chat container missing!"); return null; } const messageElement = document.createElement('div'); messageElement.classList.add('message', `message-${type}`); if (type === 'status') { if (text.toLowerCase().includes("connect") || text.toLowerCase().includes("clos")) { messageElement.classList.add('connection-status'); } if (text.toLowerCase().includes("error")) { messageElement.classList.add('error-message'); } } if (type === 'user') { messageElement.classList.add('user-message'); messageElement.style.cssText = 'align-self: flex-end; background-color: var(--accent-color); color: white; border: 1px solid var(--accent-color);'; } if (type === 'agent') { messageElement.classList.add('agent-message'); messageElement.style.border = '1px solid var(--border-color)'; } if (type === 'agent') { messageElement.innerHTML = formatMessageContent(text); } else { messageElement.textContent = text; } chatMessagesContainer.appendChild(messageElement); if (doScroll) scrollToBottom(chatMessagesContainer); return messageElement; };
 
     /**
-     * Basic sanitation and Markdown to HTML conversion for agent messages.
-     * Handles newlines and basic code blocks.
-     * @param {string} text The raw text content.
-     * @returns {string} HTML formatted string.
+     * Adds a structured log entry to the monitor panel display.
      */
-    const formatMessageContent = (text) => {
-        // 1. Sanitize basic HTML chars FIRST
-        let escapedText = text
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-
-        // 2. Convert ```code blocks``` to <pre><code>
-        // Improved Regex: Handles optional language, flexible newlines, non-greedy content match
-        escapedText = escapedText.replace(/```(\w+)?\s*?\n([\s\S]*?)\n?```/g, (match, lang, code) => {
-            // Re-escape ONLY the code content again inside the block
-            const escapedCode = code
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;");
-            const langClass = lang ? ` class="language-${lang}"` : '';
-            return `<pre><code${langClass}>${escapedCode}</code></pre>`;
-        });
-
-        // 3. Convert remaining newlines to <br> (outside of pre/code)
-        // This is tricky - the above regex replaces newlines within the block.
-        // A simpler approach for now: replace all newlines outside pre tags.
-        // We can split by <pre>, replace \n in the non-pre parts, then join.
-        const parts = escapedText.split(/(<pre>.*?<\/pre>)/s); // Split by pre blocks, keeping delimiters
-        for (let i = 0; i < parts.length; i += 2) { // Only process parts outside <pre>
-            parts[i] = parts[i].replace(/\n/g, '<br>');
-        }
-        escapedText = parts.join('');
-
-
-        // Add more Markdown conversions here if needed (e.g., bold, italics, lists)
-        // Example: Bold (**text**) -> <strong>text</strong>
-        // escapedText = escapedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        // Example: Italics (*text* or _text_) -> <em>text</em>
-        // escapedText = escapedText.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>');
-
-        return escapedText;
+    const addMonitorLog = (fullLogText) => {
+        if (!monitorContentElement) { console.error("Monitor content element (#monitor-content) not found!"); return; }
+        const logEntryDiv = document.createElement('div');
+        logEntryDiv.classList.add('monitor-log-entry');
+        const match = fullLogText.match(/^(\[.*?\]\[.*?\])\s*(\[.*?\])?\s*(.*)$/s);
+        let timestampPrefix = ""; let logType = "system"; let logContent = fullLogText;
+        if (match) {
+            timestampPrefix = match[1] || ""; const typeMatch = match[2]; logContent = match[3] || "";
+            if (typeMatch) {
+                const typeText = typeMatch.replace(/[\[\]]/g, '').trim().toLowerCase();
+                if (typeText.includes("tool start")) logType = 'tool-start';
+                else if (typeText.includes("tool output")) logType = 'tool-output';
+                else if (typeText.includes("tool error")) logType = 'tool-error';
+                else if (typeText.includes("agent finish")) logType = 'agent-finish';
+                else if (typeText.includes("error")) logType = 'error';
+                else if (typeText.includes("history")) logType = 'history';
+                else if (typeText.includes("system")) logType = 'system';
+                 // *** Add check for image generation message ***
+                 else if (typeText.includes("image generated")) logType = 'image-generated';
+            }
+        } else { if (fullLogText.toLowerCase().includes("error")) logType = 'error'; else if (fullLogText.toLowerCase().includes("system")) logType = 'system'; else logType = 'unknown'; }
+        logEntryDiv.classList.add(`log-type-${logType}`);
+        if (timestampPrefix) { const timeSpan = document.createElement('span'); timeSpan.className = 'log-timestamp'; timeSpan.textContent = timestampPrefix; logEntryDiv.appendChild(timeSpan); }
+        const contentSpan = document.createElement('span'); contentSpan.className = 'log-content';
+        if (logType === 'tool-output' || logType === 'tool-error') { const pre = document.createElement('pre'); pre.textContent = logContent.trim(); contentSpan.appendChild(pre); }
+        else { contentSpan.textContent = logContent.trim(); }
+        logEntryDiv.appendChild(contentSpan);
+        monitorContentElement.appendChild(logEntryDiv);
+        scrollToBottom(monitorContentElement);
      };
 
+     /**
+      * Displays an image in the monitor panel.
+      * @param {string} imageUrl URL of the image to display.
+      * @param {string} filename Original filename (for alt text).
+      */
+     const displayMonitorImage = (imageUrl, filename) => {
+         if (!monitorContentElement) { console.error("Monitor content element (#monitor-content) not found!"); return; }
 
-    /**
-     * Adds a message element to the chat display area, formatting agent/user messages.
-     * Returns the created element, optionally without scrolling.
-     */
-    const addChatMessage = (text, type = 'agent', doScroll = true) => {
-        if (!chatMessagesContainer) { console.error("Chat container missing!"); return null; }
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message', `message-${type}`);
+         // Create a log entry container for the image
+         const logEntryDiv = document.createElement('div');
+         logEntryDiv.classList.add('monitor-log-entry', 'log-type-image-display'); // Add specific class
 
-        // Apply basic styling classes
-        if (type === 'status') { if (text.toLowerCase().includes("connect") || text.toLowerCase().includes("clos")) { messageElement.classList.add('connection-status'); } if (text.toLowerCase().includes("error")) { messageElement.classList.add('error-message'); } }
-        if (type === 'user') { messageElement.classList.add('user-message'); messageElement.style.cssText = 'align-self: flex-end; background-color: var(--accent-color); color: white; border: 1px solid var(--accent-color);'; }
-        if (type === 'agent') { messageElement.classList.add('agent-message'); messageElement.style.border = '1px solid var(--border-color)'; }
+         // Optional: Add timestamp/info text
+         const infoSpan = document.createElement('span');
+         infoSpan.className = 'log-content'; // Reuse class or make a new one
+         infoSpan.textContent = `Displaying generated image: ${filename}`;
+         logEntryDiv.appendChild(infoSpan);
 
-        // Format content for agent messages using innerHTML
-        if (type === 'agent') {
-            messageElement.innerHTML = formatMessageContent(text);
-        } else {
-            // For user, status, etc., just use textContent (safer)
-            messageElement.textContent = text;
-        }
+         // Create image element
+         const imgElement = document.createElement('img');
+         imgElement.src = imageUrl;
+         imgElement.alt = `Generated image: ${filename}`;
+         imgElement.title = `Generated image: ${filename}`;
+         // Add error handling for broken images
+         imgElement.onerror = () => {
+             imgElement.alt = `Error loading image: ${filename}`;
+             imgElement.style.display = 'none'; // Hide broken image icon
+             const errorSpan = document.createElement('span');
+             errorSpan.className = 'log-content log-type-error'; // Style as error
+             errorSpan.textContent = ` (Error loading image)`;
+             logEntryDiv.appendChild(errorSpan);
+             console.error(`Error loading image from URL: ${imageUrl}`);
+         };
 
-        chatMessagesContainer.appendChild(messageElement);
-        if (doScroll) scrollToBottom(chatMessagesContainer);
-        return messageElement; // Return the element
-    };
+         logEntryDiv.appendChild(imgElement); // Append image to the log entry div
 
-    const addMonitorLog = (text) => { if (!monitorCodeElement) { console.error("Monitor code element missing!"); return; } const logLine = document.createTextNode(`${text}\n`); monitorCodeElement.appendChild(logLine); scrollToBottom(monitorContentElement); };
+         monitorContentElement.appendChild(logEntryDiv); // Append the whole entry
+         scrollToBottom(monitorContentElement);
+     };
+
 
     // --- Task History Functions ---
     const loadTasks = () => { const storedCounter = localStorage.getItem(COUNTER_KEY); taskCounter = storedCounter ? parseInt(storedCounter, 10) : 0; if (isNaN(taskCounter)) taskCounter = 0; let firstLoad = false; const storedTasks = localStorage.getItem(STORAGE_KEY); if (storedTasks) { try { tasks = JSON.parse(storedTasks); if (!Array.isArray(tasks)) { tasks = []; } tasks.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)); console.log(`Loaded ${tasks.length} tasks. Next Task #: ${taskCounter + 1}`); } catch (e) { console.error("Failed to parse tasks:", e); tasks = []; localStorage.removeItem(STORAGE_KEY); } } else { tasks = []; firstLoad = true; console.log("No tasks found."); } if (firstLoad && tasks.length === 0) { console.log("First load, creating 'Task - 1'."); taskCounter = 1; const firstTask = { id: `task-${Date.now()}-${Math.random().toString(16).slice(2)}`, title: `Task - ${taskCounter}`, timestamp: Date.now() }; tasks.unshift(firstTask); currentTaskId = firstTask.id; saveTasks(); console.log("Auto-created 'Task - 1'."); } else { const lastActiveId = localStorage.getItem(`${STORAGE_KEY}_active`); if (lastActiveId && tasks.some(task => task.id === lastActiveId)) { currentTaskId = lastActiveId; } else if (tasks.length > 0) { currentTaskId = tasks[0].id; } else { currentTaskId = null; } } console.log("Initial currentTaskId:", currentTaskId); };
     const saveTasks = () => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); localStorage.setItem(COUNTER_KEY, taskCounter.toString()); if (currentTaskId) { localStorage.setItem(`${STORAGE_KEY}_active`, currentTaskId); } else { localStorage.removeItem(`${STORAGE_KEY}_active`); } } catch (e) { console.error("Failed to save tasks:", e); alert("Error saving tasks."); } };
     const renderTaskList = () => { console.log(`--- Rendering Task List ---`); console.log(`Tasks:`, JSON.stringify(tasks)); console.log(`Current ID: ${currentTaskId}`); if (!taskListUl) { console.error("Task list UL missing!"); return; } taskListUl.innerHTML = ''; if (tasks.length === 0) { taskListUl.innerHTML = '<li class="task-item-placeholder">No tasks yet.</li>'; } else { tasks.forEach((task) => { const li = document.createElement('li'); li.className = 'task-item'; li.dataset.taskId = task.id; const titleSpan = document.createElement('span'); titleSpan.className = 'task-title'; const displayTitle = task.title.length > 25 ? task.title.substring(0, 22) + '...' : task.title; titleSpan.textContent = displayTitle; titleSpan.title = task.title; li.appendChild(titleSpan); const deleteBtn = document.createElement('button'); deleteBtn.className = 'task-delete-btn'; deleteBtn.textContent = '🗑️'; deleteBtn.title = `Delete: ${task.title}`; deleteBtn.dataset.taskId = task.id; li.appendChild(deleteBtn); if (task.id === currentTaskId) { li.classList.add('active'); } try { taskListUl.appendChild(li); console.log(`Appended task: ${task.id}`); } catch (appendError) { console.error(`!!! ERROR appending task: ${task.id}`, appendError); } }); } updateCurrentTaskTitle(); console.log(`--- Finished Rendering Task List ---`); };
     const updateCurrentTaskTitle = () => { if (!currentTaskTitleElement) return; const currentTask = tasks.find(task => task.id === currentTaskId); const title = currentTask ? currentTask.title : "No Task Selected"; currentTaskTitleElement.textContent = title; if(monitorStatusElement) monitorStatusElement.textContent = currentTask ? "Agent Idle" : "No Task"; if(monitorFooterStatusElement) monitorFooterStatusElement.textContent = currentTask ? `Task: ${title}` : "No Task Selected"; };
-    const clearChatAndMonitor = (addLog = true) => { if (chatMessagesContainer) chatMessagesContainer.innerHTML = ''; if (monitorCodeElement) monitorCodeElement.textContent = ''; if (addLog) { addMonitorLog("[SYSTEM] Cleared context."); } console.log("Cleared chat and monitor."); };
+    const clearChatAndMonitor = (addLog = true) => { if (chatMessagesContainer) chatMessagesContainer.innerHTML = ''; if (monitorContentElement) { while (monitorContentElement.firstChild) { monitorContentElement.removeChild(monitorContentElement.firstChild); } } if (addLog) { addMonitorLog("[SYSTEM] Cleared context."); } console.log("Cleared chat and monitor."); };
     const selectTask = (taskId) => { console.log(`Attempting select task: ${taskId}`); if (currentTaskId === taskId && taskId !== null) return; const task = tasks.find(t => t.id === taskId); currentTaskId = (!task && taskId !== null) ? null : taskId; console.log(`Selected task ID: ${currentTaskId}`); saveTasks(); console.log(">>> Calling renderTaskList..."); try { renderTaskList(); console.log("<<< Finished renderTaskList."); } catch (e) { console.error("!!! ERROR renderTaskList:", e); } /* Clear handled by history_start */ if (currentTaskId && task && socket && socket.readyState === WebSocket.OPEN) { const payload = { type: "context_switch", task: task.title, taskId: task.id }; try { console.log(`Sending context_switch...`); socket.send(JSON.stringify(payload)); console.log(`Sent context_switch.`); } catch (e) { console.error(`Failed send context_switch:`, e); addMonitorLog(`[SYSTEM] Error sending context switch.`); } } else if (!currentTaskId) { clearChatAndMonitor(); addChatMessage("No task selected.", "status"); addMonitorLog("[SYSTEM] No task selected."); } else { addMonitorLog(`[SYSTEM] Cannot notify backend: WS not open.`); } console.log(`Finished select task: ${currentTaskId}`); };
     const handleNewTaskClick = () => { console.log("'+ New Task' clicked."); taskCounter++; const taskTitle = `Task - ${taskCounter}`; const newTask = { id: `task-${Date.now()}-${Math.random().toString(16).slice(2)}`, title: taskTitle, timestamp: Date.now() }; tasks.unshift(newTask); console.log("New task added:", newTask); selectTask(newTask.id); console.log("handleNewTaskClick finished."); };
     const deleteTask = (taskId) => { console.log(`Attempting delete: ${taskId}`); const taskToDelete = tasks.find(t => t.id === taskId); if (!taskToDelete) return; if (!confirm(`Delete task "${taskToDelete.title}"?`)) return; tasks = tasks.filter(task => task.id !== taskId); console.log(`Task ${taskId} removed locally.`); if (socket && socket.readyState === WebSocket.OPEN) { try { socket.send(JSON.stringify({ type: "delete_task", taskId: taskId })); console.log(`Sent delete_task.`); addMonitorLog(`[SYSTEM] Requested delete task ${taskId}.`); } catch (e) { console.error(`Failed send delete_task:`, e); addMonitorLog(`[SYSTEM] Error sending delete request.`); } } else { addMonitorLog(`[SYSTEM] Cannot notify backend of delete: WS not open.`); } let nextTaskId = null; if (currentTaskId === taskId) { nextTaskId = tasks.length > 0 ? tasks[0].id : null; console.log(`Deleted active, selecting: ${nextTaskId}`); currentTaskId = nextTaskId; } else { nextTaskId = currentTaskId; } saveTasks(); renderTaskList(); if (currentTaskId !== nextTaskId) { selectTask(nextTaskId); } else if (currentTaskId === null && tasks.length === 0) { clearChatAndMonitor(); updateCurrentTaskTitle(); } console.log(`Finished delete: ${taskId}`); };

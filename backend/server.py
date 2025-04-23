@@ -7,6 +7,14 @@ import logging
 import shlex
 import uuid
 from typing import Optional, List, Dict, Any
+from pathlib import Path # Import Path
+import os # Import os
+
+# --- Web Server Imports ---
+from aiohttp import web
+# *** CORRECTED IMPORT for FileResponse ***
+from aiohttp.web import FileResponse
+# -------------------------
 
 # LangChain Imports
 from langchain.agents import AgentExecutor
@@ -20,8 +28,8 @@ from langchain_core.runnables import RunnableConfig
 # Project Imports
 from backend.config import load_settings, Settings
 from backend.llm_setup import get_llm
-# Import the factory function
-from backend.tools import get_dynamic_tools
+# Import the factory function and helpers
+from backend.tools import get_dynamic_tools, get_task_workspace_path, BASE_WORKSPACE_ROOT
 from backend.agent import create_agent_executor
 from backend.callbacks import WebSocketCallbackHandler
 # Import DB Utils
@@ -44,6 +52,9 @@ except Exception as e:
 connected_clients = {} # Maps session_id -> websocket
 session_data = {} # Maps session_id -> {"memory": BaseMemory, "callback_handler": WebSocketCallbackHandler, "current_task_id": str | None}
 
+# --- File Server Constants ---
+FILE_SERVER_HOST = "localhost"
+FILE_SERVER_PORT = 8766 # Different port from WebSocket
 
 # --- Helper: Read Stream from Subprocess ---
 async def read_stream(stream, stream_name, session_id, send_ws_message_func, db_add_message_func, current_task_id):
@@ -62,10 +73,9 @@ async def read_stream(stream, stream_name, session_id, send_ws_message_func, db_
         timestamp = datetime.datetime.now().isoformat(timespec='milliseconds')
         await send_ws_message_func("monitor_log", f"[{timestamp}]{log_prefix_base} {log_content}")
 
-        # *** CORRECTED SYNTAX: Save to DB ***
+        # Save to DB
         if current_task_id:
              try:
-                 # Log type distinguishes stdout/stderr, content is the line
                  await db_add_message_func(current_task_id, session_id, f"monitor_{stream_name}", line_content)
              except Exception as db_err:
                   logger.error(f"[{session_id}] Failed to save {stream_name} log to DB: {db_err}")
@@ -124,6 +134,64 @@ async def execute_shell_command(command: str, session_id, send_ws_message_func, 
     return success
 
 
+# --- File Server Handler ---
+async def handle_workspace_file(request: web.Request) -> web.Response:
+    """aiohttp handler to serve files from the workspace."""
+    task_id = request.match_info.get('task_id')
+    filename = request.match_info.get('filename')
+    session_id = request.headers.get("X-Session-ID", "unknown") # Optional: Pass session ID if needed for logging
+
+    if not task_id or not filename:
+        logger.warning(f"[{session_id}] File server request missing task_id or filename.")
+        raise web.HTTPBadRequest(text="Task ID and filename required")
+
+    # **Security:** Basic validation to prevent path traversal
+    if ".." in task_id or "/" in task_id or "\\" in task_id or \
+       ".." in filename or "/" in filename or "\\" in filename:
+        logger.error(f"[{session_id}] Invalid characters or path traversal attempt in file request: task='{task_id}', file='{filename}'")
+        raise web.HTTPForbidden(text="Invalid path components")
+
+    # Construct the full path relative to the base workspace
+    # Use the helper to ensure the task directory exists conceptually
+    task_workspace = get_task_workspace_path(task_id)
+    file_path = (task_workspace / filename).resolve()
+
+    # **Security:** Double-check the resolved path is still within the BASE_WORKSPACE_ROOT
+    try:
+        # Check if file_path is within BASE_WORKSPACE_ROOT
+        if not file_path.is_relative_to(BASE_WORKSPACE_ROOT.resolve()):
+             logger.error(f"[{session_id}] Security Error: Attempt to access file outside base workspace! Requested: {file_path}, Base: {BASE_WORKSPACE_ROOT.resolve()}")
+             raise web.HTTPForbidden(text="Access denied")
+    except ValueError: # is_relative_to raises ValueError if paths are on different drives (Windows)
+        logger.error(f"[{session_id}] Security Error: Path comparison failed (different drives?). Requested: {file_path}")
+        raise web.HTTPForbidden(text="Access denied")
+    except Exception as e: # Catch other potential errors
+        logger.error(f"[{session_id}] Security Error: Unexpected error validating path: {e}. Requested: {file_path}", exc_info=True)
+        raise web.HTTPInternalServerError(text="Error validating file path")
+
+
+    if not file_path.is_file():
+        logger.warning(f"[{session_id}] File not found request: {file_path}")
+        raise web.HTTPNotFound(text=f"File not found: {filename}")
+
+    logger.info(f"[{session_id}] Serving file: {file_path}")
+    # Use FileResponse for efficient serving
+    return FileResponse(path=file_path)
+
+
+# --- Setup File Server ---
+async def setup_file_server():
+    """Sets up and returns the aiohttp file server runner."""
+    app = web.Application()
+    # Route to serve files: /workspace_files/{task_id}/{filename}
+    app.router.add_get('/workspace_files/{task_id}/{filename}', handle_workspace_file)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, FILE_SERVER_HOST, FILE_SERVER_PORT)
+    logger.info(f"Starting file server on http://{FILE_SERVER_HOST}:{FILE_SERVER_PORT}")
+    return site, runner
+
+
 # --- WebSocket Handler ---
 async def handler(websocket):
     """Handles incoming WebSocket connections and messages for a user session."""
@@ -133,7 +201,7 @@ async def handler(websocket):
     # current_task_id is now stored in session_data
 
     # --- Helper to send messages safely ---
-    async def send_ws_message(msg_type: str, content: str):
+    async def send_ws_message(msg_type: str, content: Any): # Allow Any content for image display
         if session_id in connected_clients and connected_clients[session_id] == websocket:
             try: await websocket.send(json.dumps({"type": msg_type, "content": content}))
             except websockets.exceptions.ConnectionClosed: logger.warning(f"[{session_id}] WS closed trying to send."); # Cleanup handled in finally
@@ -160,12 +228,8 @@ async def handler(websocket):
         logger.info(f"[{session_id}] Created session memory and WebSocket callback handler.")
     except Exception as e:
         logger.error(f"[{session_id}] Failed to create memory/callback: {e}", exc_info=True)
-        # Indent the close attempt correctly
-        try:
-            await websocket.close(code=1011, reason="Session setup failed")
-        except Exception as close_e:
-             logger.error(f"[{session_id}] Error closing websocket: {close_e}")
-             pass
+        try: await websocket.close(code=1011, reason="Session setup failed");
+        except Exception as close_e: logger.error(f"[{session_id}] Error closing websocket: {close_e}"); pass
         if session_id in connected_clients: del connected_clients[session_id];
         return
 
@@ -197,7 +261,6 @@ async def handler(websocket):
                          session_data[session_id]["callback_handler"].set_task_id(current_task_id)
                          await add_task(task_id_from_frontend, task_title_from_frontend or f"Task {task_id_from_frontend}", datetime.datetime.now(datetime.timezone.utc).isoformat())
                          await add_monitor_log_and_save(f"Switched context to task ID: {current_task_id} ('{task_title_from_frontend}')", "system_context_switch")
-                         # Indent memory clear correctly
                          if "memory" in session_data[session_id]:
                              try:
                                  session_data[session_id]["memory"].clear()
@@ -230,7 +293,6 @@ async def handler(websocket):
                      if session_id in session_data:
                          session_data[session_id]["current_task_id"] = None
                          session_data[session_id]["callback_handler"].set_task_id(None)
-                         # Indent memory clear correctly
                          if "memory" in session_data[session_id]:
                              try:
                                  session_data[session_id]["memory"].clear()
@@ -268,6 +330,10 @@ async def handler(websocket):
                          await send_ws_message("agent_message", f"Sorry, internal error setting up agent.")
                          continue
 
+                    # Store list of files before agent run to detect new ones
+                    task_workspace_path = get_task_workspace_path(active_task_id)
+                    files_before = set(f.name for f in task_workspace_path.glob('*.png') if f.is_file())
+
                     try:
                         # Use astream_log() - Callbacks handle UI updates and DB saving
                         config = RunnableConfig(callbacks=[session_callback_handler])
@@ -275,6 +341,17 @@ async def handler(websocket):
                             {"input": content}, config=config
                         ):
                             pass # Callbacks handle everything
+
+                        # Check for new PNG files after successful run
+                        files_after = set(f.name for f in task_workspace_path.glob('*.png') if f.is_file())
+                        new_files = files_after - files_before
+                        if new_files:
+                            logger.info(f"[{session_id}] Detected new PNG files: {new_files}")
+                            for filename in new_files:
+                                image_url = f"http://{FILE_SERVER_HOST}:{FILE_SERVER_PORT}/workspace_files/{active_task_id}/{filename}"
+                                await add_monitor_log_and_save(f"Generated image: {filename}", "system_image_generated")
+                                await send_ws_message("display_image", {"url": image_url, "filename": filename})
+                                break # Only display the first new image for now
 
                         # await add_monitor_log_and_save("Agent stream finished.", "system_agent_end") # Callback handles final status
 
@@ -325,11 +402,8 @@ async def handler(websocket):
     except websockets.exceptions.ConnectionClosedError as e: logger.warning(f"Connection closed error: {websocket.remote_address} (Session: {session_id}) - {e}")
     except Exception as e:
         logger.error(f"Unhandled error in handler: {websocket.remote_address} (Session: {session_id}): {e}", exc_info=True)
-        try:
-            await websocket.close(code=1011, reason="Internal server error")
-        except Exception as close_e:
-            logger.error(f"[{session_id}] Error closing websocket during exception handling: {close_e}")
-            pass
+        try: await websocket.close(code=1011, reason="Internal server error");
+        except Exception as close_e: logger.error(f"[{session_id}] Error closing websocket: {close_e}"); pass
     finally: # Cleanup
         logger.info(f"Cleaning up for session {session_id}")
         if session_id in connected_clients: del connected_clients[session_id]
@@ -338,12 +412,37 @@ async def handler(websocket):
 
 
 async def main():
-    host = "localhost"; port = 8765;
-    logger.info("Initializing database...")
-    await init_db() # Initialize DB before starting server
-    logger.info(f"Starting WebSocket server on ws://{host}:{port}")
-    async with websockets.serve(handler, host, port):
-        await asyncio.Future()  # Run forever
+    # --- Start File Server ---
+    file_server_site, file_server_runner = await setup_file_server()
+    await file_server_site.start()
+    logger.info("File server started.")
+
+    # --- Start WebSocket Server ---
+    ws_host = "localhost"; ws_port = 8765;
+    logger.info(f"Starting WebSocket server on ws://{ws_host}:{ws_port}")
+    websocket_server = await websockets.serve(handler, ws_host, ws_port)
+    logger.info("WebSocket server started.")
+
+    try:
+        # Keep both servers running
+        await asyncio.gather(
+            websocket_server.wait_closed(),
+            # Keep file server running (no specific wait_closed needed for TCPSite)
+            asyncio.Future() # Runs forever until cancelled
+        )
+    except asyncio.CancelledError:
+         logger.info("Servers shutting down...")
+    finally:
+        # --- Cleanup Servers ---
+        logger.info("Stopping WebSocket server...")
+        websocket_server.close()
+        await websocket_server.wait_closed()
+        logger.info("WebSocket server stopped.")
+
+        logger.info("Stopping file server...")
+        await file_server_runner.cleanup() # Clean up aiohttp runner
+        logger.info("File server stopped.")
+
 
 if __name__ == "__main__":
     try:
@@ -352,5 +451,5 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         logger.info("Server stopped manually.")
     except Exception as e:
-        logger.critical(f"Server failed to start or encountered critical error: {e}", exc_info=True)
+        logger.critical(f"Server failed to start: {e}", exc_info=True)
 

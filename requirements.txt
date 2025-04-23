@@ -4,15 +4,16 @@ websockets>=12.0
 # Configuration
 python-dotenv>=1.0
 
-# HTTP Client
+# HTTP Client & Server
 httpx>=0.25
+aiohttp>=3.9 # Added for file server
 
 # --- LangChain Core and Integrations ---
 langchain>=0.1.0
 langchain-google-genai>=1.0
 langchain-community>=0.0.20
 langchainhub>=0.1.15
-langchain-experimental>=0.0.50
+langchain-experimental>=0.0.50 # For Python REPL Tool (if added later)
 langchain-ollama>=0.1.0
 
 # --- Tool Dependencies ---
@@ -20,7 +21,7 @@ duckduckgo-search>=5.0
 beautifulsoup4>=4.12
 lxml>=5.0
 aiofiles>=23.0
-matplotlib>=3.0
+matplotlib>=3.0 # Needed for plotting examples
 
 # --- Database ---
 aiosqlite>=0.19 # Added for async SQLite operations
