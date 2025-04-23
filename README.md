@@ -1,4 +1,3 @@
-```
 # AI Agent UI Clone & LangChain Backend
 
 This project is a functional clone of the user interface for an AI assistant system, inspired by a screenshot of Manus AI. It features a three-panel layout (Tasks, Chat, Monitor) and connects via WebSockets to a Python backend powered by **LangChain** to create a basic AI agent. The agent can use LLMs (Google Gemini or local Ollama) for reasoning and tools (Shell, Web Search, Web Reader, File Read/Write) to perform actions. The UI supports task management, chat history persistence via a local database, and displays generated images in the monitor panel.
@@ -175,5 +174,3 @@ Run from the **project root directory** (`manus-ai-ui-clone/`).
 * **Containerization:** Run the backend in Docker for better isolation and dependency management, especially crucial if adding a Python REPL.
 * **User Authentication:** Secure the application if needed.
 * **UI Polish:** Improve overall aesthetics, add loading indicators, better error displays.
-
-```
