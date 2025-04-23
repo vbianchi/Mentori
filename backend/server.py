@@ -62,9 +62,10 @@ async def read_stream(stream, stream_name, session_id, send_ws_message_func, db_
         timestamp = datetime.datetime.now().isoformat(timespec='milliseconds')
         await send_ws_message_func("monitor_log", f"[{timestamp}]{log_prefix_base} {log_content}")
 
-        # Save to DB
+        # *** CORRECTED SYNTAX: Save to DB ***
         if current_task_id:
              try:
+                 # Log type distinguishes stdout/stderr, content is the line
                  await db_add_message_func(current_task_id, session_id, f"monitor_{stream_name}", line_content)
              except Exception as db_err:
                   logger.error(f"[{session_id}] Failed to save {stream_name} log to DB: {db_err}")
@@ -96,7 +97,7 @@ async def execute_shell_command(command: str, session_id, send_ws_message_func, 
     except FileNotFoundError: status_msg = "failed (Not Found)"; cmd_part = command.split()[0] if command else "Unknown"; logger.warning(f"[{session_id}] Direct command not found: {cmd_part}")
     except Exception as e: status_msg = f"failed ({type(e).__name__})"; logger.error(f"[{session_id}] Error running direct command '{command}': {e}", exc_info=True)
     finally:
-         # *** CORRECTED SYNTAX: Ensure process termination block is indented ***
+         # Ensure process termination block is indented
          if process and process.returncode is None:
               try:
                   process.terminate()
@@ -159,8 +160,12 @@ async def handler(websocket):
         logger.info(f"[{session_id}] Created session memory and WebSocket callback handler.")
     except Exception as e:
         logger.error(f"[{session_id}] Failed to create memory/callback: {e}", exc_info=True)
-        try: await websocket.close(code=1011, reason="Session setup failed");
-        except Exception as close_e: logger.error(f"[{session_id}] Error closing websocket: {close_e}"); pass
+        # Indent the close attempt correctly
+        try:
+            await websocket.close(code=1011, reason="Session setup failed")
+        except Exception as close_e:
+             logger.error(f"[{session_id}] Error closing websocket: {close_e}")
+             pass
         if session_id in connected_clients: del connected_clients[session_id];
         return
 
@@ -192,9 +197,13 @@ async def handler(websocket):
                          session_data[session_id]["callback_handler"].set_task_id(current_task_id)
                          await add_task(task_id_from_frontend, task_title_from_frontend or f"Task {task_id_from_frontend}", datetime.datetime.now(datetime.timezone.utc).isoformat())
                          await add_monitor_log_and_save(f"Switched context to task ID: {current_task_id} ('{task_title_from_frontend}')", "system_context_switch")
+                         # Indent memory clear correctly
                          if "memory" in session_data[session_id]:
-                             try: session_data[session_id]["memory"].clear(); logger.info(f"[{session_id}] Cleared agent memory.")
-                             except Exception as mem_e: logger.error(f"[{session_id}] Failed to clear memory: {mem_e}")
+                             try:
+                                 session_data[session_id]["memory"].clear()
+                                 logger.info(f"[{session_id}] Cleared agent memory.")
+                             except Exception as mem_e:
+                                 logger.error(f"[{session_id}] Failed to clear memory: {mem_e}")
 
                          await send_ws_message("status_message", "Loading history...")
                          history_messages = await get_messages_for_task(current_task_id)
@@ -221,9 +230,13 @@ async def handler(websocket):
                      if session_id in session_data:
                          session_data[session_id]["current_task_id"] = None
                          session_data[session_id]["callback_handler"].set_task_id(None)
+                         # Indent memory clear correctly
                          if "memory" in session_data[session_id]:
-                             try: session_data[session_id]["memory"].clear(); logger.info(f"[{session_id}] Cleared agent memory.")
-                             except Exception as mem_e: logger.error(f"[{session_id}] Failed to clear memory: {mem_e}")
+                             try:
+                                 session_data[session_id]["memory"].clear()
+                                 logger.info(f"[{session_id}] Cleared agent memory.")
+                             except Exception as mem_e:
+                                 logger.error(f"[{session_id}] Failed to clear memory: {mem_e}")
                      await add_monitor_log_and_save("Received 'new_task'. Clearing context.", "system_new_task")
                      await send_ws_message("status_message", "Ready for new task goal.")
 
@@ -256,19 +269,14 @@ async def handler(websocket):
                          continue
 
                     try:
-                        # Use astream() for token streaming
+                        # Use astream_log() - Callbacks handle UI updates and DB saving
                         config = RunnableConfig(callbacks=[session_callback_handler])
-                        async for event in request_agent_executor.astream(
+                        async for chunk in request_agent_executor.astream_log(
                             {"input": content}, config=config
                         ):
-                            # Check for final output tokens specifically
-                            if "messages" in event:
-                                for msg in event["messages"]:
-                                    if isinstance(msg, AIMessage):
-                                        # Send token chunk to UI
-                                        await send_ws_message("agent_token_chunk", msg.content)
+                            pass # Callbacks handle everything
 
-                        await add_monitor_log_and_save("Agent stream finished.", "system_agent_end")
+                        # await add_monitor_log_and_save("Agent stream finished.", "system_agent_end") # Callback handles final status
 
                     except Exception as e:
                         error_msg = f"CRITICAL Error during agent execution: {e}"
@@ -281,6 +289,7 @@ async def handler(websocket):
 
                 # --- DELETE TASK ---
                 elif message_type == "delete_task" and task_id_from_frontend:
+                     # ... (delete logic remains the same) ...
                      logger.warning(f"[{session_id}] Received request to delete task: {task_id_from_frontend}")
                      await add_monitor_log_and_save(f"Received request to delete task: {task_id_from_frontend}", "system_delete_request")
                      deleted = await delete_task_and_messages(task_id_from_frontend)
@@ -295,23 +304,17 @@ async def handler(websocket):
                          await send_ws_message("status_message", f"Failed to delete task {task_id_from_frontend[:8]}...")
                          await add_monitor_log_and_save(f"Failed to delete task {task_id_from_frontend}.", "error_delete")
 
-
                 # --- Other message types ---
                 elif message_type == "run_command": # Direct command execution
-                     command = data.get("command")
-                     active_task_id = current_task_id
+                     # ... (remains the same) ...
+                     command = data.get("command"); active_task_id = current_task_id
                      await add_monitor_log_and_save(f"Received direct 'run_command'. Executing: {command}", "system_direct_cmd")
-                     if command:
-                          await execute_shell_command(command, session_id, send_ws_message, add_message, active_task_id)
-                     else:
-                          await add_monitor_log_and_save("Error: Received 'run_command' with no command.", "error_direct_cmd")
-
-                elif message_type == "action_command": # Placeholder for UI actions
+                     if command: await execute_shell_command(command, session_id, send_ws_message, add_message, active_task_id)
+                     else: await add_monitor_log_and_save("Error: 'run_command' with no command.", "error_direct_cmd")
+                elif message_type == "action_command": # Placeholder
                      await add_monitor_log_and_save(f"Received action command: {data.get('command')} (Not implemented).", "system_action_cmd")
-
-                else: # Unknown message type
-                     logger.warning(f"[{session_id}] Unknown message type received: {message_type}")
-                     await add_monitor_log_and_save(f"Received unknown message type: {message_type}", "error_unknown_msg")
+                else: # Unknown
+                     logger.warning(f"[{session_id}] Unknown message type: {message_type}"); await add_monitor_log_and_save(f"Unknown message type: {message_type}", "error_unknown_msg")
 
             # --- Error handling for message processing ---
             except json.JSONDecodeError: logger.error(f"[{session_id}] Non-JSON message: {message}"); await add_monitor_log_and_save("Error: Received invalid message format.", "error_json")

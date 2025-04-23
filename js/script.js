@@ -2,7 +2,7 @@
 /**
  * This script handles the frontend logic for the AI Agent UI,
  * including WebSocket communication, DOM manipulation, event handling,
- * task history management, chat input history, and token streaming.
+ * task history management, and chat input history.
  */
 document.addEventListener('DOMContentLoaded', () => {
     console.log("AI Agent UI Script Loaded and DOM ready!");
@@ -34,8 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let chatHistoryIndex = -1;
     let currentInputBuffer = "";
 
-    // --- Token Streaming State ---
-    let currentStreamingMessageElement = null; // Holds the div being streamed into
+    // --- Token Streaming State (REMOVED) ---
+    // let currentStreamingMessageElement = null; // Removed
 
     // --- WebSocket Setup ---
     const wsUrl = 'ws://localhost:8765';
@@ -72,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.onmessage = (event) => {
             try {
                 const message = JSON.parse(event.data);
+                // *** Reverted Switch Statement ***
                 switch (message.type) {
                     case 'history_start':
                         console.log("Received history_start signal."); isLoadingHistory = true;
@@ -80,87 +81,37 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.log("Received history_end signal."); isLoadingHistory = false;
                         const loadingMsg = chatMessagesContainer.querySelector('.message-status:last-child');
                         if (loadingMsg && loadingMsg.textContent.startsWith("Loading history...")) { loadingMsg.remove(); } break;
-
-                    // --- Handle Token Streaming ---
-                    case 'agent_token_chunk':
-                        // If this is the first token for a new message, create the element
-                        if (!currentStreamingMessageElement) {
-                            currentStreamingMessageElement = addChatMessage("", 'agent', false); // Add empty bubble, don't scroll yet
-                        }
-                        // Append the token content
-                        if (currentStreamingMessageElement) {
-                            currentStreamingMessageElement.textContent += message.content;
-                            scrollToBottom(chatMessagesContainer); // Scroll as content arrives
-                        }
-                        break;
-                    // --- End Token Streaming ---
-
-                    case 'agent_message': // Handles full agent messages (e.g., from history, or if streaming fails)
+                    case 'agent_message': // Handles full agent messages (live & history)
                         console.log("Received agent_message:", message.content);
                         addChatMessage(message.content, 'agent');
-                        currentStreamingMessageElement = null; // Ensure streaming stops if a full message arrives
                         break;
                     case 'user': // Handle user messages from history
                         console.log("Received user history message:", message.content);
                         addChatMessage(message.content, 'user');
-                        currentStreamingMessageElement = null; // Reset streaming on user message
                         break;
                     case 'status_message':
                         addChatMessage(message.content, 'status');
-                        // If status indicates completion or error, stop streaming
-                        if (message.content.includes("complete") || message.content.includes("error")) {
-                             currentStreamingMessageElement = null;
-                        }
                         break;
                     case 'monitor_log':
                         console.log("Received monitor_log:", message.content);
                         addMonitorLog(message.content);
-                        // Don't reset streaming element on monitor logs
                         break;
                     case 'user_message': break; // Ignore live echo
                     default:
                         console.warn("Received unknown message type:", message.type);
                         addMonitorLog(`[SYSTEM] Unknown message type: ${message.type}`);
-                        currentStreamingMessageElement = null; // Reset streaming on unknown type
                 }
-            } catch (error) { console.error("Failed to parse/process WS message:", error, "Data:", event.data); addMonitorLog(`[SYSTEM] Error processing message: ${error.message}.`); currentStreamingMessageElement = null; } // Reset streaming on error
+            } catch (error) { console.error("Failed to parse/process WS message:", error, "Data:", event.data); addMonitorLog(`[SYSTEM] Error processing message: ${error.message}.`); }
         };
 
-        socket.onerror = (event) => { console.error("WebSocket error:", event); addChatMessage("ERROR: Cannot connect to backend.", "status"); addMonitorLog(`[SYSTEM] WebSocket error.`); window.socket = null; currentStreamingMessageElement = null; };
-        socket.onclose = (event) => { console.log(`WebSocket closed. Code: ${event.code}`); let reason = event.reason || 'No reason given'; let advice = ""; if (event.code === 1000) { reason = "Normal"; } else { reason = `Abnormal (Code: ${event.code})`; advice = " Backend down?"; } addChatMessage(`Connection closed.${advice}`, "status"); addMonitorLog(`[SYSTEM] WebSocket disconnected. ${reason}`); window.socket = null; currentStreamingMessageElement = null; };
+        socket.onerror = (event) => { console.error("WebSocket error:", event); addChatMessage("ERROR: Cannot connect to backend.", "status"); addMonitorLog(`[SYSTEM] WebSocket error.`); window.socket = null; };
+        socket.onclose = (event) => { console.log(`WebSocket closed. Code: ${event.code}`); let reason = event.reason || 'No reason given'; let advice = ""; if (event.code === 1000) { reason = "Normal"; } else { reason = `Abnormal (Code: ${event.code})`; advice = " Backend down?"; } addChatMessage(`Connection closed.${advice}`, "status"); addMonitorLog(`[SYSTEM] WebSocket disconnected. ${reason}`); window.socket = null; };
     };
 
     // --- Helper Functions ---
     const scrollToBottom = (element) => { if (!element) return; const isScrolledToBottom = element.scrollHeight - element.clientHeight <= element.scrollTop + 50; if (isScrolledToBottom) { element.scrollTop = element.scrollHeight; } };
-
-    /**
-     * Adds a message element to the chat display area.
-     * Returns the created element, optionally without scrolling.
-     * @param {string} text The message text content.
-     * @param {string} type The type of message.
-     * @param {boolean} [doScroll=true] Whether to scroll to bottom after adding.
-     * @returns {HTMLElement} The created message element.
-     */
-    const addChatMessage = (text, type = 'agent', doScroll = true) => {
-        if (!chatMessagesContainer) { console.error("Chat container missing!"); return null; }
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message', `message-${type}`);
-        let isSimpleText = true;
-        if (type === 'status') { if (text.toLowerCase().includes("connect") || text.toLowerCase().includes("clos")) { messageElement.classList.add('connection-status'); } if (text.toLowerCase().includes("error")) { messageElement.classList.add('error-message'); } }
-        switch (type) {
-            case 'user': messageElement.classList.add('user-message'); messageElement.style.cssText = 'align-self: flex-end; background-color: var(--accent-color); color: white; border: 1px solid var(--accent-color);'; break;
-            case 'status': messageElement.classList.add('agent-status'); break;
-            case 'suggestion': messageElement.classList.add('agent-suggestion'); break;
-            case 'warning': messageElement.classList.add('agent-warning'); break;
-            case 'action-prompt': isSimpleText = false; messageElement.classList.add('action-prompt'); messageElement.innerHTML = `<p>${text}</p><button class="action-btn">Default Action</button>`; break;
-            case 'agent': default: messageElement.classList.add('agent-message'); messageElement.style.border = '1px solid var(--border-color)'; break;
-        }
-        if (isSimpleText) { messageElement.textContent = text; }
-        chatMessagesContainer.appendChild(messageElement);
-        if (doScroll) scrollToBottom(chatMessagesContainer);
-        return messageElement; // Return the element
-    };
-
+    // addChatMessage no longer needs the doScroll parameter
+    const addChatMessage = (text, type = 'agent') => { if (!chatMessagesContainer) { console.error("Chat container missing!"); return null; } const messageElement = document.createElement('div'); messageElement.classList.add('message', `message-${type}`); let isSimpleText = true; if (type === 'status') { if (text.toLowerCase().includes("connect") || text.toLowerCase().includes("clos")) { messageElement.classList.add('connection-status'); } if (text.toLowerCase().includes("error")) { messageElement.classList.add('error-message'); } } switch (type) { case 'user': messageElement.classList.add('user-message'); messageElement.style.cssText = 'align-self: flex-end; background-color: var(--accent-color); color: white; border: 1px solid var(--accent-color);'; break; case 'status': messageElement.classList.add('agent-status'); break; case 'suggestion': messageElement.classList.add('agent-suggestion'); break; case 'warning': messageElement.classList.add('agent-warning'); break; case 'action-prompt': isSimpleText = false; messageElement.classList.add('action-prompt'); messageElement.innerHTML = `<p>${text}</p><button class="action-btn">Default Action</button>`; break; case 'agent': default: messageElement.classList.add('agent-message'); messageElement.style.border = '1px solid var(--border-color)'; break; } if (isSimpleText) { messageElement.textContent = text; } chatMessagesContainer.appendChild(messageElement); scrollToBottom(chatMessagesContainer); return messageElement; }; // Return removed as it was only for streaming
     const addMonitorLog = (text) => { if (!monitorCodeElement) { console.error("Monitor code element missing!"); return; } const logLine = document.createTextNode(`${text}\n`); monitorCodeElement.appendChild(logLine); scrollToBottom(monitorContentElement); };
 
     // --- Task History Functions ---
