@@ -2,7 +2,7 @@
 /**
  * This script handles the frontend logic for the AI Agent UI,
  * including WebSocket communication, DOM manipulation, event handling,
- * task history management, and chat input history.
+ * task history management, chat input history, and Markdown formatting.
  */
 document.addEventListener('DOMContentLoaded', () => {
     console.log("AI Agent UI Script Loaded and DOM ready!");
@@ -34,8 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let chatHistoryIndex = -1;
     let currentInputBuffer = "";
 
-    // --- Token Streaming State (REMOVED) ---
-    // let currentStreamingMessageElement = null; // Removed
+    // --- Token Streaming State ---
+    let currentStreamingMessageElement = null;
 
     // --- WebSocket Setup ---
     const wsUrl = 'ws://localhost:8765';
@@ -72,7 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.onmessage = (event) => {
             try {
                 const message = JSON.parse(event.data);
-                // *** Reverted Switch Statement ***
                 switch (message.type) {
                     case 'history_start':
                         console.log("Received history_start signal."); isLoadingHistory = true;
@@ -81,16 +80,38 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.log("Received history_end signal."); isLoadingHistory = false;
                         const loadingMsg = chatMessagesContainer.querySelector('.message-status:last-child');
                         if (loadingMsg && loadingMsg.textContent.startsWith("Loading history...")) { loadingMsg.remove(); } break;
-                    case 'agent_message': // Handles full agent messages (live & history)
-                        console.log("Received agent_message:", message.content);
-                        addChatMessage(message.content, 'agent');
+
+                    // Handle Token Streaming with Formatting
+                    case 'agent_token_chunk':
+                        if (!currentStreamingMessageElement) {
+                            console.log("Creating new message element for streaming.");
+                            currentStreamingMessageElement = addChatMessage("", 'agent', false);
+                        }
+                        if (currentStreamingMessageElement) {
+                            // Append raw text first (important for accurate formatting later)
+                            currentStreamingMessageElement.textContent += message.content;
+                            // Re-apply formatting to the entire accumulated text
+                            currentStreamingMessageElement.innerHTML = formatMessageContent(currentStreamingMessageElement.textContent);
+                            scrollToBottom(chatMessagesContainer);
+                        } else { console.warn("Received token chunk but no streaming element."); }
+                        break;
+
+                    case 'agent_message': // Handles full agent messages (e.g., from history)
+                        console.log("Received full agent_message:", message.content);
+                        addChatMessage(message.content, 'agent'); // Formats the full message
+                        currentStreamingMessageElement = null; // Ensure streaming stops
                         break;
                     case 'user': // Handle user messages from history
                         console.log("Received user history message:", message.content);
-                        addChatMessage(message.content, 'user');
+                        addChatMessage(message.content, 'user'); // User messages are plain text
+                        currentStreamingMessageElement = null;
                         break;
                     case 'status_message':
-                        addChatMessage(message.content, 'status');
+                        addChatMessage(message.content, 'status'); // Status messages are plain text
+                        if (message.content.includes("complete") || message.content.includes("error")) {
+                             console.log("Resetting streaming element due to status message:", message.content);
+                             currentStreamingMessageElement = null;
+                        }
                         break;
                     case 'monitor_log':
                         console.log("Received monitor_log:", message.content);
@@ -100,18 +121,93 @@ document.addEventListener('DOMContentLoaded', () => {
                     default:
                         console.warn("Received unknown message type:", message.type);
                         addMonitorLog(`[SYSTEM] Unknown message type: ${message.type}`);
+                        currentStreamingMessageElement = null;
                 }
-            } catch (error) { console.error("Failed to parse/process WS message:", error, "Data:", event.data); addMonitorLog(`[SYSTEM] Error processing message: ${error.message}.`); }
+            } catch (error) { console.error("Failed to parse/process WS message:", error, "Data:", event.data); addMonitorLog(`[SYSTEM] Error processing message: ${error.message}.`); currentStreamingMessageElement = null; }
         };
 
-        socket.onerror = (event) => { console.error("WebSocket error:", event); addChatMessage("ERROR: Cannot connect to backend.", "status"); addMonitorLog(`[SYSTEM] WebSocket error.`); window.socket = null; };
-        socket.onclose = (event) => { console.log(`WebSocket closed. Code: ${event.code}`); let reason = event.reason || 'No reason given'; let advice = ""; if (event.code === 1000) { reason = "Normal"; } else { reason = `Abnormal (Code: ${event.code})`; advice = " Backend down?"; } addChatMessage(`Connection closed.${advice}`, "status"); addMonitorLog(`[SYSTEM] WebSocket disconnected. ${reason}`); window.socket = null; };
+        socket.onerror = (event) => { console.error("WebSocket error:", event); addChatMessage("ERROR: Cannot connect to backend.", "status"); addMonitorLog(`[SYSTEM] WebSocket error.`); window.socket = null; currentStreamingMessageElement = null; };
+        socket.onclose = (event) => { console.log(`WebSocket closed. Code: ${event.code}`); let reason = event.reason || 'No reason given'; let advice = ""; if (event.code === 1000) { reason = "Normal"; } else { reason = `Abnormal (Code: ${event.code})`; advice = " Backend down?"; } addChatMessage(`Connection closed.${advice}`, "status"); addMonitorLog(`[SYSTEM] WebSocket disconnected. ${reason}`); window.socket = null; currentStreamingMessageElement = null; };
     };
 
     // --- Helper Functions ---
     const scrollToBottom = (element) => { if (!element) return; const isScrolledToBottom = element.scrollHeight - element.clientHeight <= element.scrollTop + 50; if (isScrolledToBottom) { element.scrollTop = element.scrollHeight; } };
-    // addChatMessage no longer needs the doScroll parameter
-    const addChatMessage = (text, type = 'agent') => { if (!chatMessagesContainer) { console.error("Chat container missing!"); return null; } const messageElement = document.createElement('div'); messageElement.classList.add('message', `message-${type}`); let isSimpleText = true; if (type === 'status') { if (text.toLowerCase().includes("connect") || text.toLowerCase().includes("clos")) { messageElement.classList.add('connection-status'); } if (text.toLowerCase().includes("error")) { messageElement.classList.add('error-message'); } } switch (type) { case 'user': messageElement.classList.add('user-message'); messageElement.style.cssText = 'align-self: flex-end; background-color: var(--accent-color); color: white; border: 1px solid var(--accent-color);'; break; case 'status': messageElement.classList.add('agent-status'); break; case 'suggestion': messageElement.classList.add('agent-suggestion'); break; case 'warning': messageElement.classList.add('agent-warning'); break; case 'action-prompt': isSimpleText = false; messageElement.classList.add('action-prompt'); messageElement.innerHTML = `<p>${text}</p><button class="action-btn">Default Action</button>`; break; case 'agent': default: messageElement.classList.add('agent-message'); messageElement.style.border = '1px solid var(--border-color)'; break; } if (isSimpleText) { messageElement.textContent = text; } chatMessagesContainer.appendChild(messageElement); scrollToBottom(chatMessagesContainer); return messageElement; }; // Return removed as it was only for streaming
+
+    /**
+     * Basic sanitation and Markdown to HTML conversion for agent messages.
+     * Handles newlines and basic code blocks.
+     * @param {string} text The raw text content.
+     * @returns {string} HTML formatted string.
+     */
+    const formatMessageContent = (text) => {
+        // 1. Sanitize basic HTML chars FIRST
+        let escapedText = text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+        // 2. Convert ```code blocks``` to <pre><code>
+        // Improved Regex: Handles optional language, flexible newlines, non-greedy content match
+        escapedText = escapedText.replace(/```(\w+)?\s*?\n([\s\S]*?)\n?```/g, (match, lang, code) => {
+            // Re-escape ONLY the code content again inside the block
+            const escapedCode = code
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+            const langClass = lang ? ` class="language-${lang}"` : '';
+            return `<pre><code${langClass}>${escapedCode}</code></pre>`;
+        });
+
+        // 3. Convert remaining newlines to <br> (outside of pre/code)
+        // This is tricky - the above regex replaces newlines within the block.
+        // A simpler approach for now: replace all newlines outside pre tags.
+        // We can split by <pre>, replace \n in the non-pre parts, then join.
+        const parts = escapedText.split(/(<pre>.*?<\/pre>)/s); // Split by pre blocks, keeping delimiters
+        for (let i = 0; i < parts.length; i += 2) { // Only process parts outside <pre>
+            parts[i] = parts[i].replace(/\n/g, '<br>');
+        }
+        escapedText = parts.join('');
+
+
+        // Add more Markdown conversions here if needed (e.g., bold, italics, lists)
+        // Example: Bold (**text**) -> <strong>text</strong>
+        // escapedText = escapedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        // Example: Italics (*text* or _text_) -> <em>text</em>
+        // escapedText = escapedText.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>');
+
+        return escapedText;
+     };
+
+
+    /**
+     * Adds a message element to the chat display area, formatting agent/user messages.
+     * Returns the created element, optionally without scrolling.
+     */
+    const addChatMessage = (text, type = 'agent', doScroll = true) => {
+        if (!chatMessagesContainer) { console.error("Chat container missing!"); return null; }
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message', `message-${type}`);
+
+        // Apply basic styling classes
+        if (type === 'status') { if (text.toLowerCase().includes("connect") || text.toLowerCase().includes("clos")) { messageElement.classList.add('connection-status'); } if (text.toLowerCase().includes("error")) { messageElement.classList.add('error-message'); } }
+        if (type === 'user') { messageElement.classList.add('user-message'); messageElement.style.cssText = 'align-self: flex-end; background-color: var(--accent-color); color: white; border: 1px solid var(--accent-color);'; }
+        if (type === 'agent') { messageElement.classList.add('agent-message'); messageElement.style.border = '1px solid var(--border-color)'; }
+
+        // Format content for agent messages using innerHTML
+        if (type === 'agent') {
+            messageElement.innerHTML = formatMessageContent(text);
+        } else {
+            // For user, status, etc., just use textContent (safer)
+            messageElement.textContent = text;
+        }
+
+        chatMessagesContainer.appendChild(messageElement);
+        if (doScroll) scrollToBottom(chatMessagesContainer);
+        return messageElement; // Return the element
+    };
+
     const addMonitorLog = (text) => { if (!monitorCodeElement) { console.error("Monitor code element missing!"); return; } const logLine = document.createTextNode(`${text}\n`); monitorCodeElement.appendChild(logLine); scrollToBottom(monitorContentElement); };
 
     // --- Task History Functions ---

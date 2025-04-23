@@ -1,3 +1,5 @@
+/* css/style.css - Dark Theme */
+
 /* Basic Reset & Root Variables */
 :root {
     /* Re-evaluated colors based on screenshot */
@@ -16,6 +18,8 @@
     --warning-border: #f79009;
     --terminal-bg: #111315; /* Darker background for terminal */
     --terminal-text: #a5d6ff; /* Lighter blue/cyan text for terminal */
+    --code-bg: #2c3035; /* Use slightly lighter dark bg for code blocks */
+    --code-text: #e5e7eb; /* Lighter text for code */
 
     --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     --monospace-font: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
@@ -127,13 +131,15 @@ html, body {
 .task-item {
     padding: 10px 15px;
     cursor: pointer;
-    /* Remove border-bottom, rely on hover/active state */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: 0.9em;
     border-left: 3px solid transparent; /* For active indicator */
     transition: background-color 0.2s ease;
+    display: flex; /* Use flex for title and button */
+    justify-content: space-between; /* Space them out */
+    align-items: center;
 }
 
 .task-item.active {
@@ -142,10 +148,52 @@ html, body {
     color: var(--text-color); /* Ensure active text is clear */
     border-left-color: var(--accent-color);
 }
+.task-item.active .task-delete-btn {
+    color: var(--text-color-muted); /* Make delete button visible on active */
+    opacity: 0.7;
+}
+.task-item.active .task-delete-btn:hover {
+    opacity: 1.0;
+    color: var(--error-color);
+}
+
 
 .task-item:hover {
     background-color: var(--panel-bg-lightest);
 }
+
+.task-item-placeholder {
+    color: var(--text-color-muted);
+    padding: 0.75rem;
+    text-align: center;
+    font-style: italic;
+}
+
+.task-title {
+    flex-grow: 1; /* Allow title to take available space */
+    margin-right: 0.5rem; /* Space between title and button */
+    /* Prevent title itself from overflowing */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.task-delete-btn {
+    background: none;
+    border: none;
+    color: var(--text-color-darker); /* Darker color normally */
+    cursor: pointer;
+    font-size: 1rem; /* Adjust size if needed */
+    padding: 0 0.25rem; /* Minimal padding */
+    line-height: 1; /* Ensure button doesn't affect line height */
+    opacity: 0.5;
+    transition: opacity 0.2s ease, color 0.2s ease;
+}
+.task-delete-btn:hover {
+    opacity: 1.0;
+    color: var(--error-color); /* Red on hover */
+}
+
 
 /* Center Panel Specifics */
 .center-panel {
@@ -181,23 +229,43 @@ html, body {
     max-width: 85%;
     line-height: 1.5;
     font-size: 0.95em;
+    /* Added for wrapping */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
 }
 
-.agent-message {
+.message-agent {
     background-color: var(--panel-bg); /* Use panel bg for messages */
     align-self: flex-start; /* Align agent messages to the left */
     border: 1px solid var(--border-color); /* Subtle border */
 }
-.agent-status {
+.message-user {
+    background-color: var(--accent-color); /* Use accent color */
+    color: white; /* White text on accent */
+    align-self: flex-end; /* Align user messages to the right */
+    border: 1px solid var(--accent-color);
+}
+
+.message-status {
     background-color: transparent; /* No background */
-    border: 1px dashed var(--border-color); /* Dashed border */
-    border-left: 3px solid var(--text-color-muted); /* Indicator */
+    border: none; /* Remove border */
     color: var(--text-color-muted);
     font-size: 0.9em;
-    align-self: stretch; /* Stretch across */
-    padding: 8px 12px;
+    align-self: center; /* Center status messages */
+    padding: 5px 12px;
+    text-align: center;
+    max-width: 100%;
 }
-.agent-suggestion{
+.message-status.connection-status {
+    font-weight: 500;
+}
+.message-status.error-message {
+    color: var(--error-color);
+    font-weight: 500;
+}
+
+.message-suggestion{
      background-color: transparent;
     border: 1px dashed var(--border-color);
     border-left: 3px solid var(--warning-border); /* Yellowish indicator */
@@ -205,7 +273,7 @@ html, body {
     align-self: stretch;
     padding: 8px 12px;
 }
-.agent-warning {
+.message-warning {
     background-color: var(--warning-bg);
     border: 1px solid var(--warning-border);
     color: var(--text-color);
@@ -368,4 +436,52 @@ html, body {
     border-color: var(--text-color-muted);
 }
 
-/* Add class to body or app-container if needed for specific overrides */
+/* Styling for Code Blocks within Chat Messages */
+.message-agent pre {
+    background-color: var(--code-bg); /* Use variable */
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    overflow-x: auto; /* Add horizontal scroll for long code lines */
+    white-space: pre; /* Preserve whitespace in code */
+}
+
+.message-agent pre code {
+    font-family: var(--monospace-font); /* Use monospace font */
+    font-size: 0.9em;
+    color: var(--code-text); /* Use variable */
+    background-color: transparent; /* Code tag itself is transparent */
+    padding: 0;
+    border: none;
+    white-space: pre; /* Preserve whitespace */
+}
+
+
+/* Responsive Adjustments (Example) */
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+        height: auto; /* Allow content to determine height */
+        min-height: 100vh; /* Ensure it still fills viewport */
+    }
+    .left-panel, .right-panel, .center-panel {
+        flex: 1 1 auto; /* Allow all panels to grow/shrink */
+        height: auto; /* Remove fixed heights */
+        min-height: 200px; /* Example min height */
+    }
+    .left-panel {
+        order: 1; /* Example: Put tasks first */
+    }
+     .center-panel {
+        order: 2;
+    }
+    .right-panel {
+        order: 3;
+    }
+    .panel:not(:last-child) {
+         border-right: none; /* Remove vertical borders */
+         border-bottom: 1px solid var(--border-color); /* Add bottom border */
+    }
+}
+
