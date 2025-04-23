@@ -12,7 +12,7 @@
         <nav class="panel left-panel">
             <div class="panel-header">
                 <button id="new-task-button" class="new-task-btn">+ New Task</button>
-                </div>
+            </div>
             <ul id="task-list" class="task-list scrollable-content">
                 <li class="task-item-placeholder">Loading tasks...</li>
             </ul>
@@ -23,7 +23,7 @@
 
         <main class="panel center-panel">
             <div class="panel-header chat-header">
-                 <h3 id="current-task-title">No Task Selected</h3>
+                <h3 id="current-task-title">No Task Selected</h3>
                  <span>Share | Options</span>
             </div>
             <div id="chat-messages" class="chat-messages scrollable-content">
@@ -39,12 +39,17 @@
                 <h3>Agent Workspace</h3>
                  <span id="monitor-status">Agent Idle</span>
             </div>
-            <div id="monitor-content" class="monitor-content scrollable-content">
+
+            <div class="monitor-split-content">
+                <div id="monitor-log-area" class="monitor-log-area scrollable-content">
+                    </div>
+                <div id="monitor-artifact-area" class="monitor-artifact-area">
+                    <div class="artifact-placeholder">No artifacts generated yet.</div>
                 </div>
+            </div>
             <div class="monitor-footer">
                  <span id="monitor-footer-status">No Task Selected</span>
-                 <button class="jump-live-btn">&gt; Jump to live</button>
-            </div>
+                 <button class="jump-live-btn">&gt; Jump to live</button> </div>
         </aside>
 
     </div><script src="js/script.js"></script>

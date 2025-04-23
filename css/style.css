@@ -1,4 +1,4 @@
-/* css/style.css - Dark Theme with Structured Logs & Image Fix */
+/* css/style.css - Dark Theme with Structured Logs & Split Monitor */
 
 /* Basic Reset & Root Variables */
 :root {
@@ -95,39 +95,47 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .monitor-header h3 { margin: 0; font-size: 1em; font-weight: 500; }
 .monitor-header span { font-size: 0.85em; color: var(--text-color-darker); }
 
-/* Monitor Content Area */
-.monitor-content {
+/* *** NEW: Monitor Split Layout *** */
+.monitor-split-content {
+    flex-grow: 1; /* Takes up space between header and footer */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Prevent content overflowing the panel */
+}
+
+.monitor-log-area {
+    flex: 3 1 0; /* Takes up ~3/4 of the space, can shrink/grow */
+    overflow-y: auto; /* Allow scrolling for logs */
     padding: 10px 15px; /* Add padding */
     background-color: var(--terminal-bg);
     font-family: var(--monospace-font);
     font-size: 0.85em;
     line-height: 1.5;
     color: var(--terminal-text);
+    border-bottom: 1px solid var(--border-color); /* Separator line */
 }
 
-/* *** Styles for Structured Log Entries (Integrated) *** */
-.monitor-log-entry {
-    margin-bottom: 8px;
-    padding: 6px 10px;
-    border-radius: 4px;
-    border: 1px solid var(--border-color);
-    background-color: var(--panel-bg); /* Slightly lighter than terminal bg */
-    display: flex;
-    flex-direction: column;
+.monitor-artifact-area {
+    flex: 1 1 0; /* Takes up ~1/4 of the space, can shrink/grow */
+    overflow-y: auto; /* Allow scrolling if artifact is tall */
+    padding: 10px 15px;
+    background-color: var(--panel-bg); /* Slightly lighter bg */
+    display: flex; /* Center placeholder */
+    justify-content: center;
+    align-items: center;
 }
 
-.log-timestamp {
-    font-size: 0.8em;
+.artifact-placeholder {
     color: var(--text-color-darker);
-    margin-bottom: 4px;
-    white-space: nowrap;
+    font-style: italic;
 }
+/* *** End Split Layout *** */
 
-.log-content {
-    white-space: pre-wrap; /* Wrap text content */
-    word-wrap: break-word;
-    color: var(--text-color); /* Default text color */
-}
+
+/* Individual Log Entry Styling (Applied within monitor-log-area) */
+.monitor-log-entry { margin-bottom: 8px; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border-color); background-color: var(--panel-bg); display: flex; flex-direction: column; }
+.log-timestamp { font-size: 0.8em; color: var(--text-color-darker); margin-bottom: 4px; white-space: nowrap; }
+.log-content { white-space: pre-wrap; word-wrap: break-word; color: var(--text-color); }
 
 /* Styling for different log types */
 .log-type-system { border-left: 3px solid var(--text-color-muted); }
@@ -142,32 +150,23 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .log-type-error .log-content { color: var(--error-color); }
 .log-type-history { opacity: 0.7; border-left: 3px solid var(--text-color-darker); }
 .log-type-unknown { border-left: 3px dashed var(--text-color-darker); }
-/* *** Styles for Image Display (Integrated) *** */
 .log-type-image-generated { border-left: 3px solid var(--image-color); } /* Style for the text log */
-.log-type-image-display { /* Style for the container holding the image */
-    border-left: 3px solid var(--image-color);
-    padding: 10px; /* Add some padding around the image */
-    background-color: var(--panel-bg); /* Match other log entries */
-}
-.log-type-image-display .log-content { /* Style for the "Displaying image..." text */
-    color: var(--text-color-muted);
-    font-style: italic;
-    margin-bottom: 5px;
-}
-.log-type-image-display img {
+
+/* Styles for Artifact Area Content */
+.monitor-artifact-area img {
     display: block;
-    max-width: 100%; /* ** Constrain image width ** */
+    max-width: 100%; /* Ensure image fits within the artifact area */
+    max-height: 100%; /* Ensure image fits vertically too */
     height: auto; /* Maintain aspect ratio */
-    margin-top: 8px;
+    object-fit: contain; /* Scale down large images, preserving aspect ratio */
     border-radius: 4px;
     border: 1px solid var(--border-color);
 }
-.log-type-image-display .log-content.log-type-error { /* Style error text within image log */
+.monitor-artifact-area .artifact-error { /* Style error text within image log */
     font-size: 0.9em;
     font-style: italic;
-    color: var(--error-color); /* Make it red */
+    color: var(--error-color);
 }
-/* *** End Integrated Styles *** */
 
 
 /* Styling for Code Blocks within Chat Messages */
@@ -182,4 +181,3 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     .left-panel { order: 1; } .center-panel { order: 2; } .right-panel { order: 3; }
     .panel:not(:last-child) { border-right: none; border-bottom: 1px solid var(--border-color); }
 }
-
