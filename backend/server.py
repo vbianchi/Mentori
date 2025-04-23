@@ -13,7 +13,6 @@ import os
 # --- Web Server Imports ---
 from aiohttp import web
 from aiohttp.web import FileResponse
-# *** ADDED: Import aiohttp-cors ***
 import aiohttp_cors
 # -------------------------
 
@@ -28,9 +27,8 @@ from langchain_core.runnables import RunnableConfig
 # Project Imports
 from backend.config import load_settings, Settings
 from backend.llm_setup import get_llm
-# Import the factory function and helpers
-# *** Import TEXT_EXTENSIONS from tools ***
-from backend.tools import get_dynamic_tools, get_task_workspace_path, BASE_WORKSPACE_ROOT, TEXT_EXTENSIONS
+# *** CORRECTED IMPORT: Removed TEXT_EXTENSIONS from here ***
+from backend.tools import get_dynamic_tools, get_task_workspace_path, BASE_WORKSPACE_ROOT
 from backend.agent import create_agent_executor
 from backend.callbacks import WebSocketCallbackHandler
 from backend.db_utils import init_db, add_task, add_message, get_messages_for_task, delete_task_and_messages
@@ -55,7 +53,8 @@ session_data = {}
 # --- File Server Constants ---
 FILE_SERVER_HOST = "localhost"
 FILE_SERVER_PORT = 8766
-# TEXT_EXTENSIONS defined in tools.py, imported above
+# *** Define TEXT_EXTENSIONS here ***
+TEXT_EXTENSIONS = {".txt", ".py", ".js", ".css", ".html", ".json", ".csv", ".md", ".log", ".yaml", ".yml"}
 
 # --- Helper: Read Stream from Subprocess ---
 async def read_stream(stream, stream_name, session_id, send_ws_message_func, db_add_message_func, current_task_id):
@@ -74,10 +73,9 @@ async def read_stream(stream, stream_name, session_id, send_ws_message_func, db_
         timestamp = datetime.datetime.now().isoformat(timespec='milliseconds')
         await send_ws_message_func("monitor_log", f"[{timestamp}]{log_prefix_base} {log_content}")
 
-        # *** CORRECTED SYNTAX: Save to DB ***
+        # Save to DB
         if current_task_id:
              try:
-                 # Log type distinguishes stdout/stderr, content is the line
                  await db_add_message_func(current_task_id, session_id, f"monitor_{stream_name}", line_content)
              except Exception as db_err:
                   logger.error(f"[{session_id}] Failed to save {stream_name} log to DB: {db_err}")
@@ -154,30 +152,13 @@ async def handle_workspace_file(request: web.Request) -> web.Response:
 async def setup_file_server():
     """Sets up and returns the aiohttp file server runner with CORS."""
     app = web.Application()
-
-    # Configure CORS
     cors = aiohttp_cors.setup(app, defaults={
-        "http://localhost:8000": aiohttp_cors.ResourceOptions(
-            allow_credentials=True,
-            expose_headers="*",
-            allow_headers="*",
-            allow_methods="*" # Allow GET requests for files
-        ),
-         # Add other origins if needed
+        "http://localhost:8000": aiohttp_cors.ResourceOptions(allow_credentials=True, expose_headers="*", allow_headers="*", allow_methods="*"),
     })
-
-    # Add the route and apply CORS
     resource = app.router.add_resource('/workspace_files/{task_id}/{filename}')
     route = resource.add_route('GET', handle_workspace_file)
     cors.add(route)
-
-    # Setup runner and site
-    runner = web.AppRunner(app)
-    await runner.setup()
-    site = web.TCPSite(runner, FILE_SERVER_HOST, FILE_SERVER_PORT)
-    logger.info(f"Starting file server with CORS on http://{FILE_SERVER_HOST}:{FILE_SERVER_PORT}")
-    return site, runner
-
+    runner = web.AppRunner(app); await runner.setup(); site = web.TCPSite(runner, FILE_SERVER_HOST, FILE_SERVER_PORT); logger.info(f"Starting file server with CORS on http://{FILE_SERVER_HOST}:{FILE_SERVER_PORT}"); return site, runner
 
 # --- WebSocket Handler ---
 async def handler(websocket):
@@ -201,7 +182,6 @@ async def handler(websocket):
          full_content = f"{log_prefix} {text}"
          await send_ws_message("monitor_log", full_content)
          active_task_id = session_data.get(session_id, {}).get("current_task_id")
-         # *** CORRECTED SYNTAX: Save to DB ***
          if active_task_id:
              try:
                  await add_message(active_task_id, session_id, log_type, text);
@@ -218,12 +198,8 @@ async def handler(websocket):
         logger.info(f"[{session_id}] Created session memory and WebSocket callback handler.")
     except Exception as e:
         logger.error(f"[{session_id}] Failed to create memory/callback: {e}", exc_info=True)
-        # Indent the close attempt correctly
-        try:
-            await websocket.close(code=1011, reason="Session setup failed")
-        except Exception as close_e:
-             logger.error(f"[{session_id}] Error closing websocket: {close_e}")
-             pass
+        try: await websocket.close(code=1011, reason="Session setup failed");
+        except Exception as close_e: logger.error(f"[{session_id}] Error closing websocket: {close_e}"); pass
         if session_id in connected_clients: del connected_clients[session_id];
         return
 
@@ -255,7 +231,6 @@ async def handler(websocket):
                          session_data[session_id]["callback_handler"].set_task_id(current_task_id)
                          await add_task(task_id_from_frontend, task_title_from_frontend or f"Task {task_id_from_frontend}", datetime.datetime.now(datetime.timezone.utc).isoformat())
                          await add_monitor_log_and_save(f"Switched context to task ID: {current_task_id} ('{task_title_from_frontend}')", "system_context_switch")
-                         # Indent memory clear correctly
                          if "memory" in session_data[session_id]:
                              try:
                                  session_data[session_id]["memory"].clear()
@@ -264,59 +239,42 @@ async def handler(websocket):
                                  logger.error(f"[{session_id}] Failed to clear memory: {mem_e}")
 
                          await send_ws_message("status_message", "Loading history...")
-                         history_messages = await get_messages_for_task(current_task_id) # Includes timestamp now
-                         # Process history to send artifacts
-                         artifacts_from_history = [] # Renamed
+                         history_messages = await get_messages_for_task(current_task_id)
+                         artifacts_from_history = []
                          if history_messages:
                              logger.info(f"[{session_id}] Sending {len(history_messages)} history messages.")
                              await send_ws_message("history_start", f"Loading {len(history_messages)} messages...")
                              for i, msg in enumerate(history_messages):
                                  db_msg_type = msg['message_type']; db_content = msg['content']; db_timestamp = msg['timestamp']
                                  ui_msg_type = None; content_to_send = db_content
-
                                  if db_msg_type == "user_input": ui_msg_type = "user"
                                  elif db_msg_type == "agent_finish" or db_msg_type == "agent": ui_msg_type = "agent_message"
-                                 # Collect artifact generated events
-                                 elif db_msg_type == "artifact_generated": # Use generic type
+                                 elif db_msg_type == "artifact_generated":
                                      filename = db_content
                                      file_path = get_task_workspace_path(current_task_id) / filename
-                                     artifact_type = 'unknown' # Default
-                                     if file_path.suffix.lower() == '.png':
-                                         artifact_type = 'image'
-                                     elif file_path.suffix.lower() in TEXT_EXTENSIONS:
-                                         artifact_type = 'text'
-
+                                     artifact_type = 'unknown'
+                                     if file_path.suffix.lower() == '.png': artifact_type = 'image'
+                                     elif file_path.suffix.lower() in TEXT_EXTENSIONS: artifact_type = 'text'
                                      if artifact_type != 'unknown':
                                          artifact_url = f"http://{FILE_SERVER_HOST}:{FILE_SERVER_PORT}/workspace_files/{current_task_id}/{filename}"
                                          artifacts_from_history.append({"type": artifact_type, "url": artifact_url, "filename": filename})
-                                         # Send log message for this event
                                          log_prefix = f"[{db_timestamp}][{session_id[:8]}]"
                                          await send_ws_message("monitor_log", f"{log_prefix} [History][ARTIFACT_GENERATED] {filename} (Type: {artifact_type})")
-                                     else:
-                                          logger.warning(f"[{session_id}] Skipping unknown artifact type in history: {filename}")
-                                     ui_msg_type = None # Don't send another log below
-
-                                 # Handle other monitor logs
+                                     else: logger.warning(f"[{session_id}] Skipping unknown artifact type in history: {filename}")
+                                     ui_msg_type = None
                                  elif db_msg_type.startswith("monitor_") or db_msg_type.startswith("error_") or db_msg_type.startswith("system_") or db_msg_type in ["tool_input", "tool_output", "tool_error"]:
                                      ui_msg_type = "monitor_log"; log_prefix = f"[{db_timestamp}][{session_id[:8]}]"; log_type_indicator = f"[{db_msg_type.upper()}]" if not db_msg_type.startswith("monitor_") else ""; content_to_send = f"{log_prefix} [History]{log_type_indicator} {db_content}"
-
                                  if ui_msg_type:
                                      logger.info(f"[{session_id}] Sending history msg {i+1}/{len(history_messages)}: Type='{ui_msg_type}', Content='{content_to_send[:50]}...'")
                                      await send_ws_message(ui_msg_type, content_to_send)
                                      await asyncio.sleep(0.01)
-
                              await send_ws_message("history_end", "History loaded.")
-                             # Send collected artifacts AFTER history logs
-                             if artifacts_from_history:
-                                 logger.info(f"[{session_id}] Sending {len(artifacts_from_history)} artifacts from history.")
-                                 await send_ws_message("update_artifacts", artifacts_from_history) # Use new message type
-                             else: # Send empty list if none were found in history
-                                  await send_ws_message("update_artifacts", [])
-
+                             if artifacts_from_history: logger.info(f"[{session_id}] Sending {len(artifacts_from_history)} artifacts from history."); await send_ws_message("update_artifacts", artifacts_from_history)
+                             else: await send_ws_message("update_artifacts", [])
                              await send_ws_message("status_message", "History loaded. Ready.")
                          else:
                              await send_ws_message("status_message", "No history. Ready.")
-                             await send_ws_message("update_artifacts", []) # Send empty artifact list
+                             await send_ws_message("update_artifacts", [])
                              logger.info(f"[{session_id}] No history found.")
                      else: logger.error(f"[{session_id}] Context switch for missing session!")
 
@@ -326,7 +284,6 @@ async def handler(websocket):
                      if session_id in session_data:
                          session_data[session_id]["current_task_id"] = None
                          session_data[session_id]["callback_handler"].set_task_id(None)
-                         # Indent memory clear correctly
                          if "memory" in session_data[session_id]:
                              try:
                                  session_data[session_id]["memory"].clear()
@@ -335,8 +292,7 @@ async def handler(websocket):
                                  logger.error(f"[{session_id}] Failed to clear memory: {mem_e}")
                      await add_monitor_log_and_save("Received 'new_task'. Clearing context.", "system_new_task")
                      await send_ws_message("status_message", "Ready for new task goal.")
-                     await send_ws_message("update_artifacts", []) # Clear artifacts
-
+                     await send_ws_message("update_artifacts", [])
 
                 # --- USER MESSAGE -> Trigger Agent ---
                 elif message_type == "user_message":
@@ -365,28 +321,22 @@ async def handler(websocket):
                          await send_ws_message("agent_message", f"Sorry, internal error setting up agent.")
                          continue
 
-                    # Get ALL relevant artifact files before run
                     task_workspace_path = get_task_workspace_path(active_task_id)
                     artifact_patterns = ['*.png'] + [f'*{ext}' for ext in TEXT_EXTENSIONS]
                     files_before_run = set()
                     for pattern in artifact_patterns: files_before_run.update(f.name for f in task_workspace_path.glob(pattern) if f.is_file())
 
-
                     try:
-                        # Use astream_log() - Callbacks handle UI updates and DB saving
                         config = RunnableConfig(callbacks=[session_callback_handler])
                         async for chunk in request_agent_executor.astream_log(
                             {"input": content}, config=config
-                        ):
-                            pass # Callbacks handle everything
+                        ): pass
 
-                        # Check for ALL relevant artifact files after successful run
                         artifacts = []
                         all_files_after = []
                         for pattern in artifact_patterns: all_files_after.extend(task_workspace_path.glob(pattern))
-                        # Sort by modification time to get newest first if needed
-                        sorted_files = sorted(all_files_after, key=os.path.getmtime, reverse=True) # Newest first
-                        latest_new_artifact_filename = None # Track the last *new* one saved in this run
+                        sorted_files = sorted(all_files_after, key=os.path.getmtime, reverse=True)
+                        latest_new_artifact_filename = None
                         for file_path in sorted_files:
                              if file_path.is_file():
                                  filename = file_path.name
@@ -396,16 +346,12 @@ async def handler(websocket):
                                  if artifact_type != 'unknown':
                                      artifact_url = f"http://{FILE_SERVER_HOST}:{FILE_SERVER_PORT}/workspace_files/{active_task_id}/{filename}"
                                      artifacts.append({"type": artifact_type, "url": artifact_url, "filename": filename})
-                                     # Save artifact generated event to DB only if it's new this run
                                      if filename not in files_before_run and latest_new_artifact_filename is None:
                                          await add_message(active_task_id, session_id, "artifact_generated", filename)
                                          await add_monitor_log_and_save(f"Artifact generated: {filename}", "system_artifact_generated")
                                          latest_new_artifact_filename = filename
-                        # Send the full list of current artifacts
-                        if artifacts:
-                            logger.info(f"[{session_id}] Sending update with {len(artifacts)} artifacts.")
-                            await send_ws_message("update_artifacts", artifacts) # Use new message type
-                        # else: await send_ws_message("update_artifacts", []) # Optionally send empty list
+                        if artifacts: logger.info(f"[{session_id}] Sending update with {len(artifacts)} artifacts."); await send_ws_message("update_artifacts", artifacts)
+                        # else: await send_ws_message("update_artifacts", [])
 
                     except Exception as e:
                         error_msg = f"CRITICAL Error during agent execution: {e}"
@@ -414,7 +360,6 @@ async def handler(websocket):
                         await send_ws_message("status_message", "Error during task processing.")
                         await send_ws_message("agent_message", f"Sorry, an internal error occurred: {type(e).__name__}")
                         if active_task_id: await add_message(active_task_id, session_id, "error_agent", f"{type(e).__name__}: {e}")
-
 
                 # --- DELETE TASK ---
                 elif message_type == "delete_task" and task_id_from_frontend:
