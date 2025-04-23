@@ -39,7 +39,7 @@ from backend.db_utils import init_db, add_task, add_message, get_messages_for_ta
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# --- Load Settings, Initialize LLM ---
+# --- Load Settings, Initialize LLM (at startup) ---
 try:
     settings: Settings = load_settings()
     llm = get_llm(settings)
@@ -54,6 +54,9 @@ session_data = {} # Maps session_id -> {"memory": BaseMemory, "callback_handler"
 # --- File Server Constants ---
 FILE_SERVER_HOST = "localhost"
 FILE_SERVER_PORT = 8766 # Different port from WebSocket
+# Define recognizable text extensions
+TEXT_EXTENSIONS = {".txt", ".py", ".js", ".css", ".html", ".json", ".csv", ".md", ".log", ".yaml", ".yml"}
+
 
 # --- Helper: Read Stream from Subprocess ---
 async def read_stream(stream, stream_name, session_id, send_ws_message_func, db_add_message_func, current_task_id):
@@ -90,7 +93,7 @@ async def execute_shell_command(command: str, session_id, send_ws_message_func, 
     await send_ws_message_func("monitor_log", f"[{timestamp_start}]{log_prefix_base} {start_log_content}")
     await send_ws_message_func("status_message", f"Running direct command: {command[:60]}...")
 
-    # *** CORRECTED SYNTAX: Save command start to DB ***
+    # Save command start to DB
     if current_task_id:
         try:
             await db_add_message_func(current_task_id, session_id, "monitor_direct_cmd_start", command)
@@ -122,7 +125,7 @@ async def execute_shell_command(command: str, session_id, send_ws_message_func, 
          finish_log_content = f"[Direct Command] Finished '{command[:60]}...', {status_msg}."
          await send_ws_message_func("monitor_log", f"[{timestamp_end}]{log_prefix_base} {finish_log_content}")
 
-         # *** CORRECTED SYNTAX: Save command end to DB ***
+         # Save command end to DB
          if current_task_id:
              try:
                  await db_add_message_func(current_task_id, session_id, "monitor_direct_cmd_end", f"Command: {command} | Status: {status_msg}")
@@ -162,7 +165,7 @@ async def handler(websocket):
     # current_task_id is now stored in session_data
 
     # --- Helper to send messages safely ---
-    async def send_ws_message(msg_type: str, content: Any): # Allow Any content for image display
+    async def send_ws_message(msg_type: str, content: Any): # Allow Any content for artifacts
         if session_id in connected_clients and connected_clients[session_id] == websocket:
             try: await websocket.send(json.dumps({"type": msg_type, "content": content}))
             except websockets.exceptions.ConnectionClosed: logger.warning(f"[{session_id}] WS closed trying to send."); # Cleanup handled in finally
@@ -239,6 +242,8 @@ async def handler(websocket):
 
                          await send_ws_message("status_message", "Loading history...")
                          history_messages = await get_messages_for_task(current_task_id) # Includes timestamp now
+                         # Process history to send artifacts
+                         artifacts_from_history = [] # Renamed
                          if history_messages:
                              logger.info(f"[{session_id}] Sending {len(history_messages)} history messages.")
                              await send_ws_message("history_start", f"Loading {len(history_messages)} messages...")
@@ -248,13 +253,27 @@ async def handler(websocket):
 
                                  if db_msg_type == "user_input": ui_msg_type = "user"
                                  elif db_msg_type == "agent_finish" or db_msg_type == "agent": ui_msg_type = "agent_message"
-                                 elif db_msg_type == "image_generated":
+                                 # Collect artifact generated events
+                                 elif db_msg_type == "artifact_generated": # Use generic type
                                      filename = db_content
-                                     image_url = f"http://{FILE_SERVER_HOST}:{FILE_SERVER_PORT}/workspace_files/{current_task_id}/{filename}"
-                                     log_prefix = f"[{db_timestamp}][{session_id[:8]}]"
-                                     await send_ws_message("monitor_log", f"{log_prefix} [History][IMAGE_GENERATED] {filename}")
-                                     await send_ws_message("display_image", {"url": image_url, "filename": filename})
-                                     ui_msg_type = None # Don't send duplicate log
+                                     file_path = get_task_workspace_path(current_task_id) / filename
+                                     artifact_type = 'unknown' # Default
+                                     if file_path.suffix.lower() == '.png':
+                                         artifact_type = 'image'
+                                     elif file_path.suffix.lower() in TEXT_EXTENSIONS:
+                                         artifact_type = 'text'
+
+                                     if artifact_type != 'unknown':
+                                         artifact_url = f"http://{FILE_SERVER_HOST}:{FILE_SERVER_PORT}/workspace_files/{current_task_id}/{filename}"
+                                         artifacts_from_history.append({"type": artifact_type, "url": artifact_url, "filename": filename})
+                                         # Send log message for this event
+                                         log_prefix = f"[{db_timestamp}][{session_id[:8]}]"
+                                         await send_ws_message("monitor_log", f"{log_prefix} [History][ARTIFACT_GENERATED] {filename} (Type: {artifact_type})")
+                                     else:
+                                          logger.warning(f"[{session_id}] Skipping unknown artifact type in history: {filename}")
+                                     ui_msg_type = None # Don't send another log below
+
+                                 # Handle other monitor logs
                                  elif db_msg_type.startswith("monitor_") or db_msg_type.startswith("error_") or db_msg_type.startswith("system_") or db_msg_type in ["tool_input", "tool_output", "tool_error"]:
                                      ui_msg_type = "monitor_log"; log_prefix = f"[{db_timestamp}][{session_id[:8]}]"; log_type_indicator = f"[{db_msg_type.upper()}]" if not db_msg_type.startswith("monitor_") else ""; content_to_send = f"{log_prefix} [History]{log_type_indicator} {db_content}"
 
@@ -262,11 +281,20 @@ async def handler(websocket):
                                      logger.info(f"[{session_id}] Sending history msg {i+1}/{len(history_messages)}: Type='{ui_msg_type}', Content='{content_to_send[:50]}...'")
                                      await send_ws_message(ui_msg_type, content_to_send)
                                      await asyncio.sleep(0.01)
-                                 # else: logger.warning(f"[{session_id}] Skipping hist msg type: {db_msg_type}") # Can be noisy
 
                              await send_ws_message("history_end", "History loaded.")
+                             # Send collected artifacts AFTER history logs
+                             if artifacts_from_history:
+                                 logger.info(f"[{session_id}] Sending {len(artifacts_from_history)} artifacts from history.")
+                                 await send_ws_message("update_artifacts", artifacts_from_history) # Use new message type
+                             else: # Send empty list if none were found in history
+                                  await send_ws_message("update_artifacts", [])
+
                              await send_ws_message("status_message", "History loaded. Ready.")
-                         else: await send_ws_message("status_message", "No history. Ready."); logger.info(f"[{session_id}] No history found.")
+                         else:
+                             await send_ws_message("status_message", "No history. Ready.")
+                             await send_ws_message("update_artifacts", []) # Send empty artifact list
+                             logger.info(f"[{session_id}] No history found.")
                      else: logger.error(f"[{session_id}] Context switch for missing session!")
 
                 # --- NEW TASK ---
@@ -284,6 +312,8 @@ async def handler(websocket):
                                  logger.error(f"[{session_id}] Failed to clear memory: {mem_e}")
                      await add_monitor_log_and_save("Received 'new_task'. Clearing context.", "system_new_task")
                      await send_ws_message("status_message", "Ready for new task goal.")
+                     await send_ws_message("update_artifacts", []) # Clear artifacts
+
 
                 # --- USER MESSAGE -> Trigger Agent ---
                 elif message_type == "user_message":
@@ -294,7 +324,6 @@ async def handler(websocket):
                          continue
 
                     await add_message(active_task_id, session_id, "user_input", content)
-                    # REMOVED redundant monitor log save for user input
                     await send_ws_message("status_message", f"Processing input: '{content[:60]}...'")
 
                     if session_id not in session_data: continue
@@ -313,9 +342,13 @@ async def handler(websocket):
                          await send_ws_message("agent_message", f"Sorry, internal error setting up agent.")
                          continue
 
-                    # Store list of files before agent run to detect new ones
+                    # Get ALL relevant artifact files before run
                     task_workspace_path = get_task_workspace_path(active_task_id)
-                    files_before = set(f.name for f in task_workspace_path.glob('*.png') if f.is_file())
+                    artifact_patterns = ['*.png'] + [f'*{ext}' for ext in TEXT_EXTENSIONS]
+                    files_before_run = set()
+                    for pattern in artifact_patterns:
+                        files_before_run.update(f.name for f in task_workspace_path.glob(pattern) if f.is_file())
+
 
                     try:
                         # Use astream_log() - Callbacks handle UI updates and DB saving
@@ -325,19 +358,44 @@ async def handler(websocket):
                         ):
                             pass # Callbacks handle everything
 
-                        # Check for new PNG files after successful run
-                        files_after = set(f.name for f in task_workspace_path.glob('*.png') if f.is_file())
-                        new_files = files_after - files_before
-                        if new_files:
-                            logger.info(f"[{session_id}] Detected new PNG files: {new_files}")
-                            for filename in new_files:
-                                image_url = f"http://{FILE_SERVER_HOST}:{FILE_SERVER_PORT}/workspace_files/{active_task_id}/{filename}"
-                                await add_message(active_task_id, session_id, "image_generated", filename)
-                                await add_monitor_log_and_save(f"Generated image: {filename}", "system_image_generated")
-                                await send_ws_message("display_image", {"url": image_url, "filename": filename})
-                                break # Only display the first new image for now
+                        # Check for ALL relevant artifact files after successful run
+                        artifacts = []
+                        all_files_after = []
+                        for pattern in artifact_patterns:
+                            all_files_after.extend(task_workspace_path.glob(pattern))
 
-                        # await add_monitor_log_and_save("Agent stream finished.", "system_agent_end") # Callback handles final status
+                        # Sort by modification time to get newest first if needed
+                        sorted_files = sorted(all_files_after, key=os.path.getmtime, reverse=True)
+
+                        latest_new_artifact_filename = None # Track the last *new* one saved in this run
+
+                        for file_path in sorted_files:
+                             if file_path.is_file():
+                                 filename = file_path.name
+                                 artifact_type = 'unknown'
+                                 if file_path.suffix.lower() == '.png':
+                                     artifact_type = 'image'
+                                 elif file_path.suffix.lower() in TEXT_EXTENSIONS:
+                                     artifact_type = 'text'
+
+                                 if artifact_type != 'unknown':
+                                     artifact_url = f"http://{FILE_SERVER_HOST}:{FILE_SERVER_PORT}/workspace_files/{active_task_id}/{filename}"
+                                     artifacts.append({"type": artifact_type, "url": artifact_url, "filename": filename})
+
+                                     # Save artifact generated event to DB only if it's new this run
+                                     if filename not in files_before_run and latest_new_artifact_filename is None:
+                                         await add_message(active_task_id, session_id, "artifact_generated", filename)
+                                         await add_monitor_log_and_save(f"Artifact generated: {filename}", "system_artifact_generated")
+                                         latest_new_artifact_filename = filename # Ensure we only save one DB record per run
+
+
+                        # Send the full list of current artifacts
+                        if artifacts:
+                            logger.info(f"[{session_id}] Sending update with {len(artifacts)} artifacts.")
+                            await send_ws_message("update_artifacts", artifacts) # Use new message type
+                        # else: # Optionally send empty list if no artifacts found
+                        #     await send_ws_message("update_artifacts", [])
+
 
                     except Exception as e:
                         error_msg = f"CRITICAL Error during agent execution: {e}"
@@ -386,8 +444,12 @@ async def handler(websocket):
     except websockets.exceptions.ConnectionClosedError as e: logger.warning(f"Connection closed error: {websocket.remote_address} (Session: {session_id}) - {e}")
     except Exception as e:
         logger.error(f"Unhandled error in handler: {websocket.remote_address} (Session: {session_id}): {e}", exc_info=True)
-        try: await websocket.close(code=1011, reason="Internal server error");
-        except Exception as close_e: logger.error(f"[{session_id}] Error closing websocket: {close_e}"); pass
+        # *** CORRECTED SYNTAX: Indent try/except block ***
+        try:
+            await websocket.close(code=1011, reason="Internal server error")
+        except Exception as close_e:
+            logger.error(f"[{session_id}] Error closing websocket during exception handling: {close_e}")
+            pass
     finally: # Cleanup
         logger.info(f"Cleaning up for session {session_id}")
         if session_id in connected_clients: del connected_clients[session_id]

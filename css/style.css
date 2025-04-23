@@ -17,6 +17,7 @@
     --tool-color: #a5d6ff; /* Light blue for tool logs */
     --system-color: #6b7280; /* Muted grey for system logs */
     --image-color: #84cc16; /* Lime green for image logs */
+    --text-artifact-color: #fde047; /* Yellow for text artifacts */
     --warning-bg: rgba(247, 144, 9, 0.1);
     --warning-border: #f79009;
     --terminal-bg: #111315;
@@ -40,9 +41,8 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .panel-header, .panel-footer, .monitor-footer, .chat-header, .monitor-header { padding: 10px 15px; background-color: var(--panel-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; min-height: 45px; }
 .panel-footer { border-bottom: none; border-top: 1px solid var(--border-color); margin-top: auto; color: var(--text-color-muted); font-size: 0.85em; }
 .monitor-footer { border-bottom: none; border-top: 1px solid var(--border-color); background-color: var(--terminal-bg); display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; font-size: 0.9em; color: var(--text-color-muted); }
-.monitor-footer span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 10px; }
-.jump-live-btn { background: var(--panel-bg-lightest); border: 1px solid var(--border-color); color: var(--text-color-muted); padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.85em; transition: all 0.2s ease; flex-shrink: 0; }
-.jump-live-btn:hover { background-color: var(--panel-bg-lighter); color: var(--text-color); border-color: var(--text-color-muted); }
+.monitor-footer span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; /* Removed padding-right */ }
+/* Removed .jump-live-btn styles */
 
 /* Scrollable Content */
 .scrollable-content { flex-grow: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--panel-bg-lightest) var(--panel-bg); }
@@ -95,49 +95,16 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .monitor-header h3 { margin: 0; font-size: 1em; font-weight: 500; }
 .monitor-header span { font-size: 0.85em; color: var(--text-color-darker); }
 
-/* *** NEW: Monitor Split Layout *** */
-.monitor-split-content {
-    flex-grow: 1; /* Takes up space between header and footer */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* Prevent content overflowing the panel */
-}
+/* Monitor Split Layout */
+.monitor-split-content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
+.monitor-log-area { flex: 3 1 0; overflow-y: auto; padding: 10px 15px; background-color: var(--terminal-bg); font-family: var(--monospace-font); font-size: 0.85em; line-height: 1.5; color: var(--terminal-text); border-bottom: 1px solid var(--border-color); }
+.monitor-artifact-area { flex: 1 1 0; overflow-y: auto; padding: 10px 15px; background-color: var(--panel-bg); display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+.artifact-placeholder { color: var(--text-color-darker); font-style: italic; }
 
-.monitor-log-area {
-    flex: 3 1 0; /* Takes up ~3/4 of the space, can shrink/grow */
-    overflow-y: auto; /* Allow scrolling for logs */
-    padding: 10px 15px; /* Add padding */
-    background-color: var(--terminal-bg);
-    font-family: var(--monospace-font);
-    font-size: 0.85em;
-    line-height: 1.5;
-    color: var(--terminal-text);
-    border-bottom: 1px solid var(--border-color); /* Separator line */
-}
-
-.monitor-artifact-area {
-    flex: 1 1 0; /* Takes up ~1/4 of the space, can shrink/grow */
-    overflow-y: auto; /* Allow scrolling if artifact is tall */
-    padding: 10px 15px;
-    background-color: var(--panel-bg); /* Slightly lighter bg */
-    display: flex; /* Center placeholder */
-    justify-content: center;
-    align-items: center;
-}
-
-.artifact-placeholder {
-    color: var(--text-color-darker);
-    font-style: italic;
-}
-/* *** End Split Layout *** */
-
-
-/* Individual Log Entry Styling (Applied within monitor-log-area) */
+/* Individual Log Entry Styling */
 .monitor-log-entry { margin-bottom: 8px; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border-color); background-color: var(--panel-bg); display: flex; flex-direction: column; }
 .log-timestamp { font-size: 0.8em; color: var(--text-color-darker); margin-bottom: 4px; white-space: nowrap; }
 .log-content { white-space: pre-wrap; word-wrap: break-word; color: var(--text-color); }
-
-/* Styling for different log types */
 .log-type-system { border-left: 3px solid var(--text-color-muted); }
 .log-type-tool-start { border-left: 3px solid var(--tool-color); background-color: var(--panel-bg-lighter); }
 .log-type-tool-output .log-content pre,
@@ -150,24 +117,35 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .log-type-error .log-content { color: var(--error-color); }
 .log-type-history { opacity: 0.7; border-left: 3px solid var(--text-color-darker); }
 .log-type-unknown { border-left: 3px dashed var(--text-color-darker); }
-.log-type-image-generated { border-left: 3px solid var(--image-color); } /* Style for the text log */
+.log-type-image-generated, .log-type-artifact-generated { border-left: 3px solid var(--image-color); } /* Style for the text log */
 
 /* Styles for Artifact Area Content */
-.monitor-artifact-area img {
-    display: block;
-    max-width: 100%; /* Ensure image fits within the artifact area */
-    max-height: 100%; /* Ensure image fits vertically too */
-    height: auto; /* Maintain aspect ratio */
-    object-fit: contain; /* Scale down large images, preserving aspect ratio */
-    border-radius: 4px;
-    border: 1px solid var(--border-color);
-}
-.monitor-artifact-area .artifact-error { /* Style error text within image log */
+.monitor-artifact-area img { display: block; max-width: 100%; max-height: calc(100% - 30px); height: auto; object-fit: contain; border-radius: 4px; border: 1px solid var(--border-color); margin-bottom: 5px; }
+.monitor-artifact-area .artifact-error { font-size: 0.9em; font-style: italic; color: var(--error-color); }
+/* *** NEW: Styles for Text Artifact Preview *** */
+.monitor-artifact-area pre {
+    width: 100%;
+    height: calc(100% - 30px); /* Fill available space minus nav */
+    margin: 0;
+    padding: 10px;
+    font-family: var(--monospace-font);
     font-size: 0.9em;
-    font-style: italic;
-    color: var(--error-color);
+    color: var(--code-text);
+    background-color: var(--code-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    white-space: pre-wrap; /* Wrap long lines */
+    word-break: break-all; /* Break long words/lines */
+    overflow: auto; /* Allow scrolling within the pre */
+    margin-bottom: 5px; /* Space between text and nav */
 }
 
+/* Artifact Navigation Styles */
+.artifact-nav { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 5px; width: 100%; flex-shrink: 0; }
+.artifact-nav-btn { background-color: var(--panel-bg-lighter); color: var(--text-color-muted); border: 1px solid var(--border-color); padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 0.85em; transition: all 0.2s ease; }
+.artifact-nav-btn:hover:not(:disabled) { background-color: var(--panel-bg-lightest); color: var(--text-color); border-color: var(--text-color-muted); }
+.artifact-nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.artifact-counter { font-size: 0.85em; color: var(--text-color-muted); }
 
 /* Styling for Code Blocks within Chat Messages */
 .message-agent pre { background-color: var(--code-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 0.75rem; margin: 0.5rem 0; overflow-x: auto; white-space: pre; }
