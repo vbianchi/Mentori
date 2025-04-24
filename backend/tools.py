@@ -4,18 +4,20 @@ import httpx
 from bs4 import BeautifulSoup
 from pathlib import Path
 import os
-import re # Import regex for validation
+import re
 import aiofiles
 import codecs
 import asyncio
-import sys # Import sys to get current python executable
+import sys
 from typing import List, Optional
 
 # LangChain Tool Imports
 from langchain_core.tools import Tool, BaseTool
 from langchain_community.tools import DuckDuckGoSearchRun
 from langchain_community.tools.file_management import ReadFileTool
-# Removed PythonREPLTool import as we are creating a specific installer tool
+# *** CORRECTED IMPORT for PythonREPL ***
+from langchain_experimental.utilities import PythonREPL
+# --------------------------------------
 
 logger = logging.getLogger(__name__)
 
@@ -32,12 +34,13 @@ except Exception as e:
     logger.error(f"Error resolving project/workspace path: {e}", exc_info=True)
     raise
 
+# Define recognizable text extensions
+TEXT_EXTENSIONS = {".txt", ".py", ".js", ".css", ".html", ".json", ".csv", ".md", ".log", ".yaml", ".yml"}
+
+
 # --- Helper Function to get Task-Specific Workspace ---
 def get_task_workspace_path(task_id: Optional[str]) -> Path:
-    """
-    Constructs and ensures the path for a specific task's workspace.
-    Returns BASE_WORKSPACE_ROOT if task_id is None or invalid.
-    """
+    # ... (remains the same) ...
     if not task_id or not isinstance(task_id, str):
         logger.warning(f"Invalid or missing task_id ('{task_id}') provided for workspace path. Using base workspace.")
         return BASE_WORKSPACE_ROOT
@@ -53,9 +56,9 @@ def get_task_workspace_path(task_id: Optional[str]) -> Path:
 # --- Tool Implementation Functions ---
 
 async def fetch_and_parse_url(url: str) -> str:
-    """Fetches and parses URL content."""
+    # ... (remains the same) ...
     MAX_CONTENT_LENGTH = 4000; REQUEST_TIMEOUT = 15.0
-    HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'} # Mimic browser
+    HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
     if not isinstance(url, str): return "Error: Invalid URL input (must be a string)."
     clean_url = url.strip().replace('\n', '').replace('\r', '').replace('\t', '').strip('`')
     if not clean_url: return "Error: Received an empty URL."
@@ -84,7 +87,7 @@ async def fetch_and_parse_url(url: str) -> str:
 
 
 async def write_to_file_in_task_workspace(input_str: str, task_workspace: Path) -> str:
-    """Writes text content to a file within the SPECIFIED task workspace."""
+    # ... (remains the same) ...
     logger.info(f"Write tool received input: {input_str[:100]}... for workspace {task_workspace.name}")
     relative_path_str = ""
     try:
@@ -110,26 +113,17 @@ async def write_to_file_in_task_workspace(input_str: str, task_workspace: Path) 
 
 # --- Custom Shell Tool operating in Task Workspace ---
 class TaskWorkspaceShellTool(BaseTool):
+    # ... (remains the same) ...
     name: str = "workspace_shell"
     description: str = (f"Use this tool ONLY to execute **non-interactive** shell commands directly within the **current task's dedicated workspace**. Useful for running scripts (e.g., 'python my_script.py'), listing files (`ls -l`), checking file details (`wc`, `head`), etc. Input MUST be a valid shell command string. Do NOT include path prefixes. **DO NOT use this for 'pip install' or environment modifications.**")
     task_workspace: Path
-
     def _run(self, command: str) -> str:
-        """Synchronous execution wrapper."""
         logger.warning("Running TaskWorkspaceShellTool synchronously using _run.")
-        try:
-            loop = asyncio.get_running_loop()
-            result = loop.run_until_complete(self._arun_internal(command))
-        except RuntimeError: # No running event loop
-             result = asyncio.run(self._arun_internal(command))
+        try: loop = asyncio.get_running_loop(); result = loop.run_until_complete(self._arun_internal(command))
+        except RuntimeError: result = asyncio.run(self._arun_internal(command))
         return result
-
-    async def _arun(self, command: str) -> str:
-         """Asynchronous execution entry point."""
-         return await self._arun_internal(command)
-
+    async def _arun(self, command: str) -> str: return await self._arun_internal(command)
     async def _arun_internal(self, command: str) -> str:
-        """Internal async helper for running the command in the specific task workspace."""
         cwd = str(self.task_workspace); logger.info(f"TaskWorkspaceShellTool executing command: '{command}' in CWD: {cwd}")
         process = None; stdout_str = ""; stderr_str = ""
         try:
@@ -153,36 +147,21 @@ class TaskWorkspaceShellTool(BaseTool):
         except FileNotFoundError: cmd_part = clean_command.split()[0] if clean_command else "Unknown"; logger.warning(f"TaskWorkspaceShellTool command not found: {cmd_part}"); return f"Error: Command not found: {cmd_part}"
         except Exception as e: logger.error(f"Error executing command '{clean_command}' in task workspace: {e}", exc_info=True); return f"Error executing command: {type(e).__name__}"
         finally:
-            # *** CORRECTED SYNTAX: Indent try/except block ***
             if process and process.returncode is None:
-                try:
-                    process.terminate()
-                    await process.wait()
-                    logger.warning(f"Terminated task workspace shell process: {clean_command}")
-                except Exception as term_e:
-                     logger.error(f"Error terminating process: {term_e}")
-                     pass # Ignore errors during cleanup
+                try: process.terminate(); await process.wait(); logger.warning(f"Terminated task workspace shell process: {clean_command}")
+                except Exception as term_e: logger.error(f"Error terminating process: {term_e}"); pass
 
 
-# *** Python Package Installer Tool Implementation ***
+# --- Python Package Installer Tool Implementation ---
 PACKAGE_SPEC_REGEX = re.compile(r"^[a-zA-Z0-9_.-]+(?:\[[a-zA-Z0-9_,-]+\])?(?:[=<>!~]=?\s*[a-zA-Z0-9_.*-]+)?$")
 
 async def install_python_package(package_specifier: str) -> str:
-    """
-    Installs a Python package into the current environment using pip.
-    Input MUST be a valid package specifier (e.g., 'pandas', 'matplotlib>=3.0', 'package-name[extra]').
-    **Security Warning:** This installs packages directly into the backend server's Python environment.
-    Use with caution. Containerization is recommended for production.
-    """
-    package_specifier = package_specifier.strip().strip('\'"`') # Clean input
+    # ... (install_python_package function remains the same) ...
+    package_specifier = package_specifier.strip().strip('\'"`')
     logger.info(f"Received request to install package: '{package_specifier}'")
-
-    # --- Input Validation ---
     if not package_specifier: return "Error: No package specified."
     if not PACKAGE_SPEC_REGEX.match(package_specifier): logger.error(f"Invalid package specifier format rejected: '{package_specifier}'"); return f"Error: Invalid package specifier format: '{package_specifier}'. Only package names, extras ([...]), and version specifiers (==, >=, etc.) are allowed."
     if ';' in package_specifier or '&' in package_specifier or '|' in package_specifier: logger.error(f"Potential command injection detected in package specifier: '{package_specifier}'"); return "Error: Invalid characters detected in package specifier."
-
-    # --- Execution ---
     command = [sys.executable, "-m", "pip", "install", package_specifier]
     logger.info(f"Executing installation command: {' '.join(command)}")
     process = None
@@ -199,6 +178,9 @@ async def install_python_package(package_specifier: str) -> str:
     except Exception as e: logger.error(f"Error installing package '{package_specifier}': {e}", exc_info=True); return f"Error during installation: {type(e).__name__}"
     finally: pass
 
+# *** Create PythonREPL utility instance ***
+python_repl_utility = PythonREPL()
+
 # --- Tool Factory Function ---
 def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
     """
@@ -209,7 +191,19 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
     stateless_tools = [
         DuckDuckGoSearchRun(description=( "Use this tool ONLY when you need to find current information, real-time data (like weather), or answer questions about recent events or topics not covered by your training data. Input MUST be a concise search query string.")),
         Tool.from_function( func=fetch_and_parse_url, name="web_page_reader", description=( "Use this tool ONLY to fetch and extract the main text content from a specific web page, given its URL. Input MUST be a single, valid URL string (whitespace and newlines will be removed). "), coroutine=fetch_and_parse_url),
-         Tool.from_function( func=install_python_package, name="python_package_installer", description=( "Use this tool ONLY to install a Python package using pip if it's missing and required for another step (like running a script). Input MUST be a valid package name or specifier (e.g., 'pandas', 'matplotlib>=3.5', 'seaborn==0.12.0', 'package-name[extra]'). **SECURITY WARNING:** This installs packages directly into the server's environment. Use with caution. Do NOT use this for general shell commands."), coroutine=install_python_package)
+         Tool.from_function( func=install_python_package, name="python_package_installer", description=( "Use this tool ONLY to install a Python package using pip if it's missing and required for another step (like running a script). Input MUST be a valid package name or specifier (e.g., 'pandas', 'matplotlib>=3.5', 'seaborn==0.12.0', 'package-name[extra]'). **SECURITY WARNING:** This installs packages directly into the server's environment. Use with caution. Do NOT use this for general shell commands."), coroutine=install_python_package),
+         # Use Tool.from_function with PythonREPL utility
+         Tool.from_function(
+            func=python_repl_utility.run, # Use the .run method of the utility
+            name="Python_REPL", # Keep the name consistent
+            description=(
+                "Use this tool to execute Python code snippets directly in the backend environment. Input MUST be valid, complete Python code. "
+                "Handles single and multi-line inputs. Use standard Python syntax for newlines within the input string. "
+                "Useful for quick calculations, data manipulation (if libraries like pandas are installed), or simple logic. "
+                "Output will be the stdout or error from the execution. "
+                "**Security Note:** Code execution is NOT sandboxed. Be extremely cautious about the code you ask it to run. Prefer using 'write_file' and 'workspace_shell' for complex or file-interacting scripts."
+            ),
+         )
     ]
 
     if not current_task_id:

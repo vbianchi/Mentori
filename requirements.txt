@@ -7,14 +7,14 @@ python-dotenv>=1.0
 # HTTP Client & Server
 httpx>=0.25
 aiohttp>=3.9 # For file server
-aiohttp-cors>=0.7 # Added for CORS handling
+aiohttp-cors>=0.7 # For CORS handling
 
 # --- LangChain Core and Integrations ---
 langchain>=0.1.0
 langchain-google-genai>=1.0
 langchain-community>=0.0.20
 langchainhub>=0.1.15
-langchain-experimental>=0.0.50 # For Python REPL Tool (if added later)
+langchain-experimental>=0.0.50 # Added for Python REPL Tool
 langchain-ollama>=0.1.0
 
 # --- Tool Dependencies ---
