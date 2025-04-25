@@ -2,8 +2,7 @@
 /**
  * This script handles the frontend logic for the AI Agent UI,
  * including WebSocket communication, DOM manipulation, event handling,
- * task history management, chat input history, structured monitor logging,
- * and artifact (image/text) display and cycling in the monitor artifact area.
+ * task history management, chat input history, and Markdown formatting (including links).
  */
 document.addEventListener('DOMContentLoaded', () => {
     console.log("AI Agent UI Script Loaded and DOM ready!");
@@ -74,9 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
                      try { socket.send(JSON.stringify({ type: "context_switch", task: currentTask.title, taskId: currentTask.id })); }
                      catch (error) { console.error("Failed to send initial context_switch:", error); }
                  }
-            } else {
-                updateArtifactDisplay();
-            }
+            } else { updateArtifactDisplay(); }
         };
 
         socket.onmessage = (event) => {
@@ -93,29 +90,34 @@ document.addEventListener('DOMContentLoaded', () => {
                         scrollToBottom(chatMessagesContainer);
                         scrollToBottom(monitorLogAreaElement);
                         break;
+
+                    // Handle Token Streaming with Formatting
                     case 'agent_token_chunk':
                         if (!currentStreamingMessageElement) {
                             console.log("Creating new message element for streaming.");
                             currentStreamingMessageElement = addChatMessage("", 'agent', false);
                         }
                         if (currentStreamingMessageElement) {
+                            // Append raw text first
                             currentStreamingMessageElement.textContent += message.content;
+                            // Re-apply formatting to the entire accumulated text
                             currentStreamingMessageElement.innerHTML = formatMessageContent(currentStreamingMessageElement.textContent);
                             scrollToBottom(chatMessagesContainer);
                         } else { console.warn("Received token chunk but no streaming element."); }
                         break;
-                    case 'agent_message':
+
+                    case 'agent_message': // Handles full agent messages (e.g., from history)
                         console.log("Received full agent_message:", message.content);
-                        addChatMessage(message.content, 'agent');
-                        currentStreamingMessageElement = null;
+                        addChatMessage(message.content, 'agent'); // Formats the full message
+                        currentStreamingMessageElement = null; // Ensure streaming stops
                         break;
-                    case 'user':
+                    case 'user': // Handle user messages from history
                         console.log("Received user history message:", message.content);
-                        addChatMessage(message.content, 'user');
+                        addChatMessage(message.content, 'user'); // User messages are plain text
                         currentStreamingMessageElement = null;
                         break;
                     case 'status_message':
-                        addChatMessage(message.content, 'status');
+                        addChatMessage(message.content, 'status'); // Status messages are plain text
                         if (message.content.includes("complete") || message.content.includes("error")) {
                              console.log("Resetting streaming element due to status message:", message.content);
                              currentStreamingMessageElement = null;
@@ -125,18 +127,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.log("Received monitor_log:", message.content);
                         addMonitorLog(message.content);
                         break;
-                    // *** Renamed message type ***
                     case 'update_artifacts':
                         console.log("Received update_artifacts message:", message.content);
                         if (Array.isArray(message.content)) {
-                             currentTaskArtifacts = message.content; // Use new state variable
+                             currentTaskArtifacts = message.content;
                              currentArtifactIndex = currentTaskArtifacts.length > 0 ? 0 : -1;
                              updateArtifactDisplay();
                         } else {
                              console.warn("Invalid update_artifacts message content:", message.content);
-                             currentTaskArtifacts = [];
-                             currentArtifactIndex = -1;
-                             updateArtifactDisplay();
+                             currentTaskArtifacts = []; currentArtifactIndex = -1; updateArtifactDisplay();
                         }
                         break;
                     case 'user_message': break; // Ignore live echo
@@ -154,91 +153,86 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Helper Functions ---
     const scrollToBottom = (element) => { if (!element) return; element.scrollTop = element.scrollHeight; };
-    const formatMessageContent = (text) => { /* ... (remains the same) ... */ let escapedText = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); const segments = []; let lastIndex = 0; const codeBlockRegex = /```(\w*)\n([\s\S]*?)\n?```/g; let match; while ((match = codeBlockRegex.exec(escapedText)) !== null) { if (match.index > lastIndex) { segments.push({ type: 'text', content: escapedText.substring(lastIndex, match.index) }); } segments.push({ type: 'code', lang: match[1] || '', content: match[2] }); lastIndex = codeBlockRegex.lastIndex; } if (lastIndex < escapedText.length) { segments.push({ type: 'text', content: escapedText.substring(lastIndex) }); } let htmlContent = ""; segments.forEach(segment => { if (segment.type === 'code') { const escapedCode = segment.content.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); const langClass = segment.lang ? ` class="language-${segment.lang}"` : ''; htmlContent += `<pre><code${langClass}>${escapedCode}</code></pre>`; } else { let processedText = segment.content; processedText = processedText.replace(/(\*\*\*|___)(.*?)\1/g, '<strong><em>$2</em></strong>'); processedText = processedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); processedText = processedText.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>'); processedText = processedText.replace(/\n/g, '<br>'); htmlContent += processedText; } }); return htmlContent; };
-    const addChatMessage = (text, type = 'agent', doScroll = true) => { /* ... (remains the same) ... */ if (!chatMessagesContainer) { console.error("Chat container missing!"); return null; } const messageElement = document.createElement('div'); messageElement.classList.add('message', `message-${type}`); if (type === 'status') { if (text.toLowerCase().includes("connect") || text.toLowerCase().includes("clos")) { messageElement.classList.add('connection-status'); } if (text.toLowerCase().includes("error")) { messageElement.classList.add('error-message'); } } if (type === 'user') { messageElement.classList.add('user-message'); messageElement.style.cssText = 'align-self: flex-end; background-color: var(--accent-color); color: white; border: 1px solid var(--accent-color);'; } if (type === 'agent') { messageElement.classList.add('agent-message'); messageElement.style.border = '1px solid var(--border-color)'; } if (type === 'agent') { messageElement.innerHTML = formatMessageContent(text); } else { messageElement.textContent = text; } chatMessagesContainer.appendChild(messageElement); if (doScroll) scrollToBottom(chatMessagesContainer); return messageElement; };
-    const addMonitorLog = (fullLogText) => { /* ... (remains the same) ... */ if (!monitorLogAreaElement) { console.error("Monitor log area element (#monitor-log-area) not found!"); return; } const logEntryDiv = document.createElement('div'); logEntryDiv.classList.add('monitor-log-entry'); const match = fullLogText.match(/^(\[.*?\]\[.*?\])\s*(\[.*?\])?\s*(.*)$/s); let timestampPrefix = ""; let logType = "system"; let logContent = fullLogText; if (match) { timestampPrefix = match[1] || ""; const typeMatch = match[2]; logContent = match[3] || ""; if (typeMatch) { const typeText = typeMatch.replace(/[\[\]]/g, '').trim().toLowerCase(); if (typeText.includes("tool start")) logType = 'tool-start'; else if (typeText.includes("tool output")) logType = 'tool-output'; else if (typeText.includes("tool error")) logType = 'tool-error'; else if (typeText.includes("agent finish")) logType = 'agent-finish'; else if (typeText.includes("error")) logType = 'error'; else if (typeText.includes("history")) logType = 'history'; else if (typeText.includes("system")) logType = 'system'; else if (typeText.includes("image generated")) logType = 'image-generated'; else if (typeText.includes("artifact generated")) logType = 'artifact-generated'; /* Check for new generic type */ } } else { if (fullLogText.toLowerCase().includes("error")) logType = 'error'; else if (fullLogText.toLowerCase().includes("system")) logType = 'system'; else logType = 'unknown'; } logEntryDiv.classList.add(`log-type-${logType}`); if (timestampPrefix) { const timeSpan = document.createElement('span'); timeSpan.className = 'log-timestamp'; timeSpan.textContent = timestampPrefix; logEntryDiv.appendChild(timeSpan); } const contentSpan = document.createElement('span'); contentSpan.className = 'log-content'; if (logType === 'tool-output' || logType === 'tool-error') { const pre = document.createElement('pre'); pre.textContent = logContent.trim(); contentSpan.appendChild(pre); } else { contentSpan.textContent = logContent.trim(); } logEntryDiv.appendChild(contentSpan); monitorLogAreaElement.appendChild(logEntryDiv); scrollToBottom(monitorLogAreaElement); };
 
     /**
-      * Updates the artifact display area based on the current index and artifact type.
-      */
-    const updateArtifactDisplay = async () => { // Made async for fetch
-        if (!monitorArtifactAreaElement || !artifactNavElement || !artifactPrevBtn || !artifactNextBtn || !artifactCounterElement) {
-            console.error("Artifact display elements not found!");
-            return;
+     * Basic sanitation and Markdown to HTML conversion for agent messages.
+     * Handles newlines, code blocks, bold, italics, and links.
+     * @param {string} text The raw text content.
+     * @returns {string} HTML formatted string.
+     */
+    const formatMessageContent = (text) => {
+        // 1. Sanitize basic HTML chars FIRST
+        let formattedText = text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+        // 2. Convert ```code blocks``` to <pre><code>
+        formattedText = formattedText.replace(/```(\w*)\n([\s\S]*?)\n?```/g, (match, lang, code) => {
+             const escapedCode = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+             const langClass = lang ? ` class="language-${lang}"` : '';
+             return `<pre><code${langClass}>${escapedCode}</code></pre>`;
+         });
+
+        // 3. Convert Markdown Links: [text](url) -> <a href="url">text</a>
+        // Ensure this runs *before* bold/italics
+        formattedText = formattedText.replace(
+            /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, // Matches [text](http://...) or [text](https://...)
+            (match, linkText, linkUrl) => {
+                // Basic sanitation was already done on the whole text
+                // Just ensure quotes in URL are handled for the href attribute
+                const safeLinkUrl = linkUrl.replace(/"/g, "&quot;");
+                return `<a href="${safeLinkUrl}" target="_blank" rel="noopener noreferrer">${linkText}</a>`;
+            }
+        );
+
+        // 4. Convert Bold and Italics (ensure they don't interfere with HTML tags)
+        // Process these *after* links and code blocks
+        // Bold (***text*** or **text**) - Handle triple first
+        formattedText = formattedText.replace(/(\*\*\*|___)(?=\S)([\s\S]*?\S)\1/g, '<strong><em>$2</em></strong>');
+        // Bold (**text**)
+        formattedText = formattedText.replace(/\*\*(?=\S)([\s\S]*?\S)\*\*/g, '<strong>$1</strong>');
+        // Italics (*text* or _text_)
+        formattedText = formattedText.replace(/(\*|_)(?=\S)([\s\S]*?\S)\1/g, '<em>$2</em>');
+
+
+        // 5. Convert remaining newlines to <br> (ONLY outside of pre/code tags)
+        const parts = formattedText.split(/(<pre>.*?<\/pre>|<a.*?<\/a>)/s); // Split by pre blocks AND links
+        for (let i = 0; i < parts.length; i += 2) { // Only process parts outside <pre> and <a>
+            parts[i] = parts[i].replace(/\n/g, '<br>');
         }
+        formattedText = parts.join('');
 
-        // Clear previous content (excluding nav)
-        while (monitorArtifactAreaElement.firstChild && monitorArtifactAreaElement.firstChild !== artifactNavElement) {
-             monitorArtifactAreaElement.removeChild(monitorArtifactAreaElement.firstChild);
-        }
+        return formattedText;
+     };
 
 
-        if (currentTaskArtifacts.length === 0 || currentArtifactIndex < 0) {
-            // Display placeholder if no artifacts or index is invalid
-            const placeholder = document.createElement('div');
-            placeholder.className = 'artifact-placeholder';
-            placeholder.textContent = 'No artifacts generated yet.';
-            monitorArtifactAreaElement.insertBefore(placeholder, artifactNavElement);
-            artifactNavElement.style.display = 'none'; // Hide nav
+    /**
+     * Adds a message element to the chat display area, formatting agent/user messages.
+     */
+    const addChatMessage = (text, type = 'agent', doScroll = true) => {
+        if (!chatMessagesContainer) { console.error("Chat container missing!"); return null; }
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message', `message-${type}`);
+        if (type === 'status') { if (text.toLowerCase().includes("connect") || text.toLowerCase().includes("clos")) { messageElement.classList.add('connection-status'); } if (text.toLowerCase().includes("error")) { messageElement.classList.add('error-message'); } }
+        if (type === 'user') { messageElement.classList.add('user-message'); messageElement.style.cssText = 'align-self: flex-end; background-color: var(--accent-color); color: var(--button-text-on-accent); border: 1px solid var(--accent-color);'; }
+        if (type === 'agent') { messageElement.classList.add('agent-message'); messageElement.style.border = '1px solid var(--border-color)'; }
+
+        if (type === 'agent') {
+            messageElement.innerHTML = formatMessageContent(text); // Apply formatting
         } else {
-            // Get current artifact data
-            const artifact = currentTaskArtifacts[currentArtifactIndex];
-            if (!artifact || !artifact.url || !artifact.filename || !artifact.type) {
-                 const errorDiv = Object.assign(document.createElement('div'), { className: 'artifact-error', textContent: 'Error displaying artifact: Invalid data.' });
-                 monitorArtifactAreaElement.insertBefore(errorDiv, artifactNavElement);
-                 artifactNavElement.style.display = 'none';
-                 return;
-            }
-
-            // *** Display based on type ***
-            if (artifact.type === 'image') {
-                const imgElement = document.createElement('img');
-                imgElement.src = artifact.url;
-                imgElement.alt = `Generated image: ${artifact.filename}`;
-                imgElement.title = `Generated image: ${artifact.filename}`;
-                imgElement.onerror = () => {
-                    imgElement.remove(); // Remove broken image placeholder
-                    const errorDiv = Object.assign(document.createElement('div'), { className: 'artifact-error', textContent: `Error loading image: ${artifact.filename}` });
-                    monitorArtifactAreaElement.insertBefore(errorDiv, artifactNavElement);
-                    console.error(`Error loading image from URL: ${artifact.url}`);
-                };
-                monitorArtifactAreaElement.insertBefore(imgElement, artifactNavElement);
-            } else if (artifact.type === 'text') {
-                 const preElement = document.createElement('pre');
-                 preElement.textContent = 'Loading text file...'; // Placeholder
-                 monitorArtifactAreaElement.insertBefore(preElement, artifactNavElement);
-
-                 // Fetch the text content
-                 try {
-                     const response = await fetch(artifact.url);
-                     if (!response.ok) {
-                         throw new Error(`HTTP error! status: ${response.status}`);
-                     }
-                     const textContent = await response.text();
-                     preElement.textContent = textContent; // Display fetched text
-                 } catch (error) {
-                     console.error(`Error fetching text artifact ${artifact.filename}:`, error);
-                     preElement.textContent = `Error loading file: ${artifact.filename}\n${error.message}`;
-                     preElement.classList.add('artifact-error'); // Add error styling
-                 }
-            } else {
-                 // Handle unknown artifact types
-                 const unknownDiv = Object.assign(document.createElement('div'), { className: 'artifact-placeholder', textContent: `Unsupported artifact type: ${artifact.filename}` });
-                 monitorArtifactAreaElement.insertBefore(unknownDiv, artifactNavElement);
-            }
-
-            // Update and show/hide navigation controls
-            if (currentTaskArtifacts.length > 1) {
-                artifactCounterElement.textContent = `Artifact ${currentArtifactIndex + 1} of ${currentTaskArtifacts.length}`; // Generic counter text
-                artifactPrevBtn.disabled = (currentArtifactIndex === 0);
-                artifactNextBtn.disabled = (currentArtifactIndex === currentTaskArtifacts.length - 1);
-                artifactNavElement.style.display = 'flex'; // Show nav
-            } else {
-                artifactNavElement.style.display = 'none'; // Hide nav if only one artifact
-            }
+            messageElement.textContent = text; // User/Status messages as plain text
         }
+
+        chatMessagesContainer.appendChild(messageElement);
+        if (doScroll) scrollToBottom(chatMessagesContainer);
+        return messageElement;
     };
 
+    const addMonitorLog = (fullLogText) => { /* ... (remains the same) ... */ if (!monitorLogAreaElement) { console.error("Monitor log area element (#monitor-log-area) not found!"); return; } const logEntryDiv = document.createElement('div'); logEntryDiv.classList.add('monitor-log-entry'); const match = fullLogText.match(/^(\[.*?\]\[.*?\])\s*(\[.*?\])?\s*(.*)$/s); let timestampPrefix = ""; let logType = "system"; let logContent = fullLogText; if (match) { timestampPrefix = match[1] || ""; const typeMatch = match[2]; logContent = match[3] || ""; if (typeMatch) { const typeText = typeMatch.replace(/[\[\]]/g, '').trim().toLowerCase(); if (typeText.includes("tool start")) logType = 'tool-start'; else if (typeText.includes("tool output")) logType = 'tool-output'; else if (typeText.includes("tool error")) logType = 'tool-error'; else if (typeText.includes("agent finish")) logType = 'agent-finish'; else if (typeText.includes("error")) logType = 'error'; else if (typeText.includes("history")) logType = 'history'; else if (typeText.includes("system")) logType = 'system'; else if (typeText.includes("image generated") || typeText.includes("artifact generated")) logType = 'artifact-generated'; } } else { if (fullLogText.toLowerCase().includes("error")) logType = 'error'; else if (fullLogText.toLowerCase().includes("system")) logType = 'system'; else logType = 'unknown'; } logEntryDiv.classList.add(`log-type-${logType}`); if (timestampPrefix) { const timeSpan = document.createElement('span'); timeSpan.className = 'log-timestamp'; timeSpan.textContent = timestampPrefix; logEntryDiv.appendChild(timeSpan); } const contentSpan = document.createElement('span'); contentSpan.className = 'log-content'; if (logType === 'tool-output' || logType === 'tool-error') { const pre = document.createElement('pre'); pre.textContent = logContent.trim(); contentSpan.appendChild(pre); } else { contentSpan.textContent = logContent.trim(); } logEntryDiv.appendChild(contentSpan); monitorLogAreaElement.appendChild(logEntryDiv); scrollToBottom(monitorLogAreaElement); };
+    const updateArtifactDisplay = async () => { /* ... (remains the same) ... */ if (!monitorArtifactAreaElement || !artifactNavElement || !artifactPrevBtn || !artifactNextBtn || !artifactCounterElement) { console.error("Artifact display elements not found!"); return; } while (monitorArtifactAreaElement.firstChild && monitorArtifactAreaElement.firstChild !== artifactNavElement) { monitorArtifactAreaElement.removeChild(monitorArtifactAreaElement.firstChild); } if (currentTaskArtifacts.length === 0 || currentArtifactIndex < 0) { const placeholder = document.createElement('div'); placeholder.className = 'artifact-placeholder'; placeholder.textContent = 'No artifacts generated yet.'; monitorArtifactAreaElement.insertBefore(placeholder, artifactNavElement); artifactNavElement.style.display = 'none'; } else { const artifact = currentTaskArtifacts[currentArtifactIndex]; if (!artifact || !artifact.url || !artifact.filename || !artifact.type) { const errorDiv = Object.assign(document.createElement('div'), { className: 'artifact-error', textContent: 'Error displaying artifact: Invalid data.' }); monitorArtifactAreaElement.insertBefore(errorDiv, artifactNavElement); artifactNavElement.style.display = 'none'; return; } if (artifact.type === 'image') { const imgElement = document.createElement('img'); imgElement.src = artifact.url; imgElement.alt = `Generated image: ${artifact.filename}`; imgElement.title = `Generated image: ${artifact.filename}`; imgElement.onerror = () => { imgElement.remove(); const errorDiv = Object.assign(document.createElement('div'), { className: 'artifact-error', textContent: `Error loading image: ${artifact.filename}` }); monitorArtifactAreaElement.insertBefore(errorDiv, artifactNavElement); console.error(`Error loading image from URL: ${artifact.url}`); }; monitorArtifactAreaElement.insertBefore(imgElement, artifactNavElement); } else if (artifact.type === 'text') { const preElement = document.createElement('pre'); preElement.textContent = 'Loading text file...'; monitorArtifactAreaElement.insertBefore(preElement, artifactNavElement); try { const response = await fetch(artifact.url); if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); } const textContent = await response.text(); preElement.textContent = textContent; } catch (error) { console.error(`Error fetching text artifact ${artifact.filename}:`, error); preElement.textContent = `Error loading file: ${artifact.filename}\n${error.message}`; preElement.classList.add('artifact-error'); } } else { const unknownDiv = Object.assign(document.createElement('div'), { className: 'artifact-placeholder', textContent: `Unsupported artifact type: ${artifact.filename}` }); monitorArtifactAreaElement.insertBefore(unknownDiv, artifactNavElement); } if (currentTaskArtifacts.length > 1) { artifactCounterElement.textContent = `Artifact ${currentArtifactIndex + 1} of ${currentTaskArtifacts.length}`; artifactPrevBtn.disabled = (currentArtifactIndex === 0); artifactNextBtn.disabled = (currentArtifactIndex === currentTaskArtifacts.length - 1); artifactNavElement.style.display = 'flex'; } else { artifactNavElement.style.display = 'none'; } } };
 
     // --- Task History Functions ---
     const loadTasks = () => { /* ... (remains the same) ... */ const storedCounter = localStorage.getItem(COUNTER_KEY); taskCounter = storedCounter ? parseInt(storedCounter, 10) : 0; if (isNaN(taskCounter)) taskCounter = 0; let firstLoad = false; const storedTasks = localStorage.getItem(STORAGE_KEY); if (storedTasks) { try { tasks = JSON.parse(storedTasks); if (!Array.isArray(tasks)) { tasks = []; } tasks.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)); console.log(`Loaded ${tasks.length} tasks. Next Task #: ${taskCounter + 1}`); } catch (e) { console.error("Failed to parse tasks:", e); tasks = []; localStorage.removeItem(STORAGE_KEY); } } else { tasks = []; firstLoad = true; console.log("No tasks found."); } if (firstLoad && tasks.length === 0) { console.log("First load, creating 'Task - 1'."); taskCounter = 1; const firstTask = { id: `task-${Date.now()}-${Math.random().toString(16).slice(2)}`, title: `Task - ${taskCounter}`, timestamp: Date.now() }; tasks.unshift(firstTask); currentTaskId = firstTask.id; saveTasks(); console.log("Auto-created 'Task - 1'."); } else { const lastActiveId = localStorage.getItem(`${STORAGE_KEY}_active`); if (lastActiveId && tasks.some(task => task.id === lastActiveId)) { currentTaskId = lastActiveId; } else if (tasks.length > 0) { currentTaskId = tasks[0].id; } else { currentTaskId = null; } } console.log("Initial currentTaskId:", currentTaskId); };

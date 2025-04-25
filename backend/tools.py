@@ -224,6 +224,7 @@ async def search_pubmed(query: str, max_results: int = 5) -> str:
         if not isinstance(pubmed_articles, list): logger.warning(f"Unexpected PubMed format: {type(pubmed_articles)}."); return str(records)
         for i, record in enumerate(pubmed_articles):
             if i >= max_results: break
+            pmid = "Unknown PMID"
             try:
                 article = record.get('MedlineCitation', {}).get('Article', {}); pmid = record.get('MedlineCitation', {}).get('PMID', 'Unknown PMID'); title = article.get('ArticleTitle', 'No Title')
                 authors_list = article.get('AuthorList', []); authors = ", ".join([f"{a.get('LastName', '')} {a.get('Initials', '')}" for a in authors_list if isinstance(a, dict)]) or "No Authors"
@@ -236,12 +237,13 @@ async def search_pubmed(query: str, max_results: int = 5) -> str:
                 if isinstance(article_ids, list):
                     for article_id in article_ids:
                         if article_id.attributes.get('IdType') == 'doi': doi = str(article_id); break
-                link = f"https://doi.org/{doi}" if doi else f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/"
-                summaries.append(f"Result {i+1}:\nPMID: {pmid}\nTitle: {title}\nAuthors: {authors}\nLink: {link}\nAbstract Snippet: {abstract_snippet}\n---")
-            except Exception as parse_err: logger.error(f"Error parsing PubMed record {i+1} (PMID: {pmid}): {parse_err}", exc_info=True); summaries.append(f"Result {i+1}:\nError parsing record (PMID: {pmid}).\n---")
+                link = f"https://doi.org/{doi}" if doi else f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/"; link_text = doi if doi else pmid
+                summaries.append(f"**Result {i+1}:**\n**PMID:** {pmid}\n**Title:** {title}\n**Authors:** {authors}\n**Link:** [{link_text}]({link})\n**Abstract Snippet:** {abstract_snippet}\n---")
+            except Exception as parse_err: logger.error(f"Error parsing PubMed record {i+1} (PMID: {pmid}): {parse_err}", exc_info=True); summaries.append(f"**Result {i+1}:**\nError parsing record (PMID: {pmid}).\n---")
         return "\n".join(summaries) if summaries else "No valid records processed."
     except HTTPError as e: logger.error(f"HTTP Error fetching PubMed data: {e.code} {e.reason}"); return f"Error: Failed to fetch data from PubMed (HTTP {e.code})."
     except Exception as e: logger.error(f"Error searching PubMed for '{query}': {e}", exc_info=True); return f"Error: An unexpected error occurred during PubMed search: {type(e).__name__}"
+
 
 # Create PythonREPL utility instance
 python_repl_utility = PythonREPL()
