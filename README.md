@@ -23,12 +23,6 @@ This project is a functional clone of the user interface for an AI assistant sys
 * **Persistence:** Task list and chat/monitor history are stored locally using SQLite.
 * **Task Workspaces:** File/Shell tools operate within isolated directories for each task (`workspace/<task_id>/`).
 
-## Screenshot (Target UI)
-
-(Please place the `image_917c03.jpg` file in the root of this repository for the image below to display correctly)
-
-![Manus AI Screenshot](./image_917c03.jpg)
-
 ## Current Capabilities & Workflow
 
 The agent operates within a task-based context. When you select a task:
