@@ -5,14 +5,15 @@
 __pycache__/
 *.pyc
 
-# Environment variables file
+# Environment variables file (DO NOT COMMIT ACTUAL SECRETS)
 .env
 
 # Agent workspace directory
 workspace/
 
-# Database directory
+# Database directory and specific file
 database/
+database/agent_history.db
 
 # IDE/OS specific files (examples)
 .vscode/
