@@ -140,7 +140,7 @@ Run from the **project root directory** (`ResearchAgent/`).
 
 1.  **Terminal 1: Start Backend Server**
     * Activate environment: `source .venv/bin/activate`
-    * Run server as module: `python -m backend.server`
+    * **Run server as module:** `python3 -m backend.server` *(Using python3)*
     * Keep running. Observe logs for WebSocket server (e.g., `ws://localhost:8765`) and File server (e.g., `http://localhost:8766`).
 
 2.  **Terminal 2: Start Frontend HTTP Server**
@@ -152,7 +152,7 @@ Run from the **project root directory** (`ResearchAgent/`).
 
 ## Usage & Testing
 
-* **Create Task:** Click "+ New Task".
+* **Create Task:** Click "+ New Task". "Task - 1" is created automatically on first launch if no tasks exist.
 * **Select Task:** Click a task to load its history and set its workspace.
 * **Chat:** Interact with the agent. Use Up/Down arrows for input history.
 * **Monitor:** Observe structured logs (tool usage, system messages).
