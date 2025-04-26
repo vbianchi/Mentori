@@ -99,34 +99,55 @@ manus-ai-ui-clone/
 
 1.  **Clone Repository:**
     ```bash
-    git clone https://github.com/vbianchi/ResearchAgent.git
+    git clone [https://github.com/vbianchi/ResearchAgent.git](https://github.com/vbianchi/ResearchAgent.git)
     cd ResearchAgent
     ```
 2.  **Prerequisites:**
     * Ensure Python 3.10+ is installed.
-    * **(Optional but Recommended for R usage):** Install R ([https://www.r-project.org/](https://www.r-project.org/)) and ensure the `Rscript` command is available in your system's PATH if you intend for the agent to execute R scripts via the `workspace_shell` tool.
-3.  **Create Virtual Environment:**
-    ```bash
-    python -m venv .venv
-    source .venv/bin/activate # Linux/macOS
-    # .\ .venv\Scripts\activate # Windows
-    ```
-4.  **Install Dependencies:**
-    ```bash
-    # Using pip (ensure pip is up-to-date: python -m pip install --upgrade pip)
-    pip install -r requirements.txt
+    * **(Optional):** Install R and ensure `Rscript` is in PATH for R script execution via the `workspace_shell` tool.
 
-    # Or using uv (faster alternative)
-    # pip install uv
-    # uv pip install -r requirements.txt
+3.  **Install `uv` (Recommended - Fast Package Installer):**
+    * Follow the official installation instructions: [https://github.com/astral-sh/uv#installation](https://github.com/astral-sh/uv#installation) (Typically involves running a `curl` or `pip` command).
+
+4.  **Create and Activate Virtual Environment:**
+    ```bash
+    # Create the environment using uv (recommended)
+    uv venv --python 3.12 # Or your desired Python version e.g., 3.10, 3.11
+
+    # OR create using standard venv
+    # python -m venv .venv
+
+    # Activate the environment (Linux/Mac/WSL)
+    source .venv/bin/activate
+    # (For Windows CMD: .venv\Scripts\activate.bat)
+    # (For Windows PowerShell: .venv\Scripts\Activate.ps1)
     ```
-5.  **Create `.env` File:**
-    * Create `.env` in the project root.
+
+5.  **Install Dependencies:**
+    ```bash
+    # Using uv (recommended)
+    uv pip install -r requirements.txt
+
+    # OR using standard pip
+    # pip install -r requirements.txt
+    ```
+
+6.  **Create `.env` File:**
+    * Create `.env` in the project root (`ResearchAgent/.env`).
     * Add `GOOGLE_API_KEY=YOUR_ACTUAL_GOOGLE_API_KEY` if using Gemini.
-    * **(Optional but Recommended):** Add `ENTREZ_EMAIL=your_email@example.com` (NCBI requires this for PubMed API usage). Replace with your actual email.
+    * **(Recommended):** Add `ENTREZ_EMAIL=your_email@example.com` (NCBI requires this for PubMed API usage). Replace with your actual email.
     * See Configuration section for other optional variables (`AI_PROVIDER`, etc.).
-    * Ensure `.env` is in `.gitignore`.
-6.  **(If using Ollama)** Ensure Ollama server is running and the desired model is pulled.
+    * Ensure `.env` is listed in `.gitignore`.
+
+7.  **(If using Ollama)**
+    * **Install Ollama:** Follow instructions at [https://ollama.com/](https://ollama.com/).
+    * **Run Ollama:** Ensure the Ollama application or background service is running.
+    * **Pull Models:** Download the specific models you intend to use (as specified in `.env` or defaults) via your terminal:
+      ```bash
+      # Example models:
+      ollama pull gemma:2b
+      ollama pull llama3:8b
+      ```
 
 ## Configuration
 
@@ -164,13 +185,13 @@ Run from the **project root directory** (`ResearchAgent/`).
 * **Artifact Viewer:** View generated images or text files using the Prev/Next buttons.
 * **Test PubMed Search:**
     * Ask: `"Search PubMed for recent articles on CRISPR gene editing."`
-    * Look For (Monitor): `pubmed_search` used, output showing article summaries.
+    * Look For (Monitor): `pubmed_search` used, output showing article summaries. Chat shows formatted results with links.
 * **Test Package Installation:**
     * Ask: `"Install the 'numpy' python package."`
     * Look For (Monitor): `python_package_installer` used, output showing successful installation.
 * **Test Python REPL:**
     * Ask: `"Use the Python REPL tool to calculate 15 factorial."`
-    * Look For (Monitor): `Python_REPL` used, output showing the result.
+    * Look For (Monitor): `Python_REPL` used with input like `import math; print(math.factorial(15))`, output showing the result.
 * **Test Image Generation:**
     * Ask: `"Write a python script named 'plot.py' that uses matplotlib to create a simple sine wave plot and saves it as 'sine_wave.png'. Then execute the script using python."` (Ensure `matplotlib` is installed first).
     * Check Monitor panel for logs and Artifact Viewer for the image.
@@ -184,12 +205,12 @@ Run from the **project root directory** (`ResearchAgent/`).
 
 ## Future Perspectives & Ideas
 
-* **Phase 2: Containerization:** Run the backend in Docker for proper isolation of package installations/code execution and enhanced security. This is the **recommended next step** before adding more complex execution tools or exposing the application.
+* **Containerization (Recommended Next Step):** Run the backend in Docker for proper isolation of package installations/code execution and enhanced security.
 * **ERIC/DOAJ Tools:** Add tools for searching these free databases.
 * **Task Renaming:** Allow users to rename tasks in the left panel.
 * **Enhanced Monitor:** Add filtering/search, step navigation.
 * **Enhanced Artifact Viewer:** Support more file types (PDF previews?), allow downloading artifacts.
-* **More Robust Formatting:** Use a dedicated Markdown library (like Marked.js) in the frontend for richer chat formatting (lists, links, tables).
+* **More Robust Formatting:** Use a dedicated Markdown library (like Marked.js) in the frontend for richer chat formatting (lists, tables, etc.).
 * **Domain-Specific Tools:** PubMed Central (full text), BLAST execution, VCF/FASTA parsing, Epi Info interaction?
 * **User Authentication.**
 * **UI Polish:** Improve overall aesthetics, add loading indicators, better error displays.
