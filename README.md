@@ -99,7 +99,7 @@ manus-ai-ui-clone/
 
 1.  **Clone Repository:**
     ```bash
-    git clone [https://github.com/vbianchi/ResearchAgent.git](https://github.com/vbianchi/ResearchAgent.git)
+    git clone https://github.com/vbianchi/ResearchAgent.git
     cd ResearchAgent
     ```
 2.  **Prerequisites:**
