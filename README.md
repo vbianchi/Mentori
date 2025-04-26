@@ -104,6 +104,10 @@ manus-ai-ui-clone/
     ```
 2.  **Prerequisites:**
     * Ensure Python 3.10+ is installed.
+    * Ensure pip3 is installed.
+    ```bash
+    sudo apt install python3-pip
+    ```
     * **(Optional):** Install R and ensure `Rscript` is in PATH for R script execution via the `workspace_shell` tool.
 
 3.  **Install `uv` (Recommended - Fast Package Installer):**
