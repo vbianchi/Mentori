@@ -1,17 +1,17 @@
-# AI Agent UI Clone & LangChain Backend
+# ResearchAgent: AI Assistant for Research Workflows
 
-This project is a functional clone of the user interface for an AI assistant system, inspired by a screenshot of Manus AI. It features a three-panel layout (Tasks, Chat, Monitor) and connects via WebSockets to a Python backend powered by **LangChain** to create a basic AI agent. The agent can use LLMs (Google Gemini or local Ollama) for reasoning and tools (Shell, Web Search, Web Reader, File Read/Write, Package Installer, Python REPL, **PubMed Search**) to perform actions. The UI supports task management, chat history persistence via a local database, and displays generated artifacts (images, text files) in the monitor panel.
+This project provides a functional user interface and backend for an AI agent system designed to assist with research tasks, particularly in fields like bioinformatics and epidemiology. It features a three-panel layout (Tasks, Chat, Monitor) and connects via WebSockets to a Python backend powered by **LangChain**. The agent can use LLMs (Google Gemini or local Ollama) for reasoning and tools (Shell, Web Search, Web Reader, File Read/Write, Package Installer, Python REPL, PubMed Search) to perform actions within isolated task workspaces.
 
 ## Features
 
 * **Task Management:** Create, select, and delete tasks. Each task maintains its own context and workspace.
-* **Chat Interface:** Interact with the AI agent via a familiar chat window. Supports input history (Up/Down arrows). Basic Markdown rendering (newlines, bold, italics, code blocks).
+* **Chat Interface:** Interact with the AI agent via a familiar chat window. Supports input history (Up/Down arrows). Basic Markdown rendering (newlines, bold, italics, code blocks, links).
 * **Agent Workspace (Monitor):** View the agent's internal steps, tool usage, and outputs in a structured, styled log panel.
 * **Artifact Viewer:** Displays generated `.png` images and previews common text files (`.txt`, `.py`, `.csv`, etc.) in a dedicated area below the monitor logs, with navigation for multiple artifacts.
 * **Tool Integration:** Includes tools for:
     * Web Search (DuckDuckGo)
     * Web Page Reading
-    * **NEW:** PubMed Search (Biomedical Literature)
+    * PubMed Search (Biomedical Literature)
     * File Reading (within task workspace)
     * File Writing (within task workspace)
     * Shell Command Execution (within task workspace, including `Rscript` if R is installed)
@@ -37,8 +37,8 @@ When you send a message:
     * `pubmed_search`: To search for biomedical literature abstracts.
     * `write_file`: To save text or code (Python, R, etc.) to a file within the task's workspace.
     * `read_file`: To read files from the task's workspace.
-    * `workspace_shell`: To execute shell commands (like `python script.py` or `ls`) within the task's workspace.
-    * `python_package_installer`: To install required Python packages using `pip`. **(Security Warning!)**
+    * `workspace_shell`: To execute shell commands (like `python script.py` or `ls`) within the task's workspace. **Note:** Running R scripts requires R and `Rscript` to be installed and available in the backend server's PATH.
+    * `python_package_installer`: To install required Python packages using `pip`. **(Security Warning: Installs into the main backend environment - Phase 1!)**
     * `PythonREPLTool`: To execute Python code snippets directly. **(Security Warning!)**
 3.  All steps (tool usage, errors, final answer) are logged to the Monitor panel and saved to the database for the current task.
 4.  If the agent run generates new image or text artifacts (based on file extensions) in the task's workspace, the backend detects them and sends a message to the UI to update the artifact viewer.
@@ -52,7 +52,7 @@ When you send a message:
     * **Web Server:** `aiohttp`, `aiohttp-cors` (for serving generated files)
     * **LangChain Core:** `langchain`
     * **LLM Integrations:** `langchain-google-genai`, `langchain-ollama`
-    * **Tools:** `langchain-community` (for File Tools, Search), `langchain-experimental` (for Python REPL), **`biopython` (for PubMed)**
+    * **Tools:** `langchain-community` (for File Tools, Search), `langchain-experimental` (for Python REPL), `biopython` (for PubMed)
     * **Prompts:** `langchainhub`
     * **Config:** `python-dotenv`
     * **HTTP:** `httpx`
@@ -99,12 +99,12 @@ manus-ai-ui-clone/
 
 1.  **Clone Repository:**
     ```bash
-    git clone <your-repository-url>
-    cd manus-ai-ui-clone
+    git clone [https://github.com/vbianchi/ResearchAgent.git](https://github.com/vbianchi/ResearchAgent.git)
+    cd ResearchAgent
     ```
 2.  **Prerequisites:**
     * Ensure Python 3.10+ is installed.
-    * **(Optional):** Install R and ensure `Rscript` is in PATH for R script execution.
+    * **(Optional but Recommended for R usage):** Install R ([https://www.r-project.org/](https://www.r-project.org/)) and ensure the `Rscript` command is available in your system's PATH if you intend for the agent to execute R scripts via the `workspace_shell` tool.
 3.  **Create Virtual Environment:**
     ```bash
     python -m venv .venv
@@ -141,7 +141,7 @@ Configure via environment variables or the `.env` file:
 
 ## Running the Application
 
-Run from the **project root directory** (`manus-ai-ui-clone/`).
+Run from the **project root directory** (`ResearchAgent/`).
 
 1.  **Terminal 1: Start Backend Server**
     * Activate environment: `source .venv/bin/activate`
@@ -157,7 +157,7 @@ Run from the **project root directory** (`manus-ai-ui-clone/`).
 
 ## Usage & Testing
 
-* **Create Task:** Click "+ New Task".
+* **Create Task:** Click "+ New Task". "Task - 1" is created automatically on first launch if no tasks exist.
 * **Select Task:** Click a task to load its history and set its workspace.
 * **Chat:** Interact with the agent. Use Up/Down arrows for input history.
 * **Monitor:** Observe structured logs (tool usage, system messages).
@@ -178,17 +178,18 @@ Run from the **project root directory** (`manus-ai-ui-clone/`).
 
 ## Security Warnings
 
-* **`python_package_installer` Tool:** Installs packages directly into the backend server's Python environment.
-* **`PythonREPLTool` Tool:** Executes arbitrary Python code directly in the backend server's environment.
-* **Recommendation:** **Strongly consider running the backend server inside a Docker container (Phase 2)**, especially when using these tools, to isolate execution and mitigate risks.
+* **`python_package_installer` Tool:** Installs packages directly into the backend server's Python environment. This can break dependencies or install unwanted software if the agent is manipulated.
+* **`PythonREPLTool` Tool:** Executes arbitrary Python code directly in the backend server's environment. This is a **significant security risk** if the agent is prompted with malicious code. It can access files, make network requests, or potentially damage the system.
+* **Recommendation:** **Strongly consider running the backend server inside a Docker container (Phase 2)**, especially when using the `python_package_installer` or `PythonREPLTool`, to isolate execution and mitigate risks.
 
 ## Future Perspectives & Ideas
 
-* **Phase 2: Containerization:** Run the backend in Docker.
+* **Phase 2: Containerization:** Run the backend in Docker for proper isolation of package installations/code execution and enhanced security. This is the **recommended next step** before adding more complex execution tools or exposing the application.
 * **ERIC/DOAJ Tools:** Add tools for searching these free databases.
-* **Task Renaming:** Allow users to rename tasks.
-* **Enhanced Monitor/Artifact Viewer:** Filtering, navigation, more file types (PDF, CSV tables), download.
-* **More Robust Formatting:** Use a dedicated Markdown library.
-* **Domain-Specific Tools:** PubMed Central (full text), BLAST, VCF/FASTA parsing, Epi Info interaction?
+* **Task Renaming:** Allow users to rename tasks in the left panel.
+* **Enhanced Monitor:** Add filtering/search, step navigation.
+* **Enhanced Artifact Viewer:** Support more file types (PDF previews?), allow downloading artifacts.
+* **More Robust Formatting:** Use a dedicated Markdown library (like Marked.js) in the frontend for richer chat formatting (lists, links, tables).
+* **Domain-Specific Tools:** PubMed Central (full text), BLAST execution, VCF/FASTA parsing, Epi Info interaction?
 * **User Authentication.**
-* **UI Polish.**
+* **UI Polish:** Improve overall aesthetics, add loading indicators, better error displays.
