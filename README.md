@@ -160,9 +160,9 @@ Configure via environment variables or the `.env` file:
 * `GOOGLE_API_KEY` (Required if using Gemini)
 * `ENTREZ_EMAIL` (Required for PubMed Tool): Your email address for NCBI API identification.
 * `AI_PROVIDER` (Optional): `gemini` (default) or `ollama`.
-* `GEMINI_MODEL` (Optional): Default `gemini-1.5-flash-latest`.
+* `GEMINI_MODEL` (Optional): Default `gemini-2.0-flash`.
 * `OLLAMA_BASE_URL` (Optional): Default `http://localhost:11434`.
-* `OLLAMA_MODEL` (Optional): Default `gemma:2b`. Ensure model exists in Ollama.
+* `OLLAMA_MODEL` (Optional): Default `gemma3:12b`. Ensure model exists in Ollama.
 
 ## Running the Application
 
@@ -170,7 +170,7 @@ Run from the **project root directory** (`ResearchAgent/`).
 
 1.  **Terminal 1: Start Backend Server**
     * Activate environment: `source .venv/bin/activate`
-    * Run server as module: `python -m backend.server`
+    * Run server as module: `python3 -m backend.server`
     * Keep running. Observe logs for WebSocket server (e.g., `ws://localhost:8765`) and File server (e.g., `http://localhost:8766`).
 
 2.  **Terminal 2: Start Frontend HTTP Server**
