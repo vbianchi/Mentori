@@ -281,4 +281,3 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
     all_tools = stateless_tools + task_specific_tools
     logger.info(f"Returning tools for task {current_task_id}: {[tool.name for tool in all_tools]}")
     return all_tools
-
