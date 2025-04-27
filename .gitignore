@@ -13,7 +13,7 @@ workspace/
 
 # Database directory and specific file
 database/
-database/agent_history.db
+*.db
 
 # IDE/OS specific files (examples)
 .vscode/
