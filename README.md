@@ -136,19 +136,54 @@ manus-ai-ui-clone/
 
 ## Running the Application
 
-Run from the **project root directory** (`ResearchAgent/`).
+### Option 1: Using Docker (Recommended)
 
-1.  **Terminal 1: Start Backend Server**
-    * Activate environment: `source .venv/bin/activate`
-    * **Run server as module:** `python3 -m backend.server` *(Using python3)*
-    * Keep running. Observe logs for WebSocket server (e.g., `ws://localhost:8765`) and File server (e.g., `http://localhost:8766`).
+This method runs the backend server inside an isolated Docker container, which is recommended for security and dependency management.
 
-2.  **Terminal 2: Start Frontend HTTP Server**
-    * (Optional) Activate environment: `source .venv/bin/activate`
-    * Run server: `python3 -m http.server 8000`
+1.  **Prerequisites:** Ensure Docker and Docker Compose are installed.
+2.  **Build and Run:** From the project root directory (`ResearchAgent/`), run:
+    ```bash
+    docker-compose up --build
+    ```
+    * `--build` is only needed the first time or when you change `Dockerfile` or `requirements.txt`.
+    * This will build the Docker image and start the backend service. You will see logs from the backend server in this terminal. The WebSocket server will be available at `ws://localhost:8765` and the file server at `http://localhost:8766`.
+    * Keep this terminal running. Use `Ctrl+C` to stop the container gracefully.
+3.  **Start Frontend Server:** In a *separate* terminal, navigate to the project root and run the simple Python HTTP server for the frontend:
+    ```bash
+    # (Optional) Activate virtual environment if you need specific Python tools locally
+    # source .venv/bin/activate
+    python3 -m http.server 8000
+    ```
+    * Keep this terminal running.
+4.  **Access the UI:** Open your web browser to `http://localhost:8000`.
+
+**Development Workflow with Docker:**
+
+* Thanks to the volume mounts defined in `docker-compose.yml`:
+    * Changes made to your Python code in the `./backend` directory will be reflected *immediately* inside the running container. You typically just need to stop (`Ctrl+C`) and restart (`docker-compose up`) the container for changes to take effect (Python imports modules on startup).
+    * Files created by the agent in the `./workspace` directory will appear on your local machine.
+    * The SQLite database in `./database` will persist locally between container runs.
+    * You only need to run `docker-compose up --build` again if you modify `requirements.txt` or the `Dockerfile` itself.
+
+### Option 2: Running Directly on Host (Less Secure)
+
+If you choose not to use Docker, you can run the backend directly, but be aware of the security risks associated with the `Python_REPL` and `python_package_installer` tools.
+
+1.  **Activate Virtual Environment:**
+    ```bash
+    source .venv/bin/activate
+    ```
+2.  **Terminal 1: Start Backend Server:**
+    ```bash
+    python3 -m backend.server
+    ```
     * Keep running.
-
-3.  **Access the UI:** Open browser to `http://localhost:8000`.
+3.  **Terminal 2: Start Frontend Server:**
+    ```bash
+    python3 -m http.server 8000
+    ```
+    * Keep running.
+4.  **Access the UI:** Open your web browser to `http://localhost:8000`.
 
 ## Usage & Testing
 
