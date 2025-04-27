@@ -4,8 +4,9 @@ import datetime
 from typing import Any, Dict, List, Optional, Union, Sequence, Callable, Coroutine
 from uuid import UUID
 import json
-from pathlib import Path # Import Path
-import os # <--- IMPORT ADDED HERE
+from pathlib import Path
+import os
+import re # Import re
 
 # LangChain Core Imports
 from langchain_core.callbacks import AsyncCallbackHandler
@@ -13,29 +14,24 @@ from langchain_core.outputs import LLMResult
 from langchain_core.messages import BaseMessage
 from langchain_core.agents import AgentAction, AgentFinish
 
-# Project Imports (assuming tools.py is in the same directory level)
-# Need access to TEXT_EXTENSIONS and get_task_workspace_path
-from backend.tools import TEXT_EXTENSIONS, get_task_workspace_path
+# Project Imports
+from backend.tools import TEXT_EXTENSIONS, get_task_workspace_path # Assuming these are correctly defined in tools.py
 
 logger = logging.getLogger(__name__)
 
-# Define the type hint for the async add_message function expected from db_utils
+# Define type hints
 AddMessageFunc = Callable[[str, str, str, str], Coroutine[Any, Any, None]]
-# Define type hint for sending WebSocket messages
 SendWSMessageFunc = Callable[[str, Any], Coroutine[Any, Any, None]]
-# Define type hint for sending artifact updates specifically
-SendArtifactUpdateFunc = Callable[[List[Dict[str, str]]], Coroutine[Any, Any, None]]
 
 # --- File Server Constants ---
-# Define here or import from server.py/config.py if centralized
+# These might be better placed in config.py or server.py and passed if needed
 FILE_SERVER_CLIENT_HOST = os.getenv("FILE_SERVER_HOSTNAME", "localhost")
 FILE_SERVER_PORT = 8766
 
 class WebSocketCallbackHandler(AsyncCallbackHandler):
     """
     Async Callback handler for streaming LangChain agent events
-    (like tool usage and final answers) over a WebSocket connection
-    and saving them to the database. Also handles explicit artifact reporting.
+    and saving them to the database. Logs artifact creation from write_file.
     """
     always_verbose: bool = True
     ignore_llm: bool = False
@@ -70,12 +66,10 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         else:
             logger.warning(f"[{self.session_id}] Cannot save message type '{msg_type}' to DB: current_task_id not set.")
 
-
     # --- LLM Callbacks ---
     async def on_llm_start(self, serialized: Dict[str, Any], prompts: List[str], **kwargs: Any) -> None: pass
     async def on_llm_error(self, error: Union[Exception, KeyboardInterrupt], **kwargs: Any) -> None:
-        log_prefix = self._get_log_prefix()
-        error_type_name = type(error).__name__
+        log_prefix = self._get_log_prefix(); error_type_name = type(error).__name__
         logger.error(f"[{self.session_id}] LLM Error: {error}", exc_info=True)
         error_content = f"[LLM Error] {error_type_name}: {error}"
         await self.send_ws_message("monitor_log", f"{log_prefix} {error_content}")
@@ -86,78 +80,44 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
 
     # --- Tool Callbacks ---
     async def on_tool_start(self, serialized: Dict[str, Any], input_str: str, **kwargs: Any) -> None:
-        log_prefix = self._get_log_prefix()
-        tool_name = serialized.get("name", "Unknown Tool")
-        # Truncate long inputs for logging
+        log_prefix = self._get_log_prefix(); tool_name = serialized.get("name", "Unknown Tool")
         log_input = input_str[:500] + "..." if len(input_str) > 500 else input_str
         log_content = f"[Tool Start] Using '{tool_name}' with input: '{log_input}'"
         logger.info(f"[{self.session_id}] {log_content}")
         await self.send_ws_message("monitor_log", f"{log_prefix} {log_content}")
         await self.send_ws_message("status_message", f"Agent using tool: {tool_name}...")
-        # Save the potentially truncated input for monitor, but full input for DB?
-        # For now, save truncated to monitor log entry in DB for consistency.
-        await self._save_message("tool_input", f"{tool_name}:::{log_input}") # Save truncated input
+        await self._save_message("tool_input", f"{tool_name}:::{log_input}")
 
     async def on_tool_end(self, output: str, name: str = "Unknown Tool", **kwargs: Any) -> None:
         """
         Run when tool ends successfully. Handles general logging and
-        explicit artifact reporting for 'write_file'.
+        logs explicit artifact creation for 'write_file'.
         """
         log_prefix = self._get_log_prefix()
         logger.info(f"[{self.session_id}] Tool '{name}' finished. Output length: {len(output)}")
-        monitor_output = output # Default monitor output is the raw tool output
+        monitor_output = output # Default monitor output
 
-        # --- Artifact Handling for write_file ---
-        # Check if the output indicates a successful write_file operation
+        # --- Artifact Logging for write_file ---
         success_prefix = "SUCCESS::write_file:::"
         if name == "write_file" and output.startswith(success_prefix):
             try:
-                # *** REVISED PARSING LOGIC ***
                 if len(output) > len(success_prefix):
-                    relative_path_str = output[len(success_prefix):] # Get the substring after the prefix
-                    logger.info(f"[{self.session_id}] Detected successful write_file: '{relative_path_str}' (Parsed by removing prefix)")
-
+                    relative_path_str = output[len(success_prefix):]
+                    logger.info(f"[{self.session_id}] Detected successful write_file: '{relative_path_str}'")
                     # Save artifact generation event to DB
                     await self._save_message("artifact_generated", relative_path_str)
                     # Log to monitor
                     await self.send_ws_message("monitor_log", f"{log_prefix} [ARTIFACT_GENERATED] {relative_path_str} (via {name})")
-
-                    # Immediately send artifact update to UI
-                    if self.current_task_id:
-                        try:
-                            task_workspace = get_task_workspace_path(self.current_task_id)
-                            file_path = (task_workspace / relative_path_str).resolve()
-                            artifact_type = 'unknown'
-                            file_suffix = file_path.suffix.lower()
-                            if file_suffix in ['.png', '.jpg', '.jpeg', '.gif', '.svg']: artifact_type = 'image'
-                            elif file_suffix in TEXT_EXTENSIONS: artifact_type = 'text'
-
-                            if artifact_type != 'unknown' and file_path.exists():
-                                artifact_url = f"http://{FILE_SERVER_CLIENT_HOST}:{FILE_SERVER_PORT}/workspace_files/{self.current_task_id}/{relative_path_str}"
-                                new_artifact_data = {"type": artifact_type, "url": artifact_url, "filename": relative_path_str}
-                                await self.send_ws_message("new_artifact", new_artifact_data)
-                                logger.info(f"[{self.session_id}] Sent new_artifact message for {relative_path_str}")
-                            else:
-                                logger.warning(f"[{self.session_id}] write_file reported success for '{relative_path_str}', but file not found or type unknown.")
-
-                        except Exception as artifact_err:
-                            logger.error(f"[{self.session_id}] Error processing artifact generated by write_file '{relative_path_str}': {artifact_err}", exc_info=True)
-                    else:
-                        logger.warning(f"[{self.session_id}] write_file succeeded but cannot send artifact update: current_task_id not set.")
-
+                    # *** REMOVED sending 'new_artifact' message ***
                     # Modify output message shown in monitor log for clarity
                     monitor_output = f"Successfully wrote file: '{relative_path_str}'"
                 else:
-                    # This case should ideally not happen if startswith passed
                     raise ValueError("Output string matched prefix but was not longer than prefix.")
-
             except Exception as parse_err:
-                # Log the specific error and the original output string
                 logger.error(f"[{self.session_id}] Error processing write_file success output '{output}': {parse_err}", exc_info=True)
-                monitor_output = output # Fallback to showing original output in monitor if parsing failed
+                monitor_output = output # Fallback if parsing failed
         else:
-            # --- General Tool Output Logging (if not write_file success) ---
-            # Truncate long outputs for monitor display
+            # Truncate long outputs for monitor display if not write_file success
             monitor_output = output[:1000] + "..." if len(output) > 1000 else output
 
         # Format and send monitor log entry using the potentially modified monitor_output
@@ -165,47 +125,42 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         log_content = f"[Tool Output] Tool '{name}' returned:{formatted_output}"
         await self.send_ws_message("monitor_log", f"{log_prefix} {log_content}")
         await self.send_ws_message("status_message", f"Agent finished using tool: {name}.")
-        # Save the full original output to the database regardless of parsing success
+        # Save the full original output to the database
         await self._save_message("tool_output", output)
 
-
     async def on_tool_error(self, error: Union[Exception, KeyboardInterrupt], name: str = "Unknown Tool", **kwargs: Any) -> None:
-        log_prefix = self._get_log_prefix()
-        error_type_name = type(error).__name__
+        log_prefix = self._get_log_prefix(); error_type_name = type(error).__name__
         logger.error(f"[{self.session_id}] Tool '{name}' Error: {error}", exc_info=True)
         error_content = f"[Tool Error] Tool '{name}' failed: {error_type_name}: {error}"
         await self.send_ws_message("monitor_log", f"{log_prefix} {error_content}")
         await self.send_ws_message("status_message", f"Error occurred during tool execution: {name}.")
-        await self._save_message("error_tool", f"{name}::{error_type_name}::{error}") # Include tool name in error log
+        await self._save_message("error_tool", f"{name}::{error_type_name}::{error}")
 
     # --- Agent Finish Callback ---
     async def on_agent_finish(self, finish: AgentFinish, **kwargs: Any) -> Any:
-        """Run on agent end. Saves answer, sends final answer AND status to UI."""
         log_prefix = self._get_log_prefix()
         logger.info(f"[{self.session_id}] Agent Finish. Return values: {finish.return_values}")
         final_answer = finish.return_values.get("output", None)
-
         if isinstance(final_answer, str):
-            await self._save_message("agent_finish", final_answer) # Save final answer to DB
+            await self._save_message("agent_finish", final_answer)
             log_content = f"[Agent Finish] Sending final answer to UI."
-            await self.send_ws_message("monitor_log", f"{log_prefix} {log_content}") # Log finish event
+            await self.send_ws_message("monitor_log", f"{log_prefix} {log_content}")
             logger.info(f"[{self.session_id}] Attempting to send agent_message (Final Answer): {final_answer[:100]}...")
             await self.send_ws_message("agent_message", final_answer)
             logger.info(f"[{self.session_id}] Sent agent_message (Final Answer).")
-            await self.send_ws_message("status_message", "Task processing complete.") # Update status
+            await self.send_ws_message("status_message", "Task processing complete.")
         else:
             logger.warning(f"[{self.session_id}] Could not parse final answer string from AgentFinish: {finish.return_values}")
             fallback_message = "Processing complete. See Monitor panel for execution details."
-            await self._save_message("agent_finish_fallback", fallback_message) # Save fallback
+            await self._save_message("agent_finish_fallback", fallback_message)
             log_content = "[Agent Finish] Could not parse final answer text. Sending fallback."
-            await self.send_ws_message("monitor_log", f"{log_prefix} {log_content}") # Log fallback event
+            await self.send_ws_message("monitor_log", f"{log_prefix} {log_content}")
             logger.info(f"[{self.session_id}] Attempting to send agent_message (Fallback): {fallback_message}")
             await self.send_ws_message("agent_message", fallback_message)
             logger.info(f"[{self.session_id}] Sent agent_message (Fallback).")
-            await self.send_ws_message("status_message", "Task processing complete (check monitor).") # Update status
+            await self.send_ws_message("status_message", "Task processing complete (check monitor).")
 
     # --- Other Callbacks ---
     async def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None: pass
     async def on_agent_action(self, action: AgentAction, **kwargs: Any) -> Any: pass
     async def on_text(self, text: str, **kwargs: Any) -> Any: pass
-

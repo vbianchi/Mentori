@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         // console.log("Received monitor_log:", message.content); // Already logged by addMonitorLog
                         addMonitorLog(message.content);
                         break;
-                    case 'update_artifacts': // Handles full list updates (e.g., from history)
+                    case 'update_artifacts': // Handles full list updates (e.g., from history OR after agent run)
                         console.log("Received update_artifacts message with content:", message.content);
                         if (Array.isArray(message.content)) {
                             currentTaskArtifacts = message.content; // Replace entire list
@@ -168,20 +168,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                         break;
 
-                    // *** NEW CASE: Handle single new artifact ***
-                    case 'new_artifact':
-                        console.log("Received new_artifact message:", message.content);
-                        if (message.content && typeof message.content === 'object' && message.content.filename) {
-                            // Add the new artifact to the beginning of the list
-                            currentTaskArtifacts.unshift(message.content);
-                            // Reset index to show the newest artifact
-                            currentArtifactIndex = 0;
-                            updateArtifactDisplay();
-                            console.log(`Added new artifact '${message.content.filename}' to list.`);
-                        } else {
-                            console.warn("Invalid new_artifact message content:", message.content);
-                        }
-                        break;
+                    // *** REMOVED 'new_artifact' case ***
+                    // case 'new_artifact': ...
 
                     case 'user_message': break; // Ignore live echo of user's own message
                     default:

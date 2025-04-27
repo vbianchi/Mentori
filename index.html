@@ -3,8 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Agent Interface</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>ResearchAgent</title> <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Simple style for the credits */
+        .app-credits {
+            font-size: 0.9em; /* Slightly smaller */
+            text-align: center;
+            padding-top: 5px; /* Add some space */
+            opacity: 0.7;
+        }
+        .app-credits a {
+             color: var(--text-color-muted);
+             text-decoration: none;
+        }
+         .app-credits a:hover {
+             color: var(--text-color);
+             text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
     <div class="app-container">
@@ -17,7 +33,10 @@
                 <li class="task-item-placeholder">Loading tasks...</li>
             </ul>
             <div class="panel-footer">
-                 User Profile | Settings
+                <div class="app-credits">
+                     ResearchAgent<br>
+                     <span style="font-size: 0.9em;">Developed by Valerio Bianchi &amp; Gemini</span>
+                     </div>
             </div>
         </nav>
 
@@ -27,7 +46,7 @@
                  <span>Share | Options</span>
             </div>
             <div id="chat-messages" class="chat-messages scrollable-content">
-                </div>
+                 </div>
             <div class="chat-input-area">
                 <textarea placeholder="Type your message here..."></textarea>
                 <button>Send</button>
@@ -42,7 +61,7 @@
 
             <div class="monitor-split-content">
                 <div id="monitor-log-area" class="monitor-log-area scrollable-content">
-                    </div>
+                     </div>
                 <div id="monitor-artifact-area" class="monitor-artifact-area">
                     <div class="artifact-placeholder">No artifacts generated yet.</div>
                     <div class="artifact-nav">
@@ -53,11 +72,9 @@
                 </div>
             </div>
 
-            <div class="monitor-footer">
-                 <span id="monitor-footer-status">No Task Selected</span>
-                 </div>
-        </aside>
+            </aside>
 
-    </div><script src="js/script.js"></script>
+    </div>
+    <script src="js/script.js"></script>
 </body>
 </html>
