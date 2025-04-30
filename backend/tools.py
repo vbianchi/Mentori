@@ -4,27 +4,30 @@ import httpx
 from bs4 import BeautifulSoup
 from pathlib import Path
 import os
-import re # Import regex for validation
+import re
 import aiofiles
 import codecs
 import asyncio
-import sys # Import sys to get current python executable
-from typing import List, Optional, Dict, Any # Added Dict, Any
+import sys
+from typing import List, Optional, Dict, Any
+import functools # Import functools
 
 # LangChain Tool Imports
 from langchain_core.tools import Tool, BaseTool
 from langchain_community.tools import DuckDuckGoSearchRun
 from langchain_community.tools.file_management import ReadFileTool
-# Import the underlying REPL utility
 from langchain_experimental.utilities import PythonREPL
-# Imports for PubMed Search
 from Bio import Entrez
 from urllib.error import HTTPError
-# ------------------------------------
+
+# Project Imports
+# *** MODIFIED: Import the settings instance ***
+from backend.config import settings
 
 logger = logging.getLogger(__name__)
 
 # --- Define Base Workspace Path ---
+# (No changes needed here)
 try:
     PROJECT_ROOT = Path(__file__).resolve().parent.parent
     BASE_WORKSPACE_ROOT = PROJECT_ROOT / "workspace"
@@ -42,47 +45,44 @@ TEXT_EXTENSIONS = {".txt", ".py", ".js", ".css", ".html", ".json", ".csv", ".md"
 
 
 # --- Helper Function to get Task-Specific Workspace ---
+# (No changes needed here)
 def get_task_workspace_path(task_id: Optional[str]) -> Path:
     """
     Constructs and ensures the path for a specific task's workspace.
     Raises ValueError/OSError on invalid ID or creation failure.
     """
     if not task_id or not isinstance(task_id, str):
-        # Changed from warning/fallback to raising error for clarity
         msg = f"Invalid or missing task_id ('{task_id}') provided for workspace path."
         logger.error(msg)
         raise ValueError(msg)
-
-    # Basic check: Ensure it doesn't contain '..' or slashes. UUIDs are generally safe.
     if ".." in task_id or "/" in task_id or "\\" in task_id:
-         msg = f"Invalid characters detected in task_id: {task_id}. Denying workspace path creation."
-         logger.error(msg)
-         raise ValueError(msg)
-
+       msg = f"Invalid characters detected in task_id: {task_id}. Denying workspace path creation."
+       logger.error(msg)
+       raise ValueError(msg)
     task_workspace = BASE_WORKSPACE_ROOT / task_id
     try:
-        # exist_ok=True prevents error if directory already exists
         os.makedirs(task_workspace, exist_ok=True)
     except OSError as e:
         logger.error(f"Could not create task workspace directory at {task_workspace}: {e}", exc_info=True)
-        # Re-raise as OSError
         raise OSError(f"Could not create task workspace {task_workspace}: {e}") from e
     return task_workspace
 
 
 # --- Tool Implementation Functions ---
 
+# *** MODIFIED: No longer needs explicit settings args, uses imported settings ***
 async def fetch_and_parse_url(url: str) -> str:
-    """Fetches and parses URL content."""
-    MAX_CONTENT_LENGTH = 4000; REQUEST_TIMEOUT = 15.0
+    """Fetches and parses URL content using configured limits."""
+    max_length = settings.tool_web_reader_max_length
+    timeout = settings.tool_web_reader_timeout
     HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'} # Mimic browser
     if not isinstance(url, str): return "Error: Invalid URL input (must be a string)."
     clean_url = url.strip().replace('\n', '').replace('\r', '').replace('\t', '').strip('`')
     if not clean_url: return "Error: Received an empty URL."
     if not re.match(r"^[a-zA-Z]+://", clean_url): clean_url = f"https://{clean_url}"
-    logger.info(f"Attempting to fetch and parse cleaned URL: {clean_url}")
+    logger.info(f"Attempting to fetch and parse cleaned URL: {clean_url} (Timeout: {timeout}s)")
     try:
-        async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT, follow_redirects=True, headers=HEADERS) as client:
+        async with httpx.AsyncClient(timeout=timeout, follow_redirects=True, headers=HEADERS) as client:
             response = await client.get(clean_url); response.raise_for_status()
             content_type = response.headers.get("content-type", "").lower()
             if "html" not in content_type: return f"Error: Cannot parse content type '{content_type}'."
@@ -91,8 +91,10 @@ async def fetch_and_parse_url(url: str) -> str:
             if content_tags: texts = content_tags.find_all(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'td', 'th']); extracted_text = "\n".join(t.get_text(strip=True) for t in texts if t.get_text(strip=True))
             else: extracted_text = soup.get_text(separator="\n", strip=True)
             if not extracted_text: return "Error: Could not extract meaningful text."
-            truncated_text = extracted_text[:MAX_CONTENT_LENGTH]
-            if len(extracted_text) > MAX_CONTENT_LENGTH: truncated_text += "..."
+
+            truncated_text = extracted_text[:max_length]
+            if len(extracted_text) > max_length: truncated_text += "..."
+
             logger.info(f"Successfully extracted ~{len(truncated_text)} chars from {clean_url}")
             return truncated_text
     except httpx.TimeoutException: logger.error(f"Timeout fetching {clean_url}"); return f"Error: Timeout fetching URL."
@@ -103,6 +105,7 @@ async def fetch_and_parse_url(url: str) -> str:
     except Exception as e: logger.error(f"Error parsing {clean_url}: {e}", exc_info=True); return f"Error parsing URL: {e}"
 
 
+# (No changes needed in write_to_file_in_task_workspace itself)
 async def write_to_file_in_task_workspace(input_str: str, task_workspace: Path) -> str:
     """
     Writes text content to a file within the SPECIFIED task workspace.
@@ -115,7 +118,6 @@ async def write_to_file_in_task_workspace(input_str: str, task_workspace: Path) 
         if len(parts) != 2: return "Error: Invalid input format. Expected 'file_path:::text_content'."
         relative_path_str = parts[0].strip().strip('\'"`')
         raw_text_content = parts[1]
-        # Remove potential workspace prefixes inserted by the LLM more robustly
         cleaned_relative_path = relative_path_str
         if cleaned_relative_path.startswith((f"workspace/{task_workspace.name}/", f"workspace\\{task_workspace.name}\\" ,f"{task_workspace.name}/", f"{task_workspace.name}\\")):
              cleaned_relative_path = re.sub(r"^[\\/]?(workspace[\\/])?%s[\\/]" % re.escape(task_workspace.name), "", cleaned_relative_path)
@@ -125,37 +127,23 @@ async def write_to_file_in_task_workspace(input_str: str, task_workspace: Path) 
              logger.info(f"Stripped generic 'workspace/' prefix, using: {cleaned_relative_path}")
 
         if not cleaned_relative_path: return "Error: File path cannot be empty after cleaning."
-
-        # Decode unicode escapes (e.g., \n -> newline) common in LLM outputs
-        try: text_content = codecs.decode(raw_text_content, 'unicode_escape'); logger.info("Decoded unicode escapes.")
+        try: text_content = codecs.decode(raw_text_content, 'unicode_escape'); logger.debug("Decoded unicode escapes.")
         except Exception as decode_err: logger.warning(f"Could not decode unicode escapes, using raw content: {decode_err}"); text_content = raw_text_content
-        # Remove markdown code fences if present
         text_content = re.sub(r"^```[a-zA-Z]*\s*\n", "", text_content)
         text_content = re.sub(r"\n```$", "", text_content)
         text_content = text_content.strip()
-
-        # Security Check: Ensure relative path does not try to escape the workspace
         relative_path = Path(cleaned_relative_path)
         if relative_path.is_absolute() or '..' in relative_path.parts:
             logger.error(f"Security Error: Invalid file path '{cleaned_relative_path}' attempts traversal.")
             return f"Error: Invalid file path '{cleaned_relative_path}'. Path must be relative and within the workspace."
-
         full_path = task_workspace.joinpath(relative_path).resolve()
-
-        # Security Check: Ensure the resolved path is truly within the intended workspace
         if not full_path.is_relative_to(task_workspace.resolve()):
              logger.error(f"Security Error: Write path resolves outside task workspace! Task: {task_workspace.name}, Resolved: {full_path}")
              return "Error: File path resolves outside the designated task workspace."
-
-        # Create parent directories if they don't exist
         full_path.parent.mkdir(parents=True, exist_ok=True)
-
-        # Write the file asynchronously
         async with aiofiles.open(full_path, mode='w', encoding='utf-8') as f:
             await f.write(text_content)
-
         logger.info(f"Successfully wrote {len(text_content)} bytes to {full_path}")
-        # *** MODIFICATION: Return structured success message ***
         return f"SUCCESS::write_file:::{cleaned_relative_path}"
 
     except Exception as e:
@@ -164,6 +152,7 @@ async def write_to_file_in_task_workspace(input_str: str, task_workspace: Path) 
 
 
 # --- Custom Shell Tool operating in Task Workspace ---
+# *** MODIFIED: Init sets timeout/max_output from settings ***
 class TaskWorkspaceShellTool(BaseTool):
     name: str = "workspace_shell"
     description: str = (
@@ -173,46 +162,32 @@ class TaskWorkspaceShellTool(BaseTool):
         f"**DO NOT use this for 'pip install' or 'uv venv' or environment modifications.** Use the dedicated 'python_package_installer' tool for installations."
     )
     task_workspace: Path
-    # FUTURE: task_venv_path: Optional[Path] = None # If implementing per-task venvs
+    timeout: int = settings.tool_shell_timeout # Default from settings
+    max_output: int = settings.tool_shell_max_output # Default from settings
 
     def _run(self, command: str) -> str:
         """Synchronous execution wrapper (avoid if possible)."""
         logger.warning("Running TaskWorkspaceShellTool synchronously using _run.")
-        try:
-            # Try to get the running event loop
-            loop = asyncio.get_running_loop()
-            # Schedule the coroutine in the existing loop and wait for it
-            result = loop.run_until_complete(self._arun_internal(command))
-        except RuntimeError: # No running event loop
-            logger.warning("No running event loop, creating new one for TaskWorkspaceShellTool._run")
-            result = asyncio.run(self._arun_internal(command))
+        try: loop = asyncio.get_running_loop(); result = loop.run_until_complete(self._arun_internal(command))
+        except RuntimeError: logger.warning("No running event loop, creating new one for TaskWorkspaceShellTool._run"); result = asyncio.run(self._arun_internal(command))
         return result
 
     async def _arun(self, command: str) -> str:
-         """Asynchronous execution entry point."""
-         return await self._arun_internal(command)
+        """Asynchronous execution entry point."""
+        return await self._arun_internal(command)
 
     async def _arun_internal(self, command: str) -> str:
         """Internal async helper for running the command in the specific task workspace."""
         cwd = str(self.task_workspace.resolve())
-        logger.info(f"TaskWorkspaceShellTool executing command: '{command}' in CWD: {cwd}")
+        logger.info(f"TaskWorkspaceShellTool executing command: '{command}' in CWD: {cwd} (Timeout: {self.timeout}s)")
         process = None; stdout_str = ""; stderr_str = ""
-
-        # *** FUTURE: Per-Task Venv Activation ***
-        # ... (placeholder remains the same) ...
-        # ****************************************
-
         try:
             clean_command = command.strip().strip('`');
             if not clean_command: return "Error: Received empty command."
-            # Security: Basic check for potentially harmful patterns
             if '&&' in clean_command or '||' in clean_command or ';' in clean_command or '`' in clean_command or '$(' in clean_command:
-                 if '|' not in clean_command: # Allow single pipes
-                    logger.warning(f"Potentially unsafe shell characters detected in command: {clean_command}")
-                    # return "Error: Command contains potentially unsafe shell characters (&&, ||, ;, `, $())."
-
+                 if '|' not in clean_command: logger.warning(f"Potentially unsafe shell characters detected in command: {clean_command}")
             process = await asyncio.create_subprocess_shell(clean_command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=cwd)
-            TIMEOUT_SECONDS = 60
+            TIMEOUT_SECONDS = self.timeout
             try: stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=TIMEOUT_SECONDS)
             except asyncio.TimeoutError:
                  logger.error(f"Timeout executing command: {clean_command}")
@@ -221,20 +196,18 @@ class TaskWorkspaceShellTool(BaseTool):
                      except ProcessLookupError: pass
                      await process.wait()
                  return f"Error: Command timed out after {TIMEOUT_SECONDS} seconds."
-
             stdout_str = stdout.decode(errors='replace').strip(); stderr_str = stderr.decode(errors='replace').strip(); return_code = process.returncode
             result = ""
             if stdout_str: result += f"STDOUT:\n{stdout_str}\n"
             if return_code != 0:
-                logger.warning(f"TaskWorkspaceShellTool command '{clean_command}' failed. Exit: {return_code}. Stderr: {stderr_str}")
-                result += f"STDERR:\n{stderr_str}\n" if stderr_str else ""
-                result += f"ERROR: Command failed with exit code {return_code}"
+                 logger.warning(f"TaskWorkspaceShellTool command '{clean_command}' failed. Exit: {return_code}. Stderr: {stderr_str}")
+                 result += f"STDERR:\n{stderr_str}\n" if stderr_str else ""
+                 result += f"ERROR: Command failed with exit code {return_code}"
             elif stderr_str:
                  logger.info(f"TaskWorkspaceShellTool command '{clean_command}' succeeded (Exit: {return_code}) but produced STDERR:\n{stderr_str}")
                  result += f"STDERR (Warnings/Info):\n{stderr_str}\n"
-
             logger.info(f"TaskWorkspaceShellTool command finished. Exit code: {return_code}. Reporting result length: {len(result)}")
-            MAX_OUTPUT_LENGTH = 3000
+            MAX_OUTPUT_LENGTH = self.max_output
             if len(result) > MAX_OUTPUT_LENGTH: result = result[:MAX_OUTPUT_LENGTH] + f"\n... (output truncated after {MAX_OUTPUT_LENGTH} characters)"
             return result.strip()
         except FileNotFoundError: cmd_part = clean_command.split()[0] if clean_command else "Unknown"; logger.warning(f"TaskWorkspaceShellTool command not found: {cmd_part}"); return f"Error: Command not found: {cmd_part}"
@@ -249,10 +222,12 @@ class TaskWorkspaceShellTool(BaseTool):
 
 # --- Python Package Installer Tool Implementation ---
 PACKAGE_SPEC_REGEX = re.compile(r"^[a-zA-Z0-9_.-]+(?:\[[a-zA-Z0-9_,-]+\])?(?:[=<>!~]=?\s*[a-zA-Z0-9_.*-]+)?$")
+# *** MODIFIED: No longer needs explicit timeout arg, uses imported settings ***
 async def install_python_package(package_specifier: str) -> str:
-    """Installs a Python package using the system's Python environment."""
+    """Installs a Python package using the system's Python environment with configured timeout."""
+    timeout = settings.tool_installer_timeout
     package_specifier = package_specifier.strip().strip('\'"`')
-    logger.info(f"Received request to install package: '{package_specifier}'")
+    logger.info(f"Received request to install package: '{package_specifier}' (Timeout: {timeout}s)")
     if not package_specifier: return "Error: No package specified."
     if not PACKAGE_SPEC_REGEX.match(package_specifier): logger.error(f"Invalid package specifier format rejected: '{package_specifier}'"); return f"Error: Invalid package specifier format: '{package_specifier}'."
     if ';' in package_specifier or '&' in package_specifier or '|' in package_specifier or '`' in package_specifier or '$(' in package_specifier: logger.error(f"Potential command injection detected in package specifier: '{package_specifier}'"); return "Error: Invalid characters detected in package specifier."
@@ -264,7 +239,6 @@ async def install_python_package(package_specifier: str) -> str:
         await test_process.wait()
         if test_process.returncode == 0: logger.info("Detected uv, using 'uv pip install'.")
         else: logger.info("uv check failed or not found, falling back to 'pip install'."); installer_command_base = [python_executable, "-m", "pip"]
-    except FileNotFoundError: logger.info(f"Could not execute '{python_executable} -m uv', falling back to 'pip install'."); installer_command_base = [python_executable, "-m", "pip"]
     except Exception as e: logger.warning(f"Error checking for uv, falling back to pip: {e}"); installer_command_base = [python_executable, "-m", "pip"]
 
     command = installer_command_base + ["install", package_specifier]
@@ -272,7 +246,7 @@ async def install_python_package(package_specifier: str) -> str:
     process = None
     try:
         process = await asyncio.create_subprocess_exec(*command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
-        TIMEOUT_SECONDS = 300
+        TIMEOUT_SECONDS = timeout
         try: stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=TIMEOUT_SECONDS)
         except asyncio.TimeoutError:
             logger.error(f"Timeout installing package: {package_specifier}")
@@ -281,12 +255,10 @@ async def install_python_package(package_specifier: str) -> str:
                  except ProcessLookupError: pass
                  await process.wait()
             return f"Error: Package installation timed out after {TIMEOUT_SECONDS} seconds."
-
         stdout_str = stdout.decode(errors='replace').strip(); stderr_str = stderr.decode(errors='replace').strip(); return_code = process.returncode
         result = f"Installation command executed for '{package_specifier}'. Exit Code: {return_code}\n"
         if stdout_str: result += f"--- Installer STDOUT ---\n{stdout_str}\n"
         if stderr_str: result += f"--- Installer STDERR ---\n{stderr_str}\n"
-
         if return_code == 0:
             logger.info(f"Successfully installed package: {package_specifier}")
             success_msg = f"Successfully installed {package_specifier}."
@@ -307,21 +279,28 @@ async def install_python_package(package_specifier: str) -> str:
 
 
 # --- PubMed Search Tool Implementation ---
-Entrez.email = os.getenv("ENTREZ_EMAIL", None)
-if not Entrez.email:
-    logger.critical("ENTREZ_EMAIL not set in environment or .env file. PubMed search tool will likely fail or be blocked by NCBI.")
+# *** MODIFIED: No longer needs explicit settings args, uses imported settings ***
+async def search_pubmed(query: str) -> str:
+    """Searches PubMed for biomedical literature using configured settings."""
+    entrez_email = settings.entrez_email
+    default_max_results = settings.tool_pubmed_default_max_results
+    max_snippet = settings.tool_pubmed_max_snippet
 
-async def search_pubmed(query: str, max_results: int = 5) -> str:
-    """Searches PubMed for biomedical literature."""
-    if not Entrez.email: return "Error: PubMed Search tool is not configured. Missing NCBI Entrez email address."
-    logger.info(f"Received PubMed search request: '{query}'")
+    if not entrez_email:
+        logger.error("PubMed Search Error: Entrez email not configured in settings.")
+        return "Error: PubMed Search tool is not configured (Missing Entrez email)."
+
+    Entrez.email = entrez_email # Set email for this request
+
+    logger.info(f"Received PubMed search request: '{query}' (Default Max: {default_max_results})")
+    current_max_results = default_max_results
     match = re.search(r"\s+max_results=(\d+)$", query)
     if match:
-        try: num_res = int(match.group(1)); max_results = min(max(1, num_res), 20); query = query[:match.start()].strip(); logger.info(f"Using max_results={max_results}")
-        except ValueError: logger.warning(f"Invalid max_results value in query '{query}', using default {max_results}.")
+        try: num_res = int(match.group(1)); current_max_results = min(max(1, num_res), 20); query = query[:match.start()].strip(); logger.info(f"Using max_results={current_max_results} from query.")
+        except ValueError: logger.warning(f"Invalid max_results value in query '{query}', using default {current_max_results}.")
     if not query: return "Error: No search query provided for PubMed."
     try:
-        handle = await asyncio.to_thread(Entrez.esearch, db="pubmed", term=query, retmax=str(max_results), sort="relevance")
+        handle = await asyncio.to_thread(Entrez.esearch, db="pubmed", term=query, retmax=str(current_max_results), sort="relevance")
         search_results = await asyncio.to_thread(Entrez.read, handle); await asyncio.to_thread(handle.close)
         id_list = search_results["IdList"]
         if not id_list: return f"No results found on PubMed for query: '{query}'"
@@ -333,7 +312,7 @@ async def search_pubmed(query: str, max_results: int = 5) -> str:
             if isinstance(pubmed_articles, dict): pubmed_articles = [pubmed_articles]
             else: return "Error: Could not parse PubMed results (unexpected format)."
         for i, record in enumerate(pubmed_articles):
-            if i >= max_results: break
+            if i >= current_max_results: break
             pmid = "Unknown PMID"
             try:
                 medline_citation = record.get('MedlineCitation', {}); article = medline_citation.get('Article', {}); pmid = str(medline_citation.get('PMID', 'Unknown PMID'))
@@ -348,23 +327,24 @@ async def search_pubmed(query: str, max_results: int = 5) -> str:
                 authors = ", ".join(author_names) or "No Authors Listed"
                 abstract_text = ""; abstract_section = article.get('Abstract', {}).get('AbstractText', [])
                 if isinstance(abstract_section, list):
-                     section_texts = []
-                     for sec in abstract_section:
-                         if isinstance(sec, str): section_texts.append(sec)
-                         elif isinstance(sec, dict): section_texts.append(sec.get('#text', ''))
-                         elif hasattr(sec, 'attributes') and 'Label' in sec.attributes: section_texts.append(f"{sec.attributes['Label']}: {str(sec)}")
-                         else: section_texts.append(str(sec))
-                     abstract_text = " ".join(filter(None, section_texts))
+                    section_texts = []
+                    for sec in abstract_section:
+                        if isinstance(sec, str): section_texts.append(sec)
+                        elif isinstance(sec, dict): section_texts.append(sec.get('#text', ''))
+                        elif hasattr(sec, 'attributes') and 'Label' in sec.attributes: section_texts.append(f"\n**{sec.attributes['Label']}**: {str(sec)}")
+                        else: section_texts.append(str(sec))
+                    abstract_text = " ".join(filter(None, section_texts))
                 elif isinstance(abstract_section, str): abstract_text = abstract_section
                 else: abstract_text = str(abstract_section) if abstract_section else "No Abstract Available"
-                MAX_ABSTRACT_SNIPPET = 250; abstract_snippet = abstract_text[:MAX_ABSTRACT_SNIPPET].strip()
-                if len(abstract_text) > MAX_ABSTRACT_SNIPPET: abstract_snippet += "..."
+                MAX_ABSTRACT_SNIPPET = max_snippet
+                abstract_snippet = abstract_text.strip()[:MAX_ABSTRACT_SNIPPET]
+                if len(abstract_text.strip()) > MAX_ABSTRACT_SNIPPET: abstract_snippet += "..."
                 if not abstract_snippet: abstract_snippet = "No Abstract Available"
                 doi = None; article_ids = record.get('PubmedData', {}).get('ArticleIdList', [])
                 if isinstance(article_ids, list):
                     for article_id in article_ids:
-                         if hasattr(article_id, 'attributes') and article_id.attributes.get('IdType') == 'doi': doi = str(article_id); break
-                         elif isinstance(article_id, dict) and article_id.get('IdType') == 'doi': doi = article_id.get('#text'); break
+                        if hasattr(article_id, 'attributes') and article_id.attributes.get('IdType') == 'doi': doi = str(article_id); break
+                        elif isinstance(article_id, dict) and article_id.get('IdType') == 'doi': doi = article_id.get('#text'); break
                 link = f"https://doi.org/{doi}" if doi else f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/"; link_text = f"DOI:{doi}" if doi else f"PMID:{pmid}"
                 summaries.append(f"**Result {i+1}:**\n**Title:** {title}\n**Authors:** {authors}\n**Link:** [{link_text}]({link})\n**Abstract Snippet:** {abstract_snippet}\n---")
             except Exception as parse_err: logger.error(f"Error parsing PubMed record {i+1} (PMID: {pmid}) for query '{query}': {parse_err}", exc_info=True); summaries.append(f"**Result {i+1}:**\nError parsing record (PMID: {pmid}).\n---")
@@ -373,37 +353,76 @@ async def search_pubmed(query: str, max_results: int = 5) -> str:
     except Exception as e: logger.error(f"Error searching PubMed for '{query}': {e}", exc_info=True); return f"Error: An unexpected error occurred during PubMed search: {type(e).__name__}"
 
 
-# Create PythonREPL utility instance
+# Create PythonREPL utility instance (conditionally)
 try: python_repl_utility = PythonREPL()
 except ImportError: logger.warning("Could not import PythonREPL. The Python_REPL tool will not be available."); python_repl_utility = None
 
 # --- Tool Factory Function ---
+# *** MODIFIED: Removed settings parameter, uses imported instance ***
 def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
-    """Creates tool instances dynamically, configured for the current task's workspace."""
+    """Creates tool instances dynamically, configured for the current task's workspace and settings."""
+
     stateless_tools = [
-        DuckDuckGoSearchRun(description=("Use this tool for general web searches...")), # Truncated description for brevity
-        Tool.from_function(func=fetch_and_parse_url, name="web_page_reader", description=("Use this tool ONLY to fetch and extract text content..."), coroutine=fetch_and_parse_url),
-        Tool.from_function(func=install_python_package, name="python_package_installer", description=("Use this tool ONLY to install a Python package... **SECURITY WARNING:**..."), coroutine=install_python_package),
-        Tool.from_function(func=search_pubmed, name="pubmed_search", description=("Use this tool ONLY to search for biomedical literature on PubMed..."), coroutine=search_pubmed)
+        DuckDuckGoSearchRun(description=("A wrapper around DuckDuckGo Search. Useful for when you need to answer questions about current events. Input should be a search query.")),
+        Tool.from_function(
+            func=fetch_and_parse_url, # Function now uses imported settings internally
+            name="web_page_reader",
+            description=(f"Use this tool ONLY to fetch and extract the main text content from a given URL. Input must be a valid URL. Max content length: {settings.tool_web_reader_max_length} chars."),
+            coroutine=fetch_and_parse_url
+        ),
+        Tool.from_function(
+            func=install_python_package, # Function now uses imported settings internally
+            name="python_package_installer",
+            description=(f"Use this tool ONLY to install a Python package into the environment using 'uv pip install' or 'pip install'. Input MUST be a valid package specifier (e.g., 'numpy', 'pandas==2.0.0', 'matplotlib>=3.5'). **SECURITY WARNING:** This installs packages into the main environment. Avoid installing untrusted packages. Timeout: {settings.tool_installer_timeout}s."),
+            coroutine=install_python_package
+        ),
     ]
+
+    # Add PubMed tool only if email is configured
+    if settings.entrez_email:
+        stateless_tools.append(
+             Tool.from_function(
+                func=search_pubmed, # Function now uses imported settings internally
+                name="pubmed_search",
+                description=(f"Use this tool ONLY to search for biomedical literature abstracts on PubMed. Input should be a search query (e.g., 'CRISPR gene editing cancer therapy'). You can optionally add ' max_results=N' at the end (default is {settings.tool_pubmed_default_max_results}, max is 20). Returns formatted summaries including title, authors, link (DOI or PMID), and abstract snippet (max {settings.tool_pubmed_max_snippet} chars)."),
+                coroutine=search_pubmed
+             )
+        )
+    else:
+        logger.warning("Skipping PubMed tool creation as ENTREZ_EMAIL is not set.")
+
+    # Add Python REPL tool if available
     if python_repl_utility:
-        stateless_tools.append(Tool.from_function(func=python_repl_utility.run, name="Python_REPL", description=("Use this tool to execute Python code snippets... **Security Note:**...")))
-    else: logger.warning("Python REPL tool not available.")
+        stateless_tools.append(Tool.from_function(
+            func=python_repl_utility.run,
+            name="Python_REPL",
+            description=("Use this tool to execute Python code snippets. Input should be valid Python code. Output will be the result of the execution (stdout, stderr, or return value). **Security Note:** This executes code directly in the backend environment. Be extremely cautious.")))
+    else:
+        logger.warning("Python REPL tool not created (utility unavailable).")
 
-    if not current_task_id: logger.warning("No active task ID, returning only stateless tools."); return stateless_tools
+    # --- Task-Specific Tools ---
+    if not current_task_id:
+        logger.warning("No active task ID provided to get_dynamic_tools, returning only stateless tools.")
+        return stateless_tools
 
-    try: task_workspace = get_task_workspace_path(current_task_id); logger.info(f"Configuring file/shell tools for workspace: {task_workspace}")
-    except (ValueError, OSError) as e: logger.error(f"Failed to get or create task workspace for {current_task_id}: {e}. Returning only stateless tools."); return stateless_tools
-
-    task_venv_path = None # Placeholder
+    try:
+        task_workspace = get_task_workspace_path(current_task_id)
+        logger.info(f"Configuring file/shell tools for workspace: {task_workspace}")
+    except (ValueError, OSError) as e:
+        logger.error(f"Failed to get or create task workspace for {current_task_id}: {e}. Returning only stateless tools.")
+        return stateless_tools
 
     task_specific_tools = [
+        # Instantiation now uses defaults from settings implicitly via class definition
         TaskWorkspaceShellTool(task_workspace=task_workspace),
-        ReadFileTool(root_dir=str(task_workspace.resolve()), description=(f"Use this tool ONLY to read the entire contents of a file located within the current task's workspace ('{task_workspace.name}')...")),
+        ReadFileTool(
+            root_dir=str(task_workspace.resolve()),
+            description=(f"Use this tool ONLY to read the entire contents of a file located within the current task's workspace ('{task_workspace.name}'). Input MUST be the relative path to the file from the workspace root (e.g., 'my_data.csv', 'scripts/analysis.py').")
+        ),
         Tool.from_function(
             func=lambda input_str: write_to_file_in_task_workspace(input_str, task_workspace),
-            name="write_file", # Tool name used in callbacks.py
-            description=(f"Use this tool ONLY to write or overwrite text content to a file within the current task's workspace ('{task_workspace.name}')... Input MUST be 'relative_file_path:::text_content'..."),
+            name="write_file",
+            description=(f"Use this tool ONLY to write or overwrite text content to a file within the current task's workspace ('{task_workspace.name}'). Input MUST be 'relative_file_path:::text_content' (e.g., 'results.txt:::Analysis complete.\\nFinal score: 95'). Handles subdirectory creation. Do NOT use workspace path prefix in 'relative_file_path'."),
             coroutine=lambda input_str: write_to_file_in_task_workspace(input_str, task_workspace)
         )
     ]

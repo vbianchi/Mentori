@@ -11,6 +11,7 @@ from pathlib import Path
 import os
 import signal
 import re
+import functools # Added for partial
 
 
 # --- Web Server Imports ---
@@ -28,7 +29,7 @@ from langchain_core.runnables import RunnableConfig
 # -------------------------
 
 # Project Imports
-from backend.config import load_settings, Settings
+from backend.config import settings # Import the loaded settings instance
 from backend.llm_setup import get_llm
 from backend.tools import get_dynamic_tools, get_task_workspace_path, BASE_WORKSPACE_ROOT, TEXT_EXTENSIONS
 from backend.agent import create_agent_executor
@@ -40,17 +41,24 @@ from backend.db_utils import (
 )
 # ----------------------
 
-# Setup logging
+# Configure logging based on settings
+log_level = settings.log_level
+logging.basicConfig(
+    level=log_level,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
+logger.info(f"Logging level set to {log_level}")
 
-# --- Load Settings, Initialize LLM ---
+# --- Initialize Base LLM using Default from Settings ---
 try:
-    settings: Settings = load_settings()
-    llm = get_llm(settings)
-    logger.info("Base LLM initialized successfully.")
-except Exception as e:
-    logging.critical(f"FATAL: Failed during startup initialization: {e}", exc_info=True)
+    # Use the parsed default provider and model name from settings
+    llm = get_llm(settings, provider=settings.default_provider, model_name=settings.default_model_name)
+    logger.info(f"Base LLM initialized successfully using default: {settings.default_llm_id}")
+except Exception as llm_e:
+    logging.critical(f"FATAL: Failed during startup LLM initialization: {llm_e}", exc_info=True)
     exit(1)
+
 
 # --- Global state ---
 connected_clients: Dict[str, Dict[str, Any]] = {}
@@ -58,13 +66,14 @@ session_data: Dict[str, Dict[str, Any]] = {}
 
 # --- File Server Constants ---
 FILE_SERVER_LISTEN_HOST = "0.0.0.0"
-FILE_SERVER_CLIENT_HOST = os.getenv("FILE_SERVER_HOSTNAME", "localhost")
+FILE_SERVER_CLIENT_HOST = settings.file_server_hostname # Use setting
 FILE_SERVER_PORT = 8766
 logger.info(f"File server will listen on {FILE_SERVER_LISTEN_HOST}:{FILE_SERVER_PORT}")
 logger.info(f"File server URLs constructed for client will use: http://{FILE_SERVER_CLIENT_HOST}:{FILE_SERVER_PORT}")
 
 
 # --- Helper: Read Stream from Subprocess ---
+# (No changes needed in this function)
 async def read_stream(stream, stream_name, session_id, send_ws_message_func, db_add_message_func, current_task_id):
     """Reads lines from a stream and sends them over WebSocket via the provided sender func."""
     log_prefix_base = f"[{session_id[:8]}]"
@@ -82,6 +91,7 @@ async def read_stream(stream, stream_name, session_id, send_ws_message_func, db_
 
 
 # --- Helper: Execute Shell Command ---
+# *** MODIFIED: Use DIRECT_COMMAND_TIMEOUT from settings ***
 async def execute_shell_command(command: str, session_id: str, send_ws_message_func: callable, db_add_message_func: callable, current_task_id: Optional[str]) -> bool:
     """Executes a shell command asynchronously and streams output via send_ws_message_func."""
     log_prefix_base = f"[{session_id[:8]}]"; timestamp_start = datetime.datetime.now().isoformat(timespec='milliseconds')
@@ -98,19 +108,23 @@ async def execute_shell_command(command: str, session_id: str, send_ws_message_f
         process = await asyncio.create_subprocess_shell(command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=cwd)
         stdout_task = asyncio.create_task(read_stream(process.stdout, "stdout", session_id, send_ws_message_func, db_add_message_func, current_task_id))
         stderr_task = asyncio.create_task(read_stream(process.stderr, "stderr", session_id, send_ws_message_func, db_add_message_func, current_task_id))
-        TIMEOUT_SECONDS = 120; proc_wait_task = asyncio.create_task(process.wait())
+
+        TIMEOUT_SECONDS = settings.direct_command_timeout # Use setting
+
+        proc_wait_task = asyncio.create_task(process.wait())
         done, pending = await asyncio.wait([stdout_task, stderr_task, proc_wait_task], timeout=TIMEOUT_SECONDS, return_when=asyncio.ALL_COMPLETED)
+
         if proc_wait_task not in done:
-                logger.error(f"[{session_id}] Timeout executing direct command: {command}"); status_msg = f"failed (Timeout after {TIMEOUT_SECONDS}s)"; success = False
-                if process and process.returncode is None:
-                        try: process.terminate()
-                        except ProcessLookupError: pass
-                        await process.wait()
-                for task in pending: task.cancel()
-                await asyncio.gather(*pending, return_exceptions=True)
+            logger.error(f"[{session_id}] Timeout executing direct command: {command}"); status_msg = f"failed (Timeout after {TIMEOUT_SECONDS}s)"; success = False
+            if process and process.returncode is None:
+                try: process.terminate()
+                except ProcessLookupError: pass
+                await process.wait()
+            for task in pending: task.cancel()
+            await asyncio.gather(*pending, return_exceptions=True)
         else:
-                return_code = proc_wait_task.result(); await asyncio.gather(stdout_task, stderr_task, return_exceptions=True)
-                success = return_code == 0; status_msg = "succeeded" if success else f"failed (Code: {return_code})"
+            return_code = proc_wait_task.result(); await asyncio.gather(stdout_task, stderr_task, return_exceptions=True)
+            success = return_code == 0; status_msg = "succeeded" if success else f"failed (Code: {return_code})"
     except FileNotFoundError: cmd_part = command.split()[0] if command else "Unknown"; status_msg = f"failed (Command Not Found: {cmd_part})"; logger.warning(f"[{session_id}] Direct command not found: {cmd_part}"); success = False
     except Exception as e: status_msg = f"failed ({type(e).__name__})"; logger.error(f"[{session_id}] Error running direct command '{command}': {e}", exc_info=True); success = False
     timestamp_end = datetime.datetime.now().isoformat(timespec='milliseconds')
@@ -124,6 +138,7 @@ async def execute_shell_command(command: str, session_id: str, send_ws_message_f
     return success
 
 # --- File Server Handler ---
+# (No changes needed in this function, uses project structure)
 async def handle_workspace_file(request: web.Request) -> web.Response:
     """Handles requests for files within a specific task's workspace."""
     task_id = request.match_info.get('task_id')
@@ -164,7 +179,6 @@ async def handle_workspace_file(request: web.Request) -> web.Response:
         logger.error(f"[{session_id}] Unexpected error validating file path: {e}. Req: {filename}", exc_info=True)
         raise web.HTTPInternalServerError(text="Error validating file path")
 
-
     # Check if the file exists
     if not file_path.is_file():
         logger.warning(f"[{session_id}] File not found request: {file_path}")
@@ -175,12 +189,14 @@ async def handle_workspace_file(request: web.Request) -> web.Response:
     return FileResponse(path=file_path)
 
 # --- Setup File Server ---
+# (No changes needed in this function, uses constants derived from settings)
 async def setup_file_server():
     """Sets up and returns the aiohttp file server runner with CORS."""
     app = web.Application()
     # Configure CORS to allow requests from the frontend origin (adjust if needed)
     cors = aiohttp_cors.setup(app, defaults={
-        "http://localhost:8000": aiohttp_cors.ResourceOptions(
+        # Allow all origins for local dev, refine for production
+        "*": aiohttp_cors.ResourceOptions(
             allow_credentials=True,
             expose_headers="*",
             allow_headers="*",
@@ -196,7 +212,7 @@ async def setup_file_server():
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, FILE_SERVER_LISTEN_HOST, FILE_SERVER_PORT)
-    logger.info(f"Starting file server listening on http://{FILE_SERVER_LISTEN_HOST}:{FILE_SERVER_PORT} (allowing http://localhost:8000)")
+    logger.info(f"Starting file server listening on http://{FILE_SERVER_LISTEN_HOST}:{FILE_SERVER_PORT}")
     return site, runner
 
 # --- WebSocket Handler ---
@@ -219,6 +235,7 @@ async def handler(websocket: WebSocketProtocolType):
     logger.info(f"[{session_id}] Client added to connected_clients dict.")
 
     # --- Nested Helper Function to Send WS Messages ---
+    # (No changes needed)
     async def send_ws_message(msg_type: str, content: Any):
         """Safely sends a JSON message over the WebSocket for this session."""
         logger.debug(f"[{session_id}] Attempting to send WS message: Type='{msg_type}', Content='{str(content)[:100]}...'")
@@ -238,13 +255,13 @@ async def handler(websocket: WebSocketProtocolType):
             logger.warning(f"[{session_id}] Session not found in connected_clients when trying to send type '{msg_type}'.")
 
     # --- Nested Helper Function to Add Monitor Log and Save to DB ---
+    # (No changes needed)
     async def add_monitor_log_and_save(text: str, log_type: str = "monitor_log"):
         """Adds a log entry to the monitor panel and saves it to the database."""
         timestamp = datetime.datetime.now().isoformat(timespec='milliseconds')
         log_prefix = f"[{timestamp}][{session_id[:8]}]"
         full_content = f"{log_prefix} {text}"
         await send_ws_message("monitor_log", full_content)
-        # Get the currently active task ID for this session
         active_task_id = session_data.get(session_id, {}).get("current_task_id")
         if active_task_id:
             try:
@@ -258,12 +275,21 @@ async def handler(websocket: WebSocketProtocolType):
     session_setup_ok = False
     try:
         logger.info(f"[{session_id}] Starting session setup...")
-        logger.debug(f"[{session_id}] Creating ConversationBufferWindowMemory...")
-        memory = ConversationBufferWindowMemory(k=10, memory_key="chat_history", input_key="input", output_key="output", return_messages=True)
+        logger.debug(f"[{session_id}] Creating ConversationBufferWindowMemory (K={settings.agent_memory_window_k})...")
+        # *** MODIFIED: Use AGENT_MEMORY_WINDOW_K from settings ***
+        memory = ConversationBufferWindowMemory(
+            k=settings.agent_memory_window_k,
+            memory_key="chat_history",
+            input_key="input",
+            output_key="output",
+            return_messages=True
+        )
         logger.debug(f"[{session_id}] Memory object created.")
 
         logger.debug(f"[{session_id}] Creating WebSocketCallbackHandler...")
-        ws_callback_handler = WebSocketCallbackHandler(session_id, send_ws_message, add_message)
+        # Use functools.partial to pre-fill the db_add_message function
+        db_add_func = functools.partial(add_message)
+        ws_callback_handler = WebSocketCallbackHandler(session_id, send_ws_message, db_add_func)
         logger.debug(f"[{session_id}] Callback handler created.")
 
         logger.debug(f"[{session_id}] Storing session data...")
@@ -280,18 +306,26 @@ async def handler(websocket: WebSocketProtocolType):
         if websocket and not websocket.closed:
             try: await websocket.close(code=1011, reason="Session setup failed")
             except Exception as close_e: logger.error(f"[{session_id}] Error closing websocket during setup failure: {close_e}")
-        # Clean up potentially partially created session data
         if session_id in connected_clients: del connected_clients[session_id]
         if session_id in session_data: del session_data[session_id]
-        return # Stop the handler if setup failed
+        return
 
     if not session_setup_ok:
         logger.error(f"[{session_id}] Halting handler because session setup failed.")
-        return # Should not happen due to return above, but safety check
+        return
 
     # --- Main Message Processing Loop ---
     try:
-        logger.info(f"[{session_id}] Sending initial status message..."); await send_ws_message("status_message", f"Connected (Session: {session_id[:8]}...). Agent Ready. LLM: {settings.ai_provider} ({settings.gemini_model_name if settings.ai_provider == 'gemini' else settings.ollama_model_name}).")
+        # Send initial status including default LLM
+        status_llm_info = f"LLM: {settings.default_provider} ({settings.default_model_name})"
+        logger.info(f"[{session_id}] Sending initial status message...");
+        await send_ws_message("status_message", f"Connected (Session: {session_id[:8]}...). Agent Ready. {status_llm_info}.")
+        # TODO: Send available models to frontend here if UI needs them
+        # await send_ws_message("available_models", {
+        #    "gemini": settings.gemini_available_models,
+        #    "ollama": settings.ollama_available_models
+        # })
+
         logger.info(f"[{session_id}] Initial status message sent."); await add_monitor_log_and_save(f"New client connection: {websocket.remote_address}", "system_connect")
         logger.info(f"[{session_id}] Added system_connect log.")
 
@@ -311,40 +345,35 @@ async def handler(websocket: WebSocketProtocolType):
 
                 # --- CONTEXT SWITCH ---
                 if message_type == "context_switch" and task_id_from_frontend:
+                    # ... (Context switch logic remains largely the same) ...
                     logger.info(f"[{session_id}] Switching context to Task ID: {task_id_from_frontend}")
                     if session_id in session_data:
-                        # Cancel any existing agent task for this session
+                        # Cancel existing task
                         existing_agent_task = connected_clients.get(session_id, {}).get("agent_task")
                         if existing_agent_task and not existing_agent_task.done():
                             logger.warning(f"[{session_id}] Cancelling active agent task due to context switch.")
                             existing_agent_task.cancel()
                             await send_ws_message("status_message", "Operation cancelled due to task switch.")
                             await add_monitor_log_and_save("Agent operation cancelled due to context switch.", "system_cancel")
-                            connected_clients[session_id]["agent_task"] = None # Clear the task reference
+                            connected_clients[session_id]["agent_task"] = None
 
                         # Update session state
                         session_data[session_id]["current_task_id"] = task_id_from_frontend
                         session_data[session_id]["callback_handler"].set_task_id(task_id_from_frontend)
 
-                        # Ensure task exists in DB (add if new)
+                        # Ensure task exists in DB
                         await add_task(task_id_from_frontend, task_title_from_frontend or f"Task {task_id_from_frontend}", datetime.datetime.now(datetime.timezone.utc).isoformat())
 
-                        # <<< --- START: Ensure Workspace Directory --- >>>
+                        # Ensure Workspace Directory
                         try:
-                            # Ensure the workspace directory exists as soon as context is switched
-                            # The function get_task_workspace_path handles creation if missing
-                            _ = get_task_workspace_path(task_id_from_frontend) # Call for side effect
+                            _ = get_task_workspace_path(task_id_from_frontend)
                             logger.info(f"[{session_id}] Ensured workspace directory exists for task: {task_id_from_frontend}")
                         except (ValueError, OSError) as ws_path_e:
-                            # Log error if directory creation fails, but allow context switch to proceed
-                            logger.error(f"[{session_id}] Failed to get/create workspace path for task {task_id_from_frontend} during context switch: {ws_path_e}")
-                            # Optionally send a status message to UI? Could be noisy.
-                            # await send_ws_message("status_message", f"Warning: Could not initialize workspace folder for task {task_id_from_frontend[:8]}...")
-                        # <<< --- END: Ensure Workspace Directory --- >>>
+                             logger.error(f"[{session_id}] Failed to get/create workspace path for task {task_id_from_frontend} during context switch: {ws_path_e}")
 
                         await add_monitor_log_and_save(f"Switched context to task ID: {task_id_from_frontend} ('{task_title_from_frontend}')", "system_context_switch")
 
-                        # Clear agent memory for the new context
+                        # Clear agent memory
                         if "memory" in session_data[session_id]:
                             try:
                                 session_data[session_id]["memory"].clear()
@@ -352,7 +381,7 @@ async def handler(websocket: WebSocketProtocolType):
                             except Exception as mem_e:
                                 logger.error(f"[{session_id}] Failed to clear memory on context switch: {mem_e}")
 
-                        # Load and send history/artifacts for the new task
+                        # Load and send history/artifacts
                         await send_ws_message("status_message", "Loading history...")
                         history_messages = await get_messages_for_task(task_id_from_frontend)
                         artifacts_from_history = []
@@ -368,67 +397,52 @@ async def handler(websocket: WebSocketProtocolType):
                                 ui_msg_type = None
                                 content_to_send = db_content
 
-                                # Map DB types to UI message types and populate memory
                                 if db_msg_type == "user_input":
                                     ui_msg_type = "user"
                                     chat_history_for_memory.append(HumanMessage(content=db_content))
-                                elif db_msg_type in ["agent_finish", "agent_message", "agent"]: # Handle various agent message types
+                                elif db_msg_type in ["agent_finish", "agent_message", "agent"]:
                                     ui_msg_type = "agent_message"
                                     chat_history_for_memory.append(AIMessage(content=db_content))
                                 elif db_msg_type == "artifact_generated":
-                                    # Process artifact: find path, check existence, determine type, create URL
                                     filename = db_content
                                     try:
                                         task_ws_path = get_task_workspace_path(task_id_from_frontend)
                                         file_path = (task_ws_path / filename).resolve()
-                                        # Security check: ensure file is within the task workspace
                                         if not file_path.is_relative_to(task_ws_path.resolve()):
                                             logger.warning(f"[{session_id}] History artifact path outside workspace: {file_path}")
-                                            continue # Skip this artifact
-
+                                            continue
                                         artifact_type = 'unknown'
                                         file_suffix = file_path.suffix.lower()
-                                        if file_suffix in ['.png', '.jpg', '.jpeg', '.gif', '.svg']:
-                                            artifact_type = 'image'
-                                        elif file_suffix in TEXT_EXTENSIONS:
-                                            artifact_type = 'text'
-
+                                        if file_suffix in ['.png', '.jpg', '.jpeg', '.gif', '.svg']: artifact_type = 'image'
+                                        elif file_suffix in TEXT_EXTENSIONS: artifact_type = 'text'
                                         if artifact_type != 'unknown' and file_path.exists():
                                             relative_filename = str(file_path.relative_to(task_ws_path))
                                             artifact_url = f"http://{FILE_SERVER_CLIENT_HOST}:{FILE_SERVER_PORT}/workspace_files/{task_id_from_frontend}/{relative_filename}"
                                             artifacts_from_history.append({"type": artifact_type, "url": artifact_url, "filename": relative_filename})
-                                            # Log artifact loading to monitor
                                             log_prefix = f"[{db_timestamp}][{session_id[:8]}]"
                                             await send_ws_message("monitor_log", f"{log_prefix} [History][ARTIFACT] {relative_filename} (Type: {artifact_type})")
                                         else:
                                             logger.warning(f"[{session_id}] Artifact file from history not found or unknown type: {file_path}")
                                             log_prefix = f"[{db_timestamp}][{session_id[:8]}]"
                                             await send_ws_message("monitor_log", f"{log_prefix} [History][ARTIFACT_MISSING] {filename}")
-
-                                    except (ValueError, OSError) as path_err:
-                                        logger.error(f"[{session_id}] Error resolving task workspace path for history artifact {filename}: {path_err}")
                                     except Exception as artifact_err:
                                          logger.error(f"[{session_id}] Error processing artifact from history {filename}: {artifact_err}")
                                     ui_msg_type = None # Don't send artifact_generated as a chat message
-
                                 elif db_msg_type.startswith(("monitor_", "error_", "system_", "tool_")):
-                                    # Format monitor logs from history
                                     ui_msg_type = "monitor_log"
                                     log_prefix = f"[{db_timestamp}][{session_id[:8]}]"
-                                    # Create a simple indicator based on the DB type
                                     type_indicator = f"[{db_msg_type.replace('monitor_', '').replace('error_', 'ERR_').replace('system_', 'SYS_').upper()}]"
                                     content_to_send = f"{log_prefix} [History]{type_indicator} {db_content}"
 
-                                # Send the processed message to the UI if it has a type
                                 if ui_msg_type:
                                     await send_ws_message(ui_msg_type, content_to_send)
-                                    await asyncio.sleep(0.005) # Small delay to allow UI updates
+                                    await asyncio.sleep(0.005)
 
                             await send_ws_message("history_end", "History loaded.")
                             logger.info(f"[{session_id}] Finished sending {len(history_messages)} history messages.")
 
-                            # Repopulate agent memory with recent history
-                            MAX_MEMORY_RELOAD = 10 # Only load last N messages into memory
+                            # Repopulate agent memory
+                            MAX_MEMORY_RELOAD = settings.agent_memory_window_k # Use setting
                             if "memory" in session_data[session_id]:
                                 try:
                                     session_data[session_id]["memory"].chat_memory.messages = chat_history_for_memory[-MAX_MEMORY_RELOAD:]
@@ -436,13 +450,12 @@ async def handler(websocket: WebSocketProtocolType):
                                 except Exception as mem_load_e:
                                     logger.error(f"[{session_id}] Failed to repopulate memory from history: {mem_load_e}")
 
-                            # Send the list of artifacts found in history
+                            # Send artifacts found in history
                             if artifacts_from_history:
                                 logger.info(f"[{session_id}] Sending {len(artifacts_from_history)} artifacts from history.")
                                 await send_ws_message("update_artifacts", artifacts_from_history)
                             else:
-                                # Ensure artifact list is cleared if none found in history
-                                await send_ws_message("update_artifacts", [])
+                                await send_ws_message("update_artifacts", []) # Clear artifacts
                         else:
                             # No history found
                             await send_ws_message("history_end", "No history found.")
@@ -454,29 +467,25 @@ async def handler(websocket: WebSocketProtocolType):
                         logger.error(f"[{session_id}] Context switch received but no session data found!")
                         await send_ws_message("status_message", "Error: Session data lost. Please refresh.")
 
-                # --- NEW TASK --- (Signal from frontend that a new task button was clicked)
+                # --- NEW TASK ---
                 elif message_type == "new_task":
+                    # ... (New task logic remains the same) ...
                     logger.info(f"[{session_id}] Received 'new_task' signal. Clearing context.")
                     current_task_id = None # Clear active task ID immediately
                     if session_id in session_data:
-                        # Cancel any running agent task
+                        # Cancel existing task
                         existing_agent_task = connected_clients.get(session_id, {}).get("agent_task")
                         if existing_agent_task and not existing_agent_task.done():
-                            logger.warning(f"[{session_id}] Cancelling active agent task due to new task.")
-                            existing_agent_task.cancel()
-                            await send_ws_message("status_message", "Operation cancelled for new task.")
-                            await add_monitor_log_and_save("Agent operation cancelled due to new task creation.", "system_cancel")
-                            connected_clients[session_id]["agent_task"] = None
+                             logger.warning(f"[{session_id}] Cancelling active agent task due to new task.")
+                             existing_agent_task.cancel()
+                             await send_ws_message("status_message", "Operation cancelled for new task.")
+                             await add_monitor_log_and_save("Agent operation cancelled due to new task creation.", "system_cancel")
+                             connected_clients[session_id]["agent_task"] = None
 
                         # Reset session context
                         session_data[session_id]["current_task_id"] = None
                         session_data[session_id]["callback_handler"].set_task_id(None)
-                        if "memory" in session_data[session_id]:
-                            try:
-                                session_data[session_id]["memory"].clear()
-                                logger.info(f"[{session_id}] Cleared agent memory for new task.")
-                            except Exception as mem_e:
-                                logger.error(f"[{session_id}] Failed to clear memory for new task: {mem_e}")
+                        if "memory" in session_data[session_id]: session_data[session_id]["memory"].clear()
 
                         await add_monitor_log_and_save("Cleared context for new task.", "system_new_task")
                         await send_ws_message("status_message", "Ready for new task goal.")
@@ -486,25 +495,21 @@ async def handler(websocket: WebSocketProtocolType):
 
                 # --- USER MESSAGE ---
                 elif message_type == "user_message":
-                    # Get the active task ID again (might have changed)
                     active_task_id = session_data.get(session_id, {}).get("current_task_id")
                     if not active_task_id:
                         logger.warning(f"[{session_id}] User message received but no task active.")
                         await send_ws_message("status_message", "Please select or create a task first.")
-                        continue # Ignore message if no task is active
+                        continue
 
-                    # Check if agent is already running for this session
                     if connected_clients.get(session_id, {}).get("agent_task") and not connected_clients[session_id]["agent_task"].done():
                         logger.warning(f"[{session_id}] User message received while agent is already running for task {active_task_id}.")
                         await send_ws_message("status_message", "Agent is busy. Please wait for the current operation to complete.")
-                        continue # Ignore new message while busy
+                        continue
 
-                    # Save user input to DB and log
                     await add_message(active_task_id, session_id, "user_input", content)
                     await send_ws_message("status_message", f"Processing input: '{content[:60]}...'")
                     await add_monitor_log_and_save(f"User Input: {content}", "user_input")
 
-                    # Ensure session data exists
                     if session_id not in session_data:
                         logger.error(f"[{session_id}] User message for task {active_task_id} but no session data found!")
                         continue
@@ -514,126 +519,108 @@ async def handler(websocket: WebSocketProtocolType):
                     session_callback_handler = session_data[session_id]["callback_handler"]
                     request_agent_executor: Optional[AgentExecutor] = None
 
-                    # Create a new agent executor for this request (ensures correct tools/memory)
                     try:
-                        dynamic_agent_tools = get_dynamic_tools(active_task_id) # Tools are task-specific
-                        request_agent_executor = create_agent_executor(llm, dynamic_agent_tools, session_memory)
+                        # *** Get dynamic tools specific to this task ***
+                        # --- CORRECTED CALL: Removed settings argument ---
+                        dynamic_agent_tools = get_dynamic_tools(active_task_id)
+
+                        # *** Create Agent Executor with Max Iterations from settings ***
+                        request_agent_executor = create_agent_executor(
+                            llm=llm, # Use the globally initialized base LLM for now
+                            tools=dynamic_agent_tools,
+                            memory=session_memory,
+                            max_iterations=settings.agent_max_iterations # Use setting
+                        )
                         logger.info(f"[{session_id}] Created request-specific AgentExecutor for task {active_task_id}")
                     except Exception as agent_create_e:
                         logger.error(f"[{session_id}] Failed to create agent executor for task {active_task_id}: {agent_create_e}", exc_info=True)
                         await add_monitor_log_and_save(f"Error creating agent: {agent_create_e}", "error_system")
                         await send_ws_message("status_message", "Error: Failed to set up agent.")
                         await send_ws_message("agent_message", f"Sorry, an internal error occurred while setting up the agent: {type(agent_create_e).__name__}")
-                        continue # Don't proceed if agent setup failed
+                        continue
 
                     # --- Artifact Scan (PRE-RUN) ---
-                    # Get list of existing artifacts before the agent runs
                     task_workspace_path: Optional[Path] = None
                     files_before_run: Set[Path] = set() # Use Path objects for comparison
                     artifact_patterns = ['*.png', '*.jpg', '*.jpeg', '*.gif', '*.svg'] + [f'*{ext}' for ext in TEXT_EXTENSIONS]
                     try:
                         task_workspace_path = get_task_workspace_path(active_task_id)
-                        # Scan for files matching artifact patterns
                         for pattern in artifact_patterns:
-                            # Use rglob for recursive search if needed, currently flat search
                             files_before_run.update(f.relative_to(task_workspace_path) for f in task_workspace_path.glob(pattern) if f.is_file())
                         logger.debug(f"Files before agent run: {files_before_run}")
-                    except (ValueError, OSError) as path_e:
-                         logger.error(f"[{session_id}] Cannot get task workspace path for pre-run artifact scan: {path_e}")
-                         task_workspace_path = None # Ensure path is None if error
                     except Exception as file_scan_e:
                          logger.error(f"[{session_id}] Error scanning workspace before agent run: {file_scan_e}")
-                         files_before_run = set() # Proceed with empty set if error
+                         files_before_run = set()
+                         task_workspace_path = None
 
                     # --- Execute Agent ---
                     agent_task: Optional[asyncio.Task] = None
                     try:
-                        # Configure callbacks for this specific invocation
                         config = RunnableConfig(callbacks=[session_callback_handler])
-                        # Invoke the agent asynchronously
                         agent_coro = request_agent_executor.ainvoke({"input": content}, config=config)
                         agent_task = asyncio.create_task(agent_coro)
-                        # Store the task reference so it can be cancelled if needed
                         connected_clients[session_id]["agent_task"] = agent_task
-                        # Wait for the agent to complete
                         result = await agent_task
                         logger.info(f"[{session_id}] Agent execution completed successfully for task {active_task_id}.")
 
-                        # --- Artifact Scan (POST-RUN) ---
-                        # Scan again after the agent run to detect newly created files
-                        if task_workspace_path: # Only scan if path was valid initially
-                            try:
-                                all_files_after_run: Set[Path] = set()
-                                for pattern in artifact_patterns:
-                                    all_files_after_run.update(f.relative_to(task_workspace_path) for f in task_workspace_path.glob(pattern) if f.is_file())
+                        # --- Artifact Scan (POST-RUN) & Update ---
+                        if task_workspace_path:
+                             try:
+                                 all_files_after_run: Set[Path] = set()
+                                 for pattern in artifact_patterns:
+                                     all_files_after_run.update(f.relative_to(task_workspace_path) for f in task_workspace_path.glob(pattern) if f.is_file())
+                                 new_files = all_files_after_run - files_before_run
+                                 if new_files:
+                                     logger.info(f"[{session_id}] Detected {len(new_files)} new potential artifacts via post-run scan: {new_files}")
+                                     for file_rel_path in new_files:
+                                         await add_message(active_task_id, session_id, "artifact_generated", str(file_rel_path))
+                                         await add_monitor_log_and_save(f"Artifact generated (detected post-run): {file_rel_path}", "system_artifact_generated")
+                                 else:
+                                      logger.info(f"[{session_id}] No *new* artifacts detected via post-run scan.")
 
-                                # Find files that exist now but didn't before
-                                new_files = all_files_after_run - files_before_run
-                                if new_files:
-                                    logger.info(f"[{session_id}] Detected {len(new_files)} new potential artifacts via post-run scan: {new_files}")
-                                    # Log these newly detected artifacts to DB and monitor
-                                    for file_rel_path in new_files:
-                                        await add_message(active_task_id, session_id, "artifact_generated", str(file_rel_path))
-                                        await add_monitor_log_and_save(f"Artifact generated (detected post-run): {file_rel_path}", "system_artifact_generated")
-                                else:
-                                    logger.info(f"[{session_id}] No *new* artifacts detected via post-run scan.")
-
-                                # --- Send FINAL Artifact List ---
-                                # Get all current artifacts, sort by modification time (newest first), send full list
-                                current_artifacts_in_ws = []
-                                all_potential_artifacts = []
-                                # Use the latest scan results (all_files_after_run)
-                                for file_rel_path in all_files_after_run:
-                                    try:
-                                        file_abs_path = task_workspace_path / file_rel_path
-                                        mtime = file_abs_path.stat().st_mtime # Get modification time
-                                        all_potential_artifacts.append((file_abs_path, mtime))
-                                    except FileNotFoundError: continue # Skip if deleted between scan and stat
-
-                                # Sort by modification time, descending (newest first)
-                                sorted_files = sorted(all_potential_artifacts, key=lambda x: x[1], reverse=True)
-
-                                # Build the final artifact list for the UI
-                                for file_path, _ in sorted_files:
-                                    if file_path.is_file(): # Double check it's still a file
-                                        relative_filename = str(file_path.relative_to(task_workspace_path))
-                                        artifact_type = 'unknown'
-                                        file_suffix = file_path.suffix.lower()
-                                        if file_suffix in ['.png', '.jpg', '.jpeg', '.gif', '.svg']: artifact_type = 'image'
-                                        elif file_suffix in TEXT_EXTENSIONS: artifact_type = 'text'
-
-                                        if artifact_type != 'unknown':
-                                            artifact_url = f"http://{FILE_SERVER_CLIENT_HOST}:{FILE_SERVER_PORT}/workspace_files/{active_task_id}/{relative_filename}"
-                                            current_artifacts_in_ws.append({"type": artifact_type, "url": artifact_url, "filename": relative_filename})
-
-                                # Send the complete, sorted list to the UI
-                                if current_artifacts_in_ws:
-                                    logger.info(f"[{session_id}] Sending final update_artifacts message with {len(current_artifacts_in_ws)} artifacts.")
-                                    await send_ws_message("update_artifacts", current_artifacts_in_ws)
-                                else: # Send empty list if nothing found
-                                    logger.info(f"[{session_id}] No artifacts found in workspace post-run, sending empty update.")
-                                    await send_ws_message("update_artifacts", [])
-
-                            except Exception as artifact_scan_e:
-                                logger.error(f"[{session_id}] Error during post-run artifact scan/update: {artifact_scan_e}")
+                                 # Send FINAL Artifact List
+                                 current_artifacts_in_ws = []
+                                 all_potential_artifacts = []
+                                 for file_rel_path in all_files_after_run:
+                                     try:
+                                         file_abs_path = task_workspace_path / file_rel_path
+                                         mtime = file_abs_path.stat().st_mtime
+                                         all_potential_artifacts.append((file_abs_path, mtime))
+                                     except FileNotFoundError: continue
+                                 sorted_files = sorted(all_potential_artifacts, key=lambda x: x[1], reverse=True)
+                                 for file_path, _ in sorted_files:
+                                     if file_path.is_file():
+                                         relative_filename = str(file_path.relative_to(task_workspace_path))
+                                         artifact_type = 'unknown'
+                                         file_suffix = file_path.suffix.lower()
+                                         if file_suffix in ['.png', '.jpg', '.jpeg', '.gif', '.svg']: artifact_type = 'image'
+                                         elif file_suffix in TEXT_EXTENSIONS: artifact_type = 'text'
+                                         if artifact_type != 'unknown':
+                                             artifact_url = f"http://{FILE_SERVER_CLIENT_HOST}:{FILE_SERVER_PORT}/workspace_files/{active_task_id}/{relative_filename}"
+                                             current_artifacts_in_ws.append({"type": artifact_type, "url": artifact_url, "filename": relative_filename})
+                                 if current_artifacts_in_ws:
+                                     logger.info(f"[{session_id}] Sending final update_artifacts message with {len(current_artifacts_in_ws)} artifacts.")
+                                     await send_ws_message("update_artifacts", current_artifacts_in_ws)
+                                 else:
+                                     logger.info(f"[{session_id}] No artifacts found in workspace post-run, sending empty update.")
+                                     await send_ws_message("update_artifacts", [])
+                             except Exception as artifact_scan_e:
+                                 logger.error(f"[{session_id}] Error during post-run artifact scan/update: {artifact_scan_e}")
                         else:
-                             logger.warning(f"[{session_id}] Skipping post-run artifact scan/update due to invalid task workspace path.")
+                            logger.warning(f"[{session_id}] Skipping post-run artifact scan/update due to invalid task workspace path.")
+
 
                     except asyncio.CancelledError:
                         logger.warning(f"[{session_id}] Agent task for task {active_task_id} was cancelled.")
-                        # Status message was likely sent when cancellation occurred
                     except Exception as e:
-                        # Handle errors during agent execution
                         error_msg = f"CRITICAL Error during agent execution: {e}"
                         logger.error(f"[{session_id}] {error_msg}", exc_info=True)
                         await add_monitor_log_and_save(error_msg, "error_agent")
                         await send_ws_message("status_message", "Error during task processing.")
                         await send_ws_message("agent_message", f"Sorry, an internal error occurred: {type(e).__name__}")
-                        # Save error details to DB
                         if active_task_id:
                             await add_message(active_task_id, session_id, "error_agent", f"{type(e).__name__}: {e}")
                     finally:
-                        # Clear the agent task reference for this session once done/errored/cancelled
                         if session_id in connected_clients:
                             connected_clients[session_id]["agent_task"] = None
 
@@ -641,59 +628,42 @@ async def handler(websocket: WebSocketProtocolType):
                 elif message_type == "delete_task" and task_id_from_frontend:
                     logger.warning(f"[{session_id}] Received request to delete task: {task_id_from_frontend}")
                     await add_monitor_log_and_save(f"Received request to delete task: {task_id_from_frontend}", "system_delete_request")
-
-                    # Delete from database first
                     deleted = await delete_task_and_messages(task_id_from_frontend)
-
                     if deleted:
                         await send_ws_message("status_message", f"Task {task_id_from_frontend[:8]}... deleted.")
                         await add_monitor_log_and_save(f"Task {task_id_from_frontend} deleted successfully from DB.", "system_delete_success")
-
-                        # Delete corresponding workspace directory
                         task_workspace_to_delete : Optional[Path] = None
                         try:
                             task_workspace_to_delete = get_task_workspace_path(task_id_from_frontend)
-                            # Check if it exists and is inside the base workspace for safety
                             if task_workspace_to_delete.exists() and task_workspace_to_delete.is_relative_to(BASE_WORKSPACE_ROOT.resolve()):
                                 import shutil
-                                # Run shutil.rmtree in a separate thread to avoid blocking asyncio loop
                                 await asyncio.to_thread(shutil.rmtree, task_workspace_to_delete)
                                 logger.info(f"[{session_id}] Successfully deleted workspace directory: {task_workspace_to_delete}")
                                 await add_monitor_log_and_save(f"Workspace directory deleted: {task_workspace_to_delete.name}", "system_delete_success")
                             else:
                                 logger.warning(f"[{session_id}] Workspace directory not found or invalid for deletion: {task_workspace_to_delete}")
-                        except (ValueError, OSError) as path_err:
-                            logger.error(f"[{session_id}] Error resolving task workspace path for deletion {task_id_from_frontend}: {path_err}")
-                            await add_monitor_log_and_save(f"Error finding workspace directory for deletion: {path_err}", "error_delete")
                         except Exception as ws_del_e:
                             logger.error(f"[{session_id}] Error deleting workspace directory {task_workspace_to_delete}: {ws_del_e}")
                             await add_monitor_log_and_save(f"Error deleting workspace directory: {ws_del_e}", "error_delete")
 
-                        # If the deleted task was the currently active one, clear context
                         active_task_id = session_data.get(session_id, {}).get("current_task_id")
                         if active_task_id == task_id_from_frontend:
-                            current_task_id = None # Update local variable
-                            if session_id in session_data:
-                                # Cancel any running task for the deleted context
-                                existing_agent_task = connected_clients.get(session_id, {}).get("agent_task")
-                                if existing_agent_task and not existing_agent_task.done():
-                                    logger.warning(f"[{session_id}] Cancelling active agent task due to active task deletion.")
-                                    existing_agent_task.cancel()
-                                    connected_clients[session_id]["agent_task"] = None
-                                # Reset session state
-                                session_data[session_id]["current_task_id"] = None
-                                session_data[session_id]["callback_handler"].set_task_id(None)
-                                if "memory" in session_data[session_id]: session_data[session_id]["memory"].clear()
-                                # Notify UI
-                                await send_ws_message("status_message", "Active task deleted. Select or create a new task.")
-                                await add_monitor_log_and_save("Cleared context as active task was deleted.", "system_context_clear")
-                                await send_ws_message("update_artifacts", []) # Clear artifacts
+                             current_task_id = None # Update local variable
+                             if session_id in session_data:
+                                 existing_agent_task = connected_clients.get(session_id, {}).get("agent_task")
+                                 if existing_agent_task and not existing_agent_task.done(): existing_agent_task.cancel()
+                                 connected_clients[session_id]["agent_task"] = None
+                                 session_data[session_id]["current_task_id"] = None
+                                 session_data[session_id]["callback_handler"].set_task_id(None)
+                                 if "memory" in session_data[session_id]: session_data[session_id]["memory"].clear()
+                                 await send_ws_message("status_message", "Active task deleted. Select or create a new task.")
+                                 await add_monitor_log_and_save("Cleared context as active task was deleted.", "system_context_clear")
+                                 await send_ws_message("update_artifacts", []) # Clear artifacts
                     else:
-                        # Deletion failed (DB error)
                         await send_ws_message("status_message", f"Failed to delete task {task_id_from_frontend[:8]}...")
                         await add_monitor_log_and_save(f"Failed to delete task {task_id_from_frontend} from DB.", "error_delete")
 
-                # --- RENAME TASK --- <<< NEW HANDLER >>>
+                # --- RENAME TASK ---
                 elif message_type == "rename_task":
                     task_id_to_rename = data.get("taskId")
                     new_name = data.get("newName")
@@ -701,40 +671,33 @@ async def handler(websocket: WebSocketProtocolType):
                         logger.warning(f"[{session_id}] Received invalid rename_task message: {data}")
                         await add_monitor_log_and_save(f"Error: Received invalid rename request (missing taskId or newName).", "error_system")
                         continue
-
                     logger.info(f"[{session_id}] Received request to rename task {task_id_to_rename} to '{new_name}'.")
                     await add_monitor_log_and_save(f"Received rename request for task {task_id_to_rename} to '{new_name}'.", "system_rename_request")
-
-                    # Call the DB utility function to perform the rename
                     renamed_in_db = await rename_task_in_db(task_id_to_rename, new_name)
-
                     if renamed_in_db:
                         logger.info(f"[{session_id}] Successfully renamed task {task_id_to_rename} in database.")
                         await add_monitor_log_and_save(f"Task {task_id_to_rename} renamed to '{new_name}' in DB.", "system_rename_success")
-                        # Optionally send a success status message back? Might be redundant if UI updated optimistically.
-                        # await send_ws_message("status_message", f"Task {task_id_to_rename[:8]}... renamed.")
                     else:
                         logger.error(f"[{session_id}] Failed to rename task {task_id_to_rename} in database.")
                         await add_monitor_log_and_save(f"Failed to rename task {task_id_to_rename} in DB.", "error_db")
-                        # Optionally send an error status message back to UI?
-                        # await send_ws_message("status_message", f"Error: Failed to save rename for task {task_id_to_rename[:8]}...")
 
                 # --- Other message types ---
-                elif message_type == "run_command": # Example: Direct command execution (if needed)
+                elif message_type == "run_command": # Example: Direct command execution
                     command_to_run = data.get("command")
                     if command_to_run:
                         active_task_id_for_cmd = session_data.get(session_id, {}).get("current_task_id")
                         await add_monitor_log_and_save(f"Received direct 'run_command'. Executing: {command_to_run} (Task Context: {active_task_id_for_cmd})", "system_direct_cmd")
+                        # Pass settings to execute_shell_command if needed, but it already reads global settings
                         await execute_shell_command(command_to_run, session_id, send_ws_message, add_message, active_task_id_for_cmd)
                     else:
                         logger.warning(f"[{session_id}] Received 'run_command' with no command content.")
                         await add_monitor_log_and_save("Error: 'run_command' received with no command specified.", "error_direct_cmd")
 
                 elif message_type == "action_command": # Example: Placeholder for UI actions
-                     action = data.get("command")
-                     logger.info(f"[{session_id}] Received action command: {action} (Not implemented).")
-                     await add_monitor_log_and_save(f"Received action command: {action} (Handler not implemented).", "system_action_cmd")
-                     await send_ws_message("status_message", f"Action '{action}' not implemented.")
+                    action = data.get("command")
+                    logger.info(f"[{session_id}] Received action command: {action} (Not implemented).")
+                    await add_monitor_log_and_save(f"Received action command: {action} (Handler not implemented).", "system_action_cmd")
+                    await send_ws_message("status_message", f"Action '{action}' not implemented.")
 
                 # --- Unknown message type ---
                 else:
@@ -746,61 +709,42 @@ async def handler(websocket: WebSocketProtocolType):
                 logger.error(f"[{session_id}] Received non-JSON message: {message[:200]}{'...' if len(message)>200 else ''}")
                 await add_monitor_log_and_save("Error: Received invalid message format (not JSON).", "error_json")
             except asyncio.CancelledError:
-                 logger.info(f"[{session_id}] Message processing loop cancelled.")
-                 raise # Re-raise CancelledError to stop the handler cleanly
+                logger.info(f"[{session_id}] Message processing loop cancelled.")
+                raise # Re-raise CancelledError to stop the handler cleanly
             except Exception as e:
                 logger.error(f"[{session_id}] Error processing message: {e}", exc_info=True)
                 try:
-                    # Try to inform the client about the error
                     await add_monitor_log_and_save(f"Error processing message: {e}", "error_processing")
                     await send_ws_message("status_message", f"Error processing message: {type(e).__name__}")
                 except Exception as inner_e:
-                    # Log if even error reporting fails
                     logger.error(f"[{session_id}] Further error during error reporting: {inner_e}")
 
     # --- WebSocket Closure Handling ---
     except (ConnectionClosedOK, ConnectionClosedError) as ws_close_exc:
-        if isinstance(ws_close_exc, ConnectionClosedOK):
-            logger.info(f"Client disconnected normally: {websocket.remote_address} (Session: {session_id}) - Code: {ws_close_exc.code}, Reason: {ws_close_exc.reason}")
-        else:
-            logger.warning(f"Connection closed abnormally: {websocket.remote_address} (Session: {session_id}) - Code: {ws_close_exc.code}, Reason: {ws_close_exc.reason}")
+         if isinstance(ws_close_exc, ConnectionClosedOK): logger.info(f"Client disconnected normally: {websocket.remote_address} (Session: {session_id}) - Code: {ws_close_exc.code}, Reason: {ws_close_exc.reason}")
+         else: logger.warning(f"Connection closed abnormally: {websocket.remote_address} (Session: {session_id}) - Code: {ws_close_exc.code}, Reason: {ws_close_exc.reason}")
     except asyncio.CancelledError:
-         # This happens during shutdown
          logger.info(f"WebSocket handler for session {session_id} cancelled.")
-         if not websocket.closed:
-             await websocket.close(code=1012, reason="Server shutting down") # Service Restart code
+         if not websocket.closed: await websocket.close(code=1012, reason="Server shutting down")
     except Exception as e:
-        # Catch any other unhandled errors in the handler
-        logger.error(f"Unhandled error in WebSocket handler: {websocket.remote_address} (Session: {session_id}): {e}", exc_info=True)
-        try:
-            # Attempt to close the connection gracefully if an error occurred
-            if not websocket.closed:
-                await websocket.close(code=1011, reason="Internal server error") # Internal Error code
-        except Exception as close_e:
-            logger.error(f"[{session_id}] Error closing websocket after unhandled handler error: {close_e}")
+         logger.error(f"Unhandled error in WebSocket handler: {websocket.remote_address} (Session: {session_id}): {e}", exc_info=True)
+         try:
+             if not websocket.closed: await websocket.close(code=1011, reason="Internal server error")
+         except Exception as close_e: logger.error(f"[{session_id}] Error closing websocket after unhandled handler error: {close_e}")
 
     # --- Session Cleanup ---
     finally:
-        logger.info(f"Cleaning up resources for session {session_id}")
-        # Cancel any pending agent task associated with this session
-        agent_task = connected_clients.get(session_id, {}).get("agent_task")
-        if agent_task and not agent_task.done():
-            logger.warning(f"[{session_id}] Cancelling agent task during cleanup.")
-            agent_task.cancel()
-            try:
-                await agent_task # Wait for cancellation to complete (or raise exception)
-            except asyncio.CancelledError:
-                pass # Expected exception
-            except Exception as cancel_e:
-                logger.error(f"[{session_id}] Error waiting for agent task cancellation during cleanup: {cancel_e}")
-
-        # Remove session from global dictionaries
-        if session_id in connected_clients:
-            del connected_clients[session_id]
-        if session_id in session_data:
-            del session_data[session_id]
-
-        logger.info(f"Cleaned up session data for {session_id}. Client removed: {websocket.remote_address}. Active clients: {len(connected_clients)}")
+         logger.info(f"Cleaning up resources for session {session_id}")
+         agent_task = connected_clients.get(session_id, {}).get("agent_task")
+         if agent_task and not agent_task.done():
+             logger.warning(f"[{session_id}] Cancelling agent task during cleanup.")
+             agent_task.cancel()
+             try: await agent_task
+             except asyncio.CancelledError: pass
+             except Exception as cancel_e: logger.error(f"[{session_id}] Error waiting for agent task cancellation during cleanup: {cancel_e}")
+         if session_id in connected_clients: del connected_clients[session_id]
+         if session_id in session_data: del session_data[session_id]
+         logger.info(f"Cleaned up session data for {session_id}. Client removed: {websocket.remote_address}. Active clients: {len(connected_clients)}")
 
 
 # --- Main Application Entry Point ---
@@ -817,35 +761,28 @@ async def main():
     ws_host = "0.0.0.0" # Listen on all interfaces
     ws_port = 8765
     logger.info(f"Starting WebSocket server on ws://{ws_host}:{ws_port}")
-    # Set max_size to handle potentially large messages (e.g., file uploads if implemented)
-    # Set ping interval/timeout to keep connections alive and detect broken ones
+
+    # *** MODIFIED: Use WebSocket settings from config ***
     websocket_server = await websockets.serve(
         handler,
         ws_host,
         ws_port,
-        max_size=2**24, # ~16MB limit, adjust as needed
-        ping_interval=20,
-        ping_timeout=30
+        max_size=settings.websocket_max_size_bytes,
+        ping_interval=settings.websocket_ping_interval,
+        ping_timeout=settings.websocket_ping_timeout
     )
     logger.info("WebSocket server started.")
 
     # --- Graceful Shutdown Handling ---
     shutdown_event = asyncio.Event()
     loop = asyncio.get_running_loop()
-
-    # Store original signal handlers
     original_sigint_handler = signal.getsignal(signal.SIGINT)
     original_sigterm_handler = signal.getsignal(signal.SIGTERM)
-
     def signal_handler(sig, frame):
-        """Sets the shutdown event when SIGINT or SIGTERM is received."""
         logger.info(f"Received signal {sig}. Initiating shutdown...")
         shutdown_event.set()
-        # Restore original handlers to prevent multiple triggers if shutdown is slow
         signal.signal(signal.SIGINT, original_sigint_handler)
         signal.signal(signal.SIGTERM, original_sigterm_handler)
-
-    # Register signal handlers (may not work on Windows)
     try:
         loop.add_signal_handler(signal.SIGINT, signal_handler, signal.SIGINT, None)
         loop.add_signal_handler(signal.SIGTERM, signal_handler, signal.SIGTERM, None)
@@ -853,47 +790,31 @@ async def main():
         logger.warning("Signal handlers not available on this platform (Windows?). Use Ctrl+C.")
 
     logger.info("Application servers running. Press Ctrl+C to stop.")
-    await shutdown_event.wait() # Wait until shutdown is triggered
+    await shutdown_event.wait()
 
     # --- Perform Cleanup ---
     logger.info("Shutdown signal received. Stopping servers...")
-
-    # Stop WebSocket server
     logger.info("Stopping WebSocket server...")
     websocket_server.close()
     await websocket_server.wait_closed()
     logger.info("WebSocket server stopped.")
-
-    # Stop File server
     logger.info("Stopping file server...")
     await file_server_runner.cleanup()
     logger.info("File server stopped.")
-
-    # Cancel any remaining asyncio tasks (e.g., handlers that didn't finish)
     tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
     if tasks:
         logger.info(f"Cancelling {len(tasks)} outstanding tasks...")
         [task.cancel() for task in tasks]
-        await asyncio.gather(*tasks, return_exceptions=True) # Wait for tasks to cancel
+        await asyncio.gather(*tasks, return_exceptions=True)
         logger.info("Outstanding tasks cancelled.")
 
 # --- Script Execution ---
 if __name__ == "__main__":
-    # Configure logging level based on environment variable or default to INFO
-    log_level = os.getenv("LOG_LEVEL", "INFO").upper()
-    if log_level not in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]:
-        log_level = "INFO"
-    logging.basicConfig(
-        level=log_level,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
-    logger.info(f"Logging level set to {log_level}")
-
+    # Logging is configured above after loading settings
     try:
         asyncio.run(main()) # Run the main async function
     except KeyboardInterrupt:
         logger.info("Server stopped manually (KeyboardInterrupt).")
     except Exception as e:
-        # Catch any critical errors during startup or runtime
         logging.critical(f"Server failed to start or crashed: {e}", exc_info=True)
         exit(1) # Exit with error code

@@ -6,7 +6,7 @@ from uuid import UUID
 import json
 from pathlib import Path
 import os
-import re # Import re
+import re
 
 # LangChain Core Imports
 from langchain_core.callbacks import AsyncCallbackHandler
@@ -15,7 +15,9 @@ from langchain_core.messages import BaseMessage
 from langchain_core.agents import AgentAction, AgentFinish
 
 # Project Imports
-from backend.tools import TEXT_EXTENSIONS, get_task_workspace_path # Assuming these are correctly defined in tools.py
+# *** MODIFIED: Import settings ***
+from backend.config import settings # Import the loaded settings instance
+from backend.tools import TEXT_EXTENSIONS, get_task_workspace_path
 
 logger = logging.getLogger(__name__)
 
@@ -23,9 +25,9 @@ logger = logging.getLogger(__name__)
 AddMessageFunc = Callable[[str, str, str, str], Coroutine[Any, Any, None]]
 SendWSMessageFunc = Callable[[str, Any], Coroutine[Any, Any, None]]
 
-# --- File Server Constants ---
-# These might be better placed in config.py or server.py and passed if needed
-FILE_SERVER_CLIENT_HOST = os.getenv("FILE_SERVER_HOSTNAME", "localhost")
+# --- File Server Constants (Now primarily for logging/reference, hostname from settings) ---
+# *** MODIFIED: Use hostname from settings ***
+FILE_SERVER_CLIENT_HOST = settings.file_server_hostname
 FILE_SERVER_PORT = 8766
 
 class WebSocketCallbackHandler(AsyncCallbackHandler):
@@ -108,7 +110,6 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
                     await self._save_message("artifact_generated", relative_path_str)
                     # Log to monitor
                     await self.send_ws_message("monitor_log", f"{log_prefix} [ARTIFACT_GENERATED] {relative_path_str} (via {name})")
-                    # *** REMOVED sending 'new_artifact' message ***
                     # Modify output message shown in monitor log for clarity
                     monitor_output = f"Successfully wrote file: '{relative_path_str}'"
                 else:
