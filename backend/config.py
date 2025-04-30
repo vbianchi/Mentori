@@ -11,7 +11,16 @@ logger = logging.getLogger(__name__)
 def parse_comma_separated_list(env_var: Optional[str], default: Optional[List[str]] = None) -> List[str]:
     """Parses a comma-separated string from env var into a list."""
     if env_var:
-        return [item.strip() for item in env_var.split(',') if item.strip()]
+        # Clean potential provider prefixes before returning
+        cleaned_list = []
+        for item in env_var.split(','):
+            item = item.strip()
+            if item:
+                # Remove potential prefix like "gemini::" or "ollama::"
+                if "::" in item:
+                    item = item.split("::", 1)[1]
+                cleaned_list.append(item)
+        return cleaned_list
     return default if default is not None else []
 
 @dataclass
@@ -47,6 +56,8 @@ class Settings:
     tool_installer_timeout: int = field(default_factory=lambda: int(os.getenv('TOOL_INSTALLER_TIMEOUT', '300')))
     tool_pubmed_default_max_results: int = field(default_factory=lambda: int(os.getenv('TOOL_PUBMED_DEFAULT_MAX_RESULTS', '5')))
     tool_pubmed_max_snippet: int = field(default_factory=lambda: int(os.getenv('TOOL_PUBMED_MAX_SNIPPET', '250')))
+    # *** NEW: PDF Warning Length Setting ***
+    tool_pdf_reader_warning_length: int = field(default_factory=lambda: int(os.getenv('TOOL_PDF_READER_WARNING_LENGTH', '20000')))
 
     # --- Server Settings ---
     websocket_max_size_bytes: int = field(default_factory=lambda: int(os.getenv('WEBSOCKET_MAX_SIZE_BYTES', '16777216'))) # 16MB
@@ -75,25 +86,30 @@ class Settings:
             if provider not in ['gemini', 'ollama'] or not model_name:
                 raise ValueError("Invalid format or missing components.")
             self.default_provider = provider
-            self.default_model_name = model_name
+            self.default_model_name = model_name # Keep original name with potential version tags
         except ValueError:
             logger.error(f"Invalid DEFAULT_LLM_ID format: '{self.default_llm_id}'. Expected 'provider::model_name'. Using fallback 'gemini::gemini-1.5-flash'.")
             self.default_llm_id = 'gemini::gemini-1.5-flash'
             self.default_provider = 'gemini'
             self.default_model_name = 'gemini-1.5-flash'
 
-        # Validate Gemini Key if Gemini is default or available
-        # Check requires parsing available models first
-        self.gemini_available_models = parse_comma_separated_list(
-            self._gemini_available_models_str,
-            default=['gemini-1.5-flash', 'gemini-1.5-pro-latest'] # Sensible defaults if not set
-        )
-        self.ollama_available_models = parse_comma_separated_list(
-            self._ollama_available_models_str,
-            default=['gemma:2b', 'llama3:latest'] # Sensible defaults if not set
-        )
+        # Parse comma-separated model lists (and clean prefixes)
+        self.gemini_available_models = parse_comma_separated_list(self._gemini_available_models_str, default=['gemini-1.5-flash', 'gemini-1.5-pro-latest'])
+        self.ollama_available_models = parse_comma_separated_list(self._ollama_available_models_str, default=['gemma:2b', 'llama3:latest'])
 
-        is_gemini_needed = self.default_provider == 'gemini' or any('gemini' in model_id.lower() for model_id in self.gemini_available_models)
+        # Validate default model exists in the cleaned available lists
+        default_exists = False
+        if self.default_provider == 'gemini' and self.default_model_name in self.gemini_available_models:
+            default_exists = True
+        elif self.default_provider == 'ollama' and self.default_model_name in self.ollama_available_models:
+            default_exists = True
+
+        if not default_exists:
+             logger.warning(f"Default LLM '{self.default_llm_id}' not found in the available model lists ({self.gemini_available_models}, {self.ollama_available_models}). Check .env configuration.")
+             # Optionally, fallback to the first available model? Or raise error? For now, just warn.
+
+        # Validate Gemini Key if Gemini is default or available
+        is_gemini_needed = self.default_provider == 'gemini' or bool(self.gemini_available_models)
         if is_gemini_needed and not self.google_api_key:
             logger.error("Gemini models are configured but GOOGLE_API_KEY is not set. Application may fail.")
             # raise ValueError("GOOGLE_API_KEY is required when Gemini models are configured.")
@@ -118,6 +134,8 @@ class Settings:
         logger.info(f"Tool Web Reader Timeout: {self.tool_web_reader_timeout}s, Max Length: {self.tool_web_reader_max_length} chars")
         logger.info(f"Tool Installer Timeout: {self.tool_installer_timeout}s")
         logger.info(f"Tool PubMed Defaults: Max Results={self.tool_pubmed_default_max_results}, Max Snippet={self.tool_pubmed_max_snippet} chars")
+        # *** NEW: Log PDF Warning Length ***
+        logger.info(f"Tool PDF Reader Warning Length: {self.tool_pdf_reader_warning_length} chars")
         logger.info(f"WebSocket Ping Interval: {self.websocket_ping_interval}s, Timeout: {self.websocket_ping_timeout}s, Max Size: {self.websocket_max_size_bytes} bytes")
         logger.info(f"Direct Command Timeout: {self.direct_command_timeout}s")
         logger.info(f"File Server Hostname (for client URLs): {self.file_server_hostname}")
@@ -127,15 +145,12 @@ class Settings:
 
 def load_settings() -> Settings:
     """Loads settings from .env file and environment variables."""
-    # Load environment variables from .env file, if it exists
-    env_path = os.path.join(os.path.dirname(__file__), '..', '.env') # Assumes .env is in project root
+    env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
     if os.path.exists(env_path):
          logger.info(f"Loading environment variables from: {env_path}")
          load_dotenv(dotenv_path=env_path)
     else:
          logger.info(f".env file not found at expected location ({env_path}), loading from environment variables only.")
-
-    # Catch potential errors during Settings instantiation (e.g., invalid int/float)
     try:
         return Settings()
     except (ValueError, TypeError) as e:
@@ -147,13 +162,10 @@ def load_settings() -> Settings:
 settings = load_settings()
 # ------------------------------------------------------
 
-# Example usage (optional, for testing config loading)
+# Example usage
 if __name__ == "__main__":
-    # Settings instance is already created and loaded above
     print("\n--- Configuration Test Access ---")
     print(f"Default Provider: {settings.default_provider}")
-    print(f"Default Model: {settings.default_model_name}")
-    print(f"Memory K: {settings.agent_memory_window_k}")
-    print(f"Web Reader Timeout: {settings.tool_web_reader_timeout}")
-    print(f"Available Ollama: {settings.ollama_available_models}")
+    print(f"PDF Warning Length: {settings.tool_pdf_reader_warning_length}")
     print("-------------------------------\n")
+

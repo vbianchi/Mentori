@@ -15,7 +15,6 @@ import functools
 # LangChain Tool Imports
 from langchain_core.tools import Tool, BaseTool
 from langchain_community.tools import DuckDuckGoSearchRun
-# Removed: from langchain_community.tools.file_management import ReadFileTool
 from langchain_experimental.utilities import PythonREPL
 from Bio import Entrez
 from urllib.error import HTTPError
@@ -151,17 +150,17 @@ async def write_to_file_in_task_workspace(input_str: str, task_workspace: Path) 
         return f"Error: Failed to write file '{relative_path_str}'. Reason: {type(e).__name__}"
 
 
-# *** NEW: Function to read file content (handles text and PDF) ***
+# *** MODIFIED: Read full PDF, add warning if > warning_length ***
 async def read_file_content(relative_path_str: str, task_workspace: Path) -> str:
     """
     Reads content from a file (text or PDF) within the specified task workspace.
+    Appends a warning if PDF content exceeds configured length.
     """
     logger.info(f"Read tool attempting to read '{relative_path_str}' in workspace {task_workspace.name}")
     relative_path_str = relative_path_str.strip().strip('\'"`')
     if not relative_path_str:
         return "Error: File path cannot be empty."
 
-    # Security Check: Ensure relative path does not try to escape the workspace
     relative_path = Path(relative_path_str)
     if relative_path.is_absolute() or '..' in relative_path.parts:
         logger.error(f"Security Error: Invalid read file path '{relative_path_str}' attempts traversal.")
@@ -169,7 +168,6 @@ async def read_file_content(relative_path_str: str, task_workspace: Path) -> str
 
     full_path = task_workspace.joinpath(relative_path).resolve()
 
-    # Security Check: Ensure the resolved path is truly within the intended workspace
     if not full_path.is_relative_to(task_workspace.resolve()):
         logger.error(f"Security Error: Read path resolves outside task workspace! Task: {task_workspace.name}, Resolved: {full_path}")
         return "Error: File path resolves outside the designated task workspace."
@@ -182,6 +180,7 @@ async def read_file_content(relative_path_str: str, task_workspace: Path) -> str
         return f"Error: Path '{relative_path_str}' is not a file."
 
     file_extension = full_path.suffix.lower()
+    content = "" # Initialize content
 
     try:
         if file_extension == ".pdf":
@@ -189,47 +188,56 @@ async def read_file_content(relative_path_str: str, task_workspace: Path) -> str
                 logger.error("Attempted to read PDF, but pypdf library is not installed.")
                 return "Error: PDF reading library (pypdf) is not installed on the server."
 
-            # PDF reading can be blocking, run in a thread pool executor
             def read_pdf_sync():
-                text_content = ""
+                extracted_text = ""
                 try:
                     reader = pypdf.PdfReader(str(full_path))
-                    logger.info(f"Reading {len(reader.pages)} pages from PDF: {full_path.name}")
+                    num_pages = len(reader.pages)
+                    logger.info(f"Reading {num_pages} pages from PDF: {full_path.name}")
                     for i, page in enumerate(reader.pages):
                         try:
                             page_text = page.extract_text()
                             if page_text:
-                                text_content += f"\n--- Page {i+1} ---\n" + page_text
+                                extracted_text += page_text + "\n" # Add newline between pages
                         except Exception as page_err:
                             logger.warning(f"Error extracting text from page {i+1} of {full_path.name}: {page_err}")
-                            text_content += f"\n--- Error reading page {i+1} ---"
-                    return text_content.strip()
+                            extracted_text += f"\n--- Error reading page {i+1} ---\n"
+                    return extracted_text.strip()
                 except pypdf.errors.PdfReadError as pdf_err:
                     logger.error(f"Error reading PDF file {full_path.name}: {pdf_err}")
-                    return f"Error: Could not read PDF file '{relative_path_str}'. It might be corrupted or encrypted. Error: {pdf_err}"
+                    # Return error directly, no warning needed
+                    raise RuntimeError(f"Error: Could not read PDF file '{relative_path_str}'. It might be corrupted or encrypted. Error: {pdf_err}") from pdf_err
                 except Exception as e:
                     logger.error(f"Unexpected error reading PDF {full_path.name}: {e}", exc_info=True)
-                    return f"Error: An unexpected error occurred while reading PDF '{relative_path_str}'."
+                    # Return error directly
+                    raise RuntimeError(f"Error: An unexpected error occurred while reading PDF '{relative_path_str}'.") from e
 
             loop = asyncio.get_running_loop()
-            content = await loop.run_in_executor(None, read_pdf_sync) # Run blocking IO in default executor
-            logger.info(f"Successfully read ~{len(content)} chars from PDF '{relative_path_str}'")
-            # Truncate very large PDF text? Consider adding a setting later.
-            MAX_PDF_LEN = 20000 # Example limit
-            if len(content) > MAX_PDF_LEN:
-                 content = content[:MAX_PDF_LEN] + f"\n... (PDF content truncated after {MAX_PDF_LEN} characters)"
-            return content
+            content = await loop.run_in_executor(None, read_pdf_sync)
+            logger.info(f"Successfully read {len(content)} chars from PDF '{relative_path_str}'")
+
+            # *** NEW: Add warning if content exceeds configured length ***
+            warning_length = settings.tool_pdf_reader_warning_length
+            actual_length = len(content)
+            if actual_length > warning_length:
+                warning_message = f"\n\n[SYSTEM WARNING: Full PDF content read ({actual_length} chars), which exceeds the warning threshold of {warning_length} chars. This may be too long for the current LLM's context window.]"
+                content += warning_message
+                logger.warning(f"PDF content length ({actual_length}) exceeds warning threshold ({warning_length}). Appending warning.")
 
         elif file_extension in TEXT_EXTENSIONS:
             # Read as text file asynchronously
             async with aiofiles.open(full_path, mode='r', encoding='utf-8', errors='ignore') as f:
                 content = await f.read()
             logger.info(f"Successfully read {len(content)} chars from text file '{relative_path_str}'")
-            return content
+            # No warning needed for text files currently
         else:
             logger.warning(f"Read tool: Unsupported file extension '{file_extension}' for file '{relative_path_str}'")
             return f"Error: Cannot read file. Unsupported file extension: '{file_extension}'. Supported text: {', '.join(TEXT_EXTENSIONS)}, .pdf"
 
+        return content # Return the full content (with potential warning for PDF)
+
+    except RuntimeError as rt_err: # Catch errors raised from sync PDF reading
+        return str(rt_err) # Return the error message from the exception
     except Exception as e:
         logger.error(f"Error reading file '{relative_path_str}' in workspace {task_workspace.name}: {e}", exc_info=True)
         return f"Error: Failed to read file '{relative_path_str}'. Reason: {type(e).__name__}"
@@ -492,11 +500,11 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
 
     task_specific_tools = [
         TaskWorkspaceShellTool(task_workspace=task_workspace),
-        # *** MODIFIED: Replace ReadFileTool with custom Tool ***
         Tool.from_function(
             func=lambda path_str: read_file_content(path_str, task_workspace),
-            name="read_file", # Keep the same name for agent compatibility
-            description=(f"Use this tool ONLY to read the entire contents of a file (including text and PDF files) located within the current task's workspace ('{task_workspace.name}'). Input MUST be the relative path to the file from the workspace root (e.g., 'my_data.csv', 'report.pdf', 'scripts/analysis.py'). Returns the full text content or an error message."),
+            name="read_file",
+            # *** MODIFIED: Updated description for PDF warning ***
+            description=(f"Use this tool ONLY to read the entire contents of a file (including text and PDF files) located within the current task's workspace ('{task_workspace.name}'). Input MUST be the relative path to the file from the workspace root (e.g., 'my_data.csv', 'report.pdf', 'scripts/analysis.py'). Returns the full text content. For PDFs, a warning is appended if the content exceeds {settings.tool_pdf_reader_warning_length} characters."),
             coroutine=lambda path_str: read_file_content(path_str, task_workspace)
         ),
         Tool.from_function(
@@ -510,4 +518,3 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
     all_tools = stateless_tools + task_specific_tools
     logger.info(f"Returning tools for task {current_task_id}: {[tool.name for tool in all_tools]}")
     return all_tools
-
