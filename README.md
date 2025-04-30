@@ -13,7 +13,7 @@ This project provides a functional user interface and backend for an AI agent sy
     * Web Search (`duckduckgo_search`)
     * Web Page Reading (`web_page_reader`)
     * PubMed Search (`pubmed_search`)
-    * File Reading (`read_file` within task workspace)
+    * File Reading (`read_file` within task workspace - **Supports text and PDF files**)
     * File Writing (`write_file` within task workspace)
     * Shell Command Execution (`workspace_shell` within task workspace, including `Rscript` if R is installed)
     * Python Package Installation (`python_package_installer`) **(Security Warning!)**
@@ -32,12 +32,13 @@ This project provides a functional user interface and backend for an AI agent sy
     * **Web Server:** `aiohttp`, `aiohttp-cors`
     * **LangChain Core:** `langchain`
     * **LLM Integrations:** `langchain-google-genai`, `langchain-ollama`
-    * **Tools:** `langchain-community` (File Tools, Search), `langchain-experimental` (Python REPL), `biopython` (PubMed)
+    * **Tools:** `langchain-community` (Search), `langchain-experimental` (Python REPL), `biopython` (PubMed)
     * **Prompts:** `langchainhub`
     * **Config:** `python-dotenv`
     * **HTTP:** `httpx`
     * **Web Parsing:** `beautifulsoup4`, `lxml`
     * **Async File I/O:** `aiofiles`
+    * **PDF Reading:** `pypdf`
     * **Plotting (Example):** `matplotlib`
     * **Database:** `aiosqlite`
 * **Environment:** `venv` with `pip` (or `uv`)
@@ -194,6 +195,7 @@ Runs the backend server inside an isolated Docker container. **Highly recommende
 * **Test Package Installation:** Ask: `"Install the 'numpy' python package."`
 * **Test Python REPL:** Ask: `"Use the Python REPL tool to calculate 15 factorial."`
 * **Test Image Generation:** Ask: `"Write a python script named 'plot.py' that uses matplotlib to create a simple sine wave plot and saves it as 'sine_wave.png'. Then execute the script using python."` (Ensure `matplotlib` is installed first).
+* **Test File/PDF Reading:** Ask: `"Read the file named 'my_document.txt'"` or `"Read the file named 'research_paper.pdf'"` (assuming these files exist in the task workspace).
 * **Test LLM Switching:** Select one model, ask a question. Select a different model, ask another question. Observe the agent's responses and potentially different styles.
 * **Delete Task:** Click the trash icon (🗑️) next to a task (confirmation required).
 
@@ -206,7 +208,7 @@ Runs the backend server inside an isolated Docker container. **Highly recommende
 ## Future Perspectives & Ideas
 
 * **Streaming Output:** Ensure agent responses consistently stream token-by-token to the UI.
-* **PDF Reading Tool:** Enhance `read_file` or add a new tool to extract text from PDF files.
+* **PDF Reading Enhancements:** Add options for page ranges, improve handling of complex layouts/images.
 * **Drag & Drop Upload:** Allow users to upload files to the current task's workspace via drag and drop.
 * **Collapse Agent Steps:** Add UI controls to collapse/expand intermediate thought/tool steps in the chat/monitor.
 * **More Robust Formatting:** Use a dedicated Markdown library (e.g., `markdown-it`) for more complex rendering.

@@ -10,24 +10,29 @@ import codecs
 import asyncio
 import sys
 from typing import List, Optional, Dict, Any
-import functools # Import functools
+import functools
 
 # LangChain Tool Imports
 from langchain_core.tools import Tool, BaseTool
 from langchain_community.tools import DuckDuckGoSearchRun
-from langchain_community.tools.file_management import ReadFileTool
+# Removed: from langchain_community.tools.file_management import ReadFileTool
 from langchain_experimental.utilities import PythonREPL
 from Bio import Entrez
 from urllib.error import HTTPError
 
+# *** NEW: Import pypdf ***
+try:
+    import pypdf
+except ImportError:
+    logger.warning("pypdf not installed. PDF reading functionality will be unavailable.")
+    pypdf = None
+
 # Project Imports
-# *** MODIFIED: Import the settings instance ***
 from backend.config import settings
 
 logger = logging.getLogger(__name__)
 
 # --- Define Base Workspace Path ---
-# (No changes needed here)
 try:
     PROJECT_ROOT = Path(__file__).resolve().parent.parent
     BASE_WORKSPACE_ROOT = PROJECT_ROOT / "workspace"
@@ -40,12 +45,11 @@ except Exception as e:
     logger.error(f"Error resolving project/workspace path: {e}", exc_info=True)
     raise
 
-# Define recognizable text extensions
+# Define recognizable text extensions (used as fallback)
 TEXT_EXTENSIONS = {".txt", ".py", ".js", ".css", ".html", ".json", ".csv", ".md", ".log", ".yaml", ".yml"}
 
 
 # --- Helper Function to get Task-Specific Workspace ---
-# (No changes needed here)
 def get_task_workspace_path(task_id: Optional[str]) -> Path:
     """
     Constructs and ensures the path for a specific task's workspace.
@@ -70,12 +74,11 @@ def get_task_workspace_path(task_id: Optional[str]) -> Path:
 
 # --- Tool Implementation Functions ---
 
-# *** MODIFIED: No longer needs explicit settings args, uses imported settings ***
 async def fetch_and_parse_url(url: str) -> str:
     """Fetches and parses URL content using configured limits."""
     max_length = settings.tool_web_reader_max_length
     timeout = settings.tool_web_reader_timeout
-    HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'} # Mimic browser
+    HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
     if not isinstance(url, str): return "Error: Invalid URL input (must be a string)."
     clean_url = url.strip().replace('\n', '').replace('\r', '').replace('\t', '').strip('`')
     if not clean_url: return "Error: Received an empty URL."
@@ -91,10 +94,8 @@ async def fetch_and_parse_url(url: str) -> str:
             if content_tags: texts = content_tags.find_all(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'td', 'th']); extracted_text = "\n".join(t.get_text(strip=True) for t in texts if t.get_text(strip=True))
             else: extracted_text = soup.get_text(separator="\n", strip=True)
             if not extracted_text: return "Error: Could not extract meaningful text."
-
             truncated_text = extracted_text[:max_length]
             if len(extracted_text) > max_length: truncated_text += "..."
-
             logger.info(f"Successfully extracted ~{len(truncated_text)} chars from {clean_url}")
             return truncated_text
     except httpx.TimeoutException: logger.error(f"Timeout fetching {clean_url}"); return f"Error: Timeout fetching URL."
@@ -105,7 +106,6 @@ async def fetch_and_parse_url(url: str) -> str:
     except Exception as e: logger.error(f"Error parsing {clean_url}: {e}", exc_info=True); return f"Error parsing URL: {e}"
 
 
-# (No changes needed in write_to_file_in_task_workspace itself)
 async def write_to_file_in_task_workspace(input_str: str, task_workspace: Path) -> str:
     """
     Writes text content to a file within the SPECIFIED task workspace.
@@ -151,8 +151,91 @@ async def write_to_file_in_task_workspace(input_str: str, task_workspace: Path) 
         return f"Error: Failed to write file '{relative_path_str}'. Reason: {type(e).__name__}"
 
 
+# *** NEW: Function to read file content (handles text and PDF) ***
+async def read_file_content(relative_path_str: str, task_workspace: Path) -> str:
+    """
+    Reads content from a file (text or PDF) within the specified task workspace.
+    """
+    logger.info(f"Read tool attempting to read '{relative_path_str}' in workspace {task_workspace.name}")
+    relative_path_str = relative_path_str.strip().strip('\'"`')
+    if not relative_path_str:
+        return "Error: File path cannot be empty."
+
+    # Security Check: Ensure relative path does not try to escape the workspace
+    relative_path = Path(relative_path_str)
+    if relative_path.is_absolute() or '..' in relative_path.parts:
+        logger.error(f"Security Error: Invalid read file path '{relative_path_str}' attempts traversal.")
+        return f"Error: Invalid file path '{relative_path_str}'. Path must be relative and within the workspace."
+
+    full_path = task_workspace.joinpath(relative_path).resolve()
+
+    # Security Check: Ensure the resolved path is truly within the intended workspace
+    if not full_path.is_relative_to(task_workspace.resolve()):
+        logger.error(f"Security Error: Read path resolves outside task workspace! Task: {task_workspace.name}, Resolved: {full_path}")
+        return "Error: File path resolves outside the designated task workspace."
+
+    if not full_path.exists():
+        logger.warning(f"Read tool: File not found at {full_path}")
+        return f"Error: File not found at path '{relative_path_str}'."
+    if not full_path.is_file():
+        logger.warning(f"Read tool: Path is not a file: {full_path}")
+        return f"Error: Path '{relative_path_str}' is not a file."
+
+    file_extension = full_path.suffix.lower()
+
+    try:
+        if file_extension == ".pdf":
+            if pypdf is None:
+                logger.error("Attempted to read PDF, but pypdf library is not installed.")
+                return "Error: PDF reading library (pypdf) is not installed on the server."
+
+            # PDF reading can be blocking, run in a thread pool executor
+            def read_pdf_sync():
+                text_content = ""
+                try:
+                    reader = pypdf.PdfReader(str(full_path))
+                    logger.info(f"Reading {len(reader.pages)} pages from PDF: {full_path.name}")
+                    for i, page in enumerate(reader.pages):
+                        try:
+                            page_text = page.extract_text()
+                            if page_text:
+                                text_content += f"\n--- Page {i+1} ---\n" + page_text
+                        except Exception as page_err:
+                            logger.warning(f"Error extracting text from page {i+1} of {full_path.name}: {page_err}")
+                            text_content += f"\n--- Error reading page {i+1} ---"
+                    return text_content.strip()
+                except pypdf.errors.PdfReadError as pdf_err:
+                    logger.error(f"Error reading PDF file {full_path.name}: {pdf_err}")
+                    return f"Error: Could not read PDF file '{relative_path_str}'. It might be corrupted or encrypted. Error: {pdf_err}"
+                except Exception as e:
+                    logger.error(f"Unexpected error reading PDF {full_path.name}: {e}", exc_info=True)
+                    return f"Error: An unexpected error occurred while reading PDF '{relative_path_str}'."
+
+            loop = asyncio.get_running_loop()
+            content = await loop.run_in_executor(None, read_pdf_sync) # Run blocking IO in default executor
+            logger.info(f"Successfully read ~{len(content)} chars from PDF '{relative_path_str}'")
+            # Truncate very large PDF text? Consider adding a setting later.
+            MAX_PDF_LEN = 20000 # Example limit
+            if len(content) > MAX_PDF_LEN:
+                 content = content[:MAX_PDF_LEN] + f"\n... (PDF content truncated after {MAX_PDF_LEN} characters)"
+            return content
+
+        elif file_extension in TEXT_EXTENSIONS:
+            # Read as text file asynchronously
+            async with aiofiles.open(full_path, mode='r', encoding='utf-8', errors='ignore') as f:
+                content = await f.read()
+            logger.info(f"Successfully read {len(content)} chars from text file '{relative_path_str}'")
+            return content
+        else:
+            logger.warning(f"Read tool: Unsupported file extension '{file_extension}' for file '{relative_path_str}'")
+            return f"Error: Cannot read file. Unsupported file extension: '{file_extension}'. Supported text: {', '.join(TEXT_EXTENSIONS)}, .pdf"
+
+    except Exception as e:
+        logger.error(f"Error reading file '{relative_path_str}' in workspace {task_workspace.name}: {e}", exc_info=True)
+        return f"Error: Failed to read file '{relative_path_str}'. Reason: {type(e).__name__}"
+
+
 # --- Custom Shell Tool operating in Task Workspace ---
-# *** MODIFIED: Init sets timeout/max_output from settings ***
 class TaskWorkspaceShellTool(BaseTool):
     name: str = "workspace_shell"
     description: str = (
@@ -162,8 +245,8 @@ class TaskWorkspaceShellTool(BaseTool):
         f"**DO NOT use this for 'pip install' or 'uv venv' or environment modifications.** Use the dedicated 'python_package_installer' tool for installations."
     )
     task_workspace: Path
-    timeout: int = settings.tool_shell_timeout # Default from settings
-    max_output: int = settings.tool_shell_max_output # Default from settings
+    timeout: int = settings.tool_shell_timeout
+    max_output: int = settings.tool_shell_max_output
 
     def _run(self, command: str) -> str:
         """Synchronous execution wrapper (avoid if possible)."""
@@ -222,7 +305,6 @@ class TaskWorkspaceShellTool(BaseTool):
 
 # --- Python Package Installer Tool Implementation ---
 PACKAGE_SPEC_REGEX = re.compile(r"^[a-zA-Z0-9_.-]+(?:\[[a-zA-Z0-9_,-]+\])?(?:[=<>!~]=?\s*[a-zA-Z0-9_.*-]+)?$")
-# *** MODIFIED: No longer needs explicit timeout arg, uses imported settings ***
 async def install_python_package(package_specifier: str) -> str:
     """Installs a Python package using the system's Python environment with configured timeout."""
     timeout = settings.tool_installer_timeout
@@ -279,7 +361,6 @@ async def install_python_package(package_specifier: str) -> str:
 
 
 # --- PubMed Search Tool Implementation ---
-# *** MODIFIED: No longer needs explicit settings args, uses imported settings ***
 async def search_pubmed(query: str) -> str:
     """Searches PubMed for biomedical literature using configured settings."""
     entrez_email = settings.entrez_email
@@ -290,7 +371,7 @@ async def search_pubmed(query: str) -> str:
         logger.error("PubMed Search Error: Entrez email not configured in settings.")
         return "Error: PubMed Search tool is not configured (Missing Entrez email)."
 
-    Entrez.email = entrez_email # Set email for this request
+    Entrez.email = entrez_email
 
     logger.info(f"Received PubMed search request: '{query}' (Default Max: {default_max_results})")
     current_max_results = default_max_results
@@ -358,31 +439,29 @@ try: python_repl_utility = PythonREPL()
 except ImportError: logger.warning("Could not import PythonREPL. The Python_REPL tool will not be available."); python_repl_utility = None
 
 # --- Tool Factory Function ---
-# *** MODIFIED: Removed settings parameter, uses imported instance ***
 def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
     """Creates tool instances dynamically, configured for the current task's workspace and settings."""
 
     stateless_tools = [
         DuckDuckGoSearchRun(description=("A wrapper around DuckDuckGo Search. Useful for when you need to answer questions about current events. Input should be a search query.")),
         Tool.from_function(
-            func=fetch_and_parse_url, # Function now uses imported settings internally
+            func=fetch_and_parse_url,
             name="web_page_reader",
             description=(f"Use this tool ONLY to fetch and extract the main text content from a given URL. Input must be a valid URL. Max content length: {settings.tool_web_reader_max_length} chars."),
             coroutine=fetch_and_parse_url
         ),
         Tool.from_function(
-            func=install_python_package, # Function now uses imported settings internally
+            func=install_python_package,
             name="python_package_installer",
             description=(f"Use this tool ONLY to install a Python package into the environment using 'uv pip install' or 'pip install'. Input MUST be a valid package specifier (e.g., 'numpy', 'pandas==2.0.0', 'matplotlib>=3.5'). **SECURITY WARNING:** This installs packages into the main environment. Avoid installing untrusted packages. Timeout: {settings.tool_installer_timeout}s."),
             coroutine=install_python_package
         ),
     ]
 
-    # Add PubMed tool only if email is configured
     if settings.entrez_email:
         stateless_tools.append(
              Tool.from_function(
-                func=search_pubmed, # Function now uses imported settings internally
+                func=search_pubmed,
                 name="pubmed_search",
                 description=(f"Use this tool ONLY to search for biomedical literature abstracts on PubMed. Input should be a search query (e.g., 'CRISPR gene editing cancer therapy'). You can optionally add ' max_results=N' at the end (default is {settings.tool_pubmed_default_max_results}, max is 20). Returns formatted summaries including title, authors, link (DOI or PMID), and abstract snippet (max {settings.tool_pubmed_max_snippet} chars)."),
                 coroutine=search_pubmed
@@ -391,7 +470,6 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
     else:
         logger.warning("Skipping PubMed tool creation as ENTREZ_EMAIL is not set.")
 
-    # Add Python REPL tool if available
     if python_repl_utility:
         stateless_tools.append(Tool.from_function(
             func=python_repl_utility.run,
@@ -413,11 +491,13 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
         return stateless_tools
 
     task_specific_tools = [
-        # Instantiation now uses defaults from settings implicitly via class definition
         TaskWorkspaceShellTool(task_workspace=task_workspace),
-        ReadFileTool(
-            root_dir=str(task_workspace.resolve()),
-            description=(f"Use this tool ONLY to read the entire contents of a file located within the current task's workspace ('{task_workspace.name}'). Input MUST be the relative path to the file from the workspace root (e.g., 'my_data.csv', 'scripts/analysis.py').")
+        # *** MODIFIED: Replace ReadFileTool with custom Tool ***
+        Tool.from_function(
+            func=lambda path_str: read_file_content(path_str, task_workspace),
+            name="read_file", # Keep the same name for agent compatibility
+            description=(f"Use this tool ONLY to read the entire contents of a file (including text and PDF files) located within the current task's workspace ('{task_workspace.name}'). Input MUST be the relative path to the file from the workspace root (e.g., 'my_data.csv', 'report.pdf', 'scripts/analysis.py'). Returns the full text content or an error message."),
+            coroutine=lambda path_str: read_file_content(path_str, task_workspace)
         ),
         Tool.from_function(
             func=lambda input_str: write_to_file_in_task_workspace(input_str, task_workspace),
@@ -430,3 +510,4 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
     all_tools = stateless_tools + task_specific_tools
     logger.info(f"Returning tools for task {current_task_id}: {[tool.name for tool in all_tools]}")
     return all_tools
+
