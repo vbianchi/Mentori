@@ -13,6 +13,16 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # Set the working directory in the container
 WORKDIR /app
 
+# <<< --- START: Install curl and other system dependencies --- >>>
+# Update package lists and install curl along with build essentials if needed later
+# Using apt-get directly here for system packages
+RUN apt-get update && apt-get install -y \
+    curl \
+    # Add any other essential system packages here if needed in the future (e.g., build-essential for C extensions)
+    && rm -rf /var/lib/apt/lists/* # Clean up apt cache
+# <<< --- END: Install curl --- >>>
+
+
 # Install uv (faster package installer) - Recommended based on README
 # We use pip to bootstrap uv itself
 # Use python3 explicitly for pip command
@@ -37,3 +47,4 @@ EXPOSE 8766
 # Define the command to run the application
 # Use python3 explicitly
 CMD ["python3", "-m", "backend.server"]
+
