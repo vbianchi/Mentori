@@ -78,7 +78,7 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .center-panel { flex: 1; background-color: var(--bg-color); }
 .chat-header { background-color: var(--panel-bg); border-bottom: 1px solid var(--border-color); }
 .chat-header h3 { margin: 0; font-size: 1em; font-weight: 500; }
-.chat-header span { font-size: 0.9em; color: var(--text-color-muted); }
+/* .chat-header span { font-size: 0.9em; color: var(--text-color-muted); } */ /* Replaced by selector */
 .chat-messages { padding: 20px; display: flex; flex-direction: column; gap: 18px; }
 .message { padding: 10px 15px; border-radius: 8px; max-width: 85%; line-height: 1.5; font-size: 0.95em; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; }
 .message-agent { background-color: var(--panel-bg); align-self: flex-start; border: 1px solid var(--border-color); color: var(--text-color); }
@@ -148,6 +148,43 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .message-agent pre code { font-family: var(--monospace-font); font-size: 0.9em; color: var(--code-text); background-color: transparent; padding: 0; border: none; white-space: pre; }
 
 
+/* LLM Selector Styling (in Chat Header) */
+.llm-selector {
+    background-color: var(--panel-bg-lighter); /* Match input bg */
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 3px 6px; /* Smaller padding */
+    font-size: 0.85em; /* Smaller font */
+    max-width: 200px; /* Limit width */
+    cursor: pointer;
+    margin-left: auto; /* Push to the right */
+    height: fit-content; /* Adjust height to content */
+    align-self: center; /* Vertically center */
+}
+
+.llm-selector:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 1px var(--accent-color);
+}
+
+/* Style for option groups (Gemini, Ollama) */
+.llm-selector optgroup {
+    font-weight: bold;
+    font-style: italic;
+    background-color: var(--panel-bg); /* Slightly darker than options */
+    color: var(--text-color-muted);
+}
+
+/* Style for individual options */
+.llm-selector option {
+    background-color: var(--panel-bg-lighter);
+    color: var(--text-color);
+    padding: 2px 0; /* Add slight vertical padding */
+}
+
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .app-container { flex-direction: column; height: auto; min-height: 100vh; }
@@ -156,4 +193,8 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     .center-panel { flex: 1 1 auto; height: auto; min-height: 300px; order: 2; }
     .panel:not(:last-child) { border-right: none; border-bottom: 1px solid var(--border-color); }
     .monitor-artifact-area img, .monitor-artifact-area pre { max-height: 200px; }
+    .llm-selector {
+        max-width: 150px; /* Adjust width for smaller screens */
+        font-size: 0.8em;
+    }
 }
