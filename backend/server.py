@@ -33,7 +33,11 @@ from backend.llm_setup import get_llm
 from backend.tools import get_dynamic_tools, get_task_workspace_path, BASE_WORKSPACE_ROOT, TEXT_EXTENSIONS
 from backend.agent import create_agent_executor
 from backend.callbacks import WebSocketCallbackHandler # Import updated handler
-from backend.db_utils import init_db, add_task, add_message, get_messages_for_task, delete_task_and_messages
+# --- MODIFIED: Import new DB function ---
+from backend.db_utils import (
+    init_db, add_task, add_message, get_messages_for_task,
+    delete_task_and_messages, rename_task_in_db
+)
 # ----------------------
 
 # Setup logging
@@ -287,10 +291,8 @@ async def handler(websocket: WebSocketProtocolType):
 
     # --- Main Message Processing Loop ---
     try:
-        logger.info(f"[{session_id}] Sending initial status message...")
-        await send_ws_message("status_message", f"Connected (Session: {session_id[:8]}...). Agent Ready. LLM: {settings.ai_provider} ({settings.gemini_model_name if settings.ai_provider == 'gemini' else settings.ollama_model_name}).")
-        logger.info(f"[{session_id}] Initial status message sent.")
-        await add_monitor_log_and_save(f"New client connection: {websocket.remote_address}", "system_connect")
+        logger.info(f"[{session_id}] Sending initial status message..."); await send_ws_message("status_message", f"Connected (Session: {session_id[:8]}...). Agent Ready. LLM: {settings.ai_provider} ({settings.gemini_model_name if settings.ai_provider == 'gemini' else settings.ollama_model_name}).")
+        logger.info(f"[{session_id}] Initial status message sent."); await add_monitor_log_and_save(f"New client connection: {websocket.remote_address}", "system_connect")
         logger.info(f"[{session_id}] Added system_connect log.")
 
         logger.info(f"[{session_id}] Entering message processing loop...")
@@ -691,6 +693,32 @@ async def handler(websocket: WebSocketProtocolType):
                         await send_ws_message("status_message", f"Failed to delete task {task_id_from_frontend[:8]}...")
                         await add_monitor_log_and_save(f"Failed to delete task {task_id_from_frontend} from DB.", "error_delete")
 
+                # --- RENAME TASK --- <<< NEW HANDLER >>>
+                elif message_type == "rename_task":
+                    task_id_to_rename = data.get("taskId")
+                    new_name = data.get("newName")
+                    if not task_id_to_rename or not new_name:
+                        logger.warning(f"[{session_id}] Received invalid rename_task message: {data}")
+                        await add_monitor_log_and_save(f"Error: Received invalid rename request (missing taskId or newName).", "error_system")
+                        continue
+
+                    logger.info(f"[{session_id}] Received request to rename task {task_id_to_rename} to '{new_name}'.")
+                    await add_monitor_log_and_save(f"Received rename request for task {task_id_to_rename} to '{new_name}'.", "system_rename_request")
+
+                    # Call the DB utility function to perform the rename
+                    renamed_in_db = await rename_task_in_db(task_id_to_rename, new_name)
+
+                    if renamed_in_db:
+                        logger.info(f"[{session_id}] Successfully renamed task {task_id_to_rename} in database.")
+                        await add_monitor_log_and_save(f"Task {task_id_to_rename} renamed to '{new_name}' in DB.", "system_rename_success")
+                        # Optionally send a success status message back? Might be redundant if UI updated optimistically.
+                        # await send_ws_message("status_message", f"Task {task_id_to_rename[:8]}... renamed.")
+                    else:
+                        logger.error(f"[{session_id}] Failed to rename task {task_id_to_rename} in database.")
+                        await add_monitor_log_and_save(f"Failed to rename task {task_id_to_rename} in DB.", "error_db")
+                        # Optionally send an error status message back to UI?
+                        # await send_ws_message("status_message", f"Error: Failed to save rename for task {task_id_to_rename[:8]}...")
+
                 # --- Other message types ---
                 elif message_type == "run_command": # Example: Direct command execution (if needed)
                     command_to_run = data.get("command")
@@ -869,4 +897,3 @@ if __name__ == "__main__":
         # Catch any critical errors during startup or runtime
         logging.critical(f"Server failed to start or crashed: {e}", exc_info=True)
         exit(1) # Exit with error code
-

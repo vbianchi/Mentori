@@ -21,10 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatSendButton = document.querySelector('.chat-input-area button');
     const currentTaskTitleElement = document.getElementById('current-task-title');
     const monitorStatusElement = document.getElementById('monitor-status');
-    const monitorFooterStatusElement = document.getElementById('monitor-footer-status');
+    const monitorFooterStatusElement = document.getElementById('monitor-footer-status'); // Assuming this exists or is added
 
     // --- State Variables ---
-    let tasks = [];
+    let tasks = []; // Array of task objects {id: string, title: string, timestamp: number}
     let currentTaskId = null;
     let taskCounter = 0;
     const STORAGE_KEY = 'aiAgentTasks';
@@ -91,9 +91,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         addMonitorLog(`[SYSTEM] Error sending initial context switch: ${error.message}`);
                     }
                 } else {
-                     console.warn("currentTaskId set, but task not found in list on connection open.");
-                     currentTaskId = null; // Reset if task is invalid
-                     updateArtifactDisplay(); // Clear artifacts for no task
+                    console.warn("currentTaskId set, but task not found in list on connection open.");
+                    currentTaskId = null; // Reset if task is invalid
+                    updateArtifactDisplay(); // Clear artifacts for no task
                 }
             } else {
                 updateArtifactDisplay(); // Ensure artifact display is cleared if no task active
@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         socket.onerror = (event) => {
-             // Log the raw event for more details if possible
+                // Log the raw event for more details if possible
             console.error("WebSocket error event:", event);
             addChatMessage("ERROR: Cannot connect to backend.", "status", true); // Ensure scroll on error
             addMonitorLog(`[SYSTEM] WebSocket error occurred.`);
@@ -229,10 +229,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 2. Convert ```code blocks``` to <pre><code>
         formattedText = formattedText.replace(/```(\w*)\n([\s\S]*?)\n?```/g, (match, lang, code) => {
-             const escapedCode = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); // Re-escape inside code block
-             const langClass = lang ? ` class="language-${lang}"` : '';
-             return `<pre><code${langClass}>${escapedCode}</code></pre>`;
-           });
+            const escapedCode = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); // Re-escape inside code block
+            const langClass = lang ? ` class="language-${lang}"` : '';
+            return `<pre><code${langClass}>${escapedCode}</code></pre>`;
+            });
 
         // 3. Convert Markdown Links: [text](url) -> <a href="url">text</a>
         formattedText = formattedText.replace(
@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formattedText = parts.join('');
 
         return formattedText;
-       };
+        };
 
 
     /**
@@ -496,7 +496,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveTasks = () => {
         try {
             // Ensure tasks are sorted before saving (optional, but maintains order)
-             tasks.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                tasks.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
             localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
             localStorage.setItem(COUNTER_KEY, taskCounter.toString());
             if (currentTaskId) {
@@ -530,6 +530,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 titleSpan.title = task.title; // Show full title on hover
                 li.appendChild(titleSpan);
 
+                // Container for buttons
+                const controlsDiv = document.createElement('div');
+                controlsDiv.className = 'task-item-controls';
+
+                // Edit button
+                const editBtn = document.createElement('button');
+                editBtn.className = 'task-edit-btn';
+                editBtn.textContent = '✏️'; // Use emoji for edit icon
+                editBtn.title = `Rename Task: ${task.title}`;
+                editBtn.dataset.taskId = task.id;
+                editBtn.dataset.taskTitle = task.title; // Store current title
+                // Prevent click on edit button from selecting the task
+                editBtn.addEventListener('click', (event) => {
+                    event.stopPropagation(); // Stop click from bubbling up to the li
+                    handleEditTaskClick(task.id, task.title);
+                });
+                controlsDiv.appendChild(editBtn);
+
+                // Delete button
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'task-delete-btn';
                 deleteBtn.textContent = '🗑️'; // Use emoji for delete icon
@@ -537,14 +556,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 deleteBtn.dataset.taskId = task.id; // Set task ID for the button too
                 // Prevent click on delete button from selecting the task
                 deleteBtn.addEventListener('click', (event) => {
-                     event.stopPropagation(); // Stop click from bubbling up to the li
-                     handleDeleteTaskClick(task.id, task.title);
+                    event.stopPropagation(); // Stop click from bubbling up to the li
+                    handleDeleteTaskClick(task.id, task.title);
                 });
-                li.appendChild(deleteBtn);
+                controlsDiv.appendChild(deleteBtn);
+
+                li.appendChild(controlsDiv); // Add controls container to list item
 
                 // Add click listener to the list item itself for selection
                 li.addEventListener('click', () => {
-                     handleTaskItemClick(task.id);
+                    handleTaskItemClick(task.id);
                 });
 
 
@@ -560,12 +581,72 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Separate click handlers for clarity
     const handleTaskItemClick = (taskId) => {
-         console.log(`Task item clicked: ${taskId}`);
-         selectTask(taskId);
+            console.log(`Task item clicked: ${taskId}`);
+            selectTask(taskId);
     };
     const handleDeleteTaskClick = (taskId, taskTitle) => {
-         console.log(`Delete button clicked for task: ${taskId} (${taskTitle})`);
-         deleteTask(taskId, taskTitle);
+            console.log(`Delete button clicked for task: ${taskId} (${taskTitle})`);
+            deleteTask(taskId, taskTitle);
+    };
+    // --- NEW: Edit Task Click Handler ---
+    const handleEditTaskClick = (taskId, currentTitle) => {
+        console.log(`Edit button clicked for task: ${taskId} (${currentTitle})`);
+        const newTitle = prompt(`Enter new name for task "${currentTitle}":`, currentTitle);
+
+        if (newTitle === null) { // User cancelled
+            console.log("Rename cancelled by user.");
+            return;
+        }
+
+        const trimmedTitle = newTitle.trim();
+        if (!trimmedTitle) {
+            alert("Task name cannot be empty.");
+            console.log("Rename aborted: empty title.");
+            return;
+        }
+
+        if (trimmedTitle === currentTitle) {
+            console.log("Rename aborted: title unchanged.");
+            return;
+        }
+
+        // Update local task data
+        const taskIndex = tasks.findIndex(task => task.id === taskId);
+        if (taskIndex !== -1) {
+            tasks[taskIndex].title = trimmedTitle;
+            console.log(`Task ${taskId} title updated locally to: ${trimmedTitle}`);
+
+            // Save to localStorage
+            saveTasks();
+
+            // Re-render the list to show the new name
+            renderTaskList();
+
+            // Update chat header if the active task was renamed
+            if (taskId === currentTaskId) {
+                updateCurrentTaskTitle();
+            }
+
+            // Send update to backend
+            if (window.socket && window.socket.readyState === WebSocket.OPEN) {
+                try {
+                    const payload = JSON.stringify({ type: "rename_task", taskId: taskId, newName: trimmedTitle });
+                    console.log("Sending rename_task:", payload);
+                    window.socket.send(payload);
+                    addMonitorLog(`[SYSTEM] Sent rename request for task ${taskId} to '${trimmedTitle}'.`);
+                } catch (e) {
+                    console.error("Error sending rename_task via WebSocket:", e);
+                    addMonitorLog(`[SYSTEM] Error sending rename request: ${e.message}`);
+                    addChatMessage("Error sending rename request to backend.", "status");
+                    // Consider reverting the local change or notifying user persistence failed
+                }
+            } else {
+                console.warn("Cannot send rename_task: WebSocket is not open.");
+                addChatMessage("Task renamed locally. Connect to backend to sync.", "status");
+            }
+        } else {
+            console.error(`Task ${taskId} not found locally for renaming.`);
+        }
     };
 
 
@@ -585,15 +666,15 @@ document.addEventListener('DOMContentLoaded', () => {
         currentArtifactIndex = -1;
         updateArtifactDisplay(); // Update display to show placeholder
         if (addLog && monitorLogAreaElement) { // Check if monitor area exists
-             addMonitorLog("[SYSTEM] Cleared context.");
+                addMonitorLog("[SYSTEM] Cleared context.");
         }
         console.log("Cleared chat and monitor.");
     };
     const selectTask = (taskId) => {
         console.log(`Attempting to select task: ${taskId}`);
         if (currentTaskId === taskId && taskId !== null) {
-             console.log("Task already selected.");
-             return; // Avoid unnecessary actions if already selected
+                console.log("Task already selected.");
+                return; // Avoid unnecessary actions if already selected
         }
 
         const task = tasks.find(t => t.id === taskId);
@@ -613,11 +694,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log(`Sent context_switch.`);
                 // Clear chat immediately for responsiveness, history will load
                 clearChatAndMonitor(false);
-                 addChatMessage("Switching task context...", "status"); // Show loading status
+                    addChatMessage("Switching task context...", "status"); // Show loading status
             } catch (e) {
                 console.error(`Failed to send context_switch:`, e);
                 addMonitorLog(`[SYSTEM] Error sending context switch: ${e.message}`);
-                 addChatMessage("Error switching task context.", "status");
+                    addChatMessage("Error switching task context.", "status");
             }
         } else if (!currentTaskId) {
             // Handle case where no task is selected (e.g., after deleting the last task)
@@ -625,10 +706,10 @@ document.addEventListener('DOMContentLoaded', () => {
             addChatMessage("No task selected.", "status");
             addMonitorLog("[SYSTEM] No task selected.");
         } else if (!socket || socket.readyState !== WebSocket.OPEN) {
-             // Handle case where selection happens while disconnected
-             clearChatAndMonitor(false); // Clear UI but don't log system message yet
-             addChatMessage("Switched task locally. Connect to backend to load history.", "status");
-             addMonitorLog(`[SYSTEM] Switched task locally to ${taskId}, but WS not open.`);
+                // Handle case where selection happens while disconnected
+                clearChatAndMonitor(false); // Clear UI but don't log system message yet
+                addChatMessage("Switched task locally. Connect to backend to load history.", "status");
+                addMonitorLog(`[SYSTEM] Switched task locally to ${taskId}, but WS not open.`);
         }
         console.log(`Finished select task logic for: ${currentTaskId}`);
     };
@@ -659,8 +740,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Filter out the task locally
         const taskIndex = tasks.findIndex(task => task.id === taskId);
         if (taskIndex === -1) {
-             console.warn(`Task ${taskId} not found locally for deletion.`);
-             return; // Should not happen if UI is correct
+                console.warn(`Task ${taskId} not found locally for deletion.`);
+                return; // Should not happen if UI is correct
         }
         tasks.splice(taskIndex, 1); // Remove task from local array
         console.log(`Task ${taskId} removed locally.`);
@@ -675,11 +756,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error(`Failed send delete_task:`, e);
                 addMonitorLog(`[SYSTEM] Error sending delete request: ${e.message}`);
                 // Optionally inform user that backend delete might have failed
-                 addChatMessage("Error sending delete request to backend.", "status");
+                    addChatMessage("Error sending delete request to backend.", "status");
             }
         } else {
             addMonitorLog(`[SYSTEM] Cannot notify backend of delete: WS not open.`);
-             addChatMessage("Task deleted locally. Connect to backend to sync deletion.", "status");
+                addChatMessage("Task deleted locally. Connect to backend to sync deletion.", "status");
         }
 
         // Determine the next task to select
@@ -689,12 +770,12 @@ document.addEventListener('DOMContentLoaded', () => {
             nextTaskId = tasks.length > 0 ? tasks[0].id : null;
             console.log(`Deleted active task, selecting next: ${nextTaskId}`);
             // selectTask will handle clearing UI etc.
-             selectTask(nextTaskId);
+                selectTask(nextTaskId);
         } else {
             // If a different task was deleted, keep the current one active
             // Just re-render the list and save the state
-             saveTasks();
-             renderTaskList();
+                saveTasks();
+                renderTaskList();
         }
 
         console.log(`Finished delete task logic for: ${taskId}`);
@@ -704,10 +785,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (newTaskButton) { newTaskButton.addEventListener('click', handleNewTaskClick); }
     else { console.error("New task button element not found!"); }
 
-    // Use event delegation for task list clicks (select/delete)
+    // Use event delegation for task list clicks (select/delete/edit) - handled in renderTaskList now
     if (taskListUl) {
-         // Removed the direct listener on taskListUl, handled by listeners added in renderTaskList
-         console.log("Task list event listeners will be added during rendering.");
+        console.log("Task list event listeners will be added during rendering.");
     } else { console.error("Task list UL element not found!"); }
 
 
@@ -715,9 +795,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleSendMessage = () => {
         const messageText = chatTextarea.value.trim();
         if (!currentTaskId){
-             alert("Please select or create a task first.");
-             chatTextarea.focus();
-             return;
+                alert("Please select or create a task first.");
+                chatTextarea.focus();
+                return;
         }
         if (messageText) {
             addChatMessage(messageText, 'user'); // Display user message immediately
@@ -738,7 +818,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log("Sending user_message:", payload);
                     window.socket.send(payload);
                     console.log("Message sent.");
-                     addChatMessage("Agent processing...", "status"); // Indicate processing start
+                        addChatMessage("Agent processing...", "status"); // Indicate processing start
                 } catch (e) {
                     console.error("Error sending message via WebSocket:", e);
                     addMonitorLog(`[SYSTEM] Error sending message: ${e.message}`);
@@ -812,23 +892,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Event delegation for potential future action buttons in chat
-     document.body.addEventListener('click', event => {
-         if (event.target.classList.contains('action-btn')) {
-             const commandText = event.target.textContent.trim();
-             console.log(`Action button clicked: ${commandText}`);
-             addMonitorLog(`[USER_ACTION] Clicked: ${commandText}`);
-             if (socket && socket.readyState === WebSocket.OPEN) {
-                 try {
-                     socket.send(JSON.stringify({ type: "action_command", command: commandText }));
-                 } catch (e) {
-                     console.error("Failed send action_command:", e);
-                     addMonitorLog(`[SYSTEM] Error sending action command: ${e.message}`);
-                 }
-             } else {
-                 addMonitorLog(`[SYSTEM] Cannot send action command: WS not open.`);
-             }
-         }
-     });
+        document.body.addEventListener('click', event => {
+            if (event.target.classList.contains('action-btn')) {
+                const commandText = event.target.textContent.trim();
+                console.log(`Action button clicked: ${commandText}`);
+                addMonitorLog(`[USER_ACTION] Clicked: ${commandText}`);
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    try {
+                        socket.send(JSON.stringify({ type: "action_command", command: commandText }));
+                    } catch (e) {
+                        console.error("Failed send action_command:", e);
+                        addMonitorLog(`[SYSTEM] Error sending action command: ${e.message}`);
+                    }
+                } else {
+                    addMonitorLog(`[SYSTEM] Cannot send action command: WS not open.`);
+                }
+            }
+        });
 
     // Artifact Navigation Event Listeners
     if (artifactPrevBtn) {
@@ -854,4 +934,3 @@ document.addEventListener('DOMContentLoaded', () => {
     connectWebSocket(); // Connect WS (sends initial context if needed)
 
 }); // End of DOMContentLoaded listener
-

@@ -88,7 +88,6 @@ async def add_message(task_id: str, session_id: str, message_type: str, content:
     except Exception as e:
         logger.error(f"Error adding message for task {task_id} to DB: {e}", exc_info=True)
 
-# *** NEW FUNCTION ***
 async def get_messages_for_task(task_id: str) -> List[Dict[str, Any]]:
     """Retrieves all messages for a given task_id, ordered by timestamp."""
     logger.info(f"Retrieving messages from DB for task_id: {task_id}")
@@ -114,7 +113,6 @@ async def get_messages_for_task(task_id: str) -> List[Dict[str, Any]]:
         return [] # Return empty list on error
 
 
-# --- Functions for Deleting Tasks (Phase 2.2) ---
 async def delete_task_and_messages(task_id: str) -> bool:
     """Deletes a task and all associated messages from the database."""
     logger.warning(f"Attempting to delete task and messages from DB for task_id: {task_id}")
@@ -134,5 +132,29 @@ async def delete_task_and_messages(task_id: str) -> bool:
                 return False
     except Exception as e:
         logger.error(f"Error deleting task {task_id} from DB: {e}", exc_info=True)
+        return False
+
+# --- NEW FUNCTION for Renaming Tasks ---
+async def rename_task_in_db(task_id: str, new_title: str) -> bool:
+    """Updates the title of a specific task in the database."""
+    logger.info(f"Attempting to rename task {task_id} to '{new_title}' in DB.")
+    if not task_id or not new_title:
+        logger.error("Rename task error: task_id and new_title cannot be empty.")
+        return False
+    try:
+        async with aiosqlite.connect(DB_PATH) as db:
+            cursor = await db.execute(
+                "UPDATE tasks SET title = ? WHERE task_id = ?",
+                (new_title, task_id)
+            )
+            await db.commit()
+            if cursor.rowcount > 0:
+                logger.info(f"Successfully renamed task {task_id} to '{new_title}' in DB.")
+                return True
+            else:
+                logger.warning(f"Task {task_id} not found in DB for renaming.")
+                return False
+    except Exception as e:
+        logger.error(f"Error renaming task {task_id} in DB: {e}", exc_info=True)
         return False
 

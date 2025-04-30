@@ -55,15 +55,24 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .new-task-btn { background-color: var(--accent-color); color: var(--button-text-on-accent); border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: 500; font-size: 0.9em; transition: background-color 0.2s ease; }
 .new-task-btn:hover { background-color: var(--accent-color-hover); }
 .task-list { list-style: none; padding: 8px 0; }
-.task-item { padding: 10px 15px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.9em; border-left: 3px solid transparent; transition: background-color 0.2s ease; display: flex; justify-content: space-between; align-items: center; }
+.task-item { padding: 10px 15px; cursor: pointer; font-size: 0.9em; border-left: 3px solid transparent; transition: background-color 0.2s ease, border-left-color 0.2s ease; display: flex; justify-content: space-between; align-items: center; gap: 5px; /* Add gap */ }
 .task-item.active { background-color: var(--panel-bg-lighter); font-weight: 500; color: var(--text-color); border-left-color: var(--accent-color); }
-.task-item.active .task-delete-btn { color: var(--text-color-muted); opacity: 0.7; }
-.task-item.active .task-delete-btn:hover { opacity: 1.0; color: var(--error-color); }
 .task-item:hover { background-color: var(--panel-bg-lightest); }
 .task-item-placeholder { color: var(--text-color-muted); padding: 0.75rem; text-align: center; font-style: italic; }
-.task-title { flex-grow: 1; margin-right: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.task-delete-btn { background: none; border: none; color: var(--text-color-darker); cursor: pointer; font-size: 1rem; padding: 0 0.25rem; line-height: 1; opacity: 0.5; transition: opacity 0.2s ease, color 0.2s ease; }
+.task-title { flex-grow: 1; margin-right: 0.25rem; /* Reduced margin */ white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Container for buttons to keep them together */
+.task-item-controls { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+/* Edit Task Button Styling */
+.task-edit-btn { background: none; border: none; color: var(--text-color-darker); cursor: pointer; font-size: 0.9rem; /* Slightly smaller */ padding: 0 0.2rem; line-height: 1; opacity: 0; /* Hidden by default */ transition: opacity 0.2s ease, color 0.2s ease; }
+.task-item:hover .task-edit-btn,
+.task-item.active .task-edit-btn { opacity: 0.6; /* Show on hover/active */ }
+.task-edit-btn:hover { opacity: 1.0; color: var(--accent-color); /* Use accent color on hover */ }
+/* Delete Task Button Styling */
+.task-delete-btn { background: none; border: none; color: var(--text-color-darker); cursor: pointer; font-size: 1rem; padding: 0 0.25rem; line-height: 1; opacity: 0; /* Hidden by default */ transition: opacity 0.2s ease, color 0.2s ease; }
+.task-item:hover .task-delete-btn,
+.task-item.active .task-delete-btn { opacity: 0.6; /* Show on hover/active */ }
 .task-delete-btn:hover { opacity: 1.0; color: var(--error-color); }
+
 
 /* Center Panel */
 .center-panel { flex: 1; background-color: var(--bg-color); }
@@ -148,4 +157,3 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     .panel:not(:last-child) { border-right: none; border-bottom: 1px solid var(--border-color); }
     .monitor-artifact-area img, .monitor-artifact-area pre { max-height: 200px; }
 }
-
