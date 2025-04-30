@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                         break;
                     case 'monitor_log':
-                        addMonitorLog(message.content);
+                        addMonitorLog(message.content); // Let addMonitorLog handle parsing
                         break;
                     case 'update_artifacts':
                         console.log("Received update_artifacts message with content:", message.content);
@@ -163,18 +163,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                         break;
 
-                    // *** NEW: Handle available models from backend ***
                     case 'available_models':
                         console.log("Received available_models:", message.content);
                         if (message.content && typeof message.content === 'object') {
                             availableModels.gemini = message.content.gemini || [];
                             availableModels.ollama = message.content.ollama || [];
                             defaultLlmId = message.content.default_llm_id || null;
-                            populateLlmSelector(); // Update dropdown
+                            populateLlmSelector();
                         } else {
                             console.warn("Invalid available_models message content:", message.content);
-                            availableModels = { gemini: [], ollama: [] }; // Reset
-                            populateLlmSelector(); // Update dropdown (will show error)
+                            availableModels = { gemini: [], ollama: [] };
+                            populateLlmSelector();
                         }
                         break;
 
@@ -197,7 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
             addMonitorLog(`[SYSTEM] WebSocket error occurred.`);
             window.socket = null;
             currentStreamingMessageElement = null;
-            // Disable LLM selector on error
              if (llmSelectElement) {
                 llmSelectElement.innerHTML = '<option value="">Connection Error</option>';
                 llmSelectElement.disabled = true;
@@ -213,7 +211,6 @@ document.addEventListener('DOMContentLoaded', () => {
             addMonitorLog(`[SYSTEM] WebSocket disconnected. ${reason}`);
             window.socket = null;
             currentStreamingMessageElement = null;
-            // Disable LLM selector on close
              if (llmSelectElement) {
                 llmSelectElement.innerHTML = '<option value="">Disconnected</option>';
                 llmSelectElement.disabled = true;
@@ -286,43 +283,66 @@ document.addEventListener('DOMContentLoaded', () => {
         return messageElement;
     };
 
+    /**
+     * Adds a log entry to the monitor panel with appropriate styling.
+     * Parses timestamp/session and type indicator prefixes.
+     */
     const addMonitorLog = (fullLogText) => {
         if (!monitorLogAreaElement) { console.error("Monitor log area element (#monitor-log-area) not found!"); return; }
         const logEntryDiv = document.createElement('div');
         logEntryDiv.classList.add('monitor-log-entry');
+
+        // *** MODIFIED REGEX: More flexible for type indicator ***
+        // Captures:
+        // Group 1: Timestamp + Session ID (e.g., "[2024...][sessId]")
+        // Group 2: Optional Type Indicator (e.g., "[TOOL START]", "[Agent Thought (Final)]") - Non-greedy match
+        // Group 3: The actual log content
         const logRegex = /^(\[.*?\]\[.*?\])\s*(?:\[(.*?)\])?\s*(.*)$/s;
         const match = fullLogText.match(logRegex);
+
         let timestampPrefix = "";
         let logTypeIndicator = "";
-        let logContent = fullLogText;
-        let logType = "unknown";
+        let logContent = fullLogText; // Default if regex fails
+        let logType = "unknown"; // Default type
+
         if (match) {
             timestampPrefix = match[1] || "";
-            logTypeIndicator = (match[2] || "").trim().toUpperCase();
-            logContent = match[3] || "";
+            logTypeIndicator = (match[2] || "").trim().toUpperCase(); // Type indicator like TOOL START, AGENT THOUGHT (FINAL)
+            logContent = match[3] || ""; // The actual log message content
+
+            // Determine log type based on indicator
             if (logTypeIndicator.includes("TOOL START")) logType = 'tool-start';
             else if (logTypeIndicator.includes("TOOL OUTPUT")) logType = 'tool-output';
             else if (logTypeIndicator.includes("TOOL ERROR")) logType = 'tool-error';
-            else if (logTypeIndicator.includes("AGENT FINISH")) logType = 'agent-finish';
+            // *** NEW: Check for Agent Thought types ***
+            else if (logTypeIndicator.includes("AGENT THOUGHT (ACTION)")) logType = 'agent-thought-action';
+            else if (logTypeIndicator.includes("AGENT THOUGHT (FINAL)")) logType = 'agent-thought-final';
+            else if (logTypeIndicator.includes("AGENT FINISH")) logType = 'agent-finish'; // Keep this distinct
             else if (logTypeIndicator.includes("ERROR") || logTypeIndicator.includes("ERR_")) logType = 'error';
             else if (logTypeIndicator.includes("HISTORY")) logType = 'history';
             else if (logTypeIndicator.includes("SYSTEM") || logTypeIndicator.includes("SYS_")) logType = 'system';
             else if (logTypeIndicator.includes("ARTIFACT")) logType = 'artifact-generated';
             else if (logTypeIndicator.includes("USER INPUT")) logType = 'user-input';
         } else {
+            // Fallback type detection if regex fails (less reliable)
             if (fullLogText.toLowerCase().includes("error")) logType = 'error';
             else if (fullLogText.toLowerCase().includes("system")) logType = 'system';
+            console.warn("Could not parse monitor log prefix reliably:", fullLogText);
         }
+
         logEntryDiv.classList.add(`log-type-${logType}`);
+
         if (timestampPrefix) {
             const timeSpan = document.createElement('span');
             timeSpan.className = 'log-timestamp';
             timeSpan.textContent = timestampPrefix;
             logEntryDiv.appendChild(timeSpan);
         }
+
         const contentSpan = document.createElement('span');
         contentSpan.className = 'log-content';
-        if (logType === 'tool-output' || logType === 'tool-error') {
+        // Use <pre> for tool output/error AND thoughts for better formatting
+        if (logType === 'tool-output' || logType === 'tool-error' || logType.startsWith('agent-thought')) {
             const pre = document.createElement('pre');
             pre.textContent = logContent.trim();
             contentSpan.appendChild(pre);
@@ -330,9 +350,11 @@ document.addEventListener('DOMContentLoaded', () => {
             contentSpan.textContent = logContent.trim();
         }
         logEntryDiv.appendChild(contentSpan);
+
         monitorLogAreaElement.appendChild(logEntryDiv);
         scrollToBottom(monitorLogAreaElement);
     };
+
 
     const updateArtifactDisplay = async () => {
         if (!monitorArtifactAreaElement || !artifactNavElement || !artifactPrevBtn || !artifactNextBtn || !artifactCounterElement) {
@@ -588,11 +610,10 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(`Finished delete task logic for: ${taskId}`);
     };
 
-    // *** NEW: Populate LLM Selector ***
     const populateLlmSelector = () => {
         if (!llmSelectElement) { console.error("LLM select element not found!"); return; }
-        llmSelectElement.innerHTML = ''; // Clear existing options
-        llmSelectElement.disabled = true; // Disable while populating
+        llmSelectElement.innerHTML = '';
+        llmSelectElement.disabled = true;
 
         if ((!availableModels.gemini || availableModels.gemini.length === 0) &&
             (!availableModels.ollama || availableModels.ollama.length === 0)) {
@@ -600,37 +621,34 @@ document.addEventListener('DOMContentLoaded', () => {
             option.value = "";
             option.textContent = "No LLMs available";
             llmSelectElement.appendChild(option);
-            return; // Exit if no models
+            return;
         }
 
-        // Add Gemini models
         if (availableModels.gemini && availableModels.gemini.length > 0) {
             const geminiGroup = document.createElement('optgroup');
             geminiGroup.label = 'Gemini';
             availableModels.gemini.forEach(modelId => {
                 const option = document.createElement('option');
-                option.value = `gemini::${modelId}`; // Store full ID
-                option.textContent = modelId; // Display model name
+                option.value = `gemini::${modelId}`;
+                option.textContent = modelId;
                 geminiGroup.appendChild(option);
             });
             llmSelectElement.appendChild(geminiGroup);
         }
 
-        // Add Ollama models
         if (availableModels.ollama && availableModels.ollama.length > 0) {
             const ollamaGroup = document.createElement('optgroup');
             ollamaGroup.label = 'Ollama';
             availableModels.ollama.forEach(modelId => {
                 const option = document.createElement('option');
-                option.value = `ollama::${modelId}`; // Store full ID
-                option.textContent = modelId; // Display model name
+                option.value = `ollama::${modelId}`;
+                option.textContent = modelId;
                 ollamaGroup.appendChild(option);
             });
             llmSelectElement.appendChild(ollamaGroup);
         }
 
-        // Set initial selection (try last selected, then default, then first available)
-        const lastSelected = localStorage.getItem('selectedLlmId'); // Optional: Store last selection
+        const lastSelected = localStorage.getItem('selectedLlmId');
         if (lastSelected && llmSelectElement.querySelector(`option[value="${lastSelected}"]`)) {
             llmSelectElement.value = lastSelected;
             currentSelectedLlmId = lastSelected;
@@ -638,9 +656,8 @@ document.addEventListener('DOMContentLoaded', () => {
             llmSelectElement.value = defaultLlmId;
             currentSelectedLlmId = defaultLlmId;
         } else if (llmSelectElement.options.length > 0) {
-            // Select the first valid option if default/last not found
              for (let i = 0; i < llmSelectElement.options.length; i++) {
-                if (llmSelectElement.options[i].value) { // Check if it has a non-empty value
+                if (llmSelectElement.options[i].value) {
                     llmSelectElement.selectedIndex = i;
                     currentSelectedLlmId = llmSelectElement.value;
                     break;
@@ -649,18 +666,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         console.log(`LLM selector populated. Initial selection: ${currentSelectedLlmId}`);
-        llmSelectElement.disabled = false; // Re-enable selector
+        llmSelectElement.disabled = false;
     };
 
 
-    // *** NEW: Send WebSocket Message Helper ***
     const sendWsMessage = (type, content) => {
         if (window.socket && window.socket.readyState === WebSocket.OPEN) {
             try {
-                const payload = JSON.stringify({ type: type, ...content }); // Spread content properties
+                const payload = JSON.stringify({ type: type, ...content });
                 console.log(`Sending WS message: ${type}`, content);
                 window.socket.send(payload);
-                // Log specific messages if needed
                 if (type === "rename_task" || type === "delete_task" || type === "set_llm") {
                      addMonitorLog(`[SYSTEM] Sent ${type} request.`);
                 }
@@ -671,7 +686,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             console.warn(`Cannot send ${type}: WebSocket is not open.`);
-            // Avoid flooding with status messages for non-critical sends
             if (type === "user_message" || type === "context_switch") {
                 addChatMessage(`Cannot send ${type}: Not connected to backend.`, "status");
             }
@@ -680,7 +694,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
 
-    // Chat Input Sending Logic
     const handleSendMessage = () => {
         const messageText = chatTextarea.value.trim();
         if (!currentTaskId){
@@ -697,9 +710,7 @@ document.addEventListener('DOMContentLoaded', () => {
             chatHistoryIndex = -1;
             currentInputBuffer = "";
 
-            // Send message to backend
-            sendWsMessage("user_message", { content: messageText }); // Use helper
-            // Indicate processing start immediately after sending
+            sendWsMessage("user_message", { content: messageText });
             addChatMessage("Agent processing...", "status");
 
             chatTextarea.value = '';
@@ -742,15 +753,13 @@ document.addEventListener('DOMContentLoaded', () => {
         chatTextarea.addEventListener('input', () => { chatTextarea.style.height = 'auto'; chatTextarea.style.height = chatTextarea.scrollHeight + 'px'; });
     }
 
-    // *** NEW: LLM Selector Change Listener ***
     if (llmSelectElement) {
         llmSelectElement.addEventListener('change', (event) => {
             const selectedId = event.target.value;
             if (selectedId && selectedId !== currentSelectedLlmId) {
                 console.log(`LLM selection changed to: ${selectedId}`);
                 currentSelectedLlmId = selectedId;
-                localStorage.setItem('selectedLlmId', selectedId); // Optional: Store preference
-                // Send update to backend
+                localStorage.setItem('selectedLlmId', selectedId);
                 sendWsMessage("set_llm", { llm_id: selectedId });
                 addChatMessage(`Switched LLM to ${selectedId}`, 'status');
             } else if (!selectedId) {
@@ -778,3 +787,4 @@ document.addEventListener('DOMContentLoaded', () => {
     connectWebSocket();
 
 }); // End of DOMContentLoaded listener
+
