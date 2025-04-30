@@ -2,17 +2,17 @@
 import logging
 from langchain import hub # To pull standard prompts
 from langchain.agents import AgentExecutor, create_react_agent
-# *** CORRECTED IMPORT for BaseMemory ***
-from langchain_core.memory import BaseMemory # Import from langchain_core
+from langchain_core.memory import BaseMemory
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.tools import BaseTool
 from typing import List
+from backend.config import Settings # Import Settings
 
 logger = logging.getLogger(__name__)
 
-# Modified to accept a memory object
-def create_agent_executor(llm: BaseChatModel, tools: List[BaseTool], memory: BaseMemory) -> AgentExecutor:
-    """Creates and returns a LangChain AgentExecutor with memory."""
+# Modified to accept settings
+def create_agent_executor(llm: BaseChatModel, tools: List[BaseTool], memory: BaseMemory, settings: Settings) -> AgentExecutor:
+    """Creates and returns a LangChain AgentExecutor with memory and configured settings."""
     logger.info("Creating LangChain agent executor with memory...")
 
     # Get the ReAct Chat prompt template - requires 'chat_history' input variable
@@ -53,16 +53,17 @@ New input: {input}
     agent = create_react_agent(llm, tools, prompt)
     logger.info("ReAct chat agent created.")
 
-    # Create the Agent Executor, passing the memory object
+    # Create the Agent Executor, passing the memory object and using configured settings
     agent_executor = AgentExecutor(
         agent=agent,
         tools=tools,
         memory=memory, # Pass the memory object here
-        verbose=True,
-        handle_parsing_errors="Check your output and make sure it conforms!",
-        max_iterations=10
+        verbose=True, # Keep verbose for now, could be configurable later
+        handle_parsing_errors="Check your output and make sure it conforms!", # Basic error handling
+        # --- MODIFIED: Use max_iterations from settings ---
+        max_iterations=settings.agent_max_iterations
     )
-    logger.info("Agent Executor with memory created.")
+    logger.info(f"Agent Executor created. Max iterations: {settings.agent_max_iterations}")
 
     return agent_executor
 

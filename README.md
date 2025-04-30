@@ -4,7 +4,7 @@ This project provides a functional user interface and backend for an AI agent sy
 
 ## Features
 
-* **Task Management:** Create, select, and delete tasks. Each task maintains its own context and workspace.
+* **Task Management:** Create, select, delete, and **rename** tasks. Each task maintains its own context and workspace.
 * **Chat Interface:** Interact with the AI agent via a familiar chat window. Supports input history (Up/Down arrows). Basic Markdown rendering (newlines, bold, italics, code blocks, links).
 * **Agent Workspace (Monitor):** View the agent's internal steps, tool usage, and outputs in a structured, styled log panel.
 * **Artifact Viewer:** Displays generated `.png` images and previews common text files (`.txt`, `.py`, `.csv`, etc.) in a dedicated area below the monitor logs, with navigation for multiple artifacts.
@@ -20,8 +20,8 @@ This project provides a functional user interface and backend for an AI agent sy
 * **Backend:** Python backend using `websockets`, `aiohttp` (for file serving), and `LangChain`.
 * **Frontend:** Simple HTML, CSS, and vanilla JavaScript.
 * **LLM Flexibility:** Configurable to use Google Gemini (via API key) or a local Ollama instance.
-* **Persistence:** Task list and chat/monitor history are stored locally using SQLite in the `database/` directory.
-* **Task Workspaces:** File/Shell tools operate within isolated directories for each task (`workspace/<task_id>/`).
+* **Persistence:** Task list (including names) and chat/monitor history are stored locally using SQLite in the `database/` directory.
+* **Task Workspaces:** File/Shell tools operate within isolated directories for each task (`workspace/<task_id>/`), created upon task selection.
 
 ## Tech Stack
 
@@ -46,31 +46,34 @@ This project provides a functional user interface and backend for an AI agent sy
 
 ```
 
-manus-ai-ui-clone/
-├── .venv/                  # Virtual environment
+ResearchAgent/
+├── .venv/              # Virtual environment
 ├── backend/
 │   ├── init.py
-│   ├── agent.py            # Agent creation logic
-│   ├── callbacks.py        # WebSocket callback handler
-│   ├── config.py           # Configuration loading
-│   ├── db_utils.py         # SQLite database functions
-│   ├── llm_setup.py        # LLM initialization (Gemini/Ollama)
-│   ├── server.py           # Main WebSocket & File server logic
-│   └── tools.py            # Tool definitions and factory
+│   ├── agent.py        # Agent creation logic
+│   ├── callbacks.py    # WebSocket callback handler
+│   ├── config.py       # Configuration loading
+│   ├── db_utils.py     # SQLite database functions
+│   ├── llm_setup.py    # LLM initialization (Gemini/Ollama)
+│   ├── server.py       # Main WebSocket & File server logic
+│   └── tools.py        # Tool definitions and factory
 ├── css/
-│   └── style.css           # Frontend styling
-├── database/               # SQLite database storage (Created automatically, GITIGNORED)
+│   └── style.css       # Frontend styling
+├── database/           # SQLite database storage (Created automatically, GITIGNORED)
 │   └── agent_history.db
 ├── js/
-│   └── script.js           # Frontend JavaScript logic
-├── workspace/              # Base directory for task workspaces (GITIGNORED)
-│   └── /          # Auto-created workspace for each task
-│       └── ...             # Files created by the agent for this task
-├── .env                    # Environment variables (GITIGNORED)
-├── .gitignore              # Git ignore rules
-├── index.html              # Main HTML file for the UI
-├── requirements.txt        # Python dependencies
-└── README.md               # This file
+│   └── script.js       # Frontend JavaScript logic
+├── workspace/          # Base directory for task workspaces (GITIGNORED)
+│   └── <task_id>/      # Auto-created workspace for each task
+│       └── ...         # Files created by the agent for this task
+├── .env                # Environment variables (GITIGNORED)
+├── .env.example        # Example environment file
+├── .gitignore          # Git ignore rules
+├── Dockerfile          # Docker build instructions
+├── docker-compose.yml  # Docker compose configuration
+├── index.html          # Main HTML file for the UI
+├── requirements.txt    # Python dependencies
+└── README.md           # This file
 
 ```
 
@@ -117,22 +120,19 @@ manus-ai-ui-clone/
     * **Fill in required values:**
         * Add your `GOOGLE_API_KEY`. You can get one from [Google AI for Developers](https://ai.google.dev/).
         * Add your `ENTREZ_EMAIL` (required for PubMed Tool).
-    * **(Optional):** Uncomment and modify other settings (`AI_PROVIDER`, `OLLAMA_MODEL`, etc.) if needed.
+    * **(If using Ollama):**
+        * Ensure `AI_PROVIDER=ollama` is set.
+        * **Important:** If running Ollama as a service within WSL 2 and using the Docker setup below, set `OLLAMA_BASE_URL=http://localhost:11434`. The `network_mode: host` in `docker-compose.yml` allows the container to access the WSL host's localhost.
+        * If Ollama runs elsewhere (different machine, different Docker container), set `OLLAMA_BASE_URL` accordingly.
+        * Set `OLLAMA_MODEL` to a model you have pulled (e.g., `llama3:latest`).
+    * **(Optional):** Modify other settings like `GEMINI_MODEL` if needed.
     * **Security:** The `.env` file is listed in `.gitignore` to prevent accidental commits of your secrets.
 
 7.  **(If using Ollama)**
     * Install Ollama: [https://ollama.com/](https://ollama.com/)
-    * Ensure the Ollama service is running.
-    * Pull required models: `ollama pull <model_name>` (e.g., `ollama pull gemma:2b`).
-
-## Configuration Details (`env` file)
-
-* `GOOGLE_API_KEY`: **Required if using Gemini.** Your API key from [Google AI for Developers](https://ai.google.dev/).
-* `ENTREZ_EMAIL`: **Required for PubMed Tool.** Your email address for NCBI API identification (they use it to contact you if there are issues with your requests).
-* `AI_PROVIDER`: (Optional) `gemini` (default) or `ollama`.
-* `GEMINI_MODEL`: (Optional) Default `gemini-1.5-flash-latest`.
-* `OLLAMA_BASE_URL`: (Optional) Default `http://localhost:11434`.
-* `OLLAMA_MODEL`: (Optional) Default `gemma:2b`. Ensure this model is pulled in Ollama.
+    * Ensure the Ollama service is running (e.g., `sudo systemctl start ollama` if installed as a service in Linux/WSL, or run the desktop app).
+    * **Important for Docker/WSL:** If Ollama was installed as a systemd service, ensure it's configured to listen on all interfaces by editing the service file (e.g., `sudo systemctl edit --full ollama.service`) and adding `Environment="OLLAMA_HOST=0.0.0.0"` under `[Service]`, then run `sudo systemctl daemon-reload` and `sudo systemctl restart ollama`.
+    * Pull required models: `ollama pull <model_name>` (e.g., `ollama pull llama3:latest`).
 
 ## Running the Application
 
@@ -147,10 +147,10 @@ This method runs the backend server inside an isolated Docker container, which i
     ```
     * The `--build` flag is only strictly necessary the first time you run this or when you change the `Dockerfile` or `requirements.txt`. Subsequent runs can often just use `docker compose up`.
     * This command will:
-        * Build the Docker image using the specifications in `Dockerfile` (including installing all Python dependencies).
+        * Build the Docker image using the specifications in `Dockerfile` (including installing all Python dependencies and `curl` for debugging).
         * Start the backend service defined in `docker-compose.yml`.
-    * You will see logs from the backend server in this terminal. The WebSocket server will be available at `ws://localhost:8765` and the file server at `http://localhost:8766` (mapping from inside the container).
-    * Keep this terminal running. Use `Ctrl+C` to stop the container gracefully when you are finished.
+    * **Networking Note:** The `docker-compose.yml` is configured with `network_mode: host`. This means the container shares the network of the host (your WSL environment if using Docker Desktop on Windows/Mac). The backend will listen directly on host ports 8765 (WebSocket) and 8766 (File Server). Ensure these ports are free on your host/WSL. This mode simplifies connecting to services like Ollama running directly in the same WSL environment (use `http://localhost:11434` for `OLLAMA_BASE_URL`).
+    * You will see logs from the backend server in this terminal. Keep it running. Use `Ctrl+C` to stop the container gracefully.
 3.  **Start Frontend Server:** Docker Compose (as configured) only runs the backend. You still need to serve the frontend files (HTML, CSS, JS). Open a ***separate*** terminal, navigate to the project root directory (`ResearchAgent/`), and run the simple Python HTTP server:
     ```bash
     python3 -m http.server 8000
@@ -187,7 +187,8 @@ You can run the backend server directly on your host machine, but this is **not 
 
 ## Usage & Testing
 
-* **Create Task:** Click "+ New Task". "Task - 1" is created automatically on first launch if no tasks exist.
+* **Create Task:** Click "+ New Task". "Task - 1" (or subsequent number) is created automatically on first launch if no tasks exist.
+* **Rename Task:** Hover over a task in the list and click the pencil icon (✏️). Enter the new name in the prompt.
 * **Select Task:** Click a task to load its history and set its workspace.
 * **Chat:** Interact with the agent. Use Up/Down arrows for input history.
 * **Monitor:** Observe structured logs (tool usage, system messages).
@@ -196,21 +197,24 @@ You can run the backend server directly on your host machine, but this is **not 
 * **Test Package Installation:** Ask: `"Install the 'numpy' python package."`
 * **Test Python REPL:** Ask: `"Use the Python REPL tool to calculate 15 factorial."`
 * **Test Image Generation:** Ask: `"Write a python script named 'plot.py' that uses matplotlib to create a simple sine wave plot and saves it as 'sine_wave.png'. Then execute the script using python."` (Ensure `matplotlib` is installed first).
-* **Delete Task:** Click the trash icon (confirmation required).
+* **Delete Task:** Click the trash icon (🗑️) next to a task (confirmation required).
 
 ## Security Warnings
 
 * **`python_package_installer` Tool:** Installs packages directly into the backend server's Python environment.
 * **`PythonREPLTool` Tool:** Executes arbitrary Python code directly in the backend server's environment. This is a **significant security risk**.
-* **Recommendation:** **Strongly consider running the backend server inside a Docker container (Phase 2)**, especially when using the `python_package_installer` or `PythonREPLTool`, to isolate execution and mitigate risks.
+* **Recommendation:** **Strongly consider running the backend server inside a Docker container**, especially when using the `python_package_installer` or `PythonREPLTool`, to isolate execution and mitigate risks.
 
 ## Future Perspectives & Ideas
 
-* **Containerization (Recommended Next Step):** Run the backend in Docker.
+* **LLM Selection UI:** Allow users to select specific Gemini/Ollama models from a dropdown in the chat interface.
+* **PDF Reading Tool:** Enhance the `read_file` tool or add a new tool to directly extract text from PDF files.
+* **Drag & Drop Upload:** Allow users to drag files directly onto the UI to upload them to the current task's workspace.
+* **Collapse Agent Steps:** Add UI controls to collapse/expand the agent's intermediate thought/tool usage steps in the chat for a cleaner view.
+* **Configuration File:** Move more hardcoded parameters (timeouts, limits, agent settings) to the `.env` file.
 * **ERIC/DOAJ Tools:** Add tools for searching these free databases.
-* **Task Renaming.**
-* **Enhanced Monitor/Artifact Viewer:** Filtering, search, more file types, download.
-* **More Robust Formatting:** Use a dedicated Markdown library.
+* **Enhanced Monitor/Artifact Viewer:** Filtering, search, more file types, download button.
+* **More Robust Formatting:** Use a dedicated Markdown library (e.g., `markdown-it`) for more complex rendering.
 * **Domain-Specific Tools:** PubMed Central, BLAST, VCF/FASTA parsing, etc.
 * **User Authentication.**
 * **UI Polish.**
