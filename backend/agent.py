@@ -1,36 +1,29 @@
 # backend/agent.py
 import logging
-from langchain import hub # To pull standard prompts
+# *** REMOVED: hub import is no longer needed ***
+# from langchain import hub
 from langchain.agents import AgentExecutor, create_react_agent
-from langchain_core.memory import BaseMemory # Import from langchain_core
+from langchain_core.memory import BaseMemory
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.tools import BaseTool
+# *** ADDED: Import PromptTemplate ***
+from langchain_core.prompts import PromptTemplate
 from typing import List
 
 logger = logging.getLogger(__name__)
 
-# *** MODIFIED: Accepts max_iterations ***
 def create_agent_executor(
     llm: BaseChatModel,
     tools: List[BaseTool],
     memory: BaseMemory,
-    max_iterations: int # Added parameter
+    max_iterations: int
 ) -> AgentExecutor:
     """Creates and returns a LangChain AgentExecutor with memory and max iterations."""
     logger.info(f"Creating LangChain agent executor with memory (Max Iterations: {max_iterations})...")
 
-    # Get the ReAct Chat prompt template - requires 'chat_history' input variable
-    try:
-        prompt = hub.pull("hwchase17/react-chat")
-        # Check if the pulled prompt supports 'chat_history' if necessary
-        if "chat_history" not in prompt.input_variables:
-             logger.warning("Pulled 'hwchase17/react-chat' prompt might be missing 'chat_history'. Using fallback.")
-             raise ValueError("Prompt missing required 'chat_history' variable.")
-    except Exception as e:
-        logger.error(f"Failed to pull prompt 'hwchase17/react-chat' from Langchain Hub or it's incompatible: {e}. Using a basic fallback.", exc_info=True)
-        # Define a fallback prompt that includes chat_history
-        from langchain_core.prompts import PromptTemplate
-        template = """Assistant is a large language model trained by Google.
+    # --- MODIFIED: Always use the local custom prompt template ---
+    # Define the prompt template directly
+    template = """Assistant is a large language model trained by Google.
 
 Assistant is designed to be able to assist with a wide range of tasks, from answering simple questions to providing in-depth explanations and discussions on a wide range of topics. As a language model, Assistant is able to communicate and generate human-like text in response to a wide range of prompts and questions.
 
@@ -47,6 +40,8 @@ Observation: the result of the action
 Thought: Do I need to use a tool? No
 Final Answer: [your response here]
 
+**IMPORTANT:** If you used a tool to find information (like search results or file content), **always include the full information found** in your Final Answer. Do not just summarize that you found it or refer to the Observation block.
+
 Begin!
 
 Previous conversation history:
@@ -54,7 +49,15 @@ Previous conversation history:
 
 New input: {input}
 {agent_scratchpad}"""
+    try:
         prompt = PromptTemplate.from_template(template)
+        logger.info("Using local custom prompt template.")
+    except Exception as e:
+        logger.error(f"Failed to create PromptTemplate from local template: {e}", exc_info=True)
+        # If even the local template fails, something is fundamentally wrong
+        raise RuntimeError(f"Could not create prompt template: {e}") from e
+    # --- END MODIFIED SECTION ---
+
 
     # Create the ReAct agent
     try:

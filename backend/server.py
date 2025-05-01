@@ -6,12 +6,15 @@ import datetime
 import logging
 import shlex
 import uuid
+# *** MODIFIED (2b): Use Any for type hint robustness ***
 from typing import Optional, List, Dict, Any, Set, Tuple
 from pathlib import Path
 import os
 import signal
 import re
 import functools
+# *** MODIFIED (2d): Import warnings ***
+import warnings
 
 # --- Web Server Imports ---
 from aiohttp import web
@@ -182,12 +185,11 @@ async def setup_file_server():
 
 # --- WebSocket Handler ---
 # Use standard type hint as specific imports can be fragile across versions
-from websockets.legacy.server import WebSocketServerProtocol as LegacyWebSocketServerProtocol # Keep legacy for type hint robustness
 from websockets.exceptions import ConnectionClosedOK, ConnectionClosedError
-WebSocketProtocolType = LegacyWebSocketServerProtocol # type: ignore
+# WebSocketProtocolType = Any # Use simple Any type hint to avoid deprecation warnings
 
 
-async def handler(websocket: WebSocketProtocolType):
+async def handler(websocket: Any): # *** MODIFIED (2b): Use Any type hint ***
     """Handles incoming WebSocket connections and messages for a user session."""
     session_id = str(uuid.uuid4())
     logger.info(f"[{session_id}] Connection attempt from {websocket.remote_address}...")
@@ -436,7 +438,7 @@ async def handler(websocket: WebSocketProtocolType):
 
                     # Save the actual user input to DB
                     await add_message(active_task_id, session_id, "user_input", user_input_content)
-                    # *** MODIFIED (4): Save monitor log with distinct type ***
+                    # Save monitor log with distinct type
                     await add_monitor_log_and_save(f"User Input: {user_input_content}", "monitor_user_input")
 
                     if session_id not in session_data: logger.error(f"[{session_id}] User message for task {active_task_id} but no session data found!"); continue
@@ -777,10 +779,10 @@ async def main():
 
 # --- Script Execution ---
 if __name__ == "__main__":
-    # *** MODIFIED (2d): Optionally suppress LangSmith warning ***
-    # import warnings
-    # warnings.filterwarnings("ignore", category=UserWarning, message=".*LangSmith API key.*")
-    # warnings.filterwarnings("ignore", category=UserWarning, message=".*LangSmithMissingAPIKeyWarning.*")
+    # *** MODIFIED (2d): Uncomment to suppress LangSmith warning ***
+    import warnings
+    warnings.filterwarnings("ignore", category=UserWarning, message=".*LangSmith API key.*")
+    warnings.filterwarnings("ignore", category=UserWarning, message=".*LangSmithMissingAPIKeyWarning.*")
     # OR configure LangSmith via environment variables:
     # os.environ["LANGCHAIN_TRACING_V2"] = "true"
     # os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
