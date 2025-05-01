@@ -22,14 +22,14 @@ from urllib.error import HTTPError
 # PDF Import
 try:
     import pypdf
+    logger = logging.getLogger(__name__) # Define logger early
 except ImportError:
+    logger = logging.getLogger(__name__) # Define logger even if import fails
     logger.warning("pypdf not installed. PDF reading functionality will be unavailable.")
     pypdf = None
 
 # Project Imports
 from backend.config import settings
-
-logger = logging.getLogger(__name__)
 
 # --- Define Base Workspace Path ---
 try:
@@ -204,14 +204,19 @@ async def read_file_content(relative_path_str: str, task_workspace: Path) -> str
     Appends a warning if PDF content exceeds configured length.
     """
     tool_name = "read_file"
-    logger.info(f"Tool '{tool_name}' received raw input: '{relative_path_str}' in workspace {task_workspace.name}")
+    logger.info(f"Tool '{tool_name}' received raw input: '{relative_path_str[:100]}...' in workspace {task_workspace.name}")
 
-    # Input Validation
+    # Input Validation & Cleaning
     if not isinstance(relative_path_str, str) or not relative_path_str.strip():
         logger.error(f"Tool '{tool_name}': Received invalid input. Expected a non-empty relative file path string.")
         return "Error: Invalid input. Expected a non-empty relative file path string."
 
-    cleaned_relative_path = relative_path_str.strip().strip('\'"`')
+    # *** MODIFIED: Extract only the first line and clean it ***
+    first_line = relative_path_str.splitlines()[0] if relative_path_str else ""
+    cleaned_relative_path = first_line.strip().strip('\'"`')
+    logger.info(f"Tool '{tool_name}': Cleaned input path to: '{cleaned_relative_path}'")
+    # *** END MODIFIED ***
+
     if not cleaned_relative_path:
         logger.error(f"Tool '{tool_name}': File path became empty after cleaning.")
         return "Error: File path cannot be empty after cleaning."
@@ -369,10 +374,10 @@ class TaskWorkspaceShellTool(BaseTool):
         except Exception as e: logger.error(f"Tool '{tool_name}': Error executing command '{clean_command}' in task workspace: {e}", exc_info=True); return f"Error executing command: {type(e).__name__}"
         finally:
             if process and process.returncode is None:
-                logger.warning(f"Tool '{tool_name}': Process '{clean_command}' still running in finally block, attempting termination.")
-                try: process.terminate(); await process.wait()
-                except ProcessLookupError: pass
-                except Exception as term_e: logger.error(f"Tool '{tool_name}': Error during final termination attempt: {term_e}")
+                 logger.warning(f"Tool '{tool_name}': Process '{clean_command}' still running in finally block, attempting termination.")
+                 try: process.terminate(); await process.wait()
+                 except ProcessLookupError: pass
+                 except Exception as term_e: logger.error(f"Tool '{tool_name}': Error during final termination attempt: {term_e}")
 
 
 # --- Python Package Installer Tool Implementation ---
@@ -573,10 +578,10 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
     if settings.entrez_email:
         stateless_tools.append(
              Tool.from_function(
-                func=search_pubmed,
-                name="pubmed_search",
-                description=(f"Use this tool ONLY to search for biomedical literature abstracts on PubMed. Input MUST be a search query string (e.g., 'CRISPR gene editing cancer therapy'). You can optionally append ' max_results=N' (space required before 'max_results') to the end of the query string to specify the number of results (default is {settings.tool_pubmed_default_max_results}, max is 20). Returns formatted summaries including title, authors, link (DOI or PMID), and abstract snippet (max {settings.tool_pubmed_max_snippet} chars)."),
-                coroutine=search_pubmed
+                 func=search_pubmed,
+                 name="pubmed_search",
+                 description=(f"Use this tool ONLY to search for biomedical literature abstracts on PubMed. Input MUST be a search query string (e.g., 'CRISPR gene editing cancer therapy'). You can optionally append ' max_results=N' (space required before 'max_results') to the end of the query string to specify the number of results (default is {settings.tool_pubmed_default_max_results}, max is 20). Returns formatted summaries including title, authors, link (DOI or PMID), and abstract snippet (max {settings.tool_pubmed_max_snippet} chars)."),
+                 coroutine=search_pubmed
              )
         )
     else:

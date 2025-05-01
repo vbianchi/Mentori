@@ -9,7 +9,7 @@ This project provides a functional user interface and backend for an AI agent sy
 * **LLM Selection:** Choose the specific language model (Gemini or Ollama models configured in `.env`) to use for the current session directly from the chat header.
 * **Agent Workspace (Monitor):** View the agent's internal steps, tool usage, and outputs in a structured, styled log panel.
 * **Monitor Status Indicator:** A visual indicator (dot + text) in the monitor header shows the agent's current state (e.g., Idle, Running, Error, Disconnected).
-* **Agent Cancellation (STOP Button):** A STOP button appears in the monitor header while the agent is running. Clicking it sends a cancellation request to the backend. **Note:** Currently, this interrupts the agent *between* major steps (e.g., before the next tool use or LLM call) rather than immediately halting a long-running step.
+* **Agent Cancellation (STOP Button):** A STOP button appears in the monitor header while the agent is running. Clicking it sends a cancellation request to the backend. **Note:** This attempts to interrupt the agent *between* major steps (e.g., before the next tool use or LLM call) rather than immediately halting a long-running step, and may not always succeed if the agent is blocked internally.
 * **File Upload:** An "Upload File(s)" button in the task panel allows users to upload files directly into the currently selected task's workspace. The artifact viewer updates automatically after a successful upload.
 * **Artifact Viewer:** Displays generated `.png` images and previews common text files (`.txt`, `.py`, `.csv`, etc.) in a dedicated area below the monitor logs, with navigation for multiple artifacts.
 * **Tool Integration:** Includes tools for:
@@ -36,7 +36,7 @@ This project provides a functional user interface and backend for an AI agent sy
     * **LangChain Core:** `langchain`
     * **LLM Integrations:** `langchain-google-genai`, `langchain-ollama`
     * **Tools:** `langchain-community` (Search), `langchain-experimental` (Python REPL), `biopython` (PubMed)
-    * **Prompts:** `langchainhub`
+    * **Prompts:** `langchainhub` (Fallback prompt used)
     * **Config:** `python-dotenv`
     * **HTTP:** `httpx`
     * **Web Parsing:** `beautifulsoup4`, `lxml`
@@ -86,7 +86,7 @@ ResearchAgent/
 
 1.  **Clone Repository:**
     ```bash
-    git clone [https://github.com/vbianchi/ResearchAgent.git](https://github.com/vbianchi/ResearchAgent.git)
+    git clone https://github.com/vbianchi/ResearchAgent.git
     cd ResearchAgent
     ```
 2.  **Prerequisites:**
