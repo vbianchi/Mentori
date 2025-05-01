@@ -39,6 +39,34 @@
         }
         .stop-button:hover:not(:disabled) { background-color: #d32f2f; /* Darker red */ }
         .stop-button:disabled { background-color: #9E9E9E; cursor: not-allowed; opacity: 0.6; }
+        /* *** NEW: Style for Upload Area *** */
+        .upload-area {
+            padding: 5px 15px 10px; /* Add some padding */
+            border-top: 1px solid var(--border-color); /* Separator */
+            background-color: var(--panel-bg); /* Match footer/header */
+            flex-shrink: 0;
+            text-align: center; /* Center the button */
+        }
+        .upload-button {
+            background-color: var(--panel-bg-lighter);
+            color: var(--text-color-muted);
+            border: 1px solid var(--border-color);
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.2s ease;
+        }
+        .upload-button:hover:not(:disabled) {
+            background-color: var(--panel-bg-lightest);
+            color: var(--text-color);
+            border-color: var(--text-color-muted);
+        }
+         .upload-button:disabled {
+             opacity: 0.5;
+             cursor: not-allowed;
+         }
+        /* *** END NEW *** */
 
     </style>
 </head>
@@ -52,6 +80,10 @@
             <ul id="task-list" class="task-list scrollable-content">
                 <li class="task-item-placeholder">Loading tasks...</li>
             </ul>
+            <div class="upload-area">
+                <input type="file" id="file-upload-input" multiple style="display: none;">
+                <button id="upload-file-button" class="upload-button" title="Upload files to current task workspace" disabled>Upload File(s)</button>
+            </div>
             <div class="panel-footer">
                 <div class="app-credits">
                     ResearchAgent<br>
@@ -79,10 +111,10 @@
             <div class="panel-header monitor-header">
                 <h3>Agent Workspace</h3>
                 <div class="monitor-controls"> <div id="monitor-status-container" class="monitor-status-container">
-                        <span id="status-dot" class="status-dot disconnected"></span>
-                        <span id="monitor-status-text" class="monitor-status-text">Disconnected</span>
-                    </div>
-                    <button id="stop-button" class="stop-button">STOP</button>
+                    <span id="status-dot" class="status-dot disconnected"></span>
+                    <span id="monitor-status-text" class="monitor-status-text">Disconnected</span>
+                </div>
+                <button id="stop-button" class="stop-button">STOP</button>
                 </div>
             </div>
 

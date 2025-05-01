@@ -3,7 +3,7 @@
  * This script handles the frontend logic for the AI Agent UI,
  * including WebSocket communication, DOM manipulation, event handling,
  * task history management, chat input history, Markdown formatting,
- * LLM selection, monitor status updates, and agent cancellation.
+ * LLM selection, monitor status updates, agent cancellation, and file uploads.
  */
 document.addEventListener('DOMContentLoaded', () => {
     console.log("AI Agent UI Script Loaded and DOM ready!");
@@ -25,7 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusDotElement = document.getElementById('status-dot');
     const monitorStatusTextElement = document.getElementById('monitor-status-text');
     const llmSelectElement = document.getElementById('llm-select');
-    const stopButton = document.getElementById('stop-button'); // *** NEW: Stop Button ***
+    const stopButton = document.getElementById('stop-button');
+    const fileUploadInput = document.getElementById('file-upload-input');
+    const uploadFileButton = document.getElementById('upload-file-button');
 
     // --- State Variables ---
     let tasks = [];
@@ -52,8 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentTaskArtifacts = [];
     let currentArtifactIndex = -1;
 
-    // --- WebSocket Setup ---
-    const wsUrl = 'ws://localhost:8765';
+    // --- Backend URLs ---
+    const wsUrl = 'ws://localhost:8765'; // WebSocket server
+    const httpBackendBaseUrl = 'http://localhost:8766'; // HTTP server for uploads/files
+
     let socket;
     window.socket = null;
     console.log("Initialized window.socket to null.");
@@ -216,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         addMonitorLog(message.content);
                         // If agent finishes or errors, ensure status is updated
                         if (message.content.includes("[Agent Finish]") || message.content.includes("Error]")) {
-                             if(isAgentRunning) updateMonitorStatus('idle', 'Idle'); // Set back to idle if it was running
+                            if(isAgentRunning) updateMonitorStatus('idle', 'Idle'); // Set back to idle if it was running
                         }
                         break;
                     case 'update_artifacts':
@@ -230,6 +234,19 @@ document.addEventListener('DOMContentLoaded', () => {
                             currentTaskArtifacts = []; currentArtifactIndex = -1; updateArtifactDisplay();
                         }
                         break;
+                    // *** NEW: Handle artifact refresh trigger ***
+                    case 'trigger_artifact_refresh':
+                        const taskIdToRefresh = message.content?.taskId;
+                        console.log(`Received trigger_artifact_refresh for task: ${taskIdToRefresh}`);
+                        if (taskIdToRefresh && taskIdToRefresh === currentTaskId) {
+                            console.log(`Current task matches refresh trigger, requesting updated artifacts for ${currentTaskId}`);
+                            addMonitorLog(`[SYSTEM] File upload detected, refreshing artifact list...`);
+                            sendWsMessage('get_artifacts_for_task', { taskId: currentTaskId });
+                        } else {
+                            console.log(`Ignoring artifact refresh trigger for non-current task (${taskIdToRefresh})`);
+                        }
+                        break;
+                    // *** END NEW ***
 
                     case 'available_models':
                         console.log("Received available_models:", message.content);
@@ -267,8 +284,8 @@ document.addEventListener('DOMContentLoaded', () => {
             window.socket = null;
             currentStreamingMessageElement = null;
              if (llmSelectElement) {
-                llmSelectElement.innerHTML = '<option value="">Connection Error</option>';
-                llmSelectElement.disabled = true;
+                 llmSelectElement.innerHTML = '<option value="">Connection Error</option>';
+                 llmSelectElement.disabled = true;
              }
         };
         socket.onclose = (event) => {
@@ -283,8 +300,8 @@ document.addEventListener('DOMContentLoaded', () => {
             window.socket = null;
             currentStreamingMessageElement = null;
              if (llmSelectElement) {
-                llmSelectElement.innerHTML = '<option value="">Disconnected</option>';
-                llmSelectElement.disabled = true;
+                 llmSelectElement.innerHTML = '<option value="">Disconnected</option>';
+                 llmSelectElement.disabled = true;
              }
         };
     };
@@ -351,6 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
             timestampPrefix = match[1] || "";
             logTypeIndicator = (match[2] || "").trim().toUpperCase();
             logContent = match[3] || "";
+            // Match CSS class names
             if (logTypeIndicator.includes("TOOL START")) logType = 'tool-start';
             else if (logTypeIndicator.includes("TOOL OUTPUT")) logType = 'tool-output';
             else if (logTypeIndicator.includes("TOOL ERROR")) logType = 'tool-error';
@@ -360,8 +378,8 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (logTypeIndicator.includes("ERROR") || logTypeIndicator.includes("ERR_")) logType = 'error';
             else if (logTypeIndicator.includes("HISTORY")) logType = 'history';
             else if (logTypeIndicator.includes("SYSTEM") || logTypeIndicator.includes("SYS_")) logType = 'system';
-            else if (logTypeIndicator.includes("ARTIFACT")) logType = 'artifact-generated';
-            else if (logTypeIndicator.includes("USER INPUT")) logType = 'user-input';
+            else if (logTypeIndicator.includes("ARTIFACT")) logType = 'artifact-generated'; // Match general artifact log
+            else if (logTypeIndicator.includes("USER_INPUT_LOG")) logType = 'user-input-log'; // Match specific user input log type
         } else {
             if (fullLogText.toLowerCase().includes("error")) logType = 'error';
             else if (fullLogText.toLowerCase().includes("system")) logType = 'system';
@@ -412,6 +430,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 artifactNavElement.style.display = 'none';
                 return;
             }
+            // Display filename
+            const filenameDiv = document.createElement('div');
+            filenameDiv.className = 'artifact-filename'; // Add a class for styling
+            filenameDiv.textContent = artifact.filename;
+            filenameDiv.style.fontSize = '0.85em'; // Example style
+            filenameDiv.style.color = 'var(--text-color-darker)';
+            filenameDiv.style.marginBottom = '5px';
+            filenameDiv.style.textAlign = 'center';
+            filenameDiv.style.wordBreak = 'break-all';
+            monitorArtifactAreaElement.insertBefore(filenameDiv, artifactNavElement);
+
             if (artifact.type === 'image') {
                 const imgElement = document.createElement('img');
                 imgElement.src = artifact.url;
@@ -552,6 +581,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
         updateCurrentTaskTitle();
+        // Enable/disable upload button based on task selection
+        if (uploadFileButton) {
+            uploadFileButton.disabled = !currentTaskId;
+        }
         console.log(`--- Finished Rendering Task List ---`);
     };
     const handleTaskItemClick = (taskId) => { console.log(`Task item clicked: ${taskId}`); selectTask(taskId); };
@@ -602,7 +635,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentTaskId = task ? taskId : null;
         console.log(`Selected task ID set to: ${currentTaskId}`);
         saveTasks();
-        renderTaskList();
+        renderTaskList(); // This will update the upload button state
         if (currentTaskId && task) {
             sendWsMessage("context_switch", { task: task.title, taskId: task.id });
             clearChatAndMonitor(false);
@@ -698,11 +731,11 @@ document.addEventListener('DOMContentLoaded', () => {
             currentSelectedLlmId = defaultLlmId;
         } else if (llmSelectElement.options.length > 0) {
              for (let i = 0; i < llmSelectElement.options.length; i++) {
-                if (llmSelectElement.options[i].value) {
-                    llmSelectElement.selectedIndex = i;
-                    currentSelectedLlmId = llmSelectElement.value;
-                    break;
-                }
+                 if (llmSelectElement.options[i].value) {
+                     llmSelectElement.selectedIndex = i;
+                     currentSelectedLlmId = llmSelectElement.value;
+                     break;
+                 }
              }
         }
 
@@ -717,7 +750,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const payload = JSON.stringify({ type: type, ...content });
                 console.log(`Sending WS message: ${type}`, content);
                 window.socket.send(payload);
-                if (type === "rename_task" || type === "delete_task" || type === "set_llm" || type === "cancel_agent") { // Added cancel_agent
+                if (type === "rename_task" || type === "delete_task" || type === "set_llm" || type === "cancel_agent" || type === "get_artifacts_for_task") { // Added get_artifacts_for_task
                      addMonitorLog(`[SYSTEM] Sent ${type} request.`);
                 }
             } catch (e) {
@@ -727,7 +760,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             console.warn(`Cannot send ${type}: WebSocket is not open.`);
-            if (type === "user_message" || type === "context_switch") {
+            if (type === "user_message" || type === "context_switch" || type === "get_artifacts_for_task") { // Added get_artifacts_for_task
                 addChatMessage(`Cannot send ${type}: Not connected to backend.`, "status");
             }
              addMonitorLog(`[SYSTEM] Cannot send ${type}: WS not open.`);
@@ -766,6 +799,108 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         chatTextarea.focus();
     };
+
+    // --- File Upload Handler with Debug Logging & Correct URL ---
+    const handleFileUpload = async (event) => {
+        console.log("[handleFileUpload] Function entered."); // DEBUG
+        if (!currentTaskId) {
+            alert("Please select a task before uploading files.");
+            console.log("[handleFileUpload] No task selected, aborting."); // DEBUG
+            return;
+        }
+        if (!event.target.files || event.target.files.length === 0) {
+            console.log("[handleFileUpload] No files selected for upload."); // DEBUG
+            return;
+        }
+
+        const files = event.target.files;
+        const uploadUrl = `${httpBackendBaseUrl}/upload/${currentTaskId}`;
+
+        // Attempt to get session ID from WebSocket URL if available (for logging context on backend)
+        let sessionID = 'unknown';
+        try {
+            if (window.socket?.url) {
+                // This parsing might fail if the URL is unexpected, hence the try...catch
+                sessionID = new URL(window.socket.url).searchParams.get('session_id') || 'unknown';
+            }
+        } catch (e) {
+            console.warn("[handleFileUpload] Could not parse session ID from WebSocket URL:", e);
+        }
+
+        console.log(`[handleFileUpload] Preparing to upload ${files.length} file(s) to ${uploadUrl} for task ${currentTaskId}. Session: ${sessionID}`); // DEBUG
+        addMonitorLog(`[SYSTEM] Attempting to upload ${files.length} file(s) to task ${currentTaskId}...`);
+        uploadFileButton.disabled = true; // Disable button during upload
+
+        let overallSuccess = true;
+        let errorMessages = [];
+
+        for (const file of files) {
+            const formData = new FormData();
+            formData.append('file', file, file.name); // Ensure filename is included
+            console.log(`[handleFileUpload] Processing file: ${file.name} (Size: ${file.size} bytes)`); // DEBUG
+
+            try {
+                addMonitorLog(`[SYSTEM] Uploading ${file.name}...`);
+                console.log(`[handleFileUpload] Sending POST request to ${uploadUrl} for ${file.name}`); // DEBUG
+                const response = await fetch(uploadUrl, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        // Include session ID if needed by backend for context/logging
+                         'X-Session-ID': sessionID
+                    }
+                });
+
+                console.log(`[handleFileUpload] Received response for ${file.name}. Status: ${response.status}, OK: ${response.ok}`); // DEBUG
+                console.log("[handleFileUpload] Raw response object:", response); // DEBUG
+
+                let result;
+                try {
+                    result = await response.json();
+                    console.log(`[handleFileUpload] Parsed JSON response for ${file.name}:`, result); // DEBUG
+                } catch (jsonError) {
+                    console.error(`[handleFileUpload] Failed to parse JSON response for ${file.name}:`, jsonError); // DEBUG
+                    const textResponse = await response.text(); // Try getting text response
+                    console.error(`[handleFileUpload] Raw text response for ${file.name}:`, textResponse); // DEBUG
+                    result = { status: 'error', message: `Failed to parse server response (Status: ${response.status})` };
+                }
+
+
+                if (response.ok && result.status === 'success') {
+                    console.log(`[handleFileUpload] Successfully uploaded ${file.name}:`, result); // DEBUG
+                    addMonitorLog(`[SYSTEM] Successfully uploaded: ${result.saved?.[0]?.filename || file.name}`);
+                    // Note: Backend now sends 'trigger_artifact_refresh' via WebSocket
+                } else {
+                    console.error(`[handleFileUpload] Error reported for ${file.name}:`, result); // DEBUG
+                    const message = result.message || `HTTP error ${response.status}`;
+                    errorMessages.push(`${file.name}: ${message}`);
+                    addMonitorLog(`[SYSTEM] Error uploading ${file.name}: ${message}`);
+                    overallSuccess = false;
+                }
+            } catch (error) {
+                console.error(`[handleFileUpload] Network or fetch error uploading ${file.name}:`, error); // DEBUG
+                const message = error.message || 'Network error';
+                errorMessages.push(`${file.name}: ${message}`);
+                addMonitorLog(`[SYSTEM] Network/Fetch Error uploading ${file.name}: ${message}`);
+                overallSuccess = false;
+            }
+        }
+
+        // Re-enable button and clear input
+        console.log("[handleFileUpload] Re-enabling upload button and clearing input."); // DEBUG
+        uploadFileButton.disabled = false;
+        event.target.value = null; // Clear the file input
+
+        // Display final status
+        if (overallSuccess) {
+            addChatMessage(`Successfully uploaded ${files.length} file(s).`, 'status');
+        } else {
+            addChatMessage(`Error uploading some files:\n${errorMessages.join('\n')}`, 'status', true); // Show detailed errors
+        }
+        console.log("[handleFileUpload] Function finished."); // DEBUG
+        // Artifact refresh is now triggered by backend via WebSocket 'trigger_artifact_refresh' message
+    };
+    // --- *** END NEW *** ---
 
     // --- Event Listeners Setup ---
     if (newTaskButton) { newTaskButton.addEventListener('click', handleNewTaskClick); }
@@ -812,7 +947,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     } else { console.error("LLM select element not found!"); }
 
-    // *** NEW: Stop Button Listener ***
     if (stopButton) {
         stopButton.addEventListener('click', () => {
             if (isAgentRunning) {
@@ -824,6 +958,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     } else { console.error("Stop button element not found!"); }
+
+    // *** File Upload Listeners ***
+    if (uploadFileButton && fileUploadInput) {
+        uploadFileButton.addEventListener('click', () => {
+            console.log("Upload button clicked, triggering file input."); // DEBUG
+            fileUploadInput.click(); // Trigger hidden file input
+        });
+        fileUploadInput.addEventListener('change', handleFileUpload);
+    } else {
+        console.error("File upload button or input element not found!");
+    }
+    // *** END NEW ***
 
 
     document.body.addEventListener('click', event => {
@@ -840,7 +986,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Initial Load Actions ---
     loadTasks();
-    renderTaskList();
+    renderTaskList(); // This will now also set initial upload button state
     connectWebSocket();
 
 }); // End of DOMContentLoaded listener

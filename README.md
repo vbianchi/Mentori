@@ -10,6 +10,7 @@ This project provides a functional user interface and backend for an AI agent sy
 * **Agent Workspace (Monitor):** View the agent's internal steps, tool usage, and outputs in a structured, styled log panel.
 * **Monitor Status Indicator:** A visual indicator (dot + text) in the monitor header shows the agent's current state (e.g., Idle, Running, Error, Disconnected).
 * **Agent Cancellation (STOP Button):** A STOP button appears in the monitor header while the agent is running. Clicking it sends a cancellation request to the backend. **Note:** Currently, this interrupts the agent *between* major steps (e.g., before the next tool use or LLM call) rather than immediately halting a long-running step.
+* **File Upload:** An "Upload File(s)" button in the task panel allows users to upload files directly into the currently selected task's workspace. The artifact viewer updates automatically after a successful upload.
 * **Artifact Viewer:** Displays generated `.png` images and previews common text files (`.txt`, `.py`, `.csv`, etc.) in a dedicated area below the monitor logs, with navigation for multiple artifacts.
 * **Tool Integration:** Includes tools for:
     * Web Search (`duckduckgo_search`)
@@ -44,7 +45,7 @@ This project provides a functional user interface and backend for an AI agent sy
     * **Plotting (Example):** `matplotlib`
     * **Database:** `aiosqlite`
 * **Environment:** `venv` with `pip` (or `uv`)
-* **Protocol:** WebSockets (WS)
+* **Protocol:** WebSockets (WS), HTTP (for file upload/serving)
 
 ## Project Structure
 
@@ -93,7 +94,7 @@ ResearchAgent/
     * **(Optional):** Install R and ensure `Rscript` is in PATH for R script execution via the shell tool.
 
 3.  **Install `uv` (Recommended - Fast Package Installer):**
-    * Follow instructions: https://github.com/astral-sh/uv#installation
+    * Follow instructions: [https://github.com/astral-sh/uv#installation](https://github.com/astral-sh/uv#installation)
 
 4.  **Create and Activate Virtual Environment:**
     ```bash
@@ -193,7 +194,8 @@ Runs the backend server inside an isolated Docker container. **Highly recommende
 * **Chat:** Interact with the agent. Use Up/Down arrows for input history.
 * **Monitor:** Observe agent logs and status indicator (Idle/Running/Error/Disconnected).
 * **Cancel Agent:** Click the "STOP" button in the monitor header while the agent is running to request cancellation (interrupts between steps).
-* **Artifact Viewer:** View generated images/text files using Prev/Next buttons.
+* **Upload Files:** Select a task, click the "Upload File(s)" button below the task list, choose files. Check monitor/artifacts for confirmation.
+* **Artifact Viewer:** View generated/uploaded images/text files using Prev/Next buttons.
 * **Test PubMed Search:** Ask: `"Search PubMed for recent articles on CRISPR gene editing."`
 * **Test Package Installation:** Ask: `"Install the 'numpy' python package."`
 * **Test Python REPL:** Ask: `"Use the Python REPL tool to calculate 15 factorial."`
@@ -212,7 +214,7 @@ Runs the backend server inside an isolated Docker container. **Highly recommende
 
 * **Agent Control:** Improve the STOP button to more reliably and immediately halt ongoing agent tasks, potentially by running the agent in a separate process.
 * **Streaming Output:** Ensure agent responses consistently stream token-by-token to the UI for better responsiveness.
-* **File Upload:** Allow users to upload files to the current task's workspace via drag & drop or an upload button.
+* **Drag & Drop Upload:** Enhance file upload to support drag and drop onto the task list or chat area.
 * **PDF Reading Enhancements:** Add options for page ranges or user-specified `max_length` override, improve handling of complex layouts/images.
 * **Structured Output:** Add capability for the agent to return results in structured formats (e.g., JSON) for easier parsing or downstream use.
 * **Data Visualization:** Enable the agent (e.g., via Python REPL) to generate plots from data and display them directly in the Artifact Viewer.
