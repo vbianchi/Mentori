@@ -13,13 +13,19 @@ from langchain_core.callbacks import AsyncCallbackHandler
 from langchain_core.outputs import LLMResult
 from langchain_core.messages import BaseMessage
 from langchain_core.agents import AgentAction, AgentFinish
-from langchain_core.documents import Document # *** ADDED IMPORT ***
+from langchain_core.documents import Document
 
 # Project Imports
 from backend.config import settings
 from backend.tools import TEXT_EXTENSIONS, get_task_workspace_path
 
 logger = logging.getLogger(__name__)
+
+# --- Define Custom Exception for Cancellation ---
+class AgentCancelledException(Exception):
+    """Custom exception to signal agent cancellation via callbacks."""
+    pass
+# ---------------------------------------------
 
 # Define type hints
 AddMessageFunc = Callable[[str, str, str, str], Coroutine[Any, Any, None]]
@@ -34,21 +40,24 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
     Async Callback handler for streaming LangChain agent events
     and saving them to the database. Logs artifact creation from write_file.
     Sends agent thoughts to the monitor panel.
+    Checks for cancellation requests before LLM/Tool starts.
     """
     # Configuration for which callbacks to ignore/activate
     # Set these to False to activate the respective callback logs (can be verbose)
     always_verbose: bool = True # Set to True to enable custom logging via methods below
-    ignore_llm: bool = True
+    ignore_llm: bool = False # *** MODIFIED: Need on_llm_start ***
     ignore_chain: bool = True
     ignore_agent: bool = False # We need on_agent_action and on_agent_finish
     ignore_retriever: bool = True
-    ignore_chat_model: bool = True
+    ignore_chat_model: bool = False # *** MODIFIED: Need on_chat_model_start ***
 
-    def __init__(self, session_id: str, send_ws_message_func: SendWSMessageFunc, db_add_message_func: AddMessageFunc):
+    # *** MODIFIED: Accept session_data ***
+    def __init__(self, session_id: str, send_ws_message_func: SendWSMessageFunc, db_add_message_func: AddMessageFunc, session_data_ref: Dict[str, Any]):
         super().__init__()
         self.session_id = session_id
         self.send_ws_message = send_ws_message_func
         self.db_add_message = db_add_message_func
+        self.session_data = session_data_ref # Store reference to global session data
         self.current_task_id: Optional[str] = None
         logger.info(f"[{self.session_id}] WebSocketCallbackHandler initialized.")
 
@@ -71,9 +80,39 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         else:
             logger.warning(f"[{self.session_id}] Cannot save message type '{msg_type}' to DB: current_task_id not set.")
 
+    # --- Check Cancellation Helper ---
+    def _check_cancellation(self, step_name: str):
+        """Checks the cancellation flag and raises AgentCancelledException if set."""
+        if self.session_id in self.session_data:
+            if self.session_data[self.session_id].get('cancellation_requested', False):
+                logger.warning(f"[{self.session_id}] Cancellation detected in callback before {step_name}. Raising AgentCancelledException.")
+                raise AgentCancelledException("Cancellation requested by user.")
+        else:
+            # This shouldn't happen in normal operation
+            logger.error(f"[{self.session_id}] Cannot check cancellation flag: Session data not found for session.")
+
+
     # --- LLM Callbacks ---
-    # Keep ignored ones minimal for performance if not needed
-    async def on_llm_start(self, serialized: Dict[str, Any], prompts: List[str], **kwargs: Any) -> None: pass
+    async def on_llm_start(self, serialized: Dict[str, Any], prompts: List[str], **kwargs: Any) -> None:
+        """Check for cancellation before starting LLM call."""
+        try:
+            self._check_cancellation("LLM execution")
+        except AgentCancelledException:
+            raise # Re-raise to stop the chain
+
+        # Original logging (optional, can be kept or removed)
+        # log_prefix = self._get_log_prefix()
+        # logger.debug(f"{log_prefix} [LLM Start] Prompts: {prompts[:1]}...") # Log only first prompt for brevity
+
+    async def on_chat_model_start(
+        self, serialized: Dict[str, Any], messages: List[List[BaseMessage]], **kwargs: Any
+    ) -> Any:
+        """Check for cancellation before starting Chat Model call."""
+        try:
+            self._check_cancellation("Chat Model execution")
+        except AgentCancelledException:
+            raise # Re-raise to stop the chain
+
     async def on_llm_new_token(self, token: str, **kwargs: Any) -> None: pass # Often too verbose
     async def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None: pass
 
@@ -92,7 +131,15 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
 
     # --- Tool Callbacks ---
     async def on_tool_start(self, serialized: Dict[str, Any], input_str: str, **kwargs: Any) -> None:
-        log_prefix = self._get_log_prefix(); tool_name = serialized.get("name", "Unknown Tool")
+        """Check for cancellation before starting Tool call."""
+        tool_name = serialized.get("name", "Unknown Tool")
+        try:
+            self._check_cancellation(f"Tool execution ('{tool_name}')")
+        except AgentCancelledException:
+            raise # Re-raise to stop the chain
+
+        # Original logging
+        log_prefix = self._get_log_prefix()
         # Truncate potentially long input strings for logging
         log_input = input_str[:500] + "..." if len(str(input_str)) > 500 else input_str
         log_content = f"[Tool Start] Using '{tool_name}' with input: '{log_input}'"
@@ -136,6 +183,15 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         await self._save_message("tool_output", output_str)
 
     async def on_tool_error(self, error: Union[Exception, KeyboardInterrupt], name: str = "Unknown Tool", **kwargs: Any) -> None:
+        # *** ADDED: Check if it's our custom cancellation exception ***
+        if isinstance(error, AgentCancelledException):
+             logger.warning(f"[{self.session_id}] Tool '{name}' execution cancelled by AgentCancelledException.")
+             # Optionally send a specific monitor log for this?
+             # await self.send_ws_message("monitor_log", f"{self._get_log_prefix()} [Tool Cancelled] Tool '{name}' stopped due to user request.")
+             # Re-raise the exception so the agent execution stops
+             raise error
+
+        # Original error handling
         log_prefix = self._get_log_prefix(); error_type_name = type(error).__name__
         error_str = str(error)
         logger.error(f"[{self.session_id}] Tool '{name}' Error: {error_str}", exc_info=True)
@@ -229,8 +285,6 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
     # --- Other Callbacks (Keep minimal if not used) ---
     async def on_text(self, text: str, **kwargs: Any) -> Any: pass
     async def on_retriever_start(self, serialized: Dict[str, Any], query: str, **kwargs: Any) -> Any: pass
-    # *** CORRECTED: Type hint uses imported Document ***
     async def on_retriever_end(self, documents: Sequence[Document], **kwargs: Any) -> Any: pass # type: ignore
     async def on_retriever_error(self, error: Union[Exception, KeyboardInterrupt], **kwargs: Any) -> Any: pass
-    async def on_chat_model_start(self, serialized: Dict[str, Any], messages: List[List[BaseMessage]], **kwargs: Any) -> Any: pass
 

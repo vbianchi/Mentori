@@ -6,7 +6,7 @@ FROM python:3.12-slim-bullseye AS base
 # Set environment variables using key=value format
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-# Set timezone based on user's location (San Cesareo, Italy) - Optional but can be helpful for logs
+# Set timezone based on user's location - Optional but can be helpful for logs
 ENV TZ=Europe/Rome
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 

@@ -21,7 +21,8 @@ import aiohttp_cors
 
 # LangChain Imports
 from langchain.agents import AgentExecutor
-from langchain.memory import ConversationBufferWindowMemory
+# Check LangChain migration guide for ConversationBufferWindowMemory
+from langchain.memory import ConversationBufferWindowMemory # Keep for now, verify in LangChain docs
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.agents import AgentAction, AgentFinish
 from langchain_core.runnables import RunnableConfig
@@ -33,7 +34,7 @@ from backend.config import settings
 from backend.llm_setup import get_llm
 from backend.tools import get_dynamic_tools, get_task_workspace_path, BASE_WORKSPACE_ROOT, TEXT_EXTENSIONS
 from backend.agent import create_agent_executor
-from backend.callbacks import WebSocketCallbackHandler
+from backend.callbacks import WebSocketCallbackHandler, AgentCancelledException
 from backend.db_utils import (
     init_db, add_task, add_message, get_messages_for_task,
     delete_task_and_messages, rename_task_in_db
@@ -44,7 +45,7 @@ from backend.db_utils import (
 log_level = settings.log_level
 logging.basicConfig(
     level=log_level,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s\n' # Added newline
 )
 logger = logging.getLogger(__name__)
 logger.info(f"Logging level set to {log_level}")
@@ -60,7 +61,7 @@ except Exception as llm_e:
 
 # --- Global state ---
 connected_clients: Dict[str, Dict[str, Any]] = {}
-session_data: Dict[str, Dict[str, Any]] = {}
+session_data: Dict[str, Dict[str, Any]] = {} # Added 'cancellation_requested' flag here
 
 # --- File Server Constants ---
 FILE_SERVER_LISTEN_HOST = "0.0.0.0"
@@ -180,16 +181,11 @@ async def setup_file_server():
     return site, runner
 
 # --- WebSocket Handler ---
-try:
-    from websockets.exceptions import ConnectionClosedOK, ConnectionClosedError
-    from websockets.server import WebSocketServerProtocol
-    WebSocketProtocolType = WebSocketServerProtocol
-except ImportError:
-    logger.warning("Could not import specific websocket types, using generic hints.")
-    from websockets.legacy.server import WebSocketServerProtocol as LegacyWebSocketServerProtocol # type: ignore
-    WebSocketProtocolType = LegacyWebSocketServerProtocol # type: ignore
-    ConnectionClosedOK = websockets.exceptions.ConnectionClosedOK # type: ignore
-    ConnectionClosedError = websockets.exceptions.ConnectionClosedError # type: ignore
+# Use standard type hint as specific imports can be fragile across versions
+from websockets.legacy.server import WebSocketServerProtocol as LegacyWebSocketServerProtocol # Keep legacy for type hint robustness
+from websockets.exceptions import ConnectionClosedOK, ConnectionClosedError
+WebSocketProtocolType = LegacyWebSocketServerProtocol # type: ignore
+
 
 async def handler(websocket: WebSocketProtocolType):
     """Handles incoming WebSocket connections and messages for a user session."""
@@ -227,6 +223,7 @@ async def handler(websocket: WebSocketProtocolType):
         active_task_id = session_data.get(session_id, {}).get("current_task_id")
         if active_task_id:
             try:
+                # *** MODIFIED (4): Save with the specific log_type passed in ***
                 await add_message(active_task_id, session_id, log_type, text)
             except Exception as db_err:
                 logger.error(f"[{session_id}] Failed to save monitor log '{log_type}' to DB: {db_err}")
@@ -238,13 +235,14 @@ async def handler(websocket: WebSocketProtocolType):
     try:
         logger.info(f"[{session_id}] Starting session setup...")
         logger.debug(f"[{session_id}] Creating ConversationBufferWindowMemory (K={settings.agent_memory_window_k})...")
+        # *** TODO (2c): Verify ConversationBufferWindowMemory usage with LangChain docs ***
         memory = ConversationBufferWindowMemory(
             k=settings.agent_memory_window_k, memory_key="chat_history", input_key="input", output_key="output", return_messages=True
         )
         logger.debug(f"[{session_id}] Memory object created.")
         logger.debug(f"[{session_id}] Creating WebSocketCallbackHandler...")
         db_add_func = functools.partial(add_message)
-        ws_callback_handler = WebSocketCallbackHandler(session_id, send_ws_message, db_add_func)
+        ws_callback_handler = WebSocketCallbackHandler(session_id, send_ws_message, db_add_func, session_data)
         logger.debug(f"[{session_id}] Callback handler created.")
         logger.debug(f"[{session_id}] Storing session data...")
         session_data[session_id] = {
@@ -252,7 +250,8 @@ async def handler(websocket: WebSocketProtocolType):
             "callback_handler": ws_callback_handler,
             "current_task_id": None,
             "selected_llm_provider": settings.default_provider,
-            "selected_llm_model_name": settings.default_model_name
+            "selected_llm_model_name": settings.default_model_name,
+            "cancellation_requested": False # Initialize cancellation flag
         }
         logger.info(f"[{session_id}] Session setup complete.")
         session_setup_ok = True
@@ -299,6 +298,8 @@ async def handler(websocket: WebSocketProtocolType):
                 if message_type == "context_switch" and task_id_from_frontend:
                     logger.info(f"[{session_id}] Switching context to Task ID: {task_id_from_frontend}")
                     if session_id in session_data:
+                        # Reset cancellation flag on context switch
+                        session_data[session_id]['cancellation_requested'] = False
                         existing_agent_task = connected_clients.get(session_id, {}).get("agent_task")
                         if existing_agent_task and not existing_agent_task.done():
                             logger.warning(f"[{session_id}] Cancelling active agent task due to context switch.")
@@ -328,9 +329,20 @@ async def handler(websocket: WebSocketProtocolType):
                                 db_timestamp = msg.get('timestamp', datetime.datetime.now().isoformat())
                                 ui_msg_type = None
                                 content_to_send = db_content
-                                if db_msg_type == "user_input": ui_msg_type = "user"; chat_history_for_memory.append(HumanMessage(content=db_content))
-                                elif db_msg_type in ["agent_finish", "agent_message", "agent"]: ui_msg_type = "agent_message"; chat_history_for_memory.append(AIMessage(content=db_content))
+                                send_to_chat = False # Default to NOT sending to chat
+
+                                # Determine the UI message type and if it should go to chat
+                                if db_msg_type == "user_input":
+                                    ui_msg_type = "user"
+                                    send_to_chat = True # Send actual user input to chat
+                                    chat_history_for_memory.append(HumanMessage(content=db_content))
+                                elif db_msg_type in ["agent_finish", "agent_message", "agent"]:
+                                    ui_msg_type = "agent_message"
+                                    send_to_chat = True # Send agent messages to chat
+                                    chat_history_for_memory.append(AIMessage(content=db_content))
                                 elif db_msg_type == "artifact_generated":
+                                    # Process artifact but don't send to chat or monitor directly here
+                                    # (Monitor log is handled separately, artifact list is sent at end)
                                     filename = db_content
                                     try:
                                         task_ws_path = get_task_workspace_path(task_id_from_frontend)
@@ -344,13 +356,35 @@ async def handler(websocket: WebSocketProtocolType):
                                             relative_filename = str(file_path.relative_to(task_ws_path))
                                             artifact_url = f"http://{FILE_SERVER_CLIENT_HOST}:{FILE_SERVER_PORT}/workspace_files/{task_id_from_frontend}/{relative_filename}"
                                             artifacts_from_history.append({"type": artifact_type, "url": artifact_url, "filename": relative_filename})
+                                            # Log artifact generation to monitor
                                             log_prefix = f"[{db_timestamp}][{session_id[:8]}]"; await send_ws_message("monitor_log", f"{log_prefix} [History][ARTIFACT] {relative_filename} (Type: {artifact_type})")
-                                        else: logger.warning(f"[{session_id}] Artifact file from history not found or unknown type: {file_path}"); log_prefix = f"[{db_timestamp}][{session_id[:8]}]"; await send_ws_message("monitor_log", f"{log_prefix} [History][ARTIFACT_MISSING] {filename}")
-                                    except Exception as artifact_err: logger.error(f"[{session_id}] Error processing artifact from history {filename}: {artifact_err}")
-                                    ui_msg_type = None
-                                elif db_msg_type.startswith(("monitor_", "error_", "system_", "tool_", "agent_thought_")):
-                                    ui_msg_type = "monitor_log"; log_prefix = f"[{db_timestamp}][{session_id[:8]}]"; type_indicator = f"[{db_msg_type.replace('monitor_', '').replace('error_', 'ERR_').replace('system_', 'SYS_').replace('agent_thought_action', 'THOUGHT_ACT').replace('agent_thought_final', 'THOUGHT_FIN').upper()}]"; content_to_send = f"{log_prefix} [History]{type_indicator} {db_content}"
-                                if ui_msg_type: await send_ws_message(ui_msg_type, content_to_send); await asyncio.sleep(0.005)
+                                        else:
+                                            logger.warning(f"[{session_id}] Artifact file from history not found or unknown type: {file_path}")
+                                            log_prefix = f"[{db_timestamp}][{session_id[:8]}]"; await send_ws_message("monitor_log", f"{log_prefix} [History][ARTIFACT_MISSING] {filename}")
+                                    except Exception as artifact_err:
+                                        logger.error(f"[{session_id}] Error processing artifact from history {filename}: {artifact_err}")
+                                # *** MODIFIED (4): Handle specific monitor types ***
+                                elif db_msg_type.startswith(("monitor_", "error_", "system_", "tool_", "agent_thought_", "monitor_user_input")):
+                                    ui_msg_type = "monitor_log" # All these go ONLY to monitor
+                                    log_prefix = f"[{db_timestamp}][{session_id[:8]}]"
+                                    # Create a more readable type indicator for the monitor log
+                                    type_indicator = f"[{db_msg_type.replace('monitor_', '').replace('error_', 'ERR_').replace('system_', 'SYS_').replace('agent_thought_action', 'THOUGHT_ACT').replace('agent_thought_final', 'THOUGHT_FIN').replace('monitor_user_input', 'USER_INPUT_LOG').upper()}]"
+                                    content_to_send = f"{log_prefix} [History]{type_indicator} {db_content}"
+                                    send_to_chat = False # Ensure these never go to chat
+                                else:
+                                    # Handle truly unknown types
+                                    send_to_chat = False
+                                    logger.warning(f"[{session_id}] Unknown history message type '{db_msg_type}' encountered.")
+                                    await send_ws_message("monitor_log", f"[{db_timestamp}][{session_id[:8]}] [History][UNKNOWN_TYPE: {db_msg_type}] {db_content}")
+
+                                # Send message to UI if applicable
+                                if ui_msg_type:
+                                    if send_to_chat:
+                                        await send_ws_message(ui_msg_type, content_to_send)
+                                    elif ui_msg_type == "monitor_log": # Send monitor logs only via monitor_log type
+                                        await send_ws_message("monitor_log", content_to_send)
+                                    await asyncio.sleep(0.005) # Slight delay for smoother loading
+
                             await send_ws_message("history_end", "History loaded.")
                             logger.info(f"[{session_id}] Finished sending {len(history_messages)} history messages.")
                             MAX_MEMORY_RELOAD = settings.agent_memory_window_k
@@ -368,13 +402,15 @@ async def handler(websocket: WebSocketProtocolType):
                     logger.info(f"[{session_id}] Received 'new_task' signal. Clearing context.")
                     current_task_id = None
                     if session_id in session_data:
+                        # Reset cancellation flag on new task
+                        session_data[session_id]['cancellation_requested'] = False
                         existing_agent_task = connected_clients.get(session_id, {}).get("agent_task")
                         if existing_agent_task and not existing_agent_task.done():
-                             logger.warning(f"[{session_id}] Cancelling active agent task due to new task.")
-                             existing_agent_task.cancel()
-                             await send_ws_message("status_message", "Operation cancelled for new task.")
-                             await add_monitor_log_and_save("Agent operation cancelled due to new task creation.", "system_cancel")
-                             connected_clients[session_id]["agent_task"] = None
+                                logger.warning(f"[{session_id}] Cancelling active agent task due to new task.")
+                                existing_agent_task.cancel()
+                                await send_ws_message("status_message", "Operation cancelled for new task.")
+                                await add_monitor_log_and_save("Agent operation cancelled due to new task creation.", "system_cancel")
+                                connected_clients[session_id]["agent_task"] = None
                         session_data[session_id]["current_task_id"] = None
                         session_data[session_id]["callback_handler"].set_task_id(None)
                         if "memory" in session_data[session_id]: session_data[session_id]["memory"].clear()
@@ -398,10 +434,15 @@ async def handler(websocket: WebSocketProtocolType):
                     if isinstance(content, str): user_input_content = content
                     else: logger.warning(f"[{session_id}] Received non-string content for user_message: {type(content)}. Ignoring."); continue
 
+                    # Save the actual user input to DB
                     await add_message(active_task_id, session_id, "user_input", user_input_content)
-                    await add_monitor_log_and_save(f"User Input: {user_input_content}", "user_input")
+                    # *** MODIFIED (4): Save monitor log with distinct type ***
+                    await add_monitor_log_and_save(f"User Input: {user_input_content}", "monitor_user_input")
 
                     if session_id not in session_data: logger.error(f"[{session_id}] User message for task {active_task_id} but no session data found!"); continue
+
+                    # Reset cancellation flag before starting a new agent run
+                    session_data[session_id]['cancellation_requested'] = False
 
                     # --- Prepare for Agent Execution ---
                     session_memory = session_data[session_id]["memory"]
@@ -416,11 +457,11 @@ async def handler(websocket: WebSocketProtocolType):
                         try:
                             request_llm = get_llm(settings, provider=selected_provider, model_name=selected_model_name)
                         except Exception as llm_init_err:
-                             logger.error(f"[{session_id}] Failed to initialize selected LLM ({selected_provider}::{selected_model_name}): {llm_init_err}", exc_info=True)
-                             await add_monitor_log_and_save(f"Error initializing selected LLM: {llm_init_err}", "error_system")
-                             await send_ws_message("status_message", "Error: Failed to use selected LLM. Check configuration.")
-                             await send_ws_message("agent_message", f"Sorry, could not use the selected LLM ({selected_model_name}). Please check the backend configuration or select another model.")
-                             continue
+                            logger.error(f"[{session_id}] Failed to initialize selected LLM ({selected_provider}::{selected_model_name}): {llm_init_err}", exc_info=True)
+                            await add_monitor_log_and_save(f"Error initializing selected LLM: {llm_init_err}", "error_system")
+                            await send_ws_message("status_message", "Error: Failed to use selected LLM. Check configuration.")
+                            await send_ws_message("agent_message", f"Sorry, could not use the selected LLM ({selected_model_name}). Please check the backend configuration or select another model.")
+                            continue
 
                         dynamic_agent_tools = get_dynamic_tools(active_task_id)
 
@@ -451,42 +492,62 @@ async def handler(websocket: WebSocketProtocolType):
                         config = RunnableConfig(callbacks=[session_callback_handler])
                         agent_coro = request_agent_executor.ainvoke({"input": user_input_content}, config=config)
                         agent_task = asyncio.create_task(agent_coro, name=f"agent_task_{session_id}_{active_task_id}") # Give task a name
-                        connected_clients[session_id]["agent_task"] = agent_task
+
+                        # Store the reference
+                        if session_id in connected_clients:
+                            connected_clients[session_id]["agent_task"] = agent_task
+                            logger.info(f"[{session_id}] Stored agent_task reference for task {active_task_id}. Ref: {agent_task}")
+                        else:
+                            logger.error(f"[{session_id}] CRITICAL: Cannot store agent_task reference, session_id not in connected_clients!")
+
                         result = await agent_task
                         logger.info(f"[{session_id}] Agent execution completed successfully for task {active_task_id}.")
 
                         # --- Artifact Scan (POST-RUN) & Update ---
                         if task_workspace_path:
-                             try:
-                                 all_files_after_run: Set[Path] = set()
-                                 for pattern in artifact_patterns: all_files_after_run.update(f.relative_to(task_workspace_path) for f in task_workspace_path.glob(pattern) if f.is_file())
-                                 new_files = all_files_after_run - files_before_run
-                                 if new_files:
-                                     logger.info(f"[{session_id}] Detected {len(new_files)} new potential artifacts via post-run scan: {new_files}")
-                                     for file_rel_path in new_files: await add_message(active_task_id, session_id, "artifact_generated", str(file_rel_path)); await add_monitor_log_and_save(f"Artifact generated (detected post-run): {file_rel_path}", "system_artifact_generated")
-                                 else: logger.info(f"[{session_id}] No *new* artifacts detected via post-run scan.")
-                                 current_artifacts_in_ws = []
-                                 all_potential_artifacts = []
-                                 for file_rel_path in all_files_after_run:
-                                     try: file_abs_path = task_workspace_path / file_rel_path; mtime = file_abs_path.stat().st_mtime; all_potential_artifacts.append((file_abs_path, mtime))
-                                     except FileNotFoundError: continue
-                                 sorted_files = sorted(all_potential_artifacts, key=lambda x: x[1], reverse=True)
-                                 for file_path, _ in sorted_files:
-                                     if file_path.is_file():
-                                         relative_filename = str(file_path.relative_to(task_workspace_path)); artifact_type = 'unknown'; file_suffix = file_path.suffix.lower()
-                                         if file_suffix in ['.png', '.jpg', '.jpeg', '.gif', '.svg']: artifact_type = 'image'
-                                         elif file_suffix in TEXT_EXTENSIONS: artifact_type = 'text'
-                                         if artifact_type != 'unknown': artifact_url = f"http://{FILE_SERVER_CLIENT_HOST}:{FILE_SERVER_PORT}/workspace_files/{active_task_id}/{relative_filename}"; current_artifacts_in_ws.append({"type": artifact_type, "url": artifact_url, "filename": relative_filename})
-                                 if current_artifacts_in_ws: logger.info(f"[{session_id}] Sending final update_artifacts message with {len(current_artifacts_in_ws)} artifacts."); await send_ws_message("update_artifacts", current_artifacts_in_ws)
-                                 else: logger.info(f"[{session_id}] No artifacts found in workspace post-run, sending empty update."); await send_ws_message("update_artifacts", [])
-                             except Exception as artifact_scan_e: logger.error(f"[{session_id}] Error during post-run artifact scan/update: {artifact_scan_e}")
+                            try:
+                                all_files_after_run: Set[Path] = set()
+                                for pattern in artifact_patterns: all_files_after_run.update(f.relative_to(task_workspace_path) for f in task_workspace_path.glob(pattern) if f.is_file())
+                                new_files = all_files_after_run - files_before_run
+                                if new_files:
+                                    logger.info(f"[{session_id}] Detected {len(new_files)} new potential artifacts via post-run scan: {new_files}")
+                                    for file_rel_path in new_files: await add_message(active_task_id, session_id, "artifact_generated", str(file_rel_path)); await add_monitor_log_and_save(f"Artifact generated (detected post-run): {file_rel_path}", "system_artifact_generated")
+                                else: logger.info(f"[{session_id}] No *new* artifacts detected via post-run scan.")
+                                current_artifacts_in_ws = []
+                                all_potential_artifacts = []
+                                for file_rel_path in all_files_after_run:
+                                    try: file_abs_path = task_workspace_path / file_rel_path; mtime = file_abs_path.stat().st_mtime; all_potential_artifacts.append((file_abs_path, mtime))
+                                    except FileNotFoundError: continue
+                                sorted_files = sorted(all_potential_artifacts, key=lambda x: x[1], reverse=True)
+                                for file_path, _ in sorted_files:
+                                    if file_path.is_file():
+                                        relative_filename = str(file_path.relative_to(task_workspace_path)); artifact_type = 'unknown'; file_suffix = file_path.suffix.lower()
+                                        if file_suffix in ['.png', '.jpg', '.jpeg', '.gif', '.svg']: artifact_type = 'image'
+                                        elif file_suffix in TEXT_EXTENSIONS: artifact_type = 'text'
+                                        if artifact_type != 'unknown': artifact_url = f"http://{FILE_SERVER_CLIENT_HOST}:{FILE_SERVER_PORT}/workspace_files/{active_task_id}/{relative_filename}"; current_artifacts_in_ws.append({"type": artifact_type, "url": artifact_url, "filename": relative_filename})
+                                if current_artifacts_in_ws: logger.info(f"[{session_id}] Sending final update_artifacts message with {len(current_artifacts_in_ws)} artifacts."); await send_ws_message("update_artifacts", current_artifacts_in_ws)
+                                else: logger.info(f"[{session_id}] No artifacts found in workspace post-run, sending empty update."); await send_ws_message("update_artifacts", [])
+                            except Exception as artifact_scan_e: logger.error(f"[{session_id}] Error during post-run artifact scan/update: {artifact_scan_e}")
                         else: logger.warning(f"[{session_id}] Skipping post-run artifact scan/update due to invalid task workspace path.")
 
+                    except AgentCancelledException as ace:
+                        logger.warning(f"[{session_id}] Caught AgentCancelledException for task {active_task_id}: {ace}")
+                        try:
+                            await send_ws_message("status_message", "Processing cancelled by user.") # Inform UI
+                            await add_monitor_log_and_save(f"Agent task stopped by user request: {ace}", "system_cancel")
+                            logger.info(f"[{session_id}] Successfully sent AgentCancelledException status messages.")
+                        except Exception as cancel_log_err:
+                            logger.error(f"[{session_id}] Error sending AgentCancelledException status messages: {cancel_log_err}", exc_info=True)
+
                     except asyncio.CancelledError:
-                        # *** ADDED Logging and Status Message ***
-                        logger.warning(f"[{session_id}] Agent task for task {active_task_id} was cancelled.")
-                        await send_ws_message("status_message", "Processing cancelled by user.") # Inform UI
-                        await add_monitor_log_and_save("Agent task cancelled by user request.", "system_cancel")
+                        logger.warning(f"[{session_id}] Caught asyncio.CancelledError for task {active_task_id}.")
+                        try:
+                            await send_ws_message("status_message", "Processing cancelled by user.") # Inform UI
+                            await add_monitor_log_and_save("Agent task cancelled by user request (asyncio).", "system_cancel")
+                            logger.info(f"[{session_id}] Successfully sent asyncio.CancelledError status messages.")
+                        except Exception as cancel_log_err:
+                            logger.error(f"[{session_id}] Error sending asyncio.CancelledError status messages: {cancel_log_err}", exc_info=True)
+
                     except Exception as e:
                         error_msg = f"CRITICAL Error during agent execution: {e}"
                         logger.error(f"[{session_id}] {error_msg}", exc_info=True)
@@ -495,9 +556,22 @@ async def handler(websocket: WebSocketProtocolType):
                         await send_ws_message("agent_message", f"Sorry, an internal error occurred: {type(e).__name__}")
                         if active_task_id: await add_message(active_task_id, session_id, "error_agent", f"{type(e).__name__}: {e}")
                     finally:
+                        # Keep the existing finally logic (checking cancellation_requested flag)
                         if session_id in connected_clients:
-                            connected_clients[session_id]["agent_task"] = None
-                            logger.debug(f"[{session_id}] Cleared agent_task reference.")
+                            agent_task_ref_before_clear = connected_clients[session_id].get("agent_task")
+                            cancellation_was_requested = session_data.get(session_id, {}).get('cancellation_requested', False)
+
+                            logger.info(f"[{session_id}] In finally block for agent execution (Task: {active_task_id}). Cancellation requested: {cancellation_was_requested}. Agent task ref before clearing: {agent_task_ref_before_clear}")
+
+                            if not cancellation_was_requested:
+                                connected_clients[session_id]["agent_task"] = None
+                                logger.debug(f"[{session_id}] Cleared agent_task reference in finally block (no cancellation requested).")
+                            else:
+                                logger.info(f"[{session_id}] Skipping agent_task reference clear in finally block due to pending cancellation request.")
+                                if session_id in session_data:
+                                    session_data[session_id]['cancellation_requested'] = False # Reset flag
+                        else:
+                            logger.warning(f"[{session_id}] Session not found in connected_clients during finally block for agent execution.")
 
                 # --- DELETE TASK ---
                 elif message_type == "delete_task" and task_id_from_frontend:
@@ -515,16 +589,18 @@ async def handler(websocket: WebSocketProtocolType):
                                 await add_monitor_log_and_save(f"Workspace directory deleted: {task_workspace_to_delete.name}", "system_delete_success")
                             else: logger.warning(f"[{session_id}] Workspace directory not found or invalid for deletion: {task_workspace_to_delete}")
                         except Exception as ws_del_e: logger.error(f"[{session_id}] Error deleting workspace directory {task_workspace_to_delete}: {ws_del_e}"); await add_monitor_log_and_save(f"Error deleting workspace directory: {ws_del_e}", "error_delete")
-                        active_task_id = session_data.get(session_id, {}).get("current_task_id")
-                        if active_task_id == task_id_from_frontend:
-                             current_task_id = None
-                             if session_id in session_data:
-                                 existing_agent_task = connected_clients.get(session_id, {}).get("agent_task")
-                                 if existing_agent_task and not existing_agent_task.done(): existing_agent_task.cancel()
-                                 connected_clients[session_id]["agent_task"] = None; session_data[session_id]["current_task_id"] = None; session_data[session_id]["callback_handler"].set_task_id(None)
-                                 if "memory" in session_data[session_id]: session_data[session_id]["memory"].clear()
-                                 await add_monitor_log_and_save("Cleared context as active task was deleted.", "system_context_clear")
-                                 await send_ws_message("update_artifacts", [])
+                        active_task_id_check = session_data.get(session_id, {}).get("current_task_id") # Re-check active task id
+                        if active_task_id_check == task_id_from_frontend:
+                            current_task_id = None # Update local variable
+                            if session_id in session_data:
+                                # Reset cancellation flag if active task is deleted
+                                session_data[session_id]['cancellation_requested'] = False
+                                existing_agent_task = connected_clients.get(session_id, {}).get("agent_task")
+                                if existing_agent_task and not existing_agent_task.done(): existing_agent_task.cancel()
+                                connected_clients[session_id]["agent_task"] = None; session_data[session_id]["current_task_id"] = None; session_data[session_id]["callback_handler"].set_task_id(None)
+                                if "memory" in session_data[session_id]: session_data[session_id]["memory"].clear()
+                                await add_monitor_log_and_save("Cleared context as active task was deleted.", "system_context_clear")
+                                await send_ws_message("update_artifacts", [])
                     else: await send_ws_message("status_message", f"Failed to delete task {task_id_from_frontend[:8]}..."); await add_monitor_log_and_save(f"Failed to delete task {task_id_from_frontend} from DB.", "error_delete")
 
                 # --- RENAME TASK ---
@@ -561,31 +637,43 @@ async def handler(websocket: WebSocketProtocolType):
                 elif message_type == "get_available_models":
                      logger.info(f"[{session_id}] Received request for available models.")
                      await send_ws_message("available_models", {
-                        "gemini": settings.gemini_available_models,
-                        "ollama": settings.ollama_available_models,
-                        "default_llm_id": settings.default_llm_id
+                         "gemini": settings.gemini_available_models,
+                         "ollama": settings.ollama_available_models,
+                         "default_llm_id": settings.default_llm_id
                      })
 
                 # *** MODIFIED: Handle Cancel Agent Request ***
                 elif message_type == "cancel_agent":
                     logger.warning(f"[{session_id}] Received request to cancel agent task.")
-                    agent_task_to_cancel = connected_clients.get(session_id, {}).get("agent_task")
+                    # Set the flag first
+                    if session_id in session_data:
+                        session_data[session_id]['cancellation_requested'] = True
+                        logger.info(f"[{session_id}] Cancellation requested flag set to True.")
+                    else:
+                        logger.error(f"[{session_id}] Cannot set cancellation flag: Session data not found.")
 
-                    # *** ADDED Logging ***
+                    # Now attempt to cancel the task if it exists and is running
+                    session_state = connected_clients.get(session_id, {})
+                    logger.info(f"[{session_id}] Checking session state in connected_clients for cancel request: {session_state}")
+                    agent_task_to_cancel = session_state.get("agent_task")
+
                     if agent_task_to_cancel:
                         logger.info(f"[{session_id}] Found agent task to cancel: {agent_task_to_cancel.get_name()} (Done: {agent_task_to_cancel.done()})")
                         if not agent_task_to_cancel.done():
+                            # Attempt cancellation via the task object (might not work if blocked)
                             agent_task_to_cancel.cancel()
-                            logger.info(f"[{session_id}] Cancel signal sent to agent task.")
-                            # Note: The actual cancellation handling and status update
-                            # happens in the 'except asyncio.CancelledError' block
-                            # of the user_message handler where the task was awaited.
+                            logger.info(f"[{session_id}] asyncio.Task.cancel() called for agent task.")
+                            # The actual stop should happen via AgentCancelledException raised by callbacks
                         else:
                              logger.warning(f"[{session_id}] Agent task was already done, cannot cancel.")
                              await send_ws_message("status_message", "Process already finished.")
+                             # Reset flag if task was already done when cancel arrived
+                             if session_id in session_data: session_data[session_id]['cancellation_requested'] = False
                     else:
                         logger.warning(f"[{session_id}] No running agent task found in connected_clients to cancel.")
                         await send_ws_message("status_message", "No active process found to cancel.")
+                        # Reset flag if no task was found
+                        if session_id in session_data: session_data[session_id]['cancellation_requested'] = False
 
 
                 # --- Other message types ---
@@ -640,6 +728,7 @@ async def handler(websocket: WebSocketProtocolType):
              agent_task.cancel()
              try: await agent_task
              except asyncio.CancelledError: pass
+             except AgentCancelledException: pass # Also catch our custom exception during cleanup
              except Exception as cancel_e: logger.error(f"[{session_id}] Error waiting for agent task cancellation during cleanup: {cancel_e}")
          if session_id in connected_clients: del connected_clients[session_id]
          if session_id in session_data: del session_data[session_id]
@@ -656,13 +745,18 @@ async def main():
     ws_host = "0.0.0.0"
     ws_port = 8765
     logger.info(f"Starting WebSocket server on ws://{ws_host}:{ws_port}")
+
+    # Define shutdown_event before server start
+    shutdown_event = asyncio.Event()
+
+    # Use standard websockets.serve
     websocket_server = await websockets.serve(
         handler, ws_host, ws_port, max_size=settings.websocket_max_size_bytes,
         ping_interval=settings.websocket_ping_interval, ping_timeout=settings.websocket_ping_timeout
     )
     logger.info("WebSocket server started.")
+
     # --- Graceful Shutdown Handling ---
-    shutdown_event = asyncio.Event()
     loop = asyncio.get_running_loop()
     original_sigint_handler = signal.getsignal(signal.SIGINT)
     original_sigterm_handler = signal.getsignal(signal.SIGTERM)
@@ -670,7 +764,10 @@ async def main():
     try: loop.add_signal_handler(signal.SIGINT, signal_handler, signal.SIGINT, None); loop.add_signal_handler(signal.SIGTERM, signal_handler, signal.SIGTERM, None)
     except NotImplementedError: logger.warning("Signal handlers not available on this platform (Windows?). Use Ctrl+C.")
     logger.info("Application servers running. Press Ctrl+C to stop.")
+
+    # Keep server running until shutdown signal
     await shutdown_event.wait()
+
     # --- Perform Cleanup ---
     logger.info("Shutdown signal received. Stopping servers...")
     logger.info("Stopping WebSocket server..."); websocket_server.close(); await websocket_server.wait_closed(); logger.info("WebSocket server stopped.")
@@ -680,6 +777,16 @@ async def main():
 
 # --- Script Execution ---
 if __name__ == "__main__":
+    # *** MODIFIED (2d): Optionally suppress LangSmith warning ***
+    # import warnings
+    # warnings.filterwarnings("ignore", category=UserWarning, message=".*LangSmith API key.*")
+    # warnings.filterwarnings("ignore", category=UserWarning, message=".*LangSmithMissingAPIKeyWarning.*")
+    # OR configure LangSmith via environment variables:
+    # os.environ["LANGCHAIN_TRACING_V2"] = "true"
+    # os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
+    # os.environ["LANGCHAIN_API_KEY"] = "YOUR_API_KEY"
+    # os.environ["LANGCHAIN_PROJECT"] = "YOUR_PROJECT_NAME" # Optional
+
     try: asyncio.run(main())
     except KeyboardInterrupt: logger.info("Server stopped manually (KeyboardInterrupt).")
     except Exception as e: logging.critical(f"Server failed to start or crashed: {e}", exc_info=True); exit(1)
