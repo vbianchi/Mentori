@@ -8,6 +8,8 @@ This project provides a functional user interface and backend for an AI agent sy
 * **Chat Interface:** Interact with the AI agent via a familiar chat window. Supports input history (Up/Down arrows). Basic Markdown rendering (newlines, bold, italics, code blocks, links).
 * **LLM Selection:** Choose the specific language model (Gemini or Ollama models configured in `.env`) to use for the current session directly from the chat header.
 * **Agent Workspace (Monitor):** View the agent's internal steps, tool usage, and outputs in a structured, styled log panel.
+* **Monitor Status Indicator:** A visual indicator (dot + text) in the monitor header shows the agent's current state (e.g., Idle, Running, Error, Disconnected).
+* **Agent Cancellation (STOP Button):** A STOP button appears in the monitor header while the agent is running. Clicking it sends a cancellation request to the backend. **Note:** Currently, this interrupts the agent *between* major steps (e.g., before the next tool use or LLM call) rather than immediately halting a long-running step.
 * **Artifact Viewer:** Displays generated `.png` images and previews common text files (`.txt`, `.py`, `.csv`, etc.) in a dedicated area below the monitor logs, with navigation for multiple artifacts.
 * **Tool Integration:** Includes tools for:
     * Web Search (`duckduckgo_search`)
@@ -91,7 +93,7 @@ ResearchAgent/
     * **(Optional):** Install R and ensure `Rscript` is in PATH for R script execution via the shell tool.
 
 3.  **Install `uv` (Recommended - Fast Package Installer):**
-    * Follow instructions: [https://github.com/astral-sh/uv#installation](https://github.com/astral-sh/uv#installation)
+    * Follow instructions: https://github.com/astral-sh/uv#installation
 
 4.  **Create and Activate Virtual Environment:**
     ```bash
@@ -99,7 +101,7 @@ ResearchAgent/
     uv venv --python 3.12 # Or your desired Python version
 
     # OR using standard venv
-    # python -m venv .env
+    # python -m venv .venv
 
     # Activate (Linux/Mac/WSL)
     source .venv/bin/activate
@@ -189,7 +191,8 @@ Runs the backend server inside an isolated Docker container. **Highly recommende
 * **Select Task:** Click a task to load its history.
 * **Select LLM:** Use the dropdown in the chat header to choose the model for the current session.
 * **Chat:** Interact with the agent. Use Up/Down arrows for input history.
-* **Monitor:** Observe agent logs.
+* **Monitor:** Observe agent logs and status indicator (Idle/Running/Error/Disconnected).
+* **Cancel Agent:** Click the "STOP" button in the monitor header while the agent is running to request cancellation (interrupts between steps).
 * **Artifact Viewer:** View generated images/text files using Prev/Next buttons.
 * **Test PubMed Search:** Ask: `"Search PubMed for recent articles on CRISPR gene editing."`
 * **Test Package Installation:** Ask: `"Install the 'numpy' python package."`
@@ -207,13 +210,19 @@ Runs the backend server inside an isolated Docker container. **Highly recommende
 
 ## Future Perspectives & Ideas
 
-* **Streaming Output:** Ensure agent responses consistently stream token-by-token to the UI.
+* **Agent Control:** Improve the STOP button to more reliably and immediately halt ongoing agent tasks, potentially by running the agent in a separate process.
+* **Streaming Output:** Ensure agent responses consistently stream token-by-token to the UI for better responsiveness.
+* **File Upload:** Allow users to upload files to the current task's workspace via drag & drop or an upload button.
 * **PDF Reading Enhancements:** Add options for page ranges or user-specified `max_length` override, improve handling of complex layouts/images.
-* **Drag & Drop Upload:** Allow users to upload files to the current task's workspace via drag and drop.
-* **Collapse Agent Steps:** Add UI controls to collapse/expand intermediate thought/tool steps in the chat/monitor.
-* **More Robust Formatting:** Use a dedicated Markdown library (e.g., `markdown-it`) for more complex rendering.
-* **Domain-Specific Tools:** PubMed Central, BLAST, VCF/FASTA parsing, etc.
-* **User Authentication.**
-* **UI Polish & Error Handling:** Improve visual feedback and handle edge cases more gracefully.
+* **Structured Output:** Add capability for the agent to return results in structured formats (e.g., JSON) for easier parsing or downstream use.
+* **Data Visualization:** Enable the agent (e.g., via Python REPL) to generate plots from data and display them directly in the Artifact Viewer.
+* **Domain-Specific Tools:** Integrate more tools relevant to bioinformatics/epidemiology (e.g., BLAST, Ensembl/UniProt API access, VCF/FASTA parsing).
+* **Artifact Management:** Allow users to rename or delete artifacts from the UI.
+* **More Robust Formatting:** Use a dedicated Markdown library (e.g., `markdown-it`) for more complex rendering if needed.
 * **Per-Task LLM Preference:** Store the last used LLM for each task.
 * **Tool Configuration UI:** Allow enabling/disabling tools per task or globally.
+* **User Authentication:** Add user accounts and login for multi-user scenarios.
+* **UI Polish & Error Handling:** Continuously improve visual feedback and handle edge cases more gracefully.
+* **Session Saving/Loading:** Persist the agent's memory state across browser sessions.
+* **Cost/Token Tracking:** Display token usage for LLM calls, especially for paid models.
+
