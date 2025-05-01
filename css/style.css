@@ -17,6 +17,7 @@
     --button-text-on-accent: #FFFFFF; /* Switch back to White text for better contrast on darker accent */
     /* --- End Updated Accent Colors --- */
     --error-color: #f36b6b; /* Keep red for errors */
+    --error-color-darker: #d32f2f; /* Darker red for hover */
     --tool-color: #148D8D; /* Medium Teal for tool logs */
     --system-color: var(--text-color-darker); /* Muted green for system logs */
     --image-color: var(--text-color-muted); /* Light green for image logs */
@@ -105,35 +106,35 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .right-panel { flex: 0 0 500px; background-color: var(--terminal-bg); }
 .monitor-header { background-color: var(--terminal-bg); border-bottom-color: var(--border-color); }
 .monitor-header h3 { margin: 0; font-size: 1em; font-weight: 500; }
-/* .monitor-header span { font-size: 0.85em; color: var(--text-color-darker); } */ /* Replaced by status container */
+.monitor-controls { display: flex; align-items: center; gap: 10px; /* Gap between status and button */ }
 
-/* *** NEW: Monitor Status Indicator Styles *** */
-.monitor-status-container {
-    display: flex;
-    align-items: center;
-    gap: 6px; /* Space between dot and text */
-}
-.status-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    background-color: var(--status-disconnected-color); /* Default grey */
-    transition: background-color 0.3s ease;
-}
-.status-dot.idle { background-color: var(--status-idle-color); } /* Green */
-.status-dot.running { background-color: var(--status-running-color); } /* Yellow */
-.status-dot.error { background-color: var(--status-error-color); } /* Red */
-.status-dot.disconnected { background-color: var(--status-disconnected-color); } /* Grey */
+/* Monitor Status Indicator Styles */
+.monitor-status-container { display: flex; align-items: center; gap: 6px; }
+.status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; background-color: var(--status-disconnected-color); transition: background-color 0.3s ease; }
+.status-dot.idle { background-color: var(--status-idle-color); }
+.status-dot.running { background-color: var(--status-running-color); }
+.status-dot.error { background-color: var(--status-error-color); }
+.status-dot.disconnected { background-color: var(--status-disconnected-color); }
+.monitor-status-text { font-size: 0.85em; color: var(--text-color-darker); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-.monitor-status-text {
-    font-size: 0.85em;
-    color: var(--text-color-darker);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+/* *** NEW: Stop Button Styles *** */
+.stop-button {
+    background-color: var(--error-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 2px 8px; /* Small padding */
+    font-size: 0.8em;
+    font-weight: bold;
+    cursor: pointer;
+    /* margin-left: 10px; */ /* Removed, using gap in .monitor-controls */
+    display: none; /* Hidden by default, shown by JS */
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+    line-height: 1.5; /* Adjust line height */
 }
-/* *** END: Monitor Status Indicator Styles *** */
+.stop-button:hover:not(:disabled) { background-color: var(--error-color-darker); }
+.stop-button:disabled { background-color: #9E9E9E; cursor: not-allowed; opacity: 0.6; }
+/* *** END: Stop Button Styles *** */
 
 
 /* Monitor Split Layout */
@@ -160,9 +161,9 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     border-radius: 3px;
     border: 1px solid var(--border-color);
     overflow-x: auto;
-    white-space: pre-wrap; /* Ensure wrapping */
-    word-break: break-word; /* Break long words */
-    overflow-wrap: break-word; /* Alternate property */
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 .log-type-tool-output { border-left: 3px solid var(--tool-color); }
 .log-type-tool-error { border-left: 3px solid var(--error-color); background-color: rgba(243, 107, 107, 0.05); }
@@ -231,4 +232,6 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     .panel:not(:last-child) { border-right: none; border-bottom: 1px solid var(--border-color); }
     .monitor-artifact-area img, .monitor-artifact-area pre { max-height: 200px; }
     .llm-selector { max-width: 150px; font-size: 0.8em; }
+    .monitor-header { flex-wrap: wrap; } /* Allow wrapping */
+    .monitor-controls { margin-left: auto; /* Push controls to right on wrap */ padding-top: 5px;}
 }

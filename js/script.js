@@ -3,7 +3,7 @@
  * This script handles the frontend logic for the AI Agent UI,
  * including WebSocket communication, DOM manipulation, event handling,
  * task history management, chat input history, Markdown formatting,
- * LLM selection, and monitor status updates.
+ * LLM selection, monitor status updates, and agent cancellation.
  */
 document.addEventListener('DOMContentLoaded', () => {
     console.log("AI Agent UI Script Loaded and DOM ready!");
@@ -21,11 +21,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatTextarea = document.querySelector('.chat-input-area textarea');
     const chatSendButton = document.querySelector('.chat-input-area button');
     const currentTaskTitleElement = document.getElementById('current-task-title');
-    // *** MODIFIED: Get new status elements ***
     const monitorStatusContainer = document.getElementById('monitor-status-container');
     const statusDotElement = document.getElementById('status-dot');
     const monitorStatusTextElement = document.getElementById('monitor-status-text');
     const llmSelectElement = document.getElementById('llm-select');
+    const stopButton = document.getElementById('stop-button'); // *** NEW: Stop Button ***
 
     // --- State Variables ---
     let tasks = [];
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let availableModels = { gemini: [], ollama: [] };
     let currentSelectedLlmId = null;
     let defaultLlmId = null;
-    let isAgentRunning = false; // *** NEW: Track agent running state ***
+    let isAgentRunning = false;
 
     // --- Chat Input History State ---
     let chatInputHistory = [];
@@ -58,37 +58,51 @@ document.addEventListener('DOMContentLoaded', () => {
     window.socket = null;
     console.log("Initialized window.socket to null.");
 
-    // *** NEW: Function to update monitor status indicator ***
+    // --- Function to update monitor status indicator & Stop Button ---
     const updateMonitorStatus = (status, text) => {
-        if (!statusDotElement || !monitorStatusTextElement) return;
+        if (!statusDotElement || !monitorStatusTextElement || !stopButton) return;
 
-        // Remove existing status classes from dot
         statusDotElement.classList.remove('idle', 'running', 'error', 'disconnected');
+        let statusText = text;
 
-        // Add the new status class and set text
         switch (status) {
             case 'idle':
                 statusDotElement.classList.add('idle');
-                monitorStatusTextElement.textContent = text || 'Idle';
+                statusText = text || 'Idle';
                 isAgentRunning = false;
+                stopButton.style.display = 'none'; // Hide stop button
+                stopButton.disabled = true;
                 break;
             case 'running':
                 statusDotElement.classList.add('running');
-                monitorStatusTextElement.textContent = text || 'Running...';
+                statusText = text || 'Running...';
                 isAgentRunning = true;
+                stopButton.style.display = 'inline-block'; // Show stop button
+                stopButton.disabled = false; // Enable stop button
                 break;
             case 'error':
                 statusDotElement.classList.add('error');
-                monitorStatusTextElement.textContent = text || 'Error';
-                isAgentRunning = false; // Agent stopped on error
+                statusText = text || 'Error';
+                isAgentRunning = false;
+                stopButton.style.display = 'none'; // Hide stop button
+                stopButton.disabled = true;
                 break;
+            case 'cancelling': // Intermediate state
+                 statusDotElement.classList.add('running'); // Keep yellow while cancelling
+                 statusText = text || 'Cancelling...';
+                 isAgentRunning = true; // Still considered running until confirmed stopped
+                 stopButton.disabled = true; // Disable button after click
+                 break;
             case 'disconnected':
             default:
                 statusDotElement.classList.add('disconnected');
-                monitorStatusTextElement.textContent = text || 'Disconnected';
+                statusText = text || 'Disconnected';
                 isAgentRunning = false;
+                stopButton.style.display = 'none'; // Hide stop button
+                stopButton.disabled = true;
                 break;
         }
+        monitorStatusTextElement.textContent = statusText;
         console.log(`Monitor status updated: ${status} - ${monitorStatusTextElement.textContent}`);
     };
 
@@ -96,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const connectWebSocket = () => {
         console.log(`Attempting to connect to WebSocket: ${wsUrl}`);
         addMonitorLog("[SYSTEM] Attempting to connect to backend...");
-        updateMonitorStatus('disconnected', 'Connecting...'); // Update status
+        updateMonitorStatus('disconnected', 'Connecting...');
         chatMessagesContainer.querySelectorAll('.connection-status').forEach(el => el.remove());
         try {
             if (window.socket && window.socket.readyState !== WebSocket.CLOSED) {
@@ -110,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Fatal Error creating WebSocket object:", error);
             addChatMessage("FATAL: Failed to initialize WebSocket connection.", "status");
             addMonitorLog(`[SYSTEM] FATAL Error creating WebSocket: ${error.message}`);
-            updateMonitorStatus('error', 'Connection Failed'); // Update status
+            updateMonitorStatus('error', 'Connection Failed');
             window.socket = null;
             return;
         }
@@ -119,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("WebSocket connection opened successfully.");
             addMonitorLog(`[SYSTEM] WebSocket connection established.`);
             addChatMessage("Connected to backend.", "status");
-            updateMonitorStatus('idle', 'Idle'); // Update status
+            updateMonitorStatus('idle', 'Idle');
 
             sendWsMessage("get_available_models", {});
 
@@ -154,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (loadingMsg && loadingMsg.textContent.startsWith("Loading history...")) { loadingMsg.remove(); }
                         scrollToBottom(chatMessagesContainer);
                         scrollToBottom(monitorLogAreaElement);
-                        updateMonitorStatus('idle', 'Idle'); // Back to idle after loading
+                        updateMonitorStatus('idle', 'Idle');
                         break;
 
                     case 'agent_token_chunk':
@@ -173,8 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.log("Received full agent_message:", message.content.substring(0, 100) + "...");
                         addChatMessage(message.content, 'agent');
                         currentStreamingMessageElement = null;
-                        // Agent finished when sending full message
-                        updateMonitorStatus('idle', 'Idle');
+                        updateMonitorStatus('idle', 'Idle'); // Agent finished
                         break;
                     case 'user':
                         console.log("Received user history message:", message.content);
@@ -182,28 +195,29 @@ document.addEventListener('DOMContentLoaded', () => {
                         currentStreamingMessageElement = null;
                         break;
                     case 'status_message':
-                         // *** MODIFIED: Only show critical status messages in chat ***
                          const lowerContent = message.content.toLowerCase();
-                         // Show connection/disconnection/critical errors in chat, others just update monitor status
                          if (lowerContent.includes("connect") || lowerContent.includes("clos") || lowerContent.includes("error")) {
                              addChatMessage(message.content, 'status');
                          }
                          // Update monitor status based on content
                          if (lowerContent.includes("error")) {
                              updateMonitorStatus('error', message.content);
-                         } else if (lowerContent.includes("complete")) {
-                             updateMonitorStatus('idle', 'Idle'); // Agent finished
-                         } else if (isAgentRunning) { // Only update if agent is already running
-                             updateMonitorStatus('running', message.content); // Show intermediate steps text in monitor header
+                         } else if (lowerContent.includes("complete") || lowerContent.includes("cancelled")) { // Also set idle on cancel
+                             updateMonitorStatus('idle', 'Idle');
+                         } else if (isAgentRunning && !lowerContent.includes("llm set")) { // Avoid overriding "Running" with "LLM set"
+                             updateMonitorStatus('running', message.content);
                          }
-                         // Reset streaming if processing is complete or errored
-                         if (lowerContent.includes("complete") || lowerContent.includes("error")) {
+                         if (lowerContent.includes("complete") || lowerContent.includes("error") || lowerContent.includes("cancelled")) {
                              console.log("Resetting streaming element due to status message:", message.content);
                              currentStreamingMessageElement = null;
                          }
                          break;
                     case 'monitor_log':
                         addMonitorLog(message.content);
+                        // If agent finishes or errors, ensure status is updated
+                        if (message.content.includes("[Agent Finish]") || message.content.includes("Error]")) {
+                             if(isAgentRunning) updateMonitorStatus('idle', 'Idle'); // Set back to idle if it was running
+                        }
                         break;
                     case 'update_artifacts':
                         console.log("Received update_artifacts message with content:", message.content);
@@ -240,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 console.error("Failed to parse/process WS message:", error, "Data:", event.data);
                 addMonitorLog(`[SYSTEM] Error processing message: ${error.message}.`);
-                updateMonitorStatus('error', 'Processing Error'); // Update status
+                updateMonitorStatus('error', 'Processing Error');
                 currentStreamingMessageElement = null;
             }
         };
@@ -249,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("WebSocket error event:", event);
             addChatMessage("ERROR: Cannot connect to backend.", "status", true);
             addMonitorLog(`[SYSTEM] WebSocket error occurred.`);
-            updateMonitorStatus('error', 'Connection Error'); // Update status
+            updateMonitorStatus('error', 'Connection Error');
             window.socket = null;
             currentStreamingMessageElement = null;
              if (llmSelectElement) {
@@ -265,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
             else { reason = `Abnormal (Code: ${event.code})`; advice = " Backend down or network issue?"; }
             addChatMessage(`Connection closed.${advice}`, "status", true);
             addMonitorLog(`[SYSTEM] WebSocket disconnected. ${reason}`);
-            updateMonitorStatus('disconnected', 'Disconnected'); // Update status
+            updateMonitorStatus('disconnected', 'Disconnected');
             window.socket = null;
             currentStreamingMessageElement = null;
              if (llmSelectElement) {
@@ -291,23 +305,19 @@ document.addEventListener('DOMContentLoaded', () => {
         return formattedText;
     };
 
-    // *** MODIFIED: Filter status messages shown in chat ***
     const addChatMessage = (text, type = 'agent', doScroll = true) => {
         if (!chatMessagesContainer) { console.error("Chat container missing!"); return null; }
 
-        // Filter out most status messages from chat, only show critical connection/error ones
         if (type === 'status') {
             const lowerText = text.toLowerCase();
             if (!(lowerText.includes("connect") || lowerText.includes("clos") || lowerText.includes("error"))) {
-                 // Don't add non-critical status messages to chat DOM
                  console.log("Skipping non-critical status message in chat:", text);
-                 return null; // Return null to indicate nothing was added
+                 return null;
             }
         }
 
         const messageElement = document.createElement('div');
         messageElement.classList.add('message', `message-${type}`);
-        // Add specific classes for styling critical status messages
         if (type === 'status') {
             const lowerText = text.toLowerCase();
             if (lowerText.includes("connect") || lowerText.includes("clos")) { messageElement.classList.add('connection-status'); }
@@ -568,16 +578,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentTask = tasks.find(task => task.id === currentTaskId);
         const title = currentTask ? currentTask.title : "No Task Selected";
         currentTaskTitleElement.textContent = title;
-        // *** Update monitor status text based on task selection ***
         if (currentTask) {
-            // Only update text if not currently running/error/disconnected
             if (!isAgentRunning && statusDotElement && !statusDotElement.classList.contains('error') && !statusDotElement.classList.contains('disconnected')) {
                  updateMonitorStatus('idle', 'Idle');
             }
         } else {
              updateMonitorStatus('idle', 'No Task');
         }
-        // if(monitorFooterStatusElement) monitorFooterStatusElement.textContent = currentTask ? `Task: ${title}` : "No Task Selected"; // Remove if footer was removed
     };
     const clearChatAndMonitor = (addLog = true) => {
         if (chatMessagesContainer) chatMessagesContainer.innerHTML = '';
@@ -595,22 +602,22 @@ document.addEventListener('DOMContentLoaded', () => {
         currentTaskId = task ? taskId : null;
         console.log(`Selected task ID set to: ${currentTaskId}`);
         saveTasks();
-        renderTaskList(); // This calls updateCurrentTaskTitle which updates monitor status
+        renderTaskList();
         if (currentTaskId && task) {
             sendWsMessage("context_switch", { task: task.title, taskId: task.id });
             clearChatAndMonitor(false);
-            addChatMessage("Switching task context...", "status"); // Keep this brief status
-            updateMonitorStatus('running', 'Switching Task...'); // Show status during switch
+            addChatMessage("Switching task context...", "status");
+            updateMonitorStatus('running', 'Switching Task...');
         } else if (!currentTaskId) {
             clearChatAndMonitor();
             addChatMessage("No task selected.", "status");
             addMonitorLog("[SYSTEM] No task selected.");
-            updateMonitorStatus('idle', 'No Task'); // Update status
+            updateMonitorStatus('idle', 'No Task');
         } else if (!socket || socket.readyState !== WebSocket.OPEN) {
             clearChatAndMonitor(false);
             addChatMessage("Switched task locally. Connect to backend to load history.", "status");
             addMonitorLog(`[SYSTEM] Switched task locally to ${taskId}, but WS not open.`);
-             updateMonitorStatus('disconnected', 'Disconnected'); // Reflect WS state
+             updateMonitorStatus('disconnected', 'Disconnected');
         }
         console.log(`Finished select task logic for: ${currentTaskId}`);
     };
@@ -636,10 +643,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentTaskId === taskId) {
             nextTaskId = tasks.length > 0 ? tasks[0].id : null;
             console.log(`Deleted active task, selecting next: ${nextTaskId}`);
-            selectTask(nextTaskId); // This will update status
+            selectTask(nextTaskId);
         } else {
             saveTasks();
-            renderTaskList(); // This updates UI but doesn't change active task/status
+            renderTaskList();
         }
         console.log(`Finished delete task logic for: ${taskId}`);
     };
@@ -710,17 +717,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const payload = JSON.stringify({ type: type, ...content });
                 console.log(`Sending WS message: ${type}`, content);
                 window.socket.send(payload);
-                if (type === "rename_task" || type === "delete_task" || type === "set_llm") {
+                if (type === "rename_task" || type === "delete_task" || type === "set_llm" || type === "cancel_agent") { // Added cancel_agent
                      addMonitorLog(`[SYSTEM] Sent ${type} request.`);
                 }
             } catch (e) {
                 console.error(`Error sending ${type} via WebSocket:`, e);
                 addMonitorLog(`[SYSTEM] Error sending ${type} request: ${e.message}`);
-                addChatMessage(`Error sending ${type} request to backend.`, "status"); // Show critical errors in chat
+                addChatMessage(`Error sending ${type} request to backend.`, "status");
             }
         } else {
             console.warn(`Cannot send ${type}: WebSocket is not open.`);
-            if (type === "user_message" || type === "context_switch") { // Only show chat errors for user-initiated actions
+            if (type === "user_message" || type === "context_switch") {
                 addChatMessage(`Cannot send ${type}: Not connected to backend.`, "status");
             }
              addMonitorLog(`[SYSTEM] Cannot send ${type}: WS not open.`);
@@ -735,6 +742,10 @@ document.addEventListener('DOMContentLoaded', () => {
             chatTextarea.focus();
             return;
         }
+        if (isAgentRunning) { // Prevent sending if agent is already running
+            addChatMessage("Agent is currently busy. Please wait or stop the current process.", "status");
+            return;
+        }
         if (messageText) {
             addChatMessage(messageText, 'user');
             if (chatInputHistory[chatInputHistory.length - 1] !== messageText) {
@@ -745,9 +756,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentInputBuffer = "";
 
             sendWsMessage("user_message", { content: messageText });
-            // *** MODIFIED: Update monitor status immediately ***
-            updateMonitorStatus('running', 'Processing...');
-            // *** REMOVED: addChatMessage("Agent processing...", "status"); ***
+            updateMonitorStatus('running', 'Processing...'); // Set status to running
 
             chatTextarea.value = '';
             chatTextarea.style.height = 'auto';
@@ -797,13 +806,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentSelectedLlmId = selectedId;
                 localStorage.setItem('selectedLlmId', selectedId);
                 sendWsMessage("set_llm", { llm_id: selectedId });
-                // Don't add chat message for LLM switch
-                // addChatMessage(`Switched LLM to ${selectedId}`, 'status');
             } else if (!selectedId) {
                  console.warn("LLM selector changed to an empty value.");
             }
         });
     } else { console.error("LLM select element not found!"); }
+
+    // *** NEW: Stop Button Listener ***
+    if (stopButton) {
+        stopButton.addEventListener('click', () => {
+            if (isAgentRunning) {
+                console.log("Stop button clicked.");
+                addMonitorLog("[SYSTEM] Stop request sent.");
+                sendWsMessage("cancel_agent", {});
+                updateMonitorStatus('cancelling', 'Cancelling...'); // Update status immediately
+                stopButton.disabled = true; // Prevent multiple clicks
+            }
+        });
+    } else { console.error("Stop button element not found!"); }
 
 
     document.body.addEventListener('click', event => {
@@ -821,7 +841,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Initial Load Actions ---
     loadTasks();
     renderTaskList();
-    connectWebSocket(); // This will set initial monitor status
+    connectWebSocket();
 
 }); // End of DOMContentLoaded listener
 
