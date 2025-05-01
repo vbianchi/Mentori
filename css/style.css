@@ -28,6 +28,13 @@
     --code-bg: var(--panel-bg-lighter); /* Code blocks match lighter panel bg */
     --code-text: var(--text-color); /* White code text */
 
+    /* Status Colors */
+    --status-idle-color: #4CAF50; /* Green */
+    --status-running-color: #FFC107; /* Yellow */
+    --status-error-color: #F44336; /* Red */
+    --status-disconnected-color: #9E9E9E; /* Grey */
+
+
     --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     --monospace-font: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
 }
@@ -98,7 +105,36 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .right-panel { flex: 0 0 500px; background-color: var(--terminal-bg); }
 .monitor-header { background-color: var(--terminal-bg); border-bottom-color: var(--border-color); }
 .monitor-header h3 { margin: 0; font-size: 1em; font-weight: 500; }
-.monitor-header span { font-size: 0.85em; color: var(--text-color-darker); }
+/* .monitor-header span { font-size: 0.85em; color: var(--text-color-darker); } */ /* Replaced by status container */
+
+/* *** NEW: Monitor Status Indicator Styles *** */
+.monitor-status-container {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Space between dot and text */
+}
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background-color: var(--status-disconnected-color); /* Default grey */
+    transition: background-color 0.3s ease;
+}
+.status-dot.idle { background-color: var(--status-idle-color); } /* Green */
+.status-dot.running { background-color: var(--status-running-color); } /* Yellow */
+.status-dot.error { background-color: var(--status-error-color); } /* Red */
+.status-dot.disconnected { background-color: var(--status-disconnected-color); } /* Grey */
+
+.monitor-status-text {
+    font-size: 0.85em;
+    color: var(--text-color-darker);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/* *** END: Monitor Status Indicator Styles *** */
+
 
 /* Monitor Split Layout */
 .monitor-split-content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
@@ -109,37 +145,37 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 /* Individual Log Entry Styling */
 .monitor-log-entry { margin-bottom: 8px; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border-color); background-color: var(--panel-bg); display: flex; flex-direction: column; }
 .log-timestamp { font-size: 0.8em; color: var(--text-color-darker); margin-bottom: 4px; white-space: nowrap; }
-.log-content { white-space: pre-wrap; word-wrap: break-word; color: var(--text-color); } /* Default wrap */
+.log-content { white-space: pre-wrap; word-wrap: break-word; color: var(--text-color); }
 .log-type-system { border-left: 3px solid var(--system-color); }
 .log-type-tool-start { border-left: 3px solid var(--tool-color); background-color: var(--panel-bg-lighter); }
 /* Styling for <pre> blocks within certain log types */
 .log-type-tool-output .log-content pre,
 .log-type-tool-error .log-content pre,
-.log-type-agent-thought-action .log-content pre, /* Apply to thoughts */
-.log-type-agent-thought-final .log-content pre { /* Apply to thoughts */
+.log-type-agent-thought-action .log-content pre,
+.log-type-agent-thought-final .log-content pre {
     background-color: var(--terminal-bg);
     color: var(--terminal-text);
     padding: 5px 8px;
     margin-top: 4px;
     border-radius: 3px;
     border: 1px solid var(--border-color);
-    overflow-x: auto; /* Allow horizontal scroll if needed */
+    overflow-x: auto;
     white-space: pre-wrap; /* Ensure wrapping */
     word-break: break-word; /* Break long words */
     overflow-wrap: break-word; /* Alternate property */
 }
 .log-type-tool-output { border-left: 3px solid var(--tool-color); }
 .log-type-tool-error { border-left: 3px solid var(--error-color); background-color: rgba(243, 107, 107, 0.05); }
-.log-type-tool-error .log-content pre { color: var(--error-color); } /* Style text inside pre */
+.log-type-tool-error .log-content pre { color: var(--error-color); }
 /* Style for agent thoughts */
 .log-type-agent-thought-action,
 .log-type-agent-thought-final {
     border-left: 3px solid var(--thought-color);
-    background-color: rgba(160, 192, 138, 0.05); /* Subtle background */
+    background-color: rgba(160, 192, 138, 0.05);
 }
 .log-type-agent-thought-action .log-content pre,
 .log-type-agent-thought-final .log-content pre {
-    color: var(--thought-color); /* Use thought color for text inside pre */
+    color: var(--thought-color);
 }
 .log-type-agent-finish { border-left: 3px solid var(--accent-color); }
 .log-type-error { border-left: 3px solid var(--error-color); background-color: rgba(243, 107, 107, 0.05); }

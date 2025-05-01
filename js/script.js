@@ -3,7 +3,7 @@
  * This script handles the frontend logic for the AI Agent UI,
  * including WebSocket communication, DOM manipulation, event handling,
  * task history management, chat input history, Markdown formatting,
- * and LLM selection.
+ * LLM selection, and monitor status updates.
  */
 document.addEventListener('DOMContentLoaded', () => {
     console.log("AI Agent UI Script Loaded and DOM ready!");
@@ -21,21 +21,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatTextarea = document.querySelector('.chat-input-area textarea');
     const chatSendButton = document.querySelector('.chat-input-area button');
     const currentTaskTitleElement = document.getElementById('current-task-title');
-    const monitorStatusElement = document.getElementById('monitor-status');
-    const monitorFooterStatusElement = document.getElementById('monitor-footer-status'); // Assuming this exists or is added
-    const llmSelectElement = document.getElementById('llm-select'); // *** NEW: LLM Selector ***
+    // *** MODIFIED: Get new status elements ***
+    const monitorStatusContainer = document.getElementById('monitor-status-container');
+    const statusDotElement = document.getElementById('status-dot');
+    const monitorStatusTextElement = document.getElementById('monitor-status-text');
+    const llmSelectElement = document.getElementById('llm-select');
 
     // --- State Variables ---
-    let tasks = []; // Array of task objects {id: string, title: string, timestamp: number}
+    let tasks = [];
     let currentTaskId = null;
     let taskCounter = 0;
     const STORAGE_KEY = 'aiAgentTasks';
     const COUNTER_KEY = 'aiAgentTaskCounter';
     let isLoadingHistory = false;
-    let availableModels = { gemini: [], ollama: [] }; // *** NEW: Store available models ***
-    let currentSelectedLlmId = null; // *** NEW: Track selected LLM ***
-    let defaultLlmId = null; // *** NEW: Store default LLM from backend ***
-
+    let availableModels = { gemini: [], ollama: [] };
+    let currentSelectedLlmId = null;
+    let defaultLlmId = null;
+    let isAgentRunning = false; // *** NEW: Track agent running state ***
 
     // --- Chat Input History State ---
     let chatInputHistory = [];
@@ -47,21 +49,54 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentStreamingMessageElement = null;
 
     // --- Artifact State ---
-    let currentTaskArtifacts = []; // Stores {type: 'image'|'text', url: string, filename: string}
+    let currentTaskArtifacts = [];
     let currentArtifactIndex = -1;
 
     // --- WebSocket Setup ---
     const wsUrl = 'ws://localhost:8765';
     let socket;
-    window.socket = null; // Make accessible globally for debugging if needed
+    window.socket = null;
     console.log("Initialized window.socket to null.");
 
-    /**
-     * Establishes and manages the WebSocket connection.
-     */
+    // *** NEW: Function to update monitor status indicator ***
+    const updateMonitorStatus = (status, text) => {
+        if (!statusDotElement || !monitorStatusTextElement) return;
+
+        // Remove existing status classes from dot
+        statusDotElement.classList.remove('idle', 'running', 'error', 'disconnected');
+
+        // Add the new status class and set text
+        switch (status) {
+            case 'idle':
+                statusDotElement.classList.add('idle');
+                monitorStatusTextElement.textContent = text || 'Idle';
+                isAgentRunning = false;
+                break;
+            case 'running':
+                statusDotElement.classList.add('running');
+                monitorStatusTextElement.textContent = text || 'Running...';
+                isAgentRunning = true;
+                break;
+            case 'error':
+                statusDotElement.classList.add('error');
+                monitorStatusTextElement.textContent = text || 'Error';
+                isAgentRunning = false; // Agent stopped on error
+                break;
+            case 'disconnected':
+            default:
+                statusDotElement.classList.add('disconnected');
+                monitorStatusTextElement.textContent = text || 'Disconnected';
+                isAgentRunning = false;
+                break;
+        }
+        console.log(`Monitor status updated: ${status} - ${monitorStatusTextElement.textContent}`);
+    };
+
+
     const connectWebSocket = () => {
         console.log(`Attempting to connect to WebSocket: ${wsUrl}`);
         addMonitorLog("[SYSTEM] Attempting to connect to backend...");
+        updateMonitorStatus('disconnected', 'Connecting...'); // Update status
         chatMessagesContainer.querySelectorAll('.connection-status').forEach(el => el.remove());
         try {
             if (window.socket && window.socket.readyState !== WebSocket.CLOSED) {
@@ -75,6 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Fatal Error creating WebSocket object:", error);
             addChatMessage("FATAL: Failed to initialize WebSocket connection.", "status");
             addMonitorLog(`[SYSTEM] FATAL Error creating WebSocket: ${error.message}`);
+            updateMonitorStatus('error', 'Connection Failed'); // Update status
             window.socket = null;
             return;
         }
@@ -83,8 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("WebSocket connection opened successfully.");
             addMonitorLog(`[SYSTEM] WebSocket connection established.`);
             addChatMessage("Connected to backend.", "status");
+            updateMonitorStatus('idle', 'Idle'); // Update status
 
-            // Request available models on connection
             sendWsMessage("get_available_models", {});
 
             if (currentTaskId) {
@@ -94,11 +130,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     sendWsMessage("context_switch", { task: currentTask.title, taskId: currentTask.id });
                 } else {
                     console.warn("currentTaskId set, but task not found in list on connection open.");
-                    currentTaskId = null;
-                    updateArtifactDisplay();
+                    currentTaskId = null; updateMonitorStatus('idle', 'No Task'); updateArtifactDisplay();
                 }
             } else {
-                updateArtifactDisplay();
+                 updateMonitorStatus('idle', 'No Task'); updateArtifactDisplay();
             }
         };
 
@@ -110,13 +145,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 switch (message.type) {
                     case 'history_start':
                         console.log("Received history_start signal."); isLoadingHistory = true;
-                        clearChatAndMonitor(false); addChatMessage(`Loading history...`, "status"); break;
+                        clearChatAndMonitor(false); addChatMessage(`Loading history...`, "status");
+                        updateMonitorStatus('running', 'Loading History...');
+                        break;
                     case 'history_end':
                         console.log("Received history_end signal."); isLoadingHistory = false;
                         const loadingMsg = chatMessagesContainer.querySelector('.message-status:last-child');
                         if (loadingMsg && loadingMsg.textContent.startsWith("Loading history...")) { loadingMsg.remove(); }
                         scrollToBottom(chatMessagesContainer);
                         scrollToBottom(monitorLogAreaElement);
+                        updateMonitorStatus('idle', 'Idle'); // Back to idle after loading
                         break;
 
                     case 'agent_token_chunk':
@@ -135,6 +173,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.log("Received full agent_message:", message.content.substring(0, 100) + "...");
                         addChatMessage(message.content, 'agent');
                         currentStreamingMessageElement = null;
+                        // Agent finished when sending full message
+                        updateMonitorStatus('idle', 'Idle');
                         break;
                     case 'user':
                         console.log("Received user history message:", message.content);
@@ -142,14 +182,28 @@ document.addEventListener('DOMContentLoaded', () => {
                         currentStreamingMessageElement = null;
                         break;
                     case 'status_message':
-                        addChatMessage(message.content, 'status');
-                        if (message.content.toLowerCase().includes("complete") || message.content.toLowerCase().includes("error")) {
-                            console.log("Resetting streaming element due to status message:", message.content);
-                            currentStreamingMessageElement = null;
-                        }
-                        break;
+                         // *** MODIFIED: Only show critical status messages in chat ***
+                         const lowerContent = message.content.toLowerCase();
+                         // Show connection/disconnection/critical errors in chat, others just update monitor status
+                         if (lowerContent.includes("connect") || lowerContent.includes("clos") || lowerContent.includes("error")) {
+                             addChatMessage(message.content, 'status');
+                         }
+                         // Update monitor status based on content
+                         if (lowerContent.includes("error")) {
+                             updateMonitorStatus('error', message.content);
+                         } else if (lowerContent.includes("complete")) {
+                             updateMonitorStatus('idle', 'Idle'); // Agent finished
+                         } else if (isAgentRunning) { // Only update if agent is already running
+                             updateMonitorStatus('running', message.content); // Show intermediate steps text in monitor header
+                         }
+                         // Reset streaming if processing is complete or errored
+                         if (lowerContent.includes("complete") || lowerContent.includes("error")) {
+                             console.log("Resetting streaming element due to status message:", message.content);
+                             currentStreamingMessageElement = null;
+                         }
+                         break;
                     case 'monitor_log':
-                        addMonitorLog(message.content); // Let addMonitorLog handle parsing
+                        addMonitorLog(message.content);
                         break;
                     case 'update_artifacts':
                         console.log("Received update_artifacts message with content:", message.content);
@@ -186,6 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 console.error("Failed to parse/process WS message:", error, "Data:", event.data);
                 addMonitorLog(`[SYSTEM] Error processing message: ${error.message}.`);
+                updateMonitorStatus('error', 'Processing Error'); // Update status
                 currentStreamingMessageElement = null;
             }
         };
@@ -194,6 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("WebSocket error event:", event);
             addChatMessage("ERROR: Cannot connect to backend.", "status", true);
             addMonitorLog(`[SYSTEM] WebSocket error occurred.`);
+            updateMonitorStatus('error', 'Connection Error'); // Update status
             window.socket = null;
             currentStreamingMessageElement = null;
              if (llmSelectElement) {
@@ -209,14 +265,13 @@ document.addEventListener('DOMContentLoaded', () => {
             else { reason = `Abnormal (Code: ${event.code})`; advice = " Backend down or network issue?"; }
             addChatMessage(`Connection closed.${advice}`, "status", true);
             addMonitorLog(`[SYSTEM] WebSocket disconnected. ${reason}`);
+            updateMonitorStatus('disconnected', 'Disconnected'); // Update status
             window.socket = null;
             currentStreamingMessageElement = null;
              if (llmSelectElement) {
                 llmSelectElement.innerHTML = '<option value="">Disconnected</option>';
                 llmSelectElement.disabled = true;
              }
-            // Optional: Attempt reconnection
-            // setTimeout(connectWebSocket, 5000);
         };
     };
 
@@ -224,51 +279,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const scrollToBottom = (element) => { if (!element) return; element.scrollTop = element.scrollHeight; };
 
     const formatMessageContent = (text) => {
-        // 1. Sanitize basic HTML chars FIRST
-        let formattedText = text
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-
-        // 2. Convert ```code blocks``` to <pre><code>
-        formattedText = formattedText.replace(/```(\w*)\n([\s\S]*?)\n?```/g, (match, lang, code) => {
-            const escapedCode = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            const langClass = lang ? ` class="language-${lang}"` : '';
-            return `<pre><code${langClass}>${escapedCode}</code></pre>`;
-        });
-
-        // 3. Convert Markdown Links: [text](url) -> <a href="url">text</a>
-        formattedText = formattedText.replace(
-            /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
-            (match, linkText, linkUrl) => {
-                const safeLinkUrl = linkUrl.replace(/"/g, "&quot;");
-                if (linkText.includes('<') || linkText.includes('>')) return match;
-                return `<a href="${safeLinkUrl}" target="_blank" rel="noopener noreferrer">${linkText}</a>`;
-            }
-        );
-
-        // 4. Convert Bold and Italics
+        let formattedText = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        formattedText = formattedText.replace(/```(\w*)\n([\s\S]*?)\n?```/g, (match, lang, code) => { const escapedCode = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); const langClass = lang ? ` class="language-${lang}"` : ''; return `<pre><code${langClass}>${escapedCode}</code></pre>`; });
+        formattedText = formattedText.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (match, linkText, linkUrl) => { const safeLinkUrl = linkUrl.replace(/"/g, "&quot;"); if (linkText.includes('<') || linkText.includes('>')) return match; return `<a href="${safeLinkUrl}" target="_blank" rel="noopener noreferrer">${linkText}</a>`; });
         formattedText = formattedText.replace(/(\*\*\*|___)(?=\S)([\s\S]*?\S)\1/g, '<strong><em>$2</em></strong>');
         formattedText = formattedText.replace(/(\*\*|__)(?=\S)([\s\S]*?\S)\1/g, '<strong>$2</strong>');
         formattedText = formattedText.replace(/(\*|_)(?=\S)([\s\S]*?\S)\1/g, '<em>$2</em>');
-
-        // 5. Convert remaining newlines to <br> (ONLY outside of pre/code tags)
         const parts = formattedText.split(/(<pre>.*?<\/pre>|<a.*?<\/a>)/s);
-        for (let i = 0; i < parts.length; i += 2) {
-            parts[i] = parts[i].replace(/\n/g, '<br>');
-        }
+        for (let i = 0; i < parts.length; i += 2) { parts[i] = parts[i].replace(/\n/g, '<br>'); }
         formattedText = parts.join('');
-
         return formattedText;
     };
 
+    // *** MODIFIED: Filter status messages shown in chat ***
     const addChatMessage = (text, type = 'agent', doScroll = true) => {
         if (!chatMessagesContainer) { console.error("Chat container missing!"); return null; }
+
+        // Filter out most status messages from chat, only show critical connection/error ones
+        if (type === 'status') {
+            const lowerText = text.toLowerCase();
+            if (!(lowerText.includes("connect") || lowerText.includes("clos") || lowerText.includes("error"))) {
+                 // Don't add non-critical status messages to chat DOM
+                 console.log("Skipping non-critical status message in chat:", text);
+                 return null; // Return null to indicate nothing was added
+            }
+        }
+
         const messageElement = document.createElement('div');
         messageElement.classList.add('message', `message-${type}`);
-        if (type === 'status') { if (text.toLowerCase().includes("connect") || text.toLowerCase().includes("clos")) { messageElement.classList.add('connection-status'); } if (text.toLowerCase().includes("error")) { messageElement.classList.add('error-message'); } }
+        // Add specific classes for styling critical status messages
+        if (type === 'status') {
+            const lowerText = text.toLowerCase();
+            if (lowerText.includes("connect") || lowerText.includes("clos")) { messageElement.classList.add('connection-status'); }
+            if (lowerText.includes("error")) { messageElement.classList.add('error-message'); }
+        }
         if (type === 'user') { messageElement.classList.add('user-message'); }
         if (type === 'agent') { messageElement.classList.add('agent-message'); }
 
@@ -283,65 +327,45 @@ document.addEventListener('DOMContentLoaded', () => {
         return messageElement;
     };
 
-    /**
-     * Adds a log entry to the monitor panel with appropriate styling.
-     * Parses timestamp/session and type indicator prefixes.
-     */
     const addMonitorLog = (fullLogText) => {
         if (!monitorLogAreaElement) { console.error("Monitor log area element (#monitor-log-area) not found!"); return; }
         const logEntryDiv = document.createElement('div');
         logEntryDiv.classList.add('monitor-log-entry');
-
-        // *** MODIFIED REGEX: More flexible for type indicator ***
-        // Captures:
-        // Group 1: Timestamp + Session ID (e.g., "[2024...][sessId]")
-        // Group 2: Optional Type Indicator (e.g., "[TOOL START]", "[Agent Thought (Final)]") - Non-greedy match
-        // Group 3: The actual log content
         const logRegex = /^(\[.*?\]\[.*?\])\s*(?:\[(.*?)\])?\s*(.*)$/s;
         const match = fullLogText.match(logRegex);
-
         let timestampPrefix = "";
         let logTypeIndicator = "";
-        let logContent = fullLogText; // Default if regex fails
-        let logType = "unknown"; // Default type
-
+        let logContent = fullLogText;
+        let logType = "unknown";
         if (match) {
             timestampPrefix = match[1] || "";
-            logTypeIndicator = (match[2] || "").trim().toUpperCase(); // Type indicator like TOOL START, AGENT THOUGHT (FINAL)
-            logContent = match[3] || ""; // The actual log message content
-
-            // Determine log type based on indicator
+            logTypeIndicator = (match[2] || "").trim().toUpperCase();
+            logContent = match[3] || "";
             if (logTypeIndicator.includes("TOOL START")) logType = 'tool-start';
             else if (logTypeIndicator.includes("TOOL OUTPUT")) logType = 'tool-output';
             else if (logTypeIndicator.includes("TOOL ERROR")) logType = 'tool-error';
-            // *** NEW: Check for Agent Thought types ***
             else if (logTypeIndicator.includes("AGENT THOUGHT (ACTION)")) logType = 'agent-thought-action';
             else if (logTypeIndicator.includes("AGENT THOUGHT (FINAL)")) logType = 'agent-thought-final';
-            else if (logTypeIndicator.includes("AGENT FINISH")) logType = 'agent-finish'; // Keep this distinct
+            else if (logTypeIndicator.includes("AGENT FINISH")) logType = 'agent-finish';
             else if (logTypeIndicator.includes("ERROR") || logTypeIndicator.includes("ERR_")) logType = 'error';
             else if (logTypeIndicator.includes("HISTORY")) logType = 'history';
             else if (logTypeIndicator.includes("SYSTEM") || logTypeIndicator.includes("SYS_")) logType = 'system';
             else if (logTypeIndicator.includes("ARTIFACT")) logType = 'artifact-generated';
             else if (logTypeIndicator.includes("USER INPUT")) logType = 'user-input';
         } else {
-            // Fallback type detection if regex fails (less reliable)
             if (fullLogText.toLowerCase().includes("error")) logType = 'error';
             else if (fullLogText.toLowerCase().includes("system")) logType = 'system';
             console.warn("Could not parse monitor log prefix reliably:", fullLogText);
         }
-
         logEntryDiv.classList.add(`log-type-${logType}`);
-
         if (timestampPrefix) {
             const timeSpan = document.createElement('span');
             timeSpan.className = 'log-timestamp';
             timeSpan.textContent = timestampPrefix;
             logEntryDiv.appendChild(timeSpan);
         }
-
         const contentSpan = document.createElement('span');
         contentSpan.className = 'log-content';
-        // Use <pre> for tool output/error AND thoughts for better formatting
         if (logType === 'tool-output' || logType === 'tool-error' || logType.startsWith('agent-thought')) {
             const pre = document.createElement('pre');
             pre.textContent = logContent.trim();
@@ -350,7 +374,6 @@ document.addEventListener('DOMContentLoaded', () => {
             contentSpan.textContent = logContent.trim();
         }
         logEntryDiv.appendChild(contentSpan);
-
         monitorLogAreaElement.appendChild(logEntryDiv);
         scrollToBottom(monitorLogAreaElement);
     };
@@ -545,8 +568,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentTask = tasks.find(task => task.id === currentTaskId);
         const title = currentTask ? currentTask.title : "No Task Selected";
         currentTaskTitleElement.textContent = title;
-        if(monitorStatusElement) monitorStatusElement.textContent = currentTask ? "Agent Idle" : "No Task";
-        if(monitorFooterStatusElement) monitorFooterStatusElement.textContent = currentTask ? `Task: ${title}` : "No Task Selected";
+        // *** Update monitor status text based on task selection ***
+        if (currentTask) {
+            // Only update text if not currently running/error/disconnected
+            if (!isAgentRunning && statusDotElement && !statusDotElement.classList.contains('error') && !statusDotElement.classList.contains('disconnected')) {
+                 updateMonitorStatus('idle', 'Idle');
+            }
+        } else {
+             updateMonitorStatus('idle', 'No Task');
+        }
+        // if(monitorFooterStatusElement) monitorFooterStatusElement.textContent = currentTask ? `Task: ${title}` : "No Task Selected"; // Remove if footer was removed
     };
     const clearChatAndMonitor = (addLog = true) => {
         if (chatMessagesContainer) chatMessagesContainer.innerHTML = '';
@@ -564,19 +595,22 @@ document.addEventListener('DOMContentLoaded', () => {
         currentTaskId = task ? taskId : null;
         console.log(`Selected task ID set to: ${currentTaskId}`);
         saveTasks();
-        renderTaskList();
+        renderTaskList(); // This calls updateCurrentTaskTitle which updates monitor status
         if (currentTaskId && task) {
             sendWsMessage("context_switch", { task: task.title, taskId: task.id });
             clearChatAndMonitor(false);
-            addChatMessage("Switching task context...", "status");
+            addChatMessage("Switching task context...", "status"); // Keep this brief status
+            updateMonitorStatus('running', 'Switching Task...'); // Show status during switch
         } else if (!currentTaskId) {
             clearChatAndMonitor();
             addChatMessage("No task selected.", "status");
             addMonitorLog("[SYSTEM] No task selected.");
+            updateMonitorStatus('idle', 'No Task'); // Update status
         } else if (!socket || socket.readyState !== WebSocket.OPEN) {
             clearChatAndMonitor(false);
             addChatMessage("Switched task locally. Connect to backend to load history.", "status");
             addMonitorLog(`[SYSTEM] Switched task locally to ${taskId}, but WS not open.`);
+             updateMonitorStatus('disconnected', 'Disconnected'); // Reflect WS state
         }
         console.log(`Finished select task logic for: ${currentTaskId}`);
     };
@@ -602,10 +636,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentTaskId === taskId) {
             nextTaskId = tasks.length > 0 ? tasks[0].id : null;
             console.log(`Deleted active task, selecting next: ${nextTaskId}`);
-            selectTask(nextTaskId);
+            selectTask(nextTaskId); // This will update status
         } else {
             saveTasks();
-            renderTaskList();
+            renderTaskList(); // This updates UI but doesn't change active task/status
         }
         console.log(`Finished delete task logic for: ${taskId}`);
     };
@@ -682,11 +716,11 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (e) {
                 console.error(`Error sending ${type} via WebSocket:`, e);
                 addMonitorLog(`[SYSTEM] Error sending ${type} request: ${e.message}`);
-                addChatMessage(`Error sending ${type} request to backend.`, "status");
+                addChatMessage(`Error sending ${type} request to backend.`, "status"); // Show critical errors in chat
             }
         } else {
             console.warn(`Cannot send ${type}: WebSocket is not open.`);
-            if (type === "user_message" || type === "context_switch") {
+            if (type === "user_message" || type === "context_switch") { // Only show chat errors for user-initiated actions
                 addChatMessage(`Cannot send ${type}: Not connected to backend.`, "status");
             }
              addMonitorLog(`[SYSTEM] Cannot send ${type}: WS not open.`);
@@ -711,7 +745,9 @@ document.addEventListener('DOMContentLoaded', () => {
             currentInputBuffer = "";
 
             sendWsMessage("user_message", { content: messageText });
-            addChatMessage("Agent processing...", "status");
+            // *** MODIFIED: Update monitor status immediately ***
+            updateMonitorStatus('running', 'Processing...');
+            // *** REMOVED: addChatMessage("Agent processing...", "status"); ***
 
             chatTextarea.value = '';
             chatTextarea.style.height = 'auto';
@@ -761,7 +797,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentSelectedLlmId = selectedId;
                 localStorage.setItem('selectedLlmId', selectedId);
                 sendWsMessage("set_llm", { llm_id: selectedId });
-                addChatMessage(`Switched LLM to ${selectedId}`, 'status');
+                // Don't add chat message for LLM switch
+                // addChatMessage(`Switched LLM to ${selectedId}`, 'status');
             } else if (!selectedId) {
                  console.warn("LLM selector changed to an empty value.");
             }
@@ -784,7 +821,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Initial Load Actions ---
     loadTasks();
     renderTaskList();
-    connectWebSocket();
+    connectWebSocket(); // This will set initial monitor status
 
 }); // End of DOMContentLoaded listener
 

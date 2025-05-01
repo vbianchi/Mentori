@@ -47,6 +47,33 @@
             background-color: var(--panel-bg-lighter);
             color: var(--text-color);
          }
+         /* Style for Monitor Status Indicator */
+         .monitor-status-container {
+            display: flex;
+            align-items: center;
+            gap: 6px; /* Space between dot and text */
+         }
+         .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background-color: grey; /* Default */
+            transition: background-color 0.3s ease;
+         }
+         .status-dot.idle { background-color: #4CAF50; } /* Green */
+         .status-dot.running { background-color: #FFC107; } /* Yellow */
+         .status-dot.error { background-color: #F44336; } /* Red */
+         .status-dot.disconnected { background-color: #9E9E9E; } /* Grey */
+
+         .monitor-status-text {
+            font-size: 0.85em;
+            color: var(--text-color-darker);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+         }
+
     </style>
 </head>
 <body>
@@ -72,7 +99,7 @@
                 <h3 id="current-task-title">No Task Selected</h3>
                 <select id="llm-select" class="llm-selector" title="Select Language Model">
                     <option value="">Loading LLMs...</option>
-                    </select>
+                </select>
             </div>
             <div id="chat-messages" class="chat-messages scrollable-content">
                 </div>
@@ -85,7 +112,10 @@
         <aside class="panel right-panel">
             <div class="panel-header monitor-header">
                 <h3>Agent Workspace</h3>
-                 <span id="monitor-status">Agent Idle</span>
+                <div id="monitor-status-container" class="monitor-status-container">
+                    <span id="status-dot" class="status-dot disconnected"></span>
+                    <span id="monitor-status-text" class="monitor-status-text">Disconnected</span>
+                </div>
             </div>
 
             <div class="monitor-split-content">
@@ -107,3 +137,4 @@
     <script src="js/script.js"></script>
 </body>
 </html>
+
