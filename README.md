@@ -11,7 +11,7 @@ This project provides a functional user interface and backend for an AI agent sy
 * **Monitor Status Indicator:** A visual indicator (dot + text) in the monitor header shows the agent's current state (e.g., Idle, Running, Error, Disconnected).
 * **Agent Cancellation (STOP Button):** A STOP button appears in the monitor header while the agent is running. Clicking it sends a cancellation request to the backend. **Note:** This attempts to interrupt the agent *between* major steps (e.g., before the next tool use or LLM call) rather than immediately halting a long-running step, and may not always succeed if the agent is blocked internally.
 * **File Upload:** An "Upload File(s)" button in the task panel allows users to upload files directly into the currently selected task's workspace. The artifact viewer updates automatically after a successful upload.
-* **Artifact Viewer:** Displays generated `.png` images and previews common text files (`.txt`, `.py`, `.csv`, etc.) in a dedicated area below the monitor logs, with navigation for multiple artifacts.
+* **Artifact Viewer:** Displays generated `.png` images and previews common text files (`.txt`, `.py`, `.csv`, etc.) in a dedicated area below the monitor logs, with navigation for multiple artifacts. The filename is displayed above the content, and the navigation buttons remain fixed at the bottom.
 * **Tool Integration:** Includes tools for:
     * Web Search (`duckduckgo_search`)
     * Web Page Reading (`web_page_reader`)
@@ -36,7 +36,7 @@ This project provides a functional user interface and backend for an AI agent sy
     * **LangChain Core:** `langchain`
     * **LLM Integrations:** `langchain-google-genai`, `langchain-ollama`
     * **Tools:** `langchain-community` (Search), `langchain-experimental` (Python REPL), `biopython` (PubMed)
-    * **Prompts:** `langchainhub` (Fallback prompt used)
+    * **Prompts:** Local fallback prompt used (based on `react-chat`)
     * **Config:** `python-dotenv`
     * **HTTP:** `httpx`
     * **Web Parsing:** `beautifulsoup4`, `lxml`
@@ -215,11 +215,15 @@ Runs the backend server inside an isolated Docker container. **Highly recommende
 * **Agent Control:** Improve the STOP button to more reliably and immediately halt ongoing agent tasks, potentially by running the agent in a separate process.
 * **Streaming Output:** Ensure agent responses consistently stream token-by-token to the UI for better responsiveness.
 * **Drag & Drop Upload:** Enhance file upload to support drag and drop onto the task list or chat area.
+* **Collapsible/Resizable Panels:** Allow the left task panel to be collapsed and/or the panel dividers to be dragged to resize areas.
 * **PDF Reading Enhancements:** Add options for page ranges or user-specified `max_length` override, improve handling of complex layouts/images.
 * **Structured Output:** Add capability for the agent to return results in structured formats (e.g., JSON) for easier parsing or downstream use.
 * **Data Visualization:** Enable the agent (e.g., via Python REPL) to generate plots from data and display them directly in the Artifact Viewer.
 * **Domain-Specific Tools:** Integrate more tools relevant to bioinformatics/epidemiology (e.g., BLAST, Ensembl/UniProt API access, VCF/FASTA parsing).
 * **Artifact Management:** Allow users to rename or delete artifacts from the UI.
+* **Chat Interaction Enhancements:**
+    * Explore using special characters (e.g., `#toolname`) to suggest or force specific tool usage.
+    * Optionally have the agent summarize its plan before execution for complex tasks.
 * **More Robust Formatting:** Use a dedicated Markdown library (e.g., `markdown-it`) for more complex rendering if needed.
 * **Per-Task LLM Preference:** Store the last used LLM for each task.
 * **Tool Configuration UI:** Allow enabling/disabling tools per task or globally.

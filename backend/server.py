@@ -336,10 +336,13 @@ async def get_artifacts(task_id: str) -> List[Dict[str, str]]:
     artifacts = []
     try:
         task_workspace_path = get_task_workspace_path(task_id)
-        artifact_patterns = ['*.png', '*.jpg', '*.jpeg', '*.gif', '*.svg'] + [f'*{ext}' for ext in TEXT_EXTENSIONS]
+        # *** Include PDF in patterns ***
+        artifact_patterns = ['*.png', '*.jpg', '*.jpeg', '*.gif', '*.svg', '*.pdf'] + [f'*{ext}' for ext in TEXT_EXTENSIONS]
         all_potential_artifacts = []
         for pattern in artifact_patterns:
-            for file_path in task_workspace_path.glob(pattern):
+            # Use rglob to find files in subdirectories as well, if needed
+            # for file_path in task_workspace_path.rglob(pattern):
+            for file_path in task_workspace_path.glob(pattern): # Keep glob for now
                 if file_path.is_file():
                     try:
                         mtime = file_path.stat().st_mtime
