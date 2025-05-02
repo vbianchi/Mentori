@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
         }
         monitorStatusTextElement.textContent = statusText;
-        console.log(`Monitor status updated: ${status} - ${monitorStatusTextElement.textContent}`);
+        // console.log(`Monitor status updated: ${status} - ${monitorStatusTextElement.textContent}`); // Reduce noise
     };
 
 
@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.onmessage = (event) => {
             try {
                 const message = JSON.parse(event.data);
-                console.debug("Received WS message:", message);
+                // console.debug("Received WS message:", message); // Reduce noise
 
                 switch (message.type) {
                     case 'history_start':
@@ -224,9 +224,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                         break;
                     case 'update_artifacts':
-                        console.log("Received update_artifacts message with content:", message.content);
+                        // *** ADDED Logging ***
+                        console.log('Received update_artifacts. Current artifacts BEFORE update:', JSON.stringify(currentTaskArtifacts));
+                        console.log('Received update_artifacts message with content:', message.content);
                         if (Array.isArray(message.content)) {
                             currentTaskArtifacts = message.content;
+                            // *** ADDED Logging ***
+                            console.log('Current artifacts AFTER update:', JSON.stringify(currentTaskArtifacts));
                             currentArtifactIndex = currentTaskArtifacts.length > 0 ? 0 : -1;
                             updateArtifactDisplay();
                         } else {
@@ -234,7 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             currentTaskArtifacts = []; currentArtifactIndex = -1; updateArtifactDisplay();
                         }
                         break;
-                    // *** NEW: Handle artifact refresh trigger ***
                     case 'trigger_artifact_refresh':
                         const taskIdToRefresh = message.content?.taskId;
                         console.log(`Received trigger_artifact_refresh for task: ${taskIdToRefresh}`);
@@ -246,7 +249,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             console.log(`Ignoring artifact refresh trigger for non-current task (${taskIdToRefresh})`);
                         }
                         break;
-                    // *** END NEW ***
 
                     case 'available_models':
                         console.log("Received available_models:", message.content);
@@ -383,7 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             if (fullLogText.toLowerCase().includes("error")) logType = 'error';
             else if (fullLogText.toLowerCase().includes("system")) logType = 'system';
-            console.warn("Could not parse monitor log prefix reliably:", fullLogText);
+            // console.warn("Could not parse monitor log prefix reliably:", fullLogText); // Reduce noise
         }
         logEntryDiv.classList.add(`log-type-${logType}`);
         if (timestampPrefix) {
@@ -623,6 +625,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (chatMessagesContainer) chatMessagesContainer.innerHTML = '';
         if (monitorLogAreaElement) monitorLogAreaElement.innerHTML = '';
         currentTaskArtifacts = [];
+        // *** ADDED Logging ***
+        console.log('Cleared currentTaskArtifacts in clearChatAndMonitor:', currentTaskArtifacts);
         currentArtifactIndex = -1;
         updateArtifactDisplay();
         if (addLog && monitorLogAreaElement) { addMonitorLog("[SYSTEM] Cleared context."); }
@@ -637,8 +641,9 @@ document.addEventListener('DOMContentLoaded', () => {
         saveTasks();
         renderTaskList(); // This will update the upload button state
         if (currentTaskId && task) {
-            sendWsMessage("context_switch", { task: task.title, taskId: task.id });
+            // *** Call clearChatAndMonitor BEFORE sending context_switch ***
             clearChatAndMonitor(false);
+            sendWsMessage("context_switch", { task: task.title, taskId: task.id });
             addChatMessage("Switching task context...", "status");
             updateMonitorStatus('running', 'Switching Task...');
         } else if (!currentTaskId) {

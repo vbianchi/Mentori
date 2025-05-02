@@ -278,8 +278,6 @@ async def handle_file_upload(request: web.Request) -> web.Response:
                         await add_message(task_id, target_session_id, "artifact_generated", safe_filename)
                         logger.info(f"[{session_id}] Saved 'artifact_generated' message to DB for {safe_filename}.")
 
-                        # Removed the failing add_monitor_log_and_save call here
-
                         # Send trigger message to the specific session
                         if target_session_id in connected_clients:
                              client_info = connected_clients[target_session_id]
@@ -418,7 +416,7 @@ async def handler(websocket: Any): # Use Any type hint
         client_info = connected_clients.get(session_id)
         if client_info:
             ws = client_info.get("websocket")
-            # *** MODIFIED: Remove ws.closed check ***
+            # Remove ws.closed check
             if ws:
                 try:
                     await ws.send(json.dumps({"type": msg_type, "content": content}))
@@ -541,9 +539,9 @@ async def handler(websocket: Any): # Use Any type hint
                         if "memory" in session_data[session_id]:
                             try: session_data[session_id]["memory"].clear(); logger.info(f"[{session_id}] Cleared agent memory for new task context.")
                             except Exception as mem_e: logger.error(f"[{session_id}] Failed to clear memory on context switch: {mem_e}")
-                        # await send_ws_message_for_session("status_message", "Loading history...") # Removed chat status
+
+                        # Load and send history messages
                         history_messages = await get_messages_for_task(task_id_from_frontend)
-                        artifacts_from_history = []
                         chat_history_for_memory = []
                         if history_messages:
                             logger.info(f"[{session_id}] Loading {len(history_messages)} history messages for task {task_id_from_frontend}.")
@@ -566,28 +564,8 @@ async def handler(websocket: Any): # Use Any type hint
                                     send_to_chat = True # Send agent messages to chat
                                     chat_history_for_memory.append(AIMessage(content=db_content))
                                 elif db_msg_type == "artifact_generated":
-                                    # Process artifact but don't send to chat or monitor directly here
-                                    # (Monitor log is handled separately, artifact list is sent at end)
-                                    filename = db_content
-                                    try:
-                                        task_ws_path = get_task_workspace_path(task_id_from_frontend)
-                                        file_path = (task_ws_path / filename).resolve()
-                                        if not file_path.is_relative_to(task_ws_path.resolve()): logger.warning(f"[{session_id}] History artifact path outside workspace: {file_path}"); continue
-                                        artifact_type = 'unknown'
-                                        file_suffix = file_path.suffix.lower()
-                                        if file_suffix in ['.png', '.jpg', '.jpeg', '.gif', '.svg']: artifact_type = 'image'
-                                        elif file_suffix in TEXT_EXTENSIONS: artifact_type = 'text'
-                                        if artifact_type != 'unknown' and file_path.exists():
-                                            relative_filename = str(file_path.relative_to(task_ws_path))
-                                            artifact_url = f"http://{FILE_SERVER_CLIENT_HOST}:{FILE_SERVER_PORT}/workspace_files/{task_id_from_frontend}/{relative_filename}"
-                                            artifacts_from_history.append({"type": artifact_type, "url": artifact_url, "filename": relative_filename})
-                                            # Log artifact generation to monitor
-                                            log_prefix = f"[{db_timestamp}][{session_id[:8]}]"; await send_ws_message_for_session("monitor_log", f"{log_prefix} [History][ARTIFACT] {relative_filename} (Type: {artifact_type})")
-                                        else:
-                                            logger.warning(f"[{session_id}] Artifact file from history not found or unknown type: {file_path}")
-                                            log_prefix = f"[{db_timestamp}][{session_id[:8]}]"; await send_ws_message_for_session("monitor_log", f"{log_prefix} [History][ARTIFACT_MISSING] {filename}")
-                                    except Exception as artifact_err:
-                                        logger.error(f"[{session_id}] Error processing artifact from history {filename}: {artifact_err}")
+                                     # Don't process artifacts here; they will be loaded from filesystem scan below
+                                     pass
                                 elif db_msg_type.startswith(("monitor_", "error_", "system_", "tool_", "agent_thought_", "monitor_user_input")):
                                     ui_msg_type = "monitor_log" # All these go ONLY to monitor
                                     log_prefix = f"[{db_timestamp}][{session_id[:8]}]"
@@ -615,10 +593,17 @@ async def handler(websocket: Any): # Use Any type hint
                             if "memory" in session_data[session_id]:
                                 try: session_data[session_id]["memory"].chat_memory.messages = chat_history_for_memory[-MAX_MEMORY_RELOAD:]; logger.info(f"[{session_id}] Repopulated agent memory with last {len(session_data[session_id]['memory'].chat_memory.messages)} messages.")
                                 except Exception as mem_load_e: logger.error(f"[{session_id}] Failed to repopulate memory from history: {mem_load_e}")
-                            if artifacts_from_history: logger.info(f"[{session_id}] Sending {len(artifacts_from_history)} artifacts from history."); await send_ws_message_for_session("update_artifacts", artifacts_from_history)
-                            else: await send_ws_message_for_session("update_artifacts", [])
-                        else: await send_ws_message_for_session("history_end", "No history found."); await send_ws_message_for_session("update_artifacts", []); logger.info(f"[{session_id}] No history found for task {task_id_from_frontend}.")
-                        # await send_ws_message_for_session("status_message", "History loaded. Ready.") # Removed chat status
+                        else:
+                             await send_ws_message_for_session("history_end", "No history found.")
+                             logger.info(f"[{session_id}] No history found for task {task_id_from_frontend}.")
+
+                        # *** MODIFIED: Always get artifacts from filesystem on context switch ***
+                        logger.info(f"[{session_id}] Getting current artifacts from filesystem for task {task_id_from_frontend}...")
+                        current_artifacts = await get_artifacts(task_id_from_frontend)
+                        await send_ws_message_for_session("update_artifacts", current_artifacts)
+                        logger.info(f"[{session_id}] Sent current artifact list ({len(current_artifacts)} items) for task {task_id_from_frontend}.")
+                        # *** END MODIFIED ***
+
                     else: logger.error(f"[{session_id}] Context switch received but no session data found!"); await send_ws_message_for_session("status_message", "Error: Session data lost. Please refresh.")
 
                 # --- NEW TASK ---
