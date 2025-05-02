@@ -1,50 +1,49 @@
-/* css/style.css - Ochre/Black Theme */
+/* css/style.css - Dark Professional Theme */
 
 /* Basic Reset & Root Variables */
 :root {
-    /* Colormind Theme Colors (#0E2C40, #1A4A5A, #148D8D, #C1E1A7, #EFBC75) - Adjusted Accent */
-    --bg-color: #0E2C40; /* Deep Blue background */
-    --panel-bg: #1A4A5A; /* Dark Teal panel background */
-    --panel-bg-lighter: #245f70; /* Slightly lighter teal for headers, input, selected */
-    --panel-bg-lightest: #2e748a; /* Hover effects */
-    --border-color: #2e748a; /* Use hover color for borders for subtlety */
-    --text-color: #FFFFFF; /* White text */
-    --text-color-muted: #C1E1A7; /* Muted Light Green muted text */
-    --text-color-darker: #a0c08a; /* Darker muted green */
-    /* *** Updated Accent Colors *** */
-    --accent-color: #D97706; /* Darker Amber/Ochre accent */
-    --accent-color-hover: #B45309; /* Even Darker Amber/Ochre hover */
-    --button-text-on-accent: #FFFFFF; /* Switch back to White text for better contrast on darker accent */
-    /* --- End Updated Accent Colors --- */
-    --error-color: #f36b6b; /* Keep red for errors */
-    --error-color-darker: #d32f2f; /* Darker red for hover */
-    --tool-color: #148D8D; /* Medium Teal for tool logs */
-    --system-color: var(--text-color-darker); /* Muted green for system logs */
-    --image-color: var(--text-color-muted); /* Light green for image logs */
-    --thought-color: #a0c08a; /* Use darker muted green for thoughts */
-    --warning-bg: rgba(217, 119, 6, 0.1); /* Subtle amber warning */
-    --warning-border: #D97706; /* Match new accent */
-    --terminal-bg: #0a1f2d; /* Darker version of bg-color */
-    --terminal-text: var(--text-color-muted); /* Light green terminal text */
-    --code-bg: var(--panel-bg-lighter); /* Code blocks match lighter panel bg */
-    --code-text: var(--text-color); /* White code text */
+    /* *** Dark Professional Theme w/ Darker Teal Accent *** */
+    --bg-color: #212529; /* Very dark grey/charcoal background */
+    --panel-bg: #343A40; /* Dark slate grey panel background */
+    --panel-bg-lighter: #495057; /* Lighter slate for headers, input, selected */
+    --panel-bg-lightest: #6C757D; /* Medium grey for hover effects */
+    --border-color: #495057; /* Use panel-bg-lighter for subtle borders */
+    --text-color: #F8F9FA; /* Off-white/light grey text */
+    --text-color-muted: #ADB5BD; /* Lighter grey muted text */
+    --text-color-darker: #6C757D; /* Medium grey */
+    /* *** MODIFIED: Darker Teal Accent *** */
+    --accent-color: #0D9488; /* Darker Teal accent */
+    --accent-color-hover: #0F766E; /* Even Darker Teal hover */
+    --button-text-on-accent: #FFFFFF; /* White text on teal accent */
+    --error-color: #DC3545; /* Standard Bootstrap danger red */
+    --error-color-darker: #B02A37; /* Darker red */
+    --tool-color: var(--accent-color); /* Use accent teal for tool indicators */
+    --system-color: var(--text-color-darker); /* Medium grey for system logs */
+    --image-color: var(--text-color-muted); /* Lighter grey for image logs */
+    --thought-color: var(--text-color-muted); /* Lighter grey for thoughts */
+    --warning-bg: rgba(13, 148, 136, 0.1); /* Subtle darker teal warning bg */
+    --warning-border: var(--accent-color); /* Darker Teal border for warning */
+    --terminal-bg: #161A1D; /* Even darker grey terminal background */
+    --terminal-text: #CED4DA; /* Lighter grey terminal text */
+    --code-bg: var(--terminal-bg); /* Match terminal bg for code blocks */
+    --code-text: var(--terminal-text); /* Match terminal text */
 
-    /* Status Colors */
-    --status-idle-color: #4CAF50; /* Green */
-    --status-running-color: #FFC107; /* Yellow */
-    --status-error-color: #F44336; /* Red */
-    --status-disconnected-color: #9E9E9E; /* Grey */
+    /* Status Colors (Keep standard for clarity) */
+    --status-idle-color: #198754; /* Standard Bootstrap success green */
+    --status-running-color: #FFC107; /* Standard Bootstrap warning yellow */
+    --status-error-color: #DC3545; /* Standard Bootstrap danger red */
+    --status-disconnected-color: #6C757D; /* Use medium grey */
 
-    /* *** Monitor Log Background Colors *** */
-    --log-bg-default: var(--panel-bg); /* Default log background */
-    --log-bg-tool-start: #205566; /* Slightly lighter than panel-bg */
-    --log-bg-tool-output: var(--panel-bg); /* Keep default for output */
-    --log-bg-thought: rgba(160, 192, 138, 0.05); /* Subtle green tint */
-    --log-bg-error: rgba(243, 107, 107, 0.05); /* Subtle red tint */
-    --log-bg-user-input: rgba(217, 119, 6, 0.05); /* Subtle accent tint */
-    --log-bg-system: var(--panel-bg); /* Keep default */
-    --log-bg-history: #163e4d; /* Slightly darker than panel-bg */
-    /* *** END: Monitor Log Background Colors *** */
+    /* Monitor Log Background Colors (Adjusted for Dark theme & new accent) */
+    --log-bg-default: var(--panel-bg); /* Dark slate */
+    --log-bg-tool-start: #40464c; /* Slightly lighter than panel-bg */
+    --log-bg-tool-output: var(--panel-bg);
+    --log-bg-thought: rgba(13, 148, 136, 0.05); /* Very subtle darker teal tint */
+    --log-bg-error: rgba(220, 53, 69, 0.08); /* Very subtle red tint */
+    --log-bg-user-input: rgba(13, 148, 136, 0.05); /* Very subtle darker teal tint */
+    --log-bg-system: var(--panel-bg);
+    --log-bg-history: #2b3035; /* Slightly darker than panel-bg */
+    /* *** END THEME *** */
 
     --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     --monospace-font: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
@@ -53,27 +52,70 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; font-family: var(--font-family); background-color: var(--bg-color); color: var(--text-color); font-size: 14px; overflow: hidden; }
 
-/* Main App Layout */
-.app-container { display: flex; height: 100vh; }
-.panel { display: flex; flex-direction: column; background-color: var(--panel-bg); height: 100%; overflow: hidden; }
-.panel:not(:last-child) { border-right: 1px solid var(--border-color); }
+/* Main App Layout (Flexbox) */
+.app-container {
+    display: flex;
+    height: 100vh;
+}
+.panel {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--panel-bg);
+    overflow: hidden;
+}
+.panel:not(:last-child) {
+    border-right: 1px solid var(--border-color);
+}
+.left-panel {
+    flex: 0 0 240px;
+}
+.center-panel {
+    flex: 1;
+    background-color: var(--bg-color); /* Use main bg for center */
+}
+.right-panel {
+    flex: 0 0 500px;
+    background-color: var(--terminal-bg); /* Use terminal bg for right */
+}
+
 
 /* Headers & Footers */
-.panel-header, .panel-footer, .chat-header, .monitor-header { padding: 10px 15px; background-color: var(--panel-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; min-height: 45px; }
-.panel-footer { border-bottom: none; border-top: 1px solid var(--border-color); margin-top: auto; color: var(--text-color-muted); font-size: 0.85em; }
+/* Make headers slightly distinct from panel bg */
+.panel-header, .chat-header, .monitor-header { background-color: var(--panel-bg-lighter); }
+.panel-header, .panel-footer, .chat-header, .monitor-header { padding: 10px 15px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; min-height: 45px; }
+.panel-footer { border-bottom: none; border-top: 1px solid var(--border-color); margin-top: auto; color: var(--text-color-muted); font-size: 0.85em; background-color: var(--panel-bg-lighter); /* Match header */ }
+.monitor-header { background-color: var(--terminal-bg); border-bottom-color: var(--border-color); } /* Override for monitor */
+
 
 /* Scrollable Content */
-.scrollable-content { flex-grow: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--panel-bg-lightest) var(--panel-bg); }
+.scrollable-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--panel-bg-lightest) var(--panel-bg);
+    /* border-bottom: 1px solid var(--border-color); */ /* Removed border */
+}
 .scrollable-content::-webkit-scrollbar { width: 8px; }
 .scrollable-content::-webkit-scrollbar-track { background: var(--panel-bg); }
 .scrollable-content::-webkit-scrollbar-thumb { background-color: var(--panel-bg-lightest); border-radius: 4px; border: 2px solid var(--panel-bg); }
 
-/* Left Panel */
-.left-panel { flex: 0 0 240px; }
-.new-task-btn { background-color: var(--accent-color); color: var(--button-text-on-accent); border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: 500; font-size: 0.9em; transition: background-color 0.2s ease; }
-.new-task-btn:hover { background-color: var(--accent-color-hover); }
-.task-list { list-style: none; padding: 8px 0; }
-.task-item { padding: 10px 15px; cursor: pointer; font-size: 0.9em; border-left: 3px solid transparent; transition: background-color 0.2s ease, border-left-color 0.2s ease; display: flex; justify-content: space-between; align-items: center; gap: 5px; }
+/* Left Panel Content Alignment */
+.new-task-btn {
+    background-color: var(--accent-color);
+    color: var(--button-text-on-accent); /* White text on teal */
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+}
+.new-task-btn:hover {
+    background-color: var(--accent-color-hover);
+}
+.task-list { list-style: none; padding: 8px 15px; background-color: var(--panel-bg); /* Ensure list bg matches panel */ }
+.task-item { padding: 10px 0; cursor: pointer; font-size: 0.9em; border-left: 3px solid transparent; transition: background-color 0.2s ease, border-left-color 0.2s ease; display: flex; justify-content: space-between; align-items: center; gap: 5px; margin: 0 -15px; padding-left: 15px; padding-right: 15px; }
 .task-item.active { background-color: var(--panel-bg-lighter); font-weight: 500; color: var(--text-color); border-left-color: var(--accent-color); }
 .task-item:hover { background-color: var(--panel-bg-lightest); }
 .task-item-placeholder { color: var(--text-color-muted); padding: 0.75rem; text-align: center; font-style: italic; }
@@ -88,16 +130,16 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .task-item.active .task-delete-btn { opacity: 0.6; }
 .task-delete-btn:hover { opacity: 1.0; color: var(--error-color); }
 
-/* *** NEW: Upload Area Styling *** */
+/* Upload Area Styling */
 .upload-area {
-    padding: 5px 15px 10px; /* Add some padding */
-    border-top: 1px solid var(--border-color); /* Separator */
-    background-color: var(--panel-bg); /* Match footer/header */
+    padding: 10px 15px; /* Consistent padding */
+    border-top: 1px solid var(--border-color); /* Add border back */
+    background-color: var(--panel-bg-lighter); /* Match header/footer */
     flex-shrink: 0;
     text-align: center; /* Center the button */
 }
 .upload-button {
-    background-color: var(--panel-bg-lighter);
+    background-color: var(--panel-bg); /* Use panel bg */
     color: var(--text-color-muted);
     border: 1px solid var(--border-color);
     padding: 5px 10px;
@@ -115,14 +157,12 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
      opacity: 0.5;
      cursor: not-allowed;
  }
-/* *** END NEW *** */
 
 
 /* Center Panel */
-.center-panel { flex: 1; background-color: var(--bg-color); }
-.chat-header { background-color: var(--panel-bg); border-bottom: 1px solid var(--border-color); }
+.chat-header { background-color: var(--panel-bg-lighter); border-bottom: 1px solid var(--border-color); }
 .chat-header h3 { margin: 0; font-size: 1em; font-weight: 500; }
-.chat-messages { padding: 20px; display: flex; flex-direction: column; gap: 18px; }
+.chat-messages { padding: 20px; display: flex; flex-direction: column; gap: 18px; background-color: var(--bg-color); /* Ensure main chat area uses main bg */ }
 .message { padding: 10px 15px; border-radius: 8px; max-width: 85%; line-height: 1.5; font-size: 0.95em; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; }
 .message-agent { background-color: var(--panel-bg); align-self: flex-start; border: 1px solid var(--border-color); color: var(--text-color); }
 .message-user { background-color: var(--accent-color); color: var(--button-text-on-accent); align-self: flex-end; border: 1px solid var(--accent-color); }
@@ -135,14 +175,20 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .action-prompt p { margin-bottom: 10px; font-weight: 500; color: var(--text-color); }
 .action-btn { background-color: var(--accent-color); color: var(--button-text-on-accent); border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px; font-size: 0.9em; font-weight: 500; transition: background-color 0.2s ease; }
 .action-btn:hover { background-color: var(--accent-color-hover); }
-.chat-input-area { display: flex; padding: 10px 15px; border-top: 1px solid var(--border-color); background-color: var(--panel-bg); flex-shrink: 0; align-items: flex-end; }
-.chat-input-area textarea { flex-grow: 1; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 5px; background-color: var(--panel-bg-lighter); color: var(--text-color); resize: none; min-height: 38px; max-height: 150px; margin-right: 10px; font-family: inherit; font-size: 0.95em; line-height: 1.4; overflow-y: auto; }
+.chat-input-area {
+    display: flex;
+    padding: 10px 15px;
+    border-top: 1px solid var(--border-color); /* Add border back */
+    background-color: var(--panel-bg-lighter); /* Match header */
+    flex-shrink: 0;
+    align-items: flex-end;
+}
+.chat-input-area textarea { flex-grow: 1; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 5px; background-color: var(--panel-bg); /* Use panel bg */ color: var(--text-color); resize: none; min-height: 38px; max-height: 150px; margin-right: 10px; font-family: inherit; font-size: 0.95em; line-height: 1.4; overflow-y: auto; }
 .chat-input-area textarea:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 1px var(--accent-color); }
 .chat-input-area button { padding: 8px 15px; background-color: var(--accent-color); color: var(--button-text-on-accent); border: none; border-radius: 5px; cursor: pointer; font-weight: 500; height: 38px; transition: background-color 0.2s ease; }
 .chat-input-area button:hover { background-color: var(--accent-color-hover); }
 
 /* Right Panel: Monitor */
-.right-panel { flex: 0 0 500px; background-color: var(--terminal-bg); }
 .monitor-header { background-color: var(--terminal-bg); border-bottom-color: var(--border-color); }
 .monitor-header h3 { margin: 0; font-size: 1em; font-weight: 500; }
 .monitor-controls { display: flex; align-items: center; gap: 10px; /* Gap between status and button */ }
@@ -159,14 +205,13 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 /* Stop Button Styles */
 .stop-button {
     background-color: var(--error-color);
-    color: white;
+    color: #FFFFFF; /* Ensure white text on error color */
     border: none;
     border-radius: 4px;
     padding: 2px 8px; /* Small padding */
     font-size: 0.8em;
     font-weight: bold;
     cursor: pointer;
-    /* margin-left: 10px; */ /* Removed, using gap in .monitor-controls */
     display: none; /* Hidden by default, shown by JS */
     transition: background-color 0.2s ease, opacity 0.2s ease;
     line-height: 1.5; /* Adjust line height */
@@ -178,13 +223,13 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 /* Monitor Split Layout */
 .monitor-split-content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
 .monitor-log-area { flex: 1 1 0; overflow-y: auto; padding: 10px 15px; background-color: var(--terminal-bg); font-family: var(--monospace-font); font-size: 0.85em; line-height: 1.5; color: var(--terminal-text); border-bottom: 1px solid var(--border-color); }
-.monitor-artifact-area { flex: 1 1 0; overflow-y: auto; padding: 10px 15px; background-color: var(--panel-bg); display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+.monitor-artifact-area { flex: 1 1 0; overflow-y: auto; padding: 10px 15px; background-color: var(--panel-bg); display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; border-top: 1px solid var(--border-color); /* Add border between log and artifact */ }
 .artifact-placeholder { color: var(--text-color-darker); font-style: italic; }
 
 /* Individual Log Entry Styling */
 .monitor-log-entry { margin-bottom: 8px; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border-color); background-color: var(--log-bg-default); /* Use default bg */ display: flex; flex-direction: column; }
-.log-timestamp { font-size: 0.8em; color: var(--text-color-darker); margin-bottom: 4px; white-space: nowrap; }
-.log-content { white-space: pre-wrap; word-wrap: break-word; color: var(--text-color); }
+.log-timestamp { font-size: 0.8em; color: var(--text-color-muted); margin-bottom: 4px; white-space: nowrap; }
+.log-content { white-space: pre-wrap; word-wrap: break-word; color: var(--text-color); } /* Use main text color */
 
 /* Apply background colors based on type */
 .log-type-system { border-left: 3px solid var(--system-color); background-color: var(--log-bg-system); }
@@ -193,13 +238,12 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .log-type-tool-error { border-left: 3px solid var(--error-color); background-color: var(--log-bg-error); }
 .log-type-agent-thought-action,
 .log-type-agent-thought-final { border-left: 3px solid var(--thought-color); background-color: var(--log-bg-thought); }
-.log-type-agent-finish { border-left: 3px solid var(--accent-color); background-color: var(--log-bg-default); } /* Keep default */
+.log-type-agent-finish { border-left: 3px solid var(--accent-color); background-color: var(--log-bg-default); }
 .log-type-error { border-left: 3px solid var(--error-color); background-color: var(--log-bg-error); }
-.log-type-error .log-content { color: var(--error-color); } /* Keep error text red */
+.log-type-error .log-content { color: var(--error-color); } /* Keep error text colored */
 .log-type-history { opacity: 0.7; border-left: 3px solid var(--text-color-darker); background-color: var(--log-bg-history); }
 .log-type-unknown { border-left: 3px dashed var(--text-color-darker); background-color: var(--log-bg-default); }
 .log-type-image-generated, .log-type-artifact-generated { border-left: 3px solid var(--image-color); background-color: var(--log-bg-default); }
-/* Renamed monitor_user_input to log-type-user-input-log */
 .log-type-user-input-log { border-left: 3px solid var(--accent-color); background-color: var(--log-bg-user-input); }
 
 
@@ -209,7 +253,7 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .log-type-agent-thought-action .log-content pre,
 .log-type-agent-thought-final .log-content pre {
     background-color: var(--terminal-bg); /* Use terminal bg for nested pre */
-    color: var(--terminal-text);
+    color: var(--terminal-text); /* Use terminal text color */
     padding: 5px 8px;
     margin-top: 4px;
     border-radius: 3px;
@@ -219,13 +263,13 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     word-break: break-word;
     overflow-wrap: break-word;
 }
-.log-type-tool-error .log-content pre { color: var(--error-color); } /* Keep pre error text red */
+.log-type-tool-error .log-content pre { color: var(--error-color); } /* Keep pre error text colored */
 .log-type-agent-thought-action .log-content pre,
 .log-type-agent-thought-final .log-content pre { color: var(--thought-color); } /* Keep pre thought text colored */
 
 
 /* Styles for Artifact Area Content */
-.monitor-artifact-area img { display: block; max-width: 100%; max-height: calc(100% - 30px); height: auto; object-fit: contain; border-radius: 4px; border: 1px solid var(--border-color); margin-bottom: 5px; }
+.monitor-artifact-area img { display: block; max-width: 100%; max-height: calc(100% - 30px); height: auto; object-fit: contain; border-radius: 4px; border: 1px solid var(--border-color); margin-bottom: 5px; background-color: #FFFFFF; /* Add white background for images */ }
 .monitor-artifact-area .artifact-error { font-size: 0.9em; font-style: italic; color: var(--error-color); }
 .monitor-artifact-area pre { width: 100%; height: calc(100% - 30px); margin: 0; padding: 10px; font-family: var(--monospace-font); font-size: 0.9em; color: var(--code-text); background-color: var(--code-bg); border: 1px solid var(--border-color); border-radius: 4px; white-space: pre-wrap; word-break: break-all; overflow: auto; margin-bottom: 5px; }
 
@@ -243,7 +287,7 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 
 /* LLM Selector Styling (in Chat Header) */
 .llm-selector {
-    background-color: var(--panel-bg-lighter);
+    background-color: var(--panel-bg); /* Match panel bg */
     color: var(--text-color);
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -257,7 +301,7 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 }
 .llm-selector:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 1px var(--accent-color); }
 .llm-selector optgroup { font-weight: bold; font-style: italic; background-color: var(--panel-bg); color: var(--text-color-muted); }
-.llm-selector option { background-color: var(--panel-bg-lighter); color: var(--text-color); padding: 2px 0; }
+.llm-selector option { background-color: var(--panel-bg); color: var(--text-color); padding: 2px 0; }
 
 
 /* Responsive Adjustments */
