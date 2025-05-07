@@ -1,12 +1,9 @@
 # backend/agent.py
 import logging
-# *** REMOVED: hub import is no longer needed ***
-# from langchain import hub
 from langchain.agents import AgentExecutor, create_react_agent
 from langchain_core.memory import BaseMemory
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.tools import BaseTool
-# *** ADDED: Import PromptTemplate ***
 from langchain_core.prompts import PromptTemplate
 from typing import List
 
@@ -21,7 +18,7 @@ def create_agent_executor(
     """Creates and returns a LangChain AgentExecutor with memory and max iterations."""
     logger.info(f"Creating LangChain agent executor with memory (Max Iterations: {max_iterations})...")
 
-    # --- MODIFIED: Always use the local custom prompt template ---
+    # --- MODIFIED: Added newline before the second "Thought:" block ---
     # Define the prompt template directly
     template = """Assistant is a large language model trained by Google.
 
@@ -37,6 +34,7 @@ Thought: Do I need to use a tool? Yes
 Action: the action to take, should be one of [{tool_names}]
 Action Input: the input to the action
 Observation: the result of the action
+
 Thought: Do I need to use a tool? No
 Final Answer: [your response here]
 
@@ -49,15 +47,14 @@ Previous conversation history:
 
 New input: {input}
 {agent_scratchpad}"""
+    # --- END MODIFIED SECTION ---
+
     try:
         prompt = PromptTemplate.from_template(template)
         logger.info("Using local custom prompt template.")
     except Exception as e:
         logger.error(f"Failed to create PromptTemplate from local template: {e}", exc_info=True)
-        # If even the local template fails, something is fundamentally wrong
         raise RuntimeError(f"Could not create prompt template: {e}") from e
-    # --- END MODIFIED SECTION ---
-
 
     # Create the ReAct agent
     try:

@@ -172,6 +172,27 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .action-prompt p { margin-bottom: 10px; font-weight: 500; color: var(--text-color); }
 .action-btn { background-color: var(--accent-color); color: var(--button-text-on-accent); border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px; font-size: 0.9em; font-weight: 500; transition: background-color 0.2s ease; }
 .action-btn:hover { background-color: var(--accent-color-hover); }
+
+/* --- NEW: Agent Thinking Status Line Style --- */
+.agent-thinking-status {
+    align-self: flex-start; /* Align like agent messages */
+    font-style: italic;
+    color: var(--text-color-muted);
+    font-size: 0.9em;
+    padding: 5px 15px; /* Less padding than regular messages */
+    margin-top: -10px; /* Slightly overlap previous message */
+    margin-bottom: 5px; /* Space before next message */
+    max-width: fit-content; /* Don't take full width */
+    background-color: transparent; /* No background */
+    border: none; /* No border */
+    cursor: pointer; /* Indicate it's clickable */
+    transition: color 0.2s ease;
+}
+.agent-thinking-status:hover {
+    color: var(--accent-color); /* Highlight on hover */
+}
+/* --- END NEW --- */
+
 .chat-input-area {
     display: flex;
     padding: 10px 15px;
@@ -220,7 +241,7 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 /* Monitor Split Layout */
 .monitor-split-content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
 .monitor-log-area { flex: 1 1 0; overflow-y: auto; padding: 10px 15px; background-color: var(--terminal-bg); font-family: var(--monospace-font); font-size: 0.85em; line-height: 1.5; color: var(--terminal-text); border-bottom: 1px solid var(--border-color); }
-/* *** MODIFIED: Artifact Area Flex Layout *** */
+/* Artifact Area Flex Layout */
 .monitor-artifact-area {
     flex: 1 1 0; /* Allow shrinking/growing */
     min-height: 100px; /* Ensure it has some minimum height */
@@ -234,7 +255,6 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     border-top: 1px solid var(--border-color);
     overflow: hidden; /* Hide overflow for main container */
 }
-/* *** END MODIFIED *** */
 .artifact-placeholder { color: var(--text-color-darker); font-style: italic; }
 
 /* Individual Log Entry Styling */
@@ -279,7 +299,7 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .log-type-agent-thought-final .log-content pre { color: var(--thought-color); } /* Keep pre thought text colored */
 
 
-/* *** MODIFIED: Styles for Artifact Area Content *** */
+/* Styles for Artifact Area Content */
 .artifact-filename {
     flex-shrink: 0; /* Don't shrink filename */
     width: 100%; /* Take full width */
@@ -343,7 +363,6 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     height: 25px;
     padding-top: 5px; /* Add some space above */
 }
-/* *** END MODIFIED *** */
 
 .artifact-nav-btn { background-color: var(--panel-bg-lighter); color: var(--text-color-muted); border: 1px solid var(--border-color); padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 0.85em; transition: all 0.2s ease; }
 .artifact-nav-btn:hover:not(:disabled) { background-color: var(--panel-bg-lightest); color: var(--text-color); border-color: var(--text-color-muted); }
@@ -353,6 +372,24 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 /* Styling for Code Blocks within Chat Messages */
 .message-agent pre { background-color: var(--code-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 0.75rem; margin: 0.5rem 0; overflow-x: auto; white-space: pre; }
 .message-agent pre code { font-family: var(--monospace-font); font-size: 0.9em; color: var(--code-text); background-color: transparent; padding: 0; border: none; white-space: pre; }
+/* Ensure inline code has similar styling */
+.message-agent code {
+    background-color: var(--code-bg);
+    color: var(--code-text);
+    padding: 0.2em 0.4em;
+    margin: 0;
+    font-size: 85%;
+    border-radius: 3px;
+    font-family: var(--monospace-font);
+}
+.message-agent pre code { /* Reset styles for code inside pre */
+    padding: 0;
+    margin: 0;
+    font-size: inherit;
+    background: none;
+    border-radius: 0;
+    color: inherit;
+}
 
 
 /* LLM Selector Styling (in Chat Header) */
@@ -387,4 +424,3 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     .monitor-header { flex-wrap: wrap; } /* Allow wrapping */
     .monitor-controls { margin-left: auto; /* Push controls to right on wrap */ padding-top: 5px;}
 }
-

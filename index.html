@@ -39,7 +39,7 @@
         }
         .stop-button:hover:not(:disabled) { background-color: #d32f2f; /* Darker red */ }
         .stop-button:disabled { background-color: #9E9E9E; cursor: not-allowed; opacity: 0.6; }
-        /* *** NEW: Style for Upload Area *** */
+        /* Style for Upload Area */
         .upload-area {
             padding: 5px 15px 10px; /* Add some padding */
             border-top: 1px solid var(--border-color); /* Separator */
@@ -66,7 +66,6 @@
              opacity: 0.5;
              cursor: not-allowed;
          }
-        /* *** END NEW *** */
 
     </style>
 </head>
@@ -100,7 +99,8 @@
                 </select>
             </div>
             <div id="chat-messages" class="chat-messages scrollable-content">
-                </div>
+                 <div id="agent-thinking-status" class="message message-status agent-thinking-status" style="display: none;">Thinking...</div>
+                 </div>
             <div class="chat-input-area">
                 <textarea placeholder="Type your message here..."></textarea>
                 <button>Send</button>
