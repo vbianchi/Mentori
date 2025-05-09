@@ -66,7 +66,26 @@
              opacity: 0.5;
              cursor: not-allowed;
          }
-
+        /* --- NEW: Token Usage Display Area --- */
+        .token-usage-area {
+            padding: 8px 15px;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--panel-bg); /* Match panel background */
+            flex-shrink: 0; /* Prevent shrinking */
+            font-size: 0.8em;
+            color: var(--text-color-muted);
+        }
+        .token-usage-area p {
+            margin: 2px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .token-usage-area .token-label {
+            font-weight: 500;
+            color: var(--text-color-darker);
+        }
+        /* --- END NEW --- */
     </style>
 </head>
 <body>
@@ -79,6 +98,10 @@
             <ul id="task-list" class="task-list scrollable-content">
                 <li class="task-item-placeholder">Loading tasks...</li>
             </ul>
+            <div id="token-usage-area" class="token-usage-area">
+                <p><span class="token-label">Last Call:</span> <span id="last-call-tokens">N/A</span></p>
+                <p><span class="token-label">Task Total:</span> <span id="task-total-tokens">N/A</span></p>
+            </div>
             <div class="upload-area">
                 <input type="file" id="file-upload-input" multiple style="display: none;">
                 <button id="upload-file-button" class="upload-button" title="Upload files to current task workspace" disabled>Upload File(s)</button>
@@ -100,7 +123,7 @@
             </div>
             <div id="chat-messages" class="chat-messages scrollable-content">
                  <div id="agent-thinking-status" class="message message-status agent-thinking-status" style="display: none;">Thinking...</div>
-                 </div>
+            </div>
             <div class="chat-input-area">
                 <textarea placeholder="Type your message here..."></textarea>
                 <button>Send</button>
@@ -120,7 +143,7 @@
 
             <div class="monitor-split-content">
                 <div id="monitor-log-area" class="monitor-log-area scrollable-content">
-                    </div>
+                </div>
                 <div id="monitor-artifact-area" class="monitor-artifact-area">
                     <div class="artifact-placeholder">No artifacts generated yet.</div>
                     <div class="artifact-nav">

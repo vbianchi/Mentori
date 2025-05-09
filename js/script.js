@@ -1,13 +1,10 @@
 // js/script.js
 /**
- * This script handles the frontend logic for the AI Agent UI,
- * including WebSocket communication, DOM manipulation, event handling,
- * task history management, chat input history, Markdown formatting,
- * LLM selection, monitor status updates, agent cancellation, and file uploads.
- * --- Streaming Fix 2 ---
- * Removed handling for agent_token_chunk and agent_stream_end.
- * Agent final answer is now received via 'agent_message'.
- * Thinking status updates handled via 'agent_thinking_update'.
+ * This script handles the frontend logic for the AI Agent UI.
+ * --- LLM Sync Fix ---
+ * Ensures the LLM selector dropdown correctly reflects the backend's
+ * actual default LLM on new connection/page reload, overriding stale
+ * localStorage values for the initial selection.
  */
 document.addEventListener('DOMContentLoaded', () => {
     console.log("AI Agent UI Script Loaded and DOM ready!");
@@ -32,7 +29,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const stopButton = document.getElementById('stop-button');
     const fileUploadInput = document.getElementById('file-upload-input');
     const uploadFileButton = document.getElementById('upload-file-button');
-    const agentThinkingStatusElement = document.getElementById('agent-thinking-status'); // Reference to the thinking status div
+    const agentThinkingStatusElement = document.getElementById('agent-thinking-status');
+    const tokenUsageAreaElement = document.getElementById('token-usage-area');
+    const lastCallTokensElement = document.getElementById('last-call-tokens');
+    const taskTotalTokensElement = document.getElementById('task-total-tokens');
+
 
     // --- State Variables ---
     let tasks = [];
@@ -42,8 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const COUNTER_KEY = 'aiAgentTaskCounter';
     let isLoadingHistory = false;
     let availableModels = { gemini: [], ollama: [] };
-    let currentSelectedLlmId = null;
-    let defaultLlmId = null;
+    let currentSelectedLlmId = null; // This will be set by the backend's default initially
+    // let defaultLlmId = null; // This is now directly used from the message
+
     let isAgentRunning = false;
 
     // --- Chat Input History State ---
@@ -52,17 +54,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let chatHistoryIndex = -1;
     let currentInputBuffer = "";
 
-    // --- REMOVED: Streaming State Variables ---
-    // let currentStreamingMessageElement = null;
-    // let currentStreamingContent = "";
-
     // --- Artifact State ---
     let currentTaskArtifacts = [];
     let currentArtifactIndex = -1;
 
+    // --- Token Tracking State ---
+    let currentTaskTotalTokens = { input: 0, output: 0, total: 0 };
+
+
     // --- Backend URLs ---
-    const wsUrl = 'ws://localhost:8765'; // WebSocket server
-    const httpBackendBaseUrl = 'http://localhost:8766'; // HTTP server for uploads/files
+    const wsUrl = 'ws://localhost:8765';
+    const httpBackendBaseUrl = 'http://localhost:8766';
 
     let socket;
     window.socket = null;
@@ -70,42 +72,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Function to update monitor status indicator & Stop Button ---
     const updateMonitorStatus = (status, text) => {
-        // This function remains largely the same, ensuring the thinking status is hidden
-        // when the agent becomes idle, errors, or disconnects.
         if (!statusDotElement || !monitorStatusTextElement || !stopButton) return;
-
         statusDotElement.classList.remove('idle', 'running', 'error', 'disconnected');
         let statusText = text;
-
         switch (status) {
             case 'idle':
-                statusDotElement.classList.add('idle');
-                statusText = text || 'Idle';
-                isAgentRunning = false;
-                stopButton.style.display = 'none';
-                stopButton.disabled = true;
+                statusDotElement.classList.add('idle'); statusText = text || 'Idle'; isAgentRunning = false;
+                stopButton.style.display = 'none'; stopButton.disabled = true;
                 if (agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
                 break;
             case 'running':
-                statusDotElement.classList.add('running');
-                statusText = text || 'Running...';
-                isAgentRunning = true;
-                stopButton.style.display = 'inline-block';
-                stopButton.disabled = false;
-                // Don't hide thinking status here explicitly, let updates manage it
+                statusDotElement.classList.add('running'); statusText = text || 'Running...'; isAgentRunning = true;
+                stopButton.style.display = 'inline-block'; stopButton.disabled = false;
                 break;
             case 'error':
-                statusDotElement.classList.add('error');
-                statusText = text || 'Error';
-                isAgentRunning = false;
-                stopButton.style.display = 'none';
-                stopButton.disabled = true;
+                statusDotElement.classList.add('error'); statusText = text || 'Error'; isAgentRunning = false;
+                stopButton.style.display = 'none'; stopButton.disabled = true;
                 if (agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
                 break;
             case 'cancelling':
-                 statusDotElement.classList.add('running');
-                 statusText = text || 'Cancelling...';
-                 isAgentRunning = true;
+                 statusDotElement.classList.add('running'); statusText = text || 'Cancelling...'; isAgentRunning = true;
                  stopButton.disabled = true;
                  if (agentThinkingStatusElement) {
                     agentThinkingStatusElement.textContent = 'Cancelling...';
@@ -114,20 +100,36 @@ document.addEventListener('DOMContentLoaded', () => {
                  break;
             case 'disconnected':
             default:
-                statusDotElement.classList.add('disconnected');
-                statusText = text || 'Disconnected';
-                isAgentRunning = false;
-                stopButton.style.display = 'none';
-                stopButton.disabled = true;
+                statusDotElement.classList.add('disconnected'); statusText = text || 'Disconnected'; isAgentRunning = false;
+                stopButton.style.display = 'none'; stopButton.disabled = true;
                 if (agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
                 break;
         }
         monitorStatusTextElement.textContent = statusText;
     };
 
+    const updateTokenDisplay = (lastCallUsage = null) => {
+        if (!lastCallTokensElement || !taskTotalTokensElement) return;
+        if (lastCallUsage) {
+            const lastInput = lastCallUsage.input_tokens || 0;
+            const lastOutput = lastCallUsage.output_tokens || 0;
+            const lastTotal = lastCallUsage.total_tokens || (lastInput + lastOutput);
+            lastCallTokensElement.textContent = `In: ${lastInput}, Out: ${lastOutput}, Total: ${lastTotal} (${lastCallUsage.model_name || 'N/A'})`;
+            currentTaskTotalTokens.input += lastInput;
+            currentTaskTotalTokens.output += lastOutput;
+            currentTaskTotalTokens.total += lastTotal;
+        }
+        taskTotalTokensElement.textContent = `In: ${currentTaskTotalTokens.input}, Out: ${currentTaskTotalTokens.output}, Total: ${currentTaskTotalTokens.total}`;
+    };
+
+    const resetTaskTokenTotals = () => {
+        currentTaskTotalTokens = { input: 0, output: 0, total: 0 };
+        if(lastCallTokensElement) lastCallTokensElement.textContent = "N/A";
+        updateTokenDisplay();
+    };
+
 
     const connectWebSocket = () => {
-        // connectWebSocket function remains the same...
         console.log(`Attempting to connect to WebSocket: ${wsUrl}`);
         addMonitorLog("[SYSTEM] Attempting to connect to backend...");
         updateMonitorStatus('disconnected', 'Connecting...');
@@ -154,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
             addMonitorLog(`[SYSTEM] WebSocket connection established.`);
             addChatMessage("Connected to backend.", "status");
             updateMonitorStatus('idle', 'Idle');
-            sendWsMessage("get_available_models", {});
+            sendWsMessage("get_available_models", {}); // This will trigger populateLlmSelector
             if (currentTaskId) {
                 const currentTask = tasks.find(task => task.id === currentTaskId);
                 if (currentTask) {
@@ -162,18 +164,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     sendWsMessage("context_switch", { task: currentTask.title, taskId: currentTask.id });
                 } else {
                     console.warn("currentTaskId set, but task not found in list on connection open.");
-                    currentTaskId = null; updateMonitorStatus('idle', 'No Task'); updateArtifactDisplay();
+                    currentTaskId = null; updateMonitorStatus('idle', 'No Task'); updateArtifactDisplay(); resetTaskTokenTotals();
                 }
             } else {
-                 updateMonitorStatus('idle', 'No Task'); updateArtifactDisplay();
+                 updateMonitorStatus('idle', 'No Task'); updateArtifactDisplay(); resetTaskTokenTotals();
             }
         };
 
         socket.onmessage = (event) => {
             try {
                 const message = JSON.parse(event.data);
-                 // console.debug("Received WS message:", message); // Reduce noise
-
                 switch (message.type) {
                     case 'history_start':
                         console.log("Received history_start signal."); isLoadingHistory = true;
@@ -188,41 +188,36 @@ document.addEventListener('DOMContentLoaded', () => {
                         scrollToBottom(monitorLogAreaElement);
                         updateMonitorStatus('idle', 'Idle');
                         break;
-
-                    // --- REMOVED: agent_token_chunk and agent_stream_end handlers ---
-
-                    // --- Handle Thinking Updates ---
                     case 'agent_thinking_update':
                         console.log("Received agent_thinking_update:", message.content);
                         if (agentThinkingStatusElement && message.content && message.content.status) {
                             agentThinkingStatusElement.textContent = message.content.status;
-                            agentThinkingStatusElement.style.display = 'block'; // Make visible
-
-                            // Position it correctly before the potential final answer bubble
+                            agentThinkingStatusElement.style.display = 'block';
                             const lastMessage = chatMessagesContainer.querySelector('.message:last-child');
                              if (lastMessage && lastMessage !== agentThinkingStatusElement) {
                                 chatMessagesContainer.insertBefore(agentThinkingStatusElement, lastMessage.nextSibling);
                             } else if (!lastMessage) {
                                 chatMessagesContainer.appendChild(agentThinkingStatusElement);
                             }
-
                             scrollToBottom(chatMessagesContainer);
                         } else {
                             console.warn("Received invalid or incomplete agent_thinking_update:", message);
                         }
                         break;
-
-                    // --- Handle Complete Agent Message ---
                     case 'agent_message':
                         console.log("Received complete agent_message:", message.content.substring(0, 100) + "...");
-                        // Hide thinking status line before adding the final message
                         if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
                         addChatMessage(message.content, 'agent');
-                        // Status is usually set by the accompanying 'status_message'
-                        // updateMonitorStatus('idle', 'Idle'); // Let status_message handle this
                         break;
-
-                    case 'user': // For history loading
+                    case 'llm_token_usage':
+                        console.log("Received llm_token_usage:", message.content);
+                        if (message.content && typeof message.content === 'object') {
+                            updateTokenDisplay(message.content);
+                        } else {
+                            console.warn("Invalid llm_token_usage message content:", message.content);
+                        }
+                        break;
+                    case 'user':
                         addChatMessage(message.content, 'user');
                         break;
                     case 'status_message':
@@ -230,26 +225,22 @@ document.addEventListener('DOMContentLoaded', () => {
                          if (lowerContent.includes("connect") || lowerContent.includes("clos") || lowerContent.includes("error")) {
                              addChatMessage(message.content, 'status');
                          }
-                         // Update monitor status
                          if (lowerContent.includes("error")) {
                              updateMonitorStatus('error', message.content);
                          } else if (lowerContent.includes("complete") || lowerContent.includes("cancelled")) {
                              updateMonitorStatus('idle', 'Idle');
                          }
-                         // Hide thinking status if processing ends
                          if (lowerContent.includes("complete") || lowerContent.includes("error") || lowerContent.includes("cancelled")) {
                              if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
                          }
                          break;
                     case 'monitor_log':
                         addMonitorLog(message.content);
-                        // If agent finishes or errors via monitor log, ensure UI state is consistent
                         if (message.content.includes("[Agent Finish]") || message.content.includes("Error]")) {
                             if(isAgentRunning) updateMonitorStatus('idle', 'Idle');
                             if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
                         }
                         break;
-                    // Other cases remain the same...
                     case 'update_artifacts':
                         console.log('Received update_artifacts. Current artifacts BEFORE update:', JSON.stringify(currentTaskArtifacts));
                         console.log('Received update_artifacts message with content:', message.content);
@@ -274,21 +265,21 @@ document.addEventListener('DOMContentLoaded', () => {
                             console.log(`Ignoring artifact refresh trigger for non-current task (${taskIdToRefresh})`);
                         }
                         break;
-                    case 'available_models':
+                    case 'available_models': // This message triggers LLM selector population
                         console.log("Received available_models:", message.content);
                         if (message.content && typeof message.content === 'object') {
                             availableModels.gemini = message.content.gemini || [];
                             availableModels.ollama = message.content.ollama || [];
-                            defaultLlmId = message.content.default_llm_id || null;
-                            populateLlmSelector();
+                            // --- MODIFIED: Directly use the default_llm_id from backend ---
+                            const backendDefaultLlmId = message.content.default_llm_id || null;
+                            populateLlmSelector(backendDefaultLlmId); // Pass it to the function
                         } else {
                             console.warn("Invalid available_models message content:", message.content);
                             availableModels = { gemini: [], ollama: [] };
-                            populateLlmSelector();
+                            populateLlmSelector(null); // Pass null if data is invalid
                         }
                         break;
-                    case 'user_message': break; // Ignore live echo
-
+                    case 'user_message': break;
                     default:
                         console.warn("Received unknown message type:", message.type, "Content:", message.content);
                         addMonitorLog(`[SYSTEM] Unknown message type received: ${message.type}`);
@@ -297,11 +288,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error("Failed to parse/process WS message:", error, "Data:", event.data);
                 addMonitorLog(`[SYSTEM] Error processing message: ${error.message}.`);
                 updateMonitorStatus('error', 'Processing Error');
-                if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none'; // Hide thinking status on error
+                if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
             }
         };
 
-        // onerror and onclose handlers remain the same...
          socket.onerror = (event) => {
             console.error("WebSocket error event:", event);
             addChatMessage("ERROR: Cannot connect to backend.", "status", true);
@@ -332,10 +322,8 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     };
 
-    // --- Helper Functions ---
     const scrollToBottom = (element) => { if (!element) return; element.scrollTop = element.scrollHeight; };
 
-    // formatMessageContent function remains the same
     const formatMessageContent = (text) => {
         let formattedText = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         formattedText = formattedText.replace(/```(\w*)\n([\s\S]*?)\n?```/g, (match, lang, code) => { const escapedCode = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); const langClass = lang ? ` class="language-${lang}"` : ''; return `<pre><code${langClass}>${escapedCode}</code></pre>`; });
@@ -350,7 +338,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return formattedText;
     };
 
-    // addChatMessage function remains the same
     const addChatMessage = (text, type = 'agent', doScroll = true) => {
         if (!chatMessagesContainer) { console.error("Chat container missing!"); return null; }
         if (type === 'status') {
@@ -370,17 +357,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (type === 'user') { messageElement.classList.add('user-message'); }
         if (type === 'agent') { messageElement.classList.add('agent-message'); }
         messageElement.innerHTML = formatMessageContent(text);
-        // --- Insert thinking status BEFORE adding a new message ---
-        // This ensures it appears above the new message if visible
         if (agentThinkingStatusElement && agentThinkingStatusElement.style.display !== 'none') {
-             chatMessagesContainer.insertBefore(agentThinkingStatusElement, null); // Move to end before adding new message
+             chatMessagesContainer.insertBefore(agentThinkingStatusElement, null);
         }
         chatMessagesContainer.appendChild(messageElement);
         if (doScroll) scrollToBottom(chatMessagesContainer);
         return messageElement;
     };
 
-    // addMonitorLog function remains the same
      const addMonitorLog = (fullLogText) => {
         if (!monitorLogAreaElement) { console.error("Monitor log area element (#monitor-log-area) not found!"); return; }
         const logEntryDiv = document.createElement('div');
@@ -406,6 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (logTypeIndicator.includes("SYSTEM") || logTypeIndicator.includes("SYS_")) logType = 'system';
             else if (logTypeIndicator.includes("ARTIFACT")) logType = 'artifact-generated';
             else if (logTypeIndicator.includes("USER_INPUT_LOG")) logType = 'user-input-log';
+            else if (logTypeIndicator.includes("LLM TOKEN USAGE")) logType = 'system';
         } else {
             if (fullLogText.toLowerCase().includes("error")) logType = 'error';
             else if (fullLogText.toLowerCase().includes("system")) logType = 'system';
@@ -431,7 +416,6 @@ document.addEventListener('DOMContentLoaded', () => {
         scrollToBottom(monitorLogAreaElement);
     };
 
-    // updateArtifactDisplay function remains the same
      const updateArtifactDisplay = async () => {
         if (!monitorArtifactAreaElement || !artifactNavElement || !artifactPrevBtn || !artifactNextBtn || !artifactCounterElement) {
             console.error("Artifact display elements not found!");
@@ -503,7 +487,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Task History Functions remain the same...
     const loadTasks = () => {
         const storedCounter = localStorage.getItem(COUNTER_KEY);
         taskCounter = storedCounter ? parseInt(storedCounter, 10) : 0;
@@ -515,25 +498,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 tasks = JSON.parse(storedTasks);
                 if (!Array.isArray(tasks)) { tasks = []; }
                 tasks.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-                console.log(`Loaded ${tasks.length} tasks. Next Task #: ${taskCounter + 1}`);
             } catch (e) {
                 console.error("Failed to parse tasks from localStorage:", e);
-                tasks = [];
-                localStorage.removeItem(STORAGE_KEY);
+                tasks = []; localStorage.removeItem(STORAGE_KEY);
             }
         } else {
-            tasks = [];
-            firstLoad = true;
-            console.log("No tasks found in localStorage.");
+            tasks = []; firstLoad = true;
         }
         if (firstLoad && tasks.length === 0) {
-            console.log("First load with no tasks, creating 'Task - 1'.");
             taskCounter = 1;
             const firstTask = { id: `task-${Date.now()}-${Math.random().toString(16).slice(2)}`, title: `Task - ${taskCounter}`, timestamp: Date.now() };
-            tasks.unshift(firstTask);
-            currentTaskId = firstTask.id;
-            saveTasks();
-            console.log("Auto-created and selected 'Task - 1'.");
+            tasks.unshift(firstTask); currentTaskId = firstTask.id; saveTasks();
         } else {
             const lastActiveId = localStorage.getItem(`${STORAGE_KEY}_active`);
             if (lastActiveId && tasks.some(task => task.id === lastActiveId)) {
@@ -559,40 +534,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     const renderTaskList = () => {
-        console.log(`--- Rendering Task List (Current ID: ${currentTaskId}) ---`);
         if (!taskListUl) { console.error("Task list UL element not found!"); return; }
         taskListUl.innerHTML = '';
         if (tasks.length === 0) {
             taskListUl.innerHTML = '<li class="task-item-placeholder">No tasks yet.</li>';
         } else {
             tasks.forEach((task) => {
-                const li = document.createElement('li');
-                li.className = 'task-item';
-                li.dataset.taskId = task.id;
-                const titleSpan = document.createElement('span');
-                titleSpan.className = 'task-title';
+                const li = document.createElement('li'); li.className = 'task-item'; li.dataset.taskId = task.id;
+                const titleSpan = document.createElement('span'); titleSpan.className = 'task-title';
                 const displayTitle = task.title.length > 25 ? task.title.substring(0, 22) + '...' : task.title;
-                titleSpan.textContent = displayTitle;
-                titleSpan.title = task.title;
-                li.appendChild(titleSpan);
-                const controlsDiv = document.createElement('div');
-                controlsDiv.className = 'task-item-controls';
-                const editBtn = document.createElement('button');
-                editBtn.className = 'task-edit-btn';
-                editBtn.textContent = '✏️';
-                editBtn.title = `Rename Task: ${task.title}`;
-                editBtn.dataset.taskId = task.id;
-                editBtn.dataset.taskTitle = task.title;
+                titleSpan.textContent = displayTitle; titleSpan.title = task.title; li.appendChild(titleSpan);
+                const controlsDiv = document.createElement('div'); controlsDiv.className = 'task-item-controls';
+                const editBtn = document.createElement('button'); editBtn.className = 'task-edit-btn'; editBtn.textContent = '✏️';
+                editBtn.title = `Rename Task: ${task.title}`; editBtn.dataset.taskId = task.id; editBtn.dataset.taskTitle = task.title;
                 editBtn.addEventListener('click', (event) => { event.stopPropagation(); handleEditTaskClick(task.id, task.title); });
                 controlsDiv.appendChild(editBtn);
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'task-delete-btn';
-                deleteBtn.textContent = '🗑️';
-                deleteBtn.title = `Delete Task: ${task.title}`;
-                deleteBtn.dataset.taskId = task.id;
+                const deleteBtn = document.createElement('button'); deleteBtn.className = 'task-delete-btn'; deleteBtn.textContent = '🗑️';
+                deleteBtn.title = `Delete Task: ${task.title}`; deleteBtn.dataset.taskId = task.id;
                 deleteBtn.addEventListener('click', (event) => { event.stopPropagation(); handleDeleteTaskClick(task.id, task.title); });
-                controlsDiv.appendChild(deleteBtn);
-                li.appendChild(controlsDiv);
+                controlsDiv.appendChild(deleteBtn); li.appendChild(controlsDiv);
                 li.addEventListener('click', () => { handleTaskItemClick(task.id); });
                 if (task.id === currentTaskId) { li.classList.add('active'); }
                 taskListUl.appendChild(li);
@@ -600,7 +560,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         updateCurrentTaskTitle();
         if (uploadFileButton) { uploadFileButton.disabled = !currentTaskId; }
-        console.log(`--- Finished Rendering Task List ---`);
     };
     const handleTaskItemClick = (taskId) => { console.log(`Task item clicked: ${taskId}`); selectTask(taskId); };
     const handleDeleteTaskClick = (taskId, taskTitle) => { console.log(`Delete button clicked for task: ${taskId} (${taskTitle})`); deleteTask(taskId, taskTitle); };
@@ -615,8 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (taskIndex !== -1) {
             tasks[taskIndex].title = trimmedTitle;
             console.log(`Task ${taskId} title updated locally to: ${trimmedTitle}`);
-            saveTasks();
-            renderTaskList();
+            saveTasks(); renderTaskList();
             if (taskId === currentTaskId) { updateCurrentTaskTitle(); }
             sendWsMessage("rename_task", { taskId: taskId, newName: trimmedTitle });
         } else { console.error(`Task ${taskId} not found locally for renaming.`); }
@@ -636,18 +594,17 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const clearChatAndMonitor = (addLog = true) => {
         if (chatMessagesContainer) chatMessagesContainer.innerHTML = '';
-        if (agentThinkingStatusElement) { // Re-add the status element after clearing
+        if (agentThinkingStatusElement) {
             chatMessagesContainer.appendChild(agentThinkingStatusElement);
             agentThinkingStatusElement.style.display = 'none';
         }
         if (monitorLogAreaElement) monitorLogAreaElement.innerHTML = '';
         currentTaskArtifacts = [];
-        console.log('Cleared currentTaskArtifacts in clearChatAndMonitor:', currentTaskArtifacts);
         currentArtifactIndex = -1;
         updateArtifactDisplay();
         if (addLog && monitorLogAreaElement) { addMonitorLog("[SYSTEM] Cleared context."); }
         console.log("Cleared chat and monitor.");
-        // No streaming state to clear now
+        resetTaskTokenTotals();
     };
     const selectTask = (taskId) => {
         console.log(`Attempting to select task: ${taskId}`);
@@ -655,8 +612,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const task = tasks.find(t => t.id === taskId);
         currentTaskId = task ? taskId : null;
         console.log(`Selected task ID set to: ${currentTaskId}`);
-        saveTasks();
-        renderTaskList();
+        saveTasks(); renderTaskList();
+        resetTaskTokenTotals();
         if (currentTaskId && task) {
             clearChatAndMonitor(false);
             sendWsMessage("context_switch", { task: task.title, taskId: task.id });
@@ -699,17 +656,17 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(`Deleted active task, selecting next: ${nextTaskId}`);
             selectTask(nextTaskId);
         } else {
-            saveTasks();
-            renderTaskList();
+            saveTasks(); renderTaskList();
         }
         console.log(`Finished delete task logic for: ${taskId}`);
     };
 
-    // populateLlmSelector function remains the same
-    const populateLlmSelector = () => {
+    // --- MODIFIED: populateLlmSelector to prioritize backend default ---
+    const populateLlmSelector = (backendDefaultLlmId) => { // Accept backend's default
         if (!llmSelectElement) { console.error("LLM select element not found!"); return; }
         llmSelectElement.innerHTML = '';
         llmSelectElement.disabled = true;
+
         if ((!availableModels.gemini || availableModels.gemini.length === 0) &&
             (!availableModels.ollama || availableModels.ollama.length === 0)) {
             const option = document.createElement('option');
@@ -718,6 +675,7 @@ document.addEventListener('DOMContentLoaded', () => {
             llmSelectElement.appendChild(option);
             return;
         }
+
         if (availableModels.gemini && availableModels.gemini.length > 0) {
             const geminiGroup = document.createElement('optgroup');
             geminiGroup.label = 'Gemini';
@@ -729,6 +687,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             llmSelectElement.appendChild(geminiGroup);
         }
+
         if (availableModels.ollama && availableModels.ollama.length > 0) {
             const ollamaGroup = document.createElement('optgroup');
             ollamaGroup.label = 'Ollama';
@@ -740,27 +699,44 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             llmSelectElement.appendChild(ollamaGroup);
         }
-        const lastSelected = localStorage.getItem('selectedLlmId');
-        if (lastSelected && llmSelectElement.querySelector(`option[value="${lastSelected}"]`)) {
-            llmSelectElement.value = lastSelected;
-            currentSelectedLlmId = lastSelected;
-        } else if (defaultLlmId && llmSelectElement.querySelector(`option[value="${defaultLlmId}"]`)) {
-            llmSelectElement.value = defaultLlmId;
-            currentSelectedLlmId = defaultLlmId;
-        } else if (llmSelectElement.options.length > 0) {
-             for (let i = 0; i < llmSelectElement.options.length; i++) {
-                 if (llmSelectElement.options[i].value) {
-                     llmSelectElement.selectedIndex = i;
-                     currentSelectedLlmId = llmSelectElement.value;
-                     break;
+
+        // --- Prioritize backend's default for the current session ---
+        if (backendDefaultLlmId && llmSelectElement.querySelector(`option[value="${backendDefaultLlmId}"]`)) {
+            llmSelectElement.value = backendDefaultLlmId;
+            currentSelectedLlmId = backendDefaultLlmId;
+            localStorage.setItem('selectedLlmId', backendDefaultLlmId); // Update localStorage
+            console.log(`LLM selector set to backend default: ${backendDefaultLlmId}`);
+        } else {
+            // Fallback to localStorage if backend default isn't valid (should not happen ideally)
+            // or if backendDefaultLlmId was null
+            const lastSelected = localStorage.getItem('selectedLlmId');
+            if (lastSelected && llmSelectElement.querySelector(`option[value="${lastSelected}"]`)) {
+                llmSelectElement.value = lastSelected;
+                currentSelectedLlmId = lastSelected;
+                console.log(`LLM selector set to localStorage value: ${lastSelected}`);
+            } else if (llmSelectElement.options.length > 0) { // Fallback to first available option
+                 for (let i = 0; i < llmSelectElement.options.length; i++) {
+                     if (llmSelectElement.options[i].value && !llmSelectElement.options[i].disabled) { // Check if option is not a disabled placeholder
+                         llmSelectElement.selectedIndex = i;
+                         currentSelectedLlmId = llmSelectElement.value;
+                         localStorage.setItem('selectedLlmId', currentSelectedLlmId);
+                         console.log(`LLM selector set to first available option: ${currentSelectedLlmId}`);
+                         break;
+                     }
                  }
-             }
+            }
         }
-        console.log(`LLM selector populated. Initial selection: ${currentSelectedLlmId}`);
+        // After setting, explicitly send the current selection to the backend to ensure sync
+        if (currentSelectedLlmId) {
+            sendWsMessage("set_llm", { llm_id: currentSelectedLlmId });
+        }
+
+        console.log(`LLM selector populated. Final selection: ${currentSelectedLlmId}`);
         llmSelectElement.disabled = false;
     };
+    // --- END MODIFIED ---
 
-    // sendWsMessage function remains the same
+
     const sendWsMessage = (type, content) => {
         if (window.socket && window.socket.readyState === WebSocket.OPEN) {
             try {
@@ -784,7 +760,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // handleSendMessage function remains the same
     const handleSendMessage = () => {
         const messageText = chatTextarea.value.trim();
         if (!currentTaskId){
@@ -804,7 +779,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             chatHistoryIndex = -1;
             currentInputBuffer = "";
-            // Clear previous thinking status before sending
             if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
             sendWsMessage("user_message", { content: messageText });
             updateMonitorStatus('running', 'Processing...');
@@ -817,7 +791,6 @@ document.addEventListener('DOMContentLoaded', () => {
         chatTextarea.focus();
     };
 
-    // handleFileUpload function remains the same
     const handleFileUpload = async (event) => {
         console.log("[handleFileUpload] Function entered.");
         if (!currentTaskId) {
@@ -896,7 +869,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- Event Listeners Setup ---
-    // Most listeners remain the same...
     if (newTaskButton) { newTaskButton.addEventListener('click', handleNewTaskClick); }
     else { console.error("New task button element not found!"); }
 
@@ -933,7 +905,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (selectedId && selectedId !== currentSelectedLlmId) {
                 console.log(`LLM selection changed to: ${selectedId}`);
                 currentSelectedLlmId = selectedId;
-                localStorage.setItem('selectedLlmId', selectedId);
+                localStorage.setItem('selectedLlmId', selectedId); // Still save user's explicit choice
                 sendWsMessage("set_llm", { llm_id: selectedId });
             } else if (!selectedId) {
                  console.warn("LLM selector changed to an empty value.");
@@ -961,7 +933,6 @@ document.addEventListener('DOMContentLoaded', () => {
         fileUploadInput.addEventListener('change', handleFileUpload);
     } else { console.error("File upload button or input element not found!"); }
 
-    // Ensure thinking status click listener is correctly attached
     if (agentThinkingStatusElement) {
         agentThinkingStatusElement.addEventListener('click', () => {
             console.log("Agent thinking status clicked. Scrolling monitor.");
