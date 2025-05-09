@@ -5,13 +5,14 @@ This project provides a functional user interface and backend for an AI agent sy
 ## Features
 
 * **Task Management:** Create, select, delete, and rename tasks. Each task maintains its own context and workspace.
-* **Chat Interface:** Interact with the AI agent via a familiar chat window. Supports input history (Up/Down arrows). Basic Markdown rendering (newlines, bold, italics, code blocks, links).
-* **LLM Selection:** Choose the specific language model (Gemini or Ollama models configured in `.env`) to use for the current session directly from the chat header.
+* **Chat Interface:** Interact with the AI agent via a familiar chat window. Supports input history (Up/Down arrows). Basic Markdown rendering (newlines, bold, italics, code blocks, links). A "Thinking..." status line appears while the agent processes requests.
+* **LLM Selection:** Choose the specific language model (Gemini or Ollama models configured in `.env`) to use for the current session directly from the chat header. The UI syncs with the backend's actual default LLM on new connections.
 * **Agent Workspace (Monitor):** View the agent's internal steps, tool usage, and outputs in a structured, styled log panel.
 * **Monitor Status Indicator:** A visual indicator (dot + text) in the monitor header shows the agent's current state (e.g., Idle, Running, Error, Disconnected).
-* **Agent Cancellation (STOP Button):** A STOP button appears in the monitor header while the agent is running. Clicking it sends a cancellation request to the backend. **Note:** This attempts to interrupt the agent *between* major steps (e.g., before the next tool use or LLM call) rather than immediately halting a long-running step, and may not always succeed if the agent is blocked internally.
+* **Agent Cancellation (STOP Button):** A STOP button appears in the monitor header while the agent is running. Clicking it sends a cancellation request to the backend.
 * **File Upload:** An "Upload File(s)" button in the task panel allows users to upload files directly into the currently selected task's workspace. The artifact viewer updates automatically after a successful upload.
 * **Artifact Viewer:** Displays generated `.png` images and previews common text files (`.txt`, `.py`, `.csv`, etc.) in a dedicated area below the monitor logs, with navigation for multiple artifacts. The filename is displayed above the content, and the navigation buttons remain fixed at the bottom.
+* **LLM Token Tracking:** Displays token usage (input, output, total) for the last LLM call and a running total for the current task in the left panel.
 * **Tool Integration:** Includes tools for:
     * Web Search (`duckduckgo_search`)
     * Web Page Reading (`web_page_reader`)
@@ -48,6 +49,7 @@ This project provides a functional user interface and backend for an AI agent sy
 * **Protocol:** WebSockets (WS), HTTP (for file upload/serving)
 
 ## Project Structure
+
 
 ```
 
@@ -86,7 +88,7 @@ ResearchAgent/
 
 1.  **Clone Repository:**
     ```bash
-    git clone https://github.com/vbianchi/ResearchAgent.git
+    git clone [https://github.com/vbianchi/ResearchAgent.git](https://github.com/vbianchi/ResearchAgent.git)
     cd ResearchAgent
     ```
 2.  **Prerequisites:**
@@ -191,11 +193,12 @@ Runs the backend server inside an isolated Docker container. **Highly recommende
 * **Rename Task:** Hover over a task, click the pencil icon (✏️).
 * **Select Task:** Click a task to load its history.
 * **Select LLM:** Use the dropdown in the chat header to choose the model for the current session.
-* **Chat:** Interact with the agent. Use Up/Down arrows for input history.
+* **Chat:** Interact with the agent. Use Up/Down arrows for input history. A "Thinking..." status line appears during processing.
 * **Monitor:** Observe agent logs and status indicator (Idle/Running/Error/Disconnected).
 * **Cancel Agent:** Click the "STOP" button in the monitor header while the agent is running to request cancellation (interrupts between steps).
 * **Upload Files:** Select a task, click the "Upload File(s)" button below the task list, choose files. Check monitor/artifacts for confirmation.
 * **Artifact Viewer:** View generated/uploaded images/text files using Prev/Next buttons.
+* **Token Usage:** Observe token counts for the last LLM call and the current task total in the left panel.
 * **Test PubMed Search:** Ask: `"Search PubMed for recent articles on CRISPR gene editing."`
 * **Test Package Installation:** Ask: `"Install the 'numpy' python package."`
 * **Test Python REPL:** Ask: `"Use the Python REPL tool to calculate 15 factorial."`
@@ -203,6 +206,12 @@ Runs the backend server inside an isolated Docker container. **Highly recommende
 * **Test File/PDF Reading:** Ask: `"Read the file named 'my_document.txt'"` or `"Read the file named 'research_paper.pdf'"` (assuming these files exist in the task workspace). Observe if a warning about length is added for large PDFs.
 * **Test LLM Switching:** Select one model, ask a question. Select a different model, ask another question. Observe the agent's responses and potentially different styles.
 * **Delete Task:** Click the trash icon (🗑️) next to a task (confirmation required).
+
+## Known Issues
+
+* **Agent Cancellation (STOP Button):** The STOP button sends a cancellation request to the agent. However, this typically interrupts the agent *between* major steps (like before the next tool use or LLM call) rather than immediately halting a long-running internal process within a tool or LLM.
+* **Markdown Rendering in Chat:** The current Markdown rendering in the chat is basic. Complex Markdown or specific edge cases (e.g., underscores in filenames not intended for italics) might not always render as expected. Full GFM support via a dedicated library is a future enhancement.
+* **Ollama Token Counts:** Token count reporting (specifically input tokens) for Ollama models can be less precise or consistently available compared to API-based models like Gemini. The displayed totals will reflect the information made available by the Ollama integration.
 
 ## Security Warnings
 
@@ -213,7 +222,7 @@ Runs the backend server inside an isolated Docker container. **Highly recommende
 ## Future Perspectives & Ideas
 
 * **Agent Control:** Improve the STOP button to more reliably and immediately halt ongoing agent tasks, potentially by running the agent in a separate process.
-* **Streaming Output:** Ensure agent responses consistently stream token-by-token to the UI for better responsiveness.
+* **Streaming Output (Final Answer):** Implement token-by-token streaming for the agent's final answer to the UI for better responsiveness (currently, only the "Thinking..." line updates dynamically).
 * **Drag & Drop Upload:** Enhance file upload to support drag and drop onto the task list or chat area.
 * **Collapsible/Resizable Panels:** Allow the left task panel to be collapsed and/or the panel dividers to be dragged to resize areas.
 * **PDF Reading Enhancements:** Add options for page ranges or user-specified `max_length` override, improve handling of complex layouts/images.
@@ -224,11 +233,11 @@ Runs the backend server inside an isolated Docker container. **Highly recommende
 * **Chat Interaction Enhancements:**
     * Explore using special characters (e.g., `#toolname`) to suggest or force specific tool usage.
     * Optionally have the agent summarize its plan before execution for complex tasks.
-* **More Robust Formatting:** Use a dedicated Markdown library (e.g., `markdown-it`) for more complex rendering if needed.
+    * Consider restructuring the agent's chat bubble to clearly delineate Thought, Action, Observation, and Final Answer components for improved readability.
+* **More Robust Formatting:** Use a dedicated Markdown library (e.g., `markdown-it` or `react-markdown` with plugins) for more complex rendering if needed.
 * **Per-Task LLM Preference:** Store the last used LLM for each task.
 * **Tool Configuration UI:** Allow enabling/disabling tools per task or globally.
 * **User Authentication:** Add user accounts and login for multi-user scenarios.
 * **UI Polish & Error Handling:** Continuously improve visual feedback and handle edge cases more gracefully.
 * **Session Saving/Loading:** Persist the agent's memory state across browser sessions.
-* **Cost/Token Tracking:** Display token usage for LLM calls, especially for paid models.
-
+* **Cost/Token Tracking:** (Implemented) Display token usage for LLM calls.
