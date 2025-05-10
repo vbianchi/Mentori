@@ -51,6 +51,7 @@ This project provides a functional user interface and backend for an AI agent sy
 ## Project Structure
 
 
+
 ```
 
 ResearchAgent/
@@ -221,18 +222,31 @@ Runs the backend server inside an isolated Docker container. **Highly recommende
 
 ## Future Perspectives & Ideas
 
+* **Advanced Agent Architecture (Planner-Controller-Executor-Evaluator):**
+    * **Planner:** Decomposes complex user requests into a sequence of smaller, manageable sub-tasks. This would likely involve an LLM call with a prompt designed for structured plan generation.
+    * **Controller/Validator:** Before execution, this component would check the planned steps (e.g., ReAct-style "Action: tool_name, Action Input: ...") for validity. It would ensure the tool exists, the input format is likely correct, and there's no extraneous text or obvious errors. This could involve programmatic checks and/or a focused LLM call for syntax/tool validation.
+    * **Executor:** Takes each validated sub-task and executes it. This could still leverage the current ReAct agent logic but focused on the specific sub-task goal.
+    * **Evaluator:** After all sub-tasks are attempted, this component assesses the overall outcome against the initial user request. It could trigger re-planning if the task isn't complete or correct, providing feedback to the Planner.
+    * This architecture aims to improve robustness for complex, multi-step tasks by introducing explicit planning, pre-execution validation, and post-execution evaluation, making it suitable for long-running research workflows.
+* **Interactive Workflows & User Guidance:**
+    * Allow the agent to request user confirmation or clarification at critical steps in a complex workflow.
+    * Enable users to intervene, modify the agent's plan, or steer its execution if intermediate results are not as expected.
+    * This makes the agent more of a collaborative partner, especially for long or exploratory tasks.
+* **Automated Result Presentation & Website Generation:**
+    * Empower the agent to generate simple, structured HTML pages or Markdown reports to present its findings, including text summaries, tables, and generated plots.
+    * Potentially offer a few predefined design templates/CSS schemes for these reports to ensure consistent and professional-looking output.
 * **Agent Control:** Improve the STOP button to more reliably and immediately halt ongoing agent tasks, potentially by running the agent in a separate process.
 * **Streaming Output (Final Answer):** Implement token-by-token streaming for the agent's final answer to the UI for better responsiveness (currently, only the "Thinking..." line updates dynamically).
 * **Drag & Drop Upload:** Enhance file upload to support drag and drop onto the task list or chat area.
 * **Collapsible/Resizable Panels:** Allow the left task panel to be collapsed and/or the panel dividers to be dragged to resize areas.
 * **PDF Reading Enhancements:** Add options for page ranges or user-specified `max_length` override, improve handling of complex layouts/images.
-* **Structured Output:** Add capability for the agent to return results in structured formats (e.g., JSON) for easier parsing or downstream use.
+* **Structured Output:** Add capability for the agent to return results in structured formats (e.g., JSON) for easier parsing or downstream use (beyond just website generation).
 * **Data Visualization:** Enable the agent (e.g., via Python REPL) to generate plots from data and display them directly in the Artifact Viewer.
 * **Domain-Specific Tools:** Integrate more tools relevant to bioinformatics/epidemiology (e.g., BLAST, Ensembl/UniProt API access, VCF/FASTA parsing).
 * **Artifact Management:** Allow users to rename or delete artifacts from the UI.
 * **Chat Interaction Enhancements:**
     * Explore using special characters (e.g., `#toolname`) to suggest or force specific tool usage.
-    * Optionally have the agent summarize its plan before execution for complex tasks.
+    * Optionally have the agent summarize its plan before execution for complex tasks (related to the Planner idea).
     * Consider restructuring the agent's chat bubble to clearly delineate Thought, Action, Observation, and Final Answer components for improved readability.
 * **More Robust Formatting:** Use a dedicated Markdown library (e.g., `markdown-it` or `react-markdown` with plugins) for more complex rendering if needed.
 * **Per-Task LLM Preference:** Store the last used LLM for each task.
