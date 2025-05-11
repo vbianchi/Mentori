@@ -424,3 +424,113 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     .monitor-header { flex-wrap: wrap; } /* Allow wrapping */
     .monitor-controls { margin-left: auto; /* Push controls to right on wrap */ padding-top: 5px;}
 }
+
+/* --- NEW: Plan Confirmation Styles --- */
+.plan-confirmation-container {
+    background-color: var(--panel-bg); /* Or a slightly different shade */
+    border: 1px solid var(--accent-color);
+    border-left: 3px solid var(--accent-color);
+    padding: 15px;
+    margin-top: 10px;
+    margin-bottom: 10px; /* Ensure gap before next message */
+    border-radius: 8px;
+    align-self: stretch; /* Take full width available in chat */
+    max-width: 100%; /* Override default message max-width */
+}
+
+.plan-confirmation-container h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: var(--text-color);
+    font-size: 1.1em;
+}
+
+.plan-summary {
+    margin-bottom: 15px;
+    line-height: 1.6;
+    color: var(--text-color-muted);
+}
+
+.plan-steps-details {
+    background-color: var(--terminal-bg); /* Darker background for details */
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+}
+
+.plan-steps-details ol {
+    padding-left: 20px;
+    margin: 0;
+}
+
+.plan-steps-details li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.plan-steps-details li .step-tool {
+    font-style: italic;
+    color: var(--tool-color);
+    font-size: 0.9em;
+}
+.plan-steps-details li .step-expected {
+    display: block;
+    font-size: 0.9em;
+    color: var(--text-color-darker);
+    margin-top: 2px;
+}
+
+
+.plan-toggle-details-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-color-muted);
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85em;
+    margin-bottom: 15px;
+    transition: all 0.2s ease;
+}
+.plan-toggle-details-btn:hover {
+    background-color: var(--panel-bg-lightest);
+    color: var(--text-color);
+}
+
+
+.plan-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end; /* Align buttons to the right */
+    margin-top: 10px;
+}
+
+.plan-confirm-btn, .plan-cancel-btn {
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+    border: none;
+}
+
+.plan-confirm-btn {
+    background-color: var(--accent-color);
+    color: var(--button-text-on-accent);
+}
+.plan-confirm-btn:hover {
+    background-color: var(--accent-color-hover);
+}
+
+.plan-cancel-btn {
+    background-color: var(--panel-bg-lightest);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+.plan-cancel-btn:hover {
+    background-color: var(--panel-bg-lighter);
+}
+/* --- END NEW --- */

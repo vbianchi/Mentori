@@ -1,10 +1,19 @@
 // js/script.js
 /**
  * This script handles the frontend logic for the AI Agent UI.
- * --- LLM Sync Fix ---
- * Ensures the LLM selector dropdown correctly reflects the backend's
- * actual default LLM on new connection/page reload, overriding stale
- * localStorage values for the initial selection.
+ * Includes:
+ * - WebSocket communication
+ * - DOM manipulation & event handling
+ * - Task management (load, save, render, select, new, delete, rename)
+ * - Chat message display and input history
+ * - Basic Markdown formatting for chat messages
+ * - LLM selection and synchronization with backend
+ * - Monitor status updates (idle, running, error, disconnected, cancelling)
+ * - Agent cancellation requests
+ * - File uploads
+ * - Artifact viewer navigation
+ * - LLM Token Usage tracking and display
+ * - Plan display for user confirmation and execution initiation
  */
 document.addEventListener('DOMContentLoaded', () => {
     console.log("AI Agent UI Script Loaded and DOM ready!");
@@ -43,26 +52,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const COUNTER_KEY = 'aiAgentTaskCounter';
     let isLoadingHistory = false;
     let availableModels = { gemini: [], ollama: [] };
-    let currentSelectedLlmId = null; // This will be set by the backend's default initially
-    // let defaultLlmId = null; // This is now directly used from the message
-
+    let currentSelectedLlmId = null;
     let isAgentRunning = false;
 
-    // --- Chat Input History State ---
     let chatInputHistory = [];
     const MAX_CHAT_HISTORY = 10;
     let chatHistoryIndex = -1;
     let currentInputBuffer = "";
 
-    // --- Artifact State ---
     let currentTaskArtifacts = [];
     let currentArtifactIndex = -1;
-
-    // --- Token Tracking State ---
     let currentTaskTotalTokens = { input: 0, output: 0, total: 0 };
 
+    let currentDisplayedPlan = null; // Stores the structured plan for confirmation
 
-    // --- Backend URLs ---
+
     const wsUrl = 'ws://localhost:8765';
     const httpBackendBaseUrl = 'http://localhost:8766';
 
@@ -70,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.socket = null;
     console.log("Initialized window.socket to null.");
 
-    // --- Function to update monitor status indicator & Stop Button ---
     const updateMonitorStatus = (status, text) => {
         if (!statusDotElement || !monitorStatusTextElement || !stopButton) return;
         statusDotElement.classList.remove('idle', 'running', 'error', 'disconnected');
@@ -136,19 +139,16 @@ document.addEventListener('DOMContentLoaded', () => {
         chatMessagesContainer.querySelectorAll('.connection-status').forEach(el => el.remove());
         try {
             if (window.socket && window.socket.readyState !== WebSocket.CLOSED) {
-                console.log("Closing existing WebSocket connection before reconnecting.");
                 window.socket.close(1000, "Reconnecting");
             }
             socket = new WebSocket(wsUrl);
             window.socket = socket;
-            console.log("WebSocket object created.");
         } catch (error) {
             console.error("Fatal Error creating WebSocket object:", error);
             addChatMessage("FATAL: Failed to initialize WebSocket connection.", "status");
             addMonitorLog(`[SYSTEM] FATAL Error creating WebSocket: ${error.message}`);
             updateMonitorStatus('error', 'Connection Failed');
-            window.socket = null;
-            return;
+            window.socket = null; return;
         }
 
         socket.onopen = (event) => {
@@ -156,14 +156,12 @@ document.addEventListener('DOMContentLoaded', () => {
             addMonitorLog(`[SYSTEM] WebSocket connection established.`);
             addChatMessage("Connected to backend.", "status");
             updateMonitorStatus('idle', 'Idle');
-            sendWsMessage("get_available_models", {}); // This will trigger populateLlmSelector
+            sendWsMessage("get_available_models", {});
             if (currentTaskId) {
                 const currentTask = tasks.find(task => task.id === currentTaskId);
                 if (currentTask) {
-                    console.log("Sending initial context switch on connection open.");
                     sendWsMessage("context_switch", { task: currentTask.title, taskId: currentTask.id });
                 } else {
-                    console.warn("currentTaskId set, but task not found in list on connection open.");
                     currentTaskId = null; updateMonitorStatus('idle', 'No Task'); updateArtifactDisplay(); resetTaskTokenTotals();
                 }
             } else {
@@ -176,50 +174,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 const message = JSON.parse(event.data);
                 switch (message.type) {
                     case 'history_start':
-                        console.log("Received history_start signal."); isLoadingHistory = true;
-                        clearChatAndMonitor(false); addChatMessage(`Loading history...`, "status");
+                        isLoadingHistory = true; clearChatAndMonitor(false); addChatMessage(`Loading history...`, "status");
                         updateMonitorStatus('running', 'Loading History...');
                         break;
                     case 'history_end':
-                        console.log("Received history_end signal."); isLoadingHistory = false;
+                        isLoadingHistory = false;
                         const loadingMsg = chatMessagesContainer.querySelector('.message-status:last-child');
                         if (loadingMsg && loadingMsg.textContent.startsWith("Loading history...")) { loadingMsg.remove(); }
-                        scrollToBottom(chatMessagesContainer);
-                        scrollToBottom(monitorLogAreaElement);
+                        scrollToBottom(chatMessagesContainer); scrollToBottom(monitorLogAreaElement);
                         updateMonitorStatus('idle', 'Idle');
                         break;
                     case 'agent_thinking_update':
-                        console.log("Received agent_thinking_update:", message.content);
                         if (agentThinkingStatusElement && message.content && message.content.status) {
                             agentThinkingStatusElement.textContent = message.content.status;
                             agentThinkingStatusElement.style.display = 'block';
-                            const lastMessage = chatMessagesContainer.querySelector('.message:last-child');
-                             if (lastMessage && lastMessage !== agentThinkingStatusElement) {
+                            const lastMessage = chatMessagesContainer.querySelector('.message:last-child:not(.agent-thinking-status)');
+                             if (lastMessage) {
                                 chatMessagesContainer.insertBefore(agentThinkingStatusElement, lastMessage.nextSibling);
-                            } else if (!lastMessage) {
+                            } else {
                                 chatMessagesContainer.appendChild(agentThinkingStatusElement);
                             }
                             scrollToBottom(chatMessagesContainer);
-                        } else {
-                            console.warn("Received invalid or incomplete agent_thinking_update:", message);
                         }
                         break;
                     case 'agent_message':
-                        console.log("Received complete agent_message:", message.content.substring(0, 100) + "...");
                         if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
                         addChatMessage(message.content, 'agent');
                         break;
                     case 'llm_token_usage':
-                        console.log("Received llm_token_usage:", message.content);
                         if (message.content && typeof message.content === 'object') {
                             updateTokenDisplay(message.content);
-                        } else {
-                            console.warn("Invalid llm_token_usage message content:", message.content);
                         }
                         break;
-                    case 'user':
-                        addChatMessage(message.content, 'user');
+                    case 'display_plan_for_confirmation':
+                        console.log("Received display_plan_for_confirmation:", message.content);
+                        if (message.content && message.content.human_summary && message.content.structured_plan) {
+                            currentDisplayedPlan = message.content.structured_plan;
+                            displayPlanForConfirmation(message.content.human_summary, message.content.structured_plan);
+                            if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
+                        } else {
+                            console.error("Invalid plan data received:", message.content);
+                            addChatMessage("Error: Received invalid plan from backend.", "status");
+                        }
                         break;
+                    case 'user': addChatMessage(message.content, 'user'); break;
                     case 'status_message':
                          const lowerContent = message.content.toLowerCase();
                          if (lowerContent.includes("connect") || lowerContent.includes("clos") || lowerContent.includes("error")) {
@@ -227,8 +225,10 @@ document.addEventListener('DOMContentLoaded', () => {
                          }
                          if (lowerContent.includes("error")) {
                              updateMonitorStatus('error', message.content);
-                         } else if (lowerContent.includes("complete") || lowerContent.includes("cancelled")) {
-                             updateMonitorStatus('idle', 'Idle');
+                         } else if (lowerContent.includes("complete") || lowerContent.includes("cancelled") || lowerContent.includes("plan confirmed")) {
+                             if (!lowerContent.includes("plan confirmed. executing steps...")) {
+                                updateMonitorStatus('idle', 'Idle');
+                             }
                          }
                          if (lowerContent.includes("complete") || lowerContent.includes("error") || lowerContent.includes("cancelled")) {
                              if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
@@ -237,49 +237,34 @@ document.addEventListener('DOMContentLoaded', () => {
                     case 'monitor_log':
                         addMonitorLog(message.content);
                         if (message.content.includes("[Agent Finish]") || message.content.includes("Error]")) {
-                            if(isAgentRunning) updateMonitorStatus('idle', 'Idle');
+                            if(isAgentRunning && !message.content.includes("PLAN EXECUTION LOOP NOT YET IMPLEMENTED")) {
+                                updateMonitorStatus('idle', 'Idle');
+                            }
                             if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
                         }
                         break;
                     case 'update_artifacts':
-                        console.log('Received update_artifacts. Current artifacts BEFORE update:', JSON.stringify(currentTaskArtifacts));
-                        console.log('Received update_artifacts message with content:', message.content);
                         if (Array.isArray(message.content)) {
                             currentTaskArtifacts = message.content;
-                            console.log('Current artifacts AFTER update:', JSON.stringify(currentTaskArtifacts));
                             currentArtifactIndex = currentTaskArtifacts.length > 0 ? 0 : -1;
                             updateArtifactDisplay();
-                        } else {
-                            console.warn("Invalid update_artifacts message content (not an array):", message.content);
-                            currentTaskArtifacts = []; currentArtifactIndex = -1; updateArtifactDisplay();
                         }
                         break;
                     case 'trigger_artifact_refresh':
                         const taskIdToRefresh = message.content?.taskId;
-                        console.log(`Received trigger_artifact_refresh for task: ${taskIdToRefresh}`);
                         if (taskIdToRefresh && taskIdToRefresh === currentTaskId) {
-                            console.log(`Current task matches refresh trigger, requesting updated artifacts for ${currentTaskId}`);
                             addMonitorLog(`[SYSTEM] File upload detected, refreshing artifact list...`);
                             sendWsMessage('get_artifacts_for_task', { taskId: currentTaskId });
-                        } else {
-                            console.log(`Ignoring artifact refresh trigger for non-current task (${taskIdToRefresh})`);
                         }
                         break;
-                    case 'available_models': // This message triggers LLM selector population
-                        console.log("Received available_models:", message.content);
+                    case 'available_models':
                         if (message.content && typeof message.content === 'object') {
                             availableModels.gemini = message.content.gemini || [];
                             availableModels.ollama = message.content.ollama || [];
-                            // --- MODIFIED: Directly use the default_llm_id from backend ---
                             const backendDefaultLlmId = message.content.default_llm_id || null;
-                            populateLlmSelector(backendDefaultLlmId); // Pass it to the function
-                        } else {
-                            console.warn("Invalid available_models message content:", message.content);
-                            availableModels = { gemini: [], ollama: [] };
-                            populateLlmSelector(null); // Pass null if data is invalid
+                            populateLlmSelector(backendDefaultLlmId);
                         }
                         break;
-                    case 'user_message': break;
                     default:
                         console.warn("Received unknown message type:", message.type, "Content:", message.content);
                         addMonitorLog(`[SYSTEM] Unknown message type received: ${message.type}`);
@@ -292,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-         socket.onerror = (event) => {
+        socket.onerror = (event) => {
             console.error("WebSocket error event:", event);
             addChatMessage("ERROR: Cannot connect to backend.", "status", true);
             addMonitorLog(`[SYSTEM] WebSocket error occurred.`);
@@ -306,8 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         socket.onclose = (event) => {
             console.log(`WebSocket closed. Code: ${event.code}, Reason: '${event.reason || 'No reason given'}' Clean close: ${event.wasClean}`);
-            let reason = event.reason || 'No reason given';
-            let advice = "";
+            let reason = event.reason || 'No reason given'; let advice = "";
             if (event.code === 1000 || event.wasClean) { reason = "Normal"; }
             else { reason = `Abnormal (Code: ${event.code})`; advice = " Backend down or network issue?"; }
             addChatMessage(`Connection closed.${advice}`, "status", true);
@@ -357,12 +341,87 @@ document.addEventListener('DOMContentLoaded', () => {
         if (type === 'user') { messageElement.classList.add('user-message'); }
         if (type === 'agent') { messageElement.classList.add('agent-message'); }
         messageElement.innerHTML = formatMessageContent(text);
-        if (agentThinkingStatusElement && agentThinkingStatusElement.style.display !== 'none') {
+        if (agentThinkingStatusElement && agentThinkingStatusElement.style.display !== 'none' && messageElement !== agentThinkingStatusElement) {
              chatMessagesContainer.insertBefore(agentThinkingStatusElement, null);
         }
         chatMessagesContainer.appendChild(messageElement);
         if (doScroll) scrollToBottom(chatMessagesContainer);
         return messageElement;
+    };
+
+    const displayPlanForConfirmation = (humanSummary, structuredPlan) => {
+        if (!chatMessagesContainer) return;
+        const existingPlanUI = chatMessagesContainer.querySelector('.plan-confirmation-container');
+        if (existingPlanUI) existingPlanUI.remove();
+
+        const planContainer = document.createElement('div');
+        planContainer.className = 'message message-system plan-confirmation-container';
+
+        const title = document.createElement('h4');
+        title.textContent = "Agent's Proposed Plan:";
+        planContainer.appendChild(title);
+
+        const summaryP = document.createElement('p');
+        summaryP.className = 'plan-summary';
+        summaryP.innerHTML = formatMessageContent(humanSummary);
+        planContainer.appendChild(summaryP);
+
+        const detailsDiv = document.createElement('div');
+        detailsDiv.className = 'plan-steps-details';
+        detailsDiv.style.display = 'none';
+        const ol = document.createElement('ol');
+        structuredPlan.forEach(step => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${step.step_id}. ${formatMessageContent(step.description)}</strong>
+                            ${step.tool_to_use && step.tool_to_use !== "None" ? `<br><span class="step-tool">Tool: ${step.tool_to_use}</span>` : ''}
+                            ${step.tool_input_instructions ? `<br><span class="step-tool">Input Hint: ${formatMessageContent(step.tool_input_instructions)}</span>` : ''}
+                            <br><span class="step-expected">Expected: ${formatMessageContent(step.expected_outcome)}</span>`;
+            ol.appendChild(li);
+        });
+        detailsDiv.appendChild(ol);
+        planContainer.appendChild(detailsDiv);
+
+        const toggleBtn = document.createElement('button');
+        toggleBtn.className = 'plan-toggle-details-btn';
+        toggleBtn.textContent = 'Show Details';
+        toggleBtn.onclick = () => {
+            const isHidden = detailsDiv.style.display === 'none';
+            detailsDiv.style.display = isHidden ? 'block' : 'none';
+            toggleBtn.textContent = isHidden ? 'Hide Details' : 'Show Details';
+        };
+        planContainer.appendChild(toggleBtn);
+
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'plan-actions';
+
+        const confirmBtn = document.createElement('button');
+        confirmBtn.className = 'plan-confirm-btn';
+        confirmBtn.textContent = 'Confirm & Run Plan';
+        confirmBtn.onclick = () => {
+            sendWsMessage('execute_confirmed_plan', { confirmed_plan: currentDisplayedPlan });
+            planContainer.remove();
+            addChatMessage("Plan confirmed. Starting execution...", "status");
+            updateMonitorStatus('running', 'Executing Plan...');
+            if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'block';
+            if(agentThinkingStatusElement) agentThinkingStatusElement.textContent = 'Executing plan step 1...';
+        };
+        actionsDiv.appendChild(confirmBtn);
+
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'plan-cancel-btn';
+        cancelBtn.textContent = 'Cancel Plan';
+        cancelBtn.onclick = () => {
+            sendWsMessage('cancel_plan', {});
+            planContainer.remove();
+            addChatMessage("Plan cancelled by user.", "status");
+            updateMonitorStatus('idle', 'Idle');
+            currentDisplayedPlan = null;
+        };
+        actionsDiv.appendChild(cancelBtn);
+
+        planContainer.appendChild(actionsDiv);
+        chatMessagesContainer.appendChild(planContainer);
+        scrollToBottom(chatMessagesContainer);
     };
 
      const addMonitorLog = (fullLogText) => {
@@ -605,6 +664,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (addLog && monitorLogAreaElement) { addMonitorLog("[SYSTEM] Cleared context."); }
         console.log("Cleared chat and monitor.");
         resetTaskTokenTotals();
+        currentDisplayedPlan = null;
     };
     const selectTask = (taskId) => {
         console.log(`Attempting to select task: ${taskId}`);
@@ -661,12 +721,10 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(`Finished delete task logic for: ${taskId}`);
     };
 
-    // --- MODIFIED: populateLlmSelector to prioritize backend default ---
-    const populateLlmSelector = (backendDefaultLlmId) => { // Accept backend's default
+    const populateLlmSelector = (backendDefaultLlmId) => {
         if (!llmSelectElement) { console.error("LLM select element not found!"); return; }
         llmSelectElement.innerHTML = '';
         llmSelectElement.disabled = true;
-
         if ((!availableModels.gemini || availableModels.gemini.length === 0) &&
             (!availableModels.ollama || availableModels.ollama.length === 0)) {
             const option = document.createElement('option');
@@ -675,7 +733,6 @@ document.addEventListener('DOMContentLoaded', () => {
             llmSelectElement.appendChild(option);
             return;
         }
-
         if (availableModels.gemini && availableModels.gemini.length > 0) {
             const geminiGroup = document.createElement('optgroup');
             geminiGroup.label = 'Gemini';
@@ -687,7 +744,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             llmSelectElement.appendChild(geminiGroup);
         }
-
         if (availableModels.ollama && availableModels.ollama.length > 0) {
             const ollamaGroup = document.createElement('optgroup');
             ollamaGroup.label = 'Ollama';
@@ -699,24 +755,20 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             llmSelectElement.appendChild(ollamaGroup);
         }
-
-        // --- Prioritize backend's default for the current session ---
         if (backendDefaultLlmId && llmSelectElement.querySelector(`option[value="${backendDefaultLlmId}"]`)) {
             llmSelectElement.value = backendDefaultLlmId;
             currentSelectedLlmId = backendDefaultLlmId;
-            localStorage.setItem('selectedLlmId', backendDefaultLlmId); // Update localStorage
+            localStorage.setItem('selectedLlmId', backendDefaultLlmId);
             console.log(`LLM selector set to backend default: ${backendDefaultLlmId}`);
         } else {
-            // Fallback to localStorage if backend default isn't valid (should not happen ideally)
-            // or if backendDefaultLlmId was null
             const lastSelected = localStorage.getItem('selectedLlmId');
             if (lastSelected && llmSelectElement.querySelector(`option[value="${lastSelected}"]`)) {
                 llmSelectElement.value = lastSelected;
                 currentSelectedLlmId = lastSelected;
                 console.log(`LLM selector set to localStorage value: ${lastSelected}`);
-            } else if (llmSelectElement.options.length > 0) { // Fallback to first available option
+            } else if (llmSelectElement.options.length > 0) {
                  for (let i = 0; i < llmSelectElement.options.length; i++) {
-                     if (llmSelectElement.options[i].value && !llmSelectElement.options[i].disabled) { // Check if option is not a disabled placeholder
+                     if (llmSelectElement.options[i].value && !llmSelectElement.options[i].disabled) {
                          llmSelectElement.selectedIndex = i;
                          currentSelectedLlmId = llmSelectElement.value;
                          localStorage.setItem('selectedLlmId', currentSelectedLlmId);
@@ -726,16 +778,12 @@ document.addEventListener('DOMContentLoaded', () => {
                  }
             }
         }
-        // After setting, explicitly send the current selection to the backend to ensure sync
         if (currentSelectedLlmId) {
             sendWsMessage("set_llm", { llm_id: currentSelectedLlmId });
         }
-
         console.log(`LLM selector populated. Final selection: ${currentSelectedLlmId}`);
         llmSelectElement.disabled = false;
     };
-    // --- END MODIFIED ---
-
 
     const sendWsMessage = (type, content) => {
         if (window.socket && window.socket.readyState === WebSocket.OPEN) {
@@ -743,7 +791,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const payload = JSON.stringify({ type: type, ...content });
                 console.log(`Sending WS message: ${type}`, content);
                 window.socket.send(payload);
-                if (type === "rename_task" || type === "delete_task" || type === "set_llm" || type === "cancel_agent" || type === "get_artifacts_for_task") {
+                if (type === "rename_task" || type === "delete_task" || type === "set_llm" || type === "cancel_agent" || type === "get_artifacts_for_task" || type === "execute_confirmed_plan" || type === "cancel_plan") {
                      addMonitorLog(`[SYSTEM] Sent ${type} request.`);
                 }
             } catch (e) {
@@ -767,7 +815,7 @@ document.addEventListener('DOMContentLoaded', () => {
             chatTextarea.focus();
             return;
         }
-        if (isAgentRunning) {
+        if (isAgentRunning) { // This also covers plan_execution_active via updateMonitorStatus
             addChatMessage("Agent is currently busy. Please wait or stop the current process.", "status");
             return;
         }
@@ -781,7 +829,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentInputBuffer = "";
             if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
             sendWsMessage("user_message", { content: messageText });
-            updateMonitorStatus('running', 'Processing...');
+            updateMonitorStatus('running', 'Generating plan...'); // Initial status for planning
             chatTextarea.value = '';
             chatTextarea.style.height = 'auto';
             chatTextarea.style.height = chatTextarea.scrollHeight + 'px';
@@ -868,6 +916,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("[handleFileUpload] Function finished.");
     };
 
+
     // --- Event Listeners Setup ---
     if (newTaskButton) { newTaskButton.addEventListener('click', handleNewTaskClick); }
     else { console.error("New task button element not found!"); }
@@ -905,7 +954,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (selectedId && selectedId !== currentSelectedLlmId) {
                 console.log(`LLM selection changed to: ${selectedId}`);
                 currentSelectedLlmId = selectedId;
-                localStorage.setItem('selectedLlmId', selectedId); // Still save user's explicit choice
+                localStorage.setItem('selectedLlmId', selectedId);
                 sendWsMessage("set_llm", { llm_id: selectedId });
             } else if (!selectedId) {
                  console.warn("LLM selector changed to an empty value.");
