@@ -1,20 +1,17 @@
 import asyncio
 import websockets
-# MODIFIED: Removed ConnectionState import as it's causing issues.
-# We'll rely on exception handling for closed connections.
-# from websockets.enums import ConnectionState 
 import json
 import datetime
 import logging
 import shlex
 import uuid
-from typing import Optional, List, Dict, Any, Set, Tuple
+from typing import Optional, List, Dict, Any, Set, Tuple, Callable, Coroutine
 from pathlib import Path
 import os
 import signal
 import re
 import functools
-import warnings # Standard library warnings module
+import warnings 
 import aiofiles
 import unicodedata
 
@@ -45,8 +42,30 @@ from backend.db_utils import (
 )
 from backend.planner import generate_plan, PlanStep
 from backend.controller import validate_and_prepare_step_action
+# MODIFIED: Import all relevant message handlers
+from backend.message_handlers import (
+    process_context_switch, process_user_message,
+    process_execute_confirmed_plan, process_new_task,
+    process_delete_task, process_rename_task
+    # Add other handlers here as they are created, e.g.
+    # process_set_llm, process_cancel_agent, process_get_artifacts_for_task,
+    # process_run_command, process_action_command
+)
 
 # ----------------------
+
+# MODIFIED: Define Type Aliases for callback functions used in MessageHandler hint
+SendWSMessageFunc = Callable[[str, Any], Coroutine[Any, Any, None]]
+AddMonitorLogFunc = Callable[[str, str], Coroutine[Any, Any, None]]
+DBAddMessageFunc = Callable[[str, str, str, str], Coroutine[Any, Any, None]]
+DBAddTaskFunc = Callable[[str, str, str], Coroutine[Any, Any, None]]
+DBGetMessagesFunc = Callable[[str], Coroutine[Any, Any, List[Dict[str, Any]]]]
+DBDeleteTaskFunc = Callable[[str], Coroutine[Any, Any, bool]]
+DBRenameTaskFunc = Callable[[str, str], Coroutine[Any, Any, bool]]
+GetArtifactsFunc = Callable[[str], Coroutine[Any, Any, List[Dict[str, str]]]]
+# For execute_shell_command, if we were to move it (not moved yet)
+ExecuteShellCommandFunc = Callable[[str, str, SendWSMessageFunc, DBAddMessageFunc, Optional[str]], Coroutine[Any, Any, bool]]
+
 
 log_level = settings.log_level
 logging.basicConfig(
@@ -73,6 +92,7 @@ logger.info(f"File server will listen on {FILE_SERVER_LISTEN_HOST}:{FILE_SERVER_
 logger.info(f"File server URLs constructed for client will use: http://{FILE_SERVER_CLIENT_HOST}:{FILE_SERVER_PORT}")
 
 async def read_stream(stream, stream_name, session_id, send_ws_message_func, db_add_message_func, current_task_id):
+    # ... (Content unchanged)
     log_prefix_base = f"[{session_id[:8]}]"
     while True:
         try: line = await stream.readline()
@@ -88,6 +108,7 @@ async def read_stream(stream, stream_name, session_id, send_ws_message_func, db_
 
 
 async def execute_shell_command(command: str, session_id: str, send_ws_message_func: callable, db_add_message_func: callable, current_task_id: Optional[str]) -> bool:
+    # ... (Content unchanged)
     log_prefix_base = f"[{session_id[:8]}]"; timestamp_start = datetime.datetime.now().isoformat(timespec='milliseconds')
     start_log_content = f"[Direct Command] Executing: {command}"
     logger.info(f"[{session_id}] {start_log_content}")
@@ -127,6 +148,7 @@ async def execute_shell_command(command: str, session_id: str, send_ws_message_f
     return success
 
 async def handle_workspace_file(request: web.Request) -> web.Response:
+    # ... (Content unchanged)
     task_id = request.match_info.get('task_id')
     filename = request.match_info.get('filename')
     session_id = request.headers.get("X-Session-ID", "unknown")
@@ -160,6 +182,7 @@ async def handle_workspace_file(request: web.Request) -> web.Response:
 
 
 def sanitize_filename(filename: str) -> str:
+    # ... (Content unchanged)
     if not filename: return f"uploaded_file_{uuid.uuid4().hex[:8]}"
     filename = unicodedata.normalize('NFKD', filename).encode('ascii', 'ignore').decode('ascii')
     filename = re.sub(r'[^\w\s.-]', '', filename).strip()
@@ -170,6 +193,7 @@ def sanitize_filename(filename: str) -> str:
     return Path(filename).name
 
 async def handle_file_upload(request: web.Request) -> web.Response:
+    # ... (Content unchanged)
     task_id = request.match_info.get('task_id')
     session_id = request.headers.get("X-Session-ID", "unknown")
     logger.info(f"[{session_id}] Received file upload request for task: {task_id}")
@@ -215,8 +239,8 @@ async def handle_file_upload(request: web.Request) -> web.Response:
                 saved_files.append({'filename': safe_filename})
                 target_session_id = None
                 logger.debug(f"[{session_id}] Searching for active session for task {task_id}...")
-                for sid, sdata in session_data.items():
-                    if sdata.get("current_task_id") == task_id:
+                for sid, sdata_val in session_data.items(): 
+                    if sdata_val.get("current_task_id") == task_id:
                         target_session_id = sid
                         logger.debug(f"[{session_id}] Found target session {target_session_id} for task {task_id}.")
                         break
@@ -262,6 +286,7 @@ async def handle_file_upload(request: web.Request) -> web.Response:
         return web.Response(status=500, text="Internal server error creating upload response.")
 
 async def get_artifacts(task_id: str) -> List[Dict[str, str]]:
+    # ... (Content unchanged)
     logger.debug(f"Scanning workspace for artifacts for task: {task_id}")
     artifacts = []
     try:
@@ -295,6 +320,7 @@ async def get_artifacts(task_id: str) -> List[Dict[str, str]]:
     return artifacts
 
 async def setup_file_server():
+    # ... (Content unchanged)
     app = web.Application()
     app['client_max_size'] = 100 * 1024**2
     cors = aiohttp_cors.setup(app, defaults={
@@ -318,23 +344,23 @@ async def setup_file_server():
     return site, runner
 
 
-async def handler(websocket: Any): # websocket is websockets.server.ServerConnection
+async def handler(websocket: Any): 
     session_id = str(uuid.uuid4())
     logger.info(f"[{session_id}] Connection attempt from {websocket.remote_address}...")
 
     async def send_ws_message_for_session(msg_type: str, content: Any):
+        # ... (Content unchanged - using simplified ws check)
         logger.debug(f"[{session_id}] Attempting to send WS message: Type='{msg_type}', Content='{str(content)[:100]}...'")
         client_info = connected_clients.get(session_id)
         if client_info:
             ws = client_info.get("websocket")
-            # MODIFIED: Reverted to simple check, relying on send() to raise error if closed
             if ws: 
                 try:
                     await ws.send(json.dumps({"type": msg_type, "content": content}))
                     logger.debug(f"[{session_id}] Successfully sent WS message type '{msg_type}'.")
                 except (websockets.exceptions.ConnectionClosedOK, websockets.exceptions.ConnectionClosedError) as close_exc:
                     logger.warning(f"[{session_id}] WS already closed when trying to send type '{msg_type}'. Error: {close_exc}")
-                except Exception as e: # Other potential errors during send
+                except Exception as e: 
                     logger.error(f"[{session_id}] Error sending WS message type '{msg_type}': {e}", exc_info=True)
             else: logger.warning(f"[{session_id}] Websocket object not found for session when trying to send type '{msg_type}'.")
         else: logger.warning(f"[{session_id}] Session not found in connected_clients when trying to send type '{msg_type}'.")
@@ -344,6 +370,7 @@ async def handler(websocket: Any): # websocket is websockets.server.ServerConnec
     logger.info(f"[{session_id}] Client added to connected_clients dict with send function.")
 
     async def add_monitor_log_and_save(text: str, log_type: str = "monitor_log"):
+        # ... (Content unchanged)
         timestamp = datetime.datetime.now().isoformat(timespec='milliseconds')
         log_prefix = f"[{timestamp}][{session_id[:8]}]"
         full_content = f"{log_prefix} {text}"
@@ -359,6 +386,7 @@ async def handler(websocket: Any): # websocket is websockets.server.ServerConnec
     memory: Optional[ConversationBufferWindowMemory] = None
     session_setup_ok = False
     try:
+        # ... (Session setup content unchanged) ...
         logger.info(f"[{session_id}] Starting session setup...")
         logger.debug(f"[{session_id}] Creating ConversationBufferWindowMemory (K={settings.agent_memory_window_k})...")
         memory = ConversationBufferWindowMemory(
@@ -386,8 +414,8 @@ async def handler(websocket: Any): # websocket is websockets.server.ServerConnec
         logger.info(f"[{session_id}] Session setup complete.")
         session_setup_ok = True
     except Exception as e:
+        # ... (Session setup error handling unchanged - using simplified websocket check) ...
         logger.error(f"[{session_id}] CRITICAL ERROR during session setup: {e}", exc_info=True)
-        # MODIFIED: Reverted to simple check for websocket object
         if websocket: 
             try: await websocket.close(code=1011, reason="Session setup failed")
             except Exception as close_e: logger.error(f"[{session_id}] Error closing websocket during setup failure: {close_e}")
@@ -397,6 +425,24 @@ async def handler(websocket: Any): # websocket is websockets.server.ServerConnec
     if not session_setup_ok:
         logger.error(f"[{session_id}] Halting handler because session setup failed.")
         return
+
+    # MODIFIED: Define message handler map with all moved handlers
+    MessageHandler = Callable[..., Coroutine[Any, Any, None]] # Simplified for brevity
+    
+    message_handler_map: Dict[str, MessageHandler] = {
+        "context_switch": process_context_switch,      # type: ignore
+        "user_message": process_user_message,          # type: ignore
+        "execute_confirmed_plan": process_execute_confirmed_plan, # type: ignore
+        "new_task": process_new_task,                  # type: ignore
+        "delete_task": process_delete_task,            # type: ignore
+        "rename_task": process_rename_task,            # type: ignore
+        # Still to be moved:
+        # "set_llm": process_set_llm,
+        # "cancel_agent": process_cancel_agent,
+        # "get_artifacts_for_task": process_get_artifacts_for_task,
+        # "run_command": process_run_command,
+        # "action_command": process_action_command,
+    }
 
     try:
         status_llm_info = f"LLM: {settings.default_provider} ({settings.default_model_name})"
@@ -416,404 +462,58 @@ async def handler(websocket: Any): # websocket is websockets.server.ServerConnec
         async for message_str in websocket:
             logger.debug(f"[{session_id}] Received raw message: {message_str[:200]}{'...' if len(message_str)>200 else ''}")
             try:
-                data = json.loads(message_str)
-                message_type = data.get("type")
-                content_payload = data.get("content")
+                parsed_data = json.loads(message_str) 
+                message_type = parsed_data.get("type")
+                
+                handler_func = message_handler_map.get(message_type)
+                if handler_func:
+                    session_data_entry = session_data.get(session_id)
+                    connected_clients_entry = connected_clients.get(session_id)
 
-                task_id_from_frontend = data.get("taskId")
-                task_title_from_frontend = data.get("task")
-
-                current_task_id = session_data.get(session_id, {}).get("current_task_id")
-                logger.debug(f"[{session_id}] Processing message type: {message_type}, Task Context: {current_task_id}")
-
-                if message_type == "context_switch" and task_id_from_frontend:
-                    logger.info(f"[{session_id}] Switching context to Task ID: {task_id_from_frontend}")
-                    if session_id in session_data:
-                        session_data[session_id]['cancellation_requested'] = False
-                        session_data[session_id]['current_plan_structured'] = None
-                        session_data[session_id]['current_plan_human_summary'] = None
-                        session_data[session_id]['current_plan_step_index'] = -1
-                        session_data[session_id]['plan_execution_active'] = False
-                        session_data[session_id]['original_user_query'] = None
-                        existing_agent_task = connected_clients.get(session_id, {}).get("agent_task")
-                        if existing_agent_task and not existing_agent_task.done():
-                            logger.warning(f"[{session_id}] Cancelling active agent/plan task due to context switch.")
-                            existing_agent_task.cancel()
-                            await send_ws_message_for_session("status_message", "Operation cancelled due to task switch.")
-                            await add_monitor_log_and_save("Agent/Plan operation cancelled due to context switch.", "system_cancel")
-                            if session_id in connected_clients: connected_clients[session_id]["agent_task"] = None
-                        session_data[session_id]["current_task_id"] = task_id_from_frontend
-                        if "callback_handler" in session_data[session_id]: session_data[session_id]["callback_handler"].set_task_id(task_id_from_frontend)
-                        await add_task(task_id_from_frontend, task_title_from_frontend or f"Task {task_id_from_frontend}", datetime.datetime.now(datetime.timezone.utc).isoformat())
-                        try: _ = get_task_workspace_path(task_id_from_frontend); logger.info(f"[{session_id}] Ensured workspace directory exists for task: {task_id_from_frontend}")
-                        except (ValueError, OSError) as ws_path_e: logger.error(f"[{session_id}] Failed to get/create workspace path for task {task_id_from_frontend} during context switch: {ws_path_e}")
-                        await add_monitor_log_and_save(f"Switched context to task ID: {task_id_from_frontend} ('{task_title_from_frontend}')", "system_context_switch")
-                        if "memory" in session_data[session_id]:
-                            try: session_data[session_id]["memory"].clear(); logger.info(f"[{session_id}] Cleared agent memory for new task context.")
-                            except Exception as mem_e: logger.error(f"[{session_id}] Failed to clear memory on context switch: {mem_e}")
-                        history_messages = await get_messages_for_task(task_id_from_frontend)
-                        chat_history_for_memory = []
-                        if history_messages:
-                            logger.info(f"[{session_id}] Loading {len(history_messages)} history messages for task {task_id_from_frontend}.")
-                            await send_ws_message_for_session("history_start", f"Loading {len(history_messages)} messages...")
-                            for i, msg_hist in enumerate(history_messages):
-                                db_msg_type = msg_hist.get('message_type', 'unknown')
-                                db_content_hist = msg_hist.get('content', '')
-                                db_timestamp = msg_hist.get('timestamp', datetime.datetime.now().isoformat())
-                                ui_msg_type = None; content_to_send = db_content_hist; send_to_chat = False
-                                if db_msg_type == "user_input": ui_msg_type = "user"; send_to_chat = True; chat_history_for_memory.append(HumanMessage(content=db_content_hist))
-                                elif db_msg_type in ["agent_finish", "agent_message", "agent"]: ui_msg_type = "agent_message"; send_to_chat = True; chat_history_for_memory.append(AIMessage(content=db_content_hist))
-                                elif db_msg_type == "artifact_generated": pass
-                                elif db_msg_type.startswith(("monitor_", "error_", "system_", "tool_", "agent_thought_", "monitor_user_input", "llm_token_usage")):
-                                    ui_msg_type = "monitor_log"
-                                    log_prefix_hist = f"[{db_timestamp}][{session_id[:8]}]"
-                                    type_indicator_hist = f"[{db_msg_type.replace('monitor_', '').replace('error_', 'ERR_').replace('system_', 'SYS_').replace('agent_thought_action', 'THOUGHT_ACT').replace('agent_thought_final', 'THOUGHT_FIN').replace('monitor_user_input', 'USER_INPUT_LOG').replace('llm_token_usage', 'TOKEN_LOG').upper()}]"
-                                    content_to_send = f"{log_prefix_hist} [History]{type_indicator_hist} {db_content_hist}"
-                                    send_to_chat = False
-                                else: send_to_chat = False; logger.warning(f"[{session_id}] Unknown history message type '{db_msg_type}' encountered."); await send_ws_message_for_session("monitor_log", f"[{db_timestamp}][{session_id[:8]}] [History][UNKNOWN_TYPE: {db_msg_type}] {db_content_hist}")
-                                if ui_msg_type:
-                                    if send_to_chat: await send_ws_message_for_session(ui_msg_type, content_to_send)
-                                    elif ui_msg_type == "monitor_log": await send_ws_message_for_session("monitor_log", content_to_send)
-                                    await asyncio.sleep(0.005)
-                            await send_ws_message_for_session("history_end", "History loaded.")
-                            logger.info(f"[{session_id}] Finished sending {len(history_messages)} history messages.")
-                            MAX_MEMORY_RELOAD = settings.agent_memory_window_k
-                            if "memory" in session_data[session_id]:
-                                try: session_data[session_id]["memory"].chat_memory.messages = chat_history_for_memory[-MAX_MEMORY_RELOAD:]; logger.info(f"[{session_id}] Repopulated agent memory with last {len(session_data[session_id]['memory'].chat_memory.messages)} messages.")
-                                except Exception as mem_load_e: logger.error(f"[{session_id}] Failed to repopulate memory from history: {mem_load_e}")
-                        else: await send_ws_message_for_session("history_end", "No history found."); logger.info(f"[{session_id}] No history found for task {task_id_from_frontend}.")
-                        logger.info(f"[{session_id}] Getting current artifacts from filesystem for task {task_id_from_frontend}...")
-                        current_artifacts = await get_artifacts(task_id_from_frontend)
-                        await send_ws_message_for_session("update_artifacts", current_artifacts)
-                        logger.info(f"[{session_id}] Sent current artifact list ({len(current_artifacts)} items) for task {task_id_from_frontend}.")
-                    else: logger.error(f"[{session_id}] Context switch received but no session data found!"); await send_ws_message_for_session("status_message", "Error: Session data lost. Please refresh.")
-
-
-                elif message_type == "user_message":
-                    user_input_content = ""
-                    if isinstance(content_payload, str): user_input_content = content_payload
-                    elif isinstance(content_payload, dict) and 'content' in content_payload and isinstance(content_payload['content'], str):
-                        user_input_content = content_payload['content']
-                    else: logger.warning(f"[{session_id}] Received non-string or unexpected content for user_message: {type(content_payload)}. Ignoring."); continue
-                    
-                    active_task_id = session_data.get(session_id, {}).get("current_task_id")
-                    if not active_task_id:
-                        logger.warning(f"[{session_id}] User message received but no task active.")
-                        await send_ws_message_for_session("status_message", "Please select or create a task first.")
-                        continue
-                    if (connected_clients.get(session_id, {}).get("agent_task") or 
-                        session_data.get(session_id, {}).get("plan_execution_active")):
-                        logger.warning(f"[{session_id}] User message received while agent/plan is already running for task {active_task_id}.")
-                        await send_ws_message_for_session("status_message", "Agent is busy. Please wait or stop the current process.")
+                    if not session_data_entry or not connected_clients_entry:
+                        logger.error(f"[{session_id}] Critical: session_data or connected_clients entry missing for active session. Type: {message_type}")
+                        await send_ws_message_for_session("status_message", "Error: Session integrity issue. Please refresh.")
                         continue
 
-                    await add_message(active_task_id, session_id, "user_input", user_input_content)
-                    await add_monitor_log_and_save(f"User Input: {user_input_content}", "monitor_user_input")
-
-                    if session_id not in session_data: logger.error(f"[{session_id}] User message for task {active_task_id} but no session data found!"); continue
+                    # Prepare arguments common to most handlers
+                    handler_args = {
+                        "session_id": session_id,
+                        "data": parsed_data, 
+                        "session_data_entry": session_data_entry,
+                        "connected_clients_entry": connected_clients_entry,
+                        "send_ws_message_func": send_ws_message_for_session,
+                        "add_monitor_log_func": add_monitor_log_and_save,
+                    }
+                    # Add specific arguments for each handler as needed
+                    if message_type == "context_switch":
+                        handler_args["db_add_message_func"] = add_message # Already in base args
+                        handler_args["db_add_task_func"] = add_task
+                        handler_args["db_get_messages_func"] = get_messages_for_task
+                        handler_args["get_artifacts_func"] = get_artifacts
+                    elif message_type == "user_message":
+                        handler_args["db_add_message_func"] = add_message # Already in base args
+                    elif message_type == "execute_confirmed_plan":
+                        pass # add_monitor_log_func is sufficient for now
+                    elif message_type == "new_task":
+                        handler_args["get_artifacts_func"] = get_artifacts
+                    elif message_type == "delete_task":
+                        handler_args["db_delete_task_func"] = delete_task_and_messages
+                        handler_args["get_artifacts_func"] = get_artifacts
+                    elif message_type == "rename_task":
+                        handler_args["db_rename_task_func"] = rename_task_in_db
                     
-                    session_data[session_id]['original_user_query'] = user_input_content
-                    session_data[session_id]['cancellation_requested'] = False
-                    await send_ws_message_for_session("agent_thinking_update", {"status": "Generating plan..."})
-
-                    selected_provider = session_data[session_id].get("selected_llm_provider", settings.default_provider)
-                    selected_model_name = session_data[session_id].get("selected_llm_model_name", settings.default_model_name)
-                    planner_llm: Optional[BaseChatModel] = None
-                    try:
-                        llm_instance = get_llm(settings, provider=selected_provider, model_name=selected_model_name)
-                        if not isinstance(llm_instance, BaseChatModel):
-                             logger.warning(f"LLM for planner is not BaseChatModel, it's {type(llm_instance)}. This might cause issues if planner expects chat-specific features.")
-                        planner_llm = llm_instance # type: ignore
-                    except Exception as llm_init_err:
-                        logger.error(f"[{session_id}] Failed to initialize LLM for planner: {llm_init_err}", exc_info=True)
-                        await add_monitor_log_and_save(f"Error initializing LLM for planner: {llm_init_err}", "error_system")
-                        await send_ws_message_for_session("status_message", "Error: Failed to prepare for planning.")
-                        await send_ws_message_for_session("agent_message", f"Sorry, could not initialize the planning module.")
-                        continue
-                    
-                    dynamic_tools = get_dynamic_tools(active_task_id)
-                    tools_summary_for_planner = "\n".join([f"- {tool.name}: {tool.description.split('.')[0]}" for tool in dynamic_tools])
-
-                    human_plan_summary, structured_plan_steps = await generate_plan(
-                        user_query=user_input_content,
-                        llm=planner_llm, # type: ignore
-                        available_tools_summary=tools_summary_for_planner
-                    )
-
-                    if human_plan_summary and structured_plan_steps:
-                        session_data[session_id]["current_plan_human_summary"] = human_plan_summary
-                        session_data[session_id]["current_plan_structured"] = structured_plan_steps
-                        session_data[session_id]["current_plan_step_index"] = 0
-                        session_data[session_id]["plan_execution_active"] = False
-
-                        await send_ws_message_for_session("display_plan_for_confirmation", {
-                            "human_summary": human_plan_summary,
-                            "structured_plan": structured_plan_steps
-                        })
-                        await add_monitor_log_and_save(f"Plan generated. Summary: {human_plan_summary}. Steps: {len(structured_plan_steps)}. Awaiting user confirmation.", "system_plan_generated")
-                        await send_ws_message_for_session("status_message", "Plan generated. Please review and confirm.")
-                        await send_ws_message_for_session("agent_thinking_update", {"status": "Awaiting plan confirmation..."})
-                    else:
-                        logger.error(f"[{session_id}] Failed to generate a plan for query: {user_input_content}")
-                        await add_monitor_log_and_save(f"Error: Failed to generate a plan.", "error_system")
-                        await send_ws_message_for_session("status_message", "Error: Could not generate a plan for your request.")
-                        await send_ws_message_for_session("agent_message", "I'm sorry, I couldn't create a plan for that request. Please try rephrasing or breaking it down.")
-                        await send_ws_message_for_session("agent_thinking_update", {"status": "Planning failed."})
-
-
-                elif message_type == "execute_confirmed_plan":
-                    logger.info(f"[{session_id}] Received 'execute_confirmed_plan'.")
-                    active_task_id = session_data.get(session_id, {}).get("current_task_id")
-                    if not active_task_id:
-                        logger.warning(f"[{session_id}] 'execute_confirmed_plan' received but no active task.")
-                        await send_ws_message_for_session("status_message", "Error: No active task to execute plan for.")
-                        continue
-
-                    confirmed_plan_steps_dicts = data.get("confirmed_plan")
-                    if not confirmed_plan_steps_dicts or not isinstance(confirmed_plan_steps_dicts, list):
-                        logger.error(f"[{session_id}] Invalid or missing plan in 'execute_confirmed_plan' message. Data received: {data}")
-                        await send_ws_message_for_session("status_message", "Error: Invalid plan received for execution.")
-                        continue
-
-                    session_data[session_id]["current_plan_structured"] = confirmed_plan_steps_dicts
-                    session_data[session_id]["current_plan_step_index"] = 0
-                    session_data[session_id]["plan_execution_active"] = True
-                    session_data[session_id]['cancellation_requested'] = False
-
-                    await add_monitor_log_and_save(f"User confirmed plan. Starting execution of {len(confirmed_plan_steps_dicts)} steps.", "system_plan_confirmed")
-                    await send_ws_message_for_session("status_message", "Plan confirmed. Executing steps...")
-                    
-                    plan_failed = False
-                    final_overall_answer = "Plan execution completed."
-
-                    original_user_query = session_data[session_id].get("original_user_query", "No original query context available.")
-                    if not original_user_query:
-                         await add_monitor_log_and_save(f"Warning: Original user query not found in session data for controller context.", "warning_system")
-
-
-                    for i, step_dict in enumerate(confirmed_plan_steps_dicts):
-                        session_data[session_id]["current_plan_step_index"] = i
-                        
-                        try:
-                            current_plan_step_obj = PlanStep(**step_dict)
-                        except Exception as pydantic_err:
-                            logger.error(f"[{session_id}] Failed to parse step dictionary into PlanStep object: {pydantic_err}. Step data: {step_dict}", exc_info=True)
-                            await add_monitor_log_and_save(f"Error: Corrupted plan step {i+1}. Skipping.", "error_plan_step")
-                            plan_failed = True; break
-                        
-                        step_description = current_plan_step_obj.description
-                        step_tool_suggestion_planner = current_plan_step_obj.tool_to_use or "None"
-                        
-                        await send_ws_message_for_session("agent_thinking_update", {
-                            "status": f"Controller validating Step {i+1}/{len(confirmed_plan_steps_dicts)}: {step_description[:40]}..."
-                        })
-                        await add_monitor_log_and_save(f"Controller: Validating Plan Step {i+1}: {step_description} (Planner hint: {step_tool_suggestion_planner})", "system_controller_start")
-
-                        step_llm_provider = session_data[session_id].get("selected_llm_provider", settings.default_provider)
-                        step_llm_model_name = session_data[session_id].get("selected_llm_model_name", settings.default_model_name)
-                        controller_llm: Optional[BaseChatModel] = None
-                        try:
-                            llm_instance_ctrl = get_llm(settings, provider=step_llm_provider, model_name=step_llm_model_name)
-                            if not isinstance(llm_instance_ctrl, BaseChatModel):
-                                logger.warning(f"LLM for controller is not BaseChatModel, it's {type(llm_instance_ctrl)}.")
-                            controller_llm = llm_instance_ctrl # type: ignore
-                        except Exception as llm_err:
-                            logger.error(f"[{session_id}] Failed to init LLM for Controller (step {i+1}): {llm_err}")
-                            await add_monitor_log_and_save(f"Error: Failed to init LLM for Controller (step {i+1}). Skipping step.", "error_system")
-                            plan_failed = True; break
-                        
-                        step_tools = get_dynamic_tools(active_task_id)
-
-                        validated_tool_name, formulated_tool_input, controller_message, controller_confidence = await validate_and_prepare_step_action(
-                            original_user_query=original_user_query,
-                            plan_step=current_plan_step_obj,
-                            available_tools=step_tools,
-                            llm=controller_llm # type: ignore
-                        )
-
-                        await add_monitor_log_and_save(f"Controller Output (Step {i+1}): Tool='{validated_tool_name}', Input='{str(formulated_tool_input)[:100]}...', Confidence={controller_confidence:.2f}. Reasoning: {controller_message}", "system_controller_output")
-
-                        if controller_confidence < 0.7:
-                            await add_monitor_log_and_save(f"Warning: Controller confidence for step {i+1} is low ({controller_confidence:.2f}). Proceeding with caution.", "warning_controller")
-                        
-                        if validated_tool_name is None and "Error in Controller" in controller_message:
-                            logger.error(f"[{session_id}] Controller failed for step {i+1}: {controller_message}")
-                            await add_monitor_log_and_save(f"Error: Controller failed to process step {i+1}. Reason: {controller_message}. Skipping step.", "error_controller")
-                            plan_failed = True; break
-
-                        agent_input_for_step: str
-                        if validated_tool_name:
-                            agent_input_for_step = (
-                                f"Your current sub-task is: \"{step_description}\".\n"
-                                f"The Controller has determined you MUST use the tool '{validated_tool_name}' "
-                                f"with the following exact input: '{formulated_tool_input}'.\n"
-                                f"Do not attempt to use other tools or inputs for this immediate action. Execute this and report the result."
-                            )
-                            await add_monitor_log_and_save(f"Executor (Step {i+1}): Instructed to use tool '{validated_tool_name}' with specific input.", "system_executor_instructed")
-                        else:
-                            agent_input_for_step = (
-                                f"Your current sub-task is: \"{step_description}\".\n"
-                                f"The Controller has determined no specific tool is required for this step. "
-                                f"Please provide a direct answer or perform the necessary analysis based on the conversation history and this sub-task description."
-                            )
-                            await add_monitor_log_and_save(f"Executor (Step {i+1}): Instructed to respond directly (no tool from Controller).", "system_executor_direct")
-                        
-                        await send_ws_message_for_session("agent_thinking_update", {
-                           "status": f"Executor running Step {i+1}/{len(confirmed_plan_steps_dicts)}: {step_description[:40]}..."
-                        })
-                        await add_monitor_log_and_save(f"Executing Plan Step {i+1} (via Executor): {step_description}", "system_plan_step_start")
-
-                        step_executor_llm: Optional[BaseChatModel] = None
-                        try:
-                            llm_instance_exec = get_llm(settings, provider=step_llm_provider, model_name=step_llm_model_name)
-                            if not isinstance(llm_instance_exec, BaseChatModel):
-                                logger.warning(f"LLM for executor is not BaseChatModel, it's {type(llm_instance_exec)}.")
-                            step_executor_llm = llm_instance_exec # type: ignore
-                        except Exception as llm_err:
-                            logger.error(f"[{session_id}] Failed to init LLM for Executor (step {i+1}): {llm_err}")
-                            await add_monitor_log_and_save(f"Error: Failed to init LLM for Executor (step {i+1}). Skipping step.", "error_system")
-                            plan_failed = True; break
-                        
-                        step_memory = session_data[session_id]["memory"]
-                        step_callback_handler = session_data[session_id]["callback_handler"]
-                        
-                        try:
-                            step_agent_executor = create_agent_executor(
-                                llm=step_executor_llm, # type: ignore
-                                tools=step_tools,
-                                memory=step_memory,
-                                max_iterations=settings.agent_max_iterations
-                            )
-                            
-                            logger.info(f"[{session_id}] Invoking AgentExecutor for step {i+1} with input: '{agent_input_for_step[:100]}...'")
-                            
-                            agent_step_task = asyncio.create_task(
-                                step_agent_executor.ainvoke(
-                                    {"input": agent_input_for_step},
-                                    config=RunnableConfig(callbacks=[step_callback_handler])
-                                )
-                            )
-                            if session_id in connected_clients:
-                                connected_clients[session_id]["agent_task"] = agent_step_task
-                            else:
-                                logger.error(f"[{session_id}] connected_clients entry missing for active session during agent task creation.")
-                                plan_failed = True; break
-
-                            step_result = await agent_step_task
-                            
-                            step_output = step_result.get("output", "Step completed, no specific output from ReAct agent.")
-                            await add_monitor_log_and_save(f"Plan Step {i+1} (Executor) completed. Output: {str(step_output)[:200]}...", "system_plan_step_end")
-
-                        except AgentCancelledException:
-                            logger.warning(f"[{session_id}] Plan execution cancelled by user during step {i+1}.")
-                            await send_ws_message_for_session("status_message", "Plan execution cancelled.")
-                            await add_monitor_log_and_save(f"Plan execution cancelled by user during step {i+1}.", "system_cancel")
-                            plan_failed = True; break
-                        except Exception as step_exec_e:
-                            logger.error(f"[{session_id}] Error executing plan step {i+1} ('{step_description}'): {step_exec_e}", exc_info=True)
-                            await add_monitor_log_and_save(f"Error executing plan step {i+1}: {step_exec_e}", "error_plan_step")
-                            await send_ws_message_for_session("status_message", f"Error in step {i+1}. Stopping plan.")
-                            plan_failed = True; break
-                        finally:
-                            if session_id in connected_clients:
-                                connected_clients[session_id]["agent_task"] = None
-
-                        if session_data[session_id].get('cancellation_requested', False):
-                            logger.warning(f"[{session_id}] Cancellation detected after step {i+1}. Stopping plan.")
-                            await send_ws_message_for_session("status_message", "Plan execution cancelled.")
-                            plan_failed = True; break
-                    
-                    session_data[session_id]["plan_execution_active"] = False
-                    session_data[session_id]["current_plan_step_index"] = -1
-
-                    if plan_failed:
-                        final_overall_answer = "Plan execution stopped due to error or cancellation."
-                        await send_ws_message_for_session("agent_thinking_update", {"status": "Plan stopped."})
-                    else:
-                        final_overall_answer = "All plan steps executed."
-                        await send_ws_message_for_session("agent_thinking_update", {"status": "Plan executed."})
-                        logger.info(f"[{session_id}] Successfully executed all {len(confirmed_plan_steps_dicts)} plan steps.")
-                    
-                    await send_ws_message_for_session("agent_message", final_overall_answer)
-                    await add_monitor_log_and_save(f"Overall Plan Execution: {final_overall_answer}", "system_plan_end")
-                    await send_ws_message_for_session("status_message", "Plan execution finished.")
-
-                elif message_type == "new_task":
-                    logger.info(f"[{session_id}] Received 'new_task' signal. Clearing context.")
-                    current_task_id = None
-                    if session_id in session_data:
-                        session_data[session_id]['cancellation_requested'] = False
-                        session_data[session_id]['current_plan_structured'] = None
-                        session_data[session_id]['current_plan_human_summary'] = None
-                        session_data[session_id]['current_plan_step_index'] = -1
-                        session_data[session_id]['plan_execution_active'] = False
-                        session_data[session_id]['original_user_query'] = None
-                        existing_agent_task = connected_clients.get(session_id, {}).get("agent_task")
-                        if existing_agent_task and not existing_agent_task.done():
-                            logger.warning(f"[{session_id}] Cancelling active agent/plan task due to new task.")
-                            existing_agent_task.cancel()
-                            await send_ws_message_for_session("status_message", "Operation cancelled for new task.")
-                            await add_monitor_log_and_save("Agent/Plan operation cancelled due to new task creation.", "system_cancel")
-                            if session_id in connected_clients: connected_clients[session_id]["agent_task"] = None
-                        session_data[session_id]["current_task_id"] = None
-                        if "callback_handler" in session_data[session_id]: session_data[session_id]["callback_handler"].set_task_id(None)
-                        if "memory" in session_data[session_id]: session_data[session_id]["memory"].clear()
-                        await add_monitor_log_and_save("Cleared context for new task.", "system_new_task")
-                        await send_ws_message_for_session("update_artifacts", [])
-                    else: logger.error(f"[{session_id}] 'new_task' signal received but no session data found!")
-
-                elif message_type == "delete_task" and task_id_from_frontend:
-                    logger.warning(f"[{session_id}] Received request to delete task: {task_id_from_frontend}")
-                    await add_monitor_log_and_save(f"Received request to delete task: {task_id_from_frontend}", "system_delete_request")
-                    deleted = await delete_task_and_messages(task_id_from_frontend)
-                    if deleted:
-                        await add_monitor_log_and_save(f"Task {task_id_from_frontend} deleted successfully from DB.", "system_delete_success")
-                        task_workspace_to_delete : Optional[Path] = None
-                        try:
-                            task_workspace_to_delete = get_task_workspace_path(task_id_from_frontend, create=False)
-                            if task_workspace_to_delete.exists() and task_workspace_to_delete.is_relative_to(BASE_WORKSPACE_ROOT.resolve()):
-                                import shutil; await asyncio.to_thread(shutil.rmtree, task_workspace_to_delete)
-                                logger.info(f"[{session_id}] Successfully deleted workspace directory: {task_workspace_to_delete}")
-                                await add_monitor_log_and_save(f"Workspace directory deleted: {task_workspace_to_delete.name}", "system_delete_success")
-                            else: logger.warning(f"[{session_id}] Workspace directory not found or invalid for deletion: {task_workspace_to_delete}")
-                        except Exception as ws_del_e: logger.error(f"[{session_id}] Error deleting workspace directory {task_workspace_to_delete}: {ws_del_e}"); await add_monitor_log_and_save(f"Error deleting workspace directory: {ws_del_e}", "error_delete")
-                        
-                        active_task_id_check = session_data.get(session_id, {}).get("current_task_id")
-                        if active_task_id_check == task_id_from_frontend:
-                            current_task_id = None
-                            if session_id in session_data:
-                                session_data[session_id]['cancellation_requested'] = False
-                                session_data[session_id]['current_plan_structured'] = None
-                                session_data[session_id]['current_plan_human_summary'] = None
-                                session_data[session_id]['current_plan_step_index'] = -1
-                                session_data[session_id]['plan_execution_active'] = False
-                                session_data[session_id]['original_user_query'] = None
-                                existing_agent_task = connected_clients.get(session_id, {}).get("agent_task")
-                                if existing_agent_task and not existing_agent_task.done(): existing_agent_task.cancel()
-                                if session_id in connected_clients: connected_clients[session_id]["agent_task"] = None
-                                session_data[session_id]["current_task_id"] = None
-                                if "callback_handler" in session_data[session_id]: session_data[session_id]["callback_handler"].set_task_id(None)
-                                if "memory" in session_data[session_id]: session_data[session_id]["memory"].clear()
-                                await add_monitor_log_and_save("Cleared context as active task was deleted.", "system_context_clear")
-                                await send_ws_message_for_session("update_artifacts", [])
-                    else: await send_ws_message_for_session("status_message", f"Failed to delete task {task_id_from_frontend[:8]}..."); await add_monitor_log_and_save(f"Failed to delete task {task_id_from_frontend} from DB.", "error_delete")
-
-                elif message_type == "rename_task":
-                    task_id_to_rename = data.get("taskId"); new_name = data.get("newName")
-                    if not task_id_to_rename or not new_name: logger.warning(f"[{session_id}] Received invalid rename_task message: {data}"); await add_monitor_log_and_save(f"Error: Received invalid rename request (missing taskId or newName).", "error_system"); continue
-                    logger.info(f"[{session_id}] Received request to rename task {task_id_to_rename} to '{new_name}'."); await add_monitor_log_and_save(f"Received rename request for task {task_id_to_rename} to '{new_name}'.", "system_rename_request")
-                    renamed_in_db = await rename_task_in_db(task_id_to_rename, new_name)
-                    if renamed_in_db: logger.info(f"[{session_id}] Successfully renamed task {task_id_to_rename} in database."); await add_monitor_log_and_save(f"Task {task_id_to_rename} renamed to '{new_name}' in DB.", "system_rename_success")
-                    else: logger.error(f"[{session_id}] Failed to rename task {task_id_to_rename} in database."); await add_monitor_log_and_save(f"Failed to rename task {task_id_to_rename} in DB.", "error_db")
-
+                    await handler_func(**handler_args) # type: ignore
+                
+                # MODIFIED: Keep elif blocks for handlers not yet moved
+                # Removed context_switch, user_message, execute_confirmed_plan, new_task, delete_task, rename_task
+                
                 elif message_type == "set_llm":
-                    llm_id = data.get("llm_id")
+                    llm_id = parsed_data.get("llm_id") 
                     if llm_id and isinstance(llm_id, str):
                         try:
                             provider, model_name_from_id = llm_id.split("::", 1); is_valid = False
                             if provider == 'gemini' and model_name_from_id in settings.gemini_available_models: is_valid = True
                             elif provider == 'ollama' and model_name_from_id in settings.ollama_available_models: is_valid = True
-                            
                             if is_valid:
                                 if session_id in session_data:
                                     session_data[session_id]["selected_llm_provider"] = provider
@@ -823,7 +523,8 @@ async def handler(websocket: Any): # websocket is websockets.server.ServerConnec
                                 else: logger.error(f"[{session_id}] Cannot set LLM: Session data not found.")
                             else: logger.warning(f"[{session_id}] Received request to set invalid/unavailable LLM ID: {llm_id}"); await add_monitor_log_and_save(f"Attempted to set invalid LLM: {llm_id}", "error_llm_set")
                         except ValueError: logger.warning(f"[{session_id}] Received invalid LLM ID format in set_llm: {llm_id}"); await add_monitor_log_and_save(f"Received invalid LLM ID format: {llm_id}", "error_llm_set")
-                    else: logger.warning(f"[{session_id}] Received invalid 'set_llm' message content: {data}")
+                    else: logger.warning(f"[{session_id}] Received invalid 'set_llm' message content: {parsed_data}")
+
 
                 elif message_type == "get_available_models":
                     logger.info(f"[{session_id}] Received request for available models.")
@@ -848,17 +549,19 @@ async def handler(websocket: Any): # websocket is websockets.server.ServerConnec
                         logger.error(f"[{session_id}] Cannot set cancellation flag: Session data not found.")
 
                 elif message_type == "get_artifacts_for_task":
-                    task_id_to_refresh = data.get("taskId")
+                    task_id_to_refresh = parsed_data.get("taskId")
                     if not task_id_to_refresh: logger.warning(f"[{session_id}] Received get_artifacts_for_task without taskId."); continue
                     logger.info(f"[{session_id}] Received request to refresh artifacts for task: {task_id_to_refresh}")
-                    if task_id_to_refresh == current_task_id:
+                    active_task_id_check_artifacts = session_data.get(session_id, {}).get("current_task_id") 
+                    if task_id_to_refresh == active_task_id_check_artifacts:
                         artifacts = await get_artifacts(task_id_to_refresh)
                         await send_ws_message_for_session("update_artifacts", artifacts)
                         logger.info(f"[{session_id}] Sent updated artifact list for task {task_id_to_refresh}.")
-                    else: logger.warning(f"[{session_id}] Received artifact refresh request for non-active task ({task_id_to_refresh} vs {current_task_id}). Ignoring.")
+                    else: logger.warning(f"[{session_id}] Received artifact refresh request for non-active task ({task_id_to_refresh} vs {active_task_id_check_artifacts}). Ignoring.")
+
 
                 elif message_type == "run_command":
-                    command_to_run = data.get("command")
+                    command_to_run = parsed_data.get("command")
                     if command_to_run and isinstance(command_to_run, str):
                         active_task_id_for_cmd = session_data.get(session_id, {}).get("current_task_id")
                         await add_monitor_log_and_save(f"Received direct 'run_command'. Executing: {command_to_run} (Task Context: {active_task_id_for_cmd})", "system_direct_cmd")
@@ -866,7 +569,7 @@ async def handler(websocket: Any): # websocket is websockets.server.ServerConnec
                     else: logger.warning(f"[{session_id}] Received 'run_command' with invalid/missing command content."); await add_monitor_log_and_save("Error: 'run_command' received with no command specified.", "error_direct_cmd")
 
                 elif message_type == "action_command":
-                    action = data.get("command")
+                    action = parsed_data.get("command")
                     if action and isinstance(action, str):
                         logger.info(f"[{session_id}] Received action command: {action} (Not implemented).")
                         await add_monitor_log_and_save(f"Received action command: {action} (Handler not implemented).", "system_action_cmd")
@@ -885,23 +588,27 @@ async def handler(websocket: Any): # websocket is websockets.server.ServerConnec
                 except Exception as inner_e: logger.error(f"[{session_id}] Further error during error reporting: {inner_e}")
 
     except (websockets.exceptions.ConnectionClosedOK, websockets.exceptions.ConnectionClosedError) as ws_close_exc:
+        # ... (Cleanup logic unchanged) ...
         if isinstance(ws_close_exc, websockets.exceptions.ConnectionClosedOK):
             logger.info(f"Client disconnected normally: {websocket.remote_address} (Session: {session_id}) - Code: {ws_close_exc.code}, Reason: {ws_close_exc.reason}")
         else:
             logger.warning(f"Connection closed abnormally: {websocket.remote_address} (Session: {session_id}) - Code: {ws_close_exc.code}, Reason: {ws_close_exc.reason}")
     except asyncio.CancelledError:
+        # ... (Cleanup logic unchanged) ...
         logger.info(f"WebSocket handler for session {session_id} cancelled.")
-        if websocket and websocket.state == ConnectionState.OPEN: 
+        if websocket: 
             await websocket.close(code=1012, reason="Server shutting down")
     except Exception as e:
+        # ... (Cleanup logic unchanged) ...
         logger.error(f"Unhandled error in WebSocket handler: {websocket.remote_address} (Session: {session_id}): {e}", exc_info=True)
         try:
-            if websocket and websocket.state == ConnectionState.OPEN: 
+            if websocket: 
                 await websocket.close(code=1011, reason="Internal server error")
         except Exception as close_e:
             logger.error(f"[{session_id}] Error closing websocket after unhandled handler error: {close_e}")
 
     finally:
+        # ... (Cleanup logic unchanged) ...
         logger.info(f"Cleaning up resources for session {session_id}")
         agent_task = connected_clients.get(session_id, {}).get("agent_task")
         if agent_task and not agent_task.done():
@@ -917,6 +624,7 @@ async def handler(websocket: Any): # websocket is websockets.server.ServerConnec
 
 
 async def main():
+    # ... (Content unchanged)
     await init_db()
     file_server_site, file_server_runner = await setup_file_server()
     await file_server_site.start()
@@ -967,12 +675,10 @@ async def main():
 
 
 if __name__ == "__main__":
+    # ... (Content unchanged)
     warnings.filterwarnings("ignore", category=UserWarning, message=".*LangSmith API key.*")
     warnings.filterwarnings("ignore", category=UserWarning, message=".*LangSmithMissingAPIKeyWarning.*")
     
-    # The LangChainDeprecationWarning filters were removed as the import was problematic.
-    # Deprecation warnings from LangChain will print to console if they occur.
-
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
