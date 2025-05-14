@@ -7,20 +7,19 @@ import shutil
 
 # LangChain Imports
 from langchain_core.messages import AIMessage, HumanMessage
-from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_core.language_models.chat_models import BaseChatModel # Still needed for type hints
 from langchain_core.runnables import RunnableConfig 
 
 # Project Imports
 from backend.config import settings
-from backend.llm_setup import get_llm
+from backend.llm_setup import get_llm # get_llm is used for Executor and DirectQA LLMs here
 from backend.tools import get_dynamic_tools, get_task_workspace_path, BASE_WORKSPACE_ROOT
 from backend.planner import generate_plan, PlanStep
 from backend.controller import validate_and_prepare_step_action
 from backend.agent import create_agent_executor
 from backend.callbacks import AgentCancelledException
-from backend.intent_classifier import classify_intent
-from backend.evaluator import evaluate_plan_outcome, EvaluationResult
-# db_utils functions and server-specific helpers (like execute_shell_command) will be passed as callables
+from backend.intent_classifier import classify_intent 
+from backend.evaluator import evaluate_plan_outcome, EvaluationResult 
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +47,7 @@ async def process_context_switch(
     db_get_messages_func: DBGetMessagesFunc,
     get_artifacts_func: GetArtifactsFunc
 ) -> None:
-    # ... (Content from previous message_handlers_py_evaluator_integration, unchanged) ...
+    # ... (Content from message_handlers_py_evaluator_integration, unchanged) ...
     task_id_from_frontend = data.get("taskId")
     task_title_from_frontend = data.get("task")
 
@@ -158,7 +157,6 @@ async def process_user_message(
     add_monitor_log_func: AddMonitorLogFunc,
     db_add_message_func: DBAddMessageFunc 
 ) -> None:
-    # ... (Content from message_handlers_py_evaluator_integration, unchanged) ...
     user_input_content = ""
     content_payload = data.get("content")
     if isinstance(content_payload, str):
@@ -188,36 +186,20 @@ async def process_user_message(
     session_data_entry['cancellation_requested'] = False
     
     await send_ws_message_func("agent_thinking_update", {"status": "Classifying intent..."})
-    selected_provider = session_data_entry.get("selected_llm_provider", settings.default_provider)
-    selected_model_name = session_data_entry.get("selected_llm_model_name", settings.default_model_name)
-    intent_llm: Optional[BaseChatModel] = None
-    try:
-        llm_instance = get_llm(settings, provider=selected_provider, model_name=selected_model_name)
-        if not isinstance(llm_instance, BaseChatModel):
-            logger.warning(f"LLM for intent classification is not BaseChatModel, it's {type(llm_instance)}.")
-        intent_llm = llm_instance # type: ignore
-    except Exception as llm_init_err:
-        logger.error(f"[{session_id}] Failed to initialize LLM for intent classification: {llm_init_err}", exc_info=True)
-        await add_monitor_log_func(f"Error initializing LLM for intent classification: {llm_init_err}", "error_system")
-        await send_ws_message_func("status_message", "Error: Failed to prepare for intent classification.")
-        await send_ws_message_func("agent_message", "Sorry, I couldn't figure out how to approach your request.")
-        await send_ws_message_func("agent_thinking_update", {"status": "Intent classification failed."})
-        return
-
+    
     dynamic_tools = get_dynamic_tools(active_task_id)
     tools_summary_for_intent = "\n".join([f"- {tool.name}: {tool.description.split('.')[0]}" for tool in dynamic_tools])
     
-    classified_intent = await classify_intent(user_input_content, intent_llm, tools_summary_for_intent)
+    # MODIFIED: classify_intent now fetches its own LLM
+    classified_intent = await classify_intent(user_input_content, tools_summary_for_intent)
     await add_monitor_log_func(f"Intent classified as: {classified_intent}", "system_intent_classified")
 
     if classified_intent == "PLAN":
         await send_ws_message_func("agent_thinking_update", {"status": "Generating plan..."})
-        planner_llm = intent_llm 
-        
+        # generate_plan will fetch the PLANNER_LLM from settings
         human_plan_summary, structured_plan_steps = await generate_plan(
             user_query=user_input_content,
-            llm=planner_llm, # type: ignore
-            available_tools_summary=tools_summary_for_intent
+            available_tools_summary=tools_summary_for_intent 
         )
 
         if human_plan_summary and structured_plan_steps:
@@ -244,7 +226,26 @@ async def process_user_message(
         await send_ws_message_func("agent_thinking_update", {"status": "Processing directly..."})
         await add_monitor_log_func(f"Handling as DIRECT_QA. Invoking ReAct agent.", "system_direct_qa")
 
-        direct_qa_llm = intent_llm 
+        # Use Executor's default LLM (or session selected) for direct Q&A
+        # This LLM is fetched based on session_data_entry or EXECUTOR_DEFAULT_LLM_ID
+        executor_provider = session_data_entry.get("selected_llm_provider", settings.executor_default_provider)
+        executor_model_name = session_data_entry.get("selected_llm_model_name", settings.executor_default_model_name)
+        logger.info(f"[{session_id}] Using LLM for Direct QA (Executor role): {executor_provider}::{executor_model_name}")
+        
+        direct_qa_llm: Optional[BaseChatModel] = None
+        try:
+            llm_instance = get_llm(settings, provider=executor_provider, model_name=executor_model_name)
+            if not isinstance(llm_instance, BaseChatModel):
+                 logger.warning(f"LLM for Direct QA is not BaseChatModel, it's {type(llm_instance)}.")
+            direct_qa_llm = llm_instance # type: ignore
+        except Exception as llm_init_err:
+            logger.error(f"[{session_id}] Failed to initialize LLM for Direct QA: {llm_init_err}", exc_info=True)
+            await add_monitor_log_func(f"Error initializing LLM for Direct QA: {llm_init_err}", "error_system")
+            await send_ws_message_func("status_message", "Error: Failed to prepare for answering.")
+            await send_ws_message_func("agent_message", "Sorry, I couldn't initialize my reasoning module to answer.")
+            await send_ws_message_func("agent_thinking_update", {"status": "Direct QA failed."})
+            return
+
         direct_qa_memory = session_data_entry["memory"]
         direct_qa_callback_handler = session_data_entry["callback_handler"]
         
@@ -285,9 +286,10 @@ async def process_user_message(
         logger.error(f"[{session_id}] Unknown intent classified: {classified_intent}. Defaulting to planning.")
         await add_monitor_log_func(f"Error: Unknown intent '{classified_intent}'. Defaulting to PLAN.", "error_system")
         await send_ws_message_func("agent_thinking_update", {"status": "Generating plan (fallback)..."})
-        planner_llm = intent_llm
+        
+        # Fallback to planning, generate_plan will use PLANNER_LLM from settings
         human_plan_summary, structured_plan_steps = await generate_plan(
-            user_query=user_input_content, llm=planner_llm, available_tools_summary=tools_summary_for_intent
+            user_query=user_input_content, available_tools_summary=tools_summary_for_intent
         )
         if human_plan_summary and structured_plan_steps:
             session_data_entry["current_plan_human_summary"] = human_plan_summary
@@ -317,7 +319,6 @@ async def process_execute_confirmed_plan(
     send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc
 ) -> None:
-    # ... (Content from message_handlers_py_evaluator_integration, unchanged) ...
     logger.info(f"[{session_id}] Received 'execute_confirmed_plan'.")
     active_task_id = session_data_entry.get("current_task_id")
     if not active_task_id:
@@ -373,30 +374,15 @@ async def process_execute_confirmed_plan(
             "status": f"Controller validating Step {i+1}/{len(confirmed_plan_steps_dicts)}: {step_description[:40]}..."
         })
         await add_monitor_log_func(f"Controller: Validating Plan Step {i+1}: {step_description} (Planner hint: {step_tool_suggestion_planner})", "system_controller_start")
-
-        step_llm_provider = session_data_entry.get("selected_llm_provider", settings.default_provider)
-        step_llm_model_name = session_data_entry.get("selected_llm_model_name", settings.default_model_name)
-        current_step_llm: Optional[BaseChatModel] = None 
-        try:
-            llm_instance = get_llm(settings, provider=step_llm_provider, model_name=step_llm_model_name)
-            if not isinstance(llm_instance, BaseChatModel):
-                logger.warning(f"LLM for step {i+1} is not BaseChatModel, it's {type(llm_instance)}.")
-            current_step_llm = llm_instance # type: ignore
-        except Exception as llm_err:
-            logger.error(f"[{session_id}] Failed to init LLM for Controller/Executor (step {i+1}): {llm_err}")
-            error_msg = f"Error: Failed to init LLM for step {i+1}. Skipping step. Details: {llm_err}"
-            await add_monitor_log_func(error_msg, "error_system")
-            current_step_detail["error"] = error_msg
-            step_execution_details_list.append(current_step_detail)
-            plan_failed = True; break
         
         step_tools = get_dynamic_tools(active_task_id)
 
+        # MODIFIED: validate_and_prepare_step_action now fetches its own LLM
         validated_tool_name, formulated_tool_input, controller_message, controller_confidence = await validate_and_prepare_step_action(
             original_user_query=original_user_query,
             plan_step=current_plan_step_obj,
-            available_tools=step_tools,
-            llm=current_step_llm # type: ignore
+            available_tools=step_tools
+            # LLM argument removed
         )
         current_step_detail.update({ 
             "controller_tool": validated_tool_name, "controller_input": formulated_tool_input,
@@ -438,13 +424,31 @@ async def process_execute_confirmed_plan(
             "status": f"Executor running Step {i+1}/{len(confirmed_plan_steps_dicts)}: {step_description[:40]}..."
         })
         await add_monitor_log_func(f"Executing Plan Step {i+1} (via Executor): {step_description}", "system_plan_step_start")
+
+        # LLM for Executor for this step (could be UI selected or EXECUTOR_DEFAULT_LLM_ID)
+        executor_provider = session_data_entry.get("selected_llm_provider", settings.executor_default_provider)
+        executor_model_name = session_data_entry.get("selected_llm_model_name", settings.executor_default_model_name)
+        logger.info(f"[{session_id}] Using Executor LLM for step {i+1}: {executor_provider}::{executor_model_name}")
+        step_executor_llm: Optional[BaseChatModel] = None
+        try:
+            llm_instance_exec = get_llm(settings, provider=executor_provider, model_name=executor_model_name)
+            if not isinstance(llm_instance_exec, BaseChatModel):
+                logger.warning(f"LLM for executor is not BaseChatModel, it's {type(llm_instance_exec)}.")
+            step_executor_llm = llm_instance_exec # type: ignore
+        except Exception as llm_err:
+            logger.error(f"[{session_id}] Failed to init LLM for Executor (step {i+1}): {llm_err}")
+            error_msg = f"Error: Failed to init LLM for Executor (step {i+1}). Skipping step. Details: {llm_err}"
+            await add_monitor_log_func(error_msg, "error_system")
+            current_step_detail["error"] = error_msg
+            step_execution_details_list.append(current_step_detail)
+            plan_failed = True; break
         
         step_memory = session_data_entry["memory"]
         step_callback_handler = session_data_entry["callback_handler"]
         
         try:
             step_agent_executor = create_agent_executor(
-                llm=current_step_llm, # type: ignore 
+                llm=step_executor_llm, # type: ignore 
                 tools=step_tools,
                 memory=step_memory,
                 max_iterations=settings.agent_max_iterations
@@ -520,38 +524,28 @@ async def process_execute_confirmed_plan(
         logger.info(f"[{session_id}] Successfully attempted all {len(confirmed_plan_steps_dicts)} plan steps. Now evaluating.")
 
     final_overall_answer = preliminary_final_answer 
-    evaluator_llm: Optional[BaseChatModel] = None
-    try:
-        eval_llm_provider = session_data_entry.get("selected_llm_provider", settings.default_provider)
-        eval_llm_model_name = session_data_entry.get("selected_llm_model_name", settings.default_model_name)
-        llm_instance_eval = get_llm(settings, provider=eval_llm_provider, model_name=eval_llm_model_name)
-        if not isinstance(llm_instance_eval, BaseChatModel):
-            logger.warning(f"LLM for evaluator is not BaseChatModel, it's {type(llm_instance_eval)}.")
-        evaluator_llm = llm_instance_eval # type: ignore
-        
-        await add_monitor_log_func("Invoking Evaluator to assess overall outcome.", "system_evaluator_start")
-        evaluation_result = await evaluate_plan_outcome(
-            original_user_query=original_user_query,
-            executed_plan_summary=executed_plan_summary_str,
-            final_agent_answer=preliminary_final_answer, 
-            llm=evaluator_llm # type: ignore
-        )
+    
+    await add_monitor_log_func("Invoking Evaluator to assess overall outcome.", "system_evaluator_start")
+    # MODIFIED: evaluate_plan_outcome now fetches its own LLM
+    evaluation_result = await evaluate_plan_outcome(
+        original_user_query=original_user_query,
+        executed_plan_summary=executed_plan_summary_str,
+        final_agent_answer=preliminary_final_answer
+        # LLM argument removed
+    )
 
-        if evaluation_result:
-            final_overall_answer = evaluation_result.assessment
-            log_msg = (
-                f"Evaluator Result: Success={evaluation_result.overall_success}, "
-                f"Confidence={evaluation_result.confidence_score:.2f}. "
-                f"Assessment: {evaluation_result.assessment}"
-            )
-            await add_monitor_log_func(log_msg, "system_evaluator_output")
-            if not evaluation_result.overall_success and evaluation_result.suggestions_for_replan:
-                await add_monitor_log_func(f"Evaluator Suggestions: {evaluation_result.suggestions_for_replan}", "system_evaluator_suggestions")
-        else:
-            await add_monitor_log_func("Evaluator failed to produce a result. Using preliminary answer.", "error_evaluator")
-    except Exception as eval_err:
-        logger.error(f"[{session_id}] Error during evaluation phase: {eval_err}", exc_info=True)
-        await add_monitor_log_func(f"Error during evaluation phase: {eval_err}. Using preliminary answer.", "error_evaluator")
+    if evaluation_result:
+        final_overall_answer = evaluation_result.assessment
+        log_msg = (
+            f"Evaluator Result: Success={evaluation_result.overall_success}, "
+            f"Confidence={evaluation_result.confidence_score:.2f}. "
+            f"Assessment: {evaluation_result.assessment}"
+        )
+        await add_monitor_log_func(log_msg, "system_evaluator_output")
+        if not evaluation_result.overall_success and evaluation_result.suggestions_for_replan:
+            await add_monitor_log_func(f"Evaluator Suggestions: {evaluation_result.suggestions_for_replan}", "system_evaluator_suggestions")
+    else:
+        await add_monitor_log_func("Evaluator failed to produce a result. Using preliminary answer.", "error_evaluator")
     
     await send_ws_message_func("agent_message", final_overall_answer)
     await add_monitor_log_func(f"Final Overall Outcome: {final_overall_answer}", "system_plan_end") 
@@ -686,14 +680,14 @@ async def process_rename_task(
         logger.error(f"[{session_id}] Failed to rename task {task_id_to_rename} in database.")
         await add_monitor_log_func(f"Failed to rename task {task_id_to_rename} in DB.", "error_db")
 
-# --- MODIFIED: Added remaining handlers ---
+# --- Handlers for remaining message types ---
 
 async def process_set_llm(
     session_id: str,
-    data: Dict[str, Any],
+    data: Dict[str, Any], # Contains llm_id
     session_data_entry: Dict[str, Any],
-    connected_clients_entry: Dict[str, Any], # Not used but kept for signature consistency
-    send_ws_message_func: SendWSMessageFunc, # Not used but kept
+    connected_clients_entry: Dict[str, Any], # Not used
+    send_ws_message_func: SendWSMessageFunc, # Not used
     add_monitor_log_func: AddMonitorLogFunc
 ) -> None:
     """Handles the 'set_llm' message from the client."""
@@ -702,6 +696,8 @@ async def process_set_llm(
         try:
             provider, model_name_from_id = llm_id.split("::", 1)
             is_valid = False
+            # Validate against the UI available models, not the role-specific ones here,
+            # as this reflects the user's direct selection for the Executor role.
             if provider == 'gemini' and model_name_from_id in settings.gemini_available_models:
                 is_valid = True
             elif provider == 'ollama' and model_name_from_id in settings.ollama_available_models:
@@ -710,14 +706,14 @@ async def process_set_llm(
             if is_valid:
                 session_data_entry["selected_llm_provider"] = provider
                 session_data_entry["selected_llm_model_name"] = model_name_from_id
-                logger.info(f"[{session_id}] Set session LLM to: {provider}::{model_name_from_id}")
-                await add_monitor_log_func(f"Session LLM set to {provider}::{model_name_from_id}", "system_llm_set")
+                logger.info(f"[{session_id}] Session LLM (for Executor/DirectQA) set to: {provider}::{model_name_from_id}")
+                await add_monitor_log_func(f"Session LLM (for Executor/DirectQA) set to {provider}::{model_name_from_id}", "system_llm_set")
             else:
-                logger.warning(f"[{session_id}] Received request to set invalid/unavailable LLM ID: {llm_id}")
-                await add_monitor_log_func(f"Attempted to set invalid LLM: {llm_id}", "error_llm_set")
+                logger.warning(f"[{session_id}] Received request to set invalid/unavailable LLM ID for session: {llm_id}")
+                await add_monitor_log_func(f"Attempted to set invalid session LLM: {llm_id}", "error_llm_set")
         except ValueError:
             logger.warning(f"[{session_id}] Received invalid LLM ID format in set_llm: {llm_id}")
-            await add_monitor_log_func(f"Received invalid LLM ID format: {llm_id}", "error_llm_set")
+            await add_monitor_log_func(f"Received invalid session LLM ID format: {llm_id}", "error_llm_set")
     else:
         logger.warning(f"[{session_id}] Received invalid 'set_llm' message content: {data}")
 
@@ -727,24 +723,23 @@ async def process_get_available_models(
     session_data_entry: Dict[str, Any], # Not used
     connected_clients_entry: Dict[str, Any], # Not used
     send_ws_message_func: SendWSMessageFunc,
-    add_monitor_log_func: AddMonitorLogFunc # Not strictly needed but good for consistency
+    add_monitor_log_func: AddMonitorLogFunc 
 ) -> None:
     """Handles the 'get_available_models' request from the client."""
     logger.info(f"[{session_id}] Received request for available models.")
     await send_ws_message_func("available_models", {
         "gemini": settings.gemini_available_models,
         "ollama": settings.ollama_available_models,
-        "default_llm_id": settings.default_llm_id
+        "default_llm_id": settings.default_llm_id # This is the overall system default
     })
-    # No specific monitor log needed here as it's a passive info request
 
 async def process_cancel_agent(
     session_id: str,
     data: Dict[str, Any], # Not used
     session_data_entry: Dict[str, Any],
     connected_clients_entry: Dict[str, Any],
-    send_ws_message_func: SendWSMessageFunc, # Not used but kept
-    add_monitor_log_func: AddMonitorLogFunc # Not used but kept
+    send_ws_message_func: SendWSMessageFunc, 
+    add_monitor_log_func: AddMonitorLogFunc 
 ) -> None:
     """Handles the 'cancel_agent' message from the client."""
     logger.warning(f"[{session_id}] Received request to cancel current operation.")
@@ -753,8 +748,9 @@ async def process_cancel_agent(
     
     agent_task_to_cancel = connected_clients_entry.get("agent_task")
     if agent_task_to_cancel and not agent_task_to_cancel.done():
-        agent_task_to_cancel.cancel() # Attempt to cancel the asyncio task
+        agent_task_to_cancel.cancel() 
         logger.info(f"[{session_id}] asyncio.Task.cancel() called for active task.")
+        # UI status update is typically handled by the agent/plan loop detecting cancellation
     else:
         logger.info(f"[{session_id}] No active asyncio task found to cancel, or task already done. Flag will be checked by callbacks/plan loop.")
 
@@ -764,7 +760,7 @@ async def process_get_artifacts_for_task(
     session_data_entry: Dict[str, Any],
     connected_clients_entry: Dict[str, Any], # Not used
     send_ws_message_func: SendWSMessageFunc,
-    add_monitor_log_func: AddMonitorLogFunc, # Not strictly needed
+    add_monitor_log_func: AddMonitorLogFunc, 
     get_artifacts_func: GetArtifactsFunc
 ) -> None:
     """Handles the 'get_artifacts_for_task' request from the client."""
@@ -786,22 +782,22 @@ async def process_run_command(
     session_id: str,
     data: Dict[str, Any], # Contains command
     session_data_entry: Dict[str, Any],
-    connected_clients_entry: Dict[str, Any], # Not used
+    connected_clients_entry: Dict[str, Any], 
     send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc,
-    db_add_message_func: DBAddMessageFunc, # For execute_shell_command
-    execute_shell_command_func: ExecuteShellCommandFunc # Passed from server.py
+    db_add_message_func: DBAddMessageFunc, 
+    execute_shell_command_func: ExecuteShellCommandFunc 
 ) -> None:
     """Handles the 'run_command' message from the client."""
     command_to_run = data.get("command")
     if command_to_run and isinstance(command_to_run, str):
         active_task_id_for_cmd = session_data_entry.get("current_task_id")
         await add_monitor_log_func(f"Received direct 'run_command'. Executing: {command_to_run} (Task Context: {active_task_id_for_cmd})", "system_direct_cmd")
-        await execute_shell_command_func(
+        await execute_shell_command_func( # Call the passed function
             command_to_run, 
             session_id, 
-            send_ws_message_func, # This send_ws_message_func is from the handler's scope
-            db_add_message_func,  # This db_add_message_func is from the handler's scope
+            send_ws_message_func, 
+            db_add_message_func,  
             active_task_id_for_cmd
         )
     else:
@@ -811,9 +807,9 @@ async def process_run_command(
 async def process_action_command(
     session_id: str,
     data: Dict[str, Any], # Contains command
-    session_data_entry: Dict[str, Any], # Not used
-    connected_clients_entry: Dict[str, Any], # Not used
-    send_ws_message_func: SendWSMessageFunc, # Not used
+    session_data_entry: Dict[str, Any], 
+    connected_clients_entry: Dict[str, Any], 
+    send_ws_message_func: SendWSMessageFunc, 
     add_monitor_log_func: AddMonitorLogFunc
 ) -> None:
     """Handles placeholder 'action_command' messages."""
@@ -823,4 +819,3 @@ async def process_action_command(
         await add_monitor_log_func(f"Received action command: {action} (Handler not implemented).", "system_action_cmd")
     else:
         logger.warning(f"[{session_id}] Received 'action_command' with invalid/missing command content.")
-

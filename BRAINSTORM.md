@@ -219,3 +219,144 @@ Here's a breakdown of potential areas to enhance the system's capabilities for c
 -   Content Selection for Reports: The Evaluator's output or a dedicated LLM call could determine which artifacts and summaries are most relevant for inclusion in a final report.
 
 -   Template-Based Reporting: Utilize predefined HTML/CSS templates for different report styles (as initially envisioned).
+
+
+
+
+Current State & User Feedback (Post v2.1 Implementation)
+--------------------------------------------------------
+
+The agent now incorporates:
+
+-   **Intent Classification:** Distinguishes simple queries from complex tasks.
+
+-   **Planner, Controller, Executor Loop:** For complex tasks.
+
+-   **Evaluator (Overall):** Assesses the final outcome of a plan.
+
+-   **Role-Specific LLM Configuration:** Allows different LLMs for different components (though not yet fully utilized by all components via session settings).
+
+-   **Refactored Backend:** Message handling is now modular in `message_handlers.py`.
+
+**User Observations & Feedback:**
+
+1.  **Bug:** Deleting a task in the UI does not delete the corresponding workspace folder on the backend.
+
+2.  **Positive:** The system feels faster and smoother, likely due to role-specific LLMs and refactoring.
+
+3.  **Feature Request (UI/UX):** Allow users to select/change the LLM for each specific role (Planner, Controller, Evaluator, etc.) directly from the UI, not just a single LLM for the Executor.
+
+4.  **Feature Request (Resilience):** If a role-specific LLM fails (e.g., due to usage limits), the system should attempt a retry using the `DEFAULT_LLM_ID`.
+
+5.  **Feature Request (Plan Visibility & Persistence):**
+
+    -   The approved plan should remain visible in the UI after confirmation (perhaps collapsed).
+
+    -   The plan should be saved to a file (e.g., `plan.md` or `plan.json`) in the task's workspace, making it an artifact.
+
+    -   This file could be updated with step statuses (e.g., a checklist like `[x]`, `[ ]`, `[!]`).
+
+    -   This could allow for breaking down plan steps into further sub-tasks.
+
+6.  **Feature Request (Artifact Viewer):** Implement a file/folder structure view for the workspace within the Artifact Viewer.
+
+7.  **Feature Request (Artifact Viewer):** Improve PDF viewing (currently just listed, not rendered).
+
+Proposed Roadmap & Areas for Improvement
+----------------------------------------
+
+Based on the feedback and our v2.0 vision, here's a potential roadmap, prioritizing bug fixes, core enhancements, and then UX/feature additions:
+
+### Phase 1: Stability & Core Loop Enhancement
+
+1.  **Bug Fix: Workspace Deletion (User Point 1)**
+
+    -   **Goal:** Ensure deleting a task properly removes its workspace folder.
+
+    -   **Action:** Review and refine `process_delete_task` in `message_handlers.py` to ensure `shutil.rmtree` is effective and errors are handled/logged.
+
+2.  **Implement LLM Retry/Fallback Logic (User Point 4)**
+
+    -   **Goal:** Improve resilience if a configured role-specific LLM fails.
+
+    -   **Action:** Modify `get_llm` (in `llm_setup.py`) or the points where it's called for each role. If the primary role-specific LLM fails, attempt to use the `DEFAULT_LLM_ID`. Log when fallbacks occur.
+
+3.  **Enhance Plan Visibility & Persistence (User Point 5 - Basic)**
+
+    -   **Goal:** Make the confirmed plan accessible.
+
+    -   **Action (Backend):** In `process_execute_confirmed_plan` (message_handlers.py), after plan confirmation, save the `structured_plan_steps` to a `plan.md` (or `.json`) file in the task's workspace. This makes it an artifact.
+
+    -   **Action (Frontend - `script.js`):** Modify `displayPlanForConfirmation` to *not* remove the plan UI upon confirmation. Instead, it could be collapsed or styled differently to indicate it's the "active plan." (More advanced UI for this can come later).
+
+### Phase 2: User Control & Collaboration
+
+1.  **UI for Role-Specific LLM Selection (User Point 3)**
+
+    -   **Goal:** Allow users to override default role LLMs per session via the UI.
+
+    -   **Action (UI - `index.html` & `script.js`):** Design a UI section (e.g., an "Advanced Settings" modal or a dedicated panel) with dropdowns for Planner LLM, Controller LLM, Evaluator LLM, etc.
+
+    -   **Action (Backend - `server.py`, `message_handlers.py`):**
+
+        -   Extend `session_data` to store these UI-selected role LLMs.
+
+        -   Create a new WebSocket message type (e.g., `set_role_llm`) for the UI to send these selections.
+
+        -   Update `intent_classifier.py`, `planner.py`, `controller.py`, `evaluator.py`, and the Executor/DirectQA paths in `message_handlers.py` to prioritize session-selected role LLMs, then `.env` role LLMs, then `DEFAULT_LLM_ID`.
+
+2.  **Interactive Plan Modification (Expanding on User Point 5)**
+
+    -   **Goal:** Allow users to edit the plan before execution.
+
+    -   **Action (UI - `script.js`):** Enhance the plan confirmation UI to allow editing step descriptions, reordering, deleting steps, or (advanced) adding new steps.
+
+    -   **Action (Backend):** The `execute_confirmed_plan` message would then receive the (potentially modified) plan from the UI.
+
+### Phase 3: Advanced Features & UX Polish
+
+1.  **Evaluator-Driven Re-planning/Correction (Core v2.0 Goal)**
+
+    -   **Goal:** Make the agent learn from failed steps and improve.
+
+    -   **Action:**
+
+        -   If `EvaluationResult.overall_success` is `False` and `suggestions_for_replan` exist:
+
+            -   Option 1 (Simpler): Present suggestions to the user, ask if they want to try a new plan based on them.
+
+            -   Option 2 (Advanced): Automatically feed suggestions back to the Planner to generate a revised plan, then present *that* to the user.
+
+        -   Implement per-step evaluation for critical steps.
+
+2.  **PDF Artifact Viewing (User Point 7 - Simple)**
+
+    -   **Goal:** Allow users to view PDFs.
+
+    -   **Action (Frontend - `script.js`):** For PDF artifacts, render a simple link (`<a target="_blank">`) that opens the PDF in a new tab.
+
+3.  **Workspace File Structure Viewer (User Point 6)**
+
+    -   **Goal:** Improve artifact navigation.
+
+    -   **Action (Backend - `tools.py` or `server.py`):**  `get_artifacts` needs to scan recursively and return paths.
+
+    -   **Action (Frontend - `script.js`):** Implement a tree-like display for artifacts.
+
+4.  **Plan as an Updatable Checklist (User Point 5 - Advanced)**
+
+    -   **Goal:** Live tracking of plan progress.
+
+    -   **Action:**
+
+        -   When saving `plan.md`, use Markdown checklist syntax.
+
+        -   After each step execution (in `process_execute_confirmed_plan`), update the `plan.md` file to mark the step as done (`[x]`), failed (`[!]`), or skipped.
+
+        -   The Artifact Viewer would need to re-fetch/re-render this `plan.md` to show live updates.
+
+5.  **Permission Gateway for Critical Steps (Core v2.0 Goal)**
+
+    -   **Goal:** Enhance safety and user trust.
+
+    -   **Action:** Before the Executor runs a sensitive tool (shell, package installer, Python REPL), even if validated by the Controller, send a specific confirmation request to the UI detailing the exact command.

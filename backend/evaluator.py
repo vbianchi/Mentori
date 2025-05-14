@@ -1,10 +1,14 @@
 import logging
 from typing import List, Dict, Any, Optional, Union
 
-from langchain_core.language_models.chat_models import BaseChatModel
+# MODIFIED: Import settings and get_llm
+from backend.config import settings
+from backend.llm_setup import get_llm
+from langchain_core.language_models.chat_models import BaseChatModel # Still needed for type hinting
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
-from langchain_core.pydantic_v1 import BaseModel, Field # Assuming pydantic_v1 for now
+from langchain_core.pydantic_v1 import BaseModel, Field 
+import asyncio # For the test block
 
 logger = logging.getLogger(__name__)
 
@@ -47,19 +51,19 @@ Focus on the substance of the results, not just whether tools ran without crashi
 
 async def evaluate_plan_outcome(
     original_user_query: str,
-    executed_plan_summary: str, # This will be a string summarizing actions, outputs, errors
-    final_agent_answer: str, # The final answer given to the user by the plan executor
-    llm: BaseChatModel
+    executed_plan_summary: str, 
+    final_agent_answer: str
+    # MODIFIED: Removed llm as an argument
 ) -> Optional[EvaluationResult]:
     """
     Evaluates the outcome of an executed plan using an LLM.
+    Fetches its own LLM based on settings.
 
     Args:
         original_user_query: The initial query from the user.
         executed_plan_summary: A textual summary of the plan's execution, including steps,
                                outputs, and any errors.
         final_agent_answer: The final answer/output produced by the agent at the end of the plan.
-        llm: The language model instance to use for evaluation.
 
     Returns:
         An EvaluationResult object, or None if an error occurs during evaluation.
@@ -68,6 +72,17 @@ async def evaluate_plan_outcome(
     logger.debug(f"Evaluator: Executed Plan Summary:\n{executed_plan_summary}")
     logger.debug(f"Evaluator: Final Agent Answer:\n{final_agent_answer}")
 
+    # MODIFIED: Get the LLM for the Evaluator from settings
+    try:
+        evaluator_llm: BaseChatModel = get_llm(
+            settings,
+            provider=settings.evaluator_provider,
+            model_name=settings.evaluator_model_name
+        ) # type: ignore
+        logger.info(f"Evaluator: Using LLM {settings.evaluator_provider}::{settings.evaluator_model_name}")
+    except Exception as e:
+        logger.error(f"Evaluator: Failed to initialize LLM: {e}", exc_info=True)
+        return None # Cannot proceed without an LLM
 
     parser = JsonOutputParser(pydantic_object=EvaluationResult)
     format_instructions = parser.get_format_instructions()
@@ -80,7 +95,7 @@ async def evaluate_plan_outcome(
                   "Please evaluate the outcome.")
     ])
 
-    chain = prompt | llm | parser
+    chain = prompt | evaluator_llm | parser
 
     try:
         evaluation_result_dict = await chain.ainvoke({
@@ -104,7 +119,7 @@ async def evaluate_plan_outcome(
     except Exception as e:
         logger.error(f"Evaluator: Error during evaluation: {e}", exc_info=True)
         try:
-            error_chain = prompt | llm | StrOutputParser()
+            error_chain = prompt | evaluator_llm | StrOutputParser() # type: ignore
             raw_output = await error_chain.ainvoke({
                 "original_user_query": original_user_query,
                 "executed_plan_summary": executed_plan_summary,
@@ -117,33 +132,8 @@ async def evaluate_plan_outcome(
         return None
 
 if __name__ == '__main__':
-    # Example Usage (requires async setup and a mock/real LLM)
     async def test_evaluator():
-        class MockLLM(BaseChatModel): # Basic mock for structure
-            async def _agenerate(self, messages, stop=None, run_manager=None, **kwargs):
-                # Simulate LLM response for testing
-                # Example 1: Success
-                # eval_response_json = EvaluationResult(
-                #     overall_success=True,
-                #     assessment="The agent successfully found two relevant papers, read the abstract of the first, and wrote a correct summary to 'summary.txt'. Goal achieved.",
-                #     confidence_score=0.95
-                # ).json()
-
-                # Example 2: Partial Success / Needs Replan
-                eval_response_json = EvaluationResult(
-                    overall_success=False,
-                    assessment="The agent found papers and wrote a summary, but the summary was for the wrong abstract (second paper instead of first). Also, the word cloud generation failed due to a missing library.",
-                    missing_information=["Correct summary for the first paper's abstract.", "Generated word cloud image."],
-                    suggestions_for_replan=[
-                        "Re-run the step to read the abstract, ensuring it targets the *first* PubMed result.",
-                        "Before generating the word cloud, ensure the 'wordcloud' Python package is installed using the package installer tool."
-                    ],
-                    confidence_score=0.85
-                ).json()
-                from langchain_core.messages import AIMessage
-                return AIMessage(content=eval_response_json)
-
-        mock_llm_instance = MockLLM()
+        # This test now relies on settings from config.py for the evaluator LLM
         
         test_query = "Find the latest 2 papers on PubMed about 'mRNA vaccine stability', read the abstract of the first result, and write a short summary of that abstract to a file named 'summary.txt'."
         test_plan_summary = """
@@ -154,11 +144,11 @@ Step 4: Attempted to run python script for word cloud. Error: ModuleNotFoundErro
         """
         test_final_answer = "I have found two papers and saved a summary of the second paper's abstract to summary.txt. I could not generate the word cloud."
 
+        # evaluate_plan_outcome now fetches its own LLM
         evaluation = await evaluate_plan_outcome(
             test_query, 
             test_plan_summary, 
-            test_final_answer, 
-            mock_llm_instance
+            test_final_answer
         )
 
         if evaluation:

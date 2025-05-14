@@ -1,11 +1,14 @@
-# backend/planner.py
 import logging
 from typing import List, Dict, Any, Tuple, Optional
 
-from langchain_core.language_models.chat_models import BaseChatModel
+# MODIFIED: Import settings and get_llm
+from backend.config import settings
+from backend.llm_setup import get_llm
+from langchain_core.language_models.chat_models import BaseChatModel # Still needed for type hinting
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
 from langchain_core.pydantic_v1 import BaseModel, Field
+import asyncio # For the test block
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +26,6 @@ class AgentPlan(BaseModel):
     steps: List[PlanStep] = Field(description="A list of detailed steps to accomplish the user's request.")
 
 
-# MODIFIED: Renamed to indicate it's a template and added placeholders for all variables
 PLANNER_SYSTEM_PROMPT_TEMPLATE = """You are an expert planning assistant for a research agent. Your goal is to take a user's complex request and break it down into a sequence of logical, actionable sub-tasks.
 
 The research agent has access to the following tools:
@@ -45,100 +47,95 @@ Do not include any preamble or explanation outside of the JSON object.
 
 async def generate_plan(
     user_query: str,
-    llm: BaseChatModel,
+    # MODIFIED: Removed llm as an argument
     available_tools_summary: str
 ) -> Tuple[Optional[str], Optional[List[Dict[str, Any]]]]:
     """
     Generates a multi-step plan based on the user query using an LLM.
+    Fetches its own LLM based on settings.
     """
-    logger.info(f"Generating plan for user query: {user_query[:100]}...")
+    logger.info(f"Planner: Generating plan for user query: {user_query[:100]}...")
+
+    # MODIFIED: Get the LLM for the Planner from settings
+    try:
+        planner_llm: BaseChatModel = get_llm(
+            settings,
+            provider=settings.planner_provider,
+            model_name=settings.planner_model_name
+        ) # type: ignore
+        logger.info(f"Planner: Using LLM {settings.planner_provider}::{settings.planner_model_name}")
+    except Exception as e:
+        logger.error(f"Planner: Failed to initialize LLM: {e}", exc_info=True)
+        return None, None
 
     parser = JsonOutputParser(pydantic_object=AgentPlan)
-    format_instructions = parser.get_format_instructions() # Get format instructions from the parser
+    format_instructions = parser.get_format_instructions()
 
-    # MODIFIED: The prompt template now explicitly defines all its input variables
     prompt_template = ChatPromptTemplate.from_messages([
-        ("system", PLANNER_SYSTEM_PROMPT_TEMPLATE), # System prompt is now a template string
-        ("human", "{user_query}")                  # Human prompt also uses a placeholder
+        ("system", PLANNER_SYSTEM_PROMPT_TEMPLATE),
+        ("human", "{user_query}")
     ])
 
-    # The chain will expect 'user_query', 'available_tools_summary', and 'format_instructions'
-    chain = prompt_template | llm | parser
+    chain = prompt_template | planner_llm | parser
 
     try:
         logger.debug(f"Planner prompt input variables: {prompt_template.input_variables}")
-        # MODIFIED: Provide all expected input variables to ainvoKe
-        planned_result = await chain.ainvoke({
+        planned_result_dict = await chain.ainvoke({
             "user_query": user_query,
             "available_tools_summary": available_tools_summary,
             "format_instructions": format_instructions
         })
 
-        if isinstance(planned_result, AgentPlan): # If Pydantic model is returned directly by some LLM/parser versions
-            agent_plan = planned_result
-        elif isinstance(planned_result, dict): # Standard case for JsonOutputParser
-            agent_plan = AgentPlan(**planned_result)
+        if isinstance(planned_result_dict, AgentPlan):
+            agent_plan = planned_result_dict
+        elif isinstance(planned_result_dict, dict):
+            agent_plan = AgentPlan(**planned_result_dict)
         else:
-            logger.error(f"Planner LLM call returned an unexpected type: {type(planned_result)}. Content: {planned_result}")
+            logger.error(f"Planner LLM call returned an unexpected type: {type(planned_result_dict)}. Content: {planned_result_dict}")
             return None, None
 
         human_summary = agent_plan.human_readable_summary
         structured_steps = [step.dict() for step in agent_plan.steps]
 
-        logger.info(f"Plan generated successfully. Summary: {human_summary}")
-        logger.debug(f"Structured plan: {structured_steps}")
+        logger.info(f"Planner: Plan generated successfully. Summary: {human_summary}")
+        logger.debug(f"Planner: Structured plan: {structured_steps}")
         return human_summary, structured_steps
 
     except Exception as e:
-        logger.error(f"Error during plan generation: {e}", exc_info=True)
-        # Attempt to get raw output for debugging if parsing failed
+        logger.error(f"Planner: Error during plan generation: {e}", exc_info=True)
         try:
-            raw_output_chain = prompt_template | llm | StrOutputParser()
-            raw_output = await raw_output_chain.ainvoke({
+            error_chain = prompt_template | planner_llm | StrOutputParser() # type: ignore
+            raw_output = await error_chain.ainvoke({
                 "user_query": user_query,
                 "available_tools_summary": available_tools_summary,
                 "format_instructions": format_instructions
             })
-            logger.error(f"Raw LLM output during planning error: {raw_output}")
+            logger.error(f"Planner: Raw LLM output on error: {raw_output}")
         except Exception as raw_e:
-            logger.error(f"Failed to get raw LLM output during planning error: {raw_e}")
+            logger.error(f"Planner: Failed to get raw LLM output on error: {raw_e}")
         return None, None
 
 if __name__ == '__main__':
-    # This is a placeholder for testing the planner module directly.
-    # You'll need to set up a mock LLM or a real LLM instance.
-    # Example (requires a compatible LLM and config):
-    # from backend.config import settings
-    # from backend.llm_setup import get_llm
-    # import asyncio
-
-    # async def test_planner():
-    #     # Ensure your .env is set up for this to work with a real LLM
-    #     try:
-    #         test_llm = get_llm(settings, settings.default_provider, settings.default_model_name)
-    #     except Exception as e:
-    #         logger.error(f"Could not initialize LLM for testing: {e}")
-    #         return
-
-    #     query = "Find recent papers on CRISPR side effects, download the top 3 PDFs, summarize each, and combine summaries into a report."
-    #     # Construct a more realistic tools summary if needed by the prompt
-    #     tools_summary = "- duckduckgo_search: For web searches.\n- web_page_reader: To read content from URLs.\n- pubmed_search: For PubMed searches.\n- read_file: To read files from workspace.\n- write_file: To write files to workspace.\n- workspace_shell: To execute shell commands.\n- Python_REPL: To execute Python code."
+    async def test_planner():
+        # This test now relies on settings from config.py for the planner LLM
         
-    #     summary, plan = await generate_plan(query, test_llm, tools_summary)
+        query = "Find recent papers on CRISPR side effects, download the top 3 PDFs, summarize each, and combine summaries into a report."
+        tools_summary = "- duckduckgo_search: For web searches.\n- web_page_reader: To read content from URLs.\n- pubmed_search: For PubMed searches.\n- read_file: To read files from workspace.\n- write_file: To write files to workspace.\n- workspace_shell: To execute shell commands.\n- Python_REPL: To execute Python code."
+        
+        # generate_plan now fetches its own LLM
+        summary, plan = await generate_plan(query, tools_summary)
 
-    #     if summary and plan:
-    #         print("---- Human Readable Summary ----")
-    #         print(summary)
-    #         print("\n---- Structured Plan ----")
-    #         for i, step_data in enumerate(plan): # Iterate over list of dicts
-    #             print(f"Step {i+1}:")
-    #             print(f"  Description: {step_data.get('description')}")
-    #             print(f"  Tool: {step_data.get('tool_to_use')}")
-    #             print(f"  Input Instructions: {step_data.get('tool_input_instructions')}")
-    #             print(f"  Expected Outcome: {step_data.get('expected_outcome')}")
-    #     else:
-    #         print("Failed to generate a plan.")
+        if summary and plan:
+            print("---- Human Readable Summary ----")
+            print(summary)
+            print("\n---- Structured Plan ----")
+            for i, step_data in enumerate(plan):
+                print(f"Step {i+1}:")
+                print(f"  Description: {step_data.get('description')}")
+                print(f"  Tool: {step_data.get('tool_to_use')}")
+                print(f"  Input Instructions: {step_data.get('tool_input_instructions')}")
+                print(f"  Expected Outcome: {step_data.get('expected_outcome')}")
+        else:
+            print("Failed to generate a plan.")
 
-    # if __name__ == '__main__':
-    #    asyncio.run(test_planner())
-    pass
+    asyncio.run(test_planner())

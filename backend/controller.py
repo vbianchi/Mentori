@@ -1,13 +1,17 @@
 import logging
 from typing import List, Dict, Any, Tuple, Optional
 
-from langchain_core.language_models.chat_models import BaseChatModel
+# MODIFIED: Import settings and get_llm
+from backend.config import settings
+from backend.llm_setup import get_llm
+from langchain_core.language_models.chat_models import BaseChatModel # Still needed for type hinting
 from langchain_core.tools import BaseTool
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from langchain_core.pydantic_v1 import BaseModel, Field
 
-from backend.planner import PlanStep # Assuming PlanStep is in backend.planner
+from backend.planner import PlanStep 
+import asyncio # For the test block
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +25,6 @@ class ValidatedStepAction(BaseModel):
     reasoning: str = Field(description="Brief reasoning for choosing this tool and formulating this input, or why no tool is needed.")
     confidence_score: float = Field(description="A score from 0.0 to 1.0 indicating the LLM's confidence in this action being correct and optimal for the given step description. 1.0 is highest confidence.", ge=0.0, le=1.0)
 
-# System prompt for the Controller/Validator LLM
 CONTROLLER_SYSTEM_PROMPT_TEMPLATE = """You are an expert Controller/Validator AI. Your task is to analyze a single step from a high-level plan and determine the most appropriate tool and the precise input for that tool to successfully execute the step.
 
 You will be given:
@@ -52,17 +55,17 @@ Do not include any preamble or explanation outside of the JSON object.
 async def validate_and_prepare_step_action(
     original_user_query: str,
     plan_step: PlanStep,
-    available_tools: List[BaseTool],
-    llm: BaseChatModel
+    available_tools: List[BaseTool]
+    # MODIFIED: Removed llm as an argument
 ) -> Tuple[Optional[str], Optional[str], str, float]:
     """
     Validates a plan step and prepares the precise tool and input using an LLM.
+    Fetches its own LLM based on settings.
 
     Args:
         original_user_query: The initial query from the user for broader context.
         plan_step: The specific PlanStep object from the planner.
         available_tools: A list of BaseTool objects available to the agent.
-        llm: The language model instance to use for validation and input formulation.
 
     Returns:
         A tuple: (tool_name, tool_input, message, confidence_score).
@@ -71,6 +74,19 @@ async def validate_and_prepare_step_action(
         'confidence_score' is the LLM's confidence in its output.
     """
     logger.info(f"Controller: Validating plan step ID {plan_step.step_id}: '{plan_step.description[:100]}...' (Planner suggestion: {plan_step.tool_to_use})")
+
+    # MODIFIED: Get the LLM for the Controller from settings
+    try:
+        controller_llm: BaseChatModel = get_llm(
+            settings,
+            provider=settings.controller_provider,
+            model_name=settings.controller_model_name
+        ) # type: ignore
+        logger.info(f"Controller: Using LLM {settings.controller_provider}::{settings.controller_model_name}")
+    except Exception as e:
+        logger.error(f"Controller: Failed to initialize LLM: {e}", exc_info=True)
+        return None, None, f"Error in Controller: Failed to initialize LLM - {str(e)}", 0.0
+
 
     available_tools_details = "\n".join(
         [f"- Name: {tool.name}\n  Description: {tool.description}\n  Input Schema: {str(tool.args)}" for tool in available_tools]
@@ -90,7 +106,7 @@ async def validate_and_prepare_step_action(
                   "Analyze this step and determine the precise action (tool and input).")
     ])
 
-    chain = prompt | llm | parser
+    chain = prompt | controller_llm | parser
 
     try:
         controller_result_dict = await chain.ainvoke({
@@ -103,8 +119,6 @@ async def validate_and_prepare_step_action(
             "format_instructions": format_instructions
         })
 
-        # The parser should return a dict if using JsonOutputParser directly
-        # If it returns the Pydantic object, convert it
         if isinstance(controller_result_dict, ValidatedStepAction):
              validated_action = controller_result_dict
         else:
@@ -112,19 +126,12 @@ async def validate_and_prepare_step_action(
 
 
         tool_name = validated_action.tool_name if validated_action.tool_name and validated_action.tool_name.lower() != 'none' else None
-        tool_input = validated_action.tool_input if tool_name else None # Input is None if tool is None
+        tool_input = validated_action.tool_input if tool_name else None 
 
-        # Basic validation: if a tool is named, its input should exist (unless tool specifically takes no input)
-        # More advanced validation could check tool_name against available_tools again, but LLM should handle this.
         if tool_name and tool_input is None:
-            # Check if the chosen tool actually expects no input.
-            # This requires inspecting the tool's args_schema or description.
-            # For now, we'll trust the LLM if it says a tool needs no input, but log a warning.
             target_tool_obj = next((t for t in available_tools if t.name == tool_name), None)
-            if target_tool_obj and target_tool_obj.args_schema and not tool_input: # If tool has schema but no input given
+            if target_tool_obj and target_tool_obj.args_schema and not tool_input: 
                  logger.warning(f"Controller LLM suggested tool '{tool_name}' but provided no input, and tool has an args_schema. Reasoning: {validated_action.reasoning}")
-                 # Potentially override to an error or let it proceed if LLM is confident.
-                 # For now, we proceed but the reasoning should explain this.
 
         logger.info(f"Controller validation complete for step {plan_step.step_id}. Tool: '{tool_name}', Input: '{str(tool_input)[:100]}...', Confidence: {validated_action.confidence_score:.2f}")
         logger.debug(f"Controller reasoning: {validated_action.reasoning}")
@@ -133,9 +140,8 @@ async def validate_and_prepare_step_action(
 
     except Exception as e:
         logger.error(f"Controller: Error during validation/preparation for step {plan_step.step_id}: {e}", exc_info=True)
-        # Attempt to get raw output for debugging if JSON parsing failed
         try:
-            error_chain = prompt | llm | StrOutputParser()
+            error_chain = prompt | controller_llm | StrOutputParser() # type: ignore
             raw_output = await error_chain.ainvoke({
                 "original_user_query": original_user_query,
                 "step_id": plan_step.step_id,
@@ -151,12 +157,9 @@ async def validate_and_prepare_step_action(
         return None, None, f"Error in Controller: {str(e)}", 0.0
 
 if __name__ == '__main__':
-    # Placeholder for testing - Requires async setup and mock/real LLM, tools.
-    # Example of how you might test it (conceptual)
     async def test_controller():
-        from backend.llm_setup import get_llm
-        from backend.config import settings
-        from langchain_core.tools import tool
+        # This test now relies on settings from config.py for the controller LLM
+        from langchain_core.tools import tool # Moved import inside for test scope
 
         @tool
         def example_search_tool(query: str) -> str:
@@ -168,21 +171,20 @@ if __name__ == '__main__':
             """Writes content to a file. Input format: 'filename:::content'"""
             return f"Successfully wrote to {filename}"
 
-
-        mock_llm = get_llm(settings, settings.default_provider, settings.default_model_name) # Replace with actual or mock
         mock_tools = [example_search_tool, example_write_file_tool]
 
         test_plan_step = PlanStep(
             step_id=1,
             description="Search for recent news on AI.",
-            tool_to_use="example_search_tool", # Planner's suggestion
+            tool_to_use="example_search_tool", 
             tool_input_instructions="Focus on AI advancements in 2024.",
             expected_outcome="A list of news articles about AI in 2024."
         )
         user_q = "What's new in AI?"
 
+        # validate_and_prepare_step_action now fetches its own LLM
         tool_name, tool_input, message, confidence = await validate_and_prepare_step_action(
-            user_q, test_plan_step, mock_tools, mock_llm
+            user_q, test_plan_step, mock_tools
         )
 
         print("--- Controller Test Result ---")
@@ -191,7 +193,4 @@ if __name__ == '__main__':
         print(f"Message/Reasoning: {message}")
         print(f"Confidence: {confidence}")
 
-    # To run this test:
-    # import asyncio
-    # asyncio.run(test_controller())
-    pass
+    asyncio.run(test_controller())

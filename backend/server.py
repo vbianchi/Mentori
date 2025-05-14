@@ -3,7 +3,7 @@ import websockets
 import json
 import datetime
 import logging
-import shlex
+import shlex # Not explicitly used in this snippet, but was in original
 import uuid
 from typing import Optional, List, Dict, Any, Set, Tuple, Callable, Coroutine
 from pathlib import Path
@@ -22,26 +22,26 @@ import aiohttp_cors
 # -------------------------
 
 # LangChain Imports
-from langchain.agents import AgentExecutor
+from langchain.agents import AgentExecutor # Used by create_agent_executor
 from langchain.memory import ConversationBufferWindowMemory
-from langchain_core.messages import AIMessage, HumanMessage
-from langchain_core.agents import AgentAction, AgentFinish
-from langchain_core.runnables import RunnableConfig
-from langchain_core.language_models.base import BaseLanguageModel
-from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_core.messages import AIMessage, HumanMessage # Used by message handlers
+from langchain_core.agents import AgentAction, AgentFinish # Used by callbacks
+from langchain_core.runnables import RunnableConfig # Used by message handlers
+from langchain_core.language_models.base import BaseLanguageModel # For type hinting get_llm
+from langchain_core.language_models.chat_models import BaseChatModel # For type hinting get_llm
 
 # Project Imports
 from backend.config import settings
 from backend.llm_setup import get_llm
 from backend.tools import get_dynamic_tools, get_task_workspace_path, BASE_WORKSPACE_ROOT, TEXT_EXTENSIONS
-from backend.agent import create_agent_executor
-from backend.callbacks import WebSocketCallbackHandler, AgentCancelledException
+from backend.agent import create_agent_executor # Used by message handlers
+from backend.callbacks import WebSocketCallbackHandler, AgentCancelledException # Used by message handlers
 from backend.db_utils import (
     init_db, add_task, add_message, get_messages_for_task,
     delete_task_and_messages, rename_task_in_db
 )
-from backend.planner import generate_plan, PlanStep
-from backend.controller import validate_and_prepare_step_action
+from backend.planner import generate_plan, PlanStep # Used by message handlers
+from backend.controller import validate_and_prepare_step_action # Used by message handlers
 # MODIFIED: Import all message handlers
 from backend.message_handlers import (
     process_context_switch, process_user_message,
@@ -71,7 +71,7 @@ logging.basicConfig(
     level=log_level,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s\n'
 )
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__) # Use __name__ for module-level logger
 logger.info(f"Logging level set to {log_level}")
 
 try:
@@ -91,7 +91,6 @@ logger.info(f"File server will listen on {FILE_SERVER_LISTEN_HOST}:{FILE_SERVER_
 logger.info(f"File server URLs constructed for client will use: http://{FILE_SERVER_CLIENT_HOST}:{FILE_SERVER_PORT}")
 
 async def read_stream(stream, stream_name, session_id, send_ws_message_func, db_add_message_func, current_task_id):
-    # ... (Content unchanged)
     log_prefix_base = f"[{session_id[:8]}]"
     while True:
         try: line = await stream.readline()
@@ -106,8 +105,7 @@ async def read_stream(stream, stream_name, session_id, send_ws_message_func, db_
     logger.debug(f"[{session_id}] {stream_name} stream finished.")
 
 
-async def execute_shell_command(command: str, session_id: str, send_ws_message_func: callable, db_add_message_func: callable, current_task_id: Optional[str]) -> bool:
-    # ... (Content unchanged)
+async def execute_shell_command(command: str, session_id: str, send_ws_message_func: SendWSMessageFunc, db_add_message_func: DBAddMessageFunc, current_task_id: Optional[str]) -> bool:
     log_prefix_base = f"[{session_id[:8]}]"; timestamp_start = datetime.datetime.now().isoformat(timespec='milliseconds')
     start_log_content = f"[Direct Command] Executing: {command}"
     logger.info(f"[{session_id}] {start_log_content}")
@@ -401,8 +399,8 @@ async def handler(websocket: Any):
             "memory": memory,
             "callback_handler": ws_callback_handler,
             "current_task_id": None,
-            "selected_llm_provider": settings.default_provider,
-            "selected_llm_model_name": settings.default_model_name,
+            "selected_llm_provider": settings.default_provider, # This will be user's selection for Executor
+            "selected_llm_model_name": settings.default_model_name, # This will be user's selection for Executor
             "cancellation_requested": False,
             "current_plan_structured": None,
             "current_plan_human_summary": None,
@@ -429,18 +427,18 @@ async def handler(websocket: Any):
     MessageHandler = Callable[..., Coroutine[Any, Any, None]] 
     
     message_handler_map: Dict[str, MessageHandler] = {
-        "context_switch": process_context_switch,
-        "user_message": process_user_message,
-        "execute_confirmed_plan": process_execute_confirmed_plan,
-        "new_task": process_new_task,
-        "delete_task": process_delete_task,
-        "rename_task": process_rename_task,
-        "set_llm": process_set_llm,
-        "get_available_models": process_get_available_models,
-        "cancel_agent": process_cancel_agent,
-        "get_artifacts_for_task": process_get_artifacts_for_task,
-        "run_command": process_run_command,
-        "action_command": process_action_command,
+        "context_switch": process_context_switch,      # type: ignore
+        "user_message": process_user_message,          # type: ignore
+        "execute_confirmed_plan": process_execute_confirmed_plan, # type: ignore
+        "new_task": process_new_task,                  # type: ignore
+        "delete_task": process_delete_task,            # type: ignore
+        "rename_task": process_rename_task,            # type: ignore
+        "set_llm": process_set_llm,                    # type: ignore
+        "get_available_models": process_get_available_models, # type: ignore
+        "cancel_agent": process_cancel_agent,          # type: ignore
+        "get_artifacts_for_task": process_get_artifacts_for_task, # type: ignore
+        "run_command": process_run_command,            # type: ignore
+        "action_command": process_action_command,      # type: ignore
     }
 
     try:
@@ -497,12 +495,11 @@ async def handler(websocket: Any):
                     elif message_type == "rename_task":
                         handler_args["db_rename_task_func"] = rename_task_in_db
                     elif message_type == "run_command":
-                         handler_args["execute_shell_command_func"] = execute_shell_command # Pass the actual function
+                         handler_args["execute_shell_command_func"] = execute_shell_command
                     
                     await handler_func(**handler_args) # type: ignore
                 
-                # MODIFIED: Removed all specific elif blocks as they are now in message_handler_map
-                else:
+                else: # This 'else' now correctly handles only truly unknown message types
                     logger.warning(f"[{session_id}] Unknown message type received: {message_type}")
                     await add_monitor_log_and_save(f"Received unknown message type: {message_type}", "error_unknown_msg")
 

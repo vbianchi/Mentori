@@ -1,10 +1,14 @@
 import logging
 from typing import Dict, Any, Optional
 
-from langchain_core.language_models.chat_models import BaseChatModel
+# MODIFIED: Import settings and get_llm
+from backend.config import settings
+from backend.llm_setup import get_llm
+from langchain_core.language_models.chat_models import BaseChatModel # Still needed for type hinting if get_llm returns it
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import JsonOutputParser
-from langchain_core.pydantic_v1 import BaseModel, Field # Assuming pydantic_v1 for now, adjust if project migrates
+from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
+from langchain_core.pydantic_v1 import BaseModel, Field 
+import asyncio # For the test block
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +30,7 @@ Available intents:
 -   "DIRECT_QA": Use this if the query is a straightforward question, a request for a simple definition or explanation, a request for brainstorming, a simple calculation, or a conversational remark that doesn't require a complex plan. The agent can likely answer this using its internal knowledge or a single quick tool use (like a web search for a current fact). Examples:
     - "What is the capital of France?"
     - "Explain the concept of X in simple terms."
-    - "Tell me a joke."
+    - "Tell me a fun fact."
     - "What's the weather like today?" (implies a single tool use)
     - "Can you help me brainstorm ideas for a project about Y?"
     - "Thanks, that was helpful!"
@@ -41,15 +45,15 @@ Do not include any preamble or explanation outside of the JSON object.
 
 async def classify_intent(
     user_query: str,
-    llm: BaseChatModel,
-    available_tools_summary: Optional[str] = None # Optional, but can provide context
+    # MODIFIED: Removed llm as an argument, it will be fetched internally
+    available_tools_summary: Optional[str] = None 
 ) -> str:
     """
     Classifies the user's intent as either requiring a plan or direct Q&A.
+    It now fetches its own LLM based on settings.
 
     Args:
         user_query: The user's input query.
-        llm: The language model instance to use for classification.
         available_tools_summary: An optional summary of available tools for context.
 
     Returns:
@@ -58,53 +62,34 @@ async def classify_intent(
     """
     logger.info(f"IntentClassifier: Classifying intent for query: {user_query[:100]}...")
 
+    # MODIFIED: Get the LLM for intent classification from settings
+    try:
+        intent_llm: BaseChatModel = get_llm(
+            settings, 
+            provider=settings.intent_classifier_provider, 
+            model_name=settings.intent_classifier_model_name
+        ) # type: ignore 
+        logger.info(f"IntentClassifier: Using LLM {settings.intent_classifier_provider}::{settings.intent_classifier_model_name}")
+    except Exception as e:
+        logger.error(f"IntentClassifier: Failed to initialize LLM for intent classification: {e}", exc_info=True)
+        logger.warning("IntentClassifier: Defaulting to 'PLAN' intent due to LLM initialization error.")
+        return "PLAN"
+
     parser = JsonOutputParser(pydantic_object=IntentClassificationOutput)
     format_instructions = parser.get_format_instructions()
-
-    # Constructing the human message part of the prompt
-    human_message_content_parts = [f"User Query: \"{user_query}\""]
+    
+    human_template = "User Query: \"{user_query}\"\n"
     if available_tools_summary:
-        human_message_content_parts.append(f"\nFor context, the agent has access to tools like: {available_tools_summary}")
-    human_message_content_parts.append("\nClassify the intent of the user query.")
-    human_message_content = "\n".join(human_message_content_parts)
+        human_template += "\nFor context, the agent has access to tools like: {available_tools_summary}\n"
+    human_template += "\nClassify the intent of the user query."
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", INTENT_CLASSIFIER_SYSTEM_PROMPT_TEMPLATE),
-        ("human", human_message_content)
+        ("human", human_template)
     ])
-
-    chain = prompt | llm | parser
+    chain = prompt | intent_llm | parser
 
     try:
-        # Provide all required variables for the prompt template
-        # The system prompt template uses 'format_instructions'
-        # The human prompt template uses 'user_query' and optionally 'available_tools_summary' (handled by f-string)
-        # So, the chain.ainvoke needs 'format_instructions' and 'user_query' (and 'available_tools_summary' if it were a direct template var)
-        # However, since we construct human_message_content directly, we only need to ensure format_instructions is available for the system prompt.
-        # The user_query is part of the human_message_content.
-        
-        # If ChatPromptTemplate.from_messages is used with f-string formatting within the messages,
-        # the variables are already embedded. If it expects explicit variables, they must be passed.
-        # For `from_messages([("system", sys_template_str), ("human", human_template_str)])`
-        # it expects variables named in the template strings.
-        # Here, format_instructions is in the system prompt. user_query is in the human prompt.
-        
-        # Let's ensure the prompt is constructed correctly for the variables.
-        # The system prompt expects "format_instructions".
-        # The human prompt is a direct string here, not a template expecting "user_query".
-        # To make it cleaner, let's make the human part also a template string.
-
-        human_template = "User Query: \"{user_query}\"\n"
-        if available_tools_summary:
-            human_template += "\nFor context, the agent has access to tools like: {available_tools_summary}\n"
-        human_template += "\nClassify the intent of the user query."
-
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", INTENT_CLASSIFIER_SYSTEM_PROMPT_TEMPLATE),
-            ("human", human_template)
-        ])
-        chain = prompt | llm | parser # Recreate chain with the new prompt
-
         invoke_params = {
             "user_query": user_query,
             "format_instructions": format_instructions
@@ -131,42 +116,25 @@ async def classify_intent(
 
     except Exception as e:
         logger.error(f"IntentClassifier: Error during intent classification: {e}", exc_info=True)
-        # Fallback to "PLAN" in case of any error to be safe
+        try:
+            error_chain = prompt | intent_llm | StrOutputParser() # type: ignore
+            raw_output_params = {
+                "user_query": user_query,
+                "format_instructions": format_instructions
+            }
+            if available_tools_summary:
+                raw_output_params["available_tools_summary"] = available_tools_summary
+            raw_output = await error_chain.ainvoke(raw_output_params)
+            logger.error(f"IntentClassifier: Raw LLM output on error: {raw_output}")
+        except Exception as raw_e:
+            logger.error(f"IntentClassifier: Failed to get raw LLM output during error: {raw_e}")
+        logger.warning("IntentClassifier: Defaulting to 'PLAN' intent due to classification error.")
         return "PLAN"
 
 if __name__ == '__main__':
-    # Example Usage (requires async setup and a mock/real LLM)
     async def test_intent_classifier():
-        # This is a placeholder. You'd need to initialize a BaseChatModel (e.g., from llm_setup)
-        # and potentially mock settings if get_llm relies on them.
-        class MockLLM(BaseChatModel):
-            def _generate(self, messages, stop=None, run_manager=None, **kwargs):
-                # Simulate LLM response for testing
-                intent_response = IntentClassificationOutput(intent="DIRECT_QA", reasoning="Simple question.").json()
-                # intent_response = IntentClassificationOutput(intent="PLAN", reasoning="Complex multi-step query.").json()
-                return {"generations": [{"text": intent_response}]} # Simplified, actual structure might vary
-            async def _agenerate(self, messages, stop=None, run_manager=None, **kwargs):
-                intent_response_json = IntentClassificationOutput(intent="DIRECT_QA", reasoning="Simple question for test.").json()
-                # Example for PLAN
-                # intent_response_json = IntentClassificationOutput(intent="PLAN", reasoning="Complex query requiring multiple steps for test.").json()
-                
-                # Simulate the structure that JsonOutputParser expects after LLM call
-                # Usually, the LLM's AIMessage content is the JSON string.
-                # The parser then takes this string.
-                # Here, we directly provide the dict that the parser would produce.
-                # For a real LLM, the chain would be: prompt | llm | StrOutputParser() | JsonOutputParser()
-                # or prompt | llm (if it outputs JSON directly) | JsonOutputParser()
-                
-                # Let's simulate what the JsonOutputParser would get from the LLM
-                # The LLM (after prompt) would output a message, whose content is the JSON string.
-                # The parser then parses this string.
-                # For testing the chain `prompt | llm | parser`, the llm mock needs to return an AIMessage
-                # whose content is the JSON string.
-                from langchain_core.messages import AIMessage
-                return AIMessage(content=intent_response_json)
-
-
-        mock_llm_instance = MockLLM()
+        # This test now relies on settings from config.py for the intent classifier LLM
+        # Ensure your .env is configured, especially INTENT_CLASSIFIER_LLM_ID or DEFAULT_LLM_ID
         
         queries = [
             "What is photosynthesis?",
@@ -178,8 +146,8 @@ if __name__ == '__main__':
         tools_summary_example = "- duckduckgo_search: For web searches.\n- write_file: To write files."
 
         for q in queries:
-            intent = await classify_intent(q, mock_llm_instance, tools_summary_example)
+            # classify_intent now fetches its own LLM
+            intent = await classify_intent(q, tools_summary_example)
             print(f"Query: \"{q}\" -> Classified Intent: {intent}")
 
     asyncio.run(test_intent_classifier())
-
