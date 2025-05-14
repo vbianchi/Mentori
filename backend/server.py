@@ -3,7 +3,7 @@ import websockets
 import json
 import datetime
 import logging
-import shlex # Not explicitly used in this snippet, but was in original
+import shlex 
 import uuid
 from typing import Optional, List, Dict, Any, Set, Tuple, Callable, Coroutine
 from pathlib import Path
@@ -22,26 +22,26 @@ import aiohttp_cors
 # -------------------------
 
 # LangChain Imports
-from langchain.agents import AgentExecutor # Used by create_agent_executor
+from langchain.agents import AgentExecutor 
 from langchain.memory import ConversationBufferWindowMemory
-from langchain_core.messages import AIMessage, HumanMessage # Used by message handlers
-from langchain_core.agents import AgentAction, AgentFinish # Used by callbacks
-from langchain_core.runnables import RunnableConfig # Used by message handlers
-from langchain_core.language_models.base import BaseLanguageModel # For type hinting get_llm
-from langchain_core.language_models.chat_models import BaseChatModel # For type hinting get_llm
+from langchain_core.messages import AIMessage, HumanMessage 
+from langchain_core.agents import AgentAction, AgentFinish 
+from langchain_core.runnables import RunnableConfig 
+from langchain_core.language_models.base import BaseLanguageModel 
+from langchain_core.language_models.chat_models import BaseChatModel 
 
 # Project Imports
 from backend.config import settings
 from backend.llm_setup import get_llm
 from backend.tools import get_dynamic_tools, get_task_workspace_path, BASE_WORKSPACE_ROOT, TEXT_EXTENSIONS
-from backend.agent import create_agent_executor # Used by message handlers
-from backend.callbacks import WebSocketCallbackHandler, AgentCancelledException # Used by message handlers
+from backend.agent import create_agent_executor 
+from backend.callbacks import WebSocketCallbackHandler, AgentCancelledException 
 from backend.db_utils import (
     init_db, add_task, add_message, get_messages_for_task,
     delete_task_and_messages, rename_task_in_db
 )
-from backend.planner import generate_plan, PlanStep # Used by message handlers
-from backend.controller import validate_and_prepare_step_action # Used by message handlers
+from backend.planner import generate_plan, PlanStep 
+from backend.controller import validate_and_prepare_step_action 
 # MODIFIED: Import all message handlers
 from backend.message_handlers import (
     process_context_switch, process_user_message,
@@ -71,7 +71,7 @@ logging.basicConfig(
     level=log_level,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s\n'
 )
-logger = logging.getLogger(__name__) # Use __name__ for module-level logger
+logger = logging.getLogger(__name__)
 logger.info(f"Logging level set to {log_level}")
 
 try:
@@ -399,8 +399,8 @@ async def handler(websocket: Any):
             "memory": memory,
             "callback_handler": ws_callback_handler,
             "current_task_id": None,
-            "selected_llm_provider": settings.default_provider, # This will be user's selection for Executor
-            "selected_llm_model_name": settings.default_model_name, # This will be user's selection for Executor
+            "selected_llm_provider": settings.default_provider, 
+            "selected_llm_model_name": settings.default_model_name, 
             "cancellation_requested": False,
             "current_plan_structured": None,
             "current_plan_human_summary": None,
@@ -442,7 +442,7 @@ async def handler(websocket: Any):
     }
 
     try:
-        status_llm_info = f"LLM: {settings.default_provider} ({settings.default_model_name})"
+        status_llm_info = f"LLM: {settings.default_provider} ({settings.default_model_name})" # This reflects the initial UI default
         logger.info(f"[{session_id}] Sending initial status message...");
         await send_ws_message_for_session("status_message", f"Connected (Session: {session_id[:8]}...). Agent Ready. {status_llm_info}.")
         await send_ws_message_for_session("available_models", {

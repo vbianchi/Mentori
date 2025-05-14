@@ -4,15 +4,16 @@ import datetime
 from typing import Dict, Any, Callable, Coroutine, Optional, List
 import asyncio
 import shutil 
+from pathlib import Path # Ensure Path is imported
 
 # LangChain Imports
 from langchain_core.messages import AIMessage, HumanMessage
-from langchain_core.language_models.chat_models import BaseChatModel # Still needed for type hints
+from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.runnables import RunnableConfig 
 
 # Project Imports
 from backend.config import settings
-from backend.llm_setup import get_llm # get_llm is used for Executor and DirectQA LLMs here
+from backend.llm_setup import get_llm
 from backend.tools import get_dynamic_tools, get_task_workspace_path, BASE_WORKSPACE_ROOT
 from backend.planner import generate_plan, PlanStep
 from backend.controller import validate_and_prepare_step_action
@@ -47,7 +48,7 @@ async def process_context_switch(
     db_get_messages_func: DBGetMessagesFunc,
     get_artifacts_func: GetArtifactsFunc
 ) -> None:
-    # ... (Content from message_handlers_py_evaluator_integration, unchanged) ...
+    # ... (Content from previous version, unchanged) ...
     task_id_from_frontend = data.get("taskId")
     task_title_from_frontend = data.get("task")
 
@@ -157,6 +158,7 @@ async def process_user_message(
     add_monitor_log_func: AddMonitorLogFunc,
     db_add_message_func: DBAddMessageFunc 
 ) -> None:
+    # ... (Content from previous version, unchanged) ...
     user_input_content = ""
     content_payload = data.get("content")
     if isinstance(content_payload, str):
@@ -190,13 +192,12 @@ async def process_user_message(
     dynamic_tools = get_dynamic_tools(active_task_id)
     tools_summary_for_intent = "\n".join([f"- {tool.name}: {tool.description.split('.')[0]}" for tool in dynamic_tools])
     
-    # MODIFIED: classify_intent now fetches its own LLM
     classified_intent = await classify_intent(user_input_content, tools_summary_for_intent)
     await add_monitor_log_func(f"Intent classified as: {classified_intent}", "system_intent_classified")
 
     if classified_intent == "PLAN":
         await send_ws_message_func("agent_thinking_update", {"status": "Generating plan..."})
-        # generate_plan will fetch the PLANNER_LLM from settings
+        
         human_plan_summary, structured_plan_steps = await generate_plan(
             user_query=user_input_content,
             available_tools_summary=tools_summary_for_intent 
@@ -226,8 +227,6 @@ async def process_user_message(
         await send_ws_message_func("agent_thinking_update", {"status": "Processing directly..."})
         await add_monitor_log_func(f"Handling as DIRECT_QA. Invoking ReAct agent.", "system_direct_qa")
 
-        # Use Executor's default LLM (or session selected) for direct Q&A
-        # This LLM is fetched based on session_data_entry or EXECUTOR_DEFAULT_LLM_ID
         executor_provider = session_data_entry.get("selected_llm_provider", settings.executor_default_provider)
         executor_model_name = session_data_entry.get("selected_llm_model_name", settings.executor_default_model_name)
         logger.info(f"[{session_id}] Using LLM for Direct QA (Executor role): {executor_provider}::{executor_model_name}")
@@ -287,7 +286,6 @@ async def process_user_message(
         await add_monitor_log_func(f"Error: Unknown intent '{classified_intent}'. Defaulting to PLAN.", "error_system")
         await send_ws_message_func("agent_thinking_update", {"status": "Generating plan (fallback)..."})
         
-        # Fallback to planning, generate_plan will use PLANNER_LLM from settings
         human_plan_summary, structured_plan_steps = await generate_plan(
             user_query=user_input_content, available_tools_summary=tools_summary_for_intent
         )
@@ -319,6 +317,7 @@ async def process_execute_confirmed_plan(
     send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc
 ) -> None:
+    # ... (Content from previous version, unchanged) ...
     logger.info(f"[{session_id}] Received 'execute_confirmed_plan'.")
     active_task_id = session_data_entry.get("current_task_id")
     if not active_task_id:
@@ -377,12 +376,10 @@ async def process_execute_confirmed_plan(
         
         step_tools = get_dynamic_tools(active_task_id)
 
-        # MODIFIED: validate_and_prepare_step_action now fetches its own LLM
         validated_tool_name, formulated_tool_input, controller_message, controller_confidence = await validate_and_prepare_step_action(
             original_user_query=original_user_query,
             plan_step=current_plan_step_obj,
             available_tools=step_tools
-            # LLM argument removed
         )
         current_step_detail.update({ 
             "controller_tool": validated_tool_name, "controller_input": formulated_tool_input,
@@ -425,7 +422,6 @@ async def process_execute_confirmed_plan(
         })
         await add_monitor_log_func(f"Executing Plan Step {i+1} (via Executor): {step_description}", "system_plan_step_start")
 
-        # LLM for Executor for this step (could be UI selected or EXECUTOR_DEFAULT_LLM_ID)
         executor_provider = session_data_entry.get("selected_llm_provider", settings.executor_default_provider)
         executor_model_name = session_data_entry.get("selected_llm_model_name", settings.executor_default_model_name)
         logger.info(f"[{session_id}] Using Executor LLM for step {i+1}: {executor_provider}::{executor_model_name}")
@@ -526,12 +522,10 @@ async def process_execute_confirmed_plan(
     final_overall_answer = preliminary_final_answer 
     
     await add_monitor_log_func("Invoking Evaluator to assess overall outcome.", "system_evaluator_start")
-    # MODIFIED: evaluate_plan_outcome now fetches its own LLM
     evaluation_result = await evaluate_plan_outcome(
         original_user_query=original_user_query,
         executed_plan_summary=executed_plan_summary_str,
         final_agent_answer=preliminary_final_answer
-        # LLM argument removed
     )
 
     if evaluation_result:
@@ -562,7 +556,7 @@ async def process_new_task(
     add_monitor_log_func: AddMonitorLogFunc,
     get_artifacts_func: GetArtifactsFunc 
 ) -> None:
-    # ... (Content from message_handlers_py_extended, unchanged) ...
+    # ... (Content from previous version, unchanged) ...
     logger.info(f"[{session_id}] Received 'new_task' signal. Clearing context.")
     
     session_data_entry['cancellation_requested'] = False
@@ -600,7 +594,6 @@ async def process_delete_task(
     db_delete_task_func: DBDeleteTaskFunc, 
     get_artifacts_func: GetArtifactsFunc 
 ) -> None:
-    # ... (Content from message_handlers_py_extended, unchanged) ...
     task_id_to_delete = data.get("taskId")
     if not task_id_to_delete:
         logger.warning(f"[{session_id}] 'delete_task' message missing taskId.")
@@ -612,20 +605,31 @@ async def process_delete_task(
     
     deleted_from_db = await db_delete_task_func(task_id_to_delete)
     
+    workspace_deletion_successful = False
     if deleted_from_db:
-        await add_monitor_log_func(f"Task {task_id_to_delete} deleted successfully from DB.", "system_delete_success")
+        await add_monitor_log_func(f"Task {task_id_to_delete} DB entries deleted successfully.", "system_delete_success")
         task_workspace_to_delete: Optional[Path] = None
         try:
-            task_workspace_to_delete = get_task_workspace_path(task_id_to_delete, create=False)
-            if task_workspace_to_delete.exists() and task_workspace_to_delete.is_relative_to(BASE_WORKSPACE_ROOT.resolve()):
-                await asyncio.to_thread(shutil.rmtree, task_workspace_to_delete) 
-                logger.info(f"[{session_id}] Successfully deleted workspace directory: {task_workspace_to_delete}")
-                await add_monitor_log_func(f"Workspace directory deleted: {task_workspace_to_delete.name}", "system_delete_success")
+            # MODIFIED: Removed create=False as it's not a valid param for the original get_task_workspace_path
+            task_workspace_to_delete = get_task_workspace_path(task_id_to_delete)
+            if task_workspace_to_delete.exists(): # Check if it exists before trying to delete
+                if task_workspace_to_delete.is_relative_to(BASE_WORKSPACE_ROOT.resolve()):
+                    logger.info(f"[{session_id}] Attempting to delete workspace directory: {task_workspace_to_delete}")
+                    await asyncio.to_thread(shutil.rmtree, task_workspace_to_delete) 
+                    logger.info(f"[{session_id}] Successfully deleted workspace directory: {task_workspace_to_delete}")
+                    await add_monitor_log_func(f"Workspace directory deleted: {task_workspace_to_delete.name}", "system_delete_success")
+                    workspace_deletion_successful = True
+                else:
+                    logger.warning(f"[{session_id}] Workspace directory {task_workspace_to_delete} is not relative to base workspace. Deletion skipped for security.")
+                    await add_monitor_log_func(f"Workspace directory {task_workspace_to_delete.name} deletion skipped (security check).", "warning_system")
             else:
-                logger.warning(f"[{session_id}] Workspace directory not found or invalid for deletion: {task_workspace_to_delete}")
+                logger.info(f"[{session_id}] Workspace directory not found for task {task_id_to_delete}, no deletion needed: {task_workspace_to_delete}")
+                await add_monitor_log_func(f"Workspace for task {task_id_to_delete} not found. No directory to delete.", "system_info")
+                workspace_deletion_successful = True 
         except Exception as ws_del_e:
-            logger.error(f"[{session_id}] Error deleting workspace directory {task_workspace_to_delete}: {ws_del_e}")
-            await add_monitor_log_func(f"Error deleting workspace directory: {ws_del_e}", "error_delete")
+            logger.error(f"[{session_id}] Error during workspace directory deletion for task {task_id_to_delete} (path: {task_workspace_to_delete}): {ws_del_e}", exc_info=True)
+            await add_monitor_log_func(f"Error deleting workspace directory for task {task_id_to_delete}: {str(ws_del_e)}", "error_delete")
+            await send_ws_message_func("status_message", f"Task DB deleted, but workspace folder for {task_id_to_delete[:8]} failed to delete.")
         
         if session_data_entry.get("current_task_id") == task_id_to_delete:
             session_data_entry['cancellation_requested'] = False
@@ -646,7 +650,7 @@ async def process_delete_task(
             await add_monitor_log_func("Cleared context as active task was deleted.", "system_context_clear")
             await send_ws_message_func("update_artifacts", [])
     else:
-        await send_ws_message_func("status_message", f"Failed to delete task {task_id_to_delete[:8]}...")
+        await send_ws_message_func("status_message", f"Failed to delete task {task_id_to_delete[:8]} from database.")
         await add_monitor_log_func(f"Failed to delete task {task_id_to_delete} from DB.", "error_delete")
 
 
@@ -659,7 +663,7 @@ async def process_rename_task(
     add_monitor_log_func: AddMonitorLogFunc,
     db_rename_task_func: DBRenameTaskFunc 
 ) -> None:
-    # ... (Content from message_handlers_py_extended, unchanged) ...
+    # ... (Content from previous version, unchanged) ...
     task_id_to_rename = data.get("taskId")
     new_name = data.get("newName")
 
@@ -681,23 +685,20 @@ async def process_rename_task(
         await add_monitor_log_func(f"Failed to rename task {task_id_to_rename} in DB.", "error_db")
 
 # --- Handlers for remaining message types ---
-
+# ... (Content from message_handlers_py_final, unchanged) ...
 async def process_set_llm(
     session_id: str,
     data: Dict[str, Any], # Contains llm_id
     session_data_entry: Dict[str, Any],
-    connected_clients_entry: Dict[str, Any], # Not used
-    send_ws_message_func: SendWSMessageFunc, # Not used
+    connected_clients_entry: Dict[str, Any], 
+    send_ws_message_func: SendWSMessageFunc, 
     add_monitor_log_func: AddMonitorLogFunc
 ) -> None:
-    """Handles the 'set_llm' message from the client."""
     llm_id = data.get("llm_id")
     if llm_id and isinstance(llm_id, str):
         try:
             provider, model_name_from_id = llm_id.split("::", 1)
             is_valid = False
-            # Validate against the UI available models, not the role-specific ones here,
-            # as this reflects the user's direct selection for the Executor role.
             if provider == 'gemini' and model_name_from_id in settings.gemini_available_models:
                 is_valid = True
             elif provider == 'ollama' and model_name_from_id in settings.ollama_available_models:
@@ -719,29 +720,27 @@ async def process_set_llm(
 
 async def process_get_available_models(
     session_id: str,
-    data: Dict[str, Any], # Not used
-    session_data_entry: Dict[str, Any], # Not used
-    connected_clients_entry: Dict[str, Any], # Not used
+    data: Dict[str, Any], 
+    session_data_entry: Dict[str, Any], 
+    connected_clients_entry: Dict[str, Any], 
     send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc 
 ) -> None:
-    """Handles the 'get_available_models' request from the client."""
     logger.info(f"[{session_id}] Received request for available models.")
     await send_ws_message_func("available_models", {
         "gemini": settings.gemini_available_models,
         "ollama": settings.ollama_available_models,
-        "default_llm_id": settings.default_llm_id # This is the overall system default
+        "default_llm_id": settings.default_llm_id 
     })
 
 async def process_cancel_agent(
     session_id: str,
-    data: Dict[str, Any], # Not used
+    data: Dict[str, Any], 
     session_data_entry: Dict[str, Any],
     connected_clients_entry: Dict[str, Any],
     send_ws_message_func: SendWSMessageFunc, 
     add_monitor_log_func: AddMonitorLogFunc 
 ) -> None:
-    """Handles the 'cancel_agent' message from the client."""
     logger.warning(f"[{session_id}] Received request to cancel current operation.")
     session_data_entry['cancellation_requested'] = True
     logger.info(f"[{session_id}] Cancellation requested flag set to True.")
@@ -750,20 +749,18 @@ async def process_cancel_agent(
     if agent_task_to_cancel and not agent_task_to_cancel.done():
         agent_task_to_cancel.cancel() 
         logger.info(f"[{session_id}] asyncio.Task.cancel() called for active task.")
-        # UI status update is typically handled by the agent/plan loop detecting cancellation
     else:
-        logger.info(f"[{session_id}] No active asyncio task found to cancel, or task already done. Flag will be checked by callbacks/plan loop.")
+        logger.info(f"[{session_id}] No active asyncio task found to cancel, or task already done.")
 
 async def process_get_artifacts_for_task(
     session_id: str,
-    data: Dict[str, Any], # Contains taskId
+    data: Dict[str, Any], 
     session_data_entry: Dict[str, Any],
-    connected_clients_entry: Dict[str, Any], # Not used
+    connected_clients_entry: Dict[str, Any], 
     send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc, 
     get_artifacts_func: GetArtifactsFunc
 ) -> None:
-    """Handles the 'get_artifacts_for_task' request from the client."""
     task_id_to_refresh = data.get("taskId")
     if not task_id_to_refresh:
         logger.warning(f"[{session_id}] Received get_artifacts_for_task without taskId.")
@@ -780,7 +777,7 @@ async def process_get_artifacts_for_task(
 
 async def process_run_command(
     session_id: str,
-    data: Dict[str, Any], # Contains command
+    data: Dict[str, Any], 
     session_data_entry: Dict[str, Any],
     connected_clients_entry: Dict[str, Any], 
     send_ws_message_func: SendWSMessageFunc,
@@ -788,12 +785,11 @@ async def process_run_command(
     db_add_message_func: DBAddMessageFunc, 
     execute_shell_command_func: ExecuteShellCommandFunc 
 ) -> None:
-    """Handles the 'run_command' message from the client."""
     command_to_run = data.get("command")
     if command_to_run and isinstance(command_to_run, str):
         active_task_id_for_cmd = session_data_entry.get("current_task_id")
         await add_monitor_log_func(f"Received direct 'run_command'. Executing: {command_to_run} (Task Context: {active_task_id_for_cmd})", "system_direct_cmd")
-        await execute_shell_command_func( # Call the passed function
+        await execute_shell_command_func( 
             command_to_run, 
             session_id, 
             send_ws_message_func, 
@@ -806,16 +802,16 @@ async def process_run_command(
 
 async def process_action_command(
     session_id: str,
-    data: Dict[str, Any], # Contains command
+    data: Dict[str, Any], 
     session_data_entry: Dict[str, Any], 
     connected_clients_entry: Dict[str, Any], 
     send_ws_message_func: SendWSMessageFunc, 
     add_monitor_log_func: AddMonitorLogFunc
 ) -> None:
-    """Handles placeholder 'action_command' messages."""
     action = data.get("command")
     if action and isinstance(action, str):
         logger.info(f"[{session_id}] Received action command: {action} (Not implemented).")
         await add_monitor_log_func(f"Received action command: {action} (Handler not implemented).", "system_action_cmd")
     else:
         logger.warning(f"[{session_id}] Received 'action_command' with invalid/missing command content.")
+
