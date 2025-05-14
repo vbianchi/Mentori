@@ -3,21 +3,22 @@ import json
 import datetime
 from typing import Dict, Any, Callable, Coroutine, Optional, List
 import asyncio
-import shutil # For deleting workspace directories
+import shutil 
 
 # LangChain Imports
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_core.runnables import RunnableConfig # For execute_confirmed_plan
+from langchain_core.runnables import RunnableConfig 
 
 # Project Imports
 from backend.config import settings
 from backend.llm_setup import get_llm
-from backend.tools import get_dynamic_tools, get_task_workspace_path, BASE_WORKSPACE_ROOT # Added BASE_WORKSPACE_ROOT
+from backend.tools import get_dynamic_tools, get_task_workspace_path, BASE_WORKSPACE_ROOT
 from backend.planner import generate_plan, PlanStep
 from backend.controller import validate_and_prepare_step_action
-from backend.agent import create_agent_executor # For execute_confirmed_plan
-from backend.callbacks import AgentCancelledException # For execute_confirmed_plan
+from backend.agent import create_agent_executor
+from backend.callbacks import AgentCancelledException
+from backend.intent_classifier import classify_intent # MODIFIED: Import classify_intent
 
 logger = logging.getLogger(__name__)
 
@@ -27,8 +28,8 @@ AddMonitorLogFunc = Callable[[str, str], Coroutine[Any, Any, None]]
 DBAddMessageFunc = Callable[[str, str, str, str], Coroutine[Any, Any, None]]
 DBAddTaskFunc = Callable[[str, str, str], Coroutine[Any, Any, None]]
 DBGetMessagesFunc = Callable[[str], Coroutine[Any, Any, List[Dict[str, Any]]]]
-DBDeleteTaskFunc = Callable[[str], Coroutine[Any, Any, bool]] # For delete_task
-DBRenameTaskFunc = Callable[[str, str], Coroutine[Any, Any, bool]] # For rename_task
+DBDeleteTaskFunc = Callable[[str], Coroutine[Any, Any, bool]] 
+DBRenameTaskFunc = Callable[[str, str], Coroutine[Any, Any, bool]] 
 GetArtifactsFunc = Callable[[str], Coroutine[Any, Any, List[Dict[str, str]]]]
 
 
@@ -44,7 +45,7 @@ async def process_context_switch(
     db_get_messages_func: DBGetMessagesFunc,
     get_artifacts_func: GetArtifactsFunc
 ) -> None:
-    # ... (Content from message_handlers_py_asyncio_fix, unchanged) ...
+    # ... (Content from message_handlers_py_extended, unchanged) ...
     task_id_from_frontend = data.get("taskId")
     task_title_from_frontend = data.get("task")
 
@@ -154,7 +155,7 @@ async def process_user_message(
     add_monitor_log_func: AddMonitorLogFunc,
     db_add_message_func: DBAddMessageFunc 
 ) -> None:
-    # ... (Content from message_handlers_py_asyncio_fix, unchanged) ...
+    """Handles the 'user_message' from the client, performs intent classification, and then either plans or executes directly."""
     user_input_content = ""
     content_payload = data.get("content")
     if isinstance(content_payload, str):
@@ -180,67 +181,147 @@ async def process_user_message(
     await db_add_message_func(active_task_id, session_id, "user_input", user_input_content)
     await add_monitor_log_func(f"User Input: {user_input_content}", "monitor_user_input")
     
-    session_data_entry['original_user_query'] = user_input_content
+    session_data_entry['original_user_query'] = user_input_content # Store for potential later use by controller/evaluator
     session_data_entry['cancellation_requested'] = False
-    await send_ws_message_func("agent_thinking_update", {"status": "Generating plan..."})
-
+    
+    # --- Intent Classification Step ---
+    await send_ws_message_func("agent_thinking_update", {"status": "Classifying intent..."})
     selected_provider = session_data_entry.get("selected_llm_provider", settings.default_provider)
     selected_model_name = session_data_entry.get("selected_llm_model_name", settings.default_model_name)
-    planner_llm: Optional[BaseChatModel] = None
+    intent_llm: Optional[BaseChatModel] = None
     try:
         llm_instance = get_llm(settings, provider=selected_provider, model_name=selected_model_name)
         if not isinstance(llm_instance, BaseChatModel):
-                logger.warning(f"LLM for planner is not BaseChatModel, it's {type(llm_instance)}. This might cause issues if planner expects chat-specific features.")
-        planner_llm = llm_instance # type: ignore
+            logger.warning(f"LLM for intent classification is not BaseChatModel, it's {type(llm_instance)}.")
+        intent_llm = llm_instance # type: ignore
     except Exception as llm_init_err:
-        logger.error(f"[{session_id}] Failed to initialize LLM for planner: {llm_init_err}", exc_info=True)
-        await add_monitor_log_func(f"Error initializing LLM for planner: {llm_init_err}", "error_system")
-        await send_ws_message_func("status_message", "Error: Failed to prepare for planning.")
-        await send_ws_message_func("agent_message", f"Sorry, could not initialize the planning module.")
-        return 
+        logger.error(f"[{session_id}] Failed to initialize LLM for intent classification: {llm_init_err}", exc_info=True)
+        await add_monitor_log_func(f"Error initializing LLM for intent classification: {llm_init_err}", "error_system")
+        await send_ws_message_func("status_message", "Error: Failed to prepare for intent classification.")
+        await send_ws_message_func("agent_message", "Sorry, I couldn't figure out how to approach your request.")
+        await send_ws_message_func("agent_thinking_update", {"status": "Intent classification failed."})
+        return
+
+    dynamic_tools = get_dynamic_tools(active_task_id)
+    tools_summary_for_intent = "\n".join([f"- {tool.name}: {tool.description.split('.')[0]}" for tool in dynamic_tools])
     
-    dynamic_tools = get_dynamic_tools(active_task_id) 
-    tools_summary_for_planner = "\n".join([f"- {tool.name}: {tool.description.split('.')[0]}" for tool in dynamic_tools])
+    classified_intent = await classify_intent(user_input_content, intent_llm, tools_summary_for_intent)
+    await add_monitor_log_func(f"Intent classified as: {classified_intent}", "system_intent_classified")
 
-    human_plan_summary, structured_plan_steps = await generate_plan(
-        user_query=user_input_content,
-        llm=planner_llm, # type: ignore
-        available_tools_summary=tools_summary_for_planner
-    )
+    if classified_intent == "PLAN":
+        await send_ws_message_func("agent_thinking_update", {"status": "Generating plan..."})
+        # Use the same LLM instance for the planner for now, or re-initialize if different settings are needed
+        planner_llm = intent_llm 
+        
+        human_plan_summary, structured_plan_steps = await generate_plan(
+            user_query=user_input_content,
+            llm=planner_llm, # type: ignore
+            available_tools_summary=tools_summary_for_intent # Re-use tools summary
+        )
 
-    if human_plan_summary and structured_plan_steps:
-        session_data_entry["current_plan_human_summary"] = human_plan_summary
-        session_data_entry["current_plan_structured"] = structured_plan_steps 
-        session_data_entry["current_plan_step_index"] = 0 
-        session_data_entry["plan_execution_active"] = False 
+        if human_plan_summary and structured_plan_steps:
+            session_data_entry["current_plan_human_summary"] = human_plan_summary
+            session_data_entry["current_plan_structured"] = structured_plan_steps 
+            session_data_entry["current_plan_step_index"] = 0 
+            session_data_entry["plan_execution_active"] = False 
 
-        await send_ws_message_func("display_plan_for_confirmation", {
-            "human_summary": human_plan_summary,
-            "structured_plan": structured_plan_steps 
-        })
-        await add_monitor_log_func(f"Plan generated. Summary: {human_plan_summary}. Steps: {len(structured_plan_steps)}. Awaiting user confirmation.", "system_plan_generated")
-        await send_ws_message_func("status_message", "Plan generated. Please review and confirm.")
-        await send_ws_message_func("agent_thinking_update", {"status": "Awaiting plan confirmation..."})
-    else:
-        logger.error(f"[{session_id}] Failed to generate a plan for query: {user_input_content}")
-        await add_monitor_log_func(f"Error: Failed to generate a plan.", "error_system")
-        await send_ws_message_func("status_message", "Error: Could not generate a plan for your request.")
-        await send_ws_message_func("agent_message", "I'm sorry, I couldn't create a plan for that request. Please try rephrasing or breaking it down.")
-        await send_ws_message_func("agent_thinking_update", {"status": "Planning failed."})
+            await send_ws_message_func("display_plan_for_confirmation", {
+                "human_summary": human_plan_summary,
+                "structured_plan": structured_plan_steps 
+            })
+            await add_monitor_log_func(f"Plan generated. Summary: {human_plan_summary}. Steps: {len(structured_plan_steps)}. Awaiting user confirmation.", "system_plan_generated")
+            await send_ws_message_func("status_message", "Plan generated. Please review and confirm.")
+            await send_ws_message_func("agent_thinking_update", {"status": "Awaiting plan confirmation..."})
+        else:
+            logger.error(f"[{session_id}] Failed to generate a plan for query: {user_input_content}")
+            await add_monitor_log_func(f"Error: Failed to generate a plan.", "error_system")
+            await send_ws_message_func("status_message", "Error: Could not generate a plan for your request.")
+            await send_ws_message_func("agent_message", "I'm sorry, I couldn't create a plan for that request. Please try rephrasing or breaking it down.")
+            await send_ws_message_func("agent_thinking_update", {"status": "Planning failed."})
+
+    elif classified_intent == "DIRECT_QA":
+        await send_ws_message_func("agent_thinking_update", {"status": "Processing directly..."})
+        await add_monitor_log_func(f"Handling as DIRECT_QA. Invoking ReAct agent.", "system_direct_qa")
+
+        # Directly invoke the ReAct agent (Executor)
+        direct_qa_llm = intent_llm # Use the same LLM for now
+        direct_qa_memory = session_data_entry["memory"]
+        direct_qa_callback_handler = session_data_entry["callback_handler"]
+        
+        try:
+            agent_executor_direct = create_agent_executor(
+                llm=direct_qa_llm, # type: ignore
+                tools=dynamic_tools, # Provide tools even for direct QA
+                memory=direct_qa_memory,
+                max_iterations=settings.agent_max_iterations # Or a smaller number for direct QA
+            )
+            
+            logger.info(f"[{session_id}] Invoking AgentExecutor directly for QA with input: '{user_input_content[:100]}...'")
+            
+            direct_qa_task = asyncio.create_task(
+                agent_executor_direct.ainvoke(
+                    {"input": user_input_content},
+                    config=RunnableConfig(callbacks=[direct_qa_callback_handler])
+                )
+            )
+            connected_clients_entry["agent_task"] = direct_qa_task
+            
+            await direct_qa_task # Wait for the direct answer to complete
+
+        except AgentCancelledException:
+            logger.warning(f"[{session_id}] Direct QA execution cancelled by user.")
+            await send_ws_message_func("status_message", "Direct QA cancelled.")
+            await add_monitor_log_func("Direct QA cancelled by user.", "system_cancel")
+        except Exception as e:
+            logger.error(f"[{session_id}] Error during direct QA execution: {e}", exc_info=True)
+            await add_monitor_log_func(f"Error during direct QA: {e}", "error_direct_qa")
+            await send_ws_message_func("agent_message", f"Sorry, I encountered an error trying to answer directly: {e}")
+            await send_ws_message_func("status_message", "Error during direct processing.")
+        finally:
+            connected_clients_entry["agent_task"] = None # Clear the task
+            await send_ws_message_func("agent_thinking_update", {"status": "Idle."}) # Reset thinking status
+
+    else: # Should not happen if classify_intent defaults to "PLAN"
+        logger.error(f"[{session_id}] Unknown intent classified: {classified_intent}. Defaulting to planning.")
+        await add_monitor_log_func(f"Error: Unknown intent '{classified_intent}'. Defaulting to PLAN.", "error_system")
+        # Fallback to planning (code is similar to PLAN block above, could be refactored)
+        await send_ws_message_func("agent_thinking_update", {"status": "Generating plan (fallback)..."})
+        planner_llm = intent_llm
+        human_plan_summary, structured_plan_steps = await generate_plan(
+            user_query=user_input_content, llm=planner_llm, available_tools_summary=tools_summary_for_intent
+        )
+        if human_plan_summary and structured_plan_steps:
+            # ... (same logic as in PLAN block for sending plan to UI) ...
+            session_data_entry["current_plan_human_summary"] = human_plan_summary
+            session_data_entry["current_plan_structured"] = structured_plan_steps
+            session_data_entry["current_plan_step_index"] = 0
+            session_data_entry["plan_execution_active"] = False
+            await send_ws_message_func("display_plan_for_confirmation", {
+                "human_summary": human_plan_summary,
+                "structured_plan": structured_plan_steps
+            })
+            await add_monitor_log_func(f"Plan generated (fallback). Summary: {human_plan_summary}. Steps: {len(structured_plan_steps)}. Awaiting user confirmation.", "system_plan_generated")
+            await send_ws_message_func("status_message", "Plan generated. Please review and confirm.")
+            await send_ws_message_func("agent_thinking_update", {"status": "Awaiting plan confirmation..."})
+        else:
+            # ... (same error handling as in PLAN block) ...
+            logger.error(f"[{session_id}] Failed to generate a plan (fallback) for query: {user_input_content}")
+            await add_monitor_log_func(f"Error: Failed to generate a plan (fallback).", "error_system")
+            await send_ws_message_func("status_message", "Error: Could not generate a plan for your request (fallback).")
+            await send_ws_message_func("agent_message", "I'm sorry, I couldn't create a plan for that request. Please try rephrasing or breaking it down.")
+            await send_ws_message_func("agent_thinking_update", {"status": "Planning failed."})
+
 
 
 async def process_execute_confirmed_plan(
     session_id: str,
-    data: Dict[str, Any], # Contains confirmed_plan
+    data: Dict[str, Any], 
     session_data_entry: Dict[str, Any],
     connected_clients_entry: Dict[str, Any],
     send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc
-    # Note: db_add_message_func is implicitly available via add_monitor_log_func's closure
-    # or could be passed explicitly if add_monitor_log_func doesn't save all desired message types.
-    # For now, assuming add_monitor_log_func handles DB saving for its logs.
 ) -> None:
-    """Handles the 'execute_confirmed_plan' message from the client."""
+    # ... (Content from message_handlers_py_extended, unchanged) ...
     logger.info(f"[{session_id}] Received 'execute_confirmed_plan'.")
     active_task_id = session_data_entry.get("current_task_id")
     if not active_task_id:
@@ -263,7 +344,7 @@ async def process_execute_confirmed_plan(
     await send_ws_message_func("status_message", "Plan confirmed. Executing steps...")
     
     plan_failed = False
-    final_overall_answer = "Plan execution completed." # Default
+    final_overall_answer = "Plan execution completed." 
 
     original_user_query = session_data_entry.get("original_user_query", "No original query context available.")
     if not original_user_query:
@@ -311,7 +392,7 @@ async def process_execute_confirmed_plan(
 
         await add_monitor_log_func(f"Controller Output (Step {i+1}): Tool='{validated_tool_name}', Input='{str(formulated_tool_input)[:100]}...', Confidence={controller_confidence:.2f}. Reasoning: {controller_message}", "system_controller_output")
 
-        if controller_confidence < 0.7: # Example threshold
+        if controller_confidence < 0.7: 
             await add_monitor_log_func(f"Warning: Controller confidence for step {i+1} is low ({controller_confidence:.2f}). Proceeding with caution.", "warning_controller")
         
         if validated_tool_name is None and "Error in Controller" in controller_message:
@@ -403,7 +484,7 @@ async def process_execute_confirmed_plan(
         final_overall_answer = "Plan execution stopped due to error or cancellation."
         await send_ws_message_func("agent_thinking_update", {"status": "Plan stopped."})
     else:
-        final_overall_answer = "All plan steps executed." # TODO: Evaluator call
+        final_overall_answer = "All plan steps executed." 
         await send_ws_message_func("agent_thinking_update", {"status": "Plan executed."})
         logger.info(f"[{session_id}] Successfully executed all {len(confirmed_plan_steps_dicts)} plan steps.")
     
@@ -414,14 +495,14 @@ async def process_execute_confirmed_plan(
 
 async def process_new_task(
     session_id: str,
-    data: Dict[str, Any], # Not strictly used by this handler, but kept for consistency
+    data: Dict[str, Any], 
     session_data_entry: Dict[str, Any],
     connected_clients_entry: Dict[str, Any],
     send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc,
-    get_artifacts_func: GetArtifactsFunc # For sending empty artifact list
+    get_artifacts_func: GetArtifactsFunc 
 ) -> None:
-    """Handles the 'new_task' signal from the client."""
+    # ... (Content from message_handlers_py_extended, unchanged) ...
     logger.info(f"[{session_id}] Received 'new_task' signal. Clearing context.")
     
     session_data_entry['cancellation_requested'] = False
@@ -439,27 +520,27 @@ async def process_new_task(
         await add_monitor_log_func("Agent/Plan operation cancelled due to new task creation.", "system_cancel")
         connected_clients_entry["agent_task"] = None
     
-    session_data_entry["current_task_id"] = None # Signal that no task is active
+    session_data_entry["current_task_id"] = None 
     if "callback_handler" in session_data_entry:
         session_data_entry["callback_handler"].set_task_id(None)
     if "memory" in session_data_entry:
         session_data_entry["memory"].clear()
     
     await add_monitor_log_func("Cleared context for new task.", "system_new_task")
-    await send_ws_message_func("update_artifacts", []) # Send empty artifact list
+    await send_ws_message_func("update_artifacts", []) 
 
 
 async def process_delete_task(
     session_id: str,
-    data: Dict[str, Any], # Contains task_id_from_frontend
+    data: Dict[str, Any], 
     session_data_entry: Dict[str, Any],
     connected_clients_entry: Dict[str, Any],
     send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc,
-    db_delete_task_func: DBDeleteTaskFunc, # Specific DB function
-    get_artifacts_func: GetArtifactsFunc # For sending empty artifact list if active task deleted
+    db_delete_task_func: DBDeleteTaskFunc, 
+    get_artifacts_func: GetArtifactsFunc 
 ) -> None:
-    """Handles the 'delete_task' message from the client."""
+    # ... (Content from message_handlers_py_extended, unchanged) ...
     task_id_to_delete = data.get("taskId")
     if not task_id_to_delete:
         logger.warning(f"[{session_id}] 'delete_task' message missing taskId.")
@@ -477,7 +558,7 @@ async def process_delete_task(
         try:
             task_workspace_to_delete = get_task_workspace_path(task_id_to_delete, create=False)
             if task_workspace_to_delete.exists() and task_workspace_to_delete.is_relative_to(BASE_WORKSPACE_ROOT.resolve()):
-                await asyncio.to_thread(shutil.rmtree, task_workspace_to_delete) # Run blocking shutil.rmtree in a thread
+                await asyncio.to_thread(shutil.rmtree, task_workspace_to_delete) 
                 logger.info(f"[{session_id}] Successfully deleted workspace directory: {task_workspace_to_delete}")
                 await add_monitor_log_func(f"Workspace directory deleted: {task_workspace_to_delete.name}", "system_delete_success")
             else:
@@ -486,7 +567,6 @@ async def process_delete_task(
             logger.error(f"[{session_id}] Error deleting workspace directory {task_workspace_to_delete}: {ws_del_e}")
             await add_monitor_log_func(f"Error deleting workspace directory: {ws_del_e}", "error_delete")
         
-        # If the deleted task was the active one for this session, clear context
         if session_data_entry.get("current_task_id") == task_id_to_delete:
             session_data_entry['cancellation_requested'] = False
             session_data_entry['current_plan_structured'] = None
@@ -512,14 +592,14 @@ async def process_delete_task(
 
 async def process_rename_task(
     session_id: str,
-    data: Dict[str, Any], # Contains taskId, newName
-    session_data_entry: Dict[str, Any], # Not directly used but passed for consistency
-    connected_clients_entry: Dict[str, Any], # Not directly used
-    send_ws_message_func: SendWSMessageFunc, # Not directly used
+    data: Dict[str, Any], 
+    session_data_entry: Dict[str, Any], 
+    connected_clients_entry: Dict[str, Any], 
+    send_ws_message_func: SendWSMessageFunc, 
     add_monitor_log_func: AddMonitorLogFunc,
-    db_rename_task_func: DBRenameTaskFunc # Specific DB function
+    db_rename_task_func: DBRenameTaskFunc 
 ) -> None:
-    """Handles the 'rename_task' message from the client."""
+    # ... (Content from message_handlers_py_extended, unchanged) ...
     task_id_to_rename = data.get("taskId")
     new_name = data.get("newName")
 
