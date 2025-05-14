@@ -4,7 +4,8 @@ import datetime
 from typing import Dict, Any, Callable, Coroutine, Optional, List
 import asyncio
 import shutil 
-from pathlib import Path # Ensure Path is imported
+from pathlib import Path # Ensure Path is imported for file operations
+import aiofiles # For async file writing
 
 # LangChain Imports
 from langchain_core.messages import AIMessage, HumanMessage
@@ -48,7 +49,7 @@ async def process_context_switch(
     db_get_messages_func: DBGetMessagesFunc,
     get_artifacts_func: GetArtifactsFunc
 ) -> None:
-    # ... (Content from previous version, unchanged) ...
+    # ... (Content from message_handlers_py_evaluator_integration, unchanged) ...
     task_id_from_frontend = data.get("taskId")
     task_title_from_frontend = data.get("task")
 
@@ -316,8 +317,10 @@ async def process_execute_confirmed_plan(
     connected_clients_entry: Dict[str, Any],
     send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc
+    # MODIFIED: Added get_artifacts_func for triggering refresh after saving plan
+    # get_artifacts_func: GetArtifactsFunc 
+    # Actually, send_ws_message_func("trigger_artifact_refresh", ...) is sufficient
 ) -> None:
-    # ... (Content from previous version, unchanged) ...
     logger.info(f"[{session_id}] Received 'execute_confirmed_plan'.")
     active_task_id = session_data_entry.get("current_task_id")
     if not active_task_id:
@@ -339,6 +342,32 @@ async def process_execute_confirmed_plan(
     await add_monitor_log_func(f"User confirmed plan. Starting execution of {len(confirmed_plan_steps_dicts)} steps.", "system_plan_confirmed")
     await send_ws_message_func("status_message", "Plan confirmed. Executing steps...")
     
+    # --- MODIFIED: Save plan to a file ---
+    plan_filename = "_plan.md"
+    plan_markdown_content = [f"# Agent Plan for Task: {active_task_id}\n"]
+    plan_markdown_content.append(f"## Original User Query:\n{session_data_entry.get('original_user_query', 'N/A')}\n")
+    plan_markdown_content.append(f"## Plan Summary:\n{session_data_entry.get('current_plan_human_summary', 'N/A')}\n")
+    plan_markdown_content.append("## Steps:\n")
+    for i, step_data in enumerate(confirmed_plan_steps_dicts):
+        plan_markdown_content.append(f"{i+1}. `[ ]` **{step_data.get('description', 'N/A')}**")
+        plan_markdown_content.append(f"    - Tool Suggestion: `{step_data.get('tool_to_use', 'None')}`")
+        plan_markdown_content.append(f"    - Input Instructions: `{step_data.get('tool_input_instructions', 'None')}`")
+        plan_markdown_content.append(f"    - Expected Outcome: `{step_data.get('expected_outcome', 'N/A')}`\n")
+    
+    try:
+        task_workspace_path = get_task_workspace_path(active_task_id)
+        plan_file_path = task_workspace_path / plan_filename
+        async with aiofiles.open(plan_file_path, 'w', encoding='utf-8') as f:
+            await f.write("\n".join(plan_markdown_content))
+        logger.info(f"[{session_id}] Saved confirmed plan to {plan_file_path}")
+        await add_monitor_log_func(f"Confirmed plan saved to artifact: {plan_filename}", "system_info")
+        # Trigger artifact refresh in UI
+        await send_ws_message_func("trigger_artifact_refresh", {"taskId": active_task_id})
+    except Exception as e:
+        logger.error(f"[{session_id}] Failed to save plan to file: {e}", exc_info=True)
+        await add_monitor_log_func(f"Error saving plan to file: {e}", "error_system")
+    # --- END MODIFIED ---
+
     plan_failed = False
     preliminary_final_answer = "Plan execution completed." 
     step_execution_details_list = [] 
@@ -610,9 +639,9 @@ async def process_delete_task(
         await add_monitor_log_func(f"Task {task_id_to_delete} DB entries deleted successfully.", "system_delete_success")
         task_workspace_to_delete: Optional[Path] = None
         try:
-            # MODIFIED: Removed create=False as it's not a valid param for the original get_task_workspace_path
+            # MODIFIED: Removed create=False
             task_workspace_to_delete = get_task_workspace_path(task_id_to_delete)
-            if task_workspace_to_delete.exists(): # Check if it exists before trying to delete
+            if task_workspace_to_delete.exists(): 
                 if task_workspace_to_delete.is_relative_to(BASE_WORKSPACE_ROOT.resolve()):
                     logger.info(f"[{session_id}] Attempting to delete workspace directory: {task_workspace_to_delete}")
                     await asyncio.to_thread(shutil.rmtree, task_workspace_to_delete) 
@@ -684,7 +713,7 @@ async def process_rename_task(
         logger.error(f"[{session_id}] Failed to rename task {task_id_to_rename} in database.")
         await add_monitor_log_func(f"Failed to rename task {task_id_to_rename} in DB.", "error_db")
 
-# --- Handlers for remaining message types ---
+# --- MODIFIED: Added remaining handlers from server.py ---
 # ... (Content from message_handlers_py_final, unchanged) ...
 async def process_set_llm(
     session_id: str,
@@ -814,4 +843,3 @@ async def process_action_command(
         await add_monitor_log_func(f"Received action command: {action} (Handler not implemented).", "system_action_cmd")
     else:
         logger.warning(f"[{session_id}] Received 'action_command' with invalid/missing command content.")
-
