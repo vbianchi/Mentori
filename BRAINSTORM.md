@@ -3,11 +3,11 @@ Current Complex Task Flow (v2.1 Baseline)
 
 The current process for handling a complex task, once classified as "PLAN" intent, generally follows these stages:
 
-1.  **User Input:** User provides a complex query.
+1.  User Input: User provides a complex query.
 
-2.  **Intent Classifier:** Classifies the query. If "PLAN", proceeds.
+2.  Intent Classifier: Classifies the query. If "PLAN", proceeds.
 
-3.  **Planner:**
+3.  Planner:
 
     -   Takes the user query and a summary of available tools.
 
@@ -15,17 +15,17 @@ The current process for handling a complex task, once classified as "PLAN" inten
 
     -   Presents a human-readable summary and the structured plan to the user via the UI.
 
-4.  **User Confirmation (UI):**
+4.  User Confirmation (UI):
 
     -   User reviews the plan (summary and details).
 
     -   User clicks "Confirm & Run Plan" or "Cancel Plan". (Currently no modification options).
 
-5.  **Execution Loop (Backend - `message_handlers.process_execute_confirmed_plan`):**
+5.  Execution Loop (Backend - `message_handlers.process_execute_confirmed_plan`):
 
     -   Iterates through each step from the confirmed plan.
 
-    -   **Controller/Validator (`controller.validate_and_prepare_step_action`):**
+    -   Controller/Validator (`controller.validate_and_prepare_step_action`):
 
         -   Receives the current `PlanStep`, original user query, available tools, and an LLM.
 
@@ -35,7 +35,7 @@ The current process for handling a complex task, once classified as "PLAN" inten
 
         -   Logs its decision and confidence.
 
-    -   **Executor (`agent.create_agent_executor` - ReAct agent):**
+    -   Executor (`agent.create_agent_executor` - ReAct agent):
 
         -   Receives a directive prompt based on the Controller's output (e.g., "Use tool X with input Y" or "Answer directly based on description Z").
 
@@ -47,7 +47,7 @@ The current process for handling a complex task, once classified as "PLAN" inten
 
     -   The loop continues to the next step unless a step fails critically or the plan is cancelled.
 
-6.  **Evaluator (Overall Plan - `evaluator.evaluate_plan_outcome`):**
+6.  Evaluator (Overall Plan - `evaluator.evaluate_plan_outcome`):
 
     -   Called after the execution loop finishes (all steps attempted or plan halted).
 
@@ -76,33 +76,53 @@ Brainstorming Areas for Improvement & Further Development
 
 Here's a breakdown of potential areas to enhance the system's capabilities for complex tasks:
 
+### 0\. Role-Specific LLM Configuration (NEW - User Suggestion)
+
+-   Concept: Assign different LLM models to different agent components (Intent Classifier, Planner, Controller, Executor, Evaluator) based on the complexity and nature of their tasks.
+
+-   Benefits:
+
+    -   Optimized Capability: Use the most powerful/creative LLMs for planning, instruction-following LLMs for control, robust LLMs for evaluation, and potentially faster/cheaper LLMs for intent classification or simpler execution steps.
+
+    -   Cost Efficiency: Reserve expensive, high-tier models for tasks that absolutely require them, using more economical models for other components.
+
+    -   Resource Management & Speed: Potentially improve overall speed and reduce load on any single LLM endpoint.
+
+-   Implementation:
+
+    -   Add new `.env` configuration variables (e.g., `INTENT_CLASSIFIER_LLM_ID`, `PLANNER_LLM_ID`, `CONTROLLER_LLM_ID`, `EVALUATOR_LLM_ID`). The `EXECUTOR_LLM_ID` could default to the UI-selected LLM or also be a configurable default.
+
+    -   Update `config.py` to load these new settings.
+
+    -   Modify the points in `message_handlers.py` (and potentially `intent_classifier.py`, `planner.py`, `controller.py`, `evaluator.py` if LLM initialization is pushed down) where LLMs are initialized for each component to use these role-specific LLM IDs from the settings.
+
 ### 1\. Intent Classification & Initial Interaction
 
--   **Granular Intents:** Beyond "PLAN" vs. "DIRECT_QA", could we have more specific plan types (e.g., "RESEARCH_SYNTHESIS_PLAN", "DATA_ANALYSIS_PLAN", "CODE_GENERATION_PLAN") that might trigger different Planner prompts or default behaviors?
+-   Granular Intents: Beyond "PLAN" vs. "DIRECT_QA", could we have more specific plan types (e.g., "RESEARCH_SYNTHESIS_PLAN", "DATA_ANALYSIS_PLAN", "CODE_GENERATION_PLAN") that might trigger different Planner prompts or default behaviors?
 
--   **Confidence-Based Actions:** If intent classification confidence is low, should the agent ask the user for clarification (e.g., "Are you asking a quick question, or do you want me to perform a series of actions?")?
+-   Confidence-Based Actions: If intent classification confidence is low, should the agent ask the user for clarification (e.g., "Are you asking a quick question, or do you want me to perform a series of actions?")?
 
--   **Clarifying Questions (Pre-Planning):** If a query is deemed complex but too ambiguous, allow the Planner (or a pre-planner LLM call) to ask clarifying questions *before* attempting to generate a full plan.
+-   Clarifying Questions (Pre-Planning): If a query is deemed complex but too ambiguous, allow the Planner (or a pre-planner LLM call) to ask clarifying questions *before* attempting to generate a full plan.
 
 ### 2\. Planning Phase (Planner Component)
 
--   **Iterative Planning with User:**
+-   Iterative Planning with User:
 
     -   Instead of just confirm/reject, allow users to provide feedback on the initial plan, and have the Planner refine it.
 
     -   "This step looks good, but for step 3, can you try using X tool instead?"
 
--   **User Constraints & Preferences:** Allow users to specify constraints during the initial query or plan review (e.g., "prioritize free tools," "limit web searches to 3," "use Python for scripting").
+-   User Constraints & Preferences: Allow users to specify constraints during the initial query or plan review (e.g., "prioritize free tools," "limit web searches to 3," "use Python for scripting").
 
--   **Alternative Plans:** Could the Planner generate 2-3 high-level strategic approaches for complex tasks, allowing the user to pick one before detailed step generation?
+-   Alternative Plans: Could the Planner generate 2-3 high-level strategic approaches for complex tasks, allowing the user to pick one before detailed step generation?
 
--   **Dynamic Tool Prompting:** Improve how tools are presented to the Planner. Instead of just a summary, could it be more dynamic based on the query?
+-   Dynamic Tool Prompting: Improve how tools are presented to the Planner. Instead of just a summary, could it be more dynamic based on the query?
 
--   **Sub-Planning:** For very complex steps within a plan, the Planner (or a dedicated sub-planner) could break that step down further.
+-   Sub-Planning: For very complex steps within a plan, the Planner (or a dedicated sub-planner) could break that step down further.
 
 ### 3\. User Plan Interaction (Pre-Execution Review)
 
--   **Full Plan Editing:**
+-   Full Plan Editing:
 
     -   Allow users to directly edit step descriptions.
 
@@ -116,13 +136,13 @@ Here's a breakdown of potential areas to enhance the system's capabilities for c
 
     -   Delete steps.
 
--   **Saving/Loading Plans:** Allow users to save a (potentially modified) plan to reuse or refine later.
+-   Saving/Loading Plans: Allow users to save a (potentially modified) plan to reuse or refine later.
 
 ### 4\. Controller/Validator Enhancements
 
--   **Richer Tool Schema Use:** More deeply leverage `tool.args_schema` for validation (e.g., data types, required fields) and for guiding the LLM in formulating inputs.
+-   Richer Tool Schema Use: More deeply leverage `tool.args_schema` for validation (e.g., data types, required fields) and for guiding the LLM in formulating inputs.
 
--   **Low Confidence Handling:**
+-   Low Confidence Handling:
 
     -   If Controller's confidence for a step's action is low:
 
@@ -132,27 +152,27 @@ Here's a breakdown of potential areas to enhance the system's capabilities for c
 
         -   Trigger a "micro-replan" for just that step, asking the Planner/Controller to try an alternative.
 
--   **Resource Pre-Checks:** Where feasible, add pre-flight checks before tool execution (e.g., URL validity, file existence if not intrinsic to the tool).
+-   Resource Pre-Checks: Where feasible, add pre-flight checks before tool execution (e.g., URL validity, file existence if not intrinsic to the tool).
 
--   **Permission Gateway:** Integrate a clear permission request step here for sensitive tools (`workspace_shell`, `python_package_installer`, `Python_REPL`), even if the overall plan was approved. The request should detail the exact command/action.
+-   Permission Gateway: Integrate a clear permission request step here for sensitive tools (`workspace_shell`, `python_package_installer`, `Python_REPL`), even if the overall plan was approved. The request should detail the exact command/action.
 
 ### 5\. Executor Enhancements
 
--   **Context Management Between Steps:** How effectively is information passed from one step's output to the next step's input formulation (via Controller) or direct execution?
+-   Context Management Between Steps: How effectively is information passed from one step's output to the next step's input formulation (via Controller) or direct execution?
 
     -   Maintain a "plan scratchpad" or "step results context" that accumulates key outputs.
 
     -   Allow the Controller/Planner to explicitly reference outputs from previous steps when formulating input for future steps.
 
--   **Direct Execution Mode:** For some validated steps (e.g., a simple, safe shell command fully formulated by the Controller with high confidence), could the Executor run it directly without the full ReAct loop, for efficiency? (Requires careful security considerations).
+-   Direct Execution Mode: For some validated steps (e.g., a simple, safe shell command fully formulated by the Controller with high confidence), could the Executor run it directly without the full ReAct loop, for efficiency? (Requires careful security considerations).
 
 ### 6\. Evaluator Enhancements (Per-Step & Overall)
 
--   **Per-Step Evaluation & Correction Loop:**
+-   Per-Step Evaluation & Correction Loop:
 
     -   After each (or critical) step execution, invoke the Evaluator focused on that step's sub-goal.
 
-    -   **Automated Retry with Fixes:** If the Evaluator identifies a fixable error (e.g., minor script bug, wrong parameter), it could:
+    -   Automated Retry with Fixes: If the Evaluator identifies a fixable error (e.g., minor script bug, wrong parameter), it could:
 
         -   Provide the corrected input/script to the Controller.
 
@@ -160,46 +180,42 @@ Here's a breakdown of potential areas to enhance the system's capabilities for c
 
         -   The Executor attempts the step again.
 
-    -   **User Intervention Point:** If automated correction fails or is not confident, present the Evaluator's analysis to the user: "Step X failed. The Evaluator thinks the issue is Y and suggests Z. How would you like to proceed? (Retry with suggestion / Edit step / Skip step / Abort plan)".
+    -   User Intervention Point: If automated correction fails or is not confident, present the Evaluator's analysis to the user: "Step X failed. The Evaluator thinks the issue is Y and suggests Z. How would you like to proceed? (Retry with suggestion / Edit step / Skip step / Abort plan)".
 
--   **Sophisticated Overall Evaluation:**
+-   Sophisticated Overall Evaluation:
 
     -   More nuanced comparison of the collective outcome of all steps against the original multi-faceted user query.
 
     -   Ability to identify if all parts of the query were addressed.
 
--   **Feedback Loop to Planner:** If the overall evaluation is negative, the Evaluator's `suggestions_for_replan` should be used to:
+-   Feedback Loop to Planner: If the overall evaluation is negative, the Evaluator's `suggestions_for_replan` should be used to:
 
     -   Automatically trigger a new planning cycle with the Planner, providing the feedback as context.
 
     -   Present the suggestions to the user, asking if they want to try a new plan based on them.
 
--   **Synthesis of Results:** The Evaluator could guide a final "synthesis" step, instructing the agent (perhaps via a new plan step) to combine key findings from successful steps into a coherent final answer or report.
+-   Synthesis of Results: The Evaluator could guide a final "synthesis" step, instructing the agent (perhaps via a new plan step) to combine key findings from successful steps into a coherent final answer or report.
 
 ### 7\. Error Handling and Robustness (Cross-Cutting)
 
--   **Max Retries per Step:** Implement a maximum number of retries for a failing step, even with Evaluator-suggested modifications.
+-   Max Retries per Step: Implement a maximum number of retries for a failing step, even with Evaluator-suggested modifications.
 
--   **Step Criticality:** Allow the Planner to mark steps as "critical" or "optional." Failure of an optional step might not halt the entire plan.
+-   Step Criticality: Allow the Planner to mark steps as "critical" or "optional." Failure of an optional step might not halt the entire plan.
 
--   **User-Defined Error Handling:** Allow users to specify preferences for how to handle errors (e.g., "always ask me," "try to fix automatically up to X times then ask").
+-   User-Defined Error Handling: Allow users to specify preferences for how to handle errors (e.g., "always ask me," "try to fix automatically up to X times then ask").
 
 ### 8\. User Steering & Collaboration (In-Flight)
 
--   **Pause/Resume:** Allow users to pause a long-running plan.
+-   Pause/Resume: Allow users to pause a long-running plan.
 
--   **Feedback Injection:** While paused or even between steps, allow users to provide feedback like "That's not the right direction, focus on X instead" or "The last result was good, make sure to use it in the next step." This feedback would need to be incorporated by the Controller/Planner for subsequent steps.
+-   Feedback Injection: While paused or even between steps, allow users to provide feedback like "That's not the right direction, focus on X instead" or "The last result was good, make sure to use it in the next step." This feedback would need to be incorporated by the Controller/Planner for subsequent steps.
 
--   **Dynamic Plan Adjustment:** Based on user feedback or unexpected intermediate results, allow the Planner to be re-invoked to adjust the *remainder* of the plan.
+-   Dynamic Plan Adjustment: Based on user feedback or unexpected intermediate results, allow the Planner to be re-invoked to adjust the *remainder* of the plan.
 
 ### 9\. Output Generation & Presentation
 
--   **Dedicated Report Generation Tool/Agent:** Trigger this after a successful (or partially successful, with user approval) plan execution.
+-   Dedicated Report Generation Tool/Agent: Trigger this after a successful (or partially successful, with user approval) plan execution.
 
--   **Content Selection for Reports:** The Evaluator's output or a dedicated LLM call could determine which artifacts and summaries are most relevant for inclusion in a final report.
+-   Content Selection for Reports: The Evaluator's output or a dedicated LLM call could determine which artifacts and summaries are most relevant for inclusion in a final report.
 
--   **Template-Based Reporting:** Utilize predefined HTML/CSS templates for different report styles (as initially envisioned).
-
-This list covers many avenues for making ResearchAgent v2.0+ a truly powerful and collaborative research assistant.
-
-Which of these areas spark the most interest for you, or seem like the most impactful next steps given our current progress? We can dive deeper into any of them.
+-   Template-Based Reporting: Utilize predefined HTML/CSS templates for different report styles (as initially envisioned).
