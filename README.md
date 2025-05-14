@@ -20,7 +20,267 @@ Features (Including v2.0 Enhancements)
 
 -   **File Upload:** An "Upload File(s)" button in the task panel allows users to upload files directly into the currently selected task's workspace. The artifact viewer updates automatically after a successful upload.
 
--   **Artifact Viewer:** Displays generated `.png` images and previews common text files (`.txt`, `.py`, `.csv`, etc.) in a dedicated area below the monitor logs, with navigation for multiple artifacts. The filename is displayed above the content, and the navigation buttons remain fixed at the bottom.
+-   **Artifact Viewer:** Displays generated `.png` images and previews common text files (`.txt`, `.py`, `.csv`, etc.) in a dedicated area below the monitor logs, with navigation for multiple artifacts. The filename is displayed above the content, and the navigation buttons remain fixed at the bottom.ResearchAgent: AI Assistant for Research Workflows (v2.1)
+=========================================================
+
+This project provides a functional user interface and backend for an AI agent system designed to assist with research tasks, particularly in fields like bioinformatics and epidemiology. It features a three-panel layout (Tasks, Chat, Monitor/Artifact Viewer) and connects via WebSockets to a Python backend powered by LangChain. Version 2.1 introduces an Intent Classifier to differentiate simple queries from complex tasks, and an initial Evaluator component to assess plan outcomes. The agent leverages a Planner-Controller-Executor-Evaluator architecture for complex tasks. It uses configurable LLMs (Google Gemini or local Ollama) for reasoning and various tools to perform actions within isolated task workspaces. Backend message handling has also been refactored for improved modularity.
+
+Features (Including v2.1 Enhancements)
+--------------------------------------
+
+-   Task Management: Create, select, delete, and rename tasks. Each task maintains its own context and workspace.
+
+-   Chat Interface: Interact with the AI agent via a familiar chat window. Supports input history (Up/Down arrows). Basic Markdown rendering (newlines, bold, italics, code blocks, links). A "Thinking..." status line appears while the agent processes requests.
+
+-   LLM Selection: Choose the specific language model (Gemini or Ollama models configured in `.env`) to use for the current session directly from the chat header. The UI syncs with the backend's actual default LLM on new connections.
+
+-   Agent Workspace (Monitor): View the agent's internal steps, tool usage, and outputs in a structured, styled log panel.
+
+-   Monitor Status Indicator: A visual indicator (dot + text) in the monitor header shows the agent's current state (e.g., Idle, Running, Error, Disconnected).
+
+-   Agent Cancellation (STOP Button): A STOP button appears in the monitor header while the agent is running. Clicking it sends a cancellation request to the backend.
+
+-   File Upload: An "Upload File(s)" button in the task panel allows users to upload files directly into the currently selected task's workspace. The artifact viewer updates automatically after a successful upload.
+
+-   Artifact Viewer: Displays generated `.png` images and previews common text files (`.txt`, `.py`, `.csv`, etc.) in a dedicated area below the monitor logs, with navigation for multiple artifacts. The filename is displayed above the content, and the navigation buttons remain fixed at the bottom.
+
+-   LLM Token Tracking: Displays token usage (input, output, total) for the last LLM call and a running total for the current task in the left panel.
+
+-   Tool Integration: Includes tools for:
+
+    -   Web Search (`duckduckgo_search`)
+
+    -   Web Page Reading (`web_page_reader`)
+
+    -   PubMed Search (`pubmed_search`)
+
+    -   File Reading (`read_file` within task workspace - Supports text and PDF files. Reads full PDF content but adds a warning if it exceeds a configurable length.)
+
+    -   File Writing (`write_file` within task workspace)
+
+    -   Shell Command Execution (`workspace_shell` within task workspace, including `Rscript` if R is installed)
+
+    -   Python Package Installation (`python_package_installer`) (Security Warning!)
+
+    -   Python Code Execution (`Python_REPL`) (Security Warning!)
+
+-   Backend: Python backend using `websockets`, `aiohttp` (for file serving), and `LangChain`. Message handling refactored into a dedicated module.
+
+-   Frontend: Simple HTML, CSS, and vanilla JavaScript.
+
+-   Configuration: Extensive configuration via `.env` file (API keys, available models, agent tuning, tool settings, server options).
+
+-   Persistence: Task list (including names) and chat/monitor history are stored locally using SQLite in the `database/` directory.
+
+-   Task Workspaces: File/Shell tools operate within isolated directories for each task (`workspace/<task_id>/`), created upon task selection.
+
+-   v2.1: Intent Classifier:
+
+    -   Before planning, an LLM-driven component classifies the user's query to determine if it's a simple question/statement ("DIRECT_QA") or a complex task requiring a plan ("PLAN").
+
+    -   Simple queries are handled directly by the agent, bypassing the full planning cycle.
+
+-   v2.0: Planner Component:
+
+    -   For complex tasks ("PLAN" intent), an LLM-driven component decomposes user requests into a structured plan (sequence of sub-tasks with suggested tools).
+
+-   v2.0: User Confirmation & Steering:
+
+    -   The Planner presents the generated plan to the user in the chat interface for review.
+
+    -   Users can approve or reject the plan *before* execution begins. (Plan modification is a future goal).
+
+-   v2.0: Controller/Validator Component:
+
+    -   Before a sub-task is executed, this component validates the proposed action (tool, input syntax) and formulates the precise tool input.
+
+-   v2.0: Executor Component:
+
+    -   Executes each validated sub-task from the plan, focusing on the specific goal of that step (currently a ReAct agent).
+
+-   v2.1: Evaluator Component (Initial):
+
+    -   After all plan steps are attempted, an LLM-driven component assesses if the overall goal has been met based on the original query and a summary of executed steps.
+
+    -   Provides a success status, a textual assessment of the outcome, and (if unsuccessful) suggestions for re-planning. The assessment is presented to the user as the final answer for the plan.
+
+-   v2.0: Permission Requests (Planned):
+
+    -   The agent will request explicit user permission before undertaking potentially irreversible, sensitive, or costly actions.
+
+-   v2.0: Automated Report/Website Generation (Planned):
+
+    -   The agent will be able to generate simple, structured HTML pages or comprehensive Markdown reports summarizing task results.
+
+Tech Stack
+----------
+
+-   Frontend: HTML5, CSS3, Vanilla JavaScript (ES6+)
+
+-   Backend:
+
+    -   Python 3.10+ (`asyncio`, `websockets`)
+
+    -   Web Server: `aiohttp`, `aiohttp-cors`
+
+    -   LangChain Core: `langchain`
+
+    -   LLM Integrations: `langchain-google-genai`, `langchain-ollama`
+
+    -   Tools: `langchain-community` (Search), `langchain-experimental` (Python REPL), `biopython` (PubMed)
+
+    -   Prompts: Local fallback prompt used (based on `react-chat`)
+
+    -   Config: `python-dotenv`
+
+    -   HTTP: `httpx`
+
+    -   Web Parsing: `beautifulsoup4`, `lxml`
+
+    -   Async File I/O: `aiofiles`
+
+    -   PDF Reading: `pypdf`
+
+    -   Plotting (Example): `matplotlib`
+
+    -   Database: `aiosqlite`
+
+-   Environment: `venv` with `pip` (or `uv`)
+
+-   Protocol: WebSockets (WS), HTTP (for file upload/serving)
+
+Project Structure
+-----------------
+
+```
+ResearchAgent/
+├── .venv/              # Virtual environment
+├── backend/
+│   ├── __init__.py
+│   ├── agent.py        # Agent creation logic (Executor base)
+│   ├── callbacks.py    # WebSocket callback handler
+│   ├── config.py       # Configuration loading
+│   ├── controller.py   # v2.0: Controller/Validator logic
+│   ├── db_utils.py     # SQLite database functions
+│   ├── evaluator.py    # v2.1: Evaluator logic
+│   ├── executor.py     # (Placeholder for future dedicated Executor logic if split from agent.py)
+│   ├── intent_classifier.py # v2.1: Intent classification logic
+│   ├── llm_setup.py    # LLM initialization
+│   ├── message_handlers.py # v2.1: Refactored WebSocket message handlers
+│   ├── planner.py      # v2.0: Planner logic
+│   ├── server.py       # Main WebSocket & File server logic (now more focused)
+│   └── tools.py        # Tool definitions and factory
+├── css/
+│   └── style.css       # Frontend styling
+├── database/           # SQLite database storage (Created automatically, GITIGNORED)
+│   └── agent_history.db
+├── js/
+│   └── script.js       # Frontend JavaScript logic
+├── workspace/          # Base directory for task workspaces (GITIGNORED)
+│   └── <task_id>/      # Auto-created workspace for each task
+│       └── ...         # Files created by the agent for this task
+├── .env                # Environment variables (GITIGNORED)
+├── .env.example        # Example environment file
+├── .gitignore          # Git ignore rules
+├── Dockerfile          # Docker build instructions
+├── docker-compose.yml  # Docker compose configuration
+├── index.html          # Main HTML file for the UI
+├── requirements.txt    # Python dependencies
+└── README.md           # This file
+
+```
+
+Setup Instructions
+------------------
+
+(Setup instructions remain largely the same as v1.5/v2.0, ensure Python 3.10+ and other prerequisites are met. The .env file and requirements.txt are key.)
+
+... (Keep existing setup instructions) ...
+
+Running the Application
+-----------------------
+
+(Running instructions remain the same)
+
+... (Keep existing running instructions) ...
+
+Usage & Testing
+---------------
+
+-   Create Task: Click "+ New Task".
+
+-   Rename Task: Hover over a task, click the pencil icon (✏️).
+
+-   Select Task: Click a task to load its history.
+
+-   Select LLM: Use the dropdown in the chat header to choose the model for the current session.
+
+-   Chat (Simple Query Test - v2.1): Ask a simple question like: `"What is the main function of mitochondria?"`. Observe if the agent answers directly without presenting a multi-step plan. Check monitor logs for "Intent classified as: DIRECT_QA".
+
+-   Chat (Complex Query Test - v2.1): Ask a complex query like: `"Find the latest 2 papers on PubMed about 'mRNA vaccine stability', read the abstract of the first result, and write a short summary of that abstract to a file named 'summary.txt'."`
+
+    -   Observe if the agent first classifies intent as "PLAN".
+
+    -   Review the proposed plan for confirmation.
+
+    -   After confirming, monitor the execution steps.
+
+    -   The final message in the chat should be the Evaluator's assessment of the plan's outcome.
+
+-   Monitor: Observe agent logs (including intent classification, controller validation, executor steps, and evaluator assessment) and status indicator (Idle/Running/Error/Disconnected).
+
+-   Cancel Agent: Click the "STOP" button in the monitor header while the agent is running.
+
+-   Upload Files: Select a task, click the "Upload File(s)" button, choose files. Artifact viewer should update.
+
+-   Artifact Viewer: View generated/uploaded images/text files. Should auto-refresh after agent `write_file` actions.
+
+-   Token Usage: Observe token counts in the left panel.
+
+-   Test LLM Switching: Select one model, ask a question. Select a different model, ask another.
+
+-   Delete Task: Click the trash icon (🗑️) next to a task.
+
+Known Issues
+------------
+
+(Keep existing known issues, review if any are resolved or new ones introduced by recent changes)
+
+-   ...
+
+Security Warnings
+-----------------
+
+(Keep existing security warnings)
+
+-   ...
+
+Future Perspectives & Ideas (Post v2.1 Core)
+--------------------------------------------
+
+-   Advanced Intent Handling: More nuanced intent types, ability for agent to ask clarifying questions if intent is ambiguous.
+
+-   Enhanced Evaluation & Re-planning Loops:
+
+    -   Allow the Evaluator's suggestions to automatically trigger re-planning or targeted step correction.
+
+    -   Implement per-step evaluation for critical steps to allow earlier intervention.
+
+-   Interactive Plan Modification & Steering: Allow users to edit, re-order, or add/remove steps from a proposed plan before execution. Allow users to provide feedback or guidance if the agent gets stuck during a long workflow.
+
+-   Permission Requests: Implement explicit user confirmation for critical/costly actions (e.g., before installing a package or running a potentially destructive shell command).
+
+-   Automated Report/Website Generation: Empower the agent to generate structured HTML/Markdown reports from task results, potentially using predefined templates.
+
+-   Streaming Output (Final Answer & Thoughts): Implement token-by-token streaming for the agent's final answer and potentially for its thoughts to the UI for better responsiveness.
+
+-   UI/UX Enhancements: Drag & Drop upload, collapsible/resizable panels, more robust Markdown rendering, per-task LLM preference storage, tool configuration UI.
+
+-   Domain-Specific Tools & Knowledge: Integrate more tools and knowledge bases relevant to specific research domains.
+
+-   Session Saving/Loading & Agent State Persistence: Allow full session state (including memory and plan progress) to be saved and restored.
+
+-   More Robust Error Handling within Tools: Improve how tools report errors and how the agent interprets them.
 
 -   **LLM Token Tracking:** Displays token usage (input, output, total) for the last LLM call and a running total for the current task in the left panel.
 

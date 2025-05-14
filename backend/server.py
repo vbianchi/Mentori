@@ -42,19 +42,19 @@ from backend.db_utils import (
 )
 from backend.planner import generate_plan, PlanStep
 from backend.controller import validate_and_prepare_step_action
-# MODIFIED: Import all relevant message handlers
+# MODIFIED: Import all message handlers
 from backend.message_handlers import (
     process_context_switch, process_user_message,
     process_execute_confirmed_plan, process_new_task,
-    process_delete_task, process_rename_task
-    # Add other handlers here as they are created, e.g.
-    # process_set_llm, process_cancel_agent, process_get_artifacts_for_task,
-    # process_run_command, process_action_command
+    process_delete_task, process_rename_task,
+    process_set_llm, process_get_available_models,
+    process_cancel_agent, process_get_artifacts_for_task,
+    process_run_command, process_action_command
 )
 
 # ----------------------
 
-# MODIFIED: Define Type Aliases for callback functions used in MessageHandler hint
+# Define Type Aliases for callback functions used in MessageHandler hint
 SendWSMessageFunc = Callable[[str, Any], Coroutine[Any, Any, None]]
 AddMonitorLogFunc = Callable[[str, str], Coroutine[Any, Any, None]]
 DBAddMessageFunc = Callable[[str, str, str, str], Coroutine[Any, Any, None]]
@@ -63,7 +63,6 @@ DBGetMessagesFunc = Callable[[str], Coroutine[Any, Any, List[Dict[str, Any]]]]
 DBDeleteTaskFunc = Callable[[str], Coroutine[Any, Any, bool]]
 DBRenameTaskFunc = Callable[[str, str], Coroutine[Any, Any, bool]]
 GetArtifactsFunc = Callable[[str], Coroutine[Any, Any, List[Dict[str, str]]]]
-# For execute_shell_command, if we were to move it (not moved yet)
 ExecuteShellCommandFunc = Callable[[str, str, SendWSMessageFunc, DBAddMessageFunc, Optional[str]], Coroutine[Any, Any, bool]]
 
 
@@ -426,22 +425,22 @@ async def handler(websocket: Any):
         logger.error(f"[{session_id}] Halting handler because session setup failed.")
         return
 
-    # MODIFIED: Define message handler map with all moved handlers
-    MessageHandler = Callable[..., Coroutine[Any, Any, None]] # Simplified for brevity
+    # MODIFIED: Define message handler map with all handlers
+    MessageHandler = Callable[..., Coroutine[Any, Any, None]] 
     
     message_handler_map: Dict[str, MessageHandler] = {
-        "context_switch": process_context_switch,      # type: ignore
-        "user_message": process_user_message,          # type: ignore
-        "execute_confirmed_plan": process_execute_confirmed_plan, # type: ignore
-        "new_task": process_new_task,                  # type: ignore
-        "delete_task": process_delete_task,            # type: ignore
-        "rename_task": process_rename_task,            # type: ignore
-        # Still to be moved:
-        # "set_llm": process_set_llm,
-        # "cancel_agent": process_cancel_agent,
-        # "get_artifacts_for_task": process_get_artifacts_for_task,
-        # "run_command": process_run_command,
-        # "action_command": process_action_command,
+        "context_switch": process_context_switch,
+        "user_message": process_user_message,
+        "execute_confirmed_plan": process_execute_confirmed_plan,
+        "new_task": process_new_task,
+        "delete_task": process_delete_task,
+        "rename_task": process_rename_task,
+        "set_llm": process_set_llm,
+        "get_available_models": process_get_available_models,
+        "cancel_agent": process_cancel_agent,
+        "get_artifacts_for_task": process_get_artifacts_for_task,
+        "run_command": process_run_command,
+        "action_command": process_action_command,
     }
 
     try:
@@ -475,7 +474,7 @@ async def handler(websocket: Any):
                         await send_ws_message_for_session("status_message", "Error: Session integrity issue. Please refresh.")
                         continue
 
-                    # Prepare arguments common to most handlers
+                    # Base arguments for all handlers
                     handler_args = {
                         "session_id": session_id,
                         "data": parsed_data, 
@@ -484,98 +483,25 @@ async def handler(websocket: Any):
                         "send_ws_message_func": send_ws_message_for_session,
                         "add_monitor_log_func": add_monitor_log_and_save,
                     }
-                    # Add specific arguments for each handler as needed
+                    # Add specific dependencies for certain handlers
+                    if message_type in ["context_switch", "user_message", "run_command"]:
+                        handler_args["db_add_message_func"] = add_message
                     if message_type == "context_switch":
-                        handler_args["db_add_message_func"] = add_message # Already in base args
                         handler_args["db_add_task_func"] = add_task
                         handler_args["db_get_messages_func"] = get_messages_for_task
                         handler_args["get_artifacts_func"] = get_artifacts
-                    elif message_type == "user_message":
-                        handler_args["db_add_message_func"] = add_message # Already in base args
-                    elif message_type == "execute_confirmed_plan":
-                        pass # add_monitor_log_func is sufficient for now
-                    elif message_type == "new_task":
-                        handler_args["get_artifacts_func"] = get_artifacts
-                    elif message_type == "delete_task":
+                    elif message_type == "new_task" or message_type == "delete_task" or message_type == "get_artifacts_for_task":
+                         handler_args["get_artifacts_func"] = get_artifacts
+                    if message_type == "delete_task":
                         handler_args["db_delete_task_func"] = delete_task_and_messages
-                        handler_args["get_artifacts_func"] = get_artifacts
                     elif message_type == "rename_task":
                         handler_args["db_rename_task_func"] = rename_task_in_db
+                    elif message_type == "run_command":
+                         handler_args["execute_shell_command_func"] = execute_shell_command # Pass the actual function
                     
                     await handler_func(**handler_args) # type: ignore
                 
-                # MODIFIED: Keep elif blocks for handlers not yet moved
-                # Removed context_switch, user_message, execute_confirmed_plan, new_task, delete_task, rename_task
-                
-                elif message_type == "set_llm":
-                    llm_id = parsed_data.get("llm_id") 
-                    if llm_id and isinstance(llm_id, str):
-                        try:
-                            provider, model_name_from_id = llm_id.split("::", 1); is_valid = False
-                            if provider == 'gemini' and model_name_from_id in settings.gemini_available_models: is_valid = True
-                            elif provider == 'ollama' and model_name_from_id in settings.ollama_available_models: is_valid = True
-                            if is_valid:
-                                if session_id in session_data:
-                                    session_data[session_id]["selected_llm_provider"] = provider
-                                    session_data[session_id]["selected_llm_model_name"] = model_name_from_id
-                                    logger.info(f"[{session_id}] Set session LLM to: {provider}::{model_name_from_id}")
-                                    await add_monitor_log_and_save(f"Session LLM set to {provider}::{model_name_from_id}", "system_llm_set")
-                                else: logger.error(f"[{session_id}] Cannot set LLM: Session data not found.")
-                            else: logger.warning(f"[{session_id}] Received request to set invalid/unavailable LLM ID: {llm_id}"); await add_monitor_log_and_save(f"Attempted to set invalid LLM: {llm_id}", "error_llm_set")
-                        except ValueError: logger.warning(f"[{session_id}] Received invalid LLM ID format in set_llm: {llm_id}"); await add_monitor_log_and_save(f"Received invalid LLM ID format: {llm_id}", "error_llm_set")
-                    else: logger.warning(f"[{session_id}] Received invalid 'set_llm' message content: {parsed_data}")
-
-
-                elif message_type == "get_available_models":
-                    logger.info(f"[{session_id}] Received request for available models.")
-                    await send_ws_message_for_session("available_models", {
-                        "gemini": settings.gemini_available_models,
-                        "ollama": settings.ollama_available_models,
-                        "default_llm_id": settings.default_llm_id
-                    })
-
-                elif message_type == "cancel_agent":
-                    logger.warning(f"[{session_id}] Received request to cancel current operation.")
-                    if session_id in session_data:
-                        session_data[session_id]['cancellation_requested'] = True
-                        logger.info(f"[{session_id}] Cancellation requested flag set to True.")
-                        agent_task_to_cancel = connected_clients.get(session_id, {}).get("agent_task")
-                        if agent_task_to_cancel and not agent_task_to_cancel.done():
-                            agent_task_to_cancel.cancel()
-                            logger.info(f"[{session_id}] asyncio.Task.cancel() called for active task.")
-                        else:
-                            logger.info(f"[{session_id}] No active asyncio task found to cancel, or task already done. Flag will be checked by callbacks/plan loop.")
-                    else:
-                        logger.error(f"[{session_id}] Cannot set cancellation flag: Session data not found.")
-
-                elif message_type == "get_artifacts_for_task":
-                    task_id_to_refresh = parsed_data.get("taskId")
-                    if not task_id_to_refresh: logger.warning(f"[{session_id}] Received get_artifacts_for_task without taskId."); continue
-                    logger.info(f"[{session_id}] Received request to refresh artifacts for task: {task_id_to_refresh}")
-                    active_task_id_check_artifacts = session_data.get(session_id, {}).get("current_task_id") 
-                    if task_id_to_refresh == active_task_id_check_artifacts:
-                        artifacts = await get_artifacts(task_id_to_refresh)
-                        await send_ws_message_for_session("update_artifacts", artifacts)
-                        logger.info(f"[{session_id}] Sent updated artifact list for task {task_id_to_refresh}.")
-                    else: logger.warning(f"[{session_id}] Received artifact refresh request for non-active task ({task_id_to_refresh} vs {active_task_id_check_artifacts}). Ignoring.")
-
-
-                elif message_type == "run_command":
-                    command_to_run = parsed_data.get("command")
-                    if command_to_run and isinstance(command_to_run, str):
-                        active_task_id_for_cmd = session_data.get(session_id, {}).get("current_task_id")
-                        await add_monitor_log_and_save(f"Received direct 'run_command'. Executing: {command_to_run} (Task Context: {active_task_id_for_cmd})", "system_direct_cmd")
-                        await execute_shell_command(command_to_run, session_id, send_ws_message_for_session, add_message, active_task_id_for_cmd)
-                    else: logger.warning(f"[{session_id}] Received 'run_command' with invalid/missing command content."); await add_monitor_log_and_save("Error: 'run_command' received with no command specified.", "error_direct_cmd")
-
-                elif message_type == "action_command":
-                    action = parsed_data.get("command")
-                    if action and isinstance(action, str):
-                        logger.info(f"[{session_id}] Received action command: {action} (Not implemented).")
-                        await add_monitor_log_and_save(f"Received action command: {action} (Handler not implemented).", "system_action_cmd")
-                    else: logger.warning(f"[{session_id}] Received 'action_command' with invalid/missing command content.")
-
-
+                # MODIFIED: Removed all specific elif blocks as they are now in message_handler_map
                 else:
                     logger.warning(f"[{session_id}] Unknown message type received: {message_type}")
                     await add_monitor_log_and_save(f"Received unknown message type: {message_type}", "error_unknown_msg")
