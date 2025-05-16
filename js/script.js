@@ -1,4 +1,3 @@
-// js/script.js
 /**
  * This script handles the frontend logic for the AI Agent UI.
  * Includes:
@@ -7,12 +6,12 @@
  * - Task management (load, save, render, select, new, delete, rename)
  * - Chat message display and input history
  * - Basic Markdown formatting for chat messages
- * - LLM selection and synchronization with backend
- * - Monitor status updates (idle, running, error, disconnected, cancelling)
+ * - LLM selection (Executor and Role-specific overrides) and synchronization with backend
+ * - Monitor status updates
  * - Agent cancellation requests
  * - File uploads
  * - Artifact viewer navigation
- * - LLM Token Usage tracking and display
+ * - LLM Token Usage tracking
  * - Plan display for user confirmation and execution initiation
  */
 document.addEventListener('DOMContentLoaded', () => {
@@ -34,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const monitorStatusContainer = document.getElementById('monitor-status-container');
     const statusDotElement = document.getElementById('status-dot');
     const monitorStatusTextElement = document.getElementById('monitor-status-text');
-    const llmSelectElement = document.getElementById('llm-select');
     const stopButton = document.getElementById('stop-button');
     const fileUploadInput = document.getElementById('file-upload-input');
     const uploadFileButton = document.getElementById('upload-file-button');
@@ -42,6 +40,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const tokenUsageAreaElement = document.getElementById('token-usage-area');
     const lastCallTokensElement = document.getElementById('last-call-tokens');
     const taskTotalTokensElement = document.getElementById('task-total-tokens');
+
+    // LLM Selector References
+    const executorLlmSelectElement = document.getElementById('llm-select'); 
+    const intentLlmSelectElement = document.getElementById('intent-llm-select');
+    const plannerLlmSelectElement = document.getElementById('planner-llm-select');
+    const controllerLlmSelectElement = document.getElementById('controller-llm-select');
+    const evaluatorLlmSelectElement = document.getElementById('evaluator-llm-select');
+
+    // Helper array for managing role selectors
+    const roleSelectorsMeta = [
+        { element: intentLlmSelectElement, role: 'intent_classifier', storageKey: 'sessionIntentLlmId', label: 'Intent Classifier' },
+        { element: plannerLlmSelectElement, role: 'planner', storageKey: 'sessionPlannerLlmId', label: 'Planner' },
+        { element: controllerLlmSelectElement, role: 'controller', storageKey: 'sessionControllerLlmId', label: 'Controller' },
+        { element: evaluatorLlmSelectElement, role: 'evaluator', storageKey: 'sessionEvaluatorLlmId', label: 'Evaluator' }
+    ];
 
 
     // --- State Variables ---
@@ -51,30 +64,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const STORAGE_KEY = 'aiAgentTasks';
     const COUNTER_KEY = 'aiAgentTaskCounter';
     let isLoadingHistory = false;
-    let availableModels = { gemini: [], ollama: [] };
-    let currentSelectedLlmId = null;
-    let isAgentRunning = false;
+    let availableModels = { gemini: [], ollama: [] }; // Populated by backend
+    
+    let currentExecutorLlmId = null; // For the main llm-select (Executor)
+    // Stores session overrides. Empty string means "Use System Default" for that role.
+    let sessionRoleLlmOverrides = { 
+        intent_classifier: "", 
+        planner: "", 
+        controller: "", 
+        evaluator: "" 
+    };
 
+    let isAgentRunning = false;
     let chatInputHistory = [];
     const MAX_CHAT_HISTORY = 10;
     let chatHistoryIndex = -1;
     let currentInputBuffer = "";
-
     let currentTaskArtifacts = [];
     let currentArtifactIndex = -1;
     let currentTaskTotalTokens = { input: 0, output: 0, total: 0 };
-
-    let currentDisplayedPlan = null; // Stores the structured plan for confirmation
-
+    let currentDisplayedPlan = null; 
 
     const wsUrl = 'ws://localhost:8765';
     const httpBackendBaseUrl = 'http://localhost:8766';
-
     let socket;
-    window.socket = null;
-    console.log("Initialized window.socket to null.");
+    window.socket = null; 
 
     const updateMonitorStatus = (status, text) => {
+        // ... (content unchanged)
         if (!statusDotElement || !monitorStatusTextElement || !stopButton) return;
         statusDotElement.classList.remove('idle', 'running', 'error', 'disconnected');
         let statusText = text;
@@ -94,13 +111,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
                 break;
             case 'cancelling':
-                 statusDotElement.classList.add('running'); statusText = text || 'Cancelling...'; isAgentRunning = true;
-                 stopButton.disabled = true;
-                 if (agentThinkingStatusElement) {
+                statusDotElement.classList.add('running'); statusText = text || 'Cancelling...'; isAgentRunning = true; 
+                stopButton.disabled = true;
+                if (agentThinkingStatusElement) {
                     agentThinkingStatusElement.textContent = 'Cancelling...';
                     agentThinkingStatusElement.style.display = 'block';
-                 }
-                 break;
+                }
+                break;
             case 'disconnected':
             default:
                 statusDotElement.classList.add('disconnected'); statusText = text || 'Disconnected'; isAgentRunning = false;
@@ -112,6 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const updateTokenDisplay = (lastCallUsage = null) => {
+        // ... (content unchanged)
         if (!lastCallTokensElement || !taskTotalTokensElement) return;
         if (lastCallUsage) {
             const lastInput = lastCallUsage.input_tokens || 0;
@@ -126,13 +144,14 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const resetTaskTokenTotals = () => {
+        // ... (content unchanged)
         currentTaskTotalTokens = { input: 0, output: 0, total: 0 };
         if(lastCallTokensElement) lastCallTokensElement.textContent = "N/A";
         updateTokenDisplay();
     };
 
-
     const connectWebSocket = () => {
+        // ... (content mostly unchanged, ensures all LLM selectors are disabled on error/close) ...
         console.log(`Attempting to connect to WebSocket: ${wsUrl}`);
         addMonitorLog("[SYSTEM] Attempting to connect to backend...");
         updateMonitorStatus('disconnected', 'Connecting...');
@@ -148,7 +167,9 @@ document.addEventListener('DOMContentLoaded', () => {
             addChatMessage("FATAL: Failed to initialize WebSocket connection.", "status");
             addMonitorLog(`[SYSTEM] FATAL Error creating WebSocket: ${error.message}`);
             updateMonitorStatus('error', 'Connection Failed');
-            window.socket = null; return;
+            window.socket = null; 
+            disableAllLlmSelectors(); 
+            return;
         }
 
         socket.onopen = (event) => {
@@ -156,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
             addMonitorLog(`[SYSTEM] WebSocket connection established.`);
             addChatMessage("Connected to backend.", "status");
             updateMonitorStatus('idle', 'Idle');
-            sendWsMessage("get_available_models", {});
+            sendWsMessage("get_available_models", {}); 
             if (currentTaskId) {
                 const currentTask = tasks.find(task => task.id === currentTaskId);
                 if (currentTask) {
@@ -165,11 +186,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     currentTaskId = null; updateMonitorStatus('idle', 'No Task'); updateArtifactDisplay(); resetTaskTokenTotals();
                 }
             } else {
-                 updateMonitorStatus('idle', 'No Task'); updateArtifactDisplay(); resetTaskTokenTotals();
+                updateMonitorStatus('idle', 'No Task'); updateArtifactDisplay(); resetTaskTokenTotals();
             }
         };
 
         socket.onmessage = (event) => {
+            // ... (existing onmessage logic for other types) ...
             try {
                 const message = JSON.parse(event.data);
                 switch (message.type) {
@@ -189,11 +211,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             agentThinkingStatusElement.textContent = message.content.status;
                             agentThinkingStatusElement.style.display = 'block';
                             const lastMessage = chatMessagesContainer.querySelector('.message:last-child:not(.agent-thinking-status)');
-                             if (lastMessage) {
-                                chatMessagesContainer.insertBefore(agentThinkingStatusElement, lastMessage.nextSibling);
-                            } else {
-                                chatMessagesContainer.appendChild(agentThinkingStatusElement);
-                            }
+                                if (lastMessage) {
+                                    chatMessagesContainer.insertBefore(agentThinkingStatusElement, lastMessage.nextSibling);
+                                } else {
+                                    chatMessagesContainer.appendChild(agentThinkingStatusElement);
+                                }
                             scrollToBottom(chatMessagesContainer);
                         }
                         break;
@@ -219,25 +241,25 @@ document.addEventListener('DOMContentLoaded', () => {
                         break;
                     case 'user': addChatMessage(message.content, 'user'); break;
                     case 'status_message':
-                         const lowerContent = message.content.toLowerCase();
-                         if (lowerContent.includes("connect") || lowerContent.includes("clos") || lowerContent.includes("error")) {
-                             addChatMessage(message.content, 'status');
-                         }
-                         if (lowerContent.includes("error")) {
-                             updateMonitorStatus('error', message.content);
-                         } else if (lowerContent.includes("complete") || lowerContent.includes("cancelled") || lowerContent.includes("plan confirmed")) {
-                             if (!lowerContent.includes("plan confirmed. executing steps...")) {
+                        const lowerContent = message.content.toLowerCase();
+                        if (lowerContent.includes("connect") || lowerContent.includes("clos") || lowerContent.includes("error")) {
+                            addChatMessage(message.content, 'status');
+                        }
+                        if (lowerContent.includes("error")) {
+                            updateMonitorStatus('error', message.content);
+                        } else if (lowerContent.includes("complete") || lowerContent.includes("cancelled") || lowerContent.includes("plan confirmed")) {
+                            if (!lowerContent.includes("plan confirmed. executing steps...")) { 
                                 updateMonitorStatus('idle', 'Idle');
-                             }
-                         }
-                         if (lowerContent.includes("complete") || lowerContent.includes("error") || lowerContent.includes("cancelled")) {
-                             if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
-                         }
-                         break;
+                            }
+                        }
+                        if (lowerContent.includes("complete") || lowerContent.includes("error") || lowerContent.includes("cancelled")) {
+                            if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
+                        }
+                        break;
                     case 'monitor_log':
                         addMonitorLog(message.content);
                         if (message.content.includes("[Agent Finish]") || message.content.includes("Error]")) {
-                            if(isAgentRunning && !message.content.includes("PLAN EXECUTION LOOP NOT YET IMPLEMENTED")) {
+                            if(isAgentRunning && !message.content.includes("PLAN EXECUTION LOOP NOT YET IMPLEMENTED")) { 
                                 updateMonitorStatus('idle', 'Idle');
                             }
                             if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
@@ -253,16 +275,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     case 'trigger_artifact_refresh':
                         const taskIdToRefresh = message.content?.taskId;
                         if (taskIdToRefresh && taskIdToRefresh === currentTaskId) {
-                            addMonitorLog(`[SYSTEM] File upload detected, refreshing artifact list...`);
+                            addMonitorLog(`[SYSTEM] File event detected, refreshing artifact list...`);
                             sendWsMessage('get_artifacts_for_task', { taskId: currentTaskId });
                         }
                         break;
-                    case 'available_models':
+                    case 'available_models': // MODIFIED: This case now handles all selectors
                         if (message.content && typeof message.content === 'object') {
                             availableModels.gemini = message.content.gemini || [];
                             availableModels.ollama = message.content.ollama || [];
-                            const backendDefaultLlmId = message.content.default_llm_id || null;
-                            populateLlmSelector(backendDefaultLlmId);
+                            
+                            const backendDefaultExecutorLlmId = message.content.default_executor_llm_id || null;
+                            const backendRoleDefaults = message.content.role_llm_defaults || {};
+                            
+                            populateAllLlmSelectors(backendDefaultExecutorLlmId, backendRoleDefaults);
                         }
                         break;
                     default:
@@ -283,11 +308,8 @@ document.addEventListener('DOMContentLoaded', () => {
             addMonitorLog(`[SYSTEM] WebSocket error occurred.`);
             updateMonitorStatus('error', 'Connection Error');
             window.socket = null;
-             if (llmSelectElement) {
-                 llmSelectElement.innerHTML = '<option value="">Connection Error</option>';
-                 llmSelectElement.disabled = true;
-             }
-             if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
+            disableAllLlmSelectors(); 
+            if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
         };
         socket.onclose = (event) => {
             console.log(`WebSocket closed. Code: ${event.code}, Reason: '${event.reason || 'No reason given'}' Clean close: ${event.wasClean}`);
@@ -298,17 +320,26 @@ document.addEventListener('DOMContentLoaded', () => {
             addMonitorLog(`[SYSTEM] WebSocket disconnected. ${reason}`);
             updateMonitorStatus('disconnected', 'Disconnected');
             window.socket = null;
-             if (llmSelectElement) {
-                 llmSelectElement.innerHTML = '<option value="">Disconnected</option>';
-                 llmSelectElement.disabled = true;
-             }
-             if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
+            disableAllLlmSelectors(); 
+            if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
         };
     };
 
+    const disableAllLlmSelectors = () => {
+        if (executorLlmSelectElement) {
+            executorLlmSelectElement.innerHTML = '<option value="">Connection Error</option>';
+            executorLlmSelectElement.disabled = true;
+        }
+        roleSelectorsMeta.forEach(selInfo => {
+            if (selInfo.element) {
+                selInfo.element.innerHTML = '<option value="">Connection Error</option>';
+                selInfo.element.disabled = true;
+            }
+        });
+    };
+    
     const scrollToBottom = (element) => { if (!element) return; element.scrollTop = element.scrollHeight; };
-
-    const formatMessageContent = (text) => {
+    const formatMessageContent = (text) => { /* ... (content unchanged) ... */ 
         let formattedText = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         formattedText = formattedText.replace(/```(\w*)\n([\s\S]*?)\n?```/g, (match, lang, code) => { const escapedCode = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); const langClass = lang ? ` class="language-${lang}"` : ''; return `<pre><code${langClass}>${escapedCode}</code></pre>`; });
         formattedText = formattedText.replace(/`([^`]+)`/g, '<code>$1</code>');
@@ -321,8 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formattedText = parts.join('');
         return formattedText;
     };
-
-    const addChatMessage = (text, type = 'agent', doScroll = true) => {
+    const addChatMessage = (text, type = 'agent', doScroll = true) => { /* ... (content unchanged) ... */ 
         if (!chatMessagesContainer) { console.error("Chat container missing!"); return null; }
         if (type === 'status') {
             const lowerText = text.toLowerCase();
@@ -342,14 +372,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (type === 'agent') { messageElement.classList.add('agent-message'); }
         messageElement.innerHTML = formatMessageContent(text);
         if (agentThinkingStatusElement && agentThinkingStatusElement.style.display !== 'none' && messageElement !== agentThinkingStatusElement) {
-             chatMessagesContainer.insertBefore(agentThinkingStatusElement, null);
+                chatMessagesContainer.insertBefore(agentThinkingStatusElement, null);
         }
         chatMessagesContainer.appendChild(messageElement);
         if (doScroll) scrollToBottom(chatMessagesContainer);
         return messageElement;
     };
-
-    const displayPlanForConfirmation = (humanSummary, structuredPlan) => {
+    const displayPlanForConfirmation = (humanSummary, structuredPlan) => { /* ... (content unchanged) ... */ 
         if (!chatMessagesContainer) return;
         const existingPlanUI = chatMessagesContainer.querySelector('.plan-confirmation-container');
         if (existingPlanUI) existingPlanUI.remove();
@@ -368,7 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const detailsDiv = document.createElement('div');
         detailsDiv.className = 'plan-steps-details';
-        detailsDiv.style.display = 'none';
+        detailsDiv.style.display = 'none'; 
         const ol = document.createElement('ol');
         structuredPlan.forEach(step => {
             const li = document.createElement('li');
@@ -399,7 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
         confirmBtn.textContent = 'Confirm & Run Plan';
         confirmBtn.onclick = () => {
             sendWsMessage('execute_confirmed_plan', { confirmed_plan: currentDisplayedPlan });
-            planContainer.remove();
+            planContainer.remove(); 
             addChatMessage("Plan confirmed. Starting execution...", "status");
             updateMonitorStatus('running', 'Executing Plan...');
             if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'block';
@@ -411,7 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cancelBtn.className = 'plan-cancel-btn';
         cancelBtn.textContent = 'Cancel Plan';
         cancelBtn.onclick = () => {
-            sendWsMessage('cancel_plan', {});
+            sendWsMessage('cancel_plan', {}); 
             planContainer.remove();
             addChatMessage("Plan cancelled by user.", "status");
             updateMonitorStatus('idle', 'Idle');
@@ -423,8 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chatMessagesContainer.appendChild(planContainer);
         scrollToBottom(chatMessagesContainer);
     };
-
-     const addMonitorLog = (fullLogText) => {
+    const addMonitorLog = (fullLogText) => { /* ... (content unchanged) ... */ 
         if (!monitorLogAreaElement) { console.error("Monitor log area element (#monitor-log-area) not found!"); return; }
         const logEntryDiv = document.createElement('div');
         logEntryDiv.classList.add('monitor-log-entry');
@@ -449,7 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (logTypeIndicator.includes("SYSTEM") || logTypeIndicator.includes("SYS_")) logType = 'system';
             else if (logTypeIndicator.includes("ARTIFACT")) logType = 'artifact-generated';
             else if (logTypeIndicator.includes("USER_INPUT_LOG")) logType = 'user-input-log';
-            else if (logTypeIndicator.includes("LLM TOKEN USAGE")) logType = 'system';
+            else if (logTypeIndicator.includes("LLM TOKEN USAGE")) logType = 'system'; 
         } else {
             if (fullLogText.toLowerCase().includes("error")) logType = 'error';
             else if (fullLogText.toLowerCase().includes("system")) logType = 'system';
@@ -474,8 +502,7 @@ document.addEventListener('DOMContentLoaded', () => {
         monitorLogAreaElement.appendChild(logEntryDiv);
         scrollToBottom(monitorLogAreaElement);
     };
-
-     const updateArtifactDisplay = async () => {
+    const updateArtifactDisplay = async () => { /* ... (content unchanged) ... */ 
         if (!monitorArtifactAreaElement || !artifactNavElement || !artifactPrevBtn || !artifactNextBtn || !artifactCounterElement) {
             console.error("Artifact display elements not found!");
             return;
@@ -514,22 +541,34 @@ document.addEventListener('DOMContentLoaded', () => {
                     monitorArtifactAreaElement.insertBefore(errorDiv, artifactNavElement);
                 };
                 monitorArtifactAreaElement.insertBefore(imgElement, artifactNavElement);
-            } else if (artifact.type === 'text') {
+            } else if (artifact.type === 'text' || artifact.type === 'pdf') { 
                 const preElement = document.createElement('pre');
                 preElement.textContent = 'Loading text file...';
-                monitorArtifactAreaElement.insertBefore(preElement, artifactNavElement);
-                try {
-                    console.log(`Fetching text artifact: ${artifact.url}`);
-                    const response = await fetch(artifact.url);
-                    if (!response.ok) { throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`); }
-                    const textContent = await response.text();
-                    preElement.textContent = textContent;
-                    console.log(`Successfully fetched and displayed ${artifact.filename}`);
-                } catch (error) {
-                    console.error(`Error fetching text artifact ${artifact.filename}:`, error);
-                    preElement.textContent = `Error loading file: ${artifact.filename}\n${error.message}`;
-                    preElement.classList.add('artifact-error');
+                if (artifact.type === 'pdf') {
+                     preElement.textContent = `PDF File: ${artifact.filename} (Preview not available, click to open if browser supports)`;
+                     const pdfLink = document.createElement('a');
+                     pdfLink.href = artifact.url;
+                     pdfLink.target = "_blank";
+                     pdfLink.textContent = `Open ${artifact.filename} in new tab`;
+                     preElement.innerHTML = ''; 
+                     preElement.appendChild(pdfLink);
+
+                } else { 
+                    preElement.textContent = 'Loading text file...';
+                     try {
+                        console.log(`Fetching text artifact: ${artifact.url}`);
+                        const response = await fetch(artifact.url);
+                        if (!response.ok) { throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`); }
+                        const textContent = await response.text();
+                        preElement.textContent = textContent;
+                        console.log(`Successfully fetched and displayed ${artifact.filename}`);
+                    } catch (error) {
+                        console.error(`Error fetching text artifact ${artifact.filename}:`, error);
+                        preElement.textContent = `Error loading file: ${artifact.filename}\n${error.message}`;
+                        preElement.classList.add('artifact-error');
+                    }
                 }
+                monitorArtifactAreaElement.insertBefore(preElement, artifactNavElement);
             } else {
                 console.warn(`Unsupported artifact type: ${artifact.type} for file ${artifact.filename}`);
                 const unknownDiv = Object.assign(document.createElement('div'), { className: 'artifact-placeholder', textContent: `Unsupported artifact type: ${artifact.filename}` });
@@ -545,8 +584,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     };
-
-    const loadTasks = () => {
+    const loadTasks = () => { /* ... (content unchanged) ... */ 
         const storedCounter = localStorage.getItem(COUNTER_KEY);
         taskCounter = storedCounter ? parseInt(storedCounter, 10) : 0;
         if (isNaN(taskCounter)) taskCounter = 0;
@@ -580,7 +618,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         console.log("Initial currentTaskId set to:", currentTaskId);
     };
-    const saveTasks = () => {
+    const saveTasks = () => { /* ... (content unchanged) ... */ 
         try {
             tasks.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
             localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
@@ -592,7 +630,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Error saving task list. Changes might not persist.");
         }
     };
-    const renderTaskList = () => {
+    const renderTaskList = () => { /* ... (content unchanged) ... */ 
         if (!taskListUl) { console.error("Task list UL element not found!"); return; }
         taskListUl.innerHTML = '';
         if (tasks.length === 0) {
@@ -622,7 +660,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const handleTaskItemClick = (taskId) => { console.log(`Task item clicked: ${taskId}`); selectTask(taskId); };
     const handleDeleteTaskClick = (taskId, taskTitle) => { console.log(`Delete button clicked for task: ${taskId} (${taskTitle})`); deleteTask(taskId, taskTitle); };
-    const handleEditTaskClick = (taskId, currentTitle) => {
+    const handleEditTaskClick = (taskId, currentTitle) => { /* ... (content unchanged) ... */ 
         console.log(`Edit button clicked for task: ${taskId} (${currentTitle})`);
         const newTitle = prompt(`Enter new name for task "${currentTitle}":`, currentTitle);
         if (newTitle === null) { console.log("Rename cancelled by user."); return; }
@@ -638,20 +676,20 @@ document.addEventListener('DOMContentLoaded', () => {
             sendWsMessage("rename_task", { taskId: taskId, newName: trimmedTitle });
         } else { console.error(`Task ${taskId} not found locally for renaming.`); }
     };
-    const updateCurrentTaskTitle = () => {
+    const updateCurrentTaskTitle = () => { /* ... (content unchanged) ... */ 
         if (!currentTaskTitleElement) return;
         const currentTask = tasks.find(task => task.id === currentTaskId);
         const title = currentTask ? currentTask.title : "No Task Selected";
         currentTaskTitleElement.textContent = title;
         if (currentTask) {
             if (!isAgentRunning && statusDotElement && !statusDotElement.classList.contains('error') && !statusDotElement.classList.contains('disconnected')) {
-                 updateMonitorStatus('idle', 'Idle');
+                updateMonitorStatus('idle', 'Idle');
             }
         } else {
-             updateMonitorStatus('idle', 'No Task');
+            updateMonitorStatus('idle', 'No Task');
         }
     };
-    const clearChatAndMonitor = (addLog = true) => {
+    const clearChatAndMonitor = (addLog = true) => { /* ... (content unchanged) ... */ 
         if (chatMessagesContainer) chatMessagesContainer.innerHTML = '';
         if (agentThinkingStatusElement) {
             chatMessagesContainer.appendChild(agentThinkingStatusElement);
@@ -666,43 +704,43 @@ document.addEventListener('DOMContentLoaded', () => {
         resetTaskTokenTotals();
         currentDisplayedPlan = null;
     };
-    const selectTask = (taskId) => {
+    const selectTask = (taskId) => { /* ... (content unchanged) ... */ 
         console.log(`Attempting to select task: ${taskId}`);
         if (currentTaskId === taskId && taskId !== null) { console.log("Task already selected."); return; }
         const task = tasks.find(t => t.id === taskId);
         currentTaskId = task ? taskId : null;
         console.log(`Selected task ID set to: ${currentTaskId}`);
         saveTasks(); renderTaskList();
-        resetTaskTokenTotals();
+        resetTaskTokenTotals(); 
         if (currentTaskId && task) {
             clearChatAndMonitor(false);
             sendWsMessage("context_switch", { task: task.title, taskId: task.id });
             addChatMessage("Switching task context...", "status");
             updateMonitorStatus('running', 'Switching Task...');
-        } else if (!currentTaskId) {
+        } else if (!currentTaskId) { 
             clearChatAndMonitor();
             addChatMessage("No task selected.", "status");
             addMonitorLog("[SYSTEM] No task selected.");
             updateMonitorStatus('idle', 'No Task');
-        } else if (!socket || socket.readyState !== WebSocket.OPEN) {
+        } else if (!socket || socket.readyState !== WebSocket.OPEN) { 
             clearChatAndMonitor(false);
             addChatMessage("Switched task locally. Connect to backend to load history.", "status");
             addMonitorLog(`[SYSTEM] Switched task locally to ${taskId}, but WS not open.`);
-             updateMonitorStatus('disconnected', 'Disconnected');
+            updateMonitorStatus('disconnected', 'Disconnected');
         }
         console.log(`Finished select task logic for: ${currentTaskId}`);
     };
-    const handleNewTaskClick = () => {
+    const handleNewTaskClick = () => { /* ... (content unchanged) ... */ 
         console.log("'+ New Task' button clicked.");
         taskCounter++;
         const taskTitle = `Task - ${taskCounter}`;
         const newTask = { id: `task-${Date.now()}-${Math.random().toString(16).slice(2)}`, title: taskTitle, timestamp: Date.now() };
         tasks.unshift(newTask);
         console.log("New task created:", newTask);
-        selectTask(newTask.id);
+        selectTask(newTask.id); 
         console.log("handleNewTaskClick finished.");
     };
-    const deleteTask = (taskId, taskTitle) => {
+    const deleteTask = (taskId, taskTitle) => { /* ... (content unchanged) ... */ 
         console.log(`Attempting to delete task: ${taskId} (${taskTitle})`);
         if (!confirm(`Are you sure you want to delete task "${taskTitle}"? This cannot be undone.`)) { console.log("Deletion cancelled by user."); return; }
         const taskIndex = tasks.findIndex(task => task.id === taskId);
@@ -714,25 +752,38 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentTaskId === taskId) {
             nextTaskId = tasks.length > 0 ? tasks[0].id : null;
             console.log(`Deleted active task, selecting next: ${nextTaskId}`);
-            selectTask(nextTaskId);
+            selectTask(nextTaskId); 
         } else {
             saveTasks(); renderTaskList();
         }
         console.log(`Finished delete task logic for: ${taskId}`);
     };
 
-    const populateLlmSelector = (backendDefaultLlmId) => {
-        if (!llmSelectElement) { console.error("LLM select element not found!"); return; }
-        llmSelectElement.innerHTML = '';
-        llmSelectElement.disabled = true;
+    // MODIFIED: Function to populate a single LLM selector
+    const populateSingleLlmSelector = (selectElement, availableModels, currentSelectedValue, defaultOptionText = "Use System Default", backendConfiguredDefaultLlmId = null) => {
+        if (!selectElement) return;
+        selectElement.innerHTML = ''; 
+
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = ""; 
+        defaultOpt.textContent = defaultOptionText;
+        selectElement.appendChild(defaultOpt);
+
         if ((!availableModels.gemini || availableModels.gemini.length === 0) &&
             (!availableModels.ollama || availableModels.ollama.length === 0)) {
-            const option = document.createElement('option');
-            option.value = "";
-            option.textContent = "No LLMs available";
-            llmSelectElement.appendChild(option);
+            const noModelsOpt = document.createElement('option');
+            noModelsOpt.value = "";
+            noModelsOpt.textContent = "No LLMs Available";
+            noModelsOpt.disabled = true;
+            if (selectElement.options.length === 1 && selectElement.options[0].value === "") { // Only if "Use System Default" is the only one
+                 selectElement.options[0].textContent = "No LLMs Available"; // Overwrite "Use System Default"
+            } else {
+                selectElement.appendChild(noModelsOpt);
+            }
+            selectElement.disabled = true;
             return;
         }
+
         if (availableModels.gemini && availableModels.gemini.length > 0) {
             const geminiGroup = document.createElement('optgroup');
             geminiGroup.label = 'Gemini';
@@ -742,7 +793,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 option.textContent = modelId;
                 geminiGroup.appendChild(option);
             });
-            llmSelectElement.appendChild(geminiGroup);
+            selectElement.appendChild(geminiGroup);
         }
         if (availableModels.ollama && availableModels.ollama.length > 0) {
             const ollamaGroup = document.createElement('optgroup');
@@ -753,46 +804,67 @@ document.addEventListener('DOMContentLoaded', () => {
                 option.textContent = modelId;
                 ollamaGroup.appendChild(option);
             });
-            llmSelectElement.appendChild(ollamaGroup);
+            selectElement.appendChild(ollamaGroup);
         }
-        if (backendDefaultLlmId && llmSelectElement.querySelector(`option[value="${backendDefaultLlmId}"]`)) {
-            llmSelectElement.value = backendDefaultLlmId;
-            currentSelectedLlmId = backendDefaultLlmId;
-            localStorage.setItem('selectedLlmId', backendDefaultLlmId);
-            console.log(`LLM selector set to backend default: ${backendDefaultLlmId}`);
+        
+        // Set selected value: Priority: localStorage override, then backend configured default, then "" (Use System Default)
+        if (currentSelectedValue && selectElement.querySelector(`option[value="${currentSelectedValue}"]`)) {
+            selectElement.value = currentSelectedValue;
+        } else if (backendConfiguredDefaultLlmId && selectElement.querySelector(`option[value="${backendConfiguredDefaultLlmId}"]`)) {
+            selectElement.value = backendConfiguredDefaultLlmId;
         } else {
-            const lastSelected = localStorage.getItem('selectedLlmId');
-            if (lastSelected && llmSelectElement.querySelector(`option[value="${lastSelected}"]`)) {
-                llmSelectElement.value = lastSelected;
-                currentSelectedLlmId = lastSelected;
-                console.log(`LLM selector set to localStorage value: ${lastSelected}`);
-            } else if (llmSelectElement.options.length > 0) {
-                 for (let i = 0; i < llmSelectElement.options.length; i++) {
-                     if (llmSelectElement.options[i].value && !llmSelectElement.options[i].disabled) {
-                         llmSelectElement.selectedIndex = i;
-                         currentSelectedLlmId = llmSelectElement.value;
-                         localStorage.setItem('selectedLlmId', currentSelectedLlmId);
-                         console.log(`LLM selector set to first available option: ${currentSelectedLlmId}`);
-                         break;
-                     }
-                 }
+            selectElement.value = ""; // Default to "Use System Default"
+        }
+        selectElement.disabled = false;
+    };
+    
+    // MODIFIED: Function to populate ALL LLM selectors
+    const populateAllLlmSelectors = (backendDefaultExecutorLlmId, backendRoleDefaults = {}) => {
+        // Populate Executor LLM (main selector in chat header)
+        const lastSelectedExecutor = localStorage.getItem('selectedExecutorLlmId');
+        // If localStorage has a value, use it. Otherwise, use the backend's default for the executor.
+        const initialExecutorValue = lastSelectedExecutor !== null ? lastSelectedExecutor : backendDefaultExecutorLlmId;
+
+        populateSingleLlmSelector(executorLlmSelectElement, availableModels, initialExecutorValue, "Loading LLMs...", backendDefaultExecutorLlmId);
+        currentExecutorLlmId = executorLlmSelectElement.value; // Update state
+        if (currentExecutorLlmId) { 
+            sendWsMessage("set_llm", { llm_id: currentExecutorLlmId });
+        }
+
+        // Populate Role-Specific LLM Selectors
+        roleSelectorsMeta.forEach(selInfo => {
+            if (selInfo.element) {
+                const lastSelectedRoleOverride = localStorage.getItem(selInfo.storageKey);
+                const backendRoleDefault = backendRoleDefaults[selInfo.role] || ""; // Get specific default for this role
+                
+                // Priority: localStorage override, then backend's default for this role
+                const initialRoleValue = lastSelectedRoleOverride !== null ? lastSelectedRoleOverride : backendRoleDefault;
+
+                populateSingleLlmSelector(selInfo.element, availableModels, initialRoleValue, "Use System Default", backendRoleDefault);
+                sessionRoleLlmOverrides[selInfo.role] = selInfo.element.value; // Update state with what's actually selected
+
+                // Send initial override to backend if it's not just the system default
+                if (sessionRoleLlmOverrides[selInfo.role] !== "" && sessionRoleLlmOverrides[selInfo.role] !== backendRoleDefault) {
+                    sendWsMessage("set_session_role_llm", { role: selInfo.role, llm_id: sessionRoleLlmOverrides[selInfo.role] });
+                } else if (sessionRoleLlmOverrides[selInfo.role] === "" && lastSelectedRoleOverride === null) {
+                    // If it's "Use System Default" and there was no localStorage, no need to send, backend uses its default.
+                } else if (sessionRoleLlmOverrides[selInfo.role] === "") {
+                    // If user explicitly selected "Use System Default" or localStorage had "", tell backend to clear override
+                     sendWsMessage("set_session_role_llm", { role: selInfo.role, llm_id: "" });
+                }
             }
-        }
-        if (currentSelectedLlmId) {
-            sendWsMessage("set_llm", { llm_id: currentSelectedLlmId });
-        }
-        console.log(`LLM selector populated. Final selection: ${currentSelectedLlmId}`);
-        llmSelectElement.disabled = false;
+        });
+        console.log("All LLM selectors populated. Initial Executor:", currentExecutorLlmId, "Initial Role Overrides:", sessionRoleLlmOverrides);
     };
 
-    const sendWsMessage = (type, content) => {
+    const sendWsMessage = (type, content) => { /* ... (content unchanged) ... */ 
         if (window.socket && window.socket.readyState === WebSocket.OPEN) {
             try {
                 const payload = JSON.stringify({ type: type, ...content });
                 console.log(`Sending WS message: ${type}`, content);
                 window.socket.send(payload);
-                if (type === "rename_task" || type === "delete_task" || type === "set_llm" || type === "cancel_agent" || type === "get_artifacts_for_task" || type === "execute_confirmed_plan" || type === "cancel_plan") {
-                     addMonitorLog(`[SYSTEM] Sent ${type} request.`);
+                if (type === "rename_task" || type === "delete_task" || type === "set_llm" || type === "cancel_agent" || type === "get_artifacts_for_task" || type === "execute_confirmed_plan" || type === "cancel_plan" || type === "set_session_role_llm") {
+                    addMonitorLog(`[SYSTEM] Sent ${type} request.`);
                 }
             } catch (e) {
                 console.error(`Error sending ${type} via WebSocket:`, e);
@@ -804,18 +876,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (type === "user_message" || type === "context_switch" || type === "get_artifacts_for_task") {
                 addChatMessage(`Cannot send ${type}: Not connected to backend.`, "status");
             }
-             addMonitorLog(`[SYSTEM] Cannot send ${type}: WS not open.`);
+            addMonitorLog(`[SYSTEM] Cannot send ${type}: WS not open.`);
         }
     };
 
-    const handleSendMessage = () => {
+    const handleSendMessage = () => { /* ... (content unchanged) ... */ 
         const messageText = chatTextarea.value.trim();
         if (!currentTaskId){
             alert("Please select or create a task first.");
             chatTextarea.focus();
             return;
         }
-        if (isAgentRunning) { // This also covers plan_execution_active via updateMonitorStatus
+        if (isAgentRunning) { 
             addChatMessage("Agent is currently busy. Please wait or stop the current process.", "status");
             return;
         }
@@ -828,8 +900,8 @@ document.addEventListener('DOMContentLoaded', () => {
             chatHistoryIndex = -1;
             currentInputBuffer = "";
             if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
-            sendWsMessage("user_message", { content: messageText });
-            updateMonitorStatus('running', 'Generating plan...'); // Initial status for planning
+            sendWsMessage("user_message", { content: messageText }); 
+            updateMonitorStatus('running', 'Classifying intent...'); 
             chatTextarea.value = '';
             chatTextarea.style.height = 'auto';
             chatTextarea.style.height = chatTextarea.scrollHeight + 'px';
@@ -839,7 +911,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chatTextarea.focus();
     };
 
-    const handleFileUpload = async (event) => {
+    const handleFileUpload = async (event) => { /* ... (content unchanged) ... */ 
         console.log("[handleFileUpload] Function entered.");
         if (!currentTaskId) {
             alert("Please select a task before uploading files.");
@@ -852,13 +924,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const files = event.target.files;
         const uploadUrl = `${httpBackendBaseUrl}/upload/${currentTaskId}`;
-        let sessionID = 'unknown';
-        try {
-            if (window.socket?.url) {
-                sessionID = new URL(window.socket.url).searchParams.get('session_id') || 'unknown';
-            }
-        } catch (e) { console.warn("[handleFileUpload] Could not parse session ID from WebSocket URL:", e); }
-        console.log(`[handleFileUpload] Preparing to upload ${files.length} file(s) to ${uploadUrl} for task ${currentTaskId}. Session: ${sessionID}`);
+        let sessionIDHeader = 'unknown_session'; 
+        if (window.socket && window.socket.url) {
+            try { 
+                const urlParams = new URL(window.socket.url).searchParams;
+                sessionIDHeader = urlParams.get('session_id') || sessionIDHeader;
+            } catch (e) { /* ignore */ }
+        }
+
+        console.log(`[handleFileUpload] Preparing to upload ${files.length} file(s) to ${uploadUrl} for task ${currentTaskId}. X-Session-ID: ${sessionIDHeader}`);
         addMonitorLog(`[SYSTEM] Attempting to upload ${files.length} file(s) to task ${currentTaskId}...`);
         uploadFileButton.disabled = true;
         let overallSuccess = true;
@@ -873,10 +947,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const response = await fetch(uploadUrl, {
                     method: 'POST',
                     body: formData,
-                    headers: { 'X-Session-ID': sessionID }
+                    headers: { 'X-Session-ID': sessionIDHeader } 
                 });
                 console.log(`[handleFileUpload] Received response for ${file.name}. Status: ${response.status}, OK: ${response.ok}`);
-                console.log("[handleFileUpload] Raw response object:", response);
                 let result;
                 try {
                     result = await response.json();
@@ -907,7 +980,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         console.log("[handleFileUpload] Re-enabling upload button and clearing input.");
         uploadFileButton.disabled = false;
-        event.target.value = null;
+        event.target.value = null; 
         if (overallSuccess) {
             addChatMessage(`Successfully uploaded ${files.length} file(s).`, 'status');
         } else {
@@ -920,9 +993,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Event Listeners Setup ---
     if (newTaskButton) { newTaskButton.addEventListener('click', handleNewTaskClick); }
     else { console.error("New task button element not found!"); }
-
-    if (taskListUl) { console.log("Task list event listeners will be added during rendering."); }
-    else { console.error("Task list UL element not found!"); }
 
     if (chatSendButton) { chatSendButton.addEventListener('click', handleSendMessage); }
     if (chatTextarea) {
@@ -948,21 +1018,36 @@ document.addEventListener('DOMContentLoaded', () => {
         chatTextarea.addEventListener('input', () => { chatTextarea.style.height = 'auto'; chatTextarea.style.height = chatTextarea.scrollHeight + 'px'; });
     }
 
-    if (llmSelectElement) {
-        llmSelectElement.addEventListener('change', (event) => {
+    // Event listener for Executor LLM selector
+    if (executorLlmSelectElement) {
+        executorLlmSelectElement.addEventListener('change', (event) => {
             const selectedId = event.target.value;
-            if (selectedId && selectedId !== currentSelectedLlmId) {
-                console.log(`LLM selection changed to: ${selectedId}`);
-                currentSelectedLlmId = selectedId;
-                localStorage.setItem('selectedLlmId', selectedId);
-                sendWsMessage("set_llm", { llm_id: selectedId });
-            } else if (!selectedId) {
-                 console.warn("LLM selector changed to an empty value.");
-            }
+            // No need to check against currentExecutorLlmId, just update if changed
+            console.log(`Executor LLM selection changed to: ${selectedId}`);
+            currentExecutorLlmId = selectedId;
+            localStorage.setItem('selectedExecutorLlmId', selectedId); 
+            sendWsMessage("set_llm", { llm_id: selectedId }); // This message updates backend's session selected_llm_provider/name
         });
-    } else { console.error("LLM select element not found!"); }
+    } else { console.error("Executor LLM select element not found!"); }
 
-    if (stopButton) {
+    // Event listeners for Role-Specific LLM selectors
+    roleSelectorsMeta.forEach(selInfo => {
+        if (selInfo.element) {
+            selInfo.element.addEventListener('change', (event) => {
+                const selectedLlmId = event.target.value; // "" means "Use System Default"
+                console.log(`Role LLM for '${selInfo.role}' changed to: ${selectedLlmId || "System Default"}`);
+                sessionRoleLlmOverrides[selInfo.role] = selectedLlmId;
+                localStorage.setItem(selInfo.storageKey, selectedLlmId);
+                // Send message to backend to update this role's LLM for the session
+                sendWsMessage("set_session_role_llm", { role: selInfo.role, llm_id: selectedLlmId });
+            });
+        } else {
+            console.error(`LLM select element for role ${selInfo.role} not found!`);
+        }
+    });
+
+
+    if (stopButton) { /* ... (content unchanged) ... */ 
         stopButton.addEventListener('click', () => {
             if (isAgentRunning) {
                 console.log("Stop button clicked.");
@@ -974,7 +1059,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     } else { console.error("Stop button element not found!"); }
 
-    if (uploadFileButton && fileUploadInput) {
+    if (uploadFileButton && fileUploadInput) { /* ... (content unchanged) ... */ 
         uploadFileButton.addEventListener('click', () => {
             console.log("Upload button clicked, triggering file input.");
             fileUploadInput.click();
@@ -982,7 +1067,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fileUploadInput.addEventListener('change', handleFileUpload);
     } else { console.error("File upload button or input element not found!"); }
 
-    if (agentThinkingStatusElement) {
+    if (agentThinkingStatusElement) { /* ... (content unchanged) ... */ 
         agentThinkingStatusElement.addEventListener('click', () => {
             console.log("Agent thinking status clicked. Scrolling monitor.");
             if (monitorLogAreaElement) {
@@ -993,7 +1078,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Agent thinking status element (#agent-thinking-status) not found!");
     }
 
-    document.body.addEventListener('click', event => {
+    document.body.addEventListener('click', event => { /* ... (content unchanged) ... */ 
         if (event.target.classList.contains('action-btn')) {
             const commandText = event.target.textContent.trim();
             console.log(`Action button clicked: ${commandText}`);
@@ -1009,6 +1094,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Initial Load Actions ---
     loadTasks();
     renderTaskList();
-    connectWebSocket();
+    connectWebSocket(); 
 
 }); // End of DOMContentLoaded listener

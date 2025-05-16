@@ -31,7 +31,7 @@ from langchain_core.language_models.base import BaseLanguageModel
 from langchain_core.language_models.chat_models import BaseChatModel 
 
 # Project Imports
-from backend.config import settings
+from backend.config import settings # settings will now have the parsed role-specific providers/models
 from backend.llm_setup import get_llm
 from backend.tools import get_dynamic_tools, get_task_workspace_path, BASE_WORKSPACE_ROOT, TEXT_EXTENSIONS
 from backend.agent import create_agent_executor 
@@ -42,14 +42,15 @@ from backend.db_utils import (
 )
 from backend.planner import generate_plan, PlanStep 
 from backend.controller import validate_and_prepare_step_action 
-# MODIFIED: Import all message handlers
+# MODIFIED: Import all message handlers, including the new one
 from backend.message_handlers import (
     process_context_switch, process_user_message,
     process_execute_confirmed_plan, process_new_task,
     process_delete_task, process_rename_task,
     process_set_llm, process_get_available_models,
     process_cancel_agent, process_get_artifacts_for_task,
-    process_run_command, process_action_command
+    process_run_command, process_action_command,
+    process_set_session_role_llm # MODIFIED: Added new handler
 )
 
 # ----------------------
@@ -75,8 +76,9 @@ logger = logging.getLogger(__name__)
 logger.info(f"Logging level set to {log_level}")
 
 try:
+    # Use the system-wide default for this startup check
     default_llm_instance_for_startup_checks: BaseLanguageModel = get_llm(settings, provider=settings.default_provider, model_name=settings.default_model_name)
-    logger.info(f"Default Base LLM for startup checks initialized successfully: {settings.default_llm_id}")
+    logger.info(f"Default Base LLM for startup checks initialized successfully: {settings.default_provider}::{settings.default_model_name}")
 except Exception as llm_e:
     logging.critical(f"FATAL: Failed during startup LLM initialization: {llm_e}", exc_info=True)
     exit(1)
@@ -91,6 +93,7 @@ logger.info(f"File server will listen on {FILE_SERVER_LISTEN_HOST}:{FILE_SERVER_
 logger.info(f"File server URLs constructed for client will use: http://{FILE_SERVER_CLIENT_HOST}:{FILE_SERVER_PORT}")
 
 async def read_stream(stream, stream_name, session_id, send_ws_message_func, db_add_message_func, current_task_id):
+    # ... (Content unchanged)
     log_prefix_base = f"[{session_id[:8]}]"
     while True:
         try: line = await stream.readline()
@@ -106,6 +109,7 @@ async def read_stream(stream, stream_name, session_id, send_ws_message_func, db_
 
 
 async def execute_shell_command(command: str, session_id: str, send_ws_message_func: SendWSMessageFunc, db_add_message_func: DBAddMessageFunc, current_task_id: Optional[str]) -> bool:
+    # ... (Content unchanged)
     log_prefix_base = f"[{session_id[:8]}]"; timestamp_start = datetime.datetime.now().isoformat(timespec='milliseconds')
     start_log_content = f"[Direct Command] Executing: {command}"
     logger.info(f"[{session_id}] {start_log_content}")
@@ -383,7 +387,6 @@ async def handler(websocket: Any):
     memory: Optional[ConversationBufferWindowMemory] = None
     session_setup_ok = False
     try:
-        # ... (Session setup content unchanged) ...
         logger.info(f"[{session_id}] Starting session setup...")
         logger.debug(f"[{session_id}] Creating ConversationBufferWindowMemory (K={settings.agent_memory_window_k})...")
         memory = ConversationBufferWindowMemory(
@@ -399,19 +402,25 @@ async def handler(websocket: Any):
             "memory": memory,
             "callback_handler": ws_callback_handler,
             "current_task_id": None,
-            "selected_llm_provider": settings.default_provider, 
-            "selected_llm_model_name": settings.default_model_name, 
+            # MODIFIED: Initialize selected_llm with EXECUTOR_DEFAULT from settings
+            "selected_llm_provider": settings.executor_default_provider, 
+            "selected_llm_model_name": settings.executor_default_model_name, 
             "cancellation_requested": False,
             "current_plan_structured": None,
             "current_plan_human_summary": None,
             "current_plan_step_index": -1,
             "plan_execution_active": False,
-            "original_user_query": None
+            "original_user_query": None,
+            "active_plan_filename": None,
+            # MODIFIED: Add storage for session-specific role LLM overrides (IDs as strings)
+            "session_intent_classifier_llm_id": None, # None means use backend default for this role
+            "session_planner_llm_id": None,
+            "session_controller_llm_id": None,
+            "session_evaluator_llm_id": None,
         }
         logger.info(f"[{session_id}] Session setup complete.")
         session_setup_ok = True
     except Exception as e:
-        # ... (Session setup error handling unchanged - using simplified websocket check) ...
         logger.error(f"[{session_id}] CRITICAL ERROR during session setup: {e}", exc_info=True)
         if websocket: 
             try: await websocket.close(code=1011, reason="Session setup failed")
@@ -433,24 +442,35 @@ async def handler(websocket: Any):
         "new_task": process_new_task,                  # type: ignore
         "delete_task": process_delete_task,            # type: ignore
         "rename_task": process_rename_task,            # type: ignore
-        "set_llm": process_set_llm,                    # type: ignore
+        "set_llm": process_set_llm,                    # type: ignore # For Executor LLM
         "get_available_models": process_get_available_models, # type: ignore
         "cancel_agent": process_cancel_agent,          # type: ignore
         "get_artifacts_for_task": process_get_artifacts_for_task, # type: ignore
         "run_command": process_run_command,            # type: ignore
         "action_command": process_action_command,      # type: ignore
+        "set_session_role_llm": process_set_session_role_llm, # MODIFIED: Added new handler
     }
 
     try:
-        status_llm_info = f"LLM: {settings.default_provider} ({settings.default_model_name})" # This reflects the initial UI default
+        # MODIFIED: Use executor_default for initial status display
+        status_llm_info = f"Executor LLM: {settings.executor_default_provider} ({settings.executor_default_model_name})"
         logger.info(f"[{session_id}] Sending initial status message...");
         await send_ws_message_for_session("status_message", f"Connected (Session: {session_id[:8]}...). Agent Ready. {status_llm_info}.")
+        
+        # MODIFIED: Construct and send role_llm_defaults
+        role_llm_defaults = {
+            "intent_classifier": f"{settings.intent_classifier_provider}::{settings.intent_classifier_model_name}",
+            "planner": f"{settings.planner_provider}::{settings.planner_model_name}",
+            "controller": f"{settings.controller_provider}::{settings.controller_model_name}",
+            "evaluator": f"{settings.evaluator_provider}::{settings.evaluator_model_name}",
+        }
         await send_ws_message_for_session("available_models", {
            "gemini": settings.gemini_available_models,
            "ollama": settings.ollama_available_models,
-           "default_llm_id": settings.default_llm_id
+           "default_executor_llm_id": f"{settings.executor_default_provider}::{settings.executor_default_model_name}", # For the main UI selector
+           "role_llm_defaults": role_llm_defaults
         })
-        logger.info(f"[{session_id}] Sent available_models to client.")
+        logger.info(f"[{session_id}] Sent available_models (with role defaults) to client.")
         logger.info(f"[{session_id}] Initial status message sent."); await add_monitor_log_and_save(f"New client connection: {websocket.remote_address}", "system_connect")
         logger.info(f"[{session_id}] Added system_connect log.")
 
@@ -473,7 +493,7 @@ async def handler(websocket: Any):
                         continue
 
                     # Base arguments for all handlers
-                    handler_args = {
+                    handler_args: Dict[str, Any] = { # Ensure handler_args is typed
                         "session_id": session_id,
                         "data": parsed_data, 
                         "session_data_entry": session_data_entry,
@@ -481,6 +501,7 @@ async def handler(websocket: Any):
                         "send_ws_message_func": send_ws_message_for_session,
                         "add_monitor_log_func": add_monitor_log_and_save,
                     }
+                    
                     # Add specific dependencies for certain handlers
                     if message_type in ["context_switch", "user_message", "run_command"]:
                         handler_args["db_add_message_func"] = add_message
@@ -496,10 +517,11 @@ async def handler(websocket: Any):
                         handler_args["db_rename_task_func"] = rename_task_in_db
                     elif message_type == "run_command":
                          handler_args["execute_shell_command_func"] = execute_shell_command
+                    # No extra args needed for set_llm, get_available_models, cancel_agent, action_command, set_session_role_llm beyond base
                     
-                    await handler_func(**handler_args) # type: ignore
+                    await handler_func(**handler_args) 
                 
-                else: # This 'else' now correctly handles only truly unknown message types
+                else: 
                     logger.warning(f"[{session_id}] Unknown message type received: {message_type}")
                     await add_monitor_log_and_save(f"Received unknown message type: {message_type}", "error_unknown_msg")
 

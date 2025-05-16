@@ -4,8 +4,8 @@ import datetime
 from typing import Dict, Any, Callable, Coroutine, Optional, List
 import asyncio
 import shutil 
-from pathlib import Path # Ensure Path is imported for file operations
-import aiofiles # For async file writing
+from pathlib import Path 
+import re 
 
 # LangChain Imports
 from langchain_core.messages import AIMessage, HumanMessage
@@ -14,7 +14,7 @@ from langchain_core.runnables import RunnableConfig
 
 # Project Imports
 from backend.config import settings
-from backend.llm_setup import get_llm
+from backend.llm_setup import get_llm 
 from backend.tools import get_dynamic_tools, get_task_workspace_path, BASE_WORKSPACE_ROOT
 from backend.planner import generate_plan, PlanStep
 from backend.controller import validate_and_prepare_step_action
@@ -37,6 +37,50 @@ GetArtifactsFunc = Callable[[str], Coroutine[Any, Any, List[Dict[str, str]]]]
 ExecuteShellCommandFunc = Callable[[str, str, SendWSMessageFunc, DBAddMessageFunc, Optional[str]], Coroutine[Any, Any, bool]]
 
 
+async def _update_plan_file_step_status(
+    task_workspace_path: Path,
+    plan_filename: str,
+    step_number: int, 
+    status_char: str 
+) -> None:
+    # ... (Content from message_handlers_py_live_plan_eval, unchanged) ...
+    if not plan_filename:
+        logger.warning("Cannot update plan file: no active plan filename.")
+        return
+    
+    plan_file_path = task_workspace_path / plan_filename
+    if not await asyncio.to_thread(plan_file_path.exists):
+        logger.warning(f"Plan file {plan_file_path} not found for updating step {step_number}.")
+        return
+
+    try:
+        async with aiofiles.open(plan_file_path, 'r+', encoding='utf-8') as f:
+            lines = await f.readlines()
+            updated_lines = []
+            found_step = False
+            step_pattern = re.compile(rf"^\s*-\s*\[\s*[ x!-]?\s*\]\s*{step_number}\.\s+.*", re.IGNORECASE)
+            checkbox_pattern = re.compile(r"(\s*-\s*\[)\s*[ x!-]?\s*(\])")
+
+            for line in lines:
+                if not found_step and step_pattern.match(line):
+                    updated_line = checkbox_pattern.sub(rf"\g<1>{status_char}\g<2>", line, count=1)
+                    updated_lines.append(updated_line)
+                    found_step = True
+                    logger.debug(f"Updated plan file for step {step_number} to status '[{status_char}]'. Line: {updated_line.strip()}")
+                else:
+                    updated_lines.append(line)
+            
+            if found_step:
+                await f.seek(0)
+                await f.truncate()
+                await f.writelines(updated_lines)
+            else:
+                logger.warning(f"Step {step_number} not found in plan file {plan_file_path} for status update.")
+
+    except Exception as e:
+        logger.error(f"Error updating plan file {plan_file_path} for step {step_number}: {e}", exc_info=True)
+
+
 async def process_context_switch(
     session_id: str,
     data: Dict[str, Any],
@@ -49,7 +93,7 @@ async def process_context_switch(
     db_get_messages_func: DBGetMessagesFunc,
     get_artifacts_func: GetArtifactsFunc
 ) -> None:
-    # ... (Content from message_handlers_py_evaluator_integration, unchanged) ...
+    # ... (Content from message_handlers_py_live_plan_eval, unchanged) ...
     task_id_from_frontend = data.get("taskId")
     task_title_from_frontend = data.get("task")
 
@@ -61,6 +105,7 @@ async def process_context_switch(
     session_data_entry['current_plan_step_index'] = -1
     session_data_entry['plan_execution_active'] = False
     session_data_entry['original_user_query'] = None 
+    session_data_entry['active_plan_filename'] = None 
 
     existing_agent_task = connected_clients_entry.get("agent_task")
     if existing_agent_task and not existing_agent_task.done():
@@ -187,6 +232,7 @@ async def process_user_message(
     
     session_data_entry['original_user_query'] = user_input_content
     session_data_entry['cancellation_requested'] = False
+    session_data_entry['active_plan_filename'] = None 
     
     await send_ws_message_func("agent_thinking_update", {"status": "Classifying intent..."})
     
@@ -317,10 +363,8 @@ async def process_execute_confirmed_plan(
     connected_clients_entry: Dict[str, Any],
     send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc
-    # MODIFIED: Added get_artifacts_func for triggering refresh after saving plan
-    # get_artifacts_func: GetArtifactsFunc 
-    # Actually, send_ws_message_func("trigger_artifact_refresh", ...) is sufficient
 ) -> None:
+    # ... (Content from message_handlers_py_live_plan_eval, unchanged) ...
     logger.info(f"[{session_id}] Received 'execute_confirmed_plan'.")
     active_task_id = session_data_entry.get("current_task_id")
     if not active_task_id:
@@ -342,17 +386,20 @@ async def process_execute_confirmed_plan(
     await add_monitor_log_func(f"User confirmed plan. Starting execution of {len(confirmed_plan_steps_dicts)} steps.", "system_plan_confirmed")
     await send_ws_message_func("status_message", "Plan confirmed. Executing steps...")
     
-    # --- MODIFIED: Save plan to a file ---
-    plan_filename = "_plan.md"
+    timestamp_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S_%f") # Added microseconds for more uniqueness
+    plan_filename = f"_plan_{timestamp_str}.md"
+    session_data_entry['active_plan_filename'] = plan_filename 
+
     plan_markdown_content = [f"# Agent Plan for Task: {active_task_id}\n"]
+    plan_markdown_content.append(f"## Plan ID: {timestamp_str}\n")
     plan_markdown_content.append(f"## Original User Query:\n{session_data_entry.get('original_user_query', 'N/A')}\n")
-    plan_markdown_content.append(f"## Plan Summary:\n{session_data_entry.get('current_plan_human_summary', 'N/A')}\n")
+    plan_markdown_content.append(f"## Plan Summary (from Planner):\n{session_data_entry.get('current_plan_human_summary', 'N/A')}\n")
     plan_markdown_content.append("## Steps:\n")
     for i, step_data in enumerate(confirmed_plan_steps_dicts):
         plan_markdown_content.append(f"{i+1}. `[ ]` **{step_data.get('description', 'N/A')}**")
-        plan_markdown_content.append(f"    - Tool Suggestion: `{step_data.get('tool_to_use', 'None')}`")
-        plan_markdown_content.append(f"    - Input Instructions: `{step_data.get('tool_input_instructions', 'None')}`")
-        plan_markdown_content.append(f"    - Expected Outcome: `{step_data.get('expected_outcome', 'N/A')}`\n")
+        plan_markdown_content.append(f"    - Tool Suggestion (Planner): `{step_data.get('tool_to_use', 'None')}`")
+        plan_markdown_content.append(f"    - Input Instructions (Planner): `{step_data.get('tool_input_instructions', 'None')}`")
+        plan_markdown_content.append(f"    - Expected Outcome (Planner): `{step_data.get('expected_outcome', 'N/A')}`\n")
     
     try:
         task_workspace_path = get_task_workspace_path(active_task_id)
@@ -361,13 +408,11 @@ async def process_execute_confirmed_plan(
             await f.write("\n".join(plan_markdown_content))
         logger.info(f"[{session_id}] Saved confirmed plan to {plan_file_path}")
         await add_monitor_log_func(f"Confirmed plan saved to artifact: {plan_filename}", "system_info")
-        # Trigger artifact refresh in UI
         await send_ws_message_func("trigger_artifact_refresh", {"taskId": active_task_id})
     except Exception as e:
-        logger.error(f"[{session_id}] Failed to save plan to file: {e}", exc_info=True)
-        await add_monitor_log_func(f"Error saving plan to file: {e}", "error_system")
-    # --- END MODIFIED ---
-
+        logger.error(f"[{session_id}] Failed to save plan to file '{plan_filename}': {e}", exc_info=True)
+        await add_monitor_log_func(f"Error saving plan to file '{plan_filename}': {e}", "error_system")
+    
     plan_failed = False
     preliminary_final_answer = "Plan execution completed." 
     step_execution_details_list = [] 
@@ -381,7 +426,7 @@ async def process_execute_confirmed_plan(
         current_step_detail = { 
             "step_number": i + 1, "description": "N/A", "controller_tool": "N/A", 
             "controller_input": "N/A", "controller_reasoning": "N/A", "controller_confidence": 0.0,
-            "executor_input": "N/A", "executor_output": "N/A", "error": None
+            "executor_input": "N/A", "executor_output": "N/A", "error": None, "status_char": " " 
         }
         
         try:
@@ -392,6 +437,7 @@ async def process_execute_confirmed_plan(
             error_msg = f"Error: Corrupted plan step {i+1}. Skipping. Details: {pydantic_err}"
             await add_monitor_log_func(error_msg, "error_plan_step")
             current_step_detail["error"] = error_msg
+            current_step_detail["status_char"] = "!"
             step_execution_details_list.append(current_step_detail)
             plan_failed = True; break
         
@@ -425,6 +471,7 @@ async def process_execute_confirmed_plan(
             error_msg = f"Error: Controller failed to process step {i+1}. Reason: {controller_message}. Skipping step."
             await add_monitor_log_func(error_msg, "error_controller")
             current_step_detail["error"] = error_msg 
+            current_step_detail["status_char"] = "!"
             step_execution_details_list.append(current_step_detail) 
             plan_failed = True; break
         
@@ -465,6 +512,7 @@ async def process_execute_confirmed_plan(
             error_msg = f"Error: Failed to init LLM for Executor (step {i+1}). Skipping step. Details: {llm_err}"
             await add_monitor_log_func(error_msg, "error_system")
             current_step_detail["error"] = error_msg
+            current_step_detail["status_char"] = "!"
             step_execution_details_list.append(current_step_detail)
             plan_failed = True; break
         
@@ -493,6 +541,7 @@ async def process_execute_confirmed_plan(
             
             step_output = step_result.get("output", "Step completed, no specific output from ReAct agent.")
             current_step_detail["executor_output"] = step_output 
+            current_step_detail["status_char"] = "x" 
             await add_monitor_log_func(f"Plan Step {i+1} (Executor) completed. Output: {str(step_output)[:200]}...", "system_plan_step_end")
 
         except AgentCancelledException as ace:
@@ -501,6 +550,7 @@ async def process_execute_confirmed_plan(
             error_msg = f"Plan execution cancelled by user during step {i+1}."
             await add_monitor_log_func(error_msg, "system_cancel")
             current_step_detail["error"] = error_msg 
+            current_step_detail["status_char"] = "-" 
             plan_failed = True
         except Exception as step_exec_e:
             logger.error(f"[{session_id}] Error executing plan step {i+1} ('{step_description}'): {step_exec_e}", exc_info=True)
@@ -508,10 +558,22 @@ async def process_execute_confirmed_plan(
             await add_monitor_log_func(error_msg, "error_plan_step")
             await send_ws_message_func("status_message", f"Error in step {i+1}. Stopping plan.")
             current_step_detail["error"] = error_msg 
+            current_step_detail["status_char"] = "!" 
             plan_failed = True
         finally:
             connected_clients_entry["agent_task"] = None
             step_execution_details_list.append(current_step_detail) 
+            
+            active_plan_filename = session_data_entry.get('active_plan_filename')
+            if active_plan_filename and active_task_id:
+                task_ws_path = get_task_workspace_path(active_task_id)
+                await _update_plan_file_step_status(
+                    task_ws_path, 
+                    active_plan_filename, 
+                    current_step_detail["step_number"], 
+                    current_step_detail["status_char"]
+                )
+                await send_ws_message_func("trigger_artifact_refresh", {"taskId": active_task_id})
             if plan_failed: break 
 
         if session_data_entry.get('cancellation_requested', False): 
@@ -519,6 +581,17 @@ async def process_execute_confirmed_plan(
             await send_ws_message_func("status_message", "Plan execution cancelled.")
             if not current_step_detail.get("error"):
                  current_step_detail["error"] = "Cancelled by user after step completion."
+                 current_step_detail["status_char"] = "-"
+                 active_plan_filename_cancel = session_data_entry.get('active_plan_filename')
+                 if active_plan_filename_cancel and active_task_id:
+                     task_ws_path_cancel = get_task_workspace_path(active_task_id)
+                     await _update_plan_file_step_status(
+                         task_ws_path_cancel, 
+                         active_plan_filename_cancel, 
+                         current_step_detail["step_number"], 
+                         current_step_detail["status_char"]
+                     )
+                     await send_ws_message_func("trigger_artifact_refresh", {"taskId": active_task_id})
             plan_failed = True; break 
     
     session_data_entry["plan_execution_active"] = False
@@ -594,6 +667,7 @@ async def process_new_task(
     session_data_entry['current_plan_step_index'] = -1
     session_data_entry['plan_execution_active'] = False
     session_data_entry['original_user_query'] = None
+    session_data_entry['active_plan_filename'] = None
 
     existing_agent_task = connected_clients_entry.get("agent_task")
     if existing_agent_task and not existing_agent_task.done():
@@ -623,6 +697,7 @@ async def process_delete_task(
     db_delete_task_func: DBDeleteTaskFunc, 
     get_artifacts_func: GetArtifactsFunc 
 ) -> None:
+    # ... (Content from previous version, with corrected get_task_workspace_path call) ...
     task_id_to_delete = data.get("taskId")
     if not task_id_to_delete:
         logger.warning(f"[{session_id}] 'delete_task' message missing taskId.")
@@ -639,8 +714,7 @@ async def process_delete_task(
         await add_monitor_log_func(f"Task {task_id_to_delete} DB entries deleted successfully.", "system_delete_success")
         task_workspace_to_delete: Optional[Path] = None
         try:
-            # MODIFIED: Removed create=False
-            task_workspace_to_delete = get_task_workspace_path(task_id_to_delete)
+            task_workspace_to_delete = get_task_workspace_path(task_id_to_delete) 
             if task_workspace_to_delete.exists(): 
                 if task_workspace_to_delete.is_relative_to(BASE_WORKSPACE_ROOT.resolve()):
                     logger.info(f"[{session_id}] Attempting to delete workspace directory: {task_workspace_to_delete}")
@@ -667,6 +741,7 @@ async def process_delete_task(
             session_data_entry['current_plan_step_index'] = -1
             session_data_entry['plan_execution_active'] = False
             session_data_entry['original_user_query'] = None
+            session_data_entry['active_plan_filename'] = None
             existing_agent_task = connected_clients_entry.get("agent_task")
             if existing_agent_task and not existing_agent_task.done():
                 existing_agent_task.cancel()
@@ -713,16 +788,15 @@ async def process_rename_task(
         logger.error(f"[{session_id}] Failed to rename task {task_id_to_rename} in database.")
         await add_monitor_log_func(f"Failed to rename task {task_id_to_rename} in DB.", "error_db")
 
-# --- MODIFIED: Added remaining handlers from server.py ---
-# ... (Content from message_handlers_py_final, unchanged) ...
 async def process_set_llm(
     session_id: str,
-    data: Dict[str, Any], # Contains llm_id
+    data: Dict[str, Any], 
     session_data_entry: Dict[str, Any],
     connected_clients_entry: Dict[str, Any], 
     send_ws_message_func: SendWSMessageFunc, 
     add_monitor_log_func: AddMonitorLogFunc
 ) -> None:
+    # ... (Content from previous version, unchanged) ...
     llm_id = data.get("llm_id")
     if llm_id and isinstance(llm_id, str):
         try:
@@ -755,11 +829,18 @@ async def process_get_available_models(
     send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc 
 ) -> None:
+    # ... (Content from previous version, unchanged) ...
     logger.info(f"[{session_id}] Received request for available models.")
     await send_ws_message_func("available_models", {
         "gemini": settings.gemini_available_models,
         "ollama": settings.ollama_available_models,
-        "default_llm_id": settings.default_llm_id 
+        "default_executor_llm_id": f"{settings.executor_default_provider}::{settings.executor_default_model_name}", # MODIFIED: Key name for clarity
+        "role_llm_defaults": { # MODIFIED: Send effective defaults for roles
+            "intent_classifier": f"{settings.intent_classifier_provider}::{settings.intent_classifier_model_name}",
+            "planner": f"{settings.planner_provider}::{settings.planner_model_name}",
+            "controller": f"{settings.controller_provider}::{settings.controller_model_name}",
+            "evaluator": f"{settings.evaluator_provider}::{settings.evaluator_model_name}",
+        }
     })
 
 async def process_cancel_agent(
@@ -770,6 +851,7 @@ async def process_cancel_agent(
     send_ws_message_func: SendWSMessageFunc, 
     add_monitor_log_func: AddMonitorLogFunc 
 ) -> None:
+    # ... (Content from previous version, unchanged) ...
     logger.warning(f"[{session_id}] Received request to cancel current operation.")
     session_data_entry['cancellation_requested'] = True
     logger.info(f"[{session_id}] Cancellation requested flag set to True.")
@@ -790,6 +872,7 @@ async def process_get_artifacts_for_task(
     add_monitor_log_func: AddMonitorLogFunc, 
     get_artifacts_func: GetArtifactsFunc
 ) -> None:
+    # ... (Content from previous version, unchanged) ...
     task_id_to_refresh = data.get("taskId")
     if not task_id_to_refresh:
         logger.warning(f"[{session_id}] Received get_artifacts_for_task without taskId.")
@@ -814,6 +897,7 @@ async def process_run_command(
     db_add_message_func: DBAddMessageFunc, 
     execute_shell_command_func: ExecuteShellCommandFunc 
 ) -> None:
+    # ... (Content from previous version, unchanged) ...
     command_to_run = data.get("command")
     if command_to_run and isinstance(command_to_run, str):
         active_task_id_for_cmd = session_data_entry.get("current_task_id")
@@ -837,9 +921,59 @@ async def process_action_command(
     send_ws_message_func: SendWSMessageFunc, 
     add_monitor_log_func: AddMonitorLogFunc
 ) -> None:
+    # ... (Content from previous version, unchanged) ...
     action = data.get("command")
     if action and isinstance(action, str):
         logger.info(f"[{session_id}] Received action command: {action} (Not implemented).")
         await add_monitor_log_func(f"Received action command: {action} (Handler not implemented).", "system_action_cmd")
     else:
         logger.warning(f"[{session_id}] Received 'action_command' with invalid/missing command content.")
+
+# MODIFIED: New handler for setting session-specific role LLM overrides
+async def process_set_session_role_llm(
+    session_id: str,
+    data: Dict[str, Any], # Expected: {"role": "planner", "llm_id": "gemini::gemini-1.5-pro-latest"} or {"role": "planner", "llm_id": ""}
+    session_data_entry: Dict[str, Any],
+    connected_clients_entry: Dict[str, Any], # Not directly used
+    send_ws_message_func: SendWSMessageFunc, # Not directly used
+    add_monitor_log_func: AddMonitorLogFunc
+) -> None:
+    """Handles setting a session-specific LLM override for a given role."""
+    role = data.get("role")
+    llm_id_override = data.get("llm_id") # This can be an empty string to clear the override
+
+    if not role or role not in ["intent_classifier", "planner", "controller", "evaluator"]:
+        logger.warning(f"[{session_id}] Invalid or missing 'role' in set_session_role_llm: {role}")
+        await add_monitor_log_func(f"Error: Invalid role specified for LLM override: {role}", "error_system")
+        return
+
+    # Construct the session_data key for this role's override
+    # e.g., session_intent_classifier_llm_id, session_planner_llm_id
+    session_override_key = f"session_{role}_llm_id" 
+
+    if llm_id_override == "": # User selected "Use System Default"
+        session_data_entry[session_override_key] = None # Clear the override
+        logger.info(f"[{session_id}] Cleared session LLM override for role '{role}'. Will use system default.")
+        await add_monitor_log_func(f"Session LLM for role '{role}' reset to system default.", "system_llm_set")
+    elif llm_id_override and isinstance(llm_id_override, str):
+        try:
+            provider, model_name = llm_id_override.split("::", 1)
+            is_valid = False
+            if provider == 'gemini' and model_name in settings.gemini_available_models:
+                is_valid = True
+            elif provider == 'ollama' and model_name in settings.ollama_available_models:
+                is_valid = True
+            
+            if is_valid:
+                session_data_entry[session_override_key] = llm_id_override
+                logger.info(f"[{session_id}] Session LLM override for role '{role}' set to: {llm_id_override}")
+                await add_monitor_log_func(f"Session LLM for role '{role}' overridden to {llm_id_override}.", "system_llm_set")
+            else:
+                logger.warning(f"[{session_id}] Attempt to set invalid/unavailable LLM ID '{llm_id_override}' for role '{role}'. Override not applied.")
+                await add_monitor_log_func(f"Attempt to set invalid LLM '{llm_id_override}' for role '{role}' ignored.", "error_llm_set")
+        except ValueError:
+            logger.warning(f"[{session_id}] Invalid LLM ID format for role '{role}': {llm_id_override}")
+            await add_monitor_log_func(f"Invalid LLM ID format for role '{role}': {llm_id_override}", "error_llm_set")
+    else:
+        logger.warning(f"[{session_id}] Invalid 'llm_id' in set_session_role_llm for role '{role}': {llm_id_override}")
+
