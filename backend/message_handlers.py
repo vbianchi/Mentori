@@ -4,8 +4,9 @@ import datetime
 from typing import Dict, Any, Callable, Coroutine, Optional, List
 import asyncio
 import shutil 
-from pathlib import Path 
-import re 
+from pathlib import Path
+import aiofiles # For async file writing
+import re # For updating plan file
 
 # LangChain Imports
 from langchain_core.messages import AIMessage, HumanMessage
@@ -40,42 +41,51 @@ ExecuteShellCommandFunc = Callable[[str, str, SendWSMessageFunc, DBAddMessageFun
 async def _update_plan_file_step_status(
     task_workspace_path: Path,
     plan_filename: str,
-    step_number: int, 
-    status_char: str 
+    step_number: int, # 1-indexed
+    status_char: str # "x" for done, "!" for error, "-" for cancelled/skipped
 ) -> None:
-    # ... (Content from message_handlers_py_live_plan_eval, unchanged) ...
+    """Helper to update a step's status in the plan Markdown file."""
     if not plan_filename:
         logger.warning("Cannot update plan file: no active plan filename.")
         return
     
     plan_file_path = task_workspace_path / plan_filename
+    # Check if file exists before attempting to read/write
+    # Use asyncio.to_thread for synchronous os.path.exists
     if not await asyncio.to_thread(plan_file_path.exists):
         logger.warning(f"Plan file {plan_file_path} not found for updating step {step_number}.")
         return
 
     try:
-        async with aiofiles.open(plan_file_path, 'r+', encoding='utf-8') as f:
-            lines = await f.readlines()
-            updated_lines = []
-            found_step = False
-            step_pattern = re.compile(rf"^\s*-\s*\[\s*[ x!-]?\s*\]\s*{step_number}\.\s+.*", re.IGNORECASE)
-            checkbox_pattern = re.compile(r"(\s*-\s*\[)\s*[ x!-]?\s*(\])")
+        # Read all lines first
+        async with aiofiles.open(plan_file_path, 'r', encoding='utf-8') as f_read:
+            lines = await f_read.readlines()
 
-            for line in lines:
-                if not found_step and step_pattern.match(line):
-                    updated_line = checkbox_pattern.sub(rf"\g<1>{status_char}\g<2>", line, count=1)
-                    updated_lines.append(updated_line)
-                    found_step = True
-                    logger.debug(f"Updated plan file for step {step_number} to status '[{status_char}]'. Line: {updated_line.strip()}")
-                else:
-                    updated_lines.append(line)
-            
-            if found_step:
-                await f.seek(0)
-                await f.truncate()
-                await f.writelines(updated_lines)
+        updated_lines = []
+        found_step = False
+        # Regex to find the checklist item for the specific step number
+        # Handles potential leading spaces and the step number followed by a dot.
+        # It looks for an existing checkbox that might contain a space, x, !, or -
+        step_pattern = re.compile(rf"^\s*-\s*\[\s*[ x!-]?\s*\]\s*{step_number}\.\s+.*", re.IGNORECASE)
+        # Regex to replace the checkbox part (captures prefix and suffix of checkbox)
+        checkbox_pattern = re.compile(r"(\s*-\s*\[)\s*[ x!-]?\s*(\])")
+
+        for line_content in lines:
+            if not found_step and step_pattern.match(line_content):
+                # Replace the checkbox with the new status
+                updated_line = checkbox_pattern.sub(rf"\g<1>{status_char}\g<2>", line_content, count=1)
+                updated_lines.append(updated_line)
+                found_step = True
+                logger.debug(f"Updated plan file for step {step_number} to status '[{status_char}]'. Line: {updated_line.strip()}")
             else:
-                logger.warning(f"Step {step_number} not found in plan file {plan_file_path} for status update.")
+                updated_lines.append(line_content)
+        
+        if found_step:
+            # Write the modified lines back
+            async with aiofiles.open(plan_file_path, 'w', encoding='utf-8') as f_write:
+                await f_write.writelines(updated_lines)
+        else:
+            logger.warning(f"Step {step_number} not found in plan file {plan_file_path} for status update.")
 
     except Exception as e:
         logger.error(f"Error updating plan file {plan_file_path} for step {step_number}: {e}", exc_info=True)
@@ -93,7 +103,6 @@ async def process_context_switch(
     db_get_messages_func: DBGetMessagesFunc,
     get_artifacts_func: GetArtifactsFunc
 ) -> None:
-    # ... (Content from message_handlers_py_live_plan_eval, unchanged) ...
     task_id_from_frontend = data.get("taskId")
     task_title_from_frontend = data.get("task")
 
@@ -105,7 +114,7 @@ async def process_context_switch(
     session_data_entry['current_plan_step_index'] = -1
     session_data_entry['plan_execution_active'] = False
     session_data_entry['original_user_query'] = None 
-    session_data_entry['active_plan_filename'] = None 
+    session_data_entry['active_plan_filename'] = None # Reset active plan file
 
     existing_agent_task = connected_clients_entry.get("agent_task")
     if existing_agent_task and not existing_agent_task.done():
@@ -232,7 +241,7 @@ async def process_user_message(
     
     session_data_entry['original_user_query'] = user_input_content
     session_data_entry['cancellation_requested'] = False
-    session_data_entry['active_plan_filename'] = None 
+    session_data_entry['active_plan_filename'] = None # Reset active plan file for new query
     
     await send_ws_message_func("agent_thinking_update", {"status": "Classifying intent..."})
     
@@ -364,7 +373,6 @@ async def process_execute_confirmed_plan(
     send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc
 ) -> None:
-    # ... (Content from message_handlers_py_live_plan_eval, unchanged) ...
     logger.info(f"[{session_id}] Received 'execute_confirmed_plan'.")
     active_task_id = session_data_entry.get("current_task_id")
     if not active_task_id:
@@ -386,13 +394,15 @@ async def process_execute_confirmed_plan(
     await add_monitor_log_func(f"User confirmed plan. Starting execution of {len(confirmed_plan_steps_dicts)} steps.", "system_plan_confirmed")
     await send_ws_message_func("status_message", "Plan confirmed. Executing steps...")
     
-    timestamp_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S_%f") # Added microseconds for more uniqueness
+    # --- MODIFIED: Save plan to a unique file ---
+    timestamp_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S_%f") 
     plan_filename = f"_plan_{timestamp_str}.md"
     session_data_entry['active_plan_filename'] = plan_filename 
 
     plan_markdown_content = [f"# Agent Plan for Task: {active_task_id}\n"]
     plan_markdown_content.append(f"## Plan ID: {timestamp_str}\n")
-    plan_markdown_content.append(f"## Original User Query:\n{session_data_entry.get('original_user_query', 'N/A')}\n")
+    original_query_for_plan_file = session_data_entry.get('original_user_query', 'N/A')
+    plan_markdown_content.append(f"## Original User Query:\n{original_query_for_plan_file}\n")
     plan_markdown_content.append(f"## Plan Summary (from Planner):\n{session_data_entry.get('current_plan_human_summary', 'N/A')}\n")
     plan_markdown_content.append("## Steps:\n")
     for i, step_data in enumerate(confirmed_plan_steps_dicts):
@@ -401,8 +411,8 @@ async def process_execute_confirmed_plan(
         plan_markdown_content.append(f"    - Input Instructions (Planner): `{step_data.get('tool_input_instructions', 'None')}`")
         plan_markdown_content.append(f"    - Expected Outcome (Planner): `{step_data.get('expected_outcome', 'N/A')}`\n")
     
+    task_workspace_path = get_task_workspace_path(active_task_id) # Define here for use in saving and updating
     try:
-        task_workspace_path = get_task_workspace_path(active_task_id)
         plan_file_path = task_workspace_path / plan_filename
         async with aiofiles.open(plan_file_path, 'w', encoding='utf-8') as f:
             await f.write("\n".join(plan_markdown_content))
@@ -412,14 +422,15 @@ async def process_execute_confirmed_plan(
     except Exception as e:
         logger.error(f"[{session_id}] Failed to save plan to file '{plan_filename}': {e}", exc_info=True)
         await add_monitor_log_func(f"Error saving plan to file '{plan_filename}': {e}", "error_system")
+    # --- END MODIFIED ---
     
     plan_failed = False
     preliminary_final_answer = "Plan execution completed." 
     step_execution_details_list = [] 
 
     original_user_query = session_data_entry.get("original_user_query", "No original query context available.")
-    if not original_user_query:
-            await add_monitor_log_func(f"Warning: Original user query not found in session data for controller context.", "warning_system")
+    if not original_user_query: # This was already checked and logged above for the plan file
+            pass # No need to log again
 
     for i, step_dict in enumerate(confirmed_plan_steps_dicts):
         session_data_entry["current_plan_step_index"] = i
@@ -565,10 +576,10 @@ async def process_execute_confirmed_plan(
             step_execution_details_list.append(current_step_detail) 
             
             active_plan_filename = session_data_entry.get('active_plan_filename')
-            if active_plan_filename and active_task_id:
-                task_ws_path = get_task_workspace_path(active_task_id)
+            if active_plan_filename and active_task_id: # Ensure task_workspace_path is defined in this scope
+                # task_workspace_path was defined before the loop, it's still valid
                 await _update_plan_file_step_status(
-                    task_ws_path, 
+                    task_workspace_path, # Use the path defined before the loop
                     active_plan_filename, 
                     current_step_detail["step_number"], 
                     current_step_detail["status_char"]
@@ -584,9 +595,9 @@ async def process_execute_confirmed_plan(
                  current_step_detail["status_char"] = "-"
                  active_plan_filename_cancel = session_data_entry.get('active_plan_filename')
                  if active_plan_filename_cancel and active_task_id:
-                     task_ws_path_cancel = get_task_workspace_path(active_task_id)
+                     # task_workspace_path is still valid from before the loop
                      await _update_plan_file_step_status(
-                         task_ws_path_cancel, 
+                         task_workspace_path, 
                          active_plan_filename_cancel, 
                          current_step_detail["step_number"], 
                          current_step_detail["status_char"]
@@ -812,14 +823,25 @@ async def process_set_llm(
                 session_data_entry["selected_llm_model_name"] = model_name_from_id
                 logger.info(f"[{session_id}] Session LLM (for Executor/DirectQA) set to: {provider}::{model_name_from_id}")
                 await add_monitor_log_func(f"Session LLM (for Executor/DirectQA) set to {provider}::{model_name_from_id}", "system_llm_set")
-            else:
-                logger.warning(f"[{session_id}] Received request to set invalid/unavailable LLM ID for session: {llm_id}")
-                await add_monitor_log_func(f"Attempted to set invalid session LLM: {llm_id}", "error_llm_set")
-        except ValueError:
-            logger.warning(f"[{session_id}] Received invalid LLM ID format in set_llm: {llm_id}")
-            await add_monitor_log_func(f"Received invalid session LLM ID format: {llm_id}", "error_llm_set")
+            else: # User selected an empty value (e.g. "Use System Default (Executor)")
+                session_data_entry["selected_llm_provider"] = settings.executor_default_provider
+                session_data_entry["selected_llm_model_name"] = settings.executor_default_model_name
+                logger.info(f"[{session_id}] Session LLM (for Executor/DirectQA) reset to system default: {settings.executor_default_provider}::{settings.executor_default_model_name}")
+                await add_monitor_log_func(f"Session LLM (for Executor/DirectQA) reset to system default.", "system_llm_set")
+
+        except ValueError: # Handles if llm_id is not in "provider::model" format
+            logger.warning(f"[{session_id}] Invalid LLM ID format in set_llm: {llm_id}. Resetting to executor default.")
+            session_data_entry["selected_llm_provider"] = settings.executor_default_provider
+            session_data_entry["selected_llm_model_name"] = settings.executor_default_model_name
+            await add_monitor_log_func(f"Received invalid session LLM ID format: {llm_id}. Reset to default.", "error_llm_set")
+    elif llm_id == "": # Explicitly chosen "Use System Default (Executor)"
+        session_data_entry["selected_llm_provider"] = settings.executor_default_provider
+        session_data_entry["selected_llm_model_name"] = settings.executor_default_model_name
+        logger.info(f"[{session_id}] Session LLM (for Executor/DirectQA) explicitly set to system default: {settings.executor_default_provider}::{settings.executor_default_model_name}")
+        await add_monitor_log_func(f"Session LLM (for Executor/DirectQA) set to system default.", "system_llm_set")
     else:
         logger.warning(f"[{session_id}] Received invalid 'set_llm' message content: {data}")
+
 
 async def process_get_available_models(
     session_id: str,
@@ -834,8 +856,8 @@ async def process_get_available_models(
     await send_ws_message_func("available_models", {
         "gemini": settings.gemini_available_models,
         "ollama": settings.ollama_available_models,
-        "default_executor_llm_id": f"{settings.executor_default_provider}::{settings.executor_default_model_name}", # MODIFIED: Key name for clarity
-        "role_llm_defaults": { # MODIFIED: Send effective defaults for roles
+        "default_executor_llm_id": f"{settings.executor_default_provider}::{settings.executor_default_model_name}", 
+        "role_llm_defaults": { 
             "intent_classifier": f"{settings.intent_classifier_provider}::{settings.intent_classifier_model_name}",
             "planner": f"{settings.planner_provider}::{settings.planner_model_name}",
             "controller": f"{settings.controller_provider}::{settings.controller_model_name}",
@@ -929,30 +951,27 @@ async def process_action_command(
     else:
         logger.warning(f"[{session_id}] Received 'action_command' with invalid/missing command content.")
 
-# MODIFIED: New handler for setting session-specific role LLM overrides
 async def process_set_session_role_llm(
     session_id: str,
-    data: Dict[str, Any], # Expected: {"role": "planner", "llm_id": "gemini::gemini-1.5-pro-latest"} or {"role": "planner", "llm_id": ""}
+    data: Dict[str, Any], 
     session_data_entry: Dict[str, Any],
-    connected_clients_entry: Dict[str, Any], # Not directly used
-    send_ws_message_func: SendWSMessageFunc, # Not directly used
+    connected_clients_entry: Dict[str, Any], 
+    send_ws_message_func: SendWSMessageFunc, 
     add_monitor_log_func: AddMonitorLogFunc
 ) -> None:
-    """Handles setting a session-specific LLM override for a given role."""
+    # ... (Content from previous version, unchanged) ...
     role = data.get("role")
-    llm_id_override = data.get("llm_id") # This can be an empty string to clear the override
+    llm_id_override = data.get("llm_id") 
 
     if not role or role not in ["intent_classifier", "planner", "controller", "evaluator"]:
         logger.warning(f"[{session_id}] Invalid or missing 'role' in set_session_role_llm: {role}")
         await add_monitor_log_func(f"Error: Invalid role specified for LLM override: {role}", "error_system")
         return
 
-    # Construct the session_data key for this role's override
-    # e.g., session_intent_classifier_llm_id, session_planner_llm_id
     session_override_key = f"session_{role}_llm_id" 
 
-    if llm_id_override == "": # User selected "Use System Default"
-        session_data_entry[session_override_key] = None # Clear the override
+    if llm_id_override == "": 
+        session_data_entry[session_override_key] = None 
         logger.info(f"[{session_id}] Cleared session LLM override for role '{role}'. Will use system default.")
         await add_monitor_log_func(f"Session LLM for role '{role}' reset to system default.", "system_llm_set")
     elif llm_id_override and isinstance(llm_id_override, str):

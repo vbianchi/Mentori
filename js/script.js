@@ -41,14 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const lastCallTokensElement = document.getElementById('last-call-tokens');
     const taskTotalTokensElement = document.getElementById('task-total-tokens');
 
-    // LLM Selector References
     const executorLlmSelectElement = document.getElementById('llm-select'); 
     const intentLlmSelectElement = document.getElementById('intent-llm-select');
     const plannerLlmSelectElement = document.getElementById('planner-llm-select');
     const controllerLlmSelectElement = document.getElementById('controller-llm-select');
     const evaluatorLlmSelectElement = document.getElementById('evaluator-llm-select');
 
-    // Helper array for managing role selectors
     const roleSelectorsMeta = [
         { element: intentLlmSelectElement, role: 'intent_classifier', storageKey: 'sessionIntentLlmId', label: 'Intent Classifier' },
         { element: plannerLlmSelectElement, role: 'planner', storageKey: 'sessionPlannerLlmId', label: 'Planner' },
@@ -56,18 +54,15 @@ document.addEventListener('DOMContentLoaded', () => {
         { element: evaluatorLlmSelectElement, role: 'evaluator', storageKey: 'sessionEvaluatorLlmId', label: 'Evaluator' }
     ];
 
-
-    // --- State Variables ---
     let tasks = [];
     let currentTaskId = null;
     let taskCounter = 0;
     const STORAGE_KEY = 'aiAgentTasks';
     const COUNTER_KEY = 'aiAgentTaskCounter';
     let isLoadingHistory = false;
-    let availableModels = { gemini: [], ollama: [] }; // Populated by backend
+    let availableModels = { gemini: [], ollama: [] }; 
     
-    let currentExecutorLlmId = null; // For the main llm-select (Executor)
-    // Stores session overrides. Empty string means "Use System Default" for that role.
+    let currentExecutorLlmId = ""; 
     let sessionRoleLlmOverrides = { 
         intent_classifier: "", 
         planner: "", 
@@ -91,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.socket = null; 
 
     const updateMonitorStatus = (status, text) => {
-        // ... (content unchanged)
+        // ... (content unchanged from previous RA_cons.md version)
         if (!statusDotElement || !monitorStatusTextElement || !stopButton) return;
         statusDotElement.classList.remove('idle', 'running', 'error', 'disconnected');
         let statusText = text;
@@ -129,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const updateTokenDisplay = (lastCallUsage = null) => {
-        // ... (content unchanged)
+        // ... (content unchanged from previous RA_cons.md version)
         if (!lastCallTokensElement || !taskTotalTokensElement) return;
         if (lastCallUsage) {
             const lastInput = lastCallUsage.input_tokens || 0;
@@ -144,14 +139,14 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const resetTaskTokenTotals = () => {
-        // ... (content unchanged)
+        // ... (content unchanged from previous RA_cons.md version)
         currentTaskTotalTokens = { input: 0, output: 0, total: 0 };
         if(lastCallTokensElement) lastCallTokensElement.textContent = "N/A";
         updateTokenDisplay();
     };
 
     const connectWebSocket = () => {
-        // ... (content mostly unchanged, ensures all LLM selectors are disabled on error/close) ...
+        // ... (content unchanged from previous RA_cons.md version) ...
         console.log(`Attempting to connect to WebSocket: ${wsUrl}`);
         addMonitorLog("[SYSTEM] Attempting to connect to backend...");
         updateMonitorStatus('disconnected', 'Connecting...');
@@ -279,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             sendWsMessage('get_artifacts_for_task', { taskId: currentTaskId });
                         }
                         break;
-                    case 'available_models': // MODIFIED: This case now handles all selectors
+                    case 'available_models': 
                         if (message.content && typeof message.content === 'object') {
                             availableModels.gemini = message.content.gemini || [];
                             availableModels.ollama = message.content.ollama || [];
@@ -339,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const scrollToBottom = (element) => { if (!element) return; element.scrollTop = element.scrollHeight; };
-    const formatMessageContent = (text) => { /* ... (content unchanged) ... */ 
+    const formatMessageContent = (text) => { /* ... (content unchanged from previous RA_cons.md version) ... */ 
         let formattedText = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         formattedText = formattedText.replace(/```(\w*)\n([\s\S]*?)\n?```/g, (match, lang, code) => { const escapedCode = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); const langClass = lang ? ` class="language-${lang}"` : ''; return `<pre><code${langClass}>${escapedCode}</code></pre>`; });
         formattedText = formattedText.replace(/`([^`]+)`/g, '<code>$1</code>');
@@ -352,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formattedText = parts.join('');
         return formattedText;
     };
-    const addChatMessage = (text, type = 'agent', doScroll = true) => { /* ... (content unchanged) ... */ 
+    const addChatMessage = (text, type = 'agent', doScroll = true) => { /* ... (content unchanged from previous RA_cons.md version) ... */ 
         if (!chatMessagesContainer) { console.error("Chat container missing!"); return null; }
         if (type === 'status') {
             const lowerText = text.toLowerCase();
@@ -378,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (doScroll) scrollToBottom(chatMessagesContainer);
         return messageElement;
     };
-    const displayPlanForConfirmation = (humanSummary, structuredPlan) => { /* ... (content unchanged) ... */ 
+    const displayPlanForConfirmation = (humanSummary, structuredPlan) => { /* ... (content unchanged from previous RA_cons.md version) ... */ 
         if (!chatMessagesContainer) return;
         const existingPlanUI = chatMessagesContainer.querySelector('.plan-confirmation-container');
         if (existingPlanUI) existingPlanUI.remove();
@@ -452,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chatMessagesContainer.appendChild(planContainer);
         scrollToBottom(chatMessagesContainer);
     };
-    const addMonitorLog = (fullLogText) => { /* ... (content unchanged) ... */ 
+    const addMonitorLog = (fullLogText) => { /* ... (content unchanged from previous RA_cons.md version) ... */ 
         if (!monitorLogAreaElement) { console.error("Monitor log area element (#monitor-log-area) not found!"); return; }
         const logEntryDiv = document.createElement('div');
         logEntryDiv.classList.add('monitor-log-entry');
@@ -502,7 +497,7 @@ document.addEventListener('DOMContentLoaded', () => {
         monitorLogAreaElement.appendChild(logEntryDiv);
         scrollToBottom(monitorLogAreaElement);
     };
-    const updateArtifactDisplay = async () => { /* ... (content unchanged) ... */ 
+    const updateArtifactDisplay = async () => { /* ... (content unchanged from previous RA_cons.md version) ... */ 
         if (!monitorArtifactAreaElement || !artifactNavElement || !artifactPrevBtn || !artifactNextBtn || !artifactCounterElement) {
             console.error("Artifact display elements not found!");
             return;
@@ -584,7 +579,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     };
-    const loadTasks = () => { /* ... (content unchanged) ... */ 
+    const loadTasks = () => { /* ... (content unchanged from previous RA_cons.md version) ... */ 
         const storedCounter = localStorage.getItem(COUNTER_KEY);
         taskCounter = storedCounter ? parseInt(storedCounter, 10) : 0;
         if (isNaN(taskCounter)) taskCounter = 0;
@@ -618,7 +613,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         console.log("Initial currentTaskId set to:", currentTaskId);
     };
-    const saveTasks = () => { /* ... (content unchanged) ... */ 
+    const saveTasks = () => { /* ... (content unchanged from previous RA_cons.md version) ... */ 
         try {
             tasks.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
             localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
@@ -630,7 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Error saving task list. Changes might not persist.");
         }
     };
-    const renderTaskList = () => { /* ... (content unchanged) ... */ 
+    const renderTaskList = () => { /* ... (content unchanged from previous RA_cons.md version) ... */ 
         if (!taskListUl) { console.error("Task list UL element not found!"); return; }
         taskListUl.innerHTML = '';
         if (tasks.length === 0) {
@@ -660,7 +655,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const handleTaskItemClick = (taskId) => { console.log(`Task item clicked: ${taskId}`); selectTask(taskId); };
     const handleDeleteTaskClick = (taskId, taskTitle) => { console.log(`Delete button clicked for task: ${taskId} (${taskTitle})`); deleteTask(taskId, taskTitle); };
-    const handleEditTaskClick = (taskId, currentTitle) => { /* ... (content unchanged) ... */ 
+    const handleEditTaskClick = (taskId, currentTitle) => { /* ... (content unchanged from previous RA_cons.md version) ... */ 
         console.log(`Edit button clicked for task: ${taskId} (${currentTitle})`);
         const newTitle = prompt(`Enter new name for task "${currentTitle}":`, currentTitle);
         if (newTitle === null) { console.log("Rename cancelled by user."); return; }
@@ -676,7 +671,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sendWsMessage("rename_task", { taskId: taskId, newName: trimmedTitle });
         } else { console.error(`Task ${taskId} not found locally for renaming.`); }
     };
-    const updateCurrentTaskTitle = () => { /* ... (content unchanged) ... */ 
+    const updateCurrentTaskTitle = () => { /* ... (content unchanged from previous RA_cons.md version) ... */ 
         if (!currentTaskTitleElement) return;
         const currentTask = tasks.find(task => task.id === currentTaskId);
         const title = currentTask ? currentTask.title : "No Task Selected";
@@ -689,7 +684,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateMonitorStatus('idle', 'No Task');
         }
     };
-    const clearChatAndMonitor = (addLog = true) => { /* ... (content unchanged) ... */ 
+    const clearChatAndMonitor = (addLog = true) => { /* ... (content unchanged from previous RA_cons.md version) ... */ 
         if (chatMessagesContainer) chatMessagesContainer.innerHTML = '';
         if (agentThinkingStatusElement) {
             chatMessagesContainer.appendChild(agentThinkingStatusElement);
@@ -704,7 +699,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resetTaskTokenTotals();
         currentDisplayedPlan = null;
     };
-    const selectTask = (taskId) => { /* ... (content unchanged) ... */ 
+    const selectTask = (taskId) => { /* ... (content unchanged from previous RA_cons.md version) ... */ 
         console.log(`Attempting to select task: ${taskId}`);
         if (currentTaskId === taskId && taskId !== null) { console.log("Task already selected."); return; }
         const task = tasks.find(t => t.id === taskId);
@@ -730,7 +725,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         console.log(`Finished select task logic for: ${currentTaskId}`);
     };
-    const handleNewTaskClick = () => { /* ... (content unchanged) ... */ 
+    const handleNewTaskClick = () => { /* ... (content unchanged from previous RA_cons.md version) ... */ 
         console.log("'+ New Task' button clicked.");
         taskCounter++;
         const taskTitle = `Task - ${taskCounter}`;
@@ -740,7 +735,7 @@ document.addEventListener('DOMContentLoaded', () => {
         selectTask(newTask.id); 
         console.log("handleNewTaskClick finished.");
     };
-    const deleteTask = (taskId, taskTitle) => { /* ... (content unchanged) ... */ 
+    const deleteTask = (taskId, taskTitle) => { /* ... (content unchanged from previous RA_cons.md version) ... */ 
         console.log(`Attempting to delete task: ${taskId} (${taskTitle})`);
         if (!confirm(`Are you sure you want to delete task "${taskTitle}"? This cannot be undone.`)) { console.log("Deletion cancelled by user."); return; }
         const taskIndex = tasks.findIndex(task => task.id === taskId);
@@ -761,7 +756,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // MODIFIED: Function to populate a single LLM selector
     const populateSingleLlmSelector = (selectElement, availableModels, currentSelectedValue, defaultOptionText = "Use System Default", backendConfiguredDefaultLlmId = null) => {
-        if (!selectElement) return;
+        if (!selectElement) {
+            console.error("populateSingleLlmSelector: selectElement is null or undefined for text:", defaultOptionText);
+            return;
+        }
         selectElement.innerHTML = ''; 
 
         const defaultOpt = document.createElement('option');
@@ -772,15 +770,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if ((!availableModels.gemini || availableModels.gemini.length === 0) &&
             (!availableModels.ollama || availableModels.ollama.length === 0)) {
             const noModelsOpt = document.createElement('option');
-            noModelsOpt.value = "";
+            noModelsOpt.value = ""; // Keep value empty
             noModelsOpt.textContent = "No LLMs Available";
-            noModelsOpt.disabled = true;
-            if (selectElement.options.length === 1 && selectElement.options[0].value === "") { // Only if "Use System Default" is the only one
-                 selectElement.options[0].textContent = "No LLMs Available"; // Overwrite "Use System Default"
-            } else {
+            noModelsOpt.disabled = true; // Disable it
+            // If "Use System Default" was the only option, replace its text
+            if (selectElement.options.length === 1 && selectElement.options[0].value === "") {
+                 selectElement.options[0].textContent = "No LLMs Available"; 
+                 selectElement.options[0].disabled = true; // Also disable this one
+            } else { // Otherwise, append the "No LLMs" as a distinct disabled option
                 selectElement.appendChild(noModelsOpt);
             }
-            selectElement.disabled = true;
+            selectElement.disabled = true; // Disable the whole select if no models
             return;
         }
 
@@ -807,14 +807,14 @@ document.addEventListener('DOMContentLoaded', () => {
             selectElement.appendChild(ollamaGroup);
         }
         
-        // Set selected value: Priority: localStorage override, then backend configured default, then "" (Use System Default)
+        // Set selected value: Priority: localStorage override, then backend configured default for that specific role, then "" (Use System Default option)
+        let valueToSet = ""; // Default to "Use System Default"
         if (currentSelectedValue && selectElement.querySelector(`option[value="${currentSelectedValue}"]`)) {
-            selectElement.value = currentSelectedValue;
+            valueToSet = currentSelectedValue;
         } else if (backendConfiguredDefaultLlmId && selectElement.querySelector(`option[value="${backendConfiguredDefaultLlmId}"]`)) {
-            selectElement.value = backendConfiguredDefaultLlmId;
-        } else {
-            selectElement.value = ""; // Default to "Use System Default"
+            valueToSet = backendConfiguredDefaultLlmId;
         }
+        selectElement.value = valueToSet;
         selectElement.disabled = false;
     };
     
@@ -822,42 +822,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const populateAllLlmSelectors = (backendDefaultExecutorLlmId, backendRoleDefaults = {}) => {
         // Populate Executor LLM (main selector in chat header)
         const lastSelectedExecutor = localStorage.getItem('selectedExecutorLlmId');
-        // If localStorage has a value, use it. Otherwise, use the backend's default for the executor.
         const initialExecutorValue = lastSelectedExecutor !== null ? lastSelectedExecutor : backendDefaultExecutorLlmId;
 
-        populateSingleLlmSelector(executorLlmSelectElement, availableModels, initialExecutorValue, "Loading LLMs...", backendDefaultExecutorLlmId);
-        currentExecutorLlmId = executorLlmSelectElement.value; // Update state
-        if (currentExecutorLlmId) { 
+        // MODIFIED: Pass "Use System Default (Executor)" as the default option text
+        populateSingleLlmSelector(executorLlmSelectElement, availableModels, initialExecutorValue, "Use System Default (Executor)", backendDefaultExecutorLlmId);
+        currentExecutorLlmId = executorLlmSelectElement.value; 
+        if (currentExecutorLlmId !== null) { // Send "" if "Use System Default" is selected
             sendWsMessage("set_llm", { llm_id: currentExecutorLlmId });
         }
+
 
         // Populate Role-Specific LLM Selectors
         roleSelectorsMeta.forEach(selInfo => {
             if (selInfo.element) {
                 const lastSelectedRoleOverride = localStorage.getItem(selInfo.storageKey);
-                const backendRoleDefault = backendRoleDefaults[selInfo.role] || ""; // Get specific default for this role
+                const backendRoleDefault = backendRoleDefaults[selInfo.role] || ""; 
                 
-                // Priority: localStorage override, then backend's default for this role
                 const initialRoleValue = lastSelectedRoleOverride !== null ? lastSelectedRoleOverride : backendRoleDefault;
 
                 populateSingleLlmSelector(selInfo.element, availableModels, initialRoleValue, "Use System Default", backendRoleDefault);
-                sessionRoleLlmOverrides[selInfo.role] = selInfo.element.value; // Update state with what's actually selected
+                sessionRoleLlmOverrides[selInfo.role] = selInfo.element.value; 
 
-                // Send initial override to backend if it's not just the system default
-                if (sessionRoleLlmOverrides[selInfo.role] !== "" && sessionRoleLlmOverrides[selInfo.role] !== backendRoleDefault) {
-                    sendWsMessage("set_session_role_llm", { role: selInfo.role, llm_id: sessionRoleLlmOverrides[selInfo.role] });
-                } else if (sessionRoleLlmOverrides[selInfo.role] === "" && lastSelectedRoleOverride === null) {
-                    // If it's "Use System Default" and there was no localStorage, no need to send, backend uses its default.
-                } else if (sessionRoleLlmOverrides[selInfo.role] === "") {
-                    // If user explicitly selected "Use System Default" or localStorage had "", tell backend to clear override
-                     sendWsMessage("set_session_role_llm", { role: selInfo.role, llm_id: "" });
+                // Send initial override to backend if it's a specific model (not empty string for "Use System Default")
+                // and it differs from what the backend would use by default for that role.
+                // Or if user had explicitly saved "" (Use System Default) to override a previous specific selection.
+                if (sessionRoleLlmOverrides[selInfo.role] !== backendRoleDefault || (sessionRoleLlmOverrides[selInfo.role] === "" && lastSelectedRoleOverride !== null) ) {
+                     sendWsMessage("set_session_role_llm", { role: selInfo.role, llm_id: sessionRoleLlmOverrides[selInfo.role] });
                 }
             }
         });
         console.log("All LLM selectors populated. Initial Executor:", currentExecutorLlmId, "Initial Role Overrides:", sessionRoleLlmOverrides);
     };
 
-    const sendWsMessage = (type, content) => { /* ... (content unchanged) ... */ 
+    const sendWsMessage = (type, content) => { /* ... (content unchanged from previous RA_cons.md version) ... */ 
         if (window.socket && window.socket.readyState === WebSocket.OPEN) {
             try {
                 const payload = JSON.stringify({ type: type, ...content });
@@ -880,7 +877,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const handleSendMessage = () => { /* ... (content unchanged) ... */ 
+    const handleSendMessage = () => { /* ... (content unchanged from previous RA_cons.md version) ... */ 
         const messageText = chatTextarea.value.trim();
         if (!currentTaskId){
             alert("Please select or create a task first.");
@@ -911,7 +908,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chatTextarea.focus();
     };
 
-    const handleFileUpload = async (event) => { /* ... (content unchanged) ... */ 
+    const handleFileUpload = async (event) => { /* ... (content unchanged from previous RA_cons.md version) ... */ 
         console.log("[handleFileUpload] Function entered.");
         if (!currentTaskId) {
             alert("Please select a task before uploading files.");
@@ -1021,12 +1018,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event listener for Executor LLM selector
     if (executorLlmSelectElement) {
         executorLlmSelectElement.addEventListener('change', (event) => {
-            const selectedId = event.target.value;
-            // No need to check against currentExecutorLlmId, just update if changed
-            console.log(`Executor LLM selection changed to: ${selectedId}`);
+            const selectedId = event.target.value; 
+            console.log(`Executor LLM selection changed to: ${selectedId || "System Default (Executor)"}`);
             currentExecutorLlmId = selectedId;
             localStorage.setItem('selectedExecutorLlmId', selectedId); 
-            sendWsMessage("set_llm", { llm_id: selectedId }); // This message updates backend's session selected_llm_provider/name
+            sendWsMessage("set_llm", { llm_id: selectedId }); 
         });
     } else { console.error("Executor LLM select element not found!"); }
 
@@ -1034,11 +1030,10 @@ document.addEventListener('DOMContentLoaded', () => {
     roleSelectorsMeta.forEach(selInfo => {
         if (selInfo.element) {
             selInfo.element.addEventListener('change', (event) => {
-                const selectedLlmId = event.target.value; // "" means "Use System Default"
+                const selectedLlmId = event.target.value; 
                 console.log(`Role LLM for '${selInfo.role}' changed to: ${selectedLlmId || "System Default"}`);
                 sessionRoleLlmOverrides[selInfo.role] = selectedLlmId;
                 localStorage.setItem(selInfo.storageKey, selectedLlmId);
-                // Send message to backend to update this role's LLM for the session
                 sendWsMessage("set_session_role_llm", { role: selInfo.role, llm_id: selectedLlmId });
             });
         } else {
@@ -1047,7 +1042,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    if (stopButton) { /* ... (content unchanged) ... */ 
+    if (stopButton) { /* ... (content unchanged from previous RA_cons.md version) ... */ 
         stopButton.addEventListener('click', () => {
             if (isAgentRunning) {
                 console.log("Stop button clicked.");
@@ -1059,7 +1054,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     } else { console.error("Stop button element not found!"); }
 
-    if (uploadFileButton && fileUploadInput) { /* ... (content unchanged) ... */ 
+    if (uploadFileButton && fileUploadInput) { /* ... (content unchanged from previous RA_cons.md version) ... */ 
         uploadFileButton.addEventListener('click', () => {
             console.log("Upload button clicked, triggering file input.");
             fileUploadInput.click();
@@ -1067,7 +1062,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fileUploadInput.addEventListener('change', handleFileUpload);
     } else { console.error("File upload button or input element not found!"); }
 
-    if (agentThinkingStatusElement) { /* ... (content unchanged) ... */ 
+    if (agentThinkingStatusElement) { /* ... (content unchanged from previous RA_cons.md version) ... */ 
         agentThinkingStatusElement.addEventListener('click', () => {
             console.log("Agent thinking status clicked. Scrolling monitor.");
             if (monitorLogAreaElement) {
@@ -1078,7 +1073,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Agent thinking status element (#agent-thinking-status) not found!");
     }
 
-    document.body.addEventListener('click', event => { /* ... (content unchanged) ... */ 
+    document.body.addEventListener('click', event => { /* ... (content unchanged from previous RA_cons.md version) ... */ 
         if (event.target.classList.contains('action-btn')) {
             const commandText = event.target.textContent.trim();
             console.log(`Action button clicked: ${commandText}`);
