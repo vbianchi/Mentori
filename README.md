@@ -190,68 +190,140 @@ ResearchAgent/
 
 ```
 
-Setup Instructions
-------------------
+## Setup Instructions
 
-(Setup instructions remain largely the same as v1.5/v2.0, ensure Python 3.10+ and other prerequisites are met. The .env file and requirements.txt are key.)
+1.  **Clone Repository:**
+    ```bash
+    git clone [https://github.com/vbianchi/ResearchAgent.git](https://github.com/vbianchi/ResearchAgent.git)
+    cd ResearchAgent
+    ```
+2.  **Prerequisites:**
+    * Ensure Python 3.10+ is installed.
+    * **(Optional):** Install R and ensure `Rscript` is in PATH for R script execution via the shell tool.
 
-... (Keep existing setup instructions) ...
+3.  **Install `uv` (Recommended - Fast Package Installer):**
+    * Follow instructions: [https://github.com/astral-sh/uv#installation](https://github.com/astral-sh/uv#installation)
 
-Running the Application
------------------------
+4.  **Create and Activate Virtual Environment:**
+    ```bash
+    # Using uv (recommended)
+    uv venv --python 3.12 # Or your desired Python version
 
-(Running instructions remain the same)
+    # OR using standard venv
+    # python -m venv .venv
 
-... (Keep existing running instructions) ...
+    # Activate (Linux/Mac/WSL)
+    source .venv/bin/activate
+    # (Windows CMD: .venv\Scripts\activate.bat)
+    # (Windows PowerShell: .venv\Scripts\Activate.ps1)
+    ```
 
-Usage & Testing
----------------
+5.  **Install Dependencies:**
+    ```bash
+    # Using uv (recommended)
+    uv pip install -r requirements.txt
 
--   Create Task: Click "+ New Task".
+    # OR using standard pip
+    # pip install -r requirements.txt
+    ```
 
--   Rename Task: Hover over a task, click the pencil icon (✏️).
+6.  **Configure Environment Variables:**
+    * **Copy the example file:** `cp .env.example .env` (or copy manually).
+    * **Edit `.env`:** Open the newly created `.env` file with a text editor.
+    * **Fill in required values:**
+        * `GOOGLE_API_KEY`: Add your Google API Key (required if using Gemini). Get one from [Google AI Studio](https://aistudio.google.com/app/apikey).
+        * `ENTREZ_EMAIL`: Add your email address (required for PubMed Tool). NCBI uses this to identify requests.
+    * **Configure LLMs:**
+        * `DEFAULT_LLM_ID`: Set the default model the UI should use on startup (e.g., `gemini::gemini-1.5-flash`).
+        * `GEMINI_AVAILABLE_MODELS`: List the Gemini models you want available in the UI dropdown, separated by commas (e.g., `gemini-1.5-flash,gemini-1.5-pro-latest`). Ensure these are accessible with your API key.
+        * `OLLAMA_AVAILABLE_MODELS`: List the Ollama models you want available, separated by commas (e.g., `gemma:2b,llama3:latest`). Ensure these are pulled and running in your Ollama instance (`ollama list`).
+        * `OLLAMA_BASE_URL`: Set the correct URL for your Ollama instance if you use it (e.g., `http://localhost:11434`).
+    * **(Optional) Adjust Tuning & Settings:** Modify agent parameters (`AGENT_MAX_ITERATIONS`, `AGENT_MEMORY_WINDOW_K`, temperatures), tool settings (timeouts, limits, `TOOL_PDF_READER_WARNING_LENGTH`), server settings, or log level as needed. See comments in `.env.example` for details.
+    * **Security:** The `.env` file is listed in `.gitignore` to prevent accidental commits of your secrets.
 
--   Select Task: Click a task to load its history.
+7.  **(If using Ollama)**
+    * Install Ollama: [https://ollama.com/](https://ollama.com/)
+    * Ensure the Ollama service is running.
+    * **Important for Docker/WSL:** If Ollama runs as a systemd service, ensure it listens on all interfaces. Edit the service file (`sudo systemctl edit --full ollama.service`), add `Environment="OLLAMA_HOST=0.0.0.0"` under `[Service]`, then run `sudo systemctl daemon-reload` and `sudo systemctl restart ollama`.
+    * Pull the models listed in `OLLAMA_AVAILABLE_MODELS`: `ollama pull <model_name>` (e.g., `ollama pull llama3:latest`).
 
--   Select LLM: Use the dropdown in the chat header to choose the model for the current session.
+## Running the Application
 
--   Chat (Simple Query Test - v2.1): Ask a simple question like: `"What is the main function of mitochondria?"`. Observe if the agent answers directly without presenting a multi-step plan. Check monitor logs for "Intent classified as: DIRECT_QA".
+### Using Docker (Recommended Method)
 
--   Chat (Complex Query Test - v2.1): Ask a complex query like: `"Find the latest 2 papers on PubMed about 'mRNA vaccine stability', read the abstract of the first result, and write a short summary of that abstract to a file named 'summary.txt'."`
+Runs the backend server inside an isolated Docker container. **Highly recommended** for security and dependency management.
 
-    -   Observe if the agent first classifies intent as "PLAN".
+1.  **Prerequisites:** Ensure Docker and Docker Compose are installed.
+2.  **Build and Run Backend:** From the project root directory (`ResearchAgent/`), run:
+    ```bash
+    docker compose up --build
+    ```
+    * The `--build` flag is needed the first time or after changing `Dockerfile` or `requirements.txt`.
+    * Uses `network_mode: host` in `docker-compose.yml`, meaning the container shares the host network. The backend listens directly on host ports 8765 (WebSocket) and 8766 (File Server). Ensure these ports are free. This simplifies connecting to services like Ollama running directly on the host/WSL (use `http://localhost:11434` for `OLLAMA_BASE_URL`).
+    * Keep this terminal running. Use `Ctrl+C` to stop.
+3.  **Start Frontend Server:** Docker Compose only runs the backend. Serve the frontend files (HTML, CSS, JS) from a ***separate*** terminal in the project root:
+    ```bash
+    python3 -m http.server 8000
+    ```
+    * Keep this second terminal running.
+4.  **Access the UI:** Open your web browser to `http://localhost:8000`.
 
-    -   Review the proposed plan for confirmation.
+**Development Workflow with Docker:**
 
-    -   After confirming, monitor the execution steps.
+* **Code Changes:** Changes to `./backend` code are reflected inside the container. Stop (`Ctrl+C`) and restart (`docker compose up`) the container to apply backend changes.
+* **Dependency Changes:** If `requirements.txt` changes, rebuild with `docker compose up --build`.
+* **Workspace & Database:** `./workspace` and `./database` are mounted as volumes, so data persists locally.
 
-    -   The final message in the chat should be the Evaluator's assessment of the plan's outcome.
+### Alternative: Running Directly on Host (Advanced / Less Secure)
 
--   Monitor: Observe agent logs (including intent classification, controller validation, executor steps, and evaluator assessment) and status indicator (Idle/Running/Error/Disconnected).
+**Not recommended** due to security risks of `Python_REPL` and `python_package_installer` executing directly in your host environment. **Proceed with extreme caution.**
 
--   Cancel Agent: Click the "STOP" button in the monitor header while the agent is running.
+1.  **Setup Environment:** Ensure Python 3.12+ is installed, activate a virtual environment (e.g., `uv venv`), and install dependencies (`uv pip install -r requirements.txt`).
+    ```bash
+    # Example activation (Linux/Mac/WSL)
+    source .venv/bin/activate
+    ```
+2.  **Terminal 1: Start Backend Server:**
+    ```bash
+    python3 -m backend.server
+    ```
+3.  **Terminal 2: Start Frontend Server:**
+    ```bash
+    python3 -m http.server 8000
+    ```
+4.  **Access the UI:** Open `http://localhost:8000`.
 
--   Upload Files: Select a task, click the "Upload File(s)" button, choose files. Artifact viewer should update.
+## Usage & Testing
 
--   Artifact Viewer: View generated/uploaded images/text files. Should auto-refresh after agent `write_file` actions.
+* **Create Task:** Click "+ New Task".
+* **Rename Task:** Hover over a task, click the pencil icon (✏️).
+* **Select Task:** Click a task to load its history.
+* **Select LLM:** Use the dropdown in the chat header to choose the model for the current session.
+* **Chat:** Interact with the agent. Use Up/Down arrows for input history. A "Thinking..." status line appears during processing.
+* **Monitor:** Observe agent logs and status indicator (Idle/Running/Error/Disconnected).
+* **Cancel Agent:** Click the "STOP" button in the monitor header while the agent is running to request cancellation (interrupts between steps).
+* **Upload Files:** Select a task, click the "Upload File(s)" button below the task list, choose files. Check monitor/artifacts for confirmation.
+* **Artifact Viewer:** View generated/uploaded images/text files using Prev/Next buttons.
+* **Token Usage:** Observe token counts for the last LLM call and the current task total in the left panel.
+* **Test PubMed Search:** Ask: `"Search PubMed for recent articles on CRISPR gene editing."`
+* **Test Package Installation:** Ask: `"Install the 'numpy' python package."`
+* **Test Python REPL:** Ask: `"Use the Python REPL tool to calculate 15 factorial."`
+* **Test Image Generation:** Ask: `"Write a python script named 'plot.py' that uses matplotlib to create a simple sine wave plot and saves it as 'sine_wave.png'. Then execute the script using python."` (Ensure `matplotlib` is installed first).
+* **Test File/PDF Reading:** Ask: `"Read the file named 'my_document.txt'"` or `"Read the file named 'research_paper.pdf'"` (assuming these files exist in the task workspace). Observe if a warning about length is added for large PDFs.
+* **Test LLM Switching:** Select one model, ask a question. Select a different model, ask another question. Observe the agent's responses and potentially different styles.
+* **Delete Task:** Click the trash icon (🗑️) next to a task (confirmation required).
 
--   Token Usage: Observe token counts in the left panel.
+## Known Issues
 
--   Test LLM Switching: Select one model, ask a question. Select a different model, ask another.
+* **Agent Cancellation (STOP Button):** The STOP button sends a cancellation request to the agent. However, this typically interrupts the agent *between* major steps (like before the next tool use or LLM call) rather than immediately halting a long-running internal process within a tool or LLM.
+* **Markdown Rendering in Chat:** The current Markdown rendering in the chat is basic. Complex Markdown or specific edge cases (e.g., underscores in filenames not intended for italics) might not always render as expected. Full GFM support via a dedicated library is a future enhancement.
+* **Ollama Token Counts:** Token count reporting (specifically input tokens) for Ollama models can be less precise or consistently available compared to API-based models like Gemini. The displayed totals will reflect the information made available by the Ollama integration.
 
--   Delete Task: Click the trash icon (🗑️) next to a task.
+## Security Warnings
 
-Known Issues
-------------
-
-(Keep existing known issues, review if any are resolved or new ones introduced by recent changes)
-
--   ...
-
-Security Warnings
------------------
-
-(Keep existing security warnings)
+* **`python_package_installer` Tool:** Installs packages directly into the backend server's Python environment. **Significant security risk if exposed.**
+* **`PythonREPLTool` Tool:** Executes arbitrary Python code directly in the backend server's environment. **Significant security risk if exposed.**
+* **Recommendation:** **Strongly consider running the backend server inside a Docker container**, especially when using the `python_package_installer` or `PythonREPLTool`, to isolate execution and mitigate risks. Do not expose the backend ports directly to the internet without proper authentication and authorization layers.
 
 -   ...
 
