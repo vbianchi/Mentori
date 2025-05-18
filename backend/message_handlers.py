@@ -23,7 +23,6 @@ from backend.controller import validate_and_prepare_step_action
 from backend.agent import create_agent_executor
 from backend.callbacks import AgentCancelledException
 from backend.intent_classifier import classify_intent
-# MODIFIED: Import new StepCorrectionOutcome and evaluate_step_outcome_and_suggest_correction
 from backend.evaluator import (
     evaluate_plan_outcome, EvaluationResult,
     evaluate_step_outcome_and_suggest_correction, StepCorrectionOutcome
@@ -68,15 +67,17 @@ async def _update_plan_file_step_status(
 
         updated_lines = []
         found_step = False
-        step_pattern = re.compile(rf"^\s*-\s*\[\s*[ x!-]?\s*\]\s*{step_number}\.\s+.*", re.IGNORECASE)
+        # Regex to find a markdown list item like: "- [ ] 1. Description"
+        step_pattern = re.compile(rf"^\s*-\s*\[\s*[ x!-]?\s*\]\s*{re.escape(str(step_number))}\.\s+.*", re.IGNORECASE)
         checkbox_pattern = re.compile(r"(\s*-\s*\[)\s*[ x!-]?\s*(\])")
 
-        for line_content in lines:
+
+        for line_no, line_content in enumerate(lines):
             if not found_step and step_pattern.match(line_content):
                 updated_line = checkbox_pattern.sub(rf"\g<1>{status_char}\g<2>", line_content, count=1)
                 updated_lines.append(updated_line)
                 found_step = True
-                logger.debug(f"Updated plan file for step {step_number} to status '[{status_char}]'. Line: {updated_line.strip()}")
+                logger.info(f"Updated plan file for step {step_number} to status '[{status_char}]'. Line: {updated_line.strip()}")
             else:
                 updated_lines.append(line_content)
 
@@ -84,7 +85,12 @@ async def _update_plan_file_step_status(
             async with aiofiles.open(plan_file_path, 'w', encoding='utf-8') as f_write:
                 await f_write.writelines(updated_lines)
         else:
-            logger.warning(f"Step {step_number} not found in plan file {plan_file_path} for status update.")
+            logger.warning(f"Step {step_number} pattern not found in plan file {plan_file_path} for status update. Regex was: {step_pattern.pattern}")
+            if len(lines) > 0:
+                logger.debug("First few lines of plan file for debugging update failure:")
+                for i, l in enumerate(lines[:5]):
+                    logger.debug(f"  Line {i+1}: {l.strip()}")
+
 
     except Exception as e:
         logger.error(f"Error updating plan file {plan_file_path} for step {step_number}: {e}", exc_info=True)
@@ -97,7 +103,7 @@ async def process_context_switch(
     db_add_task_func: DBAddTaskFunc, db_get_messages_func: DBGetMessagesFunc,
     get_artifacts_func: GetArtifactsFunc
 ) -> None:
-    # ... (existing content - no changes needed for this feature) ...
+    # ... (existing content - no changes needed) ...
     task_id_from_frontend = data.get("taskId")
     task_title_from_frontend = data.get("task")
 
@@ -109,7 +115,7 @@ async def process_context_switch(
     session_data_entry['current_plan_step_index'] = -1
     session_data_entry['plan_execution_active'] = False
     session_data_entry['original_user_query'] = None
-    session_data_entry['active_plan_filename'] = None # Reset active plan file
+    session_data_entry['active_plan_filename'] = None
 
     existing_agent_task = connected_clients_entry.get("agent_task")
     if existing_agent_task and not existing_agent_task.done():
@@ -204,7 +210,7 @@ async def process_user_message(
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc, db_add_message_func: DBAddMessageFunc
 ) -> None:
-    # ... (existing content - no changes needed for this feature) ...
+    # ... (existing content - no changes needed) ...
     user_input_content = ""
     content_payload = data.get("content")
     if isinstance(content_payload, str):
@@ -363,7 +369,6 @@ async def process_execute_confirmed_plan(
     connected_clients_entry: Dict[str, Any],
     send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc
-    # Note: db_add_message_func is not directly used here but implicitly by add_monitor_log_func and callback_handler
 ) -> None:
     logger.info(f"[{session_id}] Received 'execute_confirmed_plan'.")
     active_task_id = session_data_entry.get("current_task_id")
@@ -379,7 +384,7 @@ async def process_execute_confirmed_plan(
         return
 
     session_data_entry["current_plan_structured"] = confirmed_plan_steps_dicts
-    session_data_entry["current_plan_step_index"] = 0 # Will be updated per step
+    session_data_entry["current_plan_step_index"] = 0
     session_data_entry["plan_execution_active"] = True
     session_data_entry['cancellation_requested'] = False
 
@@ -397,13 +402,13 @@ async def process_execute_confirmed_plan(
     plan_markdown_content.append(f"## Plan Summary (from Planner):\n{session_data_entry.get('current_plan_human_summary', 'N/A')}\n")
     plan_markdown_content.append("## Steps:\n")
     for i, step_data_dict in enumerate(confirmed_plan_steps_dicts):
-        # Ensure step_data_dict is a dict before accessing keys
         desc = step_data_dict.get('description', 'N/A') if isinstance(step_data_dict, dict) else 'N/A (Invalid Step Format)'
         tool_sugg = step_data_dict.get('tool_to_use', 'None') if isinstance(step_data_dict, dict) else 'N/A'
         input_instr = step_data_dict.get('tool_input_instructions', 'None') if isinstance(step_data_dict, dict) else 'N/A'
         expected_out = step_data_dict.get('expected_outcome', 'N/A') if isinstance(step_data_dict, dict) else 'N/A'
 
-        plan_markdown_content.append(f"{i+1}. `[ ]` **{desc}**")
+        # MODIFIED: Corrected plan saving format to ensure leading dash for Markdown list items
+        plan_markdown_content.append(f"- [ ] {i+1}. **{desc}**") # No backticks around [ ]
         plan_markdown_content.append(f"    - Tool Suggestion (Planner): `{tool_sugg}`")
         plan_markdown_content.append(f"    - Input Instructions (Planner): `{input_instr}`")
         plan_markdown_content.append(f"    - Expected Outcome (Planner): `{expected_out}`\n")
@@ -420,21 +425,20 @@ async def process_execute_confirmed_plan(
         logger.error(f"[{session_id}] Failed to save plan to file '{plan_filename}': {e}", exc_info=True)
         await add_monitor_log_func(f"Error saving plan to file '{plan_filename}': {e}", "error_system")
 
-    plan_failed_definitively = False # Tracks if the entire plan should stop
+    plan_failed_definitively = False
     preliminary_final_answer_from_last_step = "Plan execution completed."
     step_execution_details_list = []
 
     original_user_query = session_data_entry.get("original_user_query", "No original query context available.")
 
-    # --- Main Loop Through Plan Steps ---
     for i, step_dict_from_plan in enumerate(confirmed_plan_steps_dicts):
         session_data_entry["current_plan_step_index"] = i
         current_step_number = i + 1
-        current_step_detail_log = { # For overall plan summary
+        current_step_detail_log = {
             "step_number": current_step_number, "description": "N/A",
             "controller_tool_initial": "N/A", "controller_input_initial": "N/A",
             "controller_reasoning_initial": "N/A", "controller_confidence_initial": 0.0,
-            "attempts": [] # Will store details of each attempt (initial + retries)
+            "attempts": [], "final_status_char": " "
         }
 
         try:
@@ -444,7 +448,6 @@ async def process_execute_confirmed_plan(
             logger.error(f"[{session_id}] Failed to parse step dictionary into PlanStep object: {pydantic_err}. Step data: {step_dict_from_plan}", exc_info=True)
             error_msg = f"Error: Corrupted plan step {current_step_number}. Skipping. Details: {pydantic_err}"
             await add_monitor_log_func(error_msg, "error_plan_step")
-            # Log this attempt's failure
             current_step_detail_log["attempts"].append({
                 "attempt_number": 1, "controller_tool": "N/A", "controller_input": "N/A",
                 "controller_reasoning": "Plan step parsing error", "controller_confidence": 0.0,
@@ -454,15 +457,15 @@ async def process_execute_confirmed_plan(
             })
             current_step_detail_log["final_status_char"] = "!"
             step_execution_details_list.append(current_step_detail_log)
-            plan_failed_definitively = True; break # Halt entire plan
+            plan_failed_definitively = True; break
 
         step_description = current_plan_step_obj.description
-        step_tools: List[BaseTool] = get_dynamic_tools(active_task_id) # Get fresh tools for each step context if needed
+        step_tools: List[BaseTool] = get_dynamic_tools(active_task_id)
 
         retry_count_for_current_step = 0
         step_succeeded_after_attempts = False
+        last_step_correction_suggestion: Optional[StepCorrectionOutcome] = None
 
-        # --- Inner Loop for Step Attempts (Initial + Retries) ---
         while retry_count_for_current_step <= MAX_STEP_RETRIES:
             attempt_number = retry_count_for_current_step + 1
             attempt_log_detail = {
@@ -470,38 +473,30 @@ async def process_execute_confirmed_plan(
                 "controller_reasoning": "N/A", "controller_confidence": 0.0,
                 "executor_input": "N/A", "executor_output": "N/A", "error": None,
                 "step_eval_achieved": False, "step_eval_assessment": "Not evaluated yet",
-                "status_char_for_attempt": " " # Default to space
+                "status_char_for_attempt": " "
             }
 
-            # Determine hints for the Controller for this attempt
-            controller_tool_hint: Optional[str]
-            controller_input_instructions_hint: Optional[str]
-
-            if retry_count_for_current_step == 0: # Initial attempt
-                await send_ws_message_func("agent_thinking_update", {"status": f"Controller validating Step {current_step_number}/{len(confirmed_plan_steps_dicts)}: {step_description[:40]}..."})
-                await add_monitor_log_func(f"Controller: Validating Plan Step {current_step_number}: {step_description} (Planner hint: {current_plan_step_obj.tool_to_use or 'None'})", "system_controller_start")
-                controller_tool_hint = current_plan_step_obj.tool_to_use
-                controller_input_instructions_hint = current_plan_step_obj.tool_input_instructions
-            else: # This is a retry attempt
-                # Hints come from the previous StepCorrectionOutcome (stored in `step_correction_result` from previous iteration)
+            plan_step_for_controller_call = current_plan_step_obj.copy()
+            if retry_count_for_current_step > 0 and last_step_correction_suggestion:
                 await send_ws_message_func("agent_thinking_update", {"status": f"Controller re-validating Step {current_step_number} (Retry {retry_count_for_current_step})..."})
                 await add_monitor_log_func(f"Controller: Re-validating Step {current_step_number} (Retry {retry_count_for_current_step}) based on Step Evaluator feedback.", "system_controller_retry")
-                # `step_correction_result` should be available from the previous failed attempt in this loop
-                controller_tool_hint = step_correction_result.suggested_new_tool_for_retry if step_correction_result else None # type: ignore
-                controller_input_instructions_hint = step_correction_result.suggested_new_input_instructions_for_retry if step_correction_result else None # type: ignore
+                plan_step_for_controller_call.tool_to_use = last_step_correction_suggestion.suggested_new_tool_for_retry
+                plan_step_for_controller_call.tool_input_instructions = last_step_correction_suggestion.suggested_new_input_instructions_for_retry
+            else:
+                await send_ws_message_func("agent_thinking_update", {"status": f"Controller validating Step {current_step_number}/{len(confirmed_plan_steps_dicts)}: {step_description[:40]}..."})
+                await add_monitor_log_func(f"Controller: Validating Plan Step {current_step_number}: {step_description} (Planner hint: {current_plan_step_obj.tool_to_use or 'None'})", "system_controller_start")
 
-            # --- Controller Call ---
             validated_tool_name, formulated_tool_input, controller_message, controller_confidence = await validate_and_prepare_step_action(
                 original_user_query=original_user_query,
-                plan_step=current_plan_step_obj, # Pass the original step object for context
+                plan_step=plan_step_for_controller_call,
                 available_tools=step_tools
-                # The LLM for controller is fetched internally by validate_and_prepare_step_action
             )
+
             attempt_log_detail.update({
                 "controller_tool": validated_tool_name, "controller_input": formulated_tool_input,
                 "controller_reasoning": controller_message, "controller_confidence": controller_confidence
             })
-            if retry_count_for_current_step == 0: # Log initial controller output only once for the step
+            if retry_count_for_current_step == 0:
                 current_step_detail_log.update({
                     "controller_tool_initial": validated_tool_name, "controller_input_initial": formulated_tool_input,
                     "controller_reasoning_initial": controller_message, "controller_confidence_initial": controller_confidence
@@ -509,7 +504,7 @@ async def process_execute_confirmed_plan(
 
             await add_monitor_log_func(f"Controller Output (Step {current_step_number}, Attempt {attempt_number}): Tool='{validated_tool_name}', Input='{str(formulated_tool_input)[:100]}...', Confidence={controller_confidence:.2f}. Reasoning: {controller_message}", "system_controller_output")
 
-            if controller_confidence < 0.7 and validated_tool_name: # Warning only if a tool is chosen
+            if controller_confidence < 0.7 and validated_tool_name:
                 await add_monitor_log_func(f"Warning: Controller confidence for step {current_step_number} (Attempt {attempt_number}) is low ({controller_confidence:.2f}). Proceeding.", "warning_controller")
 
             if validated_tool_name is None and "Error in Controller" in controller_message:
@@ -518,9 +513,8 @@ async def process_execute_confirmed_plan(
                 attempt_log_detail["error"] = error_msg; attempt_log_detail["status_char_for_attempt"] = "!"
                 current_step_detail_log["attempts"].append(attempt_log_detail)
                 current_step_detail_log["final_status_char"] = "!"
-                plan_failed_definitively = True; break # Break from retry loop, will then break from main plan loop
+                plan_failed_definitively = True; break
 
-            # --- Executor Call ---
             agent_input_for_executor: str
             if validated_tool_name:
                 agent_input_for_executor = (
@@ -544,7 +538,7 @@ async def process_execute_confirmed_plan(
             executor_model_name = session_data_entry.get("selected_llm_model_name", settings.executor_default_model_name)
             step_executor_llm: Optional[BaseChatModel] = None
             try:
-                llm_instance_exec = get_llm(settings, provider=executor_provider, model_name=executor_model_name)
+                llm_instance_exec = get_llm(settings, provider=executor_provider, model_name=executor_model_name, requested_for_role="Executor")
                 step_executor_llm = llm_instance_exec # type: ignore
             except Exception as llm_err:
                 error_msg = f"Error: Failed to init LLM for Executor (Step {current_step_number}, Attempt {attempt_number}). Details: {llm_err}"
@@ -552,11 +546,11 @@ async def process_execute_confirmed_plan(
                 attempt_log_detail["error"] = error_msg; attempt_log_detail["status_char_for_attempt"] = "!"
                 current_step_detail_log["attempts"].append(attempt_log_detail)
                 current_step_detail_log["final_status_char"] = "!"
-                plan_failed_definitively = True; break # Break from retry loop
+                plan_failed_definitively = True; break
 
             step_memory = session_data_entry["memory"]
             step_callback_handler = session_data_entry["callback_handler"]
-            step_executor_output_str = "Executor did not produce output." # Default
+            step_executor_output_str = "Executor did not produce output."
 
             try:
                 step_agent_executor = create_agent_executor(
@@ -579,81 +573,74 @@ async def process_execute_confirmed_plan(
                 attempt_log_detail["error"] = error_msg; attempt_log_detail["status_char_for_attempt"] = "-"
                 current_step_detail_log["attempts"].append(attempt_log_detail)
                 current_step_detail_log["final_status_char"] = "-"
-                plan_failed_definitively = True; break # Break from retry loop
+                plan_failed_definitively = True; break
             except Exception as step_exec_e:
                 error_msg = f"Error executing plan step {current_step_number} (Attempt {attempt_number}): {step_exec_e}"
                 logger.error(f"[{session_id}] {error_msg}", exc_info=True)
                 await add_monitor_log_func(error_msg, "error_plan_step")
-                step_executor_output_str = error_msg # Use error as output for step evaluator
+                step_executor_output_str = error_msg
                 attempt_log_detail["error"] = error_msg; attempt_log_detail["executor_output"] = error_msg
-                # Status char will be set by step evaluator or if it fails
             finally:
                 connected_clients_entry["agent_task"] = None
 
-            # --- Step Evaluator Call ---
             await add_monitor_log_func(f"Step Evaluator: Assessing outcome of Step {current_step_number} (Attempt {attempt_number})...", "system_step_eval_start")
-            step_correction_result: Optional[StepCorrectionOutcome] = await evaluate_step_outcome_and_suggest_correction(
+            last_step_correction_suggestion = await evaluate_step_outcome_and_suggest_correction(
                 original_user_query=original_user_query,
                 plan_step_being_evaluated=current_plan_step_obj,
                 controller_tool_used=validated_tool_name,
                 controller_tool_input=formulated_tool_input,
-                step_executor_output=step_executor_output_str, # This now includes errors if they occurred
+                step_executor_output=step_executor_output_str,
                 available_tools=step_tools
             )
 
-            if step_correction_result:
-                attempt_log_detail["step_eval_achieved"] = step_correction_result.step_achieved_goal
-                attempt_log_detail["step_eval_assessment"] = step_correction_result.assessment_of_step
-                await add_monitor_log_func(f"Step Evaluator (Step {current_step_number}, Att. {attempt_number}): Goal Achieved: {step_correction_result.step_achieved_goal}. Assessment: {step_correction_result.assessment_of_step}", "system_step_eval_output")
+            if last_step_correction_suggestion:
+                attempt_log_detail["step_eval_achieved"] = last_step_correction_suggestion.step_achieved_goal
+                attempt_log_detail["step_eval_assessment"] = last_step_correction_suggestion.assessment_of_step
+                await add_monitor_log_func(f"Step Evaluator (Step {current_step_number}, Att. {attempt_number}): Goal Achieved: {last_step_correction_suggestion.step_achieved_goal}. Assessment: {last_step_correction_suggestion.assessment_of_step}", "system_step_eval_output")
 
-                if step_correction_result.step_achieved_goal:
+                if last_step_correction_suggestion.step_achieved_goal:
                     attempt_log_detail["status_char_for_attempt"] = "x"
                     step_succeeded_after_attempts = True
-                    current_step_detail_log["final_status_char"] = "x" # Mark final success
+                    current_step_detail_log["final_status_char"] = "x"
                     current_step_detail_log["attempts"].append(attempt_log_detail)
-                    break # Break from retry loop, step succeeded
-                else: # Step failed this attempt
-                    if step_correction_result.is_recoverable_via_retry and retry_count_for_current_step < MAX_STEP_RETRIES:
-                        await add_monitor_log_func(f"Step Evaluator (Step {current_step_number}, Att. {attempt_number}): Suggests RETRY. Tool: '{step_correction_result.suggested_new_tool_for_retry}', Input Hint: '{step_correction_result.suggested_new_input_instructions_for_retry}', Confidence: {step_correction_result.confidence_in_correction}", "system_step_eval_suggest_retry")
-                        attempt_log_detail["status_char_for_attempt"] = "!" # Mark this attempt as failed
+                    break
+                else:
+                    if last_step_correction_suggestion.is_recoverable_via_retry and retry_count_for_current_step < MAX_STEP_RETRIES:
+                        await add_monitor_log_func(f"Step Evaluator (Step {current_step_number}, Att. {attempt_number}): Suggests RETRY. Tool: '{last_step_correction_suggestion.suggested_new_tool_for_retry}', Input Hint: '{last_step_correction_suggestion.suggested_new_input_instructions_for_retry}', Confidence: {last_step_correction_suggestion.confidence_in_correction}", "system_step_eval_suggest_retry")
+                        attempt_log_detail["status_char_for_attempt"] = "!"
                         current_step_detail_log["attempts"].append(attempt_log_detail)
                         retry_count_for_current_step += 1
-                        # Loop continues for next retry
-                    else: # Not recoverable or retries exhausted
+                    else:
                         await add_monitor_log_func(f"Step Evaluator (Step {current_step_number}, Att. {attempt_number}): Step failed and is not recoverable or retries exhausted.", "system_step_eval_unrecoverable")
                         attempt_log_detail["status_char_for_attempt"] = "!"
                         current_step_detail_log["attempts"].append(attempt_log_detail)
                         current_step_detail_log["final_status_char"] = "!"
-                        plan_failed_definitively = True; break # Break from retry loop, step definitively failed
-            else: # Step evaluator itself failed
+                        plan_failed_definitively = True; break
+            else:
                 await add_monitor_log_func(f"Error: Step Evaluator failed for Step {current_step_number} (Attempt {attempt_number}). Assuming step failed.", "error_step_eval")
                 attempt_log_detail["error"] = attempt_log_detail.get("error") or "Step Evaluator failed to produce an outcome."
                 attempt_log_detail["step_eval_assessment"] = "Step Evaluator failed."
                 attempt_log_detail["status_char_for_attempt"] = "!"
                 current_step_detail_log["attempts"].append(attempt_log_detail)
                 current_step_detail_log["final_status_char"] = "!"
-                plan_failed_definitively = True; break # Break from retry loop, step definitively failed
+                plan_failed_definitively = True; break
 
-            # Check for session cancellation request after each attempt
             if session_data_entry.get('cancellation_requested', False):
                 logger.warning(f"[{session_id}] Cancellation detected after step {current_step_number} (Attempt {attempt_number}). Stopping plan.")
                 await send_ws_message_func("status_message", "Plan execution cancelled.")
-                if not attempt_log_detail.get("error"): # If no specific error, mark as cancelled
+                if not attempt_log_detail.get("error"):
                     attempt_log_detail["error"] = "Cancelled by user after step attempt."
                 attempt_log_detail["status_char_for_attempt"] = "-"
-                current_step_detail_log["attempts"].append(attempt_log_detail) # Ensure this attempt is logged
+                current_step_detail_log["attempts"].append(attempt_log_detail)
                 current_step_detail_log["final_status_char"] = "-"
-                plan_failed_definitively = True; break # Break from retry loop
+                plan_failed_definitively = True; break
 
-        # --- End of Inner Retry Loop for Current Step ---
-        if not current_step_detail_log["attempts"]: # Should not happen if loop runs once
-             # Add a basic log if somehow attempts list is empty
+        if not current_step_detail_log["attempts"]:
             current_step_detail_log["attempts"].append({"attempt_number": 1, "error": "No attempt details recorded.", "status_char_for_attempt": "?"})
             current_step_detail_log["final_status_char"] = "?"
 
         step_execution_details_list.append(current_step_detail_log)
 
-        # Update _plan.md with the final status of this step
         active_plan_filename_local = session_data_entry.get('active_plan_filename')
         if active_plan_filename_local and active_task_id:
             await _update_plan_file_step_status(
@@ -662,28 +649,24 @@ async def process_execute_confirmed_plan(
             )
             await send_ws_message_func("trigger_artifact_refresh", {"taskId": active_task_id})
 
-        if plan_failed_definitively: # If a step definitively failed or plan was cancelled
-            break # Break from the main outer loop over plan steps
+        if plan_failed_definitively:
+            break
 
-        # Store the output of the last successful attempt of this step for overall evaluator
         if step_succeeded_after_attempts:
             last_successful_attempt = next((att for att in reversed(current_step_detail_log["attempts"]) if att["status_char_for_attempt"] == "x"), None)
             if last_successful_attempt:
                 preliminary_final_answer_from_last_step = last_successful_attempt.get("executor_output", preliminary_final_answer_from_last_step)
 
-    # --- End of Main Loop Through Plan Steps ---
-
     session_data_entry["plan_execution_active"] = False
     session_data_entry["current_plan_step_index"] = -1
 
-    # Construct summary for overall evaluator
     summary_lines_for_overall_eval = []
     for step_log in step_execution_details_list:
         summary_lines_for_overall_eval.append(f"Step {step_log['step_number']}: {step_log['description']}")
         summary_lines_for_overall_eval.append(f"  Initial Controller: Tool='{step_log['controller_tool_initial']}', Input='{str(step_log['controller_input_initial'])[:100]}', Confidence={step_log['controller_confidence_initial']:.2f}")
-        for i, attempt in enumerate(step_log["attempts"]):
-            summary_lines_for_overall_eval.append(f"  Attempt {i+1}:")
-            if attempt.get("controller_tool"): # If controller ran for this attempt
+        for i_att, attempt in enumerate(step_log["attempts"]):
+            summary_lines_for_overall_eval.append(f"  Attempt {i_att+1}:")
+            if attempt.get("controller_tool"):
                  summary_lines_for_overall_eval.append(f"    Controller: Tool='{attempt['controller_tool']}', Input='{str(attempt['controller_input'])[:100]}'")
             summary_lines_for_overall_eval.append(f"    Executor Output: {str(attempt['executor_output'])[:150]}...")
             if attempt.get("error"):
@@ -701,28 +684,25 @@ async def process_execute_confirmed_plan(
         final_message_to_user = "Plan execution stopped due to error or cancellation in one of the steps."
         await send_ws_message_func("agent_thinking_update", {"status": "Plan stopped."})
     else:
-        final_message_to_user = preliminary_final_answer_from_last_step # Use output of last successful step
+        final_message_to_user = preliminary_final_answer_from_last_step
         await send_ws_message_func("agent_thinking_update", {"status": "Plan executed. Evaluating overall outcome..."})
         logger.info(f"[{session_id}] Successfully attempted all plan steps (or those before a definitive failure). Now evaluating overall plan.")
 
-    # --- Overall Plan Evaluation ---
     await add_monitor_log_func("Invoking Overall Plan Evaluator to assess final outcome.", "system_evaluator_start")
     overall_evaluation_result = await evaluate_plan_outcome(
         original_user_query=original_user_query,
         executed_plan_summary=executed_plan_summary_str,
-        final_agent_answer=final_message_to_user # Pass the current best answer
+        final_agent_answer=final_message_to_user
     )
 
     if overall_evaluation_result:
-        final_message_to_user = overall_evaluation_result.assessment # Override with evaluator's assessment
+        final_message_to_user = overall_evaluation_result.assessment
         log_msg = (
             f"Overall Plan Evaluator Result: Success={overall_evaluation_result.overall_success}, "
             f"Confidence={overall_evaluation_result.confidence_score:.2f}. "
             f"Assessment: {overall_evaluation_result.assessment}"
         )
         await add_monitor_log_func(log_msg, "system_evaluator_output")
-        # For now, we are not yet implementing the user-choice replan based on these suggestions.
-        # This was deferred from the previous discussion.
         if not overall_evaluation_result.overall_success and overall_evaluation_result.suggestions_for_replan:
             await add_monitor_log_func(f"Overall Plan Evaluator Suggestions for future re-plan: {overall_evaluation_result.suggestions_for_replan}", "system_evaluator_suggestions")
     else:
@@ -739,7 +719,7 @@ async def process_new_task(
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc, get_artifacts_func: GetArtifactsFunc
 ) -> None:
-    # ... (existing content - no changes needed for this feature) ...
+    # ... (existing content - no changes needed) ...
     logger.info(f"[{session_id}] Received 'new_task' signal. Clearing context.")
 
     session_data_entry['cancellation_requested'] = False
@@ -774,7 +754,7 @@ async def process_delete_task(
     add_monitor_log_func: AddMonitorLogFunc, db_delete_task_func: DBDeleteTaskFunc,
     get_artifacts_func: GetArtifactsFunc
 ) -> None:
-    # ... (existing content - no changes needed for this feature) ...
+    # ... (existing content - no changes needed) ...
     task_id_to_delete = data.get("taskId")
     if not task_id_to_delete:
         logger.warning(f"[{session_id}] 'delete_task' message missing taskId.")
@@ -840,7 +820,7 @@ async def process_rename_task(
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc, db_rename_task_func: DBRenameTaskFunc
 ) -> None:
-    # ... (existing content - no changes needed for this feature) ...
+    # ... (existing content - no changes needed) ...
     task_id_to_rename = data.get("taskId")
     new_name = data.get("newName")
 
@@ -866,7 +846,7 @@ async def process_set_llm(
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc
 ) -> None:
-    # ... (existing content - no changes needed for this feature) ...
+    # ... (existing content - no changes needed) ...
     llm_id = data.get("llm_id")
     if llm_id and isinstance(llm_id, str):
         try:
@@ -907,7 +887,7 @@ async def process_get_available_models(
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc
 ) -> None:
-    # ... (existing content - no changes needed for this feature) ...
+    # ... (existing content - no changes needed) ...
     logger.info(f"[{session_id}] Received request for available models.")
     await send_ws_message_func("available_models", {
         "gemini": settings.gemini_available_models,
@@ -926,7 +906,7 @@ async def process_cancel_agent(
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc
 ) -> None:
-    # ... (existing content - no changes needed for this feature) ...
+    # ... (existing content - no changes needed) ...
     logger.warning(f"[{session_id}] Received request to cancel current operation.")
     session_data_entry['cancellation_requested'] = True
     logger.info(f"[{session_id}] Cancellation requested flag set to True.")
@@ -943,7 +923,7 @@ async def process_get_artifacts_for_task(
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc, get_artifacts_func: GetArtifactsFunc
 ) -> None:
-    # ... (existing content - no changes needed for this feature) ...
+    # ... (existing content - no changes needed) ...
     task_id_to_refresh = data.get("taskId")
     if not task_id_to_refresh:
         logger.warning(f"[{session_id}] Received get_artifacts_for_task without taskId.")
@@ -964,7 +944,7 @@ async def process_run_command(
     add_monitor_log_func: AddMonitorLogFunc, db_add_message_func: DBAddMessageFunc,
     execute_shell_command_func: ExecuteShellCommandFunc
 ) -> None:
-    # ... (existing content - no changes needed for this feature) ...
+    # ... (existing content - no changes needed) ...
     command_to_run = data.get("command")
     if command_to_run and isinstance(command_to_run, str):
         active_task_id_for_cmd = session_data_entry.get("current_task_id")
@@ -985,7 +965,7 @@ async def process_action_command(
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc
 ) -> None:
-    # ... (existing content - no changes needed for this feature) ...
+    # ... (existing content - no changes needed) ...
     action = data.get("command")
     if action and isinstance(action, str):
         logger.info(f"[{session_id}] Received action command: {action} (Not implemented).")
@@ -998,7 +978,7 @@ async def process_set_session_role_llm(
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc
 ) -> None:
-    # ... (existing content - no changes needed for this feature) ...
+    # ... (existing content - no changes needed) ...
     role = data.get("role")
     llm_id_override = data.get("llm_id")
 

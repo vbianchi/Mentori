@@ -1,20 +1,15 @@
 import logging
 from typing import List, Dict, Any, Optional, Union
 
-# MODIFIED: Import settings and get_llm
 from backend.config import settings
 from backend.llm_setup import get_llm
-from langchain_core.language_models.chat_models import BaseChatModel # Still needed for type hinting
+from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
-# MODIFIED: Changed Pydantic import to use v1 compatibility namespace as per deprecation warning
-from pydantic.v1 import BaseModel, Field
-import asyncio # For the test block
+from pydantic.v1 import BaseModel, Field # Compatibility with Pydantic v1
+import asyncio
 
-# Project Imports
-from backend.planner import PlanStep # For type hinting
-
-# MODIFIED: Added import for BaseTool
+from backend.planner import PlanStep
 from langchain_core.tools import BaseTool
 
 
@@ -57,7 +52,6 @@ Do not include any preamble or explanation outside of the JSON object.
 Focus on the substance of the results, not just whether tools ran without crashing. Did the agent *actually* answer the user's request or complete the task as intended?
 """
 
-# --- NEW: Pydantic model for Step Correction Outcome ---
 class StepCorrectionOutcome(BaseModel):
     """
     Defines the structured output for the Step Evaluator LLM.
@@ -65,13 +59,12 @@ class StepCorrectionOutcome(BaseModel):
     """
     step_achieved_goal: bool = Field(description="Boolean indicating if this specific step's intended goal was successfully achieved based on its output.")
     assessment_of_step: str = Field(description="A concise, human-readable assessment of this step's outcome, explaining why it succeeded or failed relative to its specific goal.")
-    is_recoverable_via_retry: bool = Field(description="If the step failed (step_achieved_goal is false), boolean indicating if the failure seems correctable with a retry using modified parameters or a different tool for THIS SAME STEP. Set to false if the step seems fundamentally flawed, the error is external/unfixable by the agent, or if the step actually succeeded despite minor issues.")
+    is_recoverable_via_retry: bool = Field(description="If the step failed (step_achieved_goal is false), boolean indicating if the failure seems correctable with a retry using modified parameters or a different tool for THIS SAME STEP. Set to false if the step seems fundamentally flawed, the error is external/unfixable by the agent (e.g. a website is truly down, a file genuinely doesn't exist and shouldn't), or if the step actually succeeded despite minor issues.")
     suggested_new_tool_for_retry: Optional[str] = Field(default=None, description="If is_recoverable_via_retry is true, the name of the tool (from available tools) that should be used for the retry attempt of THIS step. Can be the same as the original tool, a different tool, or 'None' if the retry should be a direct LLM response. If is_recoverable_via_retry is false, this should be null.")
     suggested_new_input_instructions_for_retry: Optional[str] = Field(default=None, description="If is_recoverable_via_retry is true, specific, concise instructions or key parameters for the Controller to formulate the tool_input for the retry attempt of THIS step. This is guidance, not the full input. If is_recoverable_via_retry is false, this should be null.")
     confidence_in_correction: Optional[float] = Field(default=None, description="If is_recoverable_via_retry is true, a score from 0.0 to 1.0 indicating confidence in the suggested correction. If false, this should be null.", ge=0.0, le=1.0)
 
 
-# --- NEW: System Prompt for Step Evaluator ---
 STEP_EVALUATOR_SYSTEM_PROMPT_TEMPLATE = """You are an expert AI Step Evaluator. Your task is to assess the outcome of a single step executed by a research agent and, if it failed, determine if it's recoverable and suggest a specific correction for retrying *only that step*.
 
 You will be given:
@@ -85,7 +78,7 @@ Your responsibilities:
 -   `step_achieved_goal`: Determine if the step's specific goal (as per its description and expected outcome) was met by the actual output.
 -   `assessment_of_step`: Briefly explain your reasoning.
 -   If `step_achieved_goal` is false:
-    -   `is_recoverable_via_retry`: Decide if the failure is likely correctable by retrying *this same step* with a different tool or modified input. Consider if the error was due to a bad tool choice, incorrect input formulation, or a minor, fixable issue. Do not suggest retry if the problem is external (e.g., website down, file truly doesn't exist and shouldn't) or if the step's logic is fundamentally flawed for the overall goal.
+    -   `is_recoverable_via_retry`: Decide if the failure is likely correctable by retrying *this same step* with a different tool or modified input. Consider if the error was due to a bad tool choice, incorrect input formulation, or a minor, fixable issue. Do not suggest retry if the problem is external (e.g., website down, file truly doesn't exist and shouldn't, or a service is rate-limiting you) or if the step's logic is fundamentally flawed for the overall goal. **If the error message clearly indicates an external, temporary issue like a 'rate limit', 'Ratelimit', 'service unavailable', or HTTP status codes like 429, 503 for a web-based tool, consider `is_recoverable_via_retry` as `false` for an *immediate* retry, as retrying the same action instantly is unlikely to succeed.**
     -   If `is_recoverable_via_retry` is true:
         -   `suggested_new_tool_for_retry`: Specify the exact name of the tool (from the available list or 'None') to use for the retry.
         -   `suggested_new_input_instructions_for_retry`: Provide concise instructions for the Controller to formulate the input for the retry. E.g., "Search for 'X Y Z' instead of 'A B C'", "Ensure the filename is 'data.csv'", "Use the full URL found in the previous step's output."
@@ -106,21 +99,8 @@ async def evaluate_plan_outcome(
     original_user_query: str,
     executed_plan_summary: str,
     final_agent_answer: str
-    # MODIFIED: Removed llm as an argument
 ) -> Optional[EvaluationResult]:
-    """
-    Evaluates the outcome of an entire executed plan using an LLM.
-    Fetches its own LLM based on settings.
-
-    Args:
-        original_user_query: The initial query from the user.
-        executed_plan_summary: A textual summary of the plan's execution, including steps,
-                               outputs, and any errors.
-        final_agent_answer: The final answer/output produced by the agent at the end of the plan.
-
-    Returns:
-        An EvaluationResult object, or None if an error occurs during evaluation.
-    """
+    # ... (existing content - no changes needed) ...
     logger.info(f"Evaluator (Overall Plan): Evaluating outcome for query: {original_user_query[:100]}...")
     logger.debug(f"Evaluator (Overall Plan): Executed Plan Summary:\n{executed_plan_summary}")
     logger.debug(f"Evaluator (Overall Plan): Final Agent Answer:\n{final_agent_answer}")
@@ -183,30 +163,15 @@ async def evaluate_plan_outcome(
             logger.error(f"Evaluator (Overall Plan): Failed to get raw LLM output on error: {raw_e}")
         return None
 
-# --- NEW: Function to evaluate a single step's outcome and suggest corrections ---
 async def evaluate_step_outcome_and_suggest_correction(
     original_user_query: str,
     plan_step_being_evaluated: PlanStep,
-    controller_tool_used: Optional[str], # Tool chosen by controller for this attempt
-    controller_tool_input: Optional[str], # Input given to tool by controller for this attempt
-    step_executor_output: str, # Actual output or error from the executor for this attempt
-    available_tools: List[BaseTool] # List of BaseTool objects
+    controller_tool_used: Optional[str],
+    controller_tool_input: Optional[str],
+    step_executor_output: str,
+    available_tools: List[BaseTool]
 ) -> Optional[StepCorrectionOutcome]:
-    """
-    Evaluates a single plan step's outcome and suggests corrections if it failed.
-    Fetches its own LLM based on settings (reuses overall evaluator's LLM for now).
-
-    Args:
-        original_user_query: The initial query from the user for broader context.
-        plan_step_being_evaluated: The PlanStep object that was attempted.
-        controller_tool_used: The tool the Controller selected for this attempt.
-        controller_tool_input: The input the Controller formulated for the tool for this attempt.
-        step_executor_output: The actual output or error message from the Executor for this step attempt.
-        available_tools: A list of BaseTool objects available to the agent.
-
-    Returns:
-        A StepCorrectionOutcome object, or None if an error occurs.
-    """
+    # ... (existing content - no changes needed) ...
     logger.info(f"Evaluator (Step): Evaluating step '{plan_step_being_evaluated.step_id}: {plan_step_being_evaluated.description[:50]}...'")
     logger.debug(f"Evaluator (Step): Original User Query: {original_user_query[:100]}...")
     logger.debug(f"Evaluator (Step): Step Description: {plan_step_being_evaluated.description}")
@@ -215,12 +180,10 @@ async def evaluate_step_outcome_and_suggest_correction(
     logger.debug(f"Evaluator (Step): Attempted Tool Input (Controller): {str(controller_tool_input)[:100]}...")
     logger.debug(f"Evaluator (Step): Actual Executor Output: {step_executor_output[:200]}...")
 
-    # For now, reuse the overall evaluator's LLM settings.
-    # Consider adding STEP_EVALUATOR_LLM_ID to config.py if separate tuning is needed.
     try:
         step_evaluator_llm: BaseChatModel = get_llm(
             settings,
-            provider=settings.evaluator_provider, # Reusing overall evaluator's LLM
+            provider=settings.evaluator_provider,
             model_name=settings.evaluator_model_name
         ) # type: ignore
         logger.info(f"Evaluator (Step): Using LLM {settings.evaluator_provider}::{settings.evaluator_model_name}")
@@ -277,7 +240,6 @@ async def evaluate_step_outcome_and_suggest_correction(
 
     except Exception as e:
         logger.error(f"Evaluator (Step {plan_step_being_evaluated.step_id}): Error during step evaluation: {e}", exc_info=True)
-        # Attempt to get raw output for debugging
         try:
             error_chain = prompt | step_evaluator_llm | StrOutputParser() # type: ignore
             raw_output = await error_chain.ainvoke({
@@ -298,8 +260,8 @@ async def evaluate_step_outcome_and_suggest_correction(
 
 
 if __name__ == '__main__':
-    # Test for Overall Plan Evaluator (existing test)
     async def test_overall_evaluator():
+        # ... (existing test - no changes needed) ...
         test_query = "Find the latest 2 papers on PubMed about 'mRNA vaccine stability', read the abstract of the first result, and write a short summary of that abstract to a file named 'summary.txt'."
         test_plan_summary = """
 Step 1: Executed pubmed_search with input 'mRNA vaccine stability latest 2'. Output: Found 2 papers: [Paper A, Paper B].
@@ -318,10 +280,8 @@ Step 4: Attempted to run python script for word cloud. Error: ModuleNotFoundErro
             if evaluation.suggestions_for_replan: print(f"Suggestions for Re-plan: {evaluation.suggestions_for_replan}")
         else: print("Overall Plan Evaluation failed.")
 
-    # --- NEW: Test for Step Evaluator ---
     async def test_step_evaluator():
-        # Mock BaseTool for available_tools list
-        # BaseTool is now imported at the top of the file
+        # ... (existing test - no changes needed) ...
         class MockTool(BaseTool):
             name: str
             description: str
@@ -343,7 +303,6 @@ Step 4: Attempted to run python script for word cloud. Error: ModuleNotFoundErro
             tool_input_instructions="Focus on general AI advancements.",
             expected_outcome="A list of recent news articles about AI."
         )
-        # Scenario 1: Step failed, but recoverable
         test_executor_output_failed_recoverable = "Error: duckduckgo_search failed because the query 'Artificial Intelligence' was too broad. Try a more specific query."
         print(f"\n--- Step Evaluator Test 1 (Failed, Recoverable) ---")
         outcome1 = await evaluate_step_outcome_and_suggest_correction(
@@ -357,7 +316,6 @@ Step 4: Attempted to run python script for word cloud. Error: ModuleNotFoundErro
         if outcome1: print(outcome1.json(indent=2))
         else: print("Step Evaluation 1 failed to produce an outcome.")
 
-        # Scenario 2: Step succeeded
         test_executor_output_succeeded = "Found 3 news articles: 1. AI in healthcare... 2. New LLM released... 3. AI ethics discussion..."
         print(f"\n--- Step Evaluator Test 2 (Succeeded) ---")
         outcome2 = await evaluate_step_outcome_and_suggest_correction(
@@ -371,7 +329,6 @@ Step 4: Attempted to run python script for word cloud. Error: ModuleNotFoundErro
         if outcome2: print(outcome2.json(indent=2))
         else: print("Step Evaluation 2 failed to produce an outcome.")
 
-        # Scenario 3: Step failed, unrecoverable
         test_step_write = PlanStep(
             step_id=2,
             description="Write the found news to 'news.txt'.",
@@ -397,4 +354,3 @@ Step 4: Attempted to run python script for word cloud. Error: ModuleNotFoundErro
         await test_step_evaluator()
 
     asyncio.run(run_all_tests())
-

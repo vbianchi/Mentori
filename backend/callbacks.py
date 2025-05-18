@@ -83,14 +83,12 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
 
     def _check_cancellation(self, step_name: str):
         """Checks if cancellation has been requested and raises AgentCancelledException if so."""
-        # Access the session_data for this specific session_id
         current_session_specific_data = self.session_data.get(self.session_id)
         if current_session_specific_data:
             if current_session_specific_data.get('cancellation_requested', False):
                 logger.warning(f"[{self.session_id}] Cancellation detected in callback before {step_name}. Raising AgentCancelledException.")
                 raise AgentCancelledException("Cancellation requested by user.")
         else:
-            # This case should ideally not happen if handler is tied to an active session
             logger.error(f"[{self.session_id}] Cannot check cancellation flag: Session data not found for session in shared dict.")
 
 
@@ -113,10 +111,10 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
 
     async def on_llm_new_token(self, token: str, **kwargs: Any) -> None:
         """Handle new token from LLM, if streaming is implemented for thoughts/final answer."""
-        pass # Placeholder for potential future streaming of thoughts
+        pass
 
     async def on_llm_end(self, response: LLMResult, *, run_id: UUID, parent_run_id: Optional[UUID] = None, **kwargs: Any) -> None:
-        """Handle end of LLM call, primarily for token usage extraction."""
+        # ... (existing content - no changes needed) ...
         log_prefix = self._get_log_prefix()
         logger.debug(f"[{self.session_id}] on_llm_end received response. Run ID: {run_id}")
         logger.debug(f"[{self.session_id}] LLMResult object: {response}")
@@ -128,7 +126,6 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         source_for_tokens = "unknown"
 
         try:
-            # --- Primary source: response.llm_output (if available and dict) ---
             if response.llm_output and isinstance(response.llm_output, dict):
                 llm_output_data = response.llm_output
                 source_for_tokens = "llm_output"
@@ -150,10 +147,9 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
                     logger.info(f"[{self.session_id}] Tokens from llm_output.usage_metadata (Gemini): In={input_tokens}, Out={output_tokens}, Total={total_tokens}")
                 elif 'eval_count' in llm_output_data: # Ollama
                     output_tokens = llm_output_data.get('eval_count')
-                    input_tokens = llm_output_data.get('prompt_eval_count') # Note: Ollama might not always provide prompt_eval_count
+                    input_tokens = llm_output_data.get('prompt_eval_count')
                     logger.info(f"[{self.session_id}] Tokens from llm_output (Ollama): Eval(Out)={output_tokens}, PromptEval(In)={input_tokens}")
 
-            # --- Fallback: response.generations (if llm_output was None or didn't yield tokens) ---
             if (input_tokens is None and output_tokens is None) and response.generations:
                 logger.debug(f"[{self.session_id}] llm_output was None or no tokens found. Trying response.generations.")
                 for gen_list in response.generations:
@@ -167,10 +163,9 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
                             input_tokens = usage_metadata.get('prompt_token_count', usage_metadata.get('input_tokens'))
                             output_tokens = usage_metadata.get('candidates_token_count', usage_metadata.get('output_tokens'))
                             total_tokens = usage_metadata.get('total_token_count')
-                            # Try to get model name from response_metadata if available (Gemini pattern)
                             if hasattr(first_gen.message, 'response_metadata') and isinstance(first_gen.message.response_metadata, dict):
                                 model_name = first_gen.message.response_metadata.get('model_name', model_name)
-                            if not model_name or model_name == "unknown_model": # Try another place for model name
+                            if not model_name or model_name == "unknown_model":
                                 model_name = getattr(first_gen, 'generation_info', {}).get('model_name', model_name)
                             logger.info(f"[{self.session_id}] Tokens from generations.message.usage_metadata (Gemini-like): In={input_tokens}, Out={output_tokens}, Total={total_tokens}, Model={model_name}")
                             break
@@ -194,7 +189,6 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
                     logger.warning(f"[{self.session_id}] response.generations is empty or None.")
 
 
-            # --- Final Processing and Sending ---
             input_tokens = int(input_tokens) if input_tokens is not None else 0
             output_tokens = int(output_tokens) if output_tokens is not None else 0
 
@@ -226,7 +220,7 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
 
 
     async def on_llm_error(self, error: Union[Exception, KeyboardInterrupt], **kwargs: Any) -> None:
-        """Handle error from LLM."""
+        # ... (existing content - no changes needed) ...
         log_prefix = self._get_log_prefix(); error_type_name = type(error).__name__
         logger.error(f"[{self.session_id}] LLM Error: {error}", exc_info=True)
         error_content = f"[LLM Error] {error_type_name}: {error}"
@@ -240,104 +234,102 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
     async def on_chain_error(self, error: Union[Exception, KeyboardInterrupt], **kwargs: Any) -> None: pass
 
     async def on_tool_start(self, serialized: Dict[str, Any], input_str: str, **kwargs: Any) -> None:
-        """Handle start of tool execution."""
+        # ... (existing content - no changes needed) ...
         tool_name = serialized.get("name", "Unknown Tool")
         try:
             self._check_cancellation(f"Tool execution ('{tool_name}')")
         except AgentCancelledException:
-            raise # Propagate to stop the agent
+            raise
         log_prefix = self._get_log_prefix()
-        log_input = input_str[:500] + "..." if len(str(input_str)) > 500 else input_str # Truncate long inputs for logging
+        log_input = input_str[:500] + "..." if len(str(input_str)) > 500 else input_str
         log_content = f"[Tool Start] Using '{tool_name}' with input: '{log_input}'"
         logger.info(f"[{self.session_id}] {log_content}")
         await self.send_ws_message("monitor_log", f"{log_prefix} {log_content}")
         await self.send_ws_message("agent_thinking_update", {"status": f"Using tool: {tool_name}..."})
-        await self._save_message("tool_input", f"{tool_name}:::{log_input}") # Save original input_str if needed for full detail
+        await self._save_message("tool_input", f"{tool_name}:::{log_input}")
 
     async def on_tool_end(self, output: str, name: str = "Unknown Tool", **kwargs: Any) -> None:
-        """Handle end of tool execution, including artifact generation for write_file."""
+        # ... (existing content - no changes needed) ...
         log_prefix = self._get_log_prefix()
-        output_str = str(output) # Ensure output is a string
+        output_str = str(output)
         logger.info(f"[{self.session_id}] Tool '{name}' finished. Output length: {len(output_str)}")
 
-        monitor_output = output_str # Default monitor output
+        monitor_output = output_str
 
-        # Check for write_file success and trigger artifact refresh
         success_prefix = "SUCCESS::write_file:::"
         if name == "write_file" and output_str.startswith(success_prefix):
             try:
-                if len(output_str) > len(success_prefix): # Check if there's actually a filename after prefix
+                if len(output_str) > len(success_prefix):
                     relative_path_str = output_str[len(success_prefix):]
                     logger.info(f"[{self.session_id}] Detected successful write_file: '{relative_path_str}'")
                     await self._save_message("artifact_generated", relative_path_str)
                     await self.send_ws_message("monitor_log", f"{log_prefix} [ARTIFACT_GENERATED] {relative_path_str} (via {name})")
-                    monitor_output = f"Successfully wrote file: '{relative_path_str}'" # Cleaner monitor log for this case
+                    monitor_output = f"Successfully wrote file: '{relative_path_str}'"
 
-                    # *** ADDED: Trigger artifact refresh on successful write_file ***
                     if self.current_task_id:
                         logger.info(f"[{self.session_id}] Triggering artifact refresh for task {self.current_task_id} after {name}.")
                         await self.send_ws_message("trigger_artifact_refresh", {"taskId": self.current_task_id})
                     else:
                         logger.warning(f"[{self.session_id}] Cannot trigger artifact refresh for {name}: current_task_id not set in callback handler.")
-                    # *** END ADDED SECTION ***
-
                 else:
-                    # This case means the output was *only* the prefix, which is unexpected.
                     logger.warning(f"[{self.session_id}] write_file output matched prefix but had no filename: '{output_str}'")
-                    # monitor_output remains the original output_str
             except Exception as parse_err:
                 logger.error(f"[{self.session_id}] Error processing write_file success output '{output_str}': {parse_err}", exc_info=True)
-                # monitor_output remains the original output_str in case of error
         else:
-            # Truncate long outputs for general monitor logging
             monitor_output = output_str[:1000] + "..." if len(output_str) > 1000 else output_str
 
-        # Format for monitor display
         formatted_output = f"\n---\n{monitor_output.strip()}\n---"
         log_content = f"[Tool Output] Tool '{name}' returned:{formatted_output}"
         await self.send_ws_message("monitor_log", f"{log_prefix} {log_content}")
         await self.send_ws_message("agent_thinking_update", {"status": f"Processed tool: {name}."})
-        await self._save_message("tool_output", output_str) # Save the full original output to DB
+        await self._save_message("tool_output", output_str)
 
     async def on_tool_error(self, error: Union[Exception, KeyboardInterrupt], name: str = "Unknown Tool", **kwargs: Any) -> None:
         """Handle error from tool."""
+        # MODIFIED: Attempt to get a more specific tool name if 'name' is generic
+        actual_tool_name = name
+        if name == "Unknown Tool" and "serialized" in kwargs and isinstance(kwargs["serialized"], dict):
+            actual_tool_name = kwargs["serialized"].get("name", name)
+            if actual_tool_name != name:
+                 logger.info(f"[{self.session_id}] Resolved 'Unknown Tool' to '{actual_tool_name}' from serialized data for error reporting.")
+
+
         if isinstance(error, AgentCancelledException):
-            logger.warning(f"[{self.session_id}] Tool '{name}' execution cancelled by AgentCancelledException.")
-            await self.send_ws_message("agent_thinking_update", {"status": f"Tool cancelled: {name}."})
-            raise error # Propagate to stop the agent
+            logger.warning(f"[{self.session_id}] Tool '{actual_tool_name}' execution cancelled by AgentCancelledException.")
+            await self.send_ws_message("agent_thinking_update", {"status": f"Tool cancelled: {actual_tool_name}."})
+            raise error
 
         log_prefix = self._get_log_prefix(); error_type_name = type(error).__name__
         error_str = str(error)
-        logger.error(f"[{self.session_id}] Tool '{name}' Error: {error_str}", exc_info=True)
-        error_content = f"[Tool Error] Tool '{name}' failed: {error_type_name}: {error_str}"
+        # Use actual_tool_name in logging and messages
+        logger.error(f"[{self.session_id}] Tool '{actual_tool_name}' Error: {error_str}", exc_info=True)
+        error_content = f"[Tool Error] Tool '{actual_tool_name}' failed: {error_type_name}: {error_str}"
         await self.send_ws_message("monitor_log", f"{log_prefix} {error_content}")
-        await self.send_ws_message("status_message", f"Error occurred during tool execution: {name}.")
-        await self.send_ws_message("agent_thinking_update", {"status": f"Error with tool: {name}."})
-        await self._save_message("error_tool", f"{name}::{error_type_name}::{error_str}")
+        await self.send_ws_message("status_message", f"Error occurred during tool execution: {actual_tool_name}.")
+        await self.send_ws_message("agent_thinking_update", {"status": f"Error with tool: {actual_tool_name}."})
+        await self._save_message("error_tool", f"{actual_tool_name}::{error_type_name}::{error_str}")
+
 
     async def on_agent_action(self, action: AgentAction, **kwargs: Any) -> Any:
-        """Handle agent action (tool selection)."""
+        # ... (existing content - no changes needed) ...
         log_prefix = self._get_log_prefix()
         thought = ""
-        # Attempt to extract the thought that led to this action
         if action.log:
             log_lines = action.log.strip().split('\n')
             thought_lines = []
             in_thought = False
-            # Iterate backwards to find the last "Thought:" block before "Action:"
             for line in reversed(log_lines):
                 stripped_line = line.strip()
-                if stripped_line.startswith("Action:"): # Stop if we hit the action itself
-                    in_thought = False # Ensure we don't capture parts of the action
+                if stripped_line.startswith("Action:"):
+                    in_thought = False
                     continue
                 if stripped_line.startswith("Thought:"):
                     in_thought = True
-                    # Extract content after "Thought:"
                     thought_part = stripped_line.split(":", 1)[1].strip() if ":" in stripped_line else stripped_line
                     thought_lines.append(thought_part)
-                    break # Found the most recent complete thought block
-                if in_thought: # If we are already inside a thought block from a previous line
-                    thought_lines.append(line) # Append the whole line as part of multi-line thought
+                    break
+                if in_thought:
+                    thought_lines.append(line)
 
             if thought_lines:
                 thought = "\n".join(reversed(thought_lines)).strip()
@@ -346,20 +338,18 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
             logger.debug(f"[{self.session_id}] Extracted thought (Action): {thought}")
             await self.send_ws_message("monitor_log", f"{log_prefix} [Agent Thought (Action)] {thought}")
             await self._save_message("agent_thought_action", thought)
-            await self.send_ws_message("agent_thinking_update", {"status": "Thinking..."}) # Generic thinking status
+            await self.send_ws_message("agent_thinking_update", {"status": "Thinking..."})
         else:
             logger.warning(f"[{self.session_id}] Could not extract thought from agent action log: {action.log}")
-            await self.send_ws_message("agent_thinking_update", {"status": "Processing..."}) # Generic processing status
+            await self.send_ws_message("agent_thinking_update", {"status": "Processing..."})
 
     async def on_agent_finish(self, finish: AgentFinish, **kwargs: Any) -> Any:
-        """Handle agent finish (final answer)."""
+        # ... (existing content - no changes needed) ...
         log_prefix = self._get_log_prefix()
         logger.info(f"[{self.session_id}] Agent Finish. Log: {finish.log}")
 
-        # Attempt to extract the final thought
         final_thought = ""
         if finish.log:
-            # Regex to find "Thought:" not followed by "Action:" before "Final Answer:"
             match = re.search(r"Thought:(.*?)(?=Final Answer:)", finish.log, re.S | re.IGNORECASE)
             if match:
                 final_thought = match.group(1).strip()
@@ -370,20 +360,17 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
                 logger.warning(f"[{self.session_id}] Could not extract final thought from agent finish log.")
 
         final_answer_content = finish.return_values.get("output", "No final output provided by agent.")
-        if not isinstance(final_answer_content, str): # Ensure it's a string
+        if not isinstance(final_answer_content, str):
             final_answer_content = str(final_answer_content)
 
         await self._save_message("agent_finish", final_answer_content)
         await self.send_ws_message("monitor_log", f"{log_prefix} [Agent Finish] Sending complete final answer.")
-        await self.send_ws_message("agent_message", final_answer_content) # Send final answer to chat
-        await self.send_ws_message("status_message", "Task processing complete.") # Update overall status
+        await self.send_ws_message("agent_message", final_answer_content)
+        await self.send_ws_message("status_message", "Task processing complete.")
         logger.info(f"[{self.session_id}] Sent complete agent_message. Final answer saved to DB.")
 
 
-    async def on_text(self, text: str, **kwargs: Any) -> Any:
-        """Handle arbitrary text from chain (not typically used by ReAct)."""
-        pass
-
+    async def on_text(self, text: str, **kwargs: Any) -> Any: pass
     async def on_retriever_start(self, serialized: Dict[str, Any], query: str, **kwargs: Any) -> Any: pass
     async def on_retriever_end(self, documents: Sequence[Document], **kwargs: Any) -> Any: pass
     async def on_retriever_error(self, error: Union[Exception, KeyboardInterrupt], **kwargs: Any) -> Any: pass
