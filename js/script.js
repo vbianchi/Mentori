@@ -257,32 +257,36 @@ document.addEventListener('DOMContentLoaded', () => {
                         break;
                     case 'update_artifacts':
                         if (Array.isArray(message.content)) {
-                            currentTaskArtifacts = message.content;
-                            // If the currently viewed artifact is a plan file, try to keep it selected or select the newest plan
-                            const currentArtifactFilename = (currentArtifactIndex >= 0 && currentArtifactIndex < currentTaskArtifacts.length)
+                            const oldArtifactCount = currentTaskArtifacts.length;
+                            const oldCurrentArtifactFilename = (currentArtifactIndex >= 0 && currentArtifactIndex < oldArtifactCount)
                                 ? currentTaskArtifacts[currentArtifactIndex]?.filename
                                 : null;
 
-                            if (currentArtifactFilename && currentArtifactFilename.startsWith("_plan_") && currentArtifactFilename.endsWith(".md")) {
-                                const newIndex = currentTaskArtifacts.findIndex(art => art.filename === currentArtifactFilename);
+                            currentTaskArtifacts = message.content; // Update the list
+
+                            if (oldCurrentArtifactFilename && oldCurrentArtifactFilename.startsWith("_plan_") && oldCurrentArtifactFilename.endsWith(".md")) {
+                                // Try to find the same plan file in the new list
+                                const newIndex = currentTaskArtifacts.findIndex(art => art.filename === oldCurrentArtifactFilename);
                                 if (newIndex !== -1) {
-                                    currentArtifactIndex = newIndex;
-                                } else { // Current plan file might have been removed (should not happen with current logic) or list reordered
+                                    currentArtifactIndex = newIndex; // Keep it selected
+                                } else {
+                                    // If not found (shouldn't happen if it's just an update), select the newest plan or first artifact
                                     const latestPlan = currentTaskArtifacts.find(art => art.filename && art.filename.startsWith("_plan_") && art.filename.endsWith(".md"));
                                     currentArtifactIndex = latestPlan ? currentTaskArtifacts.indexOf(latestPlan) : (currentTaskArtifacts.length > 0 ? 0 : -1);
                                 }
                             } else if (currentTaskArtifacts.length > 0) {
-                                currentArtifactIndex = 0; // Default to first artifact if previous wasn't a plan or not found
+                                // If previous was not a plan or no plan was selected, default to first/newest artifact
+                                currentArtifactIndex = 0;
                             } else {
                                 currentArtifactIndex = -1;
                             }
-                            updateArtifactDisplay();
+                            updateArtifactDisplay(); // This will re-render based on the new currentArtifactIndex
                         }
                         break;
                     case 'trigger_artifact_refresh':
                         const taskIdToRefresh = message.content?.taskId;
                         if (taskIdToRefresh && taskIdToRefresh === currentTaskId) {
-                            addMonitorLog(`[SYSTEM] File event detected, explicitly requesting artifact list update...`);
+                            addMonitorLog(`[SYSTEM] File event detected for task ${taskIdToRefresh}, explicitly requesting artifact list update...`);
                             // MODIFIED: Always send get_artifacts_for_task to ensure UI updates with latest file list and content
                             sendWsMessage('get_artifacts_for_task', { taskId: currentTaskId });
                         }
@@ -527,9 +531,10 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Artifact display elements not found!");
             return;
         }
-        // Clear previous artifact content more thoroughly
-        const existingContentElements = monitorArtifactAreaElement.querySelectorAll('img, pre, .artifact-filename, .artifact-error, .artifact-placeholder');
-        existingContentElements.forEach(el => el.remove());
+        // MODIFIED: Clear previous artifact content more thoroughly
+        // This selector targets all direct children of monitorArtifactAreaElement that are not the artifactNavElement itself.
+        const childrenToRemove = Array.from(monitorArtifactAreaElement.children).filter(child => child !== artifactNavElement);
+        childrenToRemove.forEach(child => monitorArtifactAreaElement.removeChild(child));
 
 
         if (currentTaskArtifacts.length === 0 || currentArtifactIndex < 0 || currentArtifactIndex >= currentTaskArtifacts.length) {
@@ -581,10 +586,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     preElement.textContent = 'Loading text file...';
                      try {
                         console.log(`Fetching text artifact: ${artifact.url}`);
-                        // Add a cache-busting query parameter to ensure fresh fetch
-                        const cacheBustUrl = `${artifact.url}?t=${new Date().getTime()}`;
-                        const response = await fetch(cacheBustUrl);
-                        if (!response.ok) { throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`); }
+                        // MODIFIED: Add cache-control headers to the fetch request
+                        const response = await fetch(artifact.url, {
+                            cache: 'reload', // Important: tells browser to revalidate with server
+                            headers: {
+                                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                                'Pragma': 'no-cache', // For HTTP/1.0 caches/proxies
+                                'Expires': '0' // For older proxies
+                            }
+                        });
+                        if (!response.ok) {
+                            // Log server's response if not OK, even if it's a 304 we want to treat it as an issue here
+                            // as we explicitly asked for no cache.
+                            logger.warn(`Text artifact fetch for ${artifact.filename} was not OK. Status: ${response.status} ${response.statusText}`);
+                            throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`);
+                        }
                         const textContent = await response.text();
                         preElement.textContent = textContent;
                         console.log(`Successfully fetched and displayed ${artifact.filename}`);
@@ -955,11 +971,9 @@ document.addEventListener('DOMContentLoaded', () => {
         let sessionIDHeader = 'unknown_session';
         if (window.socket && window.socket.url) {
             try {
-                // Attempt to get session_id from WebSocket URL if it was set as a query param
-                // This is a fallback; a more robust method would be to have backend send session_id on connect.
                 const urlParams = new URL(window.socket.url).searchParams;
                 sessionIDHeader = urlParams.get('session_id') || sessionIDHeader;
-            } catch (e) { /* ignore if parsing fails */ }
+            } catch (e) { /* ignore */ }
         }
 
         console.log(`[handleFileUpload] Preparing to upload ${files.length} file(s) to ${uploadUrl} for task ${currentTaskId}. X-Session-ID: ${sessionIDHeader}`);
