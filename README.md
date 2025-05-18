@@ -1,116 +1,195 @@
-ResearchAgent: AI Assistant for Research Workflows (v2.0 Vision)
-================================================================
+ResearchAgent: AI Assistant for Research Workflows (v2.1+ with Step Evaluation)
+===============================================================================
 
-This project provides a functional user interface and backend for an AI agent system designed to assist with research tasks, particularly in fields like bioinformatics and epidemiology. It features a three-panel layout (Tasks, Chat, Monitor/Artifact Viewer) and connects via WebSockets to a Python backend powered by **LangChain**. **Version 2.0 aims to significantly enhance the agent's ability to handle complex, multi-step research tasks through a new Planner-Controller-Executor-Evaluator architecture with user collaboration.** The agent can use configurable LLMs (Google Gemini or local Ollama) for reasoning and various tools to perform actions within isolated task workspaces.
+This project provides a functional user interface and backend for an AI agent system designed to assist with research tasks, particularly in fields like bioinformatics and epidemiology. It features a three-panel layout (Tasks, Chat, Monitor/Artifact Viewer) and connects via WebSockets to a Python backend powered by LangChain.
 
-Features (Including v2.0 Enhancements)
---------------------------------------
+Version 2.1+ introduces an advanced Planner-Controller-Executor-Evaluator architecture with per-step evaluation and a retry mechanism for enhanced task completion. The agent also includes an Intent Classifier to differentiate simple queries from complex tasks. It uses configurable LLMs (Google Gemini or local Ollama) for reasoning and various tools to perform actions within isolated task workspaces. Backend message handling has also been refactored for improved modularity.
 
--   **Task Management:** Create, select, delete, and rename tasks. Each task maintains its own context and workspace.
+Core Architecture & Workflow
+----------------------------
 
--   **Chat Interface:** Interact with the AI agent via a familiar chat window. Supports input history (Up/Down arrows). Basic Markdown rendering (newlines, bold, italics, code blocks, links). A "Thinking..." status line appears while the agent processes requests.
+The system processes user queries through a sophisticated pipeline:
 
--   **LLM Selection:** Choose the specific language model (Gemini or Ollama models configured in `.env`) to use for the current session directly from the chat header. The UI syncs with the backend's actual default LLM on new connections.
+1.  User Input: The user provides a query via the web UI.
 
--   **Agent Workspace (Monitor):** View the agent's internal steps, tool usage, and outputs in a structured, styled log panel.
+2.  Intent Classification (`intent_classifier.py`):
 
--   **Monitor Status Indicator:** A visual indicator (dot + text) in the monitor header shows the agent's current state (e.g., Idle, Running, Error, Disconnected).
+    -   A designated "Intent Classifier LLM" (configurable via `.env` and session overrides) analyzes the query.
 
--   **Agent Cancellation (STOP Button):** A STOP button appears in the monitor header while the agent is running. Clicking it sends a cancellation request to the backend.
+    -   Output: Classifies the intent as either:
 
--   **File Upload:** An "Upload File(s)" button in the task panel allows users to upload files directly into the currently selected task's workspace. The artifact viewer updates automatically after a successful upload.
+        -   `DIRECT_QA`: For simple questions, explanations, or single-tool tasks.
 
--   **Artifact Viewer:** Displays generated `.png` images and previews common text files (`.txt`, `.py`, `.csv`, etc.) in a dedicated area below the monitor logs, with navigation for multiple artifacts. The filename is displayed above the content, and the navigation buttons remain fixed at the bottom.ResearchAgent: AI Assistant for Research Workflows (v2.1)
-=========================================================
+        -   `PLAN`: For complex tasks requiring decomposition and multiple tool uses.
 
-This project provides a functional user interface and backend for an AI agent system designed to assist with research tasks, particularly in fields like bioinformatics and epidemiology. It features a three-panel layout (Tasks, Chat, Monitor/Artifact Viewer) and connects via WebSockets to a Python backend powered by LangChain. Version 2.1 introduces an Intent Classifier to differentiate simple queries from complex tasks, and an initial Evaluator component to assess plan outcomes. The agent leverages a Planner-Controller-Executor-Evaluator architecture for complex tasks. It uses configurable LLMs (Google Gemini or local Ollama) for reasoning and various tools to perform actions within isolated task workspaces. Backend message handling has also been refactored for improved modularity.
+3.  Request Handling (`message_handlers.py`):
 
-Features (Including v2.1 Enhancements)
---------------------------------------
+    -   If `DIRECT_QA`:
 
--   Task Management: Create, select, delete, and rename tasks. Each task maintains its own context and workspace.
+        -   The system bypasses the Planner and Controller.
 
--   Chat Interface: Interact with the AI agent via a familiar chat window. Supports input history (Up/Down arrows). Basic Markdown rendering (newlines, bold, italics, code blocks, links). A "Thinking..." status line appears while the agent processes requests.
+        -   The Executor (a ReAct agent via `agent.py`) is directly invoked.
 
--   LLM Selection: Choose the specific language model (Gemini or Ollama models configured in `.env`) to use for the current session directly from the chat header. The UI syncs with the backend's actual default LLM on new connections.
+        -   The Executor uses its configured LLM (session override > `EXECUTOR_DEFAULT_LLM_ID` > `DEFAULT_LLM_ID`) and available tools to generate an answer.
 
--   Agent Workspace (Monitor): View the agent's internal steps, tool usage, and outputs in a structured, styled log panel.
+        -   Callbacks send logs and the final answer to the UI.
 
--   Monitor Status Indicator: A visual indicator (dot + text) in the monitor header shows the agent's current state (e.g., Idle, Running, Error, Disconnected).
+    -   If `PLAN`: The system engages the full planning and execution cycle:
 
--   Agent Cancellation (STOP Button): A STOP button appears in the monitor header while the agent is running. Clicking it sends a cancellation request to the backend.
+        1.  Planner (`planner.py`):
 
--   File Upload: An "Upload File(s)" button in the task panel allows users to upload files directly into the currently selected task's workspace. The artifact viewer updates automatically after a successful upload.
+            -   Uses its designated "Planner LLM" (session override > `PLANNER_LLM_ID` > `DEFAULT_LLM_ID`).
 
--   Artifact Viewer: Displays generated `.png` images and previews common text files (`.txt`, `.py`, `.csv`, etc.) in a dedicated area below the monitor logs, with navigation for multiple artifacts. The filename is displayed above the content, and the navigation buttons remain fixed at the bottom.
+            -   Takes the user query and a summary of available tools.
 
--   LLM Token Tracking: Displays token usage (input, output, total) for the last LLM call and a running total for the current task in the left panel.
+            -   Generates a multi-step plan (`List[PlanStep]`) including step descriptions, tool hints, input instructions, and expected outcomes.
 
--   Tool Integration: Includes tools for:
+            -   Provides a human-readable summary of the plan.
 
-    -   Web Search (`duckduckgo_search`)
+        2.  User Confirmation (UI):
 
-    -   Web Page Reading (`web_page_reader`)
+            -   The plan summary and detailed steps are displayed in the chat.
 
-    -   PubMed Search (`pubmed_search`)
+            -   User can "Confirm & Run Plan" or "Cancel Plan".
 
-    -   File Reading (`read_file` within task workspace - Supports text and PDF files. Reads full PDF content but adds a warning if it exceeds a configurable length.)
+            -   The plan UI remains visible (but disabled) during execution.
 
-    -   File Writing (`write_file` within task workspace)
+        3.  Execution Loop (`message_handlers.process_execute_confirmed_plan`):
 
-    -   Shell Command Execution (`workspace_shell` within task workspace, including `Rscript` if R is installed)
+            -   Plan Persistence (Initial Save): Upon confirmation, a unique, timestamped Markdown file (e.g., `_plan_YYYYMMDD_HHMMSS_ffffff.md`) is created in the task's workspace. This file lists all plan steps with initial `[ ]` checkboxes. The filename is stored in the session.
 
-    -   Python Package Installation (`python_package_installer`) (Security Warning!)
+            -   The system iterates through each confirmed `PlanStep`.
 
-    -   Python Code Execution (`Python_REPL`) (Security Warning!)
+            -   Inner Retry Loop (for each step, max `MAX_STEP_RETRIES` times):
 
--   Backend: Python backend using `websockets`, `aiohttp` (for file serving), and `LangChain`. Message handling refactored into a dedicated module.
+                -   Controller/Validator (`controller.py`):
 
--   Frontend: Simple HTML, CSS, and vanilla JavaScript.
+                    -   Uses its "Controller LLM" (session override > `CONTROLLER_LLM_ID` > `DEFAULT_LLM_ID`).
 
--   Configuration: Extensive configuration via `.env` file (API keys, available models, agent tuning, tool settings, server options).
+                    -   Receives the current `PlanStep` (or correction hints on retry), original query, and available tools.
 
--   Persistence: Task list (including names) and chat/monitor history are stored locally using SQLite in the `database/` directory.
+                    -   Validates/chooses the tool and formulates the precise `tool_input`.
 
--   Task Workspaces: File/Shell tools operate within isolated directories for each task (`workspace/<task_id>/`), created upon task selection.
+                    -   Returns tool name, input, reasoning, and confidence.
 
--   v2.1: Intent Classifier:
+                -   Executor (`agent.py` - ReAct agent):
 
-    -   Before planning, an LLM-driven component classifies the user's query to determine if it's a simple question/statement ("DIRECT_QA") or a complex task requiring a plan ("PLAN").
+                    -   Uses its "Executor LLM" (session override > `EXECUTOR_DEFAULT_LLM_ID` > `DEFAULT_LLM_ID`).
 
-    -   Simple queries are handled directly by the agent, bypassing the full planning cycle.
+                    -   Receives a directive based on the Controller's output (specific tool use or direct answer).
 
--   v2.0: Planner Component:
+                    -   Executes the step.
 
-    -   For complex tasks ("PLAN" intent), an LLM-driven component decomposes user requests into a structured plan (sequence of sub-tasks with suggested tools).
+                -   Step Evaluator (`evaluator.py` - `evaluate_step_outcome_and_suggest_correction`):
 
--   v2.0: User Confirmation & Steering:
+                    -   Uses "Evaluator LLM" (session override > `EVALUATOR_LLM_ID` > `DEFAULT_LLM_ID`).
 
-    -   The Planner presents the generated plan to the user in the chat interface for review.
+                    -   Assesses if the current step's specific goal was achieved.
 
-    -   Users can approve or reject the plan *before* execution begins. (Plan modification is a future goal).
+                    -   If `step_achieved_goal` is `false` but `is_recoverable_via_retry` is `true` (and retries remain):
 
--   v2.0: Controller/Validator Component:
+                        -   Provides `suggested_new_tool_for_retry` and `suggested_new_input_instructions_for_retry`.
 
-    -   Before a sub-task is executed, this component validates the proposed action (tool, input syntax) and formulates the precise tool input.
+                        -   The inner loop continues, feeding these suggestions to the Controller for the next attempt of *this same step*.
 
--   v2.0: Executor Component:
+                    -   If `step_achieved_goal` is `true`, the inner loop breaks, and the step is marked successful.
 
-    -   Executes each validated sub-task from the plan, focusing on the specific goal of that step (currently a ReAct agent).
+                    -   If the step fails and is not recoverable or retries are exhausted, the step is marked failed, and the entire plan execution halts.
 
--   v2.1: Evaluator Component (Initial):
+            -   Live Plan Update: After each step attempt (and its final determination), the `_plan_<ID>.md` file is updated with the step's status (`[x]`, `[!]`, or `[-]`). The artifact viewer is triggered to refresh.
 
-    -   After all plan steps are attempted, an LLM-driven component assesses if the overall goal has been met based on the original query and a summary of executed steps.
+        4.  Overall Plan Evaluator (`evaluator.py` - `evaluate_plan_outcome`):
 
-    -   Provides a success status, a textual assessment of the outcome, and (if unsuccessful) suggestions for re-planning. The assessment is presented to the user as the final answer for the plan.
+            -   Called after all plan steps are attempted or the plan halts.
 
--   v2.0: Permission Requests (Planned):
+            -   Uses its "Evaluator LLM".
 
-    -   The agent will request explicit user permission before undertaking potentially irreversible, sensitive, or costly actions.
+            -   Receives the original query, a summary of all executed step details (including attempts and errors), and the preliminary final answer.
 
--   v2.0: Automated Report/Website Generation (Planned):
+            -   Assesses `overall_success`, provides a textual `assessment`, identifies `missing_information`, and can offer `suggestions_for_replan`.
 
-    -   The agent will be able to generate simple, structured HTML pages or comprehensive Markdown reports summarizing task results.
+            -   The Evaluator's `assessment` becomes the final message sent to the user.
+
+Key Current Capabilities & Features
+-----------------------------------
+
+1.  UI & User Interaction:
+
+    -   Task Management: Create, select, delete, and rename tasks with persistent history.
+
+    -   Chat Interface: Standard chat UI with input history and Markdown rendering.
+
+    -   Role-Specific LLM Selection (Session Override):
+
+        -   Main "Executor LLM" selector in the chat header.
+
+        -   Dropdowns for Intent Classifier, Planner, Controller, and Evaluator LLMs, allowing selection of specific models or "Use System Default".
+
+        -   Selections are stored in `localStorage` and sent to the backend for the current session.
+
+    -   Monitor Panel: Detailed logs of agent thoughts, tool calls, errors, system messages, and outputs from Intent Classifier, Planner, Controller, Step Evaluator, and Overall Plan Evaluator.
+
+    -   Status Indicator: Visual feedback on agent state (Idle, Running, Cancelling, Error, Disconnected).
+
+    -   STOP Button: Allows user to request cancellation of ongoing operations.
+
+    -   File Upload: Upload files to the current task's workspace.
+
+    -   Artifact Viewer:
+
+        -   Displays images and text files.
+
+        -   PDFs are listed with a link to open in a new tab.
+
+        -   Auto-refreshes when new artifacts are created or existing ones (like `_plan.md`) are updated.
+
+        -   Navigation for multiple artifacts.
+
+    -   Plan Display & Confirmation: Generated plans are shown for user confirmation and remain visible (disabled) during execution.
+
+    -   Token Usage Tracking: Per-call and per-task token counts displayed.
+
+2.  Backend Architecture & Logic:
+
+    -   Modular Design: `server.py` (WebSockets, session management), `message_handlers.py` (message processing), and component modules (`intent_classifier.py`, `planner.py`, `controller.py`, `agent.py` for Executor, `evaluator.py`).
+
+    -   Role-Specific LLM Configuration (`config.py`, `.env`): Defines different LLMs for each component, with fallback to `DEFAULT_LLM_ID`.
+
+    -   LLM Initialization with Fallback (`llm_setup.py`): `get_llm` attempts primary LLM, then system default on failure. Logging includes the role for which an LLM is being initialized.
+
+    -   Callbacks (`callbacks.py`): `WebSocketCallbackHandler` sends detailed LangChain events to UI and DB. Handles `AgentCancelledException`. Attempts to log specific tool names on error.
+
+    -   Database (`db_utils.py`): SQLite stores task details and comprehensive message history.
+
+    -   Task Workspaces (`tools.py`): Isolated directories (`workspace/<task_id>/`) for each task.
+
+    -   Plan Persistence & Live Update (`message_handlers.py`):
+
+        -   Confirmed plans saved to `_plan_<timestamp>.md` with Markdown checklist syntax.
+
+        -   Step statuses (`[ ]`, `[x]`, `[!]`, `[-]`) are updated in this file during execution.
+
+        -   The file is treated as an artifact, and UI refreshes to show changes.
+
+3.  Tool Suite (`tools.py`):
+
+    -   Web Search: `duckduckgo_search`.
+
+    -   Web Page Reader: `web_page_reader`.
+
+    -   PubMed Search: `pubmed_search`.
+
+    -   File I/O: `read_file` (text, PDF text extraction), `write_file`.
+
+    -   Shell Execution: `workspace_shell`.
+
+    -   Python Package Installer: `python_package_installer` (uses `uv pip` or `pip`). *(Security Warning)*
+
+    -   Python REPL: `Python_REPL`. *(Security Warning)*
+
+4.  Configuration (`config.py`, `.env`):
+
+    -   Centralized settings for API keys, LLM IDs, Ollama URL, agent parameters, tool limits, server options.
 
 Tech Stack
 ----------
@@ -123,13 +202,11 @@ Tech Stack
 
     -   Web Server: `aiohttp`, `aiohttp-cors`
 
-    -   LangChain Core: `langchain`
+    -   LangChain Core: `langchain`, `langchain-core`
 
     -   LLM Integrations: `langchain-google-genai`, `langchain-ollama`
 
     -   Tools: `langchain-community` (Search), `langchain-experimental` (Python REPL), `biopython` (PubMed)
-
-    -   Prompts: Local fallback prompt used (based on `react-chat`)
 
     -   Config: `python-dotenv`
 
@@ -140,8 +217,6 @@ Tech Stack
     -   Async File I/O: `aiofiles`
 
     -   PDF Reading: `pypdf`
-
-    -   Plotting (Example): `matplotlib`
 
     -   Database: `aiosqlite`
 
@@ -154,593 +229,140 @@ Project Structure
 
 ```
 ResearchAgent/
-├── .venv/              # Virtual environment
+├── .venv/
 ├── backend/
 │   ├── __init__.py
 │   ├── agent.py        # Agent creation logic (Executor base)
 │   ├── callbacks.py    # WebSocket callback handler
 │   ├── config.py       # Configuration loading
-│   ├── controller.py   # v2.0: Controller/Validator logic
+│   ├── controller.py   # Controller/Validator logic
 │   ├── db_utils.py     # SQLite database functions
-│   ├── evaluator.py    # v2.1: Evaluator logic
-│   ├── executor.py     # (Placeholder for future dedicated Executor logic if split from agent.py)
-│   ├── intent_classifier.py # v2.1: Intent classification logic
+│   ├── evaluator.py    # Step Evaluator & Overall Plan Evaluator logic
+│   ├── intent_classifier.py # Intent classification logic
 │   ├── llm_setup.py    # LLM initialization
-│   ├── message_handlers.py # v2.1: Refactored WebSocket message handlers
-│   ├── planner.py      # v2.0: Planner logic
-│   ├── server.py       # Main WebSocket & File server logic (now more focused)
-│   └── tools.py        # Tool definitions and factory
-├── css/
-│   └── style.css       # Frontend styling
-├── database/           # SQLite database storage (Created automatically, GITIGNORED)
-│   └── agent_history.db
-├── js/
-│   └── script.js       # Frontend JavaScript logic
-├── workspace/          # Base directory for task workspaces (GITIGNORED)
-│   └── <task_id>/      # Auto-created workspace for each task
-│       └── ...         # Files created by the agent for this task
-├── .env                # Environment variables (GITIGNORED)
-├── .env.example        # Example environment file
-├── .gitignore          # Git ignore rules
-├── Dockerfile          # Docker build instructions
-├── docker-compose.yml  # Docker compose configuration
-├── index.html          # Main HTML file for the UI
-├── requirements.txt    # Python dependencies
-└── README.md           # This file
-
-```
-
-## Setup Instructions
-
-1.  **Clone Repository:**
-    ```bash
-    git clone [https://github.com/vbianchi/ResearchAgent.git](https://github.com/vbianchi/ResearchAgent.git)
-    cd ResearchAgent
-    ```
-2.  **Prerequisites:**
-    * Ensure Python 3.10+ is installed.
-    * **(Optional):** Install R and ensure `Rscript` is in PATH for R script execution via the shell tool.
-
-3.  **Install `uv` (Recommended - Fast Package Installer):**
-    * Follow instructions: [https://github.com/astral-sh/uv#installation](https://github.com/astral-sh/uv#installation)
-
-4.  **Create and Activate Virtual Environment:**
-    ```bash
-    # Using uv (recommended)
-    uv venv --python 3.12 # Or your desired Python version
-
-    # OR using standard venv
-    # python -m venv .venv
-
-    # Activate (Linux/Mac/WSL)
-    source .venv/bin/activate
-    # (Windows CMD: .venv\Scripts\activate.bat)
-    # (Windows PowerShell: .venv\Scripts\Activate.ps1)
-    ```
-
-5.  **Install Dependencies:**
-    ```bash
-    # Using uv (recommended)
-    uv pip install -r requirements.txt
-
-    # OR using standard pip
-    # pip install -r requirements.txt
-    ```
-
-6.  **Configure Environment Variables:**
-    * **Copy the example file:** `cp .env.example .env` (or copy manually).
-    * **Edit `.env`:** Open the newly created `.env` file with a text editor.
-    * **Fill in required values:**
-        * `GOOGLE_API_KEY`: Add your Google API Key (required if using Gemini). Get one from [Google AI Studio](https://aistudio.google.com/app/apikey).
-        * `ENTREZ_EMAIL`: Add your email address (required for PubMed Tool). NCBI uses this to identify requests.
-    * **Configure LLMs:**
-        * `DEFAULT_LLM_ID`: Set the default model the UI should use on startup (e.g., `gemini::gemini-1.5-flash`).
-        * `GEMINI_AVAILABLE_MODELS`: List the Gemini models you want available in the UI dropdown, separated by commas (e.g., `gemini-1.5-flash,gemini-1.5-pro-latest`). Ensure these are accessible with your API key.
-        * `OLLAMA_AVAILABLE_MODELS`: List the Ollama models you want available, separated by commas (e.g., `gemma:2b,llama3:latest`). Ensure these are pulled and running in your Ollama instance (`ollama list`).
-        * `OLLAMA_BASE_URL`: Set the correct URL for your Ollama instance if you use it (e.g., `http://localhost:11434`).
-    * **(Optional) Adjust Tuning & Settings:** Modify agent parameters (`AGENT_MAX_ITERATIONS`, `AGENT_MEMORY_WINDOW_K`, temperatures), tool settings (timeouts, limits, `TOOL_PDF_READER_WARNING_LENGTH`), server settings, or log level as needed. See comments in `.env.example` for details.
-    * **Security:** The `.env` file is listed in `.gitignore` to prevent accidental commits of your secrets.
-
-7.  **(If using Ollama)**
-    * Install Ollama: [https://ollama.com/](https://ollama.com/)
-    * Ensure the Ollama service is running.
-    * **Important for Docker/WSL:** If Ollama runs as a systemd service, ensure it listens on all interfaces. Edit the service file (`sudo systemctl edit --full ollama.service`), add `Environment="OLLAMA_HOST=0.0.0.0"` under `[Service]`, then run `sudo systemctl daemon-reload` and `sudo systemctl restart ollama`.
-    * Pull the models listed in `OLLAMA_AVAILABLE_MODELS`: `ollama pull <model_name>` (e.g., `ollama pull llama3:latest`).
-
-## Running the Application
-
-### Using Docker (Recommended Method)
-
-Runs the backend server inside an isolated Docker container. **Highly recommended** for security and dependency management.
-
-1.  **Prerequisites:** Ensure Docker and Docker Compose are installed.
-2.  **Build and Run Backend:** From the project root directory (`ResearchAgent/`), run:
-    ```bash
-    docker compose up --build
-    ```
-    * The `--build` flag is needed the first time or after changing `Dockerfile` or `requirements.txt`.
-    * Uses `network_mode: host` in `docker-compose.yml`, meaning the container shares the host network. The backend listens directly on host ports 8765 (WebSocket) and 8766 (File Server). Ensure these ports are free. This simplifies connecting to services like Ollama running directly on the host/WSL (use `http://localhost:11434` for `OLLAMA_BASE_URL`).
-    * Keep this terminal running. Use `Ctrl+C` to stop.
-3.  **Start Frontend Server:** Docker Compose only runs the backend. Serve the frontend files (HTML, CSS, JS) from a ***separate*** terminal in the project root:
-    ```bash
-    python3 -m http.server 8000
-    ```
-    * Keep this second terminal running.
-4.  **Access the UI:** Open your web browser to `http://localhost:8000`.
-
-**Development Workflow with Docker:**
-
-* **Code Changes:** Changes to `./backend` code are reflected inside the container. Stop (`Ctrl+C`) and restart (`docker compose up`) the container to apply backend changes.
-* **Dependency Changes:** If `requirements.txt` changes, rebuild with `docker compose up --build`.
-* **Workspace & Database:** `./workspace` and `./database` are mounted as volumes, so data persists locally.
-
-### Alternative: Running Directly on Host (Advanced / Less Secure)
-
-**Not recommended** due to security risks of `Python_REPL` and `python_package_installer` executing directly in your host environment. **Proceed with extreme caution.**
-
-1.  **Setup Environment:** Ensure Python 3.12+ is installed, activate a virtual environment (e.g., `uv venv`), and install dependencies (`uv pip install -r requirements.txt`).
-    ```bash
-    # Example activation (Linux/Mac/WSL)
-    source .venv/bin/activate
-    ```
-2.  **Terminal 1: Start Backend Server:**
-    ```bash
-    python3 -m backend.server
-    ```
-3.  **Terminal 2: Start Frontend Server:**
-    ```bash
-    python3 -m http.server 8000
-    ```
-4.  **Access the UI:** Open `http://localhost:8000`.
-
-## Usage & Testing
-
-* **Create Task:** Click "+ New Task".
-* **Rename Task:** Hover over a task, click the pencil icon (✏️).
-* **Select Task:** Click a task to load its history.
-* **Select LLM:** Use the dropdown in the chat header to choose the model for the current session.
-* **Chat:** Interact with the agent. Use Up/Down arrows for input history. A "Thinking..." status line appears during processing.
-* **Monitor:** Observe agent logs and status indicator (Idle/Running/Error/Disconnected).
-* **Cancel Agent:** Click the "STOP" button in the monitor header while the agent is running to request cancellation (interrupts between steps).
-* **Upload Files:** Select a task, click the "Upload File(s)" button below the task list, choose files. Check monitor/artifacts for confirmation.
-* **Artifact Viewer:** View generated/uploaded images/text files using Prev/Next buttons.
-* **Token Usage:** Observe token counts for the last LLM call and the current task total in the left panel.
-* **Test PubMed Search:** Ask: `"Search PubMed for recent articles on CRISPR gene editing."`
-* **Test Package Installation:** Ask: `"Install the 'numpy' python package."`
-* **Test Python REPL:** Ask: `"Use the Python REPL tool to calculate 15 factorial."`
-* **Test Image Generation:** Ask: `"Write a python script named 'plot.py' that uses matplotlib to create a simple sine wave plot and saves it as 'sine_wave.png'. Then execute the script using python."` (Ensure `matplotlib` is installed first).
-* **Test File/PDF Reading:** Ask: `"Read the file named 'my_document.txt'"` or `"Read the file named 'research_paper.pdf'"` (assuming these files exist in the task workspace). Observe if a warning about length is added for large PDFs.
-* **Test LLM Switching:** Select one model, ask a question. Select a different model, ask another question. Observe the agent's responses and potentially different styles.
-* **Delete Task:** Click the trash icon (🗑️) next to a task (confirmation required).
-
-## Known Issues
-
-* **Agent Cancellation (STOP Button):** The STOP button sends a cancellation request to the agent. However, this typically interrupts the agent *between* major steps (like before the next tool use or LLM call) rather than immediately halting a long-running internal process within a tool or LLM.
-* **Markdown Rendering in Chat:** The current Markdown rendering in the chat is basic. Complex Markdown or specific edge cases (e.g., underscores in filenames not intended for italics) might not always render as expected. Full GFM support via a dedicated library is a future enhancement.
-* **Ollama Token Counts:** Token count reporting (specifically input tokens) for Ollama models can be less precise or consistently available compared to API-based models like Gemini. The displayed totals will reflect the information made available by the Ollama integration.
-
-## Security Warnings
-
-* **`python_package_installer` Tool:** Installs packages directly into the backend server's Python environment. **Significant security risk if exposed.**
-* **`PythonREPLTool` Tool:** Executes arbitrary Python code directly in the backend server's environment. **Significant security risk if exposed.**
-* **Recommendation:** **Strongly consider running the backend server inside a Docker container**, especially when using the `python_package_installer` or `PythonREPLTool`, to isolate execution and mitigate risks. Do not expose the backend ports directly to the internet without proper authentication and authorization layers.
-
--   ...
-
-Future Perspectives & Ideas (Post v2.1 Core)
---------------------------------------------
-
--   Advanced Intent Handling: More nuanced intent types, ability for agent to ask clarifying questions if intent is ambiguous.
-
--   Enhanced Evaluation & Re-planning Loops:
-
-    -   Allow the Evaluator's suggestions to automatically trigger re-planning or targeted step correction.
-
-    -   Implement per-step evaluation for critical steps to allow earlier intervention.
-
--   Interactive Plan Modification & Steering: Allow users to edit, re-order, or add/remove steps from a proposed plan before execution. Allow users to provide feedback or guidance if the agent gets stuck during a long workflow.
-
--   Permission Requests: Implement explicit user confirmation for critical/costly actions (e.g., before installing a package or running a potentially destructive shell command).
-
--   Automated Report/Website Generation: Empower the agent to generate structured HTML/Markdown reports from task results, potentially using predefined templates.
-
--   Streaming Output (Final Answer & Thoughts): Implement token-by-token streaming for the agent's final answer and potentially for its thoughts to the UI for better responsiveness.
-
--   UI/UX Enhancements: Drag & Drop upload, collapsible/resizable panels, more robust Markdown rendering, per-task LLM preference storage, tool configuration UI.
-
--   Domain-Specific Tools & Knowledge: Integrate more tools and knowledge bases relevant to specific research domains.
-
--   Session Saving/Loading & Agent State Persistence: Allow full session state (including memory and plan progress) to be saved and restored.
-
--   More Robust Error Handling within Tools: Improve how tools report errors and how the agent interprets them.
-
--   **LLM Token Tracking:** Displays token usage (input, output, total) for the last LLM call and a running total for the current task in the left panel.
-
--   **Tool Integration:** Includes tools for:
-
-    -   Web Search (`duckduckgo_search`)
-
-    -   Web Page Reading (`web_page_reader`)
-
-    -   PubMed Search (`pubmed_search`)
-
-    -   File Reading (`read_file` within task workspace - **Supports text and PDF files**. Reads full PDF content but adds a warning if it exceeds a configurable length.)
-
-    -   File Writing (`write_file` within task workspace)
-
-    -   Shell Command Execution (`workspace_shell` within task workspace, including `Rscript` if R is installed)
-
-    -   Python Package Installation (`python_package_installer`) **(Security Warning!)**
-
-    -   Python Code Execution (`Python_REPL`) **(Security Warning!)**
-
--   **Backend:** Python backend using `websockets`, `aiohttp` (for file serving), and `LangChain`.
-
--   **Frontend:** Simple HTML, CSS, and vanilla JavaScript.
-
--   **Configuration:** Extensive configuration via `.env` file (API keys, available models, agent tuning, tool settings, server options).
-
--   **Persistence:** Task list (including names) and chat/monitor history are stored locally using SQLite in the `database/` directory.
-
--   **Task Workspaces:** File/Shell tools operate within isolated directories for each task (`workspace/<task_id>/`), created upon task selection.
-
--   **v2.0: Planner Component:**
-
-    -   An LLM-driven component decomposes complex user requests into a structured plan (sequence of sub-tasks with suggested tools).
-
--   **v2.0: User Confirmation & Steering:**
-
-    -   The Planner presents the generated plan to the user in the chat interface for review.
-
-    -   Users can approve, reject, or suggest modifications to the plan *before* execution begins.
-
-    -   Users can potentially provide input or steer the agent during execution.
-
--   **v2.0: Controller/Validator Component:**
-
-    -   Before a sub-task is executed, this component validates the proposed action (tool, input syntax) to proactively catch errors.
-
--   **v2.0: Executor Component:**
-
-    -   Executes each validated sub-task from the plan, focusing on the specific goal of that step (likely evolving from the current ReAct agent logic).
-
--   **v2.0: Evaluator Component:**
-
-    -   After sub-tasks are attempted, an LLM-driven component assesses if the overall goal has been met.
-
-    -   Can trigger re-planning by providing feedback to the Planner if the task is incomplete or incorrect.
-
--   **v2.0: Permission Requests:**
-
-    -   The agent requests explicit user permission before undertaking potentially irreversible, sensitive, or costly actions.
-
--   **v2.0: Automated Report/Website Generation:**
-
-    -   The agent can generate simple, structured HTML pages or comprehensive Markdown reports summarizing task results.
-
-    -   May utilize predefined templates/CSS schemes for presentation.
-
-Tech Stack
-----------
-
--   **Frontend:** HTML5, CSS3, Vanilla JavaScript (ES6+)
-
--   **Backend:**
-
-    -   Python 3.10+ (`asyncio`, `websockets`)
-
-    -   **Web Server:**  `aiohttp`, `aiohttp-cors`
-
-    -   **LangChain Core:**  `langchain`
-
-    -   **LLM Integrations:**  `langchain-google-genai`, `langchain-ollama`
-
-    -   **Tools:**  `langchain-community` (Search), `langchain-experimental` (Python REPL), `biopython` (PubMed)
-
-    -   **Prompts:** Local fallback prompt used (based on `react-chat`)
-
-    -   **Config:**  `python-dotenv`
-
-    -   **HTTP:**  `httpx`
-
-    -   **Web Parsing:**  `beautifulsoup4`, `lxml`
-
-    -   **Async File I/O:**  `aiofiles`
-
-    -   **PDF Reading:**  `pypdf`
-
-    -   **Plotting (Example):**  `matplotlib`
-
-    -   **Database:**  `aiosqlite`
-
--   **Environment:**  `venv` with `pip` (or `uv`)
-
--   **Protocol:** WebSockets (WS), HTTP (for file upload/serving)
-
-
-
-```
-
-ResearchAgent/
-├── .venv/              # Virtual environment
-├── backend/
-│   ├── __init__.py
-│   ├── agent.py        # Agent creation logic (will evolve into Executor/base logic)
-│   ├── callbacks.py    # WebSocket callback handler
-│   ├── config.py       # Configuration loading
-│   ├── controller.py   # v2.0: Controller/Validator logic (NEW)
-│   ├── db_utils.py     # SQLite database functions
-│   ├── evaluator.py    # v2.0: Evaluator logic (NEW)
-│   ├── executor.py     # v2.0: Executor logic (NEW - may refactor from agent.py)
-│   ├── llm_setup.py    # LLM initialization (Gemini/Ollama)
-│   ├── planner.py      # v2.0: Planner logic (NEW)
+│   ├── message_handlers.py # WebSocket message handlers
+│   ├── planner.py      # Planner logic
 │   ├── server.py       # Main WebSocket & File server logic
 │   └── tools.py        # Tool definitions and factory
 ├── css/
-│   └── style.css       # Frontend styling
-├── database/           # SQLite database storage (Created automatically, GITIGNORED)
+│   └── style.css
+├── database/           # SQLite database storage (GITIGNORED)
 │   └── agent_history.db
 ├── js/
-│   └── script.js       # Frontend JavaScript logic
+│   └── script.js
 ├── workspace/          # Base directory for task workspaces (GITIGNORED)
-│   └── <task_id>/      # Auto-created workspace for each task
-│       └── ...         # Files created by the agent for this task
-├── .env                # Environment variables (GITIGNORED)
-├── .env.example        # Example environment file
-├── .gitignore          # Git ignore rules
-├── Dockerfile          # Docker build instructions
-├── docker-compose.yml  # Docker compose configuration
-├── index.html          # Main HTML file for the UI
-├── requirements.txt    # Python dependencies
-└── README.md           # This file
+│   └── <task_id>/
+├── .env
+├── .env.example
+├── .gitignore
+├── Dockerfile
+├── docker-compose.yml
+├── index.html
+├── requirements.txt
+└── README.md
 
 ```
 
 Setup Instructions
 ------------------
 
-1.  **Clone Repository:**
+*(Refer to your existing detailed setup instructions - assuming these are largely unchanged)*
 
-    ```
-    git clone [https://github.com/vbianchi/ResearchAgent.git](https://github.com/vbianchi/ResearchAgent.git)
-    cd ResearchAgent
+1.  Clone Repository
 
-    ```
+2.  Prerequisites (Python 3.10+)
 
-2.  **Prerequisites:**
+3.  Install `uv` (Recommended)
 
-    -   Ensure Python 3.10+ is installed.
+4.  Create and Activate Virtual Environment
 
-    -   **(Optional):** Install R and ensure `Rscript` is in PATH for R script execution via the shell tool.
+5.  Install Dependencies (`uv pip install -r requirements.txt` or `pip install -r requirements.txt`)
 
-3.  **Install `uv` (Recommended - Fast Package Installer):**
+6.  Configure Environment Variables (`.env` file based on `.env.example`)
 
-    -   Follow instructions: <https://github.com/astral-sh/uv#installation>
-
-4.  **Create and Activate Virtual Environment:**
-
-    ```
-    # Using uv (recommended)
-    uv venv --python 3.12 # Or your desired Python version
-
-    # OR using standard venv
-    # python -m venv .venv
-
-    # Activate (Linux/Mac/WSL)
-    source .venv/bin/activate
-    # (Windows CMD: .venv\Scripts\activate.bat)
-    # (Windows PowerShell: .venv\Scripts\Activate.ps1)
-
-    ```
-
-5.  **Install Dependencies:**
-
-    ```
-    # Using uv (recommended)
-    uv pip install -r requirements.txt
-
-    # OR using standard pip
-    # pip install -r requirements.txt
-
-    ```
-
-6.  **Configure Environment Variables:**
-
-    -   **Copy the example file:**  `cp .env.example .env` (or copy manually).
-
-    -   **Edit `.env`:** Open the newly created `.env` file with a text editor.
-
-    -   **Fill in required values:**
-
-        -   `GOOGLE_API_KEY`: Add your Google API Key (required if using Gemini). Get one from [Google AI Studio](https://aistudio.google.com/app/apikey "null").
-
-        -   `ENTREZ_EMAIL`: Add your email address (required for PubMed Tool). NCBI uses this to identify requests.
-
-    -   **Configure LLMs:**
-
-        -   `DEFAULT_LLM_ID`: Set the default model the UI should use on startup (e.g., `gemini::gemini-1.5-flash`).
-
-        -   `GEMINI_AVAILABLE_MODELS`: List the Gemini models you want available in the UI dropdown, separated by commas (e.g., `gemini-1.5-flash,gemini-1.5-pro-latest`). Ensure these are accessible with your API key.
-
-        -   `OLLAMA_AVAILABLE_MODELS`: List the Ollama models you want available, separated by commas (e.g., `gemma:2b,llama3:latest`). Ensure these are pulled and running in your Ollama instance (`ollama list`).
-
-        -   `OLLAMA_BASE_URL`: Set the correct URL for your Ollama instance if you use it (e.g., `http://localhost:11434`).
-
-    -   **(Optional) Adjust Tuning & Settings:** Modify agent parameters (`AGENT_MAX_ITERATIONS`, `AGENT_MEMORY_WINDOW_K`, temperatures), tool settings (timeouts, limits, `TOOL_PDF_READER_WARNING_LENGTH`), server settings, or log level as needed. See comments in `.env.example` for details.
-
-    -   **Security:** The `.env` file is listed in `.gitignore` to prevent accidental commits of your secrets.
-
-7.  **(If using Ollama)**
-
-    -   Install Ollama: <https://ollama.com/>
-
-    -   Ensure the Ollama service is running.
-
-    -   **Important for Docker/WSL:** If Ollama runs as a systemd service, ensure it listens on all interfaces. Edit the service file (`sudo systemctl edit --full ollama.service`), add `Environment="OLLAMA_HOST=0.0.0.0"` under `[Service]`, then run `sudo systemctl daemon-reload` and `sudo systemctl restart ollama`.
-
-    -   Pull the models listed in `OLLAMA_AVAILABLE_MODELS`: `ollama pull <model_name>` (e.g., `ollama pull llama3:latest`).
+7.  (If using Ollama) Install and run Ollama, pull models.
 
 Running the Application
 -----------------------
 
-### Using Docker (Recommended Method)
+*(Refer to your existing Docker or direct run instructions)*
 
-Runs the backend server inside an isolated Docker container. **Highly recommended** for security and dependency management.
+Usage & Testing
+---------------
 
-1.  **Prerequisites:** Ensure Docker and Docker Compose are installed.
+*(This section should be updated with test cases for the new step evaluation and retry logic, in addition to existing tool tests.)*
 
-2.  **Build and Run Backend:** From the project root directory (`ResearchAgent/`), run:
+-   Test Step Retry:
 
-    ```
-    docker compose up --build
+    -   Formulate a query where an intermediate step is likely to fail but be correctable. E.g., "Search for X, write to `correct_file.txt`, then try to read `incorrect_file.txt`."
 
-    ```
+    -   Observe monitor logs for Step Evaluator identifying the failure, suggesting a correction (e.g., to read `correct_file.txt`), and the Executor retrying the step successfully.
 
-    -   The `--build` flag is needed the first time or after changing `Dockerfile` or `requirements.txt`.
+    -   Verify the `_plan.md` checklist updates correctly (`[!]` then `[x]`).
 
-    -   Uses `network_mode: host` in `docker-compose.yml`, meaning the container shares the host network. The backend listens directly on host ports 8765 (WebSocket) and 8766 (File Server). Ensure these ports are free. This simplifies connecting to services like Ollama running directly on the host/WSL (use `http://localhost:11434` for `OLLAMA_BASE_URL`).
+-   Test Unrecoverable Step Failure:
 
-    -   Keep this terminal running. Use `Ctrl+C` to stop.
+    -   Query for an action that will definitively fail (e.g., "Install package `non_existent_package_xyz123`").
 
-3.  **Start Frontend Server:** Docker Compose only runs the backend. Serve the frontend files (HTML, CSS, JS) from a ***separate*** terminal in the project root:
+    -   Observe Step Evaluator marking it unrecoverable, plan halting, and `_plan.md` showing `[!]`.
 
-    ```
-    python3 -m http.server 8000
-
-    ```
-
-    -   Keep this second terminal running.
-
-4.  **Access the UI:** Open your web browser to `http://localhost:8000`.
-
-**Development Workflow with Docker:**
-
--   **Code Changes:** Changes to `./backend` code are reflected inside the container. Stop (`Ctrl+C`) and restart (`docker compose up`) the container to apply backend changes.
-
--   **Dependency Changes:** If `requirements.txt` changes, rebuild with `docker compose up --build`.
-
--   **Workspace & Database:**  `./workspace` and `./database` are mounted as volumes, so data persists locally.
-
-### Alternative: Running Directly on Host (Advanced / Less Secure)
-
-**Not recommended** due to security risks of `Python_REPL` and `python_package_installer` executing directly in your host environment. **Proceed with extreme caution.**
-
-1.  **Setup Environment:** Ensure Python 3.10+ is installed, activate a virtual environment (e.g., `uv venv`), and install dependencies (`uv pip install -r requirements.txt`).
-
-    ```
-    # Example activation (Linux/Mac/WSL)
-    source .venv/bin/activate
-
-    ```
-
-2.  **Terminal 1: Start Backend Server:**
-
-    ```
-    python3 -m backend.server
-
-    ```
-
-3.  **Terminal 2: Start Frontend Server:**
-
-    ```
-    python3 -m http.server 8000
-
-    ```
-
-4.  **Access the UI:** Open `http://localhost:8000`.
-
-Usage & Testing (v1.5 Functionality)
-------------------------------------
-
--   **Create Task:** Click "+ New Task".
-
--   **Rename Task:** Hover over a task, click the pencil icon (✏️).
-
--   **Select Task:** Click a task to load its history.
-
--   **Select LLM:** Use the dropdown in the chat header to choose the model for the current session.
-
--   **Chat:** Interact with the agent. Use Up/Down arrows for input history. A "Thinking..." status line appears during processing.
-
--   **Monitor:** Observe agent logs and status indicator (Idle/Running/Error/Disconnected).
-
--   **Cancel Agent:** Click the "STOP" button in the monitor header while the agent is running to request cancellation (interrupts between steps).
-
--   **Upload Files:** Select a task, click the "Upload File(s)" button below the task list, choose files. Check monitor/artifacts for confirmation.
-
--   **Artifact Viewer:** View generated/uploaded images/text files using Prev/Next buttons.
-
--   **Token Usage:** Observe token counts for the last LLM call and the current task total in the left panel.
-
--   **Test PubMed Search:** Ask: `"Search PubMed for recent articles on CRISPR gene editing."`
-
--   **Test Package Installation:** Ask: `"Install the 'numpy' python package."`
-
--   **Test Python REPL:** Ask: `"Use the Python REPL tool to calculate 15 factorial."`
-
--   **Test Image Generation:** Ask: `"Write a python script named 'plot.py' that uses matplotlib to create a simple sine wave plot and saves it as 'sine_wave.png'. Then execute the script using python."` (Ensure `matplotlib` is installed first).
-
--   **Test File/PDF Reading:** Ask: `"Read the file named 'my_document.txt'"` or `"Read the file named 'research_paper.pdf'"` (assuming these files exist in the task workspace). Observe if a warning about length is added for large PDFs.
-
--   **Test LLM Switching:** Select one model, ask a question. Select a different model, ask another question. Observe the agent's responses and potentially different styles.
-
--   **Delete Task:** Click the trash icon (🗑️) next to a task (confirmation required).
-
-**(Note: Testing procedures for v2.0 features like Planning and User Confirmation will be added as they are implemented.)**
+-   ... (other existing test cases for tools, LLM switching, etc.)
 
 Known Issues
 ------------
 
--   **Agent Cancellation (STOP Button):** The STOP button sends a cancellation request to the agent. However, this typically interrupts the agent *between* major steps (like before the next tool use or LLM call) rather than immediately halting a long-running internal process within a tool or LLM.
+-   DuckDuckGo Rate Limiting: The `duckduckgo_search` tool may be subject to rate limits, which can interrupt tests or normal operation. The Step Evaluator has been prompted to consider these as not immediately retryable.
 
--   **Markdown Rendering in Chat:** The current Markdown rendering in the chat is basic. Complex Markdown or specific edge cases (e.g., underscores in filenames not intended for italics) might not always render as expected. Full GFM support via a dedicated library is a future enhancement.
+-   Agent Cancellation (STOP Button): Interrupts between major steps/LLM calls, not always instantaneous.
 
--   **Ollama Token Counts:** Token count reporting (specifically input tokens) for Ollama models can be less precise or consistently available compared to API-based models like Gemini. The displayed totals will reflect the information made available by the Ollama integration.
+-   Markdown Rendering in Chat: Basic; complex Markdown might not render perfectly.
+
+-   Ollama Token Counts: Can be less precise than API-based models.
 
 Security Warnings
 -----------------
 
--   **`python_package_installer` Tool:** Installs packages directly into the backend server's Python environment. **Significant security risk if exposed.**
+-   `python_package_installer` & `Python_REPL` Tools: Execute code/install packages in the backend environment. Significant security risk if exposed. Run in Docker for isolation.
 
--   **`PythonREPLTool` Tool:** Executes arbitrary Python code directly in the backend server's environment. **Significant security risk if exposed.**
+-   `workspace_shell` Tool: Executes shell commands. Use with caution.
 
--   **Recommendation:**  **Strongly consider running the backend server inside a Docker container**, especially when using the `python_package_installer` or `PythonREPLTool`, to isolate execution and mitigate risks. Do not expose the backend ports directly to the internet without proper authentication and authorization layers.
+Future Perspectives & Ideas (Post v2.1+ Step Evaluation)
+--------------------------------------------------------
 
-Future Perspectives & Ideas (Post v2.0 Core)
---------------------------------------------
+-   Web Search Robustness: Integrate an API-key based search tool (e.g., Google Custom Search, Tavily, Serper) or develop a Playwright-based tool for more resilient web searching and interaction.
 
--   **Agent Control:** Improve the STOP button to more reliably and immediately halt ongoing agent tasks, potentially by running the agent in a separate process.
+-   Advanced Re-planning:
 
--   **Streaming Output (Final Answer):** Implement token-by-token streaming for the agent's final answer to the UI for better responsiveness (currently, only the "Thinking..." line updates dynamically).
+    -   Allow user-initiated re-planning based on Overall Plan Evaluator suggestions.
 
--   **Drag & Drop Upload:** Enhance file upload to support drag and drop onto the task list or chat area.
+    -   Enable the Planner to be re-invoked by the system if the Overall Plan Evaluator deems the entire strategy flawed, using its suggestions as input for a new plan.
 
--   **Collapsible/Resizable Panels:** Allow the left task panel to be collapsed and/or the panel dividers to be dragged to resize areas.
+-   Interactive Plan Modification (Pre-Execution & In-Flight):
 
--   **PDF Reading Enhancements:** Add options for page ranges or user-specified `max_length` override, improve handling of complex layouts/images.
+    -   UI for users to edit, re-order, add/delete steps from a proposed plan *before* execution.
 
--   **Structured Output:** Add capability for the agent to return results in structured formats (e.g., JSON) for easier parsing or downstream use (beyond just website generation).
+    -   Mechanisms for users to pause and inject feedback/guidance *during* plan execution.
 
--   **Data Visualization:** Enable the agent (e.g., via Python REPL) to generate plots from data and display them directly in the Artifact Viewer.
+-   Permission Gateway for Sensitive Tools: Implement explicit, step-specific user confirmation in the UI before executing actions with `workspace_shell`, `python_package_installer`, or `Python_REPL`, even if the overall plan was approved.
 
--   **Domain-Specific Tools:** Integrate more tools relevant to bioinformatics/epidemiology (e.g., BLAST, Ensembl/UniProt API access, VCF/FASTA parsing).
+-   Enhanced Artifact Interaction & Generation:
 
--   **Artifact Management:** Allow users to rename or delete artifacts from the UI.
+    -   Workspace file tree viewer in the UI.
 
--   **Chat Interaction Enhancements:**
+    -   Render structured data (CSV/JSON) as interactive tables.
 
-    -   Explore using special characters (e.g., `#toolname`) to suggest or force specific tool usage.
+    -   Direct interactive plot rendering.
 
-    -   Consider restructuring the agent's chat bubble to clearly delineate Thought, Action, Observation, and Final Answer components for improved readability.
+    -   Dedicated "Report Generation" tool/step to synthesize findings.
 
--   **More Robust Formatting:** Use a dedicated Markdown library (e.g., `markdown-it` or `react-markdown` with plugins) for more complex rendering if needed.
+-   UI/UX Enhancements:
 
--   **Per-Task LLM Preference:** Store the last used LLM for each task.
+    -   Live display of the `_plan.md` content directly within a chat message, updating as the plan progresses.
 
--   **Tool Configuration UI:** Allow enabling/disabling tools per task or globally.
+    -   Drag & Drop file upload.
 
--   **User Authentication:** Add user accounts and login for multi-user scenarios.
+    -   Collapsible/resizable UI panels.
 
--   **UI Polish & Error Handling:** Continuously improve visual feedback and handle edge cases more gracefully.
+-   Domain-Specific Tools & Knowledge: Further expand tools relevant to bioinformatics/epidemiology.
 
--   **Session Saving/Loading:** Persist the agent's memory state across browser sessions.
+-   Streaming Output: Token-by-token streaming for LLM responses (thoughts and final answers).

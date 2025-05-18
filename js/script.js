@@ -86,7 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.socket = null;
 
     const updateMonitorStatus = (status, text) => {
-        // ... (existing content - no changes needed)
         if (!statusDotElement || !monitorStatusTextElement || !stopButton) return;
         statusDotElement.classList.remove('idle', 'running', 'error', 'disconnected');
         let statusText = text;
@@ -124,7 +123,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const updateTokenDisplay = (lastCallUsage = null) => {
-        // ... (existing content - no changes needed)
         if (!lastCallTokensElement || !taskTotalTokensElement) return;
         if (lastCallUsage) {
             const lastInput = lastCallUsage.input_tokens || 0;
@@ -139,14 +137,12 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const resetTaskTokenTotals = () => {
-        // ... (existing content - no changes needed)
         currentTaskTotalTokens = { input: 0, output: 0, total: 0 };
         if(lastCallTokensElement) lastCallTokensElement.textContent = "N/A";
         updateTokenDisplay();
     };
 
     const connectWebSocket = () => {
-        // ... (existing content - no changes needed) ...
         console.log(`Attempting to connect to WebSocket: ${wsUrl}`);
         addMonitorLog("[SYSTEM] Attempting to connect to backend...");
         updateMonitorStatus('disconnected', 'Connecting...');
@@ -186,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         socket.onmessage = (event) => {
-            // ... (existing onmessage logic for other types) ...
             try {
                 const message = JSON.parse(event.data);
                 switch (message.type) {
@@ -263,17 +258,33 @@ document.addEventListener('DOMContentLoaded', () => {
                     case 'update_artifacts':
                         if (Array.isArray(message.content)) {
                             currentTaskArtifacts = message.content;
-                            currentArtifactIndex = currentTaskArtifacts.length > 0 ? 0 : -1;
-                            updateArtifactDisplay(); // Call without forcing fetch
+                            // If the currently viewed artifact is a plan file, try to keep it selected or select the newest plan
+                            const currentArtifactFilename = (currentArtifactIndex >= 0 && currentArtifactIndex < currentTaskArtifacts.length)
+                                ? currentTaskArtifacts[currentArtifactIndex]?.filename
+                                : null;
+
+                            if (currentArtifactFilename && currentArtifactFilename.startsWith("_plan_") && currentArtifactFilename.endsWith(".md")) {
+                                const newIndex = currentTaskArtifacts.findIndex(art => art.filename === currentArtifactFilename);
+                                if (newIndex !== -1) {
+                                    currentArtifactIndex = newIndex;
+                                } else { // Current plan file might have been removed (should not happen with current logic) or list reordered
+                                    const latestPlan = currentTaskArtifacts.find(art => art.filename && art.filename.startsWith("_plan_") && art.filename.endsWith(".md"));
+                                    currentArtifactIndex = latestPlan ? currentTaskArtifacts.indexOf(latestPlan) : (currentTaskArtifacts.length > 0 ? 0 : -1);
+                                }
+                            } else if (currentTaskArtifacts.length > 0) {
+                                currentArtifactIndex = 0; // Default to first artifact if previous wasn't a plan or not found
+                            } else {
+                                currentArtifactIndex = -1;
+                            }
+                            updateArtifactDisplay();
                         }
                         break;
                     case 'trigger_artifact_refresh':
                         const taskIdToRefresh = message.content?.taskId;
                         if (taskIdToRefresh && taskIdToRefresh === currentTaskId) {
-                            addMonitorLog(`[SYSTEM] File event detected, refreshing artifact list...`);
-                            // Backend now sends 'update_artifacts' after 'trigger_artifact_refresh' if needed,
-                            // or if the plan.md is updated, it sends 'update_artifacts' directly.
-                            // So, no explicit 'get_artifacts_for_task' needed here from client side on this trigger.
+                            addMonitorLog(`[SYSTEM] File event detected, explicitly requesting artifact list update...`);
+                            // MODIFIED: Always send get_artifacts_for_task to ensure UI updates with latest file list and content
+                            sendWsMessage('get_artifacts_for_task', { taskId: currentTaskId });
                         }
                         break;
                     case 'available_models':
@@ -300,7 +311,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         socket.onerror = (event) => {
-            // ... (existing content - no changes needed)
             console.error("WebSocket error event:", event);
             addChatMessage("ERROR: Cannot connect to backend.", "status", true);
             addMonitorLog(`[SYSTEM] WebSocket error occurred.`);
@@ -310,7 +320,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
         };
         socket.onclose = (event) => {
-            // ... (existing content - no changes needed)
             console.log(`WebSocket closed. Code: ${event.code}, Reason: '${event.reason || 'No reason given'}' Clean close: ${event.wasClean}`);
             let reason = event.reason || 'No reason given'; let advice = "";
             if (event.code === 1000 || event.wasClean) { reason = "Normal"; }
@@ -325,7 +334,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const disableAllLlmSelectors = () => {
-        // ... (existing content - no changes needed)
         if (executorLlmSelectElement) {
             executorLlmSelectElement.innerHTML = '<option value="">Connection Error</option>';
             executorLlmSelectElement.disabled = true;
@@ -339,7 +347,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const scrollToBottom = (element) => { if (!element) return; element.scrollTop = element.scrollHeight; };
-    const formatMessageContent = (text) => { /* ... (existing content - no changes needed) ... */
+
+    const formatMessageContent = (text) => {
         let formattedText = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         formattedText = formattedText.replace(/```(\w*)\n([\s\S]*?)\n?```/g, (match, lang, code) => { const escapedCode = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); const langClass = lang ? ` class="language-${lang}"` : ''; return `<pre><code${langClass}>${escapedCode}</code></pre>`; });
         formattedText = formattedText.replace(/`([^`]+)`/g, '<code>$1</code>');
@@ -352,7 +361,8 @@ document.addEventListener('DOMContentLoaded', () => {
         formattedText = parts.join('');
         return formattedText;
     };
-    const addChatMessage = (text, type = 'agent', doScroll = true) => { /* ... (existing content - no changes needed) ... */
+
+    const addChatMessage = (text, type = 'agent', doScroll = true) => {
         if (!chatMessagesContainer) { console.error("Chat container missing!"); return null; }
         if (type === 'status') {
             const lowerText = text.toLowerCase();
@@ -378,7 +388,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (doScroll) scrollToBottom(chatMessagesContainer);
         return messageElement;
     };
-    const displayPlanForConfirmation = (humanSummary, structuredPlan) => { /* ... (existing content - no changes needed) ... */
+
+    const displayPlanForConfirmation = (humanSummary, structuredPlan) => {
         if (!chatMessagesContainer) return;
         const existingPlanUI = chatMessagesContainer.querySelector('.plan-confirmation-container');
         if (existingPlanUI) existingPlanUI.remove();
@@ -459,7 +470,8 @@ document.addEventListener('DOMContentLoaded', () => {
         chatMessagesContainer.appendChild(planContainer);
         scrollToBottom(chatMessagesContainer);
     };
-    const addMonitorLog = (fullLogText) => { /* ... (existing content - no changes needed) ... */
+
+    const addMonitorLog = (fullLogText) => {
         if (!monitorLogAreaElement) { console.error("Monitor log area element (#monitor-log-area) not found!"); return; }
         const logEntryDiv = document.createElement('div');
         logEntryDiv.classList.add('monitor-log-entry');
@@ -509,6 +521,7 @@ document.addEventListener('DOMContentLoaded', () => {
         monitorLogAreaElement.appendChild(logEntryDiv);
         scrollToBottom(monitorLogAreaElement);
     };
+
     const updateArtifactDisplay = async () => {
         if (!monitorArtifactAreaElement || !artifactNavElement || !artifactPrevBtn || !artifactNextBtn || !artifactCounterElement) {
             console.error("Artifact display elements not found!");
@@ -546,16 +559,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 imgElement.title = `Generated image: ${artifact.filename}`;
                 imgElement.onerror = () => {
                     console.error(`Error loading image from URL: ${artifact.url}`);
-                    imgElement.remove(); // Remove the broken image element
+                    imgElement.remove();
                     const errorDiv = Object.assign(document.createElement('div'), { className: 'artifact-error', textContent: `Error loading image: ${artifact.filename}` });
-                    monitorArtifactAreaElement.insertBefore(errorDiv, artifactNavElement); // Insert error message
+                    monitorArtifactAreaElement.insertBefore(errorDiv, artifactNavElement);
                 };
                 monitorArtifactAreaElement.insertBefore(imgElement, artifactNavElement);
             } else if (artifact.type === 'text' || artifact.type === 'pdf') {
                 const preElement = document.createElement('pre');
-                // Crucially, clear any previous content if we are reusing a pre element,
-                // or ensure a new one is created each time. Here, we create a new one.
-                preElement.textContent = ''; // Clear for safety if it were reused
+                preElement.textContent = ''; // Clear for safety
 
                 if (artifact.type === 'pdf') {
                      preElement.textContent = `PDF File: ${artifact.filename}`;
@@ -567,13 +578,15 @@ document.addEventListener('DOMContentLoaded', () => {
                      pdfLink.style.marginTop = "5px";
                      preElement.appendChild(pdfLink);
                 } else { // 'text'
-                    preElement.textContent = 'Loading text file...'; // Placeholder while fetching
+                    preElement.textContent = 'Loading text file...';
                      try {
                         console.log(`Fetching text artifact: ${artifact.url}`);
-                        const response = await fetch(artifact.url);
+                        // Add a cache-busting query parameter to ensure fresh fetch
+                        const cacheBustUrl = `${artifact.url}?t=${new Date().getTime()}`;
+                        const response = await fetch(cacheBustUrl);
                         if (!response.ok) { throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`); }
                         const textContent = await response.text();
-                        preElement.textContent = textContent; // Set the new content
+                        preElement.textContent = textContent;
                         console.log(`Successfully fetched and displayed ${artifact.filename}`);
                     } catch (error) {
                         console.error(`Error fetching text artifact ${artifact.filename}:`, error);
@@ -598,7 +611,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     };
-    const loadTasks = () => { /* ... (existing content - no changes needed) ... */
+
+    const loadTasks = () => {
         const storedCounter = localStorage.getItem(COUNTER_KEY);
         taskCounter = storedCounter ? parseInt(storedCounter, 10) : 0;
         if (isNaN(taskCounter)) taskCounter = 0;
@@ -632,7 +646,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         console.log("Initial currentTaskId set to:", currentTaskId);
     };
-    const saveTasks = () => { /* ... (existing content - no changes needed) ... */
+
+    const saveTasks = () => {
         try {
             tasks.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
             localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
@@ -644,7 +659,8 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Error saving task list. Changes might not persist.");
         }
     };
-    const renderTaskList = () => { /* ... (existing content - no changes needed) ... */
+
+    const renderTaskList = () => {
         if (!taskListUl) { console.error("Task list UL element not found!"); return; }
         taskListUl.innerHTML = '';
         if (tasks.length === 0) {
@@ -672,9 +688,10 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCurrentTaskTitle();
         if (uploadFileButton) { uploadFileButton.disabled = !currentTaskId; }
     };
+
     const handleTaskItemClick = (taskId) => { console.log(`Task item clicked: ${taskId}`); selectTask(taskId); };
     const handleDeleteTaskClick = (taskId, taskTitle) => { console.log(`Delete button clicked for task: ${taskId} (${taskTitle})`); deleteTask(taskId, taskTitle); };
-    const handleEditTaskClick = (taskId, currentTitle) => { /* ... (existing content - no changes needed) ... */
+    const handleEditTaskClick = (taskId, currentTitle) => {
         console.log(`Edit button clicked for task: ${taskId} (${currentTitle})`);
         const newTitle = prompt(`Enter new name for task "${currentTitle}":`, currentTitle);
         if (newTitle === null) { console.log("Rename cancelled by user."); return; }
@@ -690,7 +707,8 @@ document.addEventListener('DOMContentLoaded', () => {
             sendWsMessage("rename_task", { taskId: taskId, newName: trimmedTitle });
         } else { console.error(`Task ${taskId} not found locally for renaming.`); }
     };
-    const updateCurrentTaskTitle = () => { /* ... (existing content - no changes needed) ... */
+
+    const updateCurrentTaskTitle = () => {
         if (!currentTaskTitleElement) return;
         const currentTask = tasks.find(task => task.id === currentTaskId);
         const title = currentTask ? currentTask.title : "No Task Selected";
@@ -703,7 +721,8 @@ document.addEventListener('DOMContentLoaded', () => {
             updateMonitorStatus('idle', 'No Task');
         }
     };
-    const clearChatAndMonitor = (addLog = true) => { /* ... (existing content - no changes needed) ... */
+
+    const clearChatAndMonitor = (addLog = true) => {
         if (chatMessagesContainer) chatMessagesContainer.innerHTML = '';
         if (agentThinkingStatusElement) {
             chatMessagesContainer.appendChild(agentThinkingStatusElement);
@@ -718,7 +737,8 @@ document.addEventListener('DOMContentLoaded', () => {
         resetTaskTokenTotals();
         currentDisplayedPlan = null;
     };
-    const selectTask = (taskId) => { /* ... (existing content - no changes needed) ... */
+
+    const selectTask = (taskId) => {
         console.log(`Attempting to select task: ${taskId}`);
         if (currentTaskId === taskId && taskId !== null) { console.log("Task already selected."); return; }
         const task = tasks.find(t => t.id === taskId);
@@ -744,7 +764,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         console.log(`Finished select task logic for: ${currentTaskId}`);
     };
-    const handleNewTaskClick = () => { /* ... (existing content - no changes needed) ... */
+
+    const handleNewTaskClick = () => {
         console.log("'+ New Task' button clicked.");
         taskCounter++;
         const taskTitle = `Task - ${taskCounter}`;
@@ -754,7 +775,8 @@ document.addEventListener('DOMContentLoaded', () => {
         selectTask(newTask.id);
         console.log("handleNewTaskClick finished.");
     };
-    const deleteTask = (taskId, taskTitle) => { /* ... (existing content - no changes needed) ... */
+
+    const deleteTask = (taskId, taskTitle) => {
         console.log(`Attempting to delete task: ${taskId} (${taskTitle})`);
         if (!confirm(`Are you sure you want to delete task "${taskTitle}"? This cannot be undone.`)) { console.log("Deletion cancelled by user."); return; }
         const taskIndex = tasks.findIndex(task => task.id === taskId);
@@ -774,7 +796,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const populateSingleLlmSelector = (selectElement, availableModels, currentSelectedValue, defaultOptionText = "Use System Default", backendConfiguredDefaultLlmId = null) => {
-        // ... (existing content - no changes needed)
         if (!selectElement) {
             console.error("populateSingleLlmSelector: selectElement is null or undefined for text:", defaultOptionText);
             return;
@@ -836,7 +857,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const populateAllLlmSelectors = (backendDefaultExecutorLlmId, backendRoleDefaults = {}) => {
-        // ... (existing content - no changes needed)
         const lastSelectedExecutor = localStorage.getItem('selectedExecutorLlmId');
         const initialExecutorValue = lastSelectedExecutor !== null ? lastSelectedExecutor : backendDefaultExecutorLlmId;
 
@@ -865,7 +885,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("All LLM selectors populated. Initial Executor:", currentExecutorLlmId, "Initial Role Overrides:", sessionRoleLlmOverrides);
     };
 
-    const sendWsMessage = (type, content) => { /* ... (existing content - no changes needed) ... */
+    const sendWsMessage = (type, content) => {
         if (window.socket && window.socket.readyState === WebSocket.OPEN) {
             try {
                 const payload = JSON.stringify({ type: type, ...content });
@@ -888,7 +908,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const handleSendMessage = () => { /* ... (existing content - no changes needed) ... */
+    const handleSendMessage = () => {
         const messageText = chatTextarea.value.trim();
         if (!currentTaskId){
             alert("Please select or create a task first.");
@@ -919,7 +939,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chatTextarea.focus();
     };
 
-    const handleFileUpload = async (event) => { /* ... (existing content - no changes needed) ... */
+    const handleFileUpload = async (event) => {
         console.log("[handleFileUpload] Function entered.");
         if (!currentTaskId) {
             alert("Please select a task before uploading files.");
@@ -935,9 +955,11 @@ document.addEventListener('DOMContentLoaded', () => {
         let sessionIDHeader = 'unknown_session';
         if (window.socket && window.socket.url) {
             try {
+                // Attempt to get session_id from WebSocket URL if it was set as a query param
+                // This is a fallback; a more robust method would be to have backend send session_id on connect.
                 const urlParams = new URL(window.socket.url).searchParams;
                 sessionIDHeader = urlParams.get('session_id') || sessionIDHeader;
-            } catch (e) { /* ignore */ }
+            } catch (e) { /* ignore if parsing fails */ }
         }
 
         console.log(`[handleFileUpload] Preparing to upload ${files.length} file(s) to ${uploadUrl} for task ${currentTaskId}. X-Session-ID: ${sessionIDHeader}`);
@@ -1051,7 +1073,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    if (stopButton) { /* ... (existing content - no changes needed) ... */
+    if (stopButton) {
         stopButton.addEventListener('click', () => {
             if (isAgentRunning) {
                 console.log("Stop button clicked.");
@@ -1063,7 +1085,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     } else { console.error("Stop button element not found!"); }
 
-    if (uploadFileButton && fileUploadInput) { /* ... (existing content - no changes needed) ... */
+    if (uploadFileButton && fileUploadInput) {
         uploadFileButton.addEventListener('click', () => {
             console.log("Upload button clicked, triggering file input.");
             fileUploadInput.click();
@@ -1071,7 +1093,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fileUploadInput.addEventListener('change', handleFileUpload);
     } else { console.error("File upload button or input element not found!"); }
 
-    if (agentThinkingStatusElement) { /* ... (existing content - no changes needed) ... */
+    if (agentThinkingStatusElement) {
         agentThinkingStatusElement.addEventListener('click', () => {
             console.log("Agent thinking status clicked. Scrolling monitor.");
             if (monitorLogAreaElement) {
@@ -1082,7 +1104,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Agent thinking status element (#agent-thinking-status) not found!");
     }
 
-    document.body.addEventListener('click', event => { /* ... (existing content - no changes needed) ... */
+    document.body.addEventListener('click', event => {
         if (event.target.classList.contains('action-btn')) {
             const commandText = event.target.textContent.trim();
             console.log(`Action button clicked: ${commandText}`);
