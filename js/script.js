@@ -80,6 +80,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentTaskTotalTokens = { input: 0, output: 0, total: 0 };
     let currentDisplayedPlan = null;
 
+    // Flags to manage artifact content fetching state
+    let isFetchingArtifactContent = false;
+    // Stores the URL of the artifact whose content is currently being fetched or was last fetched.
+    // This helps in deciding whether to re-fetch or if a fetch is already in progress for the *same* artifact URL.
+    let artifactContentFetchUrl = null;
+
+
     const wsUrl = 'ws://localhost:8765';
     const httpBackendBaseUrl = 'http://localhost:8766';
     let socket;
@@ -262,32 +269,30 @@ document.addEventListener('DOMContentLoaded', () => {
                                 ? currentTaskArtifacts[currentArtifactIndex]?.filename
                                 : null;
 
-                            currentTaskArtifacts = message.content; // Update the list
+                            currentTaskArtifacts = message.content;
 
                             if (oldCurrentArtifactFilename && oldCurrentArtifactFilename.startsWith("_plan_") && oldCurrentArtifactFilename.endsWith(".md")) {
-                                // Try to find the same plan file in the new list
                                 const newIndex = currentTaskArtifacts.findIndex(art => art.filename === oldCurrentArtifactFilename);
                                 if (newIndex !== -1) {
-                                    currentArtifactIndex = newIndex; // Keep it selected
+                                    currentArtifactIndex = newIndex;
                                 } else {
-                                    // If not found (shouldn't happen if it's just an update), select the newest plan or first artifact
                                     const latestPlan = currentTaskArtifacts.find(art => art.filename && art.filename.startsWith("_plan_") && art.filename.endsWith(".md"));
                                     currentArtifactIndex = latestPlan ? currentTaskArtifacts.indexOf(latestPlan) : (currentTaskArtifacts.length > 0 ? 0 : -1);
                                 }
                             } else if (currentTaskArtifacts.length > 0) {
-                                // If previous was not a plan or no plan was selected, default to first/newest artifact
                                 currentArtifactIndex = 0;
                             } else {
                                 currentArtifactIndex = -1;
                             }
-                            updateArtifactDisplay(); // This will re-render based on the new currentArtifactIndex
+                            isFetchingArtifactContent = false; // Reset flag before display update
+                            artifactContentFetchUrl = null; // Allow re-fetch if artifact list changed or different artifact selected
+                            updateArtifactDisplay();
                         }
                         break;
                     case 'trigger_artifact_refresh':
                         const taskIdToRefresh = message.content?.taskId;
                         if (taskIdToRefresh && taskIdToRefresh === currentTaskId) {
-                            addMonitorLog(`[SYSTEM] File event detected for task ${taskIdToRefresh}, explicitly requesting artifact list update...`);
-                            // MODIFIED: Always send get_artifacts_for_task to ensure UI updates with latest file list and content
+                            addMonitorLog(`[SYSTEM] File event detected for task ${taskIdToRefresh}, requesting artifact list update...`);
                             sendWsMessage('get_artifacts_for_task', { taskId: currentTaskId });
                         }
                         break;
@@ -531,11 +536,11 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Artifact display elements not found!");
             return;
         }
-        // MODIFIED: Clear previous artifact content more thoroughly
+
+        // Clear previous artifact content elements (filename, image, pre, placeholder, error)
         // This selector targets all direct children of monitorArtifactAreaElement that are not the artifactNavElement itself.
         const childrenToRemove = Array.from(monitorArtifactAreaElement.children).filter(child => child !== artifactNavElement);
         childrenToRemove.forEach(child => monitorArtifactAreaElement.removeChild(child));
-
 
         if (currentTaskArtifacts.length === 0 || currentArtifactIndex < 0 || currentArtifactIndex >= currentTaskArtifacts.length) {
             const placeholder = document.createElement('div');
@@ -543,88 +548,111 @@ document.addEventListener('DOMContentLoaded', () => {
             placeholder.textContent = 'No artifacts generated yet.';
             monitorArtifactAreaElement.insertBefore(placeholder, artifactNavElement);
             artifactNavElement.style.display = 'none';
-        } else {
-            const artifact = currentTaskArtifacts[currentArtifactIndex];
-            if (!artifact || !artifact.url || !artifact.filename || !artifact.type) {
-                console.error("Invalid artifact data:", artifact);
-                const errorDiv = Object.assign(document.createElement('div'), { className: 'artifact-error', textContent: 'Error displaying artifact: Invalid data.' });
+            artifactContentFetchUrl = null; // Reset when no artifacts
+            return;
+        }
+
+        const artifact = currentTaskArtifacts[currentArtifactIndex];
+        if (!artifact || !artifact.url || !artifact.filename || !artifact.type) {
+            console.error("Invalid artifact data:", artifact);
+            const errorDiv = Object.assign(document.createElement('div'), { className: 'artifact-error', textContent: 'Error displaying artifact: Invalid data.' });
+            monitorArtifactAreaElement.insertBefore(errorDiv, artifactNavElement);
+            artifactNavElement.style.display = 'none';
+            artifactContentFetchUrl = null; // Reset on error
+            return;
+        }
+
+        const filenameDiv = document.createElement('div');
+        filenameDiv.className = 'artifact-filename';
+        filenameDiv.textContent = artifact.filename;
+        monitorArtifactAreaElement.insertBefore(filenameDiv, artifactNavElement);
+
+        if (artifact.type === 'image') {
+            artifactContentFetchUrl = null; // Images don't need the content fetch state management
+            const imgElement = document.createElement('img');
+            imgElement.src = artifact.url; // Browser handles image caching
+            imgElement.alt = `Generated image: ${artifact.filename}`;
+            imgElement.title = `Generated image: ${artifact.filename}`;
+            imgElement.onerror = () => {
+                console.error(`Error loading image from URL: ${artifact.url}`);
+                imgElement.remove();
+                const errorDiv = Object.assign(document.createElement('div'), { className: 'artifact-error', textContent: `Error loading image: ${artifact.filename}` });
                 monitorArtifactAreaElement.insertBefore(errorDiv, artifactNavElement);
-                artifactNavElement.style.display = 'none';
-                return;
-            }
-            const filenameDiv = document.createElement('div');
-            filenameDiv.className = 'artifact-filename';
-            filenameDiv.textContent = artifact.filename;
-            monitorArtifactAreaElement.insertBefore(filenameDiv, artifactNavElement);
+            };
+            monitorArtifactAreaElement.insertBefore(imgElement, artifactNavElement);
+        } else if (artifact.type === 'text' || artifact.type === 'pdf') {
+            const preElement = document.createElement('pre'); // Create a new pre element for each render
+            monitorArtifactAreaElement.insertBefore(preElement, artifactNavElement); // Insert it into the DOM
 
-            if (artifact.type === 'image') {
-                const imgElement = document.createElement('img');
-                imgElement.src = artifact.url;
-                imgElement.alt = `Generated image: ${artifact.filename}`;
-                imgElement.title = `Generated image: ${artifact.filename}`;
-                imgElement.onerror = () => {
-                    console.error(`Error loading image from URL: ${artifact.url}`);
-                    imgElement.remove();
-                    const errorDiv = Object.assign(document.createElement('div'), { className: 'artifact-error', textContent: `Error loading image: ${artifact.filename}` });
-                    monitorArtifactAreaElement.insertBefore(errorDiv, artifactNavElement);
-                };
-                monitorArtifactAreaElement.insertBefore(imgElement, artifactNavElement);
-            } else if (artifact.type === 'text' || artifact.type === 'pdf') {
-                const preElement = document.createElement('pre');
-                preElement.textContent = ''; // Clear for safety
-
-                if (artifact.type === 'pdf') {
-                     preElement.textContent = `PDF File: ${artifact.filename}`;
-                     const pdfLink = document.createElement('a');
-                     pdfLink.href = artifact.url;
-                     pdfLink.target = "_blank";
-                     pdfLink.textContent = `Open ${artifact.filename} in new tab`;
-                     pdfLink.style.display = "block";
-                     pdfLink.style.marginTop = "5px";
-                     preElement.appendChild(pdfLink);
-                } else { // 'text'
+            if (artifact.type === 'pdf') {
+                artifactContentFetchUrl = null; // PDFs are links
+                preElement.textContent = `PDF File: ${artifact.filename}`;
+                const pdfLink = document.createElement('a');
+                pdfLink.href = artifact.url;
+                pdfLink.target = "_blank";
+                pdfLink.textContent = `Open ${artifact.filename} in new tab`;
+                pdfLink.style.display = "block";
+                pdfLink.style.marginTop = "5px";
+                preElement.appendChild(pdfLink);
+            } else { // 'text' artifact
+                // Only fetch if not already fetching this exact URL
+                if (isFetchingArtifactContent && artifactContentFetchUrl === artifact.url) {
+                    console.log(`Fetch already in progress for ${artifact.url}, existing pre-element will be updated.`);
+                    preElement.textContent = 'Loading (previous fetch in progress)...'; // Update the new pre
+                } else {
+                    isFetchingArtifactContent = true;
+                    artifactContentFetchUrl = artifact.url;
                     preElement.textContent = 'Loading text file...';
-                     try {
-                        console.log(`Fetching text artifact: ${artifact.url}`);
-                        // MODIFIED: Add cache-control headers to the fetch request
+                    try {
+                        console.log(`Fetching text artifact: ${artifact.url} with cache-control`);
                         const response = await fetch(artifact.url, {
-                            cache: 'reload', // Important: tells browser to revalidate with server
+                            cache: 'reload',
                             headers: {
                                 'Cache-Control': 'no-cache, no-store, must-revalidate',
-                                'Pragma': 'no-cache', // For HTTP/1.0 caches/proxies
-                                'Expires': '0' // For older proxies
+                                'Pragma': 'no-cache',
+                                'Expires': '0'
                             }
                         });
                         if (!response.ok) {
-                            // Log server's response if not OK, even if it's a 304 we want to treat it as an issue here
-                            // as we explicitly asked for no cache.
-                            logger.warn(`Text artifact fetch for ${artifact.filename} was not OK. Status: ${response.status} ${response.statusText}`);
+                            console.warn(`Text artifact fetch for ${artifact.filename} not OK. Status: ${response.status} ${response.statusText}`);
                             throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`);
                         }
                         const textContent = await response.text();
-                        preElement.textContent = textContent;
-                        console.log(`Successfully fetched and displayed ${artifact.filename}`);
+                        // Check if this is still the artifact we want to display before updating
+                        if (currentTaskArtifacts[currentArtifactIndex]?.url === artifact.url) {
+                            preElement.textContent = textContent;
+                            console.log(`Successfully fetched and displayed ${artifact.filename}`);
+                        } else {
+                            console.log("Artifact changed while fetching text, not updating stale content for", artifact.filename);
+                        }
                     } catch (error) {
                         console.error(`Error fetching text artifact ${artifact.filename}:`, error);
-                        preElement.textContent = `Error loading file: ${artifact.filename}\n${error.message}`;
-                        preElement.classList.add('artifact-error');
+                        if (currentTaskArtifacts[currentArtifactIndex]?.url === artifact.url) {
+                            preElement.textContent = `Error loading file: ${artifact.filename}\n${error.message}`;
+                            preElement.classList.add('artifact-error');
+                        }
+                    } finally {
+                        // Reset the flag only if this specific fetch operation has completed
+                        if (artifactContentFetchUrl === artifact.url) {
+                            isFetchingArtifactContent = false;
+                        }
                     }
                 }
-                monitorArtifactAreaElement.insertBefore(preElement, artifactNavElement);
-            } else {
-                console.warn(`Unsupported artifact type: ${artifact.type} for file ${artifact.filename}`);
-                const unknownDiv = Object.assign(document.createElement('div'), { className: 'artifact-placeholder', textContent: `Unsupported artifact type: ${artifact.filename}` });
-                monitorArtifactAreaElement.insertBefore(unknownDiv, artifactNavElement);
             }
+        } else {
+            artifactContentFetchUrl = null; // Reset for non-text/pdf types
+            console.warn(`Unsupported artifact type: ${artifact.type} for file ${artifact.filename}`);
+            const unknownDiv = Object.assign(document.createElement('div'), { className: 'artifact-placeholder', textContent: `Unsupported artifact type: ${artifact.filename}` });
+            monitorArtifactAreaElement.insertBefore(unknownDiv, artifactNavElement);
+        }
 
-            if (currentTaskArtifacts.length > 1) {
-                artifactCounterElement.textContent = `Artifact ${currentArtifactIndex + 1} of ${currentTaskArtifacts.length}`;
-                artifactPrevBtn.disabled = (currentArtifactIndex === 0);
-                artifactNextBtn.disabled = (currentArtifactIndex === currentTaskArtifacts.length - 1);
-                artifactNavElement.style.display = 'flex';
-            } else {
-                artifactNavElement.style.display = 'none';
-            }
+        if (currentTaskArtifacts.length > 1) {
+            artifactCounterElement.textContent = `Artifact ${currentArtifactIndex + 1} of ${currentTaskArtifacts.length}`;
+            artifactPrevBtn.disabled = (currentArtifactIndex === 0);
+            artifactNextBtn.disabled = (currentArtifactIndex === currentTaskArtifacts.length - 1);
+            artifactNavElement.style.display = 'flex';
+        } else {
+            artifactNavElement.style.display = 'none';
         }
     };
 
@@ -747,7 +775,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (monitorLogAreaElement) monitorLogAreaElement.innerHTML = '';
         currentTaskArtifacts = [];
         currentArtifactIndex = -1;
-        updateArtifactDisplay();
+        updateArtifactDisplay(); // This will show "No artifacts" placeholder
         if (addLog && monitorLogAreaElement) { addMonitorLog("[SYSTEM] Cleared context."); }
         console.log("Cleared chat and monitor.");
         resetTaskTokenTotals();
