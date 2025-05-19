@@ -1,9 +1,9 @@
-ResearchAgent: AI Assistant for Research Workflows (v2.1+ with Step Evaluation)
-===============================================================================
+ResearchAgent: AI Assistant for Research Workflows (v2.2)
+=========================================================
 
 This project provides a functional user interface and backend for an AI agent system designed to assist with research tasks, particularly in fields like bioinformatics and epidemiology. It features a three-panel layout (Tasks, Chat, Monitor/Artifact Viewer) and connects via WebSockets to a Python backend powered by LangChain.
 
-Version 2.1+ introduces an advanced Planner-Controller-Executor-Evaluator architecture with per-step evaluation and a retry mechanism for enhanced task completion. The agent also includes an Intent Classifier to differentiate simple queries from complex tasks. It uses configurable LLMs (Google Gemini or local Ollama) for reasoning and various tools to perform actions within isolated task workspaces. Backend message handling has also been refactored for improved modularity.
+Version 2.2 reflects recent bug fixes and a refined agent architecture, including an advanced Planner-Controller-Executor-Evaluator pipeline with per-step evaluation and a retry mechanism for enhanced task completion. The agent also includes an Intent Classifier to differentiate simple queries from complex tasks. It uses configurable LLMs (Google Gemini or local Ollama) for reasoning and various tools to perform actions within isolated task workspaces.
 
 Core Architecture & Workflow
 ----------------------------
@@ -56,7 +56,7 @@ The system processes user queries through a sophisticated pipeline:
 
         3.  Execution Loop (`message_handlers.process_execute_confirmed_plan`):
 
-            -   Plan Persistence (Initial Save): Upon confirmation, a unique, timestamped Markdown file (e.g., `_plan_YYYYMMDD_HHMMSS_ffffff.md`) is created in the task's workspace. This file lists all plan steps with initial `[ ]` checkboxes. The filename is stored in the session.
+            -   Plan Persistence (Initial Save): Upon confirmation, a unique, timestamped Markdown file (e.g., `_plan_YYYYMMDD_HHMMSS_ffffff.md`) is created in the task's workspace. This file lists all plan steps with initial `- [ ]` checkboxes (e.g., `- [ ] 1. **Step Description**`). The filename is stored in the session.
 
             -   The system iterates through each confirmed `PlanStep`.
 
@@ -84,7 +84,7 @@ The system processes user queries through a sophisticated pipeline:
 
                     -   Uses "Evaluator LLM" (session override > `EVALUATOR_LLM_ID` > `DEFAULT_LLM_ID`).
 
-                    -   Assesses if the current step's specific goal was achieved.
+                    -   Assesses if the current step's specific goal was achieved. The prompt for this evaluator has been refined to better handle external errors like rate limits, marking them as not immediately recoverable by a simple retry.
 
                     -   If `step_achieved_goal` is `false` but `is_recoverable_via_retry` is `true` (and retries remain):
 
@@ -96,7 +96,7 @@ The system processes user queries through a sophisticated pipeline:
 
                     -   If the step fails and is not recoverable or retries are exhausted, the step is marked failed, and the entire plan execution halts.
 
-            -   Live Plan Update: After each step attempt (and its final determination), the `_plan_<ID>.md` file is updated with the step's status (`[x]`, `[!]`, or `[-]`). The artifact viewer is triggered to refresh.
+            -   Live Plan Update: After each step attempt (and its final determination), the `_plan_<ID>.md` file is updated with the step's status (`[x]`, `[!]`, or `[-]`). The artifact viewer is triggered to refresh its artifact list and display the updated plan content.
 
         4.  Overall Plan Evaluator (`evaluator.py` - `evaluate_plan_outcome`):
 
@@ -119,17 +119,11 @@ Key Current Capabilities & Features
 
     -   Chat Interface: Standard chat UI with input history and Markdown rendering.
 
-    -   Role-Specific LLM Selection (Session Override):
+    -   Role-Specific LLM Selection (Session Override): Dropdowns for Intent Classifier, Planner, Controller, Executor, and Evaluator LLMs.
 
-        -   Main "Executor LLM" selector in the chat header.
+    -   Monitor Panel: Detailed logs of agent thoughts, tool calls (with improved tool name identification on error), errors, system messages, and outputs from all agent components.
 
-        -   Dropdowns for Intent Classifier, Planner, Controller, and Evaluator LLMs, allowing selection of specific models or "Use System Default".
-
-        -   Selections are stored in `localStorage` and sent to the backend for the current session.
-
-    -   Monitor Panel: Detailed logs of agent thoughts, tool calls, errors, system messages, and outputs from Intent Classifier, Planner, Controller, Step Evaluator, and Overall Plan Evaluator.
-
-    -   Status Indicator: Visual feedback on agent state (Idle, Running, Cancelling, Error, Disconnected).
+    -   Status Indicator: Visual feedback on agent state.
 
     -   STOP Button: Allows user to request cancellation of ongoing operations.
 
@@ -137,59 +131,53 @@ Key Current Capabilities & Features
 
     -   Artifact Viewer:
 
-        -   Displays images and text files.
+        -   Displays images, text files (including live-updating `_plan.md`), and PDF links.
 
-        -   PDFs are listed with a link to open in a new tab.
-
-        -   Auto-refreshes when new artifacts are created or existing ones (like `_plan.md`) are updated.
+        -   Auto-refreshes reliably when artifacts are created or updated, with fixes for previous duplication and caching issues.
 
         -   Navigation for multiple artifacts.
 
     -   Plan Display & Confirmation: Generated plans are shown for user confirmation and remain visible (disabled) during execution.
 
-    -   Token Usage Tracking: Per-call and per-task token counts displayed.
+    -   Token Usage Tracking: Per-call and per-task token counts.
 
 2.  Backend Architecture & Logic:
 
-    -   Modular Design: `server.py` (WebSockets, session management), `message_handlers.py` (message processing), and component modules (`intent_classifier.py`, `planner.py`, `controller.py`, `agent.py` for Executor, `evaluator.py`).
+    -   Modular Design: `server.py`, `message_handlers.py`, and component modules.
 
-    -   Role-Specific LLM Configuration (`config.py`, `.env`): Defines different LLMs for each component, with fallback to `DEFAULT_LLM_ID`.
+    -   Role-Specific LLM Configuration: Via `.env` and `config.py`.
 
-    -   LLM Initialization with Fallback (`llm_setup.py`): `get_llm` attempts primary LLM, then system default on failure. Logging includes the role for which an LLM is being initialized.
+    -   LLM Initialization with Fallback (`llm_setup.py`): With improved logging for role context.
 
-    -   Callbacks (`callbacks.py`): `WebSocketCallbackHandler` sends detailed LangChain events to UI and DB. Handles `AgentCancelledException`. Attempts to log specific tool names on error.
+    -   Callbacks (`callbacks.py`): `WebSocketCallbackHandler` sends detailed events; improved tool name logging in `on_tool_error`.
 
-    -   Database (`db_utils.py`): SQLite stores task details and comprehensive message history.
+    -   Database (`db_utils.py`): SQLite for persistent history.
 
-    -   Task Workspaces (`tools.py`): Isolated directories (`workspace/<task_id>/`) for each task.
+    -   Task Workspaces (`tools.py`): Isolated directories.
 
     -   Plan Persistence & Live Update (`message_handlers.py`):
 
-        -   Confirmed plans saved to `_plan_<timestamp>.md` with Markdown checklist syntax.
+        -   `_plan_<timestamp>.md` saved with correct Markdown checklist format.
 
-        -   Step statuses (`[ ]`, `[x]`, `[!]`, `[-]`) are updated in this file during execution.
-
-        -   The file is treated as an artifact, and UI refreshes to show changes.
+        -   Step statuses are correctly updated in this file during execution.
 
 3.  Tool Suite (`tools.py`):
 
-    -   Web Search: `duckduckgo_search`.
+    -   Web Search: `duckduckgo_search` (currently subject to external rate limits).
 
     -   Web Page Reader: `web_page_reader`.
 
     -   PubMed Search: `pubmed_search`.
 
-    -   File I/O: `read_file` (text, PDF text extraction), `write_file`.
+    -   File I/O: `read_file`, `write_file`.
 
-    -   Shell Execution: `workspace_shell`.
+    -   Shell Execution: `workspace_shell`. *(Security Warning)*
 
-    -   Python Package Installer: `python_package_installer` (uses `uv pip` or `pip`). *(Security Warning)*
+    -   Python Package Installer: `python_package_installer`. *(Security Warning)*
 
     -   Python REPL: `Python_REPL`. *(Security Warning)*
 
-4.  Configuration (`config.py`, `.env`):
-
-    -   Centralized settings for API keys, LLM IDs, Ollama URL, agent parameters, tool limits, server options.
+4.  Configuration (`config.py`, `.env`): Centralized settings.
 
 Tech Stack
 ----------
@@ -232,25 +220,25 @@ ResearchAgent/
 ├── .venv/
 ├── backend/
 │   ├── __init__.py
-│   ├── agent.py        # Agent creation logic (Executor base)
-│   ├── callbacks.py    # WebSocket callback handler
-│   ├── config.py       # Configuration loading
-│   ├── controller.py   # Controller/Validator logic
-│   ├── db_utils.py     # SQLite database functions
-│   ├── evaluator.py    # Step Evaluator & Overall Plan Evaluator logic
-│   ├── intent_classifier.py # Intent classification logic
-│   ├── llm_setup.py    # LLM initialization
-│   ├── message_handlers.py # WebSocket message handlers
-│   ├── planner.py      # Planner logic
-│   ├── server.py       # Main WebSocket & File server logic
-│   └── tools.py        # Tool definitions and factory
+│   ├── agent.py
+│   ├── callbacks.py
+│   ├── config.py
+│   ├── controller.py
+│   ├── db_utils.py
+│   ├── evaluator.py
+│   ├── intent_classifier.py
+│   ├── llm_setup.py
+│   ├── message_handlers.py
+│   ├── planner.py
+│   ├── server.py
+│   └── tools.py
 ├── css/
 │   └── style.css
-├── database/           # SQLite database storage (GITIGNORED)
+├── database/
 │   └── agent_history.db
 ├── js/
 │   └── script.js
-├── workspace/          # Base directory for task workspaces (GITIGNORED)
+├── workspace/
 │   └── <task_id>/
 ├── .env
 ├── .env.example
@@ -266,54 +254,19 @@ ResearchAgent/
 Setup Instructions
 ------------------
 
-*(Refer to your existing detailed setup instructions - assuming these are largely unchanged)*
-
-1.  Clone Repository
-
-2.  Prerequisites (Python 3.10+)
-
-3.  Install `uv` (Recommended)
-
-4.  Create and Activate Virtual Environment
-
-5.  Install Dependencies (`uv pip install -r requirements.txt` or `pip install -r requirements.txt`)
-
-6.  Configure Environment Variables (`.env` file based on `.env.example`)
-
-7.  (If using Ollama) Install and run Ollama, pull models.
+*(Refer to your existing detailed setup instructions)*
 
 Running the Application
 -----------------------
 
 *(Refer to your existing Docker or direct run instructions)*
 
-Usage & Testing
----------------
-
-*(This section should be updated with test cases for the new step evaluation and retry logic, in addition to existing tool tests.)*
-
--   Test Step Retry:
-
-    -   Formulate a query where an intermediate step is likely to fail but be correctable. E.g., "Search for X, write to `correct_file.txt`, then try to read `incorrect_file.txt`."
-
-    -   Observe monitor logs for Step Evaluator identifying the failure, suggesting a correction (e.g., to read `correct_file.txt`), and the Executor retrying the step successfully.
-
-    -   Verify the `_plan.md` checklist updates correctly (`[!]` then `[x]`).
-
--   Test Unrecoverable Step Failure:
-
-    -   Query for an action that will definitively fail (e.g., "Install package `non_existent_package_xyz123`").
-
-    -   Observe Step Evaluator marking it unrecoverable, plan halting, and `_plan.md` showing `[!]`.
-
--   ... (other existing test cases for tools, LLM switching, etc.)
-
 Known Issues
 ------------
 
--   DuckDuckGo Rate Limiting: The `duckduckgo_search` tool may be subject to rate limits, which can interrupt tests or normal operation. The Step Evaluator has been prompted to consider these as not immediately retryable.
+-   DuckDuckGo Rate Limiting: The `duckduckgo_search` tool is susceptible to external rate limits. While the Step Evaluator is now better at not retrying these immediately, this can still halt plan execution if search is a critical early step. This highlights the need for more robust search solutions.
 
--   Agent Cancellation (STOP Button): Interrupts between major steps/LLM calls, not always instantaneous.
+-   Agent Cancellation (STOP Button): Interrupts primarily between major steps/LLM calls; not always instantaneous within a long-running tool or LLM call.
 
 -   Markdown Rendering in Chat: Basic; complex Markdown might not render perfectly.
 
@@ -326,43 +279,57 @@ Security Warnings
 
 -   `workspace_shell` Tool: Executes shell commands. Use with caution.
 
-Future Perspectives & Ideas (Post v2.1+ Step Evaluation)
---------------------------------------------------------
+Future Perspectives & Ideas
+---------------------------
 
--   Web Search Robustness: Integrate an API-key based search tool (e.g., Google Custom Search, Tavily, Serper) or develop a Playwright-based tool for more resilient web searching and interaction.
+1.  Playwright Integration for Web Search (High Priority):
 
--   Advanced Re-planning:
+    -   Develop a new LangChain tool using Playwright to perform web searches (e.g., on Google or DuckDuckGo) and extract results.
+
+    -   This aims to provide a more robust and reliable alternative to the current `duckduckgo_search` tool, especially to mitigate rate-limiting issues.
+
+    -   Phased Approach:
+
+        -   Phase 1: Basic search and extraction of titles/links.
+
+        -   Phase 2: Snippet extraction, more robust error handling (timeouts, CAPTCHAs).
+
+        -   Phase 3: Configuration options (search engine choice, number of results).
+
+    -   Requires adding `playwright` to dependencies and updating Dockerfile/setup for browser binaries.
+
+2.  Advanced Re-planning & User Interaction:
 
     -   Allow user-initiated re-planning based on Overall Plan Evaluator suggestions.
 
-    -   Enable the Planner to be re-invoked by the system if the Overall Plan Evaluator deems the entire strategy flawed, using its suggestions as input for a new plan.
-
--   Interactive Plan Modification (Pre-Execution & In-Flight):
+    -   Enable the main Planner to be re-invoked by the system if the Overall Plan Evaluator deems the entire strategy flawed.
 
     -   UI for users to edit, re-order, add/delete steps from a proposed plan *before* execution.
 
     -   Mechanisms for users to pause and inject feedback/guidance *during* plan execution.
 
--   Permission Gateway for Sensitive Tools: Implement explicit, step-specific user confirmation in the UI before executing actions with `workspace_shell`, `python_package_installer`, or `Python_REPL`, even if the overall plan was approved.
+3.  Enhanced Security & Usability:
 
--   Enhanced Artifact Interaction & Generation:
+    -   Permission Gateway for Sensitive Tools: Implement explicit, step-specific user confirmation in the UI before executing actions with `workspace_shell`, `python_package_installer`, or `Python_REPL`.
+
+    -   Live Plan in Chat UI: Display the content of the `_plan.md` file directly within a chat message, updating it live as the plan progresses, in addition to the artifact viewer.
+
+4.  Further Artifact & Tool Enhancements:
 
     -   Workspace file tree viewer in the UI.
 
-    -   Render structured data (CSV/JSON) as interactive tables.
+    -   Render structured data (CSV/JSON) from files as interactive tables.
 
-    -   Direct interactive plot rendering.
+    -   Direct interactive plot rendering from Python REPL outputs.
 
     -   Dedicated "Report Generation" tool/step to synthesize findings.
 
--   UI/UX Enhancements:
+    -   Expand domain-specific tools for bioinformatics/epidemiology.
 
-    -   Live display of the `_plan.md` content directly within a chat message, updating as the plan progresses.
+5.  UI/UX Refinements:
 
     -   Drag & Drop file upload.
 
     -   Collapsible/resizable UI panels.
 
--   Domain-Specific Tools & Knowledge: Further expand tools relevant to bioinformatics/epidemiology.
-
--   Streaming Output: Token-by-token streaming for LLM responses (thoughts and final answers).
+    -   Streaming output for LLM thoughts and final answers.
