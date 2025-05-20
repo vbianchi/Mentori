@@ -36,6 +36,13 @@ COPY requirements.txt .
 # Use python3 explicitly to invoke uv module
 RUN python3 -m uv pip install --system -r requirements.txt
 
+# Install Playwright browser(s) and their OS dependencies.
+# We're choosing Chromium here. You can add 'firefox' or 'webkit' if needed.
+# The '--with-deps' flag attempts to install necessary OS libraries for the browser.
+RUN playwright install --with-deps chromium
+# To install all browsers:
+# RUN playwright install --with-deps
+
 # Copy the rest of the application code into the container
 # Note: For development, this will be overlaid by the volume mount in docker-compose.yml
 COPY . .

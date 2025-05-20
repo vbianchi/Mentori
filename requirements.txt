@@ -25,6 +25,7 @@ aiofiles>=23.0
 matplotlib>=3.0 # Needed for plotting examples
 biopython>=1.80 # Added for PubMed/Entrez search
 pypdf>=4.0.0 # Added for PDF reading
+playwright
 
 # --- Database ---
 aiosqlite>=0.19 # Added for async SQLite operations
