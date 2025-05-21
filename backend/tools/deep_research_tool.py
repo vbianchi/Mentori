@@ -16,7 +16,7 @@ from langchain_core.language_models.chat_models import BaseChatModel
 
 
 from .tavily_search_tool import TavilyAPISearchTool
-# from .standard_tools import fetch_and_parse_url # Imported in _arun
+# fetch_and_parse_url will be imported inside _arun to avoid circular import
 
 from backend.config import settings 
 from backend.llm_setup import get_llm 
@@ -47,9 +47,14 @@ class DeepResearchToolInput(BaseModel):
         description="Maximum total tokens from (summarized) content to pass to the final report writer LLM."
     )
 
+    # MODIFIED: Add model_json_schema method for Pydantic v2 compatibility
     @classmethod
     def model_json_schema(cls, by_alias: bool = True, ref_template: str = "#/components/schemas/{model}") -> Dict[str, Any]:
-        return cls.schema(by_alias=by_alias)
+        """
+        Generates the JSON schema for the Pydantic model.
+        This is the Pydantic v2 method name, but we call the v1 equivalent.
+        """
+        return cls.schema(by_alias=by_alias) # Pydantic v1 uses .schema()
 
 class CuratedSourcesOutput(BaseModel):
     selected_urls: List[str] = Field(description="A list of URLs selected as most promising for deep research.")
@@ -335,7 +340,6 @@ class DeepResearchTool(BaseTool):
 
         writer_llm = self._get_writer_llm()
         writer_parser = JsonOutputParser(pydantic_object=DeepResearchReportOutput) 
-        # MODIFIED: Add a human message to the writer_prompt
         writer_prompt = ChatPromptTemplate.from_messages([
             ("system", WRITER_SYSTEM_PROMPT_TEMPLATE),
             ("human", "Based on the provided system instructions and content, please generate the research report now.")
