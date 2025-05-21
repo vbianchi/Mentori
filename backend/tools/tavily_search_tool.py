@@ -5,6 +5,9 @@ import urllib.parse
 from pathlib import Path 
 import sys 
 import traceback
+# json import was removed in a previous step as TavilySearchResults returns list[dict]
+# from langchain_community.tools.tavily_search import TavilySearchResults returns list[dict]
+# so json.loads was not needed.
 
 from langchain_core.tools import BaseTool, ToolException
 from langchain_core.callbacks import CallbackManagerForToolRun
@@ -18,6 +21,21 @@ logger = logging.getLogger(__name__)
 
 class TavilySearchInput(BaseModel):
     query: str = Field(description="The search query string.")
+
+    # MODIFIED: Add model_json_schema method for Pydantic v2 compatibility needed by BaseTool.args
+    @classmethod
+    def model_json_schema(cls, by_alias: bool = True, ref_template: str = "#/components/schemas/{model}") -> Dict[str, Any]:
+        """
+        Generates the JSON schema for the Pydantic model.
+        This is the Pydantic v2 method name, but we call the v1 equivalent.
+        """
+        return cls.schema(by_alias=by_alias) # Pydantic v1 uses .schema()
+
+    # For older Langchain versions or if schema_json is specifically needed by some part
+    # def schema_json(self, *, by_alias: bool = True, **dumps_kwargs: Any) -> str:
+    #     """ Pydantic v1 method """
+    #     return super().schema_json(by_alias=by_alias, **dumps_kwargs)
+
 
 class TavilyAPISearchTool(BaseTool):
     name: str = "tavily_search_api" 
@@ -38,7 +56,6 @@ class TavilyAPISearchTool(BaseTool):
         super().__init__(**kwargs) 
         
         init_log_prefix = "TavilyAPISearchTool (__init__):"
-        # Using logger now instead of print for consistency
         logger.info(f"{init_log_prefix} ENTERING __init__ (after super) !!!")
         
         api_key_from_settings: Optional[str] = None
@@ -73,15 +90,46 @@ class TavilyAPISearchTool(BaseTool):
         if self._tavily_search_instance is None:
             logger.error("TavilyAPISearchTool: _get_tavily_instance() found _tavily_search_instance is None. Check __init__ logs.")
             raise ToolException("Tavily Search API tool is not configured: API key missing or initialization error during tool setup (see __init__ logs).")
-        return self._tavily_search_instance # Type is TavilySearchResults due to __init__ logic
+        return self._tavily_search_instance
+
+    def _format_results(self, results_list: List[Dict[str, Any]]) -> str:
+        if not results_list or not isinstance(results_list, list): 
+            logger.warning(f"TavilyAPISearchTool (_format_results): Expected a list of results, got {type(results_list)}. Returning as is or empty.")
+            return str(results_list) if results_list else "No relevant search results found."
+        
+        formatted_strings = []
+        for i, res in enumerate(results_list):
+            if not isinstance(res, dict): 
+                logger.warning(f"TavilyAPISearchTool (_format_results): Expected a dict for result item, got {type(res)}. Skipping item.")
+                continue
+            title = res.get("title", "N/A")
+            url = res.get("url", "N/A")
+            content = res.get("content", "N/A") 
+            
+            if not isinstance(content, str):
+                content = str(content)
+            content = content.replace("\n", " ").strip()
+            
+            formatted_strings.append(
+                f"Search Result {i + 1}:\nTitle: {title}\nURL: {url}\nSnippet: {content}"
+            )
+        return "\n\n===\n\n".join(formatted_strings) if formatted_strings else "No relevant search results found."
 
     def _run(self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None, **kwargs: Any) -> str:
         logger.info(f"TavilyAPISearchTool (_run): Synchronously searching for '{query}'")
         try:
             tavily_instance = self._get_tavily_instance()
-            # MODIFIED: Ensure tool_input is used when calling the underlying TavilySearchResults method
-            result = tavily_instance.run(tool_input=query) 
-            return str(result)
+            results_list_or_str = tavily_instance.run(tool_input=query) 
+            
+            if isinstance(results_list_or_str, list):
+                return self._format_results(results_list_or_str)
+            elif isinstance(results_list_or_str, str): 
+                logger.warning(f"TavilyAPISearchTool (_run): Tavily tool returned a string directly: {results_list_or_str[:200]}")
+                return results_list_or_str 
+            else:
+                logger.error(f"TavilyAPISearchTool (_run): Unexpected type from Tavily tool: {type(results_list_or_str)}")
+                return "Error: Unexpected result type from Tavily search."
+
         except ToolException: raise
         except Exception as e:
             logger.error(f"TavilyAPISearchTool (_run): Error during search for '{query}': {e}", exc_info=True)
@@ -91,11 +139,19 @@ class TavilyAPISearchTool(BaseTool):
         logger.info(f"TavilyAPISearchTool (_arun): Asynchronously searching for '{query}'")
         try:
             tavily_instance = self._get_tavily_instance()
-            # MODIFIED: Ensure tool_input is used when calling the underlying TavilySearchResults method
-            result = await tavily_instance.arun(tool_input=query) 
-            return str(result)
+            results_list_or_str = await tavily_instance.arun(tool_input=query) 
+
+            if isinstance(results_list_or_str, list):
+                return self._format_results(results_list_or_str)
+            elif isinstance(results_list_or_str, str): 
+                logger.warning(f"TavilyAPISearchTool (_arun): Tavily tool returned a string directly: {results_list_or_str[:200]}")
+                return results_list_or_str
+            else:
+                logger.error(f"TavilyAPISearchTool (_arun): Unexpected type from Tavily tool: {type(results_list_or_str)}")
+                return "Error: Unexpected result type from asynchronous Tavily search."
+                
         except ToolException: raise
-        except Exception as e:
+        except Exception as e: 
             logger.error(f"TavilyAPISearchTool (_arun): Error during async search for '{query}': {e}", exc_info=True)
             raise ToolException(f"Error performing asynchronous Tavily search: {e}")
 
@@ -123,7 +179,6 @@ async def main_test_tavily_wrapper_tool():
         test_query = "What is the Tavily API used for?"
         print(f"Test (Wrapper): Querying (async): '{test_query}'", flush=True)
         
-        # This call to our wrapper's arun should be correct
         results_async = await tool_instance.arun({"query": test_query}) 
         print("\nTest Async Results (from wrapper):", flush=True)
         print(results_async, flush=True)
