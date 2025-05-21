@@ -214,7 +214,7 @@ class PlaywrightSearchTool(BaseTool):
         raise NotImplementedError("PlaywrightSearchTool does not support synchronous execution.")
 
 async def main():
-    tool = PlaywrightSearchTool(headless_mode=True) 
+    tool = PlaywrightSearchTool(headless_mode=False) 
     
     test_queries = ["latest AI research trends", "how to make pasta carbonara", "benefits of unit testing"]
     
