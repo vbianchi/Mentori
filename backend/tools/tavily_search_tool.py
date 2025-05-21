@@ -1,13 +1,11 @@
 import asyncio
 import logging
-from typing import Optional, List, Type, Any, Dict
+from typing import Optional, List, Type, Any, Dict, Union
 import urllib.parse 
 from pathlib import Path 
 import sys 
 import traceback
-# json import was removed in a previous step as TavilySearchResults returns list[dict]
-# from langchain_community.tools.tavily_search import TavilySearchResults returns list[dict]
-# so json.loads was not needed.
+# import json # No longer needed as TavilySearchResults returns list[dict]
 
 from langchain_core.tools import BaseTool, ToolException
 from langchain_core.callbacks import CallbackManagerForToolRun
@@ -21,21 +19,11 @@ logger = logging.getLogger(__name__)
 
 class TavilySearchInput(BaseModel):
     query: str = Field(description="The search query string.")
+    max_results: Optional[int] = Field(default=5, description="Maximum number of search results to return.")
 
-    # MODIFIED: Add model_json_schema method for Pydantic v2 compatibility needed by BaseTool.args
     @classmethod
     def model_json_schema(cls, by_alias: bool = True, ref_template: str = "#/components/schemas/{model}") -> Dict[str, Any]:
-        """
-        Generates the JSON schema for the Pydantic model.
-        This is the Pydantic v2 method name, but we call the v1 equivalent.
-        """
-        return cls.schema(by_alias=by_alias) # Pydantic v1 uses .schema()
-
-    # For older Langchain versions or if schema_json is specifically needed by some part
-    # def schema_json(self, *, by_alias: bool = True, **dumps_kwargs: Any) -> str:
-    #     """ Pydantic v1 method """
-    #     return super().schema_json(by_alias=by_alias, **dumps_kwargs)
-
+        return cls.schema(by_alias=by_alias)
 
 class TavilyAPISearchTool(BaseTool):
     name: str = "tavily_search_api" 
@@ -43,7 +31,8 @@ class TavilyAPISearchTool(BaseTool):
         "A search engine optimized for comprehensive, accurate, and trusted results using the Tavily API. "
         "Useful for when you need to answer questions about current events, recent information, "
         "or general knowledge questions that require up-to-date information from the web. "
-        "Input should be a single search query string."
+        "Input should be a search query string. Optionally, 'max_results' can be specified. "
+        "Returns a list of search result objects, each containing 'title', 'url', and 'content' (snippet)."
     )
     args_schema: Type[BaseModel] = TavilySearchInput
     
@@ -56,7 +45,7 @@ class TavilyAPISearchTool(BaseTool):
         super().__init__(**kwargs) 
         
         init_log_prefix = "TavilyAPISearchTool (__init__):"
-        logger.info(f"{init_log_prefix} ENTERING __init__ (after super) !!!")
+        logger.info(f"{init_log_prefix} ENTERING __init__ (after super).")
         
         api_key_from_settings: Optional[str] = None
         settings_has_key_attr = hasattr(settings, 'tavily_api_key')
@@ -72,8 +61,12 @@ class TavilyAPISearchTool(BaseTool):
             logger.info(f"{init_log_prefix} Tavily API key IS present. Attempting instantiation of TavilySearchResults.")
             try:
                 logger.info(f"{init_log_prefix} Instantiating TavilySearchResults...")
+                # Get max_results from kwargs if provided during TavilyAPISearchTool instantiation,
+                # otherwise TavilySearchResults will use its own default.
+                # The 'max_results' from args_schema is handled per-call in _run/_arun.
+                tavily_max_results_init = kwargs.get("tavily_init_max_results", 5) # Default for the instance
                 self._tavily_search_instance = TavilySearchResults(
-                    max_results=kwargs.get("num_results", 3), 
+                    max_results=tavily_max_results_init, 
                     tavily_api_key=api_key_from_settings 
                 )
                 logger.info(f"{init_log_prefix} self._tavily_search_instance ASSIGNED successfully. Type: {type(self._tavily_search_instance)}")
@@ -92,15 +85,15 @@ class TavilyAPISearchTool(BaseTool):
             raise ToolException("Tavily Search API tool is not configured: API key missing or initialization error during tool setup (see __init__ logs).")
         return self._tavily_search_instance
 
-    def _format_results(self, results_list: List[Dict[str, Any]]) -> str:
+    def _format_results_to_string(self, results_list: List[Dict[str, Any]]) -> str:
         if not results_list or not isinstance(results_list, list): 
-            logger.warning(f"TavilyAPISearchTool (_format_results): Expected a list of results, got {type(results_list)}. Returning as is or empty.")
+            logger.warning(f"TavilyAPISearchTool (_format_results_to_string): Expected a list of results, got {type(results_list)}. Returning as is or empty.")
             return str(results_list) if results_list else "No relevant search results found."
         
         formatted_strings = []
         for i, res in enumerate(results_list):
             if not isinstance(res, dict): 
-                logger.warning(f"TavilyAPISearchTool (_format_results): Expected a dict for result item, got {type(res)}. Skipping item.")
+                logger.warning(f"TavilyAPISearchTool (_format_results_to_string): Expected a dict for result item, got {type(res)}. Skipping item.")
                 continue
             title = res.get("title", "N/A")
             url = res.get("url", "N/A")
@@ -115,19 +108,32 @@ class TavilyAPISearchTool(BaseTool):
             )
         return "\n\n===\n\n".join(formatted_strings) if formatted_strings else "No relevant search results found."
 
-    def _run(self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None, **kwargs: Any) -> str:
-        logger.info(f"TavilyAPISearchTool (_run): Synchronously searching for '{query}'")
+    def _run(
+        self, 
+        query: str, 
+        max_results: Optional[int] = None, 
+        run_manager: Optional[CallbackManagerForToolRun] = None, 
+        **kwargs: Any
+    ) -> Union[List[Dict[str, Any]], str]:
+        logger.info(f"TavilyAPISearchTool (_run): Synchronously searching for '{query}', max_results: {max_results}")
         try:
             tavily_instance = self._get_tavily_instance()
-            results_list_or_str = tavily_instance.run(tool_input=query) 
             
-            if isinstance(results_list_or_str, list):
-                return self._format_results(results_list_or_str)
-            elif isinstance(results_list_or_str, str): 
-                logger.warning(f"TavilyAPISearchTool (_run): Tavily tool returned a string directly: {results_list_or_str[:200]}")
-                return results_list_or_str 
+            tool_input_dict = {"query": query}
+            if max_results is not None: # Allow overriding max_results per call
+                tool_input_dict["max_results"] = max_results
+            
+            # MODIFIED: TavilySearchResults.run() returns List[Dict[str, Any]]
+            results_data = tavily_instance.run(tool_input=tool_input_dict) 
+            
+            if isinstance(results_data, list):
+                logger.info(f"TavilyAPISearchTool (_run): Successfully received {len(results_data)} results.")
+                return results_data # Return the list of dicts
+            elif isinstance(results_data, str): 
+                logger.warning(f"TavilyAPISearchTool (_run): Tavily tool returned a string (possibly error): {results_data[:200]}")
+                return results_data 
             else:
-                logger.error(f"TavilyAPISearchTool (_run): Unexpected type from Tavily tool: {type(results_list_or_str)}")
+                logger.error(f"TavilyAPISearchTool (_run): Unexpected type from Tavily tool: {type(results_data)}")
                 return "Error: Unexpected result type from Tavily search."
 
         except ToolException: raise
@@ -135,19 +141,32 @@ class TavilyAPISearchTool(BaseTool):
             logger.error(f"TavilyAPISearchTool (_run): Error during search for '{query}': {e}", exc_info=True)
             raise ToolException(f"Error performing Tavily search: {e}")
 
-    async def _arun(self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None, **kwargs: Any) -> str:
-        logger.info(f"TavilyAPISearchTool (_arun): Asynchronously searching for '{query}'")
+    async def _arun(
+        self, 
+        query: str, 
+        max_results: Optional[int] = None, 
+        run_manager: Optional[CallbackManagerForToolRun] = None, 
+        **kwargs: Any
+    ) -> Union[List[Dict[str, Any]], str]:
+        logger.info(f"TavilyAPISearchTool (_arun): Asynchronously searching for '{query}', max_results: {max_results}")
         try:
             tavily_instance = self._get_tavily_instance()
-            results_list_or_str = await tavily_instance.arun(tool_input=query) 
+            
+            tool_input_dict = {"query": query}
+            if max_results is not None: # Allow overriding max_results per call
+                tool_input_dict["max_results"] = max_results
 
-            if isinstance(results_list_or_str, list):
-                return self._format_results(results_list_or_str)
-            elif isinstance(results_list_or_str, str): 
-                logger.warning(f"TavilyAPISearchTool (_arun): Tavily tool returned a string directly: {results_list_or_str[:200]}")
-                return results_list_or_str
+            # MODIFIED: TavilySearchResults.arun() returns List[Dict[str, Any]]
+            results_data = await tavily_instance.arun(tool_input=tool_input_dict)
+
+            if isinstance(results_data, list):
+                logger.info(f"TavilyAPISearchTool (_arun): Successfully received {len(results_data)} results.")
+                return results_data # Return the list of dicts
+            elif isinstance(results_data, str): 
+                logger.warning(f"TavilyAPISearchTool (_arun): Tavily tool returned a string (possibly error): {results_data[:200]}")
+                return results_data
             else:
-                logger.error(f"TavilyAPISearchTool (_arun): Unexpected type from Tavily tool: {type(results_list_or_str)}")
+                logger.error(f"TavilyAPISearchTool (_arun): Unexpected type from Tavily tool: {type(results_data)}")
                 return "Error: Unexpected result type from asynchronous Tavily search."
                 
         except ToolException: raise
@@ -174,14 +193,21 @@ async def main_test_tavily_wrapper_tool():
             print("Test (Wrapper) CRITICAL: _tavily_search_instance is None after __init__. Check __init__ print/log messages.", flush=True)
             return 
 
-        print(f"Test (Wrapper): Type of tool_instance._tavily_search_instance: {type(tool_instance._tavily_search_instance)}", flush=True)
-
         test_query = "What is the Tavily API used for?"
-        print(f"Test (Wrapper): Querying (async): '{test_query}'", flush=True)
+        test_max_results = 2
+        print(f"Test (Wrapper): Querying (async): '{test_query}' with max_results={test_max_results}", flush=True)
         
-        results_async = await tool_instance.arun({"query": test_query}) 
-        print("\nTest Async Results (from wrapper):", flush=True)
-        print(results_async, flush=True)
+        results_data = await tool_instance.arun({"query": test_query, "max_results": test_max_results}) 
+        
+        print("\nTest Async Results (from wrapper - should be List[Dict]):")
+        if isinstance(results_data, list):
+            print(f"Received a list with {len(results_data)} items.")
+            for i, item in enumerate(results_data):
+                print(f"Result {i+1}: Title='{item.get('title', 'N/A')}', URL='{item.get('url', 'N/A')}'")
+                # print(f"   Snippet: {item.get('content', 'N/A')[:100]}...") # Optionally print snippet
+        else:
+            print("Received non-list data (might be an error string):")
+            print(results_data)
 
     except Exception as e:
         print(f"Test (Wrapper) CRITICAL ERROR: {type(e).__name__} - {e}", flush=True)

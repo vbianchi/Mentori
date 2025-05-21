@@ -32,6 +32,8 @@ except ImportError:
 # Project Imports
 from backend.config import settings
 from .tavily_search_tool import TavilyAPISearchTool
+# MODIFIED: Import the new DeepResearchTool
+from .deep_research_tool import DeepResearchTool
 
 
 # --- Define Base Workspace Path ---
@@ -437,8 +439,9 @@ except ImportError: logger.warning("Could not import PythonREPL. The Python_REPL
 def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
     tools: List[BaseTool] = [] 
 
-    # MODIFIED: Use lowercase 'tavily_api_key' to match the attribute in Settings dataclass
-    if settings.tavily_api_key: 
+    # Add Tavily Search Tool if API key is set, otherwise fallback to DuckDuckGo
+    # MODIFIED: Ensure correct case for settings.tavily_api_key
+    if hasattr(settings, 'tavily_api_key') and settings.tavily_api_key: 
         try:
             tavily_tool = TavilyAPISearchTool() 
             tools.append(tavily_tool)
@@ -448,9 +451,18 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
             logger.info(f"Adding DuckDuckGoSearchRun as fallback search tool due to Tavily init error for task {current_task_id or 'N/A'}.")
             tools.append(DuckDuckGoSearchRun(description=("A wrapper around DuckDuckGo Search. Useful for when you need to answer questions about current events or things you don't know. Input MUST be a search query string.")))
     else:
-        logger.info("Tavily API key not set. Adding DuckDuckGoSearchRun as default search tool.")
+        logger.info("Tavily API key not set in settings. Adding DuckDuckGoSearchRun as default search tool.")
         tools.append(DuckDuckGoSearchRun(description=("A wrapper around DuckDuckGo Search. Useful for when you need to answer questions about current events or things you don't know. Input MUST be a search query string.")))
     
+    # MODIFIED: Add DeepResearchTool
+    try:
+        deep_research_tool = DeepResearchTool()
+        tools.append(deep_research_tool)
+        logger.info(f"Added DeepResearchTool to dynamic tools for task {current_task_id or 'N/A'}.")
+    except Exception as e:
+        logger.error(f"Failed to initialize and add DeepResearchTool for task {current_task_id or 'N/A'}: {e}")
+
+
     stateless_tools_to_add = [
         Tool.from_function(
             func=fetch_and_parse_url,
