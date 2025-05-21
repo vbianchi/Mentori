@@ -1,9 +1,9 @@
-    ResearchAgent: AI Assistant for Research Workflows (v2.3)
+ResearchAgent: AI Assistant for Research Workflows (v2.4)
 =========================================================
 
 This project provides a functional user interface and backend for an AI agent system designed to assist with research tasks, particularly in fields like bioinformatics and epidemiology. It features a three-panel layout (Tasks, Chat, Monitor/Artifact Viewer) and connects via WebSockets to a Python backend powered by LangChain.
 
-Version 2.3 successfully integrates the Tavily Search API as the primary web search tool, offering more reliable and LLM-optimized search results. It builds upon the v2.2 architecture, which includes an advanced Planner-Controller-Executor-Evaluator pipeline with per-step evaluation and a retry mechanism. The agent uses an Intent Classifier and configurable LLMs (Google Gemini or local Ollama) for reasoning, with tools operating in isolated task workspaces.
+Version 2.4 introduces the `DeepResearchTool`, a multi-phase tool designed for comprehensive investigations. The initial search, source curation, and content extraction phases of this tool are now functional, using `TavilyAPISearchTool` as its core search mechanism. This version builds upon the v2.2/v2.3 architecture, which includes an advanced Planner-Controller-Executor-Evaluator pipeline with per-step evaluation and a retry mechanism. The agent uses an Intent Classifier and configurable LLMs (Google Gemini or local Ollama) for reasoning, with tools operating in isolated task workspaces.
 
 Core Architecture & Workflow
 ----------------------------
@@ -24,7 +24,7 @@ The system processes user queries through a sophisticated pipeline:
 
     -   If `PLAN`:
 
-        1.  Planner (`planner.py`): Generates a multi-step plan.
+        1.  Planner (`planner.py`): Generates a multi-step plan. If the query implies in-depth research, the Planner may suggest using the `deep_research_synthesizer` tool.
 
         2.  User Confirmation (UI): User confirms or cancels the plan.
 
@@ -32,13 +32,15 @@ The system processes user queries through a sophisticated pipeline:
 
             -   Plan Persistence: Saves the plan to a `_plan_<ID>.md` file.
 
-            -   Iterates through steps, each involving:
+            -   Iterates through each confirmed `PlanStep`.
 
-                -   Controller/Validator (`controller.py`): Validates/chooses the tool and formulates `tool_input`.
+            -   Inner Retry Loop (for each step):
 
-                -   Executor (`agent.py`): Executes the step.
+                -   Controller/Validator (`controller.py`): Validates/chooses the tool and formulates `tool_input`. For `DeepResearchTool`, this would be the `topic` and other parameters.
 
-                -   Step Evaluator (`evaluator.py`): Assesses step outcome. If failed but recoverable, hints are passed back to the Controller for a retry attempt (up to `MAX_STEP_RETRIES`). If unrecoverable or retries exhausted, the plan halts.
+                -   Executor (`agent.py`): Executes the step (e.g., calls `DeepResearchTool._arun`).
+
+                -   Step Evaluator (`evaluator.py`): Assesses step outcome. If failed but recoverable, hints are passed back to the Controller for a retry.
 
             -   Live Plan Update: The `_plan_<ID>.md` file status is updated.
 
@@ -57,13 +59,23 @@ Key Current Capabilities & Features
 
 3.  Tool Suite (`backend/tools/`):
 
-    -   Web Search: `tavily_search_api` (Primary) - Uses Tavily Search API for robust web searching.
+    -   `TavilyAPISearchTool` (Primary Web Search): Uses Tavily Search API for robust web searching, returning structured results.
 
-    -   Web Search (Fallback): `duckduckgo_search` - Still available if Tavily is not configured.
+    -   `DeepResearchTool` (Multi-Phase Investigation - In Progress):
 
-    -   Web Page Reader: `web_page_reader`.
+        -   Phase 1 (Search): Uses `TavilyAPISearchTool` for broad information gathering. (Functional)
 
-    -   PubMed Search: `pubmed_search`.
+        -   Phase 2 (Curation): Uses an LLM to select the most relevant sources from the initial search. (Functional)
+
+        -   Phase 3 (Extraction): Uses `fetch_and_parse_url` to get full content from curated URLs. (Functional)
+
+        -   Phase 4 (Synthesis): (Next to be implemented) Will use an LLM to synthesize extracted/summarized content into a report.
+
+    -   `DuckDuckGoSearchRun` (Fallback Web Search).
+
+    -   `web_page_reader` (Reads web content, used by `DeepResearchTool`).
+
+    -   `pubmed_search` (Searches PubMed).
 
     -   File I/O: `read_file`, `write_file`.
 
@@ -147,7 +159,9 @@ Setup Instructions
 
 5.  Install Dependencies: `uv pip install -r requirements.txt` (or `pip ...`)
 
-6.  Install Playwright Browser Binaries (if NOT using Docker & planning to use Playwright tool later):
+    -   This includes `langchain-tavily`.
+
+6.  Install Playwright Browser Binaries (if planning to develop Playwright tool later and NOT using Docker):
 
     ```
     playwright install --with-deps chromium
@@ -160,7 +174,7 @@ Setup Instructions
 
     -   Crucially, add your `TAVILY_API_KEY="tvly-..."`.
 
-    -   Fill in `GOOGLE_API_KEY`, `ENTREZ_EMAIL`, and other LLM configurations as needed.
+    -   Fill in `GOOGLE_API_KEY`, `ENTREZ_EMAIL`, and other LLM configurations.
 
 8.  (If using Ollama) Setup Ollama and pull models.
 
@@ -186,32 +200,32 @@ Known Issues
 
 -   Agent Cancellation (STOP Button): May not be instantaneous.
 
--   `_Exception` Tool Calls: The agent sometimes invokes an internal `_Exception` tool after a successful tool call (like Tavily search). While it usually recovers, this indicates the LLM might occasionally struggle with parsing tool output or deciding the immediate next step. Further refinement of tool output formatting or agent prompting might reduce this.
+-   `_Exception` Tool Calls: The ReAct agent might occasionally call an internal `_Exception` tool if it misinterprets a tool's output. This usually resolves itself but indicates areas for potential prompt/output refinement.
+
+-   Playwright for General Search: The `playwright_search.py` tool is parked due to the challenges of CAPTCHAs and selector volatility for general search engines. Playwright is better suited for targeted web automation tasks.
 
 Security Warnings
 -----------------
 
 -   `python_package_installer`, `Python_REPL`, `workspace_shell` tools execute code/commands directly. Use with extreme caution, preferably in Docker.
 
-Future Perspectives & Ideas
----------------------------
+Next Steps & Future Perspectives
+--------------------------------
 
-1.  Playwright Integration for Advanced Web Interaction (Next Major Consideration):
+1.  Complete `DeepResearchTool` - Phase 4: Information Synthesis:
 
-    -   Current Status: Basic structure for `playwright_search.py` exists. Dependency and Docker setup for Playwright are in place.
+    -   Implement the "Writer" LLM logic within `DeepResearchTool` to take the extracted (and potentially summarized) content and generate a structured Markdown report.
 
-    -   Goal: Develop the Playwright tool to handle:
+    -   This involves defining a robust prompt for the writer, handling context window limits (potentially by summarizing content before synthesis), and formatting the LLM's output.
 
-        -   Web searches on engines where APIs are not preferred or available (potentially using the existing selector debugging process).
+2.  Playwright for Targeted Web Automation:
 
-        -   More complex web page interactions (e.g., logging into sites, filling forms, navigating multi-page articles) if specific research tasks require it. This is where Playwright's true power lies beyond simple search.
+    -   Revisit `playwright_search.py` not for general search, but for specific tasks that require browser automation (e.g., logging into a specific database, navigating complex JavaScript-heavy sites, filling forms to download data).
 
-    -   Consideration: General web search via Playwright is prone to CAPTCHAs and site layout changes, making it less reliable than APIs like Tavily for that specific purpose. Prioritize Playwright for tasks that *require* browser automation.
+3.  Advanced Re-planning & User Interaction: (User-initiated re-planning, Planner re-invocation, UI for plan editing, in-flight feedback).
 
-2.  Advanced Re-planning & User Interaction: (User-initiated re-planning, Planner re-invocation, UI for plan editing, in-flight feedback).
+4.  Enhanced Security & Usability: (Permission Gateway for sensitive tools, Live Plan in Chat UI).
 
-3.  Enhanced Security & Usability: (Permission Gateway for sensitive tools, Live Plan in Chat UI).
+5.  Further Artifact & Tool Enhancements: (Workspace file tree, structured data rendering, report generation, more domain-specific tools).
 
-4.  Further Artifact & Tool Enhancements: (Workspace file tree, structured data rendering, report generation, more domain-specific tools).
-
-5.  UI/UX Refinements: (Drag & Drop upload, resizable panels, streaming output).
+6.  UI/UX Refinements: (Drag & Drop upload, resizable panels, streaming output).
