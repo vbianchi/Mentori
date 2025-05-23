@@ -39,6 +39,13 @@ For each sub-task in the plan:
     This approach can improve the reliability of generating complex outputs.
 3.  Provide brief `tool_input_instructions` highlighting key parameters or data the tool might need. This is NOT the full tool input, but guidance for the agent when it forms the tool input later. For example, if downloading a file, mention the expected filename.
 4.  State the `expected_outcome` of successfully completing the step (e.g., "File 'data.csv' downloaded to workspace", "Summary of article written to 'summary.txt'"). If this step's output is primarily intended as direct, raw input for a *subsequent processing step* in your plan (like parsing, further analysis, or summarization by a later step), the `expected_outcome` should clearly state that this raw, unprocessed data (e.g., "The full text content of the file 'report.txt' is returned", "The complete list of search results is made available") is the deliverable for this current step.
+
+**Handling Multi-Part User Queries for Final Output:**
+If the original user query explicitly or implicitly asks for multiple distinct pieces of information to be delivered in the final response (e.g., "tell me X, and also provide Y"), ensure your plan includes all necessary steps to gather or generate each piece of information. **Crucially, after all individual pieces of information have been gathered by preceding steps and need to be presented to the user as a combined answer, you MUST add a final "No Tool" step. The objective of this final step is to synthesize these pieces into a single, coherent, and comprehensive final answer.**
+-   The `description` for this final synthesis step should clearly state that it's combining the necessary prior outputs to fully address the user's original request.
+-   The `tool_input_instructions` should guide the LLM on which prior step outputs need to be synthesized, for example: "Combine the result from Step X [e.g., the extracted fact about AD-003's MechanismOfAction] and the result from Step Y [e.g., the one-sentence summary of the file 'alz_candidates.md'] into a complete answer to the user's original query: '{user_query}'".
+-   The `expected_outcome` for this synthesis step should be: "A single, consolidated final answer addressing all parts of the user's original request is generated and ready to be presented."
+
 Additionally, provide a `human_readable_summary` of the entire plan that can be shown to the user for confirmation.
 Ensure the output is a JSON object that strictly adheres to the following JSON schema:
 {format_instructions}
@@ -72,13 +79,14 @@ async def generate_plan(
 
     prompt_template = ChatPromptTemplate.from_messages([
         ("system", PLANNER_SYSTEM_PROMPT_TEMPLATE),
-        ("human", "{user_query}")
+        ("human", "{user_query}") # user_query will be passed in .ainvoke()
     ])
 
     chain = prompt_template | planner_llm | parser
 
     try:
         logger.debug(f"Planner prompt input variables: {prompt_template.input_variables}")
+        # Pass user_query directly here as it's used in the new prompt section for synthesis
         planned_result_dict = await chain.ainvoke({
             "user_query": user_query,
             "available_tools_summary": available_tools_summary,
@@ -94,11 +102,10 @@ async def generate_plan(
             return None, None
 
         human_summary = agent_plan.human_readable_summary
-        # Ensure step_id is present and correctly sequenced if not perfectly provided by LLM
         structured_steps = []
         for i, step_model in enumerate(agent_plan.steps):
             step_dict = step_model.dict()
-            step_dict['step_id'] = i + 1 # Enforce sequential step_id
+            step_dict['step_id'] = i + 1 
             structured_steps.append(step_dict)
 
 
@@ -121,12 +128,13 @@ async def generate_plan(
         return None, None
 
 if __name__ == '__main__':
-    async def test_planner():
+    async def test_planner_multi_output():
+        query_multi_part = """Generate a list of 3 hypothetical drug candidates for treating Alzheimer's disease, including DrugID, MechanismOfAction, and DevelopmentStage, as a Markdown table. Save this to 'drugs.md'. Then, read 'drugs.md' and tell me the MechanismOfAction for DrugID 'AD-002'. Finally, also tell me how many drugs are listed in 'drugs.md'."""
+        tools_summary = "- write_file: To write files to workspace.\n- read_file: To read files from workspace."
         
-        query = "Generate a list of 5 hypothetical drug candidates for treating Alzheimer's disease, including a fictional DrugID (e.g., AD-001), a MechanismOfAction (short phrase), and a DevelopmentStage (e.g., Phase 1, Preclinical). Present this list as a simple Markdown table. Then save it to a file."
-        tools_summary = "- duckduckgo_search: For web searches.\n- web_page_reader: To read content from URLs.\n- pubmed_search: For PubMed searches.\n- read_file: To read files from workspace.\n- write_file: To write files to workspace.\n- workspace_shell: To execute shell commands.\n- Python_REPL: To execute Python code."
-        
-        summary, plan = await generate_plan(query, tools_summary)
+        print(f"\n--- Testing Planner with Multi-Output Query ---")
+        print(f"Query: {query_multi_part}")
+        summary, plan = await generate_plan(query_multi_part, tools_summary)
 
         if summary and plan:
             print("---- Human Readable Summary ----")
@@ -142,32 +150,6 @@ if __name__ == '__main__':
                 else:
                     print(f"Step {i+1}: Invalid step data format: {step_data}")
         else:
-            print("Failed to generate a plan.")
+            print("Failed to generate a plan for multi-output query.")
 
-    # Example of a query that might benefit from the new prompt instruction
-    async def test_complex_no_tool_generation():
-        query_complex_table = "Create a detailed markdown table comparing three research papers (Paper A, Paper B, Paper C) across several criteria: Methodology, Sample Size, Key Findings, and Reported Limitations. Also provide a fictional source for each paper."
-        tools_summary = "- write_file: To write files to workspace." # Only giving write_file to force "No Tool" for generation
-        
-        print(f"\n--- Testing Planner with Complex Table Generation Query ---")
-        print(f"Query: {query_complex_table}")
-        summary, plan = await generate_plan(query_complex_table, tools_summary)
-
-        if summary and plan:
-            print("---- Human Readable Summary ----")
-            print(summary)
-            print("\n---- Structured Plan ----")
-            for i, step_data in enumerate(plan):
-                if isinstance(step_data, dict):
-                    print(f"Step {step_data.get('step_id', i+1)}:")
-                    print(f"  Description: {step_data.get('description')}")
-                    print(f"  Tool: {step_data.get('tool_to_use')}")
-                    print(f"  Input Instructions: {step_data.get('tool_input_instructions')}")
-                    print(f"  Expected Outcome: {step_data.get('expected_outcome')}")
-                else:
-                    print(f"Step {i+1}: Invalid step data format: {step_data}")
-        else:
-            print("Failed to generate a plan for complex table.")
-
-    # asyncio.run(test_planner())
-    asyncio.run(test_complex_no_tool_generation())
+    asyncio.run(test_planner_multi_output())
