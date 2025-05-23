@@ -1,362 +1,209 @@
-Current Complex Task Flow (v2.1 Baseline)
+BRAINSTORM.md - ResearchAgent Project (v2.4)
+============================================
+
+This document tracks the current workflow, brainstorming ideas, user feedback, and the proposed roadmap for the ResearchAgent project.
+
+Current Version: v2.4 (Tavily integrated, DeepResearchTool functional through content extraction, various bug fixes implemented).
+
+Current Complex Task Flow (v2.4 Baseline)
 -----------------------------------------
 
-The current process for handling a complex task, once classified as "PLAN" intent, generally follows these stages:
+The process for handling a complex task, once classified as "PLAN" intent:
 
 1.  User Input: User provides a complex query.
 
-2.  Intent Classifier: Classifies the query. If "PLAN", proceeds.
+2.  Intent Classifier (`intent_classifier.py`): Classifies the query. If "PLAN", proceeds.
 
-3.  Planner:
+3.  Planner (`planner.py`):
 
-    -   Takes the user query and a summary of available tools.
+    -   Takes the user query and a summary of available tools (including `tavily_search_api` and `deep_research_synthesizer`).
 
-    -   Generates a multi-step plan (list of `PlanStep` objects: description, tool hint, input instructions, expected outcome).
+    -   Generates a multi-step plan (list of `PlanStep` objects).
 
-    -   Presents a human-readable summary and the structured plan to the user via the UI.
+    -   Presents a human-readable summary and the structured plan to the user.
 
-4.  User Confirmation (UI):
-
-    -   User reviews the plan (summary and details).
-
-    -   User clicks "Confirm & Run Plan" or "Cancel Plan". (Currently no modification options).
+4.  User Confirmation (UI): User confirms or cancels the plan.
 
 5.  Execution Loop (Backend - `message_handlers.process_execute_confirmed_plan`):
 
-    -   Iterates through each step from the confirmed plan.
+    -   Plan Persistence: Saves the confirmed plan to a `_plan_<ID>.md` file in the task's workspace. This file uses Markdown checklist syntax.
 
-    -   Controller/Validator (`controller.validate_and_prepare_step_action`):
+    -   Iterates through each step:
 
-        -   Receives the current `PlanStep`, original user query, available tools, and an LLM.
+        -   Controller/Validator (`controller.py` - `validate_and_prepare_step_action`):
 
-        -   Validates/chooses the tool and formulates the precise `tool_input` string.
+            -   Receives the current `PlanStep`, original query, and available tools.
 
-        -   Returns the validated tool name, input, reasoning, and a confidence score.
+            -   Validates/chooses the tool and formulates the precise `tool_input` (which is now always a string; JSON string for structured inputs).
 
-        -   Logs its decision and confidence.
+            -   Returns a `ValidatedStepAction` object (or raises `ToolException`).
 
-    -   Executor (`agent.create_agent_executor` - ReAct agent):
+        -   Executor (`agent.py` - `create_agent_executor`):
 
-        -   Receives a directive prompt based on the Controller's output (e.g., "Use tool X with input Y" or "Answer directly based on description Z").
+            -   Receives a directive prompt based on the Controller's output.
 
-        -   Executes the step using its internal ReAct cycle (Thought, Action, Observation).
+            -   Executes the step using its ReAct cycle. For tools with `args_schema`, LangChain handles parsing the JSON string `tool_input` back to a dictionary.
 
-        -   Callbacks (`callbacks.WebSocketCallbackHandler`) send detailed logs of the ReAct process (thoughts, tool use, outputs, errors) to the UI monitor.
+            -   Callbacks (`callbacks.WebSocketCallbackHandler`) send detailed logs (including corrected tool names on error).
 
-        -   Step execution details (description, controller action, executor input/output, errors) are collected.
+        -   Step Evaluator (`evaluator.py` - `evaluate_step_outcome_and_suggest_correction`):
 
-    -   The loop continues to the next step unless a step fails critically or the plan is cancelled.
+            -   Assesses if the step's goal was achieved.
+
+            -   If `is_recoverable_via_retry` is true and `retry_count < AGENT_MAX_STEP_RETRIES` (from `settings`), the step is retried with suggestions fed back to the Controller. (Handling of "No Tool" step retries needs verification/refinement).
+
+        -   Live Plan Update: The `_plan_<ID>.md` file is updated with the step's status (`[x]`, `[!]`, `[-]`).
+
+    -   The loop continues unless a step definitively fails or the plan is cancelled.
 
 6.  Evaluator (Overall Plan - `evaluator.evaluate_plan_outcome`):
 
-    -   Called after the execution loop finishes (all steps attempted or plan halted).
+    -   Called after the execution loop.
 
-    -   Receives the original user query, a formatted summary of all executed step details (including outcomes/errors), the preliminary final answer (often the output of the last successful step or an error message), and an LLM.
+    -   Assesses overall goal achievement and provides a final assessment/summary to the user.
 
-    -   Assesses if the overall user goal was met.
-
-    -   Provides:
-
-        -   `overall_success` (boolean).
-
-        -   A textual `assessment` of the outcome.
-
-        -   `missing_information` (if any).
-
-        -   `suggestions_for_replan` (if applicable).
-
-        -   A `confidence_score` for the evaluation.
-
-    -   The `assessment` from the Evaluator is sent as the final message to the user in the chat.
-
-    -   Evaluator's findings (assessment, suggestions) are logged.
-
-Brainstorming Areas for Improvement & Further Development
----------------------------------------------------------
-
-Here's a breakdown of potential areas to enhance the system's capabilities for complex tasks:
-
-### 0\. Role-Specific LLM Configuration (NEW - User Suggestion)
-
--   Concept: Assign different LLM models to different agent components (Intent Classifier, Planner, Controller, Executor, Evaluator) based on the complexity and nature of their tasks.
-
--   Benefits:
-
-    -   Optimized Capability: Use the most powerful/creative LLMs for planning, instruction-following LLMs for control, robust LLMs for evaluation, and potentially faster/cheaper LLMs for intent classification or simpler execution steps.
-
-    -   Cost Efficiency: Reserve expensive, high-tier models for tasks that absolutely require them, using more economical models for other components.
-
-    -   Resource Management & Speed: Potentially improve overall speed and reduce load on any single LLM endpoint.
-
--   Implementation:
-
-    -   Add new `.env` configuration variables (e.g., `INTENT_CLASSIFIER_LLM_ID`, `PLANNER_LLM_ID`, `CONTROLLER_LLM_ID`, `EVALUATOR_LLM_ID`). The `EXECUTOR_LLM_ID` could default to the UI-selected LLM or also be a configurable default.
-
-    -   Update `config.py` to load these new settings.
-
-    -   Modify the points in `message_handlers.py` (and potentially `intent_classifier.py`, `planner.py`, `controller.py`, `evaluator.py` if LLM initialization is pushed down) where LLMs are initialized for each component to use these role-specific LLM IDs from the settings.
-
-### 1\. Intent Classification & Initial Interaction
-
--   Granular Intents: Beyond "PLAN" vs. "DIRECT_QA", could we have more specific plan types (e.g., "RESEARCH_SYNTHESIS_PLAN", "DATA_ANALYSIS_PLAN", "CODE_GENERATION_PLAN") that might trigger different Planner prompts or default behaviors?
-
--   Confidence-Based Actions: If intent classification confidence is low, should the agent ask the user for clarification (e.g., "Are you asking a quick question, or do you want me to perform a series of actions?")?
-
--   Clarifying Questions (Pre-Planning): If a query is deemed complex but too ambiguous, allow the Planner (or a pre-planner LLM call) to ask clarifying questions *before* attempting to generate a full plan.
-
-### 2\. Planning Phase (Planner Component)
-
--   Iterative Planning with User:
-
-    -   Instead of just confirm/reject, allow users to provide feedback on the initial plan, and have the Planner refine it.
-
-    -   "This step looks good, but for step 3, can you try using X tool instead?"
-
--   User Constraints & Preferences: Allow users to specify constraints during the initial query or plan review (e.g., "prioritize free tools," "limit web searches to 3," "use Python for scripting").
-
--   Alternative Plans: Could the Planner generate 2-3 high-level strategic approaches for complex tasks, allowing the user to pick one before detailed step generation?
-
--   Dynamic Tool Prompting: Improve how tools are presented to the Planner. Instead of just a summary, could it be more dynamic based on the query?
-
--   Sub-Planning: For very complex steps within a plan, the Planner (or a dedicated sub-planner) could break that step down further.
-
-### 3\. User Plan Interaction (Pre-Execution Review)
-
--   Full Plan Editing:
-
-    -   Allow users to directly edit step descriptions.
-
-    -   Change the suggested tool for a step.
-
-    -   Modify the `tool_input_instructions` that the Controller will use.
-
-    -   Re-order steps.
-
-    -   Add new steps manually.
-
-    -   Delete steps.
-
--   Saving/Loading Plans: Allow users to save a (potentially modified) plan to reuse or refine later.
-
-### 4\. Controller/Validator Enhancements
-
--   Richer Tool Schema Use: More deeply leverage `tool.args_schema` for validation (e.g., data types, required fields) and for guiding the LLM in formulating inputs.
-
--   Low Confidence Handling:
-
-    -   If Controller's confidence for a step's action is low:
-
-        -   Present the Controller's proposed action (tool & input) to the user for explicit confirmation for *that specific step*.
-
-        -   Flag the step for more detailed scrutiny by the per-step Evaluator.
-
-        -   Trigger a "micro-replan" for just that step, asking the Planner/Controller to try an alternative.
-
--   Resource Pre-Checks: Where feasible, add pre-flight checks before tool execution (e.g., URL validity, file existence if not intrinsic to the tool).
-
--   Permission Gateway: Integrate a clear permission request step here for sensitive tools (`workspace_shell`, `python_package_installer`, `Python_REPL`), even if the overall plan was approved. The request should detail the exact command/action.
-
-### 5\. Executor Enhancements
-
--   Context Management Between Steps: How effectively is information passed from one step's output to the next step's input formulation (via Controller) or direct execution?
-
-    -   Maintain a "plan scratchpad" or "step results context" that accumulates key outputs.
-
-    -   Allow the Controller/Planner to explicitly reference outputs from previous steps when formulating input for future steps.
-
--   Direct Execution Mode: For some validated steps (e.g., a simple, safe shell command fully formulated by the Controller with high confidence), could the Executor run it directly without the full ReAct loop, for efficiency? (Requires careful security considerations).
-
-### 6\. Evaluator Enhancements (Per-Step & Overall)
-
--   Per-Step Evaluation & Correction Loop:
-
-    -   After each (or critical) step execution, invoke the Evaluator focused on that step's sub-goal.
-
-    -   Automated Retry with Fixes: If the Evaluator identifies a fixable error (e.g., minor script bug, wrong parameter), it could:
-
-        -   Provide the corrected input/script to the Controller.
-
-        -   The Controller re-validates.
-
-        -   The Executor attempts the step again.
-
-    -   User Intervention Point: If automated correction fails or is not confident, present the Evaluator's analysis to the user: "Step X failed. The Evaluator thinks the issue is Y and suggests Z. How would you like to proceed? (Retry with suggestion / Edit step / Skip step / Abort plan)".
-
--   Sophisticated Overall Evaluation:
-
-    -   More nuanced comparison of the collective outcome of all steps against the original multi-faceted user query.
-
-    -   Ability to identify if all parts of the query were addressed.
-
--   Feedback Loop to Planner: If the overall evaluation is negative, the Evaluator's `suggestions_for_replan` should be used to:
-
-    -   Automatically trigger a new planning cycle with the Planner, providing the feedback as context.
-
-    -   Present the suggestions to the user, asking if they want to try a new plan based on them.
-
--   Synthesis of Results: The Evaluator could guide a final "synthesis" step, instructing the agent (perhaps via a new plan step) to combine key findings from successful steps into a coherent final answer or report.
-
-### 7\. Error Handling and Robustness (Cross-Cutting)
-
--   Max Retries per Step: Implement a maximum number of retries for a failing step, even with Evaluator-suggested modifications.
-
--   Step Criticality: Allow the Planner to mark steps as "critical" or "optional." Failure of an optional step might not halt the entire plan.
-
--   User-Defined Error Handling: Allow users to specify preferences for how to handle errors (e.g., "always ask me," "try to fix automatically up to X times then ask").
-
-### 8\. User Steering & Collaboration (In-Flight)
-
--   Pause/Resume: Allow users to pause a long-running plan.
-
--   Feedback Injection: While paused or even between steps, allow users to provide feedback like "That's not the right direction, focus on X instead" or "The last result was good, make sure to use it in the next step." This feedback would need to be incorporated by the Controller/Planner for subsequent steps.
-
--   Dynamic Plan Adjustment: Based on user feedback or unexpected intermediate results, allow the Planner to be re-invoked to adjust the *remainder* of the plan.
-
-### 9\. Output Generation & Presentation
-
--   Dedicated Report Generation Tool/Agent: Trigger this after a successful (or partially successful, with user approval) plan execution.
-
--   Content Selection for Reports: The Evaluator's output or a dedicated LLM call could determine which artifacts and summaries are most relevant for inclusion in a final report.
-
--   Template-Based Reporting: Utilize predefined HTML/CSS templates for different report styles (as initially envisioned).
-
-
-
-
-Current State & User Feedback (Post v2.1 Implementation)
+Current State & User Feedback (Post v2.3 Implementation)
 --------------------------------------------------------
 
 The agent now incorporates:
 
--   **Intent Classification:** Distinguishes simple queries from complex tasks.
+-   Intent Classification.
 
--   **Planner, Controller, Executor Loop:** For complex tasks.
+-   Planner, Controller, Executor Loop.
 
--   **Evaluator (Overall):** Assesses the final outcome of a plan.
+-   Step Evaluator (per-step evaluation is active; refined for rate-limit errors).
 
--   **Role-Specific LLM Configuration:** Allows different LLMs for different components (though not yet fully utilized by all components via session settings).
+-   Overall Evaluator.
 
--   **Refactored Backend:** Message handling is now modular in `message_handlers.py`.
+-   Role-Specific LLM Configuration (via `.env` and UI overrides).
 
-**User Observations & Feedback:**
+-   Refactored Backend.
 
-1.  **Bug:** Deleting a task in the UI does not delete the corresponding workspace folder on the backend.
+-   Tavily Search API (`TavilyAPISearchTool`) as the primary web search tool, returning structured data (`List[Dict]`). DuckDuckGo is a fallback.
 
-2.  **Positive:** The system feels faster and smoother, likely due to role-specific LLMs and refactoring.
+-   `DeepResearchTool` (`deep_research_synthesizer`):
 
-3.  **Feature Request (UI/UX):** Allow users to select/change the LLM for each specific role (Planner, Controller, Evaluator, etc.) directly from the UI, not just a single LLM for the Executor.
+    -   Phase 1 (Initial Search using Tavily): Functional.
 
-4.  **Feature Request (Resilience):** If a role-specific LLM fails (e.g., due to usage limits), the system should attempt a retry using the `DEFAULT_LLM_ID`.
+    -   Phase 2 (Source Curation using Curator LLM): Functional.
 
-5.  **Feature Request (Plan Visibility & Persistence):**
+    -   Phase 3 (Deep Content Extraction using `fetch_and_parse_url`): Functional.
 
-    -   The approved plan should remain visible in the UI after confirmation (perhaps collapsed).
+    -   Phase 4 (Information Synthesis & Report Generation): Next to be implemented.
 
-    -   The plan should be saved to a file (e.g., `plan.md` or `plan.json`) in the task's workspace, making it an artifact.
+-   Bug Fixes Implemented:
 
-    -   This file could be updated with step statuses (e.g., a checklist like `[x]`, `[ ]`, `[!]`).
+    -   Workspace Deletion Bug (User Point 1 from previous list): Fixed.
 
-    -   This could allow for breaking down plan steps into further sub-tasks.
+    -   LLM Retry/Fallback Logic (User Point 4): `get_llm` has fallback.
 
-6.  **Feature Request (Artifact Viewer):** Implement a file/folder structure view for the workspace within the Artifact Viewer.
+    -   Plan Persistence to `_plan.md` (User Point 5 - Basic): Implemented and working, including status updates.
 
-7.  **Feature Request (Artifact Viewer):** Improve PDF viewing (currently just listed, not rendered).
+    -   UI for Role-Specific LLM Selection (User Point 3): Implemented.
+
+    -   `model_json_schema` `AttributeError` for Pydantic v1 schemas: Fixed for `TavilySearchInput` and `DeepResearchToolInput`.
+
+    -   "Unknown Tool" error logging in callbacks: Fixed.
+
+    -   Artifact viewer duplication: Fixed.
+
+    -   Various `NameError` and `TypeError` issues during tool development: Resolved.
+
+    -   `AGENT_MAX_STEP_RETRIES` setting added to config and `.env`.
+
+User Observations & Feedback (Outstanding/New):
+
+1.  `_Exception` Tool Calls: The ReAct agent (Executor) sometimes still calls the internal `_Exception` tool after a successful tool run (e.g., after Tavily search in the "CRISPR" query example). While it often recovers, this indicates the LLM might be struggling with the format/length of the tool output or deciding the immediate next step.
+
+2.  Feature Request (Plan Visibility - UI): The approved plan could be made to remain visible (perhaps collapsed) in the UI after confirmation for better user context. (Currently, it disappears, but the `_plan.md` artifact appears).
+
+3.  Feature Request (Artifact Viewer - File Structure): Implement a file/folder structure view for the workspace.
+
+4.  Feature Request (Artifact Viewer - PDF): Improve PDF viewing (currently just listed as a link).
 
 Proposed Roadmap & Areas for Improvement
 ----------------------------------------
 
-Based on the feedback and our v2.0 vision, here's a potential roadmap, prioritizing bug fixes, core enhancements, and then UX/feature additions:
+### Phase 1: Complete Core `DeepResearchTool` Functionality
 
-### Phase 1: Stability & Core Loop Enhancement
+1.  Implement `DeepResearchTool` - Phase 4: Information Synthesis & Report Generation
 
-1.  **Bug Fix: Workspace Deletion (User Point 1)**
+    -   Goal: Take the extracted content (summarized if necessary) and use a "Writer" LLM to generate a structured Markdown report.
 
-    -   **Goal:** Ensure deleting a task properly removes its workspace folder.
+    -   Action:
 
-    -   **Action:** Review and refine `process_delete_task` in `message_handlers.py` to ensure `shutil.rmtree` is effective and errors are handled/logged.
+        -   Finalize the `WRITER_SYSTEM_PROMPT_TEMPLATE` and `DeepResearchReportOutput` Pydantic model in `deep_research_tool.py`.
 
-2.  **Implement LLM Retry/Fallback Logic (User Point 4)**
+        -   Implement logic in `_arun` to:
 
-    -   **Goal:** Improve resilience if a configured role-specific LLM fails.
+            -   Calculate total token estimates for extracted content.
 
-    -   **Action:** Modify `get_llm` (in `llm_setup.py`) or the points where it's called for each role. If the primary role-specific LLM fails, attempt to use the `DEFAULT_LLM_ID`. Log when fallbacks occur.
+            -   Conditionally call `_summarize_content` for each source if `estimated_total_tokens > max_total_tokens_for_writer`.
 
-3.  **Enhance Plan Visibility & Persistence (User Point 5 - Basic)**
+            -   Prepare the (summarized or full) content for the Writer LLM.
 
-    -   **Goal:** Make the confirmed plan accessible.
+            -   Invoke the Writer LLM chain (Prompt | LLM | JsonOutputParser for `DeepResearchReportOutput`).
 
-    -   **Action (Backend):** In `process_execute_confirmed_plan` (message_handlers.py), after plan confirmation, save the `structured_plan_steps` to a `plan.md` (or `.json`) file in the task's workspace. This makes it an artifact.
+            -   Format the structured output into a final Markdown report string.
 
-    -   **Action (Frontend - `script.js`):** Modify `displayPlanForConfirmation` to *not* remove the plan UI upon confirmation. Instead, it could be collapsed or styled differently to indicate it's the "active plan." (More advanced UI for this can come later).
+            -   Append a "Sources Consulted" section.
 
-### Phase 2: User Control & Collaboration
+        -   Thoroughly test this full flow with the direct script run (`python3 -m backend.tools.deep_research_tool`).
 
-1.  **UI for Role-Specific LLM Selection (User Point 3)**
+### Phase 2: Agent Integration & Refinement
 
-    -   **Goal:** Allow users to override default role LLMs per session via the UI.
+1.  Test `DeepResearchTool` via Full Agent UI Flow
 
-    -   **Action (UI - `index.html` & `script.js`):** Design a UI section (e.g., an "Advanced Settings" modal or a dedicated panel) with dropdowns for Planner LLM, Controller LLM, Evaluator LLM, etc.
+    -   Goal: Ensure the Planner selects `deep_research_synthesizer`, the Controller provides correct input, and the full report is returned to the UI.
 
-    -   **Action (Backend - `server.py`, `message_handlers.py`):**
+    -   Action: Perform end-to-end tests from the UI with queries designed to trigger the `DeepResearchTool`.
 
-        -   Extend `session_data` to store these UI-selected role LLMs.
+2.  Address `_Exception` Tool Calls (User Observation 1)
 
-        -   Create a new WebSocket message type (e.g., `set_role_llm`) for the UI to send these selections.
+    -   Goal: Make the agent's processing of tool outputs (especially from Tavily and the new `DeepResearchTool`) smoother.
 
-        -   Update `intent_classifier.py`, `planner.py`, `controller.py`, `evaluator.py`, and the Executor/DirectQA paths in `message_handlers.py` to prioritize session-selected role LLMs, then `.env` role LLMs, then `DEFAULT_LLM_ID`.
+    -   Action:
 
-2.  **Interactive Plan Modification (Expanding on User Point 5)**
+        -   Review the exact string format returned by `TavilyAPISearchTool`'s `_format_results_to_string` method (if the agent is still using this string version for some reason) and the `DeepResearchTool`'s final Markdown report.
 
-    -   **Goal:** Allow users to edit the plan before execution.
+        -   Consider if these outputs need further simplification or clearer "end of output" markers for the Executor LLM.
 
-    -   **Action (UI - `script.js`):** Enhance the plan confirmation UI to allow editing step descriptions, reordering, deleting steps, or (advanced) adding new steps.
+        -   Potentially refine the ReAct agent's main prompt in `backend/agent.py` to better handle multi-part observations or complex string outputs.
 
-    -   **Action (Backend):** The `execute_confirmed_plan` message would then receive the (potentially modified) plan from the UI.
+3.  Refine Retry Logic for "No Tool" Plan Steps
 
-### Phase 3: Advanced Features & UX Polish
+    -   Goal: Ensure that if the Step Evaluator suggests a retry for a "No Tool" step (like Step 2 in the "Valerio Bianchi" plan), the retry mechanism correctly feeds the evaluator's `suggested_new_input_instructions_for_retry` back to the Executor.
 
-1.  **Evaluator-Driven Re-planning/Correction (Core v2.0 Goal)**
+    -   Action:
 
-    -   **Goal:** Make the agent learn from failed steps and improve.
+        -   In `message_handlers.py` (`process_execute_confirmed_plan`), when `last_step_correction_suggestion.is_recoverable_via_retry` is true for a "No Tool" step:
 
-    -   **Action:**
+            -   The `plan_step_for_controller_call.tool_input_instructions` should be updated with the suggestion.
 
-        -   If `EvaluationResult.overall_success` is `False` and `suggestions_for_replan` exist:
+            -   The `controller.validate_and_prepare_step_action` should pass this new instruction through its `reasoning` (or a dedicated field if we modify `ValidatedStepAction`).
 
-            -   Option 1 (Simpler): Present suggestions to the user, ask if they want to try a new plan based on them.
+            -   The `agent_input_for_executor` prompt for "No Tool" retries needs to incorporate these specific retry instructions from the Controller/Evaluator.
 
-            -   Option 2 (Advanced): Automatically feed suggestions back to the Planner to generate a revised plan, then present *that* to the user.
+### Phase 3: Playwright & Advanced Web Interaction (Parked for now, but setup is ready)
 
-        -   Implement per-step evaluation for critical steps.
+1.  Develop Playwright for Targeted Web Automation
 
-2.  **PDF Artifact Viewing (User Point 7 - Simple)**
+    -   Goal: Use Playwright for tasks requiring complex browser interaction beyond simple search/read (e.g., logging into specific databases, form filling, navigating JS-heavy sites).
 
-    -   **Goal:** Allow users to view PDFs.
+    -   Action: Revisit `backend/tools/playwright_search.py`. Focus on a specific, well-defined task that needs Playwright. Develop robust selectors and interaction logic for that task.
 
-    -   **Action (Frontend - `script.js`):** For PDF artifacts, render a simple link (`<a target="_blank">`) that opens the PDF in a new tab.
+### Phase 4: UX Enhancements & Further Features (Longer Term)
 
-3.  **Workspace File Structure Viewer (User Point 6)**
+-   Interactive Plan Modification (Pre-Execution): Allow users to edit, reorder, add/delete steps.
 
-    -   **Goal:** Improve artifact navigation.
+-   Permission Gateway for Sensitive Tools: Explicit UI confirmation.
 
-    -   **Action (Backend - `tools.py` or `server.py`):**  `get_artifacts` needs to scan recursively and return paths.
+-   Improved PDF Viewing & Artifact Navigation (User Points 6 & 7).
 
-    -   **Action (Frontend - `script.js`):** Implement a tree-like display for artifacts.
+-   Live Plan in Chat UI (User Point 5 - Advanced).
 
-4.  **Plan as an Updatable Checklist (User Point 5 - Advanced)**
+-   Advanced Re-planning based on Overall Evaluator feedback.
 
-    -   **Goal:** Live tracking of plan progress.
+-   Streaming output for LLM responses.
 
-    -   **Action:**
-
-        -   When saving `plan.md`, use Markdown checklist syntax.
-
-        -   After each step execution (in `process_execute_confirmed_plan`), update the `plan.md` file to mark the step as done (`[x]`), failed (`[!]`), or skipped.
-
-        -   The Artifact Viewer would need to re-fetch/re-render this `plan.md` to show live updates.
-
-5.  **Permission Gateway for Critical Steps (Core v2.0 Goal)**
-
-    -   **Goal:** Enhance safety and user trust.
-
-    -   **Action:** Before the Executor runs a sensitive tool (shell, package installer, Python REPL), even if validated by the Controller, send a specific confirmation request to the UI detailing the exact command.
+This updated BRAINSTORM.md should accurately reflect our current position and the immediate next steps. The very next action is to complete the synthesis phase of the `DeepResearchTool`.
