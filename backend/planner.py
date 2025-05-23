@@ -26,8 +26,8 @@ class AgentPlan(BaseModel):
     steps: List[PlanStep] = Field(description="A list of detailed steps to accomplish the user's request.")
 
 
-PLANNER_SYSTEM_PROMPT_TEMPLATE = """You are an expert planning assistant for a research agent. Your goal is to take a user's complex request and break it down into a sequence of logical, actionable sub-tasks.
-
+PLANNER_SYSTEM_PROMPT_TEMPLATE = """You are an expert planning assistant for a research agent.
+Your goal is to take a user's complex request and break it down into a sequence of logical, actionable sub-tasks.
 The research agent has access to the following tools:
 {available_tools_summary}
 
@@ -35,15 +35,12 @@ For each sub-task in the plan:
 1.  Provide a clear `description` of what the sub-task aims to achieve.
 2.  If a tool is needed, specify the exact `tool_to_use` from the list of available tools. If no tool is directly needed for a step (e.g., the LLM itself will perform the reasoning or summarization as part of a later step), use "None".
 3.  Provide brief `tool_input_instructions` highlighting key parameters or data the tool might need. This is NOT the full tool input, but guidance for the agent when it forms the tool input later. For example, if downloading a file, mention the expected filename.
-4.  State the `expected_outcome` of successfully completing the step (e.g., "File 'data.csv' downloaded to workspace", "Summary of article written to 'summary.txt'").
-
+4.  State the `expected_outcome` of successfully completing the step (e.g., "File 'data.csv' downloaded to workspace", "Summary of article written to 'summary.txt'"). **If this step's output is primarily intended as direct, raw input for a *subsequent processing step* in your plan (like parsing, further analysis, or summarization by a later step), the `expected_outcome` should clearly state that this raw, unprocessed data (e.g., "The full text content of the file 'report.txt' is returned", "The complete list of search results is made available") is the deliverable for this current step.**
 Additionally, provide a `human_readable_summary` of the entire plan that can be shown to the user for confirmation.
-
 Ensure the output is a JSON object that strictly adheres to the following JSON schema:
 {format_instructions}
 
-Do not include any preamble or explanation outside of the JSON object.
-"""
+Do not include any preamble or explanation outside of the JSON object."""
 
 async def generate_plan(
     user_query: str,
@@ -61,7 +58,8 @@ async def generate_plan(
         planner_llm: BaseChatModel = get_llm(
             settings,
             provider=settings.planner_provider,
-            model_name=settings.planner_model_name
+            model_name=settings.planner_model_name,
+            requested_for_role="Planner" # ADDED: Role context
         ) # type: ignore
         logger.info(f"Planner: Using LLM {settings.planner_provider}::{settings.planner_model_name}")
     except Exception as e:
@@ -130,11 +128,16 @@ if __name__ == '__main__':
             print(summary)
             print("\n---- Structured Plan ----")
             for i, step_data in enumerate(plan):
-                print(f"Step {i+1}:")
-                print(f"  Description: {step_data.get('description')}")
-                print(f"  Tool: {step_data.get('tool_to_use')}")
-                print(f"  Input Instructions: {step_data.get('tool_input_instructions')}")
-                print(f"  Expected Outcome: {step_data.get('expected_outcome')}")
+                # Ensure step_data is a dict before using .get()
+                if isinstance(step_data, dict):
+                    print(f"Step {step_data.get('step_id', i+1)}:") # Use step_id if available
+                    print(f"  Description: {step_data.get('description')}")
+                    print(f"  Tool: {step_data.get('tool_to_use')}")
+                    print(f"  Input Instructions: {step_data.get('tool_input_instructions')}")
+                    print(f"  Expected Outcome: {step_data.get('expected_outcome')}")
+                else:
+                    print(f"Step {i+1}: Invalid step data format: {step_data}")
+
         else:
             print("Failed to generate a plan.")
 

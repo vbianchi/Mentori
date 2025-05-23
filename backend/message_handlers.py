@@ -43,7 +43,7 @@ GetArtifactsFunc = Callable[[str], Coroutine[Any, Any, List[Dict[str, str]]]]
 ExecuteShellCommandFunc = Callable[[str, str, SendWSMessageFunc, DBAddMessageFunc, Optional[str]], Coroutine[Any, Any, bool]]
 
 # --- Configuration for Step Retries ---
-MAX_STEP_RETRIES = 1 # Allow 1 retry (meaning 2 attempts total: initial + 1 retry)
+MAX_STEP_RETRIES = settings.agent_max_step_retries # Use from .env via config
 
 async def _update_plan_file_step_status(
     task_workspace_path: Path,
@@ -67,13 +67,17 @@ async def _update_plan_file_step_status(
 
         updated_lines = []
         found_step = False
-        # Regex to find a markdown list item like: "- [ ] 1. Description"
+        # Regex to find a markdown list item like: "- [ ] 1. Description" or "- [x] 1. ..." etc.
+        # It looks for the start of a list item, optional whitespace, the checkbox, optional whitespace,
+        # the step number followed by a period, then at least one space, and then any characters.
         step_pattern = re.compile(rf"^\s*-\s*\[\s*[ x!-]?\s*\]\s*{re.escape(str(step_number))}\.\s+.*", re.IGNORECASE)
+        # Regex to specifically target the checkbox content for replacement
         checkbox_pattern = re.compile(r"(\s*-\s*\[)\s*[ x!-]?\s*(\])")
 
 
         for line_no, line_content in enumerate(lines):
             if not found_step and step_pattern.match(line_content):
+                # Replace only the character inside the checkbox
                 updated_line = checkbox_pattern.sub(rf"\g<1>{status_char}\g<2>", line_content, count=1)
                 updated_lines.append(updated_line)
                 found_step = True
@@ -103,7 +107,6 @@ async def process_context_switch(
     db_add_task_func: DBAddTaskFunc, db_get_messages_func: DBGetMessagesFunc,
     get_artifacts_func: GetArtifactsFunc
 ) -> None:
-    # ... (existing content - no changes needed) ...
     task_id_from_frontend = data.get("taskId")
     task_title_from_frontend = data.get("task")
 
@@ -210,7 +213,6 @@ async def process_user_message(
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc, db_add_message_func: DBAddMessageFunc
 ) -> None:
-    # ... (existing content - no changes needed) ...
     user_input_content = ""
     content_payload = data.get("content")
     if isinstance(content_payload, str):
@@ -286,9 +288,9 @@ async def process_user_message(
 
         direct_qa_llm: Optional[BaseChatModel] = None
         try:
-            llm_instance = get_llm(settings, provider=executor_provider, model_name=executor_model_name)
+            llm_instance = get_llm(settings, provider=executor_provider, model_name=executor_model_name, requested_for_role="DirectQA_Executor")
             if not isinstance(llm_instance, BaseChatModel):
-                 logger.warning(f"LLM for Direct QA is not BaseChatModel, it's {type(llm_instance)}.")
+                logger.warning(f"LLM for Direct QA is not BaseChatModel, it's {type(llm_instance)}.")
             direct_qa_llm = llm_instance # type: ignore
         except Exception as llm_init_err:
             logger.error(f"[{session_id}] Failed to initialize LLM for Direct QA: {llm_init_err}", exc_info=True)
@@ -407,8 +409,7 @@ async def process_execute_confirmed_plan(
         input_instr = step_data_dict.get('tool_input_instructions', 'None') if isinstance(step_data_dict, dict) else 'N/A'
         expected_out = step_data_dict.get('expected_outcome', 'N/A') if isinstance(step_data_dict, dict) else 'N/A'
 
-        # MODIFIED: Corrected plan saving format to ensure leading dash for Markdown list items
-        plan_markdown_content.append(f"- [ ] {i+1}. **{desc}**") # No backticks around [ ]
+        plan_markdown_content.append(f"- [ ] {i+1}. **{desc}**")
         plan_markdown_content.append(f"    - Tool Suggestion (Planner): `{tool_sugg}`")
         plan_markdown_content.append(f"    - Input Instructions (Planner): `{input_instr}`")
         plan_markdown_content.append(f"    - Expected Outcome (Planner): `{expected_out}`\n")
@@ -440,6 +441,7 @@ async def process_execute_confirmed_plan(
             "controller_reasoning_initial": "N/A", "controller_confidence_initial": 0.0,
             "attempts": [], "final_status_char": " "
         }
+        current_plan_step_obj: Optional[PlanStep] = None # Initialize for type hinting
 
         try:
             current_plan_step_obj = PlanStep(**step_dict_from_plan)
@@ -458,6 +460,12 @@ async def process_execute_confirmed_plan(
             current_step_detail_log["final_status_char"] = "!"
             step_execution_details_list.append(current_step_detail_log)
             plan_failed_definitively = True; break
+        
+        # Ensure current_plan_step_obj is not None before proceeding
+        if not current_plan_step_obj: # Should not happen if parsing was successful
+             logger.critical(f"[{session_id}] CRITICAL: current_plan_step_obj is None after successful parsing for step {current_step_number}. This indicates a logic error.")
+             plan_failed_definitively = True; break
+
 
         step_description = current_plan_step_obj.description
         step_tools: List[BaseTool] = get_dynamic_tools(active_task_id)
@@ -476,7 +484,7 @@ async def process_execute_confirmed_plan(
                 "status_char_for_attempt": " "
             }
 
-            plan_step_for_controller_call = current_plan_step_obj.copy()
+            plan_step_for_controller_call = current_plan_step_obj.copy(deep=True) # Ensure a deep copy for modifications
             if retry_count_for_current_step > 0 and last_step_correction_suggestion:
                 await send_ws_message_func("agent_thinking_update", {"status": f"Controller re-validating Step {current_step_number} (Retry {retry_count_for_current_step})..."})
                 await add_monitor_log_func(f"Controller: Re-validating Step {current_step_number} (Retry {retry_count_for_current_step}) based on Step Evaluator feedback.", "system_controller_retry")
@@ -516,19 +524,23 @@ async def process_execute_confirmed_plan(
                 plan_failed_definitively = True; break
 
             agent_input_for_executor: str
+            # --- MODIFIED SECTION START ---
             if validated_tool_name:
                 agent_input_for_executor = (
                     f"Your current sub-task is: \"{step_description}\".\n"
+                    f"The precise expected output for THIS sub-task is: \"{current_plan_step_obj.expected_outcome}\".\n" 
                     f"The Controller has determined you MUST use the tool '{validated_tool_name}' "
                     f"with the following exact input: '{formulated_tool_input}'.\n"
-                    f"Execute this and report the result."
+                    f"Execute this and report the result, ensuring your final answer for this sub-task directly fulfills the stated 'precise expected output'."
                 )
             else:
                 agent_input_for_executor = (
                     f"Your current sub-task is: \"{step_description}\".\n"
+                    f"The precise expected output for THIS sub-task is: \"{current_plan_step_obj.expected_outcome}\".\n"
                     f"The Controller has determined no specific tool is required for this step. "
-                    f"Provide a direct answer or perform analysis based on conversation history and this sub-task description."
+                    f"Provide a direct answer or perform analysis based on conversation history and this sub-task description, ensuring your final answer for this sub-task directly fulfills the stated 'precise expected output'."
                 )
+            # --- MODIFIED SECTION END ---
             attempt_log_detail["executor_input"] = agent_input_for_executor
 
             await send_ws_message_func("agent_thinking_update", {"status": f"Executor running Step {current_step_number} (Attempt {attempt_number})..."})
@@ -538,7 +550,7 @@ async def process_execute_confirmed_plan(
             executor_model_name = session_data_entry.get("selected_llm_model_name", settings.executor_default_model_name)
             step_executor_llm: Optional[BaseChatModel] = None
             try:
-                llm_instance_exec = get_llm(settings, provider=executor_provider, model_name=executor_model_name, requested_for_role="Executor")
+                llm_instance_exec = get_llm(settings, provider=executor_provider, model_name=executor_model_name, requested_for_role="Executor_PlanStep")
                 step_executor_llm = llm_instance_exec # type: ignore
             except Exception as llm_err:
                 error_msg = f"Error: Failed to init LLM for Executor (Step {current_step_number}, Attempt {attempt_number}). Details: {llm_err}"
@@ -634,11 +646,8 @@ async def process_execute_confirmed_plan(
                 current_step_detail_log["attempts"].append(attempt_log_detail)
                 current_step_detail_log["final_status_char"] = "-"
                 plan_failed_definitively = True; break
-
-        if not current_step_detail_log["attempts"]:
-            current_step_detail_log["attempts"].append({"attempt_number": 1, "error": "No attempt details recorded.", "status_char_for_attempt": "?"})
-            current_step_detail_log["final_status_char"] = "?"
-
+        
+        # This append should be outside the while loop, after all attempts for the current step are done
         step_execution_details_list.append(current_step_detail_log)
 
         active_plan_filename_local = session_data_entry.get('active_plan_filename')
@@ -650,12 +659,18 @@ async def process_execute_confirmed_plan(
             await send_ws_message_func("trigger_artifact_refresh", {"taskId": active_task_id})
 
         if plan_failed_definitively:
-            break
+            break # Break from the main loop over plan steps
 
         if step_succeeded_after_attempts:
+            # Update memory with the successful step's output for context in subsequent steps.
+            # The ReAct agent's memory (`step_memory`) is updated by callbacks,
+            # but we might want to ensure the *specific successful output* is what the next step sees
+            # if there were multiple attempts. LangChain's memory usually handles chat history.
+            # For now, assume memory within ReAct handles this context correctly across its invocations.
             last_successful_attempt = next((att for att in reversed(current_step_detail_log["attempts"]) if att["status_char_for_attempt"] == "x"), None)
             if last_successful_attempt:
                 preliminary_final_answer_from_last_step = last_successful_attempt.get("executor_output", preliminary_final_answer_from_last_step)
+
 
     session_data_entry["plan_execution_active"] = False
     session_data_entry["current_plan_step_index"] = -1
@@ -684,7 +699,7 @@ async def process_execute_confirmed_plan(
         final_message_to_user = "Plan execution stopped due to error or cancellation in one of the steps."
         await send_ws_message_func("agent_thinking_update", {"status": "Plan stopped."})
     else:
-        final_message_to_user = preliminary_final_answer_from_last_step
+        final_message_to_user = preliminary_final_answer_from_last_step # This will be the output of the last successful step
         await send_ws_message_func("agent_thinking_update", {"status": "Plan executed. Evaluating overall outcome..."})
         logger.info(f"[{session_id}] Successfully attempted all plan steps (or those before a definitive failure). Now evaluating overall plan.")
 
@@ -692,10 +707,12 @@ async def process_execute_confirmed_plan(
     overall_evaluation_result = await evaluate_plan_outcome(
         original_user_query=original_user_query,
         executed_plan_summary=executed_plan_summary_str,
-        final_agent_answer=final_message_to_user
+        final_agent_answer=final_message_to_user # Pass the last step's output or error message
     )
 
     if overall_evaluation_result:
+        # If the plan failed, the assessment should explain why. If it succeeded, it confirms.
+        # The `final_message_to_user` sent to the user should ideally be the evaluator's overall assessment.
         final_message_to_user = overall_evaluation_result.assessment
         log_msg = (
             f"Overall Plan Evaluator Result: Success={overall_evaluation_result.overall_success}, "
@@ -706,7 +723,8 @@ async def process_execute_confirmed_plan(
         if not overall_evaluation_result.overall_success and overall_evaluation_result.suggestions_for_replan:
             await add_monitor_log_func(f"Overall Plan Evaluator Suggestions for future re-plan: {overall_evaluation_result.suggestions_for_replan}", "system_evaluator_suggestions")
     else:
-        await add_monitor_log_func("Error: Overall Plan Evaluator failed to produce a result. Using last available answer.", "error_evaluator")
+        # If overall evaluator fails, use the last known message (could be error or last step output)
+        await add_monitor_log_func("Error: Overall Plan Evaluator failed to produce a result. Using last available answer/error message.", "error_evaluator")
 
     await send_ws_message_func("agent_message", final_message_to_user)
     await add_monitor_log_func(f"Final Overall Outcome Sent to User: {final_message_to_user}", "system_plan_end")
@@ -719,7 +737,6 @@ async def process_new_task(
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc, get_artifacts_func: GetArtifactsFunc
 ) -> None:
-    # ... (existing content - no changes needed) ...
     logger.info(f"[{session_id}] Received 'new_task' signal. Clearing context.")
 
     session_data_entry['cancellation_requested'] = False
@@ -754,7 +771,6 @@ async def process_delete_task(
     add_monitor_log_func: AddMonitorLogFunc, db_delete_task_func: DBDeleteTaskFunc,
     get_artifacts_func: GetArtifactsFunc
 ) -> None:
-    # ... (existing content - no changes needed) ...
     task_id_to_delete = data.get("taskId")
     if not task_id_to_delete:
         logger.warning(f"[{session_id}] 'delete_task' message missing taskId.")
@@ -771,21 +787,23 @@ async def process_delete_task(
         await add_monitor_log_func(f"Task {task_id_to_delete} DB entries deleted successfully.", "system_delete_success")
         task_workspace_to_delete: Optional[Path] = None
         try:
-            task_workspace_to_delete = get_task_workspace_path(task_id_to_delete)
+            task_workspace_to_delete = get_task_workspace_path(task_id_to_delete, create_if_not_exists=False) # Don't create if deleting
             if task_workspace_to_delete.exists():
-                if task_workspace_to_delete.is_relative_to(BASE_WORKSPACE_ROOT.resolve()):
+                # Security check: ensure the path is within the base workspace root
+                if task_workspace_to_delete.resolve().is_relative_to(BASE_WORKSPACE_ROOT.resolve()) and \
+                   BASE_WORKSPACE_ROOT.resolve() != task_workspace_to_delete.resolve(): # Prevent deleting base itself
                     logger.info(f"[{session_id}] Attempting to delete workspace directory: {task_workspace_to_delete}")
                     await asyncio.to_thread(shutil.rmtree, task_workspace_to_delete)
                     logger.info(f"[{session_id}] Successfully deleted workspace directory: {task_workspace_to_delete}")
                     await add_monitor_log_func(f"Workspace directory deleted: {task_workspace_to_delete.name}", "system_delete_success")
                     workspace_deletion_successful = True
                 else:
-                    logger.warning(f"[{session_id}] Workspace directory {task_workspace_to_delete} is not relative to base workspace. Deletion skipped for security.")
+                    logger.warning(f"[{session_id}] Workspace directory {task_workspace_to_delete} is not safely within the base workspace or is the base itself. Deletion skipped for security.")
                     await add_monitor_log_func(f"Workspace directory {task_workspace_to_delete.name} deletion skipped (security check).", "warning_system")
             else:
                 logger.info(f"[{session_id}] Workspace directory not found for task {task_id_to_delete}, no deletion needed: {task_workspace_to_delete}")
                 await add_monitor_log_func(f"Workspace for task {task_id_to_delete} not found. No directory to delete.", "system_info")
-                workspace_deletion_successful = True
+                workspace_deletion_successful = True # Considered successful as there's nothing to delete
         except Exception as ws_del_e:
             logger.error(f"[{session_id}] Error during workspace directory deletion for task {task_id_to_delete} (path: {task_workspace_to_delete}): {ws_del_e}", exc_info=True)
             await add_monitor_log_func(f"Error deleting workspace directory for task {task_id_to_delete}: {str(ws_del_e)}", "error_delete")
@@ -820,7 +838,6 @@ async def process_rename_task(
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc, db_rename_task_func: DBRenameTaskFunc
 ) -> None:
-    # ... (existing content - no changes needed) ...
     task_id_to_rename = data.get("taskId")
     new_name = data.get("newName")
 
@@ -846,7 +863,6 @@ async def process_set_llm(
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc
 ) -> None:
-    # ... (existing content - no changes needed) ...
     llm_id = data.get("llm_id")
     if llm_id and isinstance(llm_id, str):
         try:
@@ -887,7 +903,6 @@ async def process_get_available_models(
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc
 ) -> None:
-    # ... (existing content - no changes needed) ...
     logger.info(f"[{session_id}] Received request for available models.")
     await send_ws_message_func("available_models", {
         "gemini": settings.gemini_available_models,
@@ -906,7 +921,6 @@ async def process_cancel_agent(
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc
 ) -> None:
-    # ... (existing content - no changes needed) ...
     logger.warning(f"[{session_id}] Received request to cancel current operation.")
     session_data_entry['cancellation_requested'] = True
     logger.info(f"[{session_id}] Cancellation requested flag set to True.")
@@ -923,7 +937,6 @@ async def process_get_artifacts_for_task(
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc, get_artifacts_func: GetArtifactsFunc
 ) -> None:
-    # ... (existing content - no changes needed) ...
     task_id_to_refresh = data.get("taskId")
     if not task_id_to_refresh:
         logger.warning(f"[{session_id}] Received get_artifacts_for_task without taskId.")
@@ -944,7 +957,6 @@ async def process_run_command(
     add_monitor_log_func: AddMonitorLogFunc, db_add_message_func: DBAddMessageFunc,
     execute_shell_command_func: ExecuteShellCommandFunc
 ) -> None:
-    # ... (existing content - no changes needed) ...
     command_to_run = data.get("command")
     if command_to_run and isinstance(command_to_run, str):
         active_task_id_for_cmd = session_data_entry.get("current_task_id")
@@ -965,7 +977,6 @@ async def process_action_command(
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc
 ) -> None:
-    # ... (existing content - no changes needed) ...
     action = data.get("command")
     if action and isinstance(action, str):
         logger.info(f"[{session_id}] Received action command: {action} (Not implemented).")
@@ -978,7 +989,6 @@ async def process_set_session_role_llm(
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc
 ) -> None:
-    # ... (existing content - no changes needed) ...
     role = data.get("role")
     llm_id_override = data.get("llm_id")
 
@@ -987,16 +997,17 @@ async def process_set_session_role_llm(
         await add_monitor_log_func(f"Error: Invalid role specified for LLM override: {role}", "error_system")
         return
 
-    session_override_key = f"session_{role}_llm_id"
+    session_override_key = f"session_{role}_llm_id" # e.g., session_planner_llm_id
 
-    if llm_id_override == "":
-        session_data_entry[session_override_key] = None
+    if llm_id_override == "": # User selected "Use System Default"
+        session_data_entry[session_override_key] = None # Clear the override
         logger.info(f"[{session_id}] Cleared session LLM override for role '{role}'. Will use system default.")
         await add_monitor_log_func(f"Session LLM for role '{role}' reset to system default.", "system_llm_set")
     elif llm_id_override and isinstance(llm_id_override, str):
         try:
             provider, model_name = llm_id_override.split("::", 1)
             is_valid = False
+            # Validate against available models from settings
             if provider == 'gemini' and model_name in settings.gemini_available_models:
                 is_valid = True
             elif provider == 'ollama' and model_name in settings.ollama_available_models:
@@ -1009,7 +1020,7 @@ async def process_set_session_role_llm(
             else:
                 logger.warning(f"[{session_id}] Attempt to set invalid/unavailable LLM ID '{llm_id_override}' for role '{role}'. Override not applied.")
                 await add_monitor_log_func(f"Attempt to set invalid LLM '{llm_id_override}' for role '{role}' ignored.", "error_llm_set")
-        except ValueError:
+        except ValueError: # llm_id was not in "provider::model" format
             logger.warning(f"[{session_id}] Invalid LLM ID format for role '{role}': {llm_id_override}")
             await add_monitor_log_func(f"Invalid LLM ID format for role '{role}': {llm_id_override}", "error_llm_set")
     else:

@@ -15,12 +15,10 @@ def parse_comma_separated_list(env_var: Optional[str], default: Optional[List[st
             item = item.strip()
             if item:
                 # Remove potential provider prefix like "gemini::" or "ollama::"
-                # This is useful if the AVAILABLE_MODELS list in .env includes the prefix for clarity,
-                # but the internal lists should just be model names.
                 if "::" in item:
                     item = item.split("::", 1)[1]
                 cleaned_list.append(item)
-        if cleaned_list: # Ensure we don't return an empty list if parsing resulted in one, but default is preferred
+        if cleaned_list:
             return cleaned_list
     return default if default is not None else []
 
@@ -31,11 +29,10 @@ class Settings:
     # --- Required API Keys ---
     google_api_key: Optional[str] = field(default_factory=lambda: os.getenv('GOOGLE_API_KEY'))
     entrez_email: Optional[str] = field(default_factory=lambda: os.getenv('ENTREZ_EMAIL'))
-    # MODIFIED: Added Tavily API Key
     tavily_api_key: Optional[str] = field(default_factory=lambda: os.getenv('TAVILY_API_KEY'))
 
     # --- Core LLM Configuration ---
-    default_llm_id: str = field(default_factory=lambda: os.getenv('DEFAULT_LLM_ID', 'gemini::gemini-1.5-flash')) # Updated default
+    default_llm_id: str = field(default_factory=lambda: os.getenv('DEFAULT_LLM_ID', 'gemini::gemini-1.5-flash'))
     
     # --- Role-Specific LLM Configuration (Raw Strings from Env) ---
     _intent_classifier_llm_id_str: Optional[str] = field(default_factory=lambda: os.getenv('INTENT_CLASSIFIER_LLM_ID'))
@@ -53,6 +50,9 @@ class Settings:
 
     # --- Agent & LLM Tuning ---
     agent_max_iterations: int = field(default_factory=lambda: int(os.getenv('AGENT_MAX_ITERATIONS', '15')))
+    # --- ADDED: agent_max_step_retries ---
+    agent_max_step_retries: int = field(default_factory=lambda: int(os.getenv('AGENT_MAX_STEP_RETRIES', '1')))
+    # --- END ADDED ---
     agent_memory_window_k: int = field(default_factory=lambda: int(os.getenv('AGENT_MEMORY_WINDOW_K', '10')))
     gemini_temperature: float = field(default_factory=lambda: float(os.getenv('GEMINI_TEMPERATURE', '0.7')))
     ollama_temperature: float = field(default_factory=lambda: float(os.getenv('OLLAMA_TEMPERATURE', '0.5')))
@@ -112,22 +112,20 @@ class Settings:
             if provider == 'gemini':
                 if model_name in self.gemini_available_models:
                     is_available = True
-                elif not self.gemini_available_models: # If list is empty, assume any gemini model might be valid (less strict)
+                elif not self.gemini_available_models: 
                     logger.warning(f"GEMINI_AVAILABLE_MODELS list is empty. Cannot validate Gemini model '{model_name}' for {role_name_for_log}. Proceeding with caution.")
-                    is_available = True # Or set to False if strict validation is required even with empty list
+                    is_available = True 
             elif provider == 'ollama':
                 if model_name in self.ollama_available_models:
                     is_available = True
                 elif not self.ollama_available_models:
                     logger.warning(f"OLLAMA_AVAILABLE_MODELS list is empty. Cannot validate Ollama model '{model_name}' for {role_name_for_log}. Proceeding with caution.")
-                    is_available = True # Or set to False
+                    is_available = True 
             else:
                 logger.warning(f"Unknown provider '{provider}' for {role_name_for_log} LLM ID: '{chosen_id_str}'. Falling back.")
                 return fallback_provider, fallback_model_name
 
             if is_available:
-                # This log is now more informative as it's logged after validation (or assumption if list is empty)
-                # logger.info(f"Using {role_name_for_log} LLM: {provider}::{model_name}") # This will be logged in __post_init__
                 return provider, model_name
             else:
                 logger.warning(f"{role_name_for_log} LLM '{chosen_id_str}' not found in its provider's available models list. Falling back to default: {fallback_provider}::{fallback_model_name}")
@@ -142,19 +140,12 @@ class Settings:
             logger.warning(f"Invalid LOG_LEVEL '{self.log_level}', defaulting to INFO.")
             self.log_level = "INFO"
         
-        # Update logging level based on settings
         logging.getLogger().setLevel(self.log_level)
-        logging.getLogger("backend").setLevel(self.log_level) # Set for your app's root logger
-        # You might want to set levels for specific noisy libraries too, e.g.:
-        # logging.getLogger("httpx").setLevel(logging.WARNING)
-        # logging.getLogger("playwright").setLevel(logging.WARNING)
+        logging.getLogger("backend").setLevel(self.log_level) 
 
+        self.gemini_available_models = parse_comma_separated_list(self._gemini_available_models_str, default=['gemini-1.5-flash'])
+        self.ollama_available_models = parse_comma_separated_list(self._ollama_available_models_str, default=['llama3:latest'])
 
-        # Parse available models first, as they are needed for validation
-        self.gemini_available_models = parse_comma_separated_list(self._gemini_available_models_str, default=['gemini-1.5-flash']) # Sensible default
-        self.ollama_available_models = parse_comma_separated_list(self._ollama_available_models_str, default=['llama3:latest']) # Sensible default
-
-        # --- Parse Default LLM ID (this is the ultimate fallback) ---
         try:
             provider, model_name = self.default_llm_id.split("::", 1)
             if not provider or not model_name: raise ValueError("Default LLM ID provider or model_name is empty.")
@@ -162,16 +153,15 @@ class Settings:
             default_is_available = False
             if provider == 'gemini' and model_name in self.gemini_available_models: default_is_available = True
             elif provider == 'ollama' and model_name in self.ollama_available_models: default_is_available = True
-            elif provider == 'gemini' and not self.gemini_available_models: # If list empty, assume valid
+            elif provider == 'gemini' and not self.gemini_available_models: 
                 logger.warning(f"GEMINI_AVAILABLE_MODELS list is empty. Assuming DEFAULT_LLM_ID '{self.default_llm_id}' is valid.")
                 default_is_available = True
-            elif provider == 'ollama' and not self.ollama_available_models: # If list empty, assume valid
+            elif provider == 'ollama' and not self.ollama_available_models: 
                 logger.warning(f"OLLAMA_AVAILABLE_MODELS list is empty. Assuming DEFAULT_LLM_ID '{self.default_llm_id}' is valid.")
                 default_is_available = True
 
             if not default_is_available:
                 logger.error(f"FATAL: DEFAULT_LLM_ID '{self.default_llm_id}' is not listed in its provider's AVAILABLE_MODELS list. Check .env.")
-                # Attempt a hardcoded ultimate fallback if even the configured default is bad and lists are populated
                 if self.gemini_available_models:
                     self.default_provider = 'gemini'
                     self.default_model_name = self.gemini_available_models[0]
@@ -190,7 +180,6 @@ class Settings:
             logger.critical(f"FATAL: Invalid DEFAULT_LLM_ID format: '{self.default_llm_id}'. Error: {e}. Application cannot proceed.")
             raise
 
-        # --- Parse Role-Specific LLMs with Fallback to Default ---
         logger.info("--- Effective LLM Configuration for Roles ---")
         self.intent_classifier_provider, self.intent_classifier_model_name = self._parse_llm_id(
             self._intent_classifier_llm_id_str, "Intent Classifier", self.default_provider, self.default_model_name
@@ -218,20 +207,20 @@ class Settings:
         if not self.entrez_email:
             logger.warning("ENTREZ_EMAIL is not set. PubMed search tool functionality will be limited or blocked by NCBI.")
         
-        # MODIFIED: Add Tavily API Key status to log
-        if not self.tavily_api_key and any(tool_name == "tavily_search_results_json" for tool_name in os.getenv("ENABLED_TOOLS","").split(",")): # Example check
+        if not self.tavily_api_key and any(tool_name == "tavily_search_results_json" for tool_name in os.getenv("ENABLED_TOOLS","").split(",")): 
              logger.warning("TAVILY_API_KEY is not set, but Tavily search might be an intended tool. Functionality will be impaired.")
 
 
         logger.info("--- General Configuration Summary ---")
         logger.info(f"System Default LLM ID (Fallback): {self.default_provider}::{self.default_model_name}")
         logger.info(f"Google API Key Loaded: {'Yes' if self.google_api_key else 'No'}")
-        # MODIFIED: Add Tavily API Key status to log
         logger.info(f"Tavily API Key Loaded: {'Yes' if self.tavily_api_key else 'No'}")
         logger.info(f"Entrez Email Set: {'Yes' if self.entrez_email else 'No (PubMed tool potentially disabled)'}")
         logger.info(f"Ollama Base URL: {self.ollama_base_url}")
         logger.info(f"Available Gemini Models (UI): {self.gemini_available_models}")
         logger.info(f"Available Ollama Models (UI): {self.ollama_available_models}")
+        logger.info(f"Agent Max Iterations: {self.agent_max_iterations}")
+        logger.info(f"Agent Max Step Retries: {self.agent_max_step_retries}") # Log the new setting
         logger.info(f"Log Level: {self.log_level}")
         logger.info("-----------------------------------")
 
@@ -239,7 +228,6 @@ class Settings:
 def load_settings() -> Settings:
     """Loads settings from .env file and environment variables."""
     env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
-    # Ensure .env is loaded before Settings() is called, especially if not using pydantic's built-in .env handling directly
     if os.path.exists(env_path):
         logger.info(f"Loading environment variables from: {env_path}")
         load_dotenv(dotenv_path=env_path, override=True) 
@@ -247,7 +235,6 @@ def load_settings() -> Settings:
         logger.info(f".env file not found at expected location ({env_path}), loading from system environment variables only.")
     
     try:
-        # Dataclass will use os.getenv in default_factory, which reads after load_dotenv
         return Settings()
     except (ValueError, TypeError) as e:
         logger.critical(f"CRITICAL ERROR creating Settings object: {e}. This usually indicates a problem with .env parsing or type conversion for default values.", exc_info=True)
@@ -265,5 +252,7 @@ if __name__ == "__main__":
     print(f"Executor Default: {settings.executor_default_provider}::{settings.executor_default_model_name}")
     print(f"Evaluator: {settings.evaluator_provider}::{settings.evaluator_model_name}")
     print(f"Tavily API Key set: {'Yes' if settings.tavily_api_key else 'No'}")
+    print(f"Agent Max Iterations: {settings.agent_max_iterations}")
+    print(f"Agent Max Step Retries: {settings.agent_max_step_retries}") # Test print
     print("-------------------------------\n")
 
