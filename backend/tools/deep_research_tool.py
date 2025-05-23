@@ -448,8 +448,8 @@ async def main():
             return
 
         test_topic_str = "Impact of AI on scientific research methodology"
-        num_initial = 5
-        num_to_dive = 2
+        num_initial = 25
+        num_to_dive = 10
 
         tool_call_input_dict = {
             "topic": test_topic_str,
