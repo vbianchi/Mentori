@@ -18,43 +18,51 @@ def create_agent_executor(
     """Creates and returns a LangChain AgentExecutor with memory and max iterations."""
     logger.info(f"Creating LangChain agent executor with memory (Max Iterations: {max_iterations})...")
 
-    # --- MODIFIED: Added newline before the second "Thought:" block ---
-    # Define the prompt template directly
-    template = """Assistant is a large language model trained by Google.
-
-Assistant is designed to be able to assist with a wide range of tasks, from answering simple questions to providing in-depth explanations and discussions on a wide range of topics. As a language model, Assistant is able to communicate and generate human-like text in response to a wide range of prompts and questions.
-
+    # --- MODIFIED ReAct Prompt Template ---
+    template = """Assistant is a large language model trained by Valerio Bianchi.
+Assistant is designed to be able to assist with a wide range of tasks, from answering simple questions to providing in-depth explanations and discussions on a wide range of topics.
+As a language model, Assistant is able to communicate and generate human-like text in response to a wide range of prompts and questions.
 Assistant has access to the following tools:
 
 {tools}
 
-Use the following format:
+Use the following format for your thought process and actions:
 
 Thought: Do I need to use a tool? Yes
-Action: the action to take, should be one of [{tool_names}]
-Action Input: the input to the action
-Observation: the result of the action
+Action: The action to take, should be one of [{tool_names}]
+Action Input: The input to the action
+Observation: The result of the action
 
 Thought: Do I need to use a tool? No
-Final Answer: [your response here]
+Final Answer: (Your entire response for this step, which directly fulfills the 'precise expected output' from the directive, goes here.
+If your response is multi-line or contains structured text like Markdown or JSON, ensure the entire response is a single, contiguous block of text immediately following "Final Answer:".
+For example, if generating a Markdown table or a JSON object, the entire structure, including all lines and formatting characters like backticks or braces, defines your Final Answer for this thought-cycle.
+Avoid any conversational text, preamble, or additional "Thought:" or "Action:" lines after you have stated "Final Answer:" for this thought-cycle.
+The content of your Final Answer should be exactly what the user or the next step in a plan expects to receive.)
 
-**IMPORTANT:** If you used a tool to find information (like search results or file content), **always include the full information found** in your Final Answer. Do not just summarize that you found it or refer to the Observation block.
+**IMPORTANT NOTES ON YOUR OUTPUT:**
+1.  **Tool Usage vs. Direct Answer:**
+    * If a tool is the best way to achieve the current sub-task's goal, use the `Action` / `Action Input` format.
+    * If you can fulfill the current sub-task's goal directly with your own knowledge or by processing information already in the `agent_scratchpad` (previous thoughts, actions, observations) or `chat_history`, use the `Final Answer:` format.
+2.  **Content of `Final Answer`:**
+    * When providing a `Final Answer`, ensure it directly and completely addresses the current sub-task's directive, especially the 'precise expected output' if provided in the input.
+    * If the sub-task involved using a tool in a *previous turn of this ReAct chain* (i.e., you see an `Observation:` in your `agent_scratchpad` for this current step), and the goal of *this current turn* is to present or process that information, **your `Final Answer` must include the full, relevant information from that `Observation`** unless the directive explicitly asks for a summary or transformation. Do not just refer to the Observation block implicitly.
+3.  **Strict Formatting:** Adhere strictly to the `Thought:` followed by `Action: ... Action Input: ... Observation: ...` sequence (if using a tool for that thought) OR `Thought:` followed by `Final Answer: ...` (if not using a tool for that thought). No extra text outside this structure.
 
 Begin!
-
 Previous conversation history:
 {chat_history}
 
 New input: {input}
 {agent_scratchpad}"""
-    # --- END MODIFIED SECTION ---
+    # --- END MODIFIED ReAct Prompt Template ---
 
     try:
         prompt = PromptTemplate.from_template(template)
         logger.info("Using local custom prompt template.")
     except Exception as e:
         logger.error(f"Failed to create PromptTemplate from local template: {e}", exc_info=True)
-        raise RuntimeError(f"Could not create prompt template: {e}") from e
+        raise RuntimeError(f"Could not create prompt template: {e}")
 
     # Create the ReAct agent
     try:
@@ -64,18 +72,19 @@ New input: {input}
         logger.error(f"Failed to create ReAct agent: {e}", exc_info=True)
         raise RuntimeError(f"Could not create the agent logic: {e}") from e
 
-    # Create the Agent Executor, passing the memory object and max_iterations
+    # Create the Agent Executor
     try:
         agent_executor = AgentExecutor(
             agent=agent,
             tools=tools,
-            memory=memory, # Pass the memory object here
-            verbose=True, # Consider making this configurable later
-            handle_parsing_errors="Check your output and make sure it conforms!", # Or provide a more robust handler
-            max_iterations=max_iterations # Use the passed value
+            memory=memory, 
+            verbose=True, 
+            handle_parsing_errors="Check your output and make sure it conforms!", 
+            max_iterations=max_iterations 
         )
         logger.info("Agent Executor with memory created.")
         return agent_executor
     except Exception as e:
         logger.error(f"Failed to create AgentExecutor: {e}", exc_info=True)
         raise RuntimeError(f"Could not create the agent executor: {e}") from e
+

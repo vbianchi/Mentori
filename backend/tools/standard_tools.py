@@ -50,7 +50,7 @@ except Exception as e:
 
 TEXT_EXTENSIONS = {".txt", ".py", ".js", ".css", ".html", ".json", ".csv", ".md", ".log", ".yaml", ".yml"}
 
-def get_task_workspace_path(task_id: Optional[str], create_if_not_exists: bool = True) -> Path: # Added create_if_not_exists
+def get_task_workspace_path(task_id: Optional[str], create_if_not_exists: bool = True) -> Path:
     if not task_id or not isinstance(task_id, str):
         msg = f"Invalid or missing task_id ('{task_id}') provided for workspace path."
         logger.error(msg)
@@ -60,7 +60,7 @@ def get_task_workspace_path(task_id: Optional[str], create_if_not_exists: bool =
         logger.error(msg)
         raise ValueError(msg)
     task_workspace = BASE_WORKSPACE_ROOT / task_id
-    if create_if_not_exists: # Only create if flag is True
+    if create_if_not_exists: 
         try:
             os.makedirs(task_workspace, exist_ok=True)
         except OSError as e:
@@ -112,9 +112,7 @@ async def fetch_and_parse_url(url: str) -> str:
 
 async def write_to_file_in_task_workspace(input_str: str, task_workspace: Path) -> str:
     tool_name = "write_file"
-    # --- ADDED LOGGING ---
     logger.debug(f"Tool '{tool_name}': Raw input_str: '{input_str[:200]}{'...' if len(input_str) > 200 else ''}' for workspace: {task_workspace.name}")
-    # --- END ADDED LOGGING ---
     if not isinstance(input_str, str) or ':::' not in input_str:
         logger.error(f"Tool '{tool_name}' received invalid input format. Expected 'file_path:::text_content'. Got: '{input_str[:100]}...'")
         return "Error: Invalid input format. Expected 'file_path:::text_content'."
@@ -126,9 +124,7 @@ async def write_to_file_in_task_workspace(input_str: str, task_workspace: Path) 
             return "Error: Invalid input format after splitting. Expected 'file_path:::text_content'."
         relative_path_str = parts[0].strip().strip('\'"`')
         raw_text_content = parts[1]
-        # --- ADDED LOGGING ---
         logger.debug(f"Tool '{tool_name}': Parsed relative_path_str: '{relative_path_str}', raw_text_content length: {len(raw_text_content)}")
-        # --- END ADDED LOGGING ---
         cleaned_relative_path = relative_path_str
         if cleaned_relative_path.startswith((f"workspace/{task_workspace.name}/", f"workspace\\{task_workspace.name}\\" ,f"{task_workspace.name}/", f"{task_workspace.name}\\")):
             cleaned_relative_path = re.sub(r"^[\\/]?(workspace[\\/])?%s[\\/]" % re.escape(task_workspace.name), "", cleaned_relative_path)
@@ -149,18 +145,14 @@ async def write_to_file_in_task_workspace(input_str: str, task_workspace: Path) 
             logger.error(f"Tool '{tool_name}': Security Error - Invalid file path '{cleaned_relative_path}' attempts traversal.")
             return f"Error: Invalid file path '{cleaned_relative_path}'. Path must be relative and within the workspace."
         full_path = task_workspace.joinpath(relative_path).resolve()
-        # --- ADDED LOGGING ---
         logger.info(f"Tool '{tool_name}': Attempting to write to resolved full_path: '{full_path}'")
-        # --- END ADDED LOGGING ---
         if not full_path.is_relative_to(task_workspace.resolve()):
             logger.error(f"Tool '{tool_name}': Security Error - Write path resolves outside task workspace! Task: {task_workspace.name}, Resolved: {full_path}")
             return "Error: File path resolves outside the designated task workspace."
         full_path.parent.mkdir(parents=True, exist_ok=True)
         async with aiofiles.open(full_path, mode='w', encoding='utf-8') as f:
             await f.write(text_content)
-        # --- ADDED LOGGING ---
         logger.info(f"Tool '{tool_name}': Successfully wrote {len(text_content)} bytes to '{full_path}'. First 100 chars: '{text_content[:100]}{'...' if len(text_content) > 100 else ''}'")
-        # --- END ADDED LOGGING ---
         return f"SUCCESS::write_file:::{cleaned_relative_path}"
     except Exception as e:
         logger.error(f"Tool '{tool_name}': Error writing file '{relative_path_str}' to workspace {task_workspace.name}: {e}", exc_info=True)
@@ -168,17 +160,13 @@ async def write_to_file_in_task_workspace(input_str: str, task_workspace: Path) 
 
 async def read_file_content(relative_path_str: str, task_workspace: Path) -> str:
     tool_name = "read_file"
-    # --- ADDED LOGGING ---
     logger.debug(f"Tool '{tool_name}': Raw relative_path_str: '{relative_path_str[:100]}{'...' if len(relative_path_str) > 100 else ''}' in workspace: {task_workspace.name}")
-    # --- END ADDED LOGGING ---
     if not isinstance(relative_path_str, str) or not relative_path_str.strip():
         logger.error(f"Tool '{tool_name}': Received invalid input. Expected a non-empty relative file path string.")
         return "Error: Invalid input. Expected a non-empty relative file path string."
     first_line = relative_path_str.splitlines()[0] if relative_path_str else ""
     cleaned_relative_path = first_line.strip().strip('\'"`')
-    # --- ADDED LOGGING ---
     logger.info(f"Tool '{tool_name}': Cleaned relative_path for reading: '{cleaned_relative_path}'")
-    # --- END ADDED LOGGING ---
     if not cleaned_relative_path:
         logger.error(f"Tool '{tool_name}': File path became empty after cleaning.")
         return "Error: File path cannot be empty after cleaning."
@@ -187,9 +175,7 @@ async def read_file_content(relative_path_str: str, task_workspace: Path) -> str
         logger.error(f"Tool '{tool_name}': Security Error - Invalid read file path '{cleaned_relative_path}' attempts traversal.")
         return f"Error: Invalid file path '{cleaned_relative_path}'. Path must be relative and within the workspace."
     full_path = task_workspace.joinpath(relative_path).resolve()
-    # --- ADDED LOGGING ---
     logger.info(f"Tool '{tool_name}': Attempting to read resolved full_path: '{full_path}'")
-    # --- END ADDED LOGGING ---
     if not full_path.is_relative_to(task_workspace.resolve()):
         logger.error(f"Tool '{tool_name}': Security Error - Read path resolves outside task workspace! Task: {task_workspace.name}, Resolved: {full_path}")
         return "Error: File path resolves outside the designated task workspace."
@@ -229,9 +215,7 @@ async def read_file_content(relative_path_str: str, task_workspace: Path) -> str
             loop = asyncio.get_running_loop()
             content = await loop.run_in_executor(None, read_pdf_sync)
             actual_length = len(content)
-            # --- MODIFIED LOGGING ---
             logger.info(f"Tool '{tool_name}': Successfully read {actual_length} chars from PDF '{cleaned_relative_path}'. First 100 chars: '{content[:100]}{'...' if actual_length > 100 else ''}'")
-            # --- END MODIFIED LOGGING ---
             warning_length = settings.tool_pdf_reader_warning_length
             if actual_length > warning_length:
                 warning_message = f"\n\n[SYSTEM WARNING: Full PDF content read ({actual_length} chars), which exceeds the warning threshold of {warning_length} chars. This may be too long for the current LLM's context window.]"
@@ -240,9 +224,7 @@ async def read_file_content(relative_path_str: str, task_workspace: Path) -> str
         elif file_extension in TEXT_EXTENSIONS:
             async with aiofiles.open(full_path, mode='r', encoding='utf-8', errors='ignore') as f:
                 content = await f.read()
-            # --- MODIFIED LOGGING ---
             logger.info(f"Tool '{tool_name}': Successfully read {len(content)} chars from text file '{cleaned_relative_path}'. First 100 chars: '{content[:100]}{'...' if len(content) > 100 else ''}'")
-            # --- END MODIFIED LOGGING ---
         else:
             logger.warning(f"Tool '{tool_name}': Unsupported file extension '{file_extension}' for file '{cleaned_relative_path}'")
             return f"Error: Cannot read file. Unsupported file extension: '{file_extension}'. Supported text: {', '.join(TEXT_EXTENSIONS)}, .pdf"
@@ -419,7 +401,7 @@ async def search_pubmed(query: str) -> str:
             try:
                 medline_citation = record.get('MedlineCitation', {}); article = medline_citation.get('Article', {}); pmid = str(medline_citation.get('PMID', 'Unknown PMID'))
                 title = article.get('ArticleTitle', 'No Title'); 
-                if not isinstance(title, str): title = str(title) # Handle potential non-string titles (e.g. from Entrez. 구조화된 제목)
+                if not isinstance(title, str): title = str(title)
                 authors_list = article.get('AuthorList', []); author_names = []
                 if isinstance(authors_list, list):
                     for author in authors_list:
@@ -432,12 +414,12 @@ async def search_pubmed(query: str) -> str:
                     section_texts = []
                     for sec in abstract_section:
                         if isinstance(sec, str): section_texts.append(sec)
-                        elif isinstance(sec, dict): section_texts.append(sec.get('#text', '')) # Handle cases like {'#text': '...', 'NlmCategory': 'BACKGROUND'}
-                        elif hasattr(sec, 'attributes') and 'Label' in sec.attributes: section_texts.append(f"\n**{sec.attributes['Label']}**: {str(sec)}") # Handle labeled sections
-                        else: section_texts.append(str(sec)) # Fallback for other unexpected structures
+                        elif isinstance(sec, dict): section_texts.append(sec.get('#text', '')) 
+                        elif hasattr(sec, 'attributes') and 'Label' in sec.attributes: section_texts.append(f"\n**{sec.attributes['Label']}**: {str(sec)}") 
+                        else: section_texts.append(str(sec)) 
                     abstract_text = " ".join(filter(None, section_texts))
-                elif isinstance(abstract_section, str): abstract_text = abstract_section # If AbstractText is just a string
-                else: abstract_text = str(abstract_section) if abstract_section else "No Abstract Available" # Fallback
+                elif isinstance(abstract_section, str): abstract_text = abstract_section 
+                else: abstract_text = str(abstract_section) if abstract_section else "No Abstract Available" 
                 MAX_ABSTRACT_SNIPPET = max_snippet
                 abstract_snippet = abstract_text.strip()[:MAX_ABSTRACT_SNIPPET]
                 if len(abstract_text.strip()) > MAX_ABSTRACT_SNIPPET: abstract_snippet += "..."
@@ -446,7 +428,7 @@ async def search_pubmed(query: str) -> str:
                 if isinstance(article_ids, list):
                     for article_id in article_ids:
                         if hasattr(article_id, 'attributes') and article_id.attributes.get('IdType') == 'doi': doi = str(article_id); break
-                        elif isinstance(article_id, dict) and article_id.get('IdType') == 'doi': doi = article_id.get('#text'); break # Handle cases where it's a dict
+                        elif isinstance(article_id, dict) and article_id.get('IdType') == 'doi': doi = article_id.get('#text'); break 
                 link = f"https://doi.org/{doi}" if doi else f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/"; link_text = f"DOI:{doi}" if doi else f"PMID:{pmid}"
                 summaries.append(f"**Result {i+1}:**\n**Title:** {title}\n**Authors:** {authors}\n**Link:** [{link_text}]({link})\n**Abstract Snippet:** {abstract_snippet}\n---")
             except Exception as parse_err: logger.error(f"Tool '{tool_name}': Error parsing PubMed record {i+1} (PMID: {pmid}) for query '{cleaned_query}': {parse_err}", exc_info=True); summaries.append(f"**Result {i+1}:**\nError parsing record (PMID: {pmid}).\n---")
@@ -513,7 +495,18 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
         tools.append(Tool.from_function(
             func=python_repl_utility.run, 
             name="Python_REPL",
-            description=("Use this tool to execute Python code snippets. Input MUST be valid Python code string. Output will be the result of the execution (stdout, stderr, or return value). **Security Note:** This executes code directly in the backend environment. Be extremely cautious.")))
+            # --- MODIFIED Python_REPL Description ---
+            description=(
+                "Executes a short, self-contained Python code snippet string. "
+                "Input MUST be a valid Python code string. "
+                "This tool is best for quick calculations, simple data manipulations (e.g., on small lists or dictionaries), or dynamic code generation where the primary result is text output via `print()` or the value of the last expression. "
+                "It does NOT execute files from the workspace (e.g., you cannot pass 'my_script.py' as input). "
+                "For running Python scripts that are saved as .py files, or for scripts that need to perform complex file I/O within the task's workspace (beyond simple print to stdout), or for scripts with multiple/complex package dependencies not already verified to be in the environment, first use the `write_file` tool to save the script, and then use the `workspace_shell` tool with a command like 'python your_script_name.py'. "
+                "Output from Python_REPL will be the stdout, stderr, or return value of the executed snippet. "
+                "**Security Note:** This executes code directly in the backend environment. Be extremely cautious."
+            )
+            # --- END MODIFIED Python_REPL Description ---
+        ))
     else:
         logger.warning("Python REPL tool not created (utility unavailable).")
 
@@ -524,7 +517,7 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
         return tools
 
     try:
-        task_workspace = get_task_workspace_path(current_task_id) # Will create if not exists by default
+        task_workspace = get_task_workspace_path(current_task_id) 
         logger.info(f"Configuring file/shell tools for workspace: {task_workspace}")
         
         task_specific_tools = [
