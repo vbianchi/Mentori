@@ -1,4 +1,3 @@
-```
 ResearchAgent: AI Assistant for Research Workflows (v2.4)
 =========================================================
 
@@ -64,36 +63,44 @@ Project Structure
 -----------------
 
 ```
-
 ResearchAgent/
-
-├── backend/
-
-│ ├── tools/
-
-│ │ ├── standard_tools.py
-
-│ │ ├── tavily_search_tool.py
-
-│ │ └── deep_research_tool.py
-
-│ ├── (other .py files like agent.py, server.py, etc.)
-
-├── css/
-
-├── database/ (GITIGNORED)
-
-├── js/
-
-├── workspace/ (GITIGNORED)
-
-├── .env
-
-├── Dockerfile
-
-├── README.md
-
-└── (other project files)
+├── .env                   # Environment variables (GITIGNORED - sensitive data)
+├── .env.example           # Example environment variables
+├── .gitignore             # Specifies intentionally untracked files that Git should ignore
+├── backend/               # Python backend code
+│   ├── init.py        # Makes 'backend' a Python package
+│   ├── agent.py           # Logic for creating and configuring the LangChain agent executor
+│   ├── callbacks.py       # Custom LangChain callback handlers (e.g., WebSocketCallbackHandler)
+│   ├── config.py          # Configuration loading (from .env) and settings management
+│   ├── controller.py      # Agent's Controller component (validates plan steps, prepares tool inputs)
+│   ├── db_utils.py        # Asynchronous SQLite database utility functions
+│   ├── evaluator.py       # Agent's Evaluator components (for individual steps and overall plan)
+│   ├── intent_classifier.py # Logic for classifying user intent (PLAN vs. DIRECT_QA)
+│   ├── llm_setup.py       # Functions for initializing LLM instances (Gemini, Ollama)
+│   ├── message_handlers.py # Handles different types of messages received over WebSocket
+│   ├── planner.py         # Agent's Planner component (generates multi-step plans)
+│   ├── server.py          # Main WebSocket server and aiohttp file server logic
+│   └── tools/             # Directory for agent tools
+│       ├── init.py    # Makes 'tools' a Python package
+│       ├── deep_research_tool.py # The multi-phase DeepResearchTool
+│       ├── playwright_search.py  # Playwright-based web search tool (currently parked/experimental)
+│       ├── standard_tools.py     # Core tools (file I/O, shell, PubMed, web reader, package installer, etc.) and tool factory
+│       └── tavily_search_tool.py # Tavily API search tool wrapper
+├── css/                   # CSS stylesheets
+│   └── style.css          # Main stylesheet for the UI
+├── database/              # Directory for SQLite database storage (GITIGNORED)
+│   └── agent_history.db   # SQLite database file
+├── Dockerfile             # Instructions for building the Docker image for the backend
+├── docker-compose.yml     # Docker Compose configuration for running the backend service
+├── index.html             # Main HTML file for the frontend UI
+├── js/                    # JavaScript files
+│   └── script.js          # Frontend JavaScript logic for UI interactions and WebSocket communication
+├── README.md              # Project overview, setup, and usage instructions
+├── requirements.txt       # Python package dependencies
+└── workspace/             # Base directory for task-specific workspaces (GITIGNORED)
+│   └── <task_id>/         # Each task gets its own subdirectory, created within 'workspace/'
+│       ├── _plan_<ID>.md  # Markdown file for a confirmed plan (e.g., _plan_20231027_123456_abcdef.md). Multiple plan files can exist per task. Stores plan steps and their live statuses (see BRAINSTORM.md for details).
+└── ...            # Other files generated or uploaded for the task
 
 ```
 
@@ -136,5 +143,3 @@ The project is actively being enhanced. Key future directions include:
 * **Ongoing UX/UI Refinements.**
 
 For a detailed, evolving roadmap and ongoing brainstorming, please see **`BRAINSTORM.md`**.
-
-```
