@@ -1,191 +1,153 @@
-ResearchAgent Development Plan: UITL & UI Enhancements
-======================================================
+ResearchAgent: Project Roadmap (v2.5 Base)
+==========================================
 
-This plan outlines the development phases for enhancing the ResearchAgent project, focusing on User-in-the-Loop (UITL) capabilities and User Interface/User Experience (UI/UX) improvements, drawing inspiration from Magentic-UI and Manus.ai.
+This document outlines the planned development path for the ResearchAgent project. It is a living document and will be updated as the project evolves.
 
-Phase 1: Immediate Focus - Enhancing Core Agent Stability & Foundational UITL
------------------------------------------------------------------------------
+Guiding Principles for Development
+----------------------------------
 
-Goal: Improve the agent's ability to self-correct and introduce basic mechanisms for the agent to request user input.
+-   Accuracy & Reliability Over Speed: Prioritize robust and correct execution of tasks, even if it means more granular planning or slightly longer execution times.
 
-1.  Advanced Step Self-Correction via Evaluator-Driven Revision
+-   User-in-the-Loop (UITL/HITL): Empower the researcher with control and the ability to guide the agent.
 
-    -   Context: `BRAINSTORM.md` Phase 2.3.
+-   Modularity & Maintainability: Continue to build and refine the codebase with clear separation of concerns.
 
-    -   Tasks:
+-   Extensibility: Design the system to easily accommodate new tools, LLMs, and agent capabilities.
 
-        -   Backend (`evaluator.py`):
+Phase 1: Core Stability & Foundational Tools (Largely Completed - Basis of v2.4/v2.5)
+-------------------------------------------------------------------------------------
 
-            -   Modify the `StepCorrectionOutcome` Pydantic model to include `suggested_revised_step_description: Optional[str]`.
+-   UI Framework: Three-panel layout (Tasks, Chat, Monitor/Artifacts).
 
-            -   Update the `STEP_EVALUATOR_SYSTEM_PROMPT_TEMPLATE` to instruct the LLM to generate this `suggested_revised_step_description` when `is_recoverable_via_retry` is true.
+-   Backend Infrastructure: Python, WebSockets, HTTP file server.
 
-        -   Backend (`message_handlers.py`):
+-   Task Management: Creation, selection, deletion, renaming, persistent storage.
 
-            -   In the plan execution loop, if a step retry is triggered based on the `StepCorrectionOutcome`, use the `suggested_revised_step_description` (if provided) as the new description for the Controller when retrying the step.
+-   Basic Agent Flow: Intent Classification, P-C-E-E pipeline (Planner, Controller, Executor, Evaluator).
 
-    -   Magentic-UI Relevance: Reinforces the importance of robust error handling and re-planning capabilities for agent stability.
+-   Core Tools: Web search (Tavily, DuckDuckGo), file I/O, PubMed search, basic web page reader.
 
-2.  Implement Foundational Agent-Initiated Interaction Points
+-   `DeepResearchTool` v1: Functional multi-phase deep research capability.
 
-    -   Context: `BRAINSTORM.md` Phase 3.1; Inspired by Magentic-UI's Co-Tasking & Action Guards.
+-   LLM Configuration: Support for Gemini & Ollama, role-specific LLM assignments.
 
-    -   Goal: Enable the agent to pause and request user clarification or approval.
+-   Frontend Refactoring (v2.5): Modularized JavaScript for improved UI code management.
 
-    -   Tasks:
+Phase 2: Enhanced Agent Capabilities & User Experience (Current & Near-Term Focus)
+----------------------------------------------------------------------------------
 
-        -   Backend (`planner.py`):
+1.  Advanced Step Self-Correction (High Priority)
 
-            -   Define a new type or add a field to `PlanStep` (e.g., `interaction_type: Optional[str]`, `interaction_prompt: Optional[str]`) to signify an "interaction required" step.
+    -   Goal: Improve autonomous error recovery.
 
-            -   Modify `generate_plan` to allow the Planner LLM to output these interaction steps when it deems user input is necessary (e.g., for ambiguity resolution or sensitive action approval).
+    -   Details: Enable the Step Evaluator to not only identify failures but also to propose revised step descriptions or parameters for a more effective retry. This involves updating prompts and Pydantic models for the Evaluator and modifying `message_handlers.py` to use these revisions.
 
-        -   Backend (`message_handlers.py`):
+    -   Status: Design phase / Initial implementation considerations.
 
-            -   When the Controller processes a plan step flagged as requiring interaction:
+2.  User-in-the-Loop (UITL/HITL) - Foundational (High Priority)
 
-                -   Pause the plan execution loop.
+    -   Goal: Introduce agent-initiated interaction points during plan execution.
 
-                -   Construct a payload containing the `interaction_prompt` and any necessary context (e.g., list of files if user selection is needed).
+    -   Details:
 
-                -   Send a new WebSocket message (e.g., type `request_user_input`) to the UI with this payload.
+        -   Planner: Generate special "interaction steps" (e.g., asking user to select from a list, confirm a summary, provide input).
 
-            -   Implement logic to wait for a `user_input_response` WebSocket message from the UI.
+        -   Backend: Pause plan execution, send interaction requests to UI, process user responses.
 
-            -   Process the user's response and resume plan execution or re-plan as appropriate.
+        -   UI: Render interaction prompts and capture user input.
 
-        -   Backend (`server.py` or dedicated WebSocket utils):
+    -   Status: Design phase.
 
-            -   Define new WebSocket message types: `request_user_input` (backend to frontend) and `user_input_response` (frontend to backend).
+3.  Improved "No Tool" Step Reliability & Granularity (Ongoing)
 
-        -   Frontend (`js/script.js`):
+    -   Goal: Ensure the Executor LLM can reliably perform generation, summarization, and formatting tasks without tool errors.
 
-            -   Add a WebSocket message listener for `request_user_input`.
+    -   Details: Continue refining Planner prompts to break down complex "No Tool" tasks. Monitor ReAct agent behavior for `_Exception` calls and refine prompts or agent architecture as needed.
 
-            -   On receiving `request_user_input`, display a modal or an inline prompt in the chat area to present the `interaction_prompt` to the user and capture their input (text, selection, confirmation).
+    -   Status: Ongoing refinement.
 
-            -   Send the captured user input back to the backend via a `user_input_response` WebSocket message.
+4.  UI/UX Refinements for Clarity & Control
 
-        -   Initial Use Case 1: Action Approval (Basic):
+    -   Goal: Make agent operations more transparent and user-friendly.
 
-            -   Identify a sensitive tool (e.g., `workspace_shell`).
+    -   Details:
 
-            -   Modify the `Controller` (`controller.py`): When it prepares to use this tool, instead of directly forming the input for the Executor, it should recognize the sensitivity. The Planner might preemptively create an interaction step, or the Controller could be enhanced to request an interaction if a sensitive tool is selected for a step. For simplicity, start with the Planner generating an interaction step for approval *before* the sensitive tool step.
+        -   Better visualization of the active plan and current step (building on artifact viewer for `_plan.md`).
 
-            -   The interaction prompt would be: "The agent proposes to use the `workspace_shell` tool with the command: `[command]`. Do you approve? (Yes/No)".
+        -   Improved artifact viewer (file/folder structure, enhanced PDF view).
 
-        -   Initial Use Case 2: Clarification Request (Basic):
+        -   Consider UI elements for the upcoming UITL features.
 
-            -   Modify `planner.py`: If the Planner LLM detects high ambiguity in the user query that prevents effective plan generation, it should generate a plan with a single `interaction_required_step` asking for specific clarification.
+    -   Status: Ongoing, iterative improvements.
 
-Phase 2: Mid-Term - Expanding UITL, Tooling, and UI Chat Clarity
-----------------------------------------------------------------
+Phase 3: Advanced Interactivity & Tooling (Mid-Term)
+----------------------------------------------------
 
-Goal: Allow users to view plan progress, improve chat readability, and add more specialized tools.
+1.  User-in-the-Loop (UITL/HITL) - Advanced Plan Modification
 
-1.  User-Initiated Plan Review (Display Only, During Execution)
+    -   Goal: Allow users to review and request modifications to an *upcoming* plan before or during execution.
 
-    -   Context: `BRAINSTORM.md` Phase 3.2, User Observation 2.
+    -   Details: UI to display upcoming steps, interface for edit requests (modify, reorder, add, delete), backend logic to validate and apply plan changes.
 
-    -   Tasks:
+    -   Status: Future development post-foundational UITL.
 
-        -   Frontend (`js/script.js`):
+2.  New Granular Tool Development
 
-            -   Add a "View Current Plan" button or a dedicated area in the UI.
+    -   Goal: Enhance agent precision and offload specific tasks from general LLM steps.
 
-            -   When clicked (or when an agent-initiated pause occurs), fetch and display the `current_plan_structured` (remaining steps with their statuses if available from `_plan_<ID>.md` or backend state).
+    -   Wishlist (to be prioritized & designed):
 
-        -   Backend (`server.py` / `message_handlers.py`):
+        -   `list_files_tool`: Safer listing of workspace files.
 
-            -   Ensure the full current plan (with statuses of completed/pending steps) is accessible, perhaps by sending it to the UI upon plan confirmation or providing an endpoint/message to request it.
+        -   `download_files_tool`: Download files from URLs to workspace.
 
-            -   Live updates to the `_plan_<ID>.md` file should trigger a WebSocket message to the UI to refresh its displayed plan view if open.
+        -   `extract_text_segment_tool`: LLM-driven extraction from larger texts.
 
-2.  Visually Distinct Message Components in Chat UI
+        -   `format_data_tool`: Deterministic or focused LLM for simple data conversions (e.g., JSON to Markdown table).
 
-    -   Context: Inspired by Manus.ai; `BRAINSTORM.md` (Comprehensive Update).
+        -   `structured_data_query_tool`: Query structured data (CSV, JSON) in files.
 
-    -   Tasks:
+        -   `summarize_text_tool`: Dedicated summarization with more control.
 
-        -   Backend (`callbacks.py` - `WebSocketCallbackHandler`):
+    -   Status: Ideation.
 
-            -   Send new, more granular WebSocket message types or add specific metadata to existing messages for:
+3.  Workspace Document Indexing & RAG (Retrieval Augmented Generation)
 
-                -   `agent_action_status` (e.g., "Planner: Generating plan...", "Controller: Validating step 'X'...", "Executor: Attempting tool 'Y'...")
+    -   Goal: Enable the agent to "read" and search across all documents within the current task's workspace.
 
-                -   `tool_attempt` (e.g., "Using Tool: `TavilyAPISearchTool` with input: `{'query': 'AI research'}`")
+    -   Details:
 
-                -   `tool_result_summary` (e.g., "Read 'report.pdf' (2500 words).")
+        -   `ingest_workspace_documents_tool`: Chunk, embed, and index workspace files.
 
-                -   `plan_step_update` (e.g., "Executing Step 3: Write summary to file.", "Step 3 Succeeded.", "Step 3 Failed: File not found.")
+        -   `search_indexed_workspace_tool`: Perform semantic search over indexed documents.
 
-        -   Frontend (`js/script.js`):
+    -   Status: Longer-term research and integration.
 
-            -   Modify `addChatMessage` or create new rendering functions in `script.js` to handle these new message types/metadata.
+Phase 4: Advanced Agent Autonomy & Specialized Applications (Longer-Term)
+-------------------------------------------------------------------------
 
-            -   Apply distinct CSS classes to these elements for styling.
+1.  Advanced Re-planning & Meta-Cognition
 
-        -   CSS (`css/style.css`):
+    -   Goal: Enable the agent to re-evaluate its overall plan based on holistic evaluation and potentially regenerate the entire plan if the current approach is failing.
 
-            -   Define CSS styles for these new message components (e.g., smaller font, different background, icons).
+    -   Status: Research.
 
-3.  Develop New Granular Tools
+2.  Permission Gateway for Sensitive Tools
 
-    -   Context: `BRAINSTORM.md` Phase 4; Inspired by Magentic-UI `FileSurfer`.
+    -   Goal: Add a confirmation step before executing potentially risky tools (`workspace_shell`, `python_package_installer`).
 
-    -   Tasks (Backend - `tools/standard_tools.py` or new files):
+    -   Status: Future enhancement.
 
-        -   Implement `list_files_tool`: Lists files/directories in the current task's workspace. Output: Formatted string or JSON.
+3.  Streaming Output for LLM Responses
 
-        -   Implement `find_file_tool`: Searches for files by name/pattern in the current task's workspace. Output: List of matching paths.
+    -   Goal: Improve perceived responsiveness by streaming LLM outputs to the UI.
 
-        -   Implement `download_files_tool`: Downloads files from given URLs directly to the current task's workspace.
+    -   Status: Future enhancement.
 
-    -   Safety: Ensure all file system tools operate strictly within the designated task workspace and have robust path validation.
+4.  Specialized Agent Personas/Workflows
 
-Phase 3: Longer-Term - Advanced UX, Planning, and Tooling
----------------------------------------------------------
+    -   Goal: Explore pre-configured agent setups optimized for specific research sub-domains (e.g., genomic data analysis, literature review synthesis).
 
-Goal: Implement more sophisticated user interactions, plan management, and advanced tool capabilities.
+    -   Status: Exploration.
 
-1.  Interactive Plan Modification (Pre-Execution & During Pauses)
-
-    -   Context: `BRAINSTORM.md` Phase 3.2; Magentic-UI's plan editor.
-
-    -   Tasks:
-
-        -   Extend the "View Current Plan" UI to allow users to suggest modifications (edit description, reorder, add, delete steps) *before* initial execution or *during* an agent-initiated pause.
-
-        -   Backend logic to receive, validate, and apply these plan modifications, then resume/start execution.
-
-2.  Plan Gallery / Reusability
-
-    -   Context: Inspired by Magentic-UI's Plan Learning and Retrieval.
-
-    -   Tasks:
-
-        -   Mechanism for users to save successfully executed or manually refined plans.
-
-        -   UI to browse, select, and adapt saved plans for new tasks.
-
-3.  Permission Gateway for Sensitive Tools
-
-    -   Context: Inspired by Magentic-UI `ActionGuards`.
-
-    -   Tasks:
-
-        -   Develop a more formal permission system for tools flagged as sensitive (e.g., `workspace_shell`, `python_package_installer`).
-
-        -   Users could grant/deny permissions per session or per task.
-
-4.  Advanced Tooling (RAG-style)
-
-    -   Context: `BRAINSTORM.md` Phase 4.
-
-    -   Tasks:
-
-        -   `ingest_workspace_documents_tool`: For indexing content within the task workspace.
-
-        -   `search_indexed_workspace_tool`: For semantic search over indexed documents.
-
-This plan provides a roadmap. We will start with Phase 1, Item 1 (Advanced Step Self-Correction) as it builds upon existing components and directly addresses agent stability. Concurrently, we can begin detailed design and backend work for Phase 1, Item 2 (Foundational Agent-Initiated Interaction Points) as this is a core UITL feature.
+This roadmap will guide our development efforts. Feedback and adjustments are welcome as the project progresses.
