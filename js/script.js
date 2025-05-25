@@ -51,24 +51,151 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
     
     const httpBackendBaseUrl = 'http://localhost:8766';
+    let isLoadingHistory = false; 
 
     window.dispatchWsMessage = (message) => {
         try {
             switch (message.type) {
-                case 'history_start': isLoadingHistory = true; if (typeof clearChatMessagesUI === 'function') clearChatMessagesUI(); if (typeof clearMonitorLogUI === 'function') clearMonitorLogUI(); if (typeof addChatMessageToUI === 'function') addChatMessageToUI(`Loading history...`, "status"); updateGlobalMonitorStatus('running', 'Loading History...'); break;
-                case 'history_end': isLoadingHistory = false; const loadingMsg = chatMessagesContainer.querySelector('.message-status:last-child'); if (loadingMsg && loadingMsg.textContent.startsWith("Loading history...")) { loadingMsg.remove(); } if (typeof scrollToBottomChat === 'function') scrollToBottomChat(); if (typeof scrollToBottomMonitorLog === 'function') scrollToBottomMonitorLog(); updateGlobalMonitorStatus('idle', 'Idle'); break;
-                case 'agent_thinking_update': if (message.content && message.content.status) { if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, message.content.status); } break;
-                case 'agent_message': if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); if (typeof addChatMessageToUI === 'function') addChatMessageToUI(message.content, 'agent'); break;
-                case 'llm_token_usage': if (message.content && typeof message.content === 'object') { handleTokenUsageUpdate(message.content); } break;
-                case 'display_plan_for_confirmation': if (message.content && message.content.human_summary && message.content.structured_plan) { StateManager.setCurrentDisplayedPlan(message.content.structured_plan); if (typeof displayPlanInUI === 'function') { displayPlanInUI(message.content.human_summary, StateManager.getCurrentDisplayedPlan(), handlePlanConfirm, handlePlanCancel); } if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); } else { console.error("Invalid plan data received:", message.content); if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Error: Received invalid plan from backend.", "status"); } break;
-                case 'user': if (typeof addChatMessageToUI === 'function') addChatMessageToUI(message.content, 'user'); break;
-                case 'status_message': const lowerContent = message.content.toLowerCase(); if (typeof addChatMessageToUI === 'function') addChatMessageToUI(message.content, 'status'); if (lowerContent.includes("error")) { updateGlobalMonitorStatus('error', message.content); } else if (lowerContent.includes("complete") || lowerContent.includes("cancelled") || lowerContent.includes("plan confirmed")) { if (!lowerContent.includes("plan confirmed. executing steps...")) { updateGlobalMonitorStatus('idle', 'Idle'); } } if (lowerContent.includes("complete") || lowerContent.includes("error") || lowerContent.includes("cancelled")) { if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); } break;
-                case 'monitor_log': if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(message.content); if (message.content.includes("[Agent Finish]") || message.content.includes("Error]")) { if(StateManager.getIsAgentRunning() && !message.content.includes("PLAN EXECUTION LOOP NOT YET IMPLEMENTED")) { updateGlobalMonitorStatus('idle', 'Idle'); } if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); } break;
-                case 'update_artifacts': if (Array.isArray(message.content)) { const oldArtifacts = StateManager.getCurrentTaskArtifacts(); const oldIndex = StateManager.getCurrentArtifactIndex(); const oldCurrentArtifactFilename = (oldIndex >= 0 && oldIndex < oldArtifacts.length) ? oldArtifacts[oldIndex]?.filename : null; StateManager.setCurrentTaskArtifacts(message.content); let newIndexToSet = -1; const newArtifacts = StateManager.getCurrentTaskArtifacts(); if (oldCurrentArtifactFilename && oldCurrentArtifactFilename.startsWith("_plan_") && oldCurrentArtifactFilename.endsWith(".md")) { const foundNewIndex = newArtifacts.findIndex(art => art.filename === oldCurrentArtifactFilename); if (foundNewIndex !== -1) { newIndexToSet = foundNewIndex; } else { const latestPlan = newArtifacts.find(art => art.filename && art.filename.startsWith("_plan_") && art.filename.endsWith(".md")); newIndexToSet = latestPlan ? newArtifacts.indexOf(latestPlan) : (newArtifacts.length > 0 ? 0 : -1); } } else if (newArtifacts.length > 0) { newIndexToSet = 0; } StateManager.setCurrentArtifactIndex(newIndexToSet); if(typeof updateArtifactDisplayUI === 'function') { updateArtifactDisplayUI(newArtifacts, StateManager.getCurrentArtifactIndex()); } } break;
-                case 'trigger_artifact_refresh': const taskIdToRefresh = message.content?.taskId; if (taskIdToRefresh && taskIdToRefresh === StateManager.getCurrentTaskId()) { if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(`[SYSTEM] File event detected for task ${taskIdToRefresh}, requesting artifact list update...`); if (typeof sendWsMessage === 'function') sendWsMessage('get_artifacts_for_task', { taskId: StateManager.getCurrentTaskId() }); } break;
-                case 'available_models': if (message.content && typeof message.content === 'object') { StateManager.setAvailableModels({gemini: message.content.gemini || [], ollama: message.content.ollama || []}); const backendDefaultExecutorLlmId = message.content.default_executor_llm_id || null; const backendRoleDefaults = message.content.role_llm_defaults || {}; if (typeof populateAllLlmSelectorsUI === 'function') { populateAllLlmSelectorsUI(StateManager.getAvailableModels(), backendDefaultExecutorLlmId, backendRoleDefaults); } } break;
-                case 'error_parsing_message': console.error("Error parsing message from WebSocket:", message.content); if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(`[SYSTEM] Error parsing WebSocket message: ${message.content}`); if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Error: Received an unreadable message from the backend.", "status"); break;
-                default: console.warn("Received unknown message type:", message.type, "Content:", message.content); if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(`[SYSTEM] Unknown message type received: ${message.type}`);
+                case 'history_start': 
+                    isLoadingHistory = true; 
+                    if (typeof clearChatMessagesUI === 'function') clearChatMessagesUI(); 
+                    if (typeof clearMonitorLogUI === 'function') clearMonitorLogUI(); 
+                    if (typeof addChatMessageToUI === 'function') addChatMessageToUI(`Loading history...`, "status"); 
+                    updateGlobalMonitorStatus('running', 'Loading History...'); 
+                    break;
+                case 'history_end': 
+                    isLoadingHistory = false; 
+                    const loadingMsg = chatMessagesContainer.querySelector('.message-status:last-child'); 
+                    if (loadingMsg && loadingMsg.textContent.startsWith("Loading history...")) { loadingMsg.remove(); } 
+                    if (typeof scrollToBottomChat === 'function') scrollToBottomChat(); 
+                    if (typeof scrollToBottomMonitorLog === 'function') scrollToBottomMonitorLog(); 
+                    updateGlobalMonitorStatus('idle', 'Idle'); 
+                    break;
+                case 'agent_thinking_update': 
+                    if (message.content && message.content.status) { 
+                        if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, message.content.status); 
+                    } 
+                    break;
+                case 'agent_message': 
+                    if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); 
+                    if (typeof addChatMessageToUI === 'function') addChatMessageToUI(message.content, 'agent'); 
+                    break;
+                case 'llm_token_usage': 
+                    if (message.content && typeof message.content === 'object') { 
+                        handleTokenUsageUpdate(message.content); 
+                    } 
+                    break;
+                case 'propose_plan_for_confirmation':
+                    if (message.content && message.content.human_summary && message.content.structured_plan && message.content.plan_id) {
+                        StateManager.setCurrentDisplayedPlan(message.content.structured_plan); 
+                        StateManager.setCurrentPlanProposalId(message.content.plan_id);         
+                
+                        if (typeof displayPlanConfirmationUI === 'function') { 
+                            displayPlanConfirmationUI(
+                                message.content.human_summary,
+                                message.content.plan_id,
+                                message.content.structured_plan, 
+                                handlePlanConfirmRequest,      
+                                handlePlanCancelRequest,       
+                                handlePlanViewDetailsRequest   
+                            );
+                        }
+                        if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); 
+                        updateGlobalMonitorStatus('idle', 'Awaiting Plan Confirmation'); 
+                    } else {
+                        console.error("[Script.js] Invalid propose_plan_for_confirmation data received:", message.content);
+                        if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Error: Received invalid plan proposal from backend.", "status");
+                    }
+                    break;
+                case 'user': 
+                    if (typeof addChatMessageToUI === 'function') addChatMessageToUI(message.content, 'user'); 
+                    break;
+                case 'status_message': 
+                    const lowerContent = message.content.toLowerCase(); 
+                    if (typeof addChatMessageToUI === 'function') addChatMessageToUI(message.content, 'status'); 
+                    if (lowerContent.includes("error")) { 
+                        updateGlobalMonitorStatus('error', message.content); 
+                    } else if (lowerContent.includes("complete") || lowerContent.includes("cancelled") || lowerContent.includes("plan confirmed") || lowerContent.includes("plan proposal cancelled")) { 
+                        if (!lowerContent.includes("plan confirmed. executing steps...")) { 
+                            updateGlobalMonitorStatus('idle', 'Idle'); 
+                        }
+                    } 
+                    if (lowerContent.includes("complete") || lowerContent.includes("error") || lowerContent.includes("cancelled") || lowerContent.includes("plan proposal cancelled")) { 
+                        if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); 
+                    } 
+                    break;
+                case 'monitor_log': 
+                    if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(message.content); 
+                    if (message.content.includes("[Agent Finish]") || message.content.includes("Error]") || message.content.includes("cancelled by user") || message.content.includes("Plan execution stopped") || message.content.includes("Plan proposal cancelled by user")) { 
+                        if(StateManager.getIsAgentRunning()) { 
+                            if (!message.content.includes("Step Evaluator") && !message.content.includes("Controller failed for step")) {
+                                updateGlobalMonitorStatus('idle', 'Idle'); 
+                            }
+                        } 
+                        if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); 
+                    } 
+                    break;
+                case 'update_artifacts': 
+                    if (Array.isArray(message.content)) { 
+                        const oldArtifacts = StateManager.getCurrentTaskArtifacts(); 
+                        const oldIndex = StateManager.getCurrentArtifactIndex(); 
+                        const oldCurrentArtifactFilename = (oldIndex >= 0 && oldIndex < oldArtifacts.length) ? oldArtifacts[oldIndex]?.filename : null; 
+                        StateManager.setCurrentTaskArtifacts(message.content); 
+                        let newIndexToSet = -1; 
+                        const newArtifacts = StateManager.getCurrentTaskArtifacts(); 
+                        if (oldCurrentArtifactFilename && oldCurrentArtifactFilename.startsWith("_plan_proposal_") && oldCurrentArtifactFilename.endsWith(".md")) { 
+                            const foundNewIndex = newArtifacts.findIndex(art => art.filename === oldCurrentArtifactFilename); 
+                            if (foundNewIndex !== -1) { 
+                                newIndexToSet = foundNewIndex; 
+                            } else { 
+                                const latestPlanProposal = newArtifacts.find(art => art.filename && art.filename.startsWith("_plan_proposal_") && art.filename.endsWith(".md"));
+                                newIndexToSet = latestPlanProposal ? newArtifacts.indexOf(latestPlanProposal) : (newArtifacts.length > 0 ? 0 : -1);
+                            } 
+                        } else if (oldCurrentArtifactFilename && oldCurrentArtifactFilename.startsWith("_plan_") && oldCurrentArtifactFilename.endsWith(".md")) { 
+                            const foundNewIndex = newArtifacts.findIndex(art => art.filename === oldCurrentArtifactFilename);
+                            if (foundNewIndex !== -1) {
+                                newIndexToSet = foundNewIndex;
+                            } else {
+                                const latestPlan = newArtifacts.find(art => art.filename && art.filename.startsWith("_plan_") && art.filename.endsWith(".md"));
+                                newIndexToSet = latestPlan ? newArtifacts.indexOf(latestPlan) : (newArtifacts.length > 0 ? 0 : -1);
+                            }
+                        } else if (newArtifacts.length > 0) { 
+                            newIndexToSet = 0; 
+                        } 
+                        StateManager.setCurrentArtifactIndex(newIndexToSet); 
+                        if(typeof updateArtifactDisplayUI === 'function') { updateArtifactDisplayUI(newArtifacts, StateManager.getCurrentArtifactIndex()); } 
+                    } 
+                    break;
+                case 'trigger_artifact_refresh': 
+                    const taskIdToRefresh = message.content?.taskId; 
+                    if (taskIdToRefresh && taskIdToRefresh === StateManager.getCurrentTaskId()) { 
+                        if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(`[SYSTEM] File event detected for task ${taskIdToRefresh}, requesting artifact list update...`); 
+                        if (typeof sendWsMessage === 'function') sendWsMessage('get_artifacts_for_task', { taskId: StateManager.getCurrentTaskId() }); 
+                    } 
+                    break;
+                case 'available_models': 
+                    if (message.content && typeof message.content === 'object') { 
+                        StateManager.setAvailableModels({gemini: message.content.gemini || [], ollama: message.content.ollama || []}); 
+                        const backendDefaultExecutorLlmId = message.content.default_executor_llm_id || null; 
+                        const backendRoleDefaults = message.content.role_llm_defaults || {}; 
+                        if (typeof populateAllLlmSelectorsUI === 'function') { populateAllLlmSelectorsUI(StateManager.getAvailableModels(), backendDefaultExecutorLlmId, backendRoleDefaults); } 
+                    } 
+                    break;
+                // --- ADDED: Handle acknowledgement of plan cancellation from backend ---
+                case 'plan_proposal_cancelled_ack': // Example, backend might just send a status_message
+                    if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(`[SYSTEM] Backend acknowledged plan proposal cancellation for ID: ${message.content?.plan_id}`);
+                    updateGlobalMonitorStatus('idle', 'Idle'); // Ensure status is idle
+                    // UI removal is handled by handlePlanCancelRequest or by new proposal replacing old one.
+                    break;
+                // --- END ADDITION ---
+                case 'error_parsing_message': 
+                    console.error("Error parsing message from WebSocket:", message.content); 
+                    if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(`[SYSTEM] Error parsing WebSocket message: ${message.content}`); 
+                    if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Error: Received an unreadable message from the backend.", "status"); 
+                    break;
+                default: 
+                    console.warn("Received unknown message type:", message.type, "Content:", message.content); 
+                    if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(`[SYSTEM] Unknown message type received: ${message.type}`);
             }
         } catch (error) {
             console.error("Failed to process dispatched WS message:", error, "Original Message:", message);
@@ -81,51 +208,31 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateGlobalMonitorStatus(status, text) { StateManager.setIsAgentRunning(status === 'running' || status === 'cancelling'); if (typeof updateMonitorStatusUI === 'function') { updateMonitorStatusUI(status, text, StateManager.getIsAgentRunning()); } }
     function handleTokenUsageUpdate(lastCallUsage = null) { StateManager.updateCurrentTaskTotalTokens(lastCallUsage); if (typeof updateTokenDisplayUI === 'function') { updateTokenDisplayUI(lastCallUsage, StateManager.getCurrentTaskTotalTokens()); } }
     function resetTaskTokenTotalsGlobally() { StateManager.resetCurrentTaskTotalTokens(); if (typeof resetTokenDisplayUI === 'function') { resetTokenDisplayUI(); } }
-    function clearChatAndMonitor(addLog = true) { if (typeof clearChatMessagesUI === 'function') clearChatMessagesUI(); if (typeof clearMonitorLogUI === 'function') clearMonitorLogUI(); StateManager.setCurrentTaskArtifacts([]); StateManager.setCurrentArtifactIndex(-1); if (typeof clearArtifactDisplayUI === 'function') clearArtifactDisplayUI(); if (addLog && typeof addLogEntryToMonitor === 'function') { addLogEntryToMonitor("[SYSTEM] Cleared context."); } resetTaskTokenTotalsGlobally(); StateManager.setCurrentDisplayedPlan(null); };
+    function clearChatAndMonitor(addLog = true) { if (typeof clearChatMessagesUI === 'function') clearChatMessagesUI(); if (typeof clearMonitorLogUI === 'function') clearMonitorLogUI(); StateManager.setCurrentTaskArtifacts([]); StateManager.setCurrentArtifactIndex(-1); if (typeof clearArtifactDisplayUI === 'function') clearArtifactDisplayUI(); if (addLog && typeof addLogEntryToMonitor === 'function') { addLogEntryToMonitor("[SYSTEM] Cleared context."); } resetTaskTokenTotalsGlobally(); StateManager.setCurrentDisplayedPlan(null); StateManager.setCurrentPlanProposalId(null); };
 
-    const handleTaskSelection = (taskId) => { // taskId can be null if last task deleted
+    const handleTaskSelection = (taskId) => { 
         console.log(`[MainScript] Task selection requested for: ${taskId}`);
         const previousActiveTaskId = StateManager.getCurrentTaskId();
-
-        // Update the state via StateManager. This also handles resetting task-specific sub-states.
         StateManager.selectTask(taskId); 
-        const newActiveTaskId = StateManager.getCurrentTaskId(); // This is the definitive new active ID
-
+        const newActiveTaskId = StateManager.getCurrentTaskId(); 
         console.log(`[MainScript] StateManager updated. Previous active: ${previousActiveTaskId}, New active: ${newActiveTaskId}`);
         console.log("[MainScript] Tasks from StateManager for rendering:", StateManager.getTasks());
-
-        // Always re-render the task list to reflect potential changes in active status or list content
-        if (typeof renderTaskList === 'function') {
-            renderTaskList(StateManager.getTasks(), newActiveTaskId);
-        } else {
-            console.error("renderTaskList (from task_ui.js) is not defined.");
-        }
-        
+        if (typeof renderTaskList === 'function') { renderTaskList(StateManager.getTasks(), newActiveTaskId); } 
+        else { console.error("renderTaskList (from task_ui.js) is not defined."); }
         resetTaskTokenTotalsGlobally(); 
-        
         const selectedTaskObject = StateManager.getTasks().find(t => t.id === newActiveTaskId);
-
         if (newActiveTaskId && selectedTaskObject) {
-            // Only send context_switch if the task actually changed OR if it's a re-selection 
-            // (e.g. after deleting the previously active task, the newActiveTaskId might be what StateManager already had,
-            // but we still need to inform the backend and clear UI for this "new" context).
-            // The key is that a "selection" action always implies a potential context change for the UI and backend.
             clearChatAndMonitor(false); 
             if (typeof sendWsMessage === 'function') sendWsMessage("context_switch", { task: selectedTaskObject.title, taskId: selectedTaskObject.id });
             if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Switching task context...", "status");
             updateGlobalMonitorStatus('running', 'Switching Task...');
-            
         } else if (!newActiveTaskId) { 
-            // This case is hit when the last task is deleted, or no task is selected initially.
             console.log("[MainScript] handleTaskSelection: newActiveTaskId is null. Clearing UI for no task selected.");
             clearChatAndMonitor(); 
             if (typeof addChatMessageToUI === 'function') addChatMessageToUI("No task selected.", "status");
             if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor("[SYSTEM] No task selected.");
             updateGlobalMonitorStatus('idle', 'No Task');
         }
-        // The case for !window.socket || window.socket.readyState !== WebSocket.OPEN
-        // is implicitly handled because sendWsMessage will fail gracefully if called.
-        // The UI will reflect the local state change.
         console.log(`[MainScript] Finished handleTaskSelection for: ${newActiveTaskId}`);
     };
 
@@ -133,8 +240,80 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleTaskDeletion = (taskId, taskTitle) => { const wasActiveTask = StateManager.getCurrentTaskId() === taskId; StateManager.deleteTask(taskId); if (typeof sendWsMessage === 'function') sendWsMessage("delete_task", { taskId: taskId }); if (wasActiveTask) { handleTaskSelection(StateManager.getCurrentTaskId()); } else { if (typeof renderTaskList === 'function') { renderTaskList(StateManager.getTasks(), StateManager.getCurrentTaskId()); } } };
     const handleTaskRename = (taskId, oldTitle, newTitle) => { if (StateManager.renameTask(taskId, newTitle)) { if (typeof renderTaskList === 'function') renderTaskList(StateManager.getTasks(), StateManager.getCurrentTaskId()); if (taskId === StateManager.getCurrentTaskId()) { if (typeof updateCurrentTaskTitleUI === 'function') updateCurrentTaskTitleUI(StateManager.getTasks(), StateManager.getCurrentTaskId()); } if (typeof sendWsMessage === 'function') sendWsMessage("rename_task", { taskId: taskId, newName: newTitle }); } };
     const handleSendMessageFromUI = (messageText) => { if (!StateManager.getCurrentTaskId()) { alert("Please select or create a task first."); return; } if (StateManager.getIsAgentRunning()) { if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Agent is currently busy. Please wait or stop the current process.", "status"); return; } if (typeof addChatMessageToUI === 'function') addChatMessageToUI(messageText, 'user'); if (typeof addMessageToInputHistory === 'function') addMessageToInputHistory(messageText);  if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); if (typeof sendWsMessage === 'function') sendWsMessage("user_message", { content: messageText }); else { if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Error: Cannot send message. Connection issue.", "status");} updateGlobalMonitorStatus('running', 'Classifying intent...'); };
-    const handlePlanConfirm = (confirmedPlanSteps) => { if (typeof sendWsMessage === 'function') { sendWsMessage('execute_confirmed_plan', { confirmed_plan: StateManager.getCurrentDisplayedPlan() }); } if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Plan confirmed. Starting execution...", "status"); updateGlobalMonitorStatus('running', 'Executing Plan...'); if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, 'Executing plan step 1...'); };
-    const handlePlanCancel = () => { if (typeof sendWsMessage === 'function') { sendWsMessage('cancel_plan', {}); } if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Plan cancelled by user.", "status"); updateGlobalMonitorStatus('idle', 'Idle'); StateManager.setCurrentDisplayedPlan(null); };
+    
+    const handlePlanConfirmRequest = (planId) => {
+        console.log(`[Script.js] Plan confirmed by user for plan ID: ${planId}`);
+        const currentPlan = StateManager.getCurrentDisplayedPlan(); 
+        if (!currentPlan) {
+            console.error(`[Script.js] Cannot confirm plan ${planId}: No plan found in state.`);
+            if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Error: Could not find plan to confirm. Please try again.", "status");
+            updateGlobalMonitorStatus('error', 'Plan Confirmation Error');
+            return;
+        }
+        if (typeof sendWsMessage === 'function') {
+            sendWsMessage('execute_confirmed_plan', { plan_id: planId, confirmed_plan: currentPlan });
+        }
+        // The UI for the plan proposal block itself should be updated by chat_ui.js or a new function
+        // For now, just log and update global status.
+        // A more robust solution would be for chat_ui.js to expose a function to transform the proposal UI.
+        const planConfirmContainer = chatMessagesContainer.querySelector(`.plan-confirmation-container[data-plan-id="${planId}"]`);
+        if (planConfirmContainer) {
+            planConfirmContainer.querySelectorAll('button').forEach(btn => btn.disabled = true);
+            planConfirmContainer.style.opacity = "0.7";
+            let statusP = planConfirmContainer.querySelector('.plan-execution-status');
+            if (!statusP) {
+                statusP = document.createElement('p');
+                statusP.className = 'plan-execution-status'; // Add a class for styling
+                statusP.style.fontSize = '0.85em';
+                statusP.style.marginTop = '8px';
+                statusP.style.fontStyle = 'italic';
+                const actionsDiv = planConfirmContainer.querySelector('.plan-actions');
+                if (actionsDiv) actionsDiv.insertAdjacentElement('afterend', statusP); // Insert after buttons
+            }
+            statusP.textContent = 'Plan confirmed. Execution started...';
+            statusP.style.color = 'var(--accent-color)'; // Or a success color
+        } else {
+             if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Plan confirmed. Executing steps...", "status");
+        }
+        updateGlobalMonitorStatus('running', 'Executing Plan...');
+        if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, 'Executing plan...');
+    };
+
+    const handlePlanCancelRequest = (planId) => {
+        console.log(`[Script.js] Plan cancelled by user for plan ID: ${planId}`);
+        if (typeof sendWsMessage === 'function') {
+            sendWsMessage('cancel_plan_proposal', { plan_id: planId }); // Message type matches backend
+        }
+        // UI update: Remove the plan proposal from chat
+        const planConfirmContainer = chatMessagesContainer.querySelector(`.plan-confirmation-container[data-plan-id="${planId}"]`);
+        if (planConfirmContainer) {
+            planConfirmContainer.remove();
+        }
+        if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Plan proposal cancelled by user.", "status");
+        updateGlobalMonitorStatus('idle', 'Idle'); // Set global status to idle
+        StateManager.setCurrentDisplayedPlan(null);
+        StateManager.setCurrentPlanProposalId(null);
+    };
+
+    /**
+     * Handles the "View Details" action from the plan confirmation UI.
+     * For now, this primarily logs the action, as the inline expansion is handled by chat_ui.js.
+     * It can still attempt to show the artifact if desired as a fallback or secondary action.
+     * @param {string} planId - The ID of the plan for which to view details.
+     * @param {boolean} isNowVisible - Whether the inline details were just made visible.
+     */
+    const handlePlanViewDetailsRequest = (planId, isNowVisible) => {
+        console.log(`[Script.js] View Details action for plan ID: ${planId}. Inline details are now ${isNowVisible ? 'visible' : 'hidden'}.`);
+        if (typeof addLogEntryToMonitor === 'function') {
+            addLogEntryToMonitor(`[UI_ACTION] User toggled plan details for proposal ${planId}. Now: ${isNowVisible ? 'visible' : 'hidden'}.`);
+        }
+        // Optional: If you still want to try showing the artifact in the viewer as a secondary action:
+        // const artifactFilename = `_plan_proposal_${planId}.md`;
+        // const artifacts = StateManager.getCurrentTaskArtifacts();
+        // const planArtifact = artifacts.find(art => art.filename === artifactFilename);
+        // if (planArtifact) { /* ... logic to show in artifact viewer ... */ }
+    };
+    
     const handleStopAgentRequest = () => { if (StateManager.getIsAgentRunning()) { if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor("[SYSTEM] Stop request sent by user."); if (typeof sendWsMessage === 'function') sendWsMessage("cancel_agent", {}); updateGlobalMonitorStatus('cancelling', 'Cancelling...'); } };
     const handleArtifactNavigation = (direction) => { let currentIndex = StateManager.getCurrentArtifactIndex(); const currentArtifacts = StateManager.getCurrentTaskArtifacts(); let newIndex = currentIndex; if (direction === "prev") { if (currentIndex > 0) newIndex = currentIndex - 1; } else if (direction === "next") { if (currentIndex < currentArtifacts.length - 1) newIndex = currentIndex + 1; } if (newIndex !== currentIndex) { StateManager.setCurrentArtifactIndex(newIndex); if(typeof updateArtifactDisplayUI === 'function') { updateArtifactDisplayUI(currentArtifacts, newIndex); } } };
     const handleExecutorLlmChange = (selectedId) => { StateManager.setCurrentExecutorLlmId(selectedId); if (typeof sendWsMessage === 'function') { sendWsMessage("set_llm", { llm_id: selectedId }); }};

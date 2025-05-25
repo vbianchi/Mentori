@@ -4,18 +4,18 @@
  * Manages the Chat UI.
  * - Renders chat messages (user, agent, status).
  * - Handles Markdown formatting.
- * - Displays the agent's proposed plan for confirmation.
+ * - Displays the agent's proposed plan for confirmation with inline details.
  * - Manages the chat input area, including input history.
  * - Shows/hides the "agent thinking" status and handles its click.
  */
 
 let chatMessagesContainerElement;
-let agentThinkingStatusElement; // Local reference within this module
+let agentThinkingStatusElement; 
 let chatTextareaElement;
 let chatSendButtonElement;
 
 let onSendMessageCallback = (messageText) => console.warn("onSendMessageCallback not set in chat_ui.js");
-let onThinkingStatusClickCallback = () => console.warn("onThinkingStatusClickCallback not set in chat_ui.js"); // New callback
+let onThinkingStatusClickCallback = () => console.warn("onThinkingStatusClickCallback not set in chat_ui.js"); 
 
 let chatInputHistory = [];
 const MAX_CHAT_HISTORY = 10;
@@ -30,7 +30,7 @@ let currentInputBuffer = "";
 function initChatUI(elements, callbacks) {
     console.log("[ChatUI] Initializing...");
     chatMessagesContainerElement = elements.chatMessagesContainer;
-    agentThinkingStatusElement = elements.agentThinkingStatusEl; // Store local reference
+    agentThinkingStatusElement = elements.agentThinkingStatusEl; 
     chatTextareaElement = elements.chatTextareaEl;
     chatSendButtonElement = elements.chatSendButtonEl;
 
@@ -51,7 +51,6 @@ function initChatUI(elements, callbacks) {
         chatTextareaElement.addEventListener('keydown', handleChatTextareaKeydown);
         chatTextareaElement.addEventListener('input', handleChatTextareaInput);
     }
-    // Add click listener for agentThinkingStatusElement
     if (agentThinkingStatusElement) {
         agentThinkingStatusElement.addEventListener('click', () => {
             console.log("[ChatUI] Agent thinking status clicked.");
@@ -102,6 +101,10 @@ function addMessageToInputHistory(messageText) {
 }
 
 function formatMessageContentInternal(text) {
+    if (typeof text !== 'string') {
+        console.warn("[ChatUI] formatMessageContentInternal received non-string input:", text);
+        text = String(text); 
+    }
     let formattedText = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     formattedText = formattedText.replace(/```(\w*)\n([\s\S]*?)\n?```/g, (match, lang, code) => { const escapedCode = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); const langClass = lang ? ` class="language-${lang}"` : ''; return `<pre><code${langClass}>${escapedCode}</code></pre>`; });
     formattedText = formattedText.replace(/`([^`]+)`/g, '<code>$1</code>');
@@ -117,52 +120,175 @@ function formatMessageContentInternal(text) {
 
 function addChatMessageToUI(text, type = 'agent', doScroll = true) {
     if (!chatMessagesContainerElement) { console.error("[ChatUI] Chat container missing!"); return null; }
-    if (type === 'status') { const lowerText = text.toLowerCase(); if (!(lowerText.includes("connect") || lowerText.includes("clos") || lowerText.includes("error"))) { console.log("[ChatUI] Skipping non-critical status message in chat:", text); return null; } }
+    if (type === 'status') { const lowerText = text.toLowerCase(); if (!(lowerText.includes("connect") || lowerText.includes("clos") || lowerText.includes("error") || lowerText.includes("plan") || lowerText.includes("task") || lowerText.includes("upload") || lowerText.includes("history"))) { console.log("[ChatUI] Skipping non-critical status message in chat:", text); return null; } }
     const messageElement = document.createElement('div');
     messageElement.classList.add('message', `message-${type}`);
     if (type === 'status') { const lowerText = text.toLowerCase(); if (lowerText.includes("connect") || lowerText.includes("clos")) { messageElement.classList.add('connection-status'); } if (lowerText.includes("error")) { messageElement.classList.add('error-message'); } }
-    if (type === 'user') messageElement.classList.add('user-message');
-    if (type === 'agent') messageElement.classList.add('agent-message');
-    messageElement.innerHTML = formatMessageContentInternal(text);
+    if (type === 'user') messageElement.classList.add('user-message'); 
+    if (type === 'agent') messageElement.classList.add('agent-message'); 
+    
+    if (type === 'confirmed_plan_log') { // Handle rendering of persistent confirmed plan
+        messageElement.classList.remove('message-agent'); // Or whatever default it got
+        messageElement.classList.add('message-system', 'plan-confirmation-container', 'plan-confirmed-static'); // Add specific class
+        const planData = JSON.parse(text); // Assuming text is the JSON string of the plan
+        
+        const titleElement = document.createElement('h4');
+        titleElement.textContent = 'Confirmed Plan (from history):';
+        messageElement.appendChild(titleElement);
+
+        const summaryElement = document.createElement('p');
+        summaryElement.className = 'plan-summary';
+        summaryElement.innerHTML = formatMessageContentInternal(planData.summary || "Summary not available.");
+        messageElement.appendChild(summaryElement);
+
+        const detailsDiv = document.createElement('div');
+        detailsDiv.className = 'plan-steps-details'; // Make it always visible or add toggle
+        detailsDiv.style.display = 'block'; // Default to visible for history
+        
+        const ol = document.createElement('ol');
+        if (planData.steps && Array.isArray(planData.steps)) {
+            planData.steps.forEach(step => { 
+                const li = document.createElement('li'); 
+                li.innerHTML = `<strong>${step.step_id}. ${formatMessageContentInternal(step.description)}</strong> ${step.tool_to_use && step.tool_to_use !== "None" ? `<br><span class="step-tool">Tool: ${step.tool_to_use}</span>` : ''} ${step.tool_input_instructions ? `<br><span class="step-tool">Input Hint: ${formatMessageContentInternal(step.tool_input_instructions)}</span>` : ''} <br><span class="step-expected">Expected: ${formatMessageContentInternal(step.expected_outcome)}</span>`; 
+                ol.appendChild(li); 
+            });
+        }
+        detailsDiv.appendChild(ol); 
+        messageElement.appendChild(detailsDiv);
+    } else {
+        messageElement.innerHTML = formatMessageContentInternal(text);
+    }
+
     if (agentThinkingStatusElement && agentThinkingStatusElement.style.display !== 'none' && messageElement !== agentThinkingStatusElement) {
-        chatMessagesContainerElement.insertBefore(agentThinkingStatusElement, null);
+        chatMessagesContainerElement.insertBefore(agentThinkingStatusElement, null); 
     }
     chatMessagesContainerElement.appendChild(messageElement);
     if (doScroll) { scrollToBottomChat(); }
     return messageElement;
 }
 
-function displayPlanInUI(humanSummary, structuredPlan, onConfirmCallback, onCancelCallback) {
-    if (!chatMessagesContainerElement) return;
-    const existingPlanUI = chatMessagesContainerElement.querySelector('.plan-confirmation-container');
-    if (existingPlanUI) existingPlanUI.remove();
+/**
+ * Displays the agent's proposed plan for user confirmation.
+ * @param {string} humanSummary - A human-readable summary of the plan.
+ * @param {string} planId - The unique ID of the plan proposal.
+ * @param {Array<object>} structuredPlan - The detailed steps of the plan.
+ * @param {function} onConfirm - Callback when "Confirm & Run" is clicked, receives planId.
+ * @param {function} onCancel - Callback when "Cancel" is clicked, receives planId.
+ * @param {function} onViewDetails - Callback (now mostly for logging, as details are inline).
+ */
+function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfirm, onCancel, onViewDetails) {
+    if (!chatMessagesContainerElement) {
+        console.error("[ChatUI] Cannot display plan confirmation: Chat messages container not initialized.");
+        return;
+    }
+
+    const existingPlanUI = chatMessagesContainerElement.querySelector(`.plan-confirmation-container[data-plan-id="${planId}"]`);
+    if (existingPlanUI) { // If a UI for this specific plan ID already exists, remove it before re-rendering
+        console.log(`[ChatUI] Removing existing plan confirmation UI for plan ID ${planId} before displaying new one.`);
+        existingPlanUI.remove();
+    } else { // If no specific plan ID match, remove any generic plan proposal UI
+        const genericExistingPlanUI = chatMessagesContainerElement.querySelector('.plan-confirmation-container:not([data-plan-id])');
+        if (genericExistingPlanUI) {
+            console.log("[ChatUI] Removing existing generic plan confirmation UI.");
+            genericExistingPlanUI.remove();
+        }
+    }
+
+
     const planContainer = document.createElement('div');
-    planContainer.className = 'message message-system plan-confirmation-container';
-    const title = document.createElement('h4'); title.textContent = "Agent's Proposed Plan:"; planContainer.appendChild(title);
-    const summaryP = document.createElement('p'); summaryP.className = 'plan-summary'; summaryP.innerHTML = formatMessageContentInternal(humanSummary); planContainer.appendChild(summaryP);
-    const detailsDiv = document.createElement('div'); detailsDiv.className = 'plan-steps-details'; detailsDiv.style.display = 'none';
+    planContainer.className = 'message message-system plan-confirmation-container'; 
+    planContainer.dataset.planId = planId; 
+
+    const titleElement = document.createElement('h4');
+    titleElement.textContent = 'Agent Proposed Plan:';
+    planContainer.appendChild(titleElement);
+
+    const summaryElement = document.createElement('p');
+    summaryElement.className = 'plan-summary';
+    summaryElement.innerHTML = formatMessageContentInternal(humanSummary); 
+    planContainer.appendChild(summaryElement);
+
+    // --- MODIFIED: Inline Details Div ---
+    const detailsDiv = document.createElement('div');
+    detailsDiv.className = 'plan-steps-details'; // Use existing CSS or new
+    detailsDiv.style.display = 'none'; // Initially hidden
+
     const ol = document.createElement('ol');
-    structuredPlan.forEach(step => { const li = document.createElement('li'); li.innerHTML = `<strong>${step.step_id}. ${formatMessageContentInternal(step.description)}</strong> ${step.tool_to_use && step.tool_to_use !== "None" ? `<br><span class="step-tool">Tool: ${step.tool_to_use}</span>` : ''} ${step.tool_input_instructions ? `<br><span class="step-tool">Input Hint: ${formatMessageContentInternal(step.tool_input_instructions)}</span>` : ''} <br><span class="step-expected">Expected: ${formatMessageContentInternal(step.expected_outcome)}</span>`; ol.appendChild(li); });
-    detailsDiv.appendChild(ol); planContainer.appendChild(detailsDiv);
-    const toggleBtn = document.createElement('button'); toggleBtn.className = 'plan-toggle-details-btn'; toggleBtn.textContent = 'Show Details';
-    toggleBtn.onclick = () => { const isHidden = detailsDiv.style.display === 'none'; detailsDiv.style.display = isHidden ? 'block' : 'none'; toggleBtn.textContent = isHidden ? 'Hide Details' : 'Show Details'; };
-    planContainer.appendChild(toggleBtn);
-    const actionsDiv = document.createElement('div'); actionsDiv.className = 'plan-actions';
-    const confirmBtn = document.createElement('button'); confirmBtn.className = 'plan-confirm-btn'; confirmBtn.textContent = 'Confirm & Run Plan';
-    confirmBtn.onclick = () => { onConfirmCallback(structuredPlan); confirmBtn.disabled = true; cancelBtn.disabled = true; toggleBtn.disabled = true; planContainer.style.opacity = "0.7"; planContainer.style.borderLeftColor = "var(--text-color-darker)"; };
+    if (structuredPlan && Array.isArray(structuredPlan)) {
+        structuredPlan.forEach(step => { 
+            const li = document.createElement('li'); 
+            li.innerHTML = `<strong>${step.step_id}. ${formatMessageContentInternal(step.description)}</strong> ${step.tool_to_use && step.tool_to_use !== "None" ? `<br><span class="step-tool">Tool: ${step.tool_to_use}</span>` : ''} ${step.tool_input_instructions ? `<br><span class="step-tool">Input Hint: ${formatMessageContentInternal(step.tool_input_instructions)}</span>` : ''} <br><span class="step-expected">Expected: ${formatMessageContentInternal(step.expected_outcome)}</span>`; 
+            ol.appendChild(li); 
+        });
+    } else {
+        const li = document.createElement('li');
+        li.textContent = "Plan details are not available or are in an unexpected format.";
+        ol.appendChild(li);
+    }
+    detailsDiv.appendChild(ol); 
+    planContainer.appendChild(detailsDiv);
+    // --- END MODIFICATION ---
+
+    const viewDetailsBtn = document.createElement('button');
+    viewDetailsBtn.className = 'plan-toggle-details-btn'; 
+    viewDetailsBtn.textContent = 'View Details';
+    viewDetailsBtn.title = `View detailed plan for proposal ${planId}`;
+    viewDetailsBtn.onclick = (e) => {
+        e.stopPropagation(); 
+        // --- MODIFIED: Toggle inline details ---
+        const isHidden = detailsDiv.style.display === 'none';
+        detailsDiv.style.display = isHidden ? 'block' : 'none';
+        viewDetailsBtn.textContent = isHidden ? 'Hide Details' : 'View Details';
+        // --- END MODIFICATION ---
+        if (typeof onViewDetails === 'function') { // Still call the callback for logging or other actions
+            onViewDetails(planId, isHidden); // Pass new state
+        }
+    };
+    planContainer.appendChild(viewDetailsBtn);
+
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'plan-actions';
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.className = 'plan-confirm-btn';
+    confirmBtn.textContent = 'Confirm & Run';
+    confirmBtn.onclick = (e) => {
+        e.stopPropagation();
+        if (typeof onConfirm === 'function') {
+            onConfirm(planId); // Pass planId
+        }
+    };
     actionsDiv.appendChild(confirmBtn);
-    const cancelBtn = document.createElement('button'); cancelBtn.className = 'plan-cancel-btn'; cancelBtn.textContent = 'Cancel Plan';
-    cancelBtn.onclick = () => { onCancelCallback(); planContainer.remove(); };
-    actionsDiv.appendChild(cancelBtn); planContainer.appendChild(actionsDiv);
-    chatMessagesContainerElement.appendChild(planContainer); scrollToBottomChat();
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'plan-cancel-btn';
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.onclick = (e) => {
+        e.stopPropagation();
+        if (typeof onCancel === 'function') {
+            onCancel(planId); // Pass planId
+        }
+    };
+    actionsDiv.appendChild(cancelBtn);
+    planContainer.appendChild(actionsDiv);
+
+    if (agentThinkingStatusElement && agentThinkingStatusElement.parentNode === chatMessagesContainerElement) {
+        chatMessagesContainerElement.insertBefore(planContainer, agentThinkingStatusElement);
+    } else {
+        chatMessagesContainerElement.appendChild(planContainer);
+    }
+
+    scrollToBottomChat(); 
+    console.log(`[ChatUI] Displayed plan confirmation for plan ID: ${planId}`);
 }
+
 
 function showAgentThinkingStatusInUI(show, statusText = "Thinking...") {
     if (!agentThinkingStatusElement || !chatMessagesContainerElement) return;
     if (show) {
         agentThinkingStatusElement.textContent = statusText;
         agentThinkingStatusElement.style.display = 'block';
-        chatMessagesContainerElement.appendChild(agentThinkingStatusElement); // Ensure it's at the end
+        chatMessagesContainerElement.appendChild(agentThinkingStatusElement); 
         scrollToBottomChat();
     } else {
         agentThinkingStatusElement.style.display = 'none';
@@ -171,10 +297,11 @@ function showAgentThinkingStatusInUI(show, statusText = "Thinking...") {
 
 function clearChatMessagesUI() {
     if (chatMessagesContainerElement) {
-        chatMessagesContainerElement.innerHTML = '';
-        if (agentThinkingStatusElement) { // Re-add hidden thinking status for future use
-            chatMessagesContainerElement.appendChild(agentThinkingStatusElement);
-            agentThinkingStatusElement.style.display = 'none';
+        const thinkingStatus = chatMessagesContainerElement.querySelector('.agent-thinking-status');
+        chatMessagesContainerElement.innerHTML = ''; 
+        if (thinkingStatus) {
+            chatMessagesContainerElement.appendChild(thinkingStatus); 
+            thinkingStatus.style.display = 'none'; 
         }
     }
 }

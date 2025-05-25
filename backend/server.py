@@ -4,9 +4,8 @@ import websockets
 import json
 import datetime
 import logging
-import shlex 
 import uuid
-from typing import Optional, List, Dict, Any, Set, Tuple, Callable, Coroutine
+from typing import Optional, List, Dict, Any, Callable, Coroutine
 from pathlib import Path
 import os
 import signal
@@ -19,16 +18,12 @@ import urllib.parse
 
 # --- Web Server Imports ---
 from aiohttp import web
-from aiohttp.web import FileResponse
+from aiohttp.web import FileResponse # Corrected import
 import aiohttp_cors
 # -------------------------
 
 # LangChain Imports
-from langchain.agents import AgentExecutor 
 from langchain.memory import ConversationBufferWindowMemory
-from langchain_core.messages import AIMessage, HumanMessage 
-from langchain_core.agents import AgentAction, AgentFinish 
-from langchain_core.runnables import RunnableConfig 
 from langchain_core.language_models.base import BaseLanguageModel 
 from langchain_core.language_models.chat_models import BaseChatModel 
 
@@ -42,19 +37,16 @@ from backend.db_utils import (
     init_db, add_task, add_message, get_messages_for_task,
     delete_task_and_messages, rename_task_in_db
 )
-from backend.planner import generate_plan, PlanStep 
-from backend.controller import validate_and_prepare_step_action 
-from backend.message_handlers import (
+from backend.message_handlers import ( 
     process_context_switch, process_user_message,
     process_execute_confirmed_plan, process_new_task,
     process_delete_task, process_rename_task,
     process_set_llm, process_get_available_models,
     process_cancel_agent, process_get_artifacts_for_task,
     process_run_command, process_action_command,
-    process_set_session_role_llm
+    process_set_session_role_llm,
+    process_cancel_plan_proposal 
 )
-
-# ----------------------
 
 # Define Type Aliases for callback functions used in MessageHandler hint
 SendWSMessageFunc = Callable[[str, Any], Coroutine[Any, Any, None]]
@@ -467,6 +459,7 @@ async def handler(websocket: Any):
             "plan_execution_active": False,
             "original_user_query": None,
             "active_plan_filename": None,
+            "current_plan_proposal_id_backend": None, # Added
             "session_intent_classifier_llm_id": None, 
             "session_planner_llm_id": None,
             "session_controller_llm_id": None,
@@ -492,6 +485,7 @@ async def handler(websocket: Any):
         "context_switch": process_context_switch,      
         "user_message": process_user_message,          
         "execute_confirmed_plan": process_execute_confirmed_plan, 
+        "cancel_plan_proposal": process_cancel_plan_proposal, # ADDED
         "new_task": process_new_task,                  
         "delete_task": process_delete_task,            
         "rename_task": process_rename_task,            
@@ -546,13 +540,12 @@ async def handler(websocket: Any):
                     handler_args: Dict[str, Any] = { 
                         "session_id": session_id, "data": parsed_data, 
                         "session_data_entry": session_data_entry, "connected_clients_entry": connected_clients_entry,
-                        "send_ws_message_func": send_ws_message_for_session, "add_monitor_log_func": add_monitor_log_and_save,
+                        "send_ws_message_func": send_ws_message_for_session, 
+                        "add_monitor_log_func": add_monitor_log_and_save,
                     }
                     
-                    # **** CORRECTED SECTION ****
-                    if message_type in ["context_switch", "user_message", "run_command", "execute_confirmed_plan"]: # Added "execute_confirmed_plan"
+                    if message_type in ["context_switch", "user_message", "run_command", "execute_confirmed_plan"]: 
                         handler_args["db_add_message_func"] = add_message
-                    # *************************
                     if message_type == "context_switch": 
                         handler_args["db_add_task_func"] = add_task
                         handler_args["db_get_messages_func"] = get_messages_for_task
@@ -572,24 +565,35 @@ async def handler(websocket: Any):
                     logger.warning(f"[{session_id}] Unknown message type received: {message_type}")
                     await add_monitor_log_and_save(f"Received unknown message type: {message_type}", "error_unknown_msg")
 
-            except json.JSONDecodeError: logger.error(f"[{session_id}] Received non-JSON message: {message_str[:200]}{'...' if len(message_str)>200 else ''}"); await add_monitor_log_and_save("Error: Received invalid message format (not JSON).", "error_json")
-            except asyncio.CancelledError: logger.info(f"[{session_id}] Message processing loop cancelled."); raise
+            except json.JSONDecodeError: 
+                logger.error(f"[{session_id}] Received non-JSON message: {message_str[:200]}{'...' if len(message_str)>200 else ''}")
+                await add_monitor_log_and_save("Error: Received invalid message format (not JSON).", "error_json")
+            except asyncio.CancelledError: 
+                logger.info(f"[{session_id}] Message processing loop cancelled."); raise
             except Exception as e:
                 logger.error(f"[{session_id}] Error processing message: {e}", exc_info=True)
-                try: await add_monitor_log_and_save(f"Error processing message: {e}", "error_processing"); await send_ws_message_for_session("status_message", f"Error processing message: {type(e).__name__}")
-                except Exception as inner_e: logger.error(f"[{session_id}] Further error during error reporting: {inner_e}")
+                try: 
+                    await add_monitor_log_and_save(f"Error processing message: {e}", "error_processing")
+                    await send_ws_message_for_session("status_message", f"Error processing message: {type(e).__name__}")
+                except Exception as inner_e: 
+                    logger.error(f"[{session_id}] Further error during error reporting: {inner_e}")
 
     except (websockets.exceptions.ConnectionClosedOK, websockets.exceptions.ConnectionClosedError) as ws_close_exc:
-        if isinstance(ws_close_exc, websockets.exceptions.ConnectionClosedOK): logger.info(f"Client disconnected normally: {websocket.remote_address} (Session: {session_id}) - Code: {ws_close_exc.code}, Reason: {ws_close_exc.reason}")
-        else: logger.warning(f"Connection closed abnormally: {websocket.remote_address} (Session: {session_id}) - Code: {ws_close_exc.code}, Reason: {ws_close_exc.reason}")
+        if isinstance(ws_close_exc, websockets.exceptions.ConnectionClosedOK): 
+            logger.info(f"Client disconnected normally: {websocket.remote_address} (Session: {session_id}) - Code: {ws_close_exc.code}, Reason: {ws_close_exc.reason}")
+        else: 
+            logger.warning(f"Connection closed abnormally: {websocket.remote_address} (Session: {session_id}) - Code: {ws_close_exc.code}, Reason: {ws_close_exc.reason}")
     except asyncio.CancelledError:
         logger.info(f"WebSocket handler for session {session_id} cancelled.")
-        if websocket: await websocket.close(code=1012, reason="Server shutting down")
+        if websocket and websocket.open: # Check if open before trying to close
+             await websocket.close(code=1012, reason="Server shutting down")
     except Exception as e:
         logger.error(f"Unhandled error in WebSocket handler: {websocket.remote_address} (Session: {session_id}): {e}", exc_info=True)
         try:
-            if websocket: await websocket.close(code=1011, reason="Internal server error")
-        except Exception as close_e: logger.error(f"[{session_id}] Error closing websocket after unhandled handler error: {close_e}")
+            if websocket and websocket.open: 
+                await websocket.close(code=1011, reason="Internal server error")
+        except Exception as close_e: 
+            logger.error(f"[{session_id}] Error closing websocket after unhandled handler error: {close_e}")
     finally:
         logger.info(f"Cleaning up resources for session {session_id}")
         agent_task = connected_clients.get(session_id, {}).get("agent_task")
@@ -598,7 +602,7 @@ async def handler(websocket: Any):
             agent_task.cancel()
             try: await agent_task
             except asyncio.CancelledError: pass
-            except AgentCancelledException: pass
+            except AgentCancelledException: pass # Expected if agent handles it
             except Exception as cancel_e: logger.error(f"[{session_id}] Error waiting for task cancellation during cleanup: {cancel_e}")
         if session_id in connected_clients: del connected_clients[session_id]
         if session_id in session_data: del session_data[session_id]
@@ -614,29 +618,75 @@ async def main():
     ws_host = "0.0.0.0"; ws_port = 8765
     logger.info(f"Starting WebSocket server on ws://{ws_host}:{ws_port}")
     shutdown_event = asyncio.Event()
-    websocket_server = await websockets.serve( handler, ws_host, ws_port, max_size=settings.websocket_max_size_bytes, ping_interval=settings.websocket_ping_interval, ping_timeout=settings.websocket_ping_timeout )
-    logger.info("WebSocket server started.")
+    
+    stop_serving = asyncio.Future() # Future to signal server to stop
+
+    async def serve_websockets():
+        async with websockets.serve(
+            handler, 
+            ws_host, 
+            ws_port, 
+            max_size=settings.websocket_max_size_bytes, 
+            ping_interval=settings.websocket_ping_interval, 
+            ping_timeout=settings.websocket_ping_timeout
+        ) as server:
+            logger.info("WebSocket server started and serving.")
+            await stop_serving # Keep server running until stop_serving is set
+            logger.info("WebSocket server received stop signal, closing.")
+        logger.info("WebSocket server fully stopped.")
+
+    server_task = asyncio.create_task(serve_websockets())
+    
     loop = asyncio.get_running_loop()
-    original_sigint_handler = signal.getsignal(signal.SIGINT); original_sigterm_handler = signal.getsignal(signal.SIGTERM)
-    def signal_handler(sig, frame): logger.info(f"Received signal {sig}. Initiating shutdown..."); shutdown_event.set(); signal.signal(signal.SIGINT, original_sigint_handler); signal.signal(signal.SIGTERM, original_sigterm_handler)
-    try: loop.add_signal_handler(signal.SIGINT, signal_handler, signal.SIGINT, None); loop.add_signal_handler(signal.SIGTERM, signal_handler, signal.SIGTERM, None)
-    except NotImplementedError: logger.warning("Signal handlers not available on this platform (e.g., Windows without ProactorEventLoop). Use Ctrl+C if available, or send SIGTERM.")
+    original_sigint_handler = signal.getsignal(signal.SIGINT)
+    original_sigterm_handler = signal.getsignal(signal.SIGTERM)
+
+    def signal_handler_wrapper(sig, frame):
+        logger.info(f"Received signal {sig}. Initiating shutdown...")
+        if not stop_serving.done():
+            stop_serving.set_result(None) # Signal the server to stop
+        # Restore original handlers to allow Python to exit if needed
+        signal.signal(signal.SIGINT, original_sigint_handler)
+        signal.signal(signal.SIGTERM, original_sigterm_handler)
+        # For non-Windows, this might be enough. For Windows, loop.stop() might be needed.
+        # If loop.stop() is called, ensure server_task is awaited or cancelled.
+
+    try: 
+        loop.add_signal_handler(signal.SIGINT, functools.partial(signal_handler_wrapper, signal.SIGINT, None))
+        loop.add_signal_handler(signal.SIGTERM, functools.partial(signal_handler_wrapper, signal.SIGTERM, None))
+    except NotImplementedError: 
+        logger.warning("Signal handlers not available on this platform (e.g., Windows without ProactorEventLoop). Use Ctrl+C if available, or send SIGTERM.")
+    
     logger.info("Application servers running. Press Ctrl+C to stop (or send SIGTERM).")
-    await shutdown_event.wait()
-    logger.info("Shutdown signal received. Stopping servers...")
-    logger.info("Stopping WebSocket server..."); websocket_server.close(); await websocket_server.wait_closed(); logger.info("WebSocket server stopped.")
-    logger.info("Stopping file server..."); await file_server_runner.cleanup(); logger.info("File server stopped.")
-    tasks_to_cancel = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
+    
+    try:
+        await server_task # Wait for the server task to complete (which happens when stop_serving is set)
+    except asyncio.CancelledError:
+        logger.info("Main server task was cancelled.")
+    
+    logger.info("Shutdown signal processed. Stopping remaining components...")
+    
+    logger.info("Stopping file server..."); 
+    await file_server_runner.cleanup(); 
+    logger.info("File server stopped.")
+    
+    tasks_to_cancel = [t for t in asyncio.all_tasks() if t is not asyncio.current_task() and not t.done()]
     if tasks_to_cancel:
         logger.info(f"Cancelling {len(tasks_to_cancel)} outstanding tasks...")
-        for task_to_cancel_item in tasks_to_cancel: task_to_cancel_item.cancel()
+        for task_to_cancel_item in tasks_to_cancel: 
+            task_to_cancel_item.cancel()
         await asyncio.gather(*tasks_to_cancel, return_exceptions=True)
         logger.info("Outstanding tasks cancelled.")
+    logger.info("Shutdown complete.")
 
 if __name__ == "__main__":
     warnings.filterwarnings("ignore", category=UserWarning, message=".*LangSmith API key.*")
     warnings.filterwarnings("ignore", category=UserWarning, message=".*LangSmithMissingAPIKeyWarning.*")
-    try: asyncio.run(main())
-    except KeyboardInterrupt: logger.info("Server stopped manually (KeyboardInterrupt).")
-    except Exception as e: logging.critical(f"Server failed to start or crashed: {e}", exc_info=True); exit(1)
+    try: 
+        asyncio.run(main())
+    except KeyboardInterrupt: 
+        logger.info("Server stopped manually (KeyboardInterrupt).")
+    except Exception as e: 
+        logging.critical(f"Server failed to start or crashed: {e}", exc_info=True); 
+        exit(1)
 

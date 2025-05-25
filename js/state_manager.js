@@ -30,8 +30,7 @@ const _state = {
     currentArtifactIndex: -1,
     currentTaskTotalTokens: { input: 0, output: 0, total: 0 },
     currentDisplayedPlan: null, // Holds the structured plan for confirmation
-    // UI specific states that might be better managed by UI modules directly or a UI state manager
-    // isLoadingHistory: false, // Example, currently in script.js
+    currentPlanProposalId: null, // ADDED: Holds the ID of the current plan proposal
 };
 
 // --- Private Helper Functions for localStorage ---
@@ -153,6 +152,7 @@ function getCurrentTaskArtifacts() { return [..._state.currentTaskArtifacts]; } 
 function getCurrentArtifactIndex() { return _state.currentArtifactIndex; }
 function getCurrentTaskTotalTokens() { return JSON.parse(JSON.stringify(_state.currentTaskTotalTokens)); }
 function getCurrentDisplayedPlan() { return _state.currentDisplayedPlan ? JSON.parse(JSON.stringify(_state.currentDisplayedPlan)) : null; }
+function getCurrentPlanProposalId() { return _state.currentPlanProposalId; } // ADDED getter
 
 // --- Setters / Updaters ---
 function addTask(taskTitle) {
@@ -178,7 +178,18 @@ function selectTask(taskId) {
         _state.currentArtifactIndex = -1;
         _state.currentTaskTotalTokens = { input: 0, output: 0, total: 0 };
         _state.currentDisplayedPlan = null;
+        _state.currentPlanProposalId = null; // ADDED: Reset plan proposal ID on task switch
         console.log(`[StateManager] Task selected: ${taskId}. Task-specific state reset.`);
+        return true;
+    } else if (taskId === null) { // Handling case where no task is selected (e.g., after deleting the last task)
+        _state.currentTaskId = null;
+        _saveActiveTaskIdToLocalStorage();
+        _state.currentTaskArtifacts = [];
+        _state.currentArtifactIndex = -1;
+        _state.currentTaskTotalTokens = { input: 0, output: 0, total: 0 };
+        _state.currentDisplayedPlan = null;
+        _state.currentPlanProposalId = null; // ADDED: Reset plan proposal ID
+        console.log(`[StateManager] No task selected. Task-specific state reset.`);
         return true;
     }
     console.warn(`[StateManager] Attempted to select non-existent task: ${taskId}`);
@@ -198,6 +209,7 @@ function deleteTask(taskId) {
             _state.currentArtifactIndex = -1;
             _state.currentTaskTotalTokens = { input: 0, output: 0, total: 0 };
             _state.currentDisplayedPlan = null;
+            _state.currentPlanProposalId = null; // ADDED: Reset plan proposal ID
         }
         return true;
     }
@@ -275,6 +287,11 @@ function setCurrentDisplayedPlan(plan) { // plan is the structured plan object
     _state.currentDisplayedPlan = plan ? JSON.parse(JSON.stringify(plan)) : null; // Deep copy or null
 }
 
+function setCurrentPlanProposalId(planId) { // ADDED setter
+    _state.currentPlanProposalId = planId;
+}
+
+
 // Expose functions (this pattern makes them available like module exports if this file is included via <script>)
 window.StateManager = {
     initStateManager,
@@ -289,6 +306,7 @@ window.StateManager = {
     getCurrentArtifactIndex,
     getCurrentTaskTotalTokens,
     getCurrentDisplayedPlan,
+    getCurrentPlanProposalId,       // ADDED
     addTask,
     selectTask,
     deleteTask,
@@ -301,7 +319,8 @@ window.StateManager = {
     setCurrentArtifactIndex,
     updateCurrentTaskTotalTokens,
     resetCurrentTaskTotalTokens,
-    setCurrentDisplayedPlan
+    setCurrentDisplayedPlan,
+    setCurrentPlanProposalId,       // ADDED
 };
 
 console.log("[StateManager] Loaded.");
