@@ -6,7 +6,7 @@ from backend.llm_setup import get_llm
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
-from langchain_core.pydantic_v1 import BaseModel, Field
+from langchain_core.pydantic_v1 import BaseModel, Field # Ensure Pydantic v1 for Langchain compatibility
 import asyncio
 
 logger = logging.getLogger(__name__)
@@ -17,7 +17,7 @@ class PlanStep(BaseModel):
     description: str = Field(description="A concise, human-readable description of what this single sub-task aims to achieve.")
     tool_to_use: Optional[str] = Field(description="The exact name of the tool to be used for this step, if any. Must be one of the available tools or 'None'.")
     tool_input_instructions: Optional[str] = Field(description="Specific instructions or key parameters for the tool_input, if a tool is used. This is not the full tool input itself, but guidance for forming it.")
-    expected_outcome: str = Field(description="What is the expected result or artifact from completing this step successfully?")
+    expected_outcome: str = Field(description="What is the expected result or artifact from completing this step successfully? For generative 'No Tool' steps, this should describe the actual content to be produced (e.g., 'The text of a short poem about stars.'). For tool steps or steps producing data for subsequent steps, describe the state or data (e.g., 'File 'data.csv' downloaded.', 'The full text of 'report.txt' is available.').")
 
 # Define the structure for the overall plan
 class AgentPlan(BaseModel):
@@ -32,19 +32,28 @@ The research agent has access to the following tools:
 
 For each sub-task in the plan:
 1.  Provide a clear `description` of what the sub-task aims to achieve.
-2.  If a tool is needed, specify the exact `tool_to_use` from the list of available tools. If no tool is directly needed for a step (e.g., the LLM itself will perform the reasoning, summarization, or content generation), use "None".
-    For such "No Tool" steps that involve the LLM generating structured text output (e.g., a Markdown table, a JSON object, a detailed list, or a multi-paragraph formatted text segment): if the required output is complex, multi-part, or has a specific intricate format, consider breaking the generation into two or more distinct "No Tool" steps if it promotes clarity and reliability. For example:
-    * An initial step to generate the core data or content elements (perhaps as a list of facts, key-value pairs, or plain sentences). The `expected_outcome` for this step would be this intermediate data.
-    * A subsequent step to take this intermediate data (which will be available from the previous step's output) and format it into the final desired complex structure (e.g., the Markdown table, the JSON object). The `expected_outcome` here would be the final formatted string.
-    This approach can improve the reliability of generating complex outputs.
-3.  Provide brief `tool_input_instructions` highlighting key parameters or data the tool might need. This is NOT the full tool input, but guidance for the agent when it forms the tool input later. For example, if downloading a file, mention the expected filename.
-4.  State the `expected_outcome` of successfully completing the step (e.g., "File 'data.csv' downloaded to workspace", "Summary of article written to 'summary.txt'"). If this step's output is primarily intended as direct, raw input for a *subsequent processing step* in your plan (like parsing, further analysis, or summarization by a later step), the `expected_outcome` should clearly state that this raw, unprocessed data (e.g., "The full text content of the file 'report.txt' is returned", "The complete list of search results is made available") is the deliverable for this current step.
+2.  If a tool is needed, specify the exact `tool_to_use` from the list of available tools.
+3.  If no tool is directly needed for a step (e.g., the LLM itself will perform the reasoning, summarization, or content generation), use "None" for `tool_to_use`.
+    -   For such "No Tool" steps that involve the LLM generating specific text output (e.g., a poem, a summary, a specific format of data like JSON or Markdown):
+        -   The `description` should clearly state the generation task (e.g., "Generate a short poem about stars", "Summarize the previous findings").
+        -   The `expected_outcome` for these generative "No Tool" steps MUST clearly state that the *actual generated content itself* is the outcome. For example:
+            - "The text of a short poem about stars." (NOT "A poem is generated and available")
+            - "A concise summary of the key findings from the search results." (NOT "A summary is created")
+            - "A JSON object listing the extracted entities." (NOT "Entities are extracted and available in JSON")
+    -   If a "No Tool" step involves complex, multi-part generation or intricate formatting (e.g., a detailed Markdown table from unstructured data), consider breaking it into two "No Tool" steps:
+        1.  An initial step to generate the core data/elements. `expected_outcome`: "Intermediate data/elements for X are generated."
+        2.  A subsequent step to format this intermediate data. `expected_outcome`: "The [data from step 1] formatted as a Markdown table."
+4.  Provide brief `tool_input_instructions` highlighting key parameters or data the tool might need if a tool is used. This is NOT the full tool input, but guidance for the agent when it forms the tool input later. For "None" tool steps, this can be a brief note on what information the LLM should focus on if not obvious from the description.
+5.  State the `expected_outcome` of successfully completing the step.
+    -   For tool steps or steps producing data primarily for *subsequent processing* within the plan (not direct user presentation yet): the `expected_outcome` should describe the state or data becoming available (e.g., "File 'data.csv' downloaded to workspace", "The full text content of the file 'report.txt' is returned and available for the next step", "The list of search results is available.").
+    -   **Crucially, for "No Tool" steps that are intended to generate the final piece of information or creative content for that part of the plan, the `expected_outcome` MUST describe the actual content itself, as shown in point 3.**
 
 **Handling Multi-Part User Queries for Final Output:**
-If the original user query explicitly or implicitly asks for multiple distinct pieces of information to be delivered in the final response (e.g., "tell me X, and also provide Y"), ensure your plan includes all necessary steps to gather or generate each piece of information. **Crucially, after all individual pieces of information have been gathered by preceding steps and need to be presented to the user as a combined answer, you MUST add a final "No Tool" step. The objective of this final step is to synthesize these pieces into a single, coherent, and comprehensive final answer.**
+If the original user query explicitly or implicitly asks for multiple distinct pieces of information to be delivered in the final response (e.g., "tell me X, and also provide Y"), ensure your plan includes all necessary steps to gather or generate each piece of information.
+**Crucially, after all individual pieces of information have been gathered by preceding steps and need to be presented to the user as a combined answer, you MUST add a final "No Tool" step.**
 -   The `description` for this final synthesis step should clearly state that it's combining the necessary prior outputs to fully address the user's original request.
--   The `tool_input_instructions` should guide the LLM on which prior step outputs need to be synthesized, for example: "Combine the result from Step X [e.g., the extracted fact about AD-003's MechanismOfAction] and the result from Step Y [e.g., the one-sentence summary of the file 'alz_candidates.md'] into a complete answer to the user's original query: '{user_query}'".
--   The `expected_outcome` for this synthesis step should be: "A single, consolidated final answer addressing all parts of the user's original request is generated and ready to be presented."
+-   The `tool_input_instructions` (for this "No Tool" synthesis step) should guide the LLM on which prior step outputs need to be synthesized, for example: "Combine the result from Step X [e.g., the extracted fact] and the result from Step Y [e.g., the summary] into a complete answer to the user's original query: '{user_query}'".
+-   The `expected_outcome` for this synthesis step should be: "A single, consolidated final answer addressing all parts of the user's original request is generated."
 
 Additionally, provide a `human_readable_summary` of the entire plan that can be shown to the user for confirmation.
 Ensure the output is a JSON object that strictly adheres to the following JSON schema:
@@ -79,16 +88,16 @@ async def generate_plan(
 
     prompt_template = ChatPromptTemplate.from_messages([
         ("system", PLANNER_SYSTEM_PROMPT_TEMPLATE),
-        ("human", "{user_query}") # user_query will be passed in .ainvoke()
+        ("human", "{user_query}") 
     ])
 
     chain = prompt_template | planner_llm | parser
 
     try:
         logger.debug(f"Planner prompt input variables: {prompt_template.input_variables}")
-        # Pass user_query directly here as it's used in the new prompt section for synthesis
+        # Pass user_query also for potential use in synthesis step instructions within the prompt
         planned_result_dict = await chain.ainvoke({
-            "user_query": user_query,
+            "user_query": user_query, # Used in the prompt for synthesis step context
             "available_tools_summary": available_tools_summary,
             "format_instructions": format_instructions
         })
@@ -99,6 +108,17 @@ async def generate_plan(
             agent_plan = AgentPlan(**planned_result_dict)
         else:
             logger.error(f"Planner LLM call returned an unexpected type: {type(planned_result_dict)}. Content: {planned_result_dict}")
+            # Attempt to get raw output if parsing failed
+            try:
+                raw_output_chain = prompt_template | planner_llm | StrOutputParser()
+                raw_output = await raw_output_chain.ainvoke({
+                    "user_query": user_query,
+                    "available_tools_summary": available_tools_summary,
+                    "format_instructions": format_instructions
+                })
+                logger.error(f"Planner: Raw LLM output on parsing error: {raw_output}")
+            except Exception as raw_e:
+                logger.error(f"Planner: Failed to get raw LLM output on parsing error: {raw_e}")
             return None, None
 
         human_summary = agent_plan.human_readable_summary
@@ -128,13 +148,14 @@ async def generate_plan(
         return None, None
 
 if __name__ == '__main__':
-    async def test_planner_multi_output():
-        query_multi_part = """Generate a list of 3 hypothetical drug candidates for treating Alzheimer's disease, including DrugID, MechanismOfAction, and DevelopmentStage, as a Markdown table. Save this to 'drugs.md'. Then, read 'drugs.md' and tell me the MechanismOfAction for DrugID 'AD-002'. Finally, also tell me how many drugs are listed in 'drugs.md'."""
+    async def test_planner_poem_generation():
+        # Test case similar to the problematic one
+        query_poem = "Create a file called poem.txt and write in it a small poem about stars."
         tools_summary = "- write_file: To write files to workspace.\n- read_file: To read files from workspace."
         
-        print(f"\n--- Testing Planner with Multi-Output Query ---")
-        print(f"Query: {query_multi_part}")
-        summary, plan = await generate_plan(query_multi_part, tools_summary)
+        print(f"\n--- Testing Planner with Poem Generation Query ---")
+        print(f"Query: {query_poem}")
+        summary, plan = await generate_plan(query_poem, tools_summary)
 
         if summary and plan:
             print("---- Human Readable Summary ----")
@@ -146,10 +167,22 @@ if __name__ == '__main__':
                     print(f"  Description: {step_data.get('description')}")
                     print(f"  Tool: {step_data.get('tool_to_use')}")
                     print(f"  Input Instructions: {step_data.get('tool_input_instructions')}")
-                    print(f"  Expected Outcome: {step_data.get('expected_outcome')}")
+                    print(f"  Expected Outcome: {step_data.get('expected_outcome')}") # Key to check
                 else:
                     print(f"Step {i+1}: Invalid step data format: {step_data}")
-        else:
-            print("Failed to generate a plan for multi-output query.")
+            
+            # Specific check for the poem generation step's expected outcome
+            if len(plan) > 0 and "poem about stars" in plan[0].get("description", "").lower():
+                print(f"\nDEBUG: Expected outcome for poem generation step (Step 1): '{plan[0].get('expected_outcome')}'")
+                if "actual text" in plan[0].get('expected_outcome', '').lower() or \
+                   "generated poem" in plan[0].get('expected_outcome', '').lower() or \
+                   "the poem itself" in plan[0].get('expected_outcome', '').lower():
+                    print("DEBUG: Step 1 expected outcome seems correctly formulated for direct content generation.")
+                else:
+                    print("DEBUG WARNING: Step 1 expected outcome might still be too indirect for direct content generation.")
 
-    asyncio.run(test_planner_multi_output())
+        else:
+            print("Failed to generate a plan for poem generation query.")
+
+    asyncio.run(test_planner_poem_generation())
+

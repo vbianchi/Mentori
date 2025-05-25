@@ -15,7 +15,7 @@ import functools
 import warnings 
 import aiofiles
 import unicodedata
-import urllib.parse # <--- ADDED IMPORT
+import urllib.parse
 
 # --- Web Server Imports ---
 from aiohttp import web
@@ -360,7 +360,7 @@ async def get_artifacts(task_id: str) -> List[Dict[str, str]]:
             elif file_suffix == '.pdf': artifact_type = 'pdf'
 
             if artifact_type != 'unknown':
-                encoded_filename = urllib.parse.quote(relative_filename) # <--- FIXED HERE
+                encoded_filename = urllib.parse.quote(relative_filename) 
                 artifact_url = f"http://{FILE_SERVER_CLIENT_HOST}:{FILE_SERVER_PORT}/workspace_files/{task_id}/{encoded_filename}"
                 artifacts.append({"type": artifact_type, "url": artifact_url, "filename": relative_filename})
         logger.info(f"Found {len(artifacts)} artifacts for task {task_id}.")
@@ -549,12 +549,22 @@ async def handler(websocket: Any):
                         "send_ws_message_func": send_ws_message_for_session, "add_monitor_log_func": add_monitor_log_and_save,
                     }
                     
-                    if message_type in ["context_switch", "user_message", "run_command"]: handler_args["db_add_message_func"] = add_message
-                    if message_type == "context_switch": handler_args["db_add_task_func"] = add_task; handler_args["db_get_messages_func"] = get_messages_for_task; handler_args["get_artifacts_func"] = get_artifacts
-                    elif message_type == "new_task" or message_type == "delete_task" or message_type == "get_artifacts_for_task": handler_args["get_artifacts_func"] = get_artifacts
-                    if message_type == "delete_task": handler_args["db_delete_task_func"] = delete_task_and_messages
-                    elif message_type == "rename_task": handler_args["db_rename_task_func"] = rename_task_in_db
-                    elif message_type == "run_command": handler_args["execute_shell_command_func"] = execute_shell_command
+                    # **** CORRECTED SECTION ****
+                    if message_type in ["context_switch", "user_message", "run_command", "execute_confirmed_plan"]: # Added "execute_confirmed_plan"
+                        handler_args["db_add_message_func"] = add_message
+                    # *************************
+                    if message_type == "context_switch": 
+                        handler_args["db_add_task_func"] = add_task
+                        handler_args["db_get_messages_func"] = get_messages_for_task
+                        handler_args["get_artifacts_func"] = get_artifacts
+                    elif message_type == "new_task" or message_type == "delete_task" or message_type == "get_artifacts_for_task": 
+                        handler_args["get_artifacts_func"] = get_artifacts
+                    if message_type == "delete_task": 
+                        handler_args["db_delete_task_func"] = delete_task_and_messages
+                    elif message_type == "rename_task": 
+                        handler_args["db_rename_task_func"] = rename_task_in_db
+                    elif message_type == "run_command": 
+                        handler_args["execute_shell_command_func"] = execute_shell_command
                     
                     await handler_func(**handler_args) 
                 
