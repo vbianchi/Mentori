@@ -37,7 +37,8 @@ from .deep_research_tool import DeepResearchTool
 
 # --- Define Base Workspace Path ---
 try:
-    PROJECT_ROOT = Path(__file__).resolve().parent.parent 
+    PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent 
+    # Assuming standard_tools.py is in backend/tools/, so .parent.parent.parent gives project root
     BASE_WORKSPACE_ROOT = PROJECT_ROOT / "workspace"
     os.makedirs(BASE_WORKSPACE_ROOT, exist_ok=True)
     logger.info(f"Base workspace directory ensured at: {BASE_WORKSPACE_ROOT}")
@@ -51,23 +52,48 @@ except Exception as e:
 TEXT_EXTENSIONS = {".txt", ".py", ".js", ".css", ".html", ".json", ".csv", ".md", ".log", ".yaml", ".yml"}
 
 def get_task_workspace_path(task_id: Optional[str], create_if_not_exists: bool = True) -> Path:
+    logger.debug(f"get_task_workspace_path called for task_id: '{task_id}', create_if_not_exists: {create_if_not_exists}")
     if not task_id or not isinstance(task_id, str):
         msg = f"Invalid or missing task_id ('{task_id}') provided for workspace path."
         logger.error(msg)
         raise ValueError(msg)
-    if ".." in task_id or "/" in task_id or "\\" in task_id:
-        msg = f"Invalid characters detected in task_id: {task_id}. Denying workspace path creation."
+    
+    # Sanitize task_id to prevent path traversal or invalid characters for directory names
+    # Allow alphanumeric, hyphens, underscores. Replace others.
+    # This is a basic sanitization. More robust might be needed depending on where task_ids originate.
+    sane_task_id = re.sub(r'[^\w\-.]', '_', task_id)
+    if not sane_task_id: # If sanitization results in empty string
+        msg = f"Task_id '{task_id}' resulted in an empty sanitized ID. Cannot create workspace."
         logger.error(msg)
         raise ValueError(msg)
-    task_workspace = BASE_WORKSPACE_ROOT / task_id
+    
+    if ".." in sane_task_id or "/" in sane_task_id or "\\" in sane_task_id:
+        # This check should ideally be redundant if re.sub is comprehensive enough, but good for safety.
+        msg = f"Invalid characters detected in sanitized task_id: {sane_task_id} (original: {task_id}). Denying workspace path creation."
+        logger.error(msg)
+        raise ValueError(msg)
+        
+    task_workspace = BASE_WORKSPACE_ROOT / sane_task_id
+    logger.info(f"Resolved task workspace path: {task_workspace}")
+
     if create_if_not_exists: 
         try:
-            os.makedirs(task_workspace, exist_ok=True)
+            if not task_workspace.exists():
+                os.makedirs(task_workspace, exist_ok=True)
+                logger.info(f"Created task workspace directory: {task_workspace}")
+            else:
+                logger.debug(f"Task workspace directory already exists: {task_workspace}")
         except OSError as e:
             logger.error(f"Could not create task workspace directory at {task_workspace}: {e}", exc_info=True)
             raise OSError(f"Could not create task workspace {task_workspace}: {e}") from e
+    elif not task_workspace.exists():
+        logger.warning(f"Task workspace directory does not exist and create_if_not_exists is False: {task_workspace}")
+        # Depending on use case, might want to raise an error here too.
+        # For now, just log and return the non-existent path.
+
     return task_workspace
 
+# ... (rest of the file remains the same)
 async def fetch_and_parse_url(url: str) -> str:
     tool_name = "web_page_reader"
     logger.info(f"Tool '{tool_name}' received raw input: '{url}'") 
@@ -495,7 +521,6 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
         tools.append(Tool.from_function(
             func=python_repl_utility.run, 
             name="Python_REPL",
-            # --- MODIFIED Python_REPL Description ---
             description=(
                 "Executes a short, self-contained Python code snippet string. "
                 "Input MUST be a valid Python code string. "
@@ -505,7 +530,6 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
                 "Output from Python_REPL will be the stdout, stderr, or return value of the executed snippet. "
                 "**Security Note:** This executes code directly in the backend environment. Be extremely cautious."
             )
-            # --- END MODIFIED Python_REPL Description ---
         ))
     else:
         logger.warning("Python REPL tool not created (utility unavailable).")
