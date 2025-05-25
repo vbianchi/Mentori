@@ -1,88 +1,86 @@
-BRAINSTORM.md - ResearchAgent Project (v2.5)
-============================================
+BRAINSTORM.md - ResearchAgent Project (v2.5.1)
+==============================================
 
 This document tracks the current workflow, user feedback, and immediate brainstorming ideas for the ResearchAgent project. For longer-term plans and phased development, please see `ROADMAP.md`.
 
-Current Version & State (v2.5 - Frontend Refactoring & Agent Stability):
+**Current Version & State (v2.5.1 - Key Fixes & Refactoring Progress):** The ResearchAgent is at v2.5.1. Recent key advancements:
 
-The ResearchAgent is at v2.5. Key recent advancements include:
+-   **Agent Logic:** The "poem discrepancy" is **fixed**; the Controller now correctly uses the output from a previous generative step as input for subsequent tool calls (e.g., writing the generated poem to a file).
 
--   Frontend Codebase Refactoring: Significant modularization of the frontend JavaScript into a `state_manager.js`, `websocket_manager.js`, and distinct `ui_modules` for tasks, chat, monitor, artifacts, LLM selectors, token usage, and file uploads. This enhances maintainability and prepares for future UI feature development.
+-   **Message Persistence:** The Overall Plan Evaluator's final assessment message is now correctly saved and reloaded in the chat history.
 
--   `DeepResearchTool`: Fully functional across all its phases (search, curation, extraction, and report synthesis).
+-   **Frontend Refactoring:** Substantial progress with `state_manager.js` and modular UI components. `script.js` is acting more as an orchestrator.
 
--   Planner Refinements:
+-   **Backend Refactoring:**  `message_handlers.py` has been successfully modularized into the `message_processing` sub-package.
 
-    -   Improved granularity for "No Tool" steps: Complex generation tasks are broken down by the Planner.
+-   **Stability:** Numerous backend errors (`TypeError`, `NameError`, `SyntaxError`) have been resolved, leading to more stable operation.
 
-    -   Final Answer Synthesis: For multi-part user queries, the Planner adds a final "No Tool" step for comprehensive answers.
+-   **UI Functionality:** Task management, file uploads, and artifact viewing (including navigation) are working reliably.
 
--   Agent Execution Stability:
+**Immediate Focus & User Feedback:**
 
-    -   Refined ReAct agent prompt for clearer `Final Answer` formatting, reducing `_Exception` tool calls.
+1.  **Plan Confirmation UI (High Priority - Blocked):**
 
-    -   Executor directive includes 'precise expected outcome' for better adherence to step goals.
+    -   **Issue:** The backend now sends a new `propose_plan_for_confirmation` message type, but the frontend (`script.js`) does not yet handle it. This means the UI currently doesn't display any plan for user confirmation, effectively halting plan-based interactions after the intent is classified as "PLAN".
 
--   Successful Complex Plan Execution: Demonstrated success with multi-step plans involving chained "No Tool" generations, file I/O, and information extraction.
+    -   **Log Indication:**  `[SYSTEM] Unknown message type received: propose_plan_for_confirmation`
 
--   All previously listed UI (task management, chat, monitor, artifact viewer), Backend (Python, WebSockets, SQLite), Agent Architecture (P-C-E-E, Intent Classifier), LLM Configuration (Gemini, Ollama, role-specific), Callbacks, and Core Tool functionalities remain operational.
+    -   **Goal:** Implement the frontend handling for this new message to display a concise plan proposal with "Confirm," "View Details," and "Cancel" options.
 
-Current Complex Task Flow (Illustrative - Post-Refinements):
+2.  **Chat Clutter & Plan Display Format (High Priority - Post above fix):**
 
-The P-C-E-E pipeline is more robust due to the Planner and Executor enhancements. For instance, generating a Markdown table and then using it now involves:
+    -   **User Feedback:** The current chat UI (when the full plan was displayed) is too cluttered with intermediate step outputs and the detailed plan itself. The goal is a cleaner interface, more like the `manus.ai` example, distinguishing clearly between direct agent-user messages and status/progress updates. The detailed plan, when shown, was also obtrusive and not persistent on refresh.
 
-1.  Intent Classification: User query is identified as requiring a "PLAN".
+    -   **Proposed Solution (being implemented):**
 
-2.  Planner:
+        -   **Concise Plan Proposal:** Show a brief summary with action buttons (Confirm, View Details, Cancel).
 
-    -   Step 1 (No Tool): Generate data (e.g., as JSON). Expected outcome: "Intermediate data for table in JSON format."
+        -   **"View Details":** Link to the `_plan_proposal_<ID>.md` (and later `_plan_<ID>.md`) artifact in the Artifact Viewer. This makes the detailed plan persistent and non-intrusive in the chat.
 
-    -   Step 2 (No Tool): Format JSON to Markdown table. Expected outcome: "Markdown table string."
+        -   **Intermediate Outputs:** Route most intermediate execution details (thoughts, tool outputs) to the Monitor Log. The main chat should show high-level progress via the "Agent Thinking" status line and final answers.
 
-    -   Step 3 (`write_file`): Save Markdown table to a file. Expected outcome: "File 'table.md' created."
+3.  **Color-Coding Agent Workspace & LLM Selectors (Medium Priority):**
 
-    -   (Potentially a final synthesis step if this was part of a multi-part query).
+    -   **User Idea:** Visually differentiate messages in the Agent Workspace (Monitor Log) based on the agent component (Planner, Controller, Executor, Evaluator) using background tints or border colors.
 
-3.  User Confirmation: Plan is displayed in UI.
+    -   **Extension:** Link these colors to the LLM selector dropdowns in the chat header to show which LLM is configured for which colored component.
 
-4.  Execution Loop (per step):
+    -   **Benefit:** Improved readability, traceability, and intuitive understanding of the agent's operations and configuration.
 
-    -   Controller: Validates the current step (e.g., for Step 2, confirms "No Tool" is appropriate and the input from Step 1's output is ready).
+**Current Workflow (Poem Example - with fixes working):**
 
-    -   Executor (ReAct Agent):
+1.  User: "Create a file called poem.txt and write in it a small poem about stars."
 
-        -   Receives directive: "Your current sub-task is: 'Format JSON to Markdown table'. The precise expected output for THIS sub-task is: 'Markdown table string'. The Controller has determined no specific tool is required. Provide a direct answer..."
+2.  Intent Classifier: PLAN.
 
-        -   Processes input (output from Step 1) and generates the Markdown table as its `Final Answer`.
+3.  Planner: Generates a plan (e.g., Step 1: Generate poem, Expected: "The text of a small poem about stars."; Step 2: Write poem to poem.txt).
 
-    -   Step Evaluator: Assesses if the Executor's output (the Markdown table string) matches the step's `expected_outcome`. If successful, proceeds. If failed but recoverable, suggests retry parameters (up to `AGENT_MAX_STEP_RETRIES`).
+    -   *Backend now sends `propose_plan_for_confirmation` (Frontend needs to handle this).*
 
-5.  Overall Evaluator (Post-Plan): Assesses if the entire sequence of operations successfully addressed the original user query.
+4.  User Confirms (once UI is fixed).
 
-(This flow benefits from the Planner's ability to break down complex "No Tool" steps and the Executor's clearer directives, leading to fewer ReAct agent errors.)
+5.  Backend saves `_plan_<ID>.md`.
 
-User Observations & Feedback (Outstanding/New):
+6.  **Step 1: Generate Poem**
 
--   `_Exception` Tool Calls: Continue monitoring for any residual `_Exception` tool calls by the ReAct agent, especially after outputs from complex tools or with less common LLMs.
+    -   Controller (receives `previous_step_output=None`): Validates, decides "No Tool".
 
--   UI - Plan Visibility: User feedback indicates a desire for the approved plan to remain easily accessible/visible during execution for better context. (Partially addressed by `_plan.md` in artifact viewer; could be enhanced).
+    -   Executor (ReAct Agent): Receives directive. Generates the poem as `Final Answer`.
 
--   UI - Artifact Viewer:
+        -   *This poem (Executor's `Final Answer`) is currently sent as an `agent_message` to chat.*
 
-    -   Feature Request: Implement a file/folder structure view for the workspace.
+    -   Step Evaluator: Confirms poem matches expected outcome.
 
-    -   Feature Request: Improve PDF viewing capabilities (e.g., direct rendering if possible, beyond just a link).
+    -   `last_successful_step_output` in `agent_flow_handlers.py` now stores this poem.
 
--   User Priority: Strong emphasis on accuracy over speed.
+7.  **Step 2: Write File**
 
--   User Priority: High desire for User-in-the-Loop (UITL/HITL) capabilities.
+    -   Controller (receives poem from Step 1 via `previous_step_output`): Validates, decides `write_file` tool. **Crucially, it now uses the provided poem to formulate the `tool_input` for `write_file` (e.g., `poem.txt:::Twinkling lights...`).**
 
-Immediate Brainstorming / Next Small UX Considerations:
+    -   Executor (ReAct Agent): Calls `write_file` with the correct poem.
 
--   Refining Status Messages: Ensure status messages in the monitor header are consistently clear and don't overflow awkwardly.
+    -   Step Evaluator: Confirms file written with correct content.
 
--   Visual Feedback for File Uploads: While functional, could add more distinct visual feedback in the UI during the upload process itself (e.g., progress per file if feasible, or clearer success/failure indicators per file in the chat/monitor).
+8.  Overall Plan Evaluator: Assesses overall success. This assessment is sent as an `agent_message` and saved to DB.
 
--   Error Display: Ensure errors from the agent or tools are presented in a user-friendly way in the chat, perhaps with a "details" toggle to see raw error messages in the monitor.
-
-This document will be used for jotting down new ideas and tracking immediate concerns. Major features and long-term planning are now in `ROADMAP.md`.
+This document will be updated as we address these UI/UX items and any new ideas emerge.
