@@ -1,4 +1,3 @@
-```
 # ResearchAgent: AI Assistant for Research Workflows (v2.5)
 
 This project provides a functional user interface and backend for an AI agent system designed to assist with research tasks, particularly in fields like bioinformatics and epidemiology. It features a three-panel layout (Tasks, Chat, Monitor/Artifact Viewer) and connects via WebSockets to a Python backend powered by LangChain.
@@ -64,103 +63,54 @@ For more detailed information on the P-C-E-E pipeline and task flow, please refe
 ```
 
 ResearchAgent/
-
 ├── .env # Environment variables (GITIGNORED - sensitive data)
-
 ├── .env.example # Example environment variables
-
 ├── .gitignore # Specifies intentionally untracked files
-
 ├── backend/ # Python backend code
-
 │ ├── init.py # Makes 'backend' a Python package
-
 │ ├── agent.py # Logic for creating the LangChain agent executor
-
 │ ├── callbacks.py # Custom LangChain callback handlers (WebSocketCallbackHandler)
-
 │ ├── config.py # Configuration loading (from .env) and settings
-
 │ ├── controller.py # Agent's Controller component
-
 │ ├── db_utils.py # Asynchronous SQLite database utility functions
-
 │ ├── evaluator.py # Agent's Evaluator components (step & overall plan)
-
 │ ├── intent_classifier.py # Logic for classifying user intent
-
 │ ├── llm_setup.py # Functions for initializing LLM instances
-
 │ ├── message_handlers.py # Handles WebSocket message types and orchestrates agent flow
-
 │ ├── planner.py # Agent's Planner component
-
 │ ├── server.py # Main WebSocket server and aiohttp file/upload server
-
 │ └── tools/ # Directory for agent tools
-
 │ ├── init.py # Makes 'tools' a Python package
-
 │ ├── deep_research_tool.py # The multi-phase DeepResearchTool
-
 │ ├── playwright_search.py # Playwright-based web search tool (experimental)
-
 │ ├── standard_tools.py # Core tools (file I/O, shell, PubMed, etc.)
-
 │ └── tavily_search_tool.py # Tavily API search tool wrapper
-
 ├── css/ # CSS stylesheets
-
 │ └── style.css # Main stylesheet for the UI
-
 ├── database/ # Directory for SQLite database storage (GITIGNORED)
-
 │ └── agent_history.db # SQLite database file
-
 ├── js/ # JavaScript frontend logic
-
 │ ├── script.js # Main orchestrator, event listeners, state management calls
-
 │ ├── state_manager.js # Manages client-side application state and localStorage
-
 │ ├── websocket_manager.js # Handles WebSocket connection and raw message sending/receiving
-
 │ └── ui_modules/ # Granular UI component managers
-
 │ ├── artifact_ui.js
-
 │ ├── chat_ui.js
-
 │ ├── file_upload_ui.js
-
 │ ├── llm_selector_ui.js
-
 │ ├── monitor_ui.js
-
 │ ├── task_ui.js
-
 │ └── token_usage_ui.js
-
 ├── BRAINSTORM.md # Current workflow, ideas, and immediate feedback log
-
 ├── Dockerfile # Instructions for building the Docker image for the backend
-
 ├── docker-compose.yml # Docker Compose configuration for running the backend service
-
 ├── index.html # Main HTML file for the frontend UI
-
 ├── README.md # This file: Project overview, setup, and usage
-
 ├── ROADMAP.md # Detailed future development plans and phases
-
 ├── requirements.txt # Python package dependencies
-
 └── workspace/ # Base directory for task-specific workspaces (GITIGNORED)
-
 └── <task_id>/ # Each task gets its own subdirectory
-
 ├── plan.md # Markdown file for a confirmed plan and its live status
-
 └── ... # Other files generated or uploaded for the task
 
 ```
@@ -263,5 +213,3 @@ The project is actively being enhanced. Key future directions include:
 * **Ongoing UX/UI Refinements.**
 
 For a detailed, evolving roadmap and ongoing brainstorming, please see **`ROADMAP.md`** and **`BRAINSTORM.md`**.
-
-```
