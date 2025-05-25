@@ -7,26 +7,18 @@
  * - Manages content fetching for text artifacts.
  */
 
-// DOM Elements (will be passed during initialization)
 let monitorArtifactAreaElement;
 let artifactNavElement;
 let artifactPrevBtnElement;
 let artifactNextBtnElement;
 let artifactCounterElement;
 
-// Internal state for this module
 let isFetchingArtifactContentInternal = false;
 let artifactContentFetchUrlInternal = null;
 
-// Callbacks to update state in script.js
-let onArtifactIndexChangeCallback = (newIndex) => console.warn("onArtifactIndexChangeCallback not set in artifact_ui.js");
+let onArtifactNavigationCallback = (direction) => console.warn("onArtifactNavigationCallback not set in artifact_ui.js", direction);
 
 
-/**
- * Initializes the Artifact UI module.
- * @param {object} elements - DOM elements { monitorArtifactArea, artifactNav, prevBtn, nextBtn, counterEl }
- * @param {object} callbacks - Callbacks { onIndexChange }
- */
 function initArtifactUI(elements, callbacks) {
     console.log("[ArtifactUI] Initializing...");
     monitorArtifactAreaElement = elements.monitorArtifactArea;
@@ -40,38 +32,30 @@ function initArtifactUI(elements, callbacks) {
         return;
     }
 
-    onArtifactIndexChangeCallback = callbacks.onIndexChange;
+    onArtifactNavigationCallback = callbacks.onNavigate; // Renamed for clarity
 
-    // Event listeners for navigation
     artifactPrevBtnElement.addEventListener('click', () => {
-        // The decision to change index is now made by script.js after getting current state
-        onArtifactIndexChangeCallback("prev"); 
+        onArtifactNavigationCallback("prev"); 
     });
 
     artifactNextBtnElement.addEventListener('click', () => {
-        onArtifactIndexChangeCallback("next");
+        onArtifactNavigationCallback("next");
     });
-    console.log("[ArtifactUI] Initialized.");
+    console.log("[ArtifactUI] Initialized with elements and navigation callback.");
 }
 
-/**
- * Updates the artifact display area based on the current artifact.
- * This function is called by script.js after the artifact list or index changes.
- * @param {Array<object>} artifactsToShow - The array of artifact objects for the current task.
- * @param {number} activeIndex - The index of the artifact to display.
- */
 async function updateArtifactDisplayUI(artifactsToShow, activeIndex) {
-    if (!monitorArtifactAreaElement || !artifactNavElement || !artifactPrevBtnElement || !artifactNextBtnElement || !artifactCounterElement) {
+    if (!monitorArtifactAreaElement || !artifactNavElement) {
         console.error("[ArtifactUI] Artifact display elements not initialized for updateArtifactDisplayUI.");
         return;
     }
-    // console.log(`[ArtifactUI] Updating display. Index: ${activeIndex}, Count: ${artifactsToShow.length}`);
+    console.log(`[ArtifactUI] updateArtifactDisplayUI called. Index: ${activeIndex}, Artifacts Count: ${artifactsToShow.length}`, artifactsToShow[activeIndex] || "No active artifact");
 
-    // Clear previous artifact content elements
     const childrenToRemove = Array.from(monitorArtifactAreaElement.children).filter(child => child !== artifactNavElement);
     childrenToRemove.forEach(child => monitorArtifactAreaElement.removeChild(child));
 
     if (artifactsToShow.length === 0 || activeIndex < 0 || activeIndex >= artifactsToShow.length) {
+        console.log("[ArtifactUI] No artifacts to display or index out of bounds.");
         const placeholder = document.createElement('div');
         placeholder.className = 'artifact-placeholder';
         placeholder.textContent = 'No artifacts generated yet.';
@@ -83,13 +67,14 @@ async function updateArtifactDisplayUI(artifactsToShow, activeIndex) {
 
     const artifact = artifactsToShow[activeIndex];
     if (!artifact || !artifact.url || !artifact.filename || !artifact.type) {
-        console.error("[ArtifactUI] Invalid artifact data:", artifact);
+        console.error("[ArtifactUI] Invalid artifact data for display:", artifact);
         const errorDiv = Object.assign(document.createElement('div'), { className: 'artifact-error', textContent: 'Error displaying artifact: Invalid data.' });
         monitorArtifactAreaElement.insertBefore(errorDiv, artifactNavElement);
         artifactNavElement.style.display = 'none';
         artifactContentFetchUrlInternal = null;
         return;
     }
+    console.log(`[ArtifactUI] Displaying artifact: ${artifact.filename}, Type: ${artifact.type}, URL: ${artifact.url}`);
 
     const filenameDiv = document.createElement('div');
     filenameDiv.className = 'artifact-filename';
@@ -115,11 +100,11 @@ async function updateArtifactDisplayUI(artifactsToShow, activeIndex) {
 
         if (artifact.type === 'pdf') {
             artifactContentFetchUrlInternal = null;
-            preElement.textContent = `PDF File: ${artifact.filename}`;
+            preElement.innerHTML = `PDF File: ${artifact.filename.replace(/</g, "&lt;").replace(/>/g, "&gt;")}`; // Sanitize filename
             const pdfLink = document.createElement('a');
             pdfLink.href = artifact.url;
             pdfLink.target = "_blank";
-            pdfLink.textContent = `Open ${artifact.filename} in new tab`;
+            pdfLink.textContent = `Open ${artifact.filename.replace(/</g, "&lt;").replace(/>/g, "&gt;")} in new tab`;
             pdfLink.style.display = "block";
             pdfLink.style.marginTop = "5px";
             preElement.appendChild(pdfLink);
@@ -131,26 +116,28 @@ async function updateArtifactDisplayUI(artifactsToShow, activeIndex) {
                 artifactContentFetchUrlInternal = artifact.url;
                 preElement.textContent = 'Loading text file...';
                 try {
+                    console.log(`[ArtifactUI] Fetching text artifact: ${artifact.url}`);
                     const response = await fetch(artifact.url, {
                         cache: 'reload',
                         headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache', 'Expires': '0' }
                     });
-                    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`);
+                    if (!response.ok) {
+                        console.warn(`[ArtifactUI] Text artifact fetch for ${artifact.filename} not OK. Status: ${response.status} ${response.statusText}`);
+                        throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`);
+                    }
                     const textContent = await response.text();
                     
-                    // Check if the artifact to display is still the current one
-                    const currentArtifactsFromState = StateManager.getCurrentTaskArtifacts(); // Assuming StateManager is global
-                    const currentIndexFromState = StateManager.getCurrentArtifactIndex();
-                    if (currentArtifactsFromState[currentIndexFromState]?.url === artifact.url) {
+                    // Check if the artifact we just fetched is still the one we *intend* to display
+                    // based on the parameters passed to this function call (artifactsToShow and activeIndex).
+                    if (artifactsToShow[activeIndex]?.url === artifact.url) {
                         preElement.textContent = textContent;
+                        console.log(`[ArtifactUI] Successfully fetched and displayed ${artifact.filename}`);
                     } else {
-                        console.log("[ArtifactUI] Artifact changed while fetching, not updating stale content for", artifact.filename);
+                        console.log(`[ArtifactUI] Artifact changed (during fetch) from "${artifact.filename}" to "${artifactsToShow[activeIndex]?.filename}". Not updating stale content.`);
                     }
                 } catch (error) {
                     console.error(`[ArtifactUI] Error fetching text artifact ${artifact.filename}:`, error);
-                     const currentArtifactsFromState = StateManager.getCurrentTaskArtifacts();
-                     const currentIndexFromState = StateManager.getCurrentArtifactIndex();
-                    if (currentArtifactsFromState[currentIndexFromState]?.url === artifact.url) {
+                    if (artifactsToShow[activeIndex]?.url === artifact.url) { // Check against passed params
                         preElement.textContent = `Error loading file: ${artifact.filename}\n${error.message}`;
                         preElement.classList.add('artifact-error');
                     }
@@ -168,19 +155,20 @@ async function updateArtifactDisplayUI(artifactsToShow, activeIndex) {
         monitorArtifactAreaElement.insertBefore(unknownDiv, artifactNavElement);
     }
 
-    if (artifactsToShow.length > 1) {
-        artifactCounterElement.textContent = `Artifact ${activeIndex + 1} of ${artifactsToShow.length}`;
-        artifactPrevBtnElement.disabled = (activeIndex === 0);
-        artifactNextBtnElement.disabled = (activeIndex === artifactsToShow.length - 1);
-        artifactNavElement.style.display = 'flex';
-    } else {
-        artifactNavElement.style.display = 'none';
+    if (artifactsToShow.length > 0 && artifactNavElement && artifactCounterElement && artifactPrevBtnElement && artifactNextBtnElement) {
+        if (artifactsToShow.length > 1) {
+            artifactCounterElement.textContent = `Artifact ${activeIndex + 1} of ${artifactsToShow.length}`;
+            artifactPrevBtnElement.disabled = (activeIndex === 0);
+            artifactNextBtnElement.disabled = (activeIndex === artifactsToShow.length - 1);
+            artifactNavElement.style.display = 'flex';
+        } else {
+            artifactNavElement.style.display = 'none';
+        }
+    } else if (artifactNavElement) {
+         artifactNavElement.style.display = 'none';
     }
 }
 
-/**
- * Clears the artifact display area.
- */
 function clearArtifactDisplayUI() {
     if (!monitorArtifactAreaElement || !artifactNavElement) return;
     const childrenToRemove = Array.from(monitorArtifactAreaElement.children).filter(child => child !== artifactNavElement);

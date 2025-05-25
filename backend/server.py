@@ -15,6 +15,7 @@ import functools
 import warnings 
 import aiofiles
 import unicodedata
+import urllib.parse # <--- ADDED IMPORT
 
 # --- Web Server Imports ---
 from aiohttp import web
@@ -148,48 +149,42 @@ async def execute_shell_command(command: str, session_id: str, send_ws_message_f
 async def handle_workspace_file(request: web.Request) -> web.Response:
     task_id = request.match_info.get('task_id')
     filename = request.match_info.get('filename')
-    session_id = request.headers.get("X-Session-ID", "unknown_file_request_session") # Use a distinct default
+    session_id = request.headers.get("X-Session-ID", "unknown_file_request_session") 
     logger.info(f"[{session_id}] File server: Received request for task_id='{task_id}', filename='{filename}'")
     if not task_id or not filename:
         logger.warning(f"[{session_id}] File server request missing task_id or filename.")
         raise web.HTTPBadRequest(text="Task ID and filename required")
     
-    # Basic sanitization for task_id and filename to prevent path traversal
-    # This is a simplified check; more robust validation might be needed.
-    if not re.match(r"^[a-zA-Z0-9_.-]+$", task_id): # Allow alphanumeric, underscore, hyphen, dot
+    if not re.match(r"^[a-zA-Z0-9_.-]+$", task_id): 
         logger.error(f"[{session_id}] Invalid task_id format rejected: {task_id}")
         raise web.HTTPForbidden(text="Invalid task ID format.")
     
-    # Prevent directory traversal for filename
     if ".." in filename or filename.startswith("/") or filename.startswith("\\"):
         logger.error(f"[{session_id}] Invalid filename path components detected: {filename}")
         raise web.HTTPForbidden(text="Invalid filename path components.")
 
     try:
-        # Get path, DO NOT create if it doesn't exist for a file GET request.
         task_workspace = get_task_workspace_path(task_id, create_if_not_exists=False)
-        # Normalize filename to prevent issues, e.g. URL encoded chars if not already handled by aiohttp
-        safe_filename = Path(filename).name # Use only the basename for security
+        safe_filename = Path(filename).name 
         
         file_path = (task_workspace / safe_filename).resolve()
         logger.debug(f"[{session_id}] File server: Resolved file path: {file_path}")
 
-        # Security check: ensure the resolved path is still within the BASE_WORKSPACE_ROOT
         if not file_path.is_relative_to(BASE_WORKSPACE_ROOT.resolve()):
             logger.error(f"[{session_id}] Security Error: Access attempt outside base workspace! Req: {file_path}, Base: {BASE_WORKSPACE_ROOT.resolve()}")
             raise web.HTTPForbidden(text="Access denied - outside base workspace.")
             
-    except ValueError as ve: # Catch specific ValueError from get_task_workspace_path for invalid task_id format
+    except ValueError as ve: 
         logger.error(f"[{session_id}] File server: Invalid task_id for file access: {ve}")
         raise web.HTTPBadRequest(text=f"Invalid task ID: {ve}")
-    except OSError as e: # Catch OSError if get_task_workspace_path has issues (though less likely with create_if_not_exists=False)
+    except OSError as e: 
         logger.error(f"[{session_id}] File server: Error resolving task workspace for file access: {e}")
         raise web.HTTPInternalServerError(text="Error accessing task workspace.")
-    except Exception as e: # Catch-all for other unexpected path validation errors
+    except Exception as e: 
         logger.error(f"[{session_id}] File server: Unexpected error validating file path: {e}. Req: {filename}", exc_info=True)
         raise web.HTTPInternalServerError(text="Error validating file path")
 
-    if not file_path.is_file(): # Check after resolving and security checks
+    if not file_path.is_file(): 
         logger.warning(f"[{session_id}] File server: File not found request: {file_path}")
         raise web.HTTPNotFound(text=f"File not found: {filename}")
     
@@ -200,38 +195,31 @@ async def handle_workspace_file(request: web.Request) -> web.Response:
 def sanitize_filename(filename: str) -> str:
     if not filename:
         return f"uploaded_file_{uuid.uuid4().hex[:8]}"
-    # Normalize unicode characters
     filename = unicodedata.normalize('NFKD', filename).encode('ascii', 'ignore').decode('ascii')
-    # Remove potentially problematic characters, keep alphanumeric, underscore, hyphen, dot, space
     filename = re.sub(r'[^\w\s.-]', '', filename).strip()
-    # Replace spaces with underscores
     filename = re.sub(r'\s+', '_', filename)
-    # If filename becomes empty after sanitization (e.g., all chars were problematic)
     if not filename:
         filename = f"uploaded_file_{uuid.uuid4().hex[:8]}"
-    # Remove leading/trailing underscores, dots, hyphens
     filename = filename.strip('._-')
-    if not filename: # If it became empty again (e.g. was just "...")
+    if not filename: 
         filename = f"uploaded_file_{uuid.uuid4().hex[:8]}"
-    return Path(filename).name # Ensure it's just a filename, no path components
+    return Path(filename).name 
 
 async def handle_file_upload(request: web.Request) -> web.Response:
     task_id = request.match_info.get('task_id')
-    session_id = request.headers.get("X-Session-ID", "unknown_upload_session") # Use a distinct default
+    session_id = request.headers.get("X-Session-ID", "unknown_upload_session") 
     logger.info(f"[{session_id}] File Upload: Received request for task_id: '{task_id}'")
 
     if not task_id:
         logger.error(f"[{session_id}] File Upload: Missing task_id.")
         return web.json_response({'status': 'error', 'message': 'Task ID required'}, status=400)
     
-    # Validate task_id format (same as in handle_workspace_file)
     if not re.match(r"^[a-zA-Z0-9_.-]+$", task_id):
         logger.error(f"[{session_id}] File Upload: Invalid task_id format: '{task_id}'")
         return web.json_response({'status': 'error', 'message': 'Invalid task ID format'}, status=400)
 
     task_workspace: Path
     try:
-        # Crucially, get_task_workspace_path WILL create the directory if it doesn't exist.
         task_workspace = get_task_workspace_path(task_id, create_if_not_exists=True)
         logger.info(f"[{session_id}] File Upload: Ensured task workspace exists at: {task_workspace}")
     except ValueError as ve:
@@ -247,11 +235,11 @@ async def handle_file_upload(request: web.Request) -> web.Response:
 
     try:
         reader = await request.multipart()
-    except Exception as e: # Catch errors during multipart reading itself
+    except Exception as e: 
         logger.error(f"[{session_id}] File Upload: Error reading multipart form data for task {task_id}: {e}", exc_info=True)
         return web.json_response({'status': 'error', 'message': f'Failed to read upload data: {e}'}, status=400)
 
-    if not reader: # Should be caught by above, but as a safeguard
+    if not reader: 
         return web.json_response({'status': 'error', 'message': 'No multipart data received'}, status=400)
 
     while True:
@@ -260,36 +248,32 @@ async def handle_file_upload(request: web.Request) -> web.Response:
             logger.debug(f"[{session_id}] File Upload: Finished processing multipart parts for task {task_id}.")
             break
 
-        if part.name == 'file' and part.filename: # Check if it's a file part with a filename
+        if part.name == 'file' and part.filename: 
             original_filename = part.filename
-            safe_filename = sanitize_filename(original_filename) # Sanitize the original filename
+            safe_filename = sanitize_filename(original_filename) 
             
-            save_path = (task_workspace / safe_filename).resolve() # Resolve to absolute, then check
+            save_path = (task_workspace / safe_filename).resolve() 
             logger.info(f"[{session_id}] File Upload: Processing uploaded file: '{original_filename}' -> '{safe_filename}' for task {task_id}. Target path: {save_path}")
 
-            # Security check: ensure the save_path is within the specific task_workspace
             if not save_path.is_relative_to(task_workspace.resolve()):
                 logger.error(f"[{session_id}] File Upload: Security Error - Upload path resolves outside task workspace! Task: {task_id}, Orig: '{original_filename}', Safe: '{safe_filename}', Resolved: {save_path}, Workspace: {task_workspace.resolve()}")
                 errors.append({'filename': original_filename, 'message': 'Invalid file path detected (path traversal attempt).'})
-                continue # Skip this file
+                continue 
 
             try:
-                # Ensure parent directory of save_path exists (it should be task_workspace itself mostly)
                 save_path.parent.mkdir(parents=True, exist_ok=True) 
                 
                 logger.debug(f"[{session_id}] File Upload: Attempting to open {save_path} for writing.")
                 async with aiofiles.open(save_path, 'wb') as f:
                     while True:
-                        chunk = await part.read_chunk() # Read data chunk by chunk
+                        chunk = await part.read_chunk() 
                         if not chunk:
                             break
                         await f.write(chunk)
                 logger.info(f"[{session_id}] File Upload: Successfully saved uploaded file to: {save_path}")
-                saved_files.append({'filename': safe_filename}) # Log the sanitized name
+                saved_files.append({'filename': safe_filename}) 
 
-                # Attempt to log to DB and notify client via WebSocket (best effort)
                 target_session_id_for_ws_notify = None
-                # Find the session_id associated with this task_id if any client is active on it
                 for sid_iter, sdata_val_iter in session_data.items(): 
                     if sdata_val_iter.get("current_task_id") == task_id:
                         target_session_id_for_ws_notify = sid_iter
@@ -322,24 +306,23 @@ async def handle_file_upload(request: web.Request) -> web.Response:
     
     logger.debug(f"[{session_id}] File Upload: Finished processing all parts. Errors: {len(errors)}, Saved: {len(saved_files)}")
 
-    # Construct and return final JSON response
     try:
         if errors:
             response_data = {'status': 'error', 'message': 'Some files failed to upload.', 'errors': errors, 'saved': saved_files}
-            status_code = 400 if not saved_files else 207 # Multi-Status if some succeeded
+            status_code = 400 if not saved_files else 207 
             logger.info(f"[{session_id}] File Upload: Returning error/partial success response: Status={status_code}, Data={response_data}")
             return web.json_response(response_data, status=status_code)
-        elif not saved_files: # No errors, but also no files saved (e.g., empty upload)
+        elif not saved_files: 
             response_data = {'status': 'error', 'message': 'No valid files were uploaded.'}
             status_code = 400
             logger.info(f"[{session_id}] File Upload: Returning no valid files error response: Status={status_code}, Data={response_data}")
             return web.json_response(response_data, status=status_code)
-        else: # All files saved successfully
+        else: 
             response_data = {'status': 'success', 'message': f'Successfully uploaded {len(saved_files)} file(s).', 'saved': saved_files}
             status_code = 200
             logger.info(f"[{session_id}] File Upload: Returning success response: Status={status_code}, Data={response_data}")
             return web.json_response(response_data, status=status_code)
-    except Exception as return_err: # Should not happen, but safeguard
+    except Exception as return_err: 
         logger.error(f"[{session_id}] File Upload: CRITICAL ERROR constructing final JSON response for upload: {return_err}", exc_info=True)
         return web.Response(status=500, text="Internal server error creating upload response.")
 
@@ -348,7 +331,7 @@ async def get_artifacts(task_id: str) -> List[Dict[str, str]]:
     logger.debug(f"Scanning workspace for artifacts for task: {task_id}")
     artifacts = []
     try:
-        task_workspace_path = get_task_workspace_path(task_id, create_if_not_exists=False) # Don't create if just listing
+        task_workspace_path = get_task_workspace_path(task_id, create_if_not_exists=False) 
         if not task_workspace_path.exists():
             logger.warning(f"Artifact scan: Workspace for task {task_id} does not exist at {task_workspace_path}. Returning empty list.")
             return []
@@ -361,11 +344,10 @@ async def get_artifacts(task_id: str) -> List[Dict[str, str]]:
                     try:
                         mtime = file_path.stat().st_mtime
                         all_potential_artifacts.append((file_path, mtime))
-                    except FileNotFoundError: # Should not happen if is_file() is true, but good practice
+                    except FileNotFoundError: 
                         logger.warning(f"File disappeared during artifact scan: {file_path}")
                         continue
         
-        # Sort files by modification time, newest first
         sorted_files = sorted(all_potential_artifacts, key=lambda x: x[1], reverse=True)
 
         for file_path, _ in sorted_files:
@@ -378,12 +360,11 @@ async def get_artifacts(task_id: str) -> List[Dict[str, str]]:
             elif file_suffix == '.pdf': artifact_type = 'pdf'
 
             if artifact_type != 'unknown':
-                # Ensure URL encoding for filename part of URL
-                encoded_filename = urllib.parse.quote(relative_filename)
+                encoded_filename = urllib.parse.quote(relative_filename) # <--- FIXED HERE
                 artifact_url = f"http://{FILE_SERVER_CLIENT_HOST}:{FILE_SERVER_PORT}/workspace_files/{task_id}/{encoded_filename}"
                 artifacts.append({"type": artifact_type, "url": artifact_url, "filename": relative_filename})
         logger.info(f"Found {len(artifacts)} artifacts for task {task_id}.")
-    except ValueError as ve: # From get_task_workspace_path if task_id is invalid
+    except ValueError as ve: 
         logger.error(f"Error scanning artifacts for task {task_id} due to invalid task ID: {ve}")
     except Exception as e:
         logger.error(f"Error scanning artifacts for task {task_id}: {e}", exc_info=True)
@@ -391,27 +372,23 @@ async def get_artifacts(task_id: str) -> List[Dict[str, str]]:
 
 async def setup_file_server():
     app = web.Application()
-    # Increase max payload size for file uploads, e.g., to 100MB
-    # This applies to the entire request body, so it covers multipart forms.
-    app['client_max_size'] = 100 * 1024**2  # 100 MB
+    app['client_max_size'] = 100 * 1024**2  
 
     cors = aiohttp_cors.setup(app, defaults={
         "*": aiohttp_cors.ResourceOptions(
             allow_credentials=True,
             expose_headers="*",
-            allow_headers="*", # Allows all headers, including X-Session-ID if client sends it
-            allow_methods=["GET", "POST", "OPTIONS"] # Explicitly list allowed methods
+            allow_headers="*", 
+            allow_methods=["GET", "POST", "OPTIONS"] 
         )
     })
-    # Route for serving files from workspace
-    get_resource = app.router.add_resource('/workspace_files/{task_id}/{filename:.+}') # :.+ matches filenames with dots
+    get_resource = app.router.add_resource('/workspace_files/{task_id}/{filename:.+}') 
     get_route = get_resource.add_route('GET', handle_workspace_file)
-    cors.add(get_route) # Apply CORS to this route
+    cors.add(get_route) 
 
-    # Route for uploading files to workspace
     post_resource = app.router.add_resource('/upload/{task_id}')
     post_route = post_resource.add_route('POST', handle_file_upload)
-    cors.add(post_route) # Apply CORS to this route
+    cors.add(post_route) 
 
     runner = web.AppRunner(app)
     await runner.setup()
@@ -444,13 +421,12 @@ async def handler(websocket: Any):
     connected_clients[session_id] = {"websocket": websocket, "agent_task": None, "send_ws_message": send_ws_message_for_session}
     logger.info(f"[{session_id}] Client added to connected_clients dict with send function.")
 
-    async def add_monitor_log_and_save(text: str, log_type: str = "monitor_log"): # Default log_type
+    async def add_monitor_log_and_save(text: str, log_type: str = "monitor_log"): 
         timestamp = datetime.datetime.now().isoformat(timespec='milliseconds')
         log_prefix = f"[{timestamp}][{session_id[:8]}]"
         
-        # Construct a more descriptive type indicator for the log entry itself
         type_indicator_for_log_entry = f"[{log_type.upper().replace('MONITOR_', '').replace('ERROR_', 'ERR_').replace('SYSTEM_', 'SYS_')}]"
-        if log_type == "monitor_log" and not text.startswith("["): # If it's a generic monitor_log, use a default indicator
+        if log_type == "monitor_log" and not text.startswith("["): 
             type_indicator_for_log_entry = "[INFO]"
 
         full_content_for_ui = f"{log_prefix} {type_indicator_for_log_entry} {text}"
@@ -459,7 +435,6 @@ async def handler(websocket: Any):
         active_task_id = session_data.get(session_id, {}).get("current_task_id")
         if active_task_id:
             try:
-                # Save to DB with the original, more specific log_type
                 await add_message(active_task_id, session_id, log_type, text)
             except Exception as db_err:
                 logger.error(f"[{session_id}] Failed to save monitor log '{log_type}' to DB: {db_err}")
