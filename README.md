@@ -54,7 +54,7 @@ For more detailed information on the P-C-E-E pipeline and task flow, please refe
 
 ## Project Structure
 
-
+```
 ResearchAgent/
 ├── .env                   # Environment variables (GITIGNORED)
 ├── .env.example           # Example environment variables
@@ -111,7 +111,7 @@ ResearchAgent/
 └── <task_id>/
 ├── plan.md
 └── ...
-
+```
 
 ## Setup Instructions & Running the Application
 (No changes from v2.5 - these remain the same)
