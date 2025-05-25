@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         StateManager.setCurrentTaskArtifacts(message.content);
                         let newIndexToSet = -1;
-                        const newArtifacts = StateManager.getCurrentTaskArtifacts(); // Get the newly set artifacts
+                        const newArtifacts = StateManager.getCurrentTaskArtifacts(); 
 
                         if (oldCurrentArtifactFilename && oldCurrentArtifactFilename.startsWith("_plan_") && oldCurrentArtifactFilename.endsWith(".md")) {
                             const foundNewIndex = newArtifacts.findIndex(art => art.filename === oldCurrentArtifactFilename);
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleTaskSelection = (taskId) => {
         console.log(`[MainScript] Task selected: ${taskId}`);
         const currentActiveTask = StateManager.getCurrentTaskId();
-        if (currentActiveTask === taskId && taskId !== null) { return; }
+        if (currentActiveTask === taskId && taskId !== null) { console.log("Task already selected."); return; }
         
         StateManager.selectTask(taskId); 
         const newActiveTaskId = StateManager.getCurrentTaskId();
@@ -160,11 +160,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (newIndex !== currentIndex) {
             StateManager.setCurrentArtifactIndex(newIndex);
             if(typeof updateArtifactDisplayUI === 'function') {
-                // Pass the current list and the new index
                 updateArtifactDisplayUI(currentArtifacts, newIndex);
             } else {
                 console.error("updateArtifactDisplayUI (from artifact_ui.js) is not defined.");
             }
+        } else {
+            console.log("[MainScript] Artifact navigation: index unchanged.", {currentIndex, newIndex, direction, count: currentArtifacts.length});
         }
     };
 
@@ -180,12 +181,22 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.addEventListener('click', event => { if (event.target.classList.contains('action-btn')) { const commandText = event.target.textContent.trim(); if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(`[USER_ACTION] Clicked: ${commandText}`); if (typeof sendWsMessage === 'function') sendWsMessage("action_command", { command: commandText }); } });
 
     // --- Initial Load and UI Modules Initialization ---
-    // StateManager.initStateManager(); // Called at the top
+    // StateManager.initStateManager(); // Called at the very top
 
     if (typeof initTaskUI === 'function') { initTaskUI( { taskListUl: taskListUl, currentTaskTitleEl: currentTaskTitleElement, uploadFileBtn: uploadFileButtonElement }, { onTaskSelect: handleTaskSelection, onNewTask: handleNewTaskCreation, onDeleteTask: handleTaskDeletion, onRenameTask: handleTaskRename }); if (typeof renderTaskList === 'function') renderTaskList(StateManager.getTasks(), StateManager.getCurrentTaskId()); }
     if (typeof initChatUI === 'function') { initChatUI( { chatMessagesContainer: chatMessagesContainer, agentThinkingStatusEl: agentThinkingStatusElement, chatTextareaEl: chatTextarea, chatSendButtonEl: chatSendButton }, { onSendMessage: handleSendMessageFromUI }); }
     if (typeof initMonitorUI === 'function') { initMonitorUI( { monitorLogArea: monitorLogAreaElement, statusDot: statusDotElement, monitorStatusText: monitorStatusTextElement, stopButton: stopButtonElement }, { onStopAgent: handleStopAgentRequest }); }
-    if (typeof initArtifactUI === 'function') { initArtifactUI( { monitorArtifactArea: monitorArtifactArea, artifactNav: artifactNav, prevBtn: artifactPrevBtn, nextBtn: artifactNextBtn, counterEl: artifactCounterElement }, {}, { onNavigate: handleArtifactNavigation }); if(typeof updateArtifactDisplayUI === 'function') updateArtifactDisplayUI(StateManager.getCurrentTaskArtifacts(), StateManager.getCurrentArtifactIndex()); }
+    
+    if (typeof initArtifactUI === 'function') {
+        initArtifactUI(
+            { monitorArtifactArea: monitorArtifactArea, artifactNav: artifactNav, prevBtn: artifactPrevBtn, nextBtn: artifactNextBtn, counterEl: artifactCounterElement },
+            { onNavigate: handleArtifactNavigation } // Corrected: Pass callbacks object directly
+        );
+        if(typeof updateArtifactDisplayUI === 'function') {
+            updateArtifactDisplayUI(StateManager.getCurrentTaskArtifacts(), StateManager.getCurrentArtifactIndex());
+        }
+    } else { console.error("initArtifactUI function not found."); }
+
     if (typeof initLlmSelectorsUI === 'function') { initLlmSelectorsUI( { executorLlmSelect: executorLlmSelectElement, roleSelectors: roleSelectorsMetaForInit }, { onExecutorLlmChange: handleExecutorLlmChange, onRoleLlmChange: handleRoleLlmChange }); }
     if (typeof initTokenUsageUI === 'function') { initTokenUsageUI({ lastCallTokensEl: lastCallTokensElement, taskTotalTokensEl: taskTotalTokensElement }); resetTaskTokenTotalsGlobally(); }
     if (typeof initFileUploadUI === 'function') { initFileUploadUI( { fileUploadInputEl: fileUploadInputElement, uploadFileButtonEl: uploadFileButtonElement }, { httpBaseUrl: httpBackendBaseUrl }, { getCurrentTaskId: StateManager.getCurrentTaskId, addLog: (logText) => { if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(logText); }, addChatMsg: (msgText, msgType, scroll) => { if (typeof addChatMessageToUI === 'function') addChatMessageToUI(msgText, msgType, scroll); } }); }

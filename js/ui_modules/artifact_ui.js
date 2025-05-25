@@ -16,7 +16,7 @@ let artifactCounterElement;
 let isFetchingArtifactContentInternal = false;
 let artifactContentFetchUrlInternal = null;
 
-let onArtifactNavigationCallback = (direction) => console.warn("onArtifactNavigationCallback not set in artifact_ui.js", direction);
+let onArtifactNavigationCallback = (direction) => console.warn("[ArtifactUI] onArtifactNavigationCallback not set or not overridden by script.js. Direction:", direction);
 
 
 function initArtifactUI(elements, callbacks) {
@@ -32,16 +32,32 @@ function initArtifactUI(elements, callbacks) {
         return;
     }
 
-    onArtifactNavigationCallback = callbacks.onNavigate; // Renamed for clarity
+    if (callbacks && typeof callbacks.onNavigate === 'function') {
+        onArtifactNavigationCallback = callbacks.onNavigate;
+        console.log("[ArtifactUI] onNavigate callback received from script.js.");
+    } else {
+        console.error("[ArtifactUI] onNavigate callback was not provided or is not a function during init!");
+    }
+
 
     artifactPrevBtnElement.addEventListener('click', () => {
-        onArtifactNavigationCallback("prev"); 
+        console.log("[ArtifactUI] Prev button clicked. Attempting to call onArtifactNavigationCallback('prev').");
+        if (typeof onArtifactNavigationCallback === 'function') {
+            onArtifactNavigationCallback("prev"); 
+        } else {
+            console.error("[ArtifactUI] Prev button: onArtifactNavigationCallback is not a function!");
+        }
     });
 
     artifactNextBtnElement.addEventListener('click', () => {
-        onArtifactNavigationCallback("next");
+        console.log("[ArtifactUI] Next button clicked. Attempting to call onArtifactNavigationCallback('next').");
+        if (typeof onArtifactNavigationCallback === 'function') {
+            onArtifactNavigationCallback("next");
+        } else {
+            console.error("[ArtifactUI] Next button: onArtifactNavigationCallback is not a function!");
+        }
     });
-    console.log("[ArtifactUI] Initialized with elements and navigation callback.");
+    console.log("[ArtifactUI] Initialized with elements and navigation callback assigned (if provided).");
 }
 
 async function updateArtifactDisplayUI(artifactsToShow, activeIndex) {
@@ -100,7 +116,7 @@ async function updateArtifactDisplayUI(artifactsToShow, activeIndex) {
 
         if (artifact.type === 'pdf') {
             artifactContentFetchUrlInternal = null;
-            preElement.innerHTML = `PDF File: ${artifact.filename.replace(/</g, "&lt;").replace(/>/g, "&gt;")}`; // Sanitize filename
+            preElement.innerHTML = `PDF File: ${artifact.filename.replace(/</g, "&lt;").replace(/>/g, "&gt;")}`;
             const pdfLink = document.createElement('a');
             pdfLink.href = artifact.url;
             pdfLink.target = "_blank";
@@ -108,7 +124,7 @@ async function updateArtifactDisplayUI(artifactsToShow, activeIndex) {
             pdfLink.style.display = "block";
             pdfLink.style.marginTop = "5px";
             preElement.appendChild(pdfLink);
-        } else { // 'text' artifact
+        } else { 
             if (isFetchingArtifactContentInternal && artifactContentFetchUrlInternal === artifact.url) {
                 preElement.textContent = 'Loading (previous fetch in progress)...';
             } else {
@@ -127,8 +143,7 @@ async function updateArtifactDisplayUI(artifactsToShow, activeIndex) {
                     }
                     const textContent = await response.text();
                     
-                    // Check if the artifact we just fetched is still the one we *intend* to display
-                    // based on the parameters passed to this function call (artifactsToShow and activeIndex).
+                    // This check needs to use the parameters passed to *this specific call* of updateArtifactDisplayUI
                     if (artifactsToShow[activeIndex]?.url === artifact.url) {
                         preElement.textContent = textContent;
                         console.log(`[ArtifactUI] Successfully fetched and displayed ${artifact.filename}`);
@@ -137,7 +152,7 @@ async function updateArtifactDisplayUI(artifactsToShow, activeIndex) {
                     }
                 } catch (error) {
                     console.error(`[ArtifactUI] Error fetching text artifact ${artifact.filename}:`, error);
-                    if (artifactsToShow[activeIndex]?.url === artifact.url) { // Check against passed params
+                    if (artifactsToShow[activeIndex]?.url === artifact.url) { 
                         preElement.textContent = `Error loading file: ${artifact.filename}\n${error.message}`;
                         preElement.classList.add('artifact-error');
                     }
