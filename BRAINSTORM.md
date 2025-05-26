@@ -1,86 +1,74 @@
-BRAINSTORM.md - ResearchAgent Project (v2.5.1)
-==============================================
+BRAINSTORM.md - ResearchAgent Project (v2.5.3 Target)
+====================================================
 
 This document tracks the current workflow, user feedback, and immediate brainstorming ideas for the ResearchAgent project. For longer-term plans and phased development, please see `ROADMAP.md`.
 
-**Current Version & State (v2.5.1 - Key Fixes & Refactoring Progress):** The ResearchAgent is at v2.5.1. Recent key advancements:
+**Current Version & State (v2.5.2 base, with recent fixes for v2.5.3 target):**
 
--   **Agent Logic:** The "poem discrepancy" is **fixed**; the Controller now correctly uses the output from a previous generative step as input for subsequent tool calls (e.g., writing the generated poem to a file).
-
--   **Message Persistence:** The Overall Plan Evaluator's final assessment message is now correctly saved and reloaded in the chat history.
-
--   **Frontend Refactoring:** Substantial progress with `state_manager.js` and modular UI components. `script.js` is acting more as an orchestrator.
-
--   **Backend Refactoring:**  `message_handlers.py` has been successfully modularized into the `message_processing` sub-package.
-
--   **Stability:** Numerous backend errors (`TypeError`, `NameError`, `SyntaxError`) have been resolved, leading to more stable operation.
-
--   **UI Functionality:** Task management, file uploads, and artifact viewing (including navigation) are working reliably.
+Recent key advancements and fixes:
+* **Agent Logic & Stability:**
+    * "Poem discrepancy" (Controller using previous step output) remains fixed. [cite: 2075, 2076]
+    * Controller's JSON parsing from LLM output is more robust (handles Markdown wrappers).
+    * ReAct agent prompt in `agent.py` refined for better tool selection formatting.
+* **Message Persistence:** Overall Plan Evaluator's final assessment message correctly saved and reloaded. [cite: 2077]
+* **Backend Plan Proposal:**
+    * Now correctly sends `propose_plan_for_confirmation` message with `plan_id`, summary, and structured plan. [cite: 2598]
+    * Saves `_plan_proposal_<plan_id>.md` artifact on proposal.
+    * Handles `cancel_plan_proposal` messages from the frontend. [cite: 2598]
+* **Tool Enhancements:**
+    * `python_package_installer` now handles multiple space/comma-separated packages.
+    * `workspace_shell` provides more reliable STDOUT.
+    * `Python_REPL` description clarified to guide LLM towards simpler uses.
+* **Frontend Refactoring:** Modular UI components and `StateManager` are in place. [cite: 2078]
+* **Backend Refactoring:** Modularized `message_handlers` in `message_processing` sub-package. [cite: 2079]
+* **UI Functionality:**
+    * Task management, file uploads, artifact viewing basics are functional. [cite: 2081]
+    * **Plan proposal UI is now appearing in the chat** with summary and action buttons. [cite: 2598]
 
 **Immediate Focus & User Feedback:**
 
-1.  **Plan Confirmation UI (High Priority - Blocked):**
+1.  **Complete UI for Plan Proposal Interaction (High Priority):**
+    * **Issue (Partially Resolved):** Backend sends `propose_plan_for_confirmation`, and a basic proposal UI appears. [cite: 2598]
+    * **Remaining Frontend Tasks:**
+        * **Inline "View Details":** The "View Details" button currently shows an "Attempting to view artifact..." message. [cite: 2598] It needs to be changed to expand/collapse the structured plan steps *directly within the chat UI proposal block*. This is the preferred behavior for quick review.
+        * **Persistent Confirmed Plan in Chat:** When a plan is confirmed, the interactive proposal block needs to transform into a static, non-interactive message in the chat, displaying the confirmed plan (summary and steps). This static representation should be saved to the database (backend already saves a `confirmed_plan_log` message) and correctly rendered from chat history on reload. [cite: 2598]
+    * **Goal:** A clean, interactive, and persistent way for users to review and confirm plans directly in the chat.
 
-    -   **Issue:** The backend now sends a new `propose_plan_for_confirmation` message type, but the frontend (`script.js`) does not yet handle it. This means the UI currently doesn't display any plan for user confirmation, effectively halting plan-based interactions after the intent is classified as "PLAN".
+2.  **Chat Clutter & Plan Display Format (High Priority - After above Plan UI fixes):**
+    * **User Feedback:** The chat UI can still be too cluttered with intermediate agent thoughts/tool outputs. The goal is a cleaner interface, more like the `manus.ai` example, distinguishing clearly between direct agent-user messages and status/progress updates. [cite: 2085, 2086]
+    * **Proposed Solution (being implemented iteratively):**
+        * **Concise Plan Proposal:** Addressed with the new UI.
+        * **"View Details":** To be changed to inline expansion (see point 1). The `_plan_proposal_<ID>.md` artifact remains for persistence. [cite: 2089]
+        * **Persistent Confirmed Plan:** Addressed by point 1. The `_plan_<ID>.md` (execution log) artifact is created upon confirmation.
+        * **Intermediate Outputs:** Route most intermediate execution details (thoughts, tool inputs/outputs) primarily to the Monitor Log. [cite: 2091] The main chat should show high-level progress via the "Agent Thinking" status line and final answers/key results. [cite: 2092]
 
-    -   **Log Indication:**  `[SYSTEM] Unknown message type received: propose_plan_for_confirmation`
+3.  **Color-Coding UI Elements (Medium Priority):**
+    * **User Idea:** Visually differentiate messages in the Monitor Log based on the agent component (Planner, Controller, Executor, Evaluator). [cite: 2093]
+    * **Extension:** Link these colors to the LLM selector dropdowns. [cite: 2094]
+    * **Benefit:** Improved readability and traceability. [cite: 2095]
 
-    -   **Goal:** Implement the frontend handling for this new message to display a concise plan proposal with "Confirm," "View Details," and "Cancel" options.
+**Current Workflow Example (Heatmap Generation - with recent fixes):**
 
-2.  **Chat Clutter & Plan Display Format (High Priority - Post above fix):**
-
-    -   **User Feedback:** The current chat UI (when the full plan was displayed) is too cluttered with intermediate step outputs and the detailed plan itself. The goal is a cleaner interface, more like the `manus.ai` example, distinguishing clearly between direct agent-user messages and status/progress updates. The detailed plan, when shown, was also obtrusive and not persistent on refresh.
-
-    -   **Proposed Solution (being implemented):**
-
-        -   **Concise Plan Proposal:** Show a brief summary with action buttons (Confirm, View Details, Cancel).
-
-        -   **"View Details":** Link to the `_plan_proposal_<ID>.md` (and later `_plan_<ID>.md`) artifact in the Artifact Viewer. This makes the detailed plan persistent and non-intrusive in the chat.
-
-        -   **Intermediate Outputs:** Route most intermediate execution details (thoughts, tool outputs) to the Monitor Log. The main chat should show high-level progress via the "Agent Thinking" status line and final answers.
-
-3.  **Color-Coding Agent Workspace & LLM Selectors (Medium Priority):**
-
-    -   **User Idea:** Visually differentiate messages in the Agent Workspace (Monitor Log) based on the agent component (Planner, Controller, Executor, Evaluator) using background tints or border colors.
-
-    -   **Extension:** Link these colors to the LLM selector dropdowns in the chat header to show which LLM is configured for which colored component.
-
-    -   **Benefit:** Improved readability, traceability, and intuitive understanding of the agent's operations and configuration.
-
-**Current Workflow (Poem Example - with fixes working):**
-
-1.  User: "Create a file called poem.txt and write in it a small poem about stars."
-
-2.  Intent Classifier: PLAN.
-
-3.  Planner: Generates a plan (e.g., Step 1: Generate poem, Expected: "The text of a small poem about stars."; Step 2: Write poem to poem.txt).
-
-    -   *Backend now sends `propose_plan_for_confirmation` (Frontend needs to handle this).*
-
-4.  User Confirms (once UI is fixed).
-
-5.  Backend saves `_plan_<ID>.md`.
-
-6.  **Step 1: Generate Poem**
-
-    -   Controller (receives `previous_step_output=None`): Validates, decides "No Tool".
-
-    -   Executor (ReAct Agent): Receives directive. Generates the poem as `Final Answer`.
-
-        -   *This poem (Executor's `Final Answer`) is currently sent as an `agent_message` to chat.*
-
-    -   Step Evaluator: Confirms poem matches expected outcome.
-
-    -   `last_successful_step_output` in `agent_flow_handlers.py` now stores this poem.
-
-7.  **Step 2: Write File**
-
-    -   Controller (receives poem from Step 1 via `previous_step_output`): Validates, decides `write_file` tool. **Crucially, it now uses the provided poem to formulate the `tool_input` for `write_file` (e.g., `poem.txt:::Twinkling lights...`).**
-
-    -   Executor (ReAct Agent): Calls `write_file` with the correct poem.
-
-    -   Step Evaluator: Confirms file written with correct content.
-
-8.  Overall Plan Evaluator: Assesses overall success. This assessment is sent as an `agent_message` and saved to DB.
-
-This document will be updated as we address these UI/UX items and any new ideas emerge.
+1.  User: "Create a set of 50 random genes values in 6 samples. Then create a heatmap... save as png. Do not use python REPL tool." [cite: 701, 702, 703]
+2.  Intent Classifier: PLAN. [cite: 705]
+3.  Planner: Generates a multi-step plan (e.g., Install packages, Generate script, Write script to file, Execute script, Confirm). [cite: 706]
+4.  Backend: Saves `_plan_proposal_<ID>.md`. Sends `propose_plan_for_confirmation` with summary, plan ID, and structured plan to UI. [cite: 706]
+5.  Frontend: Displays proposal with "View Details" (inline expansion pending), "Confirm & Run", "Cancel" buttons.
+6.  User Confirms.
+7.  Frontend: Transforms proposal UI into a static "Confirmed Plan" message. Sends `execute_confirmed_plan` to backend.
+8.  Backend: Saves `confirmed_plan_log` to DB. Creates `_plan_<ID>.md`. Starts execution.
+    * **Step 1: Install Packages**
+        * Controller -> `python_package_installer` tool with input "numpy pandas seaborn". [cite: 711, 712]
+        * Executor -> Calls tool. Tool installs packages sequentially. [cite: 718, 719, 720, 721]
+        * Step Evaluator -> Confirms success. [cite: 723]
+    * **Step 2: Write Script File**
+        * Controller -> `write_file` tool with path and script content. [cite: 726]
+        * Executor -> Calls tool (may self-correct input format for `:::`). Tool writes file. [cite: 729, 730]
+        * Step Evaluator -> Confirms success. [cite: 732]
+    * **Step 3: Execute Script**
+        * Controller -> `workspace_shell` tool with `python generate_heatmap.py`. [cite: 736]
+        * Executor -> Calls tool. Script runs (output now better captured by `workspace_shell`). [cite: 742, 747]
+        * Step Evaluator -> Confirms success (based on Executor's final answer claiming file creation, verified by `ls` in next step). [cite: 750]
+    * ... (Other steps like confirm file, summarize)
+9.  Overall Plan Evaluator: Assesses overall success. [cite: 787]
+10. Final agent message sent to chat and saved. [cite: 790]

@@ -5,6 +5,7 @@
  * - Renders chat messages (user, agent, status).
  * - Handles Markdown formatting.
  * - Displays the agent's proposed plan for confirmation with inline details.
+ * - Transforms the plan UI to a static confirmed state.
  * - Manages the chat input area, including input history.
  * - Shows/hides the "agent thinking" status and handles its click.
  */
@@ -14,19 +15,14 @@ let agentThinkingStatusElement;
 let chatTextareaElement;
 let chatSendButtonElement;
 
-let onSendMessageCallback = (messageText) => console.warn("onSendMessageCallback not set in chat_ui.js");
-let onThinkingStatusClickCallback = () => console.warn("onThinkingStatusClickCallback not set in chat_ui.js"); 
+let onSendMessageCallback = (messageText) => console.warn("[ChatUI] onSendMessageCallback not set in chat_ui.js. Message:", messageText);
+let onThinkingStatusClickCallback = () => console.warn("[ChatUI] onThinkingStatusClickCallback not set in chat_ui.js"); 
 
 let chatInputHistory = [];
-const MAX_CHAT_HISTORY = 10;
+const MAX_CHAT_HISTORY = 50; 
 let chatHistoryIndex = -1;
-let currentInputBuffer = "";
+let currentInputBuffer = ""; 
 
-/**
- * Initializes the Chat UI module.
- * @param {object} elements - DOM elements { chatMessagesContainer, agentThinkingStatusEl, chatTextareaEl, chatSendButtonEl }
- * @param {object} callbacks - Object containing callback functions { onSendMessage, onThinkingStatusClick }
- */
 function initChatUI(elements, callbacks) {
     console.log("[ChatUI] Initializing...");
     chatMessagesContainerElement = elements.chatMessagesContainer;
@@ -39,8 +35,10 @@ function initChatUI(elements, callbacks) {
     if (!chatTextareaElement) console.error("[ChatUI] Chat textarea element not provided!");
     if (!chatSendButtonElement) console.error("[ChatUI] Chat send button element not provided!");
 
-    onSendMessageCallback = callbacks.onSendMessage;
-    if (callbacks.onThinkingStatusClick) {
+    if (callbacks && typeof callbacks.onSendMessage === 'function') {
+        onSendMessageCallback = callbacks.onSendMessage;
+    }
+    if (callbacks && typeof callbacks.onThinkingStatusClick === 'function') {
         onThinkingStatusClickCallback = callbacks.onThinkingStatusClick;
     }
 
@@ -49,12 +47,14 @@ function initChatUI(elements, callbacks) {
     }
     if (chatTextareaElement) {
         chatTextareaElement.addEventListener('keydown', handleChatTextareaKeydown);
-        chatTextareaElement.addEventListener('input', handleChatTextareaInput);
+        chatTextareaElement.addEventListener('input', handleChatTextareaInput); 
     }
     if (agentThinkingStatusElement) {
         agentThinkingStatusElement.addEventListener('click', () => {
             console.log("[ChatUI] Agent thinking status clicked.");
-            onThinkingStatusClickCallback();
+            if (typeof onThinkingStatusClickCallback === 'function') {
+                onThinkingStatusClickCallback();
+            }
         });
     }
     console.log("[ChatUI] Initialized.");
@@ -63,7 +63,10 @@ function initChatUI(elements, callbacks) {
 function handleSendButtonClick() {
     const messageText = chatTextareaElement.value.trim();
     if (messageText) {
-        onSendMessageCallback(messageText); 
+        if (typeof onSendMessageCallback === 'function') {
+            onSendMessageCallback(messageText); 
+        }
+        addMessageToInputHistory(messageText); 
         chatTextareaElement.value = '';
         adjustTextareaHeight();
     }
@@ -71,33 +74,59 @@ function handleSendButtonClick() {
 }
 
 function handleChatTextareaKeydown(event) {
-    if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); handleSendButtonClick(); }
-    else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-        if (chatInputHistory.length === 0) return; event.preventDefault();
-        if (chatHistoryIndex === -1) { currentInputBuffer = chatTextareaElement.value; }
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        handleSendButtonClick();
+    } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+        if (chatInputHistory.length === 0) return;
+        event.preventDefault();
+
+        if (chatHistoryIndex === -1) { 
+            currentInputBuffer = chatTextareaElement.value;
+        }
+
         if (event.key === 'ArrowUp') {
-            if (chatHistoryIndex === -1) { chatHistoryIndex = chatInputHistory.length - 1; }
-            else if (chatHistoryIndex > 0) { chatHistoryIndex--; }
+            if (chatHistoryIndex === -1) { 
+                chatHistoryIndex = chatInputHistory.length - 1;
+            } else if (chatHistoryIndex > 0) { 
+                chatHistoryIndex--;
+            }
             chatTextareaElement.value = chatInputHistory[chatHistoryIndex];
         } else if (event.key === 'ArrowDown') {
-            if (chatHistoryIndex !== -1 && chatHistoryIndex < chatInputHistory.length - 1) {
-                chatHistoryIndex++; chatTextareaElement.value = chatInputHistory[chatHistoryIndex];
-            } else { chatHistoryIndex = -1; chatTextareaElement.value = currentInputBuffer; }
+            if (chatHistoryIndex !== -1 && chatHistoryIndex < chatInputHistory.length - 1) { 
+                chatHistoryIndex++;
+                chatTextareaElement.value = chatInputHistory[chatHistoryIndex];
+            } else { 
+                chatHistoryIndex = -1;
+                chatTextareaElement.value = currentInputBuffer;
+            }
         }
-        chatTextareaElement.selectionStart = chatTextareaElement.selectionEnd = chatTextareaElement.value.length;
+        chatTextareaElement.selectionStart = chatTextareaElement.selectionEnd = chatTextareaElement.value.length; 
         adjustTextareaHeight();
-    } else { chatHistoryIndex = -1; currentInputBuffer = ""; }
+    } else {
+        chatHistoryIndex = -1;
+    }
 }
 
-function handleChatTextareaInput() { adjustTextareaHeight(); }
-function adjustTextareaHeight() { if (!chatTextareaElement) return; chatTextareaElement.style.height = 'auto'; chatTextareaElement.style.height = chatTextareaElement.scrollHeight + 'px'; }
+function handleChatTextareaInput() {
+    adjustTextareaHeight();
+}
+
+function adjustTextareaHeight() {
+    if (!chatTextareaElement) return;
+    chatTextareaElement.style.height = 'auto'; 
+    chatTextareaElement.style.height = (chatTextareaElement.scrollHeight) + 'px';
+}
 
 function addMessageToInputHistory(messageText) {
     if (chatInputHistory[chatInputHistory.length - 1] !== messageText) {
         chatInputHistory.push(messageText);
-        if (chatInputHistory.length > MAX_CHAT_HISTORY) { chatInputHistory.shift(); }
+        if (chatInputHistory.length > MAX_CHAT_HISTORY) {
+            chatInputHistory.shift(); 
+        }
     }
-    chatHistoryIndex = -1; currentInputBuffer = "";
+    chatHistoryIndex = -1; 
+    currentInputBuffer = ""; 
 }
 
 function formatMessageContentInternal(text) {
@@ -105,95 +134,136 @@ function formatMessageContentInternal(text) {
         console.warn("[ChatUI] formatMessageContentInternal received non-string input:", text);
         text = String(text); 
     }
-    let formattedText = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-    formattedText = formattedText.replace(/```(\w*)\n([\s\S]*?)\n?```/g, (match, lang, code) => { const escapedCode = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); const langClass = lang ? ` class="language-${lang}"` : ''; return `<pre><code${langClass}>${escapedCode}</code></pre>`; });
+    let formattedText = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+    formattedText = formattedText.replace(/```(\w*)\n([\s\S]*?)\n?```/g, (match, lang, code) => {
+        const escapedCode = code; 
+        const langClass = lang ? ` class="language-${lang}"` : '';
+        return `<pre><code${langClass}>${escapedCode}</code></pre>`;
+    });
+
     formattedText = formattedText.replace(/`([^`]+)`/g, '<code>$1</code>');
-    formattedText = formattedText.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (match, linkText, linkUrl) => { const safeLinkUrl = linkUrl.replace(/"/g, "&quot;"); if (linkText.includes('&lt;') || linkText.includes('&gt;')) return match; return `<a href="${safeLinkUrl}" target="_blank" rel="noopener noreferrer">${linkText}</a>`; });
+    
+    formattedText = formattedText.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (match, linkText, linkUrl) => {
+        const safeLinkUrl = linkUrl.replace(/"/g, "&quot;"); 
+        if (linkText.includes('&lt;') || linkText.includes('&gt;')) return match;
+        return `<a href="${safeLinkUrl}" target="_blank" rel="noopener noreferrer">${linkText}</a>`;
+    });
+
     formattedText = formattedText.replace(/(\*\*\*|___)(?=\S)([\s\S]*?\S)\1/g, '<strong><em>$2</em></strong>');
     formattedText = formattedText.replace(/(\*\*|__)(?=\S)([\s\S]*?\S)\1/g, '<strong>$2</strong>');
     formattedText = formattedText.replace(/(?<![`\w])(?:(\*|_))(?=\S)([\s\S]*?\S)\1(?![`\w])/g, '<em>$2</em>');
+
     const parts = formattedText.split(/(<pre>.*?<\/pre>|<a.*?<\/a>|<code>.*?<\/code>)/s);
-    for (let i = 0; i < parts.length; i++) { if (!parts[i].startsWith('<pre') && !parts[i].startsWith('<a') && !parts[i].startsWith('<code')) { parts[i] = parts[i].replace(/\n/g, '<br>'); } }
+    for (let i = 0; i < parts.length; i++) {
+        if (!parts[i].startsWith('<pre') && !parts[i].startsWith('<a') && !parts[i].startsWith('<code')) {
+            parts[i] = parts[i].replace(/\n/g, '<br>');
+        }
+    }
     formattedText = parts.join('');
+
     return formattedText;
 }
 
 function addChatMessageToUI(text, type = 'agent', doScroll = true) {
-    if (!chatMessagesContainerElement) { console.error("[ChatUI] Chat container missing!"); return null; }
-    if (type === 'status') { const lowerText = text.toLowerCase(); if (!(lowerText.includes("connect") || lowerText.includes("clos") || lowerText.includes("error") || lowerText.includes("plan") || lowerText.includes("task") || lowerText.includes("upload") || lowerText.includes("history"))) { console.log("[ChatUI] Skipping non-critical status message in chat:", text); return null; } }
+    if (!chatMessagesContainerElement) { 
+        console.error("[ChatUI] Chat container missing! Cannot add message:", text);
+        return null; 
+    }
+
+    if (type === 'status') {
+        const lowerText = text.toLowerCase();
+        if (!(lowerText.includes("connect") || lowerText.includes("clos") || lowerText.includes("error") || lowerText.includes("plan") || lowerText.includes("task") || lowerText.includes("upload") || lowerText.includes("history"))) {
+            console.log("[ChatUI] Skipping non-critical status message in chat:", text);
+            return null; 
+        }
+    }
+
     const messageElement = document.createElement('div');
     messageElement.classList.add('message', `message-${type}`);
-    if (type === 'status') { const lowerText = text.toLowerCase(); if (lowerText.includes("connect") || lowerText.includes("clos")) { messageElement.classList.add('connection-status'); } if (lowerText.includes("error")) { messageElement.classList.add('error-message'); } }
+
+    if (type === 'status') {
+        const lowerText = text.toLowerCase();
+        if (lowerText.includes("connect") || lowerText.includes("clos")) {
+            messageElement.classList.add('connection-status');
+        }
+        if (lowerText.includes("error")) {
+            messageElement.classList.add('error-message');
+        }
+    }
     if (type === 'user') messageElement.classList.add('user-message'); 
     if (type === 'agent') messageElement.classList.add('agent-message'); 
     
-    if (type === 'confirmed_plan_log') { // Handle rendering of persistent confirmed plan
-        messageElement.classList.remove('message-agent'); // Or whatever default it got
-        messageElement.classList.add('message-system', 'plan-confirmation-container', 'plan-confirmed-static'); // Add specific class
-        const planData = JSON.parse(text); // Assuming text is the JSON string of the plan
-        
-        const titleElement = document.createElement('h4');
-        titleElement.textContent = 'Confirmed Plan (from history):';
-        messageElement.appendChild(titleElement);
+    if (type === 'confirmed_plan_log' && text) { // Handle rendering of persistent confirmed plan [cite: 38]
+        messageElement.classList.remove('message-agent'); 
+        messageElement.classList.add('message-system', 'plan-confirmation-container', 'plan-confirmed-static'); 
+        try {
+            const planData = JSON.parse(text); 
+            
+            const titleElement = document.createElement('h4');
+            titleElement.textContent = 'Confirmed Plan (from history):';
+            messageElement.appendChild(titleElement);
 
-        const summaryElement = document.createElement('p');
-        summaryElement.className = 'plan-summary';
-        summaryElement.innerHTML = formatMessageContentInternal(planData.summary || "Summary not available.");
-        messageElement.appendChild(summaryElement);
+            const summaryElement = document.createElement('p');
+            summaryElement.className = 'plan-summary';
+            summaryElement.innerHTML = formatMessageContentInternal(planData.summary || "Summary not available.");
+            messageElement.appendChild(summaryElement);
 
-        const detailsDiv = document.createElement('div');
-        detailsDiv.className = 'plan-steps-details'; // Make it always visible or add toggle
-        detailsDiv.style.display = 'block'; // Default to visible for history
-        
-        const ol = document.createElement('ol');
-        if (planData.steps && Array.isArray(planData.steps)) {
-            planData.steps.forEach(step => { 
-                const li = document.createElement('li'); 
-                li.innerHTML = `<strong>${step.step_id}. ${formatMessageContentInternal(step.description)}</strong> ${step.tool_to_use && step.tool_to_use !== "None" ? `<br><span class="step-tool">Tool: ${step.tool_to_use}</span>` : ''} ${step.tool_input_instructions ? `<br><span class="step-tool">Input Hint: ${formatMessageContentInternal(step.tool_input_instructions)}</span>` : ''} <br><span class="step-expected">Expected: ${formatMessageContentInternal(step.expected_outcome)}</span>`; 
-                ol.appendChild(li); 
-            });
+            const detailsDiv = document.createElement('div');
+            detailsDiv.className = 'plan-steps-details';
+            detailsDiv.style.display = 'block'; 
+            
+            const ol = document.createElement('ol');
+            if (planData.steps && Array.isArray(planData.steps)) {
+                planData.steps.forEach(step => { 
+                    const li = document.createElement('li'); 
+                    li.innerHTML = `<strong>${step.step_id}. ${formatMessageContentInternal(step.description)}</strong> ${step.tool_to_use && step.tool_to_use !== "None" ? `<br><span class="step-tool">Tool: ${formatMessageContentInternal(step.tool_to_use)}</span>` : ''} ${step.tool_input_instructions ? `<br><span class="step-tool">Input Hint: ${formatMessageContentInternal(step.tool_input_instructions)}</span>` : ''} <br><span class="step-expected">Expected: ${formatMessageContentInternal(step.expected_outcome)}</span>`; 
+                    ol.appendChild(li); 
+                });
+            }
+            detailsDiv.appendChild(ol); 
+            messageElement.appendChild(detailsDiv);
+        } catch (e) {
+            console.error("[ChatUI] Error parsing confirmed_plan_log data:", e, "Data:", text);
+            messageElement.innerHTML = formatMessageContentInternal("Error displaying confirmed plan from history.");
         }
-        detailsDiv.appendChild(ol); 
-        messageElement.appendChild(detailsDiv);
     } else {
         messageElement.innerHTML = formatMessageContentInternal(text);
     }
 
     if (agentThinkingStatusElement && agentThinkingStatusElement.style.display !== 'none' && messageElement !== agentThinkingStatusElement) {
-        chatMessagesContainerElement.insertBefore(agentThinkingStatusElement, null); 
+        const thinkingStatusWasPresent = agentThinkingStatusElement.parentNode === chatMessagesContainerElement;
+        if (thinkingStatusWasPresent) {
+            chatMessagesContainerElement.removeChild(agentThinkingStatusElement);
+        }
+        chatMessagesContainerElement.appendChild(messageElement);
+        if (thinkingStatusWasPresent) {
+            chatMessagesContainerElement.appendChild(agentThinkingStatusElement);
+        }
+    } else {
+        chatMessagesContainerElement.appendChild(messageElement);
     }
-    chatMessagesContainerElement.appendChild(messageElement);
-    if (doScroll) { scrollToBottomChat(); }
-    return messageElement;
+
+    if (doScroll) {
+        scrollToBottomChat();
+    }
+    return messageElement; 
 }
 
-/**
- * Displays the agent's proposed plan for user confirmation.
- * @param {string} humanSummary - A human-readable summary of the plan.
- * @param {string} planId - The unique ID of the plan proposal.
- * @param {Array<object>} structuredPlan - The detailed steps of the plan.
- * @param {function} onConfirm - Callback when "Confirm & Run" is clicked, receives planId.
- * @param {function} onCancel - Callback when "Cancel" is clicked, receives planId.
- * @param {function} onViewDetails - Callback (now mostly for logging, as details are inline).
- */
 function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfirm, onCancel, onViewDetails) {
     if (!chatMessagesContainerElement) {
         console.error("[ChatUI] Cannot display plan confirmation: Chat messages container not initialized.");
         return;
     }
 
-    const existingPlanUI = chatMessagesContainerElement.querySelector(`.plan-confirmation-container[data-plan-id="${planId}"]`);
-    if (existingPlanUI) { // If a UI for this specific plan ID already exists, remove it before re-rendering
-        console.log(`[ChatUI] Removing existing plan confirmation UI for plan ID ${planId} before displaying new one.`);
-        existingPlanUI.remove();
-    } else { // If no specific plan ID match, remove any generic plan proposal UI
-        const genericExistingPlanUI = chatMessagesContainerElement.querySelector('.plan-confirmation-container:not([data-plan-id])');
-        if (genericExistingPlanUI) {
-            console.log("[ChatUI] Removing existing generic plan confirmation UI.");
-            genericExistingPlanUI.remove();
-        }
-    }
-
+    const existingPlanUIs = chatMessagesContainerElement.querySelectorAll('.plan-confirmation-container');
+    existingPlanUIs.forEach(ui => ui.remove());
+    console.log("[ChatUI] Removed any existing plan confirmation UIs.");
 
     const planContainer = document.createElement('div');
     planContainer.className = 'message message-system plan-confirmation-container'; 
@@ -208,16 +278,18 @@ function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfi
     summaryElement.innerHTML = formatMessageContentInternal(humanSummary); 
     planContainer.appendChild(summaryElement);
 
-    // --- MODIFIED: Inline Details Div ---
     const detailsDiv = document.createElement('div');
-    detailsDiv.className = 'plan-steps-details'; // Use existing CSS or new
-    detailsDiv.style.display = 'none'; // Initially hidden
+    detailsDiv.className = 'plan-steps-details'; 
+    detailsDiv.style.display = 'none'; 
 
     const ol = document.createElement('ol');
     if (structuredPlan && Array.isArray(structuredPlan)) {
         structuredPlan.forEach(step => { 
             const li = document.createElement('li'); 
-            li.innerHTML = `<strong>${step.step_id}. ${formatMessageContentInternal(step.description)}</strong> ${step.tool_to_use && step.tool_to_use !== "None" ? `<br><span class="step-tool">Tool: ${step.tool_to_use}</span>` : ''} ${step.tool_input_instructions ? `<br><span class="step-tool">Input Hint: ${formatMessageContentInternal(step.tool_input_instructions)}</span>` : ''} <br><span class="step-expected">Expected: ${formatMessageContentInternal(step.expected_outcome)}</span>`; 
+            li.innerHTML = `<strong>${step.step_id}. ${formatMessageContentInternal(step.description)}</strong>` +
+                           `${step.tool_to_use && step.tool_to_use !== "None" ? `<br><span class="step-tool">Tool: ${formatMessageContentInternal(step.tool_to_use)}</span>` : ''}` +
+                           `${step.tool_input_instructions ? `<br><span class="step-tool">Input Hint: ${formatMessageContentInternal(step.tool_input_instructions)}</span>` : ''}` +
+                           `<br><span class="step-expected">Expected: ${formatMessageContentInternal(step.expected_outcome)}</span>`; 
             ol.appendChild(li); 
         });
     } else {
@@ -226,8 +298,7 @@ function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfi
         ol.appendChild(li);
     }
     detailsDiv.appendChild(ol); 
-    planContainer.appendChild(detailsDiv);
-    // --- END MODIFICATION ---
+    planContainer.appendChild(detailsDiv); 
 
     const viewDetailsBtn = document.createElement('button');
     viewDetailsBtn.className = 'plan-toggle-details-btn'; 
@@ -235,16 +306,14 @@ function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfi
     viewDetailsBtn.title = `View detailed plan for proposal ${planId}`;
     viewDetailsBtn.onclick = (e) => {
         e.stopPropagation(); 
-        // --- MODIFIED: Toggle inline details ---
         const isHidden = detailsDiv.style.display === 'none';
         detailsDiv.style.display = isHidden ? 'block' : 'none';
         viewDetailsBtn.textContent = isHidden ? 'Hide Details' : 'View Details';
-        // --- END MODIFICATION ---
-        if (typeof onViewDetails === 'function') { // Still call the callback for logging or other actions
-            onViewDetails(planId, isHidden); // Pass new state
+        if (typeof onViewDetails === 'function') { 
+            onViewDetails(planId, isHidden); 
         }
     };
-    planContainer.appendChild(viewDetailsBtn);
+    planContainer.appendChild(viewDetailsBtn); 
 
     const actionsDiv = document.createElement('div');
     actionsDiv.className = 'plan-actions';
@@ -255,7 +324,7 @@ function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfi
     confirmBtn.onclick = (e) => {
         e.stopPropagation();
         if (typeof onConfirm === 'function') {
-            onConfirm(planId); // Pass planId
+            onConfirm(planId); 
         }
     };
     actionsDiv.appendChild(confirmBtn);
@@ -266,13 +335,13 @@ function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfi
     cancelBtn.onclick = (e) => {
         e.stopPropagation();
         if (typeof onCancel === 'function') {
-            onCancel(planId); // Pass planId
+            onCancel(planId); 
         }
     };
     actionsDiv.appendChild(cancelBtn);
     planContainer.appendChild(actionsDiv);
 
-    if (agentThinkingStatusElement && agentThinkingStatusElement.parentNode === chatMessagesContainerElement) {
+    if (agentThinkingStatusElement && agentThinkingStatusElement.style.display !== 'none' && agentThinkingStatusElement.parentNode === chatMessagesContainerElement) {
         chatMessagesContainerElement.insertBefore(planContainer, agentThinkingStatusElement);
     } else {
         chatMessagesContainerElement.appendChild(planContainer);
@@ -280,6 +349,79 @@ function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfi
 
     scrollToBottomChat(); 
     console.log(`[ChatUI] Displayed plan confirmation for plan ID: ${planId}`);
+}
+
+/**
+ * Transforms an existing plan proposal UI into a static, confirmed plan display.
+ * @param {string} planId - The ID of the plan to transform.
+ */
+function transformToConfirmedPlanUI(planId) {
+    console.log(`[ChatUI] Transforming plan UI to confirmed state for plan ID: ${planId}`);
+    if (!chatMessagesContainerElement) {
+        console.error("[ChatUI] Chat messages container not found. Cannot transform plan UI.");
+        return;
+    }
+
+    const planContainer = chatMessagesContainerElement.querySelector(`.plan-confirmation-container[data-plan-id="${planId}"]`);
+    if (!planContainer) {
+        console.warn(`[ChatUI] Plan container with ID ${planId} not found for transformation.`);
+        // As a fallback, add a new status message if the original block isn't found
+        addChatMessageToUI(`Plan (ID: ${planId.substring(0,8)}...) confirmed and execution started.`, 'status');
+        return;
+    }
+
+    // Change title
+    const titleElement = planContainer.querySelector('h4');
+    if (titleElement) {
+        titleElement.textContent = 'Plan Confirmed:';
+    }
+
+    // Remove "View Details" button
+    const viewDetailsBtn = planContainer.querySelector('.plan-toggle-details-btn');
+    if (viewDetailsBtn) {
+        viewDetailsBtn.remove();
+    }
+
+    // Remove "Confirm & Run" and "Cancel" buttons (the whole actions div)
+    const actionsDiv = planContainer.querySelector('.plan-actions');
+    if (actionsDiv) {
+        actionsDiv.remove();
+    }
+
+    // Ensure details are visible
+    const detailsDiv = planContainer.querySelector('.plan-steps-details');
+    if (detailsDiv) {
+        detailsDiv.style.display = 'block';
+    }
+
+    // Add "Confirmed" status/timestamp
+    let statusP = planContainer.querySelector('.plan-execution-status-confirmed'); // Use a more specific class
+    if (!statusP) {
+        statusP = document.createElement('p');
+        statusP.className = 'plan-execution-status-confirmed'; 
+        statusP.style.fontSize = '0.9em';
+        statusP.style.marginTop = '10px';
+        statusP.style.color = 'var(--accent-color)'; // Or a success/info color
+        statusP.style.fontWeight = '500';
+        // Append after summary, or at the end if detailsDiv is complex
+        const summaryElement = planContainer.querySelector('.plan-summary');
+        if (summaryElement && summaryElement.nextSibling) {
+            summaryElement.parentNode.insertBefore(statusP, summaryElement.nextSibling);
+        } else if (detailsDiv && detailsDiv.nextSibling) {
+             detailsDiv.parentNode.insertBefore(statusP, detailsDiv.nextSibling);
+        }
+        else {
+            planContainer.appendChild(statusP);
+        }
+    }
+    statusP.textContent = `Status: Confirmed & Execution Started (at ${new Date().toLocaleTimeString()})`;
+
+    // Update container class for styling if needed
+    planContainer.classList.add('plan-confirmed-static');
+    // planContainer.classList.remove('plan-interactive-proposal'); // If such a class existed
+
+    console.log(`[ChatUI] Plan UI ${planId} transformed to confirmed state.`);
+    scrollToBottomChat();
 }
 
 

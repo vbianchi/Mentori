@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { element: evaluatorLlmSelectElement, role: 'evaluator', storageKey: 'sessionEvaluatorLlmId', label: 'Evaluator' }
     ];
     
-    const httpBackendBaseUrl = 'http://localhost:8766';
+    const httpBackendBaseUrl = 'http://localhost:8766'; 
     let isLoadingHistory = false; 
 
     window.dispatchWsMessage = (message) => {
@@ -181,27 +181,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (typeof populateAllLlmSelectorsUI === 'function') { populateAllLlmSelectorsUI(StateManager.getAvailableModels(), backendDefaultExecutorLlmId, backendRoleDefaults); } 
                     } 
                     break;
-                // --- ADDED: Handle acknowledgement of plan cancellation from backend ---
-                case 'plan_proposal_cancelled_ack': // Example, backend might just send a status_message
-                    if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(`[SYSTEM] Backend acknowledged plan proposal cancellation for ID: ${message.content?.plan_id}`);
-                    updateGlobalMonitorStatus('idle', 'Idle'); // Ensure status is idle
-                    // UI removal is handled by handlePlanCancelRequest or by new proposal replacing old one.
-                    break;
-                // --- END ADDITION ---
                 case 'error_parsing_message': 
                     console.error("Error parsing message from WebSocket:", message.content); 
                     if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(`[SYSTEM] Error parsing WebSocket message: ${message.content}`); 
                     if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Error: Received an unreadable message from the backend.", "status"); 
                     break;
                 default: 
-                    console.warn("Received unknown message type:", message.type, "Content:", message.content); 
+                    console.warn("[Script.js] Received unknown message type:", message.type, "Content:", message.content); 
                     if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(`[SYSTEM] Unknown message type received: ${message.type}`);
             }
         } catch (error) {
-            console.error("Failed to process dispatched WS message:", error, "Original Message:", message);
+            console.error("[Script.js] Failed to process dispatched WS message:", error, "Original Message:", message);
             if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(`[SYSTEM] Error processing dispatched message: ${error.message}.`);
             updateGlobalMonitorStatus('error', 'Processing Error');
-            if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false);
+            if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); 
         }
     };
 
@@ -253,28 +246,36 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof sendWsMessage === 'function') {
             sendWsMessage('execute_confirmed_plan', { plan_id: planId, confirmed_plan: currentPlan });
         }
-        // The UI for the plan proposal block itself should be updated by chat_ui.js or a new function
-        // For now, just log and update global status.
-        // A more robust solution would be for chat_ui.js to expose a function to transform the proposal UI.
-        const planConfirmContainer = chatMessagesContainer.querySelector(`.plan-confirmation-container[data-plan-id="${planId}"]`);
-        if (planConfirmContainer) {
-            planConfirmContainer.querySelectorAll('button').forEach(btn => btn.disabled = true);
-            planConfirmContainer.style.opacity = "0.7";
-            let statusP = planConfirmContainer.querySelector('.plan-execution-status');
-            if (!statusP) {
-                statusP = document.createElement('p');
-                statusP.className = 'plan-execution-status'; // Add a class for styling
-                statusP.style.fontSize = '0.85em';
-                statusP.style.marginTop = '8px';
-                statusP.style.fontStyle = 'italic';
-                const actionsDiv = planConfirmContainer.querySelector('.plan-actions');
-                if (actionsDiv) actionsDiv.insertAdjacentElement('afterend', statusP); // Insert after buttons
-            }
-            statusP.textContent = 'Plan confirmed. Execution started...';
-            statusP.style.color = 'var(--accent-color)'; // Or a success color
+
+        // --- MODIFICATION: Call transformToConfirmedPlanUI ---
+        if (typeof transformToConfirmedPlanUI === 'function') {
+            transformToConfirmedPlanUI(planId);
         } else {
-             if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Plan confirmed. Executing steps...", "status");
+            console.warn("[Script.js] transformToConfirmedPlanUI function not found in chat_ui.js. Plan UI will not be transformed immediately.");
+            // Fallback: Add a simple status message if transformation function isn't available
+            // This part is now less critical as the primary transformation is in chat_ui.js
+            const planConfirmContainer = chatMessagesContainer.querySelector(`.plan-confirmation-container[data-plan-id="${planId}"]`);
+            if (planConfirmContainer) {
+                planConfirmContainer.querySelectorAll('button').forEach(btn => btn.disabled = true);
+                planConfirmContainer.style.opacity = "0.7";
+                let statusP = planConfirmContainer.querySelector('.plan-execution-status');
+                if (!statusP) {
+                    statusP = document.createElement('p');
+                    statusP.className = 'plan-execution-status'; 
+                    statusP.style.fontSize = '0.85em';
+                    statusP.style.marginTop = '8px';
+                    statusP.style.fontStyle = 'italic';
+                    const actionsDiv = planConfirmContainer.querySelector('.plan-actions');
+                    if (actionsDiv) actionsDiv.insertAdjacentElement('afterend', statusP); 
+                }
+                statusP.textContent = 'Plan confirmed. Execution started...';
+                statusP.style.color = 'var(--accent-color)'; 
+            } else {
+                 if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Plan confirmed. Executing steps...", "status");
+            }
         }
+        // --- END MODIFICATION ---
+
         updateGlobalMonitorStatus('running', 'Executing Plan...');
         if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, 'Executing plan...');
     };
@@ -282,36 +283,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const handlePlanCancelRequest = (planId) => {
         console.log(`[Script.js] Plan cancelled by user for plan ID: ${planId}`);
         if (typeof sendWsMessage === 'function') {
-            sendWsMessage('cancel_plan_proposal', { plan_id: planId }); // Message type matches backend
+            sendWsMessage('cancel_plan_proposal', { plan_id: planId }); 
         }
-        // UI update: Remove the plan proposal from chat
         const planConfirmContainer = chatMessagesContainer.querySelector(`.plan-confirmation-container[data-plan-id="${planId}"]`);
         if (planConfirmContainer) {
             planConfirmContainer.remove();
         }
         if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Plan proposal cancelled by user.", "status");
-        updateGlobalMonitorStatus('idle', 'Idle'); // Set global status to idle
+        updateGlobalMonitorStatus('idle', 'Idle'); 
         StateManager.setCurrentDisplayedPlan(null);
         StateManager.setCurrentPlanProposalId(null);
     };
 
-    /**
-     * Handles the "View Details" action from the plan confirmation UI.
-     * For now, this primarily logs the action, as the inline expansion is handled by chat_ui.js.
-     * It can still attempt to show the artifact if desired as a fallback or secondary action.
-     * @param {string} planId - The ID of the plan for which to view details.
-     * @param {boolean} isNowVisible - Whether the inline details were just made visible.
-     */
     const handlePlanViewDetailsRequest = (planId, isNowVisible) => {
         console.log(`[Script.js] View Details action for plan ID: ${planId}. Inline details are now ${isNowVisible ? 'visible' : 'hidden'}.`);
         if (typeof addLogEntryToMonitor === 'function') {
-            addLogEntryToMonitor(`[UI_ACTION] User toggled plan details for proposal ${planId}. Now: ${isNowVisible ? 'visible' : 'hidden'}.`);
+            addLogEntryToMonitor(`[UI_ACTION] User toggled plan details for proposal ${planId}. Details are now ${isNowVisible ? 'visible' : 'hidden'}.`);
         }
-        // Optional: If you still want to try showing the artifact in the viewer as a secondary action:
-        // const artifactFilename = `_plan_proposal_${planId}.md`;
-        // const artifacts = StateManager.getCurrentTaskArtifacts();
-        // const planArtifact = artifacts.find(art => art.filename === artifactFilename);
-        // if (planArtifact) { /* ... logic to show in artifact viewer ... */ }
     };
     
     const handleStopAgentRequest = () => { if (StateManager.getIsAgentRunning()) { if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor("[SYSTEM] Stop request sent by user."); if (typeof sendWsMessage === 'function') sendWsMessage("cancel_agent", {}); updateGlobalMonitorStatus('cancelling', 'Cancelling...'); } };
@@ -323,11 +311,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleWsClose = (event) => { let reason = event.reason || 'No reason given'; let advice = ""; if (event.code === 1000 || event.wasClean) { reason = "Normal"; } else { reason = `Abnormal (Code: ${event.code})`; advice = " Backend down or network issue?"; } if (typeof addChatMessageToUI === 'function') addChatMessageToUI(`Connection closed.${advice}`, "status", true); if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(`[SYSTEM] WebSocket disconnected. ${reason}`); updateGlobalMonitorStatus('disconnected', 'Disconnected');  if (typeof disableAllLlmSelectorsUI === 'function') disableAllLlmSelectorsUI(); if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); };
     const handleWsError = (event, isCreationError = false) => { const errorMsg = isCreationError ? "FATAL: Failed to initialize WebSocket connection." : "ERROR: Cannot connect to backend."; if (typeof addChatMessageToUI === 'function') addChatMessageToUI(errorMsg, "status", true); if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(`[SYSTEM] WebSocket error occurred.`); updateGlobalMonitorStatus('error', isCreationError ? 'Connection Init Failed' : 'Connection Error'); if (typeof disableAllLlmSelectorsUI === 'function') disableAllLlmSelectorsUI(); if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); };
 
-    // --- Event Listeners Setup ---
     if (newTaskButton) { newTaskButton.addEventListener('click', handleNewTaskCreation); }
     document.body.addEventListener('click', event => { if (event.target.classList.contains('action-btn')) { const commandText = event.target.textContent.trim(); if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(`[USER_ACTION] Clicked: ${commandText}`); if (typeof sendWsMessage === 'function') sendWsMessage("action_command", { command: commandText }); } });
 
-    // --- Initial Load and UI Modules Initialization ---
     if (typeof initTaskUI === 'function') { initTaskUI( { taskListUl: taskListUl, currentTaskTitleEl: currentTaskTitleElement, uploadFileBtn: uploadFileButtonElement }, { onTaskSelect: handleTaskSelection, onNewTask: handleNewTaskCreation, onDeleteTask: handleTaskDeletion, onRenameTask: handleTaskRename }); if (typeof renderTaskList === 'function') renderTaskList(StateManager.getTasks(), StateManager.getCurrentTaskId()); }
     if (typeof initChatUI === 'function') { initChatUI( { chatMessagesContainer: chatMessagesContainer, agentThinkingStatusEl: agentThinkingStatusElement, chatTextareaEl: chatTextarea, chatSendButtonEl: chatSendButton }, { onSendMessage: handleSendMessageFromUI, onThinkingStatusClick: handleThinkingStatusClick }); }
     if (typeof initMonitorUI === 'function') { initMonitorUI( { monitorLogArea: monitorLogAreaElement, statusDot: statusDotElement, monitorStatusText: monitorStatusTextElement, stopButton: stopButtonElement }, { onStopAgent: handleStopAgentRequest }); }
@@ -339,3 +325,4 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof connectWebSocket === 'function') { if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor("[SYSTEM] Attempting to connect to backend..."); updateGlobalMonitorStatus('disconnected', 'Connecting...'); connectWebSocket(handleWsOpen, handleWsClose, handleWsError);
     } else { console.error("connectWebSocket function not found."); if (typeof addChatMessageToUI === 'function') addChatMessageToUI("ERROR: WebSocket manager not loaded.", "status"); updateGlobalMonitorStatus('error', 'Initialization Error'); }
 });
+
