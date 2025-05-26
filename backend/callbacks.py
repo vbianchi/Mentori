@@ -74,13 +74,15 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         except AgentCancelledException:
             raise
         
-        await self.send_ws_message("agent_thinking_update", {"status_key": "LLM_PROCESSING", "message": "Agent is thinking..."})
+        # Determine role if possible (e.g., from kwargs if main flow passes it)
+        role_hint = kwargs.get("metadata", {}).get("component_name", "LLM")
+        await self.send_ws_message("agent_thinking_update", {"status_key": "LLM_PROCESSING", "message": f"Thinking ({role_hint})..."})
         
-        # Example: log_content = f"[LLM Core Start] Prompts: {str(prompts)[:200]}..."
-        # await self.send_ws_message("monitor_log", {
-        #     "text": f"{self._get_log_prefix()} {log_content}",
-        #     "log_source": "LLM_CORE_START"
-        # })
+        prompt_summary = str(prompts)[:200] + "..." if len(str(prompts)) > 200 else str(prompts)
+        await self.send_ws_message("monitor_log", {
+            "text": f"{self._get_log_prefix()} [LLM Core Start] Role: {role_hint}, Prompts: {prompt_summary}",
+            "log_source": f"LLM_CORE_START_{role_hint.upper()}"
+        })
 
     async def on_chat_model_start(
         self, serialized: Dict[str, Any], messages: List[List[BaseMessage]], **kwargs: Any
@@ -89,33 +91,29 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
             self._check_cancellation("Chat Model execution")
         except AgentCancelledException:
             raise
-        await self.send_ws_message("agent_thinking_update", {"status_key": "LLM_PROCESSING", "message": "Agent is thinking..."})
-        # monitor_log_content = f"[Chat Model Core Start] Messages: {str(messages)[:200]}..."
-        # await self.send_ws_message("monitor_log", {
-        #     "text": f"{self._get_log_prefix()} {monitor_log_content}",
-        #     "log_source": "LLM_CORE_START" # Or "CHAT_MODEL_CORE_START"
-        # })
+        role_hint = kwargs.get("metadata", {}).get("component_name", "ChatModel")
+        await self.send_ws_message("agent_thinking_update", {"status_key": "LLM_PROCESSING", "message": f"Thinking ({role_hint})..."})
+        
+        message_summary = str(messages)[:200] + "..." if len(str(messages)) > 200 else str(messages)
+        await self.send_ws_message("monitor_log", {
+            "text": f"{self._get_log_prefix()} [Chat Model Core Start] Role: {role_hint}, Messages: {message_summary}",
+            "log_source": f"LLM_CORE_START_{role_hint.upper()}"
+        })
 
     async def on_llm_new_token(self, token: str, **kwargs: Any) -> None:
         pass
 
     async def on_llm_end(self, response: LLMResult, *, run_id: UUID, parent_run_id: Optional[UUID] = None, **kwargs: Any) -> None:
         log_prefix = self._get_log_prefix()
-        input_tokens: Optional[int] = None
-        output_tokens: Optional[int] = None
-        total_tokens: Optional[int] = None
-        model_name: str = "unknown_model"
-        source_for_tokens = "unknown"
-
+        input_tokens: Optional[int] = None; output_tokens: Optional[int] = None; total_tokens: Optional[int] = None
+        model_name: str = "unknown_model"; source_for_tokens = "unknown"
         try: 
             if response.llm_output and isinstance(response.llm_output, dict):
                 llm_output_data = response.llm_output; source_for_tokens = "llm_output"
                 model_name = llm_output_data.get('model_name', llm_output_data.get('model', model_name))
                 if 'token_usage' in llm_output_data and isinstance(llm_output_data['token_usage'], dict):
                     usage_dict = llm_output_data['token_usage']
-                    input_tokens = usage_dict.get('prompt_tokens', usage_dict.get('input_tokens'))
-                    output_tokens = usage_dict.get('completion_tokens', usage_dict.get('output_tokens'))
-                    total_tokens = usage_dict.get('total_tokens')
+                    input_tokens = usage_dict.get('prompt_tokens', usage_dict.get('input_tokens')); output_tokens = usage_dict.get('completion_tokens', usage_dict.get('output_tokens')); total_tokens = usage_dict.get('total_tokens')
                 elif 'usage_metadata' in llm_output_data and isinstance(llm_output_data['usage_metadata'], dict):
                     usage_dict = llm_output_data['usage_metadata']
                     input_tokens = usage_dict.get('prompt_token_count'); output_tokens = usage_dict.get('candidates_token_count'); total_tokens = usage_dict.get('total_token_count')
@@ -152,18 +150,20 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
                 await self.send_ws_message("monitor_log", {"text": f"{log_prefix} {log_content_tokens}", "log_source": "LLM_TOKEN_USAGE"})
                 await self.send_ws_message("llm_token_usage", token_usage_payload)
                 await self._save_message("llm_token_usage", json.dumps(token_usage_payload))
-                logger.info(f"[{self.session_id}] {log_content_tokens} - Sent to client.")
         except Exception as e:
             logger.error(f"[{self.session_id}] Error processing token usage in on_llm_end: {e}", exc_info=True)
-        await self.send_ws_message("agent_thinking_update", {"status_key": "LLM_COMPLETED", "message": "Processing complete."})
+        
+        role_hint = kwargs.get("metadata", {}).get("component_name", "LLM")
+        await self.send_ws_message("agent_thinking_update", {"status_key": "LLM_COMPLETED", "message": f"Thinking ({role_hint}) complete."})
 
     async def on_llm_error(self, error: Union[Exception, KeyboardInterrupt], **kwargs: Any) -> None:
         log_prefix = self._get_log_prefix(); error_type_name = type(error).__name__
-        logger.error(f"[{self.session_id}] LLM Error: {error}", exc_info=True)
-        error_content = f"[LLM Core Error] {error_type_name}: {error}"
-        await self.send_ws_message("monitor_log", {"text": f"{log_prefix} {error_content}", "log_source": "LLM_CORE_ERROR"})
-        await self.send_ws_message("status_message", "Error during LLM call.")
-        await self.send_ws_message("agent_thinking_update", {"status_key": "LLM_ERROR", "message": "Error during LLM call."})
+        role_hint = kwargs.get("metadata", {}).get("component_name", "LLM")
+        logger.error(f"[{self.session_id}] LLM Error ({role_hint}): {error}", exc_info=True)
+        error_content = f"[LLM Core Error] ({role_hint}) {error_type_name}: {error}"
+        await self.send_ws_message("monitor_log", {"text": f"{log_prefix} {error_content}", "log_source": f"LLM_CORE_ERROR_{role_hint.upper()}"})
+        await self.send_ws_message("status_message", f"Error during LLM call ({role_hint}).")
+        await self.send_ws_message("agent_thinking_update", {"status_key": "LLM_ERROR", "message": f"Error in LLM ({role_hint})."})
         await self._save_message("error_llm", error_content)
 
     async def on_chain_start(self, serialized: Dict[str, Any], inputs: Dict[str, Any], **kwargs: Any) -> None: pass
@@ -202,8 +202,6 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         
         log_prefix = self._get_log_prefix()
         output_str = str(output)
-        logger.info(f"[{self.session_id}] Tool '{tool_name_for_log}' finished. Output length: {len(output_str)}")
-
         monitor_output_summary = output_str[:1000] + "..." if len(output_str) > 1000 else output_str
         log_content_tool_end = f"[Tool Output] Tool '{tool_name_for_log}' returned:\n---\n{monitor_output_summary.strip()}\n---"
         final_log_source = f"TOOL_OUTPUT_{tool_name_for_log.upper()}"
@@ -218,7 +216,7 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
                         "text": f"{log_prefix} [ARTIFACT_GENERATED] {relative_path_str} (via {tool_name_for_log})",
                         "log_source": "ARTIFACT_GENERATED"
                     })
-                    log_content_tool_end = f"[Tool Output] Tool '{tool_name_for_log}' successfully wrote file: '{relative_path_str}'" # Override for more specific message
+                    log_content_tool_end = f"[Tool Output] Tool '{tool_name_for_log}' successfully wrote file: '{relative_path_str}'"
                     if self.current_task_id:
                         await self.send_ws_message("trigger_artifact_refresh", {"taskId": self.current_task_id})
             except Exception as parse_err:
@@ -242,8 +240,7 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         
         log_prefix = self._get_log_prefix(); error_type_name = type(error).__name__; error_str = str(error)
         user_friendly_tool_name = actual_tool_name.replace("_", " ").title()
-        log_source_error = f"TOOL_ERROR_{actual_tool_name.upper()}"
-
+        
         if isinstance(error, AgentCancelledException):
             logger.warning(f"[{self.session_id}] Tool '{actual_tool_name}' execution cancelled by AgentCancelledException.")
             await self.send_ws_message("agent_thinking_update", {"status_key": "TOOL_CANCELLED", "message": f"Tool {user_friendly_tool_name} cancelled."})
@@ -256,8 +253,8 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
 
         logger.error(f"[{self.session_id}] Tool '{actual_tool_name}' Error: {error_str}", exc_info=True)
         monitor_error_content = f"[Tool Error] Tool '{actual_tool_name}' failed: {error_type_name}: {error_str}"
-        await self.send_ws_message("monitor_log", {"text": f"{log_prefix} {monitor_error_content}", "log_source": log_source_error})
-        await self.send_ws_message("status_message", f"Error with tool: {actual_tool_name}.")
+        await self.send_ws_message("monitor_log", {"text": f"{log_prefix} {monitor_error_content}", "log_source": f"TOOL_ERROR_{actual_tool_name.upper()}"})
+        await self.send_ws_message("status_message", f"Error with tool: {actual_tool_name}.") # This goes to chat
         await self.send_ws_message("agent_thinking_update", {
             "status_key": "TOOL_ERROR", 
             "message": f"Error with {user_friendly_tool_name}.",
@@ -275,13 +272,15 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         
         if thought:
             await self.send_ws_message("monitor_log", {"text": f"{log_prefix} [Executor Thought] {thought}", "log_source": "EXECUTOR_THOUGHT"})
-            await self._save_message("agent_thought_action", thought) # Keep DB log for thought
+            await self._save_message("agent_thought_action", thought)
         
-        action_details_log = f"[Executor Action] Action: {action.tool}, Input: {str(action.tool_input)[:500]}" # Truncate for log
+        action_details_log = f"[Executor Action] Action: {action.tool}, Input: {str(action.tool_input)[:500]}"
         await self.send_ws_message("monitor_log", {"text": f"{log_prefix} {action_details_log}", "log_source": "EXECUTOR_ACTION"})
         
-        # A very generic update; on_tool_start will be more specific if a tool is called.
-        await self.send_ws_message("agent_thinking_update", {"status_key": "AGENT_ACTION_TAKEN", "message": "Processing action..."})
+        # More specific status will come from on_tool_start if a tool is called
+        # If LLM tries to answer directly, on_agent_finish will handle the output.
+        # This generic update might be useful if there are multiple thought/action cycles before a tool or final answer.
+        await self.send_ws_message("agent_thinking_update", {"status_key": "AGENT_EXECUTING_LOGIC", "message": "Processing..."})
 
     async def on_agent_finish(self, finish: AgentFinish, **kwargs: Any) -> Any:
         log_prefix = self._get_log_prefix()
@@ -292,7 +291,7 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         
         if final_thought_in_step:
             await self.send_ws_message("monitor_log", {"text": f"{log_prefix} [Executor Thought Final Step] {final_thought_in_step}", "log_source": "EXECUTOR_THOUGHT_FINAL_STEP"})
-            await self._save_message("agent_thought_final", final_thought_in_step) # Keep DB log
+            await self._save_message("agent_thought_final", final_thought_in_step)
         
         step_output_content = finish.return_values.get("output", "No specific output from agent step.")
         if not isinstance(step_output_content, str): step_output_content = str(step_output_content)
@@ -301,7 +300,6 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         await self._save_message("agent_executor_step_finish", step_output_content)
 
         await self.send_ws_message("agent_thinking_update", {"status_key": "EXECUTOR_STEP_COMPLETED", "message": "Agent processing step complete."})
-        logger.info(f"[{self.session_id}] Executor step output logged. Main flow will handle user-facing messages.")
         self.current_tool_name = None
 
     async def on_text(self, text: str, **kwargs: Any) -> Any: pass
