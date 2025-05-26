@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     StateManager.initStateManager();
     console.log("[Script.js] StateManager initialized.");
 
-    // --- Get references to UI elements (passed to UI modules) ---
     const taskListUl = document.getElementById('task-list');
     const newTaskButton = document.getElementById('new-task-button');
     const chatMessagesContainer = document.getElementById('chat-messages');
@@ -80,6 +79,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); 
                     if (typeof addChatMessageToUI === 'function') addChatMessageToUI(message.content, 'agent'); 
                     break;
+                // --- ADDED: Explicit handling for confirmed_plan_log from history ---
+                case 'confirmed_plan_log':
+                    if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); // Ensure thinking status is hidden
+                    if (typeof addChatMessageToUI === 'function') {
+                        addChatMessageToUI(message.content, 'confirmed_plan_log'); // Pass type to renderer
+                    }
+                    break;
+                // --- END ADDITION ---
                 case 'llm_token_usage': 
                     if (message.content && typeof message.content === 'object') { 
                         handleTokenUsageUpdate(message.content); 
@@ -247,13 +254,10 @@ document.addEventListener('DOMContentLoaded', () => {
             sendWsMessage('execute_confirmed_plan', { plan_id: planId, confirmed_plan: currentPlan });
         }
 
-        // --- MODIFICATION: Call transformToConfirmedPlanUI ---
         if (typeof transformToConfirmedPlanUI === 'function') {
             transformToConfirmedPlanUI(planId);
         } else {
             console.warn("[Script.js] transformToConfirmedPlanUI function not found in chat_ui.js. Plan UI will not be transformed immediately.");
-            // Fallback: Add a simple status message if transformation function isn't available
-            // This part is now less critical as the primary transformation is in chat_ui.js
             const planConfirmContainer = chatMessagesContainer.querySelector(`.plan-confirmation-container[data-plan-id="${planId}"]`);
             if (planConfirmContainer) {
                 planConfirmContainer.querySelectorAll('button').forEach(btn => btn.disabled = true);
@@ -274,7 +278,6 @@ document.addEventListener('DOMContentLoaded', () => {
                  if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Plan confirmed. Executing steps...", "status");
             }
         }
-        // --- END MODIFICATION ---
 
         updateGlobalMonitorStatus('running', 'Executing Plan...');
         if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, 'Executing plan...');

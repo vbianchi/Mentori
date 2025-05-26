@@ -6,6 +6,7 @@
  * - Handles Markdown formatting.
  * - Displays the agent's proposed plan for confirmation with inline details.
  * - Transforms the plan UI to a static confirmed state.
+ * - Renders persistent confirmed plans from history.
  * - Manages the chat input area, including input history.
  * - Shows/hides the "agent thinking" status and handles its click.
  */
@@ -199,14 +200,14 @@ function addChatMessageToUI(text, type = 'agent', doScroll = true) {
     if (type === 'user') messageElement.classList.add('user-message'); 
     if (type === 'agent') messageElement.classList.add('agent-message'); 
     
-    if (type === 'confirmed_plan_log' && text) { // Handle rendering of persistent confirmed plan [cite: 38]
+    if (type === 'confirmed_plan_log' && text) { 
         messageElement.classList.remove('message-agent'); 
         messageElement.classList.add('message-system', 'plan-confirmation-container', 'plan-confirmed-static'); 
         try {
             const planData = JSON.parse(text); 
             
             const titleElement = document.createElement('h4');
-            titleElement.textContent = 'Confirmed Plan (from history):';
+            titleElement.textContent = planData.title || 'Confirmed Plan (from history):'; 
             messageElement.appendChild(titleElement);
 
             const summaryElement = document.createElement('p');
@@ -222,17 +223,31 @@ function addChatMessageToUI(text, type = 'agent', doScroll = true) {
             if (planData.steps && Array.isArray(planData.steps)) {
                 planData.steps.forEach(step => { 
                     const li = document.createElement('li'); 
-                    li.innerHTML = `<strong>${step.step_id}. ${formatMessageContentInternal(step.description)}</strong> ${step.tool_to_use && step.tool_to_use !== "None" ? `<br><span class="step-tool">Tool: ${formatMessageContentInternal(step.tool_to_use)}</span>` : ''} ${step.tool_input_instructions ? `<br><span class="step-tool">Input Hint: ${formatMessageContentInternal(step.tool_input_instructions)}</span>` : ''} <br><span class="step-expected">Expected: ${formatMessageContentInternal(step.expected_outcome)}</span>`; 
+                    const stepDescription = `<strong>${step.step_id}. ${formatMessageContentInternal(step.description)}</strong>`;
+                    const toolUsed = (step.tool_to_use && step.tool_to_use !== "None") ? `<br><span class="step-tool">Tool: ${formatMessageContentInternal(step.tool_to_use)}</span>` : '';
+                    const inputHint = step.tool_input_instructions ? `<br><span class="step-tool">Input Hint: ${formatMessageContentInternal(step.tool_input_instructions)}</span>` : '';
+                    const expectedOutcome = `<br><span class="step-expected">Expected: ${formatMessageContentInternal(step.expected_outcome)}</span>`;
+                    li.innerHTML = stepDescription + toolUsed + inputHint + expectedOutcome; 
                     ol.appendChild(li); 
                 });
             }
             detailsDiv.appendChild(ol); 
             messageElement.appendChild(detailsDiv);
+
+            if (planData.timestamp) {
+                const timestampP = document.createElement('p');
+                timestampP.style.fontSize = '0.8em';
+                timestampP.style.color = 'var(--text-color-muted)';
+                timestampP.style.marginTop = '5px';
+                timestampP.textContent = `Confirmed at: ${new Date(planData.timestamp).toLocaleString()}`;
+                messageElement.appendChild(timestampP);
+            }
+
         } catch (e) {
-            console.error("[ChatUI] Error parsing confirmed_plan_log data:", e, "Data:", text);
-            messageElement.innerHTML = formatMessageContentInternal("Error displaying confirmed plan from history.");
+            console.error("[ChatUI] Error parsing confirmed_plan_log data:", e, "Raw Data:", text);
+            messageElement.innerHTML = formatMessageContentInternal(`Error displaying confirmed plan from history. Data: ${text.substring(0, 200)}...`);
         }
-    } else {
+    } else { 
         messageElement.innerHTML = formatMessageContentInternal(text);
     }
 
@@ -351,10 +366,6 @@ function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfi
     console.log(`[ChatUI] Displayed plan confirmation for plan ID: ${planId}`);
 }
 
-/**
- * Transforms an existing plan proposal UI into a static, confirmed plan display.
- * @param {string} planId - The ID of the plan to transform.
- */
 function transformToConfirmedPlanUI(planId) {
     console.log(`[ChatUI] Transforming plan UI to confirmed state for plan ID: ${planId}`);
     if (!chatMessagesContainerElement) {
@@ -365,45 +376,38 @@ function transformToConfirmedPlanUI(planId) {
     const planContainer = chatMessagesContainerElement.querySelector(`.plan-confirmation-container[data-plan-id="${planId}"]`);
     if (!planContainer) {
         console.warn(`[ChatUI] Plan container with ID ${planId} not found for transformation.`);
-        // As a fallback, add a new status message if the original block isn't found
         addChatMessageToUI(`Plan (ID: ${planId.substring(0,8)}...) confirmed and execution started.`, 'status');
         return;
     }
 
-    // Change title
     const titleElement = planContainer.querySelector('h4');
     if (titleElement) {
         titleElement.textContent = 'Plan Confirmed:';
     }
 
-    // Remove "View Details" button
     const viewDetailsBtn = planContainer.querySelector('.plan-toggle-details-btn');
     if (viewDetailsBtn) {
         viewDetailsBtn.remove();
     }
 
-    // Remove "Confirm & Run" and "Cancel" buttons (the whole actions div)
     const actionsDiv = planContainer.querySelector('.plan-actions');
     if (actionsDiv) {
         actionsDiv.remove();
     }
 
-    // Ensure details are visible
     const detailsDiv = planContainer.querySelector('.plan-steps-details');
     if (detailsDiv) {
         detailsDiv.style.display = 'block';
     }
 
-    // Add "Confirmed" status/timestamp
-    let statusP = planContainer.querySelector('.plan-execution-status-confirmed'); // Use a more specific class
+    let statusP = planContainer.querySelector('.plan-execution-status-confirmed'); 
     if (!statusP) {
         statusP = document.createElement('p');
         statusP.className = 'plan-execution-status-confirmed'; 
         statusP.style.fontSize = '0.9em';
         statusP.style.marginTop = '10px';
-        statusP.style.color = 'var(--accent-color)'; // Or a success/info color
+        statusP.style.color = 'var(--accent-color)'; 
         statusP.style.fontWeight = '500';
-        // Append after summary, or at the end if detailsDiv is complex
         const summaryElement = planContainer.querySelector('.plan-summary');
         if (summaryElement && summaryElement.nextSibling) {
             summaryElement.parentNode.insertBefore(statusP, summaryElement.nextSibling);
@@ -416,9 +420,7 @@ function transformToConfirmedPlanUI(planId) {
     }
     statusP.textContent = `Status: Confirmed & Execution Started (at ${new Date().toLocaleTimeString()})`;
 
-    // Update container class for styling if needed
     planContainer.classList.add('plan-confirmed-static');
-    // planContainer.classList.remove('plan-interactive-proposal'); // If such a class existed
 
     console.log(`[ChatUI] Plan UI ${planId} transformed to confirmed state.`);
     scrollToBottomChat();
