@@ -23,10 +23,10 @@ from urllib.error import HTTPError
 # PDF Import
 try:
     import pypdf
-    logger = logging.getLogger(__name__) 
+    logger_pypdf = logging.getLogger(__name__) # Use a distinct logger name if needed
 except ImportError:
-    logger = logging.getLogger(__name__) 
-    logger.warning("pypdf not installed. PDF reading functionality will be unavailable.")
+    logger_pypdf = logging.getLogger(__name__) 
+    logger_pypdf.warning("pypdf not installed. PDF reading functionality will be unavailable.")
     pypdf = None
 
 # Project Imports
@@ -34,11 +34,11 @@ from backend.config import settings
 from .tavily_search_tool import TavilyAPISearchTool
 from .deep_research_tool import DeepResearchTool
 
+logger = logging.getLogger(__name__) # General logger for this module
 
 # --- Define Base Workspace Path ---
 try:
     PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent 
-    # Assuming standard_tools.py is in backend/tools/, so .parent.parent.parent gives project root
     BASE_WORKSPACE_ROOT = PROJECT_ROOT / "workspace"
     os.makedirs(BASE_WORKSPACE_ROOT, exist_ok=True)
     logger.info(f"Base workspace directory ensured at: {BASE_WORKSPACE_ROOT}")
@@ -58,17 +58,13 @@ def get_task_workspace_path(task_id: Optional[str], create_if_not_exists: bool =
         logger.error(msg)
         raise ValueError(msg)
     
-    # Sanitize task_id to prevent path traversal or invalid characters for directory names
-    # Allow alphanumeric, hyphens, underscores. Replace others.
-    # This is a basic sanitization. More robust might be needed depending on where task_ids originate.
     sane_task_id = re.sub(r'[^\w\-.]', '_', task_id)
-    if not sane_task_id: # If sanitization results in empty string
+    if not sane_task_id: 
         msg = f"Task_id '{task_id}' resulted in an empty sanitized ID. Cannot create workspace."
         logger.error(msg)
         raise ValueError(msg)
     
     if ".." in sane_task_id or "/" in sane_task_id or "\\" in sane_task_id:
-        # This check should ideally be redundant if re.sub is comprehensive enough, but good for safety.
         msg = f"Invalid characters detected in sanitized task_id: {sane_task_id} (original: {task_id}). Denying workspace path creation."
         logger.error(msg)
         raise ValueError(msg)
@@ -88,12 +84,9 @@ def get_task_workspace_path(task_id: Optional[str], create_if_not_exists: bool =
             raise OSError(f"Could not create task workspace {task_workspace}: {e}") from e
     elif not task_workspace.exists():
         logger.warning(f"Task workspace directory does not exist and create_if_not_exists is False: {task_workspace}")
-        # Depending on use case, might want to raise an error here too.
-        # For now, just log and return the non-existent path.
 
     return task_workspace
 
-# ... (rest of the file remains the same)
 async def fetch_and_parse_url(url: str) -> str:
     tool_name = "web_page_reader"
     logger.info(f"Tool '{tool_name}' received raw input: '{url}'") 
@@ -185,6 +178,7 @@ async def write_to_file_in_task_workspace(input_str: str, task_workspace: Path) 
         return f"Error: Failed to write file '{relative_path_str}'. Reason: {type(e).__name__}"
 
 async def read_file_content(relative_path_str: str, task_workspace: Path) -> str:
+    # ... (content as before) ...
     tool_name = "read_file"
     logger.debug(f"Tool '{tool_name}': Raw relative_path_str: '{relative_path_str[:100]}{'...' if len(relative_path_str) > 100 else ''}' in workspace: {task_workspace.name}")
     if not isinstance(relative_path_str, str) or not relative_path_str.strip():
@@ -218,7 +212,7 @@ async def read_file_content(relative_path_str: str, task_workspace: Path) -> str
             if pypdf is None:
                 logger.error(f"Tool '{tool_name}': Attempted to read PDF, but pypdf library is not installed.")
                 return "Error: PDF reading library (pypdf) is not installed on the server."
-            def read_pdf_sync():
+            def read_pdf_sync(): # Inner function for threading
                 extracted_text = ""
                 try:
                     reader = pypdf.PdfReader(str(full_path))
@@ -232,14 +226,14 @@ async def read_file_content(relative_path_str: str, task_workspace: Path) -> str
                             logger.warning(f"Tool '{tool_name}': Error extracting text from page {i+1} of {full_path.name}: {page_err}")
                             extracted_text += f"\n--- Error reading page {i+1} ---\n"
                     return extracted_text.strip()
-                except pypdf.errors.PdfReadError as pdf_err:
+                except pypdf.errors.PdfReadError as pdf_err: # More specific pypdf error
                     logger.error(f"Tool '{tool_name}': Error reading PDF file {full_path.name}: {pdf_err}")
-                    raise RuntimeError(f"Error: Could not read PDF file '{cleaned_relative_path}'. It might be corrupted or encrypted. Error: {pdf_err}") from pdf_err
+                    raise RuntimeError(f"Error: Could not read PDF file '{cleaned_relative_path}'. It might be corrupted or encrypted. Error: {pdf_err}") from pdf_err # Re-raise as RuntimeError
                 except Exception as e:
                     logger.error(f"Tool '{tool_name}': Unexpected error reading PDF {full_path.name}: {e}", exc_info=True)
                     raise RuntimeError(f"Error: An unexpected error occurred while reading PDF '{cleaned_relative_path}'.") from e
-            loop = asyncio.get_running_loop()
-            content = await loop.run_in_executor(None, read_pdf_sync)
+            loop = asyncio.get_running_loop() # Get current loop
+            content = await loop.run_in_executor(None, read_pdf_sync) # Run sync function in executor
             actual_length = len(content)
             logger.info(f"Tool '{tool_name}': Successfully read {actual_length} chars from PDF '{cleaned_relative_path}'. First 100 chars: '{content[:100]}{'...' if actual_length > 100 else ''}'")
             warning_length = settings.tool_pdf_reader_warning_length
@@ -255,12 +249,15 @@ async def read_file_content(relative_path_str: str, task_workspace: Path) -> str
             logger.warning(f"Tool '{tool_name}': Unsupported file extension '{file_extension}' for file '{cleaned_relative_path}'")
             return f"Error: Cannot read file. Unsupported file extension: '{file_extension}'. Supported text: {', '.join(TEXT_EXTENSIONS)}, .pdf"
         return content
-    except RuntimeError as rt_err: return str(rt_err)
+    except RuntimeError as rt_err: # Catch re-raised RuntimeError from PDF reading
+        return str(rt_err)
     except Exception as e:
         logger.error(f"Tool '{tool_name}': Error reading file '{cleaned_relative_path}' in workspace {task_workspace.name}: {e}", exc_info=True)
         return f"Error: Failed to read file '{cleaned_relative_path}'. Reason: {type(e).__name__}"
 
+
 class TaskWorkspaceShellTool(BaseTool):
+    # ... (content as before) ...
     name: str = "workspace_shell"
     description: str = (
         f"Use this tool ONLY to execute **non-interactive** shell commands directly within the **current task's dedicated workspace**. "
@@ -273,10 +270,14 @@ class TaskWorkspaceShellTool(BaseTool):
     timeout: int = settings.tool_shell_timeout
     max_output: int = settings.tool_shell_max_output
 
-    def _run(self, command: str) -> str:
+    def _run(self, command: str) -> str: # run_manager: Optional[CallbackManagerForToolRun] = None
         logger.warning("Running TaskWorkspaceShellTool synchronously using _run.")
-        try: loop = asyncio.get_running_loop(); result = loop.run_until_complete(self._arun_internal(command))
-        except RuntimeError: logger.warning("No running event loop, creating new one for TaskWorkspaceShellTool._run"); result = asyncio.run(self._arun_internal(command))
+        try:
+            loop = asyncio.get_running_loop()
+            result = loop.run_until_complete(self._arun_internal(command))
+        except RuntimeError: # No running event loop
+            logger.warning("No running event loop, creating new one for TaskWorkspaceShellTool._run")
+            result = asyncio.run(self._arun_internal(command))
         return result
 
     async def _arun(self, command: str, run_manager: Optional[CallbackManagerForToolRun] = None) -> str: 
@@ -288,184 +289,353 @@ class TaskWorkspaceShellTool(BaseTool):
         if not isinstance(command, str) or not command.strip():
             logger.error(f"Tool '{tool_name}': Received invalid input. Expected a non-empty command string.")
             return "Error: Invalid input. Expected a non-empty command string."
+        
         cwd = str(self.task_workspace.resolve())
         logger.info(f"Tool '{tool_name}' executing command: '{command}' in CWD: {cwd} (Timeout: {self.timeout}s)")
-        process = None; stdout_str = ""; stderr_str = ""
+        process = None
+        stdout_str = ""
+        stderr_str = ""
         try:
-            clean_command = command.strip().strip('`'); 
-            if not clean_command: logger.error(f"Tool '{tool_name}': Command became empty after cleaning."); return "Error: Received empty command after cleaning."
+            clean_command = command.strip().strip('`'); # Basic cleaning
+            if not clean_command:
+                logger.error(f"Tool '{tool_name}': Command became empty after cleaning.")
+                return "Error: Received empty command after cleaning."
+
+            # Security check for common problematic patterns if not using shlex
             if '&&' in clean_command or '||' in clean_command or ';' in clean_command or '`' in clean_command or '$(' in clean_command:
-                if '|' not in clean_command: logger.warning(f"Tool '{tool_name}': Potentially unsafe shell characters detected in command: {clean_command}")
-            process = await asyncio.create_subprocess_shell(clean_command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=cwd)
+                if '|' not in clean_command: # Pipes are sometimes legitimate for simple chains
+                    logger.warning(f"Tool '{tool_name}': Potentially unsafe shell characters detected in command: {clean_command}")
+                    # Depending on security policy, you might return an error here or proceed with caution.
+                    # For now, proceeding with caution.
+
+            process = await asyncio.create_subprocess_shell(
+                clean_command,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd=cwd
+            )
             TIMEOUT_SECONDS = self.timeout
-            try: stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=TIMEOUT_SECONDS)
+            try:
+                stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=TIMEOUT_SECONDS)
             except asyncio.TimeoutError:
                 logger.error(f"Tool '{tool_name}': Timeout executing command: {clean_command}")
+                if process and process.returncode is None: # Ensure process is killed
+                    try: process.terminate()
+                    except ProcessLookupError: pass # Process already ended
+                    await process.wait() # Wait for termination to complete
+                return f"Error: Command timed out after {TIMEOUT_SECONDS} seconds."
+
+            stdout_str = stdout.decode(errors='replace').strip()
+            stderr_str = stderr.decode(errors='replace').strip()
+            return_code = process.returncode
+
+            result = ""
+            if stdout_str:
+                result += f"STDOUT:\n{stdout_str}\n"
+            
+            if return_code != 0:
+                logger.warning(f"Tool '{tool_name}' command '{clean_command}' failed. Exit: {return_code}. Stderr: {stderr_str}")
+                result += f"STDERR:\n{stderr_str}\n" if stderr_str else "" # Add stderr if present
+                result += f"ERROR: Command failed with exit code {return_code}"
+            elif stderr_str: # Command succeeded but produced stderr (e.g., warnings)
+                logger.info(f"Tool '{tool_name}' command '{clean_command}' succeeded (Exit: {return_code}) but produced STDERR:\n{stderr_str}")
+                result += f"STDERR (Warnings/Info):\n{stderr_str}\n"
+
+            logger.info(f"Tool '{tool_name}' command finished. Exit code: {return_code}. Reporting result length: {len(result)}")
+            
+            MAX_OUTPUT_LENGTH = self.max_output
+            if len(result) > MAX_OUTPUT_LENGTH:
+                result = result[:MAX_OUTPUT_LENGTH] + f"\n... (output truncated after {MAX_OUTPUT_LENGTH} characters)"
+            
+            return result.strip() if result else "Command executed with no output."
+
+        except FileNotFoundError:
+            cmd_part = clean_command.split()[0] if 'clean_command' in locals() and clean_command else "Unknown"
+            logger.warning(f"Tool '{tool_name}' command not found: {cmd_part}")
+            return f"Error: Command not found: {cmd_part}"
+        except Exception as e:
+            logger.error(f"Tool '{tool_name}': Error executing command '{clean_command if 'clean_command' in locals() else command}' in task workspace: {e}", exc_info=True)
+            return f"Error executing command: {type(e).__name__}"
+        finally:
+            if process and process.returncode is None: # Ensure process is cleaned up if still running
+                logger.warning(f"Tool '{tool_name}': Shell process '{clean_command if 'clean_command' in locals() else command}' still running in finally block, attempting termination.")
+                try:
+                    process.terminate()
+                    await process.wait()
+                except ProcessLookupError: pass # Process already ended
+                except Exception as term_e:
+                    logger.error(f"Tool '{tool_name}': Error during final termination attempt of shell process: {term_e}")
+
+
+# Regex for validating a single package specifier (allows versions, extras)
+PACKAGE_SPEC_REGEX = re.compile(r"^[a-zA-Z0-9_.-]+(?:\[[a-zA-Z0-9_,-]+\])?(?:[=<>!~]=?\s*[a-zA-Z0-9_.*-]+)?$")
+
+async def install_python_package(package_specifiers_str: str) -> str:
+    tool_name = "python_package_installer"
+    logger.info(f"Tool '{tool_name}' received raw input: '{package_specifiers_str}'")
+    if not isinstance(package_specifiers_str, str) or not package_specifiers_str.strip():
+        logger.error(f"Tool '{tool_name}': Received invalid input. Expected a non-empty string of package specifiers.")
+        return "Error: Invalid input. Expected a non-empty string of package specifiers (space or comma separated)."
+    
+    timeout = settings.tool_installer_timeout
+    # Split by space or comma, and filter out empty strings that might result from multiple spaces/commas
+    individual_specs = [spec.strip() for spec in re.split(r'[\s,]+', package_specifiers_str) if spec.strip()]
+
+    if not individual_specs:
+        logger.error(f"Tool '{tool_name}': No valid package specifiers found after splitting input: '{package_specifiers_str}'.")
+        return "Error: No package specifiers provided after cleaning the input string."
+
+    results_summary = []
+    all_successful = True
+
+    python_executable = sys.executable
+    installer_command_base_parts = [python_executable, "-m"]
+    # Determine if 'uv' is available and preferred
+    try:
+        uv_check_process = await asyncio.create_subprocess_exec(python_executable, "-m", "uv", "--version", stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL)
+        await uv_check_process.wait()
+        if uv_check_process.returncode == 0:
+            logger.info(f"Tool '{tool_name}': Detected uv, using 'uv pip install'.")
+            installer_command_base_parts.extend(["uv", "pip"])
+        else:
+            logger.info(f"Tool '{tool_name}': uv check failed or not found, falling back to 'pip install'.")
+            installer_command_base_parts.append("pip")
+    except Exception as uv_err:
+        logger.warning(f"Tool '{tool_name}': Error checking for uv, falling back to pip: {uv_err}")
+        installer_command_base_parts.append("pip")
+
+    for single_spec in individual_specs:
+        cleaned_package_specifier = single_spec.strip().strip('\'"`')
+        if not cleaned_package_specifier:
+            results_summary.append(f"Skipped empty specifier derived from input '{single_spec}'.")
+            continue
+
+        if not PACKAGE_SPEC_REGEX.match(cleaned_package_specifier):
+            logger.error(f"Tool '{tool_name}': Invalid package specifier format rejected: '{cleaned_package_specifier}'.")
+            results_summary.append(f"Error: Invalid package specifier format for '{cleaned_package_specifier}'. Installation skipped.")
+            all_successful = False
+            continue
+        
+        # Basic security check for command injection characters (already somewhat covered by regex)
+        if ';' in cleaned_package_specifier or '&' in cleaned_package_specifier or '|' in cleaned_package_specifier or '`' in cleaned_package_specifier or '$(' in cleaned_package_specifier:
+            logger.error(f"Tool '{tool_name}': Potential command injection detected in package specifier: '{cleaned_package_specifier}'.")
+            results_summary.append(f"Error: Invalid characters detected in package specifier '{cleaned_package_specifier}'. Installation skipped.")
+            all_successful = False
+            continue
+
+        logger.info(f"Tool '{tool_name}': Requesting install for package: '{cleaned_package_specifier}' (Timeout: {timeout}s)")
+        
+        command_to_run = installer_command_base_parts + ["install", cleaned_package_specifier]
+        logger.info(f"Tool '{tool_name}': Executing installation command: {' '.join(command_to_run)}")
+        
+        process = None
+        try:
+            process = await asyncio.create_subprocess_exec(*command_to_run, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+            TIMEOUT_SECONDS = timeout # Use the configured timeout
+            try:
+                stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=TIMEOUT_SECONDS)
+            except asyncio.TimeoutError:
+                logger.error(f"Tool '{tool_name}': Timeout installing package: {cleaned_package_specifier}")
                 if process and process.returncode is None:
                     try: process.terminate()
                     except ProcessLookupError: pass
                     await process.wait()
-                return f"Error: Command timed out after {TIMEOUT_SECONDS} seconds."
-            stdout_str = stdout.decode(errors='replace').strip(); stderr_str = stderr.decode(errors='replace').strip(); return_code = process.returncode
-            result = ""
-            if stdout_str: result += f"STDOUT:\n{stdout_str}\n"
-            if return_code != 0:
-                logger.warning(f"Tool '{tool_name}' command '{clean_command}' failed. Exit: {return_code}. Stderr: {stderr_str}")
-                result += f"STDERR:\n{stderr_str}\n" if stderr_str else ""
-                result += f"ERROR: Command failed with exit code {return_code}"
-            elif stderr_str:
-                logger.info(f"Tool '{tool_name}' command '{clean_command}' succeeded (Exit: {return_code}) but produced STDERR:\n{stderr_str}")
-                result += f"STDERR (Warnings/Info):\n{stderr_str}\n"
-            logger.info(f"Tool '{tool_name}' command finished. Exit code: {return_code}. Reporting result length: {len(result)}")
-            MAX_OUTPUT_LENGTH = self.max_output
-            if len(result) > MAX_OUTPUT_LENGTH: result = result[:MAX_OUTPUT_LENGTH] + f"\n... (output truncated after {MAX_OUTPUT_LENGTH} characters)"
-            return result.strip() if result else "Command executed with no output."
-        except FileNotFoundError: cmd_part = clean_command.split()[0] if clean_command else "Unknown"; logger.warning(f"Tool '{tool_name}' command not found: {cmd_part}"); return f"Error: Command not found: {cmd_part}"
-        except Exception as e: logger.error(f"Tool '{tool_name}': Error executing command '{clean_command}' in task workspace: {e}", exc_info=True); return f"Error executing command: {type(e).__name__}"
+                results_summary.append(f"Error installing '{cleaned_package_specifier}': Package installation timed out after {TIMEOUT_SECONDS} seconds.")
+                all_successful = False
+                continue # Move to next package
+
+            stdout_str = stdout.decode(errors='replace').strip()
+            stderr_str = stderr.decode(errors='replace').strip()
+            return_code = process.returncode
+            
+            log_output_details = ""
+            if stdout_str: log_output_details += f"--- STDOUT for {cleaned_package_specifier} ---\n{stdout_str}\n"
+            if stderr_str: log_output_details += f"--- STDERR for {cleaned_package_specifier} ---\n{stderr_str}\n"
+
+            if return_code == 0:
+                logger.info(f"Tool '{tool_name}': Successfully installed package: {cleaned_package_specifier}")
+                success_msg = f"Successfully installed '{cleaned_package_specifier}'."
+                if stderr_str: # Include stderr even on success, as it might contain warnings
+                    success_msg += f" Notes/Warnings: {stderr_str[:200]}{'...' if len(stderr_str)>200 else ''}"
+                results_summary.append(success_msg)
+                if log_output_details: logger.debug(f"Tool '{tool_name}': Full log for '{cleaned_package_specifier}':\n{log_output_details}")
+            else:
+                logger.error(f"Tool '{tool_name}': Failed to install package: {cleaned_package_specifier}. Exit code: {return_code}. Stderr: {stderr_str}")
+                error_details_for_summary = stderr_str if stderr_str else stdout_str # Prefer stderr for error details
+                results_summary.append(f"Error installing '{cleaned_package_specifier}': Failed (Code: {return_code}). Details: {error_details_for_summary[:300]}{'...' if len(error_details_for_summary)>300 else ''}")
+                all_successful = False
+                if log_output_details: logger.debug(f"Tool '{tool_name}': Full log for failed '{cleaned_package_specifier}':\n{log_output_details}")
+
+        except FileNotFoundError:
+            logger.error(f"Tool '{tool_name}': Error installing package: '{installer_command_base_parts[0]}' command not found.")
+            results_summary.append(f"Error installing '{cleaned_package_specifier}': Installer command ('{installer_command_base_parts[0]}') not found.")
+            all_successful = False
+        except Exception as e:
+            logger.error(f"Tool '{tool_name}': Error installing package '{cleaned_package_specifier}': {e}", exc_info=True)
+            results_summary.append(f"Error installing '{cleaned_package_specifier}': {type(e).__name__}.")
+            all_successful = False
         finally:
             if process and process.returncode is None:
-                logger.warning(f"Tool '{tool_name}': Shell process '{clean_command}' still running in finally block, attempting termination.")
+                logger.warning(f"Tool '{tool_name}': Installer process '{' '.join(command_to_run)}' still running in finally block, attempting termination.")
                 try: process.terminate(); await process.wait()
                 except ProcessLookupError: pass
-                except Exception as term_e: logger.error(f"Tool '{tool_name}': Error during final termination attempt of shell process: {term_e}")
+                except Exception as term_e: logger.error(f"Tool '{tool_name}': Error during final termination attempt of installer: {term_e}")
+    
+    final_message = "Package installation process finished.\n" + "\n".join(results_summary)
+    if not all_successful:
+        return f"Partial or total failure during package installation.\n{final_message}"
+    return final_message
 
-PACKAGE_SPEC_REGEX = re.compile(r"^[a-zA-Z0-9_.-]+(?:\[[a-zA-Z0-9_,-]+\])?(?:[=<>!~]=?\s*[a-zA-Z0-9_.*-]+)?$")
-async def install_python_package(package_specifier: str) -> str:
-    tool_name = "python_package_installer"
-    logger.info(f"Tool '{tool_name}' received raw input: '{package_specifier}'")
-    if not isinstance(package_specifier, str) or not package_specifier.strip():
-        logger.error(f"Tool '{tool_name}': Received invalid input. Expected a non-empty package specifier string.")
-        return "Error: Invalid input. Expected a non-empty package specifier string."
-    timeout = settings.tool_installer_timeout
-    cleaned_package_specifier = package_specifier.strip().strip('\'"`')
-    if not cleaned_package_specifier: logger.error(f"Tool '{tool_name}': Package specifier became empty after cleaning."); return "Error: No package specified after cleaning."
-    if not PACKAGE_SPEC_REGEX.match(cleaned_package_specifier): logger.error(f"Tool '{tool_name}': Invalid package specifier format rejected: '{cleaned_package_specifier}'."); return f"Error: Invalid package specifier format: '{cleaned_package_specifier}'."
-    if ';' in cleaned_package_specifier or '&' in cleaned_package_specifier or '|' in cleaned_package_specifier or '`' in cleaned_package_specifier or '$(' in cleaned_package_specifier: logger.error(f"Tool '{tool_name}': Potential command injection detected in package specifier: '{cleaned_package_specifier}'."); return "Error: Invalid characters detected in package specifier."
-    logger.info(f"Tool '{tool_name}': Requesting install for package: '{cleaned_package_specifier}' (Timeout: {timeout}s)")
-    python_executable = sys.executable
-    installer_command_base = [python_executable, "-m", "uv", "pip"]
-    try:
-        test_process = await asyncio.create_subprocess_exec(python_executable, "-m", "uv", "--version", stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL)
-        await test_process.wait()
-        if test_process.returncode == 0: logger.info(f"Tool '{tool_name}': Detected uv, using 'uv pip install'.")
-        else: logger.info(f"Tool '{tool_name}': uv check failed or not found, falling back to 'pip install'."); installer_command_base = [python_executable, "-m", "pip"]
-    except Exception as e: logger.warning(f"Tool '{tool_name}': Error checking for uv, falling back to pip: {e}"); installer_command_base = [python_executable, "-m", "pip"]
-    command = installer_command_base + ["install", cleaned_package_specifier]
-    logger.info(f"Tool '{tool_name}': Executing installation command: {' '.join(command)}")
-    process = None
-    try:
-        process = await asyncio.create_subprocess_exec(*command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
-        TIMEOUT_SECONDS = timeout
-        try: stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=TIMEOUT_SECONDS)
-        except asyncio.TimeoutError:
-            logger.error(f"Tool '{tool_name}': Timeout installing package: {cleaned_package_specifier}")
-            if process and process.returncode is None:
-                try: process.terminate()
-                except ProcessLookupError: pass
-                await process.wait()
-            return f"Error: Package installation timed out after {TIMEOUT_SECONDS} seconds."
-        stdout_str = stdout.decode(errors='replace').strip(); stderr_str = stderr.decode(errors='replace').strip(); return_code = process.returncode
-        result = f"Installation command executed for '{cleaned_package_specifier}'. Exit Code: {return_code}\n"
-        if stdout_str: result += f"--- Installer STDOUT ---\n{stdout_str}\n"
-        if stderr_str: result += f"--- Installer STDERR ---\n{stderr_str}\n" 
-        if return_code == 0:
-            logger.info(f"Tool '{tool_name}': Successfully installed package: {cleaned_package_specifier}")
-            success_msg = f"Successfully installed {cleaned_package_specifier}."
-            if stderr_str: 
-                 success_msg += f"\nNotes/Warnings from installer:\n{stderr_str[:500]}{'...' if len(stderr_str)>500 else ''}"
-            return success_msg
-        else:
-            logger.error(f"Tool '{tool_name}': Failed to install package: {cleaned_package_specifier}. Exit code: {return_code}. Stderr: {stderr_str}")
-            error_details = stderr_str if stderr_str else stdout_str
-            return f"Error: Failed to install {cleaned_package_specifier}. Exit code: {return_code}.\nDetails:\n{error_details[:1000]}{'...' if len(error_details)>1000 else ''}"
-    except FileNotFoundError: logger.error(f"Tool '{tool_name}': Error installing package: '{installer_command_base[0]}' command not found."); return f"Error: Could not find Python executable '{installer_command_base[0]}'."
-    except Exception as e: logger.error(f"Tool '{tool_name}': Error installing package '{cleaned_package_specifier}': {e}", exc_info=True); return f"Error during installation: {type(e).__name__}"
-    finally:
-        if process and process.returncode is None:
-            logger.warning(f"Tool '{tool_name}': Installer process '{' '.join(command)}' still running in finally block, attempting termination.")
-            try: process.terminate(); await process.wait()
-            except ProcessLookupError: pass
-            except Exception as term_e: logger.error(f"Tool '{tool_name}': Error during final termination attempt of installer: {term_e}")
 
 async def search_pubmed(query: str) -> str:
+    # ... (content as before) ...
     tool_name = "pubmed_search"
     logger.info(f"Tool '{tool_name}' received raw input: '{query}'")
     if not isinstance(query, str) or not query.strip():
         logger.error(f"Tool '{tool_name}': Received invalid input. Expected a non-empty search query string.")
         return "Error: Invalid input. Expected a non-empty search query string."
+    
     entrez_email = settings.entrez_email
     default_max_results = settings.tool_pubmed_default_max_results
-    max_snippet = settings.tool_pubmed_max_snippet
-    if not entrez_email: logger.error(f"Tool '{tool_name}': Entrez email not configured in settings."); return "Error: PubMed Search tool is not configured (Missing Entrez email)."
+    max_snippet_len = settings.tool_pubmed_max_snippet # Renamed for clarity
+
+    if not entrez_email:
+        logger.error(f"Tool '{tool_name}': Entrez email not configured in settings.")
+        return "Error: PubMed Search tool is not configured (Missing Entrez email)."
     Entrez.email = entrez_email
+
     cleaned_query = query.strip()
     logger.info(f"Tool '{tool_name}': Searching PubMed with query: '{cleaned_query}' (Default Max: {default_max_results})")
+    
     current_max_results = default_max_results
-    match = re.search(r"\smax_results=(\d+)$", cleaned_query)
+    # Improved regex to handle max_results anywhere and be case-insensitive
+    match = re.search(r"\smax_results=(\d+)\b", cleaned_query, re.IGNORECASE)
     if match:
         try:
-            num_res = int(match.group(1)); current_max_results = min(max(1, num_res), 20)
-            cleaned_query = cleaned_query[:match.start()].strip()
-            logger.info(f"Tool '{tool_name}': Using max_results={current_max_results} from query.")
-        except ValueError: logger.warning(f"Tool '{tool_name}': Invalid max_results value in query '{query}', using default {current_max_results}.")
-    if not cleaned_query: logger.error(f"Tool '{tool_name}': Query became empty after processing max_results."); return "Error: No search query provided after processing options."
-    try:
-        handle = await asyncio.to_thread(Entrez.esearch, db="pubmed", term=cleaned_query, retmax=str(current_max_results), sort="relevance")
-        search_results = await asyncio.to_thread(Entrez.read, handle); await asyncio.to_thread(handle.close)
-        id_list = search_results["IdList"]
-        if not id_list: logger.info(f"Tool '{tool_name}': No results found on PubMed for query: '{cleaned_query}'"); return f"No results found on PubMed for query: '{cleaned_query}'"
-        handle = await asyncio.to_thread(Entrez.efetch, db="pubmed", id=id_list, rettype="abstract", retmode="xml")
-        records = await asyncio.to_thread(Entrez.read, handle); await asyncio.to_thread(handle.close)
-        summaries = []; pubmed_articles = records.get('PubmedArticle', [])
-        if not isinstance(pubmed_articles, list):
-            logger.warning(f"Tool '{tool_name}': Unexpected PubMed fetch format for query '{cleaned_query}'. Records: {records}")
-            if isinstance(pubmed_articles, dict): pubmed_articles = [pubmed_articles]
-            else: return "Error: Could not parse PubMed results (unexpected format)."
-        for i, record in enumerate(pubmed_articles):
-            if i >= current_max_results: break
-            pmid = "Unknown PMID"
-            try:
-                medline_citation = record.get('MedlineCitation', {}); article = medline_citation.get('Article', {}); pmid = str(medline_citation.get('PMID', 'Unknown PMID'))
-                title = article.get('ArticleTitle', 'No Title'); 
-                if not isinstance(title, str): title = str(title)
-                authors_list = article.get('AuthorList', []); author_names = []
-                if isinstance(authors_list, list):
-                    for author in authors_list:
-                        if isinstance(author, dict):
-                            last_name = author.get('LastName', ''); initials = author.get('Initials', '')
-                            if last_name: author_names.append(f"{last_name} {initials}".strip())
-                authors = ", ".join(author_names) or "No Authors Listed"
-                abstract_text = ""; abstract_section = article.get('Abstract', {}).get('AbstractText', [])
-                if isinstance(abstract_section, list):
-                    section_texts = []
-                    for sec in abstract_section:
-                        if isinstance(sec, str): section_texts.append(sec)
-                        elif isinstance(sec, dict): section_texts.append(sec.get('#text', '')) 
-                        elif hasattr(sec, 'attributes') and 'Label' in sec.attributes: section_texts.append(f"\n**{sec.attributes['Label']}**: {str(sec)}") 
-                        else: section_texts.append(str(sec)) 
-                    abstract_text = " ".join(filter(None, section_texts))
-                elif isinstance(abstract_section, str): abstract_text = abstract_section 
-                else: abstract_text = str(abstract_section) if abstract_section else "No Abstract Available" 
-                MAX_ABSTRACT_SNIPPET = max_snippet
-                abstract_snippet = abstract_text.strip()[:MAX_ABSTRACT_SNIPPET]
-                if len(abstract_text.strip()) > MAX_ABSTRACT_SNIPPET: abstract_snippet += "..."
-                if not abstract_snippet: abstract_snippet = "No Abstract Available"
-                doi = None; article_ids = record.get('PubmedData', {}).get('ArticleIdList', [])
-                if isinstance(article_ids, list):
-                    for article_id in article_ids:
-                        if hasattr(article_id, 'attributes') and article_id.attributes.get('IdType') == 'doi': doi = str(article_id); break
-                        elif isinstance(article_id, dict) and article_id.get('IdType') == 'doi': doi = article_id.get('#text'); break 
-                link = f"https://doi.org/{doi}" if doi else f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/"; link_text = f"DOI:{doi}" if doi else f"PMID:{pmid}"
-                summaries.append(f"**Result {i+1}:**\n**Title:** {title}\n**Authors:** {authors}\n**Link:** [{link_text}]({link})\n**Abstract Snippet:** {abstract_snippet}\n---")
-            except Exception as parse_err: logger.error(f"Tool '{tool_name}': Error parsing PubMed record {i+1} (PMID: {pmid}) for query '{cleaned_query}': {parse_err}", exc_info=True); summaries.append(f"**Result {i+1}:**\nError parsing record (PMID: {pmid}).\n---")
-        return "\n".join(summaries) if summaries else "No valid PubMed records processed."
-    except HTTPError as e: logger.error(f"Tool '{tool_name}': HTTP Error fetching PubMed data for query '{cleaned_query}': {e.code} {e.reason}"); return f"Error: Failed to fetch data from PubMed (HTTP Error {e.code}). Check network or NCBI status."
-    except Exception as e: logger.error(f"Tool '{tool_name}': Error searching PubMed for '{cleaned_query}': {e}", exc_info=True); return f"Error: An unexpected error occurred during PubMed search: {type(e).__name__}"
+            num_res = int(match.group(1))
+            current_max_results = min(max(1, num_res), 20) # Clamp between 1 and 20
+            # Remove the max_results part from the query
+            cleaned_query = cleaned_query[:match.start()] + cleaned_query[match.end():]
+            cleaned_query = cleaned_query.strip() # Clean up any extra spaces
+            logger.info(f"Tool '{tool_name}': Using max_results={current_max_results} from query. Effective query: '{cleaned_query}'")
+        except ValueError:
+            logger.warning(f"Tool '{tool_name}': Invalid max_results value in query '{query}', using default {current_max_results}.")
+    
+    if not cleaned_query:
+        logger.error(f"Tool '{tool_name}': Query became empty after processing max_results.")
+        return "Error: No search query provided after processing options."
 
-try: python_repl_utility = PythonREPL()
-except ImportError: logger.warning("Could not import PythonREPL. The Python_REPL tool will not be available."); python_repl_utility = None
+    try:
+        # Use Entrez.esearch to get PubMed IDs
+        handle = await asyncio.to_thread(Entrez.esearch, db="pubmed", term=cleaned_query, retmax=str(current_max_results), sort="relevance")
+        search_results = await asyncio.to_thread(Entrez.read, handle)
+        await asyncio.to_thread(handle.close)
+        
+        id_list = search_results["IdList"]
+        if not id_list:
+            logger.info(f"Tool '{tool_name}': No results found on PubMed for query: '{cleaned_query}'")
+            return f"No results found on PubMed for query: '{cleaned_query}'"
+
+        # Use Entrez.efetch to get details for these IDs
+        handle = await asyncio.to_thread(Entrez.efetch, db="pubmed", id=id_list, rettype="abstract", retmode="xml")
+        records = await asyncio.to_thread(Entrez.read, handle) # Entrez.read parses the XML
+        await asyncio.to_thread(handle.close)
+
+        summaries = []
+        pubmed_articles = records.get('PubmedArticle', [])
+
+        # Ensure pubmed_articles is a list, even if only one result
+        if not isinstance(pubmed_articles, list):
+            if isinstance(pubmed_articles, dict): # Single article case
+                pubmed_articles = [pubmed_articles]
+            else: # Unexpected format
+                logger.warning(f"Tool '{tool_name}': Unexpected PubMed fetch format for query '{cleaned_query}'. Records: {str(records)[:500]}")
+                return "Error: Could not parse PubMed results (unexpected format)."
+
+        for i, record in enumerate(pubmed_articles):
+            if i >= current_max_results: break # Should not be needed due to retmax, but good safety.
+            
+            pmid = "Unknown PMID" # Default
+            try:
+                medline_citation = record.get('MedlineCitation', {})
+                article = medline_citation.get('Article', {})
+                pmid = str(medline_citation.get('PMID', 'Unknown PMID'))
+
+                title_node = article.get('ArticleTitle', 'No Title')
+                # ArticleTitle can sometimes be an object with #text, or just a string
+                title = str(title_node) if isinstance(title_node, str) else title_node.get('#text', 'No Title Available') if isinstance(title_node, dict) else 'No Title Available'
+
+
+                authors_list = article.get('AuthorList', [])
+                author_names = []
+                if isinstance(authors_list, list):
+                    for author_node in authors_list:
+                        if isinstance(author_node, dict): # Common structure
+                            last_name = author_node.get('LastName', '')
+                            initials = author_node.get('Initials', '')
+                            if last_name:
+                                author_names.append(f"{last_name} {initials}".strip())
+                authors_str = ", ".join(author_names) if author_names else "No Authors Listed"
+
+                abstract_text_parts = []
+                abstract_node = article.get('Abstract', {}).get('AbstractText', [])
+                if isinstance(abstract_node, str): # Simple abstract
+                    abstract_text_parts.append(abstract_node)
+                elif isinstance(abstract_node, list): # List of sections or parts
+                    for part in abstract_node:
+                        if isinstance(part, str):
+                            abstract_text_parts.append(part)
+                        elif hasattr(part, 'attributes') and 'Label' in part.attributes: # Structured abstract part
+                            abstract_text_parts.append(f"\n**{part.attributes['Label']}**: {str(part)}")
+                        elif isinstance(part, dict) and '#text' in part: # Handle cases where text is in #text
+                             abstract_text_parts.append(part['#text'])
+                        else: # Fallback for other structures
+                            abstract_text_parts.append(str(part))
+                
+                full_abstract = " ".join(filter(None, abstract_text_parts)).strip()
+                if not full_abstract: full_abstract = "No Abstract Available"
+                
+                abstract_snippet = full_abstract[:max_snippet_len]
+                if len(full_abstract) > max_snippet_len: abstract_snippet += "..."
+
+                doi = None
+                article_ids = record.get('PubmedData', {}).get('ArticleIdList', [])
+                if isinstance(article_ids, list):
+                    for article_id_node in article_ids:
+                        if hasattr(article_id_node, 'attributes') and article_id_node.attributes.get('IdType') == 'doi':
+                            doi = str(article_id_node) # The string content of the node
+                            break
+                        elif isinstance(article_id_node, dict) and article_id_node.get('IdType') == 'doi':
+                            doi = article_id_node.get('#text') # If it's a dict with #text
+                            break
+                
+                link = f"https://doi.org/{doi}" if doi else f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/"
+                link_text = f"DOI:{doi}" if doi else f"PMID:{pmid}"
+
+                summaries.append(f"**Result {i+1}:**\n**Title:** {title}\n**Authors:** {authors_str}\n**Link:** [{link_text}]({link})\n**Abstract Snippet:** {abstract_snippet}\n---")
+
+            except Exception as parse_err:
+                logger.error(f"Tool '{tool_name}': Error parsing PubMed record {i+1} (PMID: {pmid}) for query '{cleaned_query}': {parse_err}", exc_info=True)
+                summaries.append(f"**Result {i+1}:**\nError parsing record (PMID: {pmid}).\n---")
+        
+        return "\n".join(summaries) if summaries else "No valid PubMed records processed."
+
+    except HTTPError as e:
+        logger.error(f"Tool '{tool_name}': HTTP Error fetching PubMed data for query '{cleaned_query}': {e.code} {e.reason}")
+        return f"Error: Failed to fetch data from PubMed (HTTP Error {e.code}). Check network or NCBI status."
+    except Exception as e:
+        logger.error(f"Tool '{tool_name}': Error searching PubMed for '{cleaned_query}': {e}", exc_info=True)
+        return f"Error: An unexpected error occurred during PubMed search: {type(e).__name__}"
+
+
+try:
+    python_repl_utility = PythonREPL()
+except ImportError:
+    logger.warning("Could not import PythonREPL. The Python_REPL tool will not be available.")
+    python_repl_utility = None # Ensure it's None if import fails
 
 def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
+    # ... (content as before) ...
     tools: List[BaseTool] = [] 
 
     if hasattr(settings, 'tavily_api_key') and settings.tavily_api_key: 
@@ -476,10 +646,10 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
         except Exception as e:
             logger.error(f"Failed to initialize and add TavilyAPISearchTool for task {current_task_id or 'N/A'}: {e}")
             logger.info(f"Adding DuckDuckGoSearchRun as fallback search tool due to Tavily init error for task {current_task_id or 'N/A'}.")
-            tools.append(DuckDuckGoSearchRun(description=("A wrapper around DuckDuckGo Search. Useful for when you need to answer questions about current events or things you don't know. Input MUST be a search query string.")))
+            tools.append(DuckDuckGoSearchRun(description=("A wrapper around DuckDuckGo Search. Useful for when you need to answer questions about current events or things you don't know. Input MUST be a search query string."))) # type: ignore
     else:
         logger.info("Tavily API key not set in settings. Adding DuckDuckGoSearchRun as default search tool.")
-        tools.append(DuckDuckGoSearchRun(description=("A wrapper around DuckDuckGo Search. Useful for when you need to answer questions about current events or things you don't know. Input MUST be a search query string.")))
+        tools.append(DuckDuckGoSearchRun(description=("A wrapper around DuckDuckGo Search. Useful for when you need to answer questions about current events or things you don't know. Input MUST be a search query string."))) # type: ignore
     
     try:
         deep_research_tool = DeepResearchTool()
@@ -491,15 +661,15 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
 
     stateless_tools_to_add = [
         Tool.from_function(
-            func=fetch_and_parse_url,
+            func=fetch_and_parse_url, # type: ignore
             name="web_page_reader",
             description=(f"Use this tool ONLY to fetch and extract the main text content from a given URL. Input MUST be a single, valid URL string (e.g., 'https://example.com/page'). Max content length: {settings.tool_web_reader_max_length} chars."),
             coroutine=fetch_and_parse_url
         ),
         Tool.from_function(
-            func=install_python_package,
+            func=install_python_package, # type: ignore
             name="python_package_installer",
-            description=(f"Use this tool ONLY to install a Python package into the environment using 'uv pip install' or 'pip install'. Input MUST be a single, valid package specifier string (e.g., 'numpy', 'pandas==2.0.0', 'matplotlib>=3.5'). **SECURITY WARNING:** This installs packages into the main environment. Avoid installing untrusted packages. Timeout: {settings.tool_installer_timeout}s."),
+            description=(f"Use this tool ONLY to install Python packages into the environment using 'uv pip install' or 'pip install'. Input MUST be a string of one or more package specifiers, separated by spaces or commas (e.g., 'numpy pandas', 'matplotlib==3.5.0', 'scikit-learn>=1.0 bokeh'). **SECURITY WARNING:** This installs packages into the main environment. Avoid installing untrusted packages. Timeout: {settings.tool_installer_timeout}s."),
             coroutine=install_python_package
         ),
     ]
@@ -508,7 +678,7 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
     if settings.entrez_email:
         tools.append(
             Tool.from_function(
-                func=search_pubmed,
+                func=search_pubmed, # type: ignore
                 name="pubmed_search",
                 description=(f"Use this tool ONLY to search for biomedical literature abstracts on PubMed. Input MUST be a search query string (e.g., 'CRISPR gene editing cancer therapy'). You can optionally append ' max_results=N' (space required before 'max_results') to the end of the query string to specify the number of results (default is {settings.tool_pubmed_default_max_results}, max is 20). Returns formatted summaries including title, authors, link (DOI or PMID), and abstract snippet (max {settings.tool_pubmed_max_snippet} chars)."),
                 coroutine=search_pubmed
@@ -519,7 +689,7 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
 
     if python_repl_utility:
         tools.append(Tool.from_function(
-            func=python_repl_utility.run, 
+            func=python_repl_utility.run, # This is a synchronous function
             name="Python_REPL",
             description=(
                 "Executes a short, self-contained Python code snippet string. "
@@ -530,6 +700,7 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
                 "Output from Python_REPL will be the stdout, stderr, or return value of the executed snippet. "
                 "**Security Note:** This executes code directly in the backend environment. Be extremely cautious."
             )
+            # No coroutine specified as PythonREPL.run is sync. Langchain handles async calls to sync tools.
         ))
     else:
         logger.warning("Python REPL tool not created (utility unavailable).")
@@ -545,15 +716,15 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
         logger.info(f"Configuring file/shell tools for workspace: {task_workspace}")
         
         task_specific_tools = [
-            TaskWorkspaceShellTool(task_workspace=task_workspace),
+            TaskWorkspaceShellTool(task_workspace=task_workspace), # type: ignore
             Tool.from_function(
-                func=lambda path_str: read_file_content(path_str, task_workspace),
+                func=lambda path_str: read_file_content(path_str, task_workspace), # type: ignore
                 name="read_file",
                 description=(f"Use this tool ONLY to read the entire contents of a file (including text and PDF files) located within the current task's workspace ('{task_workspace.name}'). Input MUST be the relative path string to the file from the workspace root (e.g., 'my_data.csv', 'report.pdf', 'scripts/analysis.py'). Returns the full text content or an error message. For PDFs, a warning is appended if the content exceeds {settings.tool_pdf_reader_warning_length} characters."),
                 coroutine=lambda path_str: read_file_content(path_str, task_workspace)
             ),
             Tool.from_function(
-                func=lambda input_str: write_to_file_in_task_workspace(input_str, task_workspace),
+                func=lambda input_str: write_to_file_in_task_workspace(input_str, task_workspace), # type: ignore
                 name="write_file",
                 description=(f"Use this tool ONLY to write or overwrite text content to a file within the current task's workspace ('{task_workspace.name}'). Input MUST be a single string in the format 'relative_file_path:::text_content' (e.g., 'results.txt:::Analysis complete.\\nFinal score: 95'). Handles subdirectory creation. Do NOT use workspace path prefix in 'relative_file_path'."),
                 coroutine=lambda input_str: write_to_file_in_task_workspace(input_str, task_workspace)
