@@ -29,9 +29,9 @@ Assistant has access to the following tools:
 Use the following format for your thought process and actions:
 
 Thought: Do I need to use a tool? Yes
-Action: The action to take, should be one of [{tool_names}]
-Action Input: The input to the action
-Observation: The result of the action
+Action: The EXACT name of the tool to take, which MUST be one of [{tool_names}]. Do NOT include any other text or explanation on this line.
+Action Input: The input to the action. This should be on a new line immediately following the 'Action:' line.
+Observation: The result of the action.
 
 Thought: Do I need to use a tool? No
 Final Answer: (Your entire response for this step, which directly fulfills the 'precise expected output' from the directive, goes here.
@@ -42,7 +42,7 @@ The content of your Final Answer should be exactly what the user or the next ste
 
 **IMPORTANT NOTES ON YOUR OUTPUT:**
 1.  **Tool Usage vs. Direct Answer:**
-    * If a tool is the best way to achieve the current sub-task's goal, use the `Action` / `Action Input` format.
+    * If a tool is the best way to achieve the current sub-task's goal, use the `Action: [TOOL_NAME_ONLY]` followed by `Action Input: [INPUT_FOR_TOOL]` format.
     * If you can fulfill the current sub-task's goal directly with your own knowledge or by processing information already in the `agent_scratchpad` (previous thoughts, actions, observations) or `chat_history`, use the `Final Answer:` format.
 2.  **Content of `Final Answer`:**
     * When providing a `Final Answer`, ensure it directly and completely addresses the current sub-task's directive, especially the 'precise expected output' if provided in the input.
@@ -59,12 +59,11 @@ New input: {input}
 
     try:
         prompt = PromptTemplate.from_template(template)
-        logger.info("Using local custom prompt template.")
+        logger.info("Using local custom prompt template for ReAct agent.")
     except Exception as e:
         logger.error(f"Failed to create PromptTemplate from local template: {e}", exc_info=True)
         raise RuntimeError(f"Could not create prompt template: {e}")
 
-    # Create the ReAct agent
     try:
         agent = create_react_agent(llm, tools, prompt)
         logger.info("ReAct chat agent created.")
@@ -72,19 +71,18 @@ New input: {input}
         logger.error(f"Failed to create ReAct agent: {e}", exc_info=True)
         raise RuntimeError(f"Could not create the agent logic: {e}") from e
 
-    # Create the Agent Executor
     try:
         agent_executor = AgentExecutor(
             agent=agent,
             tools=tools,
             memory=memory, 
             verbose=True, 
-            handle_parsing_errors="Check your output and make sure it conforms!", 
-            max_iterations=max_iterations 
+            handle_parsing_errors="Check your output and make sure it conforms to the specified format!", # More direct error message
+            max_iterations=max_iterations,
+            # early_stopping_method="generate", # Consider if LLM consistently fails formatting
         )
         logger.info("Agent Executor with memory created.")
         return agent_executor
     except Exception as e:
         logger.error(f"Failed to create AgentExecutor: {e}", exc_info=True)
         raise RuntimeError(f"Could not create the agent executor: {e}") from e
-
