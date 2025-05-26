@@ -1,12 +1,14 @@
 # backend/controller.py
 import logging
 from typing import List, Dict, Any, Tuple, Optional
+import json 
+import re 
 
 # LangChain Imports
-from langchain_core.tools import BaseTool # <--- ADDED IMPORT
+from langchain_core.tools import BaseTool 
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from langchain_core.pydantic_v1 import BaseModel, Field 
 
 # Project Imports
@@ -19,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 class ControllerOutput(BaseModel):
     tool_name: Optional[str] = Field(description="The exact name of the tool to use, or 'None' if no tool is directly needed for this step. Must be one of the available tools.")
-    tool_input: Optional[str] = Field(description="The precise, complete input string for the chosen tool, or a concise summary/directive for the LLM if tool_name is 'None'.")
+    tool_input: Optional[str] = Field(default=None, description="The precise, complete input string for the chosen tool, or a concise summary/directive for the LLM if tool_name is 'None'. Can be explicitly 'None' or null if the step description and expected outcome are self-sufficient for a 'None' tool LLM action.")
     confidence_score: float = Field(description="A score from 0.0 to 1.0 indicating the controller's confidence in this tool/input choice for the step. 1.0 is high confidence.")
     reasoning: str = Field(description="Brief explanation of why this tool/input was chosen or why no tool is needed.")
 
@@ -50,7 +52,7 @@ Based on ALL the above information, determine the most appropriate `tool_name` a
 2.  **Tool Input Formulation:**
     * If a tool is chosen, `tool_input` MUST be the exact, complete, and correctly formatted string the tool expects. Use the Planner's `input_instructions` as guidance.
     * **CRUCIAL: If `previous_step_output_context` is provided AND the `current_step_description` or `planner_tool_input_instructions` clearly indicate that the current step should use the output of the previous step (e.g., "write the generated poem", "summarize the search results", "use the extracted data"), you MUST use the content from `previous_step_output_context` to form the `tool_input` (e.g., for `write_file`, the content part of the input) or as the direct basis for a "None" tool generation. Do NOT re-generate information or create new example content if it's already present in `previous_step_output_context` and is meant to be used by the current step.**
-    * If `tool_name` is "None", `tool_input` should be a concise summary of what the Executor LLM should generate or reason about to achieve the `expected_outcome`. It can be "None" if the description and expected outcome are self-sufficient for the LLM, especially if `previous_step_output_context` contains the necessary data for the LLM to work on directly.
+    * If `tool_name` is "None", `tool_input` should be a concise summary of what the Executor LLM should generate or reason about to achieve the `expected_outcome`. It can be explicitly `null` or a string "None" if the description and expected outcome are self-sufficient for the LLM, especially if `previous_step_output_context` contains the necessary data for the LLM to work on directly.
 3.  **Confidence Score:** Provide a `confidence_score` (0.0 to 1.0) for your decision.
 4.  **Reasoning:** Briefly explain your choices, including how you used (or why you didn't use) the `previous_step_output_context`.
 
@@ -116,10 +118,11 @@ async def validate_and_prepare_step_action(
         ("human", "Analyze the current plan step and provide your output in the specified JSON format.") 
     ])
 
-    chain = prompt | controller_llm | parser
+    raw_llm_output_chain = prompt | controller_llm | StrOutputParser()
+    controller_result_dict_raw = "" 
 
     try:
-        controller_result_dict = await chain.ainvoke({
+        controller_result_dict_raw = await raw_llm_output_chain.ainvoke({
             "original_user_query": original_user_query,
             "current_step_description": plan_step.description,
             "current_step_expected_outcome": plan_step.expected_outcome,
@@ -129,38 +132,58 @@ async def validate_and_prepare_step_action(
             "previous_step_output_context": previous_step_output_context_str, 
             "format_instructions": format_instructions
         })
+        logger.debug(f"Controller: Raw LLM output string before stripping: '{controller_result_dict_raw}'")
+        
+        # --- MODIFICATION: Strip Markdown ```json ... ``` wrapper ---
+        cleaned_json_string = controller_result_dict_raw.strip()
+        if cleaned_json_string.startswith("```json"):
+            cleaned_json_string = cleaned_json_string[len("```json"):].strip()
+        if cleaned_json_string.startswith("```"): # Handle case where only ``` is present
+            cleaned_json_string = cleaned_json_string[len("```"):].strip()
+        if cleaned_json_string.endswith("```"):
+            cleaned_json_string = cleaned_json_string[:-len("```")].strip()
+        
+        logger.debug(f"Controller: Cleaned JSON string for parsing: '{cleaned_json_string}'")
+        # --- END MODIFICATION ---
+        
+        controller_result_dict = json.loads(cleaned_json_string) 
+        
+        parsed_tool_name = controller_result_dict.get("tool_name")
+        parsed_tool_input = controller_result_dict.get("tool_input")
 
-        if isinstance(controller_result_dict, ControllerOutput):
-            controller_output = controller_result_dict
-        elif isinstance(controller_result_dict, dict): 
-            controller_output = ControllerOutput(**controller_result_dict)
-        else:
-            logger.error(f"Controller LLM call returned an unexpected type: {type(controller_result_dict)}. Content: {controller_result_dict}")
-            return None, None, "Error in Controller: LLM output parsing failed (unexpected type).", 0.0
+        if parsed_tool_name == "None" or parsed_tool_name is None:
+            if not isinstance(parsed_tool_input, (str, type(None))):
+                logger.warning(f"Controller: tool_name is 'None', but tool_input was type {type(parsed_tool_input)} ('{parsed_tool_input}'). Forcing to None for Pydantic.")
+                controller_result_dict["tool_input"] = None 
+            elif parsed_tool_input == "None": 
+                 controller_result_dict["tool_input"] = None 
+        elif parsed_tool_name and parsed_tool_input is None : 
+            logger.warning(f"Controller: tool_name is '{parsed_tool_name}', but tool_input was None. This might be an issue for the tool. Proceeding.")
+        elif parsed_tool_name and not isinstance(parsed_tool_input, str):
+            logger.warning(f"Controller: tool_name is '{parsed_tool_name}', but tool_input was type {type(parsed_tool_input)} ('{parsed_tool_input}'). Attempting to stringify.")
+            try:
+                controller_result_dict["tool_input"] = str(parsed_tool_input)
+            except Exception:
+                 logger.error(f"Controller: Could not convert tool_input to string for tool '{parsed_tool_name}'. Input was: {parsed_tool_input}")
+                 return None, None, f"Error in Controller: tool_input for tool '{parsed_tool_name}' could not be converted to string.", 0.0
+        
+        controller_output = ControllerOutput(**controller_result_dict)
 
         tool_name = controller_output.tool_name if controller_output.tool_name != "None" else None
-        tool_input = controller_output.tool_input
+        tool_input = controller_output.tool_input 
         reasoning = controller_output.reasoning
         confidence = controller_output.confidence_score
 
         logger.info(f"Controller validation complete for step {plan_step.step_id}. Tool: '{tool_name}', Input: '{str(tool_input)[:100]}...', Confidence: {confidence:.2f}")
         return tool_name, tool_input, reasoning, confidence
 
-    except Exception as e:
-        logger.error(f"Controller: Error during step validation: {e}", exc_info=True)
-        try:
-            raw_output_chain = prompt | controller_llm | StrOutputParser()
-            raw_output = await raw_output_chain.ainvoke({
-                "original_user_query": original_user_query,
-                "current_step_description": plan_step.description,
-                "current_step_expected_outcome": plan_step.expected_outcome,
-                "planner_tool_suggestion": plan_step.tool_to_use or "None",
-                "planner_tool_input_instructions": plan_step.tool_input_instructions or "None",
-                "available_tools_summary": tools_summary_for_controller,
-                "previous_step_output_context": previous_step_output_context_str,
-                "format_instructions": format_instructions
-            })
-            logger.error(f"Controller: Raw LLM output on error: {raw_output}")
-        except Exception as raw_e:
-            logger.error(f"Controller: Failed to get raw LLM output on error: {raw_e}")
-        return None, None, f"Error in Controller: Exception during processing - {type(e).__name__}", 0.0
+    except json.JSONDecodeError as json_err: 
+        logger.error(f"Controller: Failed to parse LLM output as JSON. Cleaned string was: '{cleaned_json_string if 'cleaned_json_string' in locals() else 'Error before cleaning'}'. Error: {json_err}", exc_info=True)
+        reasoning_match = re.search(r'"reasoning"\s*:\s*"([^"]*)"', controller_result_dict_raw, re.IGNORECASE) # Use original raw for reasoning
+        error_reasoning = f"LLM output was not valid JSON. {reasoning_match.group(1) if reasoning_match else 'Could not extract reasoning.'}"
+        return None, None, f"Error in Controller: LLM output parsing failed (not valid JSON). Reasoning hint: {error_reasoning}", 0.0
+    except Exception as e: 
+        logger.error(f"Controller: Error during step validation or Pydantic parsing: {e}. Raw output was: {controller_result_dict_raw}", exc_info=True)
+        error_detail = f"Exception: {type(e).__name__}. Raw LLM output might have been: {str(controller_result_dict_raw)[:500]}..."
+        return None, None, f"Error in Controller: {error_detail}", 0.0
+
