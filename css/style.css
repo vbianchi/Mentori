@@ -2,46 +2,60 @@
 
 /* Basic Reset & Root Variables */
 :root {
-    /* *** Dark Professional Theme w/ Darker Teal Accent *** */
-    --bg-color: #212529; /* Very dark grey/charcoal background */
-    --panel-bg: #343A40; /* Dark slate grey panel background */
-    --panel-bg-lighter: #495057; /* Lighter slate for headers, input, selected */
-    --panel-bg-lightest: #6C757D; /* Medium grey for hover effects */
-    --border-color: #495057; /* Use panel-bg-lighter for subtle borders */
-    --text-color: #F8F9FA; /* Off-white/light grey text */
-    --text-color-muted: #ADB5BD; /* Lighter grey muted text */
-    --text-color-darker: #6C757D; /* Medium grey */
-    --accent-color: #0D9488; /* Darker Teal accent */
-    --accent-color-hover: #0F766E; /* Even Darker Teal hover */
-    --button-text-on-accent: #FFFFFF; /* White text on teal accent */
-    --error-color: #DC3545; /* Standard Bootstrap danger red */
-    --error-color-darker: #B02A37; /* Darker red */
-    --tool-color: var(--accent-color); /* Use accent teal for tool indicators */
-    --system-color: var(--text-color-darker); /* Medium grey for system logs */
-    --image-color: var(--text-color-muted); /* Lighter grey for image logs */
-    --thought-color: var(--text-color-muted); /* Lighter grey for thoughts */
-    --warning-bg: rgba(13, 148, 136, 0.1); /* Subtle darker teal warning bg */
-    --warning-border: var(--accent-color); /* Darker Teal border for warning */
-    --terminal-bg: #161A1D; /* Even darker grey terminal background */
-    --terminal-text: #CED4DA; /* Lighter grey terminal text */
-    --code-bg: var(--terminal-bg); /* Match terminal bg for code blocks */
-    --code-text: var(--terminal-text); /* Match terminal text */
+    --bg-color: #212529; 
+    --panel-bg: #343A40; 
+    --panel-bg-lighter: #495057; 
+    --panel-bg-lightest: #6C757D; 
+    --border-color: #495057; 
+    --text-color: #F8F9FA; 
+    --text-color-muted: #ADB5BD; 
+    --text-color-darker: #6C757D; 
+    --accent-color: #0D9488; 
+    --accent-color-hover: #0F766E; 
+    --button-text-on-accent: #FFFFFF; 
+    --error-color: #DC3545; 
+    --error-color-darker: #B02A37; 
+    --tool-color: var(--accent-color); 
+    --system-color: var(--text-color-darker); 
+    --image-color: var(--text-color-muted); 
+    --thought-color: var(--text-color-muted); 
+    --warning-bg: rgba(13, 148, 136, 0.1); 
+    --warning-border: var(--accent-color); 
+    --terminal-bg: #161A1D; 
+    --terminal-text: #CED4DA; 
+    --code-bg: var(--terminal-bg); 
+    --code-text: var(--terminal-text); 
 
-    /* Status Colors (Keep standard for clarity) */
-    --status-idle-color: #198754; /* Standard Bootstrap success green */
-    --status-running-color: #FFC107; /* Standard Bootstrap warning yellow */
-    --status-error-color: #DC3545; /* Standard Bootstrap danger red */
-    --status-disconnected-color: #6C757D; /* Use medium grey */
+    --status-idle-color: #198754; 
+    --status-running-color: #FFC107; 
+    --status-error-color: #DC3545; 
+    --status-disconnected-color: #6C757D; 
 
-    /* Monitor Log Background Colors (Adjusted for Dark theme & new accent) */
-    --log-bg-default: var(--panel-bg); /* Dark slate */
-    --log-bg-tool-start: #40464c; /* Slightly lighter than panel-bg */
-    --log-bg-tool-output: var(--panel-bg);
-    --log-bg-thought: rgba(13, 148, 136, 0.05); /* Very subtle darker teal tint */
-    --log-bg-error: rgba(220, 53, 69, 0.08); /* Very subtle red tint */
-    --log-bg-user-input: rgba(13, 148, 136, 0.05); /* Very subtle darker teal tint */
+    --log-bg-default: var(--panel-bg); 
+    --log-bg-tool-start: #40464c; 
+    --log-bg-tool-output: var(--panel-bg); 
+    --log-bg-thought: rgba(13, 148, 136, 0.05); 
+    --log-bg-error: rgba(220, 53, 69, 0.08); 
+    --log-bg-user-input: rgba(13, 148, 136, 0.05); 
     --log-bg-system: var(--panel-bg);
-    --log-bg-history: #2b3035; /* Slightly darker than panel-bg */
+    --log-bg-history: #2b3035; 
+
+    /* NEW: Log Source Colors (Examples - Customize as needed) */
+    --log-source-planner-bg: rgba(52, 152, 219, 0.1);  /* Light Blue tint */
+    --log-source-planner-border: #3498DB;             /* Blue */
+    --log-source-controller-bg: rgba(230, 126, 34, 0.1);/* Orange tint */
+    --log-source-controller-border: #E67E22;          /* Orange */
+    --log-source-executor-bg: rgba(46, 204, 113, 0.1); /* Green tint */
+    --log-source-executor-border: #2ECC71;            /* Green */
+    --log-source-evaluator-bg: rgba(155, 89, 182, 0.1);/* Purple tint */
+    --log-source-evaluator-border: #9B59B6;           /* Purple */
+    --log-source-tool-bg: rgba(26, 188, 156, 0.1);   /* Teal tint (general tool) */
+    --log-source-tool-border: #1ABC9C;                /* Teal */
+    --log-source-system-bg: rgba(149, 165, 166, 0.1); /* Grey tint */
+    --log-source-system-border: #95A5A6;              /* Grey */
+    --log-source-error-bg: var(--log-bg-error);       /* Use existing error tint */
+    --log-source-error-border: var(--error-color);    /* Red */
+
 
     --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     --monospace-font: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
@@ -50,68 +64,26 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; font-family: var(--font-family); background-color: var(--bg-color); color: var(--text-color); font-size: 14px; overflow: hidden; }
 
-/* Main App Layout (Flexbox) */
-.app-container {
-    display: flex;
-    height: 100vh;
-}
-.panel {
-    display: flex;
-    flex-direction: column;
-    background-color: var(--panel-bg);
-    overflow: hidden;
-}
-.panel:not(:last-child) {
-    border-right: 1px solid var(--border-color);
-}
-.left-panel {
-    flex: 0 0 240px;
-}
-.center-panel {
-    flex: 1;
-    background-color: var(--bg-color); /* Use main bg for center */
-}
-.right-panel {
-    flex: 0 0 500px;
-    background-color: var(--terminal-bg); /* Use terminal bg for right */
-}
+.app-container { display: flex; height: 100vh; }
+.panel { display: flex; flex-direction: column; background-color: var(--panel-bg); overflow: hidden; }
+.panel:not(:last-child) { border-right: 1px solid var(--border-color); }
+.left-panel { flex: 0 0 240px; }
+.center-panel { flex: 1; background-color: var(--bg-color); }
+.right-panel { flex: 0 0 500px; background-color: var(--terminal-bg); }
 
-
-/* Headers & Footers */
 .panel-header, .chat-header, .monitor-header { background-color: var(--panel-bg-lighter); }
 .panel-header, .panel-footer, .chat-header, .monitor-header { padding: 10px 15px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; min-height: 45px; }
-.panel-footer { border-bottom: none; border-top: 1px solid var(--border-color); margin-top: auto; color: var(--text-color-muted); font-size: 0.85em; background-color: var(--panel-bg-lighter); /* Match header */ }
-.monitor-header { background-color: var(--terminal-bg); border-bottom-color: var(--border-color); } /* Override for monitor */
+.panel-footer { border-bottom: none; border-top: 1px solid var(--border-color); margin-top: auto; color: var(--text-color-muted); font-size: 0.85em; background-color: var(--panel-bg-lighter); }
+.monitor-header { background-color: var(--terminal-bg); border-bottom-color: var(--border-color); }
 
-
-/* Scrollable Content */
-.scrollable-content {
-    flex-grow: 1;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--panel-bg-lightest) var(--panel-bg);
-    /* border-bottom: 1px solid var(--border-color); */ /* Removed border */
-}
+.scrollable-content { flex-grow: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--panel-bg-lightest) var(--panel-bg); }
 .scrollable-content::-webkit-scrollbar { width: 8px; }
 .scrollable-content::-webkit-scrollbar-track { background: var(--panel-bg); }
 .scrollable-content::-webkit-scrollbar-thumb { background-color: var(--panel-bg-lightest); border-radius: 4px; border: 2px solid var(--panel-bg); }
 
-/* Left Panel Content Alignment */
-.new-task-btn {
-    background-color: var(--accent-color);
-    color: var(--button-text-on-accent); /* White text on teal */
-    border: none;
-    padding: 6px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: 500;
-    font-size: 0.9em;
-    transition: background-color 0.2s ease;
-}
-.new-task-btn:hover {
-    background-color: var(--accent-color-hover);
-}
-.task-list { list-style: none; padding: 8px 15px; background-color: var(--panel-bg); /* Ensure list bg matches panel */ }
+.new-task-btn { background-color: var(--accent-color); color: var(--button-text-on-accent); border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: 500; font-size: 0.9em; transition: background-color 0.2s ease; }
+.new-task-btn:hover { background-color: var(--accent-color-hover); }
+.task-list { list-style: none; padding: 8px 15px; background-color: var(--panel-bg); }
 .task-item { padding: 10px 0; cursor: pointer; font-size: 0.9em; border-left: 3px solid transparent; transition: background-color 0.2s ease, border-left-color 0.2s ease; display: flex; justify-content: space-between; align-items: center; gap: 5px; margin: 0 -15px; padding-left: 15px; padding-right: 15px; }
 .task-item.active { background-color: var(--panel-bg-lighter); font-weight: 500; color: var(--text-color); border-left-color: var(--accent-color); }
 .task-item:hover { background-color: var(--panel-bg-lightest); }
@@ -119,18 +91,15 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .task-title { flex-grow: 1; margin-right: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .task-item-controls { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
 .task-edit-btn { background: none; border: none; color: var(--text-color-darker); cursor: pointer; font-size: 0.9rem; padding: 0 0.2rem; line-height: 1; opacity: 0; transition: opacity 0.2s ease, color 0.2s ease; }
-.task-item:hover .task-edit-btn,
-.task-item.active .task-edit-btn { opacity: 0.6; }
+.task-item:hover .task-edit-btn, .task-item.active .task-edit-btn { opacity: 0.6; }
 .task-edit-btn:hover { opacity: 1.0; color: var(--accent-color); }
 .task-delete-btn { background: none; border: none; color: var(--text-color-darker); cursor: pointer; font-size: 1rem; padding: 0 0.25rem; line-height: 1; opacity: 0; transition: opacity 0.2s ease, color 0.2s ease; }
-.task-item:hover .task-delete-btn,
-.task-item.active .task-delete-btn { opacity: 0.6; }
+.task-item:hover .task-delete-btn, .task-item.active .task-delete-btn { opacity: 0.6; }
 .task-delete-btn:hover { opacity: 1.0; color: var(--error-color); }
 
-/* Center Panel */
 .chat-header { background-color: var(--panel-bg-lighter); border-bottom: 1px solid var(--border-color); }
 .chat-header h3 { margin: 0; font-size: 1em; font-weight: 500; }
-.chat-messages { padding: 20px; display: flex; flex-direction: column; gap: 18px; background-color: var(--bg-color); /* Ensure main chat area uses main bg */ }
+.chat-messages { padding: 20px; display: flex; flex-direction: column; gap: 18px; background-color: var(--bg-color); }
 .message { padding: 10px 15px; border-radius: 8px; max-width: 85%; line-height: 1.5; font-size: 0.95em; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; }
 .message-agent { background-color: var(--panel-bg); align-self: flex-start; border: 1px solid var(--border-color); color: var(--text-color); }
 .message-user { background-color: var(--accent-color); color: var(--button-text-on-accent); align-self: flex-end; border: 1px solid var(--accent-color); }
@@ -144,419 +113,149 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .action-btn { background-color: var(--accent-color); color: var(--button-text-on-accent); border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px; font-size: 0.9em; font-weight: 500; transition: background-color 0.2s ease; }
 .action-btn:hover { background-color: var(--accent-color-hover); }
 
-/* --- NEW: Agent Thinking Status Line Style --- */
-.agent-thinking-status {
-    align-self: flex-start; /* Align like agent messages */
-    font-style: italic;
-    color: var(--text-color-muted);
-    font-size: 0.9em;
-    padding: 5px 15px; /* Less padding than regular messages */
-    margin-top: -10px; /* Slightly overlap previous message */
-    margin-bottom: 5px; /* Space before next message */
-    max-width: fit-content; /* Don't take full width */
-    background-color: transparent; /* No background */
-    border: none; /* No border */
-    cursor: pointer; /* Indicate it's clickable */
-    transition: color 0.2s ease;
-}
-.agent-thinking-status:hover {
-    color: var(--accent-color); /* Highlight on hover */
-}
-/* --- END NEW --- */
+.agent-thinking-status { align-self: flex-start; font-style: italic; color: var(--text-color-muted); font-size: 0.9em; padding: 5px 15px; margin-top: -10px; margin-bottom: 5px; max-width: fit-content; background-color: transparent; border: none; cursor: pointer; transition: color 0.2s ease; }
+.agent-thinking-status:hover { color: var(--accent-color); }
 
-.chat-input-area {
-    display: flex;
-    padding: 10px 15px;
-    border-top: 1px solid var(--border-color); /* Add border back */
-    background-color: var(--panel-bg-lighter); /* Match header */
-    flex-shrink: 0;
-    align-items: flex-end;
-}
-.chat-input-area textarea { flex-grow: 1; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 5px; background-color: var(--panel-bg); /* Use panel bg */ color: var(--text-color); resize: none; min-height: 38px; max-height: 150px; margin-right: 10px; font-family: inherit; font-size: 0.95em; line-height: 1.4; overflow-y: auto; }
+.chat-input-area { display: flex; padding: 10px 15px; border-top: 1px solid var(--border-color); background-color: var(--panel-bg-lighter); flex-shrink: 0; align-items: flex-end; }
+.chat-input-area textarea { flex-grow: 1; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 5px; background-color: var(--panel-bg); color: var(--text-color); resize: none; min-height: 38px; max-height: 150px; margin-right: 10px; font-family: inherit; font-size: 0.95em; line-height: 1.4; overflow-y: auto; }
 .chat-input-area textarea:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 1px var(--accent-color); }
 .chat-input-area button { padding: 8px 15px; background-color: var(--accent-color); color: var(--button-text-on-accent); border: none; border-radius: 5px; cursor: pointer; font-weight: 500; height: 38px; transition: background-color 0.2s ease; }
 .chat-input-area button:hover { background-color: var(--accent-color-hover); }
 
-/* Right Panel: Monitor */
 .monitor-header { background-color: var(--terminal-bg); border-bottom-color: var(--border-color); }
 .monitor-header h3 { margin: 0; font-size: 1em; font-weight: 500; }
-.monitor-controls { display: flex; align-items: center; gap: 10px; /* Gap between status and button */ }
+.monitor-controls { display: flex; align-items: center; gap: 10px; }
 
-
-/* Monitor Split Layout */
 .monitor-split-content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
 .monitor-log-area { flex: 1 1 0; overflow-y: auto; padding: 10px 15px; background-color: var(--terminal-bg); font-family: var(--monospace-font); font-size: 0.85em; line-height: 1.5; color: var(--terminal-text); border-bottom: 1px solid var(--border-color); }
-/* Artifact Area Flex Layout */
-.monitor-artifact-area {
-    flex: 1 1 0; /* Allow shrinking/growing */
-    min-height: 100px; /* Ensure it has some minimum height */
-    padding: 10px 15px;
-    background-color: var(--panel-bg);
-    display: flex; /* Use flexbox */
-    flex-direction: column; /* Stack children vertically */
-    justify-content: center; /* Center placeholder vertically */
-    align-items: center; /* Center placeholder horizontally */
-    position: relative;
-    border-top: 1px solid var(--border-color);
-    overflow: hidden; /* Hide overflow for main container */
-}
+.monitor-artifact-area { flex: 1 1 0; min-height: 100px; padding: 10px 15px; background-color: var(--panel-bg); display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; border-top: 1px solid var(--border-color); overflow: hidden; }
 .artifact-placeholder { color: var(--text-color-darker); font-style: italic; }
 
-/* Individual Log Entry Styling */
 .monitor-log-entry { margin-bottom: 8px; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border-color); background-color: var(--log-bg-default); display: flex; flex-direction: column; }
 .log-timestamp { font-size: 0.8em; color: var(--text-color-muted); margin-bottom: 4px; white-space: nowrap; }
 .log-content { white-space: pre-wrap; word-wrap: break-word; color: var(--text-color); }
 
-/* Apply background colors based on type */
+/* Existing log-type-* styles (can be overridden by log-source-* if more specific) */
 .log-type-system { border-left: 3px solid var(--system-color); background-color: var(--log-bg-system); }
 .log-type-tool-start { border-left: 3px solid var(--tool-color); background-color: var(--log-bg-tool-start); }
 .log-type-tool-output { border-left: 3px solid var(--tool-color); background-color: var(--log-bg-tool-output); }
 .log-type-tool-error { border-left: 3px solid var(--error-color); background-color: var(--log-bg-error); }
-.log-type-agent-thought-action,
-.log-type-agent-thought-final { border-left: 3px solid var(--thought-color); background-color: var(--log-bg-thought); }
+.log-type-agent-thought-action, .log-type-agent-thought-final { border-left: 3px solid var(--thought-color); background-color: var(--log-bg-thought); }
 .log-type-agent-finish { border-left: 3px solid var(--accent-color); background-color: var(--log-bg-default); }
 .log-type-error { border-left: 3px solid var(--error-color); background-color: var(--log-bg-error); }
-.log-type-error .log-content { color: var(--error-color); } /* Keep error text colored */
+.log-type-error .log-content { color: var(--error-color); }
 .log-type-history { opacity: 0.7; border-left: 3px solid var(--text-color-darker); background-color: var(--log-bg-history); }
 .log-type-unknown { border-left: 3px dashed var(--text-color-darker); background-color: var(--log-bg-default); }
 .log-type-image-generated, .log-type-artifact-generated { border-left: 3px solid var(--image-color); background-color: var(--log-bg-default); }
 .log-type-user-input-log { border-left: 3px solid var(--accent-color); background-color: var(--log-bg-user-input); }
 
+/* --- NEW: Styles for Log Sources --- */
+.log-source-planner { background-color: var(--log-source-planner-bg) !important; border-left: 3px solid var(--log-source-planner-border) !important; }
+.log-source-controller { background-color: var(--log-source-controller-bg) !important; border-left: 3px solid var(--log-source-controller-border) !important; }
+.log-source-executor-thought, .log-source-executor-action, .log-source-executor-thought-final-step, .log-source-executor-step-output { background-color: var(--log-source-executor-bg) !important; border-left: 3px solid var(--log-source-executor-border) !important; }
+.log-source-llm-core-start, .log-source-llm-token-usage, .log-source-llm-core-error { background-color: var(--log-source-evaluator-bg) !important; border-left: 3px solid var(--log-source-evaluator-border) !important; } /* Using evaluator colors for general LLM for now */
+.log-source-step-evaluator { background-color: var(--log-source-evaluator-bg) !important; border-left: 3px solid var(--log-source-evaluator-border) !important; }
+.log-source-overall-evaluator { background-color: var(--log-source-evaluator-bg) !important; border-left: 3px solid var(--log-source-evaluator-border) !important; } /* Example, might need distinct color */
 
-/* Styling for <pre> blocks within certain log types */
-.log-type-tool-output .log-content pre,
-.log-type-tool-error .log-content pre,
-.log-type-agent-thought-action .log-content pre,
-.log-type-agent-thought-final .log-content pre {
-    background-color: var(--terminal-bg); /* Use terminal bg for nested pre */
-    color: var(--terminal-text); /* Use terminal text color */
-    padding: 5px 8px;
-    margin-top: 4px;
-    border-radius: 3px;
-    border: 1px solid var(--border-color);
-    overflow-x: auto;
-    white-space: pre-wrap;
-    word-break: break-word;
-    overflow-wrap: break-word;
-}
-.log-type-tool-error .log-content pre { color: var(--error-color); } /* Keep pre error text colored */
-.log-type-agent-thought-action .log-content pre,
-.log-type-agent-thought-final .log-content pre { color: var(--thought-color); } /* Keep pre thought text colored */
+/* General Tool Styles (can be overridden by specific tool if needed) */
+[class^="log-source-tool_"] { background-color: var(--log-source-tool-bg) !important; border-left: 3px solid var(--log-source-tool-border) !important; }
+.log-source-tool_error { background-color: var(--log-source-error-bg) !important; border-left: 3px solid var(--log-source-error-border) !important; }
+.log-source-tool_error .log-content { color: var(--error-color) !important; }
+.log-source-artifact_generated { border-left: 3px solid var(--image-color) !important; } /* Keep existing style */
+
+.log-source-system, .log-source-system-event, .log-source-unknown-source { background-color: var(--log-source-system-bg) !important; border-left: 3px solid var(--log-source-system-border) !important; }
+/* --- END NEW Log Source Styles --- */
 
 
-/* Styles for Artifact Area Content */
-.artifact-filename {
-    flex-shrink: 0; /* Don't shrink filename */
-    width: 100%; /* Take full width */
-    text-align: center;
-    padding: 5px 0;
-    font-size: 0.85em;
-    color: var(--text-color-darker);
-    border-bottom: 1px solid var(--border-color); /* Optional separator */
-    margin-bottom: 5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.log-type-tool-output .log-content pre, .log-type-tool-error .log-content pre, .log-type-agent-thought-action .log-content pre, .log-type-agent-thought-final .log-content pre,
+.log-source-executor-thought .log-content pre, .log-source-executor-action .log-content pre, .log-source-executor-thought-final-step .log-content pre, .log-source-executor-step-output .log-content pre,
+[class*="log-source-tool_"].log-content pre /* For tool outputs using new source classes */
+{
+    background-color: var(--terminal-bg); 
+    color: var(--terminal-text); 
+    padding: 5px 8px; margin-top: 4px; border-radius: 3px; border: 1px solid var(--border-color); overflow-x: auto; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;
 }
+.log-type-tool-error .log-content pre, .log-source-tool_error .log-content pre { color: var(--error-color); }
+.log-type-agent-thought-action .log-content pre, .log-type-agent-thought-final .log-content pre,
+.log-source-executor-thought .log-content pre, .log-source-executor-thought-final-step .log-content pre
+{ color: var(--thought-color); }
 
-.monitor-artifact-area img,
-.monitor-artifact-area pre {
-    flex-grow: 1; /* Allow content to grow */
-    flex-shrink: 1; /* Allow content to shrink */
-    min-height: 0; /* Important for allowing shrinking */
-    max-width: 100%; /* Prevent horizontal overflow */
-    max-height: 100%; /* Prevent vertical overflow within its flex space */
-    overflow: auto; /* Add scrollbars if content overflows */
-    border: none; /* Remove previous border */
-    margin-bottom: 5px; /* Space before nav */
-    border-radius: 4px; /* Keep rounded corners */
-}
-.monitor-artifact-area img {
-    object-fit: contain; /* Scale image while preserving aspect ratio */
-    background-color: #FFFFFF; /* Add white background for images */
-}
-.monitor-artifact-area pre {
-    width: 100%; /* Ensure pre takes full width */
-    padding: 10px;
-    font-family: var(--monospace-font);
-    font-size: 0.9em;
-    color: var(--code-text);
-    background-color: var(--code-bg);
-    border: 1px solid var(--border-color); /* Add border back to pre */
-    white-space: pre-wrap;
-    word-break: break-all;
-}
-.monitor-artifact-area .artifact-error {
-    font-size: 0.9em;
-    font-style: italic;
-    color: var(--error-color);
-    flex-grow: 1; /* Allow error message to fill space */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+.artifact-filename { flex-shrink: 0; width: 100%; text-align: center; padding: 5px 0; font-size: 0.85em; color: var(--text-color-darker); border-bottom: 1px solid var(--border-color); margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.monitor-artifact-area img, .monitor-artifact-area pre { flex-grow: 1; flex-shrink: 1; min-height: 0; max-width: 100%; max-height: 100%; overflow: auto; border: none; margin-bottom: 5px; border-radius: 4px; }
+.monitor-artifact-area img { object-fit: contain; background-color: #FFFFFF; }
+.monitor-artifact-area pre { width: 100%; padding: 10px; font-family: var(--monospace-font); font-size: 0.9em; color: var(--code-text); background-color: var(--code-bg); border: 1px solid var(--border-color); white-space: pre-wrap; word-break: break-all; }
+.monitor-artifact-area .artifact-error { font-size: 0.9em; font-style: italic; color: var(--error-color); flex-grow: 1; display: flex; align-items: center; justify-content: center; }
 
-/* Artifact Navigation Styles */
-.artifact-nav {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    margin-top: auto; /* Push to bottom */
-    width: 100%;
-    flex-shrink: 0; /* Don't shrink nav */
-    height: 25px;
-    padding-top: 5px; /* Add some space above */
-}
-
+.artifact-nav { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: auto; width: 100%; flex-shrink: 0; height: 25px; padding-top: 5px; }
 .artifact-nav-btn { background-color: var(--panel-bg-lighter); color: var(--text-color-muted); border: 1px solid var(--border-color); padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 0.85em; transition: all 0.2s ease; }
 .artifact-nav-btn:hover:not(:disabled) { background-color: var(--panel-bg-lightest); color: var(--text-color); border-color: var(--text-color-muted); }
 .artifact-nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .artifact-counter { font-size: 0.85em; color: var(--text-color-muted); }
 
-/* Styling for Code Blocks within Chat Messages */
 .message-agent pre { background-color: var(--code-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 0.75rem; margin: 0.5rem 0; overflow-x: auto; white-space: pre; }
 .message-agent pre code { font-family: var(--monospace-font); font-size: 0.9em; color: var(--code-text); background-color: transparent; padding: 0; border: none; white-space: pre; }
-/* Ensure inline code has similar styling */
-.message-agent code {
-    background-color: var(--code-bg);
-    color: var(--code-text);
-    padding: 0.2em 0.4em;
-    margin: 0;
-    font-size: 85%;
-    border-radius: 3px;
-    font-family: var(--monospace-font);
-}
-.message-agent pre code { /* Reset styles for code inside pre */
-    padding: 0;
-    margin: 0;
-    font-size: inherit;
-    background: none;
-    border-radius: 0;
-    color: inherit;
-}
+.message-agent code { background-color: var(--code-bg); color: var(--code-text); padding: 0.2em 0.4em; margin: 0; font-size: 85%; border-radius: 3px; font-family: var(--monospace-font); }
+.message-agent pre code { padding: 0; margin: 0; font-size: inherit; background: none; border-radius: 0; color: inherit; }
 
-/* Responsive Adjustments */
 @media (max-width: 768px) {
     .app-container { flex-direction: column; height: auto; min-height: 100vh; }
     .left-panel { flex: 0 0 auto; width: 100%; order: 1; }
     .right-panel { flex: 0 0 auto; width: 100%; order: 3; }
     .center-panel { flex: 1 1 auto; height: auto; min-height: 300px; order: 2; }
     .panel:not(:last-child) { border-right: none; border-bottom: 1px solid var(--border-color); }
-    /* Adjust artifact area max height for mobile */
-    .monitor-artifact-area img, .monitor-artifact-area pre { max-height: 150px; /* Reduce max height */ }
+    .monitor-artifact-area img, .monitor-artifact-area pre { max-height: 150px; }
     .llm-selector { max-width: 150px; font-size: 0.8em; }
-    .monitor-header { flex-wrap: wrap; } /* Allow wrapping */
-    .monitor-controls { margin-left: auto; /* Push controls to right on wrap */ padding-top: 5px;}
+    .monitor-header { flex-wrap: wrap; } 
+    .monitor-controls { margin-left: auto; padding-top: 5px;}
 }
 
-/* --- NEW: Plan Confirmation Styles --- */
-.plan-confirmation-container {
-    background-color: var(--panel-bg); /* Or a slightly different shade */
-    border: 1px solid var(--accent-color);
-    border-left: 3px solid var(--accent-color);
-    padding: 15px;
-    margin-top: 10px;
-    margin-bottom: 10px; /* Ensure gap before next message */
-    border-radius: 8px;
-    align-self: stretch; /* Take full width available in chat */
-    max-width: 100%; /* Override default message max-width */
-}
+.plan-confirmation-container { background-color: var(--panel-bg); border: 1px solid var(--accent-color); border-left: 3px solid var(--accent-color); padding: 15px; margin-top: 10px; margin-bottom: 10px; border-radius: 8px; align-self: stretch; max-width: 100%; }
+.plan-confirmation-container h4 { margin-top: 0; margin-bottom: 10px; color: var(--text-color); font-size: 1.1em; }
+.plan-summary { margin-bottom: 15px; line-height: 1.6; color: var(--text-color-muted); }
+.plan-steps-details { background-color: var(--terminal-bg); border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 0.9em; }
+.plan-steps-details ol { padding-left: 20px; margin: 0; }
+.plan-steps-details li { margin-bottom: 8px; line-height: 1.5; }
+.plan-steps-details li .step-tool { font-style: italic; color: var(--tool-color); font-size: 0.9em; }
+.plan-steps-details li .step-expected { display: block; font-size: 0.9em; color: var(--text-color-darker); margin-top: 2px; }
+.plan-toggle-details-btn { background: none; border: 1px solid var(--border-color); color: var(--text-color-muted); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85em; margin-bottom: 15px; transition: all 0.2s ease; }
+.plan-toggle-details-btn:hover { background-color: var(--panel-bg-lightest); color: var(--text-color); }
+.plan-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; }
+.plan-confirm-btn, .plan-cancel-btn { padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: 500; font-size: 0.9em; transition: background-color 0.2s ease; border: none; }
+.plan-confirm-btn { background-color: var(--accent-color); color: var(--button-text-on-accent); }
+.plan-confirm-btn:hover { background-color: var(--accent-color-hover); }
+.plan-cancel-btn { background-color: var(--panel-bg-lightest); color: var(--text-color); border: 1px solid var(--border-color); }
+.plan-cancel-btn:hover { background-color: var(--panel-bg-lighter); }
 
-.plan-confirmation-container h4 {
-    margin-top: 0;
-    margin-bottom: 10px;
-    color: var(--text-color);
-    font-size: 1.1em;
-}
-
-.plan-summary {
-    margin-bottom: 15px;
-    line-height: 1.6;
-    color: var(--text-color-muted);
-}
-
-.plan-steps-details {
-    background-color: var(--terminal-bg); /* Darker background for details */
-    border: 1px solid var(--border-color);
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 15px;
-    font-size: 0.9em;
-}
-
-.plan-steps-details ol {
-    padding-left: 20px;
-    margin: 0;
-}
-
-.plan-steps-details li {
-    margin-bottom: 8px;
-    line-height: 1.5;
-}
-
-.plan-steps-details li .step-tool {
-    font-style: italic;
-    color: var(--tool-color);
-    font-size: 0.9em;
-}
-.plan-steps-details li .step-expected {
-    display: block;
-    font-size: 0.9em;
-    color: var(--text-color-darker);
-    margin-top: 2px;
-}
-
-
-.plan-toggle-details-btn {
-    background: none;
-    border: 1px solid var(--border-color);
-    color: var(--text-color-muted);
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.85em;
-    margin-bottom: 15px;
-    transition: all 0.2s ease;
-}
-.plan-toggle-details-btn:hover {
-    background-color: var(--panel-bg-lightest);
-    color: var(--text-color);
-}
-
-
-.plan-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end; /* Align buttons to the right */
-    margin-top: 10px;
-}
-
-.plan-confirm-btn, .plan-cancel-btn {
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: 500;
-    font-size: 0.9em;
-    transition: background-color 0.2s ease;
-    border: none;
-}
-
-.plan-confirm-btn {
-    background-color: var(--accent-color);
-    color: var(--button-text-on-accent);
-}
-.plan-confirm-btn:hover {
-    background-color: var(--accent-color-hover);
-}
-
-.plan-cancel-btn {
-    background-color: var(--panel-bg-lightest);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-}
-.plan-cancel-btn:hover {
-    background-color: var(--panel-bg-lighter);
-}
-/* --- END NEW --- */
-
-/* Styles from index.html <style> block - MOVED HERE */
 .app-credits { font-size: 0.9em; text-align: center; padding-top: 5px; opacity: 0.7; }
 .app-credits a { color: var(--text-color-muted); text-decoration: none; }
 .app-credits a:hover { color: var(--text-color); text-decoration: underline; }
 
-/* Styles for LLM selectors in the header */
-.chat-header-llm-controls {
-    display: flex;
-    flex-wrap: wrap; /* Allow selectors to wrap to the next line */
-    gap: 10px; /* Space between individual selectors */
-    align-items: center; /* Align items vertically */
-    flex-grow: 1; /* Allow this container to take available space */
-    justify-content: flex-end; /* Align selectors to the right */
-}
+.chat-header-llm-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; flex-grow: 1; justify-content: flex-end; }
+.llm-selector-group { display: flex; flex-direction: column; gap: 2px; }
+.llm-selector-group label { font-size: 0.75em; color: var(--text-color-darker); margin-bottom: 0; white-space: nowrap; }
+.llm-selector, .role-llm-select { background-color: var(--panel-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 4px; padding: 4px 6px; font-size: 0.8em; max-width: 160px; min-width: 120px; cursor: pointer; }
+.llm-selector:focus, .role-llm-select:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 1px var(--accent-color); }
+.llm-selector optgroup, .role-llm-select optgroup { font-weight: bold; font-style: italic; background-color: var(--panel-bg-lighter); color: var(--text-color-muted); }
+.llm-selector option, .role-llm-select option { background-color: var(--panel-bg); color: var(--text-color); }
 
-.llm-selector-group {
-    display: flex;
-    flex-direction: column; /* Stack label and select vertically */
-    gap: 2px;
-}
-.llm-selector-group label {
-    font-size: 0.75em; /* Smaller label */
-    color: var(--text-color-darker);
-    margin-bottom: 0;
-    white-space: nowrap;
-}
-
-.llm-selector, .role-llm-select { /* Combined common styles */
-    background-color: var(--panel-bg); 
-    color: var(--text-color); 
-    border: 1px solid var(--border-color); 
-    border-radius: 4px; 
-    padding: 4px 6px; 
-    font-size: 0.8em; 
-    max-width: 160px; 
-    min-width: 120px; 
-    cursor: pointer; 
-}
-.llm-selector:focus, .role-llm-select:focus { 
-    outline: none; 
-    border-color: var(--accent-color); 
-    box-shadow: 0 0 0 1px var(--accent-color); 
-}
-.llm-selector optgroup, .role-llm-select optgroup { 
-    font-weight: bold; 
-    font-style: italic; 
-    background-color: var(--panel-bg-lighter); 
-    color: var(--text-color-muted); 
-}
-.llm-selector option, .role-llm-select option { 
-    background-color: var(--panel-bg); 
-    color: var(--text-color); 
-}
-
-/* Style for Monitor Status Indicator */
 .monitor-status-container { display: flex; align-items: center; gap: 6px; }
 .status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; background-color: grey; transition: background-color 0.3s ease; }
-.status-dot.idle { background-color: var(--status-idle-color); } /* Updated to use var */
-.status-dot.running { background-color: var(--status-running-color); } /* Updated to use var */
-.status-dot.error { background-color: var(--status-error-color); } /* Updated to use var */
-.status-dot.disconnected { background-color: var(--status-disconnected-color); } /* Updated to use var */
+.status-dot.idle { background-color: var(--status-idle-color); } 
+.status-dot.running { background-color: var(--status-running-color); } 
+.status-dot.error { background-color: var(--status-error-color); } 
+.status-dot.disconnected { background-color: var(--status-disconnected-color); } 
 .monitor-status-text { font-size: 0.85em; color: var(--text-color-darker); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* Style for Stop Button */
-.stop-button {
-    background-color: var(--error-color); color: white; border: none; border-radius: 4px;
-    padding: 2px 8px; font-size: 0.8em; font-weight: bold; cursor: pointer;
-    margin-left: 10px; display: none; transition: background-color 0.2s ease, opacity 0.2s ease;
-    line-height: 1.5; /* Added from duplicate definition */
-}
-.stop-button:hover:not(:disabled) { background-color: var(--error-color-darker); } /* Updated to use var */
+.stop-button { background-color: var(--error-color); color: white; border: none; border-radius: 4px; padding: 2px 8px; font-size: 0.8em; font-weight: bold; cursor: pointer; margin-left: 10px; display: none; transition: background-color 0.2s ease, opacity 0.2s ease; line-height: 1.5; }
+.stop-button:hover:not(:disabled) { background-color: var(--error-color-darker); } 
 .stop-button:disabled { background-color: #9E9E9E; cursor: not-allowed; opacity: 0.6; }
 
-/* Style for Upload Area */
-.upload-area {
-    padding: 10px 15px; /* Updated padding */
-    border-top: 1px solid var(--border-color);
-    background-color: var(--panel-bg-lighter); /* Updated background */
-    flex-shrink: 0; text-align: center;
-}
-.upload-button {
-    background-color: var(--panel-bg); /* Updated background */
-    color: var(--text-color-muted);
-    border: 1px solid var(--border-color); padding: 5px 10px; border-radius: 4px;
-    cursor: pointer; font-size: 0.85em; transition: all 0.2s ease;
-}
-.upload-button:hover:not(:disabled) {
-    background-color: var(--panel-bg-lightest); color: var(--text-color); border-color: var(--text-color-muted);
-}
+.upload-area { padding: 10px 15px; border-top: 1px solid var(--border-color); background-color: var(--panel-bg-lighter); flex-shrink: 0; text-align: center; }
+.upload-button { background-color: var(--panel-bg); color: var(--text-color-muted); border: 1px solid var(--border-color); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85em; transition: all 0.2s ease; }
+.upload-button:hover:not(:disabled) { background-color: var(--panel-bg-lightest); color: var(--text-color); border-color: var(--text-color-muted); }
 .upload-button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* Token Usage Display Area */
-.token-usage-area {
-    padding: 8px 15px; border-top: 1px solid var(--border-color);
-    background-color: var(--panel-bg); flex-shrink: 0;
-    font-size: 0.8em; color: var(--text-color-muted);
-}
+.token-usage-area { padding: 8px 15px; border-top: 1px solid var(--border-color); background-color: var(--panel-bg); flex-shrink: 0; font-size: 0.8em; color: var(--text-color-muted); }
 .token-usage-area p { margin: 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .token-usage-area .token-label { font-weight: 500; color: var(--text-color-darker); }
-/* End of MOVED styles */
+
