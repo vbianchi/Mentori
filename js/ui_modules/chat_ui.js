@@ -426,11 +426,29 @@ function transformToConfirmedPlanUI(planId) {
     scrollToBottomChat();
 }
 
-
-function showAgentThinkingStatusInUI(show, statusText = "Thinking...") {
+/**
+ * Shows or hides the "Agent is thinking..." status message.
+ * @param {boolean} show - True to show, false to hide.
+ * @param {object|string} [statusUpdate="Thinking..."] - Structured status object or simple text.
+ * If object: { status_key: "KEY", message: "User-friendly text", details: {...} }
+ */
+function showAgentThinkingStatusInUI(show, statusUpdate = { message: "Thinking...", status_key: "DEFAULT_THINKING" }) {
     if (!agentThinkingStatusElement || !chatMessagesContainerElement) return;
+    
     if (show) {
-        agentThinkingStatusElement.textContent = statusText;
+        let displayMessage = "Thinking...";
+        if (typeof statusUpdate === 'string') {
+            displayMessage = statusUpdate;
+        } else if (statusUpdate && typeof statusUpdate.message === 'string') {
+            displayMessage = statusUpdate.message;
+            // Optional: Log the status_key and details for debugging or future richer UI
+            // console.log(`[ChatUI] Thinking status update - Key: ${statusUpdate.status_key}, Details:`, statusUpdate.details);
+        } else if (statusUpdate && typeof statusUpdate.status === 'string') { // Fallback for old format
+            displayMessage = statusUpdate.status;
+        }
+
+
+        agentThinkingStatusElement.textContent = displayMessage;
         agentThinkingStatusElement.style.display = 'block';
         chatMessagesContainerElement.appendChild(agentThinkingStatusElement); 
         scrollToBottomChat();

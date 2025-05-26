@@ -71,22 +71,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     updateGlobalMonitorStatus('idle', 'Idle'); 
                     break;
                 case 'agent_thinking_update': 
-                    if (message.content && message.content.status) { 
-                        if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, message.content.status); 
-                    } 
+                    // --- MODIFICATION: Expect message.content to be an object ---
+                    if (message.content && typeof message.content === 'object' && message.content.message) { 
+                        if (typeof showAgentThinkingStatusInUI === 'function') {
+                            // Pass the whole content object to the UI function
+                            showAgentThinkingStatusInUI(true, message.content); 
+                        }
+                    } else if (message.content && typeof message.content.status === 'string') { // Fallback for older string format
+                         if (typeof showAgentThinkingStatusInUI === 'function') {
+                            showAgentThinkingStatusInUI(true, { message: message.content.status, status_key: "LEGACY_STATUS" });
+                        }
+                    }
+                    // --- END MODIFICATION ---
                     break;
                 case 'agent_message': 
                     if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); 
                     if (typeof addChatMessageToUI === 'function') addChatMessageToUI(message.content, 'agent'); 
                     break;
-                // --- ADDED: Explicit handling for confirmed_plan_log from history ---
                 case 'confirmed_plan_log':
-                    if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); // Ensure thinking status is hidden
+                    if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); 
                     if (typeof addChatMessageToUI === 'function') {
-                        addChatMessageToUI(message.content, 'confirmed_plan_log'); // Pass type to renderer
+                        addChatMessageToUI(message.content, 'confirmed_plan_log'); 
                     }
                     break;
-                // --- END ADDITION ---
                 case 'llm_token_usage': 
                     if (message.content && typeof message.content === 'object') { 
                         handleTokenUsageUpdate(message.content); 
@@ -133,13 +140,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     break;
                 case 'monitor_log': 
                     if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(message.content); 
-                    if (message.content.includes("[Agent Finish]") || message.content.includes("Error]") || message.content.includes("cancelled by user") || message.content.includes("Plan execution stopped") || message.content.includes("Plan proposal cancelled by user")) { 
-                        if(StateManager.getIsAgentRunning()) { 
-                            if (!message.content.includes("Step Evaluator") && !message.content.includes("Controller failed for step")) {
+                    if (message.content.includes("[Agent Finish]") || message.content.includes("Error]") || message.content.includes("cancelled by user") || message.content.includes("Plan execution stopped") || message.content.includes("Plan proposal cancelled by user") || message.content.includes("[EXECUTOR_STEP_OUTPUT]")) { 
+                        // Hide thinking status if a step output is logged to monitor,
+                        // or if a terminal state is logged.
+                        // The next thinking update will show it again if needed.
+                        if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); 
+                        
+                        // If it's a truly terminal message, set global status to idle
+                        if (message.content.includes("[Agent Finish]") || message.content.includes("cancelled by user") || message.content.includes("Plan execution stopped") || message.content.includes("Plan proposal cancelled by user")) {
+                            if(StateManager.getIsAgentRunning()) { 
                                 updateGlobalMonitorStatus('idle', 'Idle'); 
                             }
-                        } 
-                        if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); 
+                        }
                     } 
                     break;
                 case 'update_artifacts': 
@@ -280,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         updateGlobalMonitorStatus('running', 'Executing Plan...');
-        if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, 'Executing plan...');
+        if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: 'Executing plan...', status_key: 'PLAN_EXECUTION_START'});
     };
 
     const handlePlanCancelRequest = (planId) => {
@@ -323,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof initArtifactUI === 'function') { initArtifactUI( { monitorArtifactArea: monitorArtifactArea, artifactNav: artifactNav, prevBtn: artifactPrevBtn, nextBtn: artifactNextBtn, counterEl: artifactCounterElement }, { onNavigate: handleArtifactNavigation }); if(typeof updateArtifactDisplayUI === 'function') updateArtifactDisplayUI(StateManager.getCurrentTaskArtifacts(), StateManager.getCurrentArtifactIndex()); }
     if (typeof initLlmSelectorsUI === 'function') { initLlmSelectorsUI( { executorLlmSelect: executorLlmSelectElement, roleSelectors: roleSelectorsMetaForInit }, { onExecutorLlmChange: handleExecutorLlmChange, onRoleLlmChange: handleRoleLlmChange }); }
     if (typeof initTokenUsageUI === 'function') { initTokenUsageUI({ lastCallTokensEl: lastCallTokensElement, taskTotalTokensEl: taskTotalTokensElement }); resetTaskTokenTotalsGlobally(); }
-    if (typeof initFileUploadUI === 'function') { initFileUploadUI( { fileUploadInputEl: fileUploadInputElement, uploadFileButtonEl: uploadFileButtonElement }, { httpBaseUrl: httpBackendBaseUrl }, { getCurrentTaskId: StateManager.getCurrentTaskId, addLog: (logText) => { if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(logText); }, addChatMsg: (msgText, msgType, scroll) => { if (typeof addChatMessageToUI === 'function') addChatMessageToUI(msgText, msgType, scroll); } }); }
+    if (typeof initFileUploadUI === 'function') { initFileUploadUI( { fileUploadInputEl: fileUploadInputElement, uploadFileButtonEl: uploadFileButtonElement }, { httpBackendBaseUrl: httpBackendBaseUrl }, { getCurrentTaskId: StateManager.getCurrentTaskId, addLog: (logText) => { if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(logText); }, addChatMsg: (msgText, msgType, scroll) => { if (typeof addChatMessageToUI === 'function') addChatMessageToUI(msgText, msgType, scroll); } }); }
 
     if (typeof connectWebSocket === 'function') { if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor("[SYSTEM] Attempting to connect to backend..."); updateGlobalMonitorStatus('disconnected', 'Connecting...'); connectWebSocket(handleWsOpen, handleWsClose, handleWsError);
     } else { console.error("connectWebSocket function not found."); if (typeof addChatMessageToUI === 'function') addChatMessageToUI("ERROR: WebSocket manager not loaded.", "status"); updateGlobalMonitorStatus('error', 'Initialization Error'); }
