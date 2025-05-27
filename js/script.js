@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const stopButtonElement = document.getElementById('stop-button');
     const fileUploadInputElement = document.getElementById('file-upload-input');
     const uploadFileButtonElement = document.getElementById('upload-file-button');
-    const agentThinkingStatusElement = document.getElementById('agent-thinking-status'); // Global status line
+    const agentThinkingStatusElement = document.getElementById('agent-thinking-status'); 
     const lastCallTokensElement = document.getElementById('last-call-tokens');
     const taskTotalTokensElement = document.getElementById('task-total-tokens');
     const executorLlmSelectElement = document.getElementById('llm-select');
@@ -52,63 +52,67 @@ document.addEventListener('DOMContentLoaded', () => {
     const httpBackendBaseUrl = 'http://localhost:8766'; 
     let isLoadingHistory = false; 
 
-    // Global message dispatcher for WebSocket messages
     window.dispatchWsMessage = (message) => {
         try {
-            // console.log("[Script.js] Dispatching WS Message:", message.type, message.content); // Debug log
+            // console.log("[Script.js] Dispatching WS Message:", message.type, message.content); 
             switch (message.type) {
                 case 'history_start': 
                     isLoadingHistory = true;
-                    if (typeof clearChatMessagesUI === 'function') clearChatMessagesUI(); 
-                    if (typeof clearMonitorLogUI === 'function') clearMonitorLogUI(); 
+                    // clearChatMessagesUI and clearMonitorLogUI are called by handleTaskSelection before context_switch
+                    // if (typeof clearChatMessagesUI === 'function') clearChatMessagesUI(); 
+                    // if (typeof clearMonitorLogUI === 'function') clearMonitorLogUI(); 
                     if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Loading history...", "status_message", { component_hint: "SYSTEM"});
                     updateGlobalMonitorStatus('running', 'Loading History...'); 
                     break;
                 case 'history_end': 
                     isLoadingHistory = false;
-                    const loadingMsg = chatMessagesContainer.querySelector('.message-outer-blue-line .message-system-status-content'); 
-                    if (loadingMsg && loadingMsg.textContent.startsWith("Loading history...")) { 
-                        const wrapper = loadingMsg.closest('.message-outer-blue-line');
-                        if(wrapper) wrapper.remove();
+                    const loadingMsgWrapper = Array.from(chatMessagesContainer.querySelectorAll('.message-outer-blue-line'))
+                                               .find(wrapper => wrapper.querySelector('.message-system-status-content')?.textContent.startsWith("Loading history..."));
+                    if (loadingMsgWrapper) { 
+                        loadingMsgWrapper.remove();
                     } 
                     if (typeof scrollToBottomChat === 'function') scrollToBottomChat();
                     if (typeof scrollToBottomMonitorLog === 'function') scrollToBottomMonitorLog(); 
-                    // Set to idle only if not actively running something else (e.g. mid-plan execution during a quick refresh)
-                    if (!StateManager.getIsAgentRunning()) {
+                    
+                    // **MODIFIED**: Explicitly set to idle AFTER history is loaded 
+                    // and if no other process has claimed to be running in the meantime.
+                    if (!StateManager.getIsAgentRunning()) { 
                         updateGlobalMonitorStatus('idle', 'Idle'); 
-                        if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "Idle.", status_key: "IDLE", component_hint: "SYSTEM" });
+                        if (typeof showAgentThinkingStatusInUI === 'function') {
+                            showAgentThinkingStatusInUI(true, { message: "Idle.", status_key: "IDLE", component_hint: "SYSTEM" });
+                        }
+                    } else {
+                        // If agent is running (e.g. plan started during a quick refresh), don't override its current thinking status
+                        console.log("[Script.js] History loaded, but agent is already running. Not setting to Idle.");
                     }
                     break;
-                case 'agent_major_step_announcement': // Handles both live and historical
+                case 'agent_major_step_announcement': 
                     if (message.content && typeof message.content.description === 'string') {
                         if (typeof displayMajorStepAnnouncementUI === 'function') {
                             displayMajorStepAnnouncementUI(message.content);
                         }
-                        // Don't immediately hide global thinking; sub-statuses might not follow instantly.
-                        // Let sub-statuses or next major step control the global line.
                     } else {
                         console.warn("[Script.js] Invalid agent_major_step_announcement data:", message.content);
                     }
                     break;
-                case 'agent_thinking_update': // Handles live and historical sub_status/thought, and bottom line updates
+                case 'agent_thinking_update': 
                     if (message.content && typeof message.content === 'object' && (message.content.message || message.content.sub_type)) { 
                         if (typeof showAgentThinkingStatusInUI === 'function') {
-                            showAgentThinkingStatusInUI(true, message.content); // message.content is statusUpdateObject
+                            showAgentThinkingStatusInUI(true, message.content); 
                         }
-                    } else if (message.content && typeof message.content.status === 'string') { // Legacy
+                    } else if (message.content && typeof message.content.status === 'string') { 
                          if (typeof showAgentThinkingStatusInUI === 'function') {
                             showAgentThinkingStatusInUI(true, { message: message.content.status, status_key: "LEGACY_STATUS", component_hint: "SYSTEM" });
                         }
                     }
                     break;
-                case 'agent_message': // This is for the FINAL agent output
-                    if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); // Hide any active "thinking..."
+                case 'agent_message': 
+                    if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); 
                     if (typeof addChatMessageToUI === 'function') addChatMessageToUI(message.content, message.type, { component_hint: message.content.component_hint || 'DEFAULT' });
                     updateGlobalMonitorStatus('idle', 'Idle');
                     if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "Idle.", status_key: "IDLE", component_hint: "SYSTEM" });
                     break;
-                case 'confirmed_plan_log': // Handles live and historical
-                    // if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); // Not needed, plan proposal UI is removed
+                case 'confirmed_plan_log': 
                     if (typeof addChatMessageToUI === 'function') {
                         addChatMessageToUI(message.content, message.type); 
                     }
@@ -132,7 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             };
                             addChatMessageToUI(planDataForUI, message.type);
                         }
-                        // if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); // Redundant if addChatMessageToUI handles it
                         updateGlobalMonitorStatus('idle', 'Awaiting Plan Confirmation'); 
                         if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "Awaiting plan confirmation...", status_key: "AWAITING_PLAN_CONFIRMATION", component_hint: "SYSTEM" });
                     } else {
@@ -140,10 +143,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Error: Received invalid plan proposal from backend.", "status_message", { component_hint: "ERROR", isError: true });
                     }
                     break;
-                case 'user': // Handles live and historical
+                case 'user': 
                     if (typeof addChatMessageToUI === 'function') addChatMessageToUI(message.content, message.type);
                     break;
-                case 'status_message': // Handles live and historical
+                case 'status_message': 
                     let statusText = "";
                     let statusComponentHint = "SYSTEM";
                     let isErrorStatus = false;
@@ -155,7 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         statusComponentHint = message.content.component_hint || statusComponentHint;
                     } else if (message.content) {
                         statusText = String(message.content);
-                        console.warn("[Script.js] status_message content was not a string or expected object, converted to string:", statusText);
                     }
 
                     const lowerStatusText = statusText.toLowerCase();
@@ -166,20 +168,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (isErrorStatus) { 
                         updateGlobalMonitorStatus('error', statusText);
                         if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "Error occurred.", status_key: "ERROR", component_hint: "ERROR" });
-                    } else if (lowerStatusText.includes("complete") || lowerStatusText.includes("cancelled") || lowerStatusText.includes("plan proposal cancelled")) { 
+                    } else if (lowerStatusText.includes("complete") || lowerStatusText.includes("cancelled") || lowerStatusText.includes("plan proposal cancelled") || lowerStatusText.includes("task context ready")) { 
                         updateGlobalMonitorStatus('idle', 'Idle');
                         if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "Idle.", status_key: "IDLE", component_hint: "SYSTEM" });
-                    } else if (lowerStatusText.includes("plan confirmed. executing steps...")) {
-                        // This specific message implies agent is running, handled by agent_major_step or thinking_update
                     }
                     break;
                 case 'monitor_log': 
                     if (message.content && typeof message.content.text === 'string') {
                         if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(message.content);
-                        // Monitor log itself usually doesn't change the global "Idle/Running" status directly,
-                        // but specific content might imply a state change handled by other messages.
                     } else {
-                        console.warn("[Script.js] monitor_log message content is not in expected object format or text is missing:", message.content);
                         if (typeof message.content === 'string' && typeof addLogEntryToMonitor === 'function') {
                              addLogEntryToMonitor({ text: message.content, log_source: "UNKNOWN_STRING_LOG" });
                         }
@@ -187,6 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     break;
                 case 'update_artifacts': 
                     if (Array.isArray(message.content)) { 
+                        // ... (artifact update logic - remains the same)
                         const oldArtifacts = StateManager.getCurrentTaskArtifacts();
                         const oldIndex = StateManager.getCurrentArtifactIndex(); 
                         const oldCurrentArtifactFilename = (oldIndex >= 0 && oldIndex < oldArtifacts.length) ? oldArtifacts[oldIndex]?.filename : null; 
@@ -211,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'trigger_artifact_refresh': 
                     const taskIdToRefresh = message.content?.taskId;
                     if (taskIdToRefresh && taskIdToRefresh === StateManager.getCurrentTaskId()) { 
-                        if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM] File event detected for task ${taskIdToRefresh}, requesting artifact list update...`, log_source: "SYSTEM_EVENT"});
+                        if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM_EVENT] File event detected for task ${taskIdToRefresh}, requesting artifact list update...`, log_source: "SYSTEM_EVENT"});
                         if (typeof sendWsMessage === 'function') sendWsMessage('get_artifacts_for_task', { taskId: StateManager.getCurrentTaskId() });
                     } 
                     break;
@@ -225,47 +223,96 @@ document.addEventListener('DOMContentLoaded', () => {
                     break;
                 case 'error_parsing_message': 
                     console.error("Error parsing message from WebSocket:", message.content);
-                    if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM] Error parsing WebSocket message: ${message.content}`, log_source: "SYSTEM_ERROR"});
+                    if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM_ERROR] Error parsing WebSocket message: ${message.content}`, log_source: "SYSTEM_ERROR"});
                     if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Error: Received an unreadable message from the backend.", "status_message", {component_hint: "ERROR", isError: true}); 
                     break;
                 default: 
                     console.warn("[Script.js] Received unknown message type:", message.type, "Content:", message.content);
-                    if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM] Unknown message type received: ${message.type}`, log_source: "SYSTEM_WARNING"});
+                    if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM_WARNING] Unknown message type received: ${message.type}`, log_source: "SYSTEM_WARNING"});
             }
         } catch (error) {
             console.error("[Script.js] Failed to process dispatched WS message:", error, "Original Message:", message);
-            if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM] Error processing dispatched message: ${error.message}.`, log_source: "SYSTEM_ERROR"});
+            if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM_ERROR] Error processing dispatched message: ${error.message}.`, log_source: "SYSTEM_ERROR"});
             updateGlobalMonitorStatus('error', 'Processing Error');
             if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); 
         }
     };
 
-    // Helper and Handler Functions
-    function updateGlobalMonitorStatus(status, text) { StateManager.setIsAgentRunning(status === 'running' || status === 'cancelling'); if (typeof updateMonitorStatusUI === 'function') { updateMonitorStatusUI(status, text, StateManager.getIsAgentRunning()); } }
-    function handleTokenUsageUpdate(lastCallUsage = null) { StateManager.updateCurrentTaskTotalTokens(lastCallUsage); if (typeof updateTokenDisplayUI === 'function') { updateTokenDisplayUI(lastCallUsage, StateManager.getCurrentTaskTotalTokens()); } }
-    function resetTaskTokenTotalsGlobally() { StateManager.resetCurrentTaskTotalTokens(); if (typeof resetTokenDisplayUI === 'function') { resetTokenDisplayUI(); } }
-    function clearChatAndMonitor(addLog = true) { if (typeof clearChatMessagesUI === 'function') clearChatMessagesUI(); if (typeof clearMonitorLogUI === 'function') clearMonitorLogUI(); StateManager.setCurrentTaskArtifacts([]); StateManager.setCurrentArtifactIndex(-1); if (typeof clearArtifactDisplayUI === 'function') clearArtifactDisplayUI(); if (addLog && typeof addLogEntryToMonitor === 'function') { addLogEntryToMonitor({text: "[SYSTEM] Cleared context.", log_source: "SYSTEM_EVENT"}); } resetTaskTokenTotalsGlobally(); StateManager.setCurrentDisplayedPlan(null); StateManager.setCurrentPlanProposalId(null); };
+    function updateGlobalMonitorStatus(status, text) { 
+        StateManager.setIsAgentRunning(status === 'running' || status === 'cancelling'); 
+        if (typeof updateMonitorStatusUI === 'function') { 
+            updateMonitorStatusUI(status, text, StateManager.getIsAgentRunning()); 
+        } 
+    }
+    function handleTokenUsageUpdate(lastCallUsage = null) { 
+        StateManager.updateCurrentTaskTotalTokens(lastCallUsage); 
+        if (typeof updateTokenDisplayUI === 'function') { 
+            updateTokenDisplayUI(lastCallUsage, StateManager.getCurrentTaskTotalTokens()); 
+        } 
+    }
+    function resetTaskTokenTotalsGlobally() { 
+        StateManager.resetCurrentTaskTotalTokens(); 
+        if (typeof resetTokenDisplayUI === 'function') { 
+            resetTokenDisplayUI(); 
+        } 
+    }
+    function clearChatAndMonitor(addLog = true) { 
+        if (typeof clearChatMessagesUI === 'function') clearChatMessagesUI(); 
+        if (typeof clearMonitorLogUI === 'function') clearMonitorLogUI(); 
+        StateManager.setCurrentTaskArtifacts([]); 
+        StateManager.setCurrentArtifactIndex(-1); 
+        if (typeof clearArtifactDisplayUI === 'function') clearArtifactDisplayUI(); 
+        if (addLog && typeof addLogEntryToMonitor === 'function') { 
+            addLogEntryToMonitor({text: "[SYSTEM_EVENT] Cleared context.", log_source: "SYSTEM_EVENT"}); 
+        } 
+        resetTaskTokenTotalsGlobally(); 
+        StateManager.setCurrentDisplayedPlan(null); 
+        StateManager.setCurrentPlanProposalId(null); 
+    };
     
     const handleTaskSelection = (taskId) => { 
         console.log(`[MainScript] Task selection requested for: ${taskId}`);
         const previousActiveTaskId = StateManager.getCurrentTaskId();
+        
+        // **MODIFIED START: Force idle state BEFORE context switch for the new task**
+        StateManager.setIsAgentRunning(false); // Assume previous task's agent run is over or should be treated as such
+        const selectedTaskObjectForTitle = StateManager.getTasks().find(t => t.id === taskId);
+        const taskTitleForStatus = selectedTaskObjectForTitle ? selectedTaskObjectForTitle.title : (taskId ? 'Selected Task' : 'New Task');
+        
+        updateGlobalMonitorStatus('idle', `Initializing ${taskTitleForStatus}...`);
+        if (typeof showAgentThinkingStatusInUI === 'function') {
+            showAgentThinkingStatusInUI(true, { 
+                message: `Initializing ${taskTitleForStatus}...`, 
+                status_key: "TASK_INIT", // A new status key for this specific state
+                component_hint: "SYSTEM" 
+            });
+        }
+        if (typeof clearCurrentMajorStepUI === 'function') { // Ensure chat_ui.js has this
+             clearCurrentMajorStepUI();
+        }
+        // **MODIFIED END**
+
         StateManager.selectTask(taskId); 
         const newActiveTaskId = StateManager.getCurrentTaskId(); 
         console.log(`[MainScript] StateManager updated. Previous active: ${previousActiveTaskId}, New active: ${newActiveTaskId}`);
         if (typeof renderTaskList === 'function') { renderTaskList(StateManager.getTasks(), newActiveTaskId); } 
         resetTaskTokenTotalsGlobally(); 
-        const selectedTaskObject = StateManager.getTasks().find(t => t.id === newActiveTaskId);
+        
+        const selectedTaskObject = StateManager.getTasks().find(t => t.id === newActiveTaskId); // Re-fetch after selectTask
+        
         if (newActiveTaskId && selectedTaskObject) {
-            clearChatAndMonitor(false); // Don't add "Cleared context" log during task switch
+            clearChatAndMonitor(false); 
             if (typeof sendWsMessage === 'function') sendWsMessage("context_switch", { task: selectedTaskObject.title, taskId: selectedTaskObject.id });
-            // "Loading history..." will be sent by history_start
-            updateGlobalMonitorStatus('running', 'Switching Task...'); // Initial status
+            // "Loading history..." status will be sent by 'history_start' from backend.
+            // The "Initializing task..." from above will be replaced by "Loading history..." then "Idle."
         } else if (!newActiveTaskId) { 
             clearChatAndMonitor(); 
             if (typeof addChatMessageToUI === 'function') addChatMessageToUI("No task selected.", "status_message", {component_hint: "SYSTEM"});
-            if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: "[SYSTEM] No task selected.", log_source: "SYSTEM_EVENT"});
+            if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: "[SYSTEM_EVENT] No task selected.", log_source: "SYSTEM_EVENT"});
             updateGlobalMonitorStatus('idle', 'No Task');
-            if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "No task selected.", status_key: "IDLE", component_hint: "SYSTEM" });
+            if (typeof showAgentThinkingStatusInUI === 'function') {
+                showAgentThinkingStatusInUI(true, { message: "No task selected.", status_key: "IDLE", component_hint: "SYSTEM" });
+            }
         }
     };
     const handleNewTaskCreation = () => { const newTask = StateManager.addTask(); handleTaskSelection(newTask.id); };
@@ -274,10 +321,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const handleSendMessageFromUI = (messageText) => { 
         if (!StateManager.getCurrentTaskId()) { alert("Please select or create a task first."); return; } 
-        if (StateManager.getIsAgentRunning()) { if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Agent is currently busy. Please wait or stop the current process.", "status_message", {component_hint: "SYSTEM", isError: false /* Not an error, just a warning/info */}); return; } 
+        if (StateManager.getIsAgentRunning()) { if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Agent is currently busy. Please wait or stop the current process.", "status_message", {component_hint: "SYSTEM"}); return; } 
         if (typeof addChatMessageToUI === 'function') addChatMessageToUI(messageText, 'user'); 
         if (typeof addMessageToInputHistory === 'function') addMessageToInputHistory(messageText); 
-        if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); // Clear previous bottom line
+        if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); 
         if (typeof sendWsMessage === 'function') sendWsMessage("user_message", { content: messageText }); 
         else { if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Error: Cannot send message. Connection issue.", "status_message", {component_hint: "ERROR", isError: true});} 
         updateGlobalMonitorStatus('running', 'Classifying intent...'); 
@@ -289,7 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentPlan = StateManager.getCurrentDisplayedPlan(); 
         if (!currentPlan) {
             console.error(`[Script.js] Cannot confirm plan ${planId}: No plan found in state.`);
-            if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Error: Could not find plan to confirm. Please try again.", "status_message", {component_hint: "ERROR", isError: true});
+            if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Error: Could not find plan to confirm.", "status_message", {component_hint: "ERROR", isError: true});
             updateGlobalMonitorStatus('error', 'Plan Confirmation Error');
             return;
         }
@@ -300,14 +347,13 @@ document.addEventListener('DOMContentLoaded', () => {
             transformToConfirmedPlanUI(planId);
         }
         updateGlobalMonitorStatus('running', 'Executing Plan...');
-        // Backend will send agent_major_step_announcement or agent_thinking_update to manage UI thinking status
     };
     const handlePlanCancelRequest = (planId) => {
         console.log(`[Script.js] Plan cancelled by user for plan ID: ${planId}`);
         if (typeof sendWsMessage === 'function') {
             sendWsMessage('cancel_plan_proposal', { plan_id: planId });
         }
-        const planConfirmContainer = chatMessagesContainer.querySelector(`.plan-confirmation-wrapper[data-plan-id="${planId}"]`); // Use wrapper class
+        const planConfirmContainer = chatMessagesContainer.querySelector(`.plan-confirmation-wrapper[data-plan-id="${planId}"]`);
         if (planConfirmContainer) {
             planConfirmContainer.remove();
         }
@@ -318,22 +364,35 @@ document.addEventListener('DOMContentLoaded', () => {
         StateManager.setCurrentPlanProposalId(null);
     };
     const handlePlanViewDetailsRequest = (planId, isNowVisible) => { if (typeof addLogEntryToMonitor === 'function') { addLogEntryToMonitor({text: `[UI_ACTION] User toggled plan details for proposal ${planId}. Details are now ${isNowVisible ? 'visible' : 'hidden'}.`, log_source: "UI_EVENT"}); } };
-    const handleStopAgentRequest = () => { if (StateManager.getIsAgentRunning()) { if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: "[SYSTEM] Stop request sent by user.", log_source: "SYSTEM_EVENT"}); if (typeof sendWsMessage === 'function') sendWsMessage("cancel_agent", {}); updateGlobalMonitorStatus('cancelling', 'Cancelling...'); if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "Cancelling...", status_key: "CANCELLING", component_hint: "SYSTEM" }); } };
+    const handleStopAgentRequest = () => { if (StateManager.getIsAgentRunning()) { if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: "[SYSTEM_EVENT] Stop request sent by user.", log_source: "SYSTEM_EVENT"}); if (typeof sendWsMessage === 'function') sendWsMessage("cancel_agent", {}); updateGlobalMonitorStatus('cancelling', 'Cancelling...'); if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "Cancelling...", status_key: "CANCELLING", component_hint: "SYSTEM" }); } };
     const handleArtifactNavigation = (direction) => { let currentIndex = StateManager.getCurrentArtifactIndex(); const currentArtifacts = StateManager.getCurrentTaskArtifacts(); let newIndex = currentIndex; if (direction === "prev") { if (currentIndex > 0) newIndex = currentIndex - 1; } else if (direction === "next") { if (currentIndex < currentArtifacts.length - 1) newIndex = currentIndex + 1; } if (newIndex !== currentIndex) { StateManager.setCurrentArtifactIndex(newIndex); if(typeof updateArtifactDisplayUI === 'function') { updateArtifactDisplayUI(currentArtifacts, newIndex); } } };
     const handleExecutorLlmChange = (selectedId) => { StateManager.setCurrentExecutorLlmId(selectedId); if (typeof sendWsMessage === 'function') { sendWsMessage("set_llm", { llm_id: selectedId }); }};
     const handleRoleLlmChange = (role, selectedId) => { StateManager.setRoleLlmOverride(role, selectedId); if (typeof sendWsMessage === 'function') { sendWsMessage("set_session_role_llm", { role: role, llm_id: selectedId }); }};
     const handleThinkingStatusClick = () => { if (typeof scrollToBottomMonitorLog === 'function') { scrollToBottomMonitorLog(); } };
     
     const handleWsOpen = (event) => { 
-        if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM] WebSocket connection established.`, log_source: "SYSTEM_CONNECTION"}); 
+        if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM_CONNECTION] WebSocket connection established.`, log_source: "SYSTEM_CONNECTION"}); 
         if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Connected to backend.", "status_message", {component_hint: "SYSTEM"}); 
         updateGlobalMonitorStatus('idle', 'Idle'); 
         if (typeof sendWsMessage === 'function') { 
             sendWsMessage("get_available_models", {}); 
-            const currentTaskFromState = StateManager.getTasks().find(task => task.id === StateManager.getCurrentTaskId()); 
-            if (StateManager.getCurrentTaskId() && currentTaskFromState) { 
-                sendWsMessage("context_switch", { task: currentTaskFromState.title, taskId: currentTaskFromState.id }); 
+            const activeTaskFromStorage = StateManager.getTasks().find(task => task.id === StateManager.getCurrentTaskId()); 
+            if (StateManager.getCurrentTaskId() && activeTaskFromStorage) { 
+                // Instead of directly calling handleTaskSelection, which might have UI side effects not desired here,
+                // we ensure the state is set and then send context_switch.
+                // The UI state should already be 'idle' from updateGlobalMonitorStatus above.
+                console.log(`[Script.js] WS Open: Active task ${activeTaskFromStorage.id} found. Sending context_switch.`);
+                StateManager.setIsAgentRunning(false); // Ensure agent is not considered running on fresh connect
+                 if (typeof showAgentThinkingStatusInUI === 'function') {
+                    showAgentThinkingStatusInUI(true, { 
+                        message: `Initializing Task: ${activeTaskFromStorage.title}...`, 
+                        status_key: "TASK_INIT", 
+                        component_hint: "SYSTEM" 
+                    });
+                }
+                sendWsMessage("context_switch", { task: activeTaskFromStorage.title, taskId: activeTaskFromStorage.id }); 
             } else { 
+                console.log("[Script.js] WS Open: No active task found in StateManager on initial load.");
                 updateGlobalMonitorStatus('idle', 'No Task'); 
                 if(typeof clearArtifactDisplayUI === 'function') clearArtifactDisplayUI(); 
                 resetTaskTokenTotalsGlobally(); 
@@ -341,12 +400,12 @@ document.addEventListener('DOMContentLoaded', () => {
             } 
         } 
     };
-    const handleWsClose = (event) => { let reason = event.reason || 'No reason given'; let advice = ""; if (event.code === 1000 || event.wasClean) { reason = "Normal"; } else { reason = `Abnormal (Code: ${event.code})`; advice = " Backend down or network issue?"; } if (typeof addChatMessageToUI === 'function') addChatMessageToUI(`Connection closed.${advice}`, "status_message", {component_hint: "ERROR", isError: true}); if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM] WebSocket disconnected. ${reason}`, log_source: "SYSTEM_CONNECTION"}); updateGlobalMonitorStatus('disconnected', 'Disconnected');  if (typeof disableAllLlmSelectorsUI === 'function') disableAllLlmSelectorsUI(); if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "Disconnected.", status_key: "DISCONNECTED", component_hint: "ERROR" }); };
-    const handleWsError = (event, isCreationError = false) => { const errorMsg = isCreationError ? "FATAL: Failed to initialize WebSocket connection." : "ERROR: Cannot connect to backend."; if (typeof addChatMessageToUI === 'function') addChatMessageToUI(errorMsg, "status_message", {component_hint: "ERROR", isError: true}); if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM] WebSocket error occurred.`, log_source: "SYSTEM_ERROR"}); updateGlobalMonitorStatus('error', isCreationError ? 'Connection Init Failed' : 'Connection Error'); if (typeof disableAllLlmSelectorsUI === 'function') disableAllLlmSelectorsUI(); if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "Connection Error.", status_key: "ERROR", component_hint: "ERROR" }); };
+    const handleWsClose = (event) => { let reason = event.reason || 'No reason given'; let advice = ""; if (event.code === 1000 || event.wasClean) { reason = "Normal"; } else { reason = `Abnormal (Code: ${event.code})`; advice = " Backend down or network issue?"; } if (typeof addChatMessageToUI === 'function') addChatMessageToUI(`Connection closed.${advice}`, "status_message", {component_hint: "ERROR", isError: true}); if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM_CONNECTION] WebSocket disconnected. ${reason}`, log_source: "SYSTEM_CONNECTION"}); updateGlobalMonitorStatus('disconnected', 'Disconnected');  if (typeof disableAllLlmSelectorsUI === 'function') disableAllLlmSelectorsUI(); if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "Disconnected.", status_key: "DISCONNECTED", component_hint: "ERROR" }); };
+    const handleWsError = (event, isCreationError = false) => { const errorMsg = isCreationError ? "FATAL: Failed to initialize WebSocket connection." : "ERROR: Cannot connect to backend."; if (typeof addChatMessageToUI === 'function') addChatMessageToUI(errorMsg, "status_message", {component_hint: "ERROR", isError: true}); if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM_ERROR] WebSocket error occurred.`, log_source: "SYSTEM_ERROR"}); updateGlobalMonitorStatus('error', isCreationError ? 'Connection Init Failed' : 'Connection Error'); if (typeof disableAllLlmSelectorsUI === 'function') disableAllLlmSelectorsUI(); if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "Connection Error.", status_key: "ERROR", component_hint: "ERROR" }); };
 
     // Initialize UI Modules
     if (newTaskButton) { newTaskButton.addEventListener('click', handleNewTaskCreation); }
-    document.body.addEventListener('click', event => { if (event.target.classList.contains('action-btn')) { const commandText = event.target.textContent.trim(); if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[USER_ACTION] Clicked: ${commandText}`, log_source: "UI_EVENT"}); if (typeof sendWsMessage === 'function') sendWsMessage("action_command", { command: commandText }); } });
+    document.body.addEventListener('click', event => { if (event.target.classList.contains('action-btn')) { const commandText = event.target.textContent.trim(); if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[UI_ACTION] Clicked: ${commandText}`, log_source: "UI_EVENT"}); if (typeof sendWsMessage === 'function') sendWsMessage("action_command", { command: commandText }); } });
     if (typeof initTaskUI === 'function') { initTaskUI( { taskListUl: taskListUl, currentTaskTitleEl: currentTaskTitleElement, uploadFileBtn: uploadFileButtonElement }, { onTaskSelect: handleTaskSelection, onNewTask: handleNewTaskCreation, onDeleteTask: handleTaskDeletion, onRenameTask: handleTaskRename }); if (typeof renderTaskList === 'function') renderTaskList(StateManager.getTasks(), StateManager.getCurrentTaskId()); }
     if (typeof initChatUI === 'function') { initChatUI( { chatMessagesContainer: chatMessagesContainer, agentThinkingStatusEl: agentThinkingStatusElement, chatTextareaEl: chatTextarea, chatSendButtonEl: chatSendButton }, { onSendMessage: handleSendMessageFromUI, onThinkingStatusClick: handleThinkingStatusClick }); }
     if (typeof initMonitorUI === 'function') { initMonitorUI( { monitorLogArea: monitorLogAreaElement, statusDot: statusDotElement, monitorStatusText: monitorStatusTextElement, stopButton: stopButtonElement }, { onStopAgent: handleStopAgentRequest }); }
@@ -356,6 +415,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof initFileUploadUI === 'function') { initFileUploadUI( { fileUploadInputEl: fileUploadInputElement, uploadFileButtonEl: uploadFileButtonElement }, { httpBackendBaseUrl: httpBackendBaseUrl }, { getCurrentTaskId: StateManager.getCurrentTaskId, addLog: (logData) => { if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(logData); }, addChatMsg: (msgText, msgType, options) => { if (typeof addChatMessageToUI === 'function') addChatMessageToUI(msgText, msgType, options); } }); }
 
     // Establish WebSocket Connection
-    if (typeof connectWebSocket === 'function') { if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: "[SYSTEM] Attempting to connect to backend...", log_source: "SYSTEM_CONNECTION"}); updateGlobalMonitorStatus('disconnected', 'Connecting...'); connectWebSocket(handleWsOpen, handleWsClose, handleWsError);
+    if (typeof connectWebSocket === 'function') { if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: "[SYSTEM_CONNECTION] Attempting to connect to backend...", log_source: "SYSTEM_CONNECTION"}); updateGlobalMonitorStatus('disconnected', 'Connecting...'); connectWebSocket(handleWsOpen, handleWsClose, handleWsError);
     } else { console.error("connectWebSocket function not found."); if (typeof addChatMessageToUI === 'function') addChatMessageToUI("ERROR: WebSocket manager not loaded.", "status_message", {component_hint: "ERROR", isError: true}); updateGlobalMonitorStatus('error', 'Initialization Error'); }
 });
