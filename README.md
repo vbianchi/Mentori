@@ -103,10 +103,9 @@ ResearchAgent/
 
 ## Known Issues / Immediate Next Steps (Targeting v2.5.3 Fixes)
 
--   **NEW TASK CONNECTION (High Priority):** Newly created tasks do not immediately establish full context with the backend. Requires an interaction attempt (like sending a message) and then a page refresh to function correctly.
+-   **FILE UPLOAD (High Priority):** File upload functionality is broken, resulting in an HTTP 501 "Not Implemented" error from the backend.
 -   **ARTIFACT VIEWER REFRESH (Medium Priority):** The artifact viewer does not consistently or immediately auto-update after a task completes and writes files, even if logs indicate a refresh was triggered.
 -   **TOKEN COUNTER (Medium Priority):** The UI token counter is no longer updating.
--   **FILE UPLOAD (High Priority):** File upload functionality is broken, resulting in an HTTP 501 "Not Implemented" error from the backend.
 -   **PLAN FILE STATUS UPDATE (Low Priority):** Backend logs still show warnings about not finding step patterns to update status checkboxes in the `_plan_{id}.md` artifact.
 -   **"UNKNOWN" HISTORY MESSAGE TYPES (Low Priority - Review):** Some internal system message types are logged to the monitor from history; confirm this is the desired behavior for all such types.
 

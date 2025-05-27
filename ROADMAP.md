@@ -29,7 +29,6 @@ This document outlines the planned development path for the ResearchAgent projec
     -   **Visual Design Goal (Achieved):** Implemented the chat interface as per `simulation_option6.html` (unified blue outer lines, no line on major steps, nested/indented component-specific lines for sub-statuses & thoughts, user message right line, persistent bottom thinking line). HTML tags (`<strong>`, `<em>`) now render correctly.
     -   **Persistence (Implemented):** All new message structures (major steps, sub-statuses, thoughts) are saved to and reloaded from the database.
     -   **Current Bugs & Next Steps for Chat UI/UX:**
-        -   **FIX (High Priority): New Task Connection:** Ensure newly created tasks immediately establish full backend context without requiring refresh.
         -   **FIX (High Priority): File Upload:** Resolve HTTP 501 error.
         -   **FIX (Medium Priority): Token Counter:** Ensure UI token counter updates correctly.
         -   **FIX (Medium Priority): Artifact Viewer Refresh:** Ensure reliable auto-update after task completion.
