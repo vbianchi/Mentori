@@ -30,7 +30,9 @@ function initTokenUsageUI(elements) {
  * @param {object|null} lastCallUsage - Object with { input_tokens, output_tokens, total_tokens, model_name } or null.
  * @param {object} currentTaskTotals - Object with { input, output, total } for the current task.
  */
+// <<< START MODIFICATION - Phase 2, Action 2.4 >>>
 function updateTokenDisplayUI(lastCallUsage, currentTaskTotals) {
+    console.log("[TokenUsageUI] updateTokenDisplayUI called. Last Call:", JSON.stringify(lastCallUsage), "Task Totals:", JSON.stringify(currentTaskTotals));
     if (!lastCallTokensElementUI || !taskTotalTokensElementUI) {
         console.error("[TokenUsageUI] Token display elements not initialized for update.");
         return;
@@ -42,9 +44,9 @@ function updateTokenDisplayUI(lastCallUsage, currentTaskTotals) {
         const lastTotal = lastCallUsage.total_tokens || (lastInput + lastOutput);
         lastCallTokensElementUI.textContent = `In: ${lastInput}, Out: ${lastOutput}, Total: ${lastTotal} (${lastCallUsage.model_name || 'N/A'})`;
     }
-    // currentTaskTotals is updated in script.js and passed here for display
     taskTotalTokensElementUI.textContent = `In: ${currentTaskTotals.input}, Out: ${currentTaskTotals.output}, Total: ${currentTaskTotals.total}`;
 }
+// <<< END MODIFICATION >>>
 
 /**
  * Resets the token display elements to their initial state.
@@ -56,5 +58,5 @@ function resetTokenDisplayUI() {
         return;
     }
     lastCallTokensElementUI.textContent = "N/A";
-    taskTotalTokensElementUI.textContent = `In: 0, Out: 0, Total: 0`; // Reflects the reset state
+    taskTotalTokensElementUI.textContent = `In: 0, Out: 0, Total: 0`;
 }

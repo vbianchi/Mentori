@@ -1,3 +1,4 @@
+# backend/callbacks.py
 import logging
 import datetime
 from typing import Any, Dict, List, Optional, Union, Sequence, Callable, Coroutine
@@ -142,12 +143,20 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         model_name: str = "unknown_model"
         source_for_tokens = "unknown"
 
+        # <<< START MODIFICATION - Granular Logging >>>
+        logger.debug(f"[{self.session_id}] on_llm_end: Entered. response.llm_output: {response.llm_output}")
+        logger.debug(f"[{self.session_id}] on_llm_end: response.generations: {response.generations}")
+        # <<< END MODIFICATION >>>
+
         try:
             # Attempt to get token usage from llm_output first
             if response.llm_output and isinstance(response.llm_output, dict):
                 llm_output_data = response.llm_output
                 source_for_tokens = "llm_output"
                 model_name = llm_output_data.get('model_name', llm_output_data.get('model', model_name))
+                # <<< START MODIFICATION - Granular Logging >>>
+                logger.debug(f"[{self.session_id}] on_llm_end: Processing llm_output. Model name from llm_output: {model_name}")
+                # <<< END MODIFICATION >>>
 
                 # Standard LangChain token_usage
                 if 'token_usage' in llm_output_data and isinstance(llm_output_data['token_usage'], dict):
@@ -155,23 +164,38 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
                     input_tokens = usage_dict_from_llm_output.get('prompt_tokens', usage_dict_from_llm_output.get('input_tokens'))
                     output_tokens = usage_dict_from_llm_output.get('completion_tokens', usage_dict_from_llm_output.get('output_tokens'))
                     total_tokens = usage_dict_from_llm_output.get('total_tokens')
+                    # <<< START MODIFICATION - Granular Logging >>>
+                    logger.debug(f"[{self.session_id}] on_llm_end: Tokens from llm_output.token_usage: In={input_tokens}, Out={output_tokens}, Total={total_tokens}")
+                    # <<< END MODIFICATION >>>
                 # Gemini specific in llm_output
                 elif 'usage_metadata' in llm_output_data and isinstance(llm_output_data['usage_metadata'], dict):
                     usage_metadata_from_llm_output = llm_output_data['usage_metadata']
                     input_tokens = usage_metadata_from_llm_output.get('prompt_token_count')
                     output_tokens = usage_metadata_from_llm_output.get('candidates_token_count')
                     total_tokens = usage_metadata_from_llm_output.get('total_token_count')
+                    # <<< START MODIFICATION - Granular Logging >>>
+                    logger.debug(f"[{self.session_id}] on_llm_end: Tokens from llm_output.usage_metadata (Gemini): In={input_tokens}, Out={output_tokens}, Total={total_tokens}")
+                    # <<< END MODIFICATION >>>
                 # Ollama specific in llm_output (sometimes)
-                elif 'eval_count' in llm_output_data: # Check this before generations for Ollama
+                elif 'eval_count' in llm_output_data: 
                     output_tokens = llm_output_data.get('eval_count')
-                    input_tokens = llm_output_data.get('prompt_eval_count') # Might be prompt_eval_count or similar
+                    input_tokens = llm_output_data.get('prompt_eval_count') 
+                    # <<< START MODIFICATION - Granular Logging >>>
+                    logger.debug(f"[{self.session_id}] on_llm_end: Tokens from llm_output (Ollama eval_count): In={input_tokens}, Out={output_tokens}")
+                    # <<< END MODIFICATION >>>
 
             # Fallback to generations if tokens not found in llm_output
             if (input_tokens is None or output_tokens is None) and response.generations:
+                # <<< START MODIFICATION - Granular Logging >>>
+                logger.debug(f"[{self.session_id}] on_llm_end: Tokens not found in llm_output, trying response.generations.")
+                # <<< END MODIFICATION >>>
                 for gen_list in response.generations:
                     if not gen_list: continue
                     first_gen = gen_list[0]
                     source_for_tokens = "generations"
+                    # <<< START MODIFICATION - Granular Logging >>>
+                    logger.debug(f"[{self.session_id}] on_llm_end: Processing first_gen: {first_gen}")
+                    # <<< END MODIFICATION >>>
                     
                     # Gemini AIMessage structure
                     if hasattr(first_gen, 'message') and hasattr(first_gen.message, 'usage_metadata') and first_gen.message.usage_metadata:
@@ -182,21 +206,32 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
                             total_tokens = usage_metadata_from_gen.get('total_token_count')
                             if hasattr(first_gen.message, 'response_metadata') and isinstance(first_gen.message.response_metadata, dict):
                                 model_name = first_gen.message.response_metadata.get('model_name', model_name)
+                            # <<< START MODIFICATION - Granular Logging >>>
+                            logger.debug(f"[{self.session_id}] on_llm_end: Tokens from generations.message.usage_metadata (Gemini): In={input_tokens}, Out={output_tokens}, Total={total_tokens}, Model={model_name}")
+                            # <<< END MODIFICATION >>>
                             break 
                     # LangChain generation_info (common for Ollama and others)
                     elif hasattr(first_gen, 'generation_info') and first_gen.generation_info:
                         gen_info = first_gen.generation_info
                         if isinstance(gen_info, dict):
-                            model_name = gen_info.get('model', model_name) # Ollama often puts model here
+                            model_name = gen_info.get('model', model_name) 
+                            # <<< START MODIFICATION - Granular Logging >>>
+                            logger.debug(f"[{self.session_id}] on_llm_end: Processing generation_info. Model from gen_info: {model_name}")
+                            # <<< END MODIFICATION >>>
                             if 'token_usage' in gen_info and isinstance(gen_info['token_usage'], dict):
                                 usage_dict_from_gen_info = gen_info['token_usage']
                                 input_tokens = usage_dict_from_gen_info.get('prompt_tokens', usage_dict_from_gen_info.get('input_tokens'))
                                 output_tokens = usage_dict_from_gen_info.get('completion_tokens', usage_dict_from_gen_info.get('output_tokens'))
                                 total_tokens = usage_dict_from_gen_info.get('total_tokens')
-                            elif 'eval_count' in gen_info: # Ollama specific in generation_info
+                                # <<< START MODIFICATION - Granular Logging >>>
+                                logger.debug(f"[{self.session_id}] on_llm_end: Tokens from generation_info.token_usage: In={input_tokens}, Out={output_tokens}, Total={total_tokens}")
+                                # <<< END MODIFICATION >>>
+                            elif 'eval_count' in gen_info: 
                                 output_tokens = gen_info.get('eval_count')
-                                input_tokens = gen_info.get('prompt_eval_count') # or 'prompt_eval_duration' is time
-                            # Add other provider-specific checks within gen_info if necessary
+                                input_tokens = gen_info.get('prompt_eval_count')
+                                # <<< START MODIFICATION - Granular Logging >>>
+                                logger.debug(f"[{self.session_id}] on_llm_end: Tokens from generation_info (Ollama eval_count): In={input_tokens}, Out={output_tokens}")
+                                # <<< END MODIFICATION >>>
                             break 
             
             input_tokens = int(input_tokens) if input_tokens is not None else 0
@@ -204,12 +239,21 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
             if total_tokens is None: total_tokens = input_tokens + output_tokens
             else: total_tokens = int(total_tokens)
 
+            # <<< START MODIFICATION - Granular Logging >>>
+            logger.debug(f"[{self.session_id}] on_llm_end: Final parsed tokens before sending: In={input_tokens}, Out={output_tokens}, Total={total_tokens}, Model={model_name}, Source={source_for_tokens}")
+            # <<< END MODIFICATION >>>
+
             if input_tokens > 0 or output_tokens > 0 or total_tokens > 0:
                 token_usage_payload = {"model_name": str(model_name), "input_tokens": input_tokens, "output_tokens": output_tokens, "total_tokens": total_tokens, "source": source_for_tokens}
                 usage_str = f"Model: {model_name}, Input: {input_tokens}, Output: {output_tokens}, Total: {total_tokens} (Source: {source_for_tokens})"
                 await self.send_ws_message("monitor_log", {"text": f"{log_prefix} [LLM Token Usage] {usage_str}", "log_source": f"{LOG_SOURCE_LLM_CORE}_TOKEN_USAGE"})
+                logger.info(f"[{self.session_id}] Sending 'llm_token_usage' message with payload: {token_usage_payload}")
                 await self.send_ws_message("llm_token_usage", token_usage_payload)
                 await self._save_message_to_db("llm_token_usage", token_usage_payload)
+            # <<< START MODIFICATION - Granular Logging >>>
+            else:
+                logger.warning(f"[{self.session_id}] on_llm_end: No positive token counts found (In={input_tokens}, Out={output_tokens}, Total={total_tokens}). 'llm_token_usage' message will NOT be sent.")
+            # <<< END MODIFICATION >>>
         except Exception as e:
             logger.error(f"[{self.session_id}] Error processing token usage in on_llm_end: {e}", exc_info=True)
         
