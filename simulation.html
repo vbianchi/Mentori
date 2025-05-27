@@ -1,25 +1,33 @@
-<div style="font-family: sans-serif; max-width: 700px; margin: auto; padding: 20px; background-color: #212529; color: #F8F9FA; border-radius: 8px;">
+<div style="font-family: sans-serif; max-width: 700px; margin: auto; padding: 20px; background-color: #212529; color: #F8F9FA; border-radius: 8px; display: flex; flex-direction: column; height: 600px; /* Fixed height for demo */">
 
-<h3 style="color: #F8F9FA; border-bottom: 1px solid #495057; padding-bottom: 10px; margin-bottom: 20px;">Simulation: Heatmap Generation (Consistent Lines)</h3>
+<div style="flex-grow: 1; overflow-y: auto; padding-bottom: 10px; /* Space for thinking line */">
 
-<div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
-    <div style="background-color: #0D9488; color: #FFFFFF; padding: 10px 15px; border-radius: 15px 15px 5px 15px; max-width: 70%;">
-        Create a heatmap from the data in file data.txt
-    </div>
-</div>
-
-<div style="margin-bottom: 10px; padding-left: 10px; border-left: 3px solid #5DADE2;"> <div style="max-width: 95%; padding: 5px 0px;">
-        <div style="font-size: 0.85em; color: #ADB5BD; padding-left: 10px;">
-            <i>Intent: This task requires planning. Generating a plan...</i>
+<div style="margin-bottom: 10px; padding-left: 10px; border-left: 3px solid #7F8C8D;"> <div style="max-width: 95%; padding: 5px 0px;">
+        <div style="font-size: 0.9em; color: #ADB5BD; padding-left: 10px;">
+            <i>Loading history...</i>
         </div>
     </div>
 </div>
 
-<div style="margin-bottom: 15px; padding-left: 10px; border-left: 3px solid #3498DB;"> <div style="max-width: 95%; padding: 5px 0px;">
-        Okay, I can help with that! Here's the proposed plan to generate a heatmap from `data.txt`:
+<div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+    <div style="background-color: #0D9488; color: #FFFFFF; padding: 10px 15px; border-radius: 15px 15px 5px 15px; max-width: 70%;">
+        Create a heatmap with random data and save it as "heatmap.png"
+    </div>
+</div>
+
+<div style="margin-bottom: 10px; padding-left: 10px; border-left: 3px solid #5DADE2;"> <div style="max-width: 95%; padding: 5px 0px;">
+        <div style="font-size: 0.9em; color: #ADB5BD; padding-left: 10px;">
+            <i>Intent: This task requires planning.</i>
+        </div>
+    </div>
+</div>
+
+<div style="margin-bottom: 10px; padding-left: 10px; border-left: 3px solid #3498DB;"> <div style="max-width: 95%; padding: 5px 0px;">
+        Okay, I'll create a plan to generate a heatmap from random data and save it as `heatmap.png`.
+        <br>Here's the proposed plan:
         <div style="background-color: #2C3237; border: 1px solid #495057; padding: 15px; margin-top: 10px; border-radius: 8px;">
             <h4>Plan Proposal: Generate Heatmap</h4>
-            <p style="color: #ADB5BD; margin-bottom: 10px; font-size: 0.9em;">1. Read data from `data.txt`. <br>2. Install necessary Python packages (pandas, matplotlib, seaborn). <br>3. Write a Python script to generate the heatmap. <br>4. Execute the script and confirm heatmap creation.</p>
+            <p style="color: #ADB5BD; margin-bottom: 10px; font-size: 0.9em;">1. Install necessary Python packages.<br>2. Write Python script for heatmap.<br>3. Execute script.<br>4. Confirm file creation.<br>5. Inform user.</p>
             <button style="background: none; border: 1px solid #495057; color: #ADB5BD; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85em; margin-bottom: 10px;">View Details</button>
             <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 5px;">
                 <button style="background-color: #495057; color: #F8F9FA; padding: 8px 15px; border-radius: 5px; cursor: pointer; border: none;">Cancel</button>
@@ -29,96 +37,83 @@
     </div>
 </div>
 
-<div style="text-align: center; font-size: 0.9em; color: #6C757D; margin-bottom: 15px; padding-left: 10px; border-left: 3px solid #7F8C8D;"> Plan confirmed by user. Starting execution...
-</div>
-
-<div style="margin-bottom: 5px; padding-left: 10px; border-left: 3px solid #E67E22;"> <div style="max-width: 95%; padding: 5px 0px;">
-        **Step 1/4: Read data from `data.txt`**
-        <div style="font-size: 0.85em; color: #ADB5BD; margin-top: 3px; padding-left: 10px;">
-            <i>Controller: Preparing to use `read_file` tool for `data.txt`.</i>
-        </div>
-    </div>
-</div>
-<div style="margin-bottom: 5px; padding-left: 10px; border-left: 3px solid #1ABC9C;"> <div style="max-width: 95%; padding: 5px 0px;">
-        <div style="font-size: 0.85em; color: #ADB5BD; padding-left: 10px;">
-             <i>Executor: Using tool `read_file` for `data.txt`...</i>
-        </div>
-    </div>
-</div>
-<div style="margin-bottom: 15px; padding-left: 10px; border-left: 3px solid #9B59B6;"> <div style="max-width: 95%; padding: 5px 0px;">
-        <div style="font-size: 0.85em; color: #ADB5BD; padding-left: 10px;">
-             <i>Evaluator: Successfully read data from `data.txt`. Content available for next step.</i>
+<div style="margin-bottom: 10px; padding-left: 10px; border-left: 3px solid #7F8C8D;"> <div style="max-width: 95%; padding: 5px 0px;">
+        <div style="font-size: 0.9em; color: #ADB5BD; padding-left: 10px;">
+            <i>Plan confirmed. Starting execution...</i>
         </div>
     </div>
 </div>
 
 <div style="margin-bottom: 5px; padding-left: 10px; border-left: 3px solid #E67E22;"> <div style="max-width: 95%; padding: 5px 0px;">
-        **Step 2/4: Install required Python packages**
-        <div style="font-size: 0.85em; color: #ADB5BD; margin-top: 3px; padding-left: 10px;">
-            <i>Controller: Preparing `python_package_installer` for `pandas, matplotlib, seaborn`.</i>
+        <div style="padding-left: 10px;">
+            <strong>Step 1/5: Install required Python packages (numpy, matplotlib, seaborn).</strong>
+        </div>
+    </div>
+</div>
+<div style="margin-bottom: 5px; padding-left: 10px; border-left: 3px solid #E67E22;"> <div style="max-width: 95%; padding: 5px 0px;">
+        <div style="font-size: 0.85em; color: #ADB5BD; padding-left: 10px;">
+            <i>Controller: Validating step, preparing `python_package_installer`...</i>
         </div>
     </div>
 </div>
 <div style="margin-bottom: 5px; padding-left: 10px; border-left: 3px solid #1ABC9C;"> <div style="max-width: 95%; padding: 5px 0px;">
         <div style="font-size: 0.85em; color: #ADB5BD; padding-left: 10px;">
-            <i>Executor: Using `python_package_installer`... (pandas, matplotlib, seaborn)</i>
+            <i>Executor: Installing `numpy, matplotlib, seaborn`...</i>
         </div>
     </div>
 </div>
-<div style="margin-bottom: 15px; padding-left: 10px; border-left: 3px solid #9B59B6;"> <div style="max-width: 95%; padding: 5px 0px;">
+<div style="margin-bottom: 10px; padding-left: 10px; border-left: 3px solid #9B59B6;"> <div style="max-width: 95%; padding: 5px 0px;">
         <div style="font-size: 0.85em; color: #ADB5BD; padding-left: 10px;">
-            <i>Evaluator: Packages `pandas, matplotlib, seaborn` installed successfully.</i>
+            <i>Evaluator: Packages installed successfully.</i>
         </div>
     </div>
 </div>
 
 <div style="margin-bottom: 5px; padding-left: 10px; border-left: 3px solid #E67E22;"> <div style="max-width: 95%; padding: 5px 0px;">
-        **Step 3/4: Write Python script for heatmap generation**
-        <div style="font-size: 0.85em; color: #ADB5BD; margin-top: 3px; padding-left: 10px;">
-            <i>Controller: Using LLM to generate script content for `generate_heatmap.py`.</i>
+        <div style="padding-left: 10px;">
+            <strong>Step 2/5: Create Python script `generate_heatmap.py`.</strong>
+        </div>
+    </div>
+</div>
+<div style="margin-bottom: 5px; padding-left: 10px; border-left: 3px solid #E67E22;"> <div style="max-width: 95%; padding: 5px 0px;">
+        <div style="font-size: 0.85em; color: #ADB5BD; padding-left: 10px;">
+            <i>Controller: Generating script content...</i>
         </div>
     </div>
 </div>
 <div style="margin-bottom: 5px; padding-left: 10px; border-left: 3px solid #1ABC9C;"> <div style="max-width: 95%; padding: 5px 0px;">
         <div style="font-size: 0.85em; color: #ADB5BD; padding-left: 10px;">
-            <i>Executor: Using tool `write_file` to save script to `generate_heatmap.py`...</i>
+            <i>Executor: Writing script to `generate_heatmap.py`...</i>
         </div>
     </div>
 </div>
-<div style="margin-bottom: 15px; padding-left: 10px; border-left: 3px solid #9B59B6;"> <div style="max-width: 95%; padding: 5px 0px;">
+<div style="margin-bottom: 10px; padding-left: 10px; border-left: 3px solid #9B59B6;"> <div style="max-width: 95%; padding: 5px 0px;">
         <div style="font-size: 0.85em; color: #ADB5BD; padding-left: 10px;">
-            <i>Evaluator: Script `generate_heatmap.py` saved to workspace.</i>
+            <i>Evaluator: Script `generate_heatmap.py` saved.</i>
         </div>
     </div>
 </div>
 
 <div style="margin-bottom: 5px; padding-left: 10px; border-left: 3px solid #E67E22;"> <div style="max-width: 95%; padding: 5px 0px;">
-        **Step 4/4: Execute Python script to generate heatmap**
-        <div style="font-size: 0.85em; color: #ADB5BD; margin-top: 3px; padding-left: 10px;">
-            <i>Controller: Preparing `workspace_shell` to run `python generate_heatmap.py`.</i>
+        <div style="padding-left: 10px;">
+            <strong>Step 5/5: Inform user of heatmap creation.</strong>
         </div>
     </div>
 </div>
-<div style="margin-bottom: 5px; padding-left: 10px; border-left: 3px solid #1ABC9C;"> <div style="max-width: 95%; padding: 5px 0px;">
+<div style="margin-bottom: 10px; padding-left: 10px; border-left: 3px solid #2ECC71;"> <div style="max-width: 95%; padding: 5px 0px;">
         <div style="font-size: 0.85em; color: #ADB5BD; padding-left: 10px;">
-            <i>Executor: Using `workspace_shell`: `python generate_heatmap.py`...</i>
-        </div>
-    </div>
-</div>
-<div style="margin-bottom: 15px; padding-left: 10px; border-left: 3px solid #9B59B6;"> <div style="max-width: 95%; padding: 5px 0px;">
-        <div style="font-size: 0.85em; color: #ADB5BD; padding-left: 10px;">
-            <i>Evaluator: Script executed. Heatmap `heatmap.png` generated.</i>
+            <i>Executor: Preparing final confirmation message...</i>
         </div>
     </div>
 </div>
 
-<div style="display: flex; justify-content: flex-start; margin-bottom: 15px;">
-    <div style="background-color: #343A40; padding: 10px 15px; border-radius: 15px 15px 15px 5px; max-width: 70%; border: 1px solid #495057; border-left: 3px solid #0F766E !important;"> The heatmap has been successfully generated from `data.txt` and saved as `heatmap.png` in your current task workspace. You can view it in the Artifacts panel.
+<div style="display: flex; justify-content: flex-start; margin-bottom: 10px;">
+    <div style="background-color: #343A40; color: #FFFFFF; padding: 10px 15px; border-radius: 15px 15px 15px 5px; max-width: 70%; border: 1px solid #495057; border-left: 3px solid #0F766E !important;"> The heatmap has been successfully generated with random data and saved as `heatmap.png` in your task workspace. You can find it in the Artifacts panel.
     </div>
 </div>
 
-<div style="text-align: left; font-size: 0.9em; color: #6C757D; margin-top: 10px; padding: 5px 0;">
-    <i>Idle. Ready for next query.</i>
+</div> <div style="flex-shrink: 0; text-align: left; font-size: 0.9em; color: #6C757D; padding: 5px 10px 5px 20px; border-top: 1px solid #495057; position: relative; border-left: 3px solid transparent;" id="simulated-global-thinking-line">
+    <i>Thinking (LLM)...</i>
 </div>
 
 </div>
