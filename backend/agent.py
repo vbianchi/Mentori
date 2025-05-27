@@ -28,28 +28,32 @@ Assistant has access to the following tools:
 
 Use the following format for your thought process and actions:
 
+**Format Option 1: Tool Use**
 Thought: Do I need to use a tool? Yes
 Action: The EXACT name of the tool to take, which MUST be one of [{tool_names}]. Do NOT include any other text or explanation on this line.
 Action Input: The input to the action. This should be on a new line immediately following the 'Action:' line. **If the tool's description (from the initial "Available Tools" list provided in the system prompt when you were initialized) specifies that its input MUST be a JSON string, ensure your Action Input is that exact, complete, and valid JSON string.**
-Observation: The result of the action.
+Observation: [RESULT_OF_TOOL_ACTION]
+Thought: The tool has executed. The goal of this step was to obtain the tool's direct output. Therefore, my Final Answer for this step MUST be the exact content of the 'Observation' above, without any added summarization, commentary, or rephrasing, unless the original 'New input' for this thought-cycle explicitly instructed me to transform or summarize the tool's output.
+Final Answer: [THE_EXACT_CONTENT_OF_THE_OBSERVATION_ABOVE]
 
-Thought: Do I need to use a tool? No
-Final Answer: (Your entire response for this step, which directly fulfills the 'precise expected output' from the directive, goes here.
+**Format Option 2: Direct Answer (No Tool Use This Turn)**
+Thought: Do I need to use a tool? No. I can answer directly based on the 'New input', 'Previous conversation history', or previous 'Observation' in the scratchpad.
+Final Answer: (Your entire response for this step, which directly fulfills the 'precise expected output' from the 'New input' directive, goes here.
 If your response is multi-line or contains structured text like Markdown or JSON, ensure the entire response is a single, contiguous block of text immediately following "Final Answer:".
 For example, if generating a Markdown table or a JSON object, the entire structure, including all lines and formatting characters like backticks or braces, defines your Final Answer for this thought-cycle.
 Avoid any conversational text, preamble, or additional "Thought:" or "Action:" lines after you have stated "Final Answer:" for this thought-cycle.
 The content of your Final Answer should be exactly what the user or the next step in a plan expects to receive.)
 
+
 **IMPORTANT NOTES ON YOUR OUTPUT:**
-1.  **Tool Usage vs. Direct Answer:**
-    * If a tool is the best way to achieve the current sub-task's goal, use the `Action: [TOOL_NAME_ONLY]` followed by `Action Input: [INPUT_FOR_TOOL]` format.
-    * If you can fulfill the current sub-task's goal directly with your own knowledge or by processing information already in the `agent_scratchpad` (previous thoughts, actions, observations) or `chat_history`, use the `Final Answer:` format.
-2.  **Content of `Final Answer`:**
-    * When providing a `Final Answer`, ensure it directly and completely addresses the current sub-task's directive, especially the 'precise expected output' if provided in the input.
-    * **If the current sub-task's directive was to use a specific tool and obtain its direct output (e.g., 'get search results', 'generate a report', 'read a file'), and the tool executed successfully providing an `Observation`, your `Final Answer:` for this thought-cycle MUST BE the exact, complete content of that `Observation`. Do not summarize it or describe it (e.g., do not say "The report is available below." or "The tool returned the following content:"); output the tool's result directly as your `Final Answer:` for this step.**
-    * If the sub-task involved using a tool in a *previous turn of this ReAct chain* (i.e., you see an `Observation:` in your `agent_scratchpad` for this current step), and the goal of *this current turn* is to present or process that information, **your `Final Answer` must include the full, relevant information from that `Observation`** unless the directive explicitly asks for a summary or transformation. Do not just refer to the Observation block implicitly.
-3.  **Strict Formatting:** Adhere strictly to the `Thought:` followed by `Action: ... Action Input: ... Observation: ...` sequence (if using a tool for that thought) OR `Thought:` followed by `Final Answer: ...` (if not using a tool for that thought).
-    * No extra text outside this structure.
+1.  **Choose a Format:** For each thought-cycle, you must decide if you are using a tool (Format Option 1) or answering directly (Format Option 2).
+2.  **Using Tool Output (Format Option 1):**
+    * When you use a tool and receive an `Observation`, your *next immediate thought* should be as described in "Format Option 1": acknowledge the tool execution and confirm that the `Observation` content will be your `Final Answer`.
+    * Your `Final Answer:` MUST then be the **exact, verbatim content** of the `Observation`. Do not add introductory phrases like "The tool returned:", "Here is the report:", or "The file content is:". Just provide the raw observation.
+3.  **Direct Answer (Format Option 2):**
+    * Use this if you are *not* calling a tool in the current thought-cycle. Your `Final Answer:` should directly address the 'New input' directive.
+    * If the 'New input' asks you to process information from a *previous* `Observation` (visible in your `agent_scratchpad`), your `Final Answer` should include or be based on that information as instructed.
+4.  **Strict Formatting:** Adhere strictly to one of the two formats above. No extra text outside this structure for each thought-cycle.
 
 Begin!
 Previous conversation history:
