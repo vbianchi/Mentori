@@ -25,8 +25,8 @@ let currentMajorStepDiv = null;
 
 // Map component hints from backend to CSS class modifiers for borders
 const componentBorderColorMap = {
-    DEFAULT: 'agent-line-default', // Should map to a defined CSS var or class
-    USER: 'user-message-line-color', // Special case for user right-hand line
+    DEFAULT: 'agent-line-default', 
+    USER: 'user-message-line-color', 
     SYSTEM: 'agent-line-system',
     INTENT_CLASSIFIER: 'agent-line-intent-classifier',
     PLANNER: 'agent-line-planner',
@@ -43,7 +43,7 @@ const componentBorderColorMap = {
 function initChatUI(elements, callbacks) {
     console.log("[ChatUI] Initializing...");
     chatMessagesContainerElement = elements.chatMessagesContainer;
-    agentThinkingStatusElement = elements.agentThinkingStatusEl; // This is the #agent-thinking-status div
+    agentThinkingStatusElement = elements.agentThinkingStatusEl; 
     chatTextareaElement = elements.chatTextareaEl;
     chatSendButtonElement = elements.chatSendButtonEl;
 
@@ -116,13 +116,13 @@ function handleChatTextareaKeydown(event) {
             adjustTextareaHeight();
         }
     } else {
-        chatHistoryIndex = -1; // Reset on other key presses
+        chatHistoryIndex = -1; 
     }
 }
 
 function handleChatTextareaInput() {
     adjustTextareaHeight();
-    if (chatHistoryIndex !== -1) { // If user types while history item is shown, detach from history
+    if (chatHistoryIndex !== -1) { 
         currentInputBuffer = chatTextareaElement.value;
         chatHistoryIndex = -1;
     }
@@ -130,7 +130,7 @@ function handleChatTextareaInput() {
 
 function adjustTextareaHeight() {
     if (!chatTextareaElement) return;
-    chatTextareaElement.style.height = 'auto'; // Temporarily shrink to get correct scrollHeight
+    chatTextareaElement.style.height = 'auto'; 
     chatTextareaElement.style.height = (chatTextareaElement.scrollHeight) + 'px';
 }
 
@@ -147,62 +147,79 @@ function formatMessageContentInternal(text, isThoughtContentBox = false) {
     if (typeof text !== 'string') {
         text = String(text);
     }
-    // 1. Escape HTML special characters first to prevent XSS or misinterpretation
-    let formattedText = text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
 
-    // 2. Process Markdown for code blocks (```lang\ncode\n```)
-    // Ensure it captures multi-line code correctly and handles optional language
-    formattedText = formattedText.replace(/```(\w*)\n([\s\S]*?)\n?```/g, (match, lang, code) => {
-        const escapedCode = code; // Already HTML escaped
+    // **REVISED STRATEGY for HTML Tag Rendering**
+    // 1. First, convert specific Markdown patterns to HTML tags.
+    //    This needs to be done carefully to avoid conflicts.
+
+    // Code blocks (```lang\ncode\n```) - These should be handled first as they contain arbitrary text.
+    // We temporarily replace them with placeholders, then reinsert them after other Markdown.
+    const codeBlockPlaceholders = [];
+    let tempText = text.replace(/```(\w*)\n([\s\S]*?)\n?```/g, (match, lang, code) => {
+        // Escape HTML within the code block itself to be safe
+        const escapedCode = code.replace(/&/g, "&amp;")
+                                .replace(/</g, "&lt;")
+                                .replace(/>/g, "&gt;");
         const langClass = lang ? ` class="language-${lang}"` : '';
-        return `<pre><code${langClass}>${escapedCode}</code></pre>`;
+        const placeholder = `%%CODEBLOCK_${codeBlockPlaceholders.length}%%`;
+        codeBlockPlaceholders.push(`<pre><code${langClass}>${escapedCode}</code></pre>`);
+        return placeholder;
+    });
+
+    // Inline code (`code`) - also handle with placeholders
+    const inlineCodePlaceholders = [];
+    tempText = tempText.replace(/`([^`]+?)`/g, (match, code) => {
+        const escapedCode = code.replace(/&/g, "&amp;")
+                                .replace(/</g, "&lt;")
+                                .replace(/>/g, "&gt;");
+        const placeholder = `%%INLINECODE_${inlineCodePlaceholders.length}%%`;
+        inlineCodePlaceholders.push(`<code>${escapedCode}</code>`);
+        return placeholder;
     });
     
-    // 3. Process Markdown for inline code (`code`)
-    formattedText = formattedText.replace(/`([^`]+?)`/g, '<code>$1</code>');
-
-    // 4. Process Markdown for links ([text](url))
-    // Ensure this doesn't interfere with already processed HTML, e.g. in <pre>
-    // This regex is a bit safer by looking for non-angle bracket content in link text.
-    formattedText = formattedText.replace(/\[([^<>[\]]+?)\]\((https?:\/\/[^\s)]+)\)/g, (match, linkText, linkUrl) => {
-        const safeLinkUrl = linkUrl.replace(/"/g, "&quot;"); // Sanitize URL further if needed
-        return `<a href="${safeLinkUrl}" target="_blank" rel="noopener noreferrer">${linkText}</a>`;
+    // Links ([text](url))
+    tempText = tempText.replace(/\[([^<>[\]]+?)\]\((https?:\/\/[^\s)]+)\)/g, (match, linkText, linkUrl) => {
+        // Escape linkText and linkUrl parts that will become HTML content/attributes
+        const safeLinkText = linkText.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        const safeLinkUrl = linkUrl.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+        return `<a href="${safeLinkUrl}" target="_blank" rel="noopener noreferrer">${safeLinkText}</a>`;
     });
-    
-    // 5. Process bold/italic, ensuring they don't break inside HTML tags
-    // This is complex with regex. A more robust solution might involve a proper Markdown library
-    // or a more sophisticated splitting strategy. For now, a simplified approach:
-    const parts = formattedText.split(/(<pre>.*?<\/pre>|<a.*?<\/a>|<code>.*?<\/code>)/s);
-    for (let i = 0; i < parts.length; i++) {
-        if (!parts[i].startsWith('<pre') && !parts[i].startsWith('<a') && !parts[i].startsWith('<code')) {
-            // Bold and Italic (***text*** or ___text___)
-            parts[i] = parts[i].replace(/(\*\*\*|___)(?=\S)([\s\S]*?\S)\1/g, '<strong><em>$2</em></strong>');
-            // Bold (**text** or __text__)
-            parts[i] = parts[i].replace(/(\*\*|__)(?=\S)([\s\S]*?\S)\1/g, '<strong>$2</strong>');
-            // Italic (*text* or _text_) - more careful regex to avoid unintended matches
-            parts[i] = parts[i].replace(/(?<![`\w])(?:(\*|_))(?=\S)([\s\S]*?\S)\1(?![`\w])/g, '<em>$2</em>');
-        }
-    }
-    formattedText = parts.join('');
 
-    // 6. Convert newlines to <br> ONLY IF not inside a <pre> tag (pre handles newlines itself)
+    // Bold and Italic (***text*** or ___text___)
+    tempText = tempText.replace(/(\*\*\*|___)(?=\S)([\s\S]*?\S)\1/g, (match, wrapper, content) => `<strong><em>${content.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</em></strong>`);
+    // Bold (**text** or __text__)
+    tempText = tempText.replace(/(\*\*|__)(?=\S)([\s\S]*?\S)\1/g, (match, wrapper, content) => `<strong>${content.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</strong>`);
+    // Italic (*text* or _text_)
+    tempText = tempText.replace(/(?<![`*\w\\])(?:(\*|_))(?=\S)([\s\S]*?\S)\1(?![`*\w])/g, (match, wrapper, content) => `<em>${content.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</em>`);
+
+    // 2. Now, escape remaining HTML special characters in the text that wasn't part of our Markdown conversions.
+    // This is tricky because our Markdown replacements have inserted HTML.
+    // A simpler approach: the initial input `text` should be what we consider "user text".
+    // Our markdown conversions create trusted HTML.
+    // The issue is if the *original* text contained `<` or `&` that wasn't part of markdown.
+    // The previous version's initial full escape was problematic.
+    // Let's assume for now that the markdown conversions handle the necessary escaping for their content.
+    // The main problem was HTML tags being displayed, which means they were being treated as text.
+    // The current `tempText` now contains our generated HTML.
+
+    // 3. Convert newlines to <br> ONLY IF not inside a <pre> tag (which is now a placeholder)
     // and not for thought content box which uses white-space: pre-wrap
     if (!isThoughtContentBox) {
-        const preParts = formattedText.split(/(<pre>.*?<\/pre>)/s);
-        for (let i = 0; i < preParts.length; i++) {
-            if (!preParts[i].startsWith('<pre')) {
-                preParts[i] = preParts[i].replace(/\n/g, '<br>');
+        // Split by code block placeholders to avoid adding <br> inside them
+        const partsForNewline = tempText.split(/(%%CODEBLOCK_\d+%%)/g);
+        for (let i = 0; i < partsForNewline.length; i++) {
+            if (!partsForNewline[i].startsWith('%%CODEBLOCK_')) {
+                partsForNewline[i] = partsForNewline[i].replace(/\n/g, '<br>');
             }
         }
-        formattedText = preParts.join('');
+        tempText = partsForNewline.join('');
     }
 
-    return formattedText;
+    // 4. Reinsert code blocks and inline code
+    tempText = tempText.replace(/%%CODEBLOCK_(\d+)%%/g, (match, index) => codeBlockPlaceholders[parseInt(index)]);
+    tempText = tempText.replace(/%%INLINECODE_(\d+)%%/g, (match, index) => inlineCodePlaceholders[parseInt(index)]);
+    
+    return tempText;
 }
 
 
@@ -211,30 +228,22 @@ function getComponentClass(componentHint) {
     if (componentBorderColorMap[hint]) {
         return componentBorderColorMap[hint];
     }
-    // Dynamic handling for TOOL_ F_X_Y -> agent-line-tool-x-y
     if (hint.startsWith("TOOL_")) {
-        const toolSpecificClass = `agent-line-${hint.toLowerCase().replace(/_/g, '-')}`;
-        // Here, you might check if a CSS rule for toolSpecificClass actually exists.
-        // For now, we'll default to the generic tool class if a very specific one isn't predefined.
-        return componentBorderColorMap.TOOL; // Fallback to generic tool line color
+        return componentBorderColorMap.TOOL; 
     }
-    return componentBorderColorMap.SYSTEM; // Default for unknown hints
+    return componentBorderColorMap.SYSTEM; 
 }
 
-/**
- * Displays a major step announcement in the chat.
- * @param {object} data - Object containing { step_number, total_steps, description, component_hint }
- */
 function displayMajorStepAnnouncementUI(data) {
     if (!chatMessagesContainerElement) {
         console.error("[ChatUI] Chat container missing! Cannot display major step.");
         return;
     }
     
-    const { step_number, total_steps, description } = data; // component_hint not used for major step line itself
+    const { step_number, total_steps, description } = data; 
     
     const stepWrapperDiv = document.createElement('div');
-    stepWrapperDiv.className = 'message message-agent-step'; // No side-line class here
+    stepWrapperDiv.className = 'message message-agent-step'; 
     
     const titleDiv = document.createElement('div');
     titleDiv.className = 'step-title';
@@ -245,7 +254,7 @@ function displayMajorStepAnnouncementUI(data) {
     subContentContainer.className = 'sub-content-container';
     stepWrapperDiv.appendChild(subContentContainer);
     
-    currentMajorStepDiv = stepWrapperDiv; // Set this as the current step for sub-statuses/thoughts
+    currentMajorStepDiv = stepWrapperDiv; 
 
     appendMessageElement(stepWrapperDiv);
     scrollToBottomChat();
@@ -258,10 +267,9 @@ function addChatMessageToUI(messageData, type, options = {}, doScroll = true) {
         return null;
     }
 
-    let baseMessageDiv; // This will be the div that gets appended
-    let contentDiv;     // This is where the actual text/HTML content goes
+    let baseMessageDiv; 
+    let contentHolderDiv; 
 
-    // Extract content and componentHint consistently
     let textContent, componentHint;
     if (typeof messageData === 'string') {
         textContent = messageData;
@@ -275,16 +283,13 @@ function addChatMessageToUI(messageData, type, options = {}, doScroll = true) {
     }
     const effectiveComponentHint = componentHint || 'SYSTEM';
 
-
     if (type === 'user') {
         baseMessageDiv = document.createElement('div');
-        baseMessageDiv.className = 'message message-user-wrapper'; // Wrapper for flex alignment
-        contentDiv = document.createElement('div');
-        contentDiv.className = 'message-user'; // Actual bubble with right border
-        contentDiv.innerHTML = formatMessageContentInternal(textContent);
-        baseMessageDiv.appendChild(contentDiv);
+        baseMessageDiv.className = 'message message-user-wrapper'; 
+        contentHolderDiv = document.createElement('div');
+        contentHolderDiv.className = 'message-user'; 
+        baseMessageDiv.appendChild(contentHolderDiv);
     } else if (type === 'propose_plan_for_confirmation') {
-        // displayPlanConfirmationUI will create and return the full wrapper
         baseMessageDiv = displayPlanConfirmationUI(
             messageData.human_summary, 
             messageData.plan_id, 
@@ -292,36 +297,32 @@ function addChatMessageToUI(messageData, type, options = {}, doScroll = true) {
             messageData.onConfirm, 
             messageData.onCancel,
             messageData.onViewDetails
-        ); // displayPlanConfirmationUI now handles its own appending internally
-        if (!baseMessageDiv) return; // In case displayPlanConfirmationUI fails or doesn't return element
+        ); 
+        if (!baseMessageDiv) return;
     } else {
-        // For system_status, agent_message (final), confirmed_plan_log
         baseMessageDiv = document.createElement('div');
-        baseMessageDiv.className = 'message message-outer-blue-line'; // Wrapper with unified blue line
+        baseMessageDiv.className = 'message message-outer-blue-line'; 
 
-        contentDiv = document.createElement('div'); // Inner div for specific styling
-        baseMessageDiv.appendChild(contentDiv);
+        contentHolderDiv = document.createElement('div'); 
+        baseMessageDiv.appendChild(contentHolderDiv);
 
         if (type === 'status_message') {
-            contentDiv.className = 'message-system-status-content';
-            contentDiv.innerHTML = formatMessageContentInternal(textContent);
+            contentHolderDiv.className = 'message-system-status-content';
             if (options.isError || String(textContent).toLowerCase().includes("error")) {
-                contentDiv.classList.add('error-text'); // Apply error text color
+                contentHolderDiv.classList.add('error-text'); 
             }
-        } else if (type === 'agent_message') { // Final agent output
-            contentDiv.className = 'message-agent-final-content'; // Bubble style
-            contentDiv.innerHTML = formatMessageContentInternal(textContent);
-            currentMajorStepDiv = null; // Final message, reset current step context
+        } else if (type === 'agent_message') { 
+            contentHolderDiv.className = 'message-agent-final-content'; 
+            currentMajorStepDiv = null; 
         } else if (type === 'confirmed_plan_log' && textContent) {
-            contentDiv.className = 'message-plan-proposal-content'; // Similar to proposal
-            // Parse and render the confirmed plan log (similar to displayPlanConfirmationUI but static)
+            contentHolderDiv.className = 'message-plan-proposal-content'; 
             try {
-                const planData = JSON.parse(textContent); // textContent is the JSON string here
+                const planData = JSON.parse(textContent); 
                 const planBlock = document.createElement('div');
-                planBlock.className = 'plan-proposal-block plan-confirmed-static'; // Add static class
+                planBlock.className = 'plan-proposal-block plan-confirmed-static'; 
                 
                 const titleElement = document.createElement('h4');
-                titleElement.textContent = planData.title || 'Confirmed Plan (from history):';
+                titleElement.innerHTML = formatMessageContentInternal(planData.title || 'Confirmed Plan (from history):');
                 planBlock.appendChild(titleElement);
 
                 const summaryElement = document.createElement('p');
@@ -331,7 +332,7 @@ function addChatMessageToUI(messageData, type, options = {}, doScroll = true) {
 
                 const detailsDiv = document.createElement('div');
                 detailsDiv.className = 'plan-steps-details';
-                detailsDiv.style.display = 'block'; // Always show details for confirmed log
+                detailsDiv.style.display = 'block'; 
                 const ol = document.createElement('ol');
                 if (planData.steps && Array.isArray(planData.steps)) {
                     planData.steps.forEach(step => {
@@ -346,7 +347,7 @@ function addChatMessageToUI(messageData, type, options = {}, doScroll = true) {
                 }
                 detailsDiv.appendChild(ol);
                 planBlock.appendChild(detailsDiv);
-                contentDiv.appendChild(planBlock);
+                contentHolderDiv.appendChild(planBlock); 
 
                 if (planData.timestamp) {
                     const timestampP = document.createElement('p');
@@ -356,46 +357,50 @@ function addChatMessageToUI(messageData, type, options = {}, doScroll = true) {
                     timestampP.textContent = `Originally Confirmed: ${new Date(planData.timestamp).toLocaleString()}`;
                     planBlock.appendChild(timestampP);
                 }
+                textContent = null; 
             } catch (e) {
                 console.error("[ChatUI] Error parsing confirmed_plan_log data from history:", e, "Raw Data:", textContent);
-                contentDiv.innerHTML = formatMessageContentInternal(`Error displaying confirmed plan from history.`);
+                textContent = `Error displaying confirmed plan from history.`; 
+                contentHolderDiv.innerHTML = formatMessageContentInternal(textContent);
             }
-        } else { // Fallback for any other type that might be routed here erroneously
-            contentDiv.className = 'message-content-text'; // Generic content
-            contentDiv.innerHTML = formatMessageContentInternal(textContent);
-            baseMessageDiv.classList.add(getComponentClass(effectiveComponentHint)); // Add component line if not blue
+        } else { 
+            contentHolderDiv.className = 'message-content-text'; 
+            baseMessageDiv.classList.add(getComponentClass(effectiveComponentHint)); 
         }
     }
     
-    if (baseMessageDiv) { // Ensure baseMessageDiv was created (e.g. not handled by displayPlanConfirmationUI directly)
+    if (contentHolderDiv && textContent !== null) { 
+        contentHolderDiv.innerHTML = formatMessageContentInternal(textContent);
+    }
+    
+    if (baseMessageDiv) { 
         appendMessageElement(baseMessageDiv);
     }
 
     if (doScroll) {
         scrollToBottomChat();
     }
-    return baseMessageDiv; // Return the top-level appended element
+    return baseMessageDiv; 
 }
 
 
 function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfirm, onCancel, onViewDetails) {
     if (!chatMessagesContainerElement) return null;
 
-    // Remove any existing plan proposals to avoid duplicates
     chatMessagesContainerElement.querySelectorAll('.plan-confirmation-wrapper').forEach(ui => ui.remove());
 
     const planWrapper = document.createElement('div');
-    planWrapper.className = 'message message-outer-blue-line plan-confirmation-wrapper'; // Wrapper for blue line
-    planWrapper.dataset.planId = planId; // Store planId on the wrapper
+    planWrapper.className = 'message message-outer-blue-line plan-confirmation-wrapper'; 
+    planWrapper.dataset.planId = planId; 
 
     const planContentDiv = document.createElement('div');
-    planContentDiv.className = 'message-plan-proposal-content'; // Inner content div
+    planContentDiv.className = 'message-plan-proposal-content'; 
     
-    const planBlock = document.createElement('div'); // The actual dark block for plan
+    const planBlock = document.createElement('div'); 
     planBlock.className = 'plan-proposal-block';
 
     const titleElement = document.createElement('h4');
-    titleElement.textContent = 'Agent Proposed Plan:';
+    titleElement.textContent = 'Agent Proposed Plan:'; 
     planBlock.appendChild(titleElement);
 
     const summaryElement = document.createElement('p');
@@ -405,7 +410,7 @@ function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfi
 
     const detailsDiv = document.createElement('div');
     detailsDiv.className = 'plan-steps-details';
-    detailsDiv.style.display = 'none'; // Initially hidden
+    detailsDiv.style.display = 'none'; 
 
     const ol = document.createElement('ol');
     if (structuredPlan && Array.isArray(structuredPlan)) {
@@ -419,7 +424,7 @@ function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfi
             ol.appendChild(li);
         });
     } else {
-        ol.innerHTML = "<li>Plan details not available.</li>";
+        ol.innerHTML = "<li>Plan details not available.</li>"; 
     }
     detailsDiv.appendChild(ol);
     planBlock.appendChild(detailsDiv);
@@ -428,7 +433,7 @@ function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfi
     viewDetailsBtn.className = 'plan-toggle-details-btn';
     viewDetailsBtn.textContent = 'View Details';
     viewDetailsBtn.title = `View detailed plan for proposal ${planId}`;
-    viewDetailsBtn.onclick = (e) => {
+    viewDetailsBtn.onclick = (e) => { 
         e.stopPropagation();
         const isHidden = detailsDiv.style.display === 'none';
         detailsDiv.style.display = isHidden ? 'block' : 'none';
@@ -456,9 +461,9 @@ function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfi
     planContentDiv.appendChild(planBlock);
     planWrapper.appendChild(planContentDiv);
 
-    appendMessageElement(planWrapper); // Append the fully constructed plan UI
+    appendMessageElement(planWrapper); 
     scrollToBottomChat();
-    return planWrapper; // Return the main wrapper element
+    return planWrapper; 
 }
 
 
@@ -466,11 +471,9 @@ function transformToConfirmedPlanUI(planId) {
     if (!chatMessagesContainerElement) return;
     const planWrapper = chatMessagesContainerElement.querySelector(`.plan-confirmation-wrapper[data-plan-id="${planId}"]`);
     if (!planWrapper) {
-        // If the original proposal UI isn't found (e.g., after refresh), add a simple status message
         addChatMessageToUI(`Plan (ID: ${planId.substring(0,8)}...) confirmed. Executing steps...`, 'status_message', {component_hint: 'SYSTEM'});
         return;
     }
-    // The planWrapper already has .message-outer-blue-line
     
     const planBlock = planWrapper.querySelector('.plan-proposal-block');
     if (!planBlock) return;
@@ -478,7 +481,7 @@ function transformToConfirmedPlanUI(planId) {
     planBlock.classList.add('plan-confirmed-static');
 
     const titleElement = planBlock.querySelector('h4');
-    if (titleElement) titleElement.textContent = 'Plan Confirmed:';
+    if (titleElement) titleElement.textContent = 'Plan Confirmed:'; 
     
     const viewDetailsBtn = planBlock.querySelector('.plan-toggle-details-btn');
     if (viewDetailsBtn) viewDetailsBtn.remove();
@@ -487,15 +490,15 @@ function transformToConfirmedPlanUI(planId) {
     if (actionsDiv) actionsDiv.remove();
 
     const detailsDiv = planBlock.querySelector('.plan-steps-details');
-    if (detailsDiv) detailsDiv.style.display = 'block'; // Ensure details are visible
+    if (detailsDiv) detailsDiv.style.display = 'block'; 
 
     let statusP = planBlock.querySelector('.plan-execution-status-confirmed');
     if (!statusP) {
         statusP = document.createElement('p');
         statusP.className = 'plan-execution-status-confirmed';
-        planBlock.appendChild(statusP); // Append to the dark block
+        planBlock.appendChild(statusP); 
     }
-    statusP.textContent = `Status: Confirmed & Execution Started (at ${new Date().toLocaleTimeString()})`;
+    statusP.textContent = `Status: Confirmed & Execution Started (at ${new Date().toLocaleTimeString()})`; 
     scrollToBottomChat();
 }
 
@@ -505,21 +508,19 @@ function showAgentThinkingStatusInUI(show, statusUpdateObject = { message: "Thin
     let displayMessage = "Thinking...";
     let componentHint = statusUpdateObject?.component_hint || "SYSTEM";
     let statusKey = statusUpdateObject?.status_key || "UNKNOWN_STATUS";
-    let subType = statusUpdateObject?.sub_type; // 'sub_status' or 'thought'
+    let subType = statusUpdateObject?.sub_type; 
 
-    if (typeof statusUpdateObject === 'string') { // Legacy or simple message
+    if (typeof statusUpdateObject === 'string') { 
         displayMessage = statusUpdateObject;
     } else if (statusUpdateObject && typeof statusUpdateObject.message === 'string') {
         displayMessage = statusUpdateObject.message;
     } else if (statusUpdateObject && typeof statusUpdateObject.message === 'object' && subType === 'thought') {
-        // For thoughts, message is { label, content_markdown }
-        // displayMessage will be handled by the thought rendering logic
+        // Content for thought is in statusUpdateObject.message.content_markdown
     } else if (statusUpdateObject && statusUpdateObject.message) {
-         displayMessage = String(statusUpdateObject.message); // Fallback
+         displayMessage = String(statusUpdateObject.message); 
     }
 
-
-    const isFinalStateForBottomLine = ["IDLE", "CANCELLED", "ERROR", "PLAN_FAILED", "DIRECT_QA_COMPLETED", "DIRECT_QA_FAILED", "UNKNOWN_INTENT", "AWAITING_PLAN_CONFIRMATION"].includes(statusKey);
+    const isFinalStateForBottomLine = ["IDLE", "CANCELLED", "ERROR", "PLAN_FAILED", "DIRECT_QA_COMPLETED", "DIRECT_QA_FAILED", "UNKNOWN_INTENT", "AWAITING_PLAN_CONFIRMATION", "PLAN_STOPPED", "PLAN_COMPLETED_ISSUES"].includes(statusKey);
 
     if (show && currentMajorStepDiv && (subType === 'sub_status' || subType === 'thought')) {
         const subContentContainer = currentMajorStepDiv.querySelector('.sub-content-container');
@@ -530,7 +531,7 @@ function showAgentThinkingStatusInUI(show, statusUpdateObject = { message: "Thin
                 nestedMessageDiv.className = `message message-agent-substatus ${getComponentClass(componentHint)}`;
                 const contentEl = document.createElement('div');
                 contentEl.className = 'content';
-                contentEl.innerHTML = formatMessageContentInternal(`<i>${displayMessage}</i>`);
+                contentEl.innerHTML = formatMessageContentInternal(`<em>${displayMessage}</em>`);
                 nestedMessageDiv.appendChild(contentEl);
             } else if (subType === 'thought' && statusUpdateObject.message && typeof statusUpdateObject.message === 'object') {
                 nestedMessageDiv = document.createElement('div');
@@ -538,39 +539,34 @@ function showAgentThinkingStatusInUI(show, statusUpdateObject = { message: "Thin
                 
                 const labelEl = document.createElement('div');
                 labelEl.className = 'thought-label';
-                labelEl.textContent = statusUpdateObject.message.label || `${componentHint} thought:`;
+                labelEl.innerHTML = formatMessageContentInternal(statusUpdateObject.message.label || `${componentHint} thought:`);
                 nestedMessageDiv.appendChild(labelEl);
 
                 const contentBoxEl = document.createElement('div');
                 contentBoxEl.className = 'thought-content-box';
-                contentBoxEl.innerHTML = formatMessageContentInternal(statusUpdateObject.message.content_markdown, true); // true for isThoughtContentBox
+                contentBoxEl.innerHTML = formatMessageContentInternal(statusUpdateObject.message.content_markdown, true); 
                 nestedMessageDiv.appendChild(contentBoxEl);
             }
 
             if (nestedMessageDiv) {
                 subContentContainer.appendChild(nestedMessageDiv);
-                // Optionally hide or set global line to Idle if a sub-status/thought is more prominent
                 agentThinkingStatusElement.style.display = 'none'; 
                 scrollToBottomChat();
-                return; // Handled as a nested message
+                return; 
             }
         }
     }
     
-    // Fallback to global status line OR if it's a final state OR no currentMajorStepDiv
     if (show) {
-        agentThinkingStatusElement.innerHTML = formatMessageContentInternal(displayMessage); // Use innerHTML for italic if displayMessage contains it
-        agentThinkingStatusElement.className = `message agent-thinking-status ${getComponentClass(componentHint)}`;
+        agentThinkingStatusElement.innerHTML = formatMessageContentInternal(displayMessage); 
+        agentThinkingStatusElement.className = `message agent-thinking-status ${getComponentClass(componentHint)}`; 
         agentThinkingStatusElement.style.display = 'block';
-        // Ensure it's the last child
         if (chatMessagesContainerElement.lastChild !== agentThinkingStatusElement) {
             chatMessagesContainerElement.appendChild(agentThinkingStatusElement);
         }
     } else { 
-        // If explicitly told to hide, or if a final state implies hiding the "Thinking..." part
-        // and showing a final "Idle." or "Error."
         if (isFinalStateForBottomLine) {
-            agentThinkingStatusElement.innerHTML = formatMessageContentInternal(displayMessage); // Show the final state message
+            agentThinkingStatusElement.innerHTML = formatMessageContentInternal(displayMessage); 
             agentThinkingStatusElement.className = `message agent-thinking-status ${getComponentClass(componentHint)}`;
             agentThinkingStatusElement.style.display = 'block';
             if (chatMessagesContainerElement.lastChild !== agentThinkingStatusElement) {
@@ -582,7 +578,7 @@ function showAgentThinkingStatusInUI(show, statusUpdateObject = { message: "Thin
     }
 
     if (isFinalStateForBottomLine) {
-        currentMajorStepDiv = null; // Reset context for major steps
+        currentMajorStepDiv = null; 
     }
     scrollToBottomChat();
 }
@@ -591,29 +587,24 @@ function showAgentThinkingStatusInUI(show, statusUpdateObject = { message: "Thin
 function clearChatMessagesUI() {
     if (chatMessagesContainerElement) {
         const thinkingStatus = agentThinkingStatusElement; 
-        chatMessagesContainerElement.innerHTML = ''; // Clear all
+        chatMessagesContainerElement.innerHTML = ''; 
         if (thinkingStatus) { 
-            chatMessagesContainerElement.appendChild(thinkingStatus); // Re-add the (now empty/hidden) status line
+            chatMessagesContainerElement.appendChild(thinkingStatus); 
             thinkingStatus.style.display = 'none';
-            thinkingStatus.textContent = ''; // Clear its content too
+            thinkingStatus.innerHTML = ''; 
         }
-        currentMajorStepDiv = null; // Reset current step context
+        currentMajorStepDiv = null; 
     }
 }
 
 function scrollToBottomChat() {
     if (chatMessagesContainerElement) {
-        // Timeout helps ensure DOM has updated, especially if images/complex content was added
         setTimeout(() => {
             chatMessagesContainerElement.scrollTop = chatMessagesContainerElement.scrollHeight;
         }, 0);
     }
 }
 
-/**
- * Appends a message element to the chat container, ensuring the thinking status line remains last.
- * @param {HTMLElement} messageElement - The message element to append.
- */
 function appendMessageElement(messageElement) {
     if (!chatMessagesContainerElement || !messageElement) return;
 
