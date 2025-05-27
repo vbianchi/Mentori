@@ -2,7 +2,7 @@
 
 /**
  * Manages the Chat UI.
- * - Renders chat messages (user, agent, status, step announcements).
+ * - Renders chat messages (user, agent, status, step announcements, sub-statuses).
  * - Handles Markdown formatting.
  * - Displays plan proposals and confirmed plans.
  * - Manages chat input and thinking status.
@@ -25,8 +25,8 @@ let currentMajorStepDiv = null;
 
 // Map component hints from backend to CSS class modifiers for borders
 const componentBorderColorMap = {
-    DEFAULT: 'agent-line-default', // For final agent messages with bubbles
-    USER: 'user-line-accent', // Should not have a line, but for consistency
+    DEFAULT: 'agent-line-default',
+    USER: 'user-line-accent', // Not used for lines, but for consistency
     SYSTEM: 'agent-line-system',
     INTENT_CLASSIFIER: 'agent-line-intent-classifier',
     PLANNER: 'agent-line-planner',
@@ -34,16 +34,16 @@ const componentBorderColorMap = {
     EXECUTOR: 'agent-line-executor',
     EVALUATOR_STEP: 'agent-line-evaluator-step',
     EVALUATOR_OVERALL: 'agent-line-evaluator-overall',
-    TOOL: 'agent-line-tool', // Generic tool
-    // Specific tools can be added if needed, e.g., TOOL_TAVILY_SEARCH_API: 'agent-line-tool-tavily'
+    TOOL: 'agent-line-tool',
+    // Specific tools can be dynamically generated if needed: e.g. TOOL_TAVILY_SEARCH_API -> agent-line-tool-tavily-search-api
     WARNING: 'agent-line-warning',
-    ERROR: 'agent-line-error' // For recoverable/intermediate errors in thinking status
+    ERROR: 'agent-line-error'
 };
 
 function initChatUI(elements, callbacks) {
     console.log("[ChatUI] Initializing...");
     chatMessagesContainerElement = elements.chatMessagesContainer;
-    agentThinkingStatusElement = elements.agentThinkingStatusEl; // Global status line
+    agentThinkingStatusElement = elements.agentThinkingStatusEl;
     chatTextareaElement = elements.chatTextareaEl;
     chatSendButtonElement = elements.chatSendButtonEl;
 
@@ -59,7 +59,6 @@ function initChatUI(elements, callbacks) {
     chatTextareaElement.addEventListener('keydown', handleChatTextareaKeydown);
     chatTextareaElement.addEventListener('input', handleChatTextareaInput);
     
-    // Keep global thinking status clickable for now (e.g., to scroll monitor)
     agentThinkingStatusElement.addEventListener('click', () => {
         if (typeof onThinkingStatusClickCallback === 'function') {
             onThinkingStatusClickCallback();
@@ -77,8 +76,8 @@ function handleSendButtonClick() {
         addMessageToInputHistory(messageText);
         chatTextareaElement.value = '';
         adjustTextareaHeight();
-        currentInputBuffer = ""; // Reset buffer after send
-        chatHistoryIndex = -1;    // Reset history index
+        currentInputBuffer = ""; 
+        chatHistoryIndex = -1;    
     }
     chatTextareaElement.focus();
 }
@@ -88,10 +87,9 @@ function handleChatTextareaKeydown(event) {
         event.preventDefault();
         handleSendButtonClick();
     } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-        if (chatInputHistory.length === 0 && chatTextareaElement.value.trim() === "") return; // Allow default if field is empty and no history
+        if (chatInputHistory.length === 0 && chatTextareaElement.value.trim() === "") return;
         
         if (chatHistoryIndex === -1 && (chatTextareaElement.value.trim() !== "" || event.key === 'ArrowUp')) {
-             // Only save to buffer if navigating away from current non-empty input or starting history nav
             if (chatInputHistory.length > 0 || event.key === 'ArrowUp') {
                  currentInputBuffer = chatTextareaElement.value;
             }
@@ -101,34 +99,32 @@ function handleChatTextareaKeydown(event) {
         if (event.key === 'ArrowUp') {
             if (chatInputHistory.length > 0) {
                 newHistoryIndex = (chatHistoryIndex === -1) ? chatInputHistory.length - 1 : Math.max(0, chatHistoryIndex - 1);
-            } else { return; } // No history, do nothing
+            } else { return; }
         } else if (event.key === 'ArrowDown') {
             if (chatHistoryIndex !== -1 && chatHistoryIndex < chatInputHistory.length - 1) {
                 newHistoryIndex++;
-            } else { // Reached end of history or was not in history
-                newHistoryIndex = -1; // Go to current input buffer
+            } else { 
+                newHistoryIndex = -1;
             }
         }
 
         if (newHistoryIndex !== chatHistoryIndex || (event.key === 'ArrowDown' && chatHistoryIndex === chatInputHistory.length - 1) ) {
-            event.preventDefault(); // Prevent cursor move only if history changes or trying to go past buffer
+            event.preventDefault(); 
             chatHistoryIndex = newHistoryIndex;
             chatTextareaElement.value = (chatHistoryIndex === -1) ? currentInputBuffer : chatInputHistory[chatHistoryIndex];
             chatTextareaElement.selectionStart = chatTextareaElement.selectionEnd = chatTextareaElement.value.length;
             adjustTextareaHeight();
         }
     } else {
-        // Any other key press resets history navigation state for next up/down
         chatHistoryIndex = -1;
     }
 }
 
 function handleChatTextareaInput() {
     adjustTextareaHeight();
-    // If user types, they are no longer navigating history with currentInputBuffer
     if (chatHistoryIndex !== -1) {
-        currentInputBuffer = chatTextareaElement.value; // Update buffer as they might have edited a history item
-        chatHistoryIndex = -1; // Exit history navigation mode
+        currentInputBuffer = chatTextareaElement.value;
+        chatHistoryIndex = -1;
     }
 }
 
@@ -145,8 +141,6 @@ function addMessageToInputHistory(messageText) {
             chatInputHistory.shift();
         }
     }
-    // chatHistoryIndex = -1; // Resetting here might be too aggressive if user sends then immediately tries to nav
-    // currentInputBuffer = ""; // Also potentially too aggressive
 }
 
 function formatMessageContentInternal(text) {
@@ -161,7 +155,7 @@ function formatMessageContentInternal(text) {
         .replace(/'/g, "&#039;");
 
     formattedText = formattedText.replace(/```(\w*)\n([\s\S]*?)\n?```/g, (match, lang, code) => {
-        const escapedCode = code; // Already HTML escaped
+        const escapedCode = code;
         const langClass = lang ? ` class="language-${lang}"` : '';
         return `<pre><code${langClass}>${escapedCode}</code></pre>`;
     });
@@ -170,12 +164,10 @@ function formatMessageContentInternal(text) {
     
     formattedText = formattedText.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (match, linkText, linkUrl) => {
         const safeLinkUrl = linkUrl.replace(/"/g, "&quot;");
-        // Avoid re-hyperlinking already escaped links from markdown
         if (linkText.includes('&lt;') || linkText.includes('&gt;')) return match;
         return `<a href="${safeLinkUrl}" target="_blank" rel="noopener noreferrer">${linkText}</a>`;
     });
 
-    // Bold and Italic handling - ensure it doesn't mess with code or pre blocks
     const parts = formattedText.split(/(<pre>.*?<\/pre>|<a.*?<\/a>|<code>.*?<\/code>)/s);
     for (let i = 0; i < parts.length; i++) {
         if (!parts[i].startsWith('<pre') && !parts[i].startsWith('<a') && !parts[i].startsWith('<code')) {
@@ -186,7 +178,6 @@ function formatMessageContentInternal(text) {
         }
     }
     formattedText = parts.join('');
-
     return formattedText;
 }
 
@@ -195,77 +186,126 @@ function getComponentClass(componentHint) {
     if (componentBorderColorMap[hint]) {
         return componentBorderColorMap[hint];
     }
-    // Handle tool-specific hints like TOOL_TAVILY_SEARCH_API_START
-    if (hint.startsWith("TOOL_")) {
-        return componentBorderColorMap.TOOL; // Fallback to generic tool color
+    if (hint.startsWith("TOOL_")) { // e.g. TOOL_TAVILY_SEARCH_API
+        const specificToolClass = `agent-line-${hint.toLowerCase().replace(/_/g, '-')}`;
+        // Check if a specific CSS class exists for this tool, otherwise use generic tool class
+        // This check would ideally be against actual CSS rules, but for now, assume generic if not in map
+        return componentBorderColorMap.TOOL; 
     }
     return componentBorderColorMap.SYSTEM; // Default for unknown hints
 }
 
-function addChatMessageToUI(messageData, type, doScroll = true) {
+// <<< --- START NEW FUNCTION --- >>>
+/**
+ * Displays a major step announcement in the chat.
+ * @param {object} data - Object containing { step_number, total_steps, description, component_hint }
+ */
+function displayMajorStepAnnouncementUI(data) {
+    if (!chatMessagesContainerElement) {
+        console.error("[ChatUI] Chat container missing! Cannot display major step.");
+        return;
+    }
+    
+    const { step_number, total_steps, description, component_hint } = data;
+    
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message', 'message-agent-step', getComponentClass(component_hint || 'SYSTEM'));
+    
+    const textContentDiv = document.createElement('div');
+    textContentDiv.className = 'message-content-text';
+    textContentDiv.innerHTML = formatMessageContentInternal(`<strong>Step ${step_number}/${total_steps}: ${description}</strong>`);
+    messageElement.appendChild(textContentDiv);
+    
+    const subStatusContainer = document.createElement('div');
+    subStatusContainer.className = 'sub-status-container';
+    messageElement.appendChild(subStatusContainer);
+    
+    currentMajorStepDiv = messageElement; // Set this as the current step for sub-statuses
+
+    // Append logic (handles existing thinking status line)
+    const thinkingStatusWasLast = agentThinkingStatusElement.parentNode === chatMessagesContainerElement &&
+                                 chatMessagesContainerElement.lastChild === agentThinkingStatusElement;
+    if (thinkingStatusWasLast) {
+        chatMessagesContainerElement.insertBefore(messageElement, agentThinkingStatusElement);
+    } else {
+        chatMessagesContainerElement.appendChild(messageElement);
+    }
+    scrollToBottomChat();
+    console.log(`[ChatUI] Displayed Major Step Announcement: Step ${step_number}/${total_steps}`);
+}
+// <<< --- END NEW FUNCTION --- >>>
+
+
+function addChatMessageToUI(messageData, type, options = {}, doScroll = true) {
     if (!chatMessagesContainerElement) {
         console.error("[ChatUI] Chat container missing! Cannot add message:", messageData);
         return null;
     }
 
+    // Handle direct call for plan proposal
+    if (type === 'propose_plan_for_confirmation' && typeof messageData === 'object' && messageData !== null) {
+        displayPlanConfirmationUI(
+            messageData.human_summary, 
+            messageData.plan_id, 
+            messageData.structured_plan,
+            messageData.onConfirm, // These are callback functions passed from script.js
+            messageData.onCancel,
+            messageData.onViewDetails
+        );
+        return; // displayPlanConfirmationUI handles its own appending
+    }
+    
     const messageElement = document.createElement('div');
-    let content, componentHint, stepInfo;
+    let content, componentHint;
 
     if (typeof messageData === 'string') {
         content = messageData;
+        componentHint = options.component_hint;
     } else if (typeof messageData === 'object' && messageData !== null) {
-        content = messageData.content || messageData.text || (messageData.message ? messageData.message : JSON.stringify(messageData)); // Ensure some content
-        componentHint = messageData.component_hint;
-        stepInfo = messageData.step_info; // e.g., { current: 1, total: 3, description: "..." } for step announcements
-        if (type === 'agent_major_step_announcement' && messageData.description) {
-            content = `**Step ${messageData.step_number}/${messageData.total_steps}: ${messageData.description}**`;
-        }
+        content = messageData.content || messageData.text || (messageData.message ? messageData.message : JSON.stringify(messageData));
+        componentHint = messageData.component_hint || options.component_hint;
     } else {
-        content = String(messageData); // Fallback
+        content = String(messageData);
+        componentHint = options.component_hint;
     }
     
     messageElement.classList.add('message');
+    const effectiveComponentHint = componentHint || 'SYSTEM'; // Default if no hint provided
 
     if (type === 'user') {
         messageElement.classList.add('message-user');
-        // User messages get a bubble by default from CSS
-    } else if (type === 'agent_message') { // This is now for the FINAL agent message
-        messageElement.classList.add('message-agent-final', getComponentClass(componentHint || 'DEFAULT'));
-    } else if (type === 'agent_major_step_announcement') {
-        messageElement.classList.add('message-agent-step', getComponentClass(componentHint || 'SYSTEM'));
-        currentMajorStepDiv = messageElement; // Track this for sub-statuses
-        const subStatusContainer = document.createElement('div');
-        subStatusContainer.className = 'sub-status-container';
-        messageElement.appendChild(subStatusContainer); // Add it now, showAgentThinkingStatusInUI will populate
+    } else if (type === 'agent_message') { // Final agent output
+        messageElement.classList.add('message-agent-final', getComponentClass(effectiveComponentHint));
+        currentMajorStepDiv = null; // A final message means the plan/sequence is over
     } else if (type === 'status_message') {
-        messageElement.classList.add('message-status', getComponentClass(componentHint || 'SYSTEM'));
+        messageElement.classList.add('message-status', getComponentClass(effectiveComponentHint));
         const lowerText = String(content).toLowerCase();
-        if (lowerText.includes("connect") || lowerText.includes("clos")) {
-            messageElement.classList.add('connection-status');
-        }
-        if (lowerText.includes("error")) {
-            messageElement.classList.add('error-message', componentBorderColorMap.ERROR);
+        if (lowerText.includes("connect") || lowerText.includes("clos")) messageElement.classList.add('connection-status');
+        if (options.isError || lowerText.includes("error")) { // Check options.isError for explicit error styling
+            messageElement.classList.add('error-message');
+            // Ensure error line color if not already set by component hint
+            if (!messageElement.classList.contains(componentBorderColorMap.ERROR)) {
+                 messageElement.classList.add(componentBorderColorMap.ERROR);
+            }
         }
     } else if (type === 'confirmed_plan_log' && content) {
-        messageElement.classList.remove('message-agent-final'); // Ensure it's not bubbled by default
         messageElement.classList.add('message-system', 'plan-confirmation-container', 'plan-confirmed-static', getComponentClass('PLANNER'));
+        // ... (parsing and rendering logic for confirmed_plan_log remains the same) ...
         try {
             const planData = JSON.parse(content);
             const titleElement = document.createElement('h4');
             titleElement.textContent = planData.title || 'Confirmed Plan (from history):';
             messageElement.appendChild(titleElement);
-
             const summaryElement = document.createElement('p');
             summaryElement.className = 'plan-summary';
             summaryElement.innerHTML = formatMessageContentInternal(planData.summary || "Summary not available.");
             messageElement.appendChild(summaryElement);
-
             const detailsDiv = document.createElement('div');
             detailsDiv.className = 'plan-steps-details';
             detailsDiv.style.display = 'block'; 
             const ol = document.createElement('ol');
             if (planData.steps && Array.isArray(planData.steps)) {
-                planData.steps.forEach(step => {
+                planData.steps.forEach(step => { /* ... step rendering ... */ 
                     const li = document.createElement('li');
                     const stepDescription = `<strong>${step.step_id}. ${formatMessageContentInternal(step.description)}</strong>`;
                     const toolUsed = (step.tool_to_use && step.tool_to_use !== "None") ? `<br><span class="step-tool">Tool: ${formatMessageContentInternal(step.tool_to_use)}</span>` : '';
@@ -277,7 +317,7 @@ function addChatMessageToUI(messageData, type, doScroll = true) {
             }
             detailsDiv.appendChild(ol);
             messageElement.appendChild(detailsDiv);
-            if (planData.timestamp) {
+            if (planData.timestamp) { /* ... timestamp rendering ... */
                 const timestampP = document.createElement('p');
                 timestampP.style.fontSize = '0.8em';
                 timestampP.style.color = 'var(--text-color-muted)';
@@ -289,38 +329,17 @@ function addChatMessageToUI(messageData, type, doScroll = true) {
             console.error("[ChatUI] Error parsing confirmed_plan_log data:", e, "Raw Data:", content);
             messageElement.innerHTML = formatMessageContentInternal(`Error displaying confirmed plan from history.`);
         }
-    } else { // Generic agent intermediate messages if not caught above
-         messageElement.classList.add('message-agent-intermediate', getComponentClass(componentHint || 'SYSTEM'));
+    } else { 
+         messageElement.classList.add('message-agent-intermediate', getComponentClass(effectiveComponentHint));
     }
 
-    // Common content handling
     if (type !== 'propose_plan_for_confirmation' && type !== 'confirmed_plan_log') {
-         // The actual text content for non-plan messages
         const textContentDiv = document.createElement('div');
-        textContentDiv.className = 'message-content-text'; // For main text styling
+        textContentDiv.className = 'message-content-text';
         textContentDiv.innerHTML = formatMessageContentInternal(content);
-        
-        // If it's a major step, this textContentDiv is the primary part. Sub-statuses go into its child.
-        if (type === 'agent_major_step_announcement') {
-            // Insert title content before the sub-status container
-            const subStatusContainer = messageElement.querySelector('.sub-status-container');
-            if (subStatusContainer) {
-                messageElement.insertBefore(textContentDiv, subStatusContainer);
-            } else { // Should not happen if subStatusContainer is always added
-                messageElement.appendChild(textContentDiv);
-            }
-        } else {
-            messageElement.appendChild(textContentDiv);
-        }
-    } else if (type === 'propose_plan_for_confirmation' && messageData) {
-        // displayPlanConfirmationUI now takes messageData directly
-        displayPlanConfirmationUI(messageData.human_summary, messageData.plan_id, messageData.structured_plan, 
-            messageData.onConfirm, messageData.onCancel, messageData.onViewDetails);
-        return; // displayPlanConfirmationUI appends its own element
+        messageElement.appendChild(textContentDiv);
     }
-
-
-    // Append logic
+    
     const thinkingStatusWasLast = agentThinkingStatusElement.parentNode === chatMessagesContainerElement &&
                                  chatMessagesContainerElement.lastChild === agentThinkingStatusElement;
     if (thinkingStatusWasLast) {
@@ -336,6 +355,8 @@ function addChatMessageToUI(messageData, type, doScroll = true) {
 }
 
 function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfirm, onCancel, onViewDetails) {
+    // ... (This function remains largely the same as in v2, but ensure it's called correctly by addChatMessageToUI)
+    // It should also use getComponentClass('PLANNER') for its main container.
     if (!chatMessagesContainerElement) return;
 
     const existingPlanUIs = chatMessagesContainerElement.querySelectorAll('.plan-confirmation-container');
@@ -343,7 +364,7 @@ function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfi
 
     const planContainer = document.createElement('div');
     planContainer.className = 'message message-system plan-confirmation-container';
-    planContainer.classList.add(getComponentClass('PLANNER')); // Planner color for proposal
+    planContainer.classList.add(getComponentClass('PLANNER')); 
     planContainer.dataset.planId = planId;
 
     const titleElement = document.createElement('h4');
@@ -408,14 +429,21 @@ function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfi
     scrollToBottomChat();
 }
 
+
 function transformToConfirmedPlanUI(planId) {
+    // ... (This function remains largely the same as in v2)
     if (!chatMessagesContainerElement) return;
     const planContainer = chatMessagesContainerElement.querySelector(`.plan-confirmation-container[data-plan-id="${planId}"]`);
     if (!planContainer) {
-        addChatMessageToUI(`Plan (ID: ${planId.substring(0,8)}...) confirmed.`, 'status_message', { component_hint: 'SYSTEM' });
+        addChatMessageToUI(`Plan (ID: ${planId.substring(0,8)}...) confirmed.`, 'status_message', {component_hint: 'SYSTEM'});
         return;
     }
     planContainer.classList.add('plan-confirmed-static');
+    // Retain planner color for confirmed plan
+    // planContainer.classList.remove(getComponentClass('PLANNER')); 
+    // planContainer.classList.add(getComponentClass('SYSTEM'));
+
+
     const titleElement = planContainer.querySelector('h4');
     if (titleElement) titleElement.textContent = 'Plan Confirmed:';
     
@@ -426,7 +454,7 @@ function transformToConfirmedPlanUI(planId) {
     if (actionsDiv) actionsDiv.remove();
 
     const detailsDiv = planContainer.querySelector('.plan-steps-details');
-    if (detailsDiv) detailsDiv.style.display = 'block'; // Ensure details are visible
+    if (detailsDiv) detailsDiv.style.display = 'block';
 
     let statusP = planContainer.querySelector('.plan-execution-status-confirmed');
     if (!statusP) {
@@ -436,68 +464,69 @@ function transformToConfirmedPlanUI(planId) {
         statusP.style.marginTop = '10px';
         statusP.style.color = 'var(--accent-color)';
         statusP.style.fontWeight = '500';
-        planContainer.appendChild(statusP); // Append at the end
+        planContainer.appendChild(statusP);
     }
     statusP.textContent = `Status: Confirmed & Execution Started (at ${new Date().toLocaleTimeString()})`;
     scrollToBottomChat();
 }
 
-
 function showAgentThinkingStatusInUI(show, statusUpdateObject = { message: "Thinking...", status_key: "DEFAULT_THINKING", component_hint: "SYSTEM" }) {
     if (!agentThinkingStatusElement || !chatMessagesContainerElement) return;
 
     let displayMessage = "Thinking...";
-    let componentHint = "SYSTEM";
+    let componentHint = statusUpdateObject?.component_hint || "SYSTEM"; // Default to SYSTEM if no hint
+    let statusKey = statusUpdateObject?.status_key || "UNKNOWN_STATUS";
 
-    if (typeof statusUpdateObject === 'string') { // Legacy or simple message
+    if (typeof statusUpdateObject === 'string') {
         displayMessage = statusUpdateObject;
     } else if (statusUpdateObject && typeof statusUpdateObject.message === 'string') {
         displayMessage = statusUpdateObject.message;
-        componentHint = statusUpdateObject.component_hint || componentHint;
     }
     
-    const isIdleOrFinal = ["IDLE", "CANCELLED", "PLAN_FAILED", "DIRECT_QA_COMPLETED", "DIRECT_QA_FAILED", "UNKNOWN_INTENT"].includes(statusUpdateObject?.status_key);
+    const isIdleOrFinal = ["IDLE", "CANCELLED", "PLAN_FAILED", "DIRECT_QA_COMPLETED", "DIRECT_QA_FAILED", "UNKNOWN_INTENT", "AWAITING_PLAN_CONFIRMATION"].includes(statusKey);
 
     if (show && !isIdleOrFinal && currentMajorStepDiv) {
-        // Append as sub-status to the current major step
         const subStatusContainer = currentMajorStepDiv.querySelector('.sub-status-container');
         if (subStatusContainer) {
             const subStatusDiv = document.createElement('div');
-            subStatusDiv.className = `message-agent-substatus ${getComponentClass(componentHint)}`;
+            // Add base class and component-specific class for border
+            subStatusDiv.className = `message message-agent-substatus ${getComponentClass(componentHint)}`;
             
             const italicEl = document.createElement('i');
             italicEl.textContent = displayMessage;
-            subStatusDiv.appendChild(italicEl);
+            
+            const contentDiv = document.createElement('div'); // Wrapper for text content
+            contentDiv.className = 'message-content-text';
+            contentDiv.appendChild(italicEl);
+            subStatusDiv.appendChild(contentDiv);
 
-            // Clear previous sub-statuses in this container before adding new one, or append?
-            // For now, let's append to show a trail under the current step.
             subStatusContainer.appendChild(subStatusDiv);
-            agentThinkingStatusElement.style.display = 'none'; // Hide global one if sub-status is shown
+            agentThinkingStatusElement.style.display = 'none'; 
             scrollToBottomChat();
             return; 
         }
     }
     
-    // Fallback to global status line if not showing sub-status or if it's an idle/final state
+    // Fallback to global status line
     if (show) {
-        agentThinkingStatusElement.textContent = displayMessage;
-        agentThinkingStatusElement.className = `message message-status agent-thinking-status ${getComponentClass(componentHint)}`; // Apply color class
-        agentThinkingStatusElement.style.display = 'block';
-        // Ensure it's at the bottom
-        if (chatMessagesContainerElement.lastChild !== agentThinkingStatusElement) {
-            chatMessagesContainerElement.appendChild(agentThinkingStatusElement);
-        }
-    } else {
-        agentThinkingStatusElement.style.display = 'none';
-    }
-    if (isIdleOrFinal) { // Ensure global status is updated for idle/final
         agentThinkingStatusElement.textContent = displayMessage;
         agentThinkingStatusElement.className = `message message-status agent-thinking-status ${getComponentClass(componentHint)}`;
         agentThinkingStatusElement.style.display = 'block';
         if (chatMessagesContainerElement.lastChild !== agentThinkingStatusElement) {
             chatMessagesContainerElement.appendChild(agentThinkingStatusElement);
         }
-        currentMajorStepDiv = null; // Reset active major step when agent goes idle/final
+    } else { // if show is false
+        agentThinkingStatusElement.style.display = 'none';
+    }
+
+    if (isIdleOrFinal) { // Ensure global status is updated for idle/final and currentMajorStepDiv is reset
+        agentThinkingStatusElement.textContent = displayMessage;
+        agentThinkingStatusElement.className = `message message-status agent-thinking-status ${getComponentClass(componentHint)}`;
+        agentThinkingStatusElement.style.display = 'block';
+        if (chatMessagesContainerElement.lastChild !== agentThinkingStatusElement) {
+            chatMessagesContainerElement.appendChild(agentThinkingStatusElement);
+        }
+        currentMajorStepDiv = null; 
     }
     scrollToBottomChat();
 }
@@ -505,13 +534,13 @@ function showAgentThinkingStatusInUI(show, statusUpdateObject = { message: "Thin
 
 function clearChatMessagesUI() {
     if (chatMessagesContainerElement) {
-        const thinkingStatus = agentThinkingStatusElement; // Keep a reference
+        const thinkingStatus = agentThinkingStatusElement; 
         chatMessagesContainerElement.innerHTML = '';
-        if (thinkingStatus) { // Re-append if it was there
+        if (thinkingStatus) { 
             chatMessagesContainerElement.appendChild(thinkingStatus);
             thinkingStatus.style.display = 'none';
         }
-        currentMajorStepDiv = null; // Reset active major step
+        currentMajorStepDiv = null; 
     }
 }
 
