@@ -1,60 +1,45 @@
 # ResearchAgent: AI Assistant for Research Workflows (v2.5.3 - UI/UX Refinements In Progress)
 
 This project provides a functional user interface and backend for an AI agent system designed to assist with research tasks, particularly in fields like bioinformatics and epidemiology. It features a three-panel layout (Tasks, Chat, Monitor/Artifact Viewer) and connects via WebSockets to a Python backend powered by LangChain.
-**Targeting Version 2.5.3**
+
+Targeting Version 2.5.3
 
 **Recent Developments (Leading to v2.5.3 Target):**
 
-* **Core Bug Fixes & Feature Verification (Complete):**
-    * Resolved critical `IndentationError` issues in `backend/message_processing/agent_flow_handlers.py`.
-    * `deep_research_synthesizer` & `write_file` Flow Fully Functional.
-* **Chat UI/UX Refinement (Design Solidified, Backend & Frontend Implementation Next):**
-    * **New Vision (Inspired by `manus.ai` and iterative refinement, target: `simulation_option6.html`):** Aiming for a highly intuitive and clear chat interface. This involves:
-        * **User Messages:** Right-aligned with a bubble and a right-hand side-line matching the user's accent color.
-        * **System Messages (Status, Plan Proposals, Final Agent Response):** These messages (e.g., "Loading history...", plan proposal blocks, final agent summary) will feature a unified blue outer left-hand side-line. Plan proposals and final agent responses will have distinct background bubbles.
-        * **Major Step Announcements:** Messages like "Step 1/N: Doing X" will appear left-aligned *without* a side-line or background bubble, with the title in bold.
-        * **Nested Sub-Statuses & Agent Thoughts:**
-            * Significant agent sub-statuses (e.g., "Controller: Validating step...", "Executor: Using tool Y...") will appear as new, sequential messages *indented under their parent major step announcement*. They will be italicized, have no background bubble, and feature a component-specific colored left-hand side-line.
-            * Verbose "thoughts" or preliminary outputs from agent components (e.g., Controller's reasoning) will also be displayed indented under the relevant major step. They will have normal font, no bubble, a component-specific colored left-hand side-line, a label (e.g., "Controller thought:"), and their content presented in a distinct dark box (similar to a `<pre>` block).
-        * **Persistent Bottom "Thinking" Line:** A single line at the very bottom of the scrollable chat area for low-level, rapidly updating "Thinking (LLM)..." statuses. This line will update in place and feature a dynamic, component-specific colored left-hand side-line.
-    * **Backend Support (Partially Implemented, Enhancements Required):**
-        * `callbacks.py` and `agent_flow_handlers.py` send structured `agent_thinking_update` messages with `component_hint` and new `agent_major_step_announcement` types.
-        * **Persistence Strategy:** Backend logic (in `server.py`, `task_handlers.py`, `db_utils.py`) will be enhanced to save all new message types (major steps, sub-statuses, agent thoughts) to the database with appropriate structures and `message_type` identifiers. These will be reloaded with chat history to ensure full persistence.
-* **Plan Proposal UI & Persistence (Complete):** Remains functional.
-* **Monitor Log Enhancements (Ongoing):**
-    * Backend sends `log_source`. Frontend `monitor_ui.js` adds CSS classes. CSS styling for colors is the next step here.
+-   **Core Bug Fixes & Feature Verification (Largely Complete):**
+    -   Resolved critical `IndentationError` issues in backend.
+    -   `deep_research_synthesizer` & `write_file` Flow: Core logic for actual execution is now in place, replacing placeholder outputs.
+    -   `UnboundLocalError` in `callbacks.py` related to token usage parsing: **FIXED.**
+-   **Chat UI/UX Refinement (Partially Implemented, Ongoing Fixes):**
+    -   **Visual Design (Target: `simulation_option6.html`):**
+        -   User messages with right side-lines, system/plan/final messages with unified blue outer left side-lines, no side-lines for major step announcements, and nested/indented component-specific lines for sub-statuses & agent thoughts are implemented.
+        -   HTML tags (`<strong>`, `<em>`) are now rendering correctly in the chat.
+    -   **Backend Support & Persistence:**
+        -   Backend sends structured messages for steps, sub-statuses, and thoughts.
+        -   Persistence for these new message types in the database and reloading into history is implemented.
+-   **Plan Proposal UI & Persistence (Complete):** Remains functional.
 
 ## Core Architecture & Workflow
 
-The ResearchAgent processes user queries through a sophisticated pipeline:
-1.  **Intent Classification**: Determines if a query requires direct answering or multi-step planning.
-2.  **Planning (if required)**: An LLM-based Planner generates a sequence of steps.
-3.  **User Confirmation (for plans)**: The proposed plan is shown to the user for approval.
-4.  **Execution**: A Controller validates each step, and an Executor (ReAct agent) carries out the action, using tools as needed. A Step Evaluator assesses each step's outcome, allowing for retries.
-5.  **Overall Evaluation**: A final assessment of the plan's success is provided.
-
-For more detailed information on the P-C-E-E pipeline and task flow, please refer to `BRAINSTORM.md`.
-For future development plans, see `ROADMAP.md`.
+(No changes to this section)
 
 ## Key Current Capabilities & Features
 
 1.  **UI & User Interaction:**
-    * Task Management with persistent storage and reliable UI updates.
-    * Chat Interface with Markdown rendering, input history, interactive plan proposals.
-    * **Chat UI Target (v2.5.3):** A refined interface as per `simulation_option6.html` (detailed above and in `BRAINSTORM.md`), featuring clear visual hierarchy for steps, sub-statuses, agent thoughts, and a persistent bottom thinking line. All chat elements will be persistent across sessions.
-    * Role-Specific LLM Selection.
-    * Monitor Panel for structured agent logs.
-    * Artifact Viewer for text/image/PDF outputs.
-    * Token Usage Tracking.
-    * File upload capability to task workspaces.
+    -   Task Management: Creation, deletion, renaming functional. Workspace folders managed correctly.
+    -   Chat Interface:
+        -   **Rendering:** Correctly displays styled HTML tags. Implements the new visual hierarchy for steps, sub-statuses, and thoughts as per `simulation_option6.html`.
+        -   **Persistence:** All chat message types, including the new structured ones, are saved and reloaded.
+    -   Role-Specific LLM Selection.
+    -   Monitor Panel for structured agent logs.
+    -   Artifact Viewer.
+    -   Token Usage Tracking.
+    -   File upload capability.
 2.  **Backend Architecture & Logic:**
-    * Modular Python backend with refactored message handlers.
-    * LangChain for P-C-E-E pipeline.
-    * Task-specific, isolated workspaces with persistent history (SQLite).
-    * **Tool Integration Fixed:** Robust input and output handling for complex tools.
-    * **Message Structure & Persistence:** Refined WebSocket messages (`agent_major_step_announcement`, `agent_thinking_update` with `component_hint` and `sub_type`) to support the new UI vision. All chat-relevant messages, including steps, sub-statuses, and thoughts, will be saved to and reloaded from the database.
-3.  **Tool Suite (`backend/tools/`):**
-    * `deep_research_synthesizer` and `write_file` are working correctly in sequence. Other tools remain functional.
+    -   Modular Python backend. LangChain for P-C-E-E pipeline.
+    -   Task-specific, isolated workspaces with persistent history (SQLite).
+    -   **Actual Plan Execution:** Backend now attempts full execution of plan steps, including tool usage and LLM generation, replacing previous placeholder logic.
+    -   **Message Structure & Persistence:** Implemented for all chat-relevant messages.
 
 ## Tech Stack
 
@@ -118,20 +103,12 @@ ResearchAgent/
 
 ## Known Issues / Immediate Next Steps (Targeting v2.5.3 Fixes)
 
-* **IMPLEMENT (High Priority): New Chat UI Rendering & Persistence:**
-    * **Issue:** Current chat UI does not yet reflect the `simulation_option6.html` design (unified outer blue lines, no line on major steps, nested/indented component-specific lines for sub-statuses & thoughts, user message right line, persistent bottom thinking line, consistent thought styling, and full message persistence).
-    * **Goal:** Update `script.js`, `chat_ui.js`, and `style.css` based on the vision captured in `simulation_option6.html` and our detailed plan. Implement backend changes for saving and loading all new message structures to ensure full persistence.
-    * **Status:** Backend sends some foundational messages. Significant frontend implementation and backend persistence enhancements are the next major tasks.
-* **BUG FIX (Medium Priority): Chat Input Unresponsive:**
-    * **Issue:** After a task completes, chat input sometimes remains disabled.
-    * **Goal:** Ensure `StateManager.isAgentRunning` is correctly reset and UI re-enables input.
-* **DEBUG (Medium Priority): Monitor Log Color-Coding:**
-    * **Issue:** Visual differentiation by `log_source` in the Monitor Log is not yet appearing correctly.
-    * **Goal:** Implement effective color-coding.
-    * **Action:** Create/Debug CSS rules in `style.css`.
-* **Fix (Low Priority): `<strong>` Tag Rendering in Chat:**
-    * **Issue:** User noted some HTML tags (like `<strong>`) not rendering correctly.
-    * **Goal:** Ensure `innerHTML` is consistently used for content processed by `formatMessageContentInternal` in `chat_ui.js`.
+-   **NEW TASK CONNECTION (High Priority):** Newly created tasks do not immediately establish full context with the backend. Requires an interaction attempt (like sending a message) and then a page refresh to function correctly.
+-   **ARTIFACT VIEWER REFRESH (Medium Priority):** The artifact viewer does not consistently or immediately auto-update after a task completes and writes files, even if logs indicate a refresh was triggered.
+-   **TOKEN COUNTER (Medium Priority):** The UI token counter is no longer updating.
+-   **FILE UPLOAD (High Priority):** File upload functionality is broken, resulting in an HTTP 501 "Not Implemented" error from the backend.
+-   **PLAN FILE STATUS UPDATE (Low Priority):** Backend logs still show warnings about not finding step patterns to update status checkboxes in the `_plan_{id}.md` artifact.
+-   **"UNKNOWN" HISTORY MESSAGE TYPES (Low Priority - Review):** Some internal system message types are logged to the monitor from history; confirm this is the desired behavior for all such types.
 
 ## Security Warnings
 
@@ -139,5 +116,5 @@ ResearchAgent/
 
 ## Next Steps & Future Perspectives
 
-The immediate focus is on implementing the new Chat UI rendering logic on the frontend and the corresponding persistence mechanisms on the backend. Following that, efforts will target the remaining known issues.
+The immediate focus is on resolving the critical bugs related to new task connection, file uploads, and token counter functionality. Following that, artifact viewer refresh and other minor issues will be addressed.
 For a detailed, evolving roadmap and ongoing brainstorming, please see **`ROADMAP.md`** and **`BRAINSTORM.md`**.
