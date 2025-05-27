@@ -1,5 +1,4 @@
-BRAINSTORM.md - ResearchAgent Project (v2.5.3 Target)
-=====================================================
+# BRAINSTORM.md - ResearchAgent Project (v2.5.3 Target)
 
 This document tracks the current workflow, user feedback, and immediate brainstorming ideas for the ResearchAgent project.
 
@@ -8,145 +7,67 @@ Current Version & State (Targeting v2.5.3):
 Recent key advancements and fixes:
 
 -   Core Agent Logic & Tool Integration (RESOLVED):
-
-    -   `deep_research_synthesizer` & `write_file` Flow: The critical bug chain preventing the actual content from `deep_research_synthesizer` being saved by `write_file` has been resolved. This involved fixes in:
-
-        -   `backend/controller.py`: Ensuring correct JSON string input for tools.
-
-        -   `backend/agent.py`: Refining the ReAct agent prompt to output raw tool observations as its `Final Answer`.
-
-        -   `backend/evaluator.py`: Making the Step Evaluator stricter about verifying actual content generation.
-
-    -   Backend `IndentationError` issues in `agent_flow_handlers.py` have been resolved.
-
--   Chat UI/UX Refinement (Design Solidified, Backend Ready, Frontend Implementation Next):
-
-    -   New Vision (Inspired by `manus.ai` and User Feedback):
-
-        -   Sequential Main Messages: User inputs, major plan step announcements (e.g., "Step 1/N: Doing X"), and significant agent sub-statuses (e.g., "Controller: Validating step...", "Executor: Using tool Y...", "Evaluator: Step Z complete.") will appear sequentially in the main chat area. Each of these messages will have a colored side-line indicating the source/component (e.g., Planner blue, Controller orange, Executor green, Tool teal, Evaluator purple, System grey) and will *not* have a background bubble (except for user messages and the final agent conclusive message).
-
-        -   Persistent Bottom "Thinking" Line: A single, unobtrusive line at the very bottom of the chat area will be dedicated to displaying low-level, rapidly updating "Thinking (LLM)...", "LLM complete.", or "Tool X processing..." statuses from `callbacks.py`. This line will update in place and also feature a colored side-line corresponding to the active component.
-
-        -   Final Agent Message: Will appear in a distinct, styled bubble with its own colored side-line.
-
-    -   `simulation.html` (Conceptual Guide): The vision for this UI is captured in a conceptual HTML/Markdown mock-up, detailed below in "Chat UI Simulation (Conceptual)". This serves as the visual target for frontend development.
-
-    -   Backend Message Structure Ready:
-
-        -   `callbacks.py`: Sends structured `agent_thinking_update` messages with `component_hint` (e.g., `LLM_CORE`, `TOOL_TAVILY_SEARCH_API`) for frontend styling decisions. `on_tool_error` messages are now less alarming in chat.
-
-        -   `agent_flow_handlers.py`: Sends new `agent_major_step_announcement` WebSocket message type for each plan step (containing step number, total steps, description, component hint). Other `agent_thinking_update` messages from here also include `component_hint`.
-
-    -   Status Message Persistence (Backend Complete):
-
-        -   Critical `status_message` types (e.g., "Loading history...", "Plan processing stopped...") are now saved to the database by `server.py`.
-
-        -   `task_handlers.py` now loads and sends these saved `status_message`s to the frontend when chat history is repopulated, ensuring they persist across page refreshes.
-
--   Plan Proposal UI & Persistence (COMPLETE): Remains functional.
-
+    -   `deep_research_synthesizer` & `write_file` Flow: Fully resolved.
+    -   Backend `IndentationError` issues: Resolved.
+-   Chat UI/UX Refinement (Design Solidified based on `simulation_option6.html`, Backend & Frontend Implementation Next):
+    -   **New Vision (Target: `simulation_option6.html`):**
+        -   **User Messages:** Right-aligned bubble with a right-hand side-line matching the user's accent color.
+        -   **Unified Blue Outer Side-Lines:** General system status messages (e.g., "Loading history...", "Plan confirmed..."), plan proposal blocks, and the final agent conclusive message will feature a consistent blue left-hand side-line.
+        -   **Major Step Announcements:** Messages like "Step 1/N: Doing X" will be left-aligned, bold, and will _not_ have a side-line or background bubble.
+        -   **Nested Sub-Statuses:** Significant agent sub-statuses (e.g., "Controller: Validating...", "Executor: Using tool...") will appear as new, sequential messages _indented under their parent major step announcement_. They will be italicized, have no background bubble, and feature a component-specific colored left-hand side-line (e.g., Controller orange, Tool teal).
+        -   **Nested Agent Thoughts/Verbose Outputs:** More detailed "thoughts" or preliminary outputs from agent components will also be displayed indented under the relevant major step. They will have normal font, no bubble, a component-specific colored left-hand side-line, a label (e.g., "Controller thought:"), and their content presented in a distinct dark box (similar to a `<pre>` block, especially for code-like content).
+        -   **Persistent Bottom "Thinking" Line:** A single line at the very bottom of the _scrollable chat area_ for low-level, rapidly updating "Thinking (LLM)..." statuses. This line will update in place and feature a dynamic, component-specific colored left-hand side-line.
+        -   **Final Agent Message:** Will appear in a distinct, styled bubble with the unified blue left-hand side-line.
+    -   **Backend Message Structure & Persistence Strategy (Enhancements Required):**
+        -   `callbacks.py` & `agent_flow_handlers.py`: Will send structured `agent_thinking_update` messages with `component_hint` and a new `sub_type` field (e.g., `'sub_status'`, `'thought'`) to differentiate rendering on the frontend. `agent_major_step_announcement` messages are already defined.
+        -   **Persistence:** All new message structures (major steps, sub-statuses, thoughts) will be saved to the database (`db_utils.py`, `server.py`) with distinct `message_type` identifiers. `task_handlers.py` will be updated to load and send these historical messages to the frontend, ensuring they are correctly dispatched and rendered with their specific styling and nesting.
+    -   **Status Message Persistence (Backend Partially Complete):** Critical `status_message` types are saved. This will be extended for the new message structures.
+-   Plan Proposal UI & Persistence (COMPLETE): Remains functional, will adopt the unified blue outer side-line.
 -   Monitor Log Enhancements (Backend Ready, Frontend CSS Next):
-
-    -   Backend provides `log_source` for monitor entries. Frontend `monitor_ui.js` adds CSS classes. CSS styling for colors is pending.
+    -   Backend provides `log_source`. CSS styling for colors is pending.
 
 Immediate Focus & User Feedback / Known Issues:
 
-1.  IMPLEMENT (High Priority): New Chat UI Rendering (Frontend Task):
+1.  **IMPLEMENT (High Priority): New Chat UI Rendering & Persistence (Frontend & Backend Task):**
+    -   **Issue:** Current chat UI does not yet reflect the `simulation_option6.html` design. Full persistence for all message types is not yet implemented.
+    -   **Goal:** Update frontend (`script.js`, `chat_ui.js`, `style.css`) and backend (`db_utils.py`, `server.py`, `task_handlers.py`, `agent_flow_handlers.py`, `callbacks.py`) to implement the vision.
+        -   **`style.css`:**
+            -   Add styles for user message right side-line.
+            -   Implement unified blue outer left side-line for system status, plan proposals, final agent messages.
+            -   Remove side-lines from major step announcement elements.
+            -   Add styles for indented, component-colored side-lines for sub-statuses and agent thoughts.
+            -   Style agent thought content (label + dark box).
+            -   Ensure persistent bottom thinking line is styled correctly and placed as the last scrollable item.
+            -   Define all component-specific side-line color classes.
+        -   **`chat_ui.js`:**
+            -   `addChatMessageToUI`: Modify to handle wrapper divs for messages needing the unified blue outer line. Correctly render user messages with the right side-line. Delegate rendering of sub-statuses and thoughts.
+            -   `displayMajorStepAnnouncementUI`: Render major steps without side-lines. Create a container within for nested sub-content. Set `currentMajorStepDiv`.
+            -   `showAgentThinkingStatusInUI`:
+                -   If `currentMajorStepDiv` is set and `statusUpdateObject.sub_type` is 'sub\_status' or 'thought', append the new message (sub-status or thought with its specific styling and side-line) to the sub-content container of `currentMajorStepDiv`.
+                -   Otherwise, update the persistent bottom `#agent-thinking-status` line with its dynamic component side-line.
+                -   Reset `currentMajorStepDiv` when a final state (Idle, Error, Cancelled) is reached or a new final agent message is displayed.
+            -   `formatMessageContentInternal`: Ensure robust Markdown to HTML conversion, especially for code blocks within thoughts.
+            -   Ensure all historical messages (including new types) are rendered correctly when loaded.
+        -   **`script.js`:**
+            -   `dispatchWsMessage`: Correctly route `agent_major_step_announcement` to `displayMajorStepAnnouncementUI`. Route `agent_thinking_update` (with `sub_type`) to `showAgentThinkingStatusInUI`. Ensure final `agent_message` updates the bottom thinking line to "Idle". Handle new historical message types.
+        -   **Backend:** Implement saving and loading for `db_major_step_announcement`, `db_agent_sub_status`, `db_agent_thought` message types. Ensure WebSocket messages for historical items are structured for correct frontend dispatch.
+    -   **Persistence Check:** Verify that all styled messages (steps, sub-statuses, thoughts, etc.) are persistent after page refresh.
+2.  **BUG FIX (Medium Priority): Chat Input Unresponsive:**
+    -   **Issue:** After a task completes, chat input sometimes remains disabled.
+    -   **Goal:** Ensure `StateManager.isAgentRunning` is correctly reset and UI re-enables input, tied to the "Idle" state of the bottom thinking line.
+3.  **DEBUG (Medium Priority): Monitor Log Color-Coding:**
+    -   **Issue:** Visual differentiation by `log_source` in the Monitor Log is not yet appearing correctly.
+    -   **Goal:** Implement effective color-coding in `style.css`.
+4.  **Fix (Low Priority): `<strong>` Tag Rendering in Chat:**
+    -   **Issue:** User noted some HTML tags (like `<strong>`) not rendering correctly.
+    -   **Goal:** Ensure `innerHTML` is consistently used for content processed by `formatMessageContentInternal`.
 
-    -   Issue: Current chat UI (based on user-provided baseline files) does not yet reflect the new `manus.ai`-inspired design.
+Chat UI Simulation Details (Based on `simulation_option6.html`):
 
-    -   Goal: Update `script.js`, `chat_ui.js`, and `style.css` (from the user-provided baseline) to implement the vision captured in the "Chat UI Simulation (Conceptual)" section below.
-
-        -   `script.js`: Ensure `agent_major_step_announcement` is correctly dispatched.
-
-        -   `chat_ui.js`:
-
-            -   Implement rendering for `agent_major_step_announcement` as distinct, non-bubbled messages with colored side-lines.
-
-            -   Refactor `showAgentThinkingStatusInUI` to:
-
-                -   Update the persistent bottom line for low-level LLM churn messages.
-
-                -   Render significant sub-statuses as new, distinct, non-bubbled messages in the main chat flow by calling `addChatMessageToUI`.
-
-            -   Ensure `status_message`s (live and from history) are rendered left-aligned with a system-colored side-line (fixing previous centering).
-
-            -   Fix `<strong>` tag rendering by consistently using `innerHTML` for formatted content.
-
-        -   `style.css`: Add all necessary CSS rules for the new message appearances and colored side-lines.
-
-    -   Persistence Check: Verify that the newly styled status messages are indeed persistent after page refresh.
-
-2.  BUG FIX (Medium Priority): Chat Input Unresponsive:
-
-    -   Issue: After a task completes, chat input sometimes remains disabled.
-
-    -   Goal: Ensure `StateManager.isAgentRunning` is correctly reset and UI re-enables input.
-
-3.  DEBUG (Medium Priority): Monitor Log Color-Coding:
-
-    -   Issue: Visual differentiation by `log_source` in the Monitor Log is not yet appearing correctly.
-
-    -   Goal: Implement effective color-coding.
-
-    -   Action: Create/Debug CSS rules in `style.css`. Verify `log_source` consistency from all backend logging points.
-
-Chat UI Simulation (Conceptual - Represents `simulation.html` idea):
-
-*This simulation details the target look and feel for the chat interface.*
-
--   User Messages: Standard bubble, right-aligned (e.g., user accent color `#0D9488`).
-
-    -   Example: `Create a heatmap with random data and save it as "heatmap.png"`
-
--   Agent/System Messages (Sequential, Non-Bubbled, with Side-Lines):
-
-    -   Intent Classifier Update: (Left-aligned, Light Blue side-line #5DADE2, no bubble, italic)
-
-        _Intent: This task requires planning. Generating a plan..._
-
-    -   Planner Update & Plan Proposal: (Left-aligned, Medium Blue side-line #3498DB, no bubble)
-
-        Okay, I'll create a plan to generate a heatmap...
-
-        Here's the proposed plan:
-
-        (Plan Proposal Block - styled distinctly, Planner blue accent line/theme)
-
-    -   System Status (e.g., Plan Confirmed): (Left-aligned, Grey side-line #7F8C8D, no bubble, italic)
-
-        _Plan confirmed. Starting execution..._
-
-    -   Agent Major Step Announcement: (Left-aligned, Controller Orange side-line #E67E22, no bubble)
-
-        **Step 1/5: Install required Python packages (numpy, matplotlib, seaborn).**
-
-    -   Agent Significant Sub-Status (Controller): (Left-aligned, Controller Orange side-line, no bubble, italic)
-
-        _Controller: Validating step, preparing \python_package_installer`..._`
-
-    -   Agent Significant Sub-Status (Executor/Tool): (Left-aligned, Tool Teal side-line #1ABC9C, no bubble, italic)
-
-        _Executor: Installing \numpy, matplotlib, seaborn`..._`
-
-    -   Agent Significant Sub-Status (Evaluator): (Left-aligned, Evaluator Purple side-line #9B59B6, no bubble, italic)
-
-        _Evaluator: Packages installed successfully._
-
-    -   *(This pattern repeats for each step and its significant sub-statuses)*
-
-    -   Warning Example (if a recoverable error happened): (Left-aligned, Warning Amber side-line #F39C12, no bubble, italic)
-
-        _Warning: Initial attempt for Step X failed, retrying..._
-
--   Agent Final Conclusive Message: (Left-aligned, Default Agent Dark Green side-line #0F766E, WITH background bubble)
-
-    The heatmap has been successfully generated... You can find it in the Artifacts panel.
-
--   Persistent Bottom "Thinking" Line (Single line at the very bottom of the chat, updates in place):
-
-    -   (Side-line color changes based on component: LLM Core grey `#7f8c8d`, Controller orange `#E67E22`, etc.)
-
-    -   Example Text: `_Thinking (Controller LLM)..._` which then updates to `_Controller LLM complete._` or `_Idle._`
-
-This refined workflow aims for clarity, providing a high-level sequential log of actions in the main chat, while relegating very rapid, low-level "thinking" updates to a persistent but unobtrusive bottom line.
+-   **User Messages:** Right-aligned bubble, user accent color, right-hand side-line (darker user accent).
+-   **System Status / Plan Proposal / Final Agent Message:** Left-aligned, unified blue side-line. Bubbles for proposal and final agent message.
+-   **Agent Major Step Announcement:** Left-aligned, NO side-line, bold title (e.g., "Step 1/5: Action...").
+-   **Nested Sub-Content (under Major Step):**
+    -   **Sub-Statuses:** Indented, italic, component-specific colored left side-line (e.g., "Controller: Validating...").
+    -   **Agent Thoughts:** Indented, normal font, component-specific colored left side-line, label ("Controller thought:"), content in dark box.
+-   **Persistent Bottom "Thinking" Line:** Last scrollable item, italic, dynamic component-specific colored left side-line (e.g., "Thinking (LLM Core)...", "Idle.").

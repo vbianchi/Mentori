@@ -6,23 +6,21 @@ This project provides a functional user interface and backend for an AI agent sy
 **Recent Developments (Leading to v2.5.3 Target):**
 
 * **Core Bug Fixes & Feature Verification (Complete):**
-    * Resolved critical `IndentationError` issues in `backend/message_processing/agent_flow_handlers.py`, enabling stable plan execution.
-    * **`deep_research_synthesizer` & `write_file` Flow Fully Functional:**
-        * The Controller now robustly provides correctly formatted JSON string input to `deep_research_synthesizer`.
-        * The ReAct agent (`agent.py`) prompt has been significantly improved to ensure it outputs the direct raw content from tools as its `Final Answer` for a step.
-        * The Step Evaluator (`evaluator.py`) prompt is stricter in verifying actual content generation against expected outcomes.
-        * End-to-end execution of plans involving `deep_research_synthesizer` (generating a report) followed by `write_file` (saving that report) is now working correctly, with the actual content being saved to the file.
-* **Chat UI/UX Refinement (Design Solidified, Backend Ready, Frontend Implementation Next):**
-    * **New Vision (Inspired by `manus.ai` and User Feedback):** Aiming for a cleaner, more intuitive chat interface. This involves:
-        * **Sequential Main Messages:** User inputs, major plan step announcements (e.g., "Step 1/N: Doing X"), and significant agent sub-statuses (e.g., "Controller: Validating step...", "Executor: Using tool Y...", "Evaluator: Step Z complete.") will appear sequentially in the main chat area. Each of these messages will have a colored side-line indicating the source/component (e.g., Planner blue, Controller orange, Executor green, Tool teal, Evaluator purple, System grey) and will *not* have a background bubble (except for user messages and the final agent conclusive message).
-        * **Persistent Bottom "Thinking" Line:** A single, unobtrusive line at the very bottom of the chat area will be dedicated to displaying low-level, rapidly updating "Thinking (LLM)...", "LLM complete.", or "Tool X processing..." statuses from `callbacks.py`. This line will update in place and also feature a colored side-line corresponding to the active component.
-        * **Final Agent Message:** Will appear in a distinct, styled bubble with its own colored side-line.
-    * **`simulation.html` (Conceptual Guide):** The vision for this UI is captured in a conceptual HTML/Markdown mock-up (which could be saved as `simulation.html` or is detailed in `BRAINSTORM.md`). It illustrates the desired flow with user messages (bubbled), agent major step announcements (left-aligned, no bubble, component-colored side-line, bold title), sequential significant sub-status updates (also left-aligned, no bubble, italicized, with component-colored side-lines), the persistent bottom thinking line, and the final agent response in a distinct bubble.
-    * **Backend Support Implemented:**
-        * `callbacks.py`: Updated to send more structured `agent_thinking_update` messages with `component_hint` for frontend styling. Error reporting refined.
-        * `agent_flow_handlers.py`: Updated to send new `agent_major_step_announcement` message type for each plan step. `agent_thinking_update` messages now also include `component_hint`. Final plan output logic improved.
-        * **Status Message Persistence (Backend Complete):** Backend logic (in `server.py` and `task_handlers.py`) has been updated to save `status_message` types to the database and reload them with chat history, making them persistent across page refreshes.
-* **Plan Proposal UI & Persistence (Complete):** Remains functional as previously developed.
+    * Resolved critical `IndentationError` issues in `backend/message_processing/agent_flow_handlers.py`.
+    * `deep_research_synthesizer` & `write_file` Flow Fully Functional.
+* **Chat UI/UX Refinement (Design Solidified, Backend & Frontend Implementation Next):**
+    * **New Vision (Inspired by `manus.ai` and iterative refinement, target: `simulation_option6.html`):** Aiming for a highly intuitive and clear chat interface. This involves:
+        * **User Messages:** Right-aligned with a bubble and a right-hand side-line matching the user's accent color.
+        * **System Messages (Status, Plan Proposals, Final Agent Response):** These messages (e.g., "Loading history...", plan proposal blocks, final agent summary) will feature a unified blue outer left-hand side-line. Plan proposals and final agent responses will have distinct background bubbles.
+        * **Major Step Announcements:** Messages like "Step 1/N: Doing X" will appear left-aligned *without* a side-line or background bubble, with the title in bold.
+        * **Nested Sub-Statuses & Agent Thoughts:**
+            * Significant agent sub-statuses (e.g., "Controller: Validating step...", "Executor: Using tool Y...") will appear as new, sequential messages *indented under their parent major step announcement*. They will be italicized, have no background bubble, and feature a component-specific colored left-hand side-line.
+            * Verbose "thoughts" or preliminary outputs from agent components (e.g., Controller's reasoning) will also be displayed indented under the relevant major step. They will have normal font, no bubble, a component-specific colored left-hand side-line, a label (e.g., "Controller thought:"), and their content presented in a distinct dark box (similar to a `<pre>` block).
+        * **Persistent Bottom "Thinking" Line:** A single line at the very bottom of the scrollable chat area for low-level, rapidly updating "Thinking (LLM)..." statuses. This line will update in place and feature a dynamic, component-specific colored left-hand side-line.
+    * **Backend Support (Partially Implemented, Enhancements Required):**
+        * `callbacks.py` and `agent_flow_handlers.py` send structured `agent_thinking_update` messages with `component_hint` and new `agent_major_step_announcement` types.
+        * **Persistence Strategy:** Backend logic (in `server.py`, `task_handlers.py`, `db_utils.py`) will be enhanced to save all new message types (major steps, sub-statuses, agent thoughts) to the database with appropriate structures and `message_type` identifiers. These will be reloaded with chat history to ensure full persistence.
+* **Plan Proposal UI & Persistence (Complete):** Remains functional.
 * **Monitor Log Enhancements (Ongoing):**
     * Backend sends `log_source`. Frontend `monitor_ui.js` adds CSS classes. CSS styling for colors is the next step here.
 
@@ -42,8 +40,8 @@ For future development plans, see `ROADMAP.md`.
 
 1.  **UI & User Interaction:**
     * Task Management with persistent storage and reliable UI updates.
-    * Chat Interface with Markdown rendering, input history, interactive plan proposals, and agent status updates.
-    * **Chat UI Target:** Aiming for a `manus.ai`-style flow with sequential step/status messages and a persistent bottom thinking line, as detailed in the conceptual `simulation.html` (described in `BRAINSTORM.md`).
+    * Chat Interface with Markdown rendering, input history, interactive plan proposals.
+    * **Chat UI Target (v2.5.3):** A refined interface as per `simulation_option6.html` (detailed above and in `BRAINSTORM.md`), featuring clear visual hierarchy for steps, sub-statuses, agent thoughts, and a persistent bottom thinking line. All chat elements will be persistent across sessions.
     * Role-Specific LLM Selection.
     * Monitor Panel for structured agent logs.
     * Artifact Viewer for text/image/PDF outputs.
@@ -53,9 +51,8 @@ For future development plans, see `ROADMAP.md`.
     * Modular Python backend with refactored message handlers.
     * LangChain for P-C-E-E pipeline.
     * Task-specific, isolated workspaces with persistent history (SQLite).
-    * **Tool Integration Fixed:** Robust input and output handling for complex tools like `deep_research_synthesizer` and `write_file`.
-    * **Message Structure:** Refined WebSocket messages (`agent_major_step_announcement`, `agent_thinking_update` with `component_hint`) to support the new UI vision.
-    * **Persistent Status Messages:** Critical status messages (e.g., "Loading history", "Plan stopped") are now saved and reloaded with chat history.
+    * **Tool Integration Fixed:** Robust input and output handling for complex tools.
+    * **Message Structure & Persistence:** Refined WebSocket messages (`agent_major_step_announcement`, `agent_thinking_update` with `component_hint` and `sub_type`) to support the new UI vision. All chat-relevant messages, including steps, sub-statuses, and thoughts, will be saved to and reloaded from the database.
 3.  **Tool Suite (`backend/tools/`):**
     * `deep_research_synthesizer` and `write_file` are working correctly in sequence. Other tools remain functional.
 
@@ -67,7 +64,8 @@ For future development plans, see `ROADMAP.md`.
 
 ## Project Structure
 
-(Key files recently focused on: `backend/callbacks.py`, `backend/agent_flow_handlers.py`, `backend/server.py`, `backend/message_processing/task_handlers.py`. Next: `frontend/js/script.js`, `frontend/js/ui_modules/chat_ui.js`, `frontend/css/style.css`)
+(Key files for upcoming Chat UI changes: `frontend/js/script.js`, `frontend/js/ui_modules/chat_ui.js`, `frontend/css/style.css`. Backend: `backend/db_utils.py`, `backend/message_processing/task_handlers.py`, `backend/message_processing/agent_flow_handlers.py`, `backend/callbacks.py`)
+
 
 ```
 ResearchAgent/
@@ -111,7 +109,7 @@ ResearchAgent/
 ├── index.html
 ├── README.md                      # This file
 ├── ROADMAP.md                     # Updated with new UI vision
-└── simulation.html                # Conceptual: Visual mock-up of the target chat UI (described in BRAINSTORM.md)
+└── simulation_option6.html                # Conceptual: Visual mock-up of the target chat UI (described in BRAINSTORM.md)
 ```
 
 ## Setup Instructions & Running the Application
@@ -120,19 +118,19 @@ ResearchAgent/
 
 ## Known Issues / Immediate Next Steps (Targeting v2.5.3 Fixes)
 
-* **IMPLEMENT (High Priority): New Chat UI Rendering:**
-    * **Issue:** Current chat UI does not yet reflect the `manus.ai`-inspired design (sequential steps, significant sub-statuses as distinct messages, persistent bottom thinking line).
-    * **Goal:** Update `script.js`, `chat_ui.js`, and `style.css` based on the vision captured in the conceptual `simulation.html` (described in `BRAINSTORM.md`) and our discussions.
-    * **Status:** Backend now sends appropriate messages (`agent_major_step_announcement`, thinking updates with `component_hint`, persistent status messages). Frontend implementation is the next major task.
+* **IMPLEMENT (High Priority): New Chat UI Rendering & Persistence:**
+    * **Issue:** Current chat UI does not yet reflect the `simulation_option6.html` design (unified outer blue lines, no line on major steps, nested/indented component-specific lines for sub-statuses & thoughts, user message right line, persistent bottom thinking line, consistent thought styling, and full message persistence).
+    * **Goal:** Update `script.js`, `chat_ui.js`, and `style.css` based on the vision captured in `simulation_option6.html` and our detailed plan. Implement backend changes for saving and loading all new message structures to ensure full persistence.
+    * **Status:** Backend sends some foundational messages. Significant frontend implementation and backend persistence enhancements are the next major tasks.
 * **BUG FIX (Medium Priority): Chat Input Unresponsive:**
     * **Issue:** After a task completes, chat input sometimes remains disabled.
     * **Goal:** Ensure `StateManager.isAgentRunning` is correctly reset and UI re-enables input.
 * **DEBUG (Medium Priority): Monitor Log Color-Coding:**
     * **Issue:** Visual differentiation by `log_source` in the Monitor Log is not yet appearing correctly.
     * **Goal:** Implement effective color-coding.
-    * **Action:** Create/Debug CSS rules in `style.css`. Verify `log_source` consistency from all backend logging points.
+    * **Action:** Create/Debug CSS rules in `style.css`.
 * **Fix (Low Priority): `<strong>` Tag Rendering in Chat:**
-    * **Issue:** User noted some HTML tags (like `<strong>`) not rendering correctly in specific chat messages.
+    * **Issue:** User noted some HTML tags (like `<strong>`) not rendering correctly.
     * **Goal:** Ensure `innerHTML` is consistently used for content processed by `formatMessageContentInternal` in `chat_ui.js`.
 
 ## Security Warnings
@@ -141,5 +139,5 @@ ResearchAgent/
 
 ## Next Steps & Future Perspectives
 
-The immediate focus is on implementing the new Chat UI rendering logic on the frontend, using the user-provided baseline files for `script.js`, `chat_ui.js`, and `style.css` as the starting point. Following that, efforts will target the remaining known issues like chat input responsiveness and monitor log styling.
+The immediate focus is on implementing the new Chat UI rendering logic on the frontend and the corresponding persistence mechanisms on the backend. Following that, efforts will target the remaining known issues.
 For a detailed, evolving roadmap and ongoing brainstorming, please see **`ROADMAP.md`** and **`BRAINSTORM.md`**.

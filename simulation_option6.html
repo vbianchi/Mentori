@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat UI Simulation - Option 6</title>
+    <style>
+        body { font-family: sans-serif; background-color: #212529; color: #F8F9FA; margin: 0; padding: 20px; }
+        .chat-container { max-width: 700px; margin: auto; background-color: #212529; border-radius: 8px; display: flex; flex-direction: column; height: 850px; padding: 10px;}
+        .chat-header { text-align: center; color: #ADB5BD; margin-bottom: 15px; border-bottom: 1px solid #495057; padding-bottom:10px; font-size: 1.1em;}
+        .messages-area { flex-grow: 1; overflow-y: auto; padding-right: 10px; }
+
+        .message { margin-bottom: 10px; }
+
+        .message-user-container { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+        .message-user {
+            background-color: #0D9488; color: #FFFFFF;
+            padding: 10px 12px 10px 15px; /* More right padding for the border */
+            border-radius: 15px 0px 0px 15px; /* Make right edge flat for border */
+            max-width: 70%;
+            border-right: 4px solid #0A6C60; /* User accent right line - increased width for visibility */
+            position: relative;
+        }
+
+        .message-system-status, .message-plan-proposal-container, .message-agent-final {
+            padding-left: 10px; border-left: 3px solid #3498DB; /* Unified Blue */
+            margin-bottom: 10px;
+        }
+        .message-system-status .content { font-size: 0.9em; color: #ADB5BD; padding: 5px 0px 5px 10px; }
+        .message-plan-proposal-container .content { padding: 5px 0px 5px 10px; }
+        .plan-proposal-block { background-color: #2C3237; border: 1px solid #495057; padding: 15px; margin-top: 10px; border-radius: 8px; }
+        .plan-proposal-block h4 { margin-top:0; color: #F8F9FA; }
+        .plan-proposal-block p { color: #ADB5BD; font-size: 0.9em; }
+        .plan-proposal-block button { cursor: pointer; }
+        .plan-proposal-block .confirm-button { background-color: #0D9488; color: #FFFFFF; padding: 8px 12px; border:none; border-radius: 4px;}
+
+        .message-agent-step { margin-bottom: 5px; padding-left: 10px; /* No outer line for major step */ }
+        .message-agent-step .step-title { padding-left: 10px; font-weight: bold; margin-bottom: 3px; }
+
+        .sub-content-container { margin-top: 3px; padding-left: 25px; /* Indentation for nested block */ }
+
+        .message-agent-substatus, .message-agent-thought {
+            margin-bottom: 5px;
+            padding-left: 10px; /* Space for its own line */
+            position: relative;
+            /* border-left will be set by INLINE STYLE for this simulation */
+        }
+        .message-agent-substatus .content { font-size: 0.85em; color: #ADB5BD; padding-left: 10px; font-style: italic; }
+        
+        .message-agent-thought .thought-label { display: block; font-size: 0.9em; color: #E0E0E0; padding-left: 10px; margin-bottom: 2px; }
+        .message-agent-thought .thought-content-box {
+            background-color: #161A1D; color: #CED4DA; padding: 8px;
+            border-radius: 4px; margin-top:2px; font-size:0.9em;
+            white-space: pre-wrap; word-wrap: break-word;
+            margin-left: 10px; /* Indent the box itself slightly */
+        }
+
+        .message-agent-final-container { display: flex; justify-content: flex-start; margin-bottom: 10px; }
+        .message-agent-final { /* Already has unified blue line from common class */
+            background-color: #343A40; color: #FFFFFF; padding: 10px 15px;
+            border-radius: 5px 15px 15px 15px; max-width: 70%;
+        }
+
+        .message-global-thinking-line {
+            margin-top: 8px; padding-left: 10px; position: relative;
+            /* border-left will be set by INLINE STYLE for this simulation */
+        }
+        .message-global-thinking-line .content { font-size: 0.9em; color: #ADB5BD; padding-left: 10px; font-style: italic; }
+
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">ResearchAgent Chat UI Simulation (Option 6)</div>
+        <div class="messages-area">
+
+            <div class="message message-system-status">
+                <div class="content"><i>Loading history...</i></div>
+            </div>
+
+            <div class="message-user-container">
+                <div class="message-user"> Analyze 'data.csv', generate stats, create heatmap, save as 'correlation_heatmap.png'.
+                </div>
+            </div>
+
+            <div class="message message-system-status">
+                <div class="content"><i>Intent: This task requires planning. Generating a plan...</i></div>
+            </div>
+            
+            <div class="message message-plan-proposal-container">
+                <div class="content">
+                    Okay, I'll create a plan. Here's the proposed plan:
+                    <div class="plan-proposal-block">
+                        <h4>Plan Proposal: Dataset Analysis & Heatmap</h4>
+                        <p>1. Read 'data.csv'.<br>2. Stats.<br>3. Heatmap.<br>4. Save.<br>5. Inform.</p>
+                        <button class="confirm-button">Confirm & Run</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="message message-system-status">
+                <div class="content"><i>Plan confirmed. Starting execution...</i></div>
+            </div>
+
+            <div class="message message-agent-step">
+                <div class="step-title"><strong>Step 1/5: Read 'data.csv'.</strong></div>
+                <div class="sub-content-container">
+                    <div class="message message-agent-substatus" style="border-left: 3px solid #E67E22;"> <div class="content"><i>Controller: Validating step, preparing `read_file`...</i></div>
+                    </div>
+                    <div class="message message-agent-thought" style="border-left: 3px solid #E67E22;"> <div class="thought-label">Controller thought:</div>
+                        <div class="thought-content-box">File 'data.csv' expected. `read_file` is suitable.</div>
+                    </div>
+                    <div class="message message-agent-substatus" style="border-left: 3px solid #1ABC9C;"> <div class="content"><i>Executor: Using `read_file` for 'data.csv'...</i></div>
+                    </div>
+                    <div class="message message-agent-substatus" style="border-left: 3px solid #9B59B6;"> <div class="content"><i>Evaluator: File 'data.csv' read. Content available.</i></div>
+                    </div>
+                </div>
+            </div> <div class="message message-agent-step">
+                <div class="step-title"><strong>Step 2/5: Generate descriptive statistics.</strong></div>
+                <div class="sub-content-container">
+                    <div class="message message-agent-substatus" style="border-left: 3px solid #E67E22;"> <div class="content"><i>Controller: This step requires direct LLM generation.</i></div>
+                    </div>
+                     <div class="message message-agent-thought" style="border-left: 3px solid #E67E22;"> <div class="thought-label">Controller instruction to Executor (LLM):</div>
+                        <div class="thought-content-box">Based on 'data.csv' content, calculate stats (mean, median, etc.). Format as markdown.</div>
+                    </div>
+                    <div class="message message-agent-substatus" style="border-left: 3px solid #2ECC71;"> <div class="content"><i>Executor: Generating descriptive statistics via LLM...</i></div>
+                    </div>
+                </div>
+            </div> <div class="message-agent-final-container">
+                <div class="message-agent-final"> Descriptive statistics generated and correlation heatmap 'correlation_heatmap.png' created and saved.
+                </div>
+            </div>
+
+            <div class="message message-global-thinking-line" style="border-left: 3px solid #6C757D;"> <div class="content"><i>Idle.</i></div>
+            </div>
+
+        </div> </div> </body>
+</html>
