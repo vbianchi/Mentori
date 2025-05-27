@@ -1,4 +1,4 @@
-/* css/style.css - Dark Professional Theme */
+/* css/style.css - Dark Professional Theme - Chat UI Update v2.5.3 */
 
 /* Basic Reset & Root Variables */
 :root {
@@ -10,17 +10,22 @@
     --text-color: #F8F9FA;
     --text-color-muted: #ADB5BD;
     --text-color-darker: #6C757D;
+    
     --accent-color: #0D9488; /* User message bubble, confirm buttons */
     --accent-color-hover: #0F766E;
+    --user-message-line-color: #0A6C60; /* Darker shade of accent for user message right line */
     --button-text-on-accent: #FFFFFF;
+    
     --error-color: #DC3545;
     --error-color-darker: #B02A37;
-    --warning-color: #FFC107; /* Amber/Yellow for warnings */
-    
-    /* --- NEW: Component/Log Source Color Variables --- */
-    /* Chat UI Side Lines */
-    --agent-line-default-color: #0F766E; /* Darker Green for final agent bubbled message */
-    --agent-line-system-color: #7F8C8D;      /* Grey for general system status */
+    --warning-color: #FFC107;
+
+    /* Unified Blue for Outer Lines */
+    --unified-outer-line-blue: #3498DB; /* Planner Medium Blue, also for system status, plan proposals, final agent messages */
+
+    /* Component/Log Source Color Variables for Side Lines */
+    --agent-line-default-color: #0F766E; /* Darker Green for final agent bubbled message (if not using unified blue) */
+    --agent-line-system-color: #7F8C8D;      /* Grey for general system status (if not using unified blue) */
     --agent-line-intent-classifier-color: #5DADE2; /* Light Blue */
     --agent-line-planner-color: #3498DB;         /* Medium Blue */
     --agent-line-controller-color: #E67E22;      /* Orange */
@@ -30,12 +35,13 @@
     --agent-line-evaluator-overall-color: #8E44AD; /* Darker Purple */
     --agent-line-warning-color: #F39C12;         /* Amber/Yellow */
     --agent-line-error-color: #E74C3C;           /* Light Red/Orange */
+    --agent-line-llm-core-color: #6C757D;        /* Darker Grey for LLM churn on bottom line */
+
 
     /* Monitor Log Backgrounds/Borders (can reuse or define new ones) */
     --log-bg-default: var(--panel-bg);
     --log-border-default: var(--border-color);
-
-    --log-source-system-bg: rgba(127, 140, 141, 0.05); /* Grey tint */
+    --log-source-system-bg: rgba(127, 140, 141, 0.05);
     --log-source-system-border: var(--agent-line-system-color);
     --log-source-intent_classifier-bg: rgba(93, 173, 226, 0.05);
     --log-source-intent_classifier-border: var(--agent-line-intent-classifier-color);
@@ -49,30 +55,25 @@
     --log-source-evaluator_step-border: var(--agent-line-evaluator-step-color);
     --log-source-evaluator_overall-bg: rgba(142, 68, 173, 0.05);
     --log-source-evaluator_overall-border: var(--agent-line-evaluator-overall-color);
-    
-    /* Tool logs - generic and specific if needed */
-    --log-source-tool-bg: rgba(26, 188, 156, 0.05); /* Teal tint */
+    --log-source-tool-bg: rgba(26, 188, 156, 0.05);
     --log-source-tool-border: var(--agent-line-tool-color);
-    /* Example for a specific tool:
-    --log-source-tool_tavily_search_api-bg: rgba(22, 160, 133, 0.05);
-    --log-source-tool_tavily_search_api-border: #16A085;
-    */
-    
-    --log-source-llm_core-bg: rgba(149, 165, 166, 0.07); /* Slightly different grey for LLM core */
-    --log-source-llm_core-border: #7f8c8d;
-    --log-source-artifact-bg: rgba(241, 196, 15, 0.05); /* Gold/Yellow tint for artifacts */
+    --log-source-llm_core-bg: rgba(149, 165, 166, 0.07);
+    --log-source-llm_core-border: var(--agent-line-llm-core-color);
+    --log-source-artifact-bg: rgba(241, 196, 15, 0.05);
     --log-source-artifact-border: #F1C40F;
-
     --log-source-warning-bg: rgba(243, 156, 18, 0.1);
     --log-source-warning-border: var(--agent-line-warning-color);
     --log-source-error-bg: rgba(231, 76, 60, 0.1);
     --log-source-error-border: var(--agent-line-error-color);
-    /* --- END NEW Component/Log Source Color Variables --- */
 
     --terminal-bg: #161A1D;
     --terminal-text: #CED4DA;
-    --code-bg: var(--terminal-bg);
+    --code-bg: var(--terminal-bg); /* For inline code */
     --code-text: var(--terminal-text);
+    --pre-bg: #161A1D; /* For <pre> blocks */
+    --pre-text: #CED4DA;
+    --pre-border: #495057;
+
 
     --status-idle-color: #198754;
     --status-running-color: #FFC107;
@@ -90,7 +91,7 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .panel { display: flex; flex-direction: column; background-color: var(--panel-bg); overflow: hidden; }
 .panel:not(:last-child) { border-right: 1px solid var(--border-color); }
 .left-panel { flex: 0 0 240px; }
-.center-panel { flex: 1; background-color: var(--bg-color); }
+.center-panel { flex: 1; background-color: var(--bg-color); } /* Center panel background is main bg */
 .right-panel { flex: 0 0 500px; background-color: var(--terminal-bg); }
 
 .panel-header, .chat-header, .monitor-header { background-color: var(--panel-bg-lighter); }
@@ -121,37 +122,48 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 
 .chat-header { background-color: var(--panel-bg-lighter); border-bottom: 1px solid var(--border-color); }
 .chat-header h3 { margin: 0; font-size: 1em; font-weight: 500; }
-.chat-messages { padding: 20px; display: flex; flex-direction: column; gap: 10px; /* Reduced gap for tighter look */ background-color: var(--bg-color); }
+.chat-messages { padding: 20px; display: flex; flex-direction: column; gap: 0px; /* Remove gap, use margin on .message */ background-color: var(--bg-color); }
 
-/* General Message Styling */
-.message { max-width: 90%; line-height: 1.5; font-size: 0.95em; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; margin-bottom: 10px; /* Consistent bottom margin */ }
+/* --- NEW CHAT UI STYLES (v2.5.3) --- */
+.message { margin-bottom: 10px; line-height: 1.5; font-size: 0.95em; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; position: relative; /* For pseudo-elements if needed */ }
 
-/* User Message (Bubble) */
-.message-user { background-color: var(--accent-color); color: var(--button-text-on-accent); padding: 10px 15px; border-radius: 15px 15px 5px 15px; align-self: flex-end; }
+/* User Message */
+.message-user-wrapper { display: flex; justify-content: flex-end; }
+.message-user {
+    background-color: var(--accent-color);
+    color: var(--button-text-on-accent);
+    padding: 10px 12px 10px 15px; /* right padding reduced for border */
+    border-radius: 15px 0px 0px 15px; /* Flat right edge */
+    max-width: 70%;
+    border-right: 3px solid var(--user-message-line-color);
+}
 
-/* Agent Final Message (Bubble) */
-.message-agent-final { background-color: var(--panel-bg); color: var(--text-color); padding: 10px 15px; border-radius: 15px 15px 15px 5px; align-self: flex-start; border: 1px solid var(--border-color); border-left-width: 3px; /* Ensure border-left is present */ }
-.message-agent-final.agent-line-default { border-left-color: var(--agent-line-default-color) !important; }
-
-/* Agent Major Step Announcement (No Bubble, Line) */
-.message-agent-step { align-self: flex-start; padding: 5px 0px 5px 10px; /* Top/Bottom padding, Left padding for line space */ border-left-style: solid; border-left-width: 3px; }
-.message-agent-step .message-content-text strong { display: block; margin-bottom: 4px; font-size: 1em; } /* Step title */
-
-/* Sub-Status Container within Major Step */
-.sub-status-container { margin-top: 5px; padding-left: 15px; /* Indent sub-statuses further */ }
-
-/* Agent Sub-Status (No Bubble, Smaller Line, Italic) */
-.message-agent-substatus { align-self: flex-start; padding: 2px 0px 2px 10px; /* Tighter padding */ border-left-style: solid; border-left-width: 3px; margin-left: 0; /* Aligns with parent step's line */ }
-.message-agent-substatus .message-content-text i { font-size: 0.85em; color: var(--text-color-muted); display: block; line-height: 1.4; }
-
-/* System Status Messages (Centered, Line) */
-.message-status { background-color: transparent; border: none; color: var(--text-color-muted); font-size: 0.9em; align-self: center; padding: 8px 12px 8px 22px; /* Padding for line */ text-align: center; max-width: 100%; position: relative; border-left-style: solid; border-left-width: 3px; }
-.message-status.connection-status { font-weight: 500; }
-.message-status.error-message { color: var(--error-color); font-weight: 500; } /* Text color for error */
-
-/* Plan Proposal & Confirmed Plan Styling (Bubble, Specific Border) */
-.plan-confirmation-container { background-color: var(--panel-bg-lighter); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; align-self: stretch; max-width: 100%; border-left-width: 3px; }
-.plan-confirmation-container h4 { margin-top: 0; margin-bottom: 10px; color: var(--text-color); font-size: 1.1em; }
+/* System Status, Plan Proposal, Final Agent Message (Unified Blue Outer Line) */
+.message-outer-blue-line {
+    padding-left: 10px; /* Space for the line */
+    border-left: 3px solid var(--unified-outer-line-blue);
+}
+.message-system-status-content { /* Content div inside the blue-lined wrapper */
+    font-size: 0.9em;
+    color: var(--text-color-muted);
+    padding: 5px 0px 5px 10px; /* Padding for the text itself */
+    font-style: italic;
+}
+.message-system-status-content.error-text { /* For error status messages */
+    color: var(--agent-line-error-color);
+    font-weight: 500;
+}
+.message-plan-proposal-content { /* Content div inside the blue-lined wrapper for plan proposal */
+    padding: 5px 0px 5px 10px;
+}
+.plan-proposal-block { /* The actual block with plan details */
+    background-color: var(--panel-bg-lighter); /* Slightly different from main panel for distinction */
+    border: 1px solid var(--border-color);
+    padding: 15px;
+    margin-top: 10px;
+    border-radius: 8px;
+}
+.plan-proposal-block h4 { margin-top: 0; margin-bottom: 10px; color: var(--text-color); font-size: 1.1em; }
 .plan-summary { margin-bottom: 15px; line-height: 1.6; color: var(--text-color-muted); }
 .plan-steps-details { background-color: var(--bg-color); border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 0.9em; }
 .plan-steps-details ol { padding-left: 20px; margin: 0; }
@@ -169,14 +181,100 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .plan-confirmed-static .plan-summary { font-style: italic; }
 .plan-execution-status-confirmed { font-size: 0.9em; margin-top: 10px; color: var(--accent-color); font-weight: 500; }
 
+.message-agent-final-content { /* Content div inside the blue-lined wrapper */
+    background-color: var(--panel-bg); /* Bubble background */
+    color: var(--text-color);
+    padding: 10px 15px;
+    border-radius: 0px 15px 15px 0px; /* Rounded except for the side with the line */
+    max-width: calc(100% - 13px); /* Adjust if line width changes */
+}
 
-/* Agent Thinking Status Line (Global, at the bottom) */
-.agent-thinking-status { align-self: flex-start; font-style: italic; color: var(--text-color-muted); font-size: 0.9em; padding: 5px 15px 5px 25px; /* Padding for line */ margin-top: 5px; max-width: fit-content; background-color: transparent; border: none; cursor: pointer; transition: color 0.2s ease; position: relative; border-left-style: solid; border-left-width: 3px; }
-.agent-thinking-status:hover { color: var(--accent-color); }
-.agent-thinking-status.agent-line-default { border-left-color: var(--agent-line-default-color); } /* For Idle */
+/* Agent Major Step Announcement (No Outer Line) */
+.message-agent-step {
+    margin-bottom: 5px;
+    padding-left: 10px; /* Base alignment padding */
+}
+.message-agent-step .step-title {
+    padding-left: 10px; /* Align with other content if needed, or remove if step title is full width */
+    font-weight: bold;
+    display: block; /* Ensure it takes full width for alignment */
+    margin-bottom: 3px;
+}
+
+/* Sub-Content Container (Indented for nested items) */
+.sub-content-container {
+    margin-top: 3px;
+    padding-left: 25px; /* Indentation for the whole nested block */
+}
+
+/* Agent Sub-Status (Component-Specific Inner Line) */
+.message-agent-substatus {
+    margin-bottom: 5px; /* Increased slightly from 3px for better separation */
+    padding-left: 10px; /* Space for its own line */
+    border-left-width: 3px;
+    border-left-style: solid;
+    /* border-left-color will be set by component class */
+}
+.message-agent-substatus .content { /* The actual text content */
+    font-size: 0.85em;
+    color: var(--text-color-muted);
+    padding-left: 10px; /* Padding for the text itself, inside the line */
+    font-style: italic;
+}
+
+/* Agent Thought/Verbose (Component-Specific Inner Line) */
+.message-agent-thought {
+    margin-bottom: 5px;
+    padding-left: 10px; /* Space for its own line */
+    border-left-width: 3px;
+    border-left-style: solid;
+    /* border-left-color will be set by component class */
+}
+.message-agent-thought .thought-label {
+    display: block;
+    font-size: 0.9em;
+    color: var(--text-color); /* More visible label */
+    padding-left: 10px;
+    margin-bottom: 2px;
+}
+.message-agent-thought .thought-content-box {
+    background-color: var(--terminal-bg);
+    color: var(--terminal-text);
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-top: 2px;
+    font-size: 0.9em;
+    white-space: pre-wrap; /* Allow wrapping for long lines */
+    word-wrap: break-word;
+    margin-left: 10px; /* Indent the box itself slightly from its side-line */
+    border: 1px solid var(--pre-border);
+}
+.message-agent-thought .thought-content-box pre { /* If <pre> is used inside by Markdown */
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    border: none;
+    color: inherit;
+}
 
 
-/* --- Component-based Line Colors --- */
+/* Persistent Bottom "Thinking" Line (#agent-thinking-status) */
+/* This element is directly styled, not a wrapper/content structure */
+#agent-thinking-status {
+    margin-top: 8px; /* Space from message above */
+    padding: 5px 0px 5px 20px; /* Left padding includes space for line (10px) + text padding (10px) */
+    border-left-width: 3px;
+    border-left-style: solid;
+    /* border-left-color will be set by component class */
+    font-size: 0.9em;
+    color: var(--text-color-muted);
+    font-style: italic;
+    display: none; /* Hidden by default, shown by JS */
+    /* Ensure it's the last item in the scroll flow */
+}
+
+
+/* Component-based Line Colors (Applied to elements with side-lines) */
 .agent-line-system { border-left-color: var(--agent-line-system-color) !important; }
 .agent-line-intent-classifier { border-left-color: var(--agent-line-intent-classifier-color) !important; }
 .agent-line-planner { border-left-color: var(--agent-line-planner-color) !important; }
@@ -187,7 +285,9 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .agent-line-evaluator-overall { border-left-color: var(--agent-line-evaluator-overall-color) !important; }
 .agent-line-warning { border-left-color: var(--agent-line-warning-color) !important; }
 .agent-line-error { border-left-color: var(--agent-line-error-color) !important; }
-.agent-line-default { border-left-color: var(--agent-line-default-color) !important; } /* For final agent message bubble line */
+.agent-line-llm-core { border-left-color: var(--agent-line-llm-core-color) !important; }
+/* .agent-line-default is for final agent message if not using unified blue, but we are. */
+/* --- END NEW CHAT UI STYLES --- */
 
 
 .chat-input-area { display: flex; padding: 10px 15px; border-top: 1px solid var(--border-color); background-color: var(--panel-bg-lighter); flex-shrink: 0; align-items: flex-end; }
@@ -205,14 +305,13 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .monitor-artifact-area { flex: 1 1 0; min-height: 100px; padding: 10px 15px; background-color: var(--panel-bg); display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; border-top: 1px solid var(--border-color); overflow: hidden; }
 .artifact-placeholder { color: var(--text-color-darker); font-style: italic; }
 
-.monitor-log-entry { margin-bottom: 8px; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--log-border-default); background-color: var(--log-bg-default); display: flex; flex-direction: column; border-left-width: 3px; /* Default left border for all */ }
+.monitor-log-entry { margin-bottom: 8px; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--log-border-default); background-color: var(--log-bg-default); display: flex; flex-direction: column; border-left-width: 3px; }
 .log-timestamp { font-size: 0.8em; color: var(--text-color-muted); margin-bottom: 4px; white-space: nowrap; }
 .log-content { white-space: pre-wrap; word-wrap: break-word; color: var(--text-color); }
-.log-content pre { background-color: var(--bg-color); color: var(--text-color); padding: 5px 8px; margin-top: 4px; border-radius: 3px; border: 1px solid var(--border-color); overflow-x: auto; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word; }
+.log-content pre { background-color: var(--pre-bg); color: var(--pre-text); padding: 5px 8px; margin-top: 4px; border-radius: 3px; border: 1px solid var(--pre-border); overflow-x: auto; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word; }
 
 
-/* --- Monitor Log Source Specific Styles --- */
-/* System & Generic */
+/* Monitor Log Source Specific Styles (ensure these use !important if needed to override general .monitor-log-entry border) */
 .log-source-system, .log-source-system_event, .log-source-system_info, .log-source-system_connect,
 .log-source-system_context_switch, .log-source-system_new_task_signal,
 .log-source-system_task_deleted, .log-source-system_task_renamed,
@@ -221,45 +320,25 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .log-source-system_direct_qa, .log-source-system_direct_qa_finish,
 .log-source-system_plan_step_start, .log-source-system_plan_step_end,
 .log-source-system_plan_end, .log-source-unknown_source {
-    background-color: var(--log-source-system-bg) !important;
-    border-left-color: var(--log-source-system-border) !important;
+    background-color: var(--log-source-system-bg); border-left-color: var(--log-source-system-border) !important;
 }
-.log-source-ui_event { /* Can share system style or have its own */
-    background-color: var(--log-source-system-bg) !important;
-    border-left-color: var(--agent-line-planner-color) !important; /* Example: blue for UI actions */
-}
-.log-source-user_input_log {
-    background-color: rgba(13, 148, 136, 0.05) !important; /* User accent tint */
-    border-left-color: var(--accent-color) !important;
-}
-
-/* Agent Components */
-.log-source-intent_classifier, [class*="log-source-llm_core_start_intent_classifier"] { background-color: var(--log-source-intent_classifier-bg) !important; border-left-color: var(--log-source-intent_classifier-border) !important; }
-.log-source-planner, [class*="log-source-llm_core_start_planner"] { background-color: var(--log-source-planner-bg) !important; border-left-color: var(--log-source-planner-border) !important; }
-.log-source-controller, [class*="log-source-llm_core_start_controller"] { background-color: var(--log-source-controller-bg) !important; border-left-color: var(--log-source-controller-border) !important; }
-.log-source-executor, [class*="log-source-executor_"], [class*="log-source-llm_core_start_executor"] { background-color: var(--log-source-executor-bg) !important; border-left-color: var(--log-source-executor-border) !important; }
-.log-source-evaluator_step, [class*="log-source-llm_core_start_stepevaluator"] { background-color: var(--log-source-evaluator_step-bg) !important; border-left-color: var(--log-source-evaluator_step-border) !important; }
-.log-source-evaluator_overall, [class*="log-source-llm_core_start_overallplanevaluator"] { background-color: var(--log-source-evaluator_overall-bg) !important; border-left-color: var(--log-source-evaluator_overall-border) !important; }
-
-/* Tools (generic and specific examples) */
-[class*="log-source-tool_"] { background-color: var(--log-source-tool-bg) !important; border-left-color: var(--log-source-tool-border) !important; }
-/* e.g. .log-source-tool_tavily_search_api_start, .log-source-tool_write_file_output */
-
-/* LLM Core (if not part of a specific component above) */
-.log-source-llm_core, .log-source-llm_core_token_usage { background-color: var(--log-source-llm_core-bg) !important; border-left-color: var(--log-source-llm_core-border) !important; }
-
-/* Artifacts */
-.log-source-artifact, [class*="log-source-artifact_"] { background-color: var(--log-source-artifact-bg) !important; border-left-color: var(--log-source-artifact-border) !important; }
-
-/* Warnings and Errors */
-.log-source-warning, [class*="log-source-warning_"], [class*="log-source-controller_warning"] { background-color: var(--log-source-warning-bg) !important; border-left-color: var(--log-source-warning-border) !important; }
+.log-source-ui_event { background-color: var(--log-source-system-bg); border-left-color: var(--agent-line-planner-color) !important; }
+.log-source-user_input_log { background-color: rgba(13, 148, 136, 0.05); border-left-color: var(--accent-color) !important; }
+.log-source-intent_classifier, [class*="log-source-llm_core_start_intent_classifier"] { background-color: var(--log-source-intent_classifier-bg); border-left-color: var(--log-source-intent_classifier-border) !important; }
+.log-source-planner, [class*="log-source-llm_core_start_planner"] { background-color: var(--log-source-planner-bg); border-left-color: var(--log-source-planner-border) !important; }
+.log-source-controller, [class*="log-source-llm_core_start_controller"] { background-color: var(--log-source-controller-bg); border-left-color: var(--log-source-controller-border) !important; }
+.log-source-executor, [class*="log-source-executor_"], [class*="log-source-llm_core_start_executor"] { background-color: var(--log-source-executor-bg); border-left-color: var(--log-source-executor-border) !important; }
+.log-source-evaluator_step, [class*="log-source-llm_core_start_stepevaluator"] { background-color: var(--log-source-evaluator_step-bg); border-left-color: var(--log-source-evaluator_step-border) !important; }
+.log-source-evaluator_overall, [class*="log-source-llm_core_start_overallplanevaluator"] { background-color: var(--log-source-evaluator_overall-bg); border-left-color: var(--log-source-evaluator_overall-border) !important; }
+[class*="log-source-tool_"] { background-color: var(--log-source-tool-bg); border-left-color: var(--log-source-tool-border) !important; }
+.log-source-llm_core, .log-source-llm_core_token_usage { background-color: var(--log-source-llm_core-bg); border-left-color: var(--log-source-llm_core-border) !important; }
+.log-source-artifact, [class*="log-source-artifact_"] { background-color: var(--log-source-artifact-bg); border-left-color: var(--log-source-artifact-border) !important; }
+.log-source-warning, [class*="log-source-warning_"], [class*="log-source-controller_warning"] { background-color: var(--log-source-warning-bg); border-left-color: var(--log-source-warning-border) !important; }
 .log-source-warning .log-content, .log-source-warning .log-content pre { color: var(--warning-color); }
-
 .log-source-error, [class*="log-source-error_"], [class*="log-source-llm_core_error"],
 [class*="log-source-tool_"][class*="_error"], [class*="log-source-controller_error"],
 [class*="log-source-evaluator_step_error"], [class*="log-source-evaluator_overall_error"] {
-    background-color: var(--log-source-error-bg) !important;
-    border-left-color: var(--log-source-error-border) !important;
+    background-color: var(--log-source-error-bg); border-left-color: var(--log-source-error-border) !important;
 }
 .log-source-error .log-content, [class*="log-source-error_"] .log-content,
 [class*="log-source-llm_core_error"] .log-content,
@@ -267,13 +346,12 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .log-source-error .log-content pre, [class*="log-source-error_"] .log-content pre {
     color: var(--error-color);
 }
-/* --- END Monitor Log Source Specific Styles --- */
 
 
 .artifact-filename { flex-shrink: 0; width: 100%; text-align: center; padding: 5px 0; font-size: 0.85em; color: var(--text-color-darker); border-bottom: 1px solid var(--border-color); margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .monitor-artifact-area img, .monitor-artifact-area pre { flex-grow: 1; flex-shrink: 1; min-height: 0; max-width: 100%; max-height: 100%; overflow: auto; border: none; margin-bottom: 5px; border-radius: 4px; }
 .monitor-artifact-area img { object-fit: contain; background-color: #FFFFFF; }
-.monitor-artifact-area pre { width: 100%; padding: 10px; font-family: var(--monospace-font); font-size: 0.9em; color: var(--code-text); background-color: var(--code-bg); border: 1px solid var(--border-color); white-space: pre-wrap; word-break: break-all; }
+.monitor-artifact-area pre { width: 100%; padding: 10px; font-family: var(--monospace-font); font-size: 0.9em; color: var(--pre-text); background-color: var(--pre-bg); border: 1px solid var(--pre-border); white-space: pre-wrap; word-break: break-all; }
 .monitor-artifact-area .artifact-error { font-size: 0.9em; font-style: italic; color: var(--error-color); flex-grow: 1; display: flex; align-items: center; justify-content: center; }
 
 .artifact-nav { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: auto; width: 100%; flex-shrink: 0; height: 25px; padding-top: 5px; }
@@ -282,10 +360,38 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .artifact-nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .artifact-counter { font-size: 0.85em; color: var(--text-color-muted); }
 
-.message-agent-final pre, .message-agent-intermediate pre { background-color: var(--code-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 0.75rem; margin: 0.5rem 0; overflow-x: auto; white-space: pre; }
-.message-agent-final pre code, .message-agent-intermediate pre code { font-family: var(--monospace-font); font-size: 0.9em; color: var(--code-text); background-color: transparent; padding: 0; border: none; white-space: pre; }
-.message-agent-final code, .message-agent-intermediate code { background-color: var(--code-bg); color: var(--code-text); padding: 0.2em 0.4em; margin: 0; font-size: 85%; border-radius: 3px; font-family: var(--monospace-font); }
-.message-agent-final pre code, .message-agent-intermediate pre code { padding: 0; margin: 0; font-size: inherit; background: none; border-radius: 0; color: inherit; }
+/* General code/pre styling for chat messages if Markdown includes them */
+.message pre { /* For <pre> generated by Markdown processing */
+    background-color: var(--pre-bg);
+    border: 1px solid var(--pre-border);
+    border-radius: 4px;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    overflow-x: auto;
+    white-space: pre; /* Important for pre */
+    font-family: var(--monospace-font);
+    font-size: 0.9em;
+    color: var(--pre-text);
+}
+.message code { /* For inline `code` */
+    background-color: var(--code-bg);
+    color: var(--code-text);
+    padding: 0.2em 0.4em;
+    margin: 0;
+    font-size: 85%;
+    border-radius: 3px;
+    font-family: var(--monospace-font);
+}
+.message pre code { /* Reset for <code> inside <pre> */
+    padding: 0;
+    margin: 0;
+    font-size: inherit; /* Inherit from <pre> */
+    background: none;
+    border-radius: 0;
+    color: inherit; /* Inherit from <pre> */
+    white-space: pre; /* Important for pre */
+}
+
 
 @media (max-width: 768px) {
     .app-container { flex-direction: column; height: auto; min-height: 100vh; }
