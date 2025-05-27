@@ -2,60 +2,82 @@
 
 /* Basic Reset & Root Variables */
 :root {
-    --bg-color: #212529; 
-    --panel-bg: #343A40; 
-    --panel-bg-lighter: #495057; 
-    --panel-bg-lightest: #6C757D; 
-    --border-color: #495057; 
-    --text-color: #F8F9FA; 
-    --text-color-muted: #ADB5BD; 
-    --text-color-darker: #6C757D; 
-    --accent-color: #0D9488; 
-    --accent-color-hover: #0F766E; 
-    --button-text-on-accent: #FFFFFF; 
-    --error-color: #DC3545; 
-    --error-color-darker: #B02A37; 
-    --tool-color: var(--accent-color); 
-    --system-color: var(--text-color-darker); 
-    --image-color: var(--text-color-muted); 
-    --thought-color: var(--text-color-muted); 
-    --warning-bg: rgba(13, 148, 136, 0.1); 
-    --warning-border: var(--accent-color); 
-    --terminal-bg: #161A1D; 
-    --terminal-text: #CED4DA; 
-    --code-bg: var(--terminal-bg); 
-    --code-text: var(--terminal-text); 
+    --bg-color: #212529;
+    --panel-bg: #343A40;
+    --panel-bg-lighter: #495057;
+    --panel-bg-lightest: #6C757D;
+    --border-color: #495057;
+    --text-color: #F8F9FA;
+    --text-color-muted: #ADB5BD;
+    --text-color-darker: #6C757D;
+    --accent-color: #0D9488; /* User message bubble, confirm buttons */
+    --accent-color-hover: #0F766E;
+    --button-text-on-accent: #FFFFFF;
+    --error-color: #DC3545;
+    --error-color-darker: #B02A37;
+    --warning-color: #FFC107; /* Amber/Yellow for warnings */
+    
+    /* --- NEW: Component/Log Source Color Variables --- */
+    /* Chat UI Side Lines */
+    --agent-line-default-color: #0F766E; /* Darker Green for final agent bubbled message */
+    --agent-line-system-color: #7F8C8D;      /* Grey for general system status */
+    --agent-line-intent-classifier-color: #5DADE2; /* Light Blue */
+    --agent-line-planner-color: #3498DB;         /* Medium Blue */
+    --agent-line-controller-color: #E67E22;      /* Orange */
+    --agent-line-executor-color: #2ECC71;        /* Green */
+    --agent-line-tool-color: #1ABC9C;            /* Teal */
+    --agent-line-evaluator-step-color: #9B59B6;  /* Purple */
+    --agent-line-evaluator-overall-color: #8E44AD; /* Darker Purple */
+    --agent-line-warning-color: #F39C12;         /* Amber/Yellow */
+    --agent-line-error-color: #E74C3C;           /* Light Red/Orange */
 
-    --status-idle-color: #198754; 
-    --status-running-color: #FFC107; 
-    --status-error-color: #DC3545; 
-    --status-disconnected-color: #6C757D; 
+    /* Monitor Log Backgrounds/Borders (can reuse or define new ones) */
+    --log-bg-default: var(--panel-bg);
+    --log-border-default: var(--border-color);
 
-    --log-bg-default: var(--panel-bg); 
-    --log-bg-tool-start: #40464c; 
-    --log-bg-tool-output: var(--panel-bg); 
-    --log-bg-thought: rgba(13, 148, 136, 0.05); 
-    --log-bg-error: rgba(220, 53, 69, 0.08); 
-    --log-bg-user-input: rgba(13, 148, 136, 0.05); 
-    --log-bg-system: var(--panel-bg);
-    --log-bg-history: #2b3035; 
+    --log-source-system-bg: rgba(127, 140, 141, 0.05); /* Grey tint */
+    --log-source-system-border: var(--agent-line-system-color);
+    --log-source-intent_classifier-bg: rgba(93, 173, 226, 0.05);
+    --log-source-intent_classifier-border: var(--agent-line-intent-classifier-color);
+    --log-source-planner-bg: rgba(52, 152, 219, 0.05);
+    --log-source-planner-border: var(--agent-line-planner-color);
+    --log-source-controller-bg: rgba(230, 126, 34, 0.05);
+    --log-source-controller-border: var(--agent-line-controller-color);
+    --log-source-executor-bg: rgba(46, 204, 113, 0.05);
+    --log-source-executor-border: var(--agent-line-executor-color);
+    --log-source-evaluator_step-bg: rgba(155, 89, 182, 0.05);
+    --log-source-evaluator_step-border: var(--agent-line-evaluator-step-color);
+    --log-source-evaluator_overall-bg: rgba(142, 68, 173, 0.05);
+    --log-source-evaluator_overall-border: var(--agent-line-evaluator-overall-color);
+    
+    /* Tool logs - generic and specific if needed */
+    --log-source-tool-bg: rgba(26, 188, 156, 0.05); /* Teal tint */
+    --log-source-tool-border: var(--agent-line-tool-color);
+    /* Example for a specific tool:
+    --log-source-tool_tavily_search_api-bg: rgba(22, 160, 133, 0.05);
+    --log-source-tool_tavily_search_api-border: #16A085;
+    */
+    
+    --log-source-llm_core-bg: rgba(149, 165, 166, 0.07); /* Slightly different grey for LLM core */
+    --log-source-llm_core-border: #7f8c8d;
+    --log-source-artifact-bg: rgba(241, 196, 15, 0.05); /* Gold/Yellow tint for artifacts */
+    --log-source-artifact-border: #F1C40F;
 
-    /* NEW: Log Source Colors (Examples - Customize as needed) */
-    --log-source-planner-bg: rgba(52, 152, 219, 0.1);  /* Light Blue tint */
-    --log-source-planner-border: #3498DB;             /* Blue */
-    --log-source-controller-bg: rgba(230, 126, 34, 0.1);/* Orange tint */
-    --log-source-controller-border: #E67E22;          /* Orange */
-    --log-source-executor-bg: rgba(46, 204, 113, 0.1); /* Green tint */
-    --log-source-executor-border: #2ECC71;            /* Green */
-    --log-source-evaluator-bg: rgba(155, 89, 182, 0.1);/* Purple tint */
-    --log-source-evaluator-border: #9B59B6;           /* Purple */
-    --log-source-tool-bg: rgba(26, 188, 156, 0.1);   /* Teal tint (general tool) */
-    --log-source-tool-border: #1ABC9C;                /* Teal */
-    --log-source-system-bg: rgba(149, 165, 166, 0.1); /* Grey tint */
-    --log-source-system-border: #95A5A6;              /* Grey */
-    --log-source-error-bg: var(--log-bg-error);       /* Use existing error tint */
-    --log-source-error-border: var(--error-color);    /* Red */
+    --log-source-warning-bg: rgba(243, 156, 18, 0.1);
+    --log-source-warning-border: var(--agent-line-warning-color);
+    --log-source-error-bg: rgba(231, 76, 60, 0.1);
+    --log-source-error-border: var(--agent-line-error-color);
+    /* --- END NEW Component/Log Source Color Variables --- */
 
+    --terminal-bg: #161A1D;
+    --terminal-text: #CED4DA;
+    --code-bg: var(--terminal-bg);
+    --code-text: var(--terminal-text);
+
+    --status-idle-color: #198754;
+    --status-running-color: #FFC107;
+    --status-error-color: #DC3545;
+    --status-disconnected-color: #6C757D;
 
     --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     --monospace-font: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
@@ -99,22 +121,74 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 
 .chat-header { background-color: var(--panel-bg-lighter); border-bottom: 1px solid var(--border-color); }
 .chat-header h3 { margin: 0; font-size: 1em; font-weight: 500; }
-.chat-messages { padding: 20px; display: flex; flex-direction: column; gap: 18px; background-color: var(--bg-color); }
-.message { padding: 10px 15px; border-radius: 8px; max-width: 85%; line-height: 1.5; font-size: 0.95em; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; }
-.message-agent { background-color: var(--panel-bg); align-self: flex-start; border: 1px solid var(--border-color); color: var(--text-color); }
-.message-user { background-color: var(--accent-color); color: var(--button-text-on-accent); align-self: flex-end; border: 1px solid var(--accent-color); }
-.message-status { background-color: transparent; border: none; color: var(--text-color-muted); font-size: 0.9em; align-self: center; padding: 5px 12px; text-align: center; max-width: 100%; }
-.message-status.connection-status { font-weight: 500; }
-.message-status.error-message { color: var(--error-color); font-weight: 500; }
-.message-suggestion{ background-color: transparent; border: 1px dashed var(--border-color); border-left: 3px solid var(--warning-border); color: var(--text-color-muted); align-self: stretch; padding: 8px 12px; }
-.message-warning { background-color: var(--warning-bg); border: 1px solid var(--warning-border); color: var(--text-color); padding: 10px 15px; border-radius: 4px; margin-top: 5px; font-size: 0.9em; align-self: stretch; }
-.action-prompt { background-color: var(--panel-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 5px; margin-top: 10px; align-self: stretch; }
-.action-prompt p { margin-bottom: 10px; font-weight: 500; color: var(--text-color); }
-.action-btn { background-color: var(--accent-color); color: var(--button-text-on-accent); border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px; font-size: 0.9em; font-weight: 500; transition: background-color 0.2s ease; }
-.action-btn:hover { background-color: var(--accent-color-hover); }
+.chat-messages { padding: 20px; display: flex; flex-direction: column; gap: 10px; /* Reduced gap for tighter look */ background-color: var(--bg-color); }
 
-.agent-thinking-status { align-self: flex-start; font-style: italic; color: var(--text-color-muted); font-size: 0.9em; padding: 5px 15px; margin-top: -10px; margin-bottom: 5px; max-width: fit-content; background-color: transparent; border: none; cursor: pointer; transition: color 0.2s ease; }
+/* General Message Styling */
+.message { max-width: 90%; line-height: 1.5; font-size: 0.95em; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; margin-bottom: 10px; /* Consistent bottom margin */ }
+
+/* User Message (Bubble) */
+.message-user { background-color: var(--accent-color); color: var(--button-text-on-accent); padding: 10px 15px; border-radius: 15px 15px 5px 15px; align-self: flex-end; }
+
+/* Agent Final Message (Bubble) */
+.message-agent-final { background-color: var(--panel-bg); color: var(--text-color); padding: 10px 15px; border-radius: 15px 15px 15px 5px; align-self: flex-start; border: 1px solid var(--border-color); border-left-width: 3px; /* Ensure border-left is present */ }
+.message-agent-final.agent-line-default { border-left-color: var(--agent-line-default-color) !important; }
+
+/* Agent Major Step Announcement (No Bubble, Line) */
+.message-agent-step { align-self: flex-start; padding: 5px 0px 5px 10px; /* Top/Bottom padding, Left padding for line space */ border-left-style: solid; border-left-width: 3px; }
+.message-agent-step .message-content-text strong { display: block; margin-bottom: 4px; font-size: 1em; } /* Step title */
+
+/* Sub-Status Container within Major Step */
+.sub-status-container { margin-top: 5px; padding-left: 15px; /* Indent sub-statuses further */ }
+
+/* Agent Sub-Status (No Bubble, Smaller Line, Italic) */
+.message-agent-substatus { align-self: flex-start; padding: 2px 0px 2px 10px; /* Tighter padding */ border-left-style: solid; border-left-width: 3px; margin-left: 0; /* Aligns with parent step's line */ }
+.message-agent-substatus .message-content-text i { font-size: 0.85em; color: var(--text-color-muted); display: block; line-height: 1.4; }
+
+/* System Status Messages (Centered, Line) */
+.message-status { background-color: transparent; border: none; color: var(--text-color-muted); font-size: 0.9em; align-self: center; padding: 8px 12px 8px 22px; /* Padding for line */ text-align: center; max-width: 100%; position: relative; border-left-style: solid; border-left-width: 3px; }
+.message-status.connection-status { font-weight: 500; }
+.message-status.error-message { color: var(--error-color); font-weight: 500; } /* Text color for error */
+
+/* Plan Proposal & Confirmed Plan Styling (Bubble, Specific Border) */
+.plan-confirmation-container { background-color: var(--panel-bg-lighter); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; align-self: stretch; max-width: 100%; border-left-width: 3px; }
+.plan-confirmation-container h4 { margin-top: 0; margin-bottom: 10px; color: var(--text-color); font-size: 1.1em; }
+.plan-summary { margin-bottom: 15px; line-height: 1.6; color: var(--text-color-muted); }
+.plan-steps-details { background-color: var(--bg-color); border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 0.9em; }
+.plan-steps-details ol { padding-left: 20px; margin: 0; }
+.plan-steps-details li { margin-bottom: 8px; line-height: 1.5; }
+.plan-steps-details li .step-tool { font-style: italic; color: var(--agent-line-tool-color); font-size: 0.9em; }
+.plan-steps-details li .step-expected { display: block; font-size: 0.9em; color: var(--text-color-darker); margin-top: 2px; }
+.plan-toggle-details-btn { background: none; border: 1px solid var(--border-color); color: var(--text-color-muted); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85em; margin-bottom: 15px; transition: all 0.2s ease; }
+.plan-toggle-details-btn:hover { background-color: var(--panel-bg-lightest); color: var(--text-color); }
+.plan-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; }
+.plan-confirm-btn, .plan-cancel-btn { padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: 500; font-size: 0.9em; transition: background-color 0.2s ease; border: none; }
+.plan-confirm-btn { background-color: var(--accent-color); color: var(--button-text-on-accent); }
+.plan-confirm-btn:hover { background-color: var(--accent-color-hover); }
+.plan-cancel-btn { background-color: var(--panel-bg-lightest); color: var(--text-color); border: 1px solid var(--border-color); }
+.plan-cancel-btn:hover { background-color: var(--panel-bg-lighter); }
+.plan-confirmed-static .plan-summary { font-style: italic; }
+.plan-execution-status-confirmed { font-size: 0.9em; margin-top: 10px; color: var(--accent-color); font-weight: 500; }
+
+
+/* Agent Thinking Status Line (Global, at the bottom) */
+.agent-thinking-status { align-self: flex-start; font-style: italic; color: var(--text-color-muted); font-size: 0.9em; padding: 5px 15px 5px 25px; /* Padding for line */ margin-top: 5px; max-width: fit-content; background-color: transparent; border: none; cursor: pointer; transition: color 0.2s ease; position: relative; border-left-style: solid; border-left-width: 3px; }
 .agent-thinking-status:hover { color: var(--accent-color); }
+.agent-thinking-status.agent-line-default { border-left-color: var(--agent-line-default-color); } /* For Idle */
+
+
+/* --- Component-based Line Colors --- */
+.agent-line-system { border-left-color: var(--agent-line-system-color) !important; }
+.agent-line-intent-classifier { border-left-color: var(--agent-line-intent-classifier-color) !important; }
+.agent-line-planner { border-left-color: var(--agent-line-planner-color) !important; }
+.agent-line-controller { border-left-color: var(--agent-line-controller-color) !important; }
+.agent-line-executor { border-left-color: var(--agent-line-executor-color) !important; }
+.agent-line-tool { border-left-color: var(--agent-line-tool-color) !important; }
+.agent-line-evaluator-step { border-left-color: var(--agent-line-evaluator-step-color) !important; }
+.agent-line-evaluator-overall { border-left-color: var(--agent-line-evaluator-overall-color) !important; }
+.agent-line-warning { border-left-color: var(--agent-line-warning-color) !important; }
+.agent-line-error { border-left-color: var(--agent-line-error-color) !important; }
+.agent-line-default { border-left-color: var(--agent-line-default-color) !important; } /* For final agent message bubble line */
+
 
 .chat-input-area { display: flex; padding: 10px 15px; border-top: 1px solid var(--border-color); background-color: var(--panel-bg-lighter); flex-shrink: 0; align-items: flex-end; }
 .chat-input-area textarea { flex-grow: 1; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 5px; background-color: var(--panel-bg); color: var(--text-color); resize: none; min-height: 38px; max-height: 150px; margin-right: 10px; font-family: inherit; font-size: 0.95em; line-height: 1.4; overflow-y: auto; }
@@ -131,54 +205,70 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .monitor-artifact-area { flex: 1 1 0; min-height: 100px; padding: 10px 15px; background-color: var(--panel-bg); display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; border-top: 1px solid var(--border-color); overflow: hidden; }
 .artifact-placeholder { color: var(--text-color-darker); font-style: italic; }
 
-.monitor-log-entry { margin-bottom: 8px; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border-color); background-color: var(--log-bg-default); display: flex; flex-direction: column; }
+.monitor-log-entry { margin-bottom: 8px; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--log-border-default); background-color: var(--log-bg-default); display: flex; flex-direction: column; border-left-width: 3px; /* Default left border for all */ }
 .log-timestamp { font-size: 0.8em; color: var(--text-color-muted); margin-bottom: 4px; white-space: nowrap; }
 .log-content { white-space: pre-wrap; word-wrap: break-word; color: var(--text-color); }
-
-/* Existing log-type-* styles (can be overridden by log-source-* if more specific) */
-.log-type-system { border-left: 3px solid var(--system-color); background-color: var(--log-bg-system); }
-.log-type-tool-start { border-left: 3px solid var(--tool-color); background-color: var(--log-bg-tool-start); }
-.log-type-tool-output { border-left: 3px solid var(--tool-color); background-color: var(--log-bg-tool-output); }
-.log-type-tool-error { border-left: 3px solid var(--error-color); background-color: var(--log-bg-error); }
-.log-type-agent-thought-action, .log-type-agent-thought-final { border-left: 3px solid var(--thought-color); background-color: var(--log-bg-thought); }
-.log-type-agent-finish { border-left: 3px solid var(--accent-color); background-color: var(--log-bg-default); }
-.log-type-error { border-left: 3px solid var(--error-color); background-color: var(--log-bg-error); }
-.log-type-error .log-content { color: var(--error-color); }
-.log-type-history { opacity: 0.7; border-left: 3px solid var(--text-color-darker); background-color: var(--log-bg-history); }
-.log-type-unknown { border-left: 3px dashed var(--text-color-darker); background-color: var(--log-bg-default); }
-.log-type-image-generated, .log-type-artifact-generated { border-left: 3px solid var(--image-color); background-color: var(--log-bg-default); }
-.log-type-user-input-log { border-left: 3px solid var(--accent-color); background-color: var(--log-bg-user-input); }
-
-/* --- NEW: Styles for Log Sources --- */
-.log-source-planner { background-color: var(--log-source-planner-bg) !important; border-left: 3px solid var(--log-source-planner-border) !important; }
-.log-source-controller { background-color: var(--log-source-controller-bg) !important; border-left: 3px solid var(--log-source-controller-border) !important; }
-.log-source-executor-thought, .log-source-executor-action, .log-source-executor-thought-final-step, .log-source-executor-step-output { background-color: var(--log-source-executor-bg) !important; border-left: 3px solid var(--log-source-executor-border) !important; }
-.log-source-llm-core-start, .log-source-llm-token-usage, .log-source-llm-core-error { background-color: var(--log-source-evaluator-bg) !important; border-left: 3px solid var(--log-source-evaluator-border) !important; } /* Using evaluator colors for general LLM for now */
-.log-source-step-evaluator { background-color: var(--log-source-evaluator-bg) !important; border-left: 3px solid var(--log-source-evaluator-border) !important; }
-.log-source-overall-evaluator { background-color: var(--log-source-evaluator-bg) !important; border-left: 3px solid var(--log-source-evaluator-border) !important; } /* Example, might need distinct color */
-
-/* General Tool Styles (can be overridden by specific tool if needed) */
-[class^="log-source-tool_"] { background-color: var(--log-source-tool-bg) !important; border-left: 3px solid var(--log-source-tool-border) !important; }
-.log-source-tool_error { background-color: var(--log-source-error-bg) !important; border-left: 3px solid var(--log-source-error-border) !important; }
-.log-source-tool_error .log-content { color: var(--error-color) !important; }
-.log-source-artifact_generated { border-left: 3px solid var(--image-color) !important; } /* Keep existing style */
-
-.log-source-system, .log-source-system-event, .log-source-unknown-source { background-color: var(--log-source-system-bg) !important; border-left: 3px solid var(--log-source-system-border) !important; }
-/* --- END NEW Log Source Styles --- */
+.log-content pre { background-color: var(--bg-color); color: var(--text-color); padding: 5px 8px; margin-top: 4px; border-radius: 3px; border: 1px solid var(--border-color); overflow-x: auto; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word; }
 
 
-.log-type-tool-output .log-content pre, .log-type-tool-error .log-content pre, .log-type-agent-thought-action .log-content pre, .log-type-agent-thought-final .log-content pre,
-.log-source-executor-thought .log-content pre, .log-source-executor-action .log-content pre, .log-source-executor-thought-final-step .log-content pre, .log-source-executor-step-output .log-content pre,
-[class*="log-source-tool_"].log-content pre /* For tool outputs using new source classes */
-{
-    background-color: var(--terminal-bg); 
-    color: var(--terminal-text); 
-    padding: 5px 8px; margin-top: 4px; border-radius: 3px; border: 1px solid var(--border-color); overflow-x: auto; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;
+/* --- Monitor Log Source Specific Styles --- */
+/* System & Generic */
+.log-source-system, .log-source-system_event, .log-source-system_info, .log-source-system_connect,
+.log-source-system_context_switch, .log-source-system_new_task_signal,
+.log-source-system_task_deleted, .log-source-system_task_renamed,
+.log-source-system_llm_set, .log-source-system_plan_generated,
+.log-source-system_plan_confirmed, .log-source-system_plan_cancelled,
+.log-source-system_direct_qa, .log-source-system_direct_qa_finish,
+.log-source-system_plan_step_start, .log-source-system_plan_step_end,
+.log-source-system_plan_end, .log-source-unknown_source {
+    background-color: var(--log-source-system-bg) !important;
+    border-left-color: var(--log-source-system-border) !important;
 }
-.log-type-tool-error .log-content pre, .log-source-tool_error .log-content pre { color: var(--error-color); }
-.log-type-agent-thought-action .log-content pre, .log-type-agent-thought-final .log-content pre,
-.log-source-executor-thought .log-content pre, .log-source-executor-thought-final-step .log-content pre
-{ color: var(--thought-color); }
+.log-source-ui_event { /* Can share system style or have its own */
+    background-color: var(--log-source-system-bg) !important;
+    border-left-color: var(--agent-line-planner-color) !important; /* Example: blue for UI actions */
+}
+.log-source-user_input_log {
+    background-color: rgba(13, 148, 136, 0.05) !important; /* User accent tint */
+    border-left-color: var(--accent-color) !important;
+}
+
+/* Agent Components */
+.log-source-intent_classifier, [class*="log-source-llm_core_start_intent_classifier"] { background-color: var(--log-source-intent_classifier-bg) !important; border-left-color: var(--log-source-intent_classifier-border) !important; }
+.log-source-planner, [class*="log-source-llm_core_start_planner"] { background-color: var(--log-source-planner-bg) !important; border-left-color: var(--log-source-planner-border) !important; }
+.log-source-controller, [class*="log-source-llm_core_start_controller"] { background-color: var(--log-source-controller-bg) !important; border-left-color: var(--log-source-controller-border) !important; }
+.log-source-executor, [class*="log-source-executor_"], [class*="log-source-llm_core_start_executor"] { background-color: var(--log-source-executor-bg) !important; border-left-color: var(--log-source-executor-border) !important; }
+.log-source-evaluator_step, [class*="log-source-llm_core_start_stepevaluator"] { background-color: var(--log-source-evaluator_step-bg) !important; border-left-color: var(--log-source-evaluator_step-border) !important; }
+.log-source-evaluator_overall, [class*="log-source-llm_core_start_overallplanevaluator"] { background-color: var(--log-source-evaluator_overall-bg) !important; border-left-color: var(--log-source-evaluator_overall-border) !important; }
+
+/* Tools (generic and specific examples) */
+[class*="log-source-tool_"] { background-color: var(--log-source-tool-bg) !important; border-left-color: var(--log-source-tool-border) !important; }
+/* e.g. .log-source-tool_tavily_search_api_start, .log-source-tool_write_file_output */
+
+/* LLM Core (if not part of a specific component above) */
+.log-source-llm_core, .log-source-llm_core_token_usage { background-color: var(--log-source-llm_core-bg) !important; border-left-color: var(--log-source-llm_core-border) !important; }
+
+/* Artifacts */
+.log-source-artifact, [class*="log-source-artifact_"] { background-color: var(--log-source-artifact-bg) !important; border-left-color: var(--log-source-artifact-border) !important; }
+
+/* Warnings and Errors */
+.log-source-warning, [class*="log-source-warning_"], [class*="log-source-controller_warning"] { background-color: var(--log-source-warning-bg) !important; border-left-color: var(--log-source-warning-border) !important; }
+.log-source-warning .log-content, .log-source-warning .log-content pre { color: var(--warning-color); }
+
+.log-source-error, [class*="log-source-error_"], [class*="log-source-llm_core_error"],
+[class*="log-source-tool_"][class*="_error"], [class*="log-source-controller_error"],
+[class*="log-source-evaluator_step_error"], [class*="log-source-evaluator_overall_error"] {
+    background-color: var(--log-source-error-bg) !important;
+    border-left-color: var(--log-source-error-border) !important;
+}
+.log-source-error .log-content, [class*="log-source-error_"] .log-content,
+[class*="log-source-llm_core_error"] .log-content,
+[class*="log-source-tool_"][class*="_error"] .log-content,
+.log-source-error .log-content pre, [class*="log-source-error_"] .log-content pre {
+    color: var(--error-color);
+}
+/* --- END Monitor Log Source Specific Styles --- */
+
 
 .artifact-filename { flex-shrink: 0; width: 100%; text-align: center; padding: 5px 0; font-size: 0.85em; color: var(--text-color-darker); border-bottom: 1px solid var(--border-color); margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .monitor-artifact-area img, .monitor-artifact-area pre { flex-grow: 1; flex-shrink: 1; min-height: 0; max-width: 100%; max-height: 100%; overflow: auto; border: none; margin-bottom: 5px; border-radius: 4px; }
@@ -192,10 +282,10 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .artifact-nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .artifact-counter { font-size: 0.85em; color: var(--text-color-muted); }
 
-.message-agent pre { background-color: var(--code-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 0.75rem; margin: 0.5rem 0; overflow-x: auto; white-space: pre; }
-.message-agent pre code { font-family: var(--monospace-font); font-size: 0.9em; color: var(--code-text); background-color: transparent; padding: 0; border: none; white-space: pre; }
-.message-agent code { background-color: var(--code-bg); color: var(--code-text); padding: 0.2em 0.4em; margin: 0; font-size: 85%; border-radius: 3px; font-family: var(--monospace-font); }
-.message-agent pre code { padding: 0; margin: 0; font-size: inherit; background: none; border-radius: 0; color: inherit; }
+.message-agent-final pre, .message-agent-intermediate pre { background-color: var(--code-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 0.75rem; margin: 0.5rem 0; overflow-x: auto; white-space: pre; }
+.message-agent-final pre code, .message-agent-intermediate pre code { font-family: var(--monospace-font); font-size: 0.9em; color: var(--code-text); background-color: transparent; padding: 0; border: none; white-space: pre; }
+.message-agent-final code, .message-agent-intermediate code { background-color: var(--code-bg); color: var(--code-text); padding: 0.2em 0.4em; margin: 0; font-size: 85%; border-radius: 3px; font-family: var(--monospace-font); }
+.message-agent-final pre code, .message-agent-intermediate pre code { padding: 0; margin: 0; font-size: inherit; background: none; border-radius: 0; color: inherit; }
 
 @media (max-width: 768px) {
     .app-container { flex-direction: column; height: auto; min-height: 100vh; }
@@ -205,26 +295,9 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     .panel:not(:last-child) { border-right: none; border-bottom: 1px solid var(--border-color); }
     .monitor-artifact-area img, .monitor-artifact-area pre { max-height: 150px; }
     .llm-selector { max-width: 150px; font-size: 0.8em; }
-    .monitor-header { flex-wrap: wrap; } 
+    .monitor-header { flex-wrap: wrap; }
     .monitor-controls { margin-left: auto; padding-top: 5px;}
 }
-
-.plan-confirmation-container { background-color: var(--panel-bg); border: 1px solid var(--accent-color); border-left: 3px solid var(--accent-color); padding: 15px; margin-top: 10px; margin-bottom: 10px; border-radius: 8px; align-self: stretch; max-width: 100%; }
-.plan-confirmation-container h4 { margin-top: 0; margin-bottom: 10px; color: var(--text-color); font-size: 1.1em; }
-.plan-summary { margin-bottom: 15px; line-height: 1.6; color: var(--text-color-muted); }
-.plan-steps-details { background-color: var(--terminal-bg); border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 0.9em; }
-.plan-steps-details ol { padding-left: 20px; margin: 0; }
-.plan-steps-details li { margin-bottom: 8px; line-height: 1.5; }
-.plan-steps-details li .step-tool { font-style: italic; color: var(--tool-color); font-size: 0.9em; }
-.plan-steps-details li .step-expected { display: block; font-size: 0.9em; color: var(--text-color-darker); margin-top: 2px; }
-.plan-toggle-details-btn { background: none; border: 1px solid var(--border-color); color: var(--text-color-muted); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85em; margin-bottom: 15px; transition: all 0.2s ease; }
-.plan-toggle-details-btn:hover { background-color: var(--panel-bg-lightest); color: var(--text-color); }
-.plan-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; }
-.plan-confirm-btn, .plan-cancel-btn { padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: 500; font-size: 0.9em; transition: background-color 0.2s ease; border: none; }
-.plan-confirm-btn { background-color: var(--accent-color); color: var(--button-text-on-accent); }
-.plan-confirm-btn:hover { background-color: var(--accent-color-hover); }
-.plan-cancel-btn { background-color: var(--panel-bg-lightest); color: var(--text-color); border: 1px solid var(--border-color); }
-.plan-cancel-btn:hover { background-color: var(--panel-bg-lighter); }
 
 .app-credits { font-size: 0.9em; text-align: center; padding-top: 5px; opacity: 0.7; }
 .app-credits a { color: var(--text-color-muted); text-decoration: none; }
@@ -240,14 +313,14 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 
 .monitor-status-container { display: flex; align-items: center; gap: 6px; }
 .status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; background-color: grey; transition: background-color 0.3s ease; }
-.status-dot.idle { background-color: var(--status-idle-color); } 
-.status-dot.running { background-color: var(--status-running-color); } 
-.status-dot.error { background-color: var(--status-error-color); } 
-.status-dot.disconnected { background-color: var(--status-disconnected-color); } 
+.status-dot.idle { background-color: var(--status-idle-color); }
+.status-dot.running { background-color: var(--status-running-color); }
+.status-dot.error { background-color: var(--status-error-color); }
+.status-dot.disconnected { background-color: var(--status-disconnected-color); }
 .monitor-status-text { font-size: 0.85em; color: var(--text-color-darker); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .stop-button { background-color: var(--error-color); color: white; border: none; border-radius: 4px; padding: 2px 8px; font-size: 0.8em; font-weight: bold; cursor: pointer; margin-left: 10px; display: none; transition: background-color 0.2s ease, opacity 0.2s ease; line-height: 1.5; }
-.stop-button:hover:not(:disabled) { background-color: var(--error-color-darker); } 
+.stop-button:hover:not(:disabled) { background-color: var(--error-color-darker); }
 .stop-button:disabled { background-color: #9E9E9E; cursor: not-allowed; opacity: 0.6; }
 
 .upload-area { padding: 10px 15px; border-top: 1px solid var(--border-color); background-color: var(--panel-bg-lighter); flex-shrink: 0; text-align: center; }
@@ -258,4 +331,3 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .token-usage-area { padding: 8px 15px; border-top: 1px solid var(--border-color); background-color: var(--panel-bg); flex-shrink: 0; font-size: 0.8em; color: var(--text-color-muted); }
 .token-usage-area p { margin: 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .token-usage-area .token-label { font-weight: 500; color: var(--text-color-darker); }
-
