@@ -31,6 +31,9 @@ Targeting Version 2.5.3
     -   Chat Interface:
         -   **Rendering:** Correctly displays styled HTML tags. Implements the new visual hierarchy for steps, sub-statuses, and thoughts as per `simulation_option6.html`.
         -   **Persistence:** All chat message types, including the new structured ones, are saved and reloaded.
+        -   **Planned Enhancements:**
+            -   Display tool action confirmations (e.g., for file writes) and output snippets (e.g., for file reads, search results) directly in chat.
+            -   "Copy to clipboard" functionality for relevant chat messages (thoughts, tool outputs, code blocks).
         -   Role-Specific LLM Selection.
     -   Monitor Panel for structured agent logs.
     -   Artifact Viewer.
@@ -41,6 +44,7 @@ Targeting Version 2.5.3
     -   Task-specific, isolated workspaces with persistent history (SQLite).
     -   **Actual Plan Execution:** Backend now attempts full execution of plan steps, including tool usage and LLM generation, replacing previous placeholder logic.
     -   **Message Structure & Persistence:** Implemented for all chat-relevant messages.
+    -   **Planned Enhancements:** Backend support for sending new WebSocket messages (`tool_result_for_chat`) from `callbacks.py` upon tool completion to facilitate in-chat display of tool actions/outputs.
 
 ## Tech Stack
 
@@ -61,7 +65,7 @@ ResearchAgent/
 ├── backend/
 │   ├── __init__.py
 │   ├── agent.py             # Updated ReAct prompt for direct tool output
-│   ├── callbacks.py         # Updated for structured thinking updates & log_source, token parsing refined
+│   ├── callbacks.py         # Updated for structured thinking updates & log_source, token parsing refined. To be enhanced for tool_result_for_chat messages.
 │   ├── config.py
 │   ├── controller.py        # Enhanced prompt for JSON tool inputs
 │   ├── db_utils.py
@@ -75,44 +79,47 @@ ResearchAgent/
 │   │   ├── config_handlers.py
 │   │   ├── operational_handlers.py
 │   │   └── task_handlers.py     # Updated to load/save status_messages from history
-│   ├── planner.py
+│   ├── planner.py             # To be enhanced for final summary steps
 │   ├── server.py                # Updated to save status_messages, handles file uploads
 │   └── tools/
 │       ├── __init__.py
-│       ├── deep_research_tool.py # Input schema `query`, saves report
+│       ├── deep_research_tool.py
 │       ├── playwright_search.py
 │       ├── standard_tools.py
 │       └── tavily_search_tool.py
 ├── css/
-│   └── style.css                # Updated for new chat UI styles & token counter
+│   └── style.css                # Updated for new chat UI styles & token counter. To be enhanced for new tool message bubbles.
 ├── js/
-│   ├── script.js                # Dispatches new message types, handles token updates
+│   ├── script.js                # Dispatches new message types, handles token updates. To handle new tool_result_for_chat.
 │   ├── state_manager.js         # Manages token state, including per-role
 │   ├── websocket_manager.js
 │   └── ui_modules/
-│       ├── chat_ui.js           # Implemented new rendering logic
+│       ├── chat_ui.js           # Implemented new rendering logic. To be enhanced for tool bubbles, collapsibility, copy button.
 │       ├── token_usage_ui.js    # Renders per-role token breakdown
 │       └── file_upload_ui.js    # Handles file upload interactions
-├── BRAINSTORM.md                # Updated with new UI vision and fixed issues
+├── BRAINSTORM.md                # Updated with new UI vision and fixed issues, new feature proposals.
 ├── Dockerfile
 ├── docker-compose.yml
 ├── index.html
 ├── README.md                      # This file
-├── ROADMAP.md                     # Updated with new UI vision and fixed issues
-└── simulation_option6.html        # Conceptual: Visual mock-up of the target chat UI (described in BRAINSTORM.md)
+├── ROADMAP.md                     # Updated with new UI vision and fixed issues, new feature proposals.
+└── simulation_option6.html        # Conceptual: Visual mock-up of the target chat UI
 ```
 
 ## Setup Instructions & Running the Application
 
 (No changes - these remain the same as provided by the user)
 
-## Known Issues / Immediate Next Steps (Targeting v2.5.3 Fixes)
+## Known Issues / Immediate Next Steps (Targeting v2.5.3 Enhancements & Fixes)
 
--   **FILE UPLOAD (FIXED):** File upload functionality is now working.
--   **TOKEN COUNTER (FIXED):** The UI token counter is now correctly updating for all agent roles.
--   **ARTIFACT VIEWER REFRESH (Medium Priority):** The artifact viewer does not consistently or immediately auto-update after a task completes and writes files, even if logs indicate a refresh was triggered. Debugging paused.
+-   **ARTIFACT VIEWER REFRESH (Medium Priority - Debugging Paused):** The artifact viewer does not consistently or immediately auto-update after a task completes and writes files.
 -   **PLAN FILE STATUS UPDATE (Low Priority):** Backend logs still show warnings about not finding step patterns to update status checkboxes in the `_plan_{id}.md` artifact.
 -   **"UNKNOWN" HISTORY MESSAGE TYPES (Low Priority - Review):** Some internal system message types are logged to the monitor from history; confirm this is the desired behavior for all such types.
+-   **ENHANCEMENT: In-Chat Tool Feedback & Usability (Next Focus):** Implement UI and backend changes to display tool action confirmations and output snippets directly in chat, along with a "copy to clipboard" feature for relevant messages. Refine planner prompting for better final summaries from the agent.
+
+**Previously Fixed in v2.5.3 development cycle:**
+-   **FILE UPLOAD (FIXED):** File upload functionality is now working.
+-   **TOKEN COUNTER (FIXED):** The UI token counter is now correctly updating for all agent roles.
 
 ## Security Warnings
 
@@ -120,5 +127,5 @@ ResearchAgent/
 
 ## Next Steps & Future Perspectives
 
-The immediate focus is on resolving issues with the artifact viewer refresh and other minor items.
+The immediate focus is on enhancing in-chat feedback for tool operations and addressing the artifact viewer refresh issue.
 For a detailed, evolving roadmap and ongoing brainstorming, please see **`ROADMAP.md`** and **`BRAINSTORM.md`**.
