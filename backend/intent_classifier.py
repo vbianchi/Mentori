@@ -55,21 +55,20 @@ async def classify_intent(
     callbacks_for_invoke: List[BaseCallbackHandler] = []
     if callback_handler:
         callbacks_for_invoke.append(callback_handler)
-        logger.debug(f"IntentClassifier: Callback handler provided: {type(callback_handler).__name__}")
+        logger.critical(f"CRITICAL_DEBUG: INTENT_CLASSIFIER - classify_intent received callback_handler: {type(callback_handler).__name__}")
     else:
-        logger.debug("IntentClassifier: No callback handler provided.")
+        logger.critical("CRITICAL_DEBUG: INTENT_CLASSIFIER - classify_intent received NO callback_handler.")
 
 
     try:
-        # <<< START MODIFICATION - Pass callbacks_for_invoke to get_llm >>>
+        logger.critical(f"CRITICAL_DEBUG: INTENT_CLASSIFIER - About to call get_llm. Callbacks_for_invoke: {[type(cb).__name__ for cb in callbacks_for_invoke] if callbacks_for_invoke else 'None'}")
         intent_llm: BaseChatModel = get_llm(
             settings, 
             provider=settings.intent_classifier_provider, 
             model_name=settings.intent_classifier_model_name,
             requested_for_role=LOG_SOURCE_INTENT_CLASSIFIER,
-            callbacks=callbacks_for_invoke # Pass the callbacks here
+            callbacks=callbacks_for_invoke # Ensure this is passed
         ) 
-        # <<< END MODIFICATION >>>
         logger.info(f"IntentClassifier: Using LLM {settings.intent_classifier_provider}::{settings.intent_classifier_model_name}")
     except Exception as e:
         logger.error(f"IntentClassifier: Failed to initialize LLM for intent classification: {e}", exc_info=True)
@@ -88,8 +87,6 @@ async def classify_intent(
         ("system", INTENT_CLASSIFIER_SYSTEM_PROMPT_TEMPLATE),
         ("human", human_template)
     ])
-    # The LLM instance (intent_llm) now has the callbacks attached at instantiation.
-    # The RunnableConfig in chain.ainvoke will also pass them, which is fine (LangChain should handle duplicates).
     chain = prompt | intent_llm | parser
 
     try:
@@ -100,7 +97,6 @@ async def classify_intent(
         if available_tools_summary:
             invoke_params["available_tools_summary"] = available_tools_summary
             
-        logger.debug(f"IntentClassifier: Invoking chain with callbacks: {[type(cb).__name__ for cb in callbacks_for_invoke] if callbacks_for_invoke else 'None'}")
         classification_result_dict = await chain.ainvoke(
             invoke_params,
             config=RunnableConfig(
@@ -152,10 +148,7 @@ async def classify_intent(
 
 if __name__ == '__main__':
     async def test_intent_classifier():
-        queries = [
-            "What is photosynthesis?",
-            "Find three articles about dark matter, summarize them, and create a presentation.",
-        ]
+        queries = ["What is photosynthesis?"]
         tools_summary_example = "- duckduckgo_search: For web searches.\n- write_file: To write files."
         for q in queries:
             intent = await classify_intent(q, tools_summary_example, None) 

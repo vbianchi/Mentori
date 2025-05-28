@@ -13,6 +13,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import BaseTool
+from langchain_core.callbacks.base import BaseCallbackHandler # For type hinting
 
 from backend.config import settings
 from backend.llm_setup import get_llm
@@ -20,16 +21,15 @@ from backend.tools import get_dynamic_tools, get_task_workspace_path
 from backend.planner import generate_plan, PlanStep
 from backend.controller import validate_and_prepare_step_action
 from backend.agent import create_agent_executor
-# <<< START MODIFICATION - Import LOG_SOURCE constants >>>
 from backend.callbacks import (
+    WebSocketCallbackHandler, # Ensure this is imported for type hint
     AgentCancelledException, 
     SUB_TYPE_BOTTOM_LINE, SUB_TYPE_SUB_STATUS, SUB_TYPE_THOUGHT, 
     DB_MSG_TYPE_SUB_STATUS, DB_MSG_TYPE_THOUGHT,
     LOG_SOURCE_INTENT_CLASSIFIER, LOG_SOURCE_PLANNER, LOG_SOURCE_CONTROLLER,
     LOG_SOURCE_EXECUTOR, LOG_SOURCE_EVALUATOR_STEP, LOG_SOURCE_EVALUATOR_OVERALL,
-    LOG_SOURCE_SYSTEM, LOG_SOURCE_LLM_CORE # Added LLM_CORE for default cases
+    LOG_SOURCE_SYSTEM, LOG_SOURCE_LLM_CORE 
 )
-# <<< END MODIFICATION >>>
 from backend.intent_classifier import classify_intent
 from backend.evaluator import (
     evaluate_plan_outcome, EvaluationResult,
@@ -43,10 +43,6 @@ AddMonitorLogFunc = Callable[[str, str], Coroutine[Any, Any, None]]
 DBAddMessageFunc = Callable[[str, str, str, str], Coroutine[Any, Any, None]]
 
 MAX_STEP_RETRIES = settings.agent_max_step_retries
-
-# Component hints already defined in callbacks, but can be redefined here if needed for specific logic
-# For consistency, we'll use the imported ones.
-
 DB_MSG_TYPE_MAJOR_STEP = "db_major_step_announcement"
 
 async def _save_message_to_db_from_handler(
@@ -124,17 +120,39 @@ async def process_user_message(
     await add_monitor_log_func(f"User Input: {user_input_content}", "monitor_user_input")
 
     session_data_entry.update({'original_user_query': user_input_content, 'cancellation_requested': False, 'active_plan_filename': None, 'current_plan_proposal_id_backend': None})
+    
+    # <<< START MODIFICATION - Explicitly log the retrieved callback_handler >>>
+    retrieved_callback_handler: Optional[WebSocketCallbackHandler] = session_data_entry.get("callback_handler")
+    logger.critical(f"CRITICAL_DEBUG: AGENT_FLOW_HANDLER (process_user_message) - Retrieved 'callback_handler' from session_data_entry. Type: {type(retrieved_callback_handler).__name__ if retrieved_callback_handler else 'None'}. Is it None? {retrieved_callback_handler is None}")
+    
+    callbacks_for_invoke: List[BaseCallbackHandler] = []
+    if not retrieved_callback_handler: # Check the specifically retrieved handler
+        logger.error(f"[{session_id}] Callback handler NOT FOUND in session_data_entry for process_user_message. Token counting for some roles may fail.")
+    else:
+        callbacks_for_invoke.append(retrieved_callback_handler)
+        logger.critical(f"CRITICAL_DEBUG: AGENT_FLOW_HANDLER (process_user_message) - Populated callbacks_for_invoke with: {[type(cb).__name__ for cb in callbacks_for_invoke]}")
+    # <<< END MODIFICATION >>>
 
     await _send_thinking_update_from_handler(send_ws_message_func, active_task_id, session_id, db_add_message_func, "Classifying intent...", "INTENT_CLASSIFICATION_START", LOG_SOURCE_INTENT_CLASSIFIER, SUB_TYPE_SUB_STATUS)
     dynamic_tools = get_dynamic_tools(active_task_id)
     tools_summary = "\n".join([f"- {tool.name}: {tool.description.split('.')[0]}" for tool in dynamic_tools])
-    classified_intent = await classify_intent(user_input_content, tools_summary)
+    
+    classified_intent = await classify_intent(
+        user_input_content, 
+        tools_summary,
+        retrieved_callback_handler # Pass the specifically retrieved handler
+    )
+
     await add_monitor_log_func(f"Intent classified as: {classified_intent}", f"{LOG_SOURCE_SYSTEM}_INTENT_CLASSIFIED")
     await _send_thinking_update_from_handler(send_ws_message_func, active_task_id, session_id, db_add_message_func, f"Intent: {classified_intent}", "INTENT_CLASSIFIED", LOG_SOURCE_INTENT_CLASSIFIER, SUB_TYPE_SUB_STATUS)
 
     if classified_intent == "PLAN":
         await _send_thinking_update_from_handler(send_ws_message_func, active_task_id, session_id, db_add_message_func, "Generating plan...", "PLAN_GENERATION_START", LOG_SOURCE_PLANNER, SUB_TYPE_SUB_STATUS)
-        human_summary, steps = await generate_plan(user_input_content, tools_summary)
+        human_summary, steps = await generate_plan(
+            user_input_content, 
+            tools_summary,
+            retrieved_callback_handler # Pass the specifically retrieved handler
+        )
         if human_summary and steps:
             plan_id = str(uuid.uuid4())
             session_data_entry.update({"current_plan_proposal_id_backend": plan_id, "current_plan_human_summary": human_summary, "current_plan_structured": steps})
@@ -157,30 +175,25 @@ async def process_user_message(
             await send_ws_message_func("status_message", {"text": "Error: Could not generate a plan.", "component_hint": LOG_SOURCE_PLANNER, "isError": True})
             await _send_thinking_update_from_handler(send_ws_message_func, active_task_id, session_id, db_add_message_func, "Planning failed.", "PLAN_FAILED", LOG_SOURCE_PLANNER, SUB_TYPE_BOTTOM_LINE)
     elif classified_intent == "DIRECT_QA":
-        # <<< START MODIFICATION - Define role hint for Direct QA >>>
-        direct_qa_role_hint = LOG_SOURCE_EXECUTOR + "_DirectQA" # More specific than just EXECUTOR
-        # <<< END MODIFICATION >>>
+        direct_qa_role_hint = LOG_SOURCE_EXECUTOR + "_DirectQA" 
         await _send_thinking_update_from_handler(send_ws_message_func, active_task_id, session_id, db_add_message_func, "Processing directly...", "DIRECT_QA_START", direct_qa_role_hint, SUB_TYPE_BOTTOM_LINE)
         executor_llm = get_llm(
             settings, 
             provider=session_data_entry.get("selected_llm_provider", settings.executor_default_provider), 
             model_name=session_data_entry.get("selected_llm_model_name", settings.executor_default_model_name), 
-            # <<< START MODIFICATION - Pass role hint to get_llm for logging clarity >>>
-            requested_for_role=direct_qa_role_hint 
-            # <<< END MODIFICATION >>>
+            requested_for_role=direct_qa_role_hint,
+            callbacks=callbacks_for_invoke # Pass callbacks to LLM for AgentExecutor too
         )
         agent_executor = create_agent_executor(llm=executor_llm, tools=dynamic_tools, memory=session_data_entry["memory"], max_iterations=settings.agent_max_iterations) 
         final_state = "DIRECT_QA_FAILED"; final_msg = "Direct QA error." 
         try:
-            # <<< START MODIFICATION - Add metadata to agent_executor.ainvoke for Direct QA >>>
             result = await agent_executor.ainvoke(
                 {"input": user_input_content}, 
                 config=RunnableConfig(
-                    callbacks=[session_data_entry["callback_handler"]],
+                    callbacks=callbacks_for_invoke, 
                     metadata={"component_name": direct_qa_role_hint} 
                 )
             )
-            # <<< END MODIFICATION >>>
             if result and 'output' in result:
                 await send_ws_message_func("agent_message", {"content": result['output'], "component_hint": direct_qa_role_hint})
                 await db_add_message_func(active_task_id, session_id, "agent_message", result['output'])
@@ -209,6 +222,17 @@ async def process_execute_confirmed_plan(
     logger.info(f"[{session_id}] Received 'execute_confirmed_plan' with plan_id: {data.get('plan_id')}")
     active_task_id = session_data_entry.get("current_task_id")
     if not active_task_id: return await send_ws_message_func("status_message", {"text": "Error: No active task.", "component_hint": LOG_SOURCE_SYSTEM, "isError": True})
+
+    retrieved_callback_handler: Optional[WebSocketCallbackHandler] = session_data_entry.get("callback_handler")
+    logger.critical(f"CRITICAL_DEBUG: AGENT_FLOW_HANDLER (process_execute_confirmed_plan) - Retrieved 'callback_handler' from session_data_entry. Type: {type(retrieved_callback_handler).__name__ if retrieved_callback_handler else 'None'}. Is it None? {retrieved_callback_handler is None}")
+    
+    callbacks_for_invoke: List[BaseCallbackHandler] = []
+    if not retrieved_callback_handler:
+        logger.error(f"[{session_id}] Callback handler not found in session_data_entry for process_execute_confirmed_plan. Token counting for some roles may fail.")
+    else:
+        callbacks_for_invoke.append(retrieved_callback_handler)
+        logger.critical(f"CRITICAL_DEBUG: AGENT_FLOW_HANDLER (process_execute_confirmed_plan) - Populated callbacks_for_invoke with: {[type(cb).__name__ for cb in callbacks_for_invoke]}")
+
 
     confirmed_plan_id = data.get("plan_id")
     confirmed_steps = data.get("confirmed_plan")
@@ -266,7 +290,8 @@ async def process_execute_confirmed_plan(
             
             tool_name, tool_input, controller_reasoning, confidence = await validate_and_prepare_step_action(
                 original_user_query, effective_plan_step_for_controller, get_dynamic_tools(active_task_id), 
-                session_data_entry, last_successful_step_output
+                session_data_entry, last_successful_step_output,
+                retrieved_callback_handler # Pass the handler
             )
             current_step_attempt_log.append(f"Attempt {retry_count+1}: Controller decided Tool='{tool_name}', Input='{str(tool_input)[:50]}...', Confidence={confidence:.2f}. Reasoning: {controller_reasoning}")
             if controller_reasoning and len(controller_reasoning) > 10: 
@@ -288,21 +313,18 @@ async def process_execute_confirmed_plan(
                     settings, 
                     provider=session_data_entry.get("selected_llm_provider", settings.executor_default_provider), 
                     model_name=session_data_entry.get("selected_llm_model_name", settings.executor_default_model_name),
-                    # <<< START MODIFICATION - Pass role hint to get_llm for logging clarity >>>
-                    requested_for_role=f"{LOG_SOURCE_EXECUTOR}_Step{current_step_num}"
-                    # <<< END MODIFICATION >>>
+                    requested_for_role=f"{LOG_SOURCE_EXECUTOR}_Step{current_step_num}",
+                    callbacks=callbacks_for_invoke # Pass callbacks to LLM for AgentExecutor too
                 )
                 agent_executor_instance = create_agent_executor(llm=executor_llm, tools=get_dynamic_tools(active_task_id), memory=session_data_entry["memory"], max_iterations=settings.agent_max_iterations) 
                 
-                # <<< START MODIFICATION - Add metadata to agent_executor.ainvoke for Plan Step >>>
                 agent_run_task = asyncio.create_task(agent_executor_instance.ainvoke(
                     {"input": executor_input_str}, 
                     config=RunnableConfig(
-                        callbacks=[session_data_entry["callback_handler"]],
-                        metadata={"component_name": LOG_SOURCE_EXECUTOR} # Using generic EXECUTOR for all steps
+                        callbacks=callbacks_for_invoke, 
+                        metadata={"component_name": LOG_SOURCE_EXECUTOR} 
                     )
                 ))
-                # <<< END MODIFICATION >>>
                 connected_clients_entry["agent_task"] = agent_run_task
                 executor_result_dict = await agent_run_task
                 step_executor_output_str = executor_result_dict.get("output", f"Step {current_step_num}{attempt_msg} completed, no specific output from ReAct agent.")
@@ -319,7 +341,12 @@ async def process_execute_confirmed_plan(
             current_step_attempt_log.append(f"Executor Output: {str(step_executor_output_str)[:100]}...")
             
             await _send_thinking_update_from_handler(send_ws_message_func, active_task_id, session_id, db_add_message_func, f"Step Evaluator assessing Step {current_step_num}{attempt_msg} outcome...", "STEP_EVAL_START", LOG_SOURCE_EVALUATOR_STEP, SUB_TYPE_SUB_STATUS)
-            eval_outcome = await evaluate_step_outcome_and_suggest_correction(original_user_query, current_plan_step_obj, tool_name, tool_input, step_executor_output_str, get_dynamic_tools(active_task_id), session_data_entry)
+            eval_outcome = await evaluate_step_outcome_and_suggest_correction(
+                original_user_query, current_plan_step_obj, 
+                tool_name, tool_input, step_executor_output_str, 
+                get_dynamic_tools(active_task_id), session_data_entry,
+                retrieved_callback_handler # Pass the handler
+            )
             
             if eval_outcome:
                 current_step_attempt_log.append(f"Evaluator: Achieved={eval_outcome.step_achieved_goal}. Assessment: {eval_outcome.assessment_of_step}")
@@ -336,18 +363,20 @@ async def process_execute_confirmed_plan(
                 plan_failed = True; final_eval_answer = f"Error: Step Evaluator failed for step {current_step_num}."; break
             retry_count += 1
         
-
         step_execution_summary_for_overall_eval.append(f"Step {current_step_num}: {current_plan_step_obj.description}\n  Status: {'Success' if step_succeeded_this_round else 'Failed'}\n  Attempts:\n    " + "\n    ".join(current_step_attempt_log))
         await _update_plan_file_step_status(task_workspace_path, plan_execution_filename, current_step_num, "x" if step_succeeded_this_round else "!")
         if not step_succeeded_this_round: plan_failed = True 
         if plan_failed: break 
         
-
     session_data_entry["plan_execution_active"] = False
     executed_plan_summary_str = "\n---\n".join(step_execution_summary_for_overall_eval) if step_execution_summary_for_overall_eval else "No steps were fully processed to summarize."
 
     await _send_thinking_update_from_handler(send_ws_message_func, active_task_id, session_id, db_add_message_func, "Evaluating overall outcome...", "OVERALL_EVAL_START", LOG_SOURCE_EVALUATOR_OVERALL, SUB_TYPE_BOTTOM_LINE)
-    overall_eval_result = await evaluate_plan_outcome(original_user_query, executed_plan_summary_str, final_eval_answer, session_data_entry)
+    overall_eval_result = await evaluate_plan_outcome(
+        original_user_query, executed_plan_summary_str, 
+        final_eval_answer, session_data_entry,
+        retrieved_callback_handler # Pass the handler
+    )
     
     final_chat_message_content = final_eval_answer 
     if overall_eval_result:
