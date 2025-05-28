@@ -52,12 +52,12 @@ For each sub-task in the plan:
     -   For tool steps or steps producing data primarily for *subsequent processing* within the plan (not direct user presentation yet): the `expected_outcome` should describe the state or data becoming available (e.g., "File 'data.csv' downloaded to workspace", "The full text content of the file 'report.txt' is returned and available for the next step", "The list of search results is available.").
     -   **Crucially, for "No Tool" steps that are intended to generate the final piece of information or creative content for that part of the plan, the `expected_outcome` MUST describe the actual content itself, as shown in point 3.**
 
-**Handling Multi-Part User Queries for Final Output:**
-If the original user query explicitly or implicitly asks for multiple distinct pieces of information to be delivered in the final response (e.g., "tell me X, and also provide Y"), ensure your plan includes all necessary steps to gather or generate each piece of information.
-**Crucially, after all individual pieces of information have been gathered by preceding steps and need to be presented to the user as a combined answer, you MUST add a final "No Tool" step.**
--   The `description` for this final synthesis step should clearly state that it's combining the necessary prior outputs to fully address the user's original request.
--   The `tool_input_instructions` (for this "No Tool" synthesis step) should guide the LLM on which prior step outputs need to be synthesized, for example: "Combine the result from Step X [e.g., the extracted fact] and the result from Step Y [e.g., the summary] into a complete answer to the user's original query: '{user_query}'".
--   The `expected_outcome` for this synthesis step should be: "A single, consolidated final answer addressing all parts of the user's original request is generated."
+**Handling Multi-Part User Queries & Final Output Synthesis:**
+If the original user query explicitly or implicitly asks for multiple distinct pieces of information to be delivered, or involves the creation of files or multiple distinct outputs (e.g., "generate two poems and save them", "research X and write a report to report.txt"), ensure your plan includes all necessary steps to gather/generate each piece and perform any actions like file writing.
+**Crucially, after all individual pieces of information have been gathered/generated and actions (like file writing) have been performed by preceding steps, you MUST add a final "No Tool" step to synthesize these outcomes into a comprehensive final answer for the user.**
+-   The `description` for this final synthesis step should clearly state its purpose, for example: "Synthesize all findings and actions into a final comprehensive answer for the user."
+-   The `tool_input_instructions` (for this "No Tool" synthesis step) should guide the LLM on what prior step outputs and actions need to be confirmed and/or synthesized. For example: "Review the outcomes of all previous steps. If files were written (e.g., 'poem1.txt', 'analysis_report.pdf'), confirm their successful creation and briefly state their purpose or content. Combine this confirmation with any other generated information (e.g., search result summaries, direct answers from previous steps) into a single, coherent, and user-friendly response that fully addresses the original query: '{user_query}'. If the query asked for content to be generated and saved, you can optionally include a very brief snippet of the generated content in your final answer if it's concise and relevant."
+-   The `expected_outcome` for this synthesis step MUST be: "A single, consolidated final answer that confirms all actions taken (like file creation) and presents all requested information, thereby fully addressing the user's original request, is generated."
 
 Additionally, provide a `human_readable_summary` of the entire plan that can be shown to the user for confirmation.
 Ensure the output is a JSON object that strictly adheres to the following JSON schema:
@@ -202,3 +202,4 @@ if __name__ == '__main__':
         else:
             print("Failed to generate a plan for poem generation query.")
     asyncio.run(test_planner_poem_generation())
+

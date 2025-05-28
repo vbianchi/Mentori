@@ -184,6 +184,7 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     padding: 10px 15px;
     border-radius: 0px 15px 15px 0px; 
     max-width: calc(100% - 13px); 
+    position: relative; /* For copy button positioning if inside */
 }
 
 .message-agent-step {
@@ -221,19 +222,74 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     border-left-width: 3px;
     border-left-style: solid;
 }
-.message-agent-thought .thought-label {
-    display: block;
-    font-size: 0.9em;
-    color: var(--text-color); 
-    padding-left: 10px;
+
+/* --- START: New Styles for Extended Copy (Phase 5) --- */
+.thought-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Changed from center to start */
+    padding-left: 10px; /* Align with content box if label is short */
     margin-bottom: 2px;
 }
+.message-agent-thought .thought-label {
+    /* display: block; /* Already block */
+    font-size: 0.9em;
+    color: var(--text-color); 
+    /* padding-left: 10px; /* Removed, handled by thought-top-row */
+    /* margin-bottom: 2px; /* Handled by thought-top-row */
+    flex-grow: 1; /* Allow label to take space */
+}
+/* General copy button style, can be shared by tool output, thoughts, pre blocks */
+.chat-copy-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-color-muted);
+    padding: 2px 6px; 
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em; 
+    margin-left: 8px; 
+    line-height: 1.2; 
+    flex-shrink: 0; 
+    transition: all 0.2s ease;
+}
+.chat-copy-btn:hover:not(:disabled) {
+    background-color: var(--panel-bg-lightest);
+    color: var(--text-color);
+    border-color: var(--text-color-muted);
+}
+.chat-copy-btn:disabled {
+    opacity: 0.7;
+    cursor: default;
+}
+
+/* Wrapper for <pre> blocks that get a copy button */
+.pre-wrapper-with-copy {
+    position: relative; /* Allows absolute positioning of copy button if desired */
+    margin: 0.5rem 0; /* Same as .message pre */
+}
+.pre-wrapper-with-copy pre {
+    margin-bottom: 0; /* Remove margin from pre itself if button is outside */
+}
+.pre-wrapper-with-copy .chat-copy-btn {
+    /* Example: Position top-right of the pre block */
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 10;
+    opacity: 0.3; /* Make it subtle until hover */
+}
+.pre-wrapper-with-copy:hover .chat-copy-btn {
+    opacity: 1;
+}
+/* --- END: New Styles for Extended Copy (Phase 5) --- */
+
 .message-agent-thought .thought-content-box {
     background-color: var(--terminal-bg);
     color: var(--terminal-text);
     padding: 8px 12px;
     border-radius: 4px;
-    margin-top: 2px;
+    margin-top: 2px; /* Reduced from original thought-content-box */
     font-size: 0.9em;
     white-space: pre-wrap; 
     word-wrap: break-word;
@@ -248,24 +304,29 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     color: inherit;
 }
 
-/* --- START: New Styles for Tool Output Messages (Phase 3) --- */
 .message-agent-tool-output {
     margin-bottom: 5px;
     padding-left: 10px; 
     border-left-width: 3px;
     border-left-style: solid;
-    /* The specific border color will be applied by a class like .agent-line-tool */
+}
+
+.tool-output-top-row {
+    display: flex;
+    justify-content: space-between; 
+    align-items: flex-start; 
+    padding-left: 10px; 
+    margin-bottom: 2px;
 }
 
 .tool-output-label {
     display: block;
     font-size: 0.9em;
     color: var(--text-color); 
-    padding-left: 10px;
-    margin-bottom: 2px;
+    flex-grow: 1; 
 }
 .tool-output-label strong {
-    color: var(--agent-line-tool-color); /* Make tool name stand out */
+    color: var(--agent-line-tool-color); 
 }
 .tool-output-label em {
     color: var(--text-color-muted);
@@ -273,7 +334,7 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 }
 
 .tool-output-content-box {
-    background-color: var(--terminal-bg); /* Same as thoughts */
+    background-color: var(--terminal-bg); 
     color: var(--terminal-text);
     padding: 8px 12px;
     border-radius: 4px;
@@ -283,9 +344,9 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     word-wrap: break-word;
     margin-left: 10px; 
     border: 1px solid var(--pre-border);
-    overflow-x: auto; /* Allow horizontal scroll for very long lines in pre */
+    overflow-x: auto; 
 }
-.tool-output-content-box pre { /* Ensure pre within tool output is styled */
+.tool-output-content-box pre { 
     margin: 0;
     padding: 0;
     background-color: transparent;
@@ -293,13 +354,13 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     color: inherit;
     font-family: var(--monospace-font);
 }
-.tool-output-content-box code { /* Ensure code within tool output is styled */
-    background-color: var(--panel-bg-lighter); /* Slightly different for inline code in tool output */
+.tool-output-content-box code { 
+    background-color: var(--panel-bg-lighter); 
     color: var(--text-color);
     padding: 0.1em 0.3em;
     border-radius: 3px;
 }
-.tool-output-content-box pre code { /* Reset for code within pre */
+.tool-output-content-box pre code { 
     background: none;
     padding: 0;
 }
@@ -307,11 +368,10 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 
 .tool-output-preview {
     /* Styles for the preview text if needed, but mostly inherits from content-box */
-    /* Could add max-height and overflow:hidden if strictly controlling by CSS */
 }
 
 .tool-output-full {
-    display: none; /* Initially hidden */
+    display: none; 
 }
 
 .tool-output-expand-btn {
@@ -322,8 +382,8 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.8em;
-    margin-top: 8px; /* Space after the content box */
-    margin-left: 10px; /* Align with content box */
+    margin-top: 8px; 
+    margin-left: 10px; 
     transition: all 0.2s ease;
 }
 .tool-output-expand-btn:hover {
@@ -336,10 +396,9 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     font-style: italic;
     color: var(--text-color-muted);
     margin-top: 5px;
-    margin-left: 10px; /* Align with content box */
+    margin-left: 10px; 
     padding-left: 10px;
 }
-/* --- END: New Styles for Tool Output Messages (Phase 3) --- */
 
 
 #agent-thinking-status {
@@ -441,7 +500,7 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     border: 1px solid var(--pre-border);
     border-radius: 4px;
     padding: 0.75rem;
-    margin: 0.5rem 0;
+    /* margin: 0.5rem 0; /* Removed to be handled by .pre-wrapper-with-copy */
     overflow-x: auto;
     white-space: pre; 
     font-family: var(--monospace-font);

@@ -6,7 +6,7 @@
  * - Handles Markdown formatting.
  * - Displays plan proposals and confirmed plans.
  * - Manages chat input and thinking status.
- * - Handles collapsibility for long tool outputs.
+ * - Handles collapsibility for long tool outputs and copy-to-clipboard.
  */
 
 let chatMessagesContainerElement;
@@ -39,10 +39,92 @@ const componentBorderColorMap = {
     ERROR: 'agent-line-error'
 };
 
-// --- START: New constants for Phase 3 ---
 const MAX_CHARS_TOOL_OUTPUT_PREVIEW = 500;
 const MAX_LINES_TOOL_OUTPUT_PREVIEW = 10;
-// --- END: New constants for Phase 3 ---
+
+/**
+ * Handles copying text to the clipboard and provides visual feedback on the button.
+ * @param {string} textToCopy - The text to be copied.
+ * @param {HTMLElement} buttonElement - The button that was clicked to trigger the copy.
+ */
+async function handleCopyToClipboard(textToCopy, buttonElement) {
+    if (!navigator.clipboard) {
+        console.warn('[ChatUI] Clipboard API not available.');
+        if (buttonElement) {
+            const originalText = buttonElement.textContent;
+            buttonElement.textContent = 'Error';
+            setTimeout(() => { buttonElement.textContent = originalText; }, 2000);
+        }
+        return;
+    }
+    try {
+        await navigator.clipboard.writeText(textToCopy);
+        console.log('[ChatUI] Text copied to clipboard:', textToCopy.substring(0, 50) + "...");
+        if (buttonElement) {
+            const originalText = buttonElement.textContent;
+            buttonElement.textContent = 'Copied ✓';
+            buttonElement.disabled = true;
+            setTimeout(() => {
+                buttonElement.textContent = originalText;
+                buttonElement.disabled = false;
+            }, 1500);
+        }
+    } catch (err) {
+        console.error('[ChatUI] Failed to copy text: ', err);
+        if (buttonElement) {
+            const originalText = buttonElement.textContent;
+            buttonElement.textContent = 'Failed!';
+            setTimeout(() => { buttonElement.textContent = originalText; }, 2000);
+        }
+    }
+}
+
+// --- START: New Helper Function for Phase 5 ---
+/**
+ * Creates a copy button element.
+ * @param {function} getTextToCopyFn - A function that returns the text to be copied when called.
+ * @param {string} buttonText - Initial text/content for the button.
+ * @returns {HTMLElement} The created button element.
+ */
+function _createCopyButton(getTextToCopyFn, buttonText = '📋&nbsp;Copy') {
+    const copyButton = document.createElement('button');
+    copyButton.className = 'chat-copy-btn';
+    copyButton.innerHTML = buttonText;
+    copyButton.title = 'Copy to clipboard';
+    copyButton.onclick = (e) => {
+        e.stopPropagation();
+        const textToCopy = getTextToCopyFn();
+        handleCopyToClipboard(textToCopy, copyButton);
+    };
+    return copyButton;
+}
+
+/**
+ * Adds copy buttons to all <pre> elements within a given parent element.
+ * It avoids adding multiple buttons to the same <pre> block.
+ * @param {HTMLElement} parentElement - The element to search within for <pre> blocks.
+ */
+function _addCopyButtonsToPreBlocks(parentElement) {
+    if (!parentElement) return;
+    const preBlocks = parentElement.querySelectorAll('pre:not(.copy-btn-added)'); // Select only <pre> not yet processed
+    preBlocks.forEach(preElement => {
+        const textToCopyFn = () => preElement.textContent || "";
+        const copyButton = _createCopyButton(textToCopyFn, 'Copy Code');
+        copyButton.style.marginLeft = 'auto'; // Push to right if in a flex container
+        copyButton.style.display = 'block'; // Or adjust as needed
+        
+        // Insert button: either before <pre> or wrap them
+        // Wrapping is often better for layout and ensuring button stays with its <pre>
+        const wrapper = document.createElement('div');
+        wrapper.className = 'pre-wrapper-with-copy'; // For potential styling
+        preElement.parentNode.insertBefore(wrapper, preElement);
+        wrapper.appendChild(preElement); // Move <pre> into wrapper
+        wrapper.appendChild(copyButton); // Add button to wrapper, after <pre>
+        
+        preElement.classList.add('copy-btn-added'); // Mark as processed
+    });
+}
+// --- END: New Helper Function for Phase 5 ---
 
 
 function initChatUI(elements, callbacks) {
@@ -160,16 +242,17 @@ function formatMessageContentInternal(text, isThoughtOrToolContentBox = false) {
 
     const codeBlockPlaceholders = [];
     let tempText = text.replace(/```(\w*)\n([\s\S]*?)\n?```/g, (match, lang, code) => {
-        const escapedCode = escapeHTML(code); // Escape HTML within the code block
+        const escapedCode = escapeHTML(code); 
         const langClass = lang ? ` class="language-${lang}"` : '';
         const placeholder = `%%CODEBLOCK_${codeBlockPlaceholders.length}%%`;
-        codeBlockPlaceholders.push(`<pre><code${langClass}>${escapedCode}</code></pre>`);
+        // Mark the placeholder as a pre block for later copy button attachment
+        codeBlockPlaceholders.push(`<pre data-is-code-block="true"><code${langClass}>${escapedCode}</code></pre>`);
         return placeholder;
     });
 
     const inlineCodePlaceholders = [];
     tempText = tempText.replace(/`([^`]+?)`/g, (match, code) => {
-        const escapedCode = escapeHTML(code); // Escape HTML within inline code
+        const escapedCode = escapeHTML(code); 
         const placeholder = `%%INLINECODE_${inlineCodePlaceholders.length}%%`;
         inlineCodePlaceholders.push(`<code>${escapedCode}</code>`);
         return placeholder;
@@ -177,20 +260,13 @@ function formatMessageContentInternal(text, isThoughtOrToolContentBox = false) {
     
     tempText = tempText.replace(/\[([^<>[\]]+?)\]\((https?:\/\/[^\s)]+)\)/g, (match, linkText, linkUrl) => {
         const safeLinkText = escapeHTML(linkText);
-        const safeLinkUrl = escapeHTML(linkUrl); // URL attributes should also be escaped
+        const safeLinkUrl = escapeHTML(linkUrl); 
         return `<a href="${safeLinkUrl}" target="_blank" rel="noopener noreferrer">${safeLinkText}</a>`;
     });
 
     tempText = tempText.replace(/(\*\*\*|___)(?=\S)([\s\S]*?\S)\1/g, (match, wrapper, content) => `<strong><em>${escapeHTML(content)}</em></strong>`);
     tempText = tempText.replace(/(\*\*|__)(?=\S)([\s\S]*?\S)\1/g, (match, wrapper, content) => `<strong>${escapeHTML(content)}</strong>`);
     tempText = tempText.replace(/(?<![`*\w\\])(?:(\*|_))(?=\S)([\s\S]*?\S)\1(?![`*\w])/g, (match, wrapper, content) => `<em>${escapeHTML(content)}</em>`);
-
-    // Escape remaining HTML special characters ONLY if not already part of a placeholder
-    // This is complex. A simpler way: if the original text was meant to be plain text,
-    // then after markdown-to-html, the parts that are still plain text should be escaped.
-    // For now, we rely on the fact that markdown replacements handle their own content.
-    // The main issue is if the *original input text* had HTML that should be displayed as text.
-    // The current approach is to convert markdown, then assume the result is intended HTML.
 
     if (!isThoughtOrToolContentBox) {
         const partsForNewline = tempText.split(/(%%CODEBLOCK_\d+%%|%%INLINECODE_\d+%%)/g);
@@ -214,7 +290,7 @@ function getComponentClass(componentHint) {
     if (componentBorderColorMap[hint]) {
         return componentBorderColorMap[hint];
     }
-    if (hint.startsWith("TOOL_")) { // Covers TOOL_READ_FILE etc.
+    if (hint.startsWith("TOOL_")) { 
         return componentBorderColorMap.TOOL; 
     }
     return componentBorderColorMap.SYSTEM; 
@@ -247,7 +323,6 @@ function displayMajorStepAnnouncementUI(data) {
     console.log(`[ChatUI] Displayed Major Step Announcement: Step ${step_number}/${total_steps}`);
 }
 
-// --- START: New function for Phase 3 ---
 function displayToolOutputMessageUI(data) {
     if (!chatMessagesContainerElement) {
         console.error("[ChatUI] Chat container missing! Cannot display tool output.");
@@ -257,16 +332,24 @@ function displayToolOutputMessageUI(data) {
     const { tool_name, tool_input_summary, tool_output_content, artifact_filename, original_length } = data;
 
     const toolOutputWrapperDiv = document.createElement('div');
-    // Add a new specific class for styling, and the common 'agent-line-tool' for the border
     toolOutputWrapperDiv.className = `message message-agent-tool-output ${getComponentClass('TOOL')}`;
 
+    const topRowDiv = document.createElement('div'); 
+    topRowDiv.className = 'tool-output-top-row'; 
+
     const labelDiv = document.createElement('div');
-    labelDiv.className = 'tool-output-label'; // New class for styling the label
+    labelDiv.className = 'tool-output-label'; 
     labelDiv.innerHTML = `Tool Output: <strong>${escapeHTML(tool_name)}</strong> (Input: <em>${escapeHTML(tool_input_summary)}</em>)`;
-    toolOutputWrapperDiv.appendChild(labelDiv);
+    topRowDiv.appendChild(labelDiv);
+
+    const copyButton = _createCopyButton(() => tool_output_content); // Pass function to get text
+    topRowDiv.appendChild(copyButton);
+    
+    toolOutputWrapperDiv.appendChild(topRowDiv);
+
 
     const contentBoxDiv = document.createElement('div');
-    contentBoxDiv.className = 'tool-output-content-box'; // New class, similar to thought-content-box
+    contentBoxDiv.className = 'tool-output-content-box';
 
     const lines = tool_output_content.split('\n');
     const isLongContent = original_length > MAX_CHARS_TOOL_OUTPUT_PREVIEW || lines.length > MAX_LINES_TOOL_OUTPUT_PREVIEW;
@@ -288,40 +371,34 @@ function displayToolOutputMessageUI(data) {
         contentBoxDiv.appendChild(fullDiv);
 
         const expandButton = document.createElement('button');
-        expandButton.className = 'tool-output-expand-btn'; // New class for styling
+        expandButton.className = 'tool-output-expand-btn'; 
         expandButton.textContent = 'Expand';
         expandButton.onclick = () => {
             const isExpanded = fullDiv.style.display === 'block';
             fullDiv.style.display = isExpanded ? 'none' : 'block';
             previewDiv.style.display = isExpanded ? 'block' : 'none';
             expandButton.textContent = isExpanded ? 'Expand' : 'Collapse';
-            scrollToBottomChat(); // Adjust scroll after expanding/collapsing
+            scrollToBottomChat(); 
         };
-        toolOutputWrapperDiv.appendChild(expandButton); // Append button after contentBox
+        toolOutputWrapperDiv.appendChild(expandButton); 
     } else {
         contentBoxDiv.innerHTML = formatMessageContentInternal(tool_output_content, true);
     }
     toolOutputWrapperDiv.appendChild(contentBoxDiv);
+    _addCopyButtonsToPreBlocks(contentBoxDiv); // Add copy buttons to pre blocks within this tool output
 
     if (artifact_filename) {
         const artifactLinkDiv = document.createElement('div');
-        artifactLinkDiv.className = 'tool-output-artifact-link'; // New class for styling
+        artifactLinkDiv.className = 'tool-output-artifact-link'; 
         artifactLinkDiv.innerHTML = `<em>References artifact: ${escapeHTML(artifact_filename)}</em>`;
-        // Later, this could be a button to trigger artifact view
         toolOutputWrapperDiv.appendChild(artifactLinkDiv);
     }
     
-    // Placeholder for Phase 4: Copy button
-    // const copyButton = document.createElement('button'); /* ... */
-    // toolOutputWrapperDiv.appendChild(copyButton);
-
-
     appendMessageElement(toolOutputWrapperDiv);
     scrollToBottomChat();
     console.log(`[ChatUI] Displayed Tool Output: ${tool_name}`);
     return toolOutputWrapperDiv;
 }
-// --- END: New function for Phase 3 ---
 
 
 function addChatMessageToUI(messageData, type, options = {}, doScroll = true) {
@@ -333,18 +410,20 @@ function addChatMessageToUI(messageData, type, options = {}, doScroll = true) {
     let baseMessageDiv; 
     let contentHolderDiv; 
 
-    let textContent, componentHint;
+    let textContent, componentHint; // textContent will hold the raw string for copying
     if (typeof messageData === 'string') {
         textContent = messageData;
         componentHint = options.component_hint;
     } else if (typeof messageData === 'object' && messageData !== null) {
-        textContent = messageData.content || messageData.text || (messageData.message ? messageData.message : JSON.stringify(messageData));
+        // Prioritize 'content' for agent messages, then 'text' for status, then stringify
+        textContent = messageData.content || messageData.text || (messageData.message ? String(messageData.message) : JSON.stringify(messageData));
         componentHint = messageData.component_hint || options.component_hint;
     } else {
         textContent = String(messageData);
         componentHint = options.component_hint;
     }
     const effectiveComponentHint = componentHint || 'SYSTEM';
+    const originalTextContentForCopy = textContent; // Store raw text before formatting for copy
 
     if (type === 'user') {
         baseMessageDiv = document.createElement('div');
@@ -361,13 +440,12 @@ function addChatMessageToUI(messageData, type, options = {}, doScroll = true) {
             messageData.onCancel,
             messageData.onViewDetails
         ); 
-        if (!baseMessageDiv) return;
-    // --- START: Call new display function for Phase 3 ---
-    } else if (type === 'tool_result_for_chat') {
-        baseMessageDiv = displayToolOutputMessageUI(messageData); // messageData is the full payload
-        if (!baseMessageDiv) return;
+        if (!baseMessageDiv) return null; // displayPlanConfirmationUI handles its own append
+        textContent = null; // Content is handled by displayPlanConfirmationUI
+    } else if (type === 'tool_result_for_chat') { 
+        baseMessageDiv = displayToolOutputMessageUI(messageData); 
+        if (!baseMessageDiv) return null; // displayToolOutputMessageUI handles its own append
         textContent = null; // Content is handled by displayToolOutputMessageUI
-    // --- END: Call new display function for Phase 3 ---
     } else {
         baseMessageDiv = document.createElement('div');
         baseMessageDiv.className = 'message message-outer-blue-line'; 
@@ -383,6 +461,11 @@ function addChatMessageToUI(messageData, type, options = {}, doScroll = true) {
         } else if (type === 'agent_message') { 
             contentHolderDiv.className = 'message-agent-final-content'; 
             currentMajorStepDiv = null; 
+            // --- START: Add Copy Button for Agent Final Answer (Phase 5) ---
+            const copyBtn = _createCopyButton(() => originalTextContentForCopy);
+            // Append to baseMessageDiv to sit outside the blue-lined content, or adjust as needed
+            baseMessageDiv.appendChild(copyBtn); // Or contentHolderDiv.appendChild(copyBtn) if preferred inside
+            // --- END: Add Copy Button for Agent Final Answer (Phase 5) ---
         } else if (type === 'confirmed_plan_log' && textContent) {
             contentHolderDiv.className = 'message-plan-proposal-content'; 
             try {
@@ -440,18 +523,13 @@ function addChatMessageToUI(messageData, type, options = {}, doScroll = true) {
     
     if (contentHolderDiv && textContent !== null) { 
         contentHolderDiv.innerHTML = formatMessageContentInternal(textContent);
+        _addCopyButtonsToPreBlocks(contentHolderDiv); // Add copy buttons to any <pre> inside this message
     }
     
-    if (baseMessageDiv && textContent !== null) { // Ensure baseMessageDiv exists before appending
+    if (baseMessageDiv && textContent !== null) {
         appendMessageElement(baseMessageDiv);
-    } else if (baseMessageDiv && textContent === null && type !== 'tool_result_for_chat') {
-         // This case is for when baseMessageDiv is created but content is handled internally (like confirmed_plan_log)
-         // No direct append here, it's already done or not needed.
-    } else if (type === 'tool_result_for_chat' && baseMessageDiv) {
-        // Already appended by displayToolOutputMessageUI
     }
-
-
+    
     if (doScroll) {
         scrollToBottomChat();
     }
@@ -482,6 +560,7 @@ function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfi
     summaryElement.className = 'plan-summary';
     summaryElement.innerHTML = formatMessageContentInternal(humanSummary);
     planBlock.appendChild(summaryElement);
+    _addCopyButtonsToPreBlocks(summaryElement); // Add copy to pre in summary
 
     const detailsDiv = document.createElement('div');
     detailsDiv.className = 'plan-steps-details';
@@ -502,7 +581,9 @@ function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfi
         ol.innerHTML = "<li>Plan details not available.</li>"; 
     }
     detailsDiv.appendChild(ol);
+    _addCopyButtonsToPreBlocks(detailsDiv); // Add copy to pre in details
     planBlock.appendChild(detailsDiv);
+
 
     const viewDetailsBtn = document.createElement('button');
     viewDetailsBtn.className = 'plan-toggle-details-btn';
@@ -516,7 +597,7 @@ function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfi
         if (typeof onViewDetails === 'function') {
             onViewDetails(planId, isHidden);
         }
-        scrollToBottomChat(); // Scroll after expanding/collapsing plan details
+        scrollToBottomChat(); 
     };
     planBlock.appendChild(viewDetailsBtn);
 
@@ -585,15 +666,20 @@ function showAgentThinkingStatusInUI(show, statusUpdateObject = { message: "Thin
     let componentHint = statusUpdateObject?.component_hint || "SYSTEM";
     let statusKey = statusUpdateObject?.status_key || "UNKNOWN_STATUS";
     let subType = statusUpdateObject?.sub_type; 
+    let originalMarkdownForCopy = ""; // For thoughts
 
     if (typeof statusUpdateObject === 'string') { 
         displayMessage = statusUpdateObject;
+        originalMarkdownForCopy = displayMessage;
     } else if (statusUpdateObject && typeof statusUpdateObject.message === 'string') {
         displayMessage = statusUpdateObject.message;
+        originalMarkdownForCopy = displayMessage;
     } else if (statusUpdateObject && typeof statusUpdateObject.message === 'object' && subType === 'thought') {
-        // Content for thought is in statusUpdateObject.message.content_markdown
+        originalMarkdownForCopy = statusUpdateObject.message.content_markdown || "";
+        // displayMessage is handled inside the thought rendering logic
     } else if (statusUpdateObject && statusUpdateObject.message) {
          displayMessage = String(statusUpdateObject.message); 
+         originalMarkdownForCopy = displayMessage;
     }
 
     const isFinalStateForBottomLine = ["IDLE", "CANCELLED", "ERROR", "PLAN_FAILED", "DIRECT_QA_COMPLETED", "DIRECT_QA_FAILED", "UNKNOWN_INTENT", "AWAITING_PLAN_CONFIRMATION", "PLAN_STOPPED", "PLAN_COMPLETED_ISSUES"].includes(statusKey);
@@ -613,15 +699,25 @@ function showAgentThinkingStatusInUI(show, statusUpdateObject = { message: "Thin
                 nestedMessageDiv = document.createElement('div');
                 nestedMessageDiv.className = `message message-agent-thought ${getComponentClass(componentHint)}`;
                 
+                // --- START: Add Copy Button for Thoughts (Phase 5) ---
+                const thoughtTopRow = document.createElement('div');
+                thoughtTopRow.className = 'thought-top-row'; // For styling label and copy button
+
                 const labelEl = document.createElement('div');
                 labelEl.className = 'thought-label';
                 labelEl.innerHTML = formatMessageContentInternal(statusUpdateObject.message.label || `${componentHint} thought:`);
-                nestedMessageDiv.appendChild(labelEl);
+                thoughtTopRow.appendChild(labelEl);
+
+                const copyBtnThought = _createCopyButton(() => originalMarkdownForCopy);
+                thoughtTopRow.appendChild(copyBtnThought);
+                nestedMessageDiv.appendChild(thoughtTopRow);
+                // --- END: Add Copy Button for Thoughts (Phase 5) ---
 
                 const contentBoxEl = document.createElement('div');
                 contentBoxEl.className = 'thought-content-box';
-                contentBoxEl.innerHTML = formatMessageContentInternal(statusUpdateObject.message.content_markdown, true); 
+                contentBoxEl.innerHTML = formatMessageContentInternal(originalMarkdownForCopy, true); 
                 nestedMessageDiv.appendChild(contentBoxEl);
+                _addCopyButtonsToPreBlocks(contentBoxEl); // Add copy to <pre> within thoughts
             }
 
             if (nestedMessageDiv) {
@@ -677,7 +773,7 @@ function scrollToBottomChat() {
     if (chatMessagesContainerElement) {
         setTimeout(() => {
             chatMessagesContainerElement.scrollTop = chatMessagesContainerElement.scrollHeight;
-        }, 0); // Timeout 0 allows browser to repaint before scrolling
+        }, 0); 
     }
 }
 
