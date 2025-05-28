@@ -4,55 +4,89 @@ import datetime
 import shutil
 from pathlib import Path
 import asyncio
-import json # Added for parsing JSON content from DB
+import json 
 
 from typing import Dict, Any, Callable, Coroutine, Optional, List
 
-# LangChain Imports
 from langchain_core.messages import AIMessage, HumanMessage
 
-# Project Imports
 from backend.config import settings 
 from backend.tools import get_task_workspace_path, BASE_WORKSPACE_ROOT
-# Import constants from callbacks or a shared constants file
 from backend.callbacks import (
     SUB_TYPE_SUB_STATUS,
     SUB_TYPE_THOUGHT,
-    DB_MSG_TYPE_SUB_STATUS, # "db_agent_sub_status"
-    DB_MSG_TYPE_THOUGHT     # "db_agent_thought"
+    DB_MSG_TYPE_SUB_STATUS, 
+    DB_MSG_TYPE_THOUGHT     
 )
 
 logger = logging.getLogger(__name__)
 
-# Type Hints for Passed-in Functions
 SendWSMessageFunc = Callable[[str, Any], Coroutine[Any, Any, None]]
 AddMonitorLogFunc = Callable[[str, str], Coroutine[Any, Any, None]]
-DBAddMessageFunc = Callable[[str, str, str, str], Coroutine[Any, Any, None]] # Used by other handlers
+DBAddMessageFunc = Callable[[str, str, str, str], Coroutine[Any, Any, None]] 
 DBAddTaskFunc = Callable[[str, str, str], Coroutine[Any, Any, None]]
 DBGetMessagesFunc = Callable[[str], Coroutine[Any, Any, List[Dict[str, Any]]]]
 DBDeleteTaskFunc = Callable[[str], Coroutine[Any, Any, bool]]
 DBRenameTaskFunc = Callable[[str, str], Coroutine[Any, Any, bool]]
 GetArtifactsFunc = Callable[[str], Coroutine[Any, Any, List[Dict[str, str]]]]
 
-# Define DB message type for major step announcements (consistent with agent_flow_handlers.py)
 DB_MSG_TYPE_MAJOR_STEP = "db_major_step_announcement"
+
+# <<< START MODIFICATION - Define known internal/system DB message types to generally ignore for chat replay >>>
+# These are useful for audit/monitor but not usually replayed as distinct chat messages.
+# Some might be replayed to the monitor log if desired.
+INTERNAL_DB_MESSAGE_TYPES_FOR_MONITOR_REPLAY_ONLY = {
+    "SYSTEM_INTENT_CLASSIFIED",
+    "agent_executor_step_finish", # The content of this is usually part of the agent's final answer for a step
+    "artifact_generated",         # Artifacts are listed separately
+    "llm_token_usage",          # Displayed in token counter, not chat
+    "monitor_log",                # Already a monitor log
+    "monitor_stdout",
+    "monitor_stderr",
+    "monitor_direct_cmd_start",
+    "monitor_direct_cmd_end",
+    "system_connect",
+    "system_context_switch",
+    "system_new_task_signal",
+    "system_task_deleted",
+    "system_task_renamed",
+    "system_llm_set",
+    "system_plan_generated", # The plan proposal itself is handled by 'propose_plan_for_confirmation'
+    # "confirmed_plan_log" IS replayed to chat
+    "system_plan_cancelled",
+    "system_direct_qa",
+    "system_direct_qa_finish",
+    "system_plan_step_start",
+    "system_plan_step_end",
+    "system_plan_end",
+    "error_json",
+    "error_unknown_msg",
+    "error_processing",
+    "error_llm_intent_classifier", # and other error_llm_*
+    "error_tool_write_file",       # and other error_tool_*
+}
+# Add specific error types if they are prefixed with "error_llm_" or "error_tool_"
+for prefix in ["error_llm_", "error_tool_"]:
+    # This is a placeholder; in a real scenario, you might have a more dynamic way or list them all.
+    # For now, we'll rely on the startswith check below.
+    pass
+# <<< END MODIFICATION >>>
 
 
 async def process_context_switch(
     session_id: str, data: Dict[str, Any], session_data_entry: Dict[str, Any],
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
-    add_monitor_log_func: AddMonitorLogFunc, # Not used directly here, but part of signature
+    add_monitor_log_func: AddMonitorLogFunc, 
     db_add_task_func: DBAddTaskFunc, 
     db_get_messages_func: DBGetMessagesFunc,
     get_artifacts_func: GetArtifactsFunc,
-    db_add_message_func: Optional[DBAddMessageFunc] = None # Keep for signature consistency if other handlers need it
+    db_add_message_func: Optional[DBAddMessageFunc] = None 
 ) -> None:
     task_id_from_frontend = data.get("taskId")
-    task_title_from_frontend = data.get("taskTitle", data.get("task")) # Accommodate potential variations
+    task_title_from_frontend = data.get("taskTitle", data.get("task")) 
 
     logger.info(f"[{session_id}] Switching context to Task ID: {task_id_from_frontend}")
 
-    # Reset relevant session state for the new task context
     session_data_entry['cancellation_requested'] = False
     session_data_entry['current_plan_structured'] = None
     session_data_entry['current_plan_human_summary'] = None
@@ -62,20 +96,17 @@ async def process_context_switch(
     session_data_entry['active_plan_filename'] = None
     session_data_entry['current_plan_proposal_id_backend'] = None
 
-
     existing_agent_task = connected_clients_entry.get("agent_task")
     if existing_agent_task and not existing_agent_task.done():
         logger.warning(f"[{session_id}] Cancelling active agent/plan task due to context switch.")
         existing_agent_task.cancel() 
         await send_ws_message_func("status_message", {"text": "Operation cancelled due to task switch.", "component_hint": "SYSTEM"})
-        # No need to call add_monitor_log_func directly here, it's passed for other handlers
         connected_clients_entry["agent_task"] = None 
 
     session_data_entry["current_task_id"] = task_id_from_frontend
     if "callback_handler" in session_data_entry and hasattr(session_data_entry["callback_handler"], 'set_task_id'): 
         session_data_entry["callback_handler"].set_task_id(task_id_from_frontend)
 
-    # Ensure task exists in DB and workspace directory exists
     await db_add_task_func(task_id_from_frontend, task_title_from_frontend or f"Task {task_id_from_frontend}", datetime.datetime.now(datetime.timezone.utc).isoformat())
     try:
         _ = get_task_workspace_path(task_id_from_frontend, create_if_not_exists=True) 
@@ -83,12 +114,10 @@ async def process_context_switch(
     except (ValueError, OSError) as ws_path_e:
         logger.error(f"[{session_id}] Failed to get/create workspace path for task {task_id_from_frontend}: {ws_path_e}")
 
-    # Log context switch to monitor (via send_ws_message, which script.js routes to monitor)
     await send_ws_message_func("monitor_log", {
         "text": f"[{datetime.datetime.now().isoformat(timespec='milliseconds')}][{session_id[:8]}] [SYSTEM_EVENT] Switched context to task ID: {task_id_from_frontend} ('{task_title_from_frontend}')",
         "log_source": "SYSTEM_CONTEXT_SWITCH"
     })
-
 
     if "memory" in session_data_entry and hasattr(session_data_entry["memory"], 'clear'):
         try:
@@ -97,55 +126,49 @@ async def process_context_switch(
         except Exception as mem_e:
             logger.error(f"[{session_id}] Failed to clear memory on context switch: {mem_e}")
 
-    # Load and send history messages
     history_messages = await db_get_messages_func(task_id_from_frontend)
-    chat_history_for_langchain_memory = [] # Only HumanMessage and AIMessage for LangChain
+    chat_history_for_langchain_memory = [] 
 
     if history_messages:
         logger.info(f"[{session_id}] Loading {len(history_messages)} history messages for task {task_id_from_frontend}.")
-        await send_ws_message_func("history_start", {"text": f"Loading {len(history_messages)} messages..."}) # Send as object
+        await send_ws_message_func("history_start", {"text": f"Loading {len(history_messages)} messages..."}) 
         
         for i, msg_hist in enumerate(history_messages):
             db_msg_type = msg_hist.get('message_type', 'unknown')
             db_content_hist_str = msg_hist.get('content', '')
             db_timestamp = msg_hist.get('timestamp', datetime.datetime.now().isoformat()) 
             
-            # Default message structure for frontend
             ws_message_type_to_send = None
             ws_payload_to_send = None
 
             try:
                 if db_msg_type == "user_input":
                     ws_message_type_to_send = "user"
-                    ws_payload_to_send = {"content": db_content_hist_str} # Frontend expects content field
+                    ws_payload_to_send = {"content": db_content_hist_str} 
                     chat_history_for_langchain_memory.append(HumanMessage(content=db_content_hist_str))
                 
-                elif db_msg_type in ["agent_message", "agent_final_assessment"]: # Assuming these are final outputs
+                elif db_msg_type in ["agent_message", "agent_final_assessment"]: 
                     ws_message_type_to_send = "agent_message"
-                    # Try to parse if it's JSON (e.g., if it includes component_hint)
                     try:
                         parsed_content = json.loads(db_content_hist_str)
                         if isinstance(parsed_content, dict) and "content" in parsed_content:
                              ws_payload_to_send = parsed_content
-                        else: # Not the expected structure, send as plain text
+                        else: 
                             ws_payload_to_send = {"content": db_content_hist_str, "component_hint": "DEFAULT"}
-                    except json.JSONDecodeError: # Not JSON, send as plain text
+                    except json.JSONDecodeError: 
                         ws_payload_to_send = {"content": db_content_hist_str, "component_hint": "DEFAULT"}
                     chat_history_for_langchain_memory.append(AIMessage(content=ws_payload_to_send["content"]))
 
                 elif db_msg_type == "confirmed_plan_log":
                     ws_message_type_to_send = "confirmed_plan_log"
-                    ws_payload_to_send = {"content": db_content_hist_str} # Content is the JSON string of the plan
+                    ws_payload_to_send = {"content": db_content_hist_str} 
 
-                elif db_msg_type == DB_MSG_TYPE_MAJOR_STEP: # "db_major_step_announcement"
+                elif db_msg_type == DB_MSG_TYPE_MAJOR_STEP: 
                     ws_message_type_to_send = "agent_major_step_announcement"
-                    try:
-                        ws_payload_to_send = json.loads(db_content_hist_str) # Content is the step data object
-                    except json.JSONDecodeError as e:
-                        logger.error(f"[{session_id}] Error parsing DB_MSG_TYPE_MAJOR_STEP content: {e}. Data: {db_content_hist_str}")
-                        continue # Skip this malformed message
+                    try: ws_payload_to_send = json.loads(db_content_hist_str) 
+                    except json.JSONDecodeError as e: logger.error(f"[{session_id}] Error parsing DB_MSG_TYPE_MAJOR_STEP content: {e}. Data: {db_content_hist_str}"); continue 
 
-                elif db_msg_type == DB_MSG_TYPE_SUB_STATUS: # "db_agent_sub_status"
+                elif db_msg_type == DB_MSG_TYPE_SUB_STATUS: 
                     ws_message_type_to_send = "agent_thinking_update"
                     try:
                         parsed_db_content = json.loads(db_content_hist_str)
@@ -153,99 +176,90 @@ async def process_context_switch(
                             "message": parsed_db_content.get("message_text", "Sub-status message missing"),
                             "component_hint": parsed_db_content.get("component_hint", "SYSTEM"),
                             "sub_type": SUB_TYPE_SUB_STATUS,
-                            "status_key": "HISTORICAL_SUB_STATUS" # Indicate it's from history
+                            "status_key": "HISTORICAL_SUB_STATUS" 
                         }
-                    except json.JSONDecodeError as e:
-                        logger.error(f"[{session_id}] Error parsing DB_MSG_TYPE_SUB_STATUS content: {e}. Data: {db_content_hist_str}")
-                        continue
+                    except json.JSONDecodeError as e: logger.error(f"[{session_id}] Error parsing DB_MSG_TYPE_SUB_STATUS content: {e}. Data: {db_content_hist_str}"); continue
 
-                elif db_msg_type == DB_MSG_TYPE_THOUGHT: # "db_agent_thought"
+                elif db_msg_type == DB_MSG_TYPE_THOUGHT: 
                     ws_message_type_to_send = "agent_thinking_update"
                     try:
                         parsed_db_content = json.loads(db_content_hist_str)
                         ws_payload_to_send = {
-                            "message": { # Frontend expects message to be an object for thoughts
+                            "message": { 
                                 "label": parsed_db_content.get("thought_label", "Agent thought:"),
                                 "content_markdown": parsed_db_content.get("thought_content_markdown", "Thought content missing")
                             },
                             "component_hint": parsed_db_content.get("component_hint", "SYSTEM"),
                             "sub_type": SUB_TYPE_THOUGHT,
-                            "status_key": "HISTORICAL_THOUGHT" # Indicate it's from history
+                            "status_key": "HISTORICAL_THOUGHT" 
                         }
-                    except json.JSONDecodeError as e:
-                        logger.error(f"[{session_id}] Error parsing DB_MSG_TYPE_THOUGHT content: {e}. Data: {db_content_hist_str}")
-                        continue
+                    except json.JSONDecodeError as e: logger.error(f"[{session_id}] Error parsing DB_MSG_TYPE_THOUGHT content: {e}. Data: {db_content_hist_str}"); continue
                 
-                elif db_msg_type == "status_message": # Existing status messages
+                elif db_msg_type == "status_message": 
                     ws_message_type_to_send = "status_message"
-                    # Ensure payload is an object with text and component_hint
                     try:
                         parsed_status = json.loads(db_content_hist_str)
                         if isinstance(parsed_status, dict) and "text" in parsed_status:
                             ws_payload_to_send = parsed_status
-                        else:
-                            ws_payload_to_send = {"text": db_content_hist_str, "component_hint": "SYSTEM"}
-                    except json.JSONDecodeError:
-                         ws_payload_to_send = {"text": db_content_hist_str, "component_hint": "SYSTEM"}
-
-
-                elif db_msg_type.startswith(("monitor_", "error_", "system_", "tool_", "agent_thought_", "monitor_user_input", "llm_token_usage")):
+                        else: ws_payload_to_send = {"text": db_content_hist_str, "component_hint": "SYSTEM"}
+                    except json.JSONDecodeError: ws_payload_to_send = {"text": db_content_hist_str, "component_hint": "SYSTEM"}
+                
+                # <<< START MODIFICATION - Handle internal/system types for monitor replay >>>
+                elif db_msg_type in INTERNAL_DB_MESSAGE_TYPES_FOR_MONITOR_REPLAY_ONLY or \
+                     db_msg_type.startswith("error_llm_") or db_msg_type.startswith("error_tool_"):
                     # These are purely for the monitor log, not for chat display or agent memory
                     log_prefix_hist = f"[{db_timestamp}][{session_id[:8]}]"
-                    type_indicator_hist = f"[{db_msg_type.replace('monitor_', '').replace('error_', 'ERR_').replace('system_', 'SYS_').replace('agent_thought_action', 'THOUGHT_ACT').replace('agent_thought_final', 'THOUGHT_FIN').replace('monitor_user_input', 'USER_INPUT_LOG').replace('llm_token_usage', 'TOKEN_LOG').upper()}]"
+                    type_indicator_hist = f"[{db_msg_type.replace('monitor_', '').replace('error_', 'ERR_').replace('system_', 'SYS_').upper()}]"
                     monitor_log_text = f"{log_prefix_hist} [History]{type_indicator_hist} {db_content_hist_str}"
                     await send_ws_message_func("monitor_log", {"text": monitor_log_text, "log_source": db_msg_type})
+                    # No ws_message_type_to_send for these, so they won't go to chat UI
+                # <<< END MODIFICATION >>>
                 
                 else: 
+                    # This is now for truly unknown types not caught by the above set
                     logger.warning(f"[{session_id}] Unknown history message type '{db_msg_type}' encountered during history load. Content: {db_content_hist_str[:100]}")
-                    # Optionally send to monitor log as unknown
                     await send_ws_message_func("monitor_log", {
-                        "text": f"[{db_timestamp}][{session_id[:8]}] [History][UNKNOWN_TYPE: {db_msg_type}] {db_content_hist_str}",
-                        "log_source": "UNKNOWN_HISTORY_TYPE"
+                        "text": f"[{db_timestamp}][{session_id[:8]}] [History][UNHANDLED_TYPE: {db_msg_type}] {db_content_hist_str}",
+                        "log_source": "UNHANDLED_HISTORY_TYPE"
                     })
 
-                # Send the message if a type and payload were determined for chat display
                 if ws_message_type_to_send and ws_payload_to_send:
                     await send_ws_message_func(ws_message_type_to_send, ws_payload_to_send)
-                    await asyncio.sleep(0.005) # Small delay to allow UI to process messages sequentially
+                    await asyncio.sleep(0.005) 
 
             except Exception as e:
                 logger.error(f"[{session_id}] Error processing history message (Type: {db_msg_type}): {e}. Data: {db_content_hist_str[:100]}", exc_info=True)
-                continue # Skip malformed/problematic message
+                continue 
 
-        await send_ws_message_func("history_end", {"text": "History loaded."}) # Send as object
+        await send_ws_message_func("history_end", {"text": "History loaded."}) 
         logger.info(f"[{session_id}] Finished sending {len(history_messages)} history messages.")
 
-        # Repopulate LangChain agent's memory
         MAX_MEMORY_RELOAD = settings.agent_memory_window_k 
         if "memory" in session_data_entry and hasattr(session_data_entry["memory"], 'chat_memory'):
             try:
-                # Filter for actual conversational turns for agent memory
                 relevant_memory_messages = [m for m in chat_history_for_langchain_memory if isinstance(m, (HumanMessage, AIMessage))]
                 session_data_entry["memory"].chat_memory.messages = relevant_memory_messages[-MAX_MEMORY_RELOAD:]
                 logger.info(f"[{session_id}] Repopulated agent memory with last {len(session_data_entry['memory'].chat_memory.messages)} relevant messages.")
             except Exception as mem_load_e:
                 logger.error(f"[{session_id}] Failed to repopulate memory from history: {mem_load_e}")
     else:
-        await send_ws_message_func("history_end", {"text": "No history found."}) # Send as object
+        await send_ws_message_func("history_end", {"text": "No history found."}) 
         logger.info(f"[{session_id}] No history found for task {task_id_from_frontend}.")
 
-    # Refresh artifacts
     logger.info(f"[{session_id}] Getting current artifacts from filesystem for task {task_id_from_frontend}...")
     current_artifacts = await get_artifacts_func(task_id_from_frontend)
-    await send_ws_message_func("update_artifacts", current_artifacts) # Expects a list
+    await send_ws_message_func("update_artifacts", current_artifacts) 
     logger.info(f"[{session_id}] Sent current artifact list ({len(current_artifacts)} items) for task {task_id_from_frontend}.")
 
 
 async def process_new_task(
     session_id: str, data: Dict[str, Any], session_data_entry: Dict[str, Any],
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
-    add_monitor_log_func: AddMonitorLogFunc, # Not used directly
-    get_artifacts_func: GetArtifactsFunc # Not used directly
+    add_monitor_log_func: AddMonitorLogFunc, 
+    get_artifacts_func: GetArtifactsFunc 
 ) -> None:
     logger.info(f"[{session_id}] Received 'new_task' signal. Clearing context for UI.")
 
-    # Reset session state related to any ongoing plan or task
     session_data_entry['cancellation_requested'] = False
     session_data_entry['current_plan_structured'] = None
     session_data_entry['current_plan_human_summary'] = None
@@ -255,7 +269,6 @@ async def process_new_task(
     session_data_entry['active_plan_filename'] = None
     session_data_entry['current_plan_proposal_id_backend'] = None
 
-
     existing_agent_task = connected_clients_entry.get("agent_task")
     if existing_agent_task and not existing_agent_task.done():
         logger.warning(f"[{session_id}] Cancelling active agent/plan task due to new task signal.")
@@ -263,7 +276,7 @@ async def process_new_task(
         await send_ws_message_func("status_message", {"text": "Operation cancelled for new task.", "component_hint": "SYSTEM"})
         connected_clients_entry["agent_task"] = None
 
-    session_data_entry["current_task_id"] = None # Signal that no task is active yet
+    session_data_entry["current_task_id"] = None 
     if "callback_handler" in session_data_entry and hasattr(session_data_entry["callback_handler"], 'set_task_id'): 
         session_data_entry["callback_handler"].set_task_id(None)
     if "memory" in session_data_entry and hasattr(session_data_entry["memory"], 'clear'):
@@ -273,15 +286,15 @@ async def process_new_task(
         "text": f"[{datetime.datetime.now().isoformat(timespec='milliseconds')}][{session_id[:8]}] [SYSTEM_EVENT] Cleared context for new task signal. Awaiting new task context switch from client.",
         "log_source": "SYSTEM_NEW_TASK_SIGNAL"
     })
-    await send_ws_message_func("update_artifacts", []) # Clear artifacts on UI
+    await send_ws_message_func("update_artifacts", []) 
 
 
 async def process_delete_task(
     session_id: str, data: Dict[str, Any], session_data_entry: Dict[str, Any],
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
-    add_monitor_log_func: AddMonitorLogFunc, # Not used directly
+    add_monitor_log_func: AddMonitorLogFunc, 
     db_delete_task_func: DBDeleteTaskFunc,
-    get_artifacts_func: GetArtifactsFunc # Not used directly
+    get_artifacts_func: GetArtifactsFunc 
 ) -> None:
     task_id_to_delete = data.get("taskId")
     if not task_id_to_delete:
@@ -292,7 +305,6 @@ async def process_delete_task(
     logger.warning(f"[{session_id}] Received request to delete task: {task_id_to_delete}")
     await send_ws_message_func("monitor_log", {"text": f"[{datetime.datetime.now().isoformat(timespec='milliseconds')}][{session_id[:8]}] [SYSTEM_EVENT] Received request to delete task: {task_id_to_delete}", "log_source": "SYSTEM_DELETE_REQUEST"})
 
-
     deleted_from_db = await db_delete_task_func(task_id_to_delete)
 
     if deleted_from_db:
@@ -300,7 +312,7 @@ async def process_delete_task(
         task_workspace_to_delete: Optional[Path] = None
         try:
             task_workspace_to_delete = get_task_workspace_path(task_id_to_delete, create_if_not_exists=False)
-            if await asyncio.to_thread(task_workspace_to_delete.exists): # Use asyncio.to_thread for sync Path methods
+            if await asyncio.to_thread(task_workspace_to_delete.exists): 
                 if task_workspace_to_delete.resolve().is_relative_to(BASE_WORKSPACE_ROOT.resolve()) and \
                    BASE_WORKSPACE_ROOT.resolve() != task_workspace_to_delete.resolve():
                     logger.info(f"[{session_id}] Attempting to delete workspace directory: {task_workspace_to_delete}")
@@ -317,8 +329,7 @@ async def process_delete_task(
 
         if session_data_entry.get("current_task_id") == task_id_to_delete:
             logger.info(f"[{session_id}] Active task {task_id_to_delete} was deleted. Clearing session context.")
-            # Reset session state (similar to process_new_task)
-            session_data_entry['cancellation_requested'] = False # ... and other fields
+            session_data_entry['cancellation_requested'] = False 
             session_data_entry['current_task_id'] = None 
             if "callback_handler" in session_data_entry: session_data_entry["callback_handler"].set_task_id(None)
             if "memory" in session_data_entry: session_data_entry["memory"].clear()
@@ -331,7 +342,7 @@ async def process_delete_task(
 async def process_rename_task(
     session_id: str, data: Dict[str, Any], session_data_entry: Dict[str, Any],
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
-    add_monitor_log_func: AddMonitorLogFunc, # Not used directly
+    add_monitor_log_func: AddMonitorLogFunc, 
     db_rename_task_func: DBRenameTaskFunc
 ) -> None:
     task_id_to_rename = data.get("taskId")

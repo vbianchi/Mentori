@@ -2,19 +2,15 @@
 import logging
 from typing import List, Dict, Any, Tuple, Optional
 
-# LangChain Imports
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser 
 from langchain_core.pydantic_v1 import BaseModel, Field, conlist
 from langchain_core.tools import BaseTool
 from langchain_core.runnables import RunnableConfig
-# <<< START MODIFICATION - Import BaseCallbackHandler type hint >>>
 from langchain_core.callbacks.base import BaseCallbackHandler
-# <<< END MODIFICATION >>>
 
 
-# Project Imports
 from backend.config import settings
 from backend.llm_setup import get_llm
 from backend.planner import PlanStep 
@@ -23,7 +19,6 @@ from backend.callbacks import LOG_SOURCE_EVALUATOR_STEP, LOG_SOURCE_EVALUATOR_OV
 
 logger = logging.getLogger(__name__)
 
-# --- Pydantic Models for Step Evaluator Output ---
 class StepCorrectionOutcome(BaseModel):
     step_achieved_goal: bool = Field(description="Boolean indicating if the step's primary goal was achieved based on the executor's output.")
     assessment_of_step: str = Field(description="Detailed assessment of the step's outcome, explaining why it succeeded or failed. If failed, explain the discrepancy between expected and actual outcome.") 
@@ -76,7 +71,6 @@ Output ONLY a JSON object adhering to this schema:
 Do not include any preamble or explanation outside the JSON object.
 """
 
-# --- Pydantic Models for Overall Plan Evaluator Output ---
 class EvaluationResult(BaseModel):
     overall_success: bool = Field(description="Boolean indicating if the overall user query was successfully addressed by the executed plan.")
     confidence_score: float = Field(description="A score from 0.0 to 1.0 indicating confidence in the success/failure assessment.")
@@ -117,20 +111,13 @@ async def evaluate_step_outcome_and_suggest_correction(
     step_executor_output: str,
     available_tools: List[BaseTool],
     session_data_entry: Dict[str, Any],
-    # <<< START MODIFICATION - Add callback_handler parameter >>>
     callback_handler: Optional[BaseCallbackHandler] = None
-    # <<< END MODIFICATION >>>
 ) -> Optional[StepCorrectionOutcome]:
-    """
-    Evaluates a single step's outcome and suggests corrections if it failed and is recoverable. 
-    """
     logger.info(f"Evaluator (Step): Evaluating step '{plan_step_being_evaluated.step_id}: {plan_step_being_evaluated.description[:50]}...'")
 
-    # <<< START MODIFICATION - Prepare callbacks list >>>
     callbacks_for_invoke: List[BaseCallbackHandler] = []
     if callback_handler:
         callbacks_for_invoke.append(callback_handler)
-    # <<< END MODIFICATION >>>
 
     evaluator_llm_id_override = session_data_entry.get("session_evaluator_llm_id")
     evaluator_provider = settings.evaluator_provider
@@ -184,12 +171,10 @@ async def evaluate_step_outcome_and_suggest_correction(
 
         eval_result_dict = await chain.ainvoke(
             evaluator_input_payload,
-            # <<< START MODIFICATION - Pass callbacks and metadata in RunnableConfig >>>
             config=RunnableConfig(
                 callbacks=callbacks_for_invoke,
                 metadata={"component_name": LOG_SOURCE_EVALUATOR_STEP}
             )
-            # <<< END MODIFICATION >>>
         )
         
         if isinstance(eval_result_dict, StepCorrectionOutcome):
@@ -201,12 +186,10 @@ async def evaluate_step_outcome_and_suggest_correction(
             raw_output_chain = prompt | evaluator_llm | StrOutputParser()
             raw_output = await raw_output_chain.ainvoke(
                 evaluator_input_payload,
-                # <<< START MODIFICATION - Pass callbacks and metadata to error handler chain >>>
                 config=RunnableConfig(
                     callbacks=callbacks_for_invoke,
                     metadata={"component_name": LOG_SOURCE_EVALUATOR_STEP + "_ERROR_HANDLER"}
                 )
-                # <<< END MODIFICATION >>>
             )
             logger.error(f"Step Evaluator Raw LLM output on Pydantic error: {raw_output}")
             return None
@@ -219,12 +202,10 @@ async def evaluate_step_outcome_and_suggest_correction(
             raw_output_chain = prompt | evaluator_llm | StrOutputParser()
             raw_output = await raw_output_chain.ainvoke(
                 evaluator_input_payload, 
-                # <<< START MODIFICATION - Pass callbacks and metadata to general error handler chain >>>
                 config=RunnableConfig(
                     callbacks=callbacks_for_invoke,
                     metadata={"component_name": LOG_SOURCE_EVALUATOR_STEP + "_ERROR_HANDLER"}
                 )
-                # <<< END MODIFICATION >>>
             )
             logger.error(f"Step Evaluator Raw LLM output on general error: {raw_output}")
         except Exception as raw_e:
@@ -237,20 +218,13 @@ async def evaluate_plan_outcome(
     executed_plan_summary: str,
     final_agent_answer: str,
     session_data_entry: Dict[str, Any],
-    # <<< START MODIFICATION - Add callback_handler parameter >>>
     callback_handler: Optional[BaseCallbackHandler] = None
-    # <<< END MODIFICATION >>>
 ) -> Optional[EvaluationResult]:
-    """
-    Evaluates the overall success of the executed plan. 
-    """
     logger.info(f"Evaluator (Overall Plan): Evaluating outcome for query: {original_user_query[:100]}...")
 
-    # <<< START MODIFICATION - Prepare callbacks list >>>
     callbacks_for_invoke: List[BaseCallbackHandler] = []
     if callback_handler:
         callbacks_for_invoke.append(callback_handler)
-    # <<< END MODIFICATION >>>
 
     evaluator_llm_id_override = session_data_entry.get("session_evaluator_llm_id")
     evaluator_provider = settings.evaluator_provider
@@ -296,12 +270,10 @@ async def evaluate_plan_outcome(
         }
         eval_result_dict = await chain.ainvoke(
             payload_for_overall_eval,
-            # <<< START MODIFICATION - Pass callbacks and metadata in RunnableConfig >>>
             config=RunnableConfig(
                 callbacks=callbacks_for_invoke,
                 metadata={"component_name": LOG_SOURCE_EVALUATOR_OVERALL}
             )
-            # <<< END MODIFICATION >>>
         )
 
         if isinstance(eval_result_dict, EvaluationResult):
@@ -313,12 +285,10 @@ async def evaluate_plan_outcome(
             raw_output_chain = prompt | evaluator_llm | StrOutputParser()
             raw_output = await raw_output_chain.ainvoke(
                 payload_for_overall_eval,
-                # <<< START MODIFICATION - Pass callbacks and metadata to error handler chain >>>
                 config=RunnableConfig(
                     callbacks=callbacks_for_invoke,
                     metadata={"component_name": LOG_SOURCE_EVALUATOR_OVERALL + "_ERROR_HANDLER"}
                 )
-                # <<< END MODIFICATION >>>
             )
             logger.error(f"Overall Plan Evaluator Raw LLM output on Pydantic error: {raw_output}")
             return None
@@ -329,7 +299,7 @@ async def evaluate_plan_outcome(
         logger.error(f"Evaluator (Overall Plan): Error during overall plan evaluation: {e}", exc_info=True)
         try:
             raw_output_chain = prompt | evaluator_llm | StrOutputParser()
-            payload_for_overall_eval_error = { # Re-define for clarity
+            payload_for_overall_eval_error = { 
                  "original_user_query": original_user_query,
                  "executed_plan_summary": executed_plan_summary,
                  "final_agent_answer": final_agent_answer,
@@ -337,15 +307,12 @@ async def evaluate_plan_outcome(
             }
             raw_output = await raw_output_chain.ainvoke(
                 payload_for_overall_eval_error,
-                # <<< START MODIFICATION - Pass callbacks and metadata to general error handler chain >>>
                 config=RunnableConfig(
                     callbacks=callbacks_for_invoke,
                     metadata={"component_name": LOG_SOURCE_EVALUATOR_OVERALL + "_ERROR_HANDLER"}
                 )
-                # <<< END MODIFICATION >>>
             )
             logger.error(f"Overall Plan Evaluator Raw LLM output on general error: {raw_output}")
         except Exception as raw_e:
-            logger.error(f"Overall Plan Evaluator: Failed to get raw LLM output during general error handling: {raw_e}")
+            logger.error(f"Overall Plan Evaluator: Failed to get raw LLM output on general error: {raw_e}")
         return None
-

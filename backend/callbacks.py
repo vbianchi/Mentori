@@ -14,13 +14,10 @@ from langchain_core.agents import AgentAction, AgentFinish
 from langchain_core.documents import Document
 
 # Project Imports
-from backend.config import settings # This should be one of the first project imports
-
-# DO NOT ADD: from backend.callbacks import ... (This would be a circular import)
+from backend.config import settings 
 
 logger = logging.getLogger(__name__)
-# Keep DEBUG level for this module for now, can be removed after fix is confirmed
-logger.setLevel(logging.DEBUG) 
+logger.setLevel(logging.DEBUG) # Ensure debug messages from this module are processed
 
 class AgentCancelledException(Exception):
     """Custom exception to signal agent cancellation via callbacks."""
@@ -120,14 +117,13 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         try: self._check_cancellation("LLM execution")
         except AgentCancelledException: raise 
 
-        logger.debug(f"[{self.session_id}] on_llm_start: kwargs received: {kwargs}")
         metadata = kwargs.get("metadata", {})
-        logger.debug(f"[{self.session_id}] on_llm_start: metadata extracted: {metadata}")
         self.current_agent_role_hint = metadata.get("component_name", LOG_SOURCE_LLM_CORE)
-        logger.info(f"[{self.session_id}] on_llm_start: current_agent_role_hint set to: {self.current_agent_role_hint}")
+        # <<< START MODIFICATION - Targeted logging for component entry >>>
+        logger.critical(f"CRITICAL_DEBUG: [{self.session_id}] on_llm_start: ENTERED for role_hint: {self.current_agent_role_hint}. Metadata: {metadata}")
+        # <<< END MODIFICATION >>>
 
         component_hint_for_status = self.current_agent_role_hint if self.current_agent_role_hint != LOG_SOURCE_LLM_CORE else "LLM"
-
         await self._send_thinking_update(f"Thinking ({component_hint_for_status})...", "LLM_PROCESSING_START", self.current_agent_role_hint, SUB_TYPE_BOTTOM_LINE)
         prompt_summary = str(prompts)[:200] + "..." if len(str(prompts)) > 200 else str(prompts)
         await self.send_ws_message("monitor_log", {"text": f"{self._get_log_prefix()} [LLM Core Start] Role: {self.current_agent_role_hint}, Prompts: {prompt_summary}", "log_source": f"{LOG_SOURCE_LLM_CORE}_START_{self.current_agent_role_hint.upper()}"})
@@ -136,11 +132,11 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         try: self._check_cancellation("Chat Model execution")
         except AgentCancelledException: raise
         
-        logger.debug(f"[{self.session_id}] on_chat_model_start: kwargs received: {kwargs}")
         metadata = kwargs.get("metadata", {})
-        logger.debug(f"[{self.session_id}] on_chat_model_start: metadata extracted: {metadata}")
         self.current_agent_role_hint = metadata.get("component_name", LOG_SOURCE_LLM_CORE)
-        logger.info(f"[{self.session_id}] on_chat_model_start: current_agent_role_hint set to: {self.current_agent_role_hint}")
+        # <<< START MODIFICATION - Targeted logging for component entry >>>
+        logger.critical(f"CRITICAL_DEBUG: [{self.session_id}] on_chat_model_start: ENTERED for role_hint: {self.current_agent_role_hint}. Metadata: {metadata}")
+        # <<< END MODIFICATION >>>
         
         component_hint_for_status = self.current_agent_role_hint if self.current_agent_role_hint != LOG_SOURCE_LLM_CORE else "ChatModel"
         await self._send_thinking_update(f"Thinking ({component_hint_for_status})...", "LLM_PROCESSING_START", self.current_agent_role_hint, SUB_TYPE_BOTTOM_LINE)
@@ -157,23 +153,24 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         model_name: str = "unknown_model"
         source_for_tokens = "unknown"
 
-        logger.info(f"[{self.session_id}] on_llm_end: Entered for role_hint: {self.current_agent_role_hint}")
-        logger.debug(f"[{self.session_id}] on_llm_end: Full response object type: {type(response)}")
+        # <<< START MODIFICATION - Targeted logging for component entry & LLMResult structure >>>
+        logger.critical(f"CRITICAL_DEBUG: [{self.session_id}] on_llm_end: ENTERED for role_hint: {self.current_agent_role_hint}")
+        logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Full response object type: {type(response)}")
         
         if response.llm_output is not None:
-            logger.debug(f"[{self.session_id}] on_llm_end: response.llm_output IS PRESENT. Type: {type(response.llm_output)}")
+            logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): response.llm_output IS PRESENT. Type: {type(response.llm_output)}")
             try:
                 if isinstance(response.llm_output, dict): llm_output_str = json.dumps(response.llm_output, indent=2)
                 else: llm_output_str = str(response.llm_output)
-                logger.debug(f"[{self.session_id}] on_llm_end: response.llm_output content:\n{llm_output_str}")
-            except Exception as e_llm_out_log: logger.error(f"[{self.session_id}] on_llm_end: Error stringifying/dumping response.llm_output: {e_llm_out_log}"); logger.debug(f"[{self.session_id}] on_llm_end: response.llm_output (raw repr): {repr(response.llm_output)[:1000]}...")
-        else: logger.debug(f"[{self.session_id}] on_llm_end: response.llm_output IS NONE.")
+                logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): response.llm_output content:\n{llm_output_str}")
+            except Exception as e_llm_out_log: logger.error(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Error stringifying/dumping response.llm_output: {e_llm_out_log}"); logger.debug(f"[{self.session_id}] on_llm_end: response.llm_output (raw repr): {repr(response.llm_output)[:1000]}...")
+        else: logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): response.llm_output IS NONE.")
 
         if response.generations is not None and len(response.generations) > 0:
-            logger.debug(f"[{self.session_id}] on_llm_end: response.generations IS PRESENT and NOT EMPTY (length {len(response.generations)}).")
+            logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): response.generations IS PRESENT and NOT EMPTY (length {len(response.generations)}).")
             try:
                 for i, gen_list in enumerate(response.generations):
-                    logger.debug(f"  Generation list {i} (length {len(gen_list)}):")
+                    logger.debug(f"  Generation list {i} (length {len(gen_list)}) for role {self.current_agent_role_hint}:")
                     for j, gen_item in enumerate(gen_list):
                         logger.debug(f"    Item {j} type: {type(gen_item)}")
                         gen_item_details = {}
@@ -185,42 +182,42 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
                             if hasattr(gen_item.message, 'usage_metadata'): gen_item_details['message_usage_metadata'] = gen_item.message.usage_metadata
                             if hasattr(gen_item.message, 'response_metadata'): gen_item_details['message_response_metadata'] = gen_item.message.response_metadata
                         if hasattr(gen_item, 'generation_info'): gen_item_details['generation_info'] = gen_item.generation_info
-                        logger.debug(f"    Item {j} details: {json.dumps(gen_item_details, default=str, indent=2)}")
-            except Exception as e_gen_log: logger.error(f"[{self.session_id}] on_llm_end: Error iterating/logging response.generations: {e_gen_log}"); logger.debug(f"[{self.session_id}] on_llm_end: response.generations (raw repr): {repr(response.generations)[:1000]}...")
-        else: logger.debug(f"[{self.session_id}] on_llm_end: response.generations IS NONE or EMPTY.")
+                        logger.debug(f"    Item {j} details (Role: {self.current_agent_role_hint}): {json.dumps(gen_item_details, default=str, indent=2)}")
+            except Exception as e_gen_log: logger.error(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Error iterating/logging response.generations: {e_gen_log}"); logger.debug(f"[{self.session_id}] on_llm_end: response.generations (raw repr): {repr(response.generations)[:1000]}...")
+        else: logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): response.generations IS NONE or EMPTY.")
+        # <<< END MODIFICATION >>>
 
         try:
             if response.llm_output and isinstance(response.llm_output, dict):
                 llm_output_data = response.llm_output
                 source_for_tokens = "llm_output"
                 model_name = llm_output_data.get('model_name', llm_output_data.get('model', model_name))
-                logger.debug(f"[{self.session_id}] on_llm_end: Processing llm_output. Model name from llm_output: {model_name}")
+                logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Processing llm_output. Model name from llm_output: {model_name}")
 
                 if 'token_usage' in llm_output_data and isinstance(llm_output_data['token_usage'], dict):
                     usage_dict_from_llm_output = llm_output_data['token_usage']
                     input_tokens = usage_dict_from_llm_output.get('prompt_tokens', usage_dict_from_llm_output.get('input_tokens'))
                     output_tokens = usage_dict_from_llm_output.get('completion_tokens', usage_dict_from_llm_output.get('output_tokens'))
                     total_tokens = usage_dict_from_llm_output.get('total_tokens')
-                    logger.debug(f"[{self.session_id}] on_llm_end: Tokens from llm_output.token_usage: In={input_tokens}, Out={output_tokens}, Total={total_tokens}")
-                elif 'usage_metadata' in llm_output_data and isinstance(llm_output_data['usage_metadata'], dict): # Gemini specific in llm_output
+                    logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Tokens from llm_output.token_usage: In={input_tokens}, Out={output_tokens}, Total={total_tokens}")
+                elif 'usage_metadata' in llm_output_data and isinstance(llm_output_data['usage_metadata'], dict):
                     usage_metadata_from_llm_output = llm_output_data['usage_metadata']
-                    # Check for standard token keys first if they appear at this level for Gemini
                     input_tokens = usage_metadata_from_llm_output.get('input_tokens', usage_metadata_from_llm_output.get('prompt_token_count'))
                     output_tokens = usage_metadata_from_llm_output.get('output_tokens', usage_metadata_from_llm_output.get('candidates_token_count'))
                     total_tokens = usage_metadata_from_llm_output.get('total_tokens', usage_metadata_from_llm_output.get('total_token_count'))
-                    logger.debug(f"[{self.session_id}] on_llm_end: Tokens from llm_output.usage_metadata (Gemini-style): In={input_tokens}, Out={output_tokens}, Total={total_tokens}")
-                elif 'eval_count' in llm_output_data: # Ollama specific in llm_output
+                    logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Tokens from llm_output.usage_metadata (Gemini-style): In={input_tokens}, Out={output_tokens}, Total={total_tokens}")
+                elif 'eval_count' in llm_output_data: 
                     output_tokens = llm_output_data.get('eval_count')
                     input_tokens = llm_output_data.get('prompt_eval_count') 
-                    logger.debug(f"[{self.session_id}] on_llm_end: Tokens from llm_output (Ollama eval_count): In={input_tokens}, Out={output_tokens}")
+                    logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Tokens from llm_output (Ollama eval_count): In={input_tokens}, Out={output_tokens}")
 
             if (input_tokens is None or output_tokens is None) and response.generations:
-                logger.debug(f"[{self.session_id}] on_llm_end: Tokens not found or incomplete in llm_output, trying response.generations.")
+                logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Tokens not found or incomplete in llm_output, trying response.generations.")
                 for gen_list in response.generations:
                     if not gen_list: continue
                     first_gen = gen_list[0]
                     source_for_tokens = "generations"
-                    logger.debug(f"[{self.session_id}] on_llm_end: Processing first_gen from generations: type={type(first_gen)}, content={str(first_gen)[:300]}...")
+                    logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Processing first_gen from generations: type={type(first_gen)}, content={str(first_gen)[:300]}...")
                     
                     if hasattr(first_gen, 'message') and hasattr(first_gen.message, 'usage_metadata') and first_gen.message.usage_metadata:
                         usage_metadata_from_gen = first_gen.message.usage_metadata
@@ -230,31 +227,29 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
                             total_tokens = usage_metadata_from_gen.get('total_tokens') 
                             if hasattr(first_gen.message, 'response_metadata') and isinstance(first_gen.message.response_metadata, dict):
                                 model_name = first_gen.message.response_metadata.get('model_name', model_name)
-                            logger.debug(f"[{self.session_id}] on_llm_end: Tokens from generations.message.usage_metadata (Gemini/ChatChunk): In={input_tokens}, Out={output_tokens}, Total={total_tokens}, Model={model_name}")
+                            logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Tokens from generations.message.usage_metadata (Gemini/ChatChunk): In={input_tokens}, Out={output_tokens}, Total={total_tokens}, Model={model_name}")
                             break 
-                    elif hasattr(first_gen, 'generation_info') and first_gen.generation_info: # Common for Ollama and others
+                    elif hasattr(first_gen, 'generation_info') and first_gen.generation_info:
                         gen_info = first_gen.generation_info
                         if isinstance(gen_info, dict):
                             model_name = gen_info.get('model', model_name) 
-                            logger.debug(f"[{self.session_id}] on_llm_end: Processing generation_info. Model from gen_info: {model_name}")
-                            if 'token_usage' in gen_info and isinstance(gen_info['token_usage'], dict): # Standard LangChain
+                            logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Processing generation_info. Model from gen_info: {model_name}")
+                            if 'token_usage' in gen_info and isinstance(gen_info['token_usage'], dict):
                                 usage_dict_from_gen_info = gen_info['token_usage']
                                 input_tokens = usage_dict_from_gen_info.get('prompt_tokens', usage_dict_from_gen_info.get('input_tokens'))
                                 output_tokens = usage_dict_from_gen_info.get('completion_tokens', usage_dict_from_gen_info.get('output_tokens'))
                                 total_tokens = usage_dict_from_gen_info.get('total_tokens')
-                                logger.debug(f"[{self.session_id}] on_llm_end: Tokens from generation_info.token_usage: In={input_tokens}, Out={output_tokens}, Total={total_tokens}")
-                            elif 'eval_count' in gen_info: # Ollama specific in generation_info
+                                logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Tokens from generation_info.token_usage: In={input_tokens}, Out={output_tokens}, Total={total_tokens}")
+                            elif 'eval_count' in gen_info: 
                                 output_tokens = gen_info.get('eval_count')
                                 input_tokens = gen_info.get('prompt_eval_count')
-                                logger.debug(f"[{self.session_id}] on_llm_end: Tokens from generation_info (Ollama eval_count): In={input_tokens}, Out={output_tokens}")
-                            # <<< START MODIFICATION - Check for Gemini-like usage_metadata within generation_info >>>
-                            elif 'usage_metadata' in gen_info and isinstance(gen_info['usage_metadata'], dict): # Could be nested for some providers
+                                logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Tokens from generation_info (Ollama eval_count): In={input_tokens}, Out={output_tokens}")
+                            elif 'usage_metadata' in gen_info and isinstance(gen_info['usage_metadata'], dict): 
                                 usage_metadata_nested = gen_info['usage_metadata']
                                 input_tokens = usage_metadata_nested.get('input_tokens', usage_metadata_nested.get('prompt_token_count'))
                                 output_tokens = usage_metadata_nested.get('output_tokens', usage_metadata_nested.get('candidates_token_count'))
                                 total_tokens = usage_metadata_nested.get('total_tokens', usage_metadata_nested.get('total_token_count'))
-                                logger.debug(f"[{self.session_id}] on_llm_end: Tokens from generation_info.usage_metadata (Nested Gemini-style): In={input_tokens}, Out={output_tokens}, Total={total_tokens}")
-                            # <<< END MODIFICATION >>>
+                                logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Tokens from generation_info.usage_metadata (Nested Gemini-style): In={input_tokens}, Out={output_tokens}, Total={total_tokens}")
                             break 
             
             input_tokens = int(input_tokens) if input_tokens is not None else 0
@@ -262,7 +257,7 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
             if total_tokens is None: total_tokens = input_tokens + output_tokens
             else: total_tokens = int(total_tokens)
 
-            logger.debug(f"[{self.session_id}] on_llm_end: Final parsed tokens before sending: In={input_tokens}, Out={output_tokens}, Total={total_tokens}, Model={model_name}, Source={source_for_tokens}")
+            logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Final parsed tokens before sending: In={input_tokens}, Out={output_tokens}, Total={total_tokens}, Model={model_name}, Source={source_for_tokens}")
 
             if input_tokens > 0 or output_tokens > 0 or total_tokens > 0:
                 token_usage_payload = {

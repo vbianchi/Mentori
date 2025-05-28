@@ -2,18 +2,14 @@
 import logging
 from typing import List, Dict, Any, Tuple, Optional
 
-# LangChain Imports
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
 from langchain_core.pydantic_v1 import BaseModel, Field 
-# <<< START MODIFICATION - Import RunnableConfig and BaseCallbackHandler type hint >>>
 from langchain_core.runnables import RunnableConfig
-from langchain_core.callbacks.base import BaseCallbackHandler # For type hinting
-# <<< END MODIFICATION >>>
+from langchain_core.callbacks.base import BaseCallbackHandler 
 import asyncio
 
-# Project Imports
 from backend.config import settings
 from backend.llm_setup import get_llm
 from backend.callbacks import LOG_SOURCE_PLANNER
@@ -21,7 +17,6 @@ from backend.callbacks import LOG_SOURCE_PLANNER
 
 logger = logging.getLogger(__name__)
 
-# Define the structure for a single step in the plan
 class PlanStep(BaseModel):
     step_id: int = Field(description="A unique sequential identifier for this step, starting from 1.")
     description: str = Field(description="A concise, human-readable description of what this single sub-task aims to achieve.")
@@ -29,7 +24,6 @@ class PlanStep(BaseModel):
     tool_input_instructions: Optional[str] = Field(description="Specific instructions or key parameters for the tool_input, if a tool is used. This is not the full tool input itself, but guidance for forming it.")
     expected_outcome: str = Field(description="What is the expected result or artifact from completing this step successfully? For generative 'No Tool' steps, this should describe the actual content to be produced (e.g., 'The text of a short poem about stars.'). For tool steps or steps producing data for subsequent steps, describe the state or data (e.g., 'File 'data.csv' downloaded.', 'The full text of 'report.txt' is available.').")
 
-# Define the structure for the overall plan
 class AgentPlan(BaseModel):
     human_readable_summary: str = Field(description="A brief, conversational summary of the overall plan for the user.")
     steps: List[PlanStep] = Field(description="A list of detailed steps to accomplish the user's request.")
@@ -74,9 +68,7 @@ Do not include any preamble or explanation outside of the JSON object."""
 async def generate_plan(
     user_query: str,
     available_tools_summary: str,
-    # <<< START MODIFICATION - Add callback_handler parameter >>>
     callback_handler: Optional[BaseCallbackHandler] = None
-    # <<< END MODIFICATION >>>
 ) -> Tuple[Optional[str], Optional[List[Dict[str, Any]]]]:
     """
     Generates a multi-step plan based on the user query using an LLM.
@@ -84,11 +76,9 @@ async def generate_plan(
     """
     logger.info(f"Planner: Generating plan for user query: {user_query[:100]}...")
 
-    # <<< START MODIFICATION - Prepare callbacks list >>>
     callbacks_for_invoke: List[BaseCallbackHandler] = []
     if callback_handler:
         callbacks_for_invoke.append(callback_handler)
-    # <<< END MODIFICATION >>>
 
     try:
         planner_llm: BaseChatModel = get_llm(
@@ -123,12 +113,10 @@ async def generate_plan(
         
         planned_result_dict = await chain.ainvoke(
             invoke_payload,
-            # <<< START MODIFICATION - Pass callbacks and metadata in RunnableConfig >>>
             config=RunnableConfig(
                 callbacks=callbacks_for_invoke,
                 metadata={"component_name": LOG_SOURCE_PLANNER}
             )
-            # <<< END MODIFICATION >>>
         )
 
         if isinstance(planned_result_dict, AgentPlan):
@@ -141,12 +129,10 @@ async def generate_plan(
                 raw_output_chain = prompt_template | planner_llm | StrOutputParser()
                 raw_output = await raw_output_chain.ainvoke(
                     invoke_payload,
-                    # <<< START MODIFICATION - Pass callbacks and metadata to error handler chain >>>
                     config=RunnableConfig(
                         callbacks=callbacks_for_invoke,
                         metadata={"component_name": LOG_SOURCE_PLANNER + "_ERROR_HANDLER"}
                     )
-                    # <<< END MODIFICATION >>>
                 )
                 logger.error(f"Planner: Raw LLM output on parsing error: {raw_output}")
             except Exception as raw_e:
@@ -160,7 +146,6 @@ async def generate_plan(
             step_dict['step_id'] = i + 1 
             structured_steps.append(step_dict)
 
-
         logger.info(f"Planner: Plan generated successfully. Summary: {human_summary}")
         logger.debug(f"Planner: Structured plan: {structured_steps}")
         return human_summary, structured_steps
@@ -169,19 +154,17 @@ async def generate_plan(
         logger.error(f"Planner: Error during plan generation: {e}", exc_info=True)
         try:
             error_chain = prompt_template | planner_llm | StrOutputParser() 
-            invoke_payload_for_error = { # Re-define payload for clarity in error case
+            invoke_payload_for_error = { 
                 "user_query": user_query,
                 "available_tools_summary": available_tools_summary,
                 "format_instructions": format_instructions
             }
             raw_output = await error_chain.ainvoke(
                 invoke_payload_for_error,
-                # <<< START MODIFICATION - Pass callbacks and metadata to general error handler chain >>>
                 config=RunnableConfig(
                     callbacks=callbacks_for_invoke,
                     metadata={"component_name": LOG_SOURCE_PLANNER + "_ERROR_HANDLER"}
                 )
-                # <<< END MODIFICATION >>>
             )
             logger.error(f"Planner: Raw LLM output on error: {raw_output}")
         except Exception as raw_e:
@@ -192,12 +175,9 @@ if __name__ == '__main__':
     async def test_planner_poem_generation():
         query_poem = "Create a file called poem.txt and write in it a small poem about stars."
         tools_summary = "- write_file: To write files to workspace.\n- read_file: To read files from workspace."
-        
         print(f"\n--- Testing Planner with Poem Generation Query ---")
         print(f"Query: {query_poem}")
-        # Test call would need a dummy callback handler if we want to test that path
         summary, plan = await generate_plan(query_poem, tools_summary, None) 
-
         if summary and plan:
             print("---- Human Readable Summary ----")
             print(summary)
@@ -211,7 +191,6 @@ if __name__ == '__main__':
                     print(f"  Expected Outcome: {step_data.get('expected_outcome')}") 
                 else:
                     print(f"Step {i+1}: Invalid step data format: {step_data}")
-            
             if len(plan) > 0 and "poem about stars" in plan[0].get("description", "").lower():
                 print(f"\nDEBUG: Expected outcome for poem generation step (Step 1): '{plan[0].get('expected_outcome')}'")
                 if "actual text" in plan[0].get('expected_outcome', '').lower() or \
@@ -220,9 +199,6 @@ if __name__ == '__main__':
                     print("DEBUG: Step 1 expected outcome seems correctly formulated for direct content generation.")
                 else:
                     print("DEBUG WARNING: Step 1 expected outcome might still be too indirect for direct content generation.")
-
         else:
             print("Failed to generate a plan for poem generation query.")
-
     asyncio.run(test_planner_poem_generation())
-

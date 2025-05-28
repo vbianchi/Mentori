@@ -5,19 +5,15 @@ import json
 import re
 import traceback 
 
-# LangChain Imports
 from langchain_core.tools import BaseTool
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_core.runnables import RunnableConfig
-# <<< START MODIFICATION - Import BaseCallbackHandler type hint >>>
 from langchain_core.callbacks.base import BaseCallbackHandler
-# <<< END MODIFICATION >>>
 
 
-# Project Imports
 from backend.config import settings
 from backend.llm_setup import get_llm
 from backend.planner import PlanStep
@@ -84,9 +80,7 @@ async def validate_and_prepare_step_action(
     available_tools: List[BaseTool],
     session_data_entry: Dict[str, Any],
     previous_step_output: Optional[str] = None,
-    # <<< START MODIFICATION - Add callback_handler parameter >>>
     callback_handler: Optional[BaseCallbackHandler] = None
-    # <<< END MODIFICATION >>>
 ) -> Tuple[Optional[str], Optional[str], str, float]:
     """
     Uses an LLM to validate the current plan step and determine the precise tool and input.
@@ -95,11 +89,9 @@ async def validate_and_prepare_step_action(
     if previous_step_output:
         logger.info(f"Controller: Received previous_step_output (first 100 chars): {previous_step_output[:100]}...")
 
-    # <<< START MODIFICATION - Prepare callbacks list >>>
     callbacks_for_invoke: List[BaseCallbackHandler] = []
     if callback_handler:
         callbacks_for_invoke.append(callback_handler)
-    # <<< END MODIFICATION >>>
 
     controller_llm_id_override = session_data_entry.get("session_controller_llm_id")
     controller_provider = settings.controller_provider
@@ -134,7 +126,6 @@ async def validate_and_prepare_step_action(
     for tool in available_tools:
         tools_summary_list.append(f"- {tool.name}: {tool.description.split('.')[0]}. (Description for context: {tool.description})")
     tools_summary_for_controller = "\n".join(tools_summary_list)
-
 
     previous_step_output_context_str = "Not applicable (this is the first step or previous step had no direct output, or its output was not relevant to pass)."
     if previous_step_output is not None:
@@ -175,12 +166,10 @@ async def validate_and_prepare_step_action(
 
         controller_result_dict_raw = await raw_llm_output_chain.ainvoke(
             input_dict_for_llm,
-            # <<< START MODIFICATION - Pass callbacks and metadata in RunnableConfig >>>
             config=RunnableConfig(
                 callbacks=callbacks_for_invoke,
                 metadata={"component_name": LOG_SOURCE_CONTROLLER}
             )
-            # <<< END MODIFICATION >>>
         )
         logger.debug(f"Controller: Raw LLM output string before stripping: '{controller_result_dict_raw}'")
 
@@ -236,4 +225,3 @@ async def validate_and_prepare_step_action(
         logger.error(f"Controller: Error during step validation or Pydantic parsing: {e}. Raw output was: {controller_result_dict_raw}\nTraceback:\n{tb_str}", exc_info=False) 
         error_detail = f"Exception: {type(e).__name__} at line {e.__traceback__.tb_lineno if e.__traceback__ else 'N/A'}. Raw LLM output might have been: {str(controller_result_dict_raw)[:500]}..."
         return None, None, f"Error in Controller: {error_detail}", 0.0
-
