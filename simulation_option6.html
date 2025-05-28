@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ResearchAgent UI Simulation (v2.5.3 - In-Chat Tools)</title>
+    <title>ResearchAgent UI Simulation (UX Refinements)</title>
     <style>
-        /* css/style.css - Dark Professional Theme - Chat UI Update v2.5.3 - Phase 5 */
+        /* css/style.css - Dark Professional Theme - Chat UI Update v2.5.3 - UX Refinements */
 
-        /* Basic Reset & Root Variables */
         :root {
             --bg-color: #212529;
             --panel-bg: #343A40;
@@ -18,19 +17,17 @@
             --text-color-muted: #ADB5BD;
             --text-color-darker: #6C757D;
             
-            --accent-color: #0D9488; /* User message bubble, confirm buttons */
+            --accent-color: #0D9488; 
             --accent-color-hover: #0F766E;
-            --user-message-line-color: #0A6C60; /* Darker shade of accent for user message right line */
+            --user-message-line-color: #0A6C60; 
             --button-text-on-accent: #FFFFFF;
             
             --error-color: #DC3545;
             --error-color-darker: #B02A37;
             --warning-color: #FFC107;
 
-            /* Unified Blue for Outer Lines */
-            --unified-outer-line-blue: #3498DB; /* Planner Medium Blue, also for system status, plan proposals, final agent messages */
+            --unified-outer-line-blue: #3498DB;
 
-            /* Component/Log Source Color Variables for Side Lines */
             --agent-line-default-color: #0F766E; 
             --agent-line-system-color: #7F8C8D;      
             --agent-line-intent-classifier-color: #5DADE2; 
@@ -44,10 +41,9 @@
             --agent-line-error-color: #E74C3C;           
             --agent-line-llm-core-color: #6C757D;        
 
-
-            /* Monitor Log Backgrounds/Borders */
             --log-bg-default: var(--panel-bg);
             --log-border-default: var(--border-color);
+            /* ... (other log source colors remain the same) ... */
             --log-source-system-bg: rgba(127, 140, 141, 0.05);
             --log-source-system-border: var(--agent-line-system-color);
             --log-source-intent_classifier-bg: rgba(93, 173, 226, 0.05);
@@ -73,6 +69,7 @@
             --log-source-error-bg: rgba(231, 76, 60, 0.1);
             --log-source-error-border: var(--agent-line-error-color);
 
+
             --terminal-bg: #161A1D;
             --terminal-text: #CED4DA;
             --code-bg: var(--terminal-bg); 
@@ -80,7 +77,6 @@
             --pre-bg: #161A1D; 
             --pre-text: #CED4DA;
             --pre-border: #495057;
-
 
             --status-idle-color: #198754;
             --status-running-color: #FFC107;
@@ -129,9 +125,9 @@
 
         .chat-header { background-color: var(--panel-bg-lighter); border-bottom: 1px solid var(--border-color); }
         .chat-header h3 { margin: 0; font-size: 1em; font-weight: 500; }
-        .chat-messages { padding: 20px; display: flex; flex-direction: column; gap: 0px; background-color: var(--bg-color); }
+        .chat-messages { padding: 20px; display: flex; flex-direction: column; gap: 5px; /* Slightly reduced gap between top-level messages */ background-color: var(--bg-color); }
 
-        .message { margin-bottom: 10px; line-height: 1.5; font-size: 0.95em; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; position: relative; }
+        .message { margin-bottom: 12px; /* Increased consistent margin */ line-height: 1.5; font-size: 0.95em; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; position: relative; }
 
         .message-user-wrapper { display: flex; justify-content: flex-end; }
         .message-user {
@@ -190,14 +186,14 @@
             color: var(--text-color);
             padding: 10px 15px;
             border-radius: 0px 15px 15px 0px; 
-            max-width: calc(100% - 13px); 
+            max-width: calc(100% - 13px); /* Original value */
             position: relative; 
         }
         /* Position copy button for final agent messages */
-        .message-outer-blue-line > .chat-copy-btn {
+        .message-outer-blue-line > .chat-copy-btn { /* Target copy buttons that are direct children */
             position: absolute;
-            top: 5px;
-            right: 5px; /* Adjust if needed based on padding of message-outer-blue-line */
+            top: 8px; /* Adjust for better vertical alignment */
+            right: 8px; 
             z-index: 10;
             opacity: 0.3;
         }
@@ -207,20 +203,30 @@
 
 
         .message-agent-step {
-            margin-bottom: 5px;
+            margin-bottom: 8px; /* Increased margin */
             padding-left: 10px; 
+            /* background-color: rgba(73, 80, 87, 0.1); /* Subtle background for the whole step block */
+            /* border-radius: 4px; */
+            /* padding-bottom: 5px; */
         }
         .message-agent-step .step-title {
             padding-left: 10px; 
             font-weight: bold;
             display: block; 
-            margin-bottom: 3px;
+            margin-bottom: 5px; /* Increased margin */
         }
 
         .sub-content-container {
-            margin-top: 3px;
-            padding-left: 25px; 
+            margin-top: 5px; /* Increased margin */
+            padding-left: 20px; /* Standardized indent for sub-content */
+            /* border-left: 1px dashed var(--panel-bg-lightest); /* Optional visual grouping */
+            /* padding-top: 5px; */
+            /* padding-bottom: 5px; */
         }
+        .sub-content-container > .message { /* Add margin between sub-messages */
+            margin-bottom: 8px;
+        }
+
 
         .message-agent-substatus {
             margin-bottom: 5px; 
@@ -229,15 +235,15 @@
             border-left-style: solid;
         }
         .message-agent-substatus .content { 
-            font-size: 0.85em;
-            color: var(--text-color-muted);
+            font-size: 0.8em; /* Slightly smaller for sub-status */
+            color: var(--text-color-darker); /* Muted further */
             padding-left: 10px; 
             font-style: italic;
         }
 
         .message-agent-thought {
             margin-bottom: 5px;
-            padding-left: 10px; 
+            padding-left: 0; /* No extra padding, relies on sub-content-container */
             border-left-width: 3px;
             border-left-style: solid;
         }
@@ -247,7 +253,7 @@
             justify-content: space-between;
             align-items: flex-start; 
             padding-left: 10px; 
-            margin-bottom: 2px;
+            margin-bottom: 4px; /* Increased margin */
         }
         .message-agent-thought .thought-label {
             font-size: 0.9em;
@@ -300,7 +306,7 @@
             color: var(--terminal-text);
             padding: 8px 12px;
             border-radius: 4px;
-            margin-top: 2px; 
+            /* margin-top: 2px; /* Removed, handled by thought-top-row */
             font-size: 0.9em;
             white-space: pre-wrap; 
             word-wrap: break-word;
@@ -317,7 +323,7 @@
 
         .message-agent-tool-output {
             margin-bottom: 5px;
-            padding-left: 10px; 
+            padding-left: 0; /* No extra padding, relies on sub-content-container */
             border-left-width: 3px;
             border-left-style: solid;
         }
@@ -327,7 +333,7 @@
             justify-content: space-between; 
             align-items: flex-start; 
             padding-left: 10px; 
-            margin-bottom: 2px;
+            margin-bottom: 4px; /* Increased margin */
         }
 
         .tool-output-label {
@@ -349,7 +355,7 @@
             color: var(--terminal-text);
             padding: 8px 12px;
             border-radius: 4px;
-            margin-top: 2px;
+            /* margin-top: 2px; /* Removed, handled by top-row */
             font-size: 0.9em;
             white-space: pre-wrap; 
             word-wrap: break-word;
@@ -377,13 +383,9 @@
         }
 
 
-        .tool-output-preview {
-            /* Styles for the preview text if needed, but mostly inherits from content-box */
-        }
+        .tool-output-preview { }
 
-        .tool-output-full {
-            display: none; 
-        }
+        .tool-output-full { display: none; }
 
         .tool-output-expand-btn {
             background: none;
@@ -403,12 +405,26 @@
         }
 
         .tool-output-artifact-link {
-            font-size: 0.8em;
-            font-style: italic;
+            font-size: 0.85em; /* Made slightly larger */
+            font-style: normal; /* No longer italic by default */
             color: var(--text-color-muted);
-            margin-top: 5px;
+            margin-top: 6px; /* Adjusted margin */
             margin-left: 10px; 
-            padding-left: 10px;
+            padding: 4px 8px; /* Add some padding to make it look more like a button */
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            display: inline-block; /* To allow padding and border */
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .tool-output-artifact-link:hover {
+            background-color: var(--panel-bg-lightest);
+            color: var(--text-color);
+            border-color: var(--text-color-muted);
+        }
+        .tool-output-artifact-link::before {
+            content: "📄 "; /* Document icon, adjust as needed */
+            margin-right: 4px;
         }
 
 
@@ -457,7 +473,7 @@
         .log-content { white-space: pre-wrap; word-wrap: break-word; color: var(--text-color); }
         .log-content pre { background-color: var(--pre-bg); color: var(--pre-text); padding: 5px 8px; margin-top: 4px; border-radius: 3px; border: 1px solid var(--pre-border); overflow-x: auto; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word; }
 
-
+        /* ... (all other log source styles remain the same) ... */
         .log-source-system, .log-source-system_event, .log-source-system_info, .log-source-system_connect,
         .log-source-system_context_switch, .log-source-system_new_task_signal,
         .log-source-system_task_deleted, .log-source-system_task_renamed,
@@ -511,7 +527,7 @@
             border: 1px solid var(--pre-border);
             border-radius: 4px;
             padding: 0.75rem;
-            /* margin: 0.5rem 0; /* Removed to be handled by .pre-wrapper-with-copy */
+            /* margin: 0.5rem 0; /* Handled by .pre-wrapper-with-copy */
             overflow-x: auto;
             white-space: pre; 
             font-family: var(--monospace-font);
@@ -817,9 +833,10 @@
                                     <li><strong>Extract a 3-bullet point summary from 'summary.txt'.</strong><br><span class="step-tool">Tool: read_file (then LLM)</span><br><span class="step-expected">Expected: 3-bullet summary generated.</span></li>
                                     <li><strong>Present the 3-bullet summary and confirm file creation.</strong><br><span class="step-tool">Tool: None</span><br><span class="step-expected">Expected: Consolidated final answer.</span></li>
                                 </ol>
-                                <div class="pre-wrapper-with-copy"> <pre data-is-code-block="true" class="copy-btn-added">Plan details can also include code blocks if necessary.
+                                <div class="pre-wrapper-with-copy">
+                                    <pre data-is-code-block="true">Plan details can also include code blocks if necessary.
     { "plan_metadata": "some_value" }</pre>
-                                    <button class="chat-copy-btn" style="position: absolute; top: 5px; right: 5px; z-index: 10; opacity: 0.3;" title="Copy to clipboard">Copy Code</button>
+                                    <button class="chat-copy-btn" title="Copy to clipboard">Copy Code</button>
                                 </div>
                             </div>
                             <div class="plan-actions">
@@ -834,7 +851,7 @@
                     <div class="step-title"><strong>Step 1/4: Perform in-depth research on 'Bioinformatics and LLMs'.</strong></div>
                     <div class="sub-content-container">
                         <div class="message message-agent-substatus agent-line-controller">
-                            <div class="content"><i>Controller: Validating step, preparing `deep_research_synthesizer`...</i></div>
+                            <div class="content">Controller: Validating step, preparing `deep_research_synthesizer`...</div>
                         </div>
                         <div class="message message-agent-thought agent-line-controller">
                             <div class="thought-top-row">
@@ -842,9 +859,11 @@
                                 <button class="chat-copy-btn" title="Copy to clipboard">📋&nbsp;Copy</button>
                             </div>
                             <div class="thought-content-box">The user wants a deep research. The `deep_research_synthesizer` tool is appropriate. I will use the query "bioinformatics and LLMs" and default number of sources.
-<pre data-is-code-block="true" class="copy-btn-added">This is a code block within a thought.
+                                <div class="pre-wrapper-with-copy">
+                                <pre data-is-code-block="true">This is a code block within a thought.
 def example_function():
     print("Hello from thought code!")</pre>
+                                <button class="chat-copy-btn" title="Copy to clipboard">Copy Code</button></div>
                             </div>
                         </div>
                          <div class="message message-agent-tool-output agent-line-tool">
@@ -864,13 +883,13 @@ def example_function():
                                 <button class="chat-copy-btn" title="Copy to clipboard">📋&nbsp;Copy</button>
                             </div>
                             <div class="tool-output-content-box">File 'summary.txt' written successfully to workspace.</div>
-                            <div class="tool-output-artifact-link"><em>References artifact: summary.txt</em></div>
+                            <div class="tool-output-artifact-link" title="View summary.txt in Artifacts">📄 References artifact: summary.txt</div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="message message-outer-blue-line">
-                    <div class="message-agent-final-content">
+                    <button class="chat-copy-btn" title="Copy to clipboard">📋&nbsp;Copy</button> <div class="message-agent-final-content">
                         The research on LLMs in bioinformatics is complete and saved to 'summary.txt'. Here's a 3-bullet summary:
                         <ul>
                             <li>LLMs are transforming bioinformatics by analyzing complex biological data.</li>
@@ -878,14 +897,13 @@ def example_function():
                             <li>Challenges remain in data privacy, interpretability, and bias.</li>
                         </ul>
                         <div class="pre-wrapper-with-copy">
-                        <pre data-is-code-block="true" class="copy-btn-added"># Example Python code snippet
+                        <pre data-is-code-block="true"># Example Python code snippet
 def greet(name):
     print(f"Hello, {name}!")
 
 greet("ResearchAgent User")</pre>
-                        <button class="chat-copy-btn" style="position: absolute; top: 5px; right: 5px; z-index: 10; opacity: 0.3;" title="Copy to clipboard">Copy Code</button></div>
+                        <button class="chat-copy-btn" title="Copy to clipboard">Copy Code</button></div>
                     </div>
-                    <button class="chat-copy-btn" style="position: absolute; top: 5px; right: 5px; z-index: 10; opacity: 0.3;" title="Copy to clipboard">📋&nbsp;Copy</button>
                 </div>
 
 
@@ -957,5 +975,52 @@ greet("ResearchAgent User")</pre>
             </div>
         </aside>
     </div>
-    </body>
+    <script>
+        // Minimal JS for Expand/Collapse and Copy Button visual feedback for simulation
+        document.addEventListener('DOMContentLoaded', () => {
+            // Expand/Collapse for Tool Outputs
+            document.querySelectorAll('.tool-output-expand-btn').forEach(button => {
+                button.onclick = () => {
+                    const wrapper = button.closest('.message-agent-tool-output');
+                    const fullDiv = wrapper.querySelector('.tool-output-full');
+                    const previewDiv = wrapper.querySelector('.tool-output-preview');
+                    if (fullDiv && previewDiv) {
+                        const isExpanded = fullDiv.style.display === 'block';
+                        fullDiv.style.display = isExpanded ? 'none' : 'block';
+                        previewDiv.style.display = isExpanded ? 'block' : 'none';
+                        button.textContent = isExpanded ? 'Expand' : 'Collapse';
+                    }
+                };
+            });
+
+            // Expand/Collapse for Plan Details
+            document.querySelectorAll('.plan-toggle-details-btn').forEach(button => {
+                button.onclick = (e) => {
+                    e.stopPropagation();
+                    const planBlock = button.closest('.plan-proposal-block');
+                    const detailsDiv = planBlock.querySelector('.plan-steps-details');
+                    if (detailsDiv) {
+                        const isHidden = detailsDiv.style.display === 'none';
+                        detailsDiv.style.display = isHidden ? 'block' : 'none';
+                        button.textContent = isHidden ? 'Hide Details' : 'View Details';
+                    }
+                };
+            });
+            
+            // Simulated Copy Button Feedback
+            document.querySelectorAll('.chat-copy-btn').forEach(button => {
+                button.onclick = (e) => {
+                    e.stopPropagation();
+                    const originalText = button.innerHTML;
+                    button.innerHTML = 'Copied ✓';
+                    button.disabled = true;
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                    }, 1500);
+                };
+            });
+        });
+    </script>
+</body>
 </html>
