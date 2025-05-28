@@ -17,7 +17,7 @@ from langchain_core.documents import Document
 from backend.config import settings 
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG) # Ensure debug messages from this module are processed
+logger.setLevel(logging.DEBUG) 
 
 class AgentCancelledException(Exception):
     """Custom exception to signal agent cancellation via callbacks."""
@@ -26,7 +26,6 @@ class AgentCancelledException(Exception):
 AddMessageFunc = Callable[[str, str, str, str], Coroutine[Any, Any, None]]
 SendWSMessageFunc = Callable[[str, Any], Coroutine[Any, Any, None]]
 
-# Standardized Log Source/Component Hint Constants
 LOG_SOURCE_INTENT_CLASSIFIER = "INTENT_CLASSIFIER"
 LOG_SOURCE_PLANNER = "PLANNER"
 LOG_SOURCE_CONTROLLER = "CONTROLLER"
@@ -41,12 +40,10 @@ LOG_SOURCE_WARNING = "WARNING"
 LOG_SOURCE_ERROR = "ERROR"
 LOG_SOURCE_ARTIFACT = "ARTIFACT"
 
-# Sub-types for agent_thinking_update messages
 SUB_TYPE_BOTTOM_LINE = "bottom_line"
 SUB_TYPE_SUB_STATUS = "sub_status"
 SUB_TYPE_THOUGHT = "thought"
 
-# DB message types for new persistent chat items
 DB_MSG_TYPE_SUB_STATUS = "db_agent_sub_status"
 DB_MSG_TYPE_THOUGHT = "db_agent_thought"
 
@@ -119,9 +116,7 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
 
         metadata = kwargs.get("metadata", {})
         self.current_agent_role_hint = metadata.get("component_name", LOG_SOURCE_LLM_CORE)
-        # <<< START MODIFICATION - Targeted logging for component entry >>>
         logger.critical(f"CRITICAL_DEBUG: [{self.session_id}] on_llm_start: ENTERED for role_hint: {self.current_agent_role_hint}. Metadata: {metadata}")
-        # <<< END MODIFICATION >>>
 
         component_hint_for_status = self.current_agent_role_hint if self.current_agent_role_hint != LOG_SOURCE_LLM_CORE else "LLM"
         await self._send_thinking_update(f"Thinking ({component_hint_for_status})...", "LLM_PROCESSING_START", self.current_agent_role_hint, SUB_TYPE_BOTTOM_LINE)
@@ -134,9 +129,7 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         
         metadata = kwargs.get("metadata", {})
         self.current_agent_role_hint = metadata.get("component_name", LOG_SOURCE_LLM_CORE)
-        # <<< START MODIFICATION - Targeted logging for component entry >>>
         logger.critical(f"CRITICAL_DEBUG: [{self.session_id}] on_chat_model_start: ENTERED for role_hint: {self.current_agent_role_hint}. Metadata: {metadata}")
-        # <<< END MODIFICATION >>>
         
         component_hint_for_status = self.current_agent_role_hint if self.current_agent_role_hint != LOG_SOURCE_LLM_CORE else "ChatModel"
         await self._send_thinking_update(f"Thinking ({component_hint_for_status})...", "LLM_PROCESSING_START", self.current_agent_role_hint, SUB_TYPE_BOTTOM_LINE)
@@ -153,7 +146,6 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         model_name: str = "unknown_model"
         source_for_tokens = "unknown"
 
-        # <<< START MODIFICATION - Targeted logging for component entry & LLMResult structure >>>
         logger.critical(f"CRITICAL_DEBUG: [{self.session_id}] on_llm_end: ENTERED for role_hint: {self.current_agent_role_hint}")
         logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Full response object type: {type(response)}")
         
@@ -185,7 +177,6 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
                         logger.debug(f"    Item {j} details (Role: {self.current_agent_role_hint}): {json.dumps(gen_item_details, default=str, indent=2)}")
             except Exception as e_gen_log: logger.error(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Error iterating/logging response.generations: {e_gen_log}"); logger.debug(f"[{self.session_id}] on_llm_end: response.generations (raw repr): {repr(response.generations)[:1000]}...")
         else: logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): response.generations IS NONE or EMPTY.")
-        # <<< END MODIFICATION >>>
 
         try:
             if response.llm_output and isinstance(response.llm_output, dict):
@@ -321,16 +312,31 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         log_content_tool_end = f"[Tool Output] Tool '{tool_name_for_log}' returned:\n---\n{monitor_output_summary.strip()}\n---"
         final_log_source = f"{LOG_SOURCE_TOOL_PREFIX}_{tool_name_for_log.upper()}_OUTPUT"
 
+        # <<< START MODIFICATION - Enhanced logging for write_file >>>
+        logger.critical(f"DEBUG_ARTIFACT_REFRESH: [callbacks.py/on_tool_end] Entered for tool: '{tool_name_for_log}'. Output starts with: '{output_str[:50]}...'")
         success_prefix = "SUCCESS::write_file:::"
-        if tool_name_for_log == "write_file" and output_str.startswith(success_prefix):
-            try:
-                if len(output_str) > len(success_prefix):
-                    relative_path_str = output_str[len(success_prefix):]
-                    await self._save_message_to_db("artifact_generated", {"path": relative_path_str, "tool": tool_name_for_log})
-                    await self.send_ws_message("monitor_log", {"text": f"{log_prefix} [{LOG_SOURCE_ARTIFACT.upper()}_GENERATED] {relative_path_str} (via {tool_name_for_log})", "log_source": f"{LOG_SOURCE_ARTIFACT}_{tool_name_for_log.upper()}"})
-                    log_content_tool_end = f"[Tool Output] Tool '{tool_name_for_log}' successfully wrote file: '{relative_path_str}'"
-                    if self.current_task_id: await self.send_ws_message("trigger_artifact_refresh", {"taskId": self.current_task_id})
-            except Exception as parse_err: logger.error(f"[{self.session_id}] Error processing write_file success output '{output_str}': {parse_err}", exc_info=True)
+        if tool_name_for_log == "write_file":
+            logger.critical(f"DEBUG_ARTIFACT_REFRESH: [callbacks.py/on_tool_end] Tool is 'write_file'. Checking output prefix.")
+            if output_str.startswith(success_prefix):
+                logger.critical(f"DEBUG_ARTIFACT_REFRESH: [callbacks.py/on_tool_end] 'write_file' output STARTS WITH success_prefix.")
+                try:
+                    if len(output_str) > len(success_prefix):
+                        relative_path_str = output_str[len(success_prefix):]
+                        await self._save_message_to_db("artifact_generated", {"path": relative_path_str, "tool": tool_name_for_log})
+                        await self.send_ws_message("monitor_log", {"text": f"{log_prefix} [{LOG_SOURCE_ARTIFACT.upper()}_GENERATED] {relative_path_str} (via {tool_name_for_log})", "log_source": f"{LOG_SOURCE_ARTIFACT}_{tool_name_for_log.upper()}"})
+                        log_content_tool_end = f"[Tool Output] Tool '{tool_name_for_log}' successfully wrote file: '{relative_path_str}'"
+                        if self.current_task_id:
+                            logger.critical(f"DEBUG_ARTIFACT_REFRESH: [callbacks.py/on_tool_end] write_file SUCCESS. About to send 'trigger_artifact_refresh' for task {self.current_task_id}")
+                            await self.send_ws_message("trigger_artifact_refresh", {"taskId": self.current_task_id})
+                        else:
+                            logger.warning(f"DEBUG_ARTIFACT_REFRESH: [callbacks.py/on_tool_end] write_file SUCCESS but current_task_id is None. Cannot trigger refresh.")
+                    else:
+                        logger.warning(f"DEBUG_ARTIFACT_REFRESH: [callbacks.py/on_tool_end] 'write_file' output starts with prefix but is too short: '{output_str}'")
+                except Exception as parse_err: 
+                    logger.error(f"[{self.session_id}] Error processing write_file success output '{output_str}': {parse_err}", exc_info=True)
+            else:
+                logger.warning(f"DEBUG_ARTIFACT_REFRESH: [callbacks.py/on_tool_end] 'write_file' output DOES NOT start with success_prefix. Output: '{output_str[:100]}...'")
+        # <<< END MODIFICATION >>>
         
         await self.send_ws_message("monitor_log", {"text": f"{log_prefix} {log_content_tool_end}", "log_source": final_log_source})
         user_friendly_tool_name = tool_name_for_log.replace("_", " ").title()
@@ -392,4 +398,3 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
     async def on_retriever_start(self, serialized: Dict[str, Any], query: str, **kwargs: Any) -> Any: pass
     async def on_retriever_end(self, documents: Sequence[Document], **kwargs: Any) -> Any: pass
     async def on_retriever_error(self, error: Union[Exception, KeyboardInterrupt], **kwargs: Any) -> Any: pass
-

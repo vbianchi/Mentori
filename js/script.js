@@ -35,10 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const fileUploadInputElement = document.getElementById('file-upload-input');
     const uploadFileButtonElement = document.getElementById('upload-file-button');
     const agentThinkingStatusElement = document.getElementById('agent-thinking-status'); 
-    // Token elements will be handled by token_usage_ui.js directly via getElementById
-    // const lastCallTokensElement = document.getElementById('last-call-tokens'); 
-    // const taskTotalTokensElement = document.getElementById('task-total-tokens-overall');
-
 
     const roleSelectorsMetaForInit = [
         { element: document.getElementById('intent-llm-select'), role: 'intent_classifier', storageKey: 'sessionIntentClassifierLlmId', label: 'Intent Classifier' },
@@ -46,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { element: document.getElementById('controller-llm-select'), role: 'controller', storageKey: 'sessionControllerLlmId', label: 'Controller' },
         { element: document.getElementById('evaluator-llm-select'), role: 'evaluator', storageKey: 'sessionEvaluatorLlmId', label: 'Evaluator' }
     ];
-    const executorLlmSelectElement = document.getElementById('llm-select'); // Still need this for initLlmSelectorsUI
+    const executorLlmSelectElement = document.getElementById('llm-select');
 
     const httpBackendBaseUrl = 'http://localhost:8766'; 
     let isLoadingHistory = false; 
@@ -183,34 +179,39 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     break;
                 case 'update_artifacts': 
+                    // <<< START DEBUG LOGGING for update_artifacts >>>
+                    console.log(`[Script.js CRITICAL DEBUG] Received 'update_artifacts'. Agent running: ${StateManager.getIsAgentRunning()}`, message.content);
+                    // <<< END DEBUG LOGGING for update_artifacts >>>
                     if (Array.isArray(message.content)) { 
-                        const oldArtifacts = StateManager.getCurrentTaskArtifacts();
-                        const oldIndex = StateManager.getCurrentArtifactIndex(); 
-                        const oldCurrentArtifactFilename = (oldIndex >= 0 && oldIndex < oldArtifacts.length) ? oldArtifacts[oldIndex]?.filename : null; 
                         StateManager.setCurrentTaskArtifacts(message.content);
-                        let newIndexToSet = -1; 
                         const newArtifacts = StateManager.getCurrentTaskArtifacts(); 
-                        if (oldCurrentArtifactFilename && oldCurrentArtifactFilename.startsWith("_plan_proposal_") && oldCurrentArtifactFilename.endsWith(".md")) { 
-                            const foundNewIndex = newArtifacts.findIndex(art => art.filename === oldCurrentArtifactFilename);
-                            if (foundNewIndex !== -1) { newIndexToSet = foundNewIndex;
-                            } else { const latestPlanProposal = newArtifacts.find(art => art.filename && art.filename.startsWith("_plan_proposal_") && art.filename.endsWith(".md"));
-                                newIndexToSet = latestPlanProposal ? newArtifacts.indexOf(latestPlanProposal) : (newArtifacts.length > 0 ? 0 : -1); } 
-                        } else if (oldCurrentArtifactFilename && oldCurrentArtifactFilename.startsWith("_plan_") && oldCurrentArtifactFilename.endsWith(".md")) { 
-                            const foundNewIndex = newArtifacts.findIndex(art => art.filename === oldCurrentArtifactFilename);
-                            if (foundNewIndex !== -1) { newIndexToSet = foundNewIndex;
-                            } else { const latestPlan = newArtifacts.find(art => art.filename && art.filename.startsWith("_plan_") && art.filename.endsWith(".md"));
-                                newIndexToSet = latestPlan ? newArtifacts.indexOf(latestPlan) : (newArtifacts.length > 0 ? 0 : -1); }
-                        } else if (newArtifacts.length > 0) { newIndexToSet = 0; } 
+                        const newIndexToSet = newArtifacts.length > 0 ? 0 : -1;
                         StateManager.setCurrentArtifactIndex(newIndexToSet);
-                        if(typeof updateArtifactDisplayUI === 'function') { updateArtifactDisplayUI(newArtifacts, StateManager.getCurrentArtifactIndex()); } 
+                        
+                        console.log(`[Script.js] Artifacts updated. New count: ${newArtifacts.length}. Displaying index: ${newIndexToSet}`);
+                        if(typeof updateArtifactDisplayUI === 'function') { 
+                            updateArtifactDisplayUI(newArtifacts, StateManager.getCurrentArtifactIndex()); 
+                        } 
                     } 
                     break;
                 case 'trigger_artifact_refresh': 
+                    // <<< START DEBUG LOGGING for trigger_artifact_refresh >>>
+                    console.log(`[Script.js CRITICAL DEBUG] Received 'trigger_artifact_refresh' for taskId: ${message.content?.taskId}. Current task: ${StateManager.getCurrentTaskId()}. Agent running: ${StateManager.getIsAgentRunning()}`);
+                    // <<< END DEBUG LOGGING for trigger_artifact_refresh >>>
                     const taskIdToRefresh = message.content?.taskId;
                     if (taskIdToRefresh && taskIdToRefresh === StateManager.getCurrentTaskId()) { 
                         if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM_EVENT] File event detected for task ${taskIdToRefresh}, requesting artifact list update...`, log_source: "SYSTEM_EVENT"});
-                        if (typeof sendWsMessage === 'function') sendWsMessage('get_artifacts_for_task', { taskId: StateManager.getCurrentTaskId() });
-                    } 
+                        if (typeof sendWsMessage === 'function') {
+                            // <<< START DEBUG LOGGING for trigger_artifact_refresh >>>
+                            console.log(`[Script.js CRITICAL DEBUG] Conditions met. Sending 'get_artifacts_for_task' for task ${StateManager.getCurrentTaskId()}`);
+                            // <<< END DEBUG LOGGING for trigger_artifact_refresh >>>
+                            sendWsMessage('get_artifacts_for_task', { taskId: StateManager.getCurrentTaskId() });
+                        }
+                    } else {
+                        // <<< START DEBUG LOGGING for trigger_artifact_refresh >>>
+                        console.log(`[Script.js CRITICAL DEBUG] Conditions NOT met for sending 'get_artifacts_for_task'. taskIdToRefresh: ${taskIdToRefresh}, currentTaskId: ${StateManager.getCurrentTaskId()}`);
+                        // <<< END DEBUG LOGGING for trigger_artifact_refresh >>>
+                    }
                     break;
                 case 'available_models': 
                     if (message.content && typeof message.content === 'object') { 
@@ -250,9 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateTokenDisplayUI(lastCallUsage, StateManager.getCurrentTaskTotalTokens()); 
         } 
     }
-    // Removed resetTaskTokenTotalsGlobally as StateManager.selectTask handles token state loading/resetting.
-
-    // <<< START MODIFICATION - clearChatAndMonitor no longer resets tokens >>>
+    
     function clearChatAndMonitor(addLog = true) { 
         if (typeof clearChatMessagesUI === 'function') clearChatMessagesUI(); 
         if (typeof clearMonitorLogUI === 'function') clearMonitorLogUI(); 
@@ -262,13 +261,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (addLog && typeof addLogEntryToMonitor === 'function') { 
             addLogEntryToMonitor({text: "[SYSTEM_EVENT] Cleared context.", log_source: "SYSTEM_EVENT"}); 
         } 
-        // StateManager.resetCurrentTaskTotalTokens(); // This is now handled by StateManager.selectTask
         StateManager.setCurrentDisplayedPlan(null); 
         StateManager.setCurrentPlanProposalId(null); 
     };
-    // <<< END MODIFICATION >>>
     
-    // <<< START MODIFICATION - handleTaskSelection updated >>>
     const handleTaskSelection = (taskId) => { 
         console.log(`[MainScript] Task selection requested for: ${taskId}`);
         const previousActiveTaskId = StateManager.getCurrentTaskId();
@@ -289,23 +285,20 @@ document.addEventListener('DOMContentLoaded', () => {
              clearCurrentMajorStepUI();
         }
 
-        StateManager.selectTask(taskId); // This will load or reset token data in StateManager
+        StateManager.selectTask(taskId); 
         const newActiveTaskId = StateManager.getCurrentTaskId(); 
         console.log(`[MainScript] StateManager updated. Previous active: ${previousActiveTaskId}, New active: ${newActiveTaskId}`);
         
         if (typeof renderTaskList === 'function') { renderTaskList(StateManager.getTasks(), newActiveTaskId); } 
         
-        // Update token display UI with the (potentially loaded or newly reset) state
         if (typeof updateTokenDisplayUI === 'function') {
-            // Pass null for lastCallUsage as we are just switching tasks, not processing a new LLM call result.
-            // StateManager.getCurrentTaskTotalTokens() will have the correct data for the new task.
             updateTokenDisplayUI(null, StateManager.getCurrentTaskTotalTokens());
         }
         
         const selectedTaskObject = StateManager.getTasks().find(t => t.id === newActiveTaskId);
         
         if (newActiveTaskId && selectedTaskObject) {
-            clearChatAndMonitor(false); // Clears UI elements but NOT token state
+            clearChatAndMonitor(false); 
             if (typeof sendWsMessage === 'function') sendWsMessage("context_switch", { task: selectedTaskObject.title, taskId: selectedTaskObject.id });
         } else if (!newActiveTaskId) { 
             clearChatAndMonitor(); 
@@ -315,13 +308,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (typeof showAgentThinkingStatusInUI === 'function') {
                 showAgentThinkingStatusInUI(true, { message: "No task selected.", status_key: "IDLE", component_hint: "SYSTEM" });
             }
-            // Ensure token display is also reset if no task is active
             if (typeof updateTokenDisplayUI === 'function') {
                  updateTokenDisplayUI(null, { overall: { input: 0, output: 0, total: 0 }, roles: {} });
             }
         }
     };
-    // <<< END MODIFICATION >>>
 
     const handleNewTaskCreation = () => { const newTask = StateManager.addTask(); handleTaskSelection(newTask.id); };
     const handleTaskDeletion = (taskId, taskTitle) => { const wasActiveTask = StateManager.getCurrentTaskId() === taskId; StateManager.deleteTask(taskId); 
@@ -404,7 +395,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log("[Script.js] WS Open: No active task found in StateManager on initial load.");
                 updateGlobalMonitorStatus('idle', 'No Task'); 
                 if(typeof clearArtifactDisplayUI === 'function') clearArtifactDisplayUI(); 
-                // Token display will be reset by handleTaskSelection if no task, or by loading persisted data
                 if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "No task selected.", status_key: "IDLE", component_hint: "SYSTEM" });
             } 
         } 
@@ -420,10 +410,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof initMonitorUI === 'function') { initMonitorUI( { monitorLogArea: monitorLogAreaElement, statusDot: statusDotElement, monitorStatusText: monitorStatusTextElement, stopButton: stopButtonElement }, { onStopAgent: handleStopAgentRequest }); }
     if (typeof initArtifactUI === 'function') { initArtifactUI( { monitorArtifactArea: monitorArtifactArea, artifactNav: artifactNav, prevBtn: artifactPrevBtn, nextBtn: artifactNextBtn, counterEl: artifactCounterElement }, { onNavigate: handleArtifactNavigation }); if(typeof updateArtifactDisplayUI === 'function') updateArtifactDisplayUI(StateManager.getCurrentTaskArtifacts(), StateManager.getCurrentArtifactIndex()); }
     if (typeof initLlmSelectorsUI === 'function') { initLlmSelectorsUI( { executorLlmSelect: executorLlmSelectElement, roleSelectors: roleSelectorsMetaForInit }, { onExecutorLlmChange: handleExecutorLlmChange, onRoleLlmChange: handleRoleLlmChange }); }
-    // Initialize token UI. It will fetch its own elements by ID.
     if (typeof initTokenUsageUI === 'function') { 
-        initTokenUsageUI({}); // Pass empty object as elements are fetched internally
-        // Initial update after StateManager is ready and potentially loaded persisted task tokens
+        initTokenUsageUI({}); 
         updateTokenDisplayUI(null, StateManager.getCurrentTaskTotalTokens());
     }
     if (typeof initFileUploadUI === 'function') { initFileUploadUI( { fileUploadInputEl: fileUploadInputElement, uploadFileButtonEl: uploadFileButtonElement }, { httpBackendBaseUrl: httpBackendBaseUrl }, { getCurrentTaskId: StateManager.getCurrentTaskId, addLog: (logData) => { if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(logData); }, addChatMsg: (msgText, msgType, options) => { if (typeof addChatMessageToUI === 'function') addChatMessageToUI(msgText, msgType, options); } }); }
@@ -432,4 +420,3 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof connectWebSocket === 'function') { if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: "[SYSTEM_CONNECTION] Attempting to connect to backend...", log_source: "SYSTEM_CONNECTION"}); updateGlobalMonitorStatus('disconnected', 'Connecting...'); connectWebSocket(handleWsOpen, handleWsClose, handleWsError);
     } else { console.error("connectWebSocket function not found."); if (typeof addChatMessageToUI === 'function') addChatMessageToUI("ERROR: WebSocket manager not loaded.", "status_message", {component_hint: "ERROR", isError: true}); updateGlobalMonitorStatus('error', 'Initialization Error'); }
 });
-

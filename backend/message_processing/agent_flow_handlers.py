@@ -13,7 +13,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import BaseTool
-from langchain_core.callbacks.base import BaseCallbackHandler # For type hinting
+from langchain_core.callbacks.base import BaseCallbackHandler 
 
 from backend.config import settings
 from backend.llm_setup import get_llm
@@ -22,7 +22,7 @@ from backend.planner import generate_plan, PlanStep
 from backend.controller import validate_and_prepare_step_action
 from backend.agent import create_agent_executor
 from backend.callbacks import (
-    WebSocketCallbackHandler, # Ensure this is imported for type hint
+    WebSocketCallbackHandler, 
     AgentCancelledException, 
     SUB_TYPE_BOTTOM_LINE, SUB_TYPE_SUB_STATUS, SUB_TYPE_THOUGHT, 
     DB_MSG_TYPE_SUB_STATUS, DB_MSG_TYPE_THOUGHT,
@@ -79,7 +79,12 @@ async def _send_thinking_update_from_handler(
         await _save_message_to_db_from_handler(task_id, session_id, db_add_message_func, db_type, db_content)
 
 async def _update_plan_file_step_status(
-    task_workspace_path: Path, plan_filename: str, step_number: int, status_char: str
+    task_workspace_path: Path, 
+    plan_filename: str, 
+    step_number: int, 
+    status_char: str,
+    current_task_id: Optional[str], 
+    send_ws_message_func: Optional[SendWSMessageFunc] 
 ) -> None:
     if not plan_filename: return
     plan_file_path = task_workspace_path / plan_filename
@@ -89,7 +94,7 @@ async def _update_plan_file_step_status(
         updated_lines = []
         found_step = False
         step_pattern = re.compile(rf"^\s*-\s*\[\s*[ x!-]?\s*\]\s*{re.escape(str(step_number))}\.\s+.*", re.IGNORECASE)
-        checkbox_pattern = re.compile(r"(\s*-\s*\[)\s*[ x!-]?\s*(\])")
+        checkbox_pattern = re.compile(r"(\s*-\s*\[)\s*[ x!-]?\s*(\])") 
         for line_content in lines:
             if not found_step and step_pattern.match(line_content):
                 updated_lines.append(checkbox_pattern.sub(rf"\g<1>{status_char}\g<2>", line_content, count=1))
@@ -98,8 +103,16 @@ async def _update_plan_file_step_status(
                 updated_lines.append(line_content)
         if found_step:
             async with aiofiles.open(plan_file_path, 'w', encoding='utf-8') as f_write: await f_write.writelines(updated_lines)
-        else: logger.warning(f"Step {step_number} pattern not found in plan file {plan_file_path} for status update. Regex: {step_pattern.pattern}")
-    except Exception as e: logger.error(f"Error updating plan file {plan_file_path} for step {step_number}: {e}", exc_info=True)
+            logger.info(f"Updated plan file '{plan_file_path.name}' for step {step_number} with status '{status_char}'.")
+            if current_task_id and send_ws_message_func:
+                # <<< START MODIFICATION - Added debug log >>>
+                logger.critical(f"DEBUG_ARTIFACT_REFRESH: [agent_flow_handlers.py/_update_plan_file_step_status] Plan file '{plan_filename}' updated. About to send 'trigger_artifact_refresh' for task {current_task_id}")
+                # <<< END MODIFICATION >>>
+                await send_ws_message_func("trigger_artifact_refresh", {"taskId": current_task_id})
+        else: 
+            logger.warning(f"Step {step_number} pattern not found in plan file {plan_file_path} for status update. Regex: {step_pattern.pattern}")
+    except Exception as e: 
+        logger.error(f"Error updating plan file {plan_file_path} for step {step_number}: {e}", exc_info=True)
 
 async def process_user_message(
     session_id: str, data: Dict[str, Any], session_data_entry: Dict[str, Any],
@@ -121,17 +134,15 @@ async def process_user_message(
 
     session_data_entry.update({'original_user_query': user_input_content, 'cancellation_requested': False, 'active_plan_filename': None, 'current_plan_proposal_id_backend': None})
     
-    # <<< START MODIFICATION - Explicitly log the retrieved callback_handler >>>
     retrieved_callback_handler: Optional[WebSocketCallbackHandler] = session_data_entry.get("callback_handler")
     logger.critical(f"CRITICAL_DEBUG: AGENT_FLOW_HANDLER (process_user_message) - Retrieved 'callback_handler' from session_data_entry. Type: {type(retrieved_callback_handler).__name__ if retrieved_callback_handler else 'None'}. Is it None? {retrieved_callback_handler is None}")
     
     callbacks_for_invoke: List[BaseCallbackHandler] = []
-    if not retrieved_callback_handler: # Check the specifically retrieved handler
+    if not retrieved_callback_handler: 
         logger.error(f"[{session_id}] Callback handler NOT FOUND in session_data_entry for process_user_message. Token counting for some roles may fail.")
     else:
         callbacks_for_invoke.append(retrieved_callback_handler)
         logger.critical(f"CRITICAL_DEBUG: AGENT_FLOW_HANDLER (process_user_message) - Populated callbacks_for_invoke with: {[type(cb).__name__ for cb in callbacks_for_invoke]}")
-    # <<< END MODIFICATION >>>
 
     await _send_thinking_update_from_handler(send_ws_message_func, active_task_id, session_id, db_add_message_func, "Classifying intent...", "INTENT_CLASSIFICATION_START", LOG_SOURCE_INTENT_CLASSIFIER, SUB_TYPE_SUB_STATUS)
     dynamic_tools = get_dynamic_tools(active_task_id)
@@ -140,7 +151,7 @@ async def process_user_message(
     classified_intent = await classify_intent(
         user_input_content, 
         tools_summary,
-        retrieved_callback_handler # Pass the specifically retrieved handler
+        retrieved_callback_handler 
     )
 
     await add_monitor_log_func(f"Intent classified as: {classified_intent}", f"{LOG_SOURCE_SYSTEM}_INTENT_CLASSIFIED")
@@ -151,7 +162,7 @@ async def process_user_message(
         human_summary, steps = await generate_plan(
             user_input_content, 
             tools_summary,
-            retrieved_callback_handler # Pass the specifically retrieved handler
+            retrieved_callback_handler 
         )
         if human_summary and steps:
             plan_id = str(uuid.uuid4())
@@ -166,7 +177,8 @@ async def process_user_message(
             try:
                 proposal_file_path = task_workspace_path / plan_proposal_filename
                 async with aiofiles.open(proposal_file_path, 'w', encoding='utf-8') as f: await f.write("\n".join(plan_proposal_markdown_content))
-                await send_ws_message_func("trigger_artifact_refresh", {"taskId": active_task_id})
+                logger.critical(f"DEBUG_ARTIFACT_REFRESH: [agent_flow_handlers.py/process_user_message] Plan proposal '{plan_proposal_filename}' saved. About to send 'trigger_artifact_refresh' for task {active_task_id}")
+                await send_ws_message_func("trigger_artifact_refresh", {"taskId": active_task_id}) 
             except Exception as e: logger.error(f"[{session_id}] Failed to save plan proposal artifact '{plan_proposal_filename}': {e}")
 
             await send_ws_message_func("propose_plan_for_confirmation", {"plan_id": plan_id, "human_summary": human_summary, "structured_plan": steps})
@@ -182,9 +194,9 @@ async def process_user_message(
             provider=session_data_entry.get("selected_llm_provider", settings.executor_default_provider), 
             model_name=session_data_entry.get("selected_llm_model_name", settings.executor_default_model_name), 
             requested_for_role=direct_qa_role_hint,
-            callbacks=callbacks_for_invoke # Pass callbacks to LLM for AgentExecutor too
+            callbacks=callbacks_for_invoke 
         )
-        agent_executor = create_agent_executor(llm=executor_llm, tools=dynamic_tools, memory=session_data_entry["memory"], max_iterations=settings.agent_max_iterations) 
+        agent_executor = create_agent_executor(llm=executor_llm, tools=get_dynamic_tools(active_task_id), memory=session_data_entry["memory"], max_iterations=settings.agent_max_iterations) 
         final_state = "DIRECT_QA_FAILED"; final_msg = "Direct QA error." 
         try:
             result = await agent_executor.ainvoke(
@@ -252,7 +264,8 @@ async def process_execute_confirmed_plan(
     try:
         async with aiofiles.open(task_workspace_path / plan_execution_filename, 'w', encoding='utf-8') as f:
             await f.write("".join(plan_markdown_content_list))
-        await send_ws_message_func("trigger_artifact_refresh", {"taskId": active_task_id})
+        logger.critical(f"DEBUG_ARTIFACT_REFRESH: [agent_flow_handlers.py/process_execute_confirmed_plan] Main plan file '{plan_execution_filename}' saved. About to send 'trigger_artifact_refresh' for task {active_task_id}")
+        await send_ws_message_func("trigger_artifact_refresh", {"taskId": active_task_id}) 
     except Exception as e: logger.error(f"Error saving execution plan artifact: {e}")
 
     plan_failed = False
@@ -291,7 +304,7 @@ async def process_execute_confirmed_plan(
             tool_name, tool_input, controller_reasoning, confidence = await validate_and_prepare_step_action(
                 original_user_query, effective_plan_step_for_controller, get_dynamic_tools(active_task_id), 
                 session_data_entry, last_successful_step_output,
-                retrieved_callback_handler # Pass the handler
+                retrieved_callback_handler 
             )
             current_step_attempt_log.append(f"Attempt {retry_count+1}: Controller decided Tool='{tool_name}', Input='{str(tool_input)[:50]}...', Confidence={confidence:.2f}. Reasoning: {controller_reasoning}")
             if controller_reasoning and len(controller_reasoning) > 10: 
@@ -314,7 +327,7 @@ async def process_execute_confirmed_plan(
                     provider=session_data_entry.get("selected_llm_provider", settings.executor_default_provider), 
                     model_name=session_data_entry.get("selected_llm_model_name", settings.executor_default_model_name),
                     requested_for_role=f"{LOG_SOURCE_EXECUTOR}_Step{current_step_num}",
-                    callbacks=callbacks_for_invoke # Pass callbacks to LLM for AgentExecutor too
+                    callbacks=callbacks_for_invoke 
                 )
                 agent_executor_instance = create_agent_executor(llm=executor_llm, tools=get_dynamic_tools(active_task_id), memory=session_data_entry["memory"], max_iterations=settings.agent_max_iterations) 
                 
@@ -345,7 +358,7 @@ async def process_execute_confirmed_plan(
                 original_user_query, current_plan_step_obj, 
                 tool_name, tool_input, step_executor_output_str, 
                 get_dynamic_tools(active_task_id), session_data_entry,
-                retrieved_callback_handler # Pass the handler
+                retrieved_callback_handler 
             )
             
             if eval_outcome:
@@ -364,7 +377,14 @@ async def process_execute_confirmed_plan(
             retry_count += 1
         
         step_execution_summary_for_overall_eval.append(f"Step {current_step_num}: {current_plan_step_obj.description}\n  Status: {'Success' if step_succeeded_this_round else 'Failed'}\n  Attempts:\n    " + "\n    ".join(current_step_attempt_log))
-        await _update_plan_file_step_status(task_workspace_path, plan_execution_filename, current_step_num, "x" if step_succeeded_this_round else "!")
+        await _update_plan_file_step_status(
+            task_workspace_path, 
+            plan_execution_filename, 
+            current_step_num, 
+            "x" if step_succeeded_this_round else "!",
+            active_task_id, 
+            send_ws_message_func 
+        )
         if not step_succeeded_this_round: plan_failed = True 
         if plan_failed: break 
         
@@ -375,7 +395,7 @@ async def process_execute_confirmed_plan(
     overall_eval_result = await evaluate_plan_outcome(
         original_user_query, executed_plan_summary_str, 
         final_eval_answer, session_data_entry,
-        retrieved_callback_handler # Pass the handler
+        retrieved_callback_handler 
     )
     
     final_chat_message_content = final_eval_answer 
@@ -408,4 +428,3 @@ async def process_cancel_plan_proposal(
         dummy_db_add = lambda tid, sid, mtype, cont: asyncio.sleep(0) # type: ignore
         await _send_thinking_update_from_handler(send_ws_message_func, session_data_entry.get("current_task_id"), session_id, dummy_db_add, "Idle.", "IDLE", LOG_SOURCE_SYSTEM, SUB_TYPE_BOTTOM_LINE)
         await send_ws_message_func("status_message", {"text": f"Plan proposal cancelled.", "component_hint": LOG_SOURCE_SYSTEM})
-
