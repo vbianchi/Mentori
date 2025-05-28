@@ -12,13 +12,18 @@ Targeting Version 2.5.3
 -   **Chat UI/UX Refinement (Implementation & Fixes Ongoing):**
     -   **Visual Design (Target: `simulation_option6.html`):**
         -   User messages with right side-lines, system/plan/final messages with unified blue outer left side-lines, no side-lines for major step announcements, and nested/indented component-specific lines for sub-statuses & agent thoughts are implemented.
-        -   HTML tags (`<strong>`, `<em>`) are now rendering correctly in the chat.
+    -   HTML tags (`<strong>`, `<em>`) are now rendering correctly in the chat.
     -   **Backend Support & Persistence:**
         -   Backend sends structured messages for steps, sub-statuses, and thoughts.
         -   Persistence for these new message types in the database and reloading into history is implemented.
     -   **Plan Proposal UI & Persistence (Complete):** Remains functional.
-    -   **Token Counter UI & Functionality (FIXED):** Expandable UI for token breakdown by role is implemented. Token counting functionality now works for all individual agent/LLM roles (Intent Classifier, Planner, Controller, Executor, Evaluator) and is accurately displayed in the UI's per-role breakdown. Persistence for displayed totals per task is working.
+    -   **Token Counter UI & Functionality (FIXED):** Expandable UI for token breakdown by role is implemented. Token counting functionality now works for all individual agent/LLM roles and is accurately displayed. Persistence for displayed totals per task is working.
     -   **File Upload Functionality (FIXED):** File uploads to the task workspace are now functional.
+    -   **In-Chat Tool Feedback & Usability (Core Functionality Implemented):**
+        -   Tool action confirmations (e.g., for file writes) and output snippets (e.g., for file reads, search results) are now displayed directly in chat.
+        -   Longer tool outputs in chat are collapsible.
+        -   "Copy to Clipboard" functionality has been added for tool outputs, agent thoughts, final agent answers, and code blocks.
+        -   Planner prompting has been refined to encourage more comprehensive final summary messages from the agent.
 
 ## Core Architecture & Workflow
 
@@ -29,22 +34,26 @@ Targeting Version 2.5.3
 1.  **UI & User Interaction:**
     -   Task Management: Creation, deletion, renaming functional. Workspace folders managed correctly.
     -   Chat Interface:
-        -   **Rendering:** Correctly displays styled HTML tags. Implements the new visual hierarchy for steps, sub-statuses, and thoughts as per `simulation_option6.html`.
-        -   **Persistence:** All chat message types, including the new structured ones, are saved and reloaded.
-        -   **Planned Enhancements:**
-            -   Display tool action confirmations (e.g., for file writes) and output snippets (e.g., for file reads, search results) directly in chat.
-            -   "Copy to clipboard" functionality for relevant chat messages (thoughts, tool outputs, code blocks).
-        -   Role-Specific LLM Selection.
+        -   **Rendering:** Correctly displays styled HTML tags. Implements the visual hierarchy for steps, sub-statuses, and thoughts.
+        -   **In-Chat Tool Feedback:** Displays tool action confirmations and output snippets directly in chat, with collapsible sections for longer outputs.
+        -   **Copy to Clipboard:** Allows copying content from tool outputs, agent thoughts, final agent answers, and code blocks.
+        -   **Persistence:** All chat message types, including structured steps, thoughts, and tool outputs, are saved and reloaded.
+        -   **Planned Enhancements (UI/UX Polish):**
+            -   Review and refine chat message visual density, indentation, and spacing.
+            -   Standardize copy/expand button placement and appearance.
+            -   Finalize "View [artifact] in Artifacts" links from tool output messages.
+    -   Role-Specific LLM Selection.
     -   Monitor Panel for structured agent logs.
     -   Artifact Viewer.
-    -   **Token Usage Tracking (FIXED & COMPLETE):** Accurately tracks and displays token usage per LLM call, broken down by agent role, and aggregated per task.
-    -   **File Upload Capability (FIXED):** Users can upload files to the active task's workspace.
+    -   Token Usage Tracking (FIXED & COMPLETE): Accurately tracks and displays token usage per LLM call, broken down by agent role, and aggregated per task.
+    -   File Upload Capability (FIXED): Users can upload files to the active task's workspace.
 2.  **Backend Architecture & Logic:**
     -   Modular Python backend. LangChain for P-C-E-E pipeline.
     -   Task-specific, isolated workspaces with persistent history (SQLite).
-    -   **Actual Plan Execution:** Backend now attempts full execution of plan steps, including tool usage and LLM generation, replacing previous placeholder logic.
-    -   **Message Structure & Persistence:** Implemented for all chat-relevant messages.
-    -   **Planned Enhancements:** Backend support for sending new WebSocket messages (`tool_result_for_chat`) from `callbacks.py` upon tool completion to facilitate in-chat display of tool actions/outputs.
+    -   Actual Plan Execution: Backend now attempts full execution of plan steps.
+    -   **Message Structure & Persistence:** Implemented for all chat-relevant messages, including new `tool_result_for_chat` messages.
+    -   **Enhanced Callbacks:** `callbacks.py` now sends `tool_result_for_chat` messages from `on_tool_end`.
+    -   **Refined Planner Prompting:** Planner prompt updated to guide the agent towards generating more comprehensive final summary messages.
 
 ## Tech Stack
 
@@ -54,8 +63,7 @@ Targeting Version 2.5.3
 
 ## Project Structure
 
-(Key files for upcoming Chat UI changes: `frontend/js/script.js`, `frontend/js/ui_modules/chat_ui.js`, `frontend/css/style.css`. Backend: `backend/db_utils.py`, `backend/message_processing/task_handlers.py`, `backend/message_processing/agent_flow_handlers.py`, `backend/callbacks.py`)
-
+(Key files for Chat UI: `frontend/js/script.js`, `frontend/js/ui_modules/chat_ui.js`, `frontend/css/style.css`. Backend: `backend/db_utils.py`, `backend/message_processing/task_handlers.py`, `backend/callbacks.py`, `backend/planner.py`)
 
 ```
 ResearchAgent/
@@ -64,23 +72,23 @@ ResearchAgent/
 ├── .gitignore
 ├── backend/
 │   ├── __init__.py
-│   ├── agent.py             # Updated ReAct prompt for direct tool output
-│   ├── callbacks.py         # Updated for structured thinking updates & log_source, token parsing refined. To be enhanced for tool_result_for_chat messages.
+│   ├── agent.py             # ReAct prompt (verified for multi-line final answers)
+│   ├── callbacks.py         # Enhanced for tool_result_for_chat messages & persistence.
 │   ├── config.py
-│   ├── controller.py        # Enhanced prompt for JSON tool inputs
-│   ├── db_utils.py
-│   ├── evaluator.py         # Stricter prompt for content verification
+│   ├── controller.py
+│   ├── db_utils.py          # Handles persistence of all message types.
+│   ├── evaluator.py
 │   ├── intent_classifier.py
 │   ├── llm_setup.py
 │   ├── message_handlers.py
 │   ├── message_processing/
 │   │   ├── __init__.py
-│   │   ├── agent_flow_handlers.py # Sends 'agent_major_step_announcement', refined thinking updates
+│   │   ├── agent_flow_handlers.py 
 │   │   ├── config_handlers.py
 │   │   ├── operational_handlers.py
-│   │   └── task_handlers.py     # Updated to load/save status_messages from history
-│   ├── planner.py             # To be enhanced for final summary steps
-│   ├── server.py                # Updated to save status_messages, handles file uploads
+│   │   └── task_handlers.py     # Updated to load/save tool_result_for_chat from history.
+│   ├── planner.py             # Enhanced for final summary steps.
+│   ├── server.py
 │   └── tools/
 │       ├── __init__.py
 │       ├── deep_research_tool.py
@@ -88,22 +96,22 @@ ResearchAgent/
 │       ├── standard_tools.py
 │       └── tavily_search_tool.py
 ├── css/
-│   └── style.css                # Updated for new chat UI styles & token counter. To be enhanced for new tool message bubbles.
+│   └── style.css                # Enhanced for new tool message bubbles & copy buttons.
 ├── js/
-│   ├── script.js                # Dispatches new message types, handles token updates. To handle new tool_result_for_chat.
-│   ├── state_manager.js         # Manages token state, including per-role
+│   ├── script.js                # Handles new tool_result_for_chat messages.
+│   ├── state_manager.js
 │   ├── websocket_manager.js
 │   └── ui_modules/
-│       ├── chat_ui.js           # Implemented new rendering logic. To be enhanced for tool bubbles, collapsibility, copy button.
-│       ├── token_usage_ui.js    # Renders per-role token breakdown
-│       └── file_upload_ui.js    # Handles file upload interactions
-├── BRAINSTORM.md                # Updated with new UI vision and fixed issues, new feature proposals.
+│       ├── chat_ui.js           # Enhanced for tool bubbles, collapsibility, copy buttons.
+│       ├── token_usage_ui.js
+│       └── file_upload_ui.js
+├── BRAINSTORM.md                # Updated with UI/UX polish items and completed features.
 ├── Dockerfile
 ├── docker-compose.yml
 ├── index.html
 ├── README.md                      # This file
-├── ROADMAP.md                     # Updated with new UI vision and fixed issues, new feature proposals.
-└── simulation_option6.html        # Conceptual: Visual mock-up of the target chat UI
+├── ROADMAP.md                     # Updated with completed features and next steps.
+└── simulation_option6.html        # Conceptual: Visual mock-up of the target chat UI (largely achieved)
 ```
 
 ## Setup Instructions & Running the Application
@@ -112,12 +120,17 @@ ResearchAgent/
 
 ## Known Issues / Immediate Next Steps (Targeting v2.5.3 Enhancements & Fixes)
 
--   **ARTIFACT VIEWER REFRESH (Medium Priority - Debugging Paused):** The artifact viewer does not consistently or immediately auto-update after a task completes and writes files.
--   **PLAN FILE STATUS UPDATE (Low Priority):** Backend logs still show warnings about not finding step patterns to update status checkboxes in the `_plan_{id}.md` artifact.
--   **"UNKNOWN" HISTORY MESSAGE TYPES (Low Priority - Review):** Some internal system message types are logged to the monitor from history; confirm this is the desired behavior for all such types.
--   **ENHANCEMENT: In-Chat Tool Feedback & Usability (Next Focus):** Implement UI and backend changes to display tool action confirmations and output snippets directly in chat, along with a "copy to clipboard" feature for relevant messages. Refine planner prompting for better final summaries from the agent.
+-   **BUG: ARTIFACT VIEWER REFRESH (Medium Priority - Debugging Resumes):** The artifact viewer does not consistently or immediately auto-update after a task completes and writes files.
+-   **UI/UX POLISH (Medium Priority - Next Focus):**
+    -   Review and refine chat message visual density, indentation, and spacing (see `BRAINSTORM.md`).
+    -   Standardize copy/expand button placement and appearance.
+    -   Finalize "View [artifact] in Artifacts" links from tool output messages.
+-   **DEBUG: Monitor Log Color-Coding (Low Priority):** Verify/implement CSS for log differentiation by source.
+-   **WARNING: PLAN FILE STATUS UPDATE (Low Priority):** Backend logs still show warnings about not finding step patterns to update status checkboxes in the `_plan_{id}.md` artifact.
+-   **REVIEW: "UNKNOWN" HISTORY MESSAGE TYPES (Low Priority - Review):** Some internal system message types are logged to the monitor from history; confirm this is the desired behavior for all such types.
 
-**Previously Fixed in v2.5.3 development cycle:**
+**Previously Fixed/Implemented in v2.5.3 development cycle:**
+-   **ENHANCEMENT: In-Chat Tool Feedback & Usability (Core Functionality Implemented):** Tool outputs in chat, copy-to-clipboard, refined planner prompting.
 -   **FILE UPLOAD (FIXED):** File upload functionality is now working.
 -   **TOKEN COUNTER (FIXED):** The UI token counter is now correctly updating for all agent roles.
 
@@ -127,5 +140,4 @@ ResearchAgent/
 
 ## Next Steps & Future Perspectives
 
-The immediate focus is on enhancing in-chat feedback for tool operations and addressing the artifact viewer refresh issue.
-For a detailed, evolving roadmap and ongoing brainstorming, please see **`ROADMAP.md`** and **`BRAINSTORM.md`**.
+The immediate focus is on addressing the artifact viewer refresh bug and undertaking UI/UX polish based on recent feedback. For a detailed, evolving roadmap and ongoing brainstorming, please see **`ROADMAP.md`** and **`BRAINSTORM.md`**.
