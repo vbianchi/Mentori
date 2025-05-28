@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ResearchAgent UI Simulation (UX Refinements)</title>
+    <title>ResearchAgent UI Simulation (Width & Alignment)</title>
     <style>
-        /* css/style.css - Dark Professional Theme - Chat UI Update v2.5.3 - UX Refinements */
+        /* css/style.css - Dark Professional Theme - Chat UI Update v2.5.3 - Width & Alignment Refinements */
 
         :root {
             --bg-color: #212529;
@@ -43,7 +43,6 @@
 
             --log-bg-default: var(--panel-bg);
             --log-border-default: var(--border-color);
-            /* ... (other log source colors remain the same) ... */
             --log-source-system-bg: rgba(127, 140, 141, 0.05);
             --log-source-system-border: var(--agent-line-system-color);
             --log-source-intent_classifier-bg: rgba(93, 173, 226, 0.05);
@@ -69,7 +68,6 @@
             --log-source-error-bg: rgba(231, 76, 60, 0.1);
             --log-source-error-border: var(--agent-line-error-color);
 
-
             --terminal-bg: #161A1D;
             --terminal-text: #CED4DA;
             --code-bg: var(--terminal-bg); 
@@ -85,6 +83,10 @@
 
             --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             --monospace-font: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+
+            /* Max width for chat content blocks */
+            --chat-content-max-width: 75%; 
+            --user-chat-content-max-width: 65%;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -125,9 +127,9 @@
 
         .chat-header { background-color: var(--panel-bg-lighter); border-bottom: 1px solid var(--border-color); }
         .chat-header h3 { margin: 0; font-size: 1em; font-weight: 500; }
-        .chat-messages { padding: 20px; display: flex; flex-direction: column; gap: 5px; /* Slightly reduced gap between top-level messages */ background-color: var(--bg-color); }
+        .chat-messages { padding: 20px; display: flex; flex-direction: column; gap: 5px; background-color: var(--bg-color); }
 
-        .message { margin-bottom: 12px; /* Increased consistent margin */ line-height: 1.5; font-size: 0.95em; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; position: relative; }
+        .message { margin-bottom: 12px; line-height: 1.5; font-size: 0.95em; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; position: relative; }
 
         .message-user-wrapper { display: flex; justify-content: flex-end; }
         .message-user {
@@ -135,13 +137,14 @@
             color: var(--button-text-on-accent);
             padding: 10px 12px 10px 15px; 
             border-radius: 15px 0px 0px 15px; 
-            max-width: 70%;
+            max-width: var(--user-chat-content-max-width); /* MODIFIED */
             border-right: 3px solid var(--user-message-line-color);
         }
 
         .message-outer-blue-line {
             padding-left: 10px; 
             border-left: 3px solid var(--unified-outer-line-blue);
+            max-width: var(--chat-content-max-width); /* MODIFIED */
         }
         .message-system-status-content { 
             font-size: 0.9em;
@@ -162,6 +165,7 @@
             padding: 15px;
             margin-top: 10px;
             border-radius: 8px;
+            /* max-width already handled by .message-outer-blue-line for the wrapper */
         }
         .plan-proposal-block h4 { margin-top: 0; margin-bottom: 10px; color: var(--text-color); font-size: 1.1em; }
         .plan-summary { margin-bottom: 15px; line-height: 1.6; color: var(--text-color-muted); }
@@ -186,13 +190,12 @@
             color: var(--text-color);
             padding: 10px 15px;
             border-radius: 0px 15px 15px 0px; 
-            max-width: calc(100% - 13px); /* Original value */
+            /* max-width handled by .message-outer-blue-line */
             position: relative; 
         }
-        /* Position copy button for final agent messages */
-        .message-outer-blue-line > .chat-copy-btn { /* Target copy buttons that are direct children */
+        .message-outer-blue-line > .chat-copy-btn { 
             position: absolute;
-            top: 8px; /* Adjust for better vertical alignment */
+            top: 8px; 
             right: 8px; 
             z-index: 10;
             opacity: 0.3;
@@ -201,49 +204,44 @@
             opacity: 1;
         }
 
-
         .message-agent-step {
-            margin-bottom: 8px; /* Increased margin */
+            margin-bottom: 8px; 
             padding-left: 10px; 
-            /* background-color: rgba(73, 80, 87, 0.1); /* Subtle background for the whole step block */
-            /* border-radius: 4px; */
-            /* padding-bottom: 5px; */
+            /* No max-width on the step itself, title can be wider */
         }
         .message-agent-step .step-title {
             padding-left: 10px; 
             font-weight: bold;
             display: block; 
-            margin-bottom: 5px; /* Increased margin */
+            margin-bottom: 5px; 
         }
 
         .sub-content-container {
-            margin-top: 5px; /* Increased margin */
-            padding-left: 20px; /* Standardized indent for sub-content */
-            /* border-left: 1px dashed var(--panel-bg-lightest); /* Optional visual grouping */
-            /* padding-top: 5px; */
-            /* padding-bottom: 5px; */
+            margin-top: 5px; 
+            padding-left: 15px; /* MODIFIED: Reduced sub-indent further for alignment */
         }
-        .sub-content-container > .message { /* Add margin between sub-messages */
+        .sub-content-container > .message { 
             margin-bottom: 8px;
+            max-width: var(--chat-content-max-width); /* MODIFIED: Apply max-width to sub-messages */
         }
 
 
         .message-agent-substatus {
             margin-bottom: 5px; 
-            padding-left: 10px; 
+            padding-left: 10px; /* This padding is for the content *inside* the border */
             border-left-width: 3px;
             border-left-style: solid;
         }
         .message-agent-substatus .content { 
-            font-size: 0.8em; /* Slightly smaller for sub-status */
-            color: var(--text-color-darker); /* Muted further */
+            font-size: 0.8em; 
+            color: var(--text-color-darker); 
             padding-left: 10px; 
             font-style: italic;
         }
 
         .message-agent-thought {
             margin-bottom: 5px;
-            padding-left: 0; /* No extra padding, relies on sub-content-container */
+            padding-left: 0; /* Relies on sub-content-container for main indent */
             border-left-width: 3px;
             border-left-style: solid;
         }
@@ -253,7 +251,7 @@
             justify-content: space-between;
             align-items: flex-start; 
             padding-left: 10px; 
-            margin-bottom: 4px; /* Increased margin */
+            margin-bottom: 4px; 
         }
         .message-agent-thought .thought-label {
             font-size: 0.9em;
@@ -286,6 +284,7 @@
         .pre-wrapper-with-copy {
             position: relative; 
             margin: 0.5rem 0; 
+            max-width: 100%; /* Ensure it doesn't overflow its parent if parent has max-width */
         }
         .pre-wrapper-with-copy pre {
             margin-bottom: 0; 
@@ -306,12 +305,12 @@
             color: var(--terminal-text);
             padding: 8px 12px;
             border-radius: 4px;
-            /* margin-top: 2px; /* Removed, handled by thought-top-row */
             font-size: 0.9em;
             white-space: pre-wrap; 
             word-wrap: break-word;
             margin-left: 10px; 
             border: 1px solid var(--pre-border);
+            /* max-width already handled by parent .message-agent-thought via .sub-content-container > .message */
         }
         .message-agent-thought .thought-content-box pre { 
             margin: 0;
@@ -323,7 +322,7 @@
 
         .message-agent-tool-output {
             margin-bottom: 5px;
-            padding-left: 0; /* No extra padding, relies on sub-content-container */
+            padding-left: 0; /* Relies on sub-content-container for main indent */
             border-left-width: 3px;
             border-left-style: solid;
         }
@@ -333,7 +332,7 @@
             justify-content: space-between; 
             align-items: flex-start; 
             padding-left: 10px; 
-            margin-bottom: 4px; /* Increased margin */
+            margin-bottom: 4px; 
         }
 
         .tool-output-label {
@@ -355,13 +354,13 @@
             color: var(--terminal-text);
             padding: 8px 12px;
             border-radius: 4px;
-            /* margin-top: 2px; /* Removed, handled by top-row */
             font-size: 0.9em;
             white-space: pre-wrap; 
             word-wrap: break-word;
             margin-left: 10px; 
             border: 1px solid var(--pre-border);
             overflow-x: auto; 
+            /* max-width already handled by parent .message-agent-tool-output via .sub-content-container > .message */
         }
         .tool-output-content-box pre { 
             margin: 0;
@@ -384,7 +383,6 @@
 
 
         .tool-output-preview { }
-
         .tool-output-full { display: none; }
 
         .tool-output-expand-btn {
@@ -405,15 +403,15 @@
         }
 
         .tool-output-artifact-link {
-            font-size: 0.85em; /* Made slightly larger */
-            font-style: normal; /* No longer italic by default */
+            font-size: 0.85em; 
+            font-style: normal; 
             color: var(--text-color-muted);
-            margin-top: 6px; /* Adjusted margin */
+            margin-top: 6px; 
             margin-left: 10px; 
-            padding: 4px 8px; /* Add some padding to make it look more like a button */
+            padding: 4px 8px; 
             border: 1px solid var(--border-color);
             border-radius: 4px;
-            display: inline-block; /* To allow padding and border */
+            display: inline-block; 
             cursor: pointer;
             transition: all 0.2s ease;
         }
@@ -423,7 +421,7 @@
             border-color: var(--text-color-muted);
         }
         .tool-output-artifact-link::before {
-            content: "📄 "; /* Document icon, adjust as needed */
+            content: "📄 "; 
             margin-right: 4px;
         }
 
@@ -437,6 +435,7 @@
             color: var(--text-color-muted);
             font-style: italic;
             display: none; 
+            max-width: var(--chat-content-max-width); /* MODIFIED */
         }
 
 
@@ -527,12 +526,12 @@
             border: 1px solid var(--pre-border);
             border-radius: 4px;
             padding: 0.75rem;
-            /* margin: 0.5rem 0; /* Handled by .pre-wrapper-with-copy */
             overflow-x: auto;
             white-space: pre; 
             font-family: var(--monospace-font);
             font-size: 0.9em;
             color: var(--pre-text);
+            /* max-width will be inherited or controlled by .pre-wrapper-with-copy */
         }
         .message code { 
             background-color: var(--code-bg);
@@ -564,6 +563,10 @@
             .llm-selector { max-width: 150px; font-size: 0.8em; }
             .monitor-header { flex-wrap: wrap; }
             .monitor-controls { margin-left: auto; padding-top: 5px;}
+            :root { /* Adjust max-widths for smaller screens */
+                --chat-content-max-width: 90%; 
+                --user-chat-content-max-width: 80%;
+            }
         }
 
         .app-credits { font-size: 0.9em; text-align: center; padding-top: 5px; opacity: 0.7; }
@@ -725,13 +728,6 @@
                         <button class="task-delete-btn" title="Delete Task">🗑️</button>
                     </div>
                 </li>
-                 <li class="task-item" data-task-id="task-3">
-                    <span class="task-title" title="Draft Grant Proposal Outline">Draft Grant Proposal Outline</span>
-                     <div class="task-item-controls">
-                        <button class="task-edit-btn" title="Rename Task">✏️</button>
-                        <button class="task-delete-btn" title="Delete Task">🗑️</button>
-                    </div>
-                </li>
             </ul>
             
             <div id="token-usage-area" class="token-usage-area">
@@ -744,8 +740,6 @@
                     <p><span class="token-label">Last Call:</span> <span id="last-call-tokens">Executor - gemini-pro: In: 512, Out: 1024, Total: 1536</span></p>
                     <div id="role-token-breakdown" class="role-token-breakdown">
                         <p class="role-token-entry"><span class="token-label-role">Planner:</span> <span class="role-token-values"><span class="token-value-item"><span class="token-sublabel">In:</span> 250</span><span class="token-value-item"><span class="token-sublabel">Out:</span> 500</span><span class="token-value-item total"><span class="token-sublabel">Total:</span> 750</span></span></p>
-                        <p class="role-token-entry"><span class="token-label-role">Executor:</span> <span class="role-token-values"><span class="token-value-item"><span class="token-sublabel">In:</span> 8000</span><span class="token-value-item"><span class="token-sublabel">Out:</span> 3059</span><span class="token-value-item total"><span class="token-sublabel">Total:</span> 11059</span></span></p>
-                        <p class="role-token-entry"><span class="token-label-role">Controller:</span> <span class="role-token-values"><span class="token-value-item"><span class="token-sublabel">In:</span> 180</span><span class="token-value-item"><span class="token-sublabel">Out:</span> 56</span><span class="token-value-item total"><span class="token-sublabel">Total:</span> 236</span></span></p>
                     </div>
                 </div>
             </div>
@@ -765,47 +759,7 @@
             <div class="panel-header chat-header">
                 <h3 id="current-task-title">Deep Dive into LLMs & Bioinformatics</h3>
                 <div class="chat-header-llm-controls">
-                    <div class="llm-selector-group">
-                        <label for="intent-llm-select">Intent Classifier:</label>
-                        <select id="intent-llm-select" class="role-llm-select" title="Override LLM for Intent Classification (session)">
-                            <option value="">Use System Default</option>
-                            <optgroup label="Gemini">
-                                <option value="gemini::gemini-1.5-flash">gemini-1.5-flash</option>
-                                <option value="gemini::gemini-pro">gemini-pro</option>
-                            </optgroup>
-                            <optgroup label="Ollama">
-                                <option value="ollama::llama3">llama3</option>
-                            </optgroup>
-                        </select>
-                    </div>
-                    <div class="llm-selector-group">
-                        <label for="planner-llm-select">Planner:</label>
-                        <select id="planner-llm-select" class="role-llm-select" title="Override LLM for Planning (session)">
-                             <option value="">Use System Default</option>
-                        </select>
-                    </div>
-                    <div class="llm-selector-group">
-                        <label for="controller-llm-select">Controller:</label>
-                        <select id="controller-llm-select" class="role-llm-select" title="Override LLM for Controller/Validator (session)">
-                             <option value="">Use System Default</option>
-                        </select>
-                    </div>
-                    <div class="llm-selector-group">
-                        <label for="llm-select">Executor LLM:</label> <select id="llm-select" class="llm-selector" title="Select LLM for current session execution (Executor)">
-                            <option value="">Use System Default (Executor)</option>
-                             <optgroup label="Gemini">
-                                <option value="gemini::gemini-1.5-flash">gemini-1.5-flash</option>
-                                <option value="gemini::gemini-pro" selected>gemini-pro</option>
-                            </optgroup>
-                        </select>
-                    </div>
-                     <div class="llm-selector-group">
-                        <label for="evaluator-llm-select">Evaluator:</label>
-                        <select id="evaluator-llm-select" class="role-llm-select" title="Override LLM for Evaluation (session)">
-                             <option value="">Use System Default</option>
-                        </select>
-                    </div>
-                </div>
+                     </div>
                 </div>
             <div id="chat-messages" class="chat-messages scrollable-content">
                 <div class="message message-user-wrapper">
@@ -819,34 +773,7 @@
                         <i>Intent: This task requires planning. Generating a plan...</i>
                     </div>
                 </div>
-
-                <div class="message message-outer-blue-line plan-confirmation-wrapper" data-plan-id="sim-plan-123">
-                    <div class="message-plan-proposal-content">
-                        <div class="plan-proposal-block">
-                            <h4>Agent Proposed Plan:</h4>
-                            <p class="plan-summary">I will conduct deep research on Bioinformatics and LLMs, save the findings to 'summary.txt', then extract and present a 3-bullet point summary.</p>
-                            <button class="plan-toggle-details-btn" title="View detailed plan">View Details</button>
-                            <div class="plan-steps-details" style="display: none;">
-                                <ol>
-                                    <li><strong>Perform in-depth research on 'Bioinformatics and LLMs'.</strong><br><span class="step-tool">Tool: deep_research_synthesizer</span><br><span class="step-expected">Expected: Comprehensive report generated.</span></li>
-                                    <li><strong>Save the research report to 'summary.txt'.</strong><br><span class="step-tool">Tool: write_file</span><br><span class="step-expected">Expected: File 'summary.txt' created with report content.</span></li>
-                                    <li><strong>Extract a 3-bullet point summary from 'summary.txt'.</strong><br><span class="step-tool">Tool: read_file (then LLM)</span><br><span class="step-expected">Expected: 3-bullet summary generated.</span></li>
-                                    <li><strong>Present the 3-bullet summary and confirm file creation.</strong><br><span class="step-tool">Tool: None</span><br><span class="step-expected">Expected: Consolidated final answer.</span></li>
-                                </ol>
-                                <div class="pre-wrapper-with-copy">
-                                    <pre data-is-code-block="true">Plan details can also include code blocks if necessary.
-    { "plan_metadata": "some_value" }</pre>
-                                    <button class="chat-copy-btn" title="Copy to clipboard">Copy Code</button>
-                                </div>
-                            </div>
-                            <div class="plan-actions">
-                                <button class="plan-confirm-btn">Confirm & Run</button>
-                                <button class="plan-cancel-btn">Cancel</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+                
                 <div class="message message-agent-step">
                     <div class="step-title"><strong>Step 1/4: Perform in-depth research on 'Bioinformatics and LLMs'.</strong></div>
                     <div class="sub-content-container">
@@ -858,12 +785,12 @@
                                 <div class="thought-label">Controller thought:</div>
                                 <button class="chat-copy-btn" title="Copy to clipboard">📋&nbsp;Copy</button>
                             </div>
-                            <div class="thought-content-box">The user wants a deep research. The `deep_research_synthesizer` tool is appropriate. I will use the query "bioinformatics and LLMs" and default number of sources.
-                                <div class="pre-wrapper-with-copy">
-                                <pre data-is-code-block="true">This is a code block within a thought.
-def example_function():
-    print("Hello from thought code!")</pre>
-                                <button class="chat-copy-btn" title="Copy to clipboard">Copy Code</button></div>
+                            <div class="thought-content-box">The user wants a deep research. The `deep_research_synthesizer` tool is appropriate.
+<div class="pre-wrapper-with-copy"><pre data-is-code-block="true">Input for tool:
+{
+  "query": "bioinformatics and LLMs",
+  "num_sources_to_deep_dive": 3
+}</pre><button class="chat-copy-btn" title="Copy to clipboard">Copy Code</button></div>
                             </div>
                         </div>
                          <div class="message message-agent-tool-output agent-line-tool">
@@ -872,8 +799,8 @@ def example_function():
                                 <button class="chat-copy-btn" title="Copy to clipboard">📋&nbsp;Copy</button>
                             </div>
                             <div class="tool-output-content-box">
-                                <div class="tool-output-preview">1. **LLMs in Bioinformatics**: Review of applications, challenges...<br>2. **Survey of Language Models for Biology**: Discusses BioBERT, SciBERT...<br>3. **Transformer Models for Protein Sequences**: DeepMind's AlphaFold...<br>... (and 7 more results) ...</div>
-                                <div class="tool-output-full" style="display: none;">1. **LLMs in Bioinformatics**: Review of applications, challenges, and future directions. Focus on sequence analysis, drug discovery, and clinical text mining. (Source: Nature Methods, 2023)<br>2. **Survey of Language Models for Biology**: Discusses BioBERT, SciBERT, and other domain-specific models. Highlights benefits for understanding biological text and sequences. (Source: Briefings in Bioinformatics, 2022)<br>3. **Transformer Models for Protein Sequences**: DeepMind's AlphaFold success and its implications. (Source: ArXiv Preprint, 2021)<br>4. **Ethical Considerations of LLMs in Healthcare**: Privacy, bias, and accountability. (Source: The Lancet Digital Health, 2023)<br>5. **Benchmarking LLMs on Biomedical Tasks**: Performance evaluation on tasks like relation extraction and question answering. (Source: JAMIA, 2022)<br>6. **ClinicalBERT**: Adapting BERT for clinical notes and its downstream applications. (Source: Journal of Biomedical Informatics, 2020)<br>7. **LLMs for Drug Repurposing**: Identifying new uses for existing drugs. (Source: Patterns, 2023)<br>8. **Generative LLMs for Synthetic Biology**: Designing novel protein sequences. (Source: ACS Synthetic Biology, 2022)<br>9. **Challenges in Fine-tuning LLMs for Genomics**: Data scarcity and computational cost. (Source: Genome Biology, 2023)<br>10. **Future of LLMs in Personalized Medicine**: Potential and hurdles. (Source: Cell Reports Medicine, 2023)</div>
+                                <div class="tool-output-preview">1. **LLMs in Bioinformatics**: Review of applications, challenges...<br>2. **Survey of Language Models for Biology**: Discusses BioBERT, SciBERT...<br>...</div>
+                                <div class="tool-output-full" style="display: none;">Full search results content here... (imagine many lines)</div>
                             </div>
                             <button class="tool-output-expand-btn">Expand</button>
                         </div>
@@ -889,23 +816,13 @@ def example_function():
                 </div>
                 
                 <div class="message message-outer-blue-line">
-                    <button class="chat-copy-btn" title="Copy to clipboard">📋&nbsp;Copy</button> <div class="message-agent-final-content">
+                    <button class="chat-copy-btn" title="Copy to clipboard">📋&nbsp;Copy</button>
+                    <div class="message-agent-final-content">
                         The research on LLMs in bioinformatics is complete and saved to 'summary.txt'. Here's a 3-bullet summary:
-                        <ul>
-                            <li>LLMs are transforming bioinformatics by analyzing complex biological data.</li>
-                            <li>Key applications include genomics, proteomics, and drug discovery.</li>
-                            <li>Challenges remain in data privacy, interpretability, and bias.</li>
-                        </ul>
-                        <div class="pre-wrapper-with-copy">
-                        <pre data-is-code-block="true"># Example Python code snippet
-def greet(name):
-    print(f"Hello, {name}!")
-
-greet("ResearchAgent User")</pre>
-                        <button class="chat-copy-btn" title="Copy to clipboard">Copy Code</button></div>
+                        <ul><li>LLMs are transforming bioinformatics.</li><li>Key applications: genomics, drug discovery.</li><li>Challenges: data privacy, bias.</li></ul>
+                        <div class="pre-wrapper-with-copy"><pre data-is-code-block="true">print("Final confirmation.")</pre><button class="chat-copy-btn" title="Copy to clipboard">Copy Code</button></div>
                     </div>
                 </div>
-
 
                 <div id="agent-thinking-status" class="message agent-thinking-status agent-line-system" style="display: block;">Idle.</div>
             </div>
@@ -928,44 +845,12 @@ greet("ResearchAgent User")</pre>
 
             <div class="monitor-split-content">
                 <div id="monitor-log-area" class="monitor-log-area scrollable-content">
-                    <div class="monitor-log-entry log-source-system_event">
-                        <span class="log-timestamp">[2025-05-29T01:05:00.123][sim-sess]</span>
-                        <span class="log-content">[SYSTEM_EVENT] Switched context to task ID: task-1 ('Deep Dive into LLMs & Bioinformatics')</span>
-                    </div>
-                     <div class="monitor-log-entry log-source-user_input_log">
-                        <span class="log-timestamp">[2025-05-29T01:05:02.456][sim-sess]</span>
-                        <span class="log-content">[USER_INPUT_LOG] User Input: Make a deep research over bioinformatics and LLMs...</span>
-                    </div>
-                    <div class="monitor-log-entry log-source-intent_classifier">
-                        <span class="log-timestamp">[2025-05-29T01:05:03.789][sim-sess]</span>
-                        <span class="log-content">[INTENT_CLASSIFIER] Intent classified as: PLAN</span>
-                    </div>
-                     <div class="monitor-log-entry log-source-planner">
-                        <span class="log-timestamp">[2025-05-29T01:05:05.123][sim-sess]</span>
-                        <span class="log-content">[PLANNER] Plan generated successfully. Summary: I will conduct deep research...</span>
-                    </div>
-                     <div class="monitor-log-entry log-source-tool_deep_research_synthesizer_output">
-                        <span class="log-timestamp">[2025-05-29T01:05:20.456][sim-sess]</span>
-                        <span class="log-content">[TOOL_DEEP_RESEARCH_SYNTHESIZER_OUTPUT] Tool 'deep_research_synthesizer' returned:
----
-# Advancing Bioinformatics with Large Language Models...
-(Full report content would be here)
----</span>
-                    </div>
-                     <div class="monitor-log-entry log-source-tool_write_file_output">
-                        <span class="log-timestamp">[2025-05-29T01:05:22.789][sim-sess]</span>
-                        <span class="log-content">[TOOL_WRITE_FILE_OUTPUT] Tool 'write_file' successfully wrote file: 'summary.txt'</span>
-                    </div>
-                     <div class="monitor-log-entry log-source-artifact_generated">
-                        <span class="log-timestamp">[2025-05-29T01:05:22.800][sim-sess]</span>
-                        <span class="log-content">[ARTIFACT_GENERATED] summary.txt (via write_file)</span>
-                    </div>
+                    <div class="monitor-log-entry log-source-system_event"><span class="log-timestamp">[timestamp]</span><span class="log-content">[SYSTEM_EVENT] Context Switched.</span></div>
+                    <div class="monitor-log-entry log-source-controller"><span class="log-timestamp">[timestamp]</span><span class="log-content">[CONTROLLER] Validating Step 1...</span></div>
                 </div>
                 <div id="monitor-artifact-area" class="monitor-artifact-area">
                     <div class="artifact-filename">summary.txt</div>
-                    <pre># Advancing Bioinformatics...
-(Content of summary.txt would be shown here)
-                    </pre>
+                    <pre>Research summary content...</pre>
                     <div class="artifact-nav">
                         <button id="artifact-prev-btn" class="artifact-nav-btn" disabled>&lt; Prev</button>
                         <span id="artifact-counter" class="artifact-counter">Artifact 1 of 1</span>
@@ -978,36 +863,29 @@ greet("ResearchAgent User")</pre>
     <script>
         // Minimal JS for Expand/Collapse and Copy Button visual feedback for simulation
         document.addEventListener('DOMContentLoaded', () => {
-            // Expand/Collapse for Tool Outputs
-            document.querySelectorAll('.tool-output-expand-btn').forEach(button => {
-                button.onclick = () => {
-                    const wrapper = button.closest('.message-agent-tool-output');
-                    const fullDiv = wrapper.querySelector('.tool-output-full');
-                    const previewDiv = wrapper.querySelector('.tool-output-preview');
-                    if (fullDiv && previewDiv) {
-                        const isExpanded = fullDiv.style.display === 'block';
-                        fullDiv.style.display = isExpanded ? 'none' : 'block';
-                        previewDiv.style.display = isExpanded ? 'block' : 'none';
-                        button.textContent = isExpanded ? 'Expand' : 'Collapse';
-                    }
-                };
-            });
-
-            // Expand/Collapse for Plan Details
-            document.querySelectorAll('.plan-toggle-details-btn').forEach(button => {
+            document.querySelectorAll('.tool-output-expand-btn, .plan-toggle-details-btn').forEach(button => {
                 button.onclick = (e) => {
                     e.stopPropagation();
-                    const planBlock = button.closest('.plan-proposal-block');
-                    const detailsDiv = planBlock.querySelector('.plan-steps-details');
-                    if (detailsDiv) {
-                        const isHidden = detailsDiv.style.display === 'none';
-                        detailsDiv.style.display = isHidden ? 'block' : 'none';
-                        button.textContent = isHidden ? 'Hide Details' : 'View Details';
+                    const targetId = button.dataset.target; // Assuming you add data-target to buttons
+                    const targetElement = targetId ? document.getElementById(targetId) : 
+                                          (button.classList.contains('tool-output-expand-btn') ? 
+                                            button.previousElementSibling.querySelector('.tool-output-full') || button.previousElementSibling.querySelector('.tool-output-preview') 
+                                            : button.nextElementSibling.querySelector('.plan-steps-details'));
+
+                    const previewElement = button.classList.contains('tool-output-expand-btn') ? 
+                                           button.previousElementSibling.querySelector('.tool-output-preview') : null;
+
+                    if (targetElement) {
+                        const isCurrentlyHidden = targetElement.style.display === 'none';
+                        targetElement.style.display = isCurrentlyHidden ? 'block' : 'none';
+                        button.textContent = isCurrentlyHidden ? (button.classList.contains('plan-toggle-details-btn') ? 'Hide Details' : 'Collapse') : (button.classList.contains('plan-toggle-details-btn') ? 'View Details' : 'Expand');
+                        if (previewElement && button.classList.contains('tool-output-expand-btn')) {
+                            previewElement.style.display = isCurrentlyHidden ? 'none' : 'block';
+                        }
                     }
                 };
             });
             
-            // Simulated Copy Button Feedback
             document.querySelectorAll('.chat-copy-btn').forEach(button => {
                 button.onclick = (e) => {
                     e.stopPropagation();
