@@ -18,8 +18,16 @@
             </ul>
             
             <div id="token-usage-area" class="token-usage-area">
-                <p><span class="token-label">Last Call:</span> <span id="last-call-tokens">N/A</span></p>
-                <p><span class="token-label">Task Total:</span> <span id="task-total-tokens">N/A</span></p>
+                <div id="token-usage-header" class="token-usage-header">
+                    <span class="token-label">Task Tokens:</span>
+                    <span id="task-total-tokens-overall">0</span>
+                    <button id="token-expand-btn" class="token-expand-btn" title="Show/Hide Details">[+]</button>
+                </div>
+                <div id="token-usage-details" class="token-usage-details" style="display: none;">
+                    <p><span class="token-label">Last Call:</span> <span id="last-call-tokens">N/A</span></p>
+                    <div id="role-token-breakdown" class="role-token-breakdown">
+                        </div>
+                </div>
             </div>
             <div class="upload-area">
                 <input type="file" id="file-upload-input" multiple style="display: none;">
@@ -114,3 +122,4 @@
     <script src="js/script.js"></script>
 </body>
 </html>
+

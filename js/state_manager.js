@@ -11,6 +11,9 @@ const STORAGE_KEY_TASK_COUNTER = 'aiAgentTaskCounter';
 const STORAGE_KEY_ACTIVE_TASK_ID = 'aiAgentTasks_active';
 const STORAGE_KEY_EXECUTOR_LLM = 'selectedExecutorLlmId';
 const STORAGE_KEY_ROLE_LLM_PREFIX = 'session'; 
+// <<< START MODIFICATION - New localStorage key prefix for token data >>>
+const STORAGE_KEY_TOKEN_USAGE_PREFIX = 'aiAgentTaskTokenUsage_';
+// <<< END MODIFICATION >>>
 
 // Internal state object
 const _state = {
@@ -28,7 +31,12 @@ const _state = {
     isAgentRunning: false,
     currentTaskArtifacts: [],
     currentArtifactIndex: -1,
-    currentTaskTotalTokens: { input: 0, output: 0, total: 0 },
+    // <<< START MODIFICATION - Redesigned currentTaskTotalTokens structure >>>
+    currentTaskTotalTokens: {
+        overall: { input: 0, output: 0, total: 0 },
+        roles: { /* e.g., "PLANNER": { input: 0, output: 0, total: 0 }, ... */ }
+    },
+    // <<< END MODIFICATION >>>
     currentDisplayedPlan: null, 
     currentPlanProposalId: null, 
     currentSessionId: null, 
@@ -100,6 +108,40 @@ function _saveRoleLlmOverrideToLocalStorage(role) {
     localStorage.setItem(key, _state.sessionRoleLlmOverrides[role]);
 }
 
+// <<< START MODIFICATION - localStorage helpers for token usage data >>>
+function _loadTokenUsageForTaskFromLocalStorage(taskId) {
+    if (!taskId) return null;
+    const storedTokenUsage = localStorage.getItem(`${STORAGE_KEY_TOKEN_USAGE_PREFIX}${taskId}`);
+    if (storedTokenUsage) {
+        try {
+            const parsedUsage = JSON.parse(storedTokenUsage);
+            // Basic validation
+            if (parsedUsage && typeof parsedUsage.overall === 'object' && typeof parsedUsage.roles === 'object') {
+                return parsedUsage;
+            }
+        } catch (e) {
+            console.error(`[StateManager] Failed to parse token usage for task ${taskId} from localStorage:`, e);
+            localStorage.removeItem(`${STORAGE_KEY_TOKEN_USAGE_PREFIX}${taskId}`);
+        }
+    }
+    return null; // Return null if not found or invalid
+}
+
+function _saveTokenUsageForTaskToLocalStorage(taskId, tokenUsageData) {
+    if (!taskId || !tokenUsageData) return;
+    try {
+        localStorage.setItem(`${STORAGE_KEY_TOKEN_USAGE_PREFIX}${taskId}`, JSON.stringify(tokenUsageData));
+    } catch (e) {
+        console.error(`[StateManager] Failed to save token usage for task ${taskId} to localStorage:`, e);
+    }
+}
+
+function _removeTokenUsageForTaskFromLocalStorage(taskId) {
+    if (!taskId) return;
+    localStorage.removeItem(`${STORAGE_KEY_TOKEN_USAGE_PREFIX}${taskId}`);
+}
+// <<< END MODIFICATION >>>
+
 
 // --- Initialization ---
 function initStateManager() {
@@ -121,6 +163,28 @@ function initStateManager() {
     for (const role in _state.sessionRoleLlmOverrides) {
         _state.sessionRoleLlmOverrides[role] = _loadRoleLlmOverrideFromLocalStorage(role);
     }
+    
+    // <<< START MODIFICATION - Load token usage for the active task >>>
+    if (_state.currentTaskId) {
+        const loadedTokens = _loadTokenUsageForTaskFromLocalStorage(_state.currentTaskId);
+        if (loadedTokens) {
+            _state.currentTaskTotalTokens = loadedTokens;
+        } else {
+            // If no stored tokens, ensure it's reset to the default structure
+            _state.currentTaskTotalTokens = {
+                overall: { input: 0, output: 0, total: 0 },
+                roles: {}
+            };
+        }
+    } else {
+        // No active task, so reset to default structure
+        _state.currentTaskTotalTokens = {
+            overall: { input: 0, output: 0, total: 0 },
+            roles: {}
+        };
+    }
+    // <<< END MODIFICATION >>>
+
 
     if (_state.tasks.length === 0) {
         console.log("[StateManager] No tasks found, creating a default first task.");
@@ -135,6 +199,7 @@ function initStateManager() {
         _saveTasksToLocalStorage();
         _saveTaskCounterToLocalStorage();
         _saveActiveTaskIdToLocalStorage();
+        // For a brand new first task, token usage will be the default zeroed structure.
     }
     console.log("[StateManager] Initial state loaded:", JSON.parse(JSON.stringify(_state)));
 }
@@ -166,6 +231,7 @@ function addTask(taskTitle) {
     _state.tasks.unshift(newTask);
     _saveTasksToLocalStorage();
     _saveTaskCounterToLocalStorage();
+    // When a new task is added, its token usage will be initialized to zeros when it's selected.
     return newTask;
 }
 
@@ -176,17 +242,24 @@ function selectTask(taskId) {
         _saveActiveTaskIdToLocalStorage();
         _state.currentTaskArtifacts = [];
         _state.currentArtifactIndex = -1;
-        _state.currentTaskTotalTokens = { input: 0, output: 0, total: 0 };
+        // <<< START MODIFICATION - Load or reset token usage for the selected task >>>
+        const loadedTokens = _loadTokenUsageForTaskFromLocalStorage(taskId);
+        if (loadedTokens) {
+            _state.currentTaskTotalTokens = loadedTokens;
+        } else {
+            resetCurrentTaskTotalTokens(); // Resets to the default structure for the new task
+        }
+        // <<< END MODIFICATION >>>
         _state.currentDisplayedPlan = null;
         _state.currentPlanProposalId = null;
-        console.log(`[StateManager] Task selected: ${taskId}. Task-specific state reset.`);
+        console.log(`[StateManager] Task selected: ${taskId}. Task-specific state (including tokens) reset/loaded.`);
         return true;
     } else if (taskId === null) { 
         _state.currentTaskId = null;
         _saveActiveTaskIdToLocalStorage();
         _state.currentTaskArtifacts = [];
         _state.currentArtifactIndex = -1;
-        _state.currentTaskTotalTokens = { input: 0, output: 0, total: 0 };
+        resetCurrentTaskTotalTokens(); // Reset for "no task"
         _state.currentDisplayedPlan = null;
         _state.currentPlanProposalId = null;
         console.log(`[StateManager] No task selected. Task-specific state reset.`);
@@ -201,12 +274,22 @@ function deleteTask(taskId) {
     if (taskIndex !== -1) {
         _state.tasks.splice(taskIndex, 1);
         _saveTasksToLocalStorage();
+        // <<< START MODIFICATION - Remove token usage from localStorage >>>
+        _removeTokenUsageForTaskFromLocalStorage(taskId);
+        // <<< END MODIFICATION >>>
         if (_state.currentTaskId === taskId) {
             _state.currentTaskId = _state.tasks.length > 0 ? _state.tasks[0].id : null;
             _saveActiveTaskIdToLocalStorage();
             _state.currentTaskArtifacts = [];
             _state.currentArtifactIndex = -1;
-            _state.currentTaskTotalTokens = { input: 0, output: 0, total: 0 };
+            // <<< START MODIFICATION - Load/reset tokens for newly active task or no task >>>
+            if (_state.currentTaskId) {
+                const loadedTokens = _loadTokenUsageForTaskFromLocalStorage(_state.currentTaskId);
+                _state.currentTaskTotalTokens = loadedTokens || { overall: { input: 0, output: 0, total: 0 }, roles: {} };
+            } else {
+                resetCurrentTaskTotalTokens();
+            }
+            // <<< END MODIFICATION >>>
             _state.currentDisplayedPlan = null;
             _state.currentPlanProposalId = null;
         }
@@ -269,21 +352,55 @@ function setCurrentArtifactIndex(index) {
     }
 }
 
-// <<< START MODIFICATION - Phase 2, Action 2.3 >>>
+// <<< START MODIFICATION - Updated updateCurrentTaskTotalTokens >>>
 function updateCurrentTaskTotalTokens(lastCallUsage) { 
-    console.log("[StateManager] updateCurrentTaskTotalTokens before:", JSON.stringify(_state.currentTaskTotalTokens), "with lastCall:", JSON.stringify(lastCallUsage));
-    if (lastCallUsage) {
-        _state.currentTaskTotalTokens.input += lastCallUsage.input_tokens || 0;
-        _state.currentTaskTotalTokens.output += lastCallUsage.output_tokens || 0;
-        _state.currentTaskTotalTokens.total += (lastCallUsage.total_tokens || ((lastCallUsage.input_tokens || 0) + (lastCallUsage.output_tokens || 0)));
+    // lastCallUsage = { model_name, role_hint, input_tokens, output_tokens, total_tokens, source }
+    console.log("[StateManager] updateCurrentTaskTotalTokens before:", JSON.parse(JSON.stringify(_state.currentTaskTotalTokens)), "with lastCall:", JSON.stringify(lastCallUsage));
+    
+    if (lastCallUsage && _state.currentTaskId) { // Ensure there's a current task
+        const role = lastCallUsage.role_hint || 'LLM_CORE'; // Default to LLM_CORE if no specific role
+        const input = lastCallUsage.input_tokens || 0;
+        const output = lastCallUsage.output_tokens || 0;
+        const total = lastCallUsage.total_tokens || (input + output);
+
+        // Ensure the roles object exists
+        if (!_state.currentTaskTotalTokens.roles) {
+            _state.currentTaskTotalTokens.roles = {};
+        }
+        // Ensure the specific role object exists
+        if (!_state.currentTaskTotalTokens.roles[role]) {
+            _state.currentTaskTotalTokens.roles[role] = { input: 0, output: 0, total: 0 };
+        }
+
+        // Update overall totals
+        _state.currentTaskTotalTokens.overall.input += input;
+        _state.currentTaskTotalTokens.overall.output += output;
+        _state.currentTaskTotalTokens.overall.total += total;
+
+        // Update per-role totals
+        _state.currentTaskTotalTokens.roles[role].input += input;
+        _state.currentTaskTotalTokens.roles[role].output += output;
+        _state.currentTaskTotalTokens.roles[role].total += total;
+        
+        // Save the updated token usage for the current task
+        _saveTokenUsageForTaskToLocalStorage(_state.currentTaskId, _state.currentTaskTotalTokens);
     }
-    console.log("[StateManager] updateCurrentTaskTotalTokens after:", JSON.stringify(_state.currentTaskTotalTokens));
+    console.log("[StateManager] updateCurrentTaskTotalTokens after:", JSON.parse(JSON.stringify(_state.currentTaskTotalTokens)));
 }
 // <<< END MODIFICATION >>>
 
+// <<< START MODIFICATION - Updated resetCurrentTaskTotalTokens >>>
 function resetCurrentTaskTotalTokens() {
-    _state.currentTaskTotalTokens = { input: 0, output: 0, total: 0 };
+    _state.currentTaskTotalTokens = {
+        overall: { input: 0, output: 0, total: 0 },
+        roles: {} // Reset roles to an empty object
+    };
+    // If there's a current task, we might want to save this reset state to localStorage,
+    // or assume that loading for a new task will handle this.
+    // For now, this just resets the in-memory state. Loading logic in selectTask handles localStorage.
+    console.log("[StateManager] currentTaskTotalTokens reset to default structure.");
 }
+// <<< END MODIFICATION >>>
 
 function setCurrentDisplayedPlan(plan) { 
     _state.currentDisplayedPlan = plan ? JSON.parse(JSON.stringify(plan)) : null; 
@@ -299,7 +416,6 @@ function setCurrentSessionId(sessionId) {
 }
 
 
-// Expose functions 
 window.StateManager = {
     initStateManager,
     getTasks,

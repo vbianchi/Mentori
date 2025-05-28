@@ -24,21 +24,21 @@
     --unified-outer-line-blue: #3498DB; /* Planner Medium Blue, also for system status, plan proposals, final agent messages */
 
     /* Component/Log Source Color Variables for Side Lines */
-    --agent-line-default-color: #0F766E; /* Darker Green for final agent bubbled message (if not using unified blue) */
-    --agent-line-system-color: #7F8C8D;      /* Grey for general system status (if not using unified blue) */
-    --agent-line-intent-classifier-color: #5DADE2; /* Light Blue */
-    --agent-line-planner-color: #3498DB;         /* Medium Blue */
-    --agent-line-controller-color: #E67E22;      /* Orange */
-    --agent-line-executor-color: #2ECC71;        /* Green */
-    --agent-line-tool-color: #1ABC9C;            /* Teal */
-    --agent-line-evaluator-step-color: #9B59B6;  /* Purple */
-    --agent-line-evaluator-overall-color: #8E44AD; /* Darker Purple */
-    --agent-line-warning-color: #F39C12;         /* Amber/Yellow */
-    --agent-line-error-color: #E74C3C;           /* Light Red/Orange */
-    --agent-line-llm-core-color: #6C757D;        /* Darker Grey for LLM churn on bottom line */
+    --agent-line-default-color: #0F766E; 
+    --agent-line-system-color: #7F8C8D;      
+    --agent-line-intent-classifier-color: #5DADE2; 
+    --agent-line-planner-color: #3498DB;         
+    --agent-line-controller-color: #E67E22;      
+    --agent-line-executor-color: #2ECC71;        
+    --agent-line-tool-color: #1ABC9C;            
+    --agent-line-evaluator-step-color: #9B59B6;  
+    --agent-line-evaluator-overall-color: #8E44AD; 
+    --agent-line-warning-color: #F39C12;         
+    --agent-line-error-color: #E74C3C;           
+    --agent-line-llm-core-color: #6C757D;        
 
 
-    /* Monitor Log Backgrounds/Borders (can reuse or define new ones) */
+    /* Monitor Log Backgrounds/Borders */
     --log-bg-default: var(--panel-bg);
     --log-border-default: var(--border-color);
     --log-source-system-bg: rgba(127, 140, 141, 0.05);
@@ -68,9 +68,9 @@
 
     --terminal-bg: #161A1D;
     --terminal-text: #CED4DA;
-    --code-bg: var(--terminal-bg); /* For inline code */
+    --code-bg: var(--terminal-bg); 
     --code-text: var(--terminal-text);
-    --pre-bg: #161A1D; /* For <pre> blocks */
+    --pre-bg: #161A1D; 
     --pre-text: #CED4DA;
     --pre-border: #495057;
 
@@ -91,7 +91,7 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .panel { display: flex; flex-direction: column; background-color: var(--panel-bg); overflow: hidden; }
 .panel:not(:last-child) { border-right: 1px solid var(--border-color); }
 .left-panel { flex: 0 0 240px; }
-.center-panel { flex: 1; background-color: var(--bg-color); } /* Center panel background is main bg */
+.center-panel { flex: 1; background-color: var(--bg-color); } 
 .right-panel { flex: 0 0 500px; background-color: var(--terminal-bg); }
 
 .panel-header, .chat-header, .monitor-header { background-color: var(--panel-bg-lighter); }
@@ -122,42 +122,39 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 
 .chat-header { background-color: var(--panel-bg-lighter); border-bottom: 1px solid var(--border-color); }
 .chat-header h3 { margin: 0; font-size: 1em; font-weight: 500; }
-.chat-messages { padding: 20px; display: flex; flex-direction: column; gap: 0px; /* Remove gap, use margin on .message */ background-color: var(--bg-color); }
+.chat-messages { padding: 20px; display: flex; flex-direction: column; gap: 0px; background-color: var(--bg-color); }
 
-/* --- NEW CHAT UI STYLES (v2.5.3) --- */
-.message { margin-bottom: 10px; line-height: 1.5; font-size: 0.95em; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; position: relative; /* For pseudo-elements if needed */ }
+.message { margin-bottom: 10px; line-height: 1.5; font-size: 0.95em; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; position: relative; }
 
-/* User Message */
 .message-user-wrapper { display: flex; justify-content: flex-end; }
 .message-user {
     background-color: var(--accent-color);
     color: var(--button-text-on-accent);
-    padding: 10px 12px 10px 15px; /* right padding reduced for border */
-    border-radius: 15px 0px 0px 15px; /* Flat right edge */
+    padding: 10px 12px 10px 15px; 
+    border-radius: 15px 0px 0px 15px; 
     max-width: 70%;
     border-right: 3px solid var(--user-message-line-color);
 }
 
-/* System Status, Plan Proposal, Final Agent Message (Unified Blue Outer Line) */
 .message-outer-blue-line {
-    padding-left: 10px; /* Space for the line */
+    padding-left: 10px; 
     border-left: 3px solid var(--unified-outer-line-blue);
 }
-.message-system-status-content { /* Content div inside the blue-lined wrapper */
+.message-system-status-content { 
     font-size: 0.9em;
     color: var(--text-color-muted);
-    padding: 5px 0px 5px 10px; /* Padding for the text itself */
+    padding: 5px 0px 5px 10px; 
     font-style: italic;
 }
-.message-system-status-content.error-text { /* For error status messages */
+.message-system-status-content.error-text { 
     color: var(--agent-line-error-color);
     font-weight: 500;
 }
-.message-plan-proposal-content { /* Content div inside the blue-lined wrapper for plan proposal */
+.message-plan-proposal-content { 
     padding: 5px 0px 5px 10px;
 }
-.plan-proposal-block { /* The actual block with plan details */
-    background-color: var(--panel-bg-lighter); /* Slightly different from main panel for distinction */
+.plan-proposal-block { 
+    background-color: var(--panel-bg-lighter); 
     border: 1px solid var(--border-color);
     padding: 15px;
     margin-top: 10px;
@@ -181,59 +178,53 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .plan-confirmed-static .plan-summary { font-style: italic; }
 .plan-execution-status-confirmed { font-size: 0.9em; margin-top: 10px; color: var(--accent-color); font-weight: 500; }
 
-.message-agent-final-content { /* Content div inside the blue-lined wrapper */
-    background-color: var(--panel-bg); /* Bubble background */
+.message-agent-final-content { 
+    background-color: var(--panel-bg); 
     color: var(--text-color);
     padding: 10px 15px;
-    border-radius: 0px 15px 15px 0px; /* Rounded except for the side with the line */
-    max-width: calc(100% - 13px); /* Adjust if line width changes */
+    border-radius: 0px 15px 15px 0px; 
+    max-width: calc(100% - 13px); 
 }
 
-/* Agent Major Step Announcement (No Outer Line) */
 .message-agent-step {
     margin-bottom: 5px;
-    padding-left: 10px; /* Base alignment padding */
+    padding-left: 10px; 
 }
 .message-agent-step .step-title {
-    padding-left: 10px; /* Align with other content if needed, or remove if step title is full width */
+    padding-left: 10px; 
     font-weight: bold;
-    display: block; /* Ensure it takes full width for alignment */
+    display: block; 
     margin-bottom: 3px;
 }
 
-/* Sub-Content Container (Indented for nested items) */
 .sub-content-container {
     margin-top: 3px;
-    padding-left: 25px; /* Indentation for the whole nested block */
+    padding-left: 25px; 
 }
 
-/* Agent Sub-Status (Component-Specific Inner Line) */
 .message-agent-substatus {
-    margin-bottom: 5px; /* Increased slightly from 3px for better separation */
-    padding-left: 10px; /* Space for its own line */
+    margin-bottom: 5px; 
+    padding-left: 10px; 
     border-left-width: 3px;
     border-left-style: solid;
-    /* border-left-color will be set by component class */
 }
-.message-agent-substatus .content { /* The actual text content */
+.message-agent-substatus .content { 
     font-size: 0.85em;
     color: var(--text-color-muted);
-    padding-left: 10px; /* Padding for the text itself, inside the line */
+    padding-left: 10px; 
     font-style: italic;
 }
 
-/* Agent Thought/Verbose (Component-Specific Inner Line) */
 .message-agent-thought {
     margin-bottom: 5px;
-    padding-left: 10px; /* Space for its own line */
+    padding-left: 10px; 
     border-left-width: 3px;
     border-left-style: solid;
-    /* border-left-color will be set by component class */
 }
 .message-agent-thought .thought-label {
     display: block;
     font-size: 0.9em;
-    color: var(--text-color); /* More visible label */
+    color: var(--text-color); 
     padding-left: 10px;
     margin-bottom: 2px;
 }
@@ -244,12 +235,12 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     border-radius: 4px;
     margin-top: 2px;
     font-size: 0.9em;
-    white-space: pre-wrap; /* Allow wrapping for long lines */
+    white-space: pre-wrap; 
     word-wrap: break-word;
-    margin-left: 10px; /* Indent the box itself slightly from its side-line */
+    margin-left: 10px; 
     border: 1px solid var(--pre-border);
 }
-.message-agent-thought .thought-content-box pre { /* If <pre> is used inside by Markdown */
+.message-agent-thought .thought-content-box pre { 
     margin: 0;
     padding: 0;
     background-color: transparent;
@@ -258,23 +249,18 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 }
 
 
-/* Persistent Bottom "Thinking" Line (#agent-thinking-status) */
-/* This element is directly styled, not a wrapper/content structure */
 #agent-thinking-status {
-    margin-top: 8px; /* Space from message above */
-    padding: 5px 0px 5px 20px; /* Left padding includes space for line (10px) + text padding (10px) */
+    margin-top: 8px; 
+    padding: 5px 0px 5px 20px; 
     border-left-width: 3px;
     border-left-style: solid;
-    /* border-left-color will be set by component class */
     font-size: 0.9em;
     color: var(--text-color-muted);
     font-style: italic;
-    display: none; /* Hidden by default, shown by JS */
-    /* Ensure it's the last item in the scroll flow */
+    display: none; 
 }
 
 
-/* Component-based Line Colors (Applied to elements with side-lines) */
 .agent-line-system { border-left-color: var(--agent-line-system-color) !important; }
 .agent-line-intent-classifier { border-left-color: var(--agent-line-intent-classifier-color) !important; }
 .agent-line-planner { border-left-color: var(--agent-line-planner-color) !important; }
@@ -286,8 +272,6 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .agent-line-warning { border-left-color: var(--agent-line-warning-color) !important; }
 .agent-line-error { border-left-color: var(--agent-line-error-color) !important; }
 .agent-line-llm-core { border-left-color: var(--agent-line-llm-core-color) !important; }
-/* .agent-line-default is for final agent message if not using unified blue, but we are. */
-/* --- END NEW CHAT UI STYLES --- */
 
 
 .chat-input-area { display: flex; padding: 10px 15px; border-top: 1px solid var(--border-color); background-color: var(--panel-bg-lighter); flex-shrink: 0; align-items: flex-end; }
@@ -311,7 +295,6 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .log-content pre { background-color: var(--pre-bg); color: var(--pre-text); padding: 5px 8px; margin-top: 4px; border-radius: 3px; border: 1px solid var(--pre-border); overflow-x: auto; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word; }
 
 
-/* Monitor Log Source Specific Styles (ensure these use !important if needed to override general .monitor-log-entry border) */
 .log-source-system, .log-source-system_event, .log-source-system_info, .log-source-system_connect,
 .log-source-system_context_switch, .log-source-system_new_task_signal,
 .log-source-system_task_deleted, .log-source-system_task_renamed,
@@ -360,20 +343,19 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .artifact-nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .artifact-counter { font-size: 0.85em; color: var(--text-color-muted); }
 
-/* General code/pre styling for chat messages if Markdown includes them */
-.message pre { /* For <pre> generated by Markdown processing */
+.message pre { 
     background-color: var(--pre-bg);
     border: 1px solid var(--pre-border);
     border-radius: 4px;
     padding: 0.75rem;
     margin: 0.5rem 0;
     overflow-x: auto;
-    white-space: pre; /* Important for pre */
+    white-space: pre; 
     font-family: var(--monospace-font);
     font-size: 0.9em;
     color: var(--pre-text);
 }
-.message code { /* For inline `code` */
+.message code { 
     background-color: var(--code-bg);
     color: var(--code-text);
     padding: 0.2em 0.4em;
@@ -382,14 +364,14 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     border-radius: 3px;
     font-family: var(--monospace-font);
 }
-.message pre code { /* Reset for <code> inside <pre> */
+.message pre code { 
     padding: 0;
     margin: 0;
-    font-size: inherit; /* Inherit from <pre> */
+    font-size: inherit; 
     background: none;
     border-radius: 0;
-    color: inherit; /* Inherit from <pre> */
-    white-space: pre; /* Important for pre */
+    color: inherit; 
+    white-space: pre; 
 }
 
 
@@ -434,6 +416,78 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .upload-button:hover:not(:disabled) { background-color: var(--panel-bg-lightest); color: var(--text-color); border-color: var(--text-color-muted); }
 .upload-button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.token-usage-area { padding: 8px 15px; border-top: 1px solid var(--border-color); background-color: var(--panel-bg); flex-shrink: 0; font-size: 0.8em; color: var(--text-color-muted); }
-.token-usage-area p { margin: 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.token-usage-area .token-label { font-weight: 500; color: var(--text-color-darker); }
+/* Token Usage Area - Original and New Styles */
+.token-usage-area { 
+    padding: 0; /* Remove padding from main area, apply to children */
+    border-top: 1px solid var(--border-color); 
+    background-color: var(--panel-bg); 
+    flex-shrink: 0; 
+    font-size: 0.8em; 
+    color: var(--text-color-muted); 
+}
+
+.token-usage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 15px; /* Padding for the header line */
+    cursor: pointer; /* Make the whole header clickable to toggle */
+    border-bottom: 1px solid transparent; /* For spacing, or remove if not needed */
+}
+.token-usage-header:hover {
+    background-color: var(--panel-bg-lighter);
+}
+
+.token-usage-area .token-label { /* General label style */
+    font-weight: 500; 
+    color: var(--text-color-darker); 
+    margin-right: 5px;
+}
+
+#task-total-tokens-overall {
+    font-weight: bold;
+    color: var(--text-color); /* Make total more prominent */
+}
+
+.token-expand-btn {
+    background: none;
+    border: none;
+    color: var(--text-color-muted);
+    cursor: pointer;
+    font-size: 1em; /* Adjust size as needed */
+    padding: 0 5px;
+    margin-left: auto; /* Push to the right */
+}
+.token-expand-btn:hover {
+    color: var(--text-color);
+}
+
+.token-usage-details {
+    padding: 0px 15px 8px 15px; /* Padding for the details section */
+    border-top: 1px solid var(--border-color); /* Separator line when expanded */
+    background-color: var(--panel-bg); /* Same as area or slightly different if desired */
+}
+.token-usage-details p { 
+    margin: 4px 0; /* Spacing for Last Call and role items */
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+}
+
+.role-token-breakdown {
+    margin-top: 5px;
+    padding-top: 5px;
+    border-top: 1px dashed var(--panel-bg-lighter); /* Optional separator for roles */
+}
+.role-token-breakdown p { /* Style for each role's token line */
+    font-size: 0.95em; /* Slightly smaller or same as parent */
+}
+.token-label-role { /* Specific label for roles if different styling needed */
+    font-weight: normal; /* Or keep bold if preferred */
+    color: var(--text-color-muted);
+    margin-right: 3px;
+}
+.token-value-role { /* For the actual token values of a role */
+    color: var(--text-color);
+}
+
