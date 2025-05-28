@@ -2,10 +2,11 @@
 
 /**
  * Manages the Chat UI.
- * - Renders chat messages (user, agent, status, step announcements, sub-statuses, thoughts).
+ * - Renders chat messages (user, agent, status, step announcements, sub-statuses, thoughts, tool outputs).
  * - Handles Markdown formatting.
  * - Displays plan proposals and confirmed plans.
  * - Manages chat input and thinking status.
+ * - Handles collapsibility for long tool outputs.
  */
 
 let chatMessagesContainerElement;
@@ -20,10 +21,8 @@ const MAX_CHAT_HISTORY = 50;
 let chatHistoryIndex = -1;
 let currentInputBuffer = "";
 
-// For storing the currently active major step element to append sub-statuses and thoughts
 let currentMajorStepDiv = null;
 
-// Map component hints from backend to CSS class modifiers for borders
 const componentBorderColorMap = {
     DEFAULT: 'agent-line-default', 
     USER: 'user-message-line-color', 
@@ -39,6 +38,12 @@ const componentBorderColorMap = {
     WARNING: 'agent-line-warning',
     ERROR: 'agent-line-error'
 };
+
+// --- START: New constants for Phase 3 ---
+const MAX_CHARS_TOOL_OUTPUT_PREVIEW = 500;
+const MAX_LINES_TOOL_OUTPUT_PREVIEW = 10;
+// --- END: New constants for Phase 3 ---
+
 
 function initChatUI(elements, callbacks) {
     console.log("[ChatUI] Initializing...");
@@ -143,79 +148,60 @@ function addMessageToInputHistory(messageText) {
     }
 }
 
-function formatMessageContentInternal(text, isThoughtContentBox = false) {
+function escapeHTML(str) {
+    if (typeof str !== 'string') return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+function formatMessageContentInternal(text, isThoughtOrToolContentBox = false) {
     if (typeof text !== 'string') {
         text = String(text);
     }
 
-    // **REVISED STRATEGY for HTML Tag Rendering**
-    // 1. First, convert specific Markdown patterns to HTML tags.
-    //    This needs to be done carefully to avoid conflicts.
-
-    // Code blocks (```lang\ncode\n```) - These should be handled first as they contain arbitrary text.
-    // We temporarily replace them with placeholders, then reinsert them after other Markdown.
     const codeBlockPlaceholders = [];
     let tempText = text.replace(/```(\w*)\n([\s\S]*?)\n?```/g, (match, lang, code) => {
-        // Escape HTML within the code block itself to be safe
-        const escapedCode = code.replace(/&/g, "&amp;")
-                                .replace(/</g, "&lt;")
-                                .replace(/>/g, "&gt;");
+        const escapedCode = escapeHTML(code); // Escape HTML within the code block
         const langClass = lang ? ` class="language-${lang}"` : '';
         const placeholder = `%%CODEBLOCK_${codeBlockPlaceholders.length}%%`;
         codeBlockPlaceholders.push(`<pre><code${langClass}>${escapedCode}</code></pre>`);
         return placeholder;
     });
 
-    // Inline code (`code`) - also handle with placeholders
     const inlineCodePlaceholders = [];
     tempText = tempText.replace(/`([^`]+?)`/g, (match, code) => {
-        const escapedCode = code.replace(/&/g, "&amp;")
-                                .replace(/</g, "&lt;")
-                                .replace(/>/g, "&gt;");
+        const escapedCode = escapeHTML(code); // Escape HTML within inline code
         const placeholder = `%%INLINECODE_${inlineCodePlaceholders.length}%%`;
         inlineCodePlaceholders.push(`<code>${escapedCode}</code>`);
         return placeholder;
     });
     
-    // Links ([text](url))
     tempText = tempText.replace(/\[([^<>[\]]+?)\]\((https?:\/\/[^\s)]+)\)/g, (match, linkText, linkUrl) => {
-        // Escape linkText and linkUrl parts that will become HTML content/attributes
-        const safeLinkText = linkText.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        const safeLinkUrl = linkUrl.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+        const safeLinkText = escapeHTML(linkText);
+        const safeLinkUrl = escapeHTML(linkUrl); // URL attributes should also be escaped
         return `<a href="${safeLinkUrl}" target="_blank" rel="noopener noreferrer">${safeLinkText}</a>`;
     });
 
-    // Bold and Italic (***text*** or ___text___)
-    tempText = tempText.replace(/(\*\*\*|___)(?=\S)([\s\S]*?\S)\1/g, (match, wrapper, content) => `<strong><em>${content.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</em></strong>`);
-    // Bold (**text** or __text__)
-    tempText = tempText.replace(/(\*\*|__)(?=\S)([\s\S]*?\S)\1/g, (match, wrapper, content) => `<strong>${content.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</strong>`);
-    // Italic (*text* or _text_)
-    tempText = tempText.replace(/(?<![`*\w\\])(?:(\*|_))(?=\S)([\s\S]*?\S)\1(?![`*\w])/g, (match, wrapper, content) => `<em>${content.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</em>`);
+    tempText = tempText.replace(/(\*\*\*|___)(?=\S)([\s\S]*?\S)\1/g, (match, wrapper, content) => `<strong><em>${escapeHTML(content)}</em></strong>`);
+    tempText = tempText.replace(/(\*\*|__)(?=\S)([\s\S]*?\S)\1/g, (match, wrapper, content) => `<strong>${escapeHTML(content)}</strong>`);
+    tempText = tempText.replace(/(?<![`*\w\\])(?:(\*|_))(?=\S)([\s\S]*?\S)\1(?![`*\w])/g, (match, wrapper, content) => `<em>${escapeHTML(content)}</em>`);
 
-    // 2. Now, escape remaining HTML special characters in the text that wasn't part of our Markdown conversions.
-    // This is tricky because our Markdown replacements have inserted HTML.
-    // A simpler approach: the initial input `text` should be what we consider "user text".
-    // Our markdown conversions create trusted HTML.
-    // The issue is if the *original* text contained `<` or `&` that wasn't part of markdown.
-    // The previous version's initial full escape was problematic.
-    // Let's assume for now that the markdown conversions handle the necessary escaping for their content.
-    // The main problem was HTML tags being displayed, which means they were being treated as text.
-    // The current `tempText` now contains our generated HTML.
+    // Escape remaining HTML special characters ONLY if not already part of a placeholder
+    // This is complex. A simpler way: if the original text was meant to be plain text,
+    // then after markdown-to-html, the parts that are still plain text should be escaped.
+    // For now, we rely on the fact that markdown replacements handle their own content.
+    // The main issue is if the *original input text* had HTML that should be displayed as text.
+    // The current approach is to convert markdown, then assume the result is intended HTML.
 
-    // 3. Convert newlines to <br> ONLY IF not inside a <pre> tag (which is now a placeholder)
-    // and not for thought content box which uses white-space: pre-wrap
-    if (!isThoughtContentBox) {
-        // Split by code block placeholders to avoid adding <br> inside them
-        const partsForNewline = tempText.split(/(%%CODEBLOCK_\d+%%)/g);
+    if (!isThoughtOrToolContentBox) {
+        const partsForNewline = tempText.split(/(%%CODEBLOCK_\d+%%|%%INLINECODE_\d+%%)/g);
         for (let i = 0; i < partsForNewline.length; i++) {
-            if (!partsForNewline[i].startsWith('%%CODEBLOCK_')) {
+            if (!partsForNewline[i].startsWith('%%CODEBLOCK_') && !partsForNewline[i].startsWith('%%INLINECODE_')) {
                 partsForNewline[i] = partsForNewline[i].replace(/\n/g, '<br>');
             }
         }
         tempText = partsForNewline.join('');
     }
 
-    // 4. Reinsert code blocks and inline code
     tempText = tempText.replace(/%%CODEBLOCK_(\d+)%%/g, (match, index) => codeBlockPlaceholders[parseInt(index)]);
     tempText = tempText.replace(/%%INLINECODE_(\d+)%%/g, (match, index) => inlineCodePlaceholders[parseInt(index)]);
     
@@ -228,7 +214,7 @@ function getComponentClass(componentHint) {
     if (componentBorderColorMap[hint]) {
         return componentBorderColorMap[hint];
     }
-    if (hint.startsWith("TOOL_")) {
+    if (hint.startsWith("TOOL_")) { // Covers TOOL_READ_FILE etc.
         return componentBorderColorMap.TOOL; 
     }
     return componentBorderColorMap.SYSTEM; 
@@ -260,6 +246,83 @@ function displayMajorStepAnnouncementUI(data) {
     scrollToBottomChat();
     console.log(`[ChatUI] Displayed Major Step Announcement: Step ${step_number}/${total_steps}`);
 }
+
+// --- START: New function for Phase 3 ---
+function displayToolOutputMessageUI(data) {
+    if (!chatMessagesContainerElement) {
+        console.error("[ChatUI] Chat container missing! Cannot display tool output.");
+        return null;
+    }
+
+    const { tool_name, tool_input_summary, tool_output_content, artifact_filename, original_length } = data;
+
+    const toolOutputWrapperDiv = document.createElement('div');
+    // Add a new specific class for styling, and the common 'agent-line-tool' for the border
+    toolOutputWrapperDiv.className = `message message-agent-tool-output ${getComponentClass('TOOL')}`;
+
+    const labelDiv = document.createElement('div');
+    labelDiv.className = 'tool-output-label'; // New class for styling the label
+    labelDiv.innerHTML = `Tool Output: <strong>${escapeHTML(tool_name)}</strong> (Input: <em>${escapeHTML(tool_input_summary)}</em>)`;
+    toolOutputWrapperDiv.appendChild(labelDiv);
+
+    const contentBoxDiv = document.createElement('div');
+    contentBoxDiv.className = 'tool-output-content-box'; // New class, similar to thought-content-box
+
+    const lines = tool_output_content.split('\n');
+    const isLongContent = original_length > MAX_CHARS_TOOL_OUTPUT_PREVIEW || lines.length > MAX_LINES_TOOL_OUTPUT_PREVIEW;
+
+    if (isLongContent) {
+        const previewDiv = document.createElement('div');
+        previewDiv.className = 'tool-output-preview';
+        let previewText = lines.slice(0, MAX_LINES_TOOL_OUTPUT_PREVIEW).join('\n');
+        if (previewText.length > MAX_CHARS_TOOL_OUTPUT_PREVIEW) {
+            previewText = previewText.substring(0, MAX_CHARS_TOOL_OUTPUT_PREVIEW);
+        }
+        previewDiv.innerHTML = formatMessageContentInternal(previewText + (lines.length > MAX_LINES_TOOL_OUTPUT_PREVIEW || original_length > MAX_CHARS_TOOL_OUTPUT_PREVIEW ? "\n..." : ""), true);
+        contentBoxDiv.appendChild(previewDiv);
+
+        const fullDiv = document.createElement('div');
+        fullDiv.className = 'tool-output-full';
+        fullDiv.style.display = 'none';
+        fullDiv.innerHTML = formatMessageContentInternal(tool_output_content, true);
+        contentBoxDiv.appendChild(fullDiv);
+
+        const expandButton = document.createElement('button');
+        expandButton.className = 'tool-output-expand-btn'; // New class for styling
+        expandButton.textContent = 'Expand';
+        expandButton.onclick = () => {
+            const isExpanded = fullDiv.style.display === 'block';
+            fullDiv.style.display = isExpanded ? 'none' : 'block';
+            previewDiv.style.display = isExpanded ? 'block' : 'none';
+            expandButton.textContent = isExpanded ? 'Expand' : 'Collapse';
+            scrollToBottomChat(); // Adjust scroll after expanding/collapsing
+        };
+        toolOutputWrapperDiv.appendChild(expandButton); // Append button after contentBox
+    } else {
+        contentBoxDiv.innerHTML = formatMessageContentInternal(tool_output_content, true);
+    }
+    toolOutputWrapperDiv.appendChild(contentBoxDiv);
+
+    if (artifact_filename) {
+        const artifactLinkDiv = document.createElement('div');
+        artifactLinkDiv.className = 'tool-output-artifact-link'; // New class for styling
+        artifactLinkDiv.innerHTML = `<em>References artifact: ${escapeHTML(artifact_filename)}</em>`;
+        // Later, this could be a button to trigger artifact view
+        toolOutputWrapperDiv.appendChild(artifactLinkDiv);
+    }
+    
+    // Placeholder for Phase 4: Copy button
+    // const copyButton = document.createElement('button'); /* ... */
+    // toolOutputWrapperDiv.appendChild(copyButton);
+
+
+    appendMessageElement(toolOutputWrapperDiv);
+    scrollToBottomChat();
+    console.log(`[ChatUI] Displayed Tool Output: ${tool_name}`);
+    return toolOutputWrapperDiv;
+}
+// --- END: New function for Phase 3 ---
+
 
 function addChatMessageToUI(messageData, type, options = {}, doScroll = true) {
     if (!chatMessagesContainerElement) {
@@ -299,6 +362,12 @@ function addChatMessageToUI(messageData, type, options = {}, doScroll = true) {
             messageData.onViewDetails
         ); 
         if (!baseMessageDiv) return;
+    // --- START: Call new display function for Phase 3 ---
+    } else if (type === 'tool_result_for_chat') {
+        baseMessageDiv = displayToolOutputMessageUI(messageData); // messageData is the full payload
+        if (!baseMessageDiv) return;
+        textContent = null; // Content is handled by displayToolOutputMessageUI
+    // --- END: Call new display function for Phase 3 ---
     } else {
         baseMessageDiv = document.createElement('div');
         baseMessageDiv.className = 'message message-outer-blue-line'; 
@@ -373,9 +442,15 @@ function addChatMessageToUI(messageData, type, options = {}, doScroll = true) {
         contentHolderDiv.innerHTML = formatMessageContentInternal(textContent);
     }
     
-    if (baseMessageDiv) { 
+    if (baseMessageDiv && textContent !== null) { // Ensure baseMessageDiv exists before appending
         appendMessageElement(baseMessageDiv);
+    } else if (baseMessageDiv && textContent === null && type !== 'tool_result_for_chat') {
+         // This case is for when baseMessageDiv is created but content is handled internally (like confirmed_plan_log)
+         // No direct append here, it's already done or not needed.
+    } else if (type === 'tool_result_for_chat' && baseMessageDiv) {
+        // Already appended by displayToolOutputMessageUI
     }
+
 
     if (doScroll) {
         scrollToBottomChat();
@@ -441,6 +516,7 @@ function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfi
         if (typeof onViewDetails === 'function') {
             onViewDetails(planId, isHidden);
         }
+        scrollToBottomChat(); // Scroll after expanding/collapsing plan details
     };
     planBlock.appendChild(viewDetailsBtn);
 
@@ -601,7 +677,7 @@ function scrollToBottomChat() {
     if (chatMessagesContainerElement) {
         setTimeout(() => {
             chatMessagesContainerElement.scrollTop = chatMessagesContainerElement.scrollHeight;
-        }, 0);
+        }, 0); // Timeout 0 allows browser to repaint before scrolling
     }
 }
 
@@ -615,3 +691,8 @@ function appendMessageElement(messageElement) {
         chatMessagesContainerElement.appendChild(messageElement);
     }
 }
+
+function clearCurrentMajorStepUI() {
+    currentMajorStepDiv = null;
+}
+

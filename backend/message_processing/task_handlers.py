@@ -16,7 +16,10 @@ from backend.callbacks import (
     SUB_TYPE_SUB_STATUS,
     SUB_TYPE_THOUGHT,
     DB_MSG_TYPE_SUB_STATUS, 
-    DB_MSG_TYPE_THOUGHT     
+    DB_MSG_TYPE_THOUGHT,
+    # --- START: Import for Phase 2 ---
+    DB_MSG_TYPE_TOOL_RESULT_FOR_CHAT
+    # --- END: Import for Phase 2 ---
 )
 
 logger = logging.getLogger(__name__)
@@ -32,15 +35,12 @@ GetArtifactsFunc = Callable[[str], Coroutine[Any, Any, List[Dict[str, str]]]]
 
 DB_MSG_TYPE_MAJOR_STEP = "db_major_step_announcement"
 
-# <<< START MODIFICATION - Define known internal/system DB message types to generally ignore for chat replay >>>
-# These are useful for audit/monitor but not usually replayed as distinct chat messages.
-# Some might be replayed to the monitor log if desired.
 INTERNAL_DB_MESSAGE_TYPES_FOR_MONITOR_REPLAY_ONLY = {
     "SYSTEM_INTENT_CLASSIFIED",
-    "agent_executor_step_finish", # The content of this is usually part of the agent's final answer for a step
-    "artifact_generated",         # Artifacts are listed separately
-    "llm_token_usage",          # Displayed in token counter, not chat
-    "monitor_log",                # Already a monitor log
+    "agent_executor_step_finish", 
+    "artifact_generated",         
+    "llm_token_usage",          
+    "monitor_log",                
     "monitor_stdout",
     "monitor_stderr",
     "monitor_direct_cmd_start",
@@ -51,8 +51,7 @@ INTERNAL_DB_MESSAGE_TYPES_FOR_MONITOR_REPLAY_ONLY = {
     "system_task_deleted",
     "system_task_renamed",
     "system_llm_set",
-    "system_plan_generated", # The plan proposal itself is handled by 'propose_plan_for_confirmation'
-    # "confirmed_plan_log" IS replayed to chat
+    "system_plan_generated", 
     "system_plan_cancelled",
     "system_direct_qa",
     "system_direct_qa_finish",
@@ -62,15 +61,7 @@ INTERNAL_DB_MESSAGE_TYPES_FOR_MONITOR_REPLAY_ONLY = {
     "error_json",
     "error_unknown_msg",
     "error_processing",
-    "error_llm_intent_classifier", # and other error_llm_*
-    "error_tool_write_file",       # and other error_tool_*
 }
-# Add specific error types if they are prefixed with "error_llm_" or "error_tool_"
-for prefix in ["error_llm_", "error_tool_"]:
-    # This is a placeholder; in a real scenario, you might have a more dynamic way or list them all.
-    # For now, we'll rely on the startswith check below.
-    pass
-# <<< END MODIFICATION >>>
 
 
 async def process_context_switch(
@@ -195,6 +186,18 @@ async def process_context_switch(
                         }
                     except json.JSONDecodeError as e: logger.error(f"[{session_id}] Error parsing DB_MSG_TYPE_THOUGHT content: {e}. Data: {db_content_hist_str}"); continue
                 
+                # --- START: Load tool_result_for_chat for Phase 2 ---
+                elif db_msg_type == DB_MSG_TYPE_TOOL_RESULT_FOR_CHAT:
+                    ws_message_type_to_send = "tool_result_for_chat"
+                    try:
+                        ws_payload_to_send = json.loads(db_content_hist_str)
+                        # No direct addition to LangChain memory for tool results, they are informational for UI
+                    except json.JSONDecodeError as e:
+                        logger.error(f"[{session_id}] Error parsing DB_MSG_TYPE_TOOL_RESULT_FOR_CHAT content: {e}. Data: {db_content_hist_str}")
+                        # Fallback: send raw string or error message to UI if needed, or skip
+                        ws_payload_to_send = {"error": "Corrupted tool result in history.", "raw_content": db_content_hist_str[:200]}
+                # --- END: Load tool_result_for_chat for Phase 2 ---
+
                 elif db_msg_type == "status_message": 
                     ws_message_type_to_send = "status_message"
                     try:
@@ -204,19 +207,14 @@ async def process_context_switch(
                         else: ws_payload_to_send = {"text": db_content_hist_str, "component_hint": "SYSTEM"}
                     except json.JSONDecodeError: ws_payload_to_send = {"text": db_content_hist_str, "component_hint": "SYSTEM"}
                 
-                # <<< START MODIFICATION - Handle internal/system types for monitor replay >>>
                 elif db_msg_type in INTERNAL_DB_MESSAGE_TYPES_FOR_MONITOR_REPLAY_ONLY or \
                      db_msg_type.startswith("error_llm_") or db_msg_type.startswith("error_tool_"):
-                    # These are purely for the monitor log, not for chat display or agent memory
                     log_prefix_hist = f"[{db_timestamp}][{session_id[:8]}]"
                     type_indicator_hist = f"[{db_msg_type.replace('monitor_', '').replace('error_', 'ERR_').replace('system_', 'SYS_').upper()}]"
                     monitor_log_text = f"{log_prefix_hist} [History]{type_indicator_hist} {db_content_hist_str}"
                     await send_ws_message_func("monitor_log", {"text": monitor_log_text, "log_source": db_msg_type})
-                    # No ws_message_type_to_send for these, so they won't go to chat UI
-                # <<< END MODIFICATION >>>
                 
                 else: 
-                    # This is now for truly unknown types not caught by the above set
                     logger.warning(f"[{session_id}] Unknown history message type '{db_msg_type}' encountered during history load. Content: {db_content_hist_str[:100]}")
                     await send_ws_message_func("monitor_log", {
                         "text": f"[{db_timestamp}][{session_id[:8]}] [History][UNHANDLED_TYPE: {db_msg_type}] {db_content_hist_str}",

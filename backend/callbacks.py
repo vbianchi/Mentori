@@ -46,6 +46,28 @@ SUB_TYPE_THOUGHT = "thought"
 
 DB_MSG_TYPE_SUB_STATUS = "db_agent_sub_status"
 DB_MSG_TYPE_THOUGHT = "db_agent_thought"
+# --- START: New constant for Phase 2 ---
+DB_MSG_TYPE_TOOL_RESULT_FOR_CHAT = "db_tool_result_for_chat"
+# --- END: New constant for Phase 2 ---
+
+
+# Tools whose direct output should be sent to chat
+TEXT_OUTPUT_TOOLS_FOR_CHAT: List[str] = [
+    "read_file",
+    "web_page_reader",
+    "pubmed_search",
+    "tavily_search_api", 
+    "deep_research_synthesizer",
+    "workspace_shell",
+    "Python_REPL",
+    "playwright_web_search" 
+]
+
+# Tools for which a confirmation message (derived from output) should be sent to chat
+CONFIRMATION_ONLY_TOOLS_FOR_CHAT: List[str] = [
+    "write_file",
+    "python_package_installer"
+]
 
 
 class WebSocketCallbackHandler(AsyncCallbackHandler):
@@ -65,6 +87,7 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         self.current_task_id: Optional[str] = None
         self.current_tool_name: Optional[str] = None
         self.current_agent_role_hint: Optional[str] = None
+        self.current_tool_input_str: Optional[str] = None 
         logger.info(f"[{self.session_id}] WebSocketCallbackHandler initialized.")
 
     def set_task_id(self, task_id: Optional[str]):
@@ -116,7 +139,7 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
 
         metadata = kwargs.get("metadata", {})
         self.current_agent_role_hint = metadata.get("component_name", LOG_SOURCE_LLM_CORE)
-        logger.critical(f"CRITICAL_DEBUG: [{self.session_id}] on_llm_start: ENTERED for role_hint: {self.current_agent_role_hint}. Metadata: {metadata}")
+        # logger.critical(f"CRITICAL_DEBUG: [{self.session_id}] on_llm_start: ENTERED for role_hint: {self.current_agent_role_hint}. Metadata: {metadata}") # Reduced verbosity
 
         component_hint_for_status = self.current_agent_role_hint if self.current_agent_role_hint != LOG_SOURCE_LLM_CORE else "LLM"
         await self._send_thinking_update(f"Thinking ({component_hint_for_status})...", "LLM_PROCESSING_START", self.current_agent_role_hint, SUB_TYPE_BOTTOM_LINE)
@@ -129,7 +152,7 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         
         metadata = kwargs.get("metadata", {})
         self.current_agent_role_hint = metadata.get("component_name", LOG_SOURCE_LLM_CORE)
-        logger.critical(f"CRITICAL_DEBUG: [{self.session_id}] on_chat_model_start: ENTERED for role_hint: {self.current_agent_role_hint}. Metadata: {metadata}")
+        # logger.critical(f"CRITICAL_DEBUG: [{self.session_id}] on_chat_model_start: ENTERED for role_hint: {self.current_agent_role_hint}. Metadata: {metadata}") # Reduced verbosity
         
         component_hint_for_status = self.current_agent_role_hint if self.current_agent_role_hint != LOG_SOURCE_LLM_CORE else "ChatModel"
         await self._send_thinking_update(f"Thinking ({component_hint_for_status})...", "LLM_PROCESSING_START", self.current_agent_role_hint, SUB_TYPE_BOTTOM_LINE)
@@ -146,69 +169,41 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         model_name: str = "unknown_model"
         source_for_tokens = "unknown"
 
-        logger.critical(f"CRITICAL_DEBUG: [{self.session_id}] on_llm_end: ENTERED for role_hint: {self.current_agent_role_hint}")
-        logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Full response object type: {type(response)}")
+        # logger.critical(f"CRITICAL_DEBUG: [{self.session_id}] on_llm_end: ENTERED for role_hint: {self.current_agent_role_hint}") # Reduced verbosity
+        # logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Full response object type: {type(response)}") # Reduced verbosity
         
-        if response.llm_output is not None:
-            logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): response.llm_output IS PRESENT. Type: {type(response.llm_output)}")
-            try:
-                if isinstance(response.llm_output, dict): llm_output_str = json.dumps(response.llm_output, indent=2)
-                else: llm_output_str = str(response.llm_output)
-                logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): response.llm_output content:\n{llm_output_str}")
-            except Exception as e_llm_out_log: logger.error(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Error stringifying/dumping response.llm_output: {e_llm_out_log}"); logger.debug(f"[{self.session_id}] on_llm_end: response.llm_output (raw repr): {repr(response.llm_output)[:1000]}...")
-        else: logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): response.llm_output IS NONE.")
-
-        if response.generations is not None and len(response.generations) > 0:
-            logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): response.generations IS PRESENT and NOT EMPTY (length {len(response.generations)}).")
-            try:
-                for i, gen_list in enumerate(response.generations):
-                    logger.debug(f"  Generation list {i} (length {len(gen_list)}) for role {self.current_agent_role_hint}:")
-                    for j, gen_item in enumerate(gen_list):
-                        logger.debug(f"    Item {j} type: {type(gen_item)}")
-                        gen_item_details = {}
-                        if hasattr(gen_item, 'text'): gen_item_details['text'] = str(gen_item.text)[:200] + "..."
-                        if hasattr(gen_item, 'message') and gen_item.message:
-                            gen_item_details['message_type'] = type(gen_item.message)
-                            gen_item_details['message_content'] = str(gen_item.message.content)[:200] + "..."
-                            if hasattr(gen_item.message, 'additional_kwargs'): gen_item_details['message_additional_kwargs'] = gen_item.message.additional_kwargs
-                            if hasattr(gen_item.message, 'usage_metadata'): gen_item_details['message_usage_metadata'] = gen_item.message.usage_metadata
-                            if hasattr(gen_item.message, 'response_metadata'): gen_item_details['message_response_metadata'] = gen_item.message.response_metadata
-                        if hasattr(gen_item, 'generation_info'): gen_item_details['generation_info'] = gen_item.generation_info
-                        logger.debug(f"    Item {j} details (Role: {self.current_agent_role_hint}): {json.dumps(gen_item_details, default=str, indent=2)}")
-            except Exception as e_gen_log: logger.error(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Error iterating/logging response.generations: {e_gen_log}"); logger.debug(f"[{self.session_id}] on_llm_end: response.generations (raw repr): {repr(response.generations)[:1000]}...")
-        else: logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): response.generations IS NONE or EMPTY.")
+        # Detailed logging of response.llm_output and response.generations can be enabled if needed for debugging token parsing
+        # For brevity, these detailed log blocks are commented out but can be re-enabled.
+        # if response.llm_output is not None: ...
+        # if response.generations is not None and len(response.generations) > 0: ...
 
         try:
             if response.llm_output and isinstance(response.llm_output, dict):
                 llm_output_data = response.llm_output
                 source_for_tokens = "llm_output"
                 model_name = llm_output_data.get('model_name', llm_output_data.get('model', model_name))
-                logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Processing llm_output. Model name from llm_output: {model_name}")
+                # logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Processing llm_output. Model name from llm_output: {model_name}") # Reduced verbosity
 
                 if 'token_usage' in llm_output_data and isinstance(llm_output_data['token_usage'], dict):
                     usage_dict_from_llm_output = llm_output_data['token_usage']
                     input_tokens = usage_dict_from_llm_output.get('prompt_tokens', usage_dict_from_llm_output.get('input_tokens'))
                     output_tokens = usage_dict_from_llm_output.get('completion_tokens', usage_dict_from_llm_output.get('output_tokens'))
                     total_tokens = usage_dict_from_llm_output.get('total_tokens')
-                    logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Tokens from llm_output.token_usage: In={input_tokens}, Out={output_tokens}, Total={total_tokens}")
                 elif 'usage_metadata' in llm_output_data and isinstance(llm_output_data['usage_metadata'], dict):
                     usage_metadata_from_llm_output = llm_output_data['usage_metadata']
                     input_tokens = usage_metadata_from_llm_output.get('input_tokens', usage_metadata_from_llm_output.get('prompt_token_count'))
                     output_tokens = usage_metadata_from_llm_output.get('output_tokens', usage_metadata_from_llm_output.get('candidates_token_count'))
                     total_tokens = usage_metadata_from_llm_output.get('total_tokens', usage_metadata_from_llm_output.get('total_token_count'))
-                    logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Tokens from llm_output.usage_metadata (Gemini-style): In={input_tokens}, Out={output_tokens}, Total={total_tokens}")
                 elif 'eval_count' in llm_output_data: 
                     output_tokens = llm_output_data.get('eval_count')
                     input_tokens = llm_output_data.get('prompt_eval_count') 
-                    logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Tokens from llm_output (Ollama eval_count): In={input_tokens}, Out={output_tokens}")
 
             if (input_tokens is None or output_tokens is None) and response.generations:
-                logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Tokens not found or incomplete in llm_output, trying response.generations.")
+                # logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Tokens not found or incomplete in llm_output, trying response.generations.") # Reduced verbosity
                 for gen_list in response.generations:
                     if not gen_list: continue
                     first_gen = gen_list[0]
                     source_for_tokens = "generations"
-                    logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Processing first_gen from generations: type={type(first_gen)}, content={str(first_gen)[:300]}...")
                     
                     if hasattr(first_gen, 'message') and hasattr(first_gen.message, 'usage_metadata') and first_gen.message.usage_metadata:
                         usage_metadata_from_gen = first_gen.message.usage_metadata
@@ -218,29 +213,24 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
                             total_tokens = usage_metadata_from_gen.get('total_tokens') 
                             if hasattr(first_gen.message, 'response_metadata') and isinstance(first_gen.message.response_metadata, dict):
                                 model_name = first_gen.message.response_metadata.get('model_name', model_name)
-                            logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Tokens from generations.message.usage_metadata (Gemini/ChatChunk): In={input_tokens}, Out={output_tokens}, Total={total_tokens}, Model={model_name}")
                             break 
                     elif hasattr(first_gen, 'generation_info') and first_gen.generation_info:
                         gen_info = first_gen.generation_info
                         if isinstance(gen_info, dict):
                             model_name = gen_info.get('model', model_name) 
-                            logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Processing generation_info. Model from gen_info: {model_name}")
                             if 'token_usage' in gen_info and isinstance(gen_info['token_usage'], dict):
                                 usage_dict_from_gen_info = gen_info['token_usage']
                                 input_tokens = usage_dict_from_gen_info.get('prompt_tokens', usage_dict_from_gen_info.get('input_tokens'))
                                 output_tokens = usage_dict_from_gen_info.get('completion_tokens', usage_dict_from_gen_info.get('output_tokens'))
                                 total_tokens = usage_dict_from_gen_info.get('total_tokens')
-                                logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Tokens from generation_info.token_usage: In={input_tokens}, Out={output_tokens}, Total={total_tokens}")
                             elif 'eval_count' in gen_info: 
                                 output_tokens = gen_info.get('eval_count')
                                 input_tokens = gen_info.get('prompt_eval_count')
-                                logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Tokens from generation_info (Ollama eval_count): In={input_tokens}, Out={output_tokens}")
                             elif 'usage_metadata' in gen_info and isinstance(gen_info['usage_metadata'], dict): 
                                 usage_metadata_nested = gen_info['usage_metadata']
                                 input_tokens = usage_metadata_nested.get('input_tokens', usage_metadata_nested.get('prompt_token_count'))
                                 output_tokens = usage_metadata_nested.get('output_tokens', usage_metadata_nested.get('candidates_token_count'))
                                 total_tokens = usage_metadata_nested.get('total_tokens', usage_metadata_nested.get('total_token_count'))
-                                logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Tokens from generation_info.usage_metadata (Nested Gemini-style): In={input_tokens}, Out={output_tokens}, Total={total_tokens}")
                             break 
             
             input_tokens = int(input_tokens) if input_tokens is not None else 0
@@ -248,7 +238,7 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
             if total_tokens is None: total_tokens = input_tokens + output_tokens
             else: total_tokens = int(total_tokens)
 
-            logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Final parsed tokens before sending: In={input_tokens}, Out={output_tokens}, Total={total_tokens}, Model={model_name}, Source={source_for_tokens}")
+            # logger.debug(f"[{self.session_id}] on_llm_end (Role: {self.current_agent_role_hint}): Final parsed tokens before sending: In={input_tokens}, Out={output_tokens}, Total={total_tokens}, Model={model_name}, Source={source_for_tokens}") # Reduced verbosity
 
             if input_tokens > 0 or output_tokens > 0 or total_tokens > 0:
                 token_usage_payload = {
@@ -292,8 +282,9 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
 
     async def on_tool_start(self, serialized: Dict[str, Any], input_str: str, **kwargs: Any) -> None:
         self.current_tool_name = serialized.get("name", "UnknownTool")
+        self.current_tool_input_str = input_str
         try: self._check_cancellation(f"Tool execution ('{self.current_tool_name}')")
-        except AgentCancelledException: self.current_tool_name = None; raise
+        except AgentCancelledException: self.current_tool_name = None; self.current_tool_input_str = None; raise 
         
         log_prefix = self._get_log_prefix()
         log_input_summary = input_str[:150] + "..." if len(str(input_str)) > 150 else input_str
@@ -312,13 +303,12 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         log_content_tool_end = f"[Tool Output] Tool '{tool_name_for_log}' returned:\n---\n{monitor_output_summary.strip()}\n---"
         final_log_source = f"{LOG_SOURCE_TOOL_PREFIX}_{tool_name_for_log.upper()}_OUTPUT"
 
-        # <<< START MODIFICATION - Enhanced logging for write_file >>>
-        logger.critical(f"DEBUG_ARTIFACT_REFRESH: [callbacks.py/on_tool_end] Entered for tool: '{tool_name_for_log}'. Output starts with: '{output_str[:50]}...'")
+        # logger.critical(f"DEBUG_ARTIFACT_REFRESH: [callbacks.py/on_tool_end] Entered for tool: '{tool_name_for_log}'. Output starts with: '{output_str[:50]}...'") # Reduced verbosity
         success_prefix = "SUCCESS::write_file:::"
         if tool_name_for_log == "write_file":
-            logger.critical(f"DEBUG_ARTIFACT_REFRESH: [callbacks.py/on_tool_end] Tool is 'write_file'. Checking output prefix.")
+            # logger.critical(f"DEBUG_ARTIFACT_REFRESH: [callbacks.py/on_tool_end] Tool is 'write_file'. Checking output prefix.") # Reduced verbosity
             if output_str.startswith(success_prefix):
-                logger.critical(f"DEBUG_ARTIFACT_REFRESH: [callbacks.py/on_tool_end] 'write_file' output STARTS WITH success_prefix.")
+                # logger.critical(f"DEBUG_ARTIFACT_REFRESH: [callbacks.py/on_tool_end] 'write_file' output STARTS WITH success_prefix.") # Reduced verbosity
                 try:
                     if len(output_str) > len(success_prefix):
                         relative_path_str = output_str[len(success_prefix):]
@@ -326,23 +316,60 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
                         await self.send_ws_message("monitor_log", {"text": f"{log_prefix} [{LOG_SOURCE_ARTIFACT.upper()}_GENERATED] {relative_path_str} (via {tool_name_for_log})", "log_source": f"{LOG_SOURCE_ARTIFACT}_{tool_name_for_log.upper()}"})
                         log_content_tool_end = f"[Tool Output] Tool '{tool_name_for_log}' successfully wrote file: '{relative_path_str}'"
                         if self.current_task_id:
-                            logger.critical(f"DEBUG_ARTIFACT_REFRESH: [callbacks.py/on_tool_end] write_file SUCCESS. About to send 'trigger_artifact_refresh' for task {self.current_task_id}")
+                            # logger.critical(f"DEBUG_ARTIFACT_REFRESH: [callbacks.py/on_tool_end] write_file SUCCESS. About to send 'trigger_artifact_refresh' for task {self.current_task_id}") # Reduced verbosity
                             await self.send_ws_message("trigger_artifact_refresh", {"taskId": self.current_task_id})
-                        else:
-                            logger.warning(f"DEBUG_ARTIFACT_REFRESH: [callbacks.py/on_tool_end] write_file SUCCESS but current_task_id is None. Cannot trigger refresh.")
-                    else:
-                        logger.warning(f"DEBUG_ARTIFACT_REFRESH: [callbacks.py/on_tool_end] 'write_file' output starts with prefix but is too short: '{output_str}'")
+                        # else: # Reduced verbosity
+                            # logger.warning(f"DEBUG_ARTIFACT_REFRESH: [callbacks.py/on_tool_end] write_file SUCCESS but current_task_id is None. Cannot trigger refresh.")
+                    # else: # Reduced verbosity
+                        # logger.warning(f"DEBUG_ARTIFACT_REFRESH: [callbacks.py/on_tool_end] 'write_file' output starts with prefix but is too short: '{output_str}'")
                 except Exception as parse_err: 
                     logger.error(f"[{self.session_id}] Error processing write_file success output '{output_str}': {parse_err}", exc_info=True)
-            else:
-                logger.warning(f"DEBUG_ARTIFACT_REFRESH: [callbacks.py/on_tool_end] 'write_file' output DOES NOT start with success_prefix. Output: '{output_str[:100]}...'")
-        # <<< END MODIFICATION >>>
+            # else: # Reduced verbosity
+                # logger.warning(f"DEBUG_ARTIFACT_REFRESH: [callbacks.py/on_tool_end] 'write_file' output DOES NOT start with success_prefix. Output: '{output_str[:100]}...'")
         
         await self.send_ws_message("monitor_log", {"text": f"{log_prefix} {log_content_tool_end}", "log_source": final_log_source})
+        await self._save_message_to_db(f"tool_output_{tool_name_for_log}", {"tool_name": tool_name_for_log, "output": output_str})
+        
+        tool_output_for_chat_content = output_str
+        artifact_filename_for_chat = None
+        tool_input_summary_for_chat = str(self.current_tool_input_str)[:150] + "..." if self.current_tool_input_str else "N/A"
+
+        if tool_name_for_log in TEXT_OUTPUT_TOOLS_FOR_CHAT:
+            if tool_name_for_log == "read_file":
+                artifact_filename_for_chat = self.current_tool_input_str 
+        
+        elif tool_name_for_log in CONFIRMATION_ONLY_TOOLS_FOR_CHAT:
+            if tool_name_for_log == "write_file":
+                if output_str.startswith(success_prefix) and len(output_str) > len(success_prefix):
+                    parsed_filename = output_str[len(success_prefix):]
+                    tool_output_for_chat_content = f"File '{parsed_filename}' written successfully to workspace."
+                    artifact_filename_for_chat = parsed_filename
+                else: 
+                    tool_output_for_chat_content = f"Attempted to write file. Status: {output_str}"
+            elif tool_name_for_log == "python_package_installer":
+                tool_output_for_chat_content = output_str 
+        
+        if tool_name_for_log in TEXT_OUTPUT_TOOLS_FOR_CHAT or tool_name_for_log in CONFIRMATION_ONLY_TOOLS_FOR_CHAT:
+            chat_payload = {
+                "tool_name": tool_name_for_log,
+                "tool_input_summary": tool_input_summary_for_chat,
+                "tool_output_content": tool_output_for_chat_content,
+                "status": "success", 
+                "artifact_filename": artifact_filename_for_chat,
+                "original_length": len(tool_output_for_chat_content),
+                "is_truncated": False 
+            }
+            await self.send_ws_message("tool_result_for_chat", chat_payload)
+            # --- START: Save to DB for Phase 2 ---
+            await self._save_message_to_db(DB_MSG_TYPE_TOOL_RESULT_FOR_CHAT, chat_payload)
+            # --- END: Save to DB for Phase 2 ---
+            logger.info(f"[{self.session_id}] Sent and saved 'tool_result_for_chat' for tool '{tool_name_for_log}'.")
+        
         user_friendly_tool_name = tool_name_for_log.replace("_", " ").title()
         await self._send_thinking_update(f"{user_friendly_tool_name} finished.", "TOOL_COMPLETED", f"{LOG_SOURCE_TOOL_PREFIX}_{tool_name_for_log.upper()}", SUB_TYPE_SUB_STATUS, details={"tool_name": tool_name_for_log, "output_summary": output_str[:100]+"..." if output_str else "No output."})
-        await self._save_message_to_db(f"tool_output_{tool_name_for_log}", {"tool_name": tool_name_for_log, "output": output_str})
+        
         self.current_tool_name = None
+        self.current_tool_input_str = None 
 
     async def on_tool_error(self, error: Union[Exception, KeyboardInterrupt], name: str = "UnknownTool", **kwargs: Any) -> None:
         actual_tool_name = name if name != "UnknownTool" else self.current_tool_name or "UnknownTool"
@@ -354,7 +381,7 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
             logger.warning(f"[{self.session_id}] Tool '{actual_tool_name}' execution cancelled.")
             await self._send_thinking_update(f"Tool {user_friendly_tool_name} cancelled.", "TOOL_CANCELLED", f"{LOG_SOURCE_TOOL_PREFIX}_{actual_tool_name.upper()}_CANCELLED", SUB_TYPE_SUB_STATUS)
             await self.send_ws_message("monitor_log", {"text": f"{log_prefix} [Tool Cancelled] Tool '{actual_tool_name}' execution stopped.", "log_source": f"{LOG_SOURCE_TOOL_PREFIX}_{actual_tool_name.upper()}_CANCELLED"})
-            self.current_tool_name = None; raise error
+            self.current_tool_name = None; self.current_tool_input_str = None; raise error 
 
         logger.error(f"[{self.session_id}] Tool '{actual_tool_name}' Error: {error_str}", exc_info=True)
         monitor_error_content = f"[Tool Error] Tool '{actual_tool_name}' failed: {error_type_name}: {error_str}"
@@ -362,6 +389,7 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         await self._send_thinking_update(f"Error with {user_friendly_tool_name}. (Retrying or evaluating...)", "TOOL_ERROR", tool_error_log_source, SUB_TYPE_SUB_STATUS, details={"tool_name": actual_tool_name, "error_type": error_type_name, "error_message": error_str[:200]})
         await self._save_message_to_db(f"error_tool_{actual_tool_name}", {"tool_name": actual_tool_name, "error_type": error_type_name, "error_message": error_str})
         self.current_tool_name = None
+        self.current_tool_input_str = None 
 
     async def on_agent_action(self, action: AgentAction, **kwargs: Any) -> Any:
         log_prefix = self._get_log_prefix()
@@ -393,8 +421,10 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
         await self._save_message_to_db("agent_executor_step_finish", {"output": step_output_content})
         await self._send_thinking_update("Agent processing step complete.", "EXECUTOR_STEP_COMPLETED", LOG_SOURCE_EXECUTOR, SUB_TYPE_SUB_STATUS)
         self.current_tool_name = None
+        self.current_tool_input_str = None 
 
     async def on_text(self, text: str, **kwargs: Any) -> Any: pass
     async def on_retriever_start(self, serialized: Dict[str, Any], query: str, **kwargs: Any) -> Any: pass
     async def on_retriever_end(self, documents: Sequence[Document], **kwargs: Any) -> Any: pass
     async def on_retriever_error(self, error: Union[Exception, KeyboardInterrupt], **kwargs: Any) -> Any: pass
+

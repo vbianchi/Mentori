@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alert("Application critical error: State manager failed to load. Please check console and refresh.");
         return;
     }
-    StateManager.initStateManager(); // This should synchronously define window.StateManager if not already defined
+    StateManager.initStateManager(); 
     console.log("[Script.js] StateManager.initStateManager() called.");
 
     // DOM Element References
@@ -139,6 +139,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Error: Received invalid plan proposal from backend.", "status_message", {component_hint: "ERROR", isError: true });
                     }
                     break;
+                // --- START: New case for tool_result_for_chat (Phase 3) ---
+                case 'tool_result_for_chat':
+                    console.debug("[Script.js] Received 'tool_result_for_chat':", message.content);
+                    if (message.content && typeof message.content === 'object') {
+                        if (typeof displayToolOutputMessageUI === 'function') {
+                            displayToolOutputMessageUI(message.content);
+                        } else {
+                            console.error("[Script.js] displayToolOutputMessageUI function not found in chat_ui.js for 'tool_result_for_chat'.");
+                        }
+                    } else {
+                        console.warn("[Script.js] Invalid 'tool_result_for_chat' data received:", message.content);
+                    }
+                    break;
+                // --- END: New case for tool_result_for_chat (Phase 3) ---
                 case 'user': 
                     if (typeof addChatMessageToUI === 'function') addChatMessageToUI(message.content, message.type);
                     break;
@@ -179,31 +193,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     break;
                 case 'update_artifacts': 
-                    console.log(`[Script.js CRITICAL DEBUG] Received 'update_artifacts'. Agent running: ${StateManager.getIsAgentRunning()}`, message.content);
+                    // console.log(`[Script.js CRITICAL DEBUG] Received 'update_artifacts'. Agent running: ${StateManager.getIsAgentRunning()}`, message.content); // Reduced verbosity
                     if (Array.isArray(message.content)) { 
                         StateManager.setCurrentTaskArtifacts(message.content);
                         const newArtifacts = StateManager.getCurrentTaskArtifacts(); 
                         const newIndexToSet = newArtifacts.length > 0 ? 0 : -1;
                         StateManager.setCurrentArtifactIndex(newIndexToSet);
                         
-                        console.log(`[Script.js] Artifacts updated. New count: ${newArtifacts.length}. Displaying index: ${newIndexToSet}`);
-                        console.log(`[Script.js CRITICAL DEBUG] About to call updateArtifactDisplayUI. Agent running: ${StateManager.getIsAgentRunning()}`);
+                        // console.log(`[Script.js] Artifacts updated. New count: ${newArtifacts.length}. Displaying index: ${newIndexToSet}`); // Reduced verbosity
+                        // console.log(`[Script.js CRITICAL DEBUG] About to call updateArtifactDisplayUI. Agent running: ${StateManager.getIsAgentRunning()}`); // Reduced verbosity
                         if(typeof updateArtifactDisplayUI === 'function') { 
                             updateArtifactDisplayUI(newArtifacts, StateManager.getCurrentArtifactIndex()); 
                         } 
                     } 
                     break;
                 case 'trigger_artifact_refresh': 
-                    console.log(`[Script.js CRITICAL DEBUG] Received 'trigger_artifact_refresh' for taskId: ${message.content?.taskId}. Current task: ${StateManager.getCurrentTaskId()}. Agent running: ${StateManager.getIsAgentRunning()}`);
+                    // console.log(`[Script.js CRITICAL DEBUG] Received 'trigger_artifact_refresh' for taskId: ${message.content?.taskId}. Current task: ${StateManager.getCurrentTaskId()}. Agent running: ${StateManager.getIsAgentRunning()}`); // Reduced verbosity
                     const taskIdToRefresh = message.content?.taskId;
                     if (taskIdToRefresh && taskIdToRefresh === StateManager.getCurrentTaskId()) { 
                         if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM_EVENT] File event detected for task ${taskIdToRefresh}, requesting artifact list update...`, log_source: "SYSTEM_EVENT"});
                         if (typeof sendWsMessage === 'function') {
-                            console.log(`[Script.js CRITICAL DEBUG] Conditions met. Sending 'get_artifacts_for_task' for task ${StateManager.getCurrentTaskId()}`);
+                            // console.log(`[Script.js CRITICAL DEBUG] Conditions met. Sending 'get_artifacts_for_task' for task ${StateManager.getCurrentTaskId()}`); // Reduced verbosity
                             sendWsMessage('get_artifacts_for_task', { taskId: StateManager.getCurrentTaskId() });
                         }
                     } else {
-                        console.log(`[Script.js CRITICAL DEBUG] Conditions NOT met for sending 'get_artifacts_for_task'. taskIdToRefresh: ${taskIdToRefresh}, currentTaskId: ${StateManager.getCurrentTaskId()}`);
+                        // console.log(`[Script.js CRITICAL DEBUG] Conditions NOT met for sending 'get_artifacts_for_task'. taskIdToRefresh: ${taskIdToRefresh}, currentTaskId: ${StateManager.getCurrentTaskId()}`); // Reduced verbosity
                     }
                     break;
                 case 'available_models': 
@@ -238,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } 
     }
     function handleTokenUsageUpdate(lastCallUsage = null) { 
-        console.log("[Script.js] handleTokenUsageUpdate called with:", JSON.stringify(lastCallUsage)); 
+        // console.log("[Script.js] handleTokenUsageUpdate called with:", JSON.stringify(lastCallUsage)); // Reduced verbosity
         StateManager.updateCurrentTaskTotalTokens(lastCallUsage); 
         if (typeof updateTokenDisplayUI === 'function') { 
             updateTokenDisplayUI(lastCallUsage, StateManager.getCurrentTaskTotalTokens()); 
@@ -402,7 +416,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof initChatUI === 'function') { initChatUI( { chatMessagesContainer: chatMessagesContainer, agentThinkingStatusEl: agentThinkingStatusElement, chatTextareaEl: chatTextarea, chatSendButtonEl: chatSendButton }, { onSendMessage: handleSendMessageFromUI, onThinkingStatusClick: handleThinkingStatusClick }); }
     if (typeof initMonitorUI === 'function') { initMonitorUI( { monitorLogArea: monitorLogAreaElement, statusDot: statusDotElement, monitorStatusText: monitorStatusTextElement, stopButton: stopButtonElement }, { onStopAgent: handleStopAgentRequest }); }
     
-    // <<< START MODIFICATION: Debugging StateManager before initArtifactUI call >>>
     if (typeof initArtifactUI === 'function') { 
         console.log("[Script.js DEBUG] Before initArtifactUI: StateManager type:", typeof StateManager);
         if (StateManager) {
@@ -418,14 +431,11 @@ document.addEventListener('DOMContentLoaded', () => {
             { onNavigate: handleArtifactNavigation }
         ); 
         
-        // This is the line that was causing the error (around original line 406)
         if (typeof updateArtifactDisplayUI === 'function') { 
-            // Add another check right before the call
             if (StateManager && typeof StateManager.getCurrentTaskArtifacts === 'function' && typeof StateManager.getCurrentArtifactIndex === 'function') {
                 updateArtifactDisplayUI(StateManager.getCurrentTaskArtifacts(), StateManager.getCurrentArtifactIndex()); 
             } else {
                 console.error("[Script.js CRITICAL ERROR] StateManager or its methods are still not available right before calling updateArtifactDisplayUI.", StateManager);
-                // Fallback or error display for artifact UI
                 if (typeof clearArtifactDisplayUI === 'function') clearArtifactDisplayUI();
                 if (monitorArtifactArea && artifactNav) {
                     const placeholder = document.createElement('div');
@@ -436,7 +446,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } 
     }
-    // <<< END MODIFICATION >>>
 
     if (typeof initLlmSelectorsUI === 'function') { initLlmSelectorsUI( { executorLlmSelect: executorLlmSelectElement, roleSelectors: roleSelectorsMetaForInit }, { onExecutorLlmChange: handleExecutorLlmChange, onRoleLlmChange: handleRoleLlmChange }); }
     if (typeof initTokenUsageUI === 'function') { 
@@ -449,3 +458,4 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof connectWebSocket === 'function') { if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: "[SYSTEM_CONNECTION] Attempting to connect to backend...", log_source: "SYSTEM_CONNECTION"}); updateGlobalMonitorStatus('disconnected', 'Connecting...'); connectWebSocket(handleWsOpen, handleWsClose, handleWsError);
     } else { console.error("connectWebSocket function not found."); if (typeof addChatMessageToUI === 'function') addChatMessageToUI("ERROR: WebSocket manager not loaded.", "status_message", {component_hint: "ERROR", isError: true}); updateGlobalMonitorStatus('error', 'Initialization Error'); }
 });
+

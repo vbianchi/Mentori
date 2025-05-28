@@ -248,6 +248,99 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     color: inherit;
 }
 
+/* --- START: New Styles for Tool Output Messages (Phase 3) --- */
+.message-agent-tool-output {
+    margin-bottom: 5px;
+    padding-left: 10px; 
+    border-left-width: 3px;
+    border-left-style: solid;
+    /* The specific border color will be applied by a class like .agent-line-tool */
+}
+
+.tool-output-label {
+    display: block;
+    font-size: 0.9em;
+    color: var(--text-color); 
+    padding-left: 10px;
+    margin-bottom: 2px;
+}
+.tool-output-label strong {
+    color: var(--agent-line-tool-color); /* Make tool name stand out */
+}
+.tool-output-label em {
+    color: var(--text-color-muted);
+    font-size: 0.9em;
+}
+
+.tool-output-content-box {
+    background-color: var(--terminal-bg); /* Same as thoughts */
+    color: var(--terminal-text);
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-top: 2px;
+    font-size: 0.9em;
+    white-space: pre-wrap; 
+    word-wrap: break-word;
+    margin-left: 10px; 
+    border: 1px solid var(--pre-border);
+    overflow-x: auto; /* Allow horizontal scroll for very long lines in pre */
+}
+.tool-output-content-box pre { /* Ensure pre within tool output is styled */
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    border: none;
+    color: inherit;
+    font-family: var(--monospace-font);
+}
+.tool-output-content-box code { /* Ensure code within tool output is styled */
+    background-color: var(--panel-bg-lighter); /* Slightly different for inline code in tool output */
+    color: var(--text-color);
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+}
+.tool-output-content-box pre code { /* Reset for code within pre */
+    background: none;
+    padding: 0;
+}
+
+
+.tool-output-preview {
+    /* Styles for the preview text if needed, but mostly inherits from content-box */
+    /* Could add max-height and overflow:hidden if strictly controlling by CSS */
+}
+
+.tool-output-full {
+    display: none; /* Initially hidden */
+}
+
+.tool-output-expand-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-color-muted);
+    padding: 3px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+    margin-top: 8px; /* Space after the content box */
+    margin-left: 10px; /* Align with content box */
+    transition: all 0.2s ease;
+}
+.tool-output-expand-btn:hover {
+    background-color: var(--panel-bg-lightest);
+    color: var(--text-color);
+}
+
+.tool-output-artifact-link {
+    font-size: 0.8em;
+    font-style: italic;
+    color: var(--text-color-muted);
+    margin-top: 5px;
+    margin-left: 10px; /* Align with content box */
+    padding-left: 10px;
+}
+/* --- END: New Styles for Tool Output Messages (Phase 3) --- */
+
 
 #agent-thinking-status {
     margin-top: 8px; 
@@ -416,7 +509,6 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .upload-button:hover:not(:disabled) { background-color: var(--panel-bg-lightest); color: var(--text-color); border-color: var(--text-color-muted); }
 .upload-button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* <<< START MODIFICATION - Token Usage Area Styles >>> */
 .token-usage-area { 
     padding: 0; 
     border-top: 1px solid var(--border-color); 
@@ -425,38 +517,34 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     font-size: 0.8em; 
     color: var(--text-color-muted); 
 }
-
 .token-usage-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 6px 15px; /* Reduced padding a bit */
+    padding: 6px 15px; 
     cursor: pointer;
-    border-bottom: 1px solid transparent; /* Only show border if details are open */
+    border-bottom: 1px solid transparent; 
     transition: background-color 0.2s ease;
 }
 .token-usage-header:hover {
     background-color: var(--panel-bg-lighter);
 }
-
 .token-usage-area .token-label { 
     font-weight: 500; 
     color: var(--text-color-darker); 
     margin-right: 5px;
 }
-
 #task-total-tokens-overall {
     font-weight: bold;
     color: var(--text-color); 
-    margin-right: 5px; /* Space before expand button */
+    margin-right: 5px; 
 }
-
 .token-expand-btn {
     background: none;
     border: none;
     color: var(--text-color-muted);
     cursor: pointer;
-    font-size: 0.9em; /* Slightly smaller */
+    font-size: 0.9em; 
     padding: 2px 4px;
     margin-left: auto; 
     border-radius: 3px;
@@ -466,7 +554,6 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     color: var(--text-color);
     background-color: var(--panel-bg-lightest);
 }
-
 .token-usage-details {
     padding: 8px 15px 8px 15px; 
     border-top: 1px solid var(--border-color); 
@@ -477,60 +564,54 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     white-space: nowrap; 
     overflow: hidden; 
     text-overflow: ellipsis; 
-    font-size: 0.95em; /* Slightly larger for details */
+    font-size: 0.95em; 
 }
-
 .role-token-breakdown {
     margin-top: 6px;
     padding-top: 6px;
     border-top: 1px dashed var(--panel-bg-lighter); 
 }
-
-.role-token-entry { /* Each <p> tag for a role */
+.role-token-entry { 
     display: flex;
-    flex-direction: column; /* Stack label and values */
-    margin-bottom: 4px !important; /* Override general p margin if needed */
+    flex-direction: column; 
+    margin-bottom: 4px !important; 
     padding-bottom: 2px;
-    border-bottom: 1px solid var(--panel-bg-lighter); /* Separator for each role */
+    border-bottom: 1px solid var(--panel-bg-lighter); 
 }
 .role-token-entry:last-child {
     border-bottom: none;
     margin-bottom: 0 !important;
 }
-
 .token-label-role { 
     font-weight: bold; 
     color: var(--text-color-muted);
     margin-right: 5px;
-    display: block; /* Make it take full width initially */
+    display: block; 
     font-size: 0.9em;
     margin-bottom: 2px;
 }
-
 .role-token-values {
-    display: grid; /* Use grid for table-like alignment */
-    grid-template-columns: auto 1fr; /* Label column, value column */
-    gap: 0px 8px; /* Row gap, column gap */
-    padding-left: 10px; /* Indent the values slightly */
+    display: grid; 
+    grid-template-columns: auto 1fr; 
+    gap: 0px 8px; 
+    padding-left: 10px; 
     font-size: 0.9em;
 }
-
 .token-value-item {
-    display: contents; /* Allows children to participate in the grid */
+    display: contents; 
 }
 .token-value-item .token-sublabel {
     color: var(--text-color-darker);
     text-align: right;
     padding-right: 5px;
 }
-.token-value-item:not(.total) span:not(.token-sublabel) { /* Value for In/Out */
+.token-value-item:not(.total) span:not(.token-sublabel) { 
     color: var(--text-color);
     text-align: left;
 }
-.token-value-item.total span:not(.token-sublabel) { /* Value for Total */
+.token-value-item.total span:not(.token-sublabel) { 
     color: var(--text-color);
     font-weight: bold;
     text-align: left;
 }
-/* <<< END MODIFICATION >>> */
 
