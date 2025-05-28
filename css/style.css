@@ -416,9 +416,9 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 .upload-button:hover:not(:disabled) { background-color: var(--panel-bg-lightest); color: var(--text-color); border-color: var(--text-color-muted); }
 .upload-button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* Token Usage Area - Original and New Styles */
+/* <<< START MODIFICATION - Token Usage Area Styles >>> */
 .token-usage-area { 
-    padding: 0; /* Remove padding from main area, apply to children */
+    padding: 0; 
     border-top: 1px solid var(--border-color); 
     background-color: var(--panel-bg); 
     flex-shrink: 0; 
@@ -430,15 +430,16 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 15px; /* Padding for the header line */
-    cursor: pointer; /* Make the whole header clickable to toggle */
-    border-bottom: 1px solid transparent; /* For spacing, or remove if not needed */
+    padding: 6px 15px; /* Reduced padding a bit */
+    cursor: pointer;
+    border-bottom: 1px solid transparent; /* Only show border if details are open */
+    transition: background-color 0.2s ease;
 }
 .token-usage-header:hover {
     background-color: var(--panel-bg-lighter);
 }
 
-.token-usage-area .token-label { /* General label style */
+.token-usage-area .token-label { 
     font-weight: 500; 
     color: var(--text-color-darker); 
     margin-right: 5px;
@@ -446,7 +447,8 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
 
 #task-total-tokens-overall {
     font-weight: bold;
-    color: var(--text-color); /* Make total more prominent */
+    color: var(--text-color); 
+    margin-right: 5px; /* Space before expand button */
 }
 
 .token-expand-btn {
@@ -454,40 +456,81 @@ html, body { height: 100%; font-family: var(--font-family); background-color: va
     border: none;
     color: var(--text-color-muted);
     cursor: pointer;
-    font-size: 1em; /* Adjust size as needed */
-    padding: 0 5px;
-    margin-left: auto; /* Push to the right */
+    font-size: 0.9em; /* Slightly smaller */
+    padding: 2px 4px;
+    margin-left: auto; 
+    border-radius: 3px;
+    line-height: 1;
 }
 .token-expand-btn:hover {
     color: var(--text-color);
+    background-color: var(--panel-bg-lightest);
 }
 
 .token-usage-details {
-    padding: 0px 15px 8px 15px; /* Padding for the details section */
-    border-top: 1px solid var(--border-color); /* Separator line when expanded */
-    background-color: var(--panel-bg); /* Same as area or slightly different if desired */
+    padding: 8px 15px 8px 15px; 
+    border-top: 1px solid var(--border-color); 
+    background-color: var(--panel-bg); 
 }
 .token-usage-details p { 
-    margin: 4px 0; /* Spacing for Last Call and role items */
+    margin: 3px 0; 
     white-space: nowrap; 
     overflow: hidden; 
     text-overflow: ellipsis; 
+    font-size: 0.95em; /* Slightly larger for details */
 }
 
 .role-token-breakdown {
-    margin-top: 5px;
-    padding-top: 5px;
-    border-top: 1px dashed var(--panel-bg-lighter); /* Optional separator for roles */
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed var(--panel-bg-lighter); 
 }
-.role-token-breakdown p { /* Style for each role's token line */
-    font-size: 0.95em; /* Slightly smaller or same as parent */
+
+.role-token-entry { /* Each <p> tag for a role */
+    display: flex;
+    flex-direction: column; /* Stack label and values */
+    margin-bottom: 4px !important; /* Override general p margin if needed */
+    padding-bottom: 2px;
+    border-bottom: 1px solid var(--panel-bg-lighter); /* Separator for each role */
 }
-.token-label-role { /* Specific label for roles if different styling needed */
-    font-weight: normal; /* Or keep bold if preferred */
+.role-token-entry:last-child {
+    border-bottom: none;
+    margin-bottom: 0 !important;
+}
+
+.token-label-role { 
+    font-weight: bold; 
     color: var(--text-color-muted);
-    margin-right: 3px;
+    margin-right: 5px;
+    display: block; /* Make it take full width initially */
+    font-size: 0.9em;
+    margin-bottom: 2px;
 }
-.token-value-role { /* For the actual token values of a role */
+
+.role-token-values {
+    display: grid; /* Use grid for table-like alignment */
+    grid-template-columns: auto 1fr; /* Label column, value column */
+    gap: 0px 8px; /* Row gap, column gap */
+    padding-left: 10px; /* Indent the values slightly */
+    font-size: 0.9em;
+}
+
+.token-value-item {
+    display: contents; /* Allows children to participate in the grid */
+}
+.token-value-item .token-sublabel {
+    color: var(--text-color-darker);
+    text-align: right;
+    padding-right: 5px;
+}
+.token-value-item:not(.total) span:not(.token-sublabel) { /* Value for In/Out */
     color: var(--text-color);
+    text-align: left;
 }
+.token-value-item.total span:not(.token-sublabel) { /* Value for Total */
+    color: var(--text-color);
+    font-weight: bold;
+    text-align: left;
+}
+/* <<< END MODIFICATION >>> */
 
