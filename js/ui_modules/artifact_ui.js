@@ -13,8 +13,9 @@ let artifactPrevBtnElement;
 let artifactNextBtnElement;
 let artifactCounterElement;
 
-let isFetchingArtifactContentInternal = false;
-let artifactContentFetchUrlInternal = null;
+// --- MODIFICATION: Use an AbortController for fetch requests ---
+let currentFetchController = null; 
+// --- END MODIFICATION ---
 
 let onArtifactNavigationCallback = (direction) => console.warn("[ArtifactUI] onArtifactNavigationCallback not set or not overridden by script.js. Direction:", direction);
 
@@ -43,7 +44,7 @@ function initArtifactUI(elements, callbacks) {
     artifactPrevBtnElement.addEventListener('click', () => {
         console.log("[ArtifactUI] Prev button clicked. Attempting to call onArtifactNavigationCallback('prev').");
         if (typeof onArtifactNavigationCallback === 'function') {
-            onArtifactNavigationCallback("prev"); 
+            onArtifactNavigationCallback("prev");
         } else {
             console.error("[ArtifactUI] Prev button: onArtifactNavigationCallback is not a function!");
         }
@@ -67,6 +68,14 @@ async function updateArtifactDisplayUI(artifactsToShow, activeIndex) {
     }
     console.log(`[ArtifactUI] updateArtifactDisplayUI called. Index: ${activeIndex}, Artifacts Count: ${artifactsToShow.length}`, artifactsToShow[activeIndex] || "No active artifact");
 
+    // --- MODIFICATION: Abort any ongoing fetch if it's for a different artifact ---
+    if (currentFetchController) {
+        console.log("[ArtifactUI] Aborting previous fetch operation.");
+        currentFetchController.abort();
+        currentFetchController = null;
+    }
+    // --- END MODIFICATION ---
+
     const childrenToRemove = Array.from(monitorArtifactAreaElement.children).filter(child => child !== artifactNavElement);
     childrenToRemove.forEach(child => monitorArtifactAreaElement.removeChild(child));
 
@@ -77,7 +86,6 @@ async function updateArtifactDisplayUI(artifactsToShow, activeIndex) {
         placeholder.textContent = 'No artifacts generated yet.';
         monitorArtifactAreaElement.insertBefore(placeholder, artifactNavElement);
         artifactNavElement.style.display = 'none';
-        artifactContentFetchUrlInternal = null;
         return;
     }
 
@@ -87,7 +95,6 @@ async function updateArtifactDisplayUI(artifactsToShow, activeIndex) {
         const errorDiv = Object.assign(document.createElement('div'), { className: 'artifact-error', textContent: 'Error displaying artifact: Invalid data.' });
         monitorArtifactAreaElement.insertBefore(errorDiv, artifactNavElement);
         artifactNavElement.style.display = 'none';
-        artifactContentFetchUrlInternal = null;
         return;
     }
     console.log(`[ArtifactUI] Displaying artifact: ${artifact.filename}, Type: ${artifact.type}, URL: ${artifact.url}`);
@@ -98,16 +105,20 @@ async function updateArtifactDisplayUI(artifactsToShow, activeIndex) {
     monitorArtifactAreaElement.insertBefore(filenameDiv, artifactNavElement);
 
     if (artifact.type === 'image') {
-        artifactContentFetchUrlInternal = null;
         const imgElement = document.createElement('img');
         imgElement.src = artifact.url;
         imgElement.alt = `Generated image: ${artifact.filename}`;
         imgElement.title = `Generated image: ${artifact.filename}`;
         imgElement.onerror = () => {
             console.error(`[ArtifactUI] Error loading image from URL: ${artifact.url}`);
-            imgElement.remove();
+            imgElement.remove(); // Remove the broken image element
             const errorDiv = Object.assign(document.createElement('div'), { className: 'artifact-error', textContent: `Error loading image: ${artifact.filename}` });
-            monitorArtifactAreaElement.insertBefore(errorDiv, artifactNavElement);
+            // Ensure errorDiv is inserted before artifactNavElement if filenameDiv was also removed or not present
+            if (monitorArtifactAreaElement.contains(filenameDiv)) {
+                 monitorArtifactAreaElement.insertBefore(errorDiv, artifactNavElement);
+            } else {
+                 monitorArtifactAreaElement.insertBefore(errorDiv, monitorArtifactAreaElement.firstChild); // Fallback
+            }
         };
         monitorArtifactAreaElement.insertBefore(imgElement, artifactNavElement);
     } else if (artifact.type === 'text' || artifact.type === 'pdf') {
@@ -115,7 +126,6 @@ async function updateArtifactDisplayUI(artifactsToShow, activeIndex) {
         monitorArtifactAreaElement.insertBefore(preElement, artifactNavElement);
 
         if (artifact.type === 'pdf') {
-            artifactContentFetchUrlInternal = null;
             preElement.innerHTML = `PDF File: ${artifact.filename.replace(/</g, "&lt;").replace(/>/g, "&gt;")}`;
             const pdfLink = document.createElement('a');
             pdfLink.href = artifact.url;
@@ -124,47 +134,64 @@ async function updateArtifactDisplayUI(artifactsToShow, activeIndex) {
             pdfLink.style.display = "block";
             pdfLink.style.marginTop = "5px";
             preElement.appendChild(pdfLink);
-        } else { 
-            if (isFetchingArtifactContentInternal && artifactContentFetchUrlInternal === artifact.url) {
-                preElement.textContent = 'Loading (previous fetch in progress)...';
-            } else {
-                isFetchingArtifactContentInternal = true;
-                artifactContentFetchUrlInternal = artifact.url;
-                preElement.textContent = 'Loading text file...';
-                try {
-                    console.log(`[ArtifactUI] Fetching text artifact: ${artifact.url}`);
-                    const response = await fetch(artifact.url, {
-                        cache: 'reload',
-                        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache', 'Expires': '0' }
-                    });
-                    if (!response.ok) {
-                        console.warn(`[ArtifactUI] Text artifact fetch for ${artifact.filename} not OK. Status: ${response.status} ${response.statusText}`);
-                        throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`);
+        } else { // Text file
+            preElement.textContent = 'Loading text file...';
+            // --- MODIFICATION: Use AbortController for text file fetch ---
+            currentFetchController = new AbortController();
+            const signal = currentFetchController.signal;
+            // --- END MODIFICATION ---
+            try {
+                console.log(`[ArtifactUI] Fetching text artifact: ${artifact.url}`);
+                const response = await fetch(artifact.url, {
+                    cache: 'reload', // Aggressive cache busting
+                    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache', 'Expires': '0' },
+                    signal // Pass the signal to the fetch request
+                });
+
+                if (!response.ok) {
+                    console.warn(`[ArtifactUI] Text artifact fetch for ${artifact.filename} not OK. Status: ${response.status} ${response.statusText}`);
+                    throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`);
+                }
+                const textContent = await response.text();
+                
+                // Check if the artifact being displayed is still the one we fetched for
+                // This check is important if multiple updates happen quickly
+                const currentDisplayedArtifact = artifactsToShow[activeIndex];
+                if (currentDisplayedArtifact && currentDisplayedArtifact.url === artifact.url) {
+                    preElement.textContent = textContent;
+                    console.log(`[ArtifactUI] Successfully fetched and displayed ${artifact.filename}`);
+                } else {
+                    console.log(`[ArtifactUI] Artifact changed (during fetch) from "${artifact.filename}" to "${currentDisplayedArtifact?.filename}". Not updating stale content.`);
+                    // If it changed, the preElement might already be for the new artifact, or it might be removed soon.
+                    // If preElement still belongs to the old artifact, and it's still in the DOM, clear it.
+                    if (preElement.parentNode === monitorArtifactAreaElement && preElement.textContent.startsWith('Loading text file...')) {
+                         preElement.textContent = 'Loading interrupted or artifact changed.';
                     }
-                    const textContent = await response.text();
-                    
-                    // This check needs to use the parameters passed to *this specific call* of updateArtifactDisplayUI
-                    if (artifactsToShow[activeIndex]?.url === artifact.url) {
-                        preElement.textContent = textContent;
-                        console.log(`[ArtifactUI] Successfully fetched and displayed ${artifact.filename}`);
-                    } else {
-                        console.log(`[ArtifactUI] Artifact changed (during fetch) from "${artifact.filename}" to "${artifactsToShow[activeIndex]?.filename}". Not updating stale content.`);
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.log(`[ArtifactUI] Fetch aborted for ${artifact.filename}`);
+                    // If the preElement is still for this aborted fetch, update its text
+                    if (preElement.textContent.startsWith('Loading text file...')) {
+                        preElement.textContent = `Loading aborted for ${artifact.filename}.`;
                     }
-                } catch (error) {
+                } else {
                     console.error(`[ArtifactUI] Error fetching text artifact ${artifact.filename}:`, error);
-                    if (artifactsToShow[activeIndex]?.url === artifact.url) { 
+                    const currentDisplayedArtifact = artifactsToShow[activeIndex];
+                     if (currentDisplayedArtifact && currentDisplayedArtifact.url === artifact.url) {
                         preElement.textContent = `Error loading file: ${artifact.filename}\n${error.message}`;
                         preElement.classList.add('artifact-error');
                     }
-                } finally {
-                    if (artifactContentFetchUrlInternal === artifact.url) {
-                        isFetchingArtifactContentInternal = false;
-                    }
                 }
+            } finally {
+                // --- MODIFICATION: Clear controller only if this was the active fetch ---
+                if (signal === currentFetchController?.signal) { // Check if this controller is still the active one
+                    currentFetchController = null;
+                }
+                // --- END MODIFICATION ---
             }
         }
     } else {
-        artifactContentFetchUrlInternal = null;
         console.warn(`[ArtifactUI] Unsupported artifact type: ${artifact.type} for file ${artifact.filename}`);
         const unknownDiv = Object.assign(document.createElement('div'), { className: 'artifact-placeholder', textContent: `Unsupported artifact type: ${artifact.filename}` });
         monitorArtifactAreaElement.insertBefore(unknownDiv, artifactNavElement);
@@ -186,6 +213,15 @@ async function updateArtifactDisplayUI(artifactsToShow, activeIndex) {
 
 function clearArtifactDisplayUI() {
     if (!monitorArtifactAreaElement || !artifactNavElement) return;
+
+    // --- MODIFICATION: Abort any ongoing fetch when clearing display ---
+    if (currentFetchController) {
+        console.log("[ArtifactUI] Aborting ongoing fetch during clearArtifactDisplayUI.");
+        currentFetchController.abort();
+        currentFetchController = null;
+    }
+    // --- END MODIFICATION ---
+
     const childrenToRemove = Array.from(monitorArtifactAreaElement.children).filter(child => child !== artifactNavElement);
     childrenToRemove.forEach(child => monitorArtifactAreaElement.removeChild(child));
 
@@ -195,7 +231,5 @@ function clearArtifactDisplayUI() {
     monitorArtifactAreaElement.insertBefore(placeholder, artifactNavElement);
     artifactNavElement.style.display = 'none';
 
-    isFetchingArtifactContentInternal = false;
-    artifactContentFetchUrlInternal = null;
     console.log("[ArtifactUI] Artifact display cleared.");
 }
