@@ -198,7 +198,7 @@ function getAvailableModels() { return JSON.parse(JSON.stringify(_state.availabl
 function getCurrentExecutorLlmId() { return _state.currentExecutorLlmId; }
 function getSessionRoleLlmOverrides() { return JSON.parse(JSON.stringify(_state.sessionRoleLlmOverrides)); }
 function getIsAgentRunning() { return _state.isAgentRunning; }
-function getCurrentTaskArtifacts() { return [..._state.currentTaskArtifacts]; }
+function getCurrentTaskArtifacts() { return [..._state.currentTaskArtifacts]; } // Exposed function
 function getCurrentArtifactIndex() { return _state.currentArtifactIndex; }
 function getCurrentTaskTotalTokens() { return JSON.parse(JSON.stringify(_state.currentTaskTotalTokens)); }
 function getCurrentDisplayedPlan() { return _state.currentDisplayedPlan ? JSON.parse(JSON.stringify(_state.currentDisplayedPlan)) : null; }
@@ -310,6 +310,7 @@ function setRoleLlmOverride(role, id) {
 }
 
 function setIsAgentRunning(isRunning) {
+    console.log(`[StateManager CRITICAL DEBUG] setIsAgentRunning called. Current: ${_state.isAgentRunning}, New: ${!!isRunning}`);
     _state.isAgentRunning = !!isRunning;
 }
 
@@ -330,41 +331,33 @@ function setCurrentArtifactIndex(index) {
     }
 }
 
-// <<< START MODIFICATION - updateCurrentTaskTotalTokens - Key Change Area >>>
 function updateCurrentTaskTotalTokens(lastCallUsage) {
-    // lastCallUsage = { model_name, role_hint, input_tokens, output_tokens, total_tokens, source }
     console.log("[StateManager] updateCurrentTaskTotalTokens (before update):", JSON.parse(JSON.stringify(_state.currentTaskTotalTokens)), "with lastCall:", JSON.stringify(lastCallUsage));
 
-    if (lastCallUsage && _state.currentTaskId) { // Ensure there's a current task
-        const role = lastCallUsage.role_hint || 'LLM_CORE'; // Default to LLM_CORE if no specific role
-        const input = parseInt(lastCallUsage.input_tokens, 10) || 0; // Ensure numbers
-        const output = parseInt(lastCallUsage.output_tokens, 10) || 0; // Ensure numbers
-        const total = parseInt(lastCallUsage.total_tokens, 10) || (input + output); // Ensure numbers
+    if (lastCallUsage && _state.currentTaskId) {
+        const role = lastCallUsage.role_hint || 'LLM_CORE';
+        const input = parseInt(lastCallUsage.input_tokens, 10) || 0;
+        const output = parseInt(lastCallUsage.output_tokens, 10) || 0;
+        const total = parseInt(lastCallUsage.total_tokens, 10) || (input + output);
 
-        // Ensure the overall object exists and has numeric properties
         if (!_state.currentTaskTotalTokens.overall || typeof _state.currentTaskTotalTokens.overall.input !== 'number') {
             _state.currentTaskTotalTokens.overall = { input: 0, output: 0, total: 0 };
         }
-        // Ensure the roles object exists
         if (!_state.currentTaskTotalTokens.roles) {
             _state.currentTaskTotalTokens.roles = {};
         }
-        // Ensure the specific role object exists and has numeric properties
         if (!_state.currentTaskTotalTokens.roles[role] || typeof _state.currentTaskTotalTokens.roles[role].input !== 'number') {
             _state.currentTaskTotalTokens.roles[role] = { input: 0, output: 0, total: 0 };
         }
 
-        // Update overall totals
         _state.currentTaskTotalTokens.overall.input += input;
         _state.currentTaskTotalTokens.overall.output += output;
         _state.currentTaskTotalTokens.overall.total += total;
 
-        // Update per-role totals
         _state.currentTaskTotalTokens.roles[role].input += input;
         _state.currentTaskTotalTokens.roles[role].output += output;
         _state.currentTaskTotalTokens.roles[role].total += total;
 
-        // Save the updated token usage for the current task
         _saveTokenUsageForTaskToLocalStorage(_state.currentTaskId, _state.currentTaskTotalTokens);
         console.log(`[StateManager] Tokens updated for role '${role}' and overall. New state:`, JSON.parse(JSON.stringify(_state.currentTaskTotalTokens)));
     } else if (!lastCallUsage) {
@@ -372,11 +365,8 @@ function updateCurrentTaskTotalTokens(lastCallUsage) {
     } else if (!_state.currentTaskId) {
         console.warn("[StateManager] updateCurrentTaskTotalTokens called but no current task ID is set. Token usage not saved to localStorage.");
     }
-    // No 'else' needed here, as we just log if no update is performed.
-    // The console.log at the end will show the state regardless.
     console.log("[StateManager] updateCurrentTaskTotalTokens (after update attempt):", JSON.parse(JSON.stringify(_state.currentTaskTotalTokens)));
 }
-// <<< END MODIFICATION >>>
 
 function resetCurrentTaskTotalTokens() {
     _state.currentTaskTotalTokens = {
@@ -408,7 +398,8 @@ window.StateManager = {
     getCurrentExecutorLlmId,
     getSessionRoleLlmOverrides,
     getIsAgentRunning,
-    getCurrentTaskArtifacts,
+    getCurrentTaskArtifacts, // <<< Make sure this is exposed
+    setCurrentTaskArtifacts,
     getCurrentArtifactIndex,
     getCurrentTaskTotalTokens,
     getCurrentDisplayedPlan,
@@ -422,7 +413,6 @@ window.StateManager = {
     setCurrentExecutorLlmId,
     setRoleLlmOverride,
     setIsAgentRunning,
-    setCurrentTaskArtifacts,
     setCurrentArtifactIndex,
     updateCurrentTaskTotalTokens,
     resetCurrentTaskTotalTokens,
