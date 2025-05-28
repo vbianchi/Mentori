@@ -14,7 +14,9 @@ from langchain_core.agents import AgentAction, AgentFinish
 from langchain_core.documents import Document
 
 # Project Imports
-from backend.config import settings
+from backend.config import settings # This should be one of the first project imports
+
+# DO NOT ADD: from backend.callbacks import ... (This would be a circular import)
 
 logger = logging.getLogger(__name__)
 # Keep DEBUG level for this module for now, can be removed after fix is confirmed
@@ -200,19 +202,20 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
                     output_tokens = usage_dict_from_llm_output.get('completion_tokens', usage_dict_from_llm_output.get('output_tokens'))
                     total_tokens = usage_dict_from_llm_output.get('total_tokens')
                     logger.debug(f"[{self.session_id}] on_llm_end: Tokens from llm_output.token_usage: In={input_tokens}, Out={output_tokens}, Total={total_tokens}")
-                elif 'usage_metadata' in llm_output_data and isinstance(llm_output_data['usage_metadata'], dict):
+                elif 'usage_metadata' in llm_output_data and isinstance(llm_output_data['usage_metadata'], dict): # Gemini specific in llm_output
                     usage_metadata_from_llm_output = llm_output_data['usage_metadata']
-                    input_tokens = usage_metadata_from_llm_output.get('prompt_token_count')
-                    output_tokens = usage_metadata_from_llm_output.get('candidates_token_count')
-                    total_tokens = usage_metadata_from_llm_output.get('total_token_count')
-                    logger.debug(f"[{self.session_id}] on_llm_end: Tokens from llm_output.usage_metadata (Gemini): In={input_tokens}, Out={output_tokens}, Total={total_tokens}")
-                elif 'eval_count' in llm_output_data: 
+                    # Check for standard token keys first if they appear at this level for Gemini
+                    input_tokens = usage_metadata_from_llm_output.get('input_tokens', usage_metadata_from_llm_output.get('prompt_token_count'))
+                    output_tokens = usage_metadata_from_llm_output.get('output_tokens', usage_metadata_from_llm_output.get('candidates_token_count'))
+                    total_tokens = usage_metadata_from_llm_output.get('total_tokens', usage_metadata_from_llm_output.get('total_token_count'))
+                    logger.debug(f"[{self.session_id}] on_llm_end: Tokens from llm_output.usage_metadata (Gemini-style): In={input_tokens}, Out={output_tokens}, Total={total_tokens}")
+                elif 'eval_count' in llm_output_data: # Ollama specific in llm_output
                     output_tokens = llm_output_data.get('eval_count')
                     input_tokens = llm_output_data.get('prompt_eval_count') 
                     logger.debug(f"[{self.session_id}] on_llm_end: Tokens from llm_output (Ollama eval_count): In={input_tokens}, Out={output_tokens}")
 
             if (input_tokens is None or output_tokens is None) and response.generations:
-                logger.debug(f"[{self.session_id}] on_llm_end: Tokens not found in llm_output, trying response.generations.")
+                logger.debug(f"[{self.session_id}] on_llm_end: Tokens not found or incomplete in llm_output, trying response.generations.")
                 for gen_list in response.generations:
                     if not gen_list: continue
                     first_gen = gen_list[0]
@@ -229,21 +232,29 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
                                 model_name = first_gen.message.response_metadata.get('model_name', model_name)
                             logger.debug(f"[{self.session_id}] on_llm_end: Tokens from generations.message.usage_metadata (Gemini/ChatChunk): In={input_tokens}, Out={output_tokens}, Total={total_tokens}, Model={model_name}")
                             break 
-                    elif hasattr(first_gen, 'generation_info') and first_gen.generation_info:
+                    elif hasattr(first_gen, 'generation_info') and first_gen.generation_info: # Common for Ollama and others
                         gen_info = first_gen.generation_info
                         if isinstance(gen_info, dict):
                             model_name = gen_info.get('model', model_name) 
                             logger.debug(f"[{self.session_id}] on_llm_end: Processing generation_info. Model from gen_info: {model_name}")
-                            if 'token_usage' in gen_info and isinstance(gen_info['token_usage'], dict):
+                            if 'token_usage' in gen_info and isinstance(gen_info['token_usage'], dict): # Standard LangChain
                                 usage_dict_from_gen_info = gen_info['token_usage']
                                 input_tokens = usage_dict_from_gen_info.get('prompt_tokens', usage_dict_from_gen_info.get('input_tokens'))
                                 output_tokens = usage_dict_from_gen_info.get('completion_tokens', usage_dict_from_gen_info.get('output_tokens'))
                                 total_tokens = usage_dict_from_gen_info.get('total_tokens')
                                 logger.debug(f"[{self.session_id}] on_llm_end: Tokens from generation_info.token_usage: In={input_tokens}, Out={output_tokens}, Total={total_tokens}")
-                            elif 'eval_count' in gen_info: 
+                            elif 'eval_count' in gen_info: # Ollama specific in generation_info
                                 output_tokens = gen_info.get('eval_count')
                                 input_tokens = gen_info.get('prompt_eval_count')
                                 logger.debug(f"[{self.session_id}] on_llm_end: Tokens from generation_info (Ollama eval_count): In={input_tokens}, Out={output_tokens}")
+                            # <<< START MODIFICATION - Check for Gemini-like usage_metadata within generation_info >>>
+                            elif 'usage_metadata' in gen_info and isinstance(gen_info['usage_metadata'], dict): # Could be nested for some providers
+                                usage_metadata_nested = gen_info['usage_metadata']
+                                input_tokens = usage_metadata_nested.get('input_tokens', usage_metadata_nested.get('prompt_token_count'))
+                                output_tokens = usage_metadata_nested.get('output_tokens', usage_metadata_nested.get('candidates_token_count'))
+                                total_tokens = usage_metadata_nested.get('total_tokens', usage_metadata_nested.get('total_token_count'))
+                                logger.debug(f"[{self.session_id}] on_llm_end: Tokens from generation_info.usage_metadata (Nested Gemini-style): In={input_tokens}, Out={output_tokens}, Total={total_tokens}")
+                            # <<< END MODIFICATION >>>
                             break 
             
             input_tokens = int(input_tokens) if input_tokens is not None else 0
@@ -254,21 +265,19 @@ class WebSocketCallbackHandler(AsyncCallbackHandler):
             logger.debug(f"[{self.session_id}] on_llm_end: Final parsed tokens before sending: In={input_tokens}, Out={output_tokens}, Total={total_tokens}, Model={model_name}, Source={source_for_tokens}")
 
             if input_tokens > 0 or output_tokens > 0 or total_tokens > 0:
-                # <<< START MODIFICATION - Add role_hint to payload >>>
                 token_usage_payload = {
                     "model_name": str(model_name),
-                    "role_hint": self.current_agent_role_hint or LOG_SOURCE_LLM_CORE, # Added role_hint
+                    "role_hint": self.current_agent_role_hint or LOG_SOURCE_LLM_CORE,
                     "input_tokens": input_tokens,
                     "output_tokens": output_tokens,
                     "total_tokens": total_tokens,
                     "source": source_for_tokens
                 }
-                # <<< END MODIFICATION >>>
-                usage_str = f"Model: {model_name}, Role: {token_usage_payload['role_hint']}, Input: {input_tokens}, Output: {output_tokens}, Total: {total_tokens} (Source: {source_for_tokens})" # Updated log string
+                usage_str = f"Model: {model_name}, Role: {token_usage_payload['role_hint']}, Input: {input_tokens}, Output: {output_tokens}, Total: {total_tokens} (Source: {source_for_tokens})"
                 await self.send_ws_message("monitor_log", {"text": f"{log_prefix} [LLM Token Usage] {usage_str}", "log_source": f"{LOG_SOURCE_LLM_CORE}_TOKEN_USAGE"})
                 logger.info(f"[{self.session_id}] Sending 'llm_token_usage' message with payload: {token_usage_payload}")
                 await self.send_ws_message("llm_token_usage", token_usage_payload)
-                await self._save_message_to_db("llm_token_usage", token_usage_payload) # Also save the payload with role_hint
+                await self._save_message_to_db("llm_token_usage", token_usage_payload) 
             else:
                 logger.warning(f"[{self.session_id}] on_llm_end: No positive token counts found (In={input_tokens}, Out={output_tokens}, Total={total_tokens}). 'llm_token_usage' message will NOT be sent for role_hint: {self.current_agent_role_hint}.")
         except Exception as e:

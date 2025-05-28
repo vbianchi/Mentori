@@ -3,7 +3,7 @@ import logging
 from typing import List, Dict, Any, Tuple, Optional
 import json
 import re
-import traceback # Added for more detailed error logging
+import traceback 
 
 # LangChain Imports
 from langchain_core.tools import BaseTool
@@ -11,11 +11,17 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from langchain_core.pydantic_v1 import BaseModel, Field
+from langchain_core.runnables import RunnableConfig
+# <<< START MODIFICATION - Import BaseCallbackHandler type hint >>>
+from langchain_core.callbacks.base import BaseCallbackHandler
+# <<< END MODIFICATION >>>
+
 
 # Project Imports
 from backend.config import settings
 from backend.llm_setup import get_llm
 from backend.planner import PlanStep
+from backend.callbacks import LOG_SOURCE_CONTROLLER
 
 
 logger = logging.getLogger(__name__)
@@ -26,7 +32,6 @@ class ControllerOutput(BaseModel):
     confidence_score: float = Field(description="A score from 0.0 to 1.0 indicating the controller's confidence in this tool/input choice for the step. 1.0 is high confidence.")
     reasoning: str = Field(description="Brief explanation of why this tool/input was chosen or why no tool is needed.")
 
-# <<< --- START MODIFIED CODE --- >>>
 CONTROLLER_SYSTEM_PROMPT_TEMPLATE = """You are an expert "Controller" for a research agent.
 Your role is to analyze a single step from a pre-defined plan and decide the BEST action for the "Executor" (a ReAct agent) to take for that step.
 **Current Task Context:**
@@ -64,7 +69,6 @@ Output ONLY a JSON object adhering to this schema:
 Do not include any preamble or explanation outside the JSON object.
 If you determine an error or impossibility in achieving the step as described, set tool_name to "None", tool_input to a description of the problem, confidence_score to 0.0, and explain in reasoning.
 """
-# <<< --- END MODIFIED CODE --- >>>
 
 def escape_template_curly_braces(text: Optional[str]) -> str:
     """Escapes single curly braces to be literal in LangChain templates."""
@@ -79,7 +83,10 @@ async def validate_and_prepare_step_action(
     plan_step: PlanStep,
     available_tools: List[BaseTool],
     session_data_entry: Dict[str, Any],
-    previous_step_output: Optional[str] = None
+    previous_step_output: Optional[str] = None,
+    # <<< START MODIFICATION - Add callback_handler parameter >>>
+    callback_handler: Optional[BaseCallbackHandler] = None
+    # <<< END MODIFICATION >>>
 ) -> Tuple[Optional[str], Optional[str], str, float]:
     """
     Uses an LLM to validate the current plan step and determine the precise tool and input.
@@ -87,6 +94,12 @@ async def validate_and_prepare_step_action(
     logger.info(f"Controller: Validating plan step ID {plan_step.step_id}: '{plan_step.description[:100]}...' (Planner suggestion: {plan_step.tool_to_use})")
     if previous_step_output:
         logger.info(f"Controller: Received previous_step_output (first 100 chars): {previous_step_output[:100]}...")
+
+    # <<< START MODIFICATION - Prepare callbacks list >>>
+    callbacks_for_invoke: List[BaseCallbackHandler] = []
+    if callback_handler:
+        callbacks_for_invoke.append(callback_handler)
+    # <<< END MODIFICATION >>>
 
     controller_llm_id_override = session_data_entry.get("session_controller_llm_id")
     controller_provider = settings.controller_provider
@@ -107,7 +120,7 @@ async def validate_and_prepare_step_action(
             settings,
             provider=controller_provider,
             model_name=controller_model_name,
-            requested_for_role="Controller"
+            requested_for_role=LOG_SOURCE_CONTROLLER
         )
         logger.info(f"Controller: Using LLM {controller_provider}::{controller_model_name}")
     except Exception as e:
@@ -133,7 +146,7 @@ async def validate_and_prepare_step_action(
     ])
 
     raw_llm_output_chain = prompt | controller_llm | StrOutputParser()
-    controller_result_dict_raw = ""
+    controller_result_dict_raw = "" 
 
     escaped_original_user_query = escape_template_curly_braces(original_user_query)
     escaped_current_step_description = escape_template_curly_braces(plan_step.description)
@@ -160,17 +173,25 @@ async def validate_and_prepare_step_action(
         }
         logger.debug(f"Controller: Input dictionary for LLM (first 100 chars of each value): {debug_dict_str_repr}")
 
-        controller_result_dict_raw = await raw_llm_output_chain.ainvoke(input_dict_for_llm)
+        controller_result_dict_raw = await raw_llm_output_chain.ainvoke(
+            input_dict_for_llm,
+            # <<< START MODIFICATION - Pass callbacks and metadata in RunnableConfig >>>
+            config=RunnableConfig(
+                callbacks=callbacks_for_invoke,
+                metadata={"component_name": LOG_SOURCE_CONTROLLER}
+            )
+            # <<< END MODIFICATION >>>
+        )
         logger.debug(f"Controller: Raw LLM output string before stripping: '{controller_result_dict_raw}'")
 
         cleaned_json_string = controller_result_dict_raw.strip()
         if cleaned_json_string.startswith("```json"):
             cleaned_json_string = cleaned_json_string[len("```json"):].strip()
-        if cleaned_json_string.startswith("```"):
+        if cleaned_json_string.startswith("```"): 
             cleaned_json_string = cleaned_json_string[len("```"):].strip()
         if cleaned_json_string.endswith("```"):
             cleaned_json_string = cleaned_json_string[:-len("```")].strip()
-
+        
         logger.debug(f"Controller: Cleaned JSON string for parsing: '{cleaned_json_string}'")
         controller_result_dict = json.loads(cleaned_json_string)
 
@@ -180,9 +201,9 @@ async def validate_and_prepare_step_action(
         if parsed_tool_name == "None" or parsed_tool_name is None:
             if not isinstance(parsed_tool_input, (str, type(None))):
                 logger.warning(f"Controller: tool_name is 'None', but tool_input was type {type(parsed_tool_input)} ('{parsed_tool_input}'). Forcing to None for Pydantic.")
-                controller_result_dict["tool_input"] = None
-            elif parsed_tool_input == "None":
-                 controller_result_dict["tool_input"] = None
+                controller_result_dict["tool_input"] = None 
+            elif parsed_tool_input == "None": 
+                 controller_result_dict["tool_input"] = None 
         elif parsed_tool_name and parsed_tool_input is None :
             logger.warning(f"Controller: tool_name is '{parsed_tool_name}', but tool_input was None. This might be an issue for the tool. Proceeding.")
         elif parsed_tool_name and not isinstance(parsed_tool_input, str):
@@ -200,9 +221,7 @@ async def validate_and_prepare_step_action(
         reasoning = controller_output.reasoning
         confidence = controller_output.confidence_score
 
-        # <<< --- START NEW CODE (Log the exact tool_input decided by Controller LLM) --- >>>
         logger.info(f"Controller LLM decided: Tool='{tool_name}', Tool Input='{tool_input}', Confidence={confidence:.2f}")
-        # <<< --- END NEW CODE --- >>>
 
         logger.info(f"Controller validation complete for step {plan_step.step_id}. Tool: '{tool_name}', Input (summary): '{str(tool_input)[:100]}...', Confidence: {confidence:.2f}")
         return tool_name, tool_input, reasoning, confidence
@@ -214,6 +233,7 @@ async def validate_and_prepare_step_action(
         return None, None, f"Error in Controller: LLM output parsing failed (not valid JSON). Reasoning hint: {error_reasoning}", 0.0
     except Exception as e:
         tb_str = traceback.format_exc()
-        logger.error(f"Controller: Error during step validation or Pydantic parsing: {e}. Raw output was: {controller_result_dict_raw}\nTraceback:\n{tb_str}", exc_info=False)
+        logger.error(f"Controller: Error during step validation or Pydantic parsing: {e}. Raw output was: {controller_result_dict_raw}\nTraceback:\n{tb_str}", exc_info=False) 
         error_detail = f"Exception: {type(e).__name__} at line {e.__traceback__.tb_lineno if e.__traceback__ else 'N/A'}. Raw LLM output might have been: {str(controller_result_dict_raw)[:500]}..."
         return None, None, f"Error in Controller: {error_detail}", 0.0
+

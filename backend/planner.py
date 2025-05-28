@@ -1,13 +1,23 @@
+# backend/planner.py
 import logging
 from typing import List, Dict, Any, Tuple, Optional
 
-from backend.config import settings
-from backend.llm_setup import get_llm
+# LangChain Imports
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
-from langchain_core.pydantic_v1 import BaseModel, Field # Ensure Pydantic v1 for Langchain compatibility
+from langchain_core.pydantic_v1 import BaseModel, Field 
+# <<< START MODIFICATION - Import RunnableConfig and BaseCallbackHandler type hint >>>
+from langchain_core.runnables import RunnableConfig
+from langchain_core.callbacks.base import BaseCallbackHandler # For type hinting
+# <<< END MODIFICATION >>>
 import asyncio
+
+# Project Imports
+from backend.config import settings
+from backend.llm_setup import get_llm
+from backend.callbacks import LOG_SOURCE_PLANNER
+
 
 logger = logging.getLogger(__name__)
 
@@ -63,21 +73,30 @@ Do not include any preamble or explanation outside of the JSON object."""
 
 async def generate_plan(
     user_query: str,
-    available_tools_summary: str
+    available_tools_summary: str,
+    # <<< START MODIFICATION - Add callback_handler parameter >>>
+    callback_handler: Optional[BaseCallbackHandler] = None
+    # <<< END MODIFICATION >>>
 ) -> Tuple[Optional[str], Optional[List[Dict[str, Any]]]]:
     """
     Generates a multi-step plan based on the user query using an LLM.
-    Fetches its own LLM based on settings.
+    Fetches its own LLM based on settings and uses the provided callback_handler.
     """
     logger.info(f"Planner: Generating plan for user query: {user_query[:100]}...")
+
+    # <<< START MODIFICATION - Prepare callbacks list >>>
+    callbacks_for_invoke: List[BaseCallbackHandler] = []
+    if callback_handler:
+        callbacks_for_invoke.append(callback_handler)
+    # <<< END MODIFICATION >>>
 
     try:
         planner_llm: BaseChatModel = get_llm(
             settings,
             provider=settings.planner_provider,
             model_name=settings.planner_model_name,
-            requested_for_role="Planner"
-        ) # type: ignore
+            requested_for_role=LOG_SOURCE_PLANNER 
+        ) 
         logger.info(f"Planner: Using LLM {settings.planner_provider}::{settings.planner_model_name}")
     except Exception as e:
         logger.error(f"Planner: Failed to initialize LLM: {e}", exc_info=True)
@@ -95,12 +114,22 @@ async def generate_plan(
 
     try:
         logger.debug(f"Planner prompt input variables: {prompt_template.input_variables}")
-        # Pass user_query also for potential use in synthesis step instructions within the prompt
-        planned_result_dict = await chain.ainvoke({
-            "user_query": user_query, # Used in the prompt for synthesis step context
+        
+        invoke_payload = {
+            "user_query": user_query, 
             "available_tools_summary": available_tools_summary,
             "format_instructions": format_instructions
-        })
+        }
+        
+        planned_result_dict = await chain.ainvoke(
+            invoke_payload,
+            # <<< START MODIFICATION - Pass callbacks and metadata in RunnableConfig >>>
+            config=RunnableConfig(
+                callbacks=callbacks_for_invoke,
+                metadata={"component_name": LOG_SOURCE_PLANNER}
+            )
+            # <<< END MODIFICATION >>>
+        )
 
         if isinstance(planned_result_dict, AgentPlan):
             agent_plan = planned_result_dict
@@ -108,14 +137,17 @@ async def generate_plan(
             agent_plan = AgentPlan(**planned_result_dict)
         else:
             logger.error(f"Planner LLM call returned an unexpected type: {type(planned_result_dict)}. Content: {planned_result_dict}")
-            # Attempt to get raw output if parsing failed
             try:
                 raw_output_chain = prompt_template | planner_llm | StrOutputParser()
-                raw_output = await raw_output_chain.ainvoke({
-                    "user_query": user_query,
-                    "available_tools_summary": available_tools_summary,
-                    "format_instructions": format_instructions
-                })
+                raw_output = await raw_output_chain.ainvoke(
+                    invoke_payload,
+                    # <<< START MODIFICATION - Pass callbacks and metadata to error handler chain >>>
+                    config=RunnableConfig(
+                        callbacks=callbacks_for_invoke,
+                        metadata={"component_name": LOG_SOURCE_PLANNER + "_ERROR_HANDLER"}
+                    )
+                    # <<< END MODIFICATION >>>
+                )
                 logger.error(f"Planner: Raw LLM output on parsing error: {raw_output}")
             except Exception as raw_e:
                 logger.error(f"Planner: Failed to get raw LLM output on parsing error: {raw_e}")
@@ -136,12 +168,21 @@ async def generate_plan(
     except Exception as e:
         logger.error(f"Planner: Error during plan generation: {e}", exc_info=True)
         try:
-            error_chain = prompt_template | planner_llm | StrOutputParser() # type: ignore
-            raw_output = await error_chain.ainvoke({
+            error_chain = prompt_template | planner_llm | StrOutputParser() 
+            invoke_payload_for_error = { # Re-define payload for clarity in error case
                 "user_query": user_query,
                 "available_tools_summary": available_tools_summary,
                 "format_instructions": format_instructions
-            })
+            }
+            raw_output = await error_chain.ainvoke(
+                invoke_payload_for_error,
+                # <<< START MODIFICATION - Pass callbacks and metadata to general error handler chain >>>
+                config=RunnableConfig(
+                    callbacks=callbacks_for_invoke,
+                    metadata={"component_name": LOG_SOURCE_PLANNER + "_ERROR_HANDLER"}
+                )
+                # <<< END MODIFICATION >>>
+            )
             logger.error(f"Planner: Raw LLM output on error: {raw_output}")
         except Exception as raw_e:
             logger.error(f"Planner: Failed to get raw LLM output on error: {raw_e}")
@@ -149,13 +190,13 @@ async def generate_plan(
 
 if __name__ == '__main__':
     async def test_planner_poem_generation():
-        # Test case similar to the problematic one
         query_poem = "Create a file called poem.txt and write in it a small poem about stars."
         tools_summary = "- write_file: To write files to workspace.\n- read_file: To read files from workspace."
         
         print(f"\n--- Testing Planner with Poem Generation Query ---")
         print(f"Query: {query_poem}")
-        summary, plan = await generate_plan(query_poem, tools_summary)
+        # Test call would need a dummy callback handler if we want to test that path
+        summary, plan = await generate_plan(query_poem, tools_summary, None) 
 
         if summary and plan:
             print("---- Human Readable Summary ----")
@@ -167,11 +208,10 @@ if __name__ == '__main__':
                     print(f"  Description: {step_data.get('description')}")
                     print(f"  Tool: {step_data.get('tool_to_use')}")
                     print(f"  Input Instructions: {step_data.get('tool_input_instructions')}")
-                    print(f"  Expected Outcome: {step_data.get('expected_outcome')}") # Key to check
+                    print(f"  Expected Outcome: {step_data.get('expected_outcome')}") 
                 else:
                     print(f"Step {i+1}: Invalid step data format: {step_data}")
             
-            # Specific check for the poem generation step's expected outcome
             if len(plan) > 0 and "poem about stars" in plan[0].get("description", "").lower():
                 print(f"\nDEBUG: Expected outcome for poem generation step (Step 1): '{plan[0].get('expected_outcome')}'")
                 if "actual text" in plan[0].get('expected_outcome', '').lower() or \
