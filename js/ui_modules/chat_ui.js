@@ -7,6 +7,7 @@
  * - Displays plan proposals and confirmed plans.
  * - Manages chat input and thinking status.
  * - Handles collapsibility for long tool outputs and copy-to-clipboard.
+ * - Implements collapsible major steps.
  */
 
 let chatMessagesContainerElement;
@@ -38,26 +39,19 @@ const componentBorderColorMap = {
     LLM_CORE: 'agent-line-llm-core',
     WARNING: 'agent-line-warning',
     ERROR: 'agent-line-error'
-    // Add more as needed, ensure these classes exist in style.css
 };
 
 const MAX_CHARS_TOOL_OUTPUT_PREVIEW = 500;
 const MAX_LINES_TOOL_OUTPUT_PREVIEW = 10;
 
 
-/**
- * Handles copying text to the clipboard and provides visual feedback on the button.
- * @param {string} textToCopy - The text to be copied.
- * @param {HTMLElement} buttonElement - The button that was clicked to trigger the copy.
- */
 async function handleCopyToClipboard(textToCopy, buttonElement) {
     if (!navigator.clipboard) {
         console.warn('[ChatUI] Clipboard API not available. Falling back to execCommand if possible.');
-        // Fallback for environments where navigator.clipboard is not available (e.g., insecure contexts, some iframes)
         try {
             const textArea = document.createElement("textarea");
             textArea.value = textToCopy;
-            textArea.style.position = "fixed"; // Prevent scrolling to bottom
+            textArea.style.position = "fixed"; 
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
@@ -67,7 +61,7 @@ async function handleCopyToClipboard(textToCopy, buttonElement) {
             if (successful) {
                 console.log('[ChatUI] Text copied to clipboard using execCommand.');
                 if (buttonElement) {
-                    const originalText = buttonElement.innerHTML; // Use innerHTML for icon compatibility
+                    const originalText = buttonElement.innerHTML; 
                     buttonElement.innerHTML = 'Copied ✓';
                     buttonElement.disabled = true;
                     setTimeout(() => {
@@ -85,17 +79,14 @@ async function handleCopyToClipboard(textToCopy, buttonElement) {
                 buttonElement.innerHTML = 'Error';
                 setTimeout(() => { buttonElement.innerHTML = originalText; }, 2000);
             }
-            // Optionally, alert the user or provide alternative instructions
-            // alert("Could not copy text. Please try manually selecting and copying.");
         }
         return;
     }
-    // Preferred modern async clipboard API
     try {
         await navigator.clipboard.writeText(textToCopy);
         console.log('[ChatUI] Text copied to clipboard:', textToCopy.substring(0, 50) + "...");
         if (buttonElement) {
-            const originalText = buttonElement.innerHTML; // Use innerHTML for icon compatibility
+            const originalText = buttonElement.innerHTML; 
             buttonElement.innerHTML = 'Copied ✓';
             buttonElement.disabled = true;
             setTimeout(() => {
@@ -113,57 +104,37 @@ async function handleCopyToClipboard(textToCopy, buttonElement) {
     }
 }
 
-
-/**
- * Creates a copy button element.
- * @param {function} getTextToCopyFn - A function that returns the text to be copied when called.
- * @param {string} buttonText - Initial text/content for the button.
- * @returns {HTMLElement} The created button element.
- */
 function _createCopyButton(getTextToCopyFn, buttonText = '📋&nbsp;Copy') {
     const copyButton = document.createElement('button');
     copyButton.className = 'chat-copy-btn';
-    copyButton.innerHTML = buttonText; // Use innerHTML to allow HTML entities like &nbsp;
+    copyButton.innerHTML = buttonText; 
     copyButton.title = 'Copy to clipboard';
     copyButton.onclick = (e) => {
-        e.stopPropagation(); // Prevent other click listeners on parent elements
+        e.stopPropagation(); 
         const textToCopy = getTextToCopyFn();
         handleCopyToClipboard(textToCopy, copyButton);
     };
     return copyButton;
 }
 
-/**
- * Adds copy buttons to all <pre> elements within a given parent element.
- * It avoids adding multiple buttons to the same <pre> block.
- * @param {HTMLElement} parentElement - The element to search within for <pre> blocks.
- */
 function _addCopyButtonsToPreBlocks(parentElement) {
     if (!parentElement) return;
-    // Select only <pre> elements that do *not* already have a copy button wrapper as a parent
     const preBlocks = parentElement.querySelectorAll('pre:not(.copy-btn-added)');
     preBlocks.forEach(preElement => {
-        // Check if it's already wrapped (e.g. by a previous call if content was re-rendered)
         if (preElement.parentElement.classList.contains('pre-wrapper-with-copy')) {
-            preElement.classList.add('copy-btn-added'); // Mark it to avoid re-processing
+            preElement.classList.add('copy-btn-added'); 
             return;
         }
-
         const textToCopyFn = () => preElement.textContent || "";
         const copyButton = _createCopyButton(textToCopyFn, 'Copy Code');
-        
         const wrapper = document.createElement('div');
         wrapper.className = 'pre-wrapper-with-copy';
-        
-        // Replace preElement with wrapper, then append preElement and button to wrapper
         preElement.parentNode.insertBefore(wrapper, preElement);
         wrapper.appendChild(preElement); 
         wrapper.appendChild(copyButton);
-        
-        preElement.classList.add('copy-btn-added'); // Mark as processed
+        preElement.classList.add('copy-btn-added'); 
     });
 }
-
 
 function initChatUI(elements, callbacks) {
     console.log("[ChatUI] Initializing...");
@@ -212,48 +183,38 @@ function handleChatTextareaKeydown(event) {
         event.preventDefault();
         handleSendButtonClick();
     } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-        // Handle input history navigation
         if (chatInputHistory.length === 0 && chatTextareaElement.value.trim() === "") return;
-        
-        // Save current input if navigating away from it for the first time
         if (chatHistoryIndex === -1 && (chatTextareaElement.value.trim() !== "" || event.key === 'ArrowUp')) {
-            // Only save if there's history to navigate to or moving up from new input
             if (chatInputHistory.length > 0 || event.key === 'ArrowUp') {
                  currentInputBuffer = chatTextareaElement.value;
             }
         }
-        
         let newHistoryIndex = chatHistoryIndex;
         if (event.key === 'ArrowUp') {
-            if (chatInputHistory.length > 0) { // Ensure there's history to navigate
+            if (chatInputHistory.length > 0) { 
                 newHistoryIndex = (chatHistoryIndex === -1) ? chatInputHistory.length - 1 : Math.max(0, chatHistoryIndex - 1);
-            } else { return; } // No history, do nothing
+            } else { return; } 
         } else if (event.key === 'ArrowDown') {
             if (chatHistoryIndex !== -1 && chatHistoryIndex < chatInputHistory.length - 1) {
                 newHistoryIndex++;
-            } else { // If at the end of history or no history selected, restore buffer
-                newHistoryIndex = -1; // Indicates current input buffer
+            } else { 
+                newHistoryIndex = -1; 
             }
         }
-
-        // Update textarea only if index actually changes or moving to buffer
         if (newHistoryIndex !== chatHistoryIndex || (event.key === 'ArrowDown' && chatHistoryIndex === chatInputHistory.length - 1) ) {
-            event.preventDefault(); // Prevent cursor from moving to start/end of line
+            event.preventDefault(); 
             chatHistoryIndex = newHistoryIndex;
             chatTextareaElement.value = (chatHistoryIndex === -1) ? currentInputBuffer : chatInputHistory[chatHistoryIndex];
-            // Move cursor to end of text
             chatTextareaElement.selectionStart = chatTextareaElement.selectionEnd = chatTextareaElement.value.length;
             adjustTextareaHeight();
         }
     } else {
-        // Any other key press means user is editing, so reset history navigation
-        chatHistoryIndex = -1; // Reset history index if user types anything else
+        chatHistoryIndex = -1; 
     }
 }
 
 function handleChatTextareaInput() {
     adjustTextareaHeight();
-    // If user types and was navigating history, save current input as buffer and reset history index
     if (chatHistoryIndex !== -1) { 
         currentInputBuffer = chatTextareaElement.value;
         chatHistoryIndex = -1;
@@ -262,80 +223,52 @@ function handleChatTextareaInput() {
 
 function adjustTextareaHeight() {
     if (!chatTextareaElement) return;
-    chatTextareaElement.style.height = 'auto'; // Temporarily shrink to get correct scrollHeight
+    chatTextareaElement.style.height = 'auto'; 
     chatTextareaElement.style.height = (chatTextareaElement.scrollHeight) + 'px';
 }
 
 function addMessageToInputHistory(messageText) {
-    // Add to history only if it's different from the last message
     if (chatInputHistory[chatInputHistory.length - 1] !== messageText) {
         chatInputHistory.push(messageText);
         if (chatInputHistory.length > MAX_CHAT_HISTORY) {
-            chatInputHistory.shift(); // Keep history to a max size
+            chatInputHistory.shift(); 
         }
     }
 }
 
-// Helper to escape HTML special characters
 function escapeHTML(str) {
     if (typeof str !== 'string') return '';
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
 
-/**
- * Formats message content:
- * - Escapes HTML.
- * - Converts Markdown (bold, italic, bold-italic, links, code blocks, inline code) to HTML.
- * - Converts newlines to <br> *unless* inside a code block or if isThoughtOrToolContentBox is true.
- * @param {string} text - The raw text content.
- * @param {boolean} isThoughtOrToolContentBox - If true, newlines are preserved (for <pre>-like behavior).
- * @returns {string} - HTML formatted string.
- */
 function formatMessageContentInternal(text, isThoughtOrToolContentBox = false) {
     if (typeof text !== 'string') {
-        text = String(text); // Ensure text is a string
+        text = String(text); 
     }
-
-    // 1. Temporarily replace code blocks to protect their content from Markdown processing
     const codeBlockPlaceholders = [];
     let tempText = text.replace(/```(\w*)\n([\s\S]*?)\n?```/g, (match, lang, code) => {
-        const escapedCode = escapeHTML(code); // Escape HTML within code
+        const escapedCode = escapeHTML(code); 
         const langClass = lang ? ` class="language-${lang}"` : '';
         const placeholder = `%%CODEBLOCK_${codeBlockPlaceholders.length}%%`;
-        // Mark the placeholder as a pre block for later copy button attachment
         codeBlockPlaceholders.push(`<pre data-is-code-block="true"><code${langClass}>${escapedCode}</code></pre>`);
         return placeholder;
     });
-
-    // 2. Temporarily replace inline code to protect its content
     const inlineCodePlaceholders = [];
     tempText = tempText.replace(/`([^`]+?)`/g, (match, code) => {
-        const escapedCode = escapeHTML(code); // Escape HTML within inline code
+        const escapedCode = escapeHTML(code); 
         const placeholder = `%%INLINECODE_${inlineCodePlaceholders.length}%%`;
         inlineCodePlaceholders.push(`<code>${escapedCode}</code>`);
         return placeholder;
     });
-    
-    // 3. Process Markdown links (must be before general HTML escaping for other parts)
-    // Regex for [text](url) - ensures URL starts with http(s)://
     tempText = tempText.replace(/\[([^<>[\]]+?)\]\((https?:\/\/[^\s)]+)\)/g, (match, linkText, linkUrl) => {
-        const safeLinkText = escapeHTML(linkText); // Escape HTML in link text
-        const safeLinkUrl = escapeHTML(linkUrl); // Escape HTML in URL (though less common to have HTML here)
+        const safeLinkText = escapeHTML(linkText); 
+        const safeLinkUrl = escapeHTML(linkUrl); 
         return `<a href="${safeLinkUrl}" target="_blank" rel="noopener noreferrer">${safeLinkText}</a>`;
     });
-
-    // 4. Process Markdown bold-italic, bold, italic
-    // Order matters: bold-italic, then bold, then italic
     tempText = tempText.replace(/(\*\*\*|___)(?=\S)([\s\S]*?\S)\1/g, (match, wrapper, content) => `<strong><em>${escapeHTML(content)}</em></strong>`);
     tempText = tempText.replace(/(\*\*|__)(?=\S)([\s\S]*?\S)\1/g, (match, wrapper, content) => `<strong>${escapeHTML(content)}</strong>`);
-    // More specific italic regex to avoid conflicts with internal underscores in words
     tempText = tempText.replace(/(?<![`*\w\\])(?:(\*|_))(?=\S)([\s\S]*?\S)\1(?![`*\w])/g, (match, wrapper, content) => `<em>${escapeHTML(content)}</em>`);
-
-
-    // 5. Handle newlines (convert to <br>) ONLY if not inside a thought/tool content box
-    // This step should happen AFTER code block placeholders are made, so newlines in code are preserved.
     if (!isThoughtOrToolContentBox) {
-        // Split by placeholders to avoid replacing \n inside them, then rejoin
         const partsForNewline = tempText.split(/(%%CODEBLOCK_\d+%%|%%INLINECODE_\d+%%)/g);
         for (let i = 0; i < partsForNewline.length; i++) {
             if (!partsForNewline[i].startsWith('%%CODEBLOCK_') && !partsForNewline[i].startsWith('%%INLINECODE_')) {
@@ -344,30 +277,21 @@ function formatMessageContentInternal(text, isThoughtOrToolContentBox = false) {
         }
         tempText = partsForNewline.join('');
     }
-    // If isThoughtOrToolContentBox is true, newlines are preserved naturally by <pre> or by CSS white-space: pre-wrap.
-
-    // 6. Restore inline code and code blocks
     tempText = tempText.replace(/%%INLINECODE_(\d+)%%/g, (match, index) => inlineCodePlaceholders[parseInt(index)]);
     tempText = tempText.replace(/%%CODEBLOCK_(\d+)%%/g, (match, index) => codeBlockPlaceholders[parseInt(index)]);
-    
     return tempText;
 }
 
-
-// Helper to get the CSS class for the component's side-line
 function getComponentClass(componentHint) {
-    const hint = String(componentHint).toUpperCase(); // Ensure uppercase for matching
+    const hint = String(componentHint).toUpperCase(); 
     if (componentBorderColorMap[hint]) {
         return componentBorderColorMap[hint];
     }
-    // Handle more specific cases like TOOL_WRITE_FILE -> TOOL
     if (hint.startsWith("TOOL_")) { 
         return componentBorderColorMap.TOOL; 
     }
-    // Add other specific prefixes if needed
-    return componentBorderColorMap.SYSTEM; // Default if no match
+    return componentBorderColorMap.SYSTEM; 
 }
-
 
 function displayMajorStepAnnouncementUI(data) {
     if (!chatMessagesContainerElement) {
@@ -378,43 +302,32 @@ function displayMajorStepAnnouncementUI(data) {
     const { step_number, total_steps, description } = data; 
     
     const stepWrapperDiv = document.createElement('div');
-    stepWrapperDiv.className = 'message message-agent-step'; // No component-specific line for major step title
+    stepWrapperDiv.className = 'message message-agent-step'; 
     
     const titleDiv = document.createElement('div');
-    titleDiv.className = 'step-title';
-    // Format description which might contain markdown
+    titleDiv.className = 'step-title'; 
     titleDiv.innerHTML = formatMessageContentInternal(`<strong>Step ${step_number}/${total_steps}: ${description}</strong>`);
+    
+    titleDiv.addEventListener('click', () => {
+        stepWrapperDiv.classList.toggle('step-collapsed');
+    });
     stepWrapperDiv.appendChild(titleDiv);
     
-    // Container for subsequent sub-statuses, thoughts, tool outputs related to this step
     const subContentContainer = document.createElement('div');
     subContentContainer.className = 'sub-content-container';
     stepWrapperDiv.appendChild(subContentContainer);
     
-    currentMajorStepDiv = stepWrapperDiv; // Set this as the current step for appending children
+    currentMajorStepDiv = stepWrapperDiv; 
 
     appendMessageElement(stepWrapperDiv);
-    scrollToBottomChat();
+    scrollToBottomChat(); 
     console.log(`[ChatUI] Displayed Major Step Announcement: Step ${step_number}/${total_steps}`);
 }
 
-
-/**
- * Displays a tool output message in the chat UI.
- * MODIFIED: Label is now clickable for expand/collapse.
- * MODIFIED: Removed scrollToBottomChat() from label click listener.
- * @param {object} data - The tool output data from the backend.
- * @returns {HTMLElement|null} The created message element or null if container is missing.
- */
 function displayToolOutputMessageUI(data) {
-    console.log("[ChatUI DEBUG] displayToolOutputMessageUI called with data:", JSON.stringify(data));
+    // Removed the initial console.log for brevity, but kept the read_file specific one
     if (data && data.tool_name === 'read_file') {
         console.log(`[ChatUI DEBUG read_file] Tool: ${data.tool_name}, Input: ${data.tool_input_summary}, Content Length: ${data.tool_output_content?.length}, Artifact: ${data.artifact_filename}`);
-    }
-
-    if (!chatMessagesContainerElement) {
-        console.error("[ChatUI] Chat container missing! Cannot display tool output.");
-        return null;
     }
 
     const { tool_name, tool_input_summary, tool_output_content, artifact_filename, original_length } = data;
@@ -459,13 +372,10 @@ function displayToolOutputMessageUI(data) {
         fullDiv.style.display = 'none'; 
         fullDiv.innerHTML = formatMessageContentInternal(tool_output_content, true);
         contentBoxDiv.appendChild(fullDiv);
-
         labelDiv.classList.add('minimized'); 
-
     } else {
         previewDiv.style.display = 'none';
         contentBoxDiv.appendChild(previewDiv); 
-        
         fullDiv.innerHTML = formatMessageContentInternal(tool_output_content || "(No output content)", true); 
         contentBoxDiv.appendChild(fullDiv);
     }
@@ -475,7 +385,6 @@ function displayToolOutputMessageUI(data) {
     labelDiv.addEventListener('click', (e) => {
         e.stopPropagation();
         const isCurrentlyExpanded = toolOutputWrapperDiv.classList.toggle('expanded');
-        
         if (isLongContent) { 
             previewDiv.style.display = isCurrentlyExpanded ? 'none' : 'block';
             fullDiv.style.display = isCurrentlyExpanded ? 'block' : 'none';
@@ -483,7 +392,6 @@ function displayToolOutputMessageUI(data) {
              previewDiv.style.display = 'none';
              fullDiv.style.display = 'block';
         }
-        // Removed scrollToBottomChat(); from here to prevent scroll jump on expand/collapse
     });
 
     if (artifact_filename) {
@@ -503,7 +411,7 @@ function displayToolOutputMessageUI(data) {
         if (isLongContent) {
             expandButton.style.display = 'block'; 
             expandButton.textContent = toolOutputWrapperDiv.classList.contains('expanded') ? 'Collapse' : 'Expand';
-            labelDiv.addEventListener('click', () => { // Sync button if label is clicked
+            labelDiv.addEventListener('click', () => { 
                  expandButton.textContent = toolOutputWrapperDiv.classList.contains('expanded') ? 'Collapse' : 'Expand';
                  if (artifact_filename) {
                     const artifactLink = toolOutputWrapperDiv.querySelector('.tool-output-artifact-link');
@@ -515,12 +423,22 @@ function displayToolOutputMessageUI(data) {
         }
     }
 
-    appendMessageElement(toolOutputWrapperDiv);
-    scrollToBottomChat(); // Scroll to bottom when a new tool output message is added
+    if (currentMajorStepDiv) {
+        const subContentContainer = currentMajorStepDiv.querySelector('.sub-content-container');
+        if (subContentContainer) {
+            subContentContainer.appendChild(toolOutputWrapperDiv);
+        } else {
+            console.warn("[ChatUI] .sub-content-container not found in currentMajorStepDiv. Appending tool output to main chat.");
+            appendMessageElement(toolOutputWrapperDiv); 
+        }
+    } else {
+        appendMessageElement(toolOutputWrapperDiv); 
+    }
+
+    scrollToBottomChat(); 
     console.log(`[ChatUI] Displayed Tool Output: ${tool_name}`);
     return toolOutputWrapperDiv;
 }
-
 
 function addChatMessageToUI(messageData, type, options = {}, doScroll = true) {
     if (!chatMessagesContainerElement) {
@@ -529,7 +447,8 @@ function addChatMessageToUI(messageData, type, options = {}, doScroll = true) {
     }
 
     let baseMessageDiv; 
-    let contentHolderDiv; 
+    let contentHolderDiv = null; // Initialize to null
+    let messageProcessedInternally = false; // Flag to track if content is handled by a sub-function
 
     let textContent, componentHint; 
     if (typeof messageData === 'string') {
@@ -552,43 +471,46 @@ function addChatMessageToUI(messageData, type, options = {}, doScroll = true) {
         contentHolderDiv.className = 'message-user'; 
         baseMessageDiv.appendChild(contentHolderDiv);
     } else if (type === 'propose_plan_for_confirmation') {
-        baseMessageDiv = displayPlanConfirmationUI(
+        baseMessageDiv = document.createElement('div');
+        baseMessageDiv.className = 'message message-agent-wrapper'; 
+        displayPlanConfirmationUI( // This function now appends to baseMessageDiv internally
             messageData.human_summary, 
             messageData.plan_id, 
             messageData.structured_plan,
             messageData.onConfirm, 
             messageData.onCancel,
-            messageData.onViewDetails
+            messageData.onViewDetails,
+            baseMessageDiv 
         ); 
-        if (!baseMessageDiv) return null; 
-        textContent = null; 
+        messageProcessedInternally = true; 
     } else if (type === 'tool_result_for_chat') { 
-        baseMessageDiv = displayToolOutputMessageUI(messageData); 
-        if (!baseMessageDiv) return null; 
-        textContent = null; 
-    } else { // For agent_message, status_message, confirmed_plan_log etc.
-        baseMessageDiv = document.createElement('div');
-        baseMessageDiv.className = 'message message-outer-blue-line'; 
+        // displayToolOutputMessageUI handles its own creation and appending to the correct parent (main chat or sub-content)
+        // It returns the element, but we don't need to re-append it here.
+        baseMessageDiv = displayToolOutputMessageUI(messageData);
+        messageProcessedInternally = true; 
+    } else { 
+        if (type === 'agent_message' || type === 'confirmed_plan_log') {
+            baseMessageDiv = document.createElement('div');
+            baseMessageDiv.className = 'message message-agent-wrapper'; 
+        } else { 
+            baseMessageDiv = document.createElement('div');
+            baseMessageDiv.className = 'message message-outer-blue-line'; 
+        }
 
         if (type === 'agent_message') { 
             currentMajorStepDiv = null; 
             const finalAnswerWrapper = document.createElement('div');
             finalAnswerWrapper.className = 'message-agent-final-content-wrapper';
-
             const avatarDiv = document.createElement('div');
             avatarDiv.className = 'agent-avatar';
             avatarDiv.textContent = 'RA'; 
             finalAnswerWrapper.appendChild(avatarDiv);
-
             contentHolderDiv = document.createElement('div');
             contentHolderDiv.className = 'message-agent-final-content';
             finalAnswerWrapper.appendChild(contentHolderDiv);
-            
             baseMessageDiv.appendChild(finalAnswerWrapper);
-
             const copyBtnFinalAnswer = _createCopyButton(() => originalTextContentForCopy);
             baseMessageDiv.appendChild(copyBtnFinalAnswer);
-
         } else { 
             contentHolderDiv = document.createElement('div'); 
             baseMessageDiv.appendChild(contentHolderDiv);
@@ -598,72 +520,88 @@ function addChatMessageToUI(messageData, type, options = {}, doScroll = true) {
                 if (options.isError || String(textContent).toLowerCase().includes("error")) {
                     contentHolderDiv.classList.add('error-text'); 
                 }
-            } else if (type === 'confirmed_plan_log' && textContent) {
-                contentHolderDiv.className = 'message-plan-proposal-content'; 
-                try {
-                    const planData = JSON.parse(textContent); 
-                    const planBlock = document.createElement('div');
-                    planBlock.className = 'plan-proposal-block plan-confirmed-static'; 
-                    
-                    const titleElement = document.createElement('h4');
-                    titleElement.innerHTML = formatMessageContentInternal(planData.title || 'Confirmed Plan (from history):');
-                    planBlock.appendChild(titleElement);
+            } else if (type === 'confirmed_plan_log') { 
+                // Removed the console.log for textContent here, as it's visible in the main console now.
+                if (textContent) { 
+                    contentHolderDiv.className = 'message-plan-proposal-content'; 
+                    try {
+                        const planData = JSON.parse(textContent); 
+                        const planBlock = document.createElement('div');
+                        planBlock.className = 'plan-proposal-block plan-confirmed-static'; 
+                        const titleElement = document.createElement('h4');
+                        titleElement.innerHTML = formatMessageContentInternal(planData.summary ? 'Confirmed Plan (from history):' : (planData.title || 'Plan Details (from history):'));
+                        planBlock.appendChild(titleElement);
 
-                    const summaryElement = document.createElement('p');
-                    summaryElement.className = 'plan-summary';
-                    summaryElement.innerHTML = formatMessageContentInternal(planData.summary || "Summary not available.");
-                    planBlock.appendChild(summaryElement);
-                     _addCopyButtonsToPreBlocks(summaryElement);
+                        if (planData.summary) { 
+                            const summaryElement = document.createElement('p');
+                            summaryElement.className = 'plan-summary';
+                            summaryElement.innerHTML = formatMessageContentInternal(planData.summary);
+                            planBlock.appendChild(summaryElement);
+                            _addCopyButtonsToPreBlocks(summaryElement);
+                        }
 
-                    const detailsDiv = document.createElement('div');
-                    detailsDiv.className = 'plan-steps-details';
-                    detailsDiv.style.display = 'block'; 
-                    const ol = document.createElement('ol');
-                    if (planData.steps && Array.isArray(planData.steps)) {
-                        planData.steps.forEach(step => {
-                            const li = document.createElement('li');
-                            const stepDescription = `<strong>${step.step_id}. ${formatMessageContentInternal(step.description)}</strong>`;
-                            const toolUsed = (step.tool_to_use && step.tool_to_use !== "None") ? `<br><span class="step-tool">Tool: ${formatMessageContentInternal(step.tool_to_use)}</span>` : '';
-                            const inputHint = step.tool_input_instructions ? `<br><span class="step-tool">Input Hint: ${formatMessageContentInternal(step.tool_input_instructions)}</span>` : '';
-                            const expectedOutcome = `<br><span class="step-expected">Expected: ${formatMessageContentInternal(step.expected_outcome)}</span>`;
-                            li.innerHTML = stepDescription + toolUsed + inputHint + expectedOutcome;
-                            ol.appendChild(li);
-                        });
+                        const detailsDiv = document.createElement('div');
+                        detailsDiv.className = 'plan-steps-details';
+                        detailsDiv.style.display = 'block'; 
+                        const ol = document.createElement('ol');
+                        if (planData.steps && Array.isArray(planData.steps)) {
+                            planData.steps.forEach(step => {
+                                const li = document.createElement('li');
+                                const stepDescription = `<strong>${step.step_id}. ${formatMessageContentInternal(step.description)}</strong>`;
+                                const toolUsed = (step.tool_to_use && step.tool_to_use !== "None") ? `<br><span class="step-tool">Tool: ${formatMessageContentInternal(step.tool_to_use)}</span>` : '';
+                                const inputHint = step.tool_input_instructions ? `<br><span class="step-tool">Input Hint: ${formatMessageContentInternal(step.tool_input_instructions)}</span>` : '';
+                                const expectedOutcome = `<br><span class="step-expected">Expected: ${formatMessageContentInternal(step.expected_outcome)}</span>`;
+                                li.innerHTML = stepDescription + toolUsed + inputHint + expectedOutcome;
+                                ol.appendChild(li);
+                            });
+                        }
+                        detailsDiv.appendChild(ol);
+                        _addCopyButtonsToPreBlocks(detailsDiv);
+                        planBlock.appendChild(detailsDiv); 
+                        
+                        let statusP = planBlock.querySelector('.plan-execution-status-confirmed');
+                        if (!statusP) {
+                            statusP = document.createElement('p');
+                            statusP.className = 'plan-execution-status-confirmed';
+                            planBlock.appendChild(statusP); 
+                        }
+                        const confirmedTime = planData.timestamp ? new Date(planData.timestamp).toLocaleTimeString() : "previously";
+                        statusP.textContent = `Status: Confirmed & Executed ${confirmedTime}`; 
+
+                        contentHolderDiv.appendChild(planBlock); 
+                        messageProcessedInternally = true; // Content handled, textContent not needed for direct render
+                    } catch (e) {
+                        console.error("[ChatUI] Error parsing confirmed_plan_log data from history:", e, "Raw Data:", textContent);
+                        textContent = `Error displaying confirmed plan from history.`; 
+                        // Fall through to render textContent in contentHolderDiv
                     }
-                    detailsDiv.appendChild(ol);
-                    _addCopyButtonsToPreBlocks(detailsDiv);
-                    planBlock.appendChild(detailsDiv);
-                    contentHolderDiv.appendChild(planBlock); 
-
-                    if (planData.timestamp) {
-                        const timestampP = document.createElement('p');
-                        timestampP.style.fontSize = '0.8em';
-                        timestampP.style.color = 'var(--text-color-muted)';
-                        timestampP.style.marginTop = '10px';
-                        timestampP.textContent = `Originally Confirmed: ${new Date(planData.timestamp).toLocaleString()}`;
-                        planBlock.appendChild(timestampP);
-                    }
-                    textContent = null; 
-                } catch (e) {
-                    console.error("[ChatUI] Error parsing confirmed_plan_log data from history:", e, "Raw Data:", textContent);
-                    textContent = `Error displaying confirmed plan from history.`; 
-                    contentHolderDiv.innerHTML = formatMessageContentInternal(textContent);
+                } else {
+                     console.warn("[ChatUI confirmed_plan_log] textContent was empty or null. Rendering error message.");
+                     textContent = "Error: Plan data missing in history."; 
                 }
             } else { 
                 contentHolderDiv.className = 'message-content-text'; 
-                baseMessageDiv.classList.add(getComponentClass(effectiveComponentHint)); 
+                if (!baseMessageDiv.classList.contains('message-agent-wrapper')) {
+                    baseMessageDiv.classList.add(getComponentClass(effectiveComponentHint)); 
+                }
             }
         }
     }
     
-    if (contentHolderDiv && textContent !== null) { 
+    if (contentHolderDiv && !messageProcessedInternally && textContent !== null) { 
         contentHolderDiv.innerHTML = formatMessageContentInternal(textContent);
         _addCopyButtonsToPreBlocks(contentHolderDiv);
     }
     
-    if (baseMessageDiv && textContent !== null) { 
+    // --- MODIFIED: Appending Logic ---
+    // Always append baseMessageDiv if it was created and not already handled by a sub-function like displayToolOutputMessageUI
+    if (baseMessageDiv && type !== 'tool_result_for_chat' && type !== 'propose_plan_for_confirmation') { 
         appendMessageElement(baseMessageDiv);
+    } else if (baseMessageDiv && (type === 'propose_plan_for_confirmation')) {
+        // displayPlanConfirmationUI already calls appendMessageElement with baseMessageDiv
+        // So, no explicit append here for this type.
     }
+    // For tool_result_for_chat, displayToolOutputMessageUI handles its own append.
     
     if (doScroll) {
         scrollToBottomChat();
@@ -672,14 +610,17 @@ function addChatMessageToUI(messageData, type, options = {}, doScroll = true) {
 }
 
 
-function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfirm, onCancel, onViewDetails) {
-    if (!chatMessagesContainerElement) return null;
+function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfirm, onCancel, onViewDetails, baseWrapper) {
+    if (!chatMessagesContainerElement || !baseWrapper) return null;
 
-    chatMessagesContainerElement.querySelectorAll('.plan-confirmation-wrapper').forEach(ui => ui.remove());
+    chatMessagesContainerElement.querySelectorAll('.plan-confirmation-wrapper').forEach(ui => {
+        if (ui.dataset.planId !== planId) ui.remove(); 
+    });
+    const existingPlanUI = chatMessagesContainerElement.querySelector(`.plan-confirmation-wrapper[data-plan-id="${planId}"]`);
+    if (existingPlanUI) existingPlanUI.remove();
 
-    const planWrapper = document.createElement('div');
-    planWrapper.className = 'message message-outer-blue-line plan-confirmation-wrapper'; 
-    planWrapper.dataset.planId = planId; 
+    baseWrapper.classList.add('plan-confirmation-wrapper'); 
+    baseWrapper.dataset.planId = planId; 
 
     const planContentDiv = document.createElement('div');
     planContentDiv.className = 'message-plan-proposal-content'; 
@@ -731,7 +672,6 @@ function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfi
         if (typeof onViewDetails === 'function') {
             onViewDetails(planId, isHidden);
         }
-        // scrollToBottomChat(); // Potentially remove this if it causes jump on "View Details"
     };
     planBlock.appendChild(viewDetailsBtn);
 
@@ -750,11 +690,11 @@ function displayPlanConfirmationUI(humanSummary, planId, structuredPlan, onConfi
     planBlock.appendChild(actionsDiv);
     
     planContentDiv.appendChild(planBlock);
-    planWrapper.appendChild(planContentDiv);
+    baseWrapper.appendChild(planContentDiv); 
 
-    appendMessageElement(planWrapper); 
+    appendMessageElement(baseWrapper); // This line was already here and correctly appends the baseWrapper.
     scrollToBottomChat();
-    return planWrapper; 
+    return baseWrapper; 
 }
 
 
@@ -852,11 +792,13 @@ function showAgentThinkingStatusInUI(show, statusUpdateObject = { message: "Thin
             }
 
             if (nestedMessageDiv) {
-                subContentContainer.appendChild(nestedMessageDiv);
+                subContentContainer.appendChild(nestedMessageDiv); 
                 agentThinkingStatusElement.style.display = 'none'; 
                 scrollToBottomChat();
                 return; 
             }
+        } else {
+            console.warn("[ChatUI] currentMajorStepDiv exists, but .sub-content-container not found within it. Appending to main chat.");
         }
     }
     
