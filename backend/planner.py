@@ -5,9 +5,9 @@ from typing import List, Dict, Any, Tuple, Optional
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
-from langchain_core.pydantic_v1 import BaseModel, Field 
+from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_core.runnables import RunnableConfig
-from langchain_core.callbacks.base import BaseCallbackHandler 
+from langchain_core.callbacks.base import BaseCallbackHandler
 import asyncio
 
 from backend.config import settings
@@ -79,14 +79,22 @@ async def generate_plan(
     callbacks_for_invoke: List[BaseCallbackHandler] = []
     if callback_handler:
         callbacks_for_invoke.append(callback_handler)
+        # Added critical debug log for consistency with other components
+        logger.critical(f"CRITICAL_DEBUG: PLANNER - generate_plan received callback_handler: {type(callback_handler).__name__}")
+    else:
+        logger.critical("CRITICAL_DEBUG: PLANNER - generate_plan received NO callback_handler.")
+
 
     try:
+        # Added critical debug log for consistency
+        logger.critical(f"CRITICAL_DEBUG: PLANNER - About to call get_llm. Callbacks_for_invoke: {[type(cb).__name__ for cb in callbacks_for_invoke] if callbacks_for_invoke else 'None'}")
         planner_llm: BaseChatModel = get_llm(
             settings,
             provider=settings.planner_provider,
             model_name=settings.planner_model_name,
-            requested_for_role=LOG_SOURCE_PLANNER 
-        ) 
+            requested_for_role=LOG_SOURCE_PLANNER,
+            callbacks=callbacks_for_invoke # *** MODIFIED: Pass callbacks_for_invoke to get_llm ***
+        )
         logger.info(f"Planner: Using LLM {settings.planner_provider}::{settings.planner_model_name}")
     except Exception as e:
         logger.error(f"Planner: Failed to initialize LLM: {e}", exc_info=True)
@@ -97,24 +105,26 @@ async def generate_plan(
 
     prompt_template = ChatPromptTemplate.from_messages([
         ("system", PLANNER_SYSTEM_PROMPT_TEMPLATE),
-        ("human", "{user_query}") 
+        ("human", "{user_query}")
     ])
 
+    # The chain's .ainvoke() will use the callbacks from RunnableConfig for chain-level events.
+    # The LLM instance itself (planner_llm) now has the callbacks for LLM-specific events.
     chain = prompt_template | planner_llm | parser
 
     try:
         logger.debug(f"Planner prompt input variables: {prompt_template.input_variables}")
-        
+
         invoke_payload = {
-            "user_query": user_query, 
+            "user_query": user_query,
             "available_tools_summary": available_tools_summary,
             "format_instructions": format_instructions
         }
-        
+
         planned_result_dict = await chain.ainvoke(
             invoke_payload,
             config=RunnableConfig(
-                callbacks=callbacks_for_invoke,
+                callbacks=callbacks_for_invoke, # These are for chain start/end, etc.
                 metadata={"component_name": LOG_SOURCE_PLANNER}
             )
         )
@@ -143,7 +153,7 @@ async def generate_plan(
         structured_steps = []
         for i, step_model in enumerate(agent_plan.steps):
             step_dict = step_model.dict()
-            step_dict['step_id'] = i + 1 
+            step_dict['step_id'] = i + 1
             structured_steps.append(step_dict)
 
         logger.info(f"Planner: Plan generated successfully. Summary: {human_summary}")
@@ -153,8 +163,8 @@ async def generate_plan(
     except Exception as e:
         logger.error(f"Planner: Error during plan generation: {e}", exc_info=True)
         try:
-            error_chain = prompt_template | planner_llm | StrOutputParser() 
-            invoke_payload_for_error = { 
+            error_chain = prompt_template | planner_llm | StrOutputParser()
+            invoke_payload_for_error = {
                 "user_query": user_query,
                 "available_tools_summary": available_tools_summary,
                 "format_instructions": format_instructions
@@ -177,7 +187,7 @@ if __name__ == '__main__':
         tools_summary = "- write_file: To write files to workspace.\n- read_file: To read files from workspace."
         print(f"\n--- Testing Planner with Poem Generation Query ---")
         print(f"Query: {query_poem}")
-        summary, plan = await generate_plan(query_poem, tools_summary, None) 
+        summary, plan = await generate_plan(query_poem, tools_summary, None)
         if summary and plan:
             print("---- Human Readable Summary ----")
             print(summary)
@@ -188,7 +198,7 @@ if __name__ == '__main__':
                     print(f"  Description: {step_data.get('description')}")
                     print(f"  Tool: {step_data.get('tool_to_use')}")
                     print(f"  Input Instructions: {step_data.get('tool_input_instructions')}")
-                    print(f"  Expected Outcome: {step_data.get('expected_outcome')}") 
+                    print(f"  Expected Outcome: {step_data.get('expected_outcome')}")
                 else:
                     print(f"Step {i+1}: Invalid step data format: {step_data}")
             if len(plan) > 0 and "poem about stars" in plan[0].get("description", "").lower():

@@ -3,7 +3,7 @@ import logging
 from typing import List, Dict, Any, Tuple, Optional
 import json
 import re
-import traceback 
+import traceback
 
 from langchain_core.tools import BaseTool
 from langchain_core.language_models.chat_models import BaseChatModel
@@ -92,6 +92,11 @@ async def validate_and_prepare_step_action(
     callbacks_for_invoke: List[BaseCallbackHandler] = []
     if callback_handler:
         callbacks_for_invoke.append(callback_handler)
+        # Added critical debug log for consistency with other components
+        logger.critical(f"CRITICAL_DEBUG: CONTROLLER - validate_and_prepare_step_action received callback_handler: {type(callback_handler).__name__}")
+    else:
+        logger.critical("CRITICAL_DEBUG: CONTROLLER - validate_and_prepare_step_action received NO callback_handler.")
+
 
     controller_llm_id_override = session_data_entry.get("session_controller_llm_id")
     controller_provider = settings.controller_provider
@@ -108,11 +113,14 @@ async def validate_and_prepare_step_action(
             logger.warning(f"Controller: Invalid session LLM ID format '{controller_llm_id_override}'. Using system default.")
 
     try:
+        # Added critical debug log for consistency
+        logger.critical(f"CRITICAL_DEBUG: CONTROLLER - About to call get_llm. Callbacks_for_invoke: {[type(cb).__name__ for cb in callbacks_for_invoke] if callbacks_for_invoke else 'None'}")
         controller_llm: BaseChatModel = get_llm(
             settings,
             provider=controller_provider,
             model_name=controller_model_name,
-            requested_for_role=LOG_SOURCE_CONTROLLER
+            requested_for_role=LOG_SOURCE_CONTROLLER,
+            callbacks=callbacks_for_invoke # *** MODIFIED: Pass callbacks_for_invoke to get_llm ***
         )
         logger.info(f"Controller: Using LLM {controller_provider}::{controller_model_name}")
     except Exception as e:
@@ -137,7 +145,7 @@ async def validate_and_prepare_step_action(
     ])
 
     raw_llm_output_chain = prompt | controller_llm | StrOutputParser()
-    controller_result_dict_raw = "" 
+    controller_result_dict_raw = ""
 
     escaped_original_user_query = escape_template_curly_braces(original_user_query)
     escaped_current_step_description = escape_template_curly_braces(plan_step.description)
@@ -167,7 +175,7 @@ async def validate_and_prepare_step_action(
         controller_result_dict_raw = await raw_llm_output_chain.ainvoke(
             input_dict_for_llm,
             config=RunnableConfig(
-                callbacks=callbacks_for_invoke,
+                callbacks=callbacks_for_invoke, # These are for chain start/end, etc.
                 metadata={"component_name": LOG_SOURCE_CONTROLLER}
             )
         )
@@ -176,11 +184,11 @@ async def validate_and_prepare_step_action(
         cleaned_json_string = controller_result_dict_raw.strip()
         if cleaned_json_string.startswith("```json"):
             cleaned_json_string = cleaned_json_string[len("```json"):].strip()
-        if cleaned_json_string.startswith("```"): 
+        if cleaned_json_string.startswith("```"):
             cleaned_json_string = cleaned_json_string[len("```"):].strip()
         if cleaned_json_string.endswith("```"):
             cleaned_json_string = cleaned_json_string[:-len("```")].strip()
-        
+
         logger.debug(f"Controller: Cleaned JSON string for parsing: '{cleaned_json_string}'")
         controller_result_dict = json.loads(cleaned_json_string)
 
@@ -190,9 +198,9 @@ async def validate_and_prepare_step_action(
         if parsed_tool_name == "None" or parsed_tool_name is None:
             if not isinstance(parsed_tool_input, (str, type(None))):
                 logger.warning(f"Controller: tool_name is 'None', but tool_input was type {type(parsed_tool_input)} ('{parsed_tool_input}'). Forcing to None for Pydantic.")
-                controller_result_dict["tool_input"] = None 
-            elif parsed_tool_input == "None": 
-                 controller_result_dict["tool_input"] = None 
+                controller_result_dict["tool_input"] = None
+            elif parsed_tool_input == "None":
+                 controller_result_dict["tool_input"] = None
         elif parsed_tool_name and parsed_tool_input is None :
             logger.warning(f"Controller: tool_name is '{parsed_tool_name}', but tool_input was None. This might be an issue for the tool. Proceeding.")
         elif parsed_tool_name and not isinstance(parsed_tool_input, str):
@@ -222,6 +230,7 @@ async def validate_and_prepare_step_action(
         return None, None, f"Error in Controller: LLM output parsing failed (not valid JSON). Reasoning hint: {error_reasoning}", 0.0
     except Exception as e:
         tb_str = traceback.format_exc()
-        logger.error(f"Controller: Error during step validation or Pydantic parsing: {e}. Raw output was: {controller_result_dict_raw}\nTraceback:\n{tb_str}", exc_info=False) 
+        logger.error(f"Controller: Error during step validation or Pydantic parsing: {e}. Raw output was: {controller_result_dict_raw}\nTraceback:\n{tb_str}", exc_info=False)
         error_detail = f"Exception: {type(e).__name__} at line {e.__traceback__.tb_lineno if e.__traceback__ else 'N/A'}. Raw LLM output might have been: {str(controller_result_dict_raw)[:500]}..."
         return None, None, f"Error in Controller: {error_detail}", 0.0
+
