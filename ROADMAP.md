@@ -1,14 +1,14 @@
-# ResearchAgent: Project Roadmap (v2.5.3 Target & Beyond)
+# ResearchAgent: Project Roadmap (v2.0.0 Target & Beyond)
 
 This document outlines the planned development path for the ResearchAgent project. It is a living document and will be updated as the project evolves.
 
 ## Guiding Principles for Development
 (Unchanged)
 
-## Phase 1: Core Stability & Foundational Tools (Largely Complete - Basis of v2.5.2)
+## Phase 1: Core Stability & Foundational Tools (Largely Complete - Basis of v2.0.0)
 (Unchanged)
 
-## Phase 2: Enhanced Agent Capabilities & User Experience (Current & Near-Term Focus - Targeting v2.5.3)
+## Phase 2: Enhanced Agent Capabilities & User Experience (Current & Near-Term Focus - Targeting v2.0.0)
 
 1.  Core Agent Execution Stability & Feature Verification (Improved)
     -   (Unchanged)
@@ -34,7 +34,7 @@ This document outlines the planned development path for the ResearchAgent projec
 
 ## Phase 3: Advanced Interactivity & Tooling (Mid-Term - Incorporating New Goals)
 
--   **ENHANCEMENT: Asynchronous Background Task Processing (Post v2.5.3):**
+-   **ENHANCEMENT: Asynchronous Background Task Processing (Post v2.0.0):**
     -   Allow agent plans to continue running if the user switches UI task context.
     -   Implement UI indicators for actively running tasks in the task list.
     -   Ensure correct rendering of non-active tasks and appropriate chat input locks.
