@@ -1,7 +1,7 @@
-# BRAINSTORM.md - ResearchAgent Project (v2.5.3 Target & Beyond)
+# BRAINSTORM.md - ResearchAgent Project (v2.0.0 Target & Beyond)
 
 This document tracks the current workflow, user feedback, and immediate brainstorming ideas for the ResearchAgent project.
-Current Version & State (Targeting v2.5.3 Foundational Fixes):
+Current Version & State (Targeting v2.0.0 Foundational Fixes):
 
 Recent key advancements and fixes:
 
@@ -20,12 +20,12 @@ Immediate Focus & User Feedback / Known Issues / Proposed Enhancements:
 
 1.  **BUG & RE-ENGINEERING - Agent Task Cancellation & STOP Button (NEW HIGH PRIORITY):**
     * **Observation:** Switching UI tasks does not reliably stop the agent processing the previous task; its status updates can bleed into the new task view. The STOP button is currently not effective.
-    * **Short-Term Goal (v2.5.3 fix):** Ensure that when a context switch *occurs in the UI*, the backend *robustly cancels* the agent task associated with the *previous* UI context. Make the STOP button fully functional to terminate the currently designated active agent task.
+    * **Short-Term Goal (v2.0.0 fix):** Ensure that when a context switch *occurs in the UI*, the backend *robustly cancels* the agent task associated with the *previous* UI context. Make the STOP button fully functional to terminate the currently designated active agent task.
     * **Challenge:** Requires careful management of asyncio tasks on the backend and ensuring cancellation propagates effectively.
 
 2.  **BUG - ARTIFACT VIEWER REFRESH (Medium Priority - Debugging Resumes):** (Details as before)
 
-3.  **UI/UX POLISH (Low Priority for v2.5.3 - Post Critical Fixes):**
+3.  **UI/UX POLISH (Low Priority for v2.0.0 - Post Critical Fixes):**
     * **A. Chat Message Visuals & Density:** Largely Addressed. Minor review of vertical spacing if needed.
     * **B. Button Placement & Consistency:** Largely Addressed.
     * **C. Monitor Log Readability:** (Details as before - Pending)
@@ -36,7 +36,7 @@ Immediate Focus & User Feedback / Known Issues / Proposed Enhancements:
 4.  **WARNING - PLAN FILE STATUS UPDATE (Low Priority):** (Details as before)
 5.  **REVIEW - "UNKNOWN" HISTORY MESSAGE TYPES (Low Priority - Mostly Addressed):** (Details as before)
 
-Future Brainstorming / More Complex Enhancements (Post v2.5.3):
+Future Brainstorming / More Complex Enhancements (Post v2.0.0):
 
 * **Advanced Multi-Tasking Agent Behavior (User Request):**
     * **Goal:** Allow an agent plan (Task A) to continue running in the background if the user switches the UI to view another task (Task B).
