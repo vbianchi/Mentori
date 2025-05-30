@@ -5,88 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ResearchAgent</title>
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        /* Simple style for the credits */
-        .app-credits { font-size: 0.9em; text-align: center; padding-top: 5px; opacity: 0.7; }
-        .app-credits a { color: var(--text-color-muted); text-decoration: none; }
-        .app-credits a:hover { color: var(--text-color); text-decoration: underline; }
-        /* Style for the LLM selector */
-        .llm-selector { background-color: var(--panel-bg-lighter); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 4px; padding: 3px 6px; font-size: 0.85em; max-width: 200px; cursor: pointer; }
-        .llm-selector:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 1px var(--accent-color); }
-        .llm-selector optgroup { font-weight: bold; font-style: italic; background-color: var(--panel-bg); color: var(--text-color-muted); }
-        .llm-selector option { background-color: var(--panel-bg-lighter); color: var(--text-color); }
-        /* Style for Monitor Status Indicator */
-        .monitor-status-container { display: flex; align-items: center; gap: 6px; }
-        .status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; background-color: grey; transition: background-color 0.3s ease; }
-        .status-dot.idle { background-color: #4CAF50; } /* Green */
-        .status-dot.running { background-color: #FFC107; } /* Yellow */
-        .status-dot.error { background-color: #F44336; } /* Red */
-        .status-dot.disconnected { background-color: #9E9E9E; } /* Grey */
-        .monitor-status-text { font-size: 0.85em; color: var(--text-color-darker); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        /* Style for Stop Button */
-        .stop-button {
-            background-color: var(--error-color);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 2px 8px;
-            font-size: 0.8em;
-            font-weight: bold;
-            cursor: pointer;
-            margin-left: 10px; /* Space from status */
-            display: none; /* Hidden by default */
-            transition: background-color 0.2s ease, opacity 0.2s ease;
-        }
-        .stop-button:hover:not(:disabled) { background-color: #d32f2f; /* Darker red */ }
-        .stop-button:disabled { background-color: #9E9E9E; cursor: not-allowed; opacity: 0.6; }
-        /* Style for Upload Area */
-        .upload-area {
-            padding: 5px 15px 10px; /* Add some padding */
-            border-top: 1px solid var(--border-color); /* Separator */
-            background-color: var(--panel-bg); /* Match footer/header */
-            flex-shrink: 0;
-            text-align: center; /* Center the button */
-        }
-        .upload-button {
-            background-color: var(--panel-bg-lighter);
-            color: var(--text-color-muted);
-            border: 1px solid var(--border-color);
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.85em;
-            transition: all 0.2s ease;
-        }
-        .upload-button:hover:not(:disabled) {
-            background-color: var(--panel-bg-lightest);
-            color: var(--text-color);
-            border-color: var(--text-color-muted);
-        }
-         .upload-button:disabled {
-             opacity: 0.5;
-             cursor: not-allowed;
-         }
-        /* --- NEW: Token Usage Display Area --- */
-        .token-usage-area {
-            padding: 8px 15px;
-            border-top: 1px solid var(--border-color);
-            background-color: var(--panel-bg); /* Match panel background */
-            flex-shrink: 0; /* Prevent shrinking */
-            font-size: 0.8em;
-            color: var(--text-color-muted);
-        }
-        .token-usage-area p {
-            margin: 2px 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .token-usage-area .token-label {
-            font-weight: 500;
-            color: var(--text-color-darker);
-        }
-        /* --- END NEW --- */
-    </style>
 </head>
 <body>
     <div class="app-container">
@@ -98,9 +16,18 @@
             <ul id="task-list" class="task-list scrollable-content">
                 <li class="task-item-placeholder">Loading tasks...</li>
             </ul>
+            
             <div id="token-usage-area" class="token-usage-area">
-                <p><span class="token-label">Last Call:</span> <span id="last-call-tokens">N/A</span></p>
-                <p><span class="token-label">Task Total:</span> <span id="task-total-tokens">N/A</span></p>
+                <div id="token-usage-header" class="token-usage-header">
+                    <span class="token-label">Task Tokens:</span>
+                    <span id="task-total-tokens-overall">0</span>
+                    <button id="token-expand-btn" class="token-expand-btn" title="Show/Hide Details">[+]</button>
+                </div>
+                <div id="token-usage-details" class="token-usage-details" style="display: none;">
+                    <p><span class="token-label">Last Call:</span> <span id="last-call-tokens">N/A</span></p>
+                    <div id="role-token-breakdown" class="role-token-breakdown">
+                        </div>
+                </div>
             </div>
             <div class="upload-area">
                 <input type="file" id="file-upload-input" multiple style="display: none;">
@@ -117,12 +44,40 @@
         <main class="panel center-panel">
             <div class="panel-header chat-header">
                 <h3 id="current-task-title">No Task Selected</h3>
-                <select id="llm-select" class="llm-selector" title="Select Language Model">
-                    <option value="">Loading LLMs...</option>
-                </select>
-            </div>
+                <div class="chat-header-llm-controls">
+                    <div class="llm-selector-group">
+                        <label for="intent-llm-select">Intent Classifier:</label>
+                        <select id="intent-llm-select" class="role-llm-select" title="Override LLM for Intent Classification (session)">
+                            <option value="">Use System Default</option>
+                        </select>
+                    </div>
+                    <div class="llm-selector-group">
+                        <label for="planner-llm-select">Planner:</label>
+                        <select id="planner-llm-select" class="role-llm-select" title="Override LLM for Planning (session)">
+                            <option value="">Use System Default</option>
+                        </select>
+                    </div>
+                    <div class="llm-selector-group">
+                        <label for="controller-llm-select">Controller:</label>
+                        <select id="controller-llm-select" class="role-llm-select" title="Override LLM for Controller/Validator (session)">
+                            <option value="">Use System Default</option>
+                        </select>
+                    </div>
+                    <div class="llm-selector-group">
+                        <label for="llm-select">Executor LLM:</label> <select id="llm-select" class="llm-selector" title="Select LLM for current session execution (Executor)">
+                            <option value="">Loading LLMs...</option>
+                        </select>
+                    </div>
+                    <div class="llm-selector-group">
+                        <label for="evaluator-llm-select">Evaluator:</label>
+                        <select id="evaluator-llm-select" class="role-llm-select" title="Override LLM for Evaluation (session)">
+                            <option value="">Use System Default</option>
+                        </select>
+                    </div>
+                </div>
+                </div>
             <div id="chat-messages" class="chat-messages scrollable-content">
-                 <div id="agent-thinking-status" class="message message-status agent-thinking-status" style="display: none;">Thinking...</div>
+                <div id="agent-thinking-status" class="message message-status agent-thinking-status" style="display: none;">Thinking...</div>
             </div>
             <div class="chat-input-area">
                 <textarea placeholder="Type your message here..."></textarea>
@@ -153,10 +108,18 @@
                     </div>
                 </div>
             </div>
-
-            </aside>
-
+        </aside>
     </div>
+    <script src="js/state_manager.js"></script>
+    <script src="js/websocket_manager.js"></script>
+    <script src="js/ui_modules/task_ui.js"></script>
+    <script src="js/ui_modules/chat_ui.js"></script>
+    <script src="js/ui_modules/monitor_ui.js"></script>
+    <script src="js/ui_modules/artifact_ui.js"></script>
+    <script src="js/ui_modules/llm_selector_ui.js"></script>
+    <script src="js/ui_modules/token_usage_ui.js"></script>
+    <script src="js/ui_modules/file_upload_ui.js"></script>
     <script src="js/script.js"></script>
 </body>
 </html>
+

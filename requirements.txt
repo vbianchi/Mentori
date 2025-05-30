@@ -16,6 +16,7 @@ langchain-community>=0.0.20
 langchainhub>=0.1.15
 langchain-experimental>=0.0.50 # For Python REPL Tool
 langchain-ollama>=0.1.0
+langchain-tavily>=0.1.0 # MODIFIED: Added Tavily Search
 
 # --- Tool Dependencies ---
 duckduckgo-search>=5.0
@@ -25,6 +26,7 @@ aiofiles>=23.0
 matplotlib>=3.0 # Needed for plotting examples
 biopython>=1.80 # Added for PubMed/Entrez search
 pypdf>=4.0.0 # Added for PDF reading
+playwright
 
 # --- Database ---
 aiosqlite>=0.19 # Added for async SQLite operations

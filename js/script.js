@@ -1,965 +1,461 @@
-// js/script.js
 /**
- * This script handles the frontend logic for the AI Agent UI.
- * --- LLM Sync Fix ---
- * Ensures the LLM selector dropdown correctly reflects the backend's
- * actual default LLM on new connection/page reload, overriding stale
- * localStorage values for the initial selection.
+ * This script acts as the main orchestrator for the AI Agent UI.
+ * - Initializes StateManager and UI modules.
+ * - Manages the core application lifecycle.
+ * - Routes events/messages between UI modules, StateManager, and WebSocket communication.
+ * - Handles WebSocket message dispatching.
  */
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("AI Agent UI Script Loaded and DOM ready!");
+    console.log("AI Agent UI Script Loaded and DOM ready! Initializing StateManager...");
+    
+    if (typeof StateManager === 'undefined' || typeof StateManager.initStateManager !== 'function') {
+        console.error("FATAL: StateManager is not loaded or initStateManager is not a function. Ensure state_manager.js is loaded before script.js.");
+        alert("Application critical error: State manager failed to load. Please check console and refresh.");
+        return;
+    }
+    StateManager.initStateManager(); 
+    console.log("[Script.js] StateManager.initStateManager() called.");
 
-    // --- Get references to UI elements ---
+    // DOM Element References
     const taskListUl = document.getElementById('task-list');
     const newTaskButton = document.getElementById('new-task-button');
     const chatMessagesContainer = document.getElementById('chat-messages');
     const monitorLogAreaElement = document.getElementById('monitor-log-area');
-    const monitorArtifactAreaElement = document.getElementById('monitor-artifact-area');
-    const artifactNavElement = document.querySelector('.artifact-nav');
+    const monitorArtifactArea = document.getElementById('monitor-artifact-area');
+    const artifactNav = document.querySelector('.artifact-nav');
     const artifactPrevBtn = document.getElementById('artifact-prev-btn');
     const artifactNextBtn = document.getElementById('artifact-next-btn');
     const artifactCounterElement = document.getElementById('artifact-counter');
     const chatTextarea = document.querySelector('.chat-input-area textarea');
     const chatSendButton = document.querySelector('.chat-input-area button');
     const currentTaskTitleElement = document.getElementById('current-task-title');
-    const monitorStatusContainer = document.getElementById('monitor-status-container');
     const statusDotElement = document.getElementById('status-dot');
     const monitorStatusTextElement = document.getElementById('monitor-status-text');
-    const llmSelectElement = document.getElementById('llm-select');
-    const stopButton = document.getElementById('stop-button');
-    const fileUploadInput = document.getElementById('file-upload-input');
-    const uploadFileButton = document.getElementById('upload-file-button');
-    const agentThinkingStatusElement = document.getElementById('agent-thinking-status');
-    const tokenUsageAreaElement = document.getElementById('token-usage-area');
-    const lastCallTokensElement = document.getElementById('last-call-tokens');
-    const taskTotalTokensElement = document.getElementById('task-total-tokens');
+    const stopButtonElement = document.getElementById('stop-button');
+    const fileUploadInputElement = document.getElementById('file-upload-input');
+    const uploadFileButtonElement = document.getElementById('upload-file-button');
+    const agentThinkingStatusElement = document.getElementById('agent-thinking-status'); 
 
+    const roleSelectorsMetaForInit = [
+        { element: document.getElementById('intent-llm-select'), role: 'intent_classifier', storageKey: 'sessionIntentClassifierLlmId', label: 'Intent Classifier' },
+        { element: document.getElementById('planner-llm-select'), role: 'planner', storageKey: 'sessionPlannerLlmId', label: 'Planner' },
+        { element: document.getElementById('controller-llm-select'), role: 'controller', storageKey: 'sessionControllerLlmId', label: 'Controller' },
+        { element: document.getElementById('evaluator-llm-select'), role: 'evaluator', storageKey: 'sessionEvaluatorLlmId', label: 'Evaluator' }
+    ];
+    const executorLlmSelectElement = document.getElementById('llm-select');
 
-    // --- State Variables ---
-    let tasks = [];
-    let currentTaskId = null;
-    let taskCounter = 0;
-    const STORAGE_KEY = 'aiAgentTasks';
-    const COUNTER_KEY = 'aiAgentTaskCounter';
-    let isLoadingHistory = false;
-    let availableModels = { gemini: [], ollama: [] };
-    let currentSelectedLlmId = null; // This will be set by the backend's default initially
-    // let defaultLlmId = null; // This is now directly used from the message
+    const httpBackendBaseUrl = 'http://localhost:8766'; 
+    let isLoadingHistory = false; 
 
-    let isAgentRunning = false;
-
-    // --- Chat Input History State ---
-    let chatInputHistory = [];
-    const MAX_CHAT_HISTORY = 10;
-    let chatHistoryIndex = -1;
-    let currentInputBuffer = "";
-
-    // --- Artifact State ---
-    let currentTaskArtifacts = [];
-    let currentArtifactIndex = -1;
-
-    // --- Token Tracking State ---
-    let currentTaskTotalTokens = { input: 0, output: 0, total: 0 };
-
-
-    // --- Backend URLs ---
-    const wsUrl = 'ws://localhost:8765';
-    const httpBackendBaseUrl = 'http://localhost:8766';
-
-    let socket;
-    window.socket = null;
-    console.log("Initialized window.socket to null.");
-
-    // --- Function to update monitor status indicator & Stop Button ---
-    const updateMonitorStatus = (status, text) => {
-        if (!statusDotElement || !monitorStatusTextElement || !stopButton) return;
-        statusDotElement.classList.remove('idle', 'running', 'error', 'disconnected');
-        let statusText = text;
-        switch (status) {
-            case 'idle':
-                statusDotElement.classList.add('idle'); statusText = text || 'Idle'; isAgentRunning = false;
-                stopButton.style.display = 'none'; stopButton.disabled = true;
-                if (agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
-                break;
-            case 'running':
-                statusDotElement.classList.add('running'); statusText = text || 'Running...'; isAgentRunning = true;
-                stopButton.style.display = 'inline-block'; stopButton.disabled = false;
-                break;
-            case 'error':
-                statusDotElement.classList.add('error'); statusText = text || 'Error'; isAgentRunning = false;
-                stopButton.style.display = 'none'; stopButton.disabled = true;
-                if (agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
-                break;
-            case 'cancelling':
-                 statusDotElement.classList.add('running'); statusText = text || 'Cancelling...'; isAgentRunning = true;
-                 stopButton.disabled = true;
-                 if (agentThinkingStatusElement) {
-                    agentThinkingStatusElement.textContent = 'Cancelling...';
-                    agentThinkingStatusElement.style.display = 'block';
-                 }
-                 break;
-            case 'disconnected':
-            default:
-                statusDotElement.classList.add('disconnected'); statusText = text || 'Disconnected'; isAgentRunning = false;
-                stopButton.style.display = 'none'; stopButton.disabled = true;
-                if (agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
-                break;
-        }
-        monitorStatusTextElement.textContent = statusText;
-    };
-
-    const updateTokenDisplay = (lastCallUsage = null) => {
-        if (!lastCallTokensElement || !taskTotalTokensElement) return;
-        if (lastCallUsage) {
-            const lastInput = lastCallUsage.input_tokens || 0;
-            const lastOutput = lastCallUsage.output_tokens || 0;
-            const lastTotal = lastCallUsage.total_tokens || (lastInput + lastOutput);
-            lastCallTokensElement.textContent = `In: ${lastInput}, Out: ${lastOutput}, Total: ${lastTotal} (${lastCallUsage.model_name || 'N/A'})`;
-            currentTaskTotalTokens.input += lastInput;
-            currentTaskTotalTokens.output += lastOutput;
-            currentTaskTotalTokens.total += lastTotal;
-        }
-        taskTotalTokensElement.textContent = `In: ${currentTaskTotalTokens.input}, Out: ${currentTaskTotalTokens.output}, Total: ${currentTaskTotalTokens.total}`;
-    };
-
-    const resetTaskTokenTotals = () => {
-        currentTaskTotalTokens = { input: 0, output: 0, total: 0 };
-        if(lastCallTokensElement) lastCallTokensElement.textContent = "N/A";
-        updateTokenDisplay();
-    };
-
-
-    const connectWebSocket = () => {
-        console.log(`Attempting to connect to WebSocket: ${wsUrl}`);
-        addMonitorLog("[SYSTEM] Attempting to connect to backend...");
-        updateMonitorStatus('disconnected', 'Connecting...');
-        chatMessagesContainer.querySelectorAll('.connection-status').forEach(el => el.remove());
+    window.dispatchWsMessage = (message) => {
         try {
-            if (window.socket && window.socket.readyState !== WebSocket.CLOSED) {
-                console.log("Closing existing WebSocket connection before reconnecting.");
-                window.socket.close(1000, "Reconnecting");
+            // console.log("[Script.js] Dispatching WS Message:", message.type, message.content); 
+            switch (message.type) {
+                case 'session_established':
+                    if (message.content && message.content.session_id && typeof StateManager !== 'undefined' && typeof StateManager.setCurrentSessionId === 'function') {
+                        StateManager.setCurrentSessionId(message.content.session_id);
+                        console.log(`[Script.js] Full session ID established via 'session_established': ${message.content.session_id}`);
+                    }
+                    break;
+                case 'history_start': 
+                    isLoadingHistory = true;
+                    if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Loading history...", "status_message", { component_hint: "SYSTEM"});
+                    updateGlobalMonitorStatus('running', 'Loading History...'); 
+                    break;
+                case 'history_end': 
+                    isLoadingHistory = false;
+                    const loadingMsgWrapper = Array.from(chatMessagesContainer.querySelectorAll('.message-outer-blue-line'))
+                                               .find(wrapper => wrapper.querySelector('.message-system-status-content')?.textContent.startsWith("Loading history..."));
+                    if (loadingMsgWrapper) { 
+                        loadingMsgWrapper.remove();
+                    } 
+                    if (typeof scrollToBottomChat === 'function') scrollToBottomChat();
+                    if (typeof scrollToBottomMonitorLog === 'function') scrollToBottomMonitorLog(); 
+                    
+                    if (!StateManager.getIsAgentRunning()) { 
+                        updateGlobalMonitorStatus('idle', 'Idle'); 
+                        if (typeof showAgentThinkingStatusInUI === 'function') {
+                            showAgentThinkingStatusInUI(true, { message: "Idle.", status_key: "IDLE", component_hint: "SYSTEM" });
+                        }
+                    } else {
+                        console.log("[Script.js] History loaded, but agent is already running. Not setting to Idle.");
+                    }
+                    break;
+                case 'agent_major_step_announcement': 
+                    if (message.content && typeof message.content.description === 'string') {
+                        if (typeof displayMajorStepAnnouncementUI === 'function') {
+                            displayMajorStepAnnouncementUI(message.content);
+                        }
+                    } else {
+                        console.warn("[Script.js] Invalid agent_major_step_announcement data:", message.content);
+                    }
+                    break;
+                case 'agent_thinking_update': 
+                    if (message.content && typeof message.content === 'object' && (message.content.message || message.content.sub_type)) { 
+                        if (typeof showAgentThinkingStatusInUI === 'function') {
+                            showAgentThinkingStatusInUI(true, message.content); 
+                        }
+                    } else if (message.content && typeof message.content.status === 'string') { 
+                         if (typeof showAgentThinkingStatusInUI === 'function') {
+                            showAgentThinkingStatusInUI(true, { message: message.content.status, status_key: "LEGACY_STATUS", component_hint: "SYSTEM" });
+                        }
+                    }
+                    break;
+                case 'agent_message': 
+                    if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); 
+                    if (typeof addChatMessageToUI === 'function') addChatMessageToUI(message.content, message.type, { component_hint: message.content.component_hint || 'DEFAULT' });
+                    updateGlobalMonitorStatus('idle', 'Idle');
+                    if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "Idle.", status_key: "IDLE", component_hint: "SYSTEM" });
+                    break;
+                case 'confirmed_plan_log': 
+                    if (typeof addChatMessageToUI === 'function') {
+                        addChatMessageToUI(message.content, message.type); 
+                    }
+                    break;
+                case 'llm_token_usage': 
+                    console.log("[Script.js] Received 'llm_token_usage':", JSON.stringify(message.content)); 
+                    if (message.content && typeof message.content === 'object') { 
+                        handleTokenUsageUpdate(message.content);
+                    } 
+                    break;
+                case 'propose_plan_for_confirmation':
+                    if (message.content && message.content.human_summary && message.content.structured_plan && message.content.plan_id) {
+                        StateManager.setCurrentDisplayedPlan(message.content.structured_plan);
+                        StateManager.setCurrentPlanProposalId(message.content.plan_id);         
+                
+                        if (typeof addChatMessageToUI === 'function') { 
+                            const planDataForUI = {
+                                ...message.content,
+                                onConfirm: handlePlanConfirmRequest,
+                                onCancel: handlePlanCancelRequest,
+                                onViewDetails: handlePlanViewDetailsRequest
+                            };
+                            addChatMessageToUI(planDataForUI, message.type);
+                        }
+                        updateGlobalMonitorStatus('idle', 'Awaiting Plan Confirmation'); 
+                        if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "Awaiting plan confirmation...", status_key: "AWAITING_PLAN_CONFIRMATION", component_hint: "SYSTEM" });
+                    } else {
+                        console.error("[Script.js] Invalid propose_plan_for_confirmation data received:", message.content);
+                        if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Error: Received invalid plan proposal from backend.", "status_message", {component_hint: "ERROR", isError: true });
+                    }
+                    break;
+                // --- START: New case for tool_result_for_chat (Phase 3) ---
+                case 'tool_result_for_chat':
+                    console.debug("[Script.js] Received 'tool_result_for_chat':", message.content);
+                    if (message.content && typeof message.content === 'object') {
+                        if (typeof displayToolOutputMessageUI === 'function') {
+                            displayToolOutputMessageUI(message.content);
+                        } else {
+                            console.error("[Script.js] displayToolOutputMessageUI function not found in chat_ui.js for 'tool_result_for_chat'.");
+                        }
+                    } else {
+                        console.warn("[Script.js] Invalid 'tool_result_for_chat' data received:", message.content);
+                    }
+                    break;
+                // --- END: New case for tool_result_for_chat (Phase 3) ---
+                case 'user': 
+                    if (typeof addChatMessageToUI === 'function') addChatMessageToUI(message.content, message.type);
+                    break;
+                case 'status_message': 
+                    let statusText = "";
+                    let statusComponentHint = "SYSTEM";
+                    let isErrorStatus = false;
+
+                    if (typeof message.content === 'string') {
+                        statusText = message.content;
+                    } else if (message.content && typeof message.content.text === 'string') {
+                        statusText = message.content.text;
+                        statusComponentHint = message.content.component_hint || statusComponentHint;
+                    } else if (message.content) {
+                        statusText = String(message.content);
+                    }
+
+                    const lowerStatusText = statusText.toLowerCase();
+                    isErrorStatus = lowerStatusText.includes("error");
+
+                    if (typeof addChatMessageToUI === 'function') addChatMessageToUI(statusText, message.type, { component_hint: statusComponentHint, isError: isErrorStatus });
+                    
+                    if (isErrorStatus) { 
+                        updateGlobalMonitorStatus('error', statusText);
+                        if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "Error occurred.", status_key: "ERROR", component_hint: "ERROR" });
+                    } else if (lowerStatusText.includes("complete") || lowerStatusText.includes("cancelled") || lowerStatusText.includes("plan proposal cancelled") || lowerStatusText.includes("task context ready")) { 
+                        updateGlobalMonitorStatus('idle', 'Idle');
+                        if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "Idle.", status_key: "IDLE", component_hint: "SYSTEM" });
+                    }
+                    break;
+                case 'monitor_log': 
+                    if (message.content && typeof message.content.text === 'string') {
+                        if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(message.content);
+                    } else {
+                        if (typeof message.content === 'string' && typeof addLogEntryToMonitor === 'function') {
+                             addLogEntryToMonitor({ text: message.content, log_source: "UNKNOWN_STRING_LOG" });
+                        }
+                    }
+                    break;
+                case 'update_artifacts': 
+                    // console.log(`[Script.js CRITICAL DEBUG] Received 'update_artifacts'. Agent running: ${StateManager.getIsAgentRunning()}`, message.content); // Reduced verbosity
+                    if (Array.isArray(message.content)) { 
+                        StateManager.setCurrentTaskArtifacts(message.content);
+                        const newArtifacts = StateManager.getCurrentTaskArtifacts(); 
+                        const newIndexToSet = newArtifacts.length > 0 ? 0 : -1;
+                        StateManager.setCurrentArtifactIndex(newIndexToSet);
+                        
+                        // console.log(`[Script.js] Artifacts updated. New count: ${newArtifacts.length}. Displaying index: ${newIndexToSet}`); // Reduced verbosity
+                        // console.log(`[Script.js CRITICAL DEBUG] About to call updateArtifactDisplayUI. Agent running: ${StateManager.getIsAgentRunning()}`); // Reduced verbosity
+                        if(typeof updateArtifactDisplayUI === 'function') { 
+                            updateArtifactDisplayUI(newArtifacts, StateManager.getCurrentArtifactIndex()); 
+                        } 
+                    } 
+                    break;
+                case 'trigger_artifact_refresh': 
+                    // console.log(`[Script.js CRITICAL DEBUG] Received 'trigger_artifact_refresh' for taskId: ${message.content?.taskId}. Current task: ${StateManager.getCurrentTaskId()}. Agent running: ${StateManager.getIsAgentRunning()}`); // Reduced verbosity
+                    const taskIdToRefresh = message.content?.taskId;
+                    if (taskIdToRefresh && taskIdToRefresh === StateManager.getCurrentTaskId()) { 
+                        if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM_EVENT] File event detected for task ${taskIdToRefresh}, requesting artifact list update...`, log_source: "SYSTEM_EVENT"});
+                        if (typeof sendWsMessage === 'function') {
+                            // console.log(`[Script.js CRITICAL DEBUG] Conditions met. Sending 'get_artifacts_for_task' for task ${StateManager.getCurrentTaskId()}`); // Reduced verbosity
+                            sendWsMessage('get_artifacts_for_task', { taskId: StateManager.getCurrentTaskId() });
+                        }
+                    } else {
+                        // console.log(`[Script.js CRITICAL DEBUG] Conditions NOT met for sending 'get_artifacts_for_task'. taskIdToRefresh: ${taskIdToRefresh}, currentTaskId: ${StateManager.getCurrentTaskId()}`); // Reduced verbosity
+                    }
+                    break;
+                case 'available_models': 
+                    if (message.content && typeof message.content === 'object') { 
+                        StateManager.setAvailableModels({gemini: message.content.gemini || [], ollama: message.content.ollama || []});
+                        const backendDefaultExecutorLlmId = message.content.default_executor_llm_id || null; 
+                        const backendRoleDefaults = message.content.role_llm_defaults || {};
+                        if (typeof populateAllLlmSelectorsUI === 'function') { populateAllLlmSelectorsUI(StateManager.getAvailableModels(), backendDefaultExecutorLlmId, backendRoleDefaults); } 
+                    } 
+                    break;
+                case 'error_parsing_message': 
+                    console.error("Error parsing message from WebSocket:", message.content);
+                    if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM_ERROR] Error parsing WebSocket message: ${message.content}`, log_source: "SYSTEM_ERROR"});
+                    if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Error: Received an unreadable message from the backend.", "status_message", {component_hint: "ERROR", isError: true}); 
+                    break;
+                default: 
+                    console.warn("[Script.js] Received unknown message type:", message.type, "Content:", message.content);
+                    if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM_WARNING] Unknown message type received: ${message.type}`, log_source: "SYSTEM_WARNING"});
             }
-            socket = new WebSocket(wsUrl);
-            window.socket = socket;
-            console.log("WebSocket object created.");
         } catch (error) {
-            console.error("Fatal Error creating WebSocket object:", error);
-            addChatMessage("FATAL: Failed to initialize WebSocket connection.", "status");
-            addMonitorLog(`[SYSTEM] FATAL Error creating WebSocket: ${error.message}`);
-            updateMonitorStatus('error', 'Connection Failed');
-            window.socket = null;
-            return;
-        }
-
-        socket.onopen = (event) => {
-            console.log("WebSocket connection opened successfully.");
-            addMonitorLog(`[SYSTEM] WebSocket connection established.`);
-            addChatMessage("Connected to backend.", "status");
-            updateMonitorStatus('idle', 'Idle');
-            sendWsMessage("get_available_models", {}); // This will trigger populateLlmSelector
-            if (currentTaskId) {
-                const currentTask = tasks.find(task => task.id === currentTaskId);
-                if (currentTask) {
-                    console.log("Sending initial context switch on connection open.");
-                    sendWsMessage("context_switch", { task: currentTask.title, taskId: currentTask.id });
-                } else {
-                    console.warn("currentTaskId set, but task not found in list on connection open.");
-                    currentTaskId = null; updateMonitorStatus('idle', 'No Task'); updateArtifactDisplay(); resetTaskTokenTotals();
-                }
-            } else {
-                 updateMonitorStatus('idle', 'No Task'); updateArtifactDisplay(); resetTaskTokenTotals();
-            }
-        };
-
-        socket.onmessage = (event) => {
-            try {
-                const message = JSON.parse(event.data);
-                switch (message.type) {
-                    case 'history_start':
-                        console.log("Received history_start signal."); isLoadingHistory = true;
-                        clearChatAndMonitor(false); addChatMessage(`Loading history...`, "status");
-                        updateMonitorStatus('running', 'Loading History...');
-                        break;
-                    case 'history_end':
-                        console.log("Received history_end signal."); isLoadingHistory = false;
-                        const loadingMsg = chatMessagesContainer.querySelector('.message-status:last-child');
-                        if (loadingMsg && loadingMsg.textContent.startsWith("Loading history...")) { loadingMsg.remove(); }
-                        scrollToBottom(chatMessagesContainer);
-                        scrollToBottom(monitorLogAreaElement);
-                        updateMonitorStatus('idle', 'Idle');
-                        break;
-                    case 'agent_thinking_update':
-                        console.log("Received agent_thinking_update:", message.content);
-                        if (agentThinkingStatusElement && message.content && message.content.status) {
-                            agentThinkingStatusElement.textContent = message.content.status;
-                            agentThinkingStatusElement.style.display = 'block';
-                            const lastMessage = chatMessagesContainer.querySelector('.message:last-child');
-                             if (lastMessage && lastMessage !== agentThinkingStatusElement) {
-                                chatMessagesContainer.insertBefore(agentThinkingStatusElement, lastMessage.nextSibling);
-                            } else if (!lastMessage) {
-                                chatMessagesContainer.appendChild(agentThinkingStatusElement);
-                            }
-                            scrollToBottom(chatMessagesContainer);
-                        } else {
-                            console.warn("Received invalid or incomplete agent_thinking_update:", message);
-                        }
-                        break;
-                    case 'agent_message':
-                        console.log("Received complete agent_message:", message.content.substring(0, 100) + "...");
-                        if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
-                        addChatMessage(message.content, 'agent');
-                        break;
-                    case 'llm_token_usage':
-                        console.log("Received llm_token_usage:", message.content);
-                        if (message.content && typeof message.content === 'object') {
-                            updateTokenDisplay(message.content);
-                        } else {
-                            console.warn("Invalid llm_token_usage message content:", message.content);
-                        }
-                        break;
-                    case 'user':
-                        addChatMessage(message.content, 'user');
-                        break;
-                    case 'status_message':
-                         const lowerContent = message.content.toLowerCase();
-                         if (lowerContent.includes("connect") || lowerContent.includes("clos") || lowerContent.includes("error")) {
-                             addChatMessage(message.content, 'status');
-                         }
-                         if (lowerContent.includes("error")) {
-                             updateMonitorStatus('error', message.content);
-                         } else if (lowerContent.includes("complete") || lowerContent.includes("cancelled")) {
-                             updateMonitorStatus('idle', 'Idle');
-                         }
-                         if (lowerContent.includes("complete") || lowerContent.includes("error") || lowerContent.includes("cancelled")) {
-                             if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
-                         }
-                         break;
-                    case 'monitor_log':
-                        addMonitorLog(message.content);
-                        if (message.content.includes("[Agent Finish]") || message.content.includes("Error]")) {
-                            if(isAgentRunning) updateMonitorStatus('idle', 'Idle');
-                            if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
-                        }
-                        break;
-                    case 'update_artifacts':
-                        console.log('Received update_artifacts. Current artifacts BEFORE update:', JSON.stringify(currentTaskArtifacts));
-                        console.log('Received update_artifacts message with content:', message.content);
-                        if (Array.isArray(message.content)) {
-                            currentTaskArtifacts = message.content;
-                            console.log('Current artifacts AFTER update:', JSON.stringify(currentTaskArtifacts));
-                            currentArtifactIndex = currentTaskArtifacts.length > 0 ? 0 : -1;
-                            updateArtifactDisplay();
-                        } else {
-                            console.warn("Invalid update_artifacts message content (not an array):", message.content);
-                            currentTaskArtifacts = []; currentArtifactIndex = -1; updateArtifactDisplay();
-                        }
-                        break;
-                    case 'trigger_artifact_refresh':
-                        const taskIdToRefresh = message.content?.taskId;
-                        console.log(`Received trigger_artifact_refresh for task: ${taskIdToRefresh}`);
-                        if (taskIdToRefresh && taskIdToRefresh === currentTaskId) {
-                            console.log(`Current task matches refresh trigger, requesting updated artifacts for ${currentTaskId}`);
-                            addMonitorLog(`[SYSTEM] File upload detected, refreshing artifact list...`);
-                            sendWsMessage('get_artifacts_for_task', { taskId: currentTaskId });
-                        } else {
-                            console.log(`Ignoring artifact refresh trigger for non-current task (${taskIdToRefresh})`);
-                        }
-                        break;
-                    case 'available_models': // This message triggers LLM selector population
-                        console.log("Received available_models:", message.content);
-                        if (message.content && typeof message.content === 'object') {
-                            availableModels.gemini = message.content.gemini || [];
-                            availableModels.ollama = message.content.ollama || [];
-                            // --- MODIFIED: Directly use the default_llm_id from backend ---
-                            const backendDefaultLlmId = message.content.default_llm_id || null;
-                            populateLlmSelector(backendDefaultLlmId); // Pass it to the function
-                        } else {
-                            console.warn("Invalid available_models message content:", message.content);
-                            availableModels = { gemini: [], ollama: [] };
-                            populateLlmSelector(null); // Pass null if data is invalid
-                        }
-                        break;
-                    case 'user_message': break;
-                    default:
-                        console.warn("Received unknown message type:", message.type, "Content:", message.content);
-                        addMonitorLog(`[SYSTEM] Unknown message type received: ${message.type}`);
-                }
-            } catch (error) {
-                console.error("Failed to parse/process WS message:", error, "Data:", event.data);
-                addMonitorLog(`[SYSTEM] Error processing message: ${error.message}.`);
-                updateMonitorStatus('error', 'Processing Error');
-                if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
-            }
-        };
-
-         socket.onerror = (event) => {
-            console.error("WebSocket error event:", event);
-            addChatMessage("ERROR: Cannot connect to backend.", "status", true);
-            addMonitorLog(`[SYSTEM] WebSocket error occurred.`);
-            updateMonitorStatus('error', 'Connection Error');
-            window.socket = null;
-             if (llmSelectElement) {
-                 llmSelectElement.innerHTML = '<option value="">Connection Error</option>';
-                 llmSelectElement.disabled = true;
-             }
-             if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
-        };
-        socket.onclose = (event) => {
-            console.log(`WebSocket closed. Code: ${event.code}, Reason: '${event.reason || 'No reason given'}' Clean close: ${event.wasClean}`);
-            let reason = event.reason || 'No reason given';
-            let advice = "";
-            if (event.code === 1000 || event.wasClean) { reason = "Normal"; }
-            else { reason = `Abnormal (Code: ${event.code})`; advice = " Backend down or network issue?"; }
-            addChatMessage(`Connection closed.${advice}`, "status", true);
-            addMonitorLog(`[SYSTEM] WebSocket disconnected. ${reason}`);
-            updateMonitorStatus('disconnected', 'Disconnected');
-            window.socket = null;
-             if (llmSelectElement) {
-                 llmSelectElement.innerHTML = '<option value="">Disconnected</option>';
-                 llmSelectElement.disabled = true;
-             }
-             if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
-        };
-    };
-
-    const scrollToBottom = (element) => { if (!element) return; element.scrollTop = element.scrollHeight; };
-
-    const formatMessageContent = (text) => {
-        let formattedText = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-        formattedText = formattedText.replace(/```(\w*)\n([\s\S]*?)\n?```/g, (match, lang, code) => { const escapedCode = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); const langClass = lang ? ` class="language-${lang}"` : ''; return `<pre><code${langClass}>${escapedCode}</code></pre>`; });
-        formattedText = formattedText.replace(/`([^`]+)`/g, '<code>$1</code>');
-        formattedText = formattedText.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (match, linkText, linkUrl) => { const safeLinkUrl = linkUrl.replace(/"/g, "&quot;"); if (linkText.includes('&lt;') || linkText.includes('&gt;')) return match; return `<a href="${safeLinkUrl}" target="_blank" rel="noopener noreferrer">${linkText}</a>`; });
-        formattedText = formattedText.replace(/(\*\*\*|___)(?=\S)([\s\S]*?\S)\1/g, '<strong><em>$2</em></strong>');
-        formattedText = formattedText.replace(/(\*\*|__)(?=\S)([\s\S]*?\S)\1/g, '<strong>$2</strong>');
-        formattedText = formattedText.replace(/(?<![`\w])(?:(\*|_))(?=\S)([\s\S]*?\S)\1(?![`\w])/g, '<em>$2</em>');
-        const parts = formattedText.split(/(<pre>.*?<\/pre>|<a.*?<\/a>|<code>.*?<\/code>)/s);
-        for (let i = 0; i < parts.length; i += 2) { parts[i] = parts[i].replace(/\n/g, '<br>'); }
-        formattedText = parts.join('');
-        return formattedText;
-    };
-
-    const addChatMessage = (text, type = 'agent', doScroll = true) => {
-        if (!chatMessagesContainer) { console.error("Chat container missing!"); return null; }
-        if (type === 'status') {
-            const lowerText = text.toLowerCase();
-            if (!(lowerText.includes("connect") || lowerText.includes("clos") || lowerText.includes("error"))) {
-                console.log("Skipping non-critical status message in chat:", text);
-                return null;
-            }
-        }
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message', `message-${type}`);
-        if (type === 'status') {
-            const lowerText = text.toLowerCase();
-            if (lowerText.includes("connect") || lowerText.includes("clos")) { messageElement.classList.add('connection-status'); }
-            if (lowerText.includes("error")) { messageElement.classList.add('error-message'); }
-        }
-        if (type === 'user') { messageElement.classList.add('user-message'); }
-        if (type === 'agent') { messageElement.classList.add('agent-message'); }
-        messageElement.innerHTML = formatMessageContent(text);
-        if (agentThinkingStatusElement && agentThinkingStatusElement.style.display !== 'none') {
-             chatMessagesContainer.insertBefore(agentThinkingStatusElement, null);
-        }
-        chatMessagesContainer.appendChild(messageElement);
-        if (doScroll) scrollToBottom(chatMessagesContainer);
-        return messageElement;
-    };
-
-     const addMonitorLog = (fullLogText) => {
-        if (!monitorLogAreaElement) { console.error("Monitor log area element (#monitor-log-area) not found!"); return; }
-        const logEntryDiv = document.createElement('div');
-        logEntryDiv.classList.add('monitor-log-entry');
-        const logRegex = /^(\[.*?\]\[.*?\])\s*(?:\[(.*?)\])?\s*(.*)$/s;
-        const match = fullLogText.match(logRegex);
-        let timestampPrefix = "";
-        let logTypeIndicator = "";
-        let logContent = fullLogText;
-        let logType = "unknown";
-        if (match) {
-            timestampPrefix = match[1] || "";
-            logTypeIndicator = (match[2] || "").trim().toUpperCase();
-            logContent = match[3] || "";
-            if (logTypeIndicator.includes("TOOL START")) logType = 'tool-start';
-            else if (logTypeIndicator.includes("TOOL OUTPUT")) logType = 'tool-output';
-            else if (logTypeIndicator.includes("TOOL ERROR")) logType = 'tool-error';
-            else if (logTypeIndicator.includes("AGENT THOUGHT (ACTION)")) logType = 'agent-thought-action';
-            else if (logTypeIndicator.includes("AGENT THOUGHT (FINAL)")) logType = 'agent-thought-final';
-            else if (logTypeIndicator.includes("AGENT FINISH")) logType = 'agent-finish';
-            else if (logTypeIndicator.includes("ERROR") || logTypeIndicator.includes("ERR_")) logType = 'error';
-            else if (logTypeIndicator.includes("HISTORY")) logType = 'history';
-            else if (logTypeIndicator.includes("SYSTEM") || logTypeIndicator.includes("SYS_")) logType = 'system';
-            else if (logTypeIndicator.includes("ARTIFACT")) logType = 'artifact-generated';
-            else if (logTypeIndicator.includes("USER_INPUT_LOG")) logType = 'user-input-log';
-            else if (logTypeIndicator.includes("LLM TOKEN USAGE")) logType = 'system';
-        } else {
-            if (fullLogText.toLowerCase().includes("error")) logType = 'error';
-            else if (fullLogText.toLowerCase().includes("system")) logType = 'system';
-        }
-        logEntryDiv.classList.add(`log-type-${logType}`);
-        if (timestampPrefix) {
-            const timeSpan = document.createElement('span');
-            timeSpan.className = 'log-timestamp';
-            timeSpan.textContent = timestampPrefix;
-            logEntryDiv.appendChild(timeSpan);
-        }
-        const contentSpan = document.createElement('span');
-        contentSpan.className = 'log-content';
-        if (logType === 'tool-output' || logType === 'tool-error' || logType.startsWith('agent-thought')) {
-            const pre = document.createElement('pre');
-            pre.textContent = logContent.trim();
-            contentSpan.appendChild(pre);
-        } else {
-            contentSpan.textContent = logContent.trim();
-        }
-        logEntryDiv.appendChild(contentSpan);
-        monitorLogAreaElement.appendChild(logEntryDiv);
-        scrollToBottom(monitorLogAreaElement);
-    };
-
-     const updateArtifactDisplay = async () => {
-        if (!monitorArtifactAreaElement || !artifactNavElement || !artifactPrevBtn || !artifactNextBtn || !artifactCounterElement) {
-            console.error("Artifact display elements not found!");
-            return;
-        }
-        while (monitorArtifactAreaElement.firstChild && monitorArtifactAreaElement.firstChild !== artifactNavElement) {
-            monitorArtifactAreaElement.removeChild(monitorArtifactAreaElement.firstChild);
-        }
-        if (currentTaskArtifacts.length === 0 || currentArtifactIndex < 0 || currentArtifactIndex >= currentTaskArtifacts.length) {
-            const placeholder = document.createElement('div');
-            placeholder.className = 'artifact-placeholder';
-            placeholder.textContent = 'No artifacts generated yet.';
-            monitorArtifactAreaElement.insertBefore(placeholder, artifactNavElement);
-            artifactNavElement.style.display = 'none';
-        } else {
-            const artifact = currentTaskArtifacts[currentArtifactIndex];
-            if (!artifact || !artifact.url || !artifact.filename || !artifact.type) {
-                console.error("Invalid artifact data:", artifact);
-                const errorDiv = Object.assign(document.createElement('div'), { className: 'artifact-error', textContent: 'Error displaying artifact: Invalid data.' });
-                monitorArtifactAreaElement.insertBefore(errorDiv, artifactNavElement);
-                artifactNavElement.style.display = 'none';
-                return;
-            }
-            const filenameDiv = document.createElement('div');
-            filenameDiv.className = 'artifact-filename';
-            filenameDiv.textContent = artifact.filename;
-            monitorArtifactAreaElement.insertBefore(filenameDiv, artifactNavElement);
-            if (artifact.type === 'image') {
-                const imgElement = document.createElement('img');
-                imgElement.src = artifact.url;
-                imgElement.alt = `Generated image: ${artifact.filename}`;
-                imgElement.title = `Generated image: ${artifact.filename}`;
-                imgElement.onerror = () => {
-                    console.error(`Error loading image from URL: ${artifact.url}`);
-                    imgElement.remove();
-                    const errorDiv = Object.assign(document.createElement('div'), { className: 'artifact-error', textContent: `Error loading image: ${artifact.filename}` });
-                    monitorArtifactAreaElement.insertBefore(errorDiv, artifactNavElement);
-                };
-                monitorArtifactAreaElement.insertBefore(imgElement, artifactNavElement);
-            } else if (artifact.type === 'text') {
-                const preElement = document.createElement('pre');
-                preElement.textContent = 'Loading text file...';
-                monitorArtifactAreaElement.insertBefore(preElement, artifactNavElement);
-                try {
-                    console.log(`Fetching text artifact: ${artifact.url}`);
-                    const response = await fetch(artifact.url);
-                    if (!response.ok) { throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`); }
-                    const textContent = await response.text();
-                    preElement.textContent = textContent;
-                    console.log(`Successfully fetched and displayed ${artifact.filename}`);
-                } catch (error) {
-                    console.error(`Error fetching text artifact ${artifact.filename}:`, error);
-                    preElement.textContent = `Error loading file: ${artifact.filename}\n${error.message}`;
-                    preElement.classList.add('artifact-error');
-                }
-            } else {
-                console.warn(`Unsupported artifact type: ${artifact.type} for file ${artifact.filename}`);
-                const unknownDiv = Object.assign(document.createElement('div'), { className: 'artifact-placeholder', textContent: `Unsupported artifact type: ${artifact.filename}` });
-                monitorArtifactAreaElement.insertBefore(unknownDiv, artifactNavElement);
-            }
-            if (currentTaskArtifacts.length > 1) {
-                artifactCounterElement.textContent = `Artifact ${currentArtifactIndex + 1} of ${currentTaskArtifacts.length}`;
-                artifactPrevBtn.disabled = (currentArtifactIndex === 0);
-                artifactNextBtn.disabled = (currentArtifactIndex === currentTaskArtifacts.length - 1);
-                artifactNavElement.style.display = 'flex';
-            } else {
-                artifactNavElement.style.display = 'none';
-            }
+            console.error("[Script.js] Failed to process dispatched WS message:", error, "Original Message:", message);
+            if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM_ERROR] Error processing dispatched message: ${error.message}.`, log_source: "SYSTEM_ERROR"});
+            updateGlobalMonitorStatus('error', 'Processing Error');
+            if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); 
         }
     };
 
-    const loadTasks = () => {
-        const storedCounter = localStorage.getItem(COUNTER_KEY);
-        taskCounter = storedCounter ? parseInt(storedCounter, 10) : 0;
-        if (isNaN(taskCounter)) taskCounter = 0;
-        let firstLoad = false;
-        const storedTasks = localStorage.getItem(STORAGE_KEY);
-        if (storedTasks) {
-            try {
-                tasks = JSON.parse(storedTasks);
-                if (!Array.isArray(tasks)) { tasks = []; }
-                tasks.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-            } catch (e) {
-                console.error("Failed to parse tasks from localStorage:", e);
-                tasks = []; localStorage.removeItem(STORAGE_KEY);
-            }
-        } else {
-            tasks = []; firstLoad = true;
-        }
-        if (firstLoad && tasks.length === 0) {
-            taskCounter = 1;
-            const firstTask = { id: `task-${Date.now()}-${Math.random().toString(16).slice(2)}`, title: `Task - ${taskCounter}`, timestamp: Date.now() };
-            tasks.unshift(firstTask); currentTaskId = firstTask.id; saveTasks();
-        } else {
-            const lastActiveId = localStorage.getItem(`${STORAGE_KEY}_active`);
-            if (lastActiveId && tasks.some(task => task.id === lastActiveId)) {
-                currentTaskId = lastActiveId;
-            } else if (tasks.length > 0) {
-                currentTaskId = tasks[0].id;
-            } else {
-                currentTaskId = null;
-            }
-        }
-        console.log("Initial currentTaskId set to:", currentTaskId);
+    function updateGlobalMonitorStatus(status, text) { 
+        StateManager.setIsAgentRunning(status === 'running' || status === 'cancelling'); 
+        if (typeof updateMonitorStatusUI === 'function') { 
+            updateMonitorStatusUI(status, text, StateManager.getIsAgentRunning()); 
+        } 
+    }
+    function handleTokenUsageUpdate(lastCallUsage = null) { 
+        // console.log("[Script.js] handleTokenUsageUpdate called with:", JSON.stringify(lastCallUsage)); // Reduced verbosity
+        StateManager.updateCurrentTaskTotalTokens(lastCallUsage); 
+        if (typeof updateTokenDisplayUI === 'function') { 
+            updateTokenDisplayUI(lastCallUsage, StateManager.getCurrentTaskTotalTokens()); 
+        } 
+    }
+    
+    function clearChatAndMonitor(addLog = true) { 
+        if (typeof clearChatMessagesUI === 'function') clearChatMessagesUI(); 
+        if (typeof clearMonitorLogUI === 'function') clearMonitorLogUI(); 
+        StateManager.setCurrentTaskArtifacts([]); 
+        StateManager.setCurrentArtifactIndex(-1); 
+        if (typeof clearArtifactDisplayUI === 'function') clearArtifactDisplayUI(); 
+        if (addLog && typeof addLogEntryToMonitor === 'function') { 
+            addLogEntryToMonitor({text: "[SYSTEM_EVENT] Cleared context.", log_source: "SYSTEM_EVENT"}); 
+        } 
+        StateManager.setCurrentDisplayedPlan(null); 
+        StateManager.setCurrentPlanProposalId(null); 
     };
-    const saveTasks = () => {
-        try {
-            tasks.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-            localStorage.setItem(COUNTER_KEY, taskCounter.toString());
-            if (currentTaskId) { localStorage.setItem(`${STORAGE_KEY}_active`, currentTaskId); }
-            else { localStorage.removeItem(`${STORAGE_KEY}_active`); }
-        } catch (e) {
-            console.error("Failed to save tasks to localStorage:", e);
-            alert("Error saving task list. Changes might not persist.");
-        }
-    };
-    const renderTaskList = () => {
-        if (!taskListUl) { console.error("Task list UL element not found!"); return; }
-        taskListUl.innerHTML = '';
-        if (tasks.length === 0) {
-            taskListUl.innerHTML = '<li class="task-item-placeholder">No tasks yet.</li>';
-        } else {
-            tasks.forEach((task) => {
-                const li = document.createElement('li'); li.className = 'task-item'; li.dataset.taskId = task.id;
-                const titleSpan = document.createElement('span'); titleSpan.className = 'task-title';
-                const displayTitle = task.title.length > 25 ? task.title.substring(0, 22) + '...' : task.title;
-                titleSpan.textContent = displayTitle; titleSpan.title = task.title; li.appendChild(titleSpan);
-                const controlsDiv = document.createElement('div'); controlsDiv.className = 'task-item-controls';
-                const editBtn = document.createElement('button'); editBtn.className = 'task-edit-btn'; editBtn.textContent = '✏️';
-                editBtn.title = `Rename Task: ${task.title}`; editBtn.dataset.taskId = task.id; editBtn.dataset.taskTitle = task.title;
-                editBtn.addEventListener('click', (event) => { event.stopPropagation(); handleEditTaskClick(task.id, task.title); });
-                controlsDiv.appendChild(editBtn);
-                const deleteBtn = document.createElement('button'); deleteBtn.className = 'task-delete-btn'; deleteBtn.textContent = '🗑️';
-                deleteBtn.title = `Delete Task: ${task.title}`; deleteBtn.dataset.taskId = task.id;
-                deleteBtn.addEventListener('click', (event) => { event.stopPropagation(); handleDeleteTaskClick(task.id, task.title); });
-                controlsDiv.appendChild(deleteBtn); li.appendChild(controlsDiv);
-                li.addEventListener('click', () => { handleTaskItemClick(task.id); });
-                if (task.id === currentTaskId) { li.classList.add('active'); }
-                taskListUl.appendChild(li);
+    
+    const handleTaskSelection = (taskId) => { 
+        console.log(`[MainScript] Task selection requested for: ${taskId}`);
+        const previousActiveTaskId = StateManager.getCurrentTaskId();
+        
+        StateManager.setIsAgentRunning(false); 
+        const selectedTaskObjectForTitle = StateManager.getTasks().find(t => t.id === taskId);
+        const taskTitleForStatus = selectedTaskObjectForTitle ? selectedTaskObjectForTitle.title : (taskId ? 'Selected Task' : 'New Task');
+        
+        updateGlobalMonitorStatus('idle', `Initializing ${taskTitleForStatus}...`);
+        if (typeof showAgentThinkingStatusInUI === 'function') {
+            showAgentThinkingStatusInUI(true, { 
+                message: `Initializing ${taskTitleForStatus}...`, 
+                status_key: "TASK_INIT", 
+                component_hint: "SYSTEM" 
             });
         }
-        updateCurrentTaskTitle();
-        if (uploadFileButton) { uploadFileButton.disabled = !currentTaskId; }
-    };
-    const handleTaskItemClick = (taskId) => { console.log(`Task item clicked: ${taskId}`); selectTask(taskId); };
-    const handleDeleteTaskClick = (taskId, taskTitle) => { console.log(`Delete button clicked for task: ${taskId} (${taskTitle})`); deleteTask(taskId, taskTitle); };
-    const handleEditTaskClick = (taskId, currentTitle) => {
-        console.log(`Edit button clicked for task: ${taskId} (${currentTitle})`);
-        const newTitle = prompt(`Enter new name for task "${currentTitle}":`, currentTitle);
-        if (newTitle === null) { console.log("Rename cancelled by user."); return; }
-        const trimmedTitle = newTitle.trim();
-        if (!trimmedTitle) { alert("Task name cannot be empty."); console.log("Rename aborted: empty title."); return; }
-        if (trimmedTitle === currentTitle) { console.log("Rename aborted: title unchanged."); return; }
-        const taskIndex = tasks.findIndex(task => task.id === taskId);
-        if (taskIndex !== -1) {
-            tasks[taskIndex].title = trimmedTitle;
-            console.log(`Task ${taskId} title updated locally to: ${trimmedTitle}`);
-            saveTasks(); renderTaskList();
-            if (taskId === currentTaskId) { updateCurrentTaskTitle(); }
-            sendWsMessage("rename_task", { taskId: taskId, newName: trimmedTitle });
-        } else { console.error(`Task ${taskId} not found locally for renaming.`); }
-    };
-    const updateCurrentTaskTitle = () => {
-        if (!currentTaskTitleElement) return;
-        const currentTask = tasks.find(task => task.id === currentTaskId);
-        const title = currentTask ? currentTask.title : "No Task Selected";
-        currentTaskTitleElement.textContent = title;
-        if (currentTask) {
-            if (!isAgentRunning && statusDotElement && !statusDotElement.classList.contains('error') && !statusDotElement.classList.contains('disconnected')) {
-                 updateMonitorStatus('idle', 'Idle');
+        if (typeof clearCurrentMajorStepUI === 'function') {
+             clearCurrentMajorStepUI();
+        }
+
+        StateManager.selectTask(taskId); 
+        const newActiveTaskId = StateManager.getCurrentTaskId(); 
+        console.log(`[MainScript] StateManager updated. Previous active: ${previousActiveTaskId}, New active: ${newActiveTaskId}`);
+        
+        if (typeof renderTaskList === 'function') { renderTaskList(StateManager.getTasks(), newActiveTaskId); } 
+        
+        if (typeof updateTokenDisplayUI === 'function') {
+            updateTokenDisplayUI(null, StateManager.getCurrentTaskTotalTokens());
+        }
+        
+        const selectedTaskObject = StateManager.getTasks().find(t => t.id === newActiveTaskId);
+        
+        if (newActiveTaskId && selectedTaskObject) {
+            clearChatAndMonitor(false); 
+            if (typeof sendWsMessage === 'function') sendWsMessage("context_switch", { task: selectedTaskObject.title, taskId: selectedTaskObject.id });
+        } else if (!newActiveTaskId) { 
+            clearChatAndMonitor(); 
+            if (typeof addChatMessageToUI === 'function') addChatMessageToUI("No task selected.", "status_message", {component_hint: "SYSTEM"});
+            if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: "[SYSTEM_EVENT] No task selected.", log_source: "SYSTEM_EVENT"});
+            updateGlobalMonitorStatus('idle', 'No Task');
+            if (typeof showAgentThinkingStatusInUI === 'function') {
+                showAgentThinkingStatusInUI(true, { message: "No task selected.", status_key: "IDLE", component_hint: "SYSTEM" });
             }
-        } else {
-             updateMonitorStatus('idle', 'No Task');
+            if (typeof updateTokenDisplayUI === 'function') {
+                 updateTokenDisplayUI(null, { overall: { input: 0, output: 0, total: 0 }, roles: {} });
+            }
         }
-    };
-    const clearChatAndMonitor = (addLog = true) => {
-        if (chatMessagesContainer) chatMessagesContainer.innerHTML = '';
-        if (agentThinkingStatusElement) {
-            chatMessagesContainer.appendChild(agentThinkingStatusElement);
-            agentThinkingStatusElement.style.display = 'none';
-        }
-        if (monitorLogAreaElement) monitorLogAreaElement.innerHTML = '';
-        currentTaskArtifacts = [];
-        currentArtifactIndex = -1;
-        updateArtifactDisplay();
-        if (addLog && monitorLogAreaElement) { addMonitorLog("[SYSTEM] Cleared context."); }
-        console.log("Cleared chat and monitor.");
-        resetTaskTokenTotals();
-    };
-    const selectTask = (taskId) => {
-        console.log(`Attempting to select task: ${taskId}`);
-        if (currentTaskId === taskId && taskId !== null) { console.log("Task already selected."); return; }
-        const task = tasks.find(t => t.id === taskId);
-        currentTaskId = task ? taskId : null;
-        console.log(`Selected task ID set to: ${currentTaskId}`);
-        saveTasks(); renderTaskList();
-        resetTaskTokenTotals();
-        if (currentTaskId && task) {
-            clearChatAndMonitor(false);
-            sendWsMessage("context_switch", { task: task.title, taskId: task.id });
-            addChatMessage("Switching task context...", "status");
-            updateMonitorStatus('running', 'Switching Task...');
-        } else if (!currentTaskId) {
-            clearChatAndMonitor();
-            addChatMessage("No task selected.", "status");
-            addMonitorLog("[SYSTEM] No task selected.");
-            updateMonitorStatus('idle', 'No Task');
-        } else if (!socket || socket.readyState !== WebSocket.OPEN) {
-            clearChatAndMonitor(false);
-            addChatMessage("Switched task locally. Connect to backend to load history.", "status");
-            addMonitorLog(`[SYSTEM] Switched task locally to ${taskId}, but WS not open.`);
-             updateMonitorStatus('disconnected', 'Disconnected');
-        }
-        console.log(`Finished select task logic for: ${currentTaskId}`);
-    };
-    const handleNewTaskClick = () => {
-        console.log("'+ New Task' button clicked.");
-        taskCounter++;
-        const taskTitle = `Task - ${taskCounter}`;
-        const newTask = { id: `task-${Date.now()}-${Math.random().toString(16).slice(2)}`, title: taskTitle, timestamp: Date.now() };
-        tasks.unshift(newTask);
-        console.log("New task created:", newTask);
-        selectTask(newTask.id);
-        console.log("handleNewTaskClick finished.");
-    };
-    const deleteTask = (taskId, taskTitle) => {
-        console.log(`Attempting to delete task: ${taskId} (${taskTitle})`);
-        if (!confirm(`Are you sure you want to delete task "${taskTitle}"? This cannot be undone.`)) { console.log("Deletion cancelled by user."); return; }
-        const taskIndex = tasks.findIndex(task => task.id === taskId);
-        if (taskIndex === -1) { console.warn(`Task ${taskId} not found locally for deletion.`); return; }
-        tasks.splice(taskIndex, 1);
-        console.log(`Task ${taskId} removed locally.`);
-        sendWsMessage("delete_task", { taskId: taskId });
-        let nextTaskId = null;
-        if (currentTaskId === taskId) {
-            nextTaskId = tasks.length > 0 ? tasks[0].id : null;
-            console.log(`Deleted active task, selecting next: ${nextTaskId}`);
-            selectTask(nextTaskId);
-        } else {
-            saveTasks(); renderTaskList();
-        }
-        console.log(`Finished delete task logic for: ${taskId}`);
     };
 
-    // --- MODIFIED: populateLlmSelector to prioritize backend default ---
-    const populateLlmSelector = (backendDefaultLlmId) => { // Accept backend's default
-        if (!llmSelectElement) { console.error("LLM select element not found!"); return; }
-        llmSelectElement.innerHTML = '';
-        llmSelectElement.disabled = true;
-
-        if ((!availableModels.gemini || availableModels.gemini.length === 0) &&
-            (!availableModels.ollama || availableModels.ollama.length === 0)) {
-            const option = document.createElement('option');
-            option.value = "";
-            option.textContent = "No LLMs available";
-            llmSelectElement.appendChild(option);
+    const handleNewTaskCreation = () => { const newTask = StateManager.addTask(); handleTaskSelection(newTask.id); };
+    const handleTaskDeletion = (taskId, taskTitle) => { const wasActiveTask = StateManager.getCurrentTaskId() === taskId; StateManager.deleteTask(taskId); 
+        if (typeof sendWsMessage === 'function') sendWsMessage("delete_task", { taskId: taskId }); if (wasActiveTask) { handleTaskSelection(StateManager.getCurrentTaskId()); 
+        } else { if (typeof renderTaskList === 'function') { renderTaskList(StateManager.getTasks(), StateManager.getCurrentTaskId()); } } };
+    const handleTaskRename = (taskId, oldTitle, newTitle) => { if (StateManager.renameTask(taskId, newTitle)) { if (typeof renderTaskList === 'function') renderTaskList(StateManager.getTasks(), StateManager.getCurrentTaskId()); 
+        if (taskId === StateManager.getCurrentTaskId()) { if (typeof updateCurrentTaskTitleUI === 'function') updateCurrentTaskTitleUI(StateManager.getTasks(), StateManager.getCurrentTaskId()); 
+        } if (typeof sendWsMessage === 'function') sendWsMessage("rename_task", { taskId: taskId, newName: newTitle }); } };
+    
+    const handleSendMessageFromUI = (messageText) => { 
+        if (!StateManager.getCurrentTaskId()) { alert("Please select or create a task first."); return; } 
+        if (StateManager.getIsAgentRunning()) { if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Agent is currently busy. Please wait or stop the current process.", "status_message", {component_hint: "SYSTEM"}); return; } 
+        if (typeof addChatMessageToUI === 'function') addChatMessageToUI(messageText, 'user'); 
+        if (typeof addMessageToInputHistory === 'function') addMessageToInputHistory(messageText); 
+        if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(false); 
+        if (typeof sendWsMessage === 'function') sendWsMessage("user_message", { content: messageText }); 
+        else { if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Error: Cannot send message. Connection issue.", "status_message", {component_hint: "ERROR", isError: true});} 
+        updateGlobalMonitorStatus('running', 'Classifying intent...'); 
+        if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "Classifying intent...", status_key: "INTENT_CLASSIFICATION_START", component_hint: "INTENT_CLASSIFIER" });
+    };
+    
+    const handlePlanConfirmRequest = (planId) => {
+        console.log(`[Script.js] Plan confirmed by user for plan ID: ${planId}`);
+        const currentPlan = StateManager.getCurrentDisplayedPlan(); 
+        if (!currentPlan) {
+            console.error(`[Script.js] Cannot confirm plan ${planId}: No plan found in state.`);
+            if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Error: Could not find plan to confirm.", "status_message", {component_hint: "ERROR", isError: true});
+            updateGlobalMonitorStatus('error', 'Plan Confirmation Error');
             return;
         }
-
-        if (availableModels.gemini && availableModels.gemini.length > 0) {
-            const geminiGroup = document.createElement('optgroup');
-            geminiGroup.label = 'Gemini';
-            availableModels.gemini.forEach(modelId => {
-                const option = document.createElement('option');
-                option.value = `gemini::${modelId}`;
-                option.textContent = modelId;
-                geminiGroup.appendChild(option);
-            });
-            llmSelectElement.appendChild(geminiGroup);
+        if (typeof sendWsMessage === 'function') {
+            sendWsMessage('execute_confirmed_plan', { plan_id: planId, confirmed_plan: currentPlan });
         }
-
-        if (availableModels.ollama && availableModels.ollama.length > 0) {
-            const ollamaGroup = document.createElement('optgroup');
-            ollamaGroup.label = 'Ollama';
-            availableModels.ollama.forEach(modelId => {
-                const option = document.createElement('option');
-                option.value = `ollama::${modelId}`;
-                option.textContent = modelId;
-                ollamaGroup.appendChild(option);
-            });
-            llmSelectElement.appendChild(ollamaGroup);
+        if (typeof transformToConfirmedPlanUI === 'function') {
+            transformToConfirmedPlanUI(planId);
         }
-
-        // --- Prioritize backend's default for the current session ---
-        if (backendDefaultLlmId && llmSelectElement.querySelector(`option[value="${backendDefaultLlmId}"]`)) {
-            llmSelectElement.value = backendDefaultLlmId;
-            currentSelectedLlmId = backendDefaultLlmId;
-            localStorage.setItem('selectedLlmId', backendDefaultLlmId); // Update localStorage
-            console.log(`LLM selector set to backend default: ${backendDefaultLlmId}`);
-        } else {
-            // Fallback to localStorage if backend default isn't valid (should not happen ideally)
-            // or if backendDefaultLlmId was null
-            const lastSelected = localStorage.getItem('selectedLlmId');
-            if (lastSelected && llmSelectElement.querySelector(`option[value="${lastSelected}"]`)) {
-                llmSelectElement.value = lastSelected;
-                currentSelectedLlmId = lastSelected;
-                console.log(`LLM selector set to localStorage value: ${lastSelected}`);
-            } else if (llmSelectElement.options.length > 0) { // Fallback to first available option
-                 for (let i = 0; i < llmSelectElement.options.length; i++) {
-                     if (llmSelectElement.options[i].value && !llmSelectElement.options[i].disabled) { // Check if option is not a disabled placeholder
-                         llmSelectElement.selectedIndex = i;
-                         currentSelectedLlmId = llmSelectElement.value;
-                         localStorage.setItem('selectedLlmId', currentSelectedLlmId);
-                         console.log(`LLM selector set to first available option: ${currentSelectedLlmId}`);
-                         break;
-                     }
-                 }
-            }
-        }
-        // After setting, explicitly send the current selection to the backend to ensure sync
-        if (currentSelectedLlmId) {
-            sendWsMessage("set_llm", { llm_id: currentSelectedLlmId });
-        }
-
-        console.log(`LLM selector populated. Final selection: ${currentSelectedLlmId}`);
-        llmSelectElement.disabled = false;
+        updateGlobalMonitorStatus('running', 'Executing Plan...');
     };
-    // --- END MODIFIED ---
-
-
-    const sendWsMessage = (type, content) => {
-        if (window.socket && window.socket.readyState === WebSocket.OPEN) {
-            try {
-                const payload = JSON.stringify({ type: type, ...content });
-                console.log(`Sending WS message: ${type}`, content);
-                window.socket.send(payload);
-                if (type === "rename_task" || type === "delete_task" || type === "set_llm" || type === "cancel_agent" || type === "get_artifacts_for_task") {
-                     addMonitorLog(`[SYSTEM] Sent ${type} request.`);
+    const handlePlanCancelRequest = (planId) => {
+        console.log(`[Script.js] Plan cancelled by user for plan ID: ${planId}`);
+        if (typeof sendWsMessage === 'function') {
+            sendWsMessage('cancel_plan_proposal', { plan_id: planId });
+        }
+        const planConfirmContainer = chatMessagesContainer.querySelector(`.plan-confirmation-wrapper[data-plan-id="${planId}"]`);
+        if (planConfirmContainer) {
+            planConfirmContainer.remove();
+        }
+        if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Plan proposal cancelled by user.", "status_message", {component_hint: "SYSTEM"});
+        updateGlobalMonitorStatus('idle', 'Idle'); 
+        if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "Idle.", status_key: "IDLE", component_hint: "SYSTEM" });
+        StateManager.setCurrentDisplayedPlan(null);
+        StateManager.setCurrentPlanProposalId(null);
+    };
+    const handlePlanViewDetailsRequest = (planId, isNowVisible) => { if (typeof addLogEntryToMonitor === 'function') { addLogEntryToMonitor({text: `[UI_ACTION] User toggled plan details for proposal ${planId}. Details are now ${isNowVisible ? 'visible' : 'hidden'}.`, log_source: "UI_EVENT"}); } };
+    const handleStopAgentRequest = () => { if (StateManager.getIsAgentRunning()) { if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: "[SYSTEM_EVENT] Stop request sent by user.", log_source: "SYSTEM_EVENT"}); if (typeof sendWsMessage === 'function') sendWsMessage("cancel_agent", {}); updateGlobalMonitorStatus('cancelling', 'Cancelling...'); if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "Cancelling...", status_key: "CANCELLING", component_hint: "SYSTEM" }); } };
+    const handleArtifactNavigation = (direction) => { let currentIndex = StateManager.getCurrentArtifactIndex(); const currentArtifacts = StateManager.getCurrentTaskArtifacts(); let newIndex = currentIndex; if (direction === "prev") { if (currentIndex > 0) newIndex = currentIndex - 1; } else if (direction === "next") { if (currentIndex < currentArtifacts.length - 1) newIndex = currentIndex + 1; } if (newIndex !== currentIndex) { StateManager.setCurrentArtifactIndex(newIndex); if(typeof updateArtifactDisplayUI === 'function') { updateArtifactDisplayUI(currentArtifacts, newIndex); } } };
+    const handleExecutorLlmChange = (selectedId) => { StateManager.setCurrentExecutorLlmId(selectedId); if (typeof sendWsMessage === 'function') { sendWsMessage("set_llm", { llm_id: selectedId }); }};
+    const handleRoleLlmChange = (role, selectedId) => { StateManager.setRoleLlmOverride(role, selectedId); if (typeof sendWsMessage === 'function') { sendWsMessage("set_session_role_llm", { role: role, llm_id: selectedId }); }};
+    const handleThinkingStatusClick = () => { if (typeof scrollToBottomMonitorLog === 'function') { scrollToBottomMonitorLog(); } };
+    
+    const handleWsOpen = (event) => { 
+        if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM_CONNECTION] WebSocket connection established.`, log_source: "SYSTEM_CONNECTION"}); 
+        if (typeof addChatMessageToUI === 'function') addChatMessageToUI("Connected to backend.", "status_message", {component_hint: "SYSTEM"}); 
+        updateGlobalMonitorStatus('idle', 'Idle'); 
+        if (typeof sendWsMessage === 'function') { 
+            sendWsMessage("get_available_models", {}); 
+            const activeTaskFromStorage = StateManager.getTasks().find(task => task.id === StateManager.getCurrentTaskId()); 
+            if (StateManager.getCurrentTaskId() && activeTaskFromStorage) { 
+                console.log(`[Script.js] WS Open: Active task ${activeTaskFromStorage.id} found. Sending context_switch.`);
+                StateManager.setIsAgentRunning(false); 
+                 if (typeof showAgentThinkingStatusInUI === 'function') {
+                    showAgentThinkingStatusInUI(true, { 
+                        message: `Initializing Task: ${activeTaskFromStorage.title}...`, 
+                        status_key: "TASK_INIT", 
+                        component_hint: "SYSTEM" 
+                    });
                 }
-            } catch (e) {
-                console.error(`Error sending ${type} via WebSocket:`, e);
-                addMonitorLog(`[SYSTEM] Error sending ${type} request: ${e.message}`);
-                addChatMessage(`Error sending ${type} request to backend.`, "status");
-            }
-        } else {
-            console.warn(`Cannot send ${type}: WebSocket is not open.`);
-            if (type === "user_message" || type === "context_switch" || type === "get_artifacts_for_task") {
-                addChatMessage(`Cannot send ${type}: Not connected to backend.`, "status");
-            }
-             addMonitorLog(`[SYSTEM] Cannot send ${type}: WS not open.`);
-        }
+                sendWsMessage("context_switch", { task: activeTaskFromStorage.title, taskId: activeTaskFromStorage.id }); 
+            } else { 
+                console.log("[Script.js] WS Open: No active task found in StateManager on initial load.");
+                updateGlobalMonitorStatus('idle', 'No Task'); 
+                if(typeof clearArtifactDisplayUI === 'function') clearArtifactDisplayUI(); 
+                if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "No task selected.", status_key: "IDLE", component_hint: "SYSTEM" });
+            } 
+        } 
     };
+    const handleWsClose = (event) => { let reason = event.reason || 'No reason given'; let advice = ""; if (event.code === 1000 || event.wasClean) { reason = "Normal"; } else { reason = `Abnormal (Code: ${event.code})`; advice = " Backend down or network issue?"; } if (typeof addChatMessageToUI === 'function') addChatMessageToUI(`Connection closed.${advice}`, "status_message", {component_hint: "ERROR", isError: true}); if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM_CONNECTION] WebSocket disconnected. ${reason}`, log_source: "SYSTEM_CONNECTION"}); updateGlobalMonitorStatus('disconnected', 'Disconnected');  if (typeof disableAllLlmSelectorsUI === 'function') disableAllLlmSelectorsUI(); if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "Disconnected.", status_key: "DISCONNECTED", component_hint: "ERROR" }); };
+    const handleWsError = (event, isCreationError = false) => { const errorMsg = isCreationError ? "FATAL: Failed to initialize WebSocket connection." : "ERROR: Cannot connect to backend."; if (typeof addChatMessageToUI === 'function') addChatMessageToUI(errorMsg, "status_message", {component_hint: "ERROR", isError: true}); if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[SYSTEM_ERROR] WebSocket error occurred.`, log_source: "SYSTEM_ERROR"}); updateGlobalMonitorStatus('error', isCreationError ? 'Connection Init Failed' : 'Connection Error'); if (typeof disableAllLlmSelectorsUI === 'function') disableAllLlmSelectorsUI(); if (typeof showAgentThinkingStatusInUI === 'function') showAgentThinkingStatusInUI(true, { message: "Connection Error.", status_key: "ERROR", component_hint: "ERROR" }); };
 
-    const handleSendMessage = () => {
-        const messageText = chatTextarea.value.trim();
-        if (!currentTaskId){
-            alert("Please select or create a task first.");
-            chatTextarea.focus();
-            return;
-        }
-        if (isAgentRunning) {
-            addChatMessage("Agent is currently busy. Please wait or stop the current process.", "status");
-            return;
-        }
-        if (messageText) {
-            addChatMessage(messageText, 'user');
-            if (chatInputHistory[chatInputHistory.length - 1] !== messageText) {
-                chatInputHistory.push(messageText);
-                if (chatInputHistory.length > MAX_CHAT_HISTORY) { chatInputHistory.shift(); }
-            }
-            chatHistoryIndex = -1;
-            currentInputBuffer = "";
-            if(agentThinkingStatusElement) agentThinkingStatusElement.style.display = 'none';
-            sendWsMessage("user_message", { content: messageText });
-            updateMonitorStatus('running', 'Processing...');
-            chatTextarea.value = '';
-            chatTextarea.style.height = 'auto';
-            chatTextarea.style.height = chatTextarea.scrollHeight + 'px';
+    // Initialize UI Modules
+    if (newTaskButton) { newTaskButton.addEventListener('click', handleNewTaskCreation); }
+    document.body.addEventListener('click', event => { if (event.target.classList.contains('action-btn')) { const commandText = event.target.textContent.trim(); if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: `[UI_ACTION] Clicked: ${commandText}`, log_source: "UI_EVENT"}); if (typeof sendWsMessage === 'function') sendWsMessage("action_command", { command: commandText }); } });
+    if (typeof initTaskUI === 'function') { initTaskUI( { taskListUl: taskListUl, currentTaskTitleEl: currentTaskTitleElement, uploadFileBtn: uploadFileButtonElement }, { onTaskSelect: handleTaskSelection, onNewTask: handleNewTaskCreation, onDeleteTask: handleTaskDeletion, onRenameTask: handleTaskRename }); if (typeof renderTaskList === 'function') renderTaskList(StateManager.getTasks(), StateManager.getCurrentTaskId()); }
+    if (typeof initChatUI === 'function') { initChatUI( { chatMessagesContainer: chatMessagesContainer, agentThinkingStatusEl: agentThinkingStatusElement, chatTextareaEl: chatTextarea, chatSendButtonEl: chatSendButton }, { onSendMessage: handleSendMessageFromUI, onThinkingStatusClick: handleThinkingStatusClick }); }
+    if (typeof initMonitorUI === 'function') { initMonitorUI( { monitorLogArea: monitorLogAreaElement, statusDot: statusDotElement, monitorStatusText: monitorStatusTextElement, stopButton: stopButtonElement }, { onStopAgent: handleStopAgentRequest }); }
+    
+    if (typeof initArtifactUI === 'function') { 
+        console.log("[Script.js DEBUG] Before initArtifactUI: StateManager type:", typeof StateManager);
+        if (StateManager) {
+            console.log("[Script.js DEBUG] StateManager object keys:", Object.keys(StateManager));
+            console.log("[Script.js DEBUG] StateManager.getCurrentTaskArtifacts type:", typeof StateManager.getCurrentTaskArtifacts);
+            console.log("[Script.js DEBUG] StateManager.getCurrentArtifactIndex type:", typeof StateManager.getCurrentArtifactIndex);
         } else {
-            console.log("Attempted to send empty message.");
+            console.error("[Script.js DEBUG] StateManager is undefined or null before initArtifactUI!");
         }
-        chatTextarea.focus();
-    };
 
-    const handleFileUpload = async (event) => {
-        console.log("[handleFileUpload] Function entered.");
-        if (!currentTaskId) {
-            alert("Please select a task before uploading files.");
-            console.log("[handleFileUpload] No task selected, aborting.");
-            return;
-        }
-        if (!event.target.files || event.target.files.length === 0) {
-            console.log("[handleFileUpload] No files selected for upload.");
-            return;
-        }
-        const files = event.target.files;
-        const uploadUrl = `${httpBackendBaseUrl}/upload/${currentTaskId}`;
-        let sessionID = 'unknown';
-        try {
-            if (window.socket?.url) {
-                sessionID = new URL(window.socket.url).searchParams.get('session_id') || 'unknown';
+        initArtifactUI( 
+            { monitorArtifactArea: monitorArtifactArea, artifactNav: artifactNav, prevBtn: artifactPrevBtn, nextBtn: artifactNextBtn, counterEl: artifactCounterElement }, 
+            { onNavigate: handleArtifactNavigation }
+        ); 
+        
+        if (typeof updateArtifactDisplayUI === 'function') { 
+            if (StateManager && typeof StateManager.getCurrentTaskArtifacts === 'function' && typeof StateManager.getCurrentArtifactIndex === 'function') {
+                updateArtifactDisplayUI(StateManager.getCurrentTaskArtifacts(), StateManager.getCurrentArtifactIndex()); 
+            } else {
+                console.error("[Script.js CRITICAL ERROR] StateManager or its methods are still not available right before calling updateArtifactDisplayUI.", StateManager);
+                if (typeof clearArtifactDisplayUI === 'function') clearArtifactDisplayUI();
+                if (monitorArtifactArea && artifactNav) {
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'artifact-placeholder';
+                    placeholder.textContent = 'Error initializing artifacts (StateManager issue).';
+                    monitorArtifactArea.insertBefore(placeholder, artifactNav);
+                }
             }
-        } catch (e) { console.warn("[handleFileUpload] Could not parse session ID from WebSocket URL:", e); }
-        console.log(`[handleFileUpload] Preparing to upload ${files.length} file(s) to ${uploadUrl} for task ${currentTaskId}. Session: ${sessionID}`);
-        addMonitorLog(`[SYSTEM] Attempting to upload ${files.length} file(s) to task ${currentTaskId}...`);
-        uploadFileButton.disabled = true;
-        let overallSuccess = true;
-        let errorMessages = [];
-        for (const file of files) {
-            const formData = new FormData();
-            formData.append('file', file, file.name);
-            console.log(`[handleFileUpload] Processing file: ${file.name} (Size: ${file.size} bytes)`);
-            try {
-                addMonitorLog(`[SYSTEM] Uploading ${file.name}...`);
-                console.log(`[handleFileUpload] Sending POST request to ${uploadUrl} for ${file.name}`);
-                const response = await fetch(uploadUrl, {
-                    method: 'POST',
-                    body: formData,
-                    headers: { 'X-Session-ID': sessionID }
-                });
-                console.log(`[handleFileUpload] Received response for ${file.name}. Status: ${response.status}, OK: ${response.ok}`);
-                console.log("[handleFileUpload] Raw response object:", response);
-                let result;
-                try {
-                    result = await response.json();
-                    console.log(`[handleFileUpload] Parsed JSON response for ${file.name}:`, result);
-                } catch (jsonError) {
-                    console.error(`[handleFileUpload] Failed to parse JSON response for ${file.name}:`, jsonError);
-                    const textResponse = await response.text();
-                    console.error(`[handleFileUpload] Raw text response for ${file.name}:`, textResponse);
-                    result = { status: 'error', message: `Failed to parse server response (Status: ${response.status})` };
-                }
-                if (response.ok && result.status === 'success') {
-                    console.log(`[handleFileUpload] Successfully uploaded ${file.name}:`, result);
-                    addMonitorLog(`[SYSTEM] Successfully uploaded: ${result.saved?.[0]?.filename || file.name}`);
-                } else {
-                    console.error(`[handleFileUpload] Error reported for ${file.name}:`, result);
-                    const message = result.message || `HTTP error ${response.status}`;
-                    errorMessages.push(`${file.name}: ${message}`);
-                    addMonitorLog(`[SYSTEM] Error uploading ${file.name}: ${message}`);
-                    overallSuccess = false;
-                }
-            } catch (error) {
-                console.error(`[handleFileUpload] Network or fetch error uploading ${file.name}:`, error);
-                const message = error.message || 'Network error';
-                errorMessages.push(`${file.name}: ${message}`);
-                addMonitorLog(`[SYSTEM] Network/Fetch Error uploading ${file.name}: ${message}`);
-                overallSuccess = false;
-            }
-        }
-        console.log("[handleFileUpload] Re-enabling upload button and clearing input.");
-        uploadFileButton.disabled = false;
-        event.target.value = null;
-        if (overallSuccess) {
-            addChatMessage(`Successfully uploaded ${files.length} file(s).`, 'status');
-        } else {
-            addChatMessage(`Error uploading some files:\n${errorMessages.join('\n')}`, 'status', true);
-        }
-        console.log("[handleFileUpload] Function finished.");
-    };
-
-    // --- Event Listeners Setup ---
-    if (newTaskButton) { newTaskButton.addEventListener('click', handleNewTaskClick); }
-    else { console.error("New task button element not found!"); }
-
-    if (taskListUl) { console.log("Task list event listeners will be added during rendering."); }
-    else { console.error("Task list UL element not found!"); }
-
-    if (chatSendButton) { chatSendButton.addEventListener('click', handleSendMessage); }
-    if (chatTextarea) {
-        chatTextarea.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); handleSendMessage(); }
-            else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-                if (chatInputHistory.length === 0) return;
-                event.preventDefault();
-                if (chatHistoryIndex === -1) { currentInputBuffer = chatTextarea.value; }
-                if (event.key === 'ArrowUp') {
-                    if (chatHistoryIndex === -1) { chatHistoryIndex = chatInputHistory.length - 1; }
-                    else if (chatHistoryIndex > 0) { chatHistoryIndex--; }
-                    chatTextarea.value = chatInputHistory[chatHistoryIndex];
-                } else if (event.key === 'ArrowDown') {
-                    if (chatHistoryIndex !== -1 && chatHistoryIndex < chatInputHistory.length - 1) {
-                        chatHistoryIndex++; chatTextarea.value = chatInputHistory[chatHistoryIndex];
-                    } else { chatHistoryIndex = -1; chatTextarea.value = currentInputBuffer; }
-                }
-                chatTextarea.selectionStart = chatTextarea.selectionEnd = chatTextarea.value.length;
-                chatTextarea.style.height = 'auto'; chatTextarea.style.height = chatTextarea.scrollHeight + 'px';
-            } else { chatHistoryIndex = -1; currentInputBuffer = ""; }
-        });
-        chatTextarea.addEventListener('input', () => { chatTextarea.style.height = 'auto'; chatTextarea.style.height = chatTextarea.scrollHeight + 'px'; });
+        } 
     }
 
-    if (llmSelectElement) {
-        llmSelectElement.addEventListener('change', (event) => {
-            const selectedId = event.target.value;
-            if (selectedId && selectedId !== currentSelectedLlmId) {
-                console.log(`LLM selection changed to: ${selectedId}`);
-                currentSelectedLlmId = selectedId;
-                localStorage.setItem('selectedLlmId', selectedId); // Still save user's explicit choice
-                sendWsMessage("set_llm", { llm_id: selectedId });
-            } else if (!selectedId) {
-                 console.warn("LLM selector changed to an empty value.");
-            }
-        });
-    } else { console.error("LLM select element not found!"); }
-
-    if (stopButton) {
-        stopButton.addEventListener('click', () => {
-            if (isAgentRunning) {
-                console.log("Stop button clicked.");
-                addMonitorLog("[SYSTEM] Stop request sent.");
-                sendWsMessage("cancel_agent", {});
-                updateMonitorStatus('cancelling', 'Cancelling...');
-                stopButton.disabled = true;
-            }
-        });
-    } else { console.error("Stop button element not found!"); }
-
-    if (uploadFileButton && fileUploadInput) {
-        uploadFileButton.addEventListener('click', () => {
-            console.log("Upload button clicked, triggering file input.");
-            fileUploadInput.click();
-        });
-        fileUploadInput.addEventListener('change', handleFileUpload);
-    } else { console.error("File upload button or input element not found!"); }
-
-    if (agentThinkingStatusElement) {
-        agentThinkingStatusElement.addEventListener('click', () => {
-            console.log("Agent thinking status clicked. Scrolling monitor.");
-            if (monitorLogAreaElement) {
-                scrollToBottom(monitorLogAreaElement);
-            }
-        });
-    } else {
-        console.error("Agent thinking status element (#agent-thinking-status) not found!");
+    if (typeof initLlmSelectorsUI === 'function') { initLlmSelectorsUI( { executorLlmSelect: executorLlmSelectElement, roleSelectors: roleSelectorsMetaForInit }, { onExecutorLlmChange: handleExecutorLlmChange, onRoleLlmChange: handleRoleLlmChange }); }
+    if (typeof initTokenUsageUI === 'function') { 
+        initTokenUsageUI({}); 
+        updateTokenDisplayUI(null, StateManager.getCurrentTaskTotalTokens());
     }
+    if (typeof initFileUploadUI === 'function') { initFileUploadUI( { fileUploadInputEl: fileUploadInputElement, uploadFileButtonEl: uploadFileButtonElement }, { httpBackendBaseUrl: httpBackendBaseUrl }, { getCurrentTaskId: StateManager.getCurrentTaskId, addLog: (logData) => { if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor(logData); }, addChatMsg: (msgText, msgType, options) => { if (typeof addChatMessageToUI === 'function') addChatMessageToUI(msgText, msgType, options); } }); }
 
-    document.body.addEventListener('click', event => {
-        if (event.target.classList.contains('action-btn')) {
-            const commandText = event.target.textContent.trim();
-            console.log(`Action button clicked: ${commandText}`);
-            addMonitorLog(`[USER_ACTION] Clicked: ${commandText}`);
-            sendWsMessage("action_command", { command: commandText });
-        }
-    });
+    // Establish WebSocket Connection
+    if (typeof connectWebSocket === 'function') { if (typeof addLogEntryToMonitor === 'function') addLogEntryToMonitor({text: "[SYSTEM_CONNECTION] Attempting to connect to backend...", log_source: "SYSTEM_CONNECTION"}); updateGlobalMonitorStatus('disconnected', 'Connecting...'); connectWebSocket(handleWsOpen, handleWsClose, handleWsError);
+    } else { console.error("connectWebSocket function not found."); if (typeof addChatMessageToUI === 'function') addChatMessageToUI("ERROR: WebSocket manager not loaded.", "status_message", {component_hint: "ERROR", isError: true}); updateGlobalMonitorStatus('error', 'Initialization Error'); }
+});
 
-    if (artifactPrevBtn) { artifactPrevBtn.addEventListener('click', () => { if (currentArtifactIndex > 0) { currentArtifactIndex--; updateArtifactDisplay(); } }); }
-    if (artifactNextBtn) { artifactNextBtn.addEventListener('click', () => { if (currentArtifactIndex < currentTaskArtifacts.length - 1) { currentArtifactIndex++; updateArtifactDisplay(); } }); }
-
-
-    // --- Initial Load Actions ---
-    loadTasks();
-    renderTaskList();
-    connectWebSocket();
-
-}); // End of DOMContentLoaded listener
