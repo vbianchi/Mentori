@@ -1,9 +1,9 @@
-# ResearchAgent: AI Assistant for Research Workflows (v2.5.3 - UI/UX Refinements & Multi-Tasking Considerations)
+# ResearchAgent: AI Assistant for Research Workflows (v2.0.0 - UI/UX Refinements & Multi-Tasking Considerations)
 
 This project provides a functional user interface and backend for an AI agent system designed to assist with research tasks, particularly in fields like bioinformatics and epidemiology. It features a three-panel layout (Tasks, Chat, Monitor/Artifact Viewer) and connects via WebSockets to a Python backend powered by LangChain.
-Targeting Version 2.5.3 (with considerations for future multi-tasking enhancements)
+Targeting Version 2.0.0 (with considerations for future multi-tasking enhancements)
 
-**Recent Developments (Leading to v2.5.3 Target):**
+**Recent Developments (Leading to v2.0.0 Target):**
 
 -   **Core Bug Fixes & Feature Verification (Largely Complete).**
 -   **Chat UI/UX Refinement (Significant Progress):**
@@ -13,7 +13,7 @@ Targeting Version 2.5.3 (with considerations for future multi-tasking enhancemen
     -   **Functionality Fixes:** `read_file` tool output now displays correctly and is properly nested. Chat scroll jump on bubble expand/collapse fixed. Plan persistence in chat is now working.
     -   **Completed Features:** Token Counter, File Upload, core In-Chat Tool Feedback.
 
-**Known Issues & Immediate Next Steps (Targeting v2.5.3 Enhancements & Fixes):**
+**Known Issues & Immediate Next Steps (Targeting v2.0.0 Enhancements & Fixes):**
 
 -   **BUG: Agent Task Cancellation & STOP Button (High Priority):**
     * Current behavior: Switching tasks does not reliably cancel the ongoing agent process in the previous task. The STOP button is not fully functional.
@@ -27,7 +27,7 @@ Targeting Version 2.5.3 (with considerations for future multi-tasking enhancemen
 -   **WARNING: PLAN FILE STATUS UPDATE (Low Priority).**
 -   **REVIEW: "UNKNOWN" HISTORY MESSAGE TYPES (Low Priority).**
 
-**Future Considerations (Post v2.5.3 - Based on Recent Brainstorming):**
+**Future Considerations (Post v2.0.0 - Based on Recent Brainstorming):**
 -   Allow agent tasks to continue running in the background if the user switches UI context to another task.
 -   Implement a visual indicator in the task list for actively processing tasks.
 -   Ensure UI for non-processing tasks renders correctly while another task runs in the background (requires message filtering).
@@ -104,7 +104,7 @@ ResearchAgent/
 ## Setup Instructions & Running the Application
 (No changes)
 
-## Previously Fixed/Implemented in v2.5.3 development cycle:
+## Previously Fixed/Implemented in v2.0.0 development cycle:
 -   **ENHANCEMENT: In-Chat Tool Feedback & Usability.**
 -   **ENHANCEMENT: Chat UI/UX Major Improvements:** Collapsible steps & tool outputs, agent avatar, alignment, widths, font sizes, LLM selector colors, no blue lines on RA/Plan.
 -   **BUG FIX: `read_file` output visibility & nesting.**
