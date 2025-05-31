@@ -92,7 +92,6 @@ async def validate_and_prepare_step_action(
     callbacks_for_invoke: List[BaseCallbackHandler] = []
     if callback_handler:
         callbacks_for_invoke.append(callback_handler)
-        # Added critical debug log for consistency with other components
         logger.critical(f"CRITICAL_DEBUG: CONTROLLER - validate_and_prepare_step_action received callback_handler: {type(callback_handler).__name__}")
     else:
         logger.critical("CRITICAL_DEBUG: CONTROLLER - validate_and_prepare_step_action received NO callback_handler.")
@@ -113,14 +112,13 @@ async def validate_and_prepare_step_action(
             logger.warning(f"Controller: Invalid session LLM ID format '{controller_llm_id_override}'. Using system default.")
 
     try:
-        # Added critical debug log for consistency
         logger.critical(f"CRITICAL_DEBUG: CONTROLLER - About to call get_llm. Callbacks_for_invoke: {[type(cb).__name__ for cb in callbacks_for_invoke] if callbacks_for_invoke else 'None'}")
         controller_llm: BaseChatModel = get_llm(
             settings,
             provider=controller_provider,
             model_name=controller_model_name,
             requested_for_role=LOG_SOURCE_CONTROLLER,
-            callbacks=callbacks_for_invoke # *** MODIFIED: Pass callbacks_for_invoke to get_llm ***
+            callbacks=callbacks_for_invoke
         )
         logger.info(f"Controller: Using LLM {controller_provider}::{controller_model_name}")
     except Exception as e:
@@ -132,8 +130,12 @@ async def validate_and_prepare_step_action(
 
     tools_summary_list = []
     for tool in available_tools:
-        tools_summary_list.append(f"- {tool.name}: {tool.description.split('.')[0]}. (Description for context: {tool.description})")
+        # <<< --- MODIFIED LINE: Use full tool.description --- >>>
+        tools_summary_list.append(f"- {tool.name}: {tool.description}")
+        # <<< --- END MODIFIED LINE --- >>>
     tools_summary_for_controller = "\n".join(tools_summary_list)
+    logger.debug(f"Controller: Tools summary for LLM prompt:\n{tools_summary_for_controller}")
+
 
     previous_step_output_context_str = "Not applicable (this is the first step or previous step had no direct output, or its output was not relevant to pass)."
     if previous_step_output is not None:
@@ -175,7 +177,7 @@ async def validate_and_prepare_step_action(
         controller_result_dict_raw = await raw_llm_output_chain.ainvoke(
             input_dict_for_llm,
             config=RunnableConfig(
-                callbacks=callbacks_for_invoke, # These are for chain start/end, etc.
+                callbacks=callbacks_for_invoke,
                 metadata={"component_name": LOG_SOURCE_CONTROLLER}
             )
         )
@@ -233,4 +235,3 @@ async def validate_and_prepare_step_action(
         logger.error(f"Controller: Error during step validation or Pydantic parsing: {e}. Raw output was: {controller_result_dict_raw}\nTraceback:\n{tb_str}", exc_info=False)
         error_detail = f"Exception: {type(e).__name__} at line {e.__traceback__.tb_lineno if e.__traceback__ else 'N/A'}. Raw LLM output might have been: {str(controller_result_dict_raw)[:500]}..."
         return None, None, f"Error in Controller: {error_detail}", 0.0
-

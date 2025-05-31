@@ -28,7 +28,8 @@ from backend.callbacks import (
     DB_MSG_TYPE_SUB_STATUS, DB_MSG_TYPE_THOUGHT,
     LOG_SOURCE_INTENT_CLASSIFIER, LOG_SOURCE_PLANNER, LOG_SOURCE_CONTROLLER,
     LOG_SOURCE_EXECUTOR, LOG_SOURCE_EVALUATOR_STEP, LOG_SOURCE_EVALUATOR_OVERALL,
-    LOG_SOURCE_SYSTEM, LOG_SOURCE_LLM_CORE
+    LOG_SOURCE_SYSTEM, LOG_SOURCE_LLM_CORE,
+    DB_MSG_TYPE_TOOL_RESULT_FOR_CHAT # Added from previous step
 )
 from backend.intent_classifier import classify_intent
 from backend.evaluator import (
@@ -139,10 +140,14 @@ async def process_user_message(
     else:
         callbacks_for_invoke.append(retrieved_callback_handler)
 
-    try: # *** MODIFIED: Wrap intent classification and planning in a try/except AgentCancelledException ***
+    try:
         await _send_thinking_update_from_handler(send_ws_message_func, active_task_id, session_id, db_add_message_func, "Classifying intent...", "INTENT_CLASSIFICATION_START", LOG_SOURCE_INTENT_CLASSIFIER, SUB_TYPE_SUB_STATUS)
         dynamic_tools = get_dynamic_tools(active_task_id)
-        tools_summary = "\n".join([f"- {tool.name}: {tool.description.split('.')[0]}" for tool in dynamic_tools])
+        # <<< --- MODIFIED LINE: Use full tool description --- >>>
+        tools_summary = "\n".join([f"- {tool.name}: {tool.description}" for tool in dynamic_tools])
+        # <<< --- END MODIFIED LINE --- >>>
+        logger.debug(f"[{session_id}] Tools summary for LLMs (Intent/Planner):\n{tools_summary}")
+
 
         classified_intent = await classify_intent(
             user_input_content,
@@ -157,7 +162,7 @@ async def process_user_message(
             await _send_thinking_update_from_handler(send_ws_message_func, active_task_id, session_id, db_add_message_func, "Generating plan...", "PLAN_GENERATION_START", LOG_SOURCE_PLANNER, SUB_TYPE_SUB_STATUS)
             human_summary, steps = await generate_plan(
                 user_input_content,
-                tools_summary,
+                tools_summary, # Pass the full tools_summary
                 retrieved_callback_handler
             )
             if human_summary and steps:
@@ -179,10 +184,10 @@ async def process_user_message(
 
                 await send_ws_message_func("propose_plan_for_confirmation", {"plan_id": plan_id, "human_summary": human_summary, "structured_plan": steps})
                 await _send_thinking_update_from_handler(send_ws_message_func, active_task_id, session_id, db_add_message_func, "Awaiting plan confirmation...", "AWAITING_PLAN_CONFIRMATION", LOG_SOURCE_SYSTEM, SUB_TYPE_BOTTOM_LINE)
-            else: # Failed to generate plan (not due to cancellation, as that's caught above)
+            else:
                 await send_ws_message_func("status_message", {"text": "Error: Could not generate a plan.", "component_hint": LOG_SOURCE_PLANNER, "isError": True})
                 await _send_thinking_update_from_handler(send_ws_message_func, active_task_id, session_id, db_add_message_func, "Planning failed.", "PLAN_FAILED", LOG_SOURCE_PLANNER, SUB_TYPE_BOTTOM_LINE)
-        
+
         elif classified_intent == "DIRECT_QA":
             direct_qa_role_hint = LOG_SOURCE_EXECUTOR + "_DirectQA"
             await _send_thinking_update_from_handler(send_ws_message_func, active_task_id, session_id, db_add_message_func, "Processing directly...", "DIRECT_QA_START", direct_qa_role_hint, SUB_TYPE_BOTTOM_LINE)
@@ -216,11 +221,10 @@ async def process_user_message(
                 else:
                      logger.warning(f"[{session_id}] Direct QA finished but no output in result: {result}")
                      final_msg = "Direct QA completed without specific output."
-            except AgentCancelledException: # This will be raised if the LLM call within AgentExecutor is cancelled via callback
+            except AgentCancelledException:
                 final_state = "CANCELLED"; final_msg = "Direct QA cancelled by user."
                 logger.warning(f"[{session_id}] Direct QA cancelled by user (caught AgentCancelledException).")
                 await send_ws_message_func("status_message", {"text": final_msg, "component_hint": LOG_SOURCE_SYSTEM})
-            # No need for separate asyncio.CancelledError here if AgentCancelledException is consistently raised by callbacks
             except Exception as e:
                 logger.error(f"[{session_id}] Direct QA error: {e}", exc_info=True)
                 final_msg = f"Direct QA error: {type(e).__name__}"
@@ -228,18 +232,16 @@ async def process_user_message(
             finally:
                 if "agent_task" in connected_clients_entry:
                      connected_clients_entry["agent_task"] = None
-                # session_data_entry['cancellation_requested'] is reset at the end of the outer try/except/finally
                 await _send_thinking_update_from_handler(send_ws_message_func, active_task_id, session_id, db_add_message_func, final_msg, final_state, direct_qa_role_hint if final_state.startswith("DIRECT") else LOG_SOURCE_SYSTEM, SUB_TYPE_BOTTOM_LINE)
 
-    except AgentCancelledException: # Catch cancellation from classify_intent or generate_plan
+    except AgentCancelledException:
         logger.warning(f"[{session_id}] User message processing (intent/planning) cancelled by user.")
         await _send_thinking_update_from_handler(send_ws_message_func, active_task_id, session_id, db_add_message_func, "Operation cancelled.", "CANCELLED", LOG_SOURCE_SYSTEM, SUB_TYPE_BOTTOM_LINE)
-    except Exception as e_outer: # Catch any other unexpected error during initial processing
+    except Exception as e_outer:
         logger.error(f"[{session_id}] Unexpected error during user message processing (intent/planning): {e_outer}", exc_info=True)
         await _send_thinking_update_from_handler(send_ws_message_func, active_task_id, session_id, db_add_message_func, f"Error: {type(e_outer).__name__}", "ERROR", LOG_SOURCE_SYSTEM, SUB_TYPE_BOTTOM_LINE)
     finally:
-        session_data_entry['cancellation_requested'] = False # Reset for next operation, regardless of how this block exited
-
+        session_data_entry['cancellation_requested'] = False
 
 async def process_execute_confirmed_plan(
     session_id: str, data: Dict[str, Any], session_data_entry: Dict[str, Any],
@@ -293,7 +295,7 @@ async def process_execute_confirmed_plan(
     original_user_query = session_data_entry.get("original_user_query", "N/A")
     step_execution_summary_for_overall_eval = []
 
-    try: # *** MODIFIED: Outer try for the whole plan execution loop to catch AgentCancelledException ***
+    try:
         for i, step_data_dict in enumerate(confirmed_steps):
             current_step_num = i + 1
             session_data_entry["current_plan_step_index"] = i
@@ -311,7 +313,6 @@ async def process_execute_confirmed_plan(
                 logger.warning(f"[{session_id}] Cancellation detected at start of step {current_step_num}.")
                 raise AgentCancelledException(f"Plan execution cancelled by user at start of step {current_step_num}.")
 
-
             step_succeeded_this_round = False; retry_count = 0
             current_step_attempt_log = []
             effective_plan_step_for_controller = current_plan_step_obj.copy(deep=True)
@@ -325,19 +326,18 @@ async def process_execute_confirmed_plan(
                 await _send_thinking_update_from_handler(send_ws_message_func, active_task_id, session_id, db_add_message_func, f"Controller validating Step {current_step_num}{attempt_msg}", "CONTROLLER_VALIDATING", LOG_SOURCE_CONTROLLER, SUB_TYPE_SUB_STATUS)
 
                 tool_name, tool_input, controller_reasoning, confidence = (None, None, "Controller error", 0.0)
-                try: # Specific try for controller
+                try:
                     tool_name, tool_input, controller_reasoning, confidence = await validate_and_prepare_step_action(
                         original_user_query, effective_plan_step_for_controller, get_dynamic_tools(active_task_id),
                         session_data_entry, last_successful_step_output,
                         retrieved_callback_handler
                     )
-                except AgentCancelledException: # Propagate if controller's LLM call was cancelled
+                except AgentCancelledException:
                     logger.warning(f"[{session_id}] Controller for step {current_step_num}{attempt_msg} cancelled by user (LLM callback).")
                     raise
                 except Exception as controller_e:
                     logger.error(f"[{session_id}] Controller for step {current_step_num}{attempt_msg} failed with other error: {controller_e}", exc_info=True)
                     controller_reasoning = f"Controller execution failed: {type(controller_e).__name__}"
-                    # Let retry logic handle this or fail the step below
 
                 current_step_attempt_log.append(f"Attempt {retry_count+1}: Controller decided Tool='{tool_name}', Input='{str(tool_input)[:50]}...', Confidence={confidence:.2f}. Reasoning: {controller_reasoning}")
                 if controller_reasoning and len(controller_reasoning) > 10:
@@ -361,7 +361,7 @@ async def process_execute_confirmed_plan(
 
                 step_executor_output_str = f"Executor error or no output for step {current_step_num}{attempt_msg}."
                 agent_run_task_step = None
-                try: # Specific try for executor
+                try:
                     executor_llm = get_llm(
                         settings,
                         provider=session_data_entry.get("selected_llm_provider", settings.executor_default_provider),
@@ -398,7 +398,7 @@ async def process_execute_confirmed_plan(
 
                 await _send_thinking_update_from_handler(send_ws_message_func, active_task_id, session_id, db_add_message_func, f"Step Evaluator assessing Step {current_step_num}{attempt_msg} outcome...", "STEP_EVAL_START", LOG_SOURCE_EVALUATOR_STEP, SUB_TYPE_SUB_STATUS)
                 eval_outcome = None
-                try: # Specific try for step evaluator
+                try:
                     eval_outcome = await evaluate_step_outcome_and_suggest_correction(
                         original_user_query, current_plan_step_obj,
                         tool_name, tool_input, step_executor_output_str,
@@ -410,7 +410,6 @@ async def process_execute_confirmed_plan(
                     raise
                 except Exception as eval_e:
                     logger.error(f"[{session_id}] Step Evaluator for step {current_step_num}{attempt_msg} failed with other error: {eval_e}", exc_info=True)
-                    # eval_outcome will remain None, handled below
 
                 if eval_outcome:
                     current_step_attempt_log.append(f"Evaluator: Achieved={eval_outcome.step_achieved_goal}. Assessment: {eval_outcome.assessment_of_step}")
@@ -429,7 +428,6 @@ async def process_execute_confirmed_plan(
                     logger.error(f"[{session_id}] Step Evaluator call returned None for step {current_step_num}{attempt_msg}.")
                     plan_failed = True; final_eval_answer_from_last_step = f"Error: Step Evaluator failed for step {current_step_num}."; break
                 retry_count += 1
-            # End of while retry_count loop
 
             if plan_failed: break
 
@@ -444,7 +442,6 @@ async def process_execute_confirmed_plan(
             )
             if not step_succeeded_this_round: plan_failed = True
             if plan_failed: break
-        # End of for step_data_dict in confirmed_steps loop
 
     except AgentCancelledException:
         logger.warning(f"[{session_id}] Plan execution loop explicitly cancelled by user.")
@@ -454,17 +451,13 @@ async def process_execute_confirmed_plan(
         logger.error(f"[{session_id}] Unexpected error during plan execution loop: {e_outer_loop}", exc_info=True)
         plan_failed = True
         final_eval_answer_from_last_step = f"Unexpected error during plan execution: {type(e_outer_loop).__name__}"
-    finally: # *** MODIFIED: Ensure this finally block correctly handles state after loop termination ***
+    finally:
         session_data_entry["plan_execution_active"] = False
-        if "agent_task" in connected_clients_entry: # Clear any lingering task reference
+        if "agent_task" in connected_clients_entry:
             connected_clients_entry["agent_task"] = None
 
-        # Only proceed to overall evaluation if not explicitly cancelled before it could start
         overall_eval_result = None
         if not session_data_entry.get('cancellation_requested', False) or not plan_failed :
-            # If plan_failed is true but cancellation_requested is false, it means a step failed unrecoverably.
-            # We still might want to run overall evaluation in that case.
-            # If cancellation_requested is true, we skip overall eval.
             if not session_data_entry.get('cancellation_requested', False):
                 await _send_thinking_update_from_handler(send_ws_message_func, active_task_id, session_id, db_add_message_func, "Evaluating overall outcome...", "OVERALL_EVAL_START", LOG_SOURCE_EVALUATOR_OVERALL, SUB_TYPE_BOTTOM_LINE)
                 try:
@@ -500,7 +493,7 @@ async def process_execute_confirmed_plan(
         elif plan_failed :
             final_chat_message_content_for_ui = final_eval_answer_from_last_step
             final_component_hint_for_ui = LOG_SOURCE_SYSTEM if "cancelled" in final_eval_answer_from_last_step.lower() else LOG_SOURCE_ERROR
-        else: # Plan didn't explicitly fail, but overall_eval_result is None
+        else:
             final_chat_message_content_for_ui = final_eval_answer_from_last_step
             final_component_hint_for_ui = LOG_SOURCE_EXECUTOR
 
@@ -532,4 +525,3 @@ async def process_cancel_plan_proposal(
         dummy_db_add = lambda tid, sid, mtype, cont: asyncio.sleep(0) # type: ignore
         await _send_thinking_update_from_handler(send_ws_message_func, session_data_entry.get("current_task_id"), session_id, dummy_db_add, "Idle.", "IDLE", LOG_SOURCE_SYSTEM, SUB_TYPE_BOTTOM_LINE)
         await send_ws_message_func("status_message", {"text": f"Plan proposal cancelled.", "component_hint": LOG_SOURCE_SYSTEM})
-

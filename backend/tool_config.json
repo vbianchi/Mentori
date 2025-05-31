@@ -1,0 +1,13 @@
+[
+  {
+    "tool_name": "tavily_search_api",
+    "module_path": "backend.tools.tavily_search_tool",
+    "class_name": "TavilyAPISearchTool",
+    "description_for_agent": "A search engine optimized for comprehensive, accurate, and trusted results using the Tavily API. Useful for when you need to answer questions about current events, recent information, or general knowledge questions that require up-to-date information from the web. Input should be a search query string. Optionally, 'max_results' can be specified within a JSON input. Returns a list of search result objects, each containing 'title', 'url', and 'content' (snippet).",
+    "input_schema_description": "A JSON string with a 'query' (string, required) and optional 'max_results' (integer). Example: '{\"query\": \"AI in medicine\", \"max_results\": 3}'",
+    "output_description": "A list of search result dictionaries. Each dictionary contains 'url', 'title', and 'content'.",
+    "initialization_params": {},
+    "enabled": true,
+    "category": "search"
+  }
+]
