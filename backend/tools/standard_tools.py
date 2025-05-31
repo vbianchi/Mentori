@@ -15,11 +15,9 @@ from typing import List, Optional, Dict, Any, Type
 from langchain_core.tools import Tool, BaseTool
 from langchain_core.callbacks import CallbackManagerForToolRun
 from langchain_community.tools import DuckDuckGoSearchRun
-# PythonREPL is now handled by PythonREPLTool class
+# Bio and pypdf are used by tools now in their own files, but kept if standard_tools needs them for other things
 from Bio import Entrez
 from urllib.error import HTTPError
-
-# PDF Import
 try:
     import pypdf
     logger_pypdf = logging.getLogger(__name__)
@@ -31,8 +29,9 @@ except ImportError:
 # Project Imports
 from backend.config import settings
 from backend.tool_loader import load_tools_from_config, ToolLoadingError
-from backend.tools.tavily_search_tool import TavilyAPISearchTool # Keep for DeepResearchTool
-from backend.tools.deep_research_tool import DeepResearchTool
+# Specific tool class imports are generally not needed here if primarily loaded via config
+# from backend.tools.tavily_search_tool import TavilyAPISearchTool
+# from backend.tools.deep_research_tool import DeepResearchTool # Will be loaded from config
 
 
 logger = logging.getLogger(__name__)
@@ -53,6 +52,7 @@ except Exception as e:
 TEXT_EXTENSIONS = {".txt", ".py", ".js", ".css", ".html", ".json", ".csv", ".md", ".log", ".yaml", ".yml"}
 
 def get_task_workspace_path(task_id: Optional[str], create_if_not_exists: bool = True) -> Path:
+    # This function remains unchanged
     logger.debug(f"get_task_workspace_path called for task_id: '{task_id}', create_if_not_exists: {create_if_not_exists}")
     if not task_id or not isinstance(task_id, str):
         msg = f"Invalid or missing task_id ('{task_id}') provided for workspace path."
@@ -82,12 +82,10 @@ def get_task_workspace_path(task_id: Optional[str], create_if_not_exists: bool =
         logger.warning(f"Task workspace directory does not exist and create_if_not_exists is False: {task_workspace}")
     return task_workspace
 
+# Helper function fetch_and_parse_url remains (used by WebPageReaderTool)
 async def fetch_and_parse_url(url: str) -> str:
-    tool_name = "web_page_reader_logic"
-    logger.info(f"Helper '{tool_name}' received raw input: '{url}'")
-    if not isinstance(url, str) or not url.strip():
-        logger.error(f"Helper '{tool_name}' received invalid input: Must be a non-empty string.")
-        return "Error: Invalid input. Expected a non-empty URL string."
+    tool_name = "web_page_reader_logic"; logger.info(f"Helper '{tool_name}' received raw input: '{url}'")
+    if not isinstance(url, str) or not url.strip(): logger.error(f"Helper '{tool_name}' received invalid input."); return "Error: Invalid input. Expected a non-empty URL string."
     max_length = settings.tool_web_reader_max_length; timeout = settings.tool_web_reader_timeout
     HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
     clean_url = url.strip().replace('\n', '').replace('\r', '').replace('\t', '').strip('`')
@@ -115,12 +113,13 @@ async def fetch_and_parse_url(url: str) -> str:
     except ImportError: logger.error(f"Helper '{tool_name}': lxml not installed."); return "Error: HTML parser (lxml) not installed."
     except Exception as e: logger.error(f"Helper '{tool_name}': Error parsing {clean_url}: {e}", exc_info=True); return f"Error parsing URL: {e}"
 
+# Helper function write_to_file_in_task_workspace remains
 async def write_to_file_in_task_workspace(input_str: str, task_workspace: Path) -> str:
     tool_name = "write_file_logic"; logger.debug(f"Helper '{tool_name}': Raw input_str: '{input_str[:200]}{'...' if len(input_str) > 200 else ''}' for workspace: {task_workspace.name}")
     if not isinstance(input_str, str) or ':::' not in input_str: logger.error(f"Helper '{tool_name}' received invalid input format."); return "Error: Invalid input format. Expected 'file_path:::text_content'."
     relative_path_str = ""
     try:
-        parts = input_str.split(':::', 1)
+        parts = input_str.split(':::', 1);
         if len(parts) != 2: logger.error(f"Helper '{tool_name}': Input split failed."); return "Error: Invalid input format after splitting."
         relative_path_str = parts[0].strip().strip('\'"`'); raw_text_content = parts[1]
         logger.debug(f"Helper '{tool_name}': Parsed relative_path_str: '{relative_path_str}', raw_text_content length: {len(raw_text_content)}")
@@ -146,83 +145,51 @@ async def write_to_file_in_task_workspace(input_str: str, task_workspace: Path) 
         return f"SUCCESS::write_file:::{cleaned_relative_path}"
     except Exception as e: logger.error(f"Helper '{tool_name}': Error writing file '{relative_path_str}': {e}", exc_info=True); return f"Error: Failed to write file '{relative_path_str}'. Reason: {type(e).__name__}"
 
+# Helper function read_file_content remains
 async def read_file_content(relative_path_str: str, task_workspace: Path) -> str:
-    tool_name = "read_file_logic"
-    logger.debug(f"Helper '{tool_name}': Raw relative_path_str: '{relative_path_str[:100]}{'...' if len(relative_path_str) > 100 else ''}' in workspace: {task_workspace.name}")
-    if not isinstance(relative_path_str, str) or not relative_path_str.strip():
-        logger.error(f"Helper '{tool_name}': Received invalid input.")
-        return "Error: Invalid input. Expected a non-empty relative file path string."
-    first_line = relative_path_str.splitlines()[0] if relative_path_str else ""
-    cleaned_relative_path = first_line.strip().strip('\'"`')
+    tool_name = "read_file_logic"; logger.debug(f"Helper '{tool_name}': Raw relative_path_str: '{relative_path_str[:100]}{'...' if len(relative_path_str) > 100 else ''}' in workspace: {task_workspace.name}")
+    if not isinstance(relative_path_str, str) or not relative_path_str.strip(): logger.error(f"Helper '{tool_name}': Received invalid input."); return "Error: Invalid input. Expected a non-empty relative file path string."
+    first_line = relative_path_str.splitlines()[0] if relative_path_str else ""; cleaned_relative_path = first_line.strip().strip('\'"`')
     logger.info(f"Helper '{tool_name}': Cleaned relative_path for reading: '{cleaned_relative_path}'")
-    if not cleaned_relative_path:
-        logger.error(f"Helper '{tool_name}': File path became empty after cleaning.")
-        return "Error: File path cannot be empty after cleaning."
+    if not cleaned_relative_path: logger.error(f"Helper '{tool_name}': File path became empty after cleaning."); return "Error: File path cannot be empty after cleaning."
     relative_path = Path(cleaned_relative_path)
-    if relative_path.is_absolute() or '..' in relative_path.parts:
-        logger.error(f"Helper '{tool_name}': Security Error - Invalid read file path '{cleaned_relative_path}'.")
-        return f"Error: Invalid file path '{cleaned_relative_path}'. Path must be relative and within the workspace."
+    if relative_path.is_absolute() or '..' in relative_path.parts: logger.error(f"Helper '{tool_name}': Security Error - Invalid read file path '{cleaned_relative_path}'."); return f"Error: Invalid file path '{cleaned_relative_path}'. Path must be relative and within the workspace."
     full_path = task_workspace.joinpath(relative_path).resolve()
     logger.info(f"Helper '{tool_name}': Attempting to read resolved full_path: '{full_path}'")
-    if not full_path.is_relative_to(task_workspace.resolve()):
-        logger.error(f"Helper '{tool_name}': Security Error - Read path resolves outside task workspace!")
-        return "Error: File path resolves outside the designated task workspace."
-    if not full_path.exists():
-        logger.warning(f"Helper '{tool_name}': File not found at {full_path}")
-        return f"Error: File not found at path '{cleaned_relative_path}'."
-    if not full_path.is_file():
-        logger.warning(f"Helper '{tool_name}': Path is not a file: {full_path}")
-        return f"Error: Path '{cleaned_relative_path}' is not a file."
-    file_extension = full_path.suffix.lower()
-    content = ""
+    if not full_path.is_relative_to(task_workspace.resolve()): logger.error(f"Helper '{tool_name}': Security Error - Read path resolves outside task workspace!"); return "Error: File path resolves outside the designated task workspace."
+    if not full_path.exists(): logger.warning(f"Helper '{tool_name}': File not found at {full_path}"); return f"Error: File not found at path '{cleaned_relative_path}'."
+    if not full_path.is_file(): logger.warning(f"Helper '{tool_name}': Path is not a file: {full_path}"); return f"Error: Path '{cleaned_relative_path}' is not a file."
+    file_extension = full_path.suffix.lower(); content = ""
     try:
         if file_extension == ".pdf":
-            if pypdf is None:
-                logger.error(f"Helper '{tool_name}': Attempted to read PDF, but pypdf library is not installed.")
-                return "Error: PDF reading library (pypdf) is not installed on the server."
-            def read_pdf_sync(): # This is the function with the potential indentation issue
+            if pypdf is None: logger.error(f"Helper '{tool_name}': Attempted to read PDF, but pypdf library is not installed."); return "Error: PDF reading library (pypdf) is not installed on the server."
+            def read_pdf_sync():
                 extracted_text = ""
-                try: # Outer try for PDF reading
-                    reader = pypdf.PdfReader(str(full_path))
-                    num_pages = len(reader.pages)
+                try:
+                    reader = pypdf.PdfReader(str(full_path)); num_pages = len(reader.pages)
                     logger.info(f"Helper '{tool_name}': Reading {num_pages} pages from PDF: {full_path.name}")
                     for i, page in enumerate(reader.pages):
-                        # Consistent 4-space indentation for this block
-                        try: # Inner try for page text extraction
+                        try:
                             page_text = page.extract_text()
                             if page_text:
                                 extracted_text += page_text + "\n"
-                        except Exception as page_err: # Corresponds to inner try
+                        except Exception as page_err:
                             logger.warning(f"Helper '{tool_name}': Error extracting text from page {i+1} of {full_path.name}: {page_err}")
                             extracted_text += f"\n--- Error reading page {i+1} ---\n"
-                    return extracted_text.strip() # Belongs to outer try's successful path
-                except pypdf.errors.PdfReadError as pdf_err: # Corresponds to outer try
-                    logger.error(f"Helper '{tool_name}': Error reading PDF file {full_path.name}: {pdf_err}")
-                    raise RuntimeError(f"Error: Could not read PDF file '{cleaned_relative_path}'. It might be corrupted or encrypted. Error: {pdf_err}") from pdf_err
-                except Exception as e: # Corresponds to outer try
-                    logger.error(f"Helper '{tool_name}': Unexpected error reading PDF {full_path.name}: {e}", exc_info=True)
-                    raise RuntimeError(f"Error: An unexpected error occurred while reading PDF '{cleaned_relative_path}'.") from e
-            loop = asyncio.get_running_loop()
-            content = await loop.run_in_executor(None, read_pdf_sync)
-            actual_length = len(content)
-            logger.info(f"Helper '{tool_name}': Successfully read {actual_length} chars from PDF '{cleaned_relative_path}'.")
+                    return extracted_text.strip()
+                except pypdf.errors.PdfReadError as pdf_err: logger.error(f"Helper '{tool_name}': Error reading PDF file {full_path.name}: {pdf_err}"); raise RuntimeError(f"Error reading PDF: {pdf_err}") from pdf_err
+                except Exception as e: logger.error(f"Helper '{tool_name}': Unexpected error reading PDF {full_path.name}: {e}", exc_info=True); raise RuntimeError(f"Unexpected error reading PDF: {e}") from e
+            loop = asyncio.get_running_loop(); content = await loop.run_in_executor(None, read_pdf_sync)
+            actual_length = len(content); logger.info(f"Helper '{tool_name}': Successfully read {actual_length} chars from PDF '{cleaned_relative_path}'.")
             warning_length = settings.tool_pdf_reader_warning_length
-            if actual_length > warning_length:
-                content += f"\n\n[SYSTEM WARNING: Full PDF content read ({actual_length} chars), exceeds warning threshold of {warning_length} chars.]"
-                logger.warning(f"Helper '{tool_name}': PDF content length ({actual_length}) exceeds warning threshold ({warning_length}).")
+            if actual_length > warning_length: content += f"\n\n[SYSTEM WARNING: Full PDF content read ({actual_length} chars), exceeds warning threshold of {warning_length} chars.]"; logger.warning(f"Helper '{tool_name}': PDF content length ({actual_length}) exceeds warning threshold ({warning_length}).")
         elif file_extension in TEXT_EXTENSIONS:
-            async with aiofiles.open(full_path, mode='r', encoding='utf-8', errors='ignore') as f:
-                content = await f.read()
+            async with aiofiles.open(full_path, mode='r', encoding='utf-8', errors='ignore') as f: content = await f.read()
             logger.info(f"Helper '{tool_name}': Successfully read {len(content)} chars from text file '{cleaned_relative_path}'.")
-        else:
-            logger.warning(f"Helper '{tool_name}': Unsupported file extension '{file_extension}' for file '{cleaned_relative_path}'")
-            return f"Error: Cannot read file. Unsupported file extension: '{file_extension}'. Supported text: {', '.join(TEXT_EXTENSIONS)}, .pdf"
+        else: logger.warning(f"Helper '{tool_name}': Unsupported file extension '{file_extension}' for file '{cleaned_relative_path}'"); return f"Error: Cannot read file. Unsupported file extension: '{file_extension}'. Supported text: {', '.join(TEXT_EXTENSIONS)}, .pdf"
         return content
-    except RuntimeError as rt_err:
-        return str(rt_err)
-    except Exception as e:
-        logger.error(f"Helper '{tool_name}': Error reading file '{cleaned_relative_path}': {e}", exc_info=True)
-        return f"Error: Failed to read file '{cleaned_relative_path}'. Reason: {type(e).__name__}"
+    except RuntimeError as rt_err: return str(rt_err)
+    except Exception as e: logger.error(f"Helper '{tool_name}': Error reading file '{cleaned_relative_path}': {e}", exc_info=True); return f"Error: Failed to read file '{cleaned_relative_path}'. Reason: {type(e).__name__}"
 
 
 # --- Tool Class Definitions (Task-Specific) ---
@@ -239,18 +206,11 @@ class ReadFileTool(BaseTool):
 
     def _run(self, relative_path_str: str) -> str:
         logger.warning(f"ReadFileTool synchronously called for: {relative_path_str}. This may block if the underlying operation is truly async.")
-        try:
-            return asyncio.run(read_file_content(relative_path_str, self.task_workspace))
+        try: return asyncio.run(read_file_content(relative_path_str, self.task_workspace))
         except RuntimeError as e:
-            if "cannot be called from a running event loop" in str(e):
-                logger.error(f"ReadFileTool _run called from a running event loop. Error for {relative_path_str}: {e}")
-                return f"Error: ReadFileTool's synchronous _run method was called from an active event loop. Path: {relative_path_str}"
-            logger.error(f"Error running ReadFileTool synchronously for {relative_path_str}: {e}", exc_info=True)
-            return f"Error reading file (sync): {e}"
-        except Exception as e:
-            logger.error(f"Unexpected error running ReadFileTool synchronously for {relative_path_str}: {e}", exc_info=True)
-            return f"Unexpected error reading file (sync): {e}"
-
+            if "cannot be called from a running event loop" in str(e): logger.error(f"ReadFileTool _run called from a running event loop. Error for {relative_path_str}: {e}"); return f"Error: ReadFileTool's synchronous _run method was called from an active event loop. Path: {relative_path_str}"
+            logger.error(f"Error running ReadFileTool synchronously for {relative_path_str}: {e}", exc_info=True); return f"Error reading file (sync): {e}"
+        except Exception as e: logger.error(f"Unexpected error running ReadFileTool synchronously for {relative_path_str}: {e}", exc_info=True); return f"Unexpected error reading file (sync): {e}"
     async def _arun(self, relative_path_str: str, run_manager: Optional[CallbackManagerForToolRun] = None) -> str:
         return await read_file_content(relative_path_str, self.task_workspace)
 
@@ -266,66 +226,31 @@ class WriteFileTool(BaseTool):
 
     def _run(self, input_str: str) -> str:
         logger.warning(f"WriteFileTool synchronously called for input: {input_str[:50]}... This may block.")
-        try:
-            return asyncio.run(write_to_file_in_task_workspace(input_str, self.task_workspace))
+        try: return asyncio.run(write_to_file_in_task_workspace(input_str, self.task_workspace))
         except RuntimeError as e:
-            if "cannot be called from a running event loop" in str(e):
-                logger.error(f"WriteFileTool _run called from a running event loop. Input: {input_str[:50]}. Error: {e}")
-                return f"Error: WriteFileTool's synchronous _run method was called from an active event loop. Input: {input_str[:50]}"
-            logger.error(f"Error running WriteFileTool synchronously for {input_str[:50]}: {e}", exc_info=True)
-            return f"Error writing file (sync): {e}"
-        except Exception as e:
-            logger.error(f"Unexpected error running WriteFileTool synchronously for {input_str[:50]}: {e}", exc_info=True)
-            return f"Unexpected error writing file (sync): {e}"
-
+            if "cannot be called from a running event loop" in str(e): logger.error(f"WriteFileTool _run called from a running event loop. Input: {input_str[:50]}. Error: {e}"); return f"Error: WriteFileTool's synchronous _run method was called from an active event loop. Input: {input_str[:50]}"
+            logger.error(f"Error running WriteFileTool synchronously for {input_str[:50]}: {e}", exc_info=True); return f"Error writing file (sync): {e}"
+        except Exception as e: logger.error(f"Unexpected error running WriteFileTool synchronously for {input_str[:50]}: {e}", exc_info=True); return f"Unexpected error writing file (sync): {e}"
     async def _arun(self, input_str: str, run_manager: Optional[CallbackManagerForToolRun] = None) -> str:
         return await write_to_file_in_task_workspace(input_str, self.task_workspace)
 
 class TaskWorkspaceShellTool(BaseTool):
-    name: str = "workspace_shell"
-    description: str = (
-        f"Use this tool ONLY to execute **non-interactive** shell commands directly within the **current task's dedicated workspace**. "
-        f"Useful for running scripts (e.g., 'python my_script.py', 'Rscript analysis.R'), listing files (`ls -l`), checking file details (`wc`, `head`), etc. "
-        f"Input MUST be a single, valid, non-interactive shell command string. Do NOT include path prefixes like 'workspace/task_id/'. "
-        f"**DO NOT use this for 'pip install' or 'uv venv' or environment modifications.** Use the dedicated 'python_package_installer' tool for installations."
-        f"Timeout: {settings.tool_shell_timeout}s. Max output length: {settings.tool_shell_max_output} chars."
-    )
-    task_workspace: Path
-    timeout: int = settings.tool_shell_timeout
-    max_output: int = settings.tool_shell_max_output
-
-    def _run(self, command: str) -> str:
+    name: str = "workspace_shell"; description: str = (...); task_workspace: Path; timeout: int = settings.tool_shell_timeout; max_output: int = settings.tool_shell_max_output
+    def _run(self, command: str) -> str: # ... (content remains the same)
         logger.warning("Running TaskWorkspaceShellTool synchronously using _run.")
         try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                logger.warning("TaskWorkspaceShellTool _run: Event loop is running. Using asyncio.run_coroutine_threadsafe.")
-                future = asyncio.run_coroutine_threadsafe(self._arun_internal(command), loop)
-                return future.result(timeout=self.timeout + 5)
-            else:
-                logger.info("TaskWorkspaceShellTool _run: Event loop is not running. Using asyncio.run().")
-                return asyncio.run(self._arun_internal(command))
+            loop = asyncio.get_event_loop();
+            if loop.is_running(): logger.warning("TaskWorkspaceShellTool _run: Event loop is running. Using asyncio.run_coroutine_threadsafe."); future = asyncio.run_coroutine_threadsafe(self._arun_internal(command), loop); return future.result(timeout=self.timeout + 5)
+            else: logger.info("TaskWorkspaceShellTool _run: Event loop is not running. Using asyncio.run()."); return asyncio.run(self._arun_internal(command))
         except RuntimeError as e:
-            if "no running event loop" in str(e).lower() or "cannot be called from a running event loop" in str(e).lower():
-                 logger.warning(f"TaskWorkspaceShellTool _run: Runtime error with event loop, trying fresh asyncio.run: {e}")
-                 return asyncio.run(self._arun_internal(command))
-            logger.error(f"TaskWorkspaceShellTool _run: Runtime error: {e}", exc_info=True)
-            return f"Error executing shell command (sync wrapper): {e}"
-        except Exception as e:
-            logger.error(f"TaskWorkspaceShellTool _run: Unexpected error: {e}", exc_info=True)
-            return f"Unexpected error executing shell command (sync wrapper): {e}"
-
-    async def _arun(self, command: str, run_manager: Optional[CallbackManagerForToolRun] = None) -> str:
-        return await self._arun_internal(command)
-
-    async def _arun_internal(self, command: str) -> str:
-        tool_name = self.name
-        logger.info(f"Tool '{tool_name}' received raw input: '{command}'")
-        if not isinstance(command, str) or not command.strip():
-            logger.error(f"Tool '{tool_name}': Received invalid input.")
-            return "Error: Invalid input. Expected a non-empty command string."
-        cwd = str(self.task_workspace.resolve())
-        logger.info(f"Tool '{tool_name}' executing command: '{command}' in CWD: {cwd} (Timeout: {self.timeout}s)")
+            if "no running event loop" in str(e).lower() or "cannot be called from a running event loop" in str(e).lower(): logger.warning(f"TaskWorkspaceShellTool _run: Runtime error with event loop, trying fresh asyncio.run: {e}"); return asyncio.run(self._arun_internal(command))
+            logger.error(f"TaskWorkspaceShellTool _run: Runtime error: {e}", exc_info=True); return f"Error executing shell command (sync wrapper): {e}"
+        except Exception as e: logger.error(f"TaskWorkspaceShellTool _run: Unexpected error: {e}", exc_info=True); return f"Unexpected error executing shell command (sync wrapper): {e}"
+    async def _arun(self, command: str, run_manager: Optional[CallbackManagerForToolRun] = None) -> str: return await self._arun_internal(command)
+    async def _arun_internal(self, command: str) -> str: # ... (content remains the same)
+        tool_name = self.name; logger.info(f"Tool '{tool_name}' received raw input: '{command}'")
+        if not isinstance(command, str) or not command.strip(): logger.error(f"Tool '{tool_name}': Received invalid input."); return "Error: Invalid input. Expected a non-empty command string."
+        cwd = str(self.task_workspace.resolve()); logger.info(f"Tool '{tool_name}' executing command: '{command}' in CWD: {cwd} (Timeout: {self.timeout}s)")
         process = None; stdout_str = ""; stderr_str = ""
         try:
             clean_command = command.strip().strip('`');
@@ -373,28 +298,26 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
 
     tools: List[BaseTool] = list(dynamically_loaded_tools)
 
-    # Fallback Search (DuckDuckGo) if Tavily isn't loaded/configured
+    # Fallback Search (DuckDuckGo) if Tavily isn't loaded/configured from tool_config.json
     tavily_loaded = any(tool.name == "tavily_search_api" for tool in tools)
     if not tavily_loaded:
-        logger.info("Tavily Search tool not found in dynamically loaded tools. Adding DuckDuckGoSearchRun as a fallback search tool.")
+        logger.info("Tavily Search tool not found or not enabled in config. Adding DuckDuckGoSearchRun as a fallback search tool.")
+        # Only add DDG if Tavily is *not* present, to avoid redundant search tools unless explicitly configured.
         tools.append(DuckDuckGoSearchRun(description=(
             "A wrapper around DuckDuckGo Search. Useful for when you need to answer questions "
             "about current events or things you don't know. Input MUST be a search query string."
         )))
-
-    # DeepResearchTool (can be moved to config later)
-    deep_research_tool_loaded = any(tool.name == "deep_research_synthesizer" for tool in tools)
-    if not deep_research_tool_loaded:
-        try:
-            deep_research_tool = DeepResearchTool()
-            tools.append(deep_research_tool)
-            logger.info(f"Manually added DeepResearchTool for task '{current_task_id or 'N/A'}'.")
-        except Exception as e:
-            logger.error(f"Failed to manually initialize DeepResearchTool: {e}", exc_info=True)
+    
+    # Note: DeepResearchTool, WebPageReaderTool, PythonPackageInstallerTool, PubMedSearchTool, PythonREPLTool
+    # are now expected to be loaded via tool_config.json.
+    # The manual additions for these are removed.
 
     # Task-specific tools that require current_task_id for workspace path
+    # These are still manually instantiated as they depend on runtime context (current_task_id).
+    # It's unlikely these would be defined in a generic tool_config.json without further
+    # modifications to the loader to handle task-specific instantiation.
     if not current_task_id:
-        logger.warning("No active task ID provided to get_dynamic_tools. Workspace-dependent tools (read_file, write_file, workspace_shell) will not be added if not already loaded from config.")
+        logger.warning("No active task ID provided to get_dynamic_tools. Task-specific tools (read_file, write_file, workspace_shell) will not be added.")
     else:
         try:
             task_workspace = get_task_workspace_path(current_task_id, create_if_not_exists=True)
@@ -406,7 +329,7 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
                 TaskWorkspaceShellTool(task_workspace=task_workspace),
             ]
             for ts_tool in task_specific_tools_to_add_manually:
-                 if not any(t.name == ts_tool.name for t in tools): # Avoid duplicates if already loaded from config
+                 if not any(t.name == ts_tool.name for t in tools): # Avoid duplicates if somehow also in config
                     tools.append(ts_tool)
                     logger.info(f"Manually added task-specific tool: {ts_tool.name}")
         except (ValueError, OSError) as e:

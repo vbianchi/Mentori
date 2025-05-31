@@ -53,5 +53,16 @@
     "initialization_params": {},
     "enabled": true,
     "category": "code_execution"
+  },
+  {
+    "tool_name": "deep_research_synthesizer",
+    "module_path": "backend.tools.deep_research_tool",
+    "class_name": "DeepResearchTool",
+    "description_for_agent": "Performs an in-depth, multi-step research investigation on a given topic/query. It conducts a broad web search (internally using a search tool like Tavily), curates top sources, then extracts content from these sources (internally using a web page reader), summarizes if necessary, and synthesizes a comprehensive Markdown report. Use for complex research questions requiring a detailed overview. Input MUST be a JSON string matching the DeepResearchToolInput schema (e.g., '{\"query\": \"your research query\", \"num_sources_to_deep_dive\": 3}').",
+    "input_schema_description": "A JSON string representing an object with fields like 'query' (string, required), 'num_initial_sources_to_consider' (integer, optional, default 7), 'num_sources_to_deep_dive' (integer, optional, default 3), 'desired_report_sections' (list of strings, optional), 'max_tokens_per_summary' (integer, optional, default 1500), 'max_total_tokens_for_writer' (integer, optional, default 100000). Example: '{\"query\": \"benefits of renewable energy\", \"num_sources_to_deep_dive\": 2}'",
+    "output_description": "A string containing a comprehensive Markdown report based on the synthesized research.",
+    "initialization_params": {},
+    "enabled": true,
+    "category": "research"
   }
 ]
