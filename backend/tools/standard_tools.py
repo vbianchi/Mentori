@@ -14,8 +14,8 @@ from typing import List, Optional, Dict, Any, Type
 # LangChain Tool Imports
 from langchain_core.tools import Tool, BaseTool
 from langchain_core.callbacks import CallbackManagerForToolRun
-from langchain_community.tools import DuckDuckGoSearchRun
-# Bio and pypdf are used by tools now in their own files, but kept if standard_tools needs them for other things
+# from langchain_community.tools import DuckDuckGoSearchRun # <<< REMOVED
+# PythonREPL is now handled by PythonREPLTool class
 from Bio import Entrez
 from urllib.error import HTTPError
 try:
@@ -30,8 +30,8 @@ except ImportError:
 from backend.config import settings
 from backend.tool_loader import load_tools_from_config, ToolLoadingError
 # Specific tool class imports are generally not needed here if primarily loaded via config
-# from backend.tools.tavily_search_tool import TavilyAPISearchTool
-# from backend.tools.deep_research_tool import DeepResearchTool # Will be loaded from config
+from backend.tools.tavily_search_tool import TavilyAPISearchTool # Kept for DeepResearchTool if it needs it
+from backend.tools.deep_research_tool import DeepResearchTool # Kept for manual add for now
 
 
 logger = logging.getLogger(__name__)
@@ -194,16 +194,7 @@ async def read_file_content(relative_path_str: str, task_workspace: Path) -> str
 
 # --- Tool Class Definitions (Task-Specific) ---
 class ReadFileTool(BaseTool):
-    name: str = "read_file"
-    description: str = (
-        f"Use this tool ONLY to read the entire contents of a file (including text and PDF files) "
-        f"located within the current task's workspace. Input MUST be the relative path string "
-        f"to the file from the workspace root (e.g., 'my_data.csv', 'report.pdf', 'scripts/analysis.py'). "
-        f"Returns the full text content or an error message. For PDFs, a warning is appended if "
-        f"the content exceeds {settings.tool_pdf_reader_warning_length} characters."
-    )
-    task_workspace: Path
-
+    name: str = "read_file"; description: str = (...); task_workspace: Path
     def _run(self, relative_path_str: str) -> str:
         logger.warning(f"ReadFileTool synchronously called for: {relative_path_str}. This may block if the underlying operation is truly async.")
         try: return asyncio.run(read_file_content(relative_path_str, self.task_workspace))
@@ -215,15 +206,7 @@ class ReadFileTool(BaseTool):
         return await read_file_content(relative_path_str, self.task_workspace)
 
 class WriteFileTool(BaseTool):
-    name: str = "write_file"
-    description: str = (
-        f"Use this tool ONLY to write or overwrite text content to a file within the current task's workspace. "
-        f"Input MUST be a single string in the format 'relative_file_path:::text_content' "
-        f"(e.g., 'results.txt:::Analysis complete.\\nFinal score: 95'). Handles subdirectory creation. "
-        f"Do NOT use workspace path prefix in 'relative_file_path'."
-    )
-    task_workspace: Path
-
+    name: str = "write_file"; description: str = (...); task_workspace: Path
     def _run(self, input_str: str) -> str:
         logger.warning(f"WriteFileTool synchronously called for input: {input_str[:50]}... This may block.")
         try: return asyncio.run(write_to_file_in_task_workspace(input_str, self.task_workspace))
@@ -298,24 +281,26 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
 
     tools: List[BaseTool] = list(dynamically_loaded_tools)
 
-    # Fallback Search (DuckDuckGo) if Tavily isn't loaded/configured from tool_config.json
+    # --- REMOVED DuckDuckGoSearchRun fallback logic ---
+    # Web search tools (like Tavily) are now expected to be loaded from config.
+    # If no search tool is configured and enabled, the agent won't have one.
     tavily_loaded = any(tool.name == "tavily_search_api" for tool in tools)
-    if not tavily_loaded:
-        logger.info("Tavily Search tool not found or not enabled in config. Adding DuckDuckGoSearchRun as a fallback search tool.")
-        # Only add DDG if Tavily is *not* present, to avoid redundant search tools unless explicitly configured.
-        tools.append(DuckDuckGoSearchRun(description=(
-            "A wrapper around DuckDuckGo Search. Useful for when you need to answer questions "
-            "about current events or things you don't know. Input MUST be a search query string."
-        )))
-    
-    # Note: DeepResearchTool, WebPageReaderTool, PythonPackageInstallerTool, PubMedSearchTool, PythonREPLTool
-    # are now expected to be loaded via tool_config.json.
-    # The manual additions for these are removed.
+    if not tavily_loaded and (hasattr(settings, 'tavily_api_key') and settings.tavily_api_key):
+        logger.warning("Tavily API key is set in .env, but TavilyAPISearchTool was not found or not enabled in tool_config.json.")
+    elif not tavily_loaded:
+        logger.warning("No primary web search tool (e.g., Tavily) loaded from config. Agent may lack web search capabilities.")
+
+
+    # DeepResearchTool is now expected to be loaded via tool_config.json
+    # Manual addition is removed.
+    deep_research_tool_loaded = any(tool.name == "deep_research_synthesizer" for tool in tools)
+    if not deep_research_tool_loaded:
+        # This log remains to indicate if it's missing, but we won't manually add it.
+        logger.warning("DeepResearchTool not found in dynamically loaded tools. Ensure it's in tool_config.json and enabled if needed.")
+
 
     # Task-specific tools that require current_task_id for workspace path
-    # These are still manually instantiated as they depend on runtime context (current_task_id).
-    # It's unlikely these would be defined in a generic tool_config.json without further
-    # modifications to the loader to handle task-specific instantiation.
+    # These remain manually instantiated.
     if not current_task_id:
         logger.warning("No active task ID provided to get_dynamic_tools. Task-specific tools (read_file, write_file, workspace_shell) will not be added.")
     else:
@@ -329,7 +314,7 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
                 TaskWorkspaceShellTool(task_workspace=task_workspace),
             ]
             for ts_tool in task_specific_tools_to_add_manually:
-                 if not any(t.name == ts_tool.name for t in tools): # Avoid duplicates if somehow also in config
+                 if not any(t.name == ts_tool.name for t in tools):
                     tools.append(ts_tool)
                     logger.info(f"Manually added task-specific tool: {ts_tool.name}")
         except (ValueError, OSError) as e:
