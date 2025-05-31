@@ -3,7 +3,7 @@ import logging
 import asyncio
 import sys
 import re
-from typing import Optional, Type
+from typing import Optional, Type, Any
 
 from langchain_core.tools import BaseTool, ToolException
 from langchain_core.callbacks import CallbackManagerForToolRun

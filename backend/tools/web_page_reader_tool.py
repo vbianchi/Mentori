@@ -3,11 +3,11 @@ import logging
 import httpx
 from bs4 import BeautifulSoup
 import re
-from typing import Optional, Type
+from typing import Optional, Type, Any 
 
 from langchain_core.tools import BaseTool, ToolException
 from langchain_core.callbacks import CallbackManagerForToolRun
-from pydantic.v1 import BaseModel, Field # Assuming Pydantic v1 for Langchain compatibility for now
+from pydantic.v1 import BaseModel, Field
 
 from backend.config import settings
 
@@ -30,7 +30,7 @@ class WebPageReaderTool(BaseTool):
         self,
         url: str,
         run_manager: Optional[CallbackManagerForToolRun] = None,
-        **kwargs: Any
+        **kwargs: Any # <<< Any is now defined
     ) -> str:
         logger.info(f"Tool '{self.name}' received URL: '{url}'")
         if not isinstance(url, str) or not url.strip():
@@ -54,7 +54,7 @@ class WebPageReaderTool(BaseTool):
         try:
             async with httpx.AsyncClient(timeout=timeout, follow_redirects=True, headers=HEADERS) as client:
                 response = await client.get(clean_url)
-                response.raise_for_status() # Raises HTTPStatusError for 4xx/5xx responses
+                response.raise_for_status()
 
                 content_type = response.headers.get("content-type", "").lower()
                 if "html" not in content_type:
@@ -73,7 +73,7 @@ class WebPageReaderTool(BaseTool):
 
                 if not extracted_text:
                     logger.warning(f"Tool '{self.name}': Could not extract meaningful text from {clean_url}")
-                    return "Error: Could not extract meaningful text from the page." # Return as string, not ToolException
+                    return "Error: Could not extract meaningful text from the page."
 
                 truncated_text = extracted_text[:max_length]
                 if len(extracted_text) > max_length:
@@ -92,24 +92,21 @@ class WebPageReaderTool(BaseTool):
         except httpx.HTTPStatusError as e:
             logger.error(f"Tool '{self.name}': HTTP error fetching {clean_url}: {e.response.status_code}")
             raise ToolException(f"Error: HTTP {e.response.status_code} fetching URL.")
-        except ImportError: # Should not happen if lxml is in requirements
+        except ImportError:
             logger.error(f"Tool '{self.name}': lxml not installed.")
             raise ToolException("Error: HTML parser (lxml) not installed.")
         except Exception as e:
             logger.error(f"Tool '{self.name}': Error parsing {clean_url}: {e}", exc_info=True)
             raise ToolException(f"Error parsing URL: {e}")
 
-    def _run(self, url: str, run_manager: Optional[CallbackManagerForToolRun] = None) -> str:
-        # Sync wrapper if needed, though LangChain often handles this.
-        # For tools primarily async, it's good practice to have _arun as the main logic.
+    def _run(self, url: str, run_manager: Optional[CallbackManagerForToolRun] = None, **kwargs: Any) -> str:
         try:
             loop = asyncio.get_event_loop()
             if loop.is_running():
-                future = asyncio.run_coroutine_threadsafe(self._arun(url=url, run_manager=run_manager), loop)
+                future = asyncio.run_coroutine_threadsafe(self._arun(url=url, run_manager=run_manager, **kwargs), loop)
                 return future.result(timeout=settings.tool_web_reader_timeout + 5)
             else:
-                return asyncio.run(self._arun(url=url, run_manager=run_manager))
+                return asyncio.run(self._arun(url=url, run_manager=run_manager, **kwargs))
         except Exception as e:
             logger.error(f"Error running WebPageReaderTool synchronously for {url}: {e}", exc_info=True)
             return f"Error: {e}"
-
