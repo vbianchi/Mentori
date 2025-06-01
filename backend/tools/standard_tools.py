@@ -8,16 +8,12 @@ import re
 import aiofiles
 import codecs
 import asyncio
-import sys
-from typing import List, Optional, Dict, Any, Type
+from typing import List, Optional, Dict, Any, Type # Ensure Any is imported
 
 # LangChain Tool Imports
-from langchain_core.tools import Tool, BaseTool
+from langchain_core.tools import BaseTool
 from langchain_core.callbacks import CallbackManagerForToolRun
-# from langchain_community.tools import DuckDuckGoSearchRun # <<< REMOVED
-# PythonREPL is now handled by PythonREPLTool class
-from Bio import Entrez
-from urllib.error import HTTPError
+# Bio and pypdf are used by tools now in their own files
 try:
     import pypdf
     logger_pypdf = logging.getLogger(__name__)
@@ -29,9 +25,8 @@ except ImportError:
 # Project Imports
 from backend.config import settings
 from backend.tool_loader import load_tools_from_config, ToolLoadingError
-# Specific tool class imports are generally not needed here if primarily loaded via config
-from backend.tools.tavily_search_tool import TavilyAPISearchTool # Kept for DeepResearchTool if it needs it
-from backend.tools.deep_research_tool import DeepResearchTool # Kept for manual add for now
+# No need to import specific tool classes here if they are all loaded via config,
+# except for task-specific ones defined below or base classes for type hinting.
 
 
 logger = logging.getLogger(__name__)
@@ -82,8 +77,9 @@ def get_task_workspace_path(task_id: Optional[str], create_if_not_exists: bool =
         logger.warning(f"Task workspace directory does not exist and create_if_not_exists is False: {task_workspace}")
     return task_workspace
 
-# Helper function fetch_and_parse_url remains (used by WebPageReaderTool)
+# Helper function fetch_and_parse_url remains (used by WebPageReaderTool class)
 async def fetch_and_parse_url(url: str) -> str:
+    # ... (content remains the same as v7) ...
     tool_name = "web_page_reader_logic"; logger.info(f"Helper '{tool_name}' received raw input: '{url}'")
     if not isinstance(url, str) or not url.strip(): logger.error(f"Helper '{tool_name}' received invalid input."); return "Error: Invalid input. Expected a non-empty URL string."
     max_length = settings.tool_web_reader_max_length; timeout = settings.tool_web_reader_timeout
@@ -115,6 +111,7 @@ async def fetch_and_parse_url(url: str) -> str:
 
 # Helper function write_to_file_in_task_workspace remains
 async def write_to_file_in_task_workspace(input_str: str, task_workspace: Path) -> str:
+    # ... (content remains the same as v7) ...
     tool_name = "write_file_logic"; logger.debug(f"Helper '{tool_name}': Raw input_str: '{input_str[:200]}{'...' if len(input_str) > 200 else ''}' for workspace: {task_workspace.name}")
     if not isinstance(input_str, str) or ':::' not in input_str: logger.error(f"Helper '{tool_name}' received invalid input format."); return "Error: Invalid input format. Expected 'file_path:::text_content'."
     relative_path_str = ""
@@ -147,6 +144,7 @@ async def write_to_file_in_task_workspace(input_str: str, task_workspace: Path) 
 
 # Helper function read_file_content remains
 async def read_file_content(relative_path_str: str, task_workspace: Path) -> str:
+    # ... (content remains the same as v7) ...
     tool_name = "read_file_logic"; logger.debug(f"Helper '{tool_name}': Raw relative_path_str: '{relative_path_str[:100]}{'...' if len(relative_path_str) > 100 else ''}' in workspace: {task_workspace.name}")
     if not isinstance(relative_path_str, str) or not relative_path_str.strip(): logger.error(f"Helper '{tool_name}': Received invalid input."); return "Error: Invalid input. Expected a non-empty relative file path string."
     first_line = relative_path_str.splitlines()[0] if relative_path_str else ""; cleaned_relative_path = first_line.strip().strip('\'"`')
@@ -194,32 +192,71 @@ async def read_file_content(relative_path_str: str, task_workspace: Path) -> str
 
 # --- Tool Class Definitions (Task-Specific) ---
 class ReadFileTool(BaseTool):
-    name: str = "read_file"; description: str = (...); task_workspace: Path
+    name: str = "read_file"
+    description: str = (
+        f"Use this tool ONLY to read the entire contents of a file (including text and PDF files) "
+        f"located within the current task's workspace. Input MUST be the relative path string "
+        f"to the file from the workspace root (e.g., 'my_data.csv', 'report.pdf', 'scripts/analysis.py'). "
+        f"Returns the full text content or an error message. For PDFs, a warning is appended if "
+        f"the content exceeds {settings.tool_pdf_reader_warning_length} characters."
+    )
+    task_workspace: Path # Pydantic field
+
+    # <<< --- REMOVED custom __init__ --- >>>
+    # Pydantic will handle task_workspace passed as a keyword argument
+
     def _run(self, relative_path_str: str) -> str:
+        # ... (content remains the same as v7) ...
         logger.warning(f"ReadFileTool synchronously called for: {relative_path_str}. This may block if the underlying operation is truly async.")
         try: return asyncio.run(read_file_content(relative_path_str, self.task_workspace))
         except RuntimeError as e:
             if "cannot be called from a running event loop" in str(e): logger.error(f"ReadFileTool _run called from a running event loop. Error for {relative_path_str}: {e}"); return f"Error: ReadFileTool's synchronous _run method was called from an active event loop. Path: {relative_path_str}"
             logger.error(f"Error running ReadFileTool synchronously for {relative_path_str}: {e}", exc_info=True); return f"Error reading file (sync): {e}"
         except Exception as e: logger.error(f"Unexpected error running ReadFileTool synchronously for {relative_path_str}: {e}", exc_info=True); return f"Unexpected error reading file (sync): {e}"
+
+
     async def _arun(self, relative_path_str: str, run_manager: Optional[CallbackManagerForToolRun] = None) -> str:
         return await read_file_content(relative_path_str, self.task_workspace)
 
 class WriteFileTool(BaseTool):
-    name: str = "write_file"; description: str = (...); task_workspace: Path
+    name: str = "write_file"
+    description: str = (
+        f"Use this tool ONLY to write or overwrite text content to a file within the current task's workspace. "
+        f"Input MUST be a single string in the format 'relative_file_path:::text_content' "
+        f"(e.g., 'results.txt:::Analysis complete.\\nFinal score: 95'). Handles subdirectory creation. "
+        f"Do NOT use workspace path prefix in 'relative_file_path'."
+    )
+    task_workspace: Path # Pydantic field
+
+    # <<< --- REMOVED custom __init__ --- >>>
+
     def _run(self, input_str: str) -> str:
+        # ... (content remains the same as v7) ...
         logger.warning(f"WriteFileTool synchronously called for input: {input_str[:50]}... This may block.")
         try: return asyncio.run(write_to_file_in_task_workspace(input_str, self.task_workspace))
         except RuntimeError as e:
             if "cannot be called from a running event loop" in str(e): logger.error(f"WriteFileTool _run called from a running event loop. Input: {input_str[:50]}. Error: {e}"); return f"Error: WriteFileTool's synchronous _run method was called from an active event loop. Input: {input_str[:50]}"
             logger.error(f"Error running WriteFileTool synchronously for {input_str[:50]}: {e}", exc_info=True); return f"Error writing file (sync): {e}"
         except Exception as e: logger.error(f"Unexpected error running WriteFileTool synchronously for {input_str[:50]}: {e}", exc_info=True); return f"Unexpected error writing file (sync): {e}"
+
     async def _arun(self, input_str: str, run_manager: Optional[CallbackManagerForToolRun] = None) -> str:
         return await write_to_file_in_task_workspace(input_str, self.task_workspace)
 
 class TaskWorkspaceShellTool(BaseTool):
-    name: str = "workspace_shell"; description: str = (...); task_workspace: Path; timeout: int = settings.tool_shell_timeout; max_output: int = settings.tool_shell_max_output
-    def _run(self, command: str) -> str: # ... (content remains the same)
+    name: str = "workspace_shell"
+    description: str = (
+        f"Use this tool ONLY to execute **non-interactive** shell commands directly within the **current task's dedicated workspace**. "
+        # ... (rest of description)
+        f"Timeout: {settings.tool_shell_timeout}s. Max output length: {settings.tool_shell_max_output} chars."
+    )
+    task_workspace: Path # Pydantic field
+    timeout: int = settings.tool_shell_timeout # Pydantic field with default
+    max_output: int = settings.tool_shell_max_output # Pydantic field with default
+
+    # <<< --- REMOVED custom __init__ --- >>>
+
+    def _run(self, command: str) -> str:
+        # ... (content remains the same as v7) ...
         logger.warning("Running TaskWorkspaceShellTool synchronously using _run.")
         try:
             loop = asyncio.get_event_loop();
@@ -229,8 +266,12 @@ class TaskWorkspaceShellTool(BaseTool):
             if "no running event loop" in str(e).lower() or "cannot be called from a running event loop" in str(e).lower(): logger.warning(f"TaskWorkspaceShellTool _run: Runtime error with event loop, trying fresh asyncio.run: {e}"); return asyncio.run(self._arun_internal(command))
             logger.error(f"TaskWorkspaceShellTool _run: Runtime error: {e}", exc_info=True); return f"Error executing shell command (sync wrapper): {e}"
         except Exception as e: logger.error(f"TaskWorkspaceShellTool _run: Unexpected error: {e}", exc_info=True); return f"Unexpected error executing shell command (sync wrapper): {e}"
-    async def _arun(self, command: str, run_manager: Optional[CallbackManagerForToolRun] = None) -> str: return await self._arun_internal(command)
-    async def _arun_internal(self, command: str) -> str: # ... (content remains the same)
+
+    async def _arun(self, command: str, run_manager: Optional[CallbackManagerForToolRun] = None) -> str:
+        return await self._arun_internal(command)
+
+    async def _arun_internal(self, command: str) -> str:
+        # ... (content remains the same as v7) ...
         tool_name = self.name; logger.info(f"Tool '{tool_name}' received raw input: '{command}'")
         if not isinstance(command, str) or not command.strip(): logger.error(f"Tool '{tool_name}': Received invalid input."); return "Error: Invalid input. Expected a non-empty command string."
         cwd = str(self.task_workspace.resolve()); logger.info(f"Tool '{tool_name}' executing command: '{command}' in CWD: {cwd} (Timeout: {self.timeout}s)")
@@ -281,26 +322,11 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
 
     tools: List[BaseTool] = list(dynamically_loaded_tools)
 
-    # --- REMOVED DuckDuckGoSearchRun fallback logic ---
-    # Web search tools (like Tavily) are now expected to be loaded from config.
-    # If no search tool is configured and enabled, the agent won't have one.
-    tavily_loaded = any(tool.name == "tavily_search_api" for tool in tools)
-    if not tavily_loaded and (hasattr(settings, 'tavily_api_key') and settings.tavily_api_key):
-        logger.warning("Tavily API key is set in .env, but TavilyAPISearchTool was not found or not enabled in tool_config.json.")
-    elif not tavily_loaded:
-        logger.warning("No primary web search tool (e.g., Tavily) loaded from config. Agent may lack web search capabilities.")
+    search_tool_loaded = any(tool.category == "search" for tool in tools if hasattr(tool, 'category')) or \
+                         any("search" in tool.name.lower() for tool in tools)
+    if not search_tool_loaded:
+        logger.warning("No primary web search tool (e.g., Tavily, or any tool categorized as 'search') loaded from config. Agent may lack web search capabilities.")
 
-
-    # DeepResearchTool is now expected to be loaded via tool_config.json
-    # Manual addition is removed.
-    deep_research_tool_loaded = any(tool.name == "deep_research_synthesizer" for tool in tools)
-    if not deep_research_tool_loaded:
-        # This log remains to indicate if it's missing, but we won't manually add it.
-        logger.warning("DeepResearchTool not found in dynamically loaded tools. Ensure it's in tool_config.json and enabled if needed.")
-
-
-    # Task-specific tools that require current_task_id for workspace path
-    # These remain manually instantiated.
     if not current_task_id:
         logger.warning("No active task ID provided to get_dynamic_tools. Task-specific tools (read_file, write_file, workspace_shell) will not be added.")
     else:
@@ -309,7 +335,7 @@ def get_dynamic_tools(current_task_id: Optional[str]) -> List[BaseTool]:
             logger.info(f"Configuring task-specific tools for workspace: {task_workspace}")
 
             task_specific_tools_to_add_manually = [
-                ReadFileTool(task_workspace=task_workspace),
+                ReadFileTool(task_workspace=task_workspace), # Pydantic will use task_workspace to set the field
                 WriteFileTool(task_workspace=task_workspace),
                 TaskWorkspaceShellTool(task_workspace=task_workspace),
             ]
