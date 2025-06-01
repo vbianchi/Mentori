@@ -60,6 +60,7 @@ INTERNAL_DB_MESSAGE_TYPES_FOR_MONITOR_REPLAY_ONLY = {
     "error_json",
     "error_unknown_msg",
     "error_processing",
+    "monitor_user_input", # <<< ADDED 'monitor_user_input' HERE
 }
 
 
@@ -364,3 +365,4 @@ async def process_rename_task(
     else:
         logger.error(f"[{session_id}] Failed to rename task {task_id_to_rename} in database.")
         await send_ws_message_func("monitor_log", {"text": f"[{datetime.datetime.now().isoformat(timespec='milliseconds')}][{session_id[:8]}] [SYSTEM_ERROR] Failed to rename task {task_id_to_rename} in DB.", "log_source": "DB_ERROR"})
+

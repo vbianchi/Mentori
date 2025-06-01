@@ -9,24 +9,28 @@ from langchain_core.tools import BaseTool
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
-from langchain_core.pydantic_v1 import BaseModel, Field
+# <<< MODIFIED IMPORT: Using Pydantic v2 directly --- >>>
+from pydantic import BaseModel, Field
+# <<< --- END MODIFIED IMPORT --- >>>
 from langchain_core.runnables import RunnableConfig
 from langchain_core.callbacks.base import BaseCallbackHandler
 
 
 from backend.config import settings
 from backend.llm_setup import get_llm
-from backend.planner import PlanStep
+from backend.planner import PlanStep # Assuming PlanStep is also migrated or compatible
 from backend.callbacks import LOG_SOURCE_CONTROLLER
 
 
 logger = logging.getLogger(__name__)
 
-class ControllerOutput(BaseModel):
+class ControllerOutput(BaseModel): # <<< Now inherits from Pydantic v2 BaseModel
     tool_name: Optional[str] = Field(description="The exact name of the tool to use, or 'None' if no tool is directly needed for this step. Must be one of the available tools.")
     tool_input: Optional[str] = Field(default=None, description="The precise, complete input string for the chosen tool, or a concise summary/directive for the LLM if tool_name is 'None'. Can be explicitly 'None' or null if the step description and expected outcome are self-sufficient for a 'None' tool LLM action.")
     confidence_score: float = Field(description="A score from 0.0 to 1.0 indicating the controller's confidence in this tool/input choice for the step. 1.0 is high confidence.")
     reasoning: str = Field(description="Brief explanation of why this tool/input was chosen or why no tool is needed.")
+    # No model_config needed here as Pydantic v2 defaults are fine for this model.
+    # If specific Pydantic v1 Config options were used, they'd translate to model_config.
 
 CONTROLLER_SYSTEM_PROMPT_TEMPLATE = """You are an expert "Controller" for a research agent.
 Your role is to analyze a single step from a pre-defined plan and decide the BEST action for the "Executor" (a ReAct agent) to take for that step.
@@ -76,7 +80,7 @@ def escape_template_curly_braces(text: Optional[str]) -> str:
 
 async def validate_and_prepare_step_action(
     original_user_query: str,
-    plan_step: PlanStep,
+    plan_step: PlanStep, # Assuming PlanStep is Pydantic v2 or compatible
     available_tools: List[BaseTool],
     session_data_entry: Dict[str, Any],
     previous_step_output: Optional[str] = None,
@@ -125,14 +129,13 @@ async def validate_and_prepare_step_action(
         logger.error(f"Controller: Failed to initialize LLM: {e}", exc_info=True)
         return None, None, f"Error in Controller: LLM initialization failed: {e}", 0.0
 
+    # JsonOutputParser with pydantic_object is compatible with Pydantic v2 models
     parser = JsonOutputParser(pydantic_object=ControllerOutput)
     format_instructions = parser.get_format_instructions()
 
     tools_summary_list = []
     for tool in available_tools:
-        # <<< --- MODIFIED LINE: Use full tool.description --- >>>
         tools_summary_list.append(f"- {tool.name}: {tool.description}")
-        # <<< --- END MODIFIED LINE --- >>>
     tools_summary_for_controller = "\n".join(tools_summary_list)
     logger.debug(f"Controller: Tools summary for LLM prompt:\n{tools_summary_for_controller}")
 
@@ -147,7 +150,7 @@ async def validate_and_prepare_step_action(
     ])
 
     raw_llm_output_chain = prompt | controller_llm | StrOutputParser()
-    controller_result_dict_raw = ""
+    controller_result_dict_raw = "" # Initialize for error handling
 
     escaped_original_user_query = escape_template_curly_braces(original_user_query)
     escaped_current_step_description = escape_template_curly_braces(plan_step.description)
@@ -192,28 +195,14 @@ async def validate_and_prepare_step_action(
             cleaned_json_string = cleaned_json_string[:-len("```")].strip()
 
         logger.debug(f"Controller: Cleaned JSON string for parsing: '{cleaned_json_string}'")
-        controller_result_dict = json.loads(cleaned_json_string)
+        # Attempt to parse the cleaned string into a dictionary first
+        controller_result_dict_parsed = json.loads(cleaned_json_string)
 
-        parsed_tool_name = controller_result_dict.get("tool_name")
-        parsed_tool_input = controller_result_dict.get("tool_input")
+        # Then, validate with Pydantic model
+        # JsonOutputParser when used with pydantic_object should handle this,
+        # but since we used StrOutputParser, we parse and validate manually.
+        controller_output = ControllerOutput(**controller_result_dict_parsed)
 
-        if parsed_tool_name == "None" or parsed_tool_name is None:
-            if not isinstance(parsed_tool_input, (str, type(None))):
-                logger.warning(f"Controller: tool_name is 'None', but tool_input was type {type(parsed_tool_input)} ('{parsed_tool_input}'). Forcing to None for Pydantic.")
-                controller_result_dict["tool_input"] = None
-            elif parsed_tool_input == "None":
-                 controller_result_dict["tool_input"] = None
-        elif parsed_tool_name and parsed_tool_input is None :
-            logger.warning(f"Controller: tool_name is '{parsed_tool_name}', but tool_input was None. This might be an issue for the tool. Proceeding.")
-        elif parsed_tool_name and not isinstance(parsed_tool_input, str):
-            logger.warning(f"Controller: tool_name is '{parsed_tool_name}', but tool_input was type {type(parsed_tool_input)} ('{parsed_tool_input}'). Attempting to stringify.")
-            try:
-                controller_result_dict["tool_input"] = str(parsed_tool_input)
-            except Exception:
-                 logger.error(f"Controller: Could not convert tool_input to string for tool '{parsed_tool_name}'. Input was: {parsed_tool_input}")
-                 return None, None, f"Error in Controller: tool_input for tool '{parsed_tool_name}' could not be converted to string.", 0.0
-
-        controller_output = ControllerOutput(**controller_result_dict)
 
         tool_name = controller_output.tool_name if controller_output.tool_name != "None" else None
         tool_input = controller_output.tool_input
@@ -230,8 +219,9 @@ async def validate_and_prepare_step_action(
         reasoning_match = re.search(r'"reasoning"\s*:\s*"([^"]*)"', controller_result_dict_raw, re.IGNORECASE)
         error_reasoning = f"LLM output was not valid JSON. {reasoning_match.group(1) if reasoning_match else 'Could not extract reasoning.'}"
         return None, None, f"Error in Controller: LLM output parsing failed (not valid JSON). Reasoning hint: {error_reasoning}", 0.0
-    except Exception as e:
+    except Exception as e: # Catches Pydantic validation errors among others
         tb_str = traceback.format_exc()
         logger.error(f"Controller: Error during step validation or Pydantic parsing: {e}. Raw output was: {controller_result_dict_raw}\nTraceback:\n{tb_str}", exc_info=False)
         error_detail = f"Exception: {type(e).__name__} at line {e.__traceback__.tb_lineno if e.__traceback__ else 'N/A'}. Raw LLM output might have been: {str(controller_result_dict_raw)[:500]}..."
         return None, None, f"Error in Controller: {error_detail}", 0.0
+
