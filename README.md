@@ -1,5 +1,7 @@
 # ResearchAgent: AI Assistant for Research Workflows (v2.5.3 - Critical Fixes & Enhancements In Progress)
 
+
+
 This project provides a functional user interface and backend for an AI agent system designed to assist with research tasks, particularly in fields like bioinformatics and epidemiology. It features a three-panel layout (Tasks, Chat, Monitor/Artifact Viewer) and connects via WebSockets to a Python backend powered by LangChain.
 
 **Targeting Version 2.5.3 (Focus on Critical Fixes, Core Functionality, and Initial Enhancements).**
