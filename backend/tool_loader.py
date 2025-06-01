@@ -4,14 +4,60 @@ import logging
 import importlib
 from pathlib import Path
 from typing import List, Dict, Any, Optional
+import os # <<< Added for os.makedirs
+import re # <<< Added for re.sub
 
 from langchain_core.tools import BaseTool
+# No longer importing get_task_workspace_path from standard_tools
 
 logger = logging.getLogger(__name__)
 
-# Define the path to the tool configuration file relative to this loader file.
-# This assumes tool_loader.py is in backend/ and tool_config.json is also in backend/
 CONFIG_FILE_PATH = Path(__file__).parent / "tool_config.json"
+RUNTIME_TASK_WORKSPACE_PLACEHOLDER = "__RUNTIME_TASK_WORKSPACE__"
+
+# <<< --- MOVED UTILITIES HERE --- >>>
+try:
+    PROJECT_ROOT = Path(__file__).resolve().parent.parent # tool_loader.py is in backend/
+    BASE_WORKSPACE_ROOT = PROJECT_ROOT / "workspace"
+    os.makedirs(BASE_WORKSPACE_ROOT, exist_ok=True)
+    logger.info(f"Base workspace directory ensured at: {BASE_WORKSPACE_ROOT} (from tool_loader.py)")
+except OSError as e:
+    logger.error(f"Could not create base workspace directory (from tool_loader.py): {e}", exc_info=True)
+    raise OSError(f"Required base workspace directory {BASE_WORKSPACE_ROOT} could not be created.") from e
+except Exception as e:
+    logger.error(f"Error resolving project/workspace path (from tool_loader.py): {e}", exc_info=True)
+    raise
+
+def get_task_workspace_path(task_id: Optional[str], create_if_not_exists: bool = True) -> Path:
+    logger.debug(f"get_task_workspace_path (in tool_loader.py) called for task_id: '{task_id}', create_if_not_exists: {create_if_not_exists}")
+    if not task_id or not isinstance(task_id, str):
+        msg = f"Invalid or missing task_id ('{task_id}') provided for workspace path."
+        logger.error(msg)
+        raise ValueError(msg)
+    sane_task_id = re.sub(r'[^\w\-.]', '_', task_id)
+    if not sane_task_id:
+        msg = f"Task_id '{task_id}' resulted in an empty sanitized ID. Cannot create workspace."
+        logger.error(msg)
+        raise ValueError(msg)
+    if ".." in sane_task_id or "/" in sane_task_id or "\\" in sane_task_id:
+        msg = f"Invalid characters detected in sanitized task_id: {sane_task_id} (original: {task_id}). Denying workspace path creation."
+        logger.error(msg)
+        raise ValueError(msg)
+    task_workspace = BASE_WORKSPACE_ROOT / sane_task_id
+    if create_if_not_exists:
+        try:
+            if not task_workspace.exists():
+                os.makedirs(task_workspace, exist_ok=True)
+                logger.info(f"Created task workspace directory: {task_workspace} (from tool_loader.py)")
+            else:
+                logger.debug(f"Task workspace directory already exists: {task_workspace} (from tool_loader.py)")
+        except OSError as e:
+            logger.error(f"Could not create task workspace directory at {task_workspace}: {e}", exc_info=True)
+            raise OSError(f"Could not create task workspace {task_workspace}: {e}") from e
+    elif not task_workspace.exists():
+        logger.warning(f"Task workspace directory does not exist and create_if_not_exists is False: {task_workspace} (from tool_loader.py)")
+    return task_workspace
+# <<< --- END MOVED UTILITIES --- >>>
 
 class ToolLoadingError(Exception):
     """Custom exception for errors during tool loading."""
@@ -19,22 +65,8 @@ class ToolLoadingError(Exception):
 
 def load_tools_from_config(
     config_path: Path = CONFIG_FILE_PATH,
-    # task_id: Optional[str] = None # Reserved for future use if loader handles task-specific tools
+    current_task_id: Optional[str] = None
 ) -> List[BaseTool]:
-    """
-    Loads and instantiates tools based on the provided JSON configuration file.
-
-    Args:
-        config_path: Path to the JSON configuration file for tools.
-        # task_id: Optional task ID, currently unused but planned for task-specific tools.
-
-    Returns:
-        A list of successfully instantiated BaseTool objects.
-
-    Raises:
-        ToolLoadingError: If the configuration file cannot be read or parsed,
-                          or if a critical error occurs during tool instantiation.
-    """
     loaded_tools: List[BaseTool] = []
     tool_configs: List[Dict[str, Any]] = []
 
@@ -57,9 +89,22 @@ def load_tools_from_config(
         logger.error(f"Unexpected error reading tool configuration file {config_path}: {e}", exc_info=True)
         raise ToolLoadingError(f"Could not read {config_path}: {e}") from e
 
+    task_workspace_path_for_tools: Optional[Path] = None # Renamed for clarity within this function
+    if current_task_id:
+        try:
+            # Uses the get_task_workspace_path now defined in this file
+            task_workspace_path_for_tools = get_task_workspace_path(current_task_id, create_if_not_exists=True)
+            logger.info(f"Resolved task workspace path for task '{current_task_id}': {task_workspace_path_for_tools}")
+        except ValueError as ve:
+            logger.error(f"Invalid task_id '{current_task_id}' for resolving workspace path: {ve}. Task-specific tools may fail to load.")
+        except OSError as oe:
+            logger.error(f"OSError resolving or creating workspace path for task '{current_task_id}': {oe}. Task-specific tools may fail to load.")
+        except Exception as e:
+            logger.error(f"Unexpected error resolving workspace for task '{current_task_id}': {e}. Task-specific tools may fail to load.", exc_info=True)
+
     for config in tool_configs:
         tool_name = config.get("tool_name")
-        is_enabled = config.get("enabled", True) # Default to True if not specified
+        is_enabled = config.get("enabled", True)
 
         if not tool_name:
             logger.warning(f"Skipping tool configuration due to missing 'tool_name': {config}")
@@ -78,6 +123,23 @@ def load_tools_from_config(
             logger.error(f"Tool '{tool_name}' configuration is missing 'module_path' or 'class_name'. Skipping.")
             continue
 
+        processed_init_params = {}
+        can_instantiate = True
+        for key, value in init_params.items():
+            if value == RUNTIME_TASK_WORKSPACE_PLACEHOLDER:
+                if task_workspace_path_for_tools:
+                    processed_init_params[key] = task_workspace_path_for_tools
+                    logger.debug(f"For tool '{tool_name}', injecting runtime task_workspace: {task_workspace_path_for_tools} for param '{key}'.")
+                else:
+                    logger.error(f"Tool '{tool_name}' requires runtime task_workspace for param '{key}', but current_task_id was not provided or workspace path resolution failed. Skipping tool.")
+                    can_instantiate = False
+                    break
+            else:
+                processed_init_params[key] = value
+
+        if not can_instantiate:
+            continue
+
         try:
             logger.debug(f"Attempting to import module: '{module_path_str}' for tool '{tool_name}'")
             module = importlib.import_module(module_path_str)
@@ -87,19 +149,9 @@ def load_tools_from_config(
             tool_class = getattr(module, class_name_str)
             logger.debug(f"Successfully retrieved class '{class_name_str}'.")
 
-            # Here, we could potentially inspect tool_class.__init__ or use a marker
-            # in the config to decide if task_id needs to be passed for task-specific tools.
-            # For Phase 1, we are assuming general tools that don't need task_id at init.
-
-            logger.debug(f"Attempting to instantiate tool '{tool_name}' with params: {init_params}")
-            tool_instance = tool_class(**init_params)
+            logger.debug(f"Attempting to instantiate tool '{tool_name}' with processed params: {processed_init_params}")
+            tool_instance = tool_class(**processed_init_params)
             logger.info(f"Successfully instantiated tool: '{tool_name}' of type {type(tool_instance)}")
-
-            # Optionally, we can update the tool's description if the config provides one
-            # that should override the class's default description.
-            # For now, we rely on the tool class defining its own description.
-            # if "description_for_agent" in config:
-            #     tool_instance.description = config["description_for_agent"]
 
             loaded_tools.append(tool_instance)
 
@@ -107,81 +159,38 @@ def load_tools_from_config(
             logger.error(f"Failed to import module '{module_path_str}' for tool '{tool_name}'. Check PYTHONPATH and module path.", exc_info=True)
         except AttributeError:
             logger.error(f"Class '{class_name_str}' not found in module '{module_path_str}' for tool '{tool_name}'.", exc_info=True)
-        except TypeError as e: # Catches errors like unexpected keyword arguments during instantiation
+        except TypeError as e:
             logger.error(f"Error instantiating tool '{tool_name}' with class '{class_name_str}'. Check 'initialization_params' and class constructor. Error: {e}", exc_info=True)
         except Exception as e:
             logger.error(f"An unexpected error occurred while loading tool '{tool_name}': {e}", exc_info=True)
-            # Depending on policy, we might want to raise an error here or just skip the tool.
-            # For now, we'll log and skip.
 
     logger.info(f"Tool loading process complete. Successfully loaded {len(loaded_tools)} tools.")
     return loaded_tools
 
 if __name__ == "__main__":
-    # Basic test for the loader
+    # ... (test harness remains the same, but will now use the local get_task_workspace_path) ...
     logging.basicConfig(level=logging.DEBUG)
     logger.info("Running tool_loader.py directly for testing...")
-    # Create a dummy config file for testing if needed, or point to the real one
-    # For this test, ensure backend/tool_config.json exists and is configured for at least one tool.
-    
-    # Ensure the dummy tool_config.json is in the same directory as this script for this test
-    # Or adjust path to point to backend/tool_config.json
-    test_config_path = Path(__file__).parent / "tool_config.json" # Assumes it's next to this file for test
-    
-    if not test_config_path.exists():
-        logger.warning(f"Test config {test_config_path} not found. Creating a dummy one for testing.")
-        dummy_config_content = [
-            {
-                "tool_name": "tavily_search_api_test_from_loader", # Different name to avoid conflict if real one is loaded
-                "module_path": "backend.tools.tavily_search_tool", # Adjust if your structure is different
-                "class_name": "TavilyAPISearchTool",
-                "description_for_agent": "Test Tavily Search (loaded dynamically).",
-                "input_schema_description": "Query string.",
-                "output_description": "Search results.",
-                "initialization_params": {}, 
-                "enabled": True 
-            }
-        ]
-        try:
-            with open(test_config_path, 'w') as f_test:
-                json.dump(dummy_config_content, f_test, indent=2)
-            logger.info(f"Dummy test config created at {test_config_path}")
-        except Exception as e:
-            logger.error(f"Failed to create dummy test config: {e}")
-            test_config_path = CONFIG_FILE_PATH # Fallback to actual config if dummy creation fails
-
+    logger.info("\n--- Test 1: Loading tools without current_task_id ---")
     try:
-        # Test with the actual config file path expected by the application
-        # This requires that your PYTHONPATH is set up correctly if running this file directly,
-        # or that the backend.tools modules are discoverable.
-        # For a more isolated test, you might mock imports or use simpler dummy tool classes.
-        # tools = load_tools_from_config(config_path=CONFIG_FILE_PATH)
-        
-        # Using the test_config_path for this direct run:
-        tools = load_tools_from_config(config_path=test_config_path)
-        
-        if tools:
-            logger.info(f"--- Dynamically Loaded Tools ({len(tools)}) ---")
-            for tool in tools:
-                logger.info(f"Tool Name: {tool.name}")
-                logger.info(f"  Description: {tool.description}")
-                if hasattr(tool, 'args_schema') and tool.args_schema:
-                    logger.info(f"  Args Schema: {tool.args_schema.schema_json(indent=2)}")
-                logger.info("-" * 20)
-        else:
-            logger.info("No tools were loaded by the test.")
-            
-    except ToolLoadingError as e:
-        logger.error(f"ToolLoadingError during test: {e}")
-    except Exception as e:
-        logger.error(f"General error during tool_loader.py test: {e}", exc_info=True)
+        tools_no_task = load_tools_from_config()
+        for tool in tools_no_task: logger.info(f"Loaded (no task_id): {tool.name}")
+        if not any(t.name in ["read_file", "write_file", "workspace_shell"] for t in tools_no_task): logger.info("Correctly did not load task-specific tools when no task_id provided.")
+        else: logger.warning("Task-specific tools were loaded even without a task_id, check placeholder logic.")
+    except ToolLoadingError as e: logger.error(f"ToolLoadingError during test (no task_id): {e}")
+    except Exception as e: logger.error(f"General error during tool_loader.py test (no task_id): {e}", exc_info=True)
 
-    # Clean up dummy config if created
-    if test_config_path.name != CONFIG_FILE_PATH.name and "dummy_config_content" in locals():
-        try:
-            # test_config_path.unlink() # Commented out to allow inspection of the dummy file after test run
-            # logger.info(f"Dummy test config {test_config_path} removed.")
-            pass
-        except Exception as e_del:
-            logger.warning(f"Could not remove dummy test config {test_config_path}: {e_del}")
+    logger.info("\n--- Test 2: Loading tools WITH current_task_id ---")
+    dummy_task_id_for_test = "test_task_for_loader_123"
+    try:
+        tools_with_task = load_tools_from_config(current_task_id=dummy_task_id_for_test)
+        for tool in tools_with_task:
+            logger.info(f"Loaded (with task_id '{dummy_task_id_for_test}'): {tool.name}")
+            if hasattr(tool, 'task_workspace'): logger.info(f"  > {tool.name} has task_workspace: {tool.task_workspace}")
+        expected_task_tools = {"read_file", "write_file", "workspace_shell"}
+        loaded_task_tool_names = {t.name for t in tools_with_task if hasattr(t, 'task_workspace')}
+        if expected_task_tools.issubset(loaded_task_tool_names): logger.info(f"Successfully loaded task-specific tools for task_id '{dummy_task_id_for_test}'.")
+        else: logger.warning(f"Missing some task-specific tools for task_id '{dummy_task_id_for_test}'. Expected: {expected_task_tools}, Got: {loaded_task_tool_names}")
+    except ToolLoadingError as e: logger.error(f"ToolLoadingError during test (with task_id): {e}")
+    except Exception as e: logger.error(f"General error during tool_loader.py test (with task_id): {e}", exc_info=True)
 

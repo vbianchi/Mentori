@@ -64,5 +64,44 @@
     "initialization_params": {},
     "enabled": true,
     "category": "research"
+  },
+  {
+    "tool_name": "read_file",
+    "module_path": "backend.tools.standard_tools",
+    "class_name": "ReadFileTool",
+    "description_for_agent": "Use this tool ONLY to read the entire contents of a file (including text and PDF files) located within the current task's workspace. Input MUST be the relative path string to the file from the workspace root (e.g., 'my_data.csv', 'report.pdf', 'scripts/analysis.py'). Returns the full text content or an error message.",
+    "input_schema_description": "A single string representing the relative path to the file within the current task's workspace. Example: 'results/summary.txt'",
+    "output_description": "The full text content of the file, or an error message.",
+    "initialization_params": {
+      "task_workspace": "__RUNTIME_TASK_WORKSPACE__"
+    },
+    "enabled": true,
+    "category": "file_system"
+  },
+  {
+    "tool_name": "write_file",
+    "module_path": "backend.tools.standard_tools",
+    "class_name": "WriteFileTool",
+    "description_for_agent": "Use this tool ONLY to write or overwrite text content to a file within the current task's workspace. Input MUST be a single string in the format 'relative_file_path:::text_content' (e.g., 'results.txt:::Analysis complete.\\nFinal score: 95'). Handles subdirectory creation. Do NOT use workspace path prefix in 'relative_file_path'.",
+    "input_schema_description": "A single string in the format 'relative_file_path:::text_content'. Example: 'output/report.md:::This is the content of the report.'",
+    "output_description": "A confirmation message indicating success (e.g., 'SUCCESS::write_file:::output/report.md') or an error message.",
+    "initialization_params": {
+      "task_workspace": "__RUNTIME_TASK_WORKSPACE__"
+    },
+    "enabled": true,
+    "category": "file_system"
+  },
+  {
+    "tool_name": "workspace_shell",
+    "module_path": "backend.tools.standard_tools",
+    "class_name": "TaskWorkspaceShellTool",
+    "description_for_agent": "Use this tool ONLY to execute non-interactive shell commands directly within the current task's dedicated workspace. Useful for running scripts (e.g., 'python my_script.py'), listing files (`ls -l`), etc. Input MUST be a single, valid, non-interactive shell command string. Do NOT use this for 'pip install'. Returns the STDOUT and STDERR from the command.",
+    "input_schema_description": "A single string representing the shell command to execute. Example: 'ls -la output_files/' or 'python data_processing_script.py --input data.csv'",
+    "output_description": "A string containing the STDOUT and STDERR from the executed command. May include error messages if the command fails.",
+    "initialization_params": {
+      "task_workspace": "__RUNTIME_TASK_WORKSPACE__"
+    },
+    "enabled": true,
+    "category": "code_execution"
   }
 ]
