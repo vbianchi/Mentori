@@ -3,11 +3,13 @@ import logging
 import asyncio
 import sys
 import re
-from typing import Optional, Type, Any
+from typing import Optional, Type, Any # Added Any
 
 from langchain_core.tools import BaseTool, ToolException
 from langchain_core.callbacks import CallbackManagerForToolRun
-from pydantic.v1 import BaseModel, Field
+# <<< MODIFIED IMPORT: Using Pydantic v2 directly --- >>>
+from pydantic import BaseModel, Field
+# <<< --- END MODIFIED IMPORT --- >>>
 
 from backend.config import settings
 
@@ -15,8 +17,9 @@ logger = logging.getLogger(__name__)
 
 PACKAGE_SPEC_REGEX = re.compile(r"^[a-zA-Z0-9_.-]+(?:\[[a-zA-Z0-9_,-]+\])?(?:[=<>!~]=?\s*[a-zA-Z0-9_.*-]+)?$")
 
-class PythonPackageInstallerInput(BaseModel):
+class PythonPackageInstallerInput(BaseModel): # <<< Now inherits from Pydantic v2 BaseModel
     package_specifiers: str = Field(description="A string of one or more package specifiers, separated by spaces or commas (e.g., 'numpy pandas', 'matplotlib==3.5.0').")
+    # No model_config needed for this simple model
 
 class PythonPackageInstallerTool(BaseTool):
     name: str = "python_package_installer"
@@ -32,9 +35,9 @@ class PythonPackageInstallerTool(BaseTool):
 
     async def _arun(
         self,
-        package_specifiers_str: str,
+        package_specifiers_str: str, # Accepts the string directly
         run_manager: Optional[CallbackManagerForToolRun] = None,
-        **kwargs: Any
+        **kwargs: Any # <<< Any is now defined
     ) -> str:
         tool_name = self.name
         logger.info(f"Tool '{tool_name}' received raw input: '{package_specifiers_str}'")
@@ -153,21 +156,17 @@ class PythonPackageInstallerTool(BaseTool):
 
         final_message = "Package installation process finished.\n" + "\n".join(results_summary)
         if not all_successful:
-            # Prepend an overall status message to the detailed log
-            # The agent's ReAct prompt expects the direct tool output.
-            # If we want to signal failure more strongly to the agent, the ReAct prompt needs to be updated
-            # to look for specific failure markers. For now, the detailed log itself contains "Error:" messages.
             return f"One or more packages failed to install. Full log:\n{final_message}"
         return final_message
 
-    def _run(self, package_specifiers_str: str, run_manager: Optional[CallbackManagerForToolRun] = None) -> str:
+    def _run(self, package_specifiers_str: str, run_manager: Optional[CallbackManagerForToolRun] = None, **kwargs: Any) -> str:
         try:
             loop = asyncio.get_event_loop()
             if loop.is_running():
-                future = asyncio.run_coroutine_threadsafe(self._arun(package_specifiers_str=package_specifiers_str, run_manager=run_manager), loop)
+                future = asyncio.run_coroutine_threadsafe(self._arun(package_specifiers_str=package_specifiers_str, run_manager=run_manager, **kwargs), loop)
                 return future.result(timeout=settings.tool_installer_timeout + 10) # Add buffer
             else:
-                return asyncio.run(self._arun(package_specifiers_str=package_specifiers_str, run_manager=run_manager))
+                return asyncio.run(self._arun(package_specifiers_str=package_specifiers_str, run_manager=run_manager, **kwargs))
         except Exception as e:
             logger.error(f"Error running PythonPackageInstallerTool synchronously for '{package_specifiers_str}': {e}", exc_info=True)
             return f"Error: {e}"
