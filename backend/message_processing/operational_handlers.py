@@ -1,6 +1,7 @@
 # backend/message_processing/operational_handlers.py
 import logging
 from typing import Dict, Any, Callable, Coroutine, Optional
+import asyncio # Added for asyncio.sleep
 
 # Project Imports
 # (Type hints for passed functions will be defined here or imported)
@@ -22,18 +23,31 @@ async def process_cancel_agent(
 ) -> None:
     logger.warning(f"[{session_id}] Received request to cancel current operation.")
     session_data_entry['cancellation_requested'] = True
-    logger.info(f"[{session_id}] Cancellation requested flag set to True.")
+    # *** MODIFIED: Added critical debug log ***
+    logger.critical(f"CRITICAL_DEBUG_CANCEL_HANDLER: [{session_id}] process_cancel_agent: Set cancellation_requested = True.")
 
     agent_task_to_cancel = connected_clients_entry.get("agent_task")
-    if agent_task_to_cancel and not agent_task_to_cancel.done():
-        agent_task_to_cancel.cancel() # Attempt to cancel the asyncio task
-        logger.info(f"[{session_id}] asyncio.Task.cancel() called for active agent/plan task.")
-        # Note: The task itself needs to handle asyncio.CancelledError to stop gracefully.
-        # The WebSocketCallbackHandler also checks session_data_entry['cancellation_requested'].
+    if agent_task_to_cancel:
+        # *** MODIFIED: Added detailed task logging ***
+        task_name = agent_task_to_cancel.get_name() if hasattr(agent_task_to_cancel, 'get_name') else "Unknown Task Name"
+        task_done = agent_task_to_cancel.done()
+        task_cancelled_state = agent_task_to_cancel.cancelled() # Check if already cancelled
+        logger.critical(f"CRITICAL_DEBUG_CANCEL_HANDLER: [{session_id}] process_cancel_agent: Found agent_task: Name='{task_name}', Done={task_done}, Cancelled_State={task_cancelled_state}. Attempting .cancel().")
+
+        if not task_done:
+            agent_task_to_cancel.cancel()
+            logger.info(f"[{session_id}] asyncio.Task.cancel() called for active agent/plan task: {task_name}.")
+            try:
+                # Give a very brief moment for the cancellation to potentially propagate
+                # if the task is currently in an awaitable point that respects cancellation.
+                await asyncio.sleep(0.01) 
+                logger.critical(f"CRITICAL_DEBUG_CANCEL_HANDLER: [{session_id}] process_cancel_agent: After .cancel() and sleep, task: Name='{task_name}', Done={agent_task_to_cancel.done()}, Cancelled_State={agent_task_to_cancel.cancelled()}.")
+            except Exception as e_sleep: # Should not happen with asyncio.sleep(0.01) but good practice
+                logger.error(f"[{session_id}] Error during sleep after cancel: {e_sleep}")
+        else:
+            logger.warning(f"[{session_id}] Agent task '{task_name}' was already done, cannot cancel.")
     else:
-        logger.info(f"[{session_id}] No active asyncio task found to cancel, or task already done.")
-        # If no task running, perhaps send a status update that nothing was running.
-        # For now, the UI will eventually go idle if no further updates.
+        logger.warning(f"[{session_id}] No active asyncio task found in connected_clients_entry to cancel.")
 
 
 async def process_get_artifacts_for_task(
@@ -49,7 +63,6 @@ async def process_get_artifacts_for_task(
     logger.info(f"[{session_id}] Received request to refresh artifacts for task: {task_id_to_refresh}")
     active_task_id = session_data_entry.get("current_task_id")
 
-    # Only send artifacts if the request is for the currently active task in this session
     if task_id_to_refresh == active_task_id:
         artifacts = await get_artifacts_func(task_id_to_refresh)
         await send_ws_message_func("update_artifacts", artifacts)
@@ -66,14 +79,13 @@ async def process_run_command(
 ) -> None:
     command_to_run = data.get("command")
     if command_to_run and isinstance(command_to_run, str):
-        active_task_id_for_cmd = session_data_entry.get("current_task_id") # Command runs in context of active task for logging
+        active_task_id_for_cmd = session_data_entry.get("current_task_id")
         await add_monitor_log_func(f"Received direct 'run_command'. Executing: {command_to_run} (Task Context: {active_task_id_for_cmd})", "system_direct_cmd")
-        # The execute_shell_command_func handles its own WebSocket updates and DB logging
         await execute_shell_command_func(
             command_to_run,
             session_id,
-            send_ws_message_func, # For its internal stream reading
-            db_add_message_func,  # For its internal stream reading
+            send_ws_message_func,
+            db_add_message_func,
             active_task_id_for_cmd
         )
     else:
@@ -81,19 +93,15 @@ async def process_run_command(
         await add_monitor_log_func("Error: 'run_command' received with no command specified.", "error_direct_cmd")
 
 
-async def process_action_command( # Placeholder for now
+async def process_action_command(
     session_id: str, data: Dict[str, Any], session_data_entry: Dict[str, Any],
     connected_clients_entry: Dict[str, Any], send_ws_message_func: SendWSMessageFunc,
     add_monitor_log_func: AddMonitorLogFunc
 ) -> None:
-    action = data.get("command") # e.g., "confirm_file_selection", "provide_parameter"
-    # This handler would be expanded for User-in-the-Loop (UITL) interactions
+    action = data.get("command")
     if action and isinstance(action, str):
         logger.info(f"[{session_id}] Received action command: {action} (Currently placeholder - Not fully implemented).")
         await add_monitor_log_func(f"Received action command: {action} (Handler not fully implemented).", "system_action_cmd")
-        # Example: if action == "user_confirmed_details_for_step_X":
-        #   session_data_entry["user_provided_details_for_step_X"] = data.get("details")
-        #   If an agent task was waiting on this, signal it to continue.
     else:
         logger.warning(f"[{session_id}] Received 'action_command' with invalid/missing command content.")
 
