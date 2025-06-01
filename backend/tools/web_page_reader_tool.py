@@ -3,18 +3,23 @@ import logging
 import httpx
 from bs4 import BeautifulSoup
 import re
-from typing import Optional, Type, Any 
+from typing import Optional, Type, Any
 
 from langchain_core.tools import BaseTool, ToolException
 from langchain_core.callbacks import CallbackManagerForToolRun
-from pydantic.v1 import BaseModel, Field
+# <<< MODIFIED IMPORT: Using Pydantic v2 directly --- >>>
+from pydantic import BaseModel, Field
+# <<< --- END MODIFIED IMPORT --- >>>
 
 from backend.config import settings
 
 logger = logging.getLogger(__name__)
 
-class WebPageReaderInput(BaseModel):
+class WebPageReaderInput(BaseModel): # <<< Now inherits from Pydantic v2 BaseModel
     url: str = Field(description="The URL of the web page to read.")
+    # No model_config needed for this simple model as Pydantic v2 defaults are fine.
+    # If we needed 'extra = "ignore"' for example, it would be:
+    # model_config = {"extra": "ignore"}
 
 class WebPageReaderTool(BaseTool):
     name: str = "web_page_reader"
@@ -24,13 +29,13 @@ class WebPageReaderTool(BaseTool):
         f"Max content length: {settings.tool_web_reader_max_length} chars. "
         f"Returns the main text content of the page or an error message."
     )
-    args_schema: Type[BaseModel] = WebPageReaderInput
+    args_schema: Type[BaseModel] = WebPageReaderInput # LangChain's BaseTool should handle Pydantic v2 models here
 
     async def _arun(
         self,
-        url: str,
+        url: str, # Accepts the string directly due to how BaseTool handles single-arg schemas
         run_manager: Optional[CallbackManagerForToolRun] = None,
-        **kwargs: Any # <<< Any is now defined
+        **kwargs: Any
     ) -> str:
         logger.info(f"Tool '{self.name}' received URL: '{url}'")
         if not isinstance(url, str) or not url.strip():
@@ -54,7 +59,7 @@ class WebPageReaderTool(BaseTool):
         try:
             async with httpx.AsyncClient(timeout=timeout, follow_redirects=True, headers=HEADERS) as client:
                 response = await client.get(clean_url)
-                response.raise_for_status()
+                response.raise_for_status() # Raises HTTPStatusError for 4xx/5xx responses
 
                 content_type = response.headers.get("content-type", "").lower()
                 if "html" not in content_type:
@@ -73,7 +78,7 @@ class WebPageReaderTool(BaseTool):
 
                 if not extracted_text:
                     logger.warning(f"Tool '{self.name}': Could not extract meaningful text from {clean_url}")
-                    return "Error: Could not extract meaningful text from the page."
+                    return "Error: Could not extract meaningful text from the page." # Return as string, not ToolException
 
                 truncated_text = extracted_text[:max_length]
                 if len(extracted_text) > max_length:

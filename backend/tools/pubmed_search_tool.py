@@ -2,11 +2,13 @@
 import logging
 import asyncio
 import re
-from typing import Optional, Type, Any
+from typing import Optional, Type, Any # Added Any
 
 from langchain_core.tools import BaseTool, ToolException
 from langchain_core.callbacks import CallbackManagerForToolRun
-from pydantic.v1 import BaseModel, Field
+# <<< MODIFIED IMPORT: Using Pydantic v2 directly --- >>>
+from pydantic import BaseModel, Field
+# <<< --- END MODIFIED IMPORT --- >>>
 from Bio import Entrez
 from urllib.error import HTTPError
 
@@ -14,8 +16,9 @@ from backend.config import settings
 
 logger = logging.getLogger(__name__)
 
-class PubMedSearchInput(BaseModel):
+class PubMedSearchInput(BaseModel): # <<< Now inherits from Pydantic v2 BaseModel
     query: str = Field(description="The search query string for PubMed. Optionally, ' max_results=N' can be appended to specify the number of results.")
+    # No model_config needed for this simple model
 
 class PubMedSearchTool(BaseTool):
     name: str = "pubmed_search"
@@ -31,9 +34,9 @@ class PubMedSearchTool(BaseTool):
 
     async def _arun(
         self,
-        query: str,
+        query: str, # Accepts the string directly
         run_manager: Optional[CallbackManagerForToolRun] = None,
-        **kwargs: Any
+        **kwargs: Any # <<< Any is now defined
     ) -> str:
         tool_name = self.name
         logger.info(f"Tool '{tool_name}' received raw input: '{query}'")
@@ -150,14 +153,14 @@ class PubMedSearchTool(BaseTool):
             logger.error(f"Tool '{tool_name}': Error searching PubMed for '{cleaned_query}': {e}", exc_info=True)
             raise ToolException(f"An unexpected error occurred during PubMed search: {type(e).__name__}")
 
-    def _run(self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None) -> str:
+    def _run(self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None, **kwargs: Any) -> str:
         try:
             loop = asyncio.get_event_loop()
             if loop.is_running():
-                future = asyncio.run_coroutine_threadsafe(self._arun(query=query, run_manager=run_manager), loop)
+                future = asyncio.run_coroutine_threadsafe(self._arun(query=query, run_manager=run_manager, **kwargs), loop)
                 return future.result(timeout=60) # Adjust timeout as needed
             else:
-                return asyncio.run(self._arun(query=query, run_manager=run_manager))
+                return asyncio.run(self._arun(query=query, run_manager=run_manager, **kwargs))
         except Exception as e:
             logger.error(f"Error running PubMedSearchTool synchronously for '{query}': {e}", exc_info=True)
             return f"Error: {e}"
