@@ -18,7 +18,7 @@ def create_agent_executor(
     """Creates and returns a LangChain AgentExecutor with memory and max iterations."""
     logger.info(f"Creating LangChain agent executor with memory (Max Iterations: {max_iterations})...")
 
-    # <<< --- START MODIFIED CODE --- >>>
+    # <<< --- START MODIFIED PROMPT --- >>>
     template = """Assistant is a large language model trained by Valerio Bianchi.
 Assistant is designed to be able to assist with a wide range of tasks, from answering simple questions to providing in-depth explanations and discussions on a wide range of topics.
 As a language model, Assistant is able to communicate and generate human-like text in response to a wide range of prompts and questions.
@@ -39,8 +39,8 @@ Final Answer: [THE_EXACT_CONTENT_OF_THE_OBSERVATION_ABOVE]
 **Format Option 2: Direct Answer (No Tool Use This Turn)**
 Thought: Do I need to use a tool? No. I can answer directly based on the 'New input', 'Previous conversation history', or previous 'Observation' in the scratchpad.
 Final Answer: (Your entire response for this step, which directly fulfills the 'precise expected output' from the 'New input' directive, goes here.
+**CRUCIAL: If the 'New input' or 'expected_outcome' implies that your 'Final Answer' should BE specific content (e.g., a report, a summary, a piece of code, a list of items), then your 'Final Answer' MUST BE that exact content itself. Do NOT just state that you have generated it or that it is available. Output ONLY the content itself.**
 If your response is multi-line or contains structured text like Markdown or JSON, ensure the entire response is a single, contiguous block of text immediately following "Final Answer:".
-For example, if generating a Markdown table or a JSON object, the entire structure, including all lines and formatting characters like backticks or braces, defines your Final Answer for this thought-cycle.
 Avoid any conversational text, preamble, or additional "Thought:" or "Action:" lines after you have stated "Final Answer:" for this thought-cycle.
 The content of your Final Answer should be exactly what the user or the next step in a plan expects to receive.)
 
@@ -61,7 +61,7 @@ Previous conversation history:
 
 New input: {input}
 {agent_scratchpad}"""
-    # <<< --- END MODIFIED CODE --- >>>
+    # <<< --- END MODIFIED PROMPT --- >>>
 
     try:
         prompt = PromptTemplate.from_template(template)
@@ -91,3 +91,4 @@ New input: {input}
     except Exception as e:
         logger.error(f"Failed to create AgentExecutor: {e}", exc_info=True)
         raise RuntimeError(f"Could not create the agent executor: {e}") from e
+
