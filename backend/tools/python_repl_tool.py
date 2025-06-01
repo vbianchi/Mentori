@@ -1,13 +1,14 @@
 # backend/tools/python_repl_tool.py
 import logging
 import asyncio
-from typing import Optional, Type, Any
-
+from typing import Optional, Type, Any # Added Any
 
 from langchain_core.tools import BaseTool, ToolException
 from langchain_core.callbacks import CallbackManagerForToolRun
-from pydantic.v1 import BaseModel, Field
-from langchain_experimental.utilities import PythonREPL # Assuming this is the one used
+# <<< MODIFIED IMPORT: Using Pydantic v2 directly --- >>>
+from pydantic import BaseModel, Field
+# <<< --- END MODIFIED IMPORT --- >>>
+from langchain_experimental.utilities import PythonREPL
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +24,9 @@ except Exception as e:
     python_repl_utility_instance = None
 
 
-class PythonREPLInput(BaseModel):
+class PythonREPLInput(BaseModel): # <<< Now inherits from Pydantic v2 BaseModel
     command: str = Field(description="A single, simple Python expression or a very short, self-contained snippet of Python code to execute.")
+    # No model_config needed for this simple model
 
 class PythonREPLTool(BaseTool):
     name: str = "Python_REPL"
@@ -43,9 +45,9 @@ class PythonREPLTool(BaseTool):
 
     def _run(
         self,
-        command: str,
+        command: str, # Accepts the string directly
         run_manager: Optional[CallbackManagerForToolRun] = None,
-        **kwargs: Any
+        **kwargs: Any # <<< Any is now defined
     ) -> str:
         logger.info(f"Tool '{self.name}' executing command: '{command}'")
         if python_repl_utility_instance is None:
@@ -66,9 +68,9 @@ class PythonREPLTool(BaseTool):
 
     async def _arun(
         self,
-        command: str,
+        command: str, # Accepts the string directly
         run_manager: Optional[CallbackManagerForToolRun] = None,
-        **kwargs: Any
+        **kwargs: Any # <<< Any is now defined
     ) -> str:
         logger.info(f"Tool '{self.name}' asynchronously executing command: '{command}'")
         if python_repl_utility_instance is None:
@@ -90,4 +92,3 @@ class PythonREPLTool(BaseTool):
         except Exception as e:
             logger.error(f"Tool '{self.name}': Error executing async command '{command}': {e}", exc_info=True)
             return f"Error in Python REPL (async): {type(e).__name__}: {str(e)}"
-
