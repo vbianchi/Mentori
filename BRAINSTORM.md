@@ -1,40 +1,52 @@
 # ResearchAgent - Brainstorming & Ideas
 
-This document is a living collection of ideas, architectural concepts, and potential future features for the ResearchAgent project. It's a space for high-level thinking, separate from the formal `ROADMAP.md`.
+This document is a living collection of ideas, architectural concepts, and potential future features for the ResearchAgent project.
 
 ## Core Agent Architecture: The "Company" Model
 
-Our evolution from a simple agent to a sophisticated, multi-node graph is the core of this project. We think of our agent less like a single entity and more like a small, efficient company with specialized roles.
+Our agent operates like a small, efficient company with specialized roles:
 
--   **The "Chief Architect" (Planner):** Our `structured_planner_node`. It's a strategic thinker that takes a complex user request and breaks it down into a detailed, structured JSON "blueprint" (the plan), including tool choices and expected outcomes.
--   **The "Site Foreman" (Controller):** Our new `controller_node`. It's the project manager, executing the Planner's blueprint step-by-step. Its key job is to manage the execution loop and perform **data piping** by substituting placeholders like `{step_1_output}` with actual results from previous steps.
--   **The "Worker" (Executor):** Our `executor_node`. It's the hands-on specialist that simply takes a precise tool call from the Controller and executes it.
--   **The "Project Supervisor" (Evaluator):** Our `evaluator_node`. It's the quality assurance inspector that assesses if a completed step truly met its goal. It has the power to halt the plan if something goes wrong.
+-   **The "Chief Architect" (Planner):** A strategic thinker that creates detailed, structured JSON "blueprints" for each task.
+-   **The "Site Foreman" (Controller):** The project manager that executes the blueprint step-by-step, handling data piping and managing correction sub-loops.
+-   **The "Worker" (Executor):** The specialist that takes precise instructions from the Controller and runs the tools.
+-   **The "Project Supervisor" (Evaluator):** The quality assurance inspector with the power to validate steps, halt execution, or even trigger a complete re-plan.
 
 ## Workspace & Security: The Sandbox Model
 
-This is a critical architectural decision for security and multi-tenancy.
+This is a critical architectural decision for security, reproducibility, and multi-tenancy.
 
--   **Hierarchical Structure:** A top-level `/workspace` directory, with subdirectories for each unique task or chat session (e.g., `/workspace/<task_id>/`). In a full multi-user system, this would become `/workspace/<user_id>/<task_id>/`.
--   **Scoped Tools:** All file system tools **must** be workspace-aware, receiving the unique `workspace_path` to ensure all operations are contained within the sandbox.
--   **File-Based Memory:** Instead of passing large data blobs in the agent's state, the agent's plan should rely on reading and writing to files within its workspace (e.g., "Step 1: Save search results to `step_1_output.json`", "Step 2: Read `step_1_output.json` to extract the data.").
+-   **Hierarchical Structure:** A top-level `/workspace` directory, with subdirectories for each unique task or chat session (e.g., `/workspace/<task_id>/`).
+-   **Scoped Tools:** All file system and execution tools are "workspace-aware" and operate only within the secure sandbox for the current task.
+-   **File-Based Memory:** The agent passes data between steps by reading and writing to files within its workspace, providing a clear and persistent audit trail.
 
-## Frontend & UI
+## Frontend & UI Design Philosophy
 
--   **Tech Stack:** We have successfully implemented a modern frontend stack using **Vite + Preact + Tailwind CSS**. This provides a fast development server, a robust component model, and a powerful utility-first styling framework.
--   **Dynamic Event Log:** The core of the UI is a real-time log that visualizes the stream of events from the agent, showing the hierarchical structure of the plan as it executes.
--   **Workspace File Browser:** A key upcoming feature is a live-updating panel that displays the contents of the agent's current sandboxed workspace. This is crucial for user transparency and debugging.
+Our UI aims to be transparent, controllable, and professional.
 
-## Advanced Self-Correction Ideas
+-   **Target Aesthetic (`manus.ai`):** We are inspired by the clean, information-dense, dark-themed UI of `manus.ai`.
+-   **Flexible Layout:** The main panels (chat/log and workspace) will be resizable, allowing the user to focus on what's important.
+-   **Multi-Functional Workspace Panel:** The right-side panel will serve as both a **file browser** (listing files in the sandbox) and an **Artifact Viewer** (rendering images, markdown, code with syntax highlighting, CSVs as tables, etc.). It should also be collapsible or movable.
+-   **Core UX:** The central view will remain a dynamic, hierarchical log of the agent's real-time thoughts and actions.
+-   **UX Enhancements:** Small but critical features like a "Copy to Clipboard" button for code blocks and other text outputs will be integrated throughout the UI.
 
-This is the next frontier after our basic loop and UI are stable.
+## Future Capabilities & Tool Development
 
--   **Dependency Installation:** If the agent gets a `ModuleNotFoundError`, the Evaluator should not just fail. It should recognize the error and trigger a correction sub-loop, instructing the Controller to `pip install <missing_library>` into a task-specific virtual environment.
--   **Smarter Evaluation & Re-Planning:** If the Evaluator determines a step succeeded technically but failed logically (e.g., it got the wrong information), it could trigger a "re-plan" event, sending the task back to the Planner with new context about what went wrong.
+To become a true research assistant, the agent's capabilities must grow.
 
-## Human-in-the-Loop (HITL) Features
+-   **Scientific Tools:**
+    -   PubMed search tool.
+    -   Wrappers for command-line bioinformatics tools (e.g., BLAST).
+    -   Connectors for scientific databases via APIs.
+-   **Software Engineering Tools:**
+    -   A dedicated, stateful `GitTool` for cloning, status checks, committing, and pushing.
+    -   A sandboxed `Python & R Package Installer` that manages dependencies within a task-specific virtual environment.
+-   **Data Interaction Tools:**
+    -   A robust `File Uploader` so users can provide their own datasets.
+    -   A `Database Tool` for executing SQL queries against user-provided databases.
+    -   An advanced `Web Browser` tool (using Selenium/Playwright) for interacting with JavaScript-heavy websites.
 
-This is a long-term goal for making the agent truly collaborative.
+## Advanced Concepts
 
--   **Pause & Resume:** The user should be able to pause the agent's execution loop between any two steps.
--   **High-Stakes Confirmation:** For potentially destructive or costly actions (e.g., `rm -rf`, `git push --force`), the agent should route to a special `HITL` node, pause, and wait for explicit user confirmation before proceeding.
+-   **Self-Correction:** The agent should be able to recover from errors. If a Python script fails with `ModuleNotFoundError`, the agent should be able\_ to attempt a `pip install` command within the task's virtual environment and retry the step.
+-   **Cost & Token Tracking:** The UI should provide transparency into token usage for each step, comparing cloud model costs versus local Ollama models.
+-   **Persistence:** All chat histories, agent plans, logs, and generated artifacts must be saved to a database for true reproducibility.
