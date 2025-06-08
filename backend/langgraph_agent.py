@@ -1,24 +1,30 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Correct Graph Structure)
+# ResearchAgent Core Agent (Phase 4: Executor)
 #
-# Correction:
-# - The graph structure is fixed. The conditional edge now correctly
-#   originates from the `prepare_inputs` node, using the `intent_classifier`
-#   function to decide the next step.
+# This file now implements the Executor node of the PCEE loop.
+#
+# Key Changes:
+# - GraphState is updated with `tool_output` to store the result of a tool call.
+# - A new `executor_node` is created. It finds the tool specified by the
+#   controller and executes it with the given input.
+# - A tool map is created for efficient lookup of tools by name.
+# - The graph flow is updated: controller -> executor, which is now the end.
 # -----------------------------------------------------------------------------
 
 import os
 import logging
 import ast
 import re
-from typing import TypedDict, Annotated, Sequence, List
-from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
+import json
+from typing import TypedDict, Annotated, Sequence, List, Optional
+from langchain_core.messages import BaseMessage, HumanMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.chat_models import ChatOllama
 from langgraph.graph import StateGraph, END
 
 # --- Local Imports ---
-from .prompts import planner_prompt_template
+from .tools import get_available_tools
+from .prompts import planner_prompt_template, controller_prompt_template
 
 # --- Logging Setup ---
 log_level = os.getenv("LOG_LEVEL", "INFO").upper()
@@ -26,10 +32,17 @@ logging.basicConfig(level=log_level, format='%(asctime)s - %(levelname)s - %(mes
 logger = logging.getLogger(__name__)
 
 # --- Agent State Definition ---
+# === Updated State for PCEE Loop ===
 class GraphState(TypedDict):
+    """
+    Represents the state of our graph.
+    """
     input: str
     messages: Annotated[Sequence[BaseMessage], lambda x, y: x + y]
     plan: List[str]
+    current_step_index: int
+    tool_call: Optional[dict]
+    tool_output: Optional[str] # New key to store tool results
     answer: str
 
 # --- LLM Provider Helper ---
@@ -54,18 +67,22 @@ def get_llm(llm_id_env_var: str, default_llm_id: str):
     LLM_CACHE[llm_id] = llm
     return llm
 
+# --- Tool Management ---
+# Create a mapping from tool names to the actual tool objects for fast lookup.
+AVAILABLE_TOOLS = get_available_tools()
+TOOL_MAP = {tool.name: tool for tool in AVAILABLE_TOOLS}
+
+def format_tools_for_prompt():
+    """Formats the available tools for inclusion in a prompt."""
+    return "\n".join([f"  - {tool.name}: {tool.description}" for tool in AVAILABLE_TOOLS])
+
 # --- Graph Nodes ---
 def prepare_inputs_node(state: GraphState):
-    """
-    This node takes the initial user message and prepares the `input`
-    field in the state for the other nodes to use.
-    """
     logger.info("Executing prepare_inputs_node")
     user_message = state['messages'][-1].content
-    return {"input": user_message}
+    return {"input": user_message, "current_step_index": 0}
 
 def planner_node(state: GraphState):
-    """Generates a multi-step plan."""
     logger.info("Executing planner_node")
     llm = get_llm("PLANNER_LLM_ID", "gemini::gemini-2.0-flash")
     prompt = planner_prompt_template
@@ -73,10 +90,7 @@ def planner_node(state: GraphState):
     response = planner_chain.invoke({"input": state["input"]})
     try:
         match = re.search(r"```python\s*([\s\S]*?)\s*```", response.content, re.DOTALL)
-        if match:
-            plan_str = match.group(1).strip()
-        else:
-            plan_str = response.content.strip()
+        plan_str = match.group(1).strip() if match else response.content.strip()
         plan = ast.literal_eval(plan_str)
         if isinstance(plan, list) and all(isinstance(item, str) for item in plan):
              logger.info(f"Generated plan: {plan}")
@@ -86,8 +100,55 @@ def planner_node(state: GraphState):
         logger.error(f"Error parsing plan from LLM response: {e}\nResponse was:\n{response.content}")
         return {"plan": [f"Error creating plan: {e}"]}
 
+def controller_node(state: GraphState):
+    logger.info("Executing controller_node")
+    current_step = state["plan"][state["current_step_index"]]
+    llm = get_llm("CONTROLLER_LLM_ID", "gemini::gemini-2.0-flash")
+    prompt = controller_prompt_template.format(
+        tools=format_tools_for_prompt(),
+        plan=state["plan"],
+        current_step=current_step
+    )
+    controller_chain = llm
+    response = controller_chain.invoke(prompt)
+    try:
+        match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL)
+        json_str = match.group(1).strip() if match else response.content.strip()
+        tool_call = json.loads(json_str)
+        logger.info(f"Controller selected tool: {tool_call}")
+        return {"tool_call": tool_call}
+    except json.JSONDecodeError as e:
+        logger.error(f"Error parsing tool call from LLM response: {e}\nResponse was:\n{response.content}")
+        return {"tool_call": {"error": "Invalid JSON output from controller."}}
+
+# === New Executor Node ===
+async def executor_node(state: GraphState):
+    """Executes the tool call selected by the controller."""
+    logger.info("Executing executor_node")
+    tool_call = state.get("tool_call")
+    if not tool_call or "tool_name" not in tool_call:
+        return {"tool_output": "Error: No tool call found in state."}
+
+    tool_name = tool_call["tool_name"]
+    tool_input = tool_call.get("tool_input", "")
+    
+    # Look up the tool in our map
+    tool = TOOL_MAP.get(tool_name)
+    if not tool:
+        return {"tool_output": f"Error: Tool '{tool_name}' not found."}
+
+    try:
+        logger.info(f"Executing tool '{tool_name}' with input: '{tool_input}'")
+        # Use `ainvoke` for async tool execution
+        output = await tool.ainvoke(tool_input)
+        logger.info(f"Tool '{tool_name}' executed successfully.")
+        return {"tool_output": output}
+    except Exception as e:
+        logger.error(f"Error executing tool '{tool_name}': {e}", exc_info=True)
+        return {"tool_output": f"An error occurred while executing the tool: {e}"}
+
+
 def direct_qa_node(state: GraphState):
-    """Directly calls an LLM for a simple question."""
     logger.info("Executing direct_qa_node")
     llm = get_llm("DEFAULT_LLM_ID", "gemini::gemini-2.0-flash")
     response = llm.invoke(state["messages"])
@@ -95,17 +156,9 @@ def direct_qa_node(state: GraphState):
 
 # --- Conditional Routing ---
 def intent_classifier(state: GraphState):
-    """
-    Classifies the user's intent. This function now ONLY returns a
-    routing decision and does not modify the state.
-    """
     logger.info("Classifying intent")
-    llm = get_llm("INTENT_CLASSIFIER_LLM_ID", "gemini::gemini-1.5-flash")
-    prompt = (
-        "Classify the user's last message. "
-        "Respond with 'AGENT_ACTION' for a task, or 'DIRECT_QA' for a simple question.\n\n"
-        f"User message: '{state['input']}'"
-    )
+    llm = get_llm("INTENT_CLASSIFIER_LLM_ID", "gemini::gemini-2.0-flash")
+    prompt = f"Classify the user's last message. Respond with 'AGENT_ACTION' for a task, or 'DIRECT_QA' for a simple question.\n\nUser message: '{state['input']}'"
     response = llm.invoke(prompt)
     decision = response.content.strip()
     logger.info(f"Intent classified as: {decision}")
@@ -116,33 +169,32 @@ def intent_classifier(state: GraphState):
 
 # --- Graph Definition ---
 def create_agent_graph():
-    """Builds the LangGraph."""
     workflow = StateGraph(GraphState)
-
-    # Add all nodes
+    # Add nodes
     workflow.add_node("prepare_inputs", prepare_inputs_node)
     workflow.add_node("direct_qa", direct_qa_node)
     workflow.add_node("planner_node", planner_node)
+    workflow.add_node("controller_node", controller_node)
+    workflow.add_node("executor_node", executor_node) # Add new node
     
-    # Set the entry point
+    # Set entry point
     workflow.set_entry_point("prepare_inputs")
     
-    # === FIX: The conditional edge now starts from the `prepare_inputs` node ===
+    # Add edges
     workflow.add_conditional_edges(
         "prepare_inputs",
         intent_classifier,
-        {
-            "direct_qa_node": "direct_qa",
-            "planner_node": "planner_node",
-        },
+        {"direct_qa_node": "direct_qa", "planner_node": "planner_node"},
     )
-
+    workflow.add_edge("planner_node", "controller_node")
+    workflow.add_edge("controller_node", "executor_node") # Controller leads to executor
+    
     # Add terminal edges
     workflow.add_edge("direct_qa", END)
-    workflow.add_edge("planner_node", END)
+    workflow.add_edge("executor_node", END) # Executor is the end for now
 
     agent = workflow.compile()
-    logger.info("PCEE agent graph (Planner stage v3) compiled successfully.")
+    logger.info("PCEE agent graph (Executor stage) compiled successfully.")
     return agent
 
 agent_graph = create_agent_graph()
