@@ -1,13 +1,13 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 2: Agent Integration)
+# ResearchAgent Backend Server (Corrected)
 #
-# This file implements the main WebSocket server for the ResearchAgent.
-# It's now updated to import the LangGraph agent and use it to process
-# incoming user messages, streaming the LLM's response back to the client.
-#
-# Usage:
-# Run this file via Docker Compose, which handles the environment.
+# This version implements the user's correct finding: the `path` argument
+# has been removed from the `agent_handler` function signature to match
+# the current `websockets` library API.
 # -----------------------------------------------------------------------------
+
+# --- Verification Step ---
+print("--- EXECUTING LATEST SERVER.PY (v_correct_handler) ---")
 
 import asyncio
 import logging
@@ -15,61 +15,48 @@ import os
 import json
 from dotenv import load_dotenv
 import websockets
+from langchain_core.messages import HumanMessage
 
 # --- Local Imports ---
-# Import the compiled agent graph from our agent module.
 from .langgraph_agent import agent_graph
 
 # --- Configuration ---
-# Load environment variables from the .env file in the project root.
 load_dotenv()
-
-# Set up basic logging to see server events in the console.
-# The logging level is configured via the LOG_LEVEL environment variable.
 log_level = os.getenv("LOG_LEVEL", "INFO").upper()
 logging.basicConfig(level=log_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 # --- WebSocket Handler ---
-async def agent_handler(websocket, path):
+# === FIX: The 'path' argument has been removed as it is no longer passed by the library ===
+async def agent_handler(websocket):
     """
-    Handles incoming WebSocket connections, runs the agent, and streams responses.
+    Handles incoming WebSocket connections, runs the agent, and streams all
+    graph events back to the client.
     """
     logger.info(f"Client connected from {websocket.remote_address}")
     try:
-        # Listen for messages from the client.
         async for message in websocket:
-            logger.info(f"Received message from client.")
+            logger.info("Received new message from client.")
             try:
-                # The agent expects a dictionary with a 'question' key.
-                inputs = {"question": message}
-                logger.info(f"Invoking agent with input: {inputs}")
+                inputs = {"messages": [HumanMessage(content=message)]}
+                logger.info(f"Invoking agent with input: {message[:100]}...")
 
-                # Use ainvoke_stream to get a stream of events from the graph.
-                # This is crucial for our real-time UI updates.
                 async for event in agent_graph.astream_events(inputs, version="v1"):
-                    # We are interested in the 'direct_qa' node's completion event.
-                    if event["event"] == "on_chain_end" and event["name"] == "direct_qa":
-                        # The final state of the node contains the answer.
-                        node_output = event["data"]["output"]
-                        final_answer = node_output.get("answer", "No answer found.")
-
-                        # Create a JSON response to send to the client.
-                        # This structured format is easier for the frontend to parse.
+                    event_type = event["event"]
+                    event_name = event["name"]
+                    
+                    if event_type in ["on_chain_start", "on_chain_end"]:
                         response = {
-                            "type": "final_answer",
-                            "data": final_answer
+                            "type": "agent_event",
+                            "event": event_type,
+                            "name": event_name,
+                            "data": event['data']
                         }
-                        await websocket.send(json.dumps(response))
-                        logger.info("Sent final answer to client.")
+                        await websocket.send(json.dumps(response, default=str))
 
             except Exception as e:
                 logger.error(f"Error processing message: {e}", exc_info=True)
-                # Inform the client about the error.
-                error_response = {
-                    "type": "error",
-                    "data": str(e)
-                }
+                error_response = {"type": "error", "data": str(e)}
                 await websocket.send(json.dumps(error_response))
 
     except websockets.exceptions.ConnectionClosed as e:
@@ -77,30 +64,27 @@ async def agent_handler(websocket, path):
     except Exception as e:
         logger.error(f"An unexpected error occurred in the handler: {e}", exc_info=True)
 
-
 # --- Main Server Function ---
 async def main():
-    """
-    Starts the WebSocket server.
-    """
+    """Starts the WebSocket server."""
     host = os.getenv("BACKEND_HOST", "0.0.0.0")
     port = int(os.getenv("BACKEND_PORT", 8765))
+    
     max_size = int(os.getenv("WEBSOCKET_MAX_SIZE_BYTES", 16 * 1024 * 1024))
     ping_interval = int(os.getenv("WEBSOCKET_PING_INTERVAL", 20))
     ping_timeout = int(os.getenv("WEBSOCKET_PING_TIMEOUT", 30))
 
     logger.info(f"Starting ResearchAgent WebSocket server at ws://{host}:{port}")
 
-    # Start the server with the agent_handler and recommended settings.
     async with websockets.serve(
-        agent_handler,
+        agent_handler, # Pass the handler directly
         host,
         port,
         max_size=max_size,
         ping_interval=ping_interval,
         ping_timeout=ping_timeout
     ):
-        await asyncio.Future()  # Run forever
+        await asyncio.Future()
 
 # --- Entry Point ---
 if __name__ == "__main__":
