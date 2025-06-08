@@ -1,117 +1,75 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Prompts
+# ResearchAgent Prompts (Advanced Architecture)
 #
-# Correction: The evaluator prompt is updated to include the `tool_call`
-# so it can understand the Controller's intent when assessing the outcome.
+# This file centralizes all the prompts for our new, more sophisticated
+# agent architecture.
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
 
-# 1. Planner Prompt
-planner_prompt_template = PromptTemplate.from_template(
+# --- Advanced PCEE Loop Prompts ---
+
+# 1. Structured Planner Prompt
+# This is the new "Chief Architect" prompt. It instructs the Planner to
+# generate a detailed, structured plan as a JSON object.
+structured_planner_prompt_template = PromptTemplate.from_template(
     """
-You are an expert planner. Your job is to create a clear, step-by-step plan 
-to fulfill the user's request.
+You are an expert architect and planner. Your job is to create a detailed,
+step-by-step execution plan in JSON format to fulfill the user's request.
 
 **User Request:**
 {input}
-
-**Instructions:**
-- Analyze the user's request and break it down into a sequence of logical steps.
-- Each step should be a single, clear action.
-- The plan should be a Python list of strings, where each string is a step.
-- Do not add any conversational fluff or explanation. Your output must be ONLY the Python list.
----
-**Begin!**
-
-**User Request:**
-{input}
-
-**Your Output (must be a Python list of strings):**
-"""
-)
-
-# 2. Controller Prompt (with History)
-controller_prompt_template = PromptTemplate.from_template(
-    """
-You are an expert controller agent. Your job is to select the most appropriate 
-tool to execute the given step of a plan, based on the history of previous steps.
 
 **Available Tools:**
 {tools}
 
-**Plan:**
-{plan}
-
-**History of Past Steps:**
-{history}
-
-**Current Step:**
-{current_step}
-
 **Instructions:**
-- Analyze the current step in the context of the plan and the history of past actions.
-- Your output must be a single, valid JSON object containing the chosen tool's name 
-  and the exact input for that tool.
-- Do not add any conversational fluff or explanation. Your output must be ONLY the JSON object.
----
-**Begin!**
-
-**History of Past Steps:**
-{history}
-
-**Current Step:**
-{current_step}
-
-**Your Output (must be a single JSON object):**
-"""
-)
-
-
-# 3. Evaluator Prompt (Smarter)
-evaluator_prompt_template = PromptTemplate.from_template(
-    """
-You are an expert evaluator. Your job is to assess the outcome of a tool's 
-execution and determine if the step was successful.
-
-**Plan Step:**
-{current_step}
-
-**Controller's Action (the tool call that was just executed):**
-{tool_call}
-
-**Tool's Output:**
-{tool_output}
-
-**Instructions:**
-- Analyze the tool's output in the context of both the Plan Step and the Controller's Action.
-- Determine if the step was successfully completed. The goal is to see if the Controller's Action successfully addressed the Plan Step.
-- Your output must be a single, valid JSON object containing a "status" key, 
-  which can be "success" or "failure", and a "reasoning" key with a brief explanation.
+- Analyze the user's request and the available tools.
+- Decompose the request into a sequence of logical steps.
+- For each step, you must specify:
+  - "step_id": A unique integer for the step (e.g., 1, 2, 3).
+  - "instruction": A clear, natural language description of what to do in this step.
+  - "tool_name": The single most appropriate tool from the "Available Tools" list to accomplish this step.
+  - "tool_input": The precise input to provide to the chosen tool.
+  - "expected_output": A clear description of what a successful output from the tool should look like or contain. This is for verification.
+- Your final output must be a single, valid JSON object containing a "plan" key, which holds a list of these step objects.
 - Do not add any conversational fluff or explanation. Your output must be ONLY the JSON object.
 
 **Example:**
-Plan Step: "Extract the version number and save it."
-Controller's Action: {{"tool_name": "workspace_shell", "tool_input": "echo '0.3.25' > version.txt"}}
-Tool's Output: "Command finished with exit code 0."
+User Request: "Find the latest version of LangChain and save it to a file."
 Your Output:
 ```json
 {{
-    "status": "success",
-    "reasoning": "The controller correctly identified the version number and the shell tool successfully executed the command to save it to a file."
+    "plan": [
+        {{
+            "step_id": 1,
+            "instruction": "Search the web to find the official PyPI page for LangChain.",
+            "tool_name": "tavily_search",
+            "tool_input": "LangChain PyPI",
+            "expected_output": "A list of search results containing a URL pointing to pypi.org for the langchain package."
+        }},
+        {{
+            "step_id": 2,
+            "instruction": "Extract the latest version number from the PyPI page search result.",
+            "tool_name": "workspace_shell",
+            "tool_input": "echo '0.3.25'",
+            "expected_output": "A string containing the version number, e.g., '0.3.25'."
+        }},
+        {{
+            "step_id": 3,
+            "instruction": "Write the extracted version number to a file named 'langchain_version.txt'.",
+            "tool_name": "workspace_shell",
+            "tool_input": "echo '0.3.25' > langchain_version.txt",
+            "expected_output": "A confirmation that the shell command executed successfully (exit code 0)."
+        }}
+    ]
 }}
 ```
 ---
 **Begin!**
 
-**Plan Step:**
-{current_step}
-
-**Controller's Action:**
-{tool_call}
-
-**Tool's Output:**
-{tool_output}
+**User Request:**
+{input}
 
 **Your Output (must be a single JSON object):**
 """
