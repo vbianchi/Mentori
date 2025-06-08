@@ -2,17 +2,22 @@
 
 ## 1. Overview
 
-ResearchAgent is a sophisticated, AI-powered agent designed to handle complex, multi-step tasks in software engineering and scientific research. Built with a Python/LangGraph backend, it leverages a unique **Plan-Controller-Executor-Evaluator (PCEE)** architecture to autonomously create, execute, and evaluate plans to fulfill high-level user requests.
+ResearchAgent is a sophisticated, AI-powered agent designed to handle complex, multi-step tasks in software engineering and scientific research. Built with a Python/LangGraph backend and a modern JavaScript frontend (Vite + Preact), it leverages a unique **Plan-Controller-Executor-Evaluator (PCEE)** architecture to autonomously create, execute, and evaluate structured plans to fulfill high-level user requests.
 
-The core philosophy is built on **transparency and adaptive execution**. The agent creates detailed, structured plans and executes them step-by-step within a secure, sandboxed workspace. It is designed to understand the outcome of its actions and adapt its approach, providing a foundation for robust, self-correcting problem-solving.
+The core philosophy is built on **transparency, adaptive execution, and security**. The agent creates detailed, structured plans and executes them step-by-step within a secure, sandboxed workspace for each task. It is designed to understand the outcome of its actions and has a foundational architecture for future self-correction and human-in-the-loop collaboration.
 
-## 2. Folder Structure
+## 2. Key Features
 
-Here is the complete structure of the project's backend and configuration files:
+* **Advanced PCEE Architecture:** A robust, multi-node graph that separates planning, control, execution, and evaluation for complex task management.
+* **Structured Planning:** The agent's "Chief Architect" (Planner) generates detailed JSON-based plans, including tool selection and expected outcomes for each step.
+* **Secure Sandboxed Workspaces:** Every task is assigned a unique, isolated directory, ensuring security and preventing state-collision between different tasks.
+* **Modular, "Plug-and-Play" Tools:** A flexible tool system allows for easy addition of new capabilities. Current tools include web search and a sandboxed file system (read, write, list).
+* **Modern Frontend:** A responsive user interface built with Vite and Preact for real-time streaming of the agent's thought process.
+
+## 3. Project Structure
 
 ```
-ResearchAgent
-
+.
 ├── backend/
 │ ├── tools/
 │ │ ├── init.py # Smart tool loader
@@ -24,82 +29,70 @@ ResearchAgent
 │ ├── prompts.py # Centralized prompts for all agent nodes
 │ └── server.py # WebSocket server entry point
 │
+├── src/ # Frontend source code
+│ ├── App.jsx # Main UI component
+│ ├── index.css # Global CSS and Tailwind directives
+│ └── main.jsx # Frontend application entry point
+│
 ├── .env.example # Template for environment variables
 ├── .gitignore # Specifies files to ignore for version control
 ├── docker-compose.yml # Orchestrates the Docker container
 ├── Dockerfile # Defines the application's Docker image
+├── index.html # Main HTML entry point for Vite
+├── package.json # Frontend dependencies and scripts
+├── package-lock.json # Locked versions of frontend dependencies
+├── postcss.config.js # PostCSS configuration for Tailwind
+├── tailwind.config.js # Tailwind CSS configuration
+├── vite.config.js # Vite build tool configuration
 └── requirements.txt # Python dependencies
-
 ```
 
-## 3. Setup and Installation
+## 4. Installation & Setup
 
-This project is designed to be run inside a Docker container for security, consistency, and ease of setup.
+You will need two separate terminals to run the backend and frontend servers.
 
 ### Prerequisites
 
-* **Docker:** Ensure Docker and Docker Compose are installed on your system. [Official Docker Installation Guide](https://docs.docker.com/engine/install/)
+* **Docker:** Ensure Docker and Docker Compose are installed. [Official Docker Installation Guide](https://docs.docker.com/engine/install/)
+* **Node.js & npm:** Ensure Node.js (which includes npm) is installed. [Official Node.js Website](https://nodejs.org/)
 
-### Step-by-Step Instructions
+### Step 1: Backend Server
 
 1.  **Clone the Repository:**
     If this project were on GitHub, you would clone it. For now, ensure all the files listed in the structure above are in a single project directory.
 
 2.  **Configure Environment Variables:**
-    Your API keys and other secrets must be configured before running the application.
+    Your API keys are required for the agent to function.
     ```bash
     # Create the .env file from the example template
     cp .env.example .env
     ```
-    Now, open the newly created `.env` file with a text editor and fill in the required values, at a minimum:
-    * `GOOGLE_API_KEY`: Your API key for Google Gemini models.
-    * `TAVILY_API_KEY`: Your API key for the Tavily search tool.
-    * `ENTREZ_EMAIL`: Your email for the PubMed tool (if you add it later).
-3.  **Build and Run the Application:**
-    Navigate to the project's root directory in your terminal and run the following Docker Compose command:
+    Open the newly created `.env` file and fill in your `GOOGLE_API_KEY` and `TAVILY_API_KEY`.
+
+3.  **Run the Backend:**
+    Navigate to the project's root directory in your **first terminal** and run:
     ```bash
-    # This command builds the Docker image and starts the backend server.
-    # The --build flag is only necessary the first time or after changing
-    # dependencies or the Dockerfile.
+    # This builds the Docker image and starts the backend WebSocket server.
     docker compose up --build
     ```
-    Docker will now build the image (installing all Python dependencies from `requirements.txt` using `uv`) and start the backend service. You will see the server logs in your terminal, ending with a line like:
-    `INFO - Starting ResearchAgent WebSocket server at ws://0.0.0.0:8765`
+    Keep this terminal running. The backend will be available at `ws://localhost:8765`.
 
-    The server is now running and ready to accept connections.
+### Step 2: Frontend Server
 
-## 4. Testing the Agent
-
-Since we do not yet have a frontend UI, you can interact with the agent directly using a command-line WebSocket client.
-
-### Prerequisites
-
-* **wscat:** A simple command-line client for WebSockets, installable via `npm`.
+1.  **Install Dependencies:**
+    In your **second terminal**, navigate to the same project root directory and run:
     ```bash
-    # Install wscat globally
-    npm install -g wscat
+    # This reads package.json and installs all frontend dependencies.
+    npm install
     ```
 
-### Connecting to the Agent
-
-1.  Leave the terminal with the running Docker container open.
-2.  Open a **new, separate terminal**.
-3.  Connect to the agent using the following command:
+2.  **Run the Frontend:**
+    Once the installation is complete, run the development server:
     ```bash
-    wscat -c ws://localhost:8765
+    # This starts the Vite development server.
+    npm run dev
     ```
-4.  You will see a `Connected (press CTRL+C to quit)` message and a `>` prompt. You can now send requests to the agent.
+    You will see a message indicating the server is running.
 
-### Example Test Cases
-
-* **Test Case A (Direct QA):**
-    ```
-    > What is the speed of light?
-    ```
-
-* **Test Case B (File System Task):**
-    ```
-    > Write a python script that prints 'Hello, World!' to a file named 'hello.py', then list all the files in the workspace.
-    ```
-
-You will see a real-time stream of JSON events from the agent as it thinks and executes its plan.
+3.  **Access the Application:**
+    Open your web browser and navigate to the local URL provided by Vite (usually `http://localhost:5173`). You should see the ResearchAgent UI, connected and ready for prompts.
