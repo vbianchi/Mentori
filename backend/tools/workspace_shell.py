@@ -1,10 +1,9 @@
 # -----------------------------------------------------------------------------
 # ResearchAgent Tool: Workspace Shell
 #
-# This tool allows the agent to execute shell commands non-interactively.
-#
-# Correction: The `Tool` definition now only provides the `coroutine` argument
-# to prevent "cannot pickle 'coroutine' object" errors during state transitions.
+# Correction: The Tool constructor now includes a placeholder `func` argument
+# to satisfy the class requirements, while keeping the `coroutine` for
+# proper async execution. This resolves the startup TypeError.
 # -----------------------------------------------------------------------------
 
 import logging
@@ -56,15 +55,17 @@ async def _run_shell_command(command: str) -> str:
 
     except asyncio.TimeoutError:
         logger.error(f"Command `{command}` timed out after {SHELL_TIMEOUT} seconds.")
-        return f"Error: Command timed out after {SHE_TIMEOUT} seconds. The process was killed."
+        return f"Error: Command timed out after {SHELL_TIMEOUT} seconds. The process was killed."
     except Exception as e:
         logger.error(f"An unexpected error occurred while running command `{command}`: {e}", exc_info=True)
         return f"An unexpected error occurred: {str(e)}"
 
+# === FIX: Added a placeholder for the required `func` argument ===
+def _placeholder_sync_func(*args, **kwargs):
+    """This is a placeholder and should never be called."""
+    raise NotImplementedError("This tool can only be used asynchronously.")
+
 # --- Tool Definition ---
-# === FIX: Removed the synchronous `func` argument ===
-# Defining the tool as async-only by providing just the `coroutine`
-# is the robust way to handle this and prevents serialization issues.
 tool = Tool(
     name="workspace_shell",
     description=(
@@ -75,5 +76,6 @@ tool = Tool(
         "Input must be a single, valid shell command string. "
         "Returns the command's stdout, stderr, and exit code."
     ),
-    coroutine=_run_shell_command,
+    func=_placeholder_sync_func, # Satisfy the constructor requirement
+    coroutine=_run_shell_command, # Specify the actual async function to run
 )
