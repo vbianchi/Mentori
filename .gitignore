@@ -9,6 +9,16 @@ __pycache__/
 *.pyo
 *.pyd
 
+# --- Frontend ---
+# Node.js dependencies
+node_modules/
+
+# Build output directory
+dist/
+
+# Vite-specific cache
+.vite/
+
 # --- IDE / Editor ---
 # VSCode
 .vscode/
@@ -28,8 +38,10 @@ Thumbs.db
 .env
 
 # The agent's sandboxed workspace directories.
-# This directory is created at runtime and should not be in version control.
 /workspace/*
 
 # Logs if we decide to write them to files
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
