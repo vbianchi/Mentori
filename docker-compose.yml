@@ -6,8 +6,6 @@
 # `docker compose up --build`
 # -----------------------------------------------------------------------------
 
-version: '3.8' # Specifies the version of the Compose file format.
-
 services:
   # Defines our backend service.
   backend:
@@ -15,25 +13,16 @@ services:
     build: .
 
     # Loads environment variables from the .env file in the project root.
-    # These variables will be accessible to the application inside the container.
     env_file:
       - .env
 
     # Maps ports from the host machine to the container.
-    # Format: "HOST_PORT:CONTAINER_PORT"
-    # - Maps host port 8765 to container port 8765 (for WebSocket server).
-    # - Maps host port 8766 to container port 8766 (for file server).
     ports:
       - "8765:8765"
       - "8766:8766"
 
     # Mounts local directories (volumes) into the container.
     # This allows for live code updates and persistent storage.
-    # Format: "HOST_PATH:CONTAINER_PATH"
-    # - Mounts the local ./backend directory to /app/backend in the container.
-    #   Changes to your local Python files will be reflected inside the container.
-    # - Mounts a ./workspace directory to /app/workspace.
-    #   Files created by the agent will be stored here and persist between restarts.
     volumes:
       - ./backend:/app/backend
       - ./workspace:/app/workspace
