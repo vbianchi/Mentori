@@ -1,0 +1,38 @@
+# -----------------------------------------------------------------------------
+# Python Dependencies for the ResearchAgent
+#
+# INSTRUCTIONS:
+# Install these dependencies using a package manager like pip or uv.
+# Example (with uv): uv pip install -r requirements.txt
+# Example (with pip): pip install -r requirements.txt
+# -----------------------------------------------------------------------------
+
+# -- Core LangChain & LangGraph Framework --
+# The primary libraries for building our agentic application.
+langchain
+langgraph
+langchain-core
+
+# -- LLM Integrations --
+# Allows us to connect to various language model providers.
+
+# For Google Gemini Models
+langchain-google-genai
+google-generativeai
+
+# For community-provided integrations, including Ollama and various tools.
+langchain-community
+
+# -- Server --
+# For running our backend WebSocket server to communicate with the frontend.
+websockets
+
+# -- Utilities --
+# For loading configuration variables from the .env file.
+python-dotenv
+
+# -- Tools --
+# Specific clients required for the agent's tools.
+
+# For the Tavily web search tool.
+tavily-python
