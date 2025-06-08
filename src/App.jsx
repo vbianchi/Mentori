@@ -38,19 +38,77 @@ const EventCard = ({ event }) => {
     );
 };
 
+const WorkspacePanel = ({ files, workspacePath, isLoading, error, onRefresh }) => {
+    return (
+        <div class="w-1/3 h-full bg-gray-800/50 rounded-lg border border-gray-700/50 p-6 shadow-2xl flex flex-col">
+            <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-4">
+                <h2 class="text-xl font-bold text-white">Agent Workspace</h2>
+                <button onClick={onRefresh} class="p-1.5 rounded-md hover:bg-gray-700" title="Refresh Workspace">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
+                        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="text-xs text-gray-500 mb-2 truncate" title={workspacePath || 'No active workspace'}>
+                {workspacePath ? `Path: ...${workspacePath.slice(-36)}` : 'No active workspace'}
+            </div>
+            <div class="flex-1 bg-gray-900/50 rounded-md p-4 text-sm text-gray-400 font-mono overflow-y-auto">
+                {isLoading && <p>Loading files...</p>}
+                {error && <p class="text-red-400">Error: {error}</p>}
+                {!isLoading && !error && files.length === 0 && <p>// Workspace is empty.</p>}
+                {!isLoading && !error && files.length > 0 && (
+                    <ul>
+                        {files.map(file => (
+                            <li key={file} class="flex items-center gap-2 mb-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                {file}
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+        </div>
+    );
+};
 
 // --- Main App Component ---
 export function App() {
     const [events, setEvents] = useState([]);
     const [inputValue, setInputValue] = useState("");
     const [connectionStatus, setConnectionStatus] = useState("Disconnected");
+    const [workspacePath, setWorkspacePath] = useState(null);
+    const [workspaceFiles, setWorkspaceFiles] = useState([]);
+    const [workspaceLoading, setWorkspaceLoading] = useState(false);
+    const [workspaceError, setWorkspaceError] = useState(null);
+
     const ws = useRef(null);
     const scrollRef = useRef(null);
 
-    // Effect to manage WebSocket connection
-    useEffect(() => {
-        if (ws.current) return; // Prevent multiple connections
+    const fetchWorkspaceFiles = async (path) => {
+        if (!path) return;
+        setWorkspaceLoading(true);
+        setWorkspaceError(null);
+        try {
+            const justTheId = path.split('/').pop();
+            const response = await fetch(`http://localhost:8766/files?path=${justTheId}`);
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.error || `HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            setWorkspaceFiles(data.files || []);
+        } catch (error) {
+            console.error("Failed to fetch workspace files:", error);
+            setWorkspaceError(error.message);
+        } finally {
+            setWorkspaceLoading(false);
+        }
+    };
 
+    // Effect to manage WebSocket connection - ONLY RUNS ONCE
+    useEffect(() => {
+        if (ws.current) return;
         setConnectionStatus("Connecting...");
         ws.current = new WebSocket("ws://localhost:8765");
 
@@ -62,31 +120,51 @@ export function App() {
         };
 
         ws.current.onmessage = (event) => {
+            let newEvent;
             try {
-                const newEvent = JSON.parse(event.data);
+                newEvent = JSON.parse(event.data);
                 setEvents(prev => [...prev, newEvent]);
             } catch (error) {
                 setEvents(prev => [...prev, { type: "raw", data: event.data }]);
             }
         };
 
-        // Cleanup on component unmount
         return () => ws.current.close();
-    }, []);
+    }, []); // <-- FIX: Empty dependency array ensures this runs only once
 
-    // Effect to scroll to bottom on new event
+    // Effect to update workspace and scroll event log
     useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
-    }, [events]);
+        
+        // Check the last event for workspace updates
+        const lastEvent = events[events.length - 1];
+        if (lastEvent?.type === 'agent_event' && lastEvent.data?.output?.workspace_path) {
+            const newPath = lastEvent.data.output.workspace_path;
+            if (newPath !== workspacePath) {
+                setWorkspacePath(newPath);
+                fetchWorkspaceFiles(newPath);
+            }
+        }
+        // Also re-fetch after a tool runs successfully
+        if(lastEvent?.type === 'agent_event' && lastEvent.event === 'on_chain_end' && lastEvent.name === 'executor_node'){
+             if(workspacePath && !lastEvent.data.output?.tool_output?.includes("Error")) {
+                fetchWorkspaceFiles(workspacePath);
+             }
+        }
+
+    }, [events]); // This effect now runs whenever the events list changes
 
     const handleSendMessage = (e) => {
         e.preventDefault();
         const message = inputValue.trim();
         if (message && ws.current?.readyState === WebSocket.OPEN) {
+            setEvents([{ type: 'user_prompt', data: message }]);
+            setWorkspacePath(null);
+            setWorkspaceFiles([]);
+            setWorkspaceError(null);
             ws.current.send(message);
-            setEvents(prev => [...prev, { type: 'user_prompt', data: message }]);
             setInputValue("");
         }
     };
@@ -108,25 +186,21 @@ export function App() {
                    {events.map((event, index) => <EventCard key={index} event={event} />)}
                 </div>
                 <form onSubmit={handleSendMessage} class="mt-4 flex gap-3 border-t border-gray-700 pt-4">
-                    <textarea
-                        value={inputValue}
-                        onInput={e => setInputValue(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) handleSendMessage(e); }}
+                    <textarea value={inputValue} onInput={e => setInputValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) handleSendMessage(e); }}
                         class="flex-1 p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
-                        placeholder="Send a message to the agent..."
-                        rows="2"
+                        placeholder="Send a message to the agent..." rows="2"
                     ></textarea>
-                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-500 transition-colors" disabled={connectionStatus !== 'Connected'}>
-                        Send
-                    </button>
+                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-500 transition-colors" disabled={connectionStatus !== 'Connected'}>Send</button>
                 </form>
             </div>
-            <div class="w-1/3 h-full bg-gray-800/50 rounded-lg border border-gray-700/50 p-6 shadow-2xl flex flex-col">
-                <h2 class="text-xl font-bold text-white mb-4 border-b border-gray-700 pb-4">Agent Workspace</h2>
-                <div class="flex-1 bg-gray-900/50 rounded-md p-4 text-sm text-gray-400 font-mono">
-                    <p>// The agent's file system will be displayed here.</p>
-                </div>
-            </div>
+            <WorkspacePanel 
+                files={workspaceFiles} 
+                workspacePath={workspacePath} 
+                isLoading={workspaceLoading}
+                error={workspaceError}
+                onRefresh={() => fetchWorkspaceFiles(workspacePath)}
+            />
         </div>
     );
 }
+
