@@ -1,0 +1,35 @@
+# --- Python ---
+# Virtual environment folder
+.venv/
+venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# --- IDE / Editor ---
+# VSCode
+.vscode/
+
+# JetBrains / PyCharm
+.idea/
+
+# --- Operating System ---
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# --- Project Specific ---
+# Environment variables file containing secrets
+.env
+
+# The agent's sandboxed workspace directories.
+# This directory is created at runtime and should not be in version control.
+/workspace/*
+
+# Logs if we decide to write them to files
+*.log
