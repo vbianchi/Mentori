@@ -21,17 +21,21 @@ const FileIcon = (props) => (
     </svg>
 );
 
+const ArrowLeftIcon = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}>
+        <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
+    </svg>
+);
+
 
 // --- UI Components ---
 
 const Sidebar = ({ title, children, isVisible, onToggle, side }) => {
-    // Use Tailwind classes for width transition. `w-0` and `w-1/4` (or similar) will be transitioned.
-    const baseClasses = "h-full bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col transition-all duration-300 ease-in-out overflow-hidden";
     const widthClass = isVisible ? 'w-1/4 min-w-[300px] p-6' : 'w-0 p-0 border-0';
     const visibilityClass = isVisible ? 'opacity-100' : 'opacity-0';
 
     return (
-        <div class={`${baseClasses} ${widthClass}`}>
+        <div class={`h-full bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col transition-all duration-300 ease-in-out overflow-hidden ${widthClass}`}>
              <div class={`flex flex-col h-full transition-opacity duration-200 ${visibilityClass}`}>
                 <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-4 flex-shrink-0">
                     <h2 class="text-xl font-bold text-white whitespace-nowrap">{title}</h2>
@@ -39,7 +43,6 @@ const Sidebar = ({ title, children, isVisible, onToggle, side }) => {
                         {side === 'left' ? <ChevronsLeftIcon class="h-4 w-4" /> : <ChevronsRightIcon class="h-4 w-4" />}
                     </button>
                 </div>
-                {/* Ensure children can grow and scroll */}
                 <div class="flex-grow min-h-0">
                     {children}
                 </div>
@@ -51,7 +54,6 @@ const Sidebar = ({ title, children, isVisible, onToggle, side }) => {
 const ToggleButton = ({ isVisible, onToggle, side }) => {
     if (isVisible) return null;
 
-    // Use fixed positioning relative to the main container
     const positionClass = side === 'left' ? 'left-4' : 'right-4';
 
     return (
@@ -107,11 +109,18 @@ export function App() {
     const [inputValue, setInputValue] = useState("");
     const [connectionStatus, setConnectionStatus] = useState("Disconnected");
     
+    // Workspace state
     const [workspacePath, setWorkspacePath] = useState(null);
     const [workspaceFiles, setWorkspaceFiles] = useState([]);
     const [workspaceLoading, setWorkspaceLoading] = useState(false);
     const [workspaceError, setWorkspaceError] = useState(null);
 
+    // Artifact Viewer State
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [fileContent, setFileContent] = useState('');
+    const [isFileLoading, setIsFileLoading] = useState(false);
+
+    // Layout state
     const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
     const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
 
@@ -144,23 +153,42 @@ export function App() {
         }
     }, []);
 
+    const fetchFileContent = useCallback(async (filename) => {
+        if (!workspacePath || !filename) return;
+        setIsFileLoading(true);
+        setSelectedFile(filename);
+        setFileContent('');
+        try {
+            const workspaceId = workspacePath.split('/').pop();
+            const response = await fetch(`http://localhost:8766/file-content?path=${workspaceId}&filename=${filename}`);
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.error || `HTTP error! status: ${response.status}`);
+            }
+            const textContent = await response.text();
+            setFileContent(textContent);
+        } catch (error) {
+            console.error("Failed to fetch file content:", error);
+            setFileContent(`Error loading file: ${error.message}`);
+        } finally {
+            setIsFileLoading(false);
+        }
+    }, [workspacePath]);
+
+
     useEffect(() => {
         function connect() {
             setConnectionStatus("Connecting...");
             ws.current = new WebSocket("ws://localhost:8765");
-
             ws.current.onopen = () => setConnectionStatus("Connected");
-            
             ws.current.onclose = () => {
                 setConnectionStatus("Disconnected");
                 setTimeout(() => connect(), 3000);
             };
-            
             ws.current.onerror = (err) => {
                 console.error("WebSocket error:", err);
                 ws.current.close();
             };
-
             ws.current.onmessage = (event) => {
                 let newEvent;
                 try {
@@ -182,7 +210,6 @@ export function App() {
 
     useEffect(() => {
         scrollToBottom();
-        
         const lastEvent = events[events.length - 1];
         if (!lastEvent) return;
 
@@ -190,6 +217,7 @@ export function App() {
             const newPath = lastEvent.data?.output?.workspace_path;
             if (newPath && newPath !== workspacePath) {
                 setWorkspacePath(newPath);
+                setSelectedFile(null); // Reset file view on new task
                 fetchWorkspaceFiles(newPath);
             }
         }
@@ -210,6 +238,7 @@ export function App() {
             setWorkspacePath(null);
             setWorkspaceFiles([]);
             setWorkspaceError(null);
+            setSelectedFile(null);
             ws.current.send(message);
             setInputValue("");
         }
@@ -225,9 +254,7 @@ export function App() {
                 </div>
             </Sidebar>
             
-            {/* Main Content */}
             <div class="flex-1 flex flex-col h-full bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl min-w-0">
-                {/* Header */}
                 <div class="flex items-center justify-between p-6 border-b border-gray-700 flex-shrink-0">
                      <h1 class="text-2xl font-bold text-white">ResearchAgent</h1>
                      <div class="flex items-center gap-2">
@@ -238,12 +265,10 @@ export function App() {
                         <span class="text-sm text-gray-400">{connectionStatus}</span>
                      </div>
                 </div>
-                {/* Event Log (Scrollable) */}
                 <div class="flex-1 overflow-y-auto p-6">
                    {events.map((event, index) => <EventCard key={index} event={event} />)}
                    <div ref={messagesEndRef} />
                 </div>
-                {/* Input Form (Fixed) */}
                 <div class="p-6 border-t border-gray-700 flex-shrink-0">
                     <form onSubmit={handleSendMessage} class="flex gap-3">
                         <textarea value={inputValue} onInput={e => setInputValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) handleSendMessage(e); }}
@@ -258,26 +283,43 @@ export function App() {
             <ToggleButton isVisible={isRightSidebarVisible} onToggle={() => setIsRightSidebarVisible(true)} side="right" />
             <Sidebar title="Agent Workspace" isVisible={isRightSidebarVisible} onToggle={() => setIsRightSidebarVisible(false)} side="right">
                 <div class="flex flex-col flex-grow min-h-0">
-                    <div class="text-xs text-gray-500 mb-2 truncate flex-shrink-0" title={workspacePath || 'No active workspace'}>
-                        {workspacePath ? `Path: ...${workspacePath.slice(-36)}` : 'No active workspace'}
-                    </div>
-                     <div class="flex-grow bg-gray-900/50 rounded-md p-4 text-sm text-gray-400 font-mono overflow-y-auto">
-                        {workspaceLoading && <p>Loading files...</p>}
-                        {workspaceError && <p class="text-red-400">Error: {workspaceError}</p>}
-                        {!workspaceLoading && !workspaceError && workspaceFiles.length === 0 && <p>// Workspace is empty.</p>}
-                        {!workspaceLoading && !workspaceError && workspaceFiles.length > 0 && (
-                            <ul>
-                                {workspaceFiles.map(file => (
-                                    <li key={file} class="flex items-center gap-2 mb-1 hover:text-white cursor-pointer">
-                                        <FileIcon class="h-4 w-4 text-gray-500" />
-                                        {file}
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
+                    {selectedFile ? (
+                        <div class="flex flex-col h-full">
+                            <div class="flex items-center gap-2 pb-2 mb-2 border-b border-gray-700 flex-shrink-0">
+                                <button onClick={() => setSelectedFile(null)} class="p-1 rounded-md hover:bg-gray-700">
+                                    <ArrowLeftIcon class="h-4 w-4" />
+                                </button>
+                                <span class="font-mono text-sm text-white truncate">{selectedFile}</span>
+                            </div>
+                            <pre class="flex-grow bg-gray-900/50 rounded-md p-4 text-sm text-gray-300 font-mono overflow-auto">
+                                {isFileLoading ? 'Loading...' : <code>{fileContent}</code>}
+                            </pre>
+                        </div>
+                    ) : (
+                         <div class="flex flex-col flex-grow min-h-0">
+                            <div class="text-xs text-gray-500 mb-2 truncate flex-shrink-0" title={workspacePath || 'No active workspace'}>
+                                {workspacePath ? `Path: ...${workspacePath.slice(-36)}` : 'No active workspace'}
+                            </div>
+                             <div class="flex-grow bg-gray-900/50 rounded-md p-4 text-sm text-gray-400 font-mono overflow-y-auto">
+                                {workspaceLoading && <p>Loading files...</p>}
+                                {workspaceError && <p class="text-red-400">Error: {workspaceError}</p>}
+                                {!workspaceLoading && !workspaceError && workspaceFiles.length === 0 && <p>// Workspace is empty.</p>}
+                                {!workspaceLoading && !workspaceError && workspaceFiles.length > 0 && (
+                                    <ul>
+                                        {workspaceFiles.map(file => (
+                                            <li key={file} onClick={() => fetchFileContent(file)} class="flex items-center gap-2 mb-1 hover:text-white cursor-pointer">
+                                                <FileIcon class="h-4 w-4 text-gray-500" />
+                                                {file}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </Sidebar>
         </div>
     );
 }
+
