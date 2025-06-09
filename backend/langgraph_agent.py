@@ -1,15 +1,12 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent
+# ResearchAgent Core Agent (Dynamic Model Selection)
 #
-# FINAL FIX: The executor_node is now fully robust. It can handle cases
-# where the planner provides a simple string as input for a structured,
-# sandboxed tool (e.g., `tool_input: "hello.py"` for `read_file`).
-#
-# The logic now checks the input type. If it's not a dictionary, it
-# intelligently wraps the input into the expected dictionary format (e.g.,
-# `{"file_path": "hello.py"}`) before injecting the `workspace_path`.
-# This makes the agent resilient to planner variations and completes the
-# stabilization of the core tool-using loop.
+# This version makes the model selection functional.
+# - The GraphState now includes a `models` dictionary.
+# - The `prepare_inputs_node` parses the initial message payload to get the
+#   user's prompt and their selected models, saving them to the state.
+# - The `get_llm` function is upgraded to accept the agent state and a role
+#   (e.g., 'planner'), dynamically choosing the model ID from the state.
 # -----------------------------------------------------------------------------
 
 import os
@@ -45,22 +42,48 @@ class GraphState(TypedDict):
     workspace_path: str
     step_outputs: Annotated[Dict[int, str], lambda x, y: {**x, **y}]
     answer: str
+    models: dict # NEW: To hold the selected models from the UI
 
 # --- LLM Provider Helper ---
 LLM_CACHE = {}
-def get_llm(llm_id_env_var: str, default_llm_id: str):
-    llm_id = os.getenv(llm_id_env_var, default_llm_id)
-    if llm_id in LLM_CACHE: return LLM_CACHE[llm_id]
-    provider, model_name = llm_id.split("::")
-    logger.info(f"Initializing LLM for '{llm_id_env_var}': Provider={provider}, Model={model_name}")
-    if provider == "gemini":
+def get_llm(state: GraphState, role: str):
+    """Dynamically gets an LLM based on the role and the user's selection in the state."""
+    
+    # Define default models for each role
+    default_models = {
+        'router': "gemini::gemini-1.5-flash-latest",
+        'planner': "gemini::gemini-1.5-flash-latest",
+        'controller': "gemini::gemini-1.5-flash-latest",
+        'evaluator': "gemini::gemini-1.5-flash-latest",
+    }
+    
+    model_id = state.get("models", {}).get(role, default_models[role])
+
+    if model_id in LLM_CACHE:
+        return LLM_CACHE[model_id]
+
+    logger.info(f"Initializing LLM for role '{role}': Model ID={model_id}")
+    
+    try:
+        provider, model_name = model_id.split("::")
+        if provider == "gemini":
+            llm = ChatGoogleGenerativeAI(model=model_name, google_api_key=os.getenv("GOOGLE_API_KEY"))
+        elif provider == "ollama":
+            llm = ChatOllama(model=model_name, base_url=os.getenv("OLLAMA_BASE_URL"))
+        else:
+            raise ValueError(f"Unsupported LLM provider: {provider}")
+        LLM_CACHE[model_id] = llm
+        return llm
+    except Exception as e:
+        logger.error(f"Failed to initialize LLM '{model_id}'. Falling back to default. Error: {e}")
+        # Fallback to the default planner model in case of an error
+        default_id = default_models['planner']
+        if default_id in LLM_CACHE: return LLM_CACHE[default_id]
+        provider, model_name = default_id.split("::")
         llm = ChatGoogleGenerativeAI(model=model_name, google_api_key=os.getenv("GOOGLE_API_KEY"))
-    elif provider == "ollama":
-        llm = ChatOllama(model=model_name, base_url=os.getenv("OLLAMA_BASE_URL"))
-    else:
-        raise ValueError(f"Unsupported LLM provider: {provider}")
-    LLM_CACHE[llm_id] = llm
-    return llm
+        LLM_CACHE[default_id] = llm
+        return llm
+
 
 # --- Tool Management ---
 AVAILABLE_TOOLS = get_available_tools()
@@ -71,17 +94,33 @@ def format_tools_for_prompt():
 
 # --- Graph Nodes ---
 def prepare_inputs_node(state: GraphState):
+    """Prepares the initial state, including workspace and model configs."""
     logger.info("Executing prepare_inputs_node")
-    user_message = state['messages'][-1].content
+    # The 'messages' list now contains the initial payload object
+    message_payload = state['messages'][0].content
+    user_prompt = message_payload.get("prompt")
+    models_config = message_payload.get("models", {})
+
     task_id = str(uuid.uuid4())
     workspace_path = f"/app/workspace/{task_id}"
     os.makedirs(workspace_path, exist_ok=True)
     logger.info(f"Created sandboxed workspace: {workspace_path}")
-    return {"input": user_message, "history": [], "current_step_index": 0, "step_outputs": {}, "workspace_path": workspace_path}
+    
+    # The 'messages' state should only contain BaseMessages for the history
+    return {
+        "messages": [HumanMessage(content=user_prompt)], # Start with the actual prompt
+        "input": user_prompt, 
+        "models": models_config,
+        "history": [], 
+        "current_step_index": 0, 
+        "step_outputs": {}, 
+        "workspace_path": workspace_path
+    }
 
 def structured_planner_node(state: GraphState):
     logger.info("Executing structured_planner_node")
-    llm = get_llm("PLANNER_LLM_ID", "gemini::gemini-1.5-flash-latest")
+    # Get the planner model based on the user's selection
+    llm = get_llm(state, 'planner')
     prompt = structured_planner_prompt_template.format(input=state["input"], tools=format_tools_for_prompt())
     response = llm.invoke(prompt)
     try:
@@ -109,9 +148,7 @@ def controller_node(state: GraphState):
     logger.info(f"Controller prepared tool call: {tool_call}")
     return {"current_tool_call": tool_call}
 
-# === FINAL ROBUST EXECUTOR NODE ===
 async def executor_node(state: GraphState):
-    """Executes the tool call, handling both dict and string inputs for sandboxed tools."""
     logger.info("Executing executor_node")
     tool_call = state.get("current_tool_call")
     if not tool_call or not tool_call.get("tool_name"):
@@ -126,26 +163,17 @@ async def executor_node(state: GraphState):
 
     invocation_input = tool_input
     
-    # --- Robustness Fix ---
-    # For sandboxed tools, ensure the input is a dictionary so we can inject the workspace path.
     if tool_name in SANDBOXED_TOOLS:
         if not isinstance(invocation_input, dict):
-            # The planner provided a string (e.g., "hello.py") instead of a dict.
-            # We must wrap it in the expected dictionary format.
-            # We look at the tool's args_schema to find the right key.
             logger.warning(f"Sandboxed tool '{tool_name}' received non-dict input. Wrapping it.")
             input_key = next(iter(tool.args.keys()), None)
             if input_key:
                 invocation_input = {input_key: invocation_input}
             else:
-                 # This is a safeguard, should not happen with our current tools.
                 return {"tool_output": f"Error: Cannot determine input key for sandboxed tool '{tool_name}'."}
-
-        # Now that we're sure it's a dict, inject the workspace path.
         invocation_input["workspace_path"] = state["workspace_path"]
 
     try:
-        # Standard LangChain tool invocation: pass a single argument for the input.
         logger.info(f"Invoking tool '{tool_name}' with input: {invocation_input}")
         output = await tool.ainvoke(invocation_input)
         logger.info(f"Tool '{tool_name}' executed successfully.")
@@ -153,7 +181,6 @@ async def executor_node(state: GraphState):
     except Exception as e:
         logger.error(f"Error executing tool '{tool_name}': {e}", exc_info=True)
         return {"tool_output": f"An error occurred while executing the tool: {e}"}
-
 
 def evaluator_node(state: GraphState):
     logger.info("Executing evaluator_node")
@@ -168,16 +195,8 @@ def evaluator_node(state: GraphState):
         if step_id: step_output_update[step_id] = tool_output
     return {"history": [history_record], "step_outputs": step_output_update}
 
-def direct_qa_node(state: GraphState):
-    # This node is not currently used in the main agent loop, but kept for routing
-    return {"answer": "This query was routed to direct QA."}
-
 def increment_step_node(state: GraphState):
     return {"current_step_index": state["current_step_index"] + 1}
-
-# --- Conditional Routers ---
-def intent_classifier(state: GraphState):
-    return "structured_planner_node"
 
 def should_continue(state: GraphState):
     tool_output = state.get("tool_output", "")
@@ -193,7 +212,6 @@ def should_continue(state: GraphState):
 def create_agent_graph():
     workflow = StateGraph(GraphState)
     workflow.add_node("prepare_inputs", prepare_inputs_node)
-    workflow.add_node("direct_qa", direct_qa_node)
     workflow.add_node("structured_planner_node", structured_planner_node)
     workflow.add_node("controller_node", controller_node)
     workflow.add_node("executor_node", executor_node)
@@ -213,3 +231,4 @@ def create_agent_graph():
     return agent
 
 agent_graph = create_agent_graph()
+

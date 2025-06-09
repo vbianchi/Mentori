@@ -175,17 +175,13 @@ export function App() {
     const [isFileLoading, setIsFileLoading] = useState(false);
     const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
     const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
-
-    const [models] = useState([
-        { id: 'gemini::gemini-1.5-flash-latest', name: 'Gemini 1.5 Flash' },
-        { id: 'gemini::gemini-1.5-pro-latest', name: 'Gemini 1.5 Pro' },
-        { id: 'ollama::llama3', name: 'Llama 3 (Ollama)' },
-    ]);
+    
+    const [models, setModels] = useState([]);
     const [selectedModels, setSelectedModels] = useState({
-        router: 'gemini::gemini-1.5-flash-latest',
-        planner: 'gemini::gemini-1.5-flash-latest',
-        controller: 'gemini::gemini-1.5-flash-latest',
-        evaluator: 'gemini::gemini-1.5-flash-latest',
+        router: '',
+        planner: '',
+        controller: '',
+        evaluator: '',
     });
 
     const handleModelChange = (role, modelId) => {
@@ -249,6 +245,30 @@ export function App() {
     }, [workspacePath, fetchWorkspaceFiles]);
 
     useEffect(() => {
+        // Fetch the available models from the backend when the app loads
+        const fetchModels = async () => {
+            try {
+                const response = await fetch('http://localhost:8766/api/models');
+                const availableModels = await response.json();
+                if (availableModels.length > 0) {
+                    setModels(availableModels);
+                    // Set the first model as the default for all roles
+                    const defaultModelId = availableModels[0].id;
+                    setSelectedModels({
+                        router: defaultModelId,
+                        planner: defaultModelId,
+                        controller: defaultModelId,
+                        evaluator: defaultModelId,
+                    });
+                }
+            } catch (error) {
+                console.error("Failed to fetch models:", error);
+            }
+        };
+        fetchModels();
+    }, []);
+
+    useEffect(() => {
         function connect() {
             setConnectionStatus("Connecting...");
             ws.current = new WebSocket("ws://localhost:8765");
@@ -258,14 +278,11 @@ export function App() {
             ws.current.onmessage = (event) => {
                 const newEvent = JSON.parse(event.data);
                 
-                // This is the crucial fix: capture the workspace path from the first relevant event
-                if (newEvent.name === 'prepare_inputs' && newEvent.event.includes('end')) {
-                    const newPath = newEvent.data?.output?.workspace_path;
-                    if (newPath) {
-                        setWorkspacePath(newPath);
-                    }
+                const path = newEvent.data?.output?.workspace_path || newEvent.data?.input?.workspace_path;
+                if (path) {
+                   setWorkspacePath(currentPath => currentPath || path);
                 }
-                
+
                 setPlanSteps(prevSteps => {
                     const data = newEvent.data?.output || {};
                     const inputData = newEvent.data?.input || {};
@@ -306,11 +323,10 @@ export function App() {
     useEffect(() => { scrollToBottom(); }, [planSteps, prompt]);
 
     useEffect(() => {
-        const lastStep = planSteps[planSteps.length - 1];
-        if (lastStep && lastStep.status === 'completed' && workspacePath) {
-             setTimeout(() => fetchWorkspaceFiles(workspacePath), 200);
+        if (workspacePath) {
+             fetchWorkspaceFiles(workspacePath);
         }
-    }, [planSteps, workspacePath, fetchWorkspaceFiles]);
+    }, [workspacePath, fetchWorkspaceFiles]);
 
 
     const handleSendMessage = (e) => {
@@ -448,4 +464,3 @@ export function App() {
         </div>
     );
 }
-

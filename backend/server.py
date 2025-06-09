@@ -1,9 +1,9 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (with File Upload API)
+# ResearchAgent Backend Server (with Models API)
 #
-# This version adds a `do_POST` method to the HTTP handler. This creates a
-# new endpoint at `/upload` that accepts multipart/form-data, allowing the
-# frontend to upload files directly into the agent's secure workspace.
+# This version adds a new endpoint at `/api/models`. This allows the
+# frontend to dynamically fetch the list of available LLMs directly from the
+# environment variables configured on the backend, making the UI adaptive.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -11,7 +11,7 @@ import logging
 import os
 import json
 import threading
-import cgi # Common Gateway Interface for parsing multipart form data
+import cgi
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
 from dotenv import load_dotenv
@@ -20,7 +20,6 @@ from langchain_core.messages import HumanMessage
 
 # --- Local Imports ---
 from .langgraph_agent import agent_graph
-# Import the security helper from the file system tool
 from .tools.file_system import _resolve_path 
 
 # --- Configuration ---
@@ -28,6 +27,18 @@ load_dotenv()
 log_level = os.getenv("LOG_LEVEL", "INFO").upper()
 logging.basicConfig(level=log_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+# --- Helper to format model names ---
+def format_model_name(model_id):
+    """Creates a user-friendly name from a model ID."""
+    try:
+        provider, name = model_id.split("::")
+        # Capitalize provider and replace dashes in name with spaces
+        name_parts = name.replace('-', ' ').split()
+        formatted_name = ' '.join(part.capitalize() for part in name_parts)
+        return f"{provider.capitalize()} {formatted_name}"
+    except:
+        return model_id # Fallback to the raw ID if parsing fails
 
 # --- HTTP File Server for Workspace ---
 
@@ -37,142 +48,110 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         """Routes GET requests to the appropriate handler."""
         parsed_path = urlparse(self.path)
-        if parsed_path.path == '/files':
+        if parsed_path.path == '/api/models':
+            self._handle_get_models()
+        elif parsed_path.path == '/files':
             self._handle_list_files(parsed_path)
         elif parsed_path.path == '/file-content':
             self._handle_get_file_content(parsed_path)
         else:
-            self.send_response(404)
-            self.end_headers()
-            self.wfile.write(b'Not Found')
+            self._send_json_response(404, {'error': 'Not Found'})
 
     def do_POST(self):
-        """Routes POST requests to the appropriate handler."""
         parsed_path = urlparse(self.path)
         if parsed_path.path == '/upload':
             self._handle_file_upload()
         else:
-            self.send_response(404)
-            self.end_headers()
-            self.wfile.write(b'Not Found')
+            self._send_json_response(404, {'error': 'Not Found'})
     
     def do_OPTIONS(self):
-        """Handle CORS preflight requests for development."""
         self.send_response(204)
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type')
         self.end_headers()
 
-
     def _send_json_response(self, status_code, data):
-        """Helper to send a JSON response."""
         self.send_response(status_code)
         self.send_header('Content-type', 'application/json')
-        self.send_header('Access-Control-Allow-Origin', '*') # For development
+        self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
-        self.wfile.write(json.dumps(data).encode())
+        self.wfile.write(json.dumps(data).encode('utf-8'))
+
+    def _handle_get_models(self):
+        """Reads LLM model IDs from environment variables and returns them."""
+        logger.info("Serving list of available models from .env")
+        models = []
+        model_ids = set()
+        # Find all environment variables ending with _LLM_ID
+        for key, value in os.environ.items():
+            if key.endswith("_LLM_ID") and value:
+                if value not in model_ids:
+                    models.append({"id": value, "name": format_model_name(value)})
+                    model_ids.add(value)
+        
+        if not models:
+            default_model = "gemini::gemini-2.0-flash"
+            models.append({"id": default_model, "name": format_model_name(default_model)})
+            logger.warning("No LLM models found in .env, using default.")
+
+        self._send_json_response(200, models)
 
     def _handle_list_files(self, parsed_path):
-        """Handles the /files endpoint to list directory contents."""
         query_components = parse_qs(parsed_path.query)
         subdir = query_components.get("path", [None])[0]
-
         if not subdir:
-            self._send_json_response(400, {"error": "Missing 'path' query parameter."})
-            return
-
+            return self._send_json_response(400, {"error": "Missing 'path' query parameter."})
         base_workspace = "/app/workspace"
-        
         try:
             full_path = os.path.join(base_workspace, subdir)
             if not os.path.abspath(full_path).startswith(os.path.abspath(base_workspace)):
-                 self._send_json_response(403, {"error": "Access denied. Path is outside the workspace."})
-                 return
-
+                 return self._send_json_response(403, {"error": "Access denied."})
             if os.path.isdir(full_path):
-                files = os.listdir(full_path)
-                self._send_json_response(200, {"files": files})
+                self._send_json_response(200, {"files": os.listdir(full_path)})
             else:
                 self._send_json_response(404, {"error": f"Directory '{subdir}' not found."})
         except Exception as e:
             self._send_json_response(500, {"error": str(e)})
             
     def _handle_get_file_content(self, parsed_path):
-        """Handles the /file-content endpoint to read a specific file."""
         query_components = parse_qs(parsed_path.query)
         workspace_id = query_components.get("path", [None])[0]
         filename = query_components.get("filename", [None])[0]
-
         if not workspace_id or not filename:
-            self._send_json_response(400, {"error": "Missing 'path' or 'filename' query parameter."})
-            return
-            
+            return self._send_json_response(400, {"error": "Missing 'path' or 'filename' parameter."})
         try:
             workspace_dir = f"/app/workspace/{workspace_id}"
             full_path = _resolve_path(workspace_dir, filename)
-
             with open(full_path, 'r', encoding='utf-8') as f:
                 content = f.read()
-            
             self.send_response(200)
             self.send_header('Content-type', 'text/plain; charset=utf-8')
-            self.send_header('Access-Control-Allow-Origin', '*') # For development
+            self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
             self.wfile.write(content.encode('utf-8'))
-
-        except PermissionError as e:
-            self._send_json_response(403, {"error": str(e)})
-        except FileNotFoundError:
-             self._send_json_response(404, {"error": f"File '{filename}' not found."})
         except Exception as e:
-            self._send_json_response(500, {"error": str(e)})
+            self._send_json_response(500, {"error": f"Error reading file: {e}"})
     
     def _handle_file_upload(self):
-        """Handles file uploads to a specific workspace."""
         try:
-            # Use cgi to parse the multipart/form-data
-            form = cgi.FieldStorage(
-                fp=self.rfile,
-                headers=self.headers,
-                environ={'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': self.headers['Content-Type']}
-            )
-            
-            if 'workspace_id' not in form:
-                self._send_json_response(400, {'error': 'workspace_id field is missing.'})
-                return
-
-            if 'file' not in form:
-                self._send_json_response(400, {'error': 'file field is missing.'})
-                return
-            
-            workspace_id = form['workspace_id'].value
+            form = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': self.headers['Content-Type']})
+            workspace_id = form.getvalue('workspace_id')
             file_item = form['file']
-
-            # Security: Sanitize the filename to prevent path traversal
+            if not workspace_id or not file_item or not file_item.filename:
+                return self._send_json_response(400, {'error': 'Missing workspace_id or file.'})
             filename = os.path.basename(file_item.filename)
-            if not filename:
-                self._send_json_response(400, {'error': 'Invalid filename.'})
-                return
-
             workspace_dir = f"/app/workspace/{workspace_id}"
-            # Use our existing security helper to build and validate the final path
             full_path = _resolve_path(workspace_dir, filename)
-
-            # Write the file
             with open(full_path, 'wb') as f:
                 f.write(file_item.file.read())
-
-            logger.info(f"Successfully uploaded '{filename}' to workspace '{workspace_id}'")
+            logger.info(f"Uploaded '{filename}' to workspace '{workspace_id}'")
             self._send_json_response(200, {'message': f"File '{filename}' uploaded successfully."})
-
         except Exception as e:
             logger.error(f"File upload failed: {e}", exc_info=True)
             self._send_json_response(500, {'error': f'Server error during file upload: {e}'})
 
-
 def run_http_server():
-    """Starts the HTTP server in a separate thread."""
     host = os.getenv("BACKEND_HOST", "0.0.0.0")
     port = int(os.getenv("FILE_SERVER_PORT", 8766))
     server_address = (host, port)
@@ -182,26 +161,37 @@ def run_http_server():
 
 # --- WebSocket Handler ---
 async def agent_handler(websocket):
-    """Handles incoming WebSocket connections and runs the agent."""
     logger.info(f"Client connected from {websocket.remote_address}")
     try:
         async for message in websocket:
             logger.info("Received new message from client.")
             try:
-                inputs = {"messages": [HumanMessage(content=message)]}
-                logger.info(f"Invoking agent with input: {message[:100]}...")
+                payload = json.loads(message)
+                prompt_text = payload.get("prompt")
+                models_config = payload.get("models", {})
 
-                async for event in agent_graph.astream_events(inputs, version="v1"):
+                if not prompt_text:
+                    logger.warning("Received payload without a prompt.")
+                    continue
+
+                initial_state = {
+                    "messages": [HumanMessage(content=message)], # Pass the original full payload
+                    "models": models_config
+                }
+                
+                logger.info(f"Invoking agent with prompt: {prompt_text[:100]}...")
+                logger.info(f"Using models: {models_config}")
+
+                async for event in agent_graph.astream_events(initial_state, version="v1"):
                     event_type = event["event"]
                     if event_type in ["on_chain_start", "on_chain_end"]:
-                        response = {
-                            "type": "agent_event",
-                            "event": event_type,
-                            "name": event["name"],
-                            "data": event['data']
-                        }
+                        response = { "type": "agent_event", "event": event_type, "name": event["name"], "data": event['data'] }
                         await websocket.send(json.dumps(response, default=str))
 
+            except json.JSONDecodeError:
+                logger.error(f"Failed to decode JSON from message: {message}")
+                error_response = {"type": "error", "data": "Invalid JSON format received."}
+                await websocket.send(json.dumps(error_response))
             except Exception as e:
                 logger.error(f"Error processing message: {e}", exc_info=True)
                 error_response = {"type": "error", "data": str(e)}
@@ -214,30 +204,18 @@ async def agent_handler(websocket):
 
 # --- Main Server Function ---
 async def main():
-    """Starts both the WebSocket and HTTP servers."""
     http_thread = threading.Thread(target=run_http_server, daemon=True)
     http_thread.start()
     
     host = os.getenv("BACKEND_HOST", "0.0.0.0")
     port = int(os.getenv("BACKEND_PORT", 8765))
-    max_size = int(os.getenv("WEBSOCKET_MAX_SIZE_BYTES", 16 * 1024 * 1024))
-    ping_interval = int(os.getenv("WEBSOCKET_PING_INTERVAL", 20))
-    ping_timeout = int(os.getenv("WEBSOCKET_PING_TIMEOUT", 30))
-
+    
     logger.info(f"Starting ResearchAgent WebSocket server at ws://{host}:{port}")
+    async with websockets.serve(agent_handler, host, port, max_size=None):
+        await asyncio.Future()
 
-    async with websockets.serve(
-        agent_handler, host, port, max_size=max_size,
-        ping_interval=ping_interval, ping_timeout=ping_timeout
-    ):
-        await asyncio.Future()  # Run forever
-
-# --- Entry Point ---
 if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
         logger.info("Server shut down gracefully.")
-    except Exception as e:
-        logger.critical(f"Server failed to start: {e}", exc_info=True)
-
