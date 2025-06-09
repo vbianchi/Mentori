@@ -48,7 +48,6 @@ const ClipboardCheckIcon = (props) => (
     </svg>
 );
 
-
 // --- UI Components ---
 const CopyButton = ({ textToCopy }) => {
     const [copied, setCopied] = useState(false);
@@ -70,11 +69,12 @@ const CopyButton = ({ textToCopy }) => {
     };
 
     return (
-        <button onClick={handleCopy} class="absolute top-2 right-2 p-1.5 bg-gray-800/70 rounded-md hover:bg-gray-700">
+        <button onClick={handleCopy} class="p-1.5 rounded-md hover:bg-gray-700" title="Copy Content">
             {copied ? <ClipboardCheckIcon class="h-4 w-4 text-green-400" /> : <ClipboardIcon class="h-4 w-4 text-gray-400" />}
         </button>
     );
 };
+
 
 const ToggleButton = ({ isVisible, onToggle, side }) => {
     if (isVisible) return null;
@@ -117,6 +117,7 @@ const EventCard = ({ event }) => {
     );
 };
 
+
 // --- Main App Component ---
 export function App() {
     const [events, setEvents] = useState([]);
@@ -136,7 +137,9 @@ export function App() {
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
 
-    const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+    };
 
     const fetchWorkspaceFiles = useCallback(async (path) => {
         if (!path) return;
@@ -234,10 +237,9 @@ export function App() {
     return (
         <div class="flex h-screen w-screen p-4 gap-4">
             
-            <ToggleButton isVisible={isLeftSidebarVisible} onToggle={() => setIsLeftSidebarVisible(true)} side="left" />
-            
+            {!isLeftSidebarVisible && <ToggleButton onToggle={() => setIsLeftSidebarVisible(true)} side="left" />}
             {isLeftSidebarVisible && (
-                <div class="h-full w-1/4 min-w-[300px] bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col transition-all duration-300 ease-in-out">
+                <div class="h-full w-1/4 min-w-[300px] bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col">
                     <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-700 flex-shrink-0">
                         <h2 class="text-xl font-bold text-white">Tasks</h2>
                         <button onClick={() => setIsLeftSidebarVisible(false)} class="p-1.5 rounded-md hover:bg-gray-700" title="Hide Sidebar">
@@ -276,10 +278,9 @@ export function App() {
                 </div>
             </div>
 
-            <ToggleButton isVisible={isRightSidebarVisible} onToggle={() => setIsRightSidebarVisible(true)} side="right" />
-            
+            {!isRightSidebarVisible && <ToggleButton onToggle={() => setIsRightSidebarVisible(true)} side="right" />}
             {isRightSidebarVisible && (
-                <div class="h-full w-1/4 min-w-[300px] bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col transition-all duration-300 ease-in-out">
+                <div class="h-full w-1/4 min-w-[300px] bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col">
                     <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-700">
                         <h2 class="text-xl font-bold text-white">Agent Workspace</h2>
                          <button onClick={() => setIsRightSidebarVisible(false)} class="p-1.5 rounded-md hover:bg-gray-700" title="Hide Workspace">
@@ -289,15 +290,15 @@ export function App() {
                     <div class="flex flex-col flex-grow min-h-0 px-6 pb-6 pt-4">
                         {selectedFile ? (
                             <div class="flex flex-col h-full">
-                                <div class="relative flex items-center justify-between gap-2 pb-2 mb-2 border-b border-gray-700 flex-shrink-0">
+                                <div class="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-gray-700 flex-shrink-0">
                                     <div class="flex items-center gap-2 min-w-0">
-                                        <button onClick={() => setSelectedFile(null)} class="p-1 rounded-md hover:bg-gray-700 flex-shrink-0"><ArrowLeftIcon class="h-4 w-4" /></button>
+                                        <button onClick={() => setSelectedFile(null)} class="p-1.5 rounded-md hover:bg-gray-700 flex-shrink-0"><ArrowLeftIcon class="h-4 w-4" /></button>
                                         <span class="font-mono text-sm text-white truncate">{selectedFile}</span>
                                     </div>
                                     <CopyButton textToCopy={fileContent} />
                                 </div>
                                 <div class="flex-grow bg-gray-900/50 rounded-md overflow-hidden">
-                                    <pre class="h-full w-full overflow-auto p-4 text-sm text-gray-300 font-mono whitespace-pre-wrap break-words">
+                                    <pre class="h-full w-full overflow-auto p-4 text-sm text-gray-300 font-mono">
                                         {isFileLoading ? 'Loading...' : <code>{fileContent}</code>}
                                     </pre>
                                 </div>
