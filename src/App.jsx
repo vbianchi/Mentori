@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useState, useEffect, useRef } from 'preact/hooks';
+import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
 
 // --- UI Components ---
 const EventCard = ({ event }) => {
@@ -43,7 +43,7 @@ const WorkspacePanel = ({ files, workspacePath, isLoading, error, onRefresh }) =
         <div class="w-1/3 h-full bg-gray-800/50 rounded-lg border border-gray-700/50 p-6 shadow-2xl flex flex-col">
             <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-4">
                 <h2 class="text-xl font-bold text-white">Agent Workspace</h2>
-                <button onClick={onRefresh} class="p-1.5 rounded-md hover:bg-gray-700" title="Refresh Workspace">
+                <button onClick={onRefresh} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="Refresh Workspace" disabled={!workspacePath}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
                         <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
@@ -85,7 +85,7 @@ export function App() {
     const ws = useRef(null);
     const scrollRef = useRef(null);
 
-    const fetchWorkspaceFiles = async (path) => {
+    const fetchWorkspaceFiles = useCallback(async (path) => {
         if (!path) return;
         setWorkspaceLoading(true);
         setWorkspaceError(null);
@@ -104,57 +104,75 @@ export function App() {
         } finally {
             setWorkspaceLoading(false);
         }
-    };
+    }, []);
 
-    // Effect to manage WebSocket connection - ONLY RUNS ONCE
+    // Effect to manage WebSocket connection - runs only once on mount
     useEffect(() => {
-        if (ws.current) return;
-        setConnectionStatus("Connecting...");
-        ws.current = new WebSocket("ws://localhost:8765");
+        function connect() {
+            setConnectionStatus("Connecting...");
+            ws.current = new WebSocket("ws://localhost:8765");
 
-        ws.current.onopen = () => setConnectionStatus("Connected");
-        ws.current.onclose = () => setConnectionStatus("Disconnected");
-        ws.current.onerror = (err) => {
-            console.error("WebSocket error:", err);
-            setConnectionStatus("Error");
-        };
+            ws.current.onopen = () => setConnectionStatus("Connected");
+            
+            ws.current.onclose = () => {
+                setConnectionStatus("Disconnected");
+                // Attempt to reconnect after a delay
+                setTimeout(() => connect(), 3000);
+            };
+            
+            ws.current.onerror = (err) => {
+                console.error("WebSocket error:", err);
+                // The onclose event will be triggered automatically, which handles reconnection.
+                ws.current.close();
+            };
 
-        ws.current.onmessage = (event) => {
-            let newEvent;
-            try {
-                newEvent = JSON.parse(event.data);
-                setEvents(prev => [...prev, newEvent]);
-            } catch (error) {
-                setEvents(prev => [...prev, { type: "raw", data: event.data }]);
+            ws.current.onmessage = (event) => {
+                let newEvent;
+                try {
+                    newEvent = JSON.parse(event.data);
+                    setEvents(prev => [...prev, newEvent]);
+                } catch (error) {
+                    setEvents(prev => [...prev, { type: "raw", data: event.data }]);
+                }
+            };
+        }
+        connect();
+        // This cleanup function will be called when the component unmounts.
+        return () => {
+            if (ws.current) {
+                // Remove the onclose listener before closing to prevent reconnect attempts on unmount
+                ws.current.onclose = null; 
+                ws.current.close();
             }
         };
+    }, []);
 
-        return () => ws.current.close();
-    }, []); // <-- FIX: Empty dependency array ensures this runs only once
-
-    // Effect to update workspace and scroll event log
+    // Effect to react to new events
     useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
         
-        // Check the last event for workspace updates
         const lastEvent = events[events.length - 1];
-        if (lastEvent?.type === 'agent_event' && lastEvent.data?.output?.workspace_path) {
-            const newPath = lastEvent.data.output.workspace_path;
-            if (newPath !== workspacePath) {
+        if (!lastEvent) return;
+
+        // Find the workspace path from the prepare_inputs node output
+        if (lastEvent.name === 'prepare_inputs' && lastEvent.event === 'on_chain_end') {
+            const newPath = lastEvent.data?.output?.workspace_path;
+            if (newPath && newPath !== workspacePath) {
                 setWorkspacePath(newPath);
                 fetchWorkspaceFiles(newPath);
             }
         }
-        // Also re-fetch after a tool runs successfully
-        if(lastEvent?.type === 'agent_event' && lastEvent.event === 'on_chain_end' && lastEvent.name === 'executor_node'){
-             if(workspacePath && !lastEvent.data.output?.tool_output?.includes("Error")) {
-                fetchWorkspaceFiles(workspacePath);
-             }
+        
+        // Refresh workspace after a successful file operation
+        if (lastEvent.name === 'executor_node' && lastEvent.event === 'on_chain_end') {
+            const toolOutput = lastEvent.data?.output?.tool_output || "";
+            if (!toolOutput.toLowerCase().includes("error") && workspacePath) {
+                setTimeout(() => fetchWorkspaceFiles(workspacePath), 100);
+            }
         }
-
-    }, [events]); // This effect now runs whenever the events list changes
+    }, [events, workspacePath, fetchWorkspaceFiles]);
 
     const handleSendMessage = (e) => {
         e.preventDefault();
@@ -193,14 +211,7 @@ export function App() {
                     <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-500 transition-colors" disabled={connectionStatus !== 'Connected'}>Send</button>
                 </form>
             </div>
-            <WorkspacePanel 
-                files={workspaceFiles} 
-                workspacePath={workspacePath} 
-                isLoading={workspaceLoading}
-                error={workspaceError}
-                onRefresh={() => fetchWorkspaceFiles(workspacePath)}
-            />
+            <WorkspacePanel files={workspaceFiles} workspacePath={workspacePath} isLoading={workspaceLoading} error={workspaceError} onRefresh={() => fetchWorkspaceFiles(workspacePath)} />
         </div>
     );
 }
-
