@@ -1,7 +1,69 @@
 import { h } from 'preact';
 import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
 
+// --- SVG Icons ---
+const ChevronsLeftIcon = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}>
+        <path d="m11 17-5-5 5-5" /><path d="m18 17-5-5 5-5" />
+    </svg>
+);
+
+const ChevronsRightIcon = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}>
+        <path d="m6 17 5-5-5-5" /><path d="m13 17 5-5-5-5" />
+    </svg>
+);
+
+const FileIcon = (props) => (
+     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}>
+        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+        <polyline points="14 2 14 8 20 8" />
+    </svg>
+);
+
+
 // --- UI Components ---
+
+const Sidebar = ({ title, children, isVisible, onToggle, side }) => {
+    // Use Tailwind classes for width transition. `w-0` and `w-1/4` (or similar) will be transitioned.
+    const baseClasses = "h-full bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col transition-all duration-300 ease-in-out overflow-hidden";
+    const widthClass = isVisible ? 'w-1/4 min-w-[300px] p-6' : 'w-0 p-0 border-0';
+    const visibilityClass = isVisible ? 'opacity-100' : 'opacity-0';
+
+    return (
+        <div class={`${baseClasses} ${widthClass}`}>
+             <div class={`flex flex-col h-full transition-opacity duration-200 ${visibilityClass}`}>
+                <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-4 flex-shrink-0">
+                    <h2 class="text-xl font-bold text-white whitespace-nowrap">{title}</h2>
+                    <button onClick={onToggle} class="p-1.5 rounded-md hover:bg-gray-700" title={side === 'left' ? "Hide Sidebar" : "Hide Workspace"}>
+                        {side === 'left' ? <ChevronsLeftIcon class="h-4 w-4" /> : <ChevronsRightIcon class="h-4 w-4" />}
+                    </button>
+                </div>
+                {/* Ensure children can grow and scroll */}
+                <div class="flex-grow min-h-0">
+                    {children}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const ToggleButton = ({ isVisible, onToggle, side }) => {
+    if (isVisible) return null;
+
+    // Use fixed positioning relative to the main container
+    const positionClass = side === 'left' ? 'left-4' : 'right-4';
+
+    return (
+         <div class={`fixed top-4 bottom-4 flex items-center z-20 ${positionClass}`}>
+            <button onClick={onToggle} class="bg-gray-800 hover:bg-gray-700 text-white p-2 h-12 rounded-md border border-gray-600" title={side === 'left' ? "Show Sidebar" : "Show Workspace"}>
+                {side === 'left' ? <ChevronsRightIcon class="h-5 w-5" /> : <ChevronsLeftIcon class="h-5 w-5" />}
+            </button>
+        </div>
+    )
+};
+
+
 const EventCard = ({ event }) => {
     let title = "Unknown Event";
     let color = "bg-gray-700/50";
@@ -38,52 +100,28 @@ const EventCard = ({ event }) => {
     );
 };
 
-const WorkspacePanel = ({ files, workspacePath, isLoading, error, onRefresh }) => {
-    return (
-        <div class="w-1/3 h-full bg-gray-800/50 rounded-lg border border-gray-700/50 p-6 shadow-2xl flex flex-col">
-            <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-4">
-                <h2 class="text-xl font-bold text-white">Agent Workspace</h2>
-                <button onClick={onRefresh} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="Refresh Workspace" disabled={!workspacePath}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
-                        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="text-xs text-gray-500 mb-2 truncate" title={workspacePath || 'No active workspace'}>
-                {workspacePath ? `Path: ...${workspacePath.slice(-36)}` : 'No active workspace'}
-            </div>
-            <div class="flex-1 bg-gray-900/50 rounded-md p-4 text-sm text-gray-400 font-mono overflow-y-auto">
-                {isLoading && <p>Loading files...</p>}
-                {error && <p class="text-red-400">Error: {error}</p>}
-                {!isLoading && !error && files.length === 0 && <p>// Workspace is empty.</p>}
-                {!isLoading && !error && files.length > 0 && (
-                    <ul>
-                        {files.map(file => (
-                            <li key={file} class="flex items-center gap-2 mb-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                                {file}
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </div>
-        </div>
-    );
-};
-
 // --- Main App Component ---
 export function App() {
+    // --- State Management ---
     const [events, setEvents] = useState([]);
     const [inputValue, setInputValue] = useState("");
     const [connectionStatus, setConnectionStatus] = useState("Disconnected");
+    
     const [workspacePath, setWorkspacePath] = useState(null);
     const [workspaceFiles, setWorkspaceFiles] = useState([]);
     const [workspaceLoading, setWorkspaceLoading] = useState(false);
     const [workspaceError, setWorkspaceError] = useState(null);
 
+    const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
+    const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
+
     const ws = useRef(null);
-    const scrollRef = useRef(null);
+    const messagesEndRef = useRef(null); // Ref for auto-scrolling
+
+    // --- Logic and Effects ---
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+    };
 
     const fetchWorkspaceFiles = useCallback(async (path) => {
         if (!path) return;
@@ -106,7 +144,6 @@ export function App() {
         }
     }, []);
 
-    // Effect to manage WebSocket connection - runs only once on mount
     useEffect(() => {
         function connect() {
             setConnectionStatus("Connecting...");
@@ -116,13 +153,11 @@ export function App() {
             
             ws.current.onclose = () => {
                 setConnectionStatus("Disconnected");
-                // Attempt to reconnect after a delay
                 setTimeout(() => connect(), 3000);
             };
             
             ws.current.onerror = (err) => {
                 console.error("WebSocket error:", err);
-                // The onclose event will be triggered automatically, which handles reconnection.
                 ws.current.close();
             };
 
@@ -137,26 +172,20 @@ export function App() {
             };
         }
         connect();
-        // This cleanup function will be called when the component unmounts.
         return () => {
             if (ws.current) {
-                // Remove the onclose listener before closing to prevent reconnect attempts on unmount
                 ws.current.onclose = null; 
                 ws.current.close();
             }
         };
     }, []);
 
-    // Effect to react to new events
     useEffect(() => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-        }
+        scrollToBottom();
         
         const lastEvent = events[events.length - 1];
         if (!lastEvent) return;
 
-        // Find the workspace path from the prepare_inputs node output
         if (lastEvent.name === 'prepare_inputs' && lastEvent.event === 'on_chain_end') {
             const newPath = lastEvent.data?.output?.workspace_path;
             if (newPath && newPath !== workspacePath) {
@@ -165,7 +194,6 @@ export function App() {
             }
         }
         
-        // Refresh workspace after a successful file operation
         if (lastEvent.name === 'executor_node' && lastEvent.event === 'on_chain_end') {
             const toolOutput = lastEvent.data?.output?.tool_output || "";
             if (!toolOutput.toLowerCase().includes("error") && workspacePath) {
@@ -178,7 +206,7 @@ export function App() {
         e.preventDefault();
         const message = inputValue.trim();
         if (message && ws.current?.readyState === WebSocket.OPEN) {
-            setEvents([{ type: 'user_prompt', data: message }]);
+            setEvents(prev => [...prev, { type: 'user_prompt', data: message }]);
             setWorkspacePath(null);
             setWorkspaceFiles([]);
             setWorkspaceError(null);
@@ -186,11 +214,21 @@ export function App() {
             setInputValue("");
         }
     };
-
+    
     return (
-        <div class="flex h-full p-4 gap-4">
-            <div class="flex flex-col flex-1 h-full bg-gray-800/50 rounded-lg border border-gray-700/50 p-6 shadow-2xl">
-                <div class="flex items-center justify-between mb-4 border-b border-gray-700 pb-4">
+        <div class="flex h-screen w-screen p-4 gap-4">
+            
+            <ToggleButton isVisible={isLeftSidebarVisible} onToggle={() => setIsLeftSidebarVisible(true)} side="left" />
+            <Sidebar title="Tasks" isVisible={isLeftSidebarVisible} onToggle={() => setIsLeftSidebarVisible(false)} side="left">
+                 <div class="flex-1 text-gray-400 min-h-0">
+                    <p>// Task list will go here.</p>
+                </div>
+            </Sidebar>
+            
+            {/* Main Content */}
+            <div class="flex-1 flex flex-col h-full bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl min-w-0">
+                {/* Header */}
+                <div class="flex items-center justify-between p-6 border-b border-gray-700 flex-shrink-0">
                      <h1 class="text-2xl font-bold text-white">ResearchAgent</h1>
                      <div class="flex items-center gap-2">
                         <span class="relative flex h-3 w-3">
@@ -200,18 +238,46 @@ export function App() {
                         <span class="text-sm text-gray-400">{connectionStatus}</span>
                      </div>
                 </div>
-                <div ref={scrollRef} class="flex-1 overflow-y-auto pr-2">
+                {/* Event Log (Scrollable) */}
+                <div class="flex-1 overflow-y-auto p-6">
                    {events.map((event, index) => <EventCard key={index} event={event} />)}
+                   <div ref={messagesEndRef} />
                 </div>
-                <form onSubmit={handleSendMessage} class="mt-4 flex gap-3 border-t border-gray-700 pt-4">
-                    <textarea value={inputValue} onInput={e => setInputValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) handleSendMessage(e); }}
-                        class="flex-1 p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
-                        placeholder="Send a message to the agent..." rows="2"
-                    ></textarea>
-                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-500 transition-colors" disabled={connectionStatus !== 'Connected'}>Send</button>
-                </form>
+                {/* Input Form (Fixed) */}
+                <div class="p-6 border-t border-gray-700 flex-shrink-0">
+                    <form onSubmit={handleSendMessage} class="flex gap-3">
+                        <textarea value={inputValue} onInput={e => setInputValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) handleSendMessage(e); }}
+                            class="flex-1 p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
+                            placeholder="Send a message to the agent..." rows="2"
+                        ></textarea>
+                        <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-500 transition-colors" disabled={connectionStatus !== 'Connected'}>Send</button>
+                    </form>
+                </div>
             </div>
-            <WorkspacePanel files={workspaceFiles} workspacePath={workspacePath} isLoading={workspaceLoading} error={workspaceError} onRefresh={() => fetchWorkspaceFiles(workspacePath)} />
+
+            <ToggleButton isVisible={isRightSidebarVisible} onToggle={() => setIsRightSidebarVisible(true)} side="right" />
+            <Sidebar title="Agent Workspace" isVisible={isRightSidebarVisible} onToggle={() => setIsRightSidebarVisible(false)} side="right">
+                <div class="flex flex-col flex-grow min-h-0">
+                    <div class="text-xs text-gray-500 mb-2 truncate flex-shrink-0" title={workspacePath || 'No active workspace'}>
+                        {workspacePath ? `Path: ...${workspacePath.slice(-36)}` : 'No active workspace'}
+                    </div>
+                     <div class="flex-grow bg-gray-900/50 rounded-md p-4 text-sm text-gray-400 font-mono overflow-y-auto">
+                        {workspaceLoading && <p>Loading files...</p>}
+                        {workspaceError && <p class="text-red-400">Error: {workspaceError}</p>}
+                        {!workspaceLoading && !workspaceError && workspaceFiles.length === 0 && <p>// Workspace is empty.</p>}
+                        {!workspaceLoading && !workspaceError && workspaceFiles.length > 0 && (
+                            <ul>
+                                {workspaceFiles.map(file => (
+                                    <li key={file} class="flex items-center gap-2 mb-1 hover:text-white cursor-pointer">
+                                        <FileIcon class="h-4 w-4 text-gray-500" />
+                                        {file}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                </div>
+            </Sidebar>
         </div>
     );
 }
