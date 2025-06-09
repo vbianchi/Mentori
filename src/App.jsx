@@ -223,7 +223,7 @@ export function App() {
         }
         connect();
         return () => { if (ws.current) { ws.current.onclose = null; ws.current.close(); }};
-    }, []); // Empty dependency array means this runs once on mount
+    }, []);
 
     useEffect(() => { scrollToBottom(); }, [planSteps, prompt]);
 
@@ -286,8 +286,8 @@ export function App() {
                         </div>
                     )}
                     {planSteps.length > 0 && (
-                        <div class="mt-4 border-t border-gray-700/50 pt-4">
-                            <h3 class="text-sm font-bold text-gray-400 mb-2 ml-1">Execution Plan</h3>
+                        <div class="mt-4 border-l-2 border-gray-700 pl-4 ml-4">
+                            <h3 class="text-sm font-bold text-gray-400 mb-2">Execution Plan</h3>
                             {planSteps.map((step, index) => <StepCard key={index} step={step} />)}
                         </div>
                     )}
