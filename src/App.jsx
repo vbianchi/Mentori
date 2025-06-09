@@ -27,6 +27,12 @@ const ArrowLeftIcon = (props) => (
     </svg>
 );
 
+const UploadCloudIcon = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}>
+        <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/>
+    </svg>
+);
+
 
 // --- UI Components ---
 
@@ -53,9 +59,7 @@ const Sidebar = ({ title, children, isVisible, onToggle, side }) => {
 
 const ToggleButton = ({ isVisible, onToggle, side }) => {
     if (isVisible) return null;
-
     const positionClass = side === 'left' ? 'left-4' : 'right-4';
-
     return (
          <div class={`fixed top-4 bottom-4 flex items-center z-20 ${positionClass}`}>
             <button onClick={onToggle} class="bg-gray-800 hover:bg-gray-700 text-white p-2 h-12 rounded-md border border-gray-600" title={side === 'left' ? "Show Sidebar" : "Show Workspace"}>
@@ -64,7 +68,6 @@ const ToggleButton = ({ isVisible, onToggle, side }) => {
         </div>
     )
 };
-
 
 const EventCard = ({ event }) => {
     let title = "Unknown Event";
@@ -102,6 +105,7 @@ const EventCard = ({ event }) => {
     );
 };
 
+
 // --- Main App Component ---
 export function App() {
     // --- State Management ---
@@ -125,7 +129,8 @@ export function App() {
     const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
 
     const ws = useRef(null);
-    const messagesEndRef = useRef(null); // Ref for auto-scrolling
+    const messagesEndRef = useRef(null);
+    const fileInputRef = useRef(null);
 
     // --- Logic and Effects ---
     const scrollToBottom = () => {
@@ -139,10 +144,7 @@ export function App() {
         try {
             const justTheId = path.split('/').pop();
             const response = await fetch(`http://localhost:8766/files?path=${justTheId}`);
-            if (!response.ok) {
-                const errData = await response.json();
-                throw new Error(errData.error || `HTTP error! status: ${response.status}`);
-            }
+            if (!response.ok) throw new Error((await response.json()).error || 'Failed to fetch files');
             const data = await response.json();
             setWorkspaceFiles(data.files || []);
         } catch (error) {
@@ -175,20 +177,50 @@ export function App() {
         }
     }, [workspacePath]);
 
+    const handleFileUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file || !workspacePath) return;
+
+        setWorkspaceLoading(true);
+        const workspaceId = workspacePath.split('/').pop();
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('workspace_id', workspaceId);
+
+        try {
+            const response = await fetch('http://localhost:8766/upload', {
+                method: 'POST',
+                body: formData,
+            });
+            if (!response.ok) throw new Error((await response.json()).error || 'File upload failed');
+            await fetchWorkspaceFiles(workspacePath);
+        } catch (error) {
+            console.error('File upload error:', error);
+            setWorkspaceError(`Upload failed: ${error.message}`);
+        } finally {
+            setWorkspaceLoading(false);
+            if(fileInputRef.current) fileInputRef.current.value = "";
+        }
+    };
 
     useEffect(() => {
         function connect() {
             setConnectionStatus("Connecting...");
             ws.current = new WebSocket("ws://localhost:8765");
+
             ws.current.onopen = () => setConnectionStatus("Connected");
+            
             ws.current.onclose = () => {
                 setConnectionStatus("Disconnected");
                 setTimeout(() => connect(), 3000);
             };
+            
             ws.current.onerror = (err) => {
                 console.error("WebSocket error:", err);
                 ws.current.close();
             };
+
             ws.current.onmessage = (event) => {
                 let newEvent;
                 try {
@@ -217,7 +249,7 @@ export function App() {
             const newPath = lastEvent.data?.output?.workspace_path;
             if (newPath && newPath !== workspacePath) {
                 setWorkspacePath(newPath);
-                setSelectedFile(null); // Reset file view on new task
+                setSelectedFile(null);
                 fetchWorkspaceFiles(newPath);
             }
         }
@@ -297,11 +329,22 @@ export function App() {
                         </div>
                     ) : (
                          <div class="flex flex-col flex-grow min-h-0">
-                            <div class="text-xs text-gray-500 mb-2 truncate flex-shrink-0" title={workspacePath || 'No active workspace'}>
-                                {workspacePath ? `Path: ...${workspacePath.slice(-36)}` : 'No active workspace'}
+                            <div class="flex justify-between items-center mb-2 flex-shrink-0">
+                                <div class="text-xs text-gray-500 truncate" title={workspacePath || 'No active workspace'}>
+                                    {workspacePath ? `Path: ...${workspacePath.slice(-36)}` : 'No active workspace'}
+                                </div>
+                                <input type="file" ref={fileInputRef} onChange={handleFileUpload} class="hidden" />
+                                <button 
+                                    onClick={() => fileInputRef.current?.click()} 
+                                    disabled={!workspacePath || workspaceLoading}
+                                    class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed" 
+                                    title="Upload File"
+                                >
+                                    <UploadCloudIcon class="h-4 w-4" />
+                                </button>
                             </div>
                              <div class="flex-grow bg-gray-900/50 rounded-md p-4 text-sm text-gray-400 font-mono overflow-y-auto">
-                                {workspaceLoading && <p>Loading files...</p>}
+                                {workspaceLoading && <p>Uploading/Refreshing...</p>}
                                 {workspaceError && <p class="text-red-400">Error: {workspaceError}</p>}
                                 {!workspaceLoading && !workspaceError && workspaceFiles.length === 0 && <p>// Workspace is empty.</p>}
                                 {!workspaceLoading && !workspaceError && workspaceFiles.length > 0 && (
@@ -322,4 +365,3 @@ export function App() {
         </div>
     );
 }
-

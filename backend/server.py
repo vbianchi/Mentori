@@ -1,9 +1,9 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (with File API)
+# ResearchAgent Backend Server (with File Upload API)
 #
-# This version is updated to include a new API endpoint: /file-content
-# This allows the frontend to securely request and display the content of a
-# specific file from within the agent's sandboxed workspace.
+# This version adds a `do_POST` method to the HTTP handler. This creates a
+# new endpoint at `/upload` that accepts multipart/form-data, allowing the
+# frontend to upload files directly into the agent's secure workspace.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -11,6 +11,7 @@ import logging
 import os
 import json
 import threading
+import cgi # Common Gateway Interface for parsing multipart form data
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
 from dotenv import load_dotenv
@@ -44,12 +45,22 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
             self.wfile.write(b'Not Found')
+
+    def do_POST(self):
+        """Routes POST requests to the appropriate handler."""
+        parsed_path = urlparse(self.path)
+        if parsed_path.path == '/upload':
+            self._handle_file_upload()
+        else:
+            self.send_response(404)
+            self.end_headers()
+            self.wfile.write(b'Not Found')
     
     def do_OPTIONS(self):
         """Handle CORS preflight requests for development."""
         self.send_response(204)
         self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type')
         self.end_headers()
 
@@ -74,10 +85,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         base_workspace = "/app/workspace"
         
         try:
-            # We don't need to resolve the path here since listdir is not recursive,
-            # but we do need to construct the full path for the OS call.
             full_path = os.path.join(base_workspace, subdir)
-            # Security check to prevent path traversal (e.g., /files?path=../)
             if not os.path.abspath(full_path).startswith(os.path.abspath(base_workspace)):
                  self._send_json_response(403, {"error": "Access denied. Path is outside the workspace."})
                  return
@@ -101,7 +109,6 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             return
             
         try:
-            # Use the already existing security helper to resolve and validate the path
             workspace_dir = f"/app/workspace/{workspace_id}"
             full_path = _resolve_path(workspace_dir, filename)
 
@@ -120,6 +127,48 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
              self._send_json_response(404, {"error": f"File '{filename}' not found."})
         except Exception as e:
             self._send_json_response(500, {"error": str(e)})
+    
+    def _handle_file_upload(self):
+        """Handles file uploads to a specific workspace."""
+        try:
+            # Use cgi to parse the multipart/form-data
+            form = cgi.FieldStorage(
+                fp=self.rfile,
+                headers=self.headers,
+                environ={'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': self.headers['Content-Type']}
+            )
+            
+            if 'workspace_id' not in form:
+                self._send_json_response(400, {'error': 'workspace_id field is missing.'})
+                return
+
+            if 'file' not in form:
+                self._send_json_response(400, {'error': 'file field is missing.'})
+                return
+            
+            workspace_id = form['workspace_id'].value
+            file_item = form['file']
+
+            # Security: Sanitize the filename to prevent path traversal
+            filename = os.path.basename(file_item.filename)
+            if not filename:
+                self._send_json_response(400, {'error': 'Invalid filename.'})
+                return
+
+            workspace_dir = f"/app/workspace/{workspace_id}"
+            # Use our existing security helper to build and validate the final path
+            full_path = _resolve_path(workspace_dir, filename)
+
+            # Write the file
+            with open(full_path, 'wb') as f:
+                f.write(file_item.file.read())
+
+            logger.info(f"Successfully uploaded '{filename}' to workspace '{workspace_id}'")
+            self._send_json_response(200, {'message': f"File '{filename}' uploaded successfully."})
+
+        except Exception as e:
+            logger.error(f"File upload failed: {e}", exc_info=True)
+            self._send_json_response(500, {'error': f'Server error during file upload: {e}'})
 
 
 def run_http_server():
@@ -144,7 +193,6 @@ async def agent_handler(websocket):
 
                 async for event in agent_graph.astream_events(inputs, version="v1"):
                     event_type = event["event"]
-                    # We stream all major node events to the frontend
                     if event_type in ["on_chain_start", "on_chain_end"]:
                         response = {
                             "type": "agent_event",
@@ -167,11 +215,9 @@ async def agent_handler(websocket):
 # --- Main Server Function ---
 async def main():
     """Starts both the WebSocket and HTTP servers."""
-    # Start the HTTP server in a daemon thread
     http_thread = threading.Thread(target=run_http_server, daemon=True)
     http_thread.start()
     
-    # Configure and start the WebSocket server
     host = os.getenv("BACKEND_HOST", "0.0.0.0")
     port = int(os.getenv("BACKEND_PORT", 8765))
     max_size = int(os.getenv("WEBSOCKET_MAX_SIZE_BYTES", 16 * 1024 * 1024))
