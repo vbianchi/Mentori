@@ -24,10 +24,10 @@ This is a critical architectural decision for security, reproducibility, and mul
 Our UI aims to be transparent, controllable, and professional.
 
 -   **Target Aesthetic (`manus.ai`):** We are inspired by the clean, information-dense, dark-themed UI of `manus.ai`.
--   **Flexible Layout:** The main panels (chat/log and workspace) will be resizable, allowing the user to focus on what's important.
--   **Multi-Functional Workspace Panel:** The right-side panel will serve as both a **file browser** (listing files in the sandbox) and an **Artifact Viewer** (rendering images, markdown, code with syntax highlighting, CSVs as tables, etc.). It should also be collapsible or movable.
--   **Core UX:** The central view will remain a dynamic, hierarchical log of the agent's real-time thoughts and actions.
--   **UX Enhancements:** Small but critical features like a "Copy to Clipboard" button for code blocks and other text outputs will be integrated throughout the UI.
+-   **Flexible Layout:** The main panels (chat/log and workspace) will be resizable and collapsible, allowing the user to focus on what's important.
+-   **Multi-Functional Workspace Panel:** The right-side panel serves as both a **file browser** and an **Artifact Viewer** (rendering images, markdown, code, etc.).
+-   **Core UX:** The central view is a dynamic, hierarchical log of the agent's real-time thoughts and actions.
+-   **UX Enhancements:** We have implemented core UX features like "Copy to Clipboard" and "File Upload". The next steps are to refine the layout and add advanced controls like a Stop/Pause button and token tracking.
 
 ## Future Capabilities & Tool Development
 
@@ -47,6 +47,6 @@ To become a true research assistant, the agent's capabilities must grow.
 
 ## Advanced Concepts
 
--   **Self-Correction:** The agent should be able to recover from errors. If a Python script fails with `ModuleNotFoundError`, the agent should be able\_ to attempt a `pip install` command within the task's virtual environment and retry the step.
+-   **Self-Correction:** The agent should be able to recover from errors. If a Python script fails with `ModuleNotFoundError`, the agent should be able to attempt a `pip install` command within the task's virtual environment and retry the step.
 -   **Cost & Token Tracking:** The UI should provide transparency into token usage for each step, comparing cloud model costs versus local Ollama models.
--   **Persistence:** All chat histories, agent plans, logs, and generated artifacts must be saved to a database for true reproducibility.
+-   **Persistence:**

@@ -12,7 +12,11 @@ The core philosophy is built on **transparency, adaptive execution, and security
 * **Structured Planning:** The agent's "Chief Architect" (Planner) generates detailed JSON-based plans, including tool selection and expected outcomes for each step.
 * **Secure Sandboxed Workspaces:** Every task is assigned a unique, isolated directory, ensuring security and preventing state-collision between different tasks.
 * **Modular, "Plug-and-Play" Tools:** A flexible tool system allows for easy addition of new capabilities. Current tools include web search and a sandboxed file system (read, write, list).
-* **Modern Frontend:** A responsive user interface built with Vite and Preact for real-time streaming of the agent's thought process.
+* **Interactive Frontend:** A responsive user interface built with Vite and Preact that provides real-time visibility into the agent's operations.
+    * **Live Event Stream:** See the agent's thought process and actions as they happen.
+    * **Interactive Workspace:** Browse, view, and upload files directly within the agent's sandboxed workspace.
+    * **Artifact Viewer:** Click on generated files like code, markdown, or text to view their contents instantly.
+    * **Clipboard Integration:** Easily copy code blocks or other agent outputs with a single click.
 
 ## 3. Project Structure
 
@@ -56,43 +60,23 @@ You will need two separate terminals to run the backend and frontend servers.
 * **Docker:** Ensure Docker and Docker Compose are installed. [Official Docker Installation Guide](https://docs.docker.com/engine/install/)
 * **Node.js & npm:** Ensure Node.js (which includes npm) is installed. [Official Node.js Website](https://nodejs.org/)
 
+## 4. Installation & Setup
+
+You will need two separate terminals to run the backend and frontend servers.
+
+### Prerequisites
+
+* **Docker:** Ensure Docker and Docker Compose are installed.
+* **Node.js & npm:** Ensure Node.js (which includes npm) is installed.
+
 ### Step 1: Backend Server
 
-1.  **Clone the Repository:**
-    If this project were on GitHub, you would clone it. For now, ensure all the files listed in the structure above are in a single project directory.
-
-2.  **Configure Environment Variables:**
-    Your API keys are required for the agent to function.
-    ```bash
-    # Create the .env file from the example template
-    cp .env.example .env
-    ```
-    Open the newly created `.env` file and fill in your `GOOGLE_API_KEY` and `TAVILY_API_KEY`.
-
-3.  **Run the Backend:**
-    Navigate to the project's root directory in your **first terminal** and run:
-    ```bash
-    # This builds the Docker image and starts the backend WebSocket server.
-    docker compose up --build
-    ```
-    Keep this terminal running. The backend will be available at `ws://localhost:8765`.
+1.  **Configure Environment Variables:** Create a `.env` file from the `.env.example` template and add your API keys (`GOOGLE_API_KEY`, `TAVILY_API_KEY`).
+2.  **Run the Backend:** In your first terminal, run `docker compose up --build`.
 
 ### Step 2: Frontend Server
 
-1.  **Install Dependencies:**
-    In your **second terminal**, navigate to the same project root directory and run:
-    ```bash
-    # This reads package.json and installs all frontend dependencies.
-    npm install
-    ```
+1.  **Install Dependencies:** In your second terminal, run `npm install`.
+2.  **Run the Frontend:** Run `npm run dev`.
+3.  **Access the Application:** Open your web browser and navigate to the local URL provided by Vite (usually `http://localhost:5173`).
 
-2.  **Run the Frontend:**
-    Once the installation is complete, run the development server:
-    ```bash
-    # This starts the Vite development server.
-    npm run dev
-    ```
-    You will see a message indicating the server is running.
-
-3.  **Access the Application:**
-    Open your web browser and navigate to the local URL provided by Vite (usually `http://localhost:5173`). You should see the ResearchAgent UI, connected and ready for prompts.
