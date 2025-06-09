@@ -20,7 +20,7 @@ const ChevronDownIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" wid
 const CopyButton = ({ textToCopy, className = '' }) => {
     const [copied, setCopied] = useState(false);
     const handleCopy = (e) => {
-        e.stopPropagation(); // Prevent card from collapsing when copy is clicked
+        e.stopPropagation();
         const textArea = document.createElement("textarea");
         textArea.value = textToCopy;
         textArea.style.position = "fixed";
@@ -67,14 +67,12 @@ const StepCard = ({ step }) => {
         switch (step.status) {
             case 'in-progress': return <LoaderIcon class="h-5 w-5 text-yellow-400" />;
             case 'completed': return <CheckCircleIcon class="h-5 w-5 text-green-400" />;
-            case 'pending':
-            default:
-                return <CircleDotIcon class="h-5 w-5 text-gray-500" />;
+            case 'pending': default: return <CircleDotIcon class="h-5 w-5 text-gray-500" />;
         }
     };
 
     return (
-        <div class="bg-gray-800/50 rounded-lg border border-gray-700/50 mb-4 transition-all">
+        <div class="bg-gray-800/50 rounded-lg border border-gray-700/50 mb-2 last:mb-0 transition-all">
              <div class="flex items-center gap-4 p-4 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
                 {getStatusIcon()}
                 <p class="text-gray-200 font-medium flex-1">{step.instruction}</p>
@@ -83,7 +81,7 @@ const StepCard = ({ step }) => {
             {isExpanded && step.status === 'completed' && step.toolCall && (
                 <div class="p-4 pt-0">
                     <div class="ml-9 pl-4 border-l border-gray-700">
-                        <InfoBlock icon={<ZapIcon class="h-4 w-4 text-gray-400" />} title="Action">
+                         <InfoBlock icon={<ZapIcon class="h-4 w-4 text-gray-400" />} title="Action">
                             <pre class="text-xs text-cyan-300 overflow-x-auto p-2 bg-black/20 rounded-md font-mono relative">
                                 <CopyButton textToCopy={JSON.stringify(step.toolCall, null, 2)} className="absolute top-1 right-1" />
                                 <code>{JSON.stringify(step.toolCall, null, 2)}</code>
@@ -184,17 +182,20 @@ export function App() {
             ws.current.onerror = () => ws.current.close();
             ws.current.onmessage = (event) => {
                 const newEvent = JSON.parse(event.data);
+                
+                const path = newEvent.data?.output?.workspace_path || newEvent.data?.input?.workspace_path;
+                if (path && !workspacePath) {
+                   setWorkspacePath(path);
+                }
 
                 setPlanSteps(prevSteps => {
                     const data = newEvent.data?.output || {};
                     const inputData = newEvent.data?.input || {};
-                    
                     if (newEvent.name === 'structured_planner_node' && newEvent.event.includes('end')) {
                         setIsThinking(false);
                         const plan = data.plan || [];
                         return plan.map(step => ({ ...step, status: 'pending' }));
                     }
-
                     if (newEvent.name === 'controller_node' && newEvent.event.includes('start')) {
                         const stepIndex = inputData.current_step_index;
                         if (prevSteps[stepIndex]) {
@@ -203,7 +204,6 @@ export function App() {
                             return newSteps;
                         }
                     }
-
                     if (newEvent.name === 'executor_node' && newEvent.event.includes('end')) {
                         const stepIndex = inputData.current_step_index;
                          if (prevSteps[stepIndex]) {
@@ -217,23 +217,20 @@ export function App() {
                             return newSteps;
                         }
                     }
-                    
                     return prevSteps;
                 });
             };
         }
         connect();
         return () => { if (ws.current) { ws.current.onclose = null; ws.current.close(); }};
-    }, []);
+    }, []); // Empty dependency array means this runs once on mount
 
-    useEffect(() => {
-        scrollToBottom();
-    }, [planSteps]);
+    useEffect(() => { scrollToBottom(); }, [planSteps, prompt]);
 
     useEffect(() => {
         const lastStep = planSteps[planSteps.length - 1];
         if (lastStep && lastStep.status === 'completed' && workspacePath) {
-             setTimeout(() => fetchWorkspaceFiles(workspacePath), 100);
+             setTimeout(() => fetchWorkspaceFiles(workspacePath), 200);
         }
     }, [planSteps, workspacePath, fetchWorkspaceFiles]);
 
@@ -288,9 +285,12 @@ export function App() {
                             <p class="text-gray-300 font-medium">Agent is thinking...</p>
                         </div>
                     )}
-                    <div class="mt-4">
-                        {planSteps.map((step, index) => <StepCard key={index} step={step} />)}
-                    </div>
+                    {planSteps.length > 0 && (
+                        <div class="mt-4 border-t border-gray-700/50 pt-4">
+                            <h3 class="text-sm font-bold text-gray-400 mb-2 ml-1">Execution Plan</h3>
+                            {planSteps.map((step, index) => <StepCard key={index} step={step} />)}
+                        </div>
+                    )}
                    <div ref={messagesEndRef} />
                 </div>
                 <div class="p-6 border-t border-gray-700 flex-shrink-0">
