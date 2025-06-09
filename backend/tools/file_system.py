@@ -1,9 +1,10 @@
 # -----------------------------------------------------------------------------
 # ResearchAgent Tool: Sandboxed File System
 #
-# FIX: Added a robust model_validator to ReadFileInput. This allows the
-# planner to use 'file', 'filename', or 'file_path' interchangeably when
-# specifying the file to read, making the tool more resilient.
+# FINAL FIX: Added a model_validator to ListFilesInput. This ensures that
+# if the planner provides an empty dictionary for the tool_input (to list
+# the root directory), the 'directory' field is correctly defaulted to '.'.
+# This makes the tool's interface fully consistent and robust.
 # -----------------------------------------------------------------------------
 
 import os
@@ -16,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 # --- Security Helper ---
 def _resolve_path(workspace_path: str, file_path: str) -> str:
+    """Validates and resolves a file path against the secure workspace directory."""
     abs_workspace_path = os.path.abspath(workspace_path)
     abs_file_path = os.path.abspath(os.path.join(abs_workspace_path, file_path))
     if not abs_file_path.startswith(abs_workspace_path):
@@ -24,6 +26,7 @@ def _resolve_path(workspace_path: str, file_path: str) -> str:
 
 # --- Pydantic Schemas for Robust Argument Parsing ---
 class WriteFileInput(BaseModel):
+    """Input schema for the write_file tool."""
     content: str = Field(..., description="The full content to write to the file.")
     file: Optional[str] = None
     file_path: Optional[str] = None
@@ -32,6 +35,7 @@ class WriteFileInput(BaseModel):
 
     @model_validator(mode='before')
     def consolidate_file_path(cls, values):
+        """Merges 'file', 'file_path', or 'filename' into the canonical 'file' field."""
         if isinstance(values, dict):
             path = values.get('file') or values.get('file_path') or values.get('filename')
             if path is None:
@@ -44,33 +48,38 @@ class WriteFileInput(BaseModel):
         return values
 
 class ReadFileInput(BaseModel):
+    """Input schema for the read_file tool."""
     file_path: Optional[str] = None
     model_config = ConfigDict(extra='allow')
     
     @model_validator(mode='before')
     def consolidate_file_path(cls, values):
-        """Consolidates various possible key names for a file path into the canonical 'file_path' field."""
+        """Merges various possible key names for a file path into the canonical 'file_path' field."""
         if isinstance(values, dict):
-            # Prioritize 'file_path', then 'file', then 'filename'
             path = values.get('file_path') or values.get('file') or values.get('filename')
             if path is None:
                 raise ValueError("A file path must be provided using one of 'file', 'file_path', or 'filename'.")
             
-            # Set the canonical 'file_path' field and remove the others to avoid confusion
             values['file_path'] = path
             values.pop('file', None)
             values.pop('filename', None)
         
-        # If the direct input is a string, assign it to 'file_path'
         elif isinstance(values, str):
             return {'file_path': values}
             
         return values
 
-
 class ListFilesInput(BaseModel):
-    directory: str = Field(default=".", description="The directory within the workspace to list files from. Use '.' for the root.")
+    """Input schema for the list_files tool."""
+    directory: str = Field(default=".", description="The directory to list files from. Defaults to the workspace root.")
     model_config = ConfigDict(extra='allow')
+
+    @model_validator(mode='before')
+    def set_default_directory(cls, values):
+        """Ensures a default directory is set if the input is an empty dictionary."""
+        if isinstance(values, dict) and 'directory' not in values:
+            values['directory'] = '.'
+        return values
 
 # --- Tool Functions ---
 def write_file(content: str, file: str, workspace_path: str) -> str:
