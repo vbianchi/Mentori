@@ -1,18 +1,15 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Definitive Executor Fix)
+# ResearchAgent Core Agent
 #
-# This version implements the definitive fix for the tool execution errors.
+# FINAL FIX: The executor_node is now fully robust. It can handle cases
+# where the planner provides a simple string as input for a structured,
+# sandboxed tool (e.g., `tool_input: "hello.py"` for `read_file`).
 #
-# The Root Cause: The previous `executor_node` was calling tools by passing
-# a single dictionary (`tool.ainvoke(tool_input)`). LangChain's StructuredTool
-# validation is very strict about the keys in this dictionary.
-#
-# The Solution: The `executor_node` is now smarter. It gathers all the
-# arguments from the planner and the system (like workspace_path) into a
-# single dictionary. It then uses the `**` operator to "splat" or unpack
-# this dictionary into keyword arguments for the tool call
-# (`tool.ainvoke(**final_args)`). This is a more robust way to call the
-# underlying function and correctly handles the dynamic nature of our system.
+# The logic now checks the input type. If it's not a dictionary, it
+# intelligently wraps the input into the expected dictionary format (e.g.,
+# `{"file_path": "hello.py"}`) before injecting the `workspace_path`.
+# This makes the agent resilient to planner variations and completes the
+# stabilization of the core tool-using loop.
 # -----------------------------------------------------------------------------
 
 import os
@@ -84,7 +81,7 @@ def prepare_inputs_node(state: GraphState):
 
 def structured_planner_node(state: GraphState):
     logger.info("Executing structured_planner_node")
-    llm = get_llm("PLANNER_LLM_ID", "gemini::gemini-2.5-flash-preview-05-20")
+    llm = get_llm("PLANNER_LLM_ID", "gemini::gemini-1.5-flash-latest")
     prompt = structured_planner_prompt_template.format(input=state["input"], tools=format_tools_for_prompt())
     response = llm.invoke(prompt)
     try:
@@ -112,40 +109,45 @@ def controller_node(state: GraphState):
     logger.info(f"Controller prepared tool call: {tool_call}")
     return {"current_tool_call": tool_call}
 
-# === Definitive Executor Node Fix ===
+# === FINAL ROBUST EXECUTOR NODE ===
 async def executor_node(state: GraphState):
-    """Executes the tool call by dynamically building arguments."""
+    """Executes the tool call, handling both dict and string inputs for sandboxed tools."""
     logger.info("Executing executor_node")
     tool_call = state.get("current_tool_call")
     if not tool_call or not tool_call.get("tool_name"):
         return {"tool_output": "Error: No tool call was provided."}
 
     tool_name = tool_call["tool_name"]
-    tool_input_from_planner = tool_call.get("tool_input", {})
+    tool_input = tool_call.get("tool_input", {})
     tool = TOOL_MAP.get(tool_name)
-    
+
     if not tool:
         return {"tool_output": f"Error: Tool '{tool_name}' not found."}
 
-    # Prepare the final arguments for the tool call
-    final_args = {}
-    if isinstance(tool_input_from_planner, dict):
-        final_args.update(tool_input_from_planner)
-    else: # Handle cases where the input is a simple string
-        # This assumes the tool's first argument is the one that accepts the string
-        tool_args_schema = tool.args
-        if tool_args_schema:
-            first_arg_name = next(iter(tool_args_schema))
-            final_args[first_arg_name] = tool_input_from_planner
-        
-    # Inject the workspace_path for sandboxed tools
+    invocation_input = tool_input
+    
+    # --- Robustness Fix ---
+    # For sandboxed tools, ensure the input is a dictionary so we can inject the workspace path.
     if tool_name in SANDBOXED_TOOLS:
-        final_args["workspace_path"] = state["workspace_path"]
-        
+        if not isinstance(invocation_input, dict):
+            # The planner provided a string (e.g., "hello.py") instead of a dict.
+            # We must wrap it in the expected dictionary format.
+            # We look at the tool's args_schema to find the right key.
+            logger.warning(f"Sandboxed tool '{tool_name}' received non-dict input. Wrapping it.")
+            input_key = next(iter(tool.args.keys()), None)
+            if input_key:
+                invocation_input = {input_key: invocation_input}
+            else:
+                 # This is a safeguard, should not happen with our current tools.
+                return {"tool_output": f"Error: Cannot determine input key for sandboxed tool '{tool_name}'."}
+
+        # Now that we're sure it's a dict, inject the workspace path.
+        invocation_input["workspace_path"] = state["workspace_path"]
+
     try:
-        logger.info(f"Executing tool '{tool_name}' with final arguments: {final_args}")
-        # === THE FIX: Unpack the dictionary into keyword arguments ===
-        output = await tool.ainvoke(final_args)
+        # Standard LangChain tool invocation: pass a single argument for the input.
+        logger.info(f"Invoking tool '{tool_name}' with input: {invocation_input}")
+        output = await tool.ainvoke(invocation_input)
         logger.info(f"Tool '{tool_name}' executed successfully.")
         return {"tool_output": str(output)}
     except Exception as e:
@@ -207,7 +209,7 @@ def create_agent_graph():
     workflow.add_conditional_edges("evaluator_node", should_continue, {END: END, "increment_step_node": "increment_step_node"})
     
     agent = workflow.compile()
-    logger.info("Advanced agent graph (Definitive Executor) compiled successfully.")
+    logger.info("Advanced agent graph compiled successfully.")
     return agent
 
 agent_graph = create_agent_graph()

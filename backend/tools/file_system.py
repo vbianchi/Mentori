@@ -1,18 +1,16 @@
 # -----------------------------------------------------------------------------
 # ResearchAgent Tool: Sandboxed File System
 #
-# Definitive Fix: The `WriteFileInput` schema is now highly robust. It
-# explicitly accepts `file`, `file_path`, or `filename` as optional fields
-# and uses a Pydantic model validator to merge them into a single,
-# canonical `file` argument. This makes the tool resilient to variations
-# in the Planner's output.
+# FIX: Added a robust model_validator to ReadFileInput. This allows the
+# planner to use 'file', 'filename', or 'file_path' interchangeably when
+# specifying the file to read, making the tool more resilient.
 # -----------------------------------------------------------------------------
 
 import os
 import logging
 from typing import Optional
 from langchain_core.tools import StructuredTool
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, model_validator, ConfigDict
 
 logger = logging.getLogger(__name__)
 
@@ -26,27 +24,19 @@ def _resolve_path(workspace_path: str, file_path: str) -> str:
 
 # --- Pydantic Schemas for Robust Argument Parsing ---
 class WriteFileInput(BaseModel):
-    content: str = Field(description="The full content to write to the file.")
-    # === THE FIX: Define all possible aliases as optional fields ===
+    content: str = Field(..., description="The full content to write to the file.")
     file: Optional[str] = None
     file_path: Optional[str] = None
     filename: Optional[str] = None
+    model_config = ConfigDict(extra='allow')
 
-    # === THE FIX: Use a model_validator to merge the aliases ===
     @model_validator(mode='before')
     def consolidate_file_path(cls, values):
-        """
-        This validator runs before any other validation. It checks for any of
-        the possible file path keys and merges them into the canonical 'file' field.
-        """
-        # The tool_input from the agent is in `values`
         if isinstance(values, dict):
-            # Prioritize 'file', then 'file_path', then 'filename'
             path = values.get('file') or values.get('file_path') or values.get('filename')
             if path is None:
                 raise ValueError("A file path must be provided using one of 'file', 'file_path', or 'filename'.")
             
-            # Set the canonical 'file' field and remove the others to avoid confusion
             values['file'] = path
             values.pop('file_path', None)
             values.pop('filename', None)
@@ -54,10 +44,33 @@ class WriteFileInput(BaseModel):
         return values
 
 class ReadFileInput(BaseModel):
-    file_path: str = Field(description="The path to the file within the workspace to be read.")
+    file_path: Optional[str] = None
+    model_config = ConfigDict(extra='allow')
+    
+    @model_validator(mode='before')
+    def consolidate_file_path(cls, values):
+        """Consolidates various possible key names for a file path into the canonical 'file_path' field."""
+        if isinstance(values, dict):
+            # Prioritize 'file_path', then 'file', then 'filename'
+            path = values.get('file_path') or values.get('file') or values.get('filename')
+            if path is None:
+                raise ValueError("A file path must be provided using one of 'file', 'file_path', or 'filename'.")
+            
+            # Set the canonical 'file_path' field and remove the others to avoid confusion
+            values['file_path'] = path
+            values.pop('file', None)
+            values.pop('filename', None)
+        
+        # If the direct input is a string, assign it to 'file_path'
+        elif isinstance(values, str):
+            return {'file_path': values}
+            
+        return values
+
 
 class ListFilesInput(BaseModel):
-    directory: str = Field(description="The directory within the workspace to list files from. Use '.' for the root.")
+    directory: str = Field(default=".", description="The directory within the workspace to list files from. Use '.' for the root.")
+    model_config = ConfigDict(extra='allow')
 
 # --- Tool Functions ---
 def write_file(content: str, file: str, workspace_path: str) -> str:
@@ -100,7 +113,7 @@ write_file_tool = StructuredTool.from_function(
 )
 read_file_tool = StructuredTool.from_function(
     func=read_file, name="read_file",
-    description="Reads the entire content of a specified file from the agent's workspace.",
+    description="Reads the entire content of a specified file from the agent's workspace. Can take a string or a JSON object with 'file_path', 'file', or 'filename'.",
     args_schema=ReadFileInput
 )
 list_files_tool = StructuredTool.from_function(
