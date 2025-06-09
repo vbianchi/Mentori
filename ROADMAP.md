@@ -21,7 +21,7 @@ This document outlines the phased development plan for the ResearchAgent project
 
 ### Phase 6: UI Polish & Advanced Controls
 
--   \[ \] **Layout & Styling:** Refine the UI to more closely match the `manus.ai` aesthetic, including implementing resizable and collapsible panels.
+-   \[x\] **Layout & Styling:** Refine the UI to more closely match the `manus.ai` aesthetic, including implementing resizable and collapsible panels.
 -   \[ \] **Token Consumption Tracking:** Implement backend logic and UI elements to display token usage estimates for each step.
 -   \[ \] **Dynamic Model Selection:** Add UI controls (e.g., dropdowns) to allow the user to change the LLM for each agent role (Planner, Controller, etc.) on the fly. **Status: Up Next**
 

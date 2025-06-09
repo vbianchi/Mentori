@@ -14,7 +14,7 @@ const ZapIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" 
 const LoaderIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin" {...props}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> );
 const CircleDotIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1"/></svg> );
 const ChevronDownIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="m6 9 6 6 6-6"/></svg> );
-
+const SlidersIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><line x1="4" x2="4" y1="21" y2="14" /><line x1="4" x2="4" y1="10" y2="3" /><line x1="12" x2="12" y1="21" y2="12" /><line x1="12" x2="12" y1="8" y2="3" /><line x1="20" x2="20" y1="21" y2="16" /><line x1="20" x2="20" y1="12" y2="3" /><line x1="2" x2="6" y1="14" y2="14" /><line x1="10" x2="14" y1="8" y2="8" /><line x1="18" x2="22" y1="16" y2="16" /></svg> );
 
 // --- UI Components ---
 const CopyButton = ({ textToCopy, className = '' }) => {
@@ -62,7 +62,6 @@ const InfoBlock = ({ icon, title, children }) => (
 
 const StepCard = ({ step }) => {
     const [isExpanded, setIsExpanded] = useState(true);
-
     const getStatusIcon = () => {
         switch (step.status) {
             case 'in-progress': return <LoaderIcon class="h-5 w-5 text-yellow-400" />;
@@ -70,7 +69,6 @@ const StepCard = ({ step }) => {
             case 'pending': default: return <CircleDotIcon class="h-5 w-5 text-gray-500" />;
         }
     };
-
     return (
         <div class="bg-gray-800/50 rounded-lg border border-gray-700/50 mb-2 last:mb-0 transition-all">
              <div class="flex items-center gap-4 p-4 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
@@ -100,6 +98,67 @@ const StepCard = ({ step }) => {
     );
 };
 
+const ModelSelector = ({ label, selectedModel, onModelChange, models }) => (
+    <div class="mb-4 last:mb-0">
+        <label class="block text-sm font-medium text-gray-400 mb-1">{label}</label>
+        <div class="relative">
+            <select
+                value={selectedModel}
+                onChange={(e) => onModelChange(e.target.value)}
+                class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-blue-500 focus:outline-none appearance-none"
+            >
+                {models.map(model => <option key={model.id} value={model.id}>{model.name}</option>)}
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                <ChevronDownIcon class="h-4 w-4" />
+            </div>
+        </div>
+    </div>
+);
+
+const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    return (
+        <div class="mt-auto border-t border-gray-700 pt-4">
+             <div class="flex items-center justify-between cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
+                 <div class="flex items-center gap-2">
+                    <SlidersIcon class="h-5 w-5 text-gray-400" />
+                    <h3 class="text-lg font-semibold text-gray-200">Settings</h3>
+                 </div>
+                 <ChevronDownIcon class={`h-5 w-5 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+             </div>
+             {isExpanded && (
+                 <div class="mt-4 pl-7">
+                    <ModelSelector 
+                        label="Router Model"
+                        models={models}
+                        selectedModel={selectedModels.router}
+                        onModelChange={(model) => onModelChange('router', model)}
+                    />
+                     <ModelSelector 
+                        label="Planner Model"
+                        models={models}
+                        selectedModel={selectedModels.planner}
+                        onModelChange={(model) => onModelChange('planner', model)}
+                    />
+                     <ModelSelector 
+                        label="Controller Model"
+                        models={models}
+                        selectedModel={selectedModels.controller}
+                        onModelChange={(model) => onModelChange('controller', model)}
+                    />
+                    <ModelSelector 
+                        label="Evaluator Model"
+                        models={models}
+                        selectedModel={selectedModels.evaluator}
+                        onModelChange={(model) => onModelChange('evaluator', model)}
+                    />
+                 </div>
+             )}
+        </div>
+    )
+}
+
 // --- Main App Component ---
 export function App() {
     const [prompt, setPrompt] = useState("");
@@ -116,6 +175,22 @@ export function App() {
     const [isFileLoading, setIsFileLoading] = useState(false);
     const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
     const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
+
+    const [models] = useState([
+        { id: 'gemini::gemini-1.5-flash-latest', name: 'Gemini 1.5 Flash' },
+        { id: 'gemini::gemini-1.5-pro-latest', name: 'Gemini 1.5 Pro' },
+        { id: 'ollama::llama3', name: 'Llama 3 (Ollama)' },
+    ]);
+    const [selectedModels, setSelectedModels] = useState({
+        router: 'gemini::gemini-1.5-flash-latest',
+        planner: 'gemini::gemini-1.5-flash-latest',
+        controller: 'gemini::gemini-1.5-flash-latest',
+        evaluator: 'gemini::gemini-1.5-flash-latest',
+    });
+
+    const handleModelChange = (role, modelId) => {
+        setSelectedModels(prev => ({ ...prev, [role]: modelId }));
+    };
 
     const ws = useRef(null);
     const messagesEndRef = useRef(null);
@@ -183,11 +258,14 @@ export function App() {
             ws.current.onmessage = (event) => {
                 const newEvent = JSON.parse(event.data);
                 
-                const path = newEvent.data?.output?.workspace_path || newEvent.data?.input?.workspace_path;
-                if (path && !workspacePath) {
-                   setWorkspacePath(path);
+                // This is the crucial fix: capture the workspace path from the first relevant event
+                if (newEvent.name === 'prepare_inputs' && newEvent.event.includes('end')) {
+                    const newPath = newEvent.data?.output?.workspace_path;
+                    if (newPath) {
+                        setWorkspacePath(newPath);
+                    }
                 }
-
+                
                 setPlanSteps(prevSteps => {
                     const data = newEvent.data?.output || {};
                     const inputData = newEvent.data?.input || {};
@@ -243,7 +321,13 @@ export function App() {
             setPlanSteps([]);
             setIsThinking(true);
             setWorkspacePath(null); setWorkspaceFiles([]); setWorkspaceError(null); setSelectedFile(null);
-            ws.current.send(message);
+            
+            const payload = {
+                prompt: message,
+                models: selectedModels,
+            };
+            ws.current.send(JSON.stringify(payload));
+            
             setInputValue("");
         }
     };
@@ -257,7 +341,16 @@ export function App() {
                         <h2 class="text-xl font-bold text-white">Tasks</h2>
                         <button onClick={() => setIsLeftSidebarVisible(false)} class="p-1.5 rounded-md hover:bg-gray-700" title="Hide Sidebar"><ChevronsLeftIcon class="h-4 w-4" /></button>
                     </div>
-                    <div class="flex-1 text-gray-400 p-6 pt-4 min-h-0"><p>// Task list will go here.</p></div>
+                    <div class="flex flex-col flex-grow p-6 pt-4 min-h-0">
+                        <div class="flex-grow overflow-y-auto">
+                           <p class="text-gray-400">// Task list will go here.</p>
+                        </div>
+                        <SettingsPanel 
+                            models={models}
+                            selectedModels={selectedModels}
+                            onModelChange={handleModelChange}
+                        />
+                    </div>
                 </div>
             )}
             
@@ -286,8 +379,8 @@ export function App() {
                         </div>
                     )}
                     {planSteps.length > 0 && (
-                        <div class="mt-4 border-l-2 border-gray-700 pl-4 ml-4">
-                            <h3 class="text-sm font-bold text-gray-400 mb-2">Execution Plan</h3>
+                        <div class="mt-4 border-l-2 border-gray-700/50 pl-6 ml-4">
+                            <h3 class="text-sm font-bold text-gray-400 mb-2 -ml-2">Execution Plan</h3>
                             {planSteps.map((step, index) => <StepCard key={index} step={step} />)}
                         </div>
                     )}
@@ -355,3 +448,4 @@ export function App() {
         </div>
     );
 }
+
