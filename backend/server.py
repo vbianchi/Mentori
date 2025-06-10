@@ -1,10 +1,14 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (with Models API)
+# ResearchAgent Backend Server (v2.1 - .env Aware)
 #
-# CORRECTION: The `_handle_file_upload` function has been updated to fix a
-# `TypeError` from the deprecated `cgi` module. The check for the uploaded
-# file is now more explicit (`file_item.value`) instead of relying on a
-# direct boolean evaluation (`not file_item`), which is not supported.
+# REFACTOR: This version is completely rewritten to be aware of the detailed
+# .env schema provided by the user.
+# - `_handle_get_models` now parses the comma-separated model lists and the
+#   specific default ID for each agent role (e.g., PLANNER_LLM_ID).
+# - It sends a structured response to the frontend containing both the list of
+#   all available models and the specific defaults configured in .env, making
+#   the user's configuration the single source of truth for the UI's initial
+#   state.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -34,12 +38,11 @@ def format_model_name(model_id):
     """Creates a user-friendly name from a model ID."""
     try:
         provider, name = model_id.split("::")
-        # Capitalize provider and replace dashes in name with spaces
         name_parts = name.replace('-', ' ').split()
         formatted_name = ' '.join(part.capitalize() for part in name_parts)
         return f"{provider.capitalize()} {formatted_name}"
     except:
-        return model_id # Fallback to the raw ID if parsing fails
+        return model_id
 
 # --- HTTP File Server for Workspace ---
 
@@ -80,22 +83,53 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(data).encode('utf-8'))
 
     def _handle_get_models(self):
-        """Reads LLM model IDs from environment variables and returns them."""
-        logger.info("Serving list of available models.")
-        models = []
+        """
+        Parses the .env file to build a structured response with all available
+        models and the user-configured default model for each agent role.
+        """
+        logger.info("Parsing .env to serve available and default models.")
+        
+        available_models = []
         model_ids = set()
-        
-        free_tier_model = "gemini::gemini-1.5-flash-latest"
-        models.append({"id": free_tier_model, "name": format_model_name(free_tier_model)})
-        model_ids.add(free_tier_model)
-        
-        for key, value in os.environ.items():
-            if key.endswith("_LLM_ID") and value:
-                if value not in model_ids:
-                    models.append({"id": value, "name": format_model_name(value)})
-                    model_ids.add(value)
 
-        self._send_json_response(200, models)
+        # Helper to parse comma-separated model lists
+        def parse_and_add_models(env_var, provider_prefix):
+            models_str = os.getenv(env_var)
+            if models_str:
+                for model_name in models_str.split(','):
+                    model_name = model_name.strip()
+                    if model_name:
+                        full_id = f"{provider_prefix}::{model_name}"
+                        if full_id not in model_ids:
+                            available_models.append({"id": full_id, "name": format_model_name(full_id)})
+                            model_ids.add(full_id)
+
+        # Parse models from both providers
+        parse_and_add_models("GEMINI_AVAILABLE_MODELS", "gemini")
+        parse_and_add_models("OLLAMA_AVAILABLE_MODELS", "ollama")
+
+        # Define a safe fallback if absolutely no models are configured
+        safe_fallback_model = "gemini::gemini-1.5-flash-latest"
+        if not available_models:
+            available_models.append({"id": safe_fallback_model, "name": format_model_name(safe_fallback_model)})
+            logger.warning("No models found in GEMINI_AVAILABLE_MODELS or OLLAMA_AVAILABLE_MODELS. Using a single safe fallback.")
+
+        # Read the global default LLM ID, which serves as a fallback for role-specific defaults
+        global_default_llm = os.getenv("DEFAULT_LLM_ID", safe_fallback_model)
+
+        # Read role-specific defaults, using the global default if a specific role is not set
+        default_models = {
+            "planner": os.getenv("PLANNER_LLM_ID", global_default_llm),
+            "controller": os.getenv("CONTROLLER_LLM_ID", global_default_llm),
+            "evaluator": os.getenv("EVALUATOR_LLM_ID", global_default_llm),
+        }
+
+        response_data = {
+            "available_models": available_models,
+            "default_models": default_models
+        }
+
+        self._send_json_response(200, response_data)
 
     def _handle_list_files(self, parsed_path):
         query_components = parse_qs(parsed_path.query)
@@ -137,7 +171,6 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             workspace_id = form.getvalue('workspace_id')
             file_item = form['file']
             
-            # --- FIX: Explicitly check the file_item's value and filename ---
             if not workspace_id or not hasattr(file_item, 'filename') or not file_item.filename:
                 return self._send_json_response(400, {'error': 'Missing workspace_id or file.'})
 

@@ -17,7 +17,6 @@ const ChevronDownIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" wid
 const SlidersIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><line x1="4" x2="4" y1="21" y2="14" /><line x1="4" x2="4" y1="10" y2="3" /><line x1="12" x2="12" y1="21" y2="12" /><line x1="12" x2="12" y1="8" y2="3" /><line x1="20" x2="20" y1="21" y2="16" /><line x1="20" x2="20" y1="12" y2="3" /><line x1="2" x2="6" y1="14" y2="14" /><line x1="10" x2="14" y1="8" y2="8" /><line x1="18" x2="22" y1="16" y2="16" /></svg> );
 const BrainCircuitIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M12 5a3 3 0 1 0-5.993.142" /><path d="M12 5a3 3 0 1 1 5.993.142" /><path d="M12 12a3 3 0 1 0-5.993.142" /><path d="M12 12a3 3 0 1 1 5.993.142" /><path d="M12 19a3 3 0 1 0-5.993.142" /><path d="M12 19a3 3 0 1 1 5.993.142" /><path d="M20 12h-2" /><path d="M6 12H4" /><path d="M12 15v-3" /><path d="M12 8V6" /><path d="M15 12a3 3 0 1 0-6 0" /><path d="M12 9a3 3 0 1 1-6 0" /></svg> );
 
-
 // --- UI Components ---
 const CopyButton = ({ textToCopy, className = '' }) => {
     const [copied, setCopied] = useState(false);
@@ -108,6 +107,7 @@ const ModelSelector = ({ label, selectedModel, onModelChange, models }) => (
                 value={selectedModel}
                 onChange={(e) => onModelChange(e.target.value)}
                 class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-blue-500 focus:outline-none appearance-none"
+                disabled={!selectedModel} // Disable if no model is selected yet
             >
                 {models.map(model => <option key={model.id} value={model.id}>{model.name}</option>)}
             </select>
@@ -125,7 +125,7 @@ const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
              <div class="flex items-center justify-between cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
                  <div class="flex items-center gap-2">
                     <SlidersIcon class="h-5 w-5 text-gray-400" />
-                    <h3 class="text-lg font-semibold text-gray-200">Settings</h3>
+                    <h3 class="text-lg font-semibold text-gray-200">Agent Models</h3>
                  </div>
                  <ChevronDownIcon class={`h-5 w-5 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
              </div>
@@ -137,21 +137,21 @@ const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
                         selectedModel={selectedModels.planner}
                         onModelChange={(model) => onModelChange('planner', model)}
                     />
-                    <p class="text-xs text-gray-500 -mt-2 mb-4">The model responsible for creating the initial plan.</p>
+                     <p class="text-xs text-gray-500 -mt-2 mb-4">Creates the high-level plan.</p>
                      <ModelSelector 
                         label="Controller Model"
                         models={models}
                         selectedModel={selectedModels.controller}
                         onModelChange={(model) => onModelChange('controller', model)}
                     />
-                     <p class="text-xs text-gray-500 -mt-2 mb-4">The model for future advanced logic, like self-correction.</p>
+                     <p class="text-xs text-gray-500 -mt-2 mb-4">Handles advanced logic (e.g., future self-correction).</p>
                     <ModelSelector 
                         label="Evaluator Model"
                         models={models}
                         selectedModel={selectedModels.evaluator}
                         onModelChange={(model) => onModelChange('evaluator', model)}
                     />
-                    <p class="text-xs text-gray-500 -mt-2 mb-4">The model for future evaluation steps.</p>
+                    <p class="text-xs text-gray-500 -mt-2 mb-4">Validates step outcomes (future feature).</p>
                  </div>
              )}
         </div>
@@ -174,7 +174,7 @@ export function App() {
     const [isFileLoading, setIsFileLoading] = useState(false);
     const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
     const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
-    const [runModels, setRunModels] = useState(null); // To store models for the current run
+    const [runModels, setRunModels] = useState(null);
     
     const [models, setModels] = useState([]);
     const [selectedModels, setSelectedModels] = useState({
@@ -248,22 +248,21 @@ export function App() {
         const fetchModels = async () => {
             try {
                 const response = await fetch('http://localhost:8766/api/models');
-                const availableModels = await response.json();
-                if (availableModels.length > 0) {
-                    setModels(availableModels);
-                    const freeTierModel = "gemini::gemini-1.5-flash-latest";
-                    const defaultModelId = availableModels.some(m => m.id === freeTierModel)
-                        ? freeTierModel
-                        : availableModels[0].id;
-
-                    setSelectedModels({
-                        planner: defaultModelId,
-                        controller: defaultModelId,
-                        evaluator: defaultModelId,
-                    });
+                if (!response.ok) throw new Error('Failed to fetch model configuration.');
+                
+                // --- FIX: Destructure the new, smarter API response ---
+                const config = await response.json();
+                
+                if (config.available_models && config.available_models.length > 0) {
+                    setModels(config.available_models);
+                    // Set the initial selections directly from the defaults provided by the backend
+                    setSelectedModels(config.default_models);
+                } else {
+                     console.error("No available models returned from the backend.");
                 }
             } catch (error) {
                 console.error("Failed to fetch models:", error);
+                // Handle UI feedback for the error here if needed
             }
         };
         fetchModels();
@@ -350,7 +349,7 @@ export function App() {
             setWorkspaceFiles([]); 
             setWorkspaceError(null); 
             setSelectedFile(null);
-            setRunModels(selectedModels); // --- FIX: Capture models for this specific run ---
+            setRunModels(selectedModels);
             
             const payload = {
                 prompt: message,
@@ -415,7 +414,6 @@ export function App() {
                     )}
                     {planSteps.length > 0 && (
                         <div class="mt-4 border-l-2 border-gray-700/50 pl-6 ml-4">
-                            {/* --- FIX: Display the planner model used for this run --- */}
                             <div class="mb-4 -ml-10">
                                 <InfoBlock icon={<BrainCircuitIcon class="h-5 w-5 text-purple-400" />} title="Planner Model">
                                     <span class="text-sm font-medium text-purple-300 font-mono">
