@@ -15,6 +15,8 @@ const LoaderIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="2
 const CircleDotIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1"/></svg> );
 const ChevronDownIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="m6 9 6 6 6-6"/></svg> );
 const SlidersIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><line x1="4" x2="4" y1="21" y2="14" /><line x1="4" x2="4" y1="10" y2="3" /><line x1="12" x2="12" y1="21" y2="12" /><line x1="12" x2="12" y1="8" y2="3" /><line x1="20" x2="20" y1="21" y2="16" /><line x1="20" x2="20" y1="12" y2="3" /><line x1="2" x2="6" y1="14" y2="14" /><line x1="10" x2="14" y1="8" y2="8" /><line x1="18" x2="22" y1="16" y2="16" /></svg> );
+const BrainCircuitIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M12 5a3 3 0 1 0-5.993.142" /><path d="M12 5a3 3 0 1 1 5.993.142" /><path d="M12 12a3 3 0 1 0-5.993.142" /><path d="M12 12a3 3 0 1 1 5.993.142" /><path d="M12 19a3 3 0 1 0-5.993.142" /><path d="M12 19a3 3 0 1 1 5.993.142" /><path d="M20 12h-2" /><path d="M6 12H4" /><path d="M12 15v-3" /><path d="M12 8V6" /><path d="M15 12a3 3 0 1 0-6 0" /><path d="M12 9a3 3 0 1 1-6 0" /></svg> );
+
 
 // --- UI Components ---
 const CopyButton = ({ textToCopy, className = '' }) => {
@@ -130,29 +132,26 @@ const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
              {isExpanded && (
                  <div class="mt-4 pl-7">
                     <ModelSelector 
-                        label="Router Model"
-                        models={models}
-                        selectedModel={selectedModels.router}
-                        onModelChange={(model) => onModelChange('router', model)}
-                    />
-                     <ModelSelector 
                         label="Planner Model"
                         models={models}
                         selectedModel={selectedModels.planner}
                         onModelChange={(model) => onModelChange('planner', model)}
                     />
+                    <p class="text-xs text-gray-500 -mt-2 mb-4">The model responsible for creating the initial plan.</p>
                      <ModelSelector 
                         label="Controller Model"
                         models={models}
                         selectedModel={selectedModels.controller}
                         onModelChange={(model) => onModelChange('controller', model)}
                     />
+                     <p class="text-xs text-gray-500 -mt-2 mb-4">The model for future advanced logic, like self-correction.</p>
                     <ModelSelector 
                         label="Evaluator Model"
                         models={models}
                         selectedModel={selectedModels.evaluator}
                         onModelChange={(model) => onModelChange('evaluator', model)}
                     />
+                    <p class="text-xs text-gray-500 -mt-2 mb-4">The model for future evaluation steps.</p>
                  </div>
              )}
         </div>
@@ -175,10 +174,10 @@ export function App() {
     const [isFileLoading, setIsFileLoading] = useState(false);
     const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
     const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
+    const [runModels, setRunModels] = useState(null); // To store models for the current run
     
     const [models, setModels] = useState([]);
     const [selectedModels, setSelectedModels] = useState({
-        router: '',
         planner: '',
         controller: '',
         evaluator: '',
@@ -201,7 +200,8 @@ export function App() {
             const workspaceId = path.split('/').pop();
             const response = await fetch(`http://localhost:8766/files?path=${workspaceId}`);
             if (!response.ok) throw new Error((await response.json()).error || 'Failed to fetch files');
-            setWorkspaceFiles((await response.json()).files || []);
+            const data = await response.json();
+            setWorkspaceFiles(data.files || []);
         } catch (error) {
             console.error("Failed to fetch workspace files:", error); setWorkspaceError(error.message);
         } finally {
@@ -251,14 +251,12 @@ export function App() {
                 const availableModels = await response.json();
                 if (availableModels.length > 0) {
                     setModels(availableModels);
-                    // --- FIX: Intelligently select the free tier model as the default ---
                     const freeTierModel = "gemini::gemini-1.5-flash-latest";
                     const defaultModelId = availableModels.some(m => m.id === freeTierModel)
                         ? freeTierModel
                         : availableModels[0].id;
 
                     setSelectedModels({
-                        router: defaultModelId,
                         planner: defaultModelId,
                         controller: defaultModelId,
                         evaluator: defaultModelId,
@@ -318,9 +316,7 @@ export function App() {
                     return prevSteps;
                 });
                 
-                // --- FIX: Refresh workspace files after a tool executes ---
                 if (newEvent.name === 'executor_node' && newEvent.event.includes('end')) {
-                    // Use a functional update to ensure we get the latest state
                     setWorkspacePath(currentPath => {
                         if (currentPath) {
                             fetchWorkspaceFiles(currentPath);
@@ -332,7 +328,7 @@ export function App() {
         }
         connect();
         return () => { if (ws.current) { ws.current.onclose = null; ws.current.close(); }};
-    }, [fetchWorkspaceFiles]); // Add fetchWorkspaceFiles to dependency array
+    }, [fetchWorkspaceFiles]);
 
     useEffect(() => { scrollToBottom(); }, [planSteps, prompt]);
 
@@ -350,7 +346,11 @@ export function App() {
             setPrompt(message);
             setPlanSteps([]);
             setIsThinking(true);
-            setWorkspacePath(null); setWorkspaceFiles([]); setWorkspaceError(null); setSelectedFile(null);
+            setWorkspacePath(null); 
+            setWorkspaceFiles([]); 
+            setWorkspaceError(null); 
+            setSelectedFile(null);
+            setRunModels(selectedModels); // --- FIX: Capture models for this specific run ---
             
             const payload = {
                 prompt: message,
@@ -361,6 +361,11 @@ export function App() {
             setInputValue("");
         }
     };
+
+    const getModelNameById = (id) => {
+        const model = models.find(m => m.id === id);
+        return model ? model.name : id;
+    }
     
     return (
         <div class="flex h-screen w-screen p-4 gap-4 bg-gray-900 text-gray-200" style={{fontFamily: "'Inter', sans-serif"}}>
@@ -410,6 +415,14 @@ export function App() {
                     )}
                     {planSteps.length > 0 && (
                         <div class="mt-4 border-l-2 border-gray-700/50 pl-6 ml-4">
+                            {/* --- FIX: Display the planner model used for this run --- */}
+                            <div class="mb-4 -ml-10">
+                                <InfoBlock icon={<BrainCircuitIcon class="h-5 w-5 text-purple-400" />} title="Planner Model">
+                                    <span class="text-sm font-medium text-purple-300 font-mono">
+                                        {getModelNameById(runModels?.planner)}
+                                    </span>
+                                </InfoBlock>
+                            </div>
                             <h3 class="text-sm font-bold text-gray-400 mb-2 -ml-2">Execution Plan</h3>
                             {planSteps.map((step, index) => <StepCard key={index} step={step} />)}
                         </div>
