@@ -1,54 +1,52 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Tool: Tavily Web Search
+# ResearchAgent Tool: Tavily Web Search (Robust)
 #
-# This tool allows the agent to search the web using the Tavily API.
-# It follows the plug-and-play contract by defining a `tool` variable
-# that the __init__.py loader can discover.
-#
-# Requires:
-# - TAVILY_API_KEY environment variable to be set.
+# CORRECTION: The tool is now explicitly configured with a Pydantic args_schema
+# to enforce the input argument name `query`. This prevents the planner from
+# hallucinating incorrect argument names like `search_query`. The tool's name
+# has also been simplified to `web_search` for clearer prompting.
 # -----------------------------------------------------------------------------
 
 import logging
 import os
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_core.tools import BaseTool
+from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
 # This is the variable that the `__init__.py` loader will look for.
 tool: BaseTool = None
 
-# --- Tool Initialization ---
-# We wrap the initialization in a try/except block to handle cases
-# where the required API key is not set. This prevents the entire
-# application from crashing if a single tool is misconfigured.
+# --- Pydantic Schema for a Consistent Interface ---
+class WebSearchInput(BaseModel):
+    """Input for the web search tool."""
+    query: str = Field(description="The search query to send to the search engine.")
 
+# --- Tool Initialization ---
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 
 if not TAVILY_API_KEY:
-    logger.warning("TAVILY_API_KEY not set. The Tavily search tool will be disabled.")
+    logger.warning("TAVILY_API_KEY not set. The web_search tool will be disabled.")
 else:
     try:
-        # Instantiate the Tavily search tool provided by LangChain.
-        # max_results can be tuned to control how much information is returned.
-        search_tool = TavilySearchResults(max_results=5)
+        # Instantiate the Tavily search tool
+        search_tool = TavilySearchResults(
+            max_results=5,
+            args_schema=WebSearchInput # Enforce the schema
+        )
         
-        # The default name and description are already quite good, but they can be
-        # customized here if needed for better prompting. For example:
-        # search_tool.name = "web_search"
-        # search_tool.description = "A tool to search the internet for up-to-date information."
+        # Override the default name and description for better prompting
+        search_tool.name = "web_search"
+        search_tool.description = "A tool to search the internet for up-to-date information, news, and articles. Use it to find information on any topic."
         
         # Assign the initialized tool to the 'tool' variable.
         tool = search_tool
         
     except Exception as e:
         logger.error(f"Failed to initialize TavilySearchResults tool: {e}", exc_info=True)
-        # Ensure 'tool' is None if initialization fails.
         tool = None
 
-# --- Self-Correction/Example for Loader ---
-# To ensure this file is a valid tool module, the 'tool' variable must exist.
-# The code above handles this, but as a safeguard:
+# Safeguard to ensure the 'tool' variable exists for the loader.
 if 'tool' not in globals():
     tool = None
