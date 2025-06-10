@@ -1,9 +1,9 @@
 # -----------------------------------------------------------------------------
 # Docker Compose for the ResearchAgent
 #
-# This file defines and configures the services for our application,
-# making it easy to run the entire backend with a single command:
-# `docker compose up --build`
+# CORRECTION: Removed `tty: true`. This setting can cause non-interactive
+# services like our Python server to exit prematurely upon starting. Removing
+# it ensures the container runs as a proper background service.
 # -----------------------------------------------------------------------------
 
 services:
@@ -29,5 +29,5 @@ services:
 
     # Keeps stdin open, which is useful for interactive debugging if needed.
     stdin_open: true
-    # Allocates a pseudo-TTY.
-    tty: true
+    # tty: true # <-- REMOVED
+

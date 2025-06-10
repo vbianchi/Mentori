@@ -67,7 +67,7 @@ You will need two separate terminals to run the backend and frontend servers.
 ### Prerequisites
 
 * **Docker:** Ensure Docker and Docker Compose are installed.
-* **Node.js & npm:** Ensure Node.js (which includes npm) is installed.
+* **Node.js & npm:** Ensure Node.js (which includes npm) is installed. (https://github.com/nodesource/distributions)
 
 ### Step 1: Backend Server
 

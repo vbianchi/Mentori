@@ -1,12 +1,12 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Dynamic Model Selection)
+# ResearchAgent Core Agent (Executor Fix)
 #
-# This version makes the model selection functional.
-# - The GraphState now includes a `models` dictionary.
-# - The `prepare_inputs_node` parses the initial message payload to get the
-#   user's prompt and their selected models, saving them to the state.
-# - The `get_llm` function is upgraded to accept the agent state and a role
-#   (e.g., 'planner'), dynamically choosing the model ID from the state.
+# CORRECTION: The `executor_node` has been completely rewritten to be more
+# robust. For sandboxed tools, it now bypasses `tool.ainvoke()` and calls the
+# underlying tool function (`.func` or `.coroutine`) directly. This allows it
+# to reliably pass the `workspace_path` as a keyword argument without it being
+# filtered by the tool's public `args_schema`, definitively fixing the
+# persistent `TypeError`.
 # -----------------------------------------------------------------------------
 
 import os
@@ -14,6 +14,7 @@ import logging
 import json
 import re
 import uuid
+import asyncio
 from typing import TypedDict, Annotated, Sequence, List, Optional, Dict
 
 from langchain_core.messages import BaseMessage, HumanMessage
@@ -42,14 +43,13 @@ class GraphState(TypedDict):
     workspace_path: str
     step_outputs: Annotated[Dict[int, str], lambda x, y: {**x, **y}]
     answer: str
-    models: dict # NEW: To hold the selected models from the UI
+    models: dict
 
 # --- LLM Provider Helper ---
 LLM_CACHE = {}
 def get_llm(state: GraphState, role: str):
     """Dynamically gets an LLM based on the role and the user's selection in the state."""
     
-    # Define default models for each role
     default_models = {
         'router': "gemini::gemini-1.5-flash-latest",
         'planner': "gemini::gemini-1.5-flash-latest",
@@ -76,14 +76,12 @@ def get_llm(state: GraphState, role: str):
         return llm
     except Exception as e:
         logger.error(f"Failed to initialize LLM '{model_id}'. Falling back to default. Error: {e}")
-        # Fallback to the default planner model in case of an error
         default_id = default_models['planner']
         if default_id in LLM_CACHE: return LLM_CACHE[default_id]
         provider, model_name = default_id.split("::")
         llm = ChatGoogleGenerativeAI(model=model_name, google_api_key=os.getenv("GOOGLE_API_KEY"))
         LLM_CACHE[default_id] = llm
         return llm
-
 
 # --- Tool Management ---
 AVAILABLE_TOOLS = get_available_tools()
@@ -96,8 +94,18 @@ def format_tools_for_prompt():
 def prepare_inputs_node(state: GraphState):
     """Prepares the initial state, including workspace and model configs."""
     logger.info("Executing prepare_inputs_node")
-    # The 'messages' list now contains the initial payload object
-    message_payload = state['messages'][0].content
+    
+    try:
+        payload_str = state['messages'][0].content
+        message_payload = json.loads(payload_str)
+    except (json.JSONDecodeError, IndexError) as e:
+        logger.error(f"Failed to parse initial payload from message content: '{state['messages'][0].content if state['messages'] else 'No messages'}'. Error: {e}")
+        return {
+            "messages": [HumanMessage(content="Error: Malformed initial payload.")],
+            "input": "Error: Malformed initial payload.",
+            "plan": [{"error": f"Failed to start. Reason: {e}"}]
+        }
+
     user_prompt = message_payload.get("prompt")
     models_config = message_payload.get("models", {})
 
@@ -106,9 +114,8 @@ def prepare_inputs_node(state: GraphState):
     os.makedirs(workspace_path, exist_ok=True)
     logger.info(f"Created sandboxed workspace: {workspace_path}")
     
-    # The 'messages' state should only contain BaseMessages for the history
     return {
-        "messages": [HumanMessage(content=user_prompt)], # Start with the actual prompt
+        "messages": [HumanMessage(content=user_prompt)],
         "input": user_prompt, 
         "models": models_config,
         "history": [], 
@@ -119,7 +126,6 @@ def prepare_inputs_node(state: GraphState):
 
 def structured_planner_node(state: GraphState):
     logger.info("Executing structured_planner_node")
-    # Get the planner model based on the user's selection
     llm = get_llm(state, 'planner')
     prompt = structured_planner_prompt_template.format(input=state["input"], tools=format_tools_for_prompt())
     response = llm.invoke(prompt)
@@ -149,6 +155,10 @@ def controller_node(state: GraphState):
     return {"current_tool_call": tool_call}
 
 async def executor_node(state: GraphState):
+    """
+    Executes the tool call prepared by the controller.
+    This node is the robust, definitive fix for the tool invocation errors.
+    """
     logger.info("Executing executor_node")
     tool_call = state.get("current_tool_call")
     if not tool_call or not tool_call.get("tool_name"):
@@ -161,26 +171,31 @@ async def executor_node(state: GraphState):
     if not tool:
         return {"tool_output": f"Error: Tool '{tool_name}' not found."}
 
-    invocation_input = tool_input
-    
-    if tool_name in SANDBOXED_TOOLS:
-        if not isinstance(invocation_input, dict):
-            logger.warning(f"Sandboxed tool '{tool_name}' received non-dict input. Wrapping it.")
-            input_key = next(iter(tool.args.keys()), None)
-            if input_key:
-                invocation_input = {input_key: invocation_input}
-            else:
-                return {"tool_output": f"Error: Cannot determine input key for sandboxed tool '{tool_name}'."}
-        invocation_input["workspace_path"] = state["workspace_path"]
-
     try:
-        logger.info(f"Invoking tool '{tool_name}' with input: {invocation_input}")
-        output = await tool.ainvoke(invocation_input)
+        # This is the new, robust invocation logic
+        if tool_name in SANDBOXED_TOOLS:
+            # For sandboxed tools, we manually inject the workspace_path and call the
+            # underlying function directly, bypassing the flawed `ainvoke` logic.
+            kwargs = tool_input.copy()
+            kwargs['workspace_path'] = state["workspace_path"]
+            logger.info(f"Manually invoking sandboxed tool '{tool_name}' with kwargs: {kwargs}")
+
+            if tool.coroutine:
+                output = await tool.coroutine(**kwargs)
+            else:
+                loop = asyncio.get_running_loop()
+                output = await loop.run_in_executor(None, lambda: tool.func(**kwargs))
+        else:
+            # For non-sandboxed tools (like web search), the standard ainvoke is fine.
+            logger.info(f"Invoking standard tool '{tool_name}' with input: {tool_input}")
+            output = await tool.ainvoke(tool_input)
+        
         logger.info(f"Tool '{tool_name}' executed successfully.")
         return {"tool_output": str(output)}
     except Exception as e:
         logger.error(f"Error executing tool '{tool_name}': {e}", exc_info=True)
-        return {"tool_output": f"An error occurred while executing the tool: {e}"}
+        # Format the error message to be more informative for the evaluator.
+        return {"tool_output": f"An error occurred while executing the tool '{tool_name}': {e}"}
 
 def evaluator_node(state: GraphState):
     logger.info("Executing evaluator_node")
@@ -200,10 +215,14 @@ def increment_step_node(state: GraphState):
 
 def should_continue(state: GraphState):
     tool_output = state.get("tool_output", "")
+    plan = state.get("plan", [])
+    if any(step.get("error") for step in plan):
+        logger.warning(f"An error was found in the plan. Ending execution.")
+        return END
     if "error" in tool_output.lower() or "failed" in tool_output.lower():
         logger.warning(f"Step failed with output: {tool_output}. Ending execution.")
         return END
-    if state["current_step_index"] + 1 >= len(state.get("plan", [])):
+    if state["current_step_index"] + 1 >= len(plan):
         logger.info("Plan is complete. Ending execution.")
         return END
     return "increment_step_node"
@@ -231,4 +250,3 @@ def create_agent_graph():
     return agent
 
 agent_graph = create_agent_graph()
-

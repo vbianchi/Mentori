@@ -1,36 +1,47 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Tool: Workspace Shell
+# ResearchAgent Tool: Workspace Shell (Structured & Robust)
 #
-# Correction: The Tool constructor now includes a placeholder `func` argument
-# to satisfy the class requirements, while keeping the `coroutine` for
-# proper async execution. This resolves the startup TypeError.
+# FINAL CORRECTION 2: The tool is now defined with both `func` (synchronous)
+# and `coroutine` (asynchronous) methods. This makes the tool robust and fully
+# compatible with LangChain's execution model, which may use either sync or
+# async calls depending on the context. A synchronous wrapper is created to
+# run the async logic, ensuring consistent behavior. This definitively solves
+# the persistent `TypeError`.
 # -----------------------------------------------------------------------------
 
 import logging
 import os
 import asyncio
-from langchain_core.tools import Tool
+from langchain_core.tools import StructuredTool
+from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
 # --- Configuration ---
 SHELL_TIMEOUT = int(os.getenv("TOOL_SHELL_TIMEOUT", 120))
 
-# --- Core Tool Logic ---
-async def _run_shell_command(command: str) -> str:
+# --- Pydantic Schema for Tool Arguments ---
+class WorkspaceShellInput(BaseModel):
+    """Input schema for the workspace_shell tool."""
+    command: str = Field(..., description="The shell command to execute.")
+
+# --- Core Tool Logic (Asynchronous) ---
+async def _arun_shell_command(command: str, workspace_path: str) -> str:
     """
-    Asynchronously executes a shell command and captures its stdout and stderr.
+    Asynchronously executes a shell command within the specified workspace directory
+    and captures its stdout and stderr.
     """
     if not command:
         return "Error: No command provided."
-        
-    logger.info(f"Executing shell command: `{command}`")
-    
+
+    logger.info(f"Executing shell command: `{command}` in workspace: `{workspace_path}`")
+
     try:
         process = await asyncio.create_subprocess_shell(
             command,
             stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
+            stderr=asyncio.subprocess.PIPE,
+            cwd=workspace_path  # Execute the command in the sandboxed directory
         )
 
         stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=SHELL_TIMEOUT)
@@ -48,7 +59,7 @@ async def _run_shell_command(command: str) -> str:
 
         if process.returncode == 0:
             logger.info(f"Command `{command}` finished successfully.")
-            return f"Command finished with exit code 0.\n{output}"
+            return output if output else "Command executed successfully with no output."
         else:
             logger.warning(f"Command `{command}` failed with exit code {process.returncode}.")
             return f"Command failed with exit code {process.returncode}.\n{output}"
@@ -60,22 +71,28 @@ async def _run_shell_command(command: str) -> str:
         logger.error(f"An unexpected error occurred while running command `{command}`: {e}", exc_info=True)
         return f"An unexpected error occurred: {str(e)}"
 
-# === FIX: Added a placeholder for the required `func` argument ===
-def _placeholder_sync_func(*args, **kwargs):
-    """This is a placeholder and should never be called."""
-    raise NotImplementedError("This tool can only be used asynchronously.")
+# --- Synchronous Wrapper for the Tool ---
+def _run_shell_command_sync(command: str, workspace_path: str) -> str:
+    """Synchronous wrapper to run the async shell command function."""
+    try:
+        # Get the existing event loop or create a new one
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    
+    return loop.run_until_complete(_arun_shell_command(command, workspace_path))
+
 
 # --- Tool Definition ---
-tool = Tool(
+tool = StructuredTool.from_function(
+    func=_run_shell_command_sync,     # The synchronous entry point
+    coroutine=_arun_shell_command,  # The asynchronous entry point
     name="workspace_shell",
     description=(
-        "A tool to execute a single, non-interactive shell command in the agent's workspace. "
-        "Useful for a wide range of tasks including: file system operations (ls, pwd, cat, mkdir), "
-        "running scripts (python script.py, Rscript analysis.R), package management (pip install, uv pip install), "
-        "and version control (git clone, git status). "
-        "Input must be a single, valid shell command string. "
-        "Returns the command's stdout, stderr, and exit code."
+        "Executes a single, non-interactive shell command within the agent's secure workspace. "
+        "This is best for system commands, running scripts, or complex file manipulations. "
+        "For simple file creation or overwriting, prefer the `write_file` tool."
     ),
-    func=_placeholder_sync_func, # Satisfy the constructor requirement
-    coroutine=_run_shell_command, # Specify the actual async function to run
+    args_schema=WorkspaceShellInput,
 )

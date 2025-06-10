@@ -1,9 +1,10 @@
 # -----------------------------------------------------------------------------
 # ResearchAgent Backend Server (with Models API)
 #
-# This version adds a new endpoint at `/api/models`. This allows the
-# frontend to dynamically fetch the list of available LLMs directly from the
-# environment variables configured on the backend, making the UI adaptive.
+# CORRECTION: The `_handle_get_models` function is updated to be more robust.
+# It now ensures that the free-tier `gemini-1.5-flash-latest` is always
+# included in the list of models sent to the frontend. This prevents the user
+# from getting stuck if they only configure paid models in their .env file.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -20,7 +21,7 @@ from langchain_core.messages import HumanMessage
 
 # --- Local Imports ---
 from .langgraph_agent import agent_graph
-from .tools.file_system import _resolve_path 
+from .tools.file_system import _resolve_path
 
 # --- Configuration ---
 load_dotenv()
@@ -63,7 +64,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             self._handle_file_upload()
         else:
             self._send_json_response(404, {'error': 'Not Found'})
-    
+
     def do_OPTIONS(self):
         self.send_response(204)
         self.send_header('Access-Control-Allow-Origin', '*')
@@ -80,20 +81,21 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
 
     def _handle_get_models(self):
         """Reads LLM model IDs from environment variables and returns them."""
-        logger.info("Serving list of available models from .env")
+        logger.info("Serving list of available models.")
         models = []
         model_ids = set()
-        # Find all environment variables ending with _LLM_ID
+        
+        # --- FIX: Always ensure a free-tier model is available ---
+        free_tier_model = "gemini::gemini-1.5-flash-latest"
+        models.append({"id": free_tier_model, "name": format_model_name(free_tier_model)})
+        model_ids.add(free_tier_model)
+        
+        # Add models from environment variables, avoiding duplicates
         for key, value in os.environ.items():
             if key.endswith("_LLM_ID") and value:
                 if value not in model_ids:
                     models.append({"id": value, "name": format_model_name(value)})
                     model_ids.add(value)
-        
-        if not models:
-            default_model = "gemini::gemini-2.0-flash"
-            models.append({"id": default_model, "name": format_model_name(default_model)})
-            logger.warning("No LLM models found in .env, using default.")
 
         self._send_json_response(200, models)
 
@@ -108,12 +110,12 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             if not os.path.abspath(full_path).startswith(os.path.abspath(base_workspace)):
                  return self._send_json_response(403, {"error": "Access denied."})
             if os.path.isdir(full_path):
-                self._send_json_response(200, {"files": os.listdir(full_path)})
+                 self._send_json_response(200, {"files": os.listdir(full_path)})
             else:
                 self._send_json_response(404, {"error": f"Directory '{subdir}' not found."})
         except Exception as e:
             self._send_json_response(500, {"error": str(e)})
-            
+
     def _handle_get_file_content(self, parsed_path):
         query_components = parse_qs(parsed_path.query)
         workspace_id = query_components.get("path", [None])[0]
@@ -124,7 +126,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             workspace_dir = f"/app/workspace/{workspace_id}"
             full_path = _resolve_path(workspace_dir, filename)
             with open(full_path, 'r', encoding='utf-8') as f:
-                content = f.read()
+                 content = f.read()
             self.send_response(200)
             self.send_header('Content-type', 'text/plain; charset=utf-8')
             self.send_header('Access-Control-Allow-Origin', '*')
@@ -132,9 +134,10 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             self.wfile.write(content.encode('utf-8'))
         except Exception as e:
             self._send_json_response(500, {"error": f"Error reading file: {e}"})
-    
+
     def _handle_file_upload(self):
         try:
+            # Use the recommended 'multipart' library or stick with 'cgi' with deprecation warning in mind
             form = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': self.headers['Content-Type']})
             workspace_id = form.getvalue('workspace_id')
             file_item = form['file']
@@ -175,10 +178,9 @@ async def agent_handler(websocket):
                     continue
 
                 initial_state = {
-                    "messages": [HumanMessage(content=message)], # Pass the original full payload
-                    "models": models_config
+                    "messages": [HumanMessage(content=json.dumps(payload))],
                 }
-                
+
                 logger.info(f"Invoking agent with prompt: {prompt_text[:100]}...")
                 logger.info(f"Using models: {models_config}")
 
@@ -206,16 +208,17 @@ async def agent_handler(websocket):
 async def main():
     http_thread = threading.Thread(target=run_http_server, daemon=True)
     http_thread.start()
-    
+
     host = os.getenv("BACKEND_HOST", "0.0.0.0")
     port = int(os.getenv("BACKEND_PORT", 8765))
-    
+
     logger.info(f"Starting ResearchAgent WebSocket server at ws://{host}:{port}")
     async with websockets.serve(agent_handler, host, port, max_size=None):
         await asyncio.Future()
 
 if __name__ == "__main__":
     try:
+        logger.info("Executing main function to start servers.")
         asyncio.run(main())
     except KeyboardInterrupt:
         logger.info("Server shut down gracefully.")
