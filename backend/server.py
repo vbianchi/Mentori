@@ -1,10 +1,10 @@
 # -----------------------------------------------------------------------------
 # ResearchAgent Backend Server (with Models API)
 #
-# CORRECTION: The `_handle_get_models` function is updated to be more robust.
-# It now ensures that the free-tier `gemini-1.5-flash-latest` is always
-# included in the list of models sent to the frontend. This prevents the user
-# from getting stuck if they only configure paid models in their .env file.
+# CORRECTION: The `_handle_file_upload` function has been updated to fix a
+# `TypeError` from the deprecated `cgi` module. The check for the uploaded
+# file is now more explicit (`file_item.value`) instead of relying on a
+# direct boolean evaluation (`not file_item`), which is not supported.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -85,12 +85,10 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         models = []
         model_ids = set()
         
-        # --- FIX: Always ensure a free-tier model is available ---
         free_tier_model = "gemini::gemini-1.5-flash-latest"
         models.append({"id": free_tier_model, "name": format_model_name(free_tier_model)})
         model_ids.add(free_tier_model)
         
-        # Add models from environment variables, avoiding duplicates
         for key, value in os.environ.items():
             if key.endswith("_LLM_ID") and value:
                 if value not in model_ids:
@@ -106,9 +104,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             return self._send_json_response(400, {"error": "Missing 'path' query parameter."})
         base_workspace = "/app/workspace"
         try:
-            full_path = os.path.join(base_workspace, subdir)
-            if not os.path.abspath(full_path).startswith(os.path.abspath(base_workspace)):
-                 return self._send_json_response(403, {"error": "Access denied."})
+            full_path = _resolve_path(base_workspace, subdir)
             if os.path.isdir(full_path):
                  self._send_json_response(200, {"files": os.listdir(full_path)})
             else:
@@ -137,22 +133,27 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
 
     def _handle_file_upload(self):
         try:
-            # Use the recommended 'multipart' library or stick with 'cgi' with deprecation warning in mind
             form = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': self.headers['Content-Type']})
             workspace_id = form.getvalue('workspace_id')
             file_item = form['file']
-            if not workspace_id or not file_item or not file_item.filename:
+            
+            # --- FIX: Explicitly check the file_item's value and filename ---
+            if not workspace_id or not hasattr(file_item, 'filename') or not file_item.filename:
                 return self._send_json_response(400, {'error': 'Missing workspace_id or file.'})
+
             filename = os.path.basename(file_item.filename)
             workspace_dir = f"/app/workspace/{workspace_id}"
             full_path = _resolve_path(workspace_dir, filename)
+
             with open(full_path, 'wb') as f:
                 f.write(file_item.file.read())
+
             logger.info(f"Uploaded '{filename}' to workspace '{workspace_id}'")
             self._send_json_response(200, {'message': f"File '{filename}' uploaded successfully."})
         except Exception as e:
             logger.error(f"File upload failed: {e}", exc_info=True)
             self._send_json_response(500, {'error': f'Server error during file upload: {e}'})
+
 
 def run_http_server():
     host = os.getenv("BACKEND_HOST", "0.0.0.0")

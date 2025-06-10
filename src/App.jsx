@@ -245,15 +245,18 @@ export function App() {
     }, [workspacePath, fetchWorkspaceFiles]);
 
     useEffect(() => {
-        // Fetch the available models from the backend when the app loads
         const fetchModels = async () => {
             try {
                 const response = await fetch('http://localhost:8766/api/models');
                 const availableModels = await response.json();
                 if (availableModels.length > 0) {
                     setModels(availableModels);
-                    // Set the first model as the default for all roles
-                    const defaultModelId = availableModels[0].id;
+                    // --- FIX: Intelligently select the free tier model as the default ---
+                    const freeTierModel = "gemini::gemini-1.5-flash-latest";
+                    const defaultModelId = availableModels.some(m => m.id === freeTierModel)
+                        ? freeTierModel
+                        : availableModels[0].id;
+
                     setSelectedModels({
                         router: defaultModelId,
                         planner: defaultModelId,
@@ -278,9 +281,9 @@ export function App() {
             ws.current.onmessage = (event) => {
                 const newEvent = JSON.parse(event.data);
                 
-                const path = newEvent.data?.output?.workspace_path || newEvent.data?.input?.workspace_path;
-                if (path) {
-                   setWorkspacePath(currentPath => currentPath || path);
+                const currentWorkspacePath = newEvent.data?.output?.workspace_path || newEvent.data?.input?.workspace_path;
+                if (currentWorkspacePath) {
+                   setWorkspacePath(path => path || currentWorkspacePath);
                 }
 
                 setPlanSteps(prevSteps => {
@@ -314,11 +317,22 @@ export function App() {
                     }
                     return prevSteps;
                 });
+                
+                // --- FIX: Refresh workspace files after a tool executes ---
+                if (newEvent.name === 'executor_node' && newEvent.event.includes('end')) {
+                    // Use a functional update to ensure we get the latest state
+                    setWorkspacePath(currentPath => {
+                        if (currentPath) {
+                            fetchWorkspaceFiles(currentPath);
+                        }
+                        return currentPath;
+                    });
+                }
             };
         }
         connect();
         return () => { if (ws.current) { ws.current.onclose = null; ws.current.close(); }};
-    }, []);
+    }, [fetchWorkspaceFiles]); // Add fetchWorkspaceFiles to dependency array
 
     useEffect(() => { scrollToBottom(); }, [planSteps, prompt]);
 
@@ -349,7 +363,7 @@ export function App() {
     };
     
     return (
-        <div class="flex h-screen w-screen p-4 gap-4">
+        <div class="flex h-screen w-screen p-4 gap-4 bg-gray-900 text-gray-200" style={{fontFamily: "'Inter', sans-serif"}}>
             {!isLeftSidebarVisible && <ToggleButton onToggle={() => setIsLeftSidebarVisible(true)} side="left" />}
             {isLeftSidebarVisible && (
                 <div class="h-full w-1/4 min-w-[300px] bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col">
