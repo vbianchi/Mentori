@@ -81,7 +81,7 @@ def task_setup_node(state: GraphState):
 def chief_architect_node(state: GraphState):
     """The "Chief Architect" - Generates the structured plan."""
     logger.info("Executing Chief_Architect")
-    llm = get_llm(state, "PLANNER_LLM_ID", "gemini::gemini-2.5-flash-preview-05-20")
+    llm = get_llm(state, "PLANNER_LLM_ID", "gemini::gemini-1.5-flash")
     prompt = structured_planner_prompt_template.format(input=state["input"], tools=format_tools_for_prompt())
     response = llm.invoke(prompt)
     try:
@@ -100,7 +100,7 @@ def site_foreman_node(state: GraphState):
     plan = state["plan"]
     logger.info(f"Executing Site_Foreman for step {step_index + 1}/{len(plan)}")
     current_step_details = plan[step_index]
-    llm = get_llm(state, "CONTROLLER_LLM_ID", "gemini::gemini-2.0-flash")
+    llm = get_llm(state, "CONTROLLER_LLM_ID", "gemini::gemini-1.5-flash")
     history_str = "\n".join(state["history"]) if state.get("history") else "No history yet."
     prompt = controller_prompt_template.format(
         tools=format_tools_for_prompt(),
@@ -155,7 +155,7 @@ def project_supervisor_node(state: GraphState):
     tool_output = state.get("tool_output", "No output from tool.")
     tool_call = state.get("current_tool_call", {})
 
-    llm = get_llm(state, "EVALUATOR_LLM_ID", "gemini::gemini-2.5-flash-preview-05-20")
+    llm = get_llm(state, "EVALUATOR_LLM_ID", "gemini::gemini-1.5-flash")
     prompt = evaluator_prompt_template.format(
         current_step=current_step_details.get('instruction', ''),
         tool_call=json.dumps(tool_call),
@@ -195,7 +195,7 @@ def advance_to_next_step_node(state: GraphState):
 def librarian_node(state: GraphState):
     """The "Librarian" - Directly calls an LLM for a simple question."""
     logger.info("Executing Librarian (Direct QA)")
-    llm = get_llm(state, "DEFAULT_LLM_ID", "gemini::gemini-2.0-flash")
+    llm = get_llm(state, "DEFAULT_LLM_ID", "gemini::gemini-1.5-flash")
     response = llm.invoke(state["messages"])
     return {"answer": response.content}
 

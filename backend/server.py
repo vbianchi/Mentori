@@ -116,7 +116,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         default_models = {
             "PLANNER_LLM_ID": os.getenv("PLANNER_LLM_ID", global_default_llm),
             "CONTROLLER_LLM_ID": os.getenv("CONTROLLER_LLM_ID", global_default_llm),
-            "EXECUTOR_DEFAULT_LLM_ID": os.getenv("EXECUTOR_DEFAULT_LLM_ID", global_default_llm),
+            "EXECUTOR_LLM_ID": os.getenv("EXECUTOR_LLM_ID", global_default_llm),
             "EVALUATOR_LLM_ID": os.getenv("EVALUATOR_LLM_ID", global_default_llm),
             "INTENT_CLASSIFIER_LLM_ID": os.getenv("INTENT_CLASSIFIER_LLM_ID", global_default_llm),
         }
