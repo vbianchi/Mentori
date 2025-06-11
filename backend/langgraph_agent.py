@@ -1,10 +1,17 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 6: Smarter Evaluator & Conceptual Names)
+# ResearchAgent Core Agent (Phase 7: Final Answer Synthesis)
 #
-# This version correctly implements the full graph logic from the user's
-# file, including the intent_classifier and direct_qa path. The node
-# functions and graph definition have been renamed to match our
-# "Company Model" terminology for clarity.
+# This version introduces a new "Final Answer Agent" node to synthesize the
+# results of a plan into a comprehensive, user-facing answer.
+#
+# 1. New Node: `final_answer_agent_node` is added to the graph. It uses the
+#    new `final_answer_prompt_template` to generate a summary.
+# 2. Updated Routing: The conditional router `should_continue` is renamed to
+#    `after_plan_step_router`. It now directs the flow to the new
+#    `Final_Answer_Agent` after a plan completes or fails, ensuring a
+#    conclusive message is always generated for the user.
+# 3. New Configurable LLM: `FINAL_ANSWER_LLM_ID` is added to allow for
+#    assigning a specific model to the final synthesis task.
 # -----------------------------------------------------------------------------
 
 import os
@@ -21,8 +28,8 @@ from langgraph.graph import StateGraph, END
 
 # --- Local Imports ---
 from .tools import get_available_tools
-# We now correctly import all three prompts again
-from .prompts import structured_planner_prompt_template, controller_prompt_template, evaluator_prompt_template
+# Import all four prompts now
+from .prompts import structured_planner_prompt_template, controller_prompt_template, evaluator_prompt_template, final_answer_prompt_template
 
 # --- Logging Setup ---
 log_level = os.getenv("LOG_LEVEL", "INFO").upper()
@@ -49,6 +56,7 @@ class GraphState(TypedDict):
 LLM_CACHE = {}
 def get_llm(state: GraphState, role_env_var: str, default_llm_id: str):
     run_config = state.get("llm_config", {})
+    # Added FINAL_ANSWER_LLM_ID to the list of roles
     llm_id = run_config.get(role_env_var) or os.getenv(role_env_var, default_llm_id)
     if llm_id in LLM_CACHE: return LLM_CACHE[llm_id]
     provider, model_name = llm_id.split("::")
@@ -104,7 +112,7 @@ def site_foreman_node(state: GraphState):
     history_str = "\n".join(state["history"]) if state.get("history") else "No history yet."
     prompt = controller_prompt_template.format(
         tools=format_tools_for_prompt(),
-        plan=state["plan"],
+        plan=json.dumps(state["plan"], indent=2),
         history=history_str,
         current_step=current_step_details.get("instruction", "")
     )
@@ -129,16 +137,16 @@ async def worker_node(state: GraphState):
     tool_input = tool_call.get("tool_input", {})
     tool = TOOL_MAP.get(tool_name)
     if not tool: return {"tool_output": f"Error: Tool '{tool_name}' not found."}
-    
+
     final_args = {}
     if isinstance(tool_input, dict): final_args.update(tool_input)
     else:
         tool_args_schema = tool.args
         if tool_args_schema: final_args[next(iter(tool_args_schema))] = tool_input
-        
+
     if tool_name in SANDBOXED_TOOLS:
         final_args["workspace_path"] = state["workspace_path"]
-        
+
     try:
         logger.info(f"Worker executing tool '{tool_name}' with args: {final_args}")
         output = await tool.ainvoke(final_args)
@@ -161,7 +169,7 @@ def project_supervisor_node(state: GraphState):
         tool_call=json.dumps(tool_call),
         tool_output=tool_output
     )
-    
+
     try:
         response = llm.invoke(prompt)
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL)
@@ -179,12 +187,12 @@ def project_supervisor_node(state: GraphState):
         f"Output: {tool_output}\n"
         f"Evaluation: {evaluation.get('status', 'unknown')} - {evaluation.get('reasoning', 'N/A')}"
     )
-    
+
     step_output_update = {}
     if evaluation.get("status") == "success":
         step_id = current_step_details.get("step_id")
         if step_id: step_output_update[step_id] = tool_output
-            
+
     return {"step_evaluation": evaluation, "history": [history_record], "step_outputs": step_output_update}
 
 def advance_to_next_step_node(state: GraphState):
@@ -199,6 +207,21 @@ def librarian_node(state: GraphState):
     response = llm.invoke(state["messages"])
     return {"answer": response.content}
 
+def final_answer_agent_node(state: GraphState):
+    """The "Expert Editor" - Synthesizes the final answer."""
+    logger.info("Executing Final_Answer_Agent")
+    # Use a powerful model for this, as it's a creative synthesis task.
+    llm = get_llm(state, "FINAL_ANSWER_LLM_ID", "gemini::gemini-1.5-pro")
+    history_str = "\n".join(state["history"])
+    prompt = final_answer_prompt_template.format(
+        input=state["input"],
+        history=history_str
+    )
+    response = llm.invoke(prompt)
+    logger.info(f"Generated final answer: {response.content[:200]}...")
+    return {"answer": response.content}
+
+
 # --- Conditional Routers ---
 def router(state: GraphState):
     """Routes the workflow based on user intent."""
@@ -210,18 +233,22 @@ def router(state: GraphState):
     logger.info(f"Routing decision: {decision}")
     return "Chief_Architect" if "AGENT_ACTION" in decision else "Librarian"
 
-def should_continue(state: GraphState):
-    """The main loop condition."""
-    logger.info("Router: Checking if we should continue")
+def after_plan_step_router(state: GraphState):
+    """Routes the workflow after a plan step is evaluated."""
+    logger.info("Router: Checking if plan should continue or finalize.")
     evaluation = state.get("step_evaluation", {})
+
+    # If the step failed, we go to the final answer agent to summarize the failure.
     if evaluation.get("status") == "failure":
-        logger.warning(f"Step failed. Reason: {evaluation.get('reasoning', 'N/A')}. Ending execution.")
-        return END
-    
+        logger.warning(f"Step failed. Reason: {evaluation.get('reasoning', 'N/A')}. Routing to Final Answer Agent.")
+        return "Final_Answer_Agent"
+
+    # If we have completed the last step in the plan, go to the final answer agent.
     if state["current_step_index"] + 1 >= len(state.get("plan", [])):
-        logger.info("Plan is complete. Ending execution.")
-        return END
-    
+        logger.info("Plan is complete. Routing to Final Answer Agent.")
+        return "Final_Answer_Agent"
+
+    # Otherwise, continue to the next step in the plan.
     return "Advance_To_Next_Step"
 
 # --- Graph Definition ---
@@ -236,19 +263,35 @@ def create_agent_graph():
     workflow.add_node("Worker", worker_node)
     workflow.add_node("Project_Supervisor", project_supervisor_node)
     workflow.add_node("Advance_To_Next_Step", advance_to_next_step_node)
-    
+    workflow.add_node("Final_Answer_Agent", final_answer_agent_node) # Add the new node
+
     # Set entry point and define edges
     workflow.set_entry_point("Task_Setup")
-    workflow.add_conditional_edges("Task_Setup", router, {"Librarian": "Librarian", "Chief_Architect": "Chief_Architect"})
+
+    # This is the initial classification of the user's request
+    workflow.add_conditional_edges("Task_Setup", router, {
+        "Librarian": "Librarian",
+        "Chief_Architect": "Chief_Architect"
+    })
+
+    # This is the main execution loop
     workflow.add_edge("Chief_Architect", "Site_Foreman")
     workflow.add_edge("Site_Foreman", "Worker")
     workflow.add_edge("Worker", "Project_Supervisor")
     workflow.add_edge("Advance_To_Next_Step", "Site_Foreman") # The loop back
-    workflow.add_conditional_edges("Project_Supervisor", should_continue, {END: END, "Advance_To_Next_Step": "Advance_To_Next_Step"})
+
+    # This is the router that decides whether to continue the loop or finish
+    workflow.add_conditional_edges("Project_Supervisor", after_plan_step_router, {
+        "Final_Answer_Agent": "Final_Answer_Agent",
+        "Advance_To_Next_Step": "Advance_To_Next_Step"
+    })
+
+    # These are the terminal edges
     workflow.add_edge("Librarian", END)
+    workflow.add_edge("Final_Answer_Agent", END)
 
     agent = workflow.compile()
-    logger.info("Advanced agent graph (Conceptual Names) compiled successfully.")
+    logger.info("Advanced agent graph (with Final Answer Agent) compiled successfully.")
     return agent
 
 agent_graph = create_agent_graph()

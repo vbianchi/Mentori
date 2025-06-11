@@ -1,9 +1,15 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Prompts (Complete)
+# ResearchAgent Prompts (Phase 7 Enhancement v2)
 #
-# This file contains the complete set of prompts required by the current
-# version of the langgraph_agent.py file, including the Planner,
-# Controller, and Evaluator prompts.
+# This file contains the prompts for the ResearchAgent.
+#
+# 1. Added `final_answer_prompt_template` to synthesize a final user-facing
+#    response after a plan is executed.
+# 2. Enhanced `evaluator_prompt_template` with more critical instructions to
+#    ensure it validates goal achievement, not just successful execution.
+# 3. Added clear JSON output examples ("few-shot" examples) to the Planner,
+#    Controller, and Evaluator prompts to increase reliability and prevent
+#    formatting errors.
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
@@ -31,7 +37,34 @@ step-by-step execution plan in JSON format to fulfill the user's request.
 - Your final output must be a single, valid JSON object containing a "plan" key, which holds a list of these step objects.
 - CRITICAL: Ensure the final output is a perfectly valid JSON. All strings must use double quotes. Any double quotes inside a string must be properly escaped with a backslash (e.g., "This is a \\"quoted\\" string.").
 - Do not add any conversational fluff or explanation. Your output must be ONLY the JSON object.
+
 ---
+**Example Output:**
+```json
+{{
+  "plan": [
+    {{
+      "step_id": 1,
+      "instruction": "Search the web to find the main topic of the user's request.",
+      "tool_name": "web_search",
+      "tool_input": {{
+        "query": "example search query"
+      }}
+    }},
+    {{
+      "step_id": 2,
+      "instruction": "Write the findings from the web search to a file named 'research_summary.txt'.",
+      "tool_name": "write_file",
+      "tool_input": {{
+        "file": "research_summary.txt",
+        "content": "The summary of the research findings will be placed here."
+      }}
+    }}
+  ]
+}}
+```
+---
+
 **Begin!**
 
 **User Request:**
@@ -41,10 +74,10 @@ step-by-step execution plan in JSON format to fulfill the user's request.
 """
 )
 
-# === RESTORED: Controller Prompt ===
+# 2. Controller Prompt
 controller_prompt_template = PromptTemplate.from_template(
     """
-You are an expert controller agent. Your job is to select the most appropriate 
+You are an expert controller agent. Your job is to select the most appropriate
 tool to execute the given step of a plan, based on the history of previous steps.
 
 **Available Tools:**
@@ -61,10 +94,22 @@ tool to execute the given step of a plan, based on the history of previous steps
 
 **Instructions:**
 - Analyze the current step in the context of the plan and the history of past actions.
-- Your output must be a single, valid JSON object containing the chosen tool's name 
+- Your output must be a single, valid JSON object containing the chosen tool's name
   and the exact input for that tool.
 - Do not add any conversational fluff or explanation. Your output must be ONLY the JSON object.
+
 ---
+**Example Output:**
+```json
+{{
+  "tool_name": "web_search",
+  "tool_input": {{
+    "query": "what is the latest version of langchain?"
+  }}
+}}
+```
+---
+
 **Begin!**
 
 **History of Past Steps:**
@@ -77,10 +122,10 @@ tool to execute the given step of a plan, based on the history of previous steps
 """
 )
 
-# === RESTORED: Evaluator Prompt ===
+# 3. Evaluator Prompt (Enhanced for Criticality)
 evaluator_prompt_template = PromptTemplate.from_template(
     """
-You are an expert evaluator. Your job is to assess the outcome of a tool's 
+You are an expert evaluator. Your job is to assess the outcome of a tool's
 execution and determine if the step was successful.
 
 **Plan Step:**
@@ -93,12 +138,21 @@ execution and determine if the step was successful.
 {tool_output}
 
 **Instructions:**
-- Analyze the tool's output in the context of both the Plan Step and the Controller's Action.
-- Determine if the step was successfully completed. The goal is to see if the Controller's Action successfully addressed the Plan Step.
-- Your output must be a single, valid JSON object containing a "status" key, 
-  which can be "success" or "failure", and a "reasoning" key with a brief explanation.
+- **Critically assess** if the `Tool's Output` **fully and completely satisfies** the `Plan Step`'s instruction.
+- **Do not just check for a successful exit code or the presence of output.** You must verify that the *substance* of the output achieves the step's goal. For example, if the step was to find a specific fact, does the output actually contain that fact? If not, you must declare it a failure.
+- Your output must be a single, valid JSON object containing a "status" key (which can be "success" or "failure") and a "reasoning" key with a brief explanation.
 - Do not add any conversational fluff or explanation. Your output must be ONLY the JSON object.
+
 ---
+**Example Output:**
+```json
+{{
+  "status": "success",
+  "reasoning": "The tool output successfully provided the requested information, which was the capital of France."
+}}
+```
+---
+
 **Begin!**
 
 **Plan Step:**
@@ -111,5 +165,33 @@ execution and determine if the step was successful.
 {tool_output}
 
 **Your Output (must be a single JSON object):**
+"""
+)
+
+# 4. Final Answer Synthesis Prompt (NEW)
+final_answer_prompt_template = PromptTemplate.from_template(
+    """
+You are the final, user-facing voice of the ResearchAgent. Your role is to act as an expert editor.
+You have been given the user's original request and the complete history of a multi-step plan that was executed to fulfill it.
+
+Your task is to synthesize all the information from the history into a single, comprehensive, and well-written final answer for the user.
+
+**User's Original Request:**
+{input}
+
+**Full Execution History:**
+{history}
+
+**Instructions:**
+1.  Carefully review the entire execution history, including the instructions, actions, and observations for each step.
+2.  Identify the key findings and the data gathered throughout the process.
+3.  Synthesize this information into a clear and coherent response that directly answers the user's original request.
+4.  If the process failed or was unable to find a definitive answer, explain what happened based on the history, and provide the most helpful information you could find.
+5.  Format your answer in clean markdown.
+6.  Do not output JSON or any other machine-readable format. Your output must be only the final, human-readable text for the user.
+
+**Begin!**
+
+**Final Answer:**
 """
 )

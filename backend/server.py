@@ -1,17 +1,16 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Final Fix)
+# ResearchAgent Backend Server (Phase 7: Final Answer Handling)
 #
-# CORRECTION: This is the definitive fix for both Planner and Librarian paths.
-# Based on the user's debug log, the logic to find the direct answer has
-# been completely rewritten to correctly parse the final event's data structure.
+# This version updates the server to handle the output from the new
+# `Final_Answer_Agent` node in the graph.
 #
-# - It now iterates through the list of final node outputs.
-# - It specifically looks for the output from the 'Librarian' node.
-# - It extracts the 'answer' from within that specific node's output.
-#
-# This robustly handles the actual data structure from LangGraph and will
-# correctly send the direct answer to the UI while keeping the planner's
-# event stream intact.
+# 1. New Message Type: The WebSocket handler can now send a `final_answer`
+#    message type to the client, distinguishing it from the `direct_answer`.
+# 2. Updated Output Parsing: The logic that processes the final graph event
+#    now checks for output from both 'Librarian' (for direct QA) and
+#    'Final_Answer_Agent' (for synthesized plan summaries).
+# 3. New Configurable Model: The HTTP server now exposes the
+#    `FINAL_ANSWER_LLM_ID` so it can be configured from the frontend.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -91,7 +90,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         models and the user-configured default model for each agent role.
         """
         logger.info("Parsing .env to serve available and default models.")
-        
+
         available_models = []
         model_ids = set()
 
@@ -122,6 +121,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             "EXECUTOR_LLM_ID": os.getenv("EXECUTOR_LLM_ID", global_default_llm),
             "EVALUATOR_LLM_ID": os.getenv("EVALUATOR_LLM_ID", global_default_llm),
             "ROUTER_LLM_ID": os.getenv("ROUTER_LLM_ID", global_default_llm),
+            "FINAL_ANSWER_LLM_ID": os.getenv("FINAL_ANSWER_LLM_ID", "gemini::gemini-1.5-pro-latest") # Added
         }
 
         response_data = {
@@ -209,7 +209,7 @@ async def agent_handler(websocket):
                     "messages": [HumanMessage(content=prompt)],
                     "llm_config": llm_config,
                 }
-                
+
                 config = {"recursion_limit": 100}
 
                 logger.info(f"Invoking agent with prompt: {prompt[:100]}...")
@@ -223,25 +223,35 @@ async def agent_handler(websocket):
                     if event_type in ["on_chain_start", "on_chain_end"]:
                         response = { "type": "agent_event", "event": event_type, "name": event["name"], "data": event['data'] }
                         await websocket.send(json.dumps(response, default=str))
-                
+
                 if last_event and last_event["event"] == "on_chain_end":
                     final_output = last_event.get("data", {}).get("output")
-                    
-                    logger.info(f"DEBUG: Final output structure: {final_output}")
+                    logger.debug(f"DEBUG: Final output structure from graph: {final_output}")
 
                     answer = None
-                    # --- THE FIX: Robustly check for the answer based on the actual data structure ---
+                    answer_type = None
+
+                    # --- THE FIX: Check for output from EITHER final node ---
                     if isinstance(final_output, list):
                         for node_output in final_output:
-                            if isinstance(node_output, dict) and 'Librarian' in node_output:
-                                librarian_result = node_output.get('Librarian')
-                                if isinstance(librarian_result, dict) and 'answer' in librarian_result:
-                                    answer = librarian_result.get('answer')
-                                    break
-                    
-                    if answer:
-                        logger.info(f"Found direct answer in final output: {answer[:100]}...")
-                        answer_response = {"type": "direct_answer", "data": answer}
+                            if isinstance(node_output, dict):
+                                if 'Librarian' in node_output:
+                                    librarian_result = node_output.get('Librarian')
+                                    if isinstance(librarian_result, dict) and 'answer' in librarian_result:
+                                        answer = librarian_result.get('answer')
+                                        answer_type = "direct_answer"
+                                        break
+                                elif 'Final_Answer_Agent' in node_output:
+                                    final_answer_result = node_output.get('Final_Answer_Agent')
+                                    if isinstance(final_answer_result, dict) and 'answer' in final_answer_result:
+                                        answer = final_answer_result.get('answer')
+                                        answer_type = "final_answer"
+                                        break
+                    # --- End of Fix ---
+
+                    if answer and answer_type:
+                        logger.info(f"Found answer of type '{answer_type}': {answer[:100]}...")
+                        answer_response = {"type": answer_type, "data": answer}
                         await websocket.send(json.dumps(answer_response))
                     else:
                         logger.info("Agent run completed without a direct answer (assumed plan).")
