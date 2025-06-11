@@ -211,7 +211,7 @@ def final_answer_agent_node(state: GraphState):
     """The "Expert Editor" - Synthesizes the final answer."""
     logger.info("Executing Final_Answer_Agent")
     # Use a powerful model for this, as it's a creative synthesis task.
-    llm = get_llm(state, "FINAL_ANSWER_LLM_ID", "gemini::gemini-1.5-pro")
+    llm = get_llm(state, "FINAL_ANSWER_LLM_ID", "gemini::gemini-1.5-flash")
     history_str = "\n".join(state["history"])
     prompt = final_answer_prompt_template.format(
         input=state["input"],
