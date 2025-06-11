@@ -33,14 +33,14 @@ def write_file(content: str, file: str, workspace_path: str) -> str:
     except Exception as e:
         return f"Error writing file: {e}"
 
-def read_file(file_path: str, workspace_path: str) -> str:
+def read_file(file: str, workspace_path: str) -> str:
     """Reads the content of a file from within the secure workspace."""
     try:
-        full_path = _resolve_path(workspace_path, file_path)
+        full_path = _resolve_path(workspace_path, file)
         with open(full_path, 'r', encoding='utf-8') as f:
             return f.read()
     except FileNotFoundError:
-        return f"Error: File not found at '{file_path}'."
+        return f"Error: File not found at '{file}'."
     except Exception as e:
         return f"Error reading file: {e}"
 
