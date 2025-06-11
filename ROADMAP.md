@@ -2,47 +2,32 @@
 
 This document outlines the phased development plan for the ResearchAgent project.
 
-### ✔️ Phase 0-4: Core Backend Engine
+### ✔️ Phase 0-6: Core Engine, UI & Stability
 
--   \[x\] **Project Setup:** Established the complete project structure, including Docker, dependencies, and all documentation.
--   \[x\] **Agent Foundation:** Built the core WebSocket server and a basic LangGraph agent.
--   \[x\] **Advanced PCEE Architecture:** Successfully implemented the full Plan-Controller-Executor-Evaluator loop with memory and data piping between steps.
--   \[x\] **Core Capabilities:** The agent can autonomously create and execute structured, multi-step plans using web search, shell commands, and file I/O.
--   \[x\] **Sandboxing:** Implemented the foundational system for creating and using secure, per-task workspaces. **Status: Completed**
+-   \[x\] **Core Backend Engine:** The foundational PCEE architecture with Router, Planner, Controller, Executor, and Evaluator nodes is stable.
+-   \[x\] **Core Frontend & Workspace:** The UI is fully functional with a live event stream, interactive workspace, artifact viewer, and file uploading.
+-   \[x\] **Advanced Controls & Stability:** Dynamic model selection is implemented, and the agent is stable for both simple QA and complex, long-running plans.
 
-### ✔️ Phase 5: Core Frontend & Workspace Interaction
+### Phase 7: Persistence, History & Task Management \[UP NEXT\]
 
--   \[x\] **Build System & Initial UI:** Set up a modern frontend environment (Vite + Preact) and rendered the initial UI structure.
--   \[x\] **Live Event Stream:** Implemented JavaScript logic to connect to the WebSocket and render the agent's real-time event stream.
--   \[x\] **Workspace File Browser:** Implemented a UI component that fetches and displays the file list from the agent's workspace.
--   \[x\] **Artifact Viewer:** Enhanced the file browser so that clicking a file renders its content directly in the panel.
--   \[x\] **File Upload Tool:** Created a new tool and a UI component to allow users to upload files into the agent's workspace.
--   \[x\] **Copy to Clipboard:** Added a "copy" button to code blocks and other relevant UI elements. **Status: Completed**
+-   \[ \] **Stateful Sessions:** Transition from a stateless model to stateful "Tasks". Each new conversation will be a persistent task with its own unique workspace and history.
+-   \[ \] **Task Management UI:** Implement the UI for managing tasks in the left-hand panel. This will include creating a new task and listing existing ones.
+-   \[ \] **Backend Task Logic:** Update the backend WebSocket handler to manage tasks. It will receive a `task_id` and either create a new workspace or resume work in an existing one.
+-   \[ \] **Conversational Memory:** Feed the chat history for a given task back into the agent's prompts. This will give the agent the context of previous turns, allowing for follow-up questions and iterative work.
+-   \[ \] **Basic User Abstraction:** Introduce a concept of a `user_id` to associate tasks with a specific user, laying the groundwork for future multi-user support.
 
-### Phase 6: UI Polish & Advanced Controls
+### Phase 8: Advanced Self-Correction & Environment Management
 
--   \[x\] **Layout & Styling:** Refine the UI to more closely match the `manus.ai` aesthetic, including implementing resizable and collapsible panels.
--   \[ \] **Token Consumption Tracking:** Implement backend logic and UI elements to display token usage estimates for each step.
--   \[x\] **Dynamic Model Selection:** Add UI controls (e.g., dropdowns) to allow the user to change the LLM for each agent role (Planner, Controller, etc.) on the fly. **Status: Up Next** (Partially complete, we need to add also the ROUTER Agent in there)
+-   \[ \] **Smarter Evaluator:** Enhance the `Project_Supervisor` with more nuanced analysis of tool output.
+-   \[ \] **Correction Sub-Loop:** Implement the logic for the agent to attempt corrective actions when a step fails.
+-   \[ \] **Python Virtual Environments:** Implement full dependency sandboxing with per-task `.venv` directories.
 
-### Phase 7: Advanced Self-Correction & Environment Management
+### Phase 9: Human-in-the-Loop (HITL) Integration
 
--   \[ \] **Smarter Evaluator:** Enhance the `evaluator_node` to use an LLM to analyze the outcome of a step and provide structured feedback (success/failure and reasoning).
--   \[ \] **Correction Sub-Loop:** Implement the logic for the agent to attempt corrective actions when a step fails (e.g., installing a missing dependency).
--   \[ \] **Python Virtual Environments:** Implement the full sandboxing plan by having the agent create and use a unique `.venv` for each task. **Status: Not Started**
+-   \[ \] **Stop/Pause Button:** Implement controls to pause and resume the agent's execution loop.
+-   \[ \] **High-Stakes Confirmation:** Create a special `HITL` node for actions that require user confirmation.
 
-### Phase 8: Human-in-the-Loop (HITL) Integration
+### Phase 10: Full Database Integration & Reproducibility
 
--   \[ \] **Stop/Pause Button:** Implement the backend logic and frontend button to allow pausing and resuming of the agent's execution loop.
--   \[ \] **High-Stakes Confirmation:** Create a special `HITL` node in the graph for potentially destructive actions, requiring user confirmation via the UI before proceeding.
--   \[ \] **Plan Editing:** A future goal to allow users to edit the agent's plan while it is paused.
-
-### Phase 9: Persistence & Reproducibility
-
--   \[ \] **Database Integration:** Integrate a database (e.g., SQLite) to store all session data.
--   \[ \] **Persistent Chat History:** Save and load user conversations and agent responses.
--   \[ \] **Task Archiving:** Store the full agent state, including the plan, step history, and generated artifacts for every task, allowing for perfect reproducibility.
-
-### Phase 10: Ongoing Capability Expansion
-
--   \[ \] **New Tools:** Continuously add new tools as outlined in the `BRAINSTORM.md`
+-   \[ \] **Database Integration:** Replace the in-memory/file-based session storage with a robust database (e.g., SQLite or PostgreSQL) to store all session data.
+-   \[ \] **Task Archiving & History:** Store and retrieve the full state of previous tasks, allowing for perfect reproducibility.
