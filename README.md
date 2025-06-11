@@ -26,12 +26,14 @@ The core philosophy is built on **transparency, adaptive execution, and security
 │ ├── tools/
 │ │ ├── init.py # Smart tool loader
 │ │ ├── file\_system.py # Sandboxed file I/O tools
-│ │ └── tavily\_search.py # Tavily web search tool
+│ │ ├── tavily\_search.py # Tavily web search tool
+│ │ └── workspace\_shell.py # Tool to execute bash commands
 │ │
 │ ├── init.py # Makes 'backend' a Python package
 │ ├── langgraph\_agent.py # Core PCEE agent logic
 │ ├── prompts.py # Centralized prompts for all agent nodes
-│ └── server.py # WebSocket server entry point
+│ ├── server.py # WebSocket server entry point
+│ └── visualize_graph.py # script to generate an md file to use on mermaid.live
 │
 ├── src/ # Frontend source code
 │ ├── App.jsx # Main UI component
@@ -40,15 +42,20 @@ The core philosophy is built on **transparency, adaptive execution, and security
 │
 ├── .env.example # Template for environment variables
 ├── .gitignore # Specifies files to ignore for version control
+├── BRAINSTORM.md # Document detailing ideas that could be developed for this project
 ├── docker-compose.yml # Orchestrates the Docker container
 ├── Dockerfile # Defines the application's Docker image
 ├── index.html # Main HTML entry point for Vite
 ├── package.json # Frontend dependencies and scripts
 ├── package-lock.json # Locked versions of frontend dependencies
+├── PCEE_ARCHITECTURE.md # Document detailing the vision for the PCEE Agent
 ├── postcss.config.js # PostCSS configuration for Tailwind
 ├── tailwind.config.js # Tailwind CSS configuration
 ├── vite.config.js # Vite build tool configuration
+├── ROADMAP.md # Document detailing the current and future set of task for this project
+├── README.md # This document
 └── requirements.txt # Python dependencies
+
 ```
 
 ## 4. Installation & Setup

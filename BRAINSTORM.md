@@ -4,7 +4,7 @@ This document is a living collection of ideas, architectural concepts, and poten
 
 ## Core Agent Architecture: The "Company" Model
 
-Our agent operates like a small, efficient company with specialized roles:
+Our agent operates like a small, efficient company with specialized roles (check PCEE_ARCHITECTURE.md for more details):
 
 -   **The "Chief Architect" (Planner):** A strategic thinker that creates detailed, structured JSON "blueprints" for each task.
 -   **The "Site Foreman" (Controller):** The project manager that executes the blueprint step-by-step, handling data piping and managing correction sub-loops.
