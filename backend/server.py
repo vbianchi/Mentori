@@ -1,14 +1,14 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (v2.2 - Corrected)
+# ResearchAgent Backend Server (v2.3 - Recursion Limit Fix)
 #
-# This version uses the user-provided server code as a base and correctly
-# implements the dynamic LLM configuration logic in the WebSocket handler.
+# FOCUSED FIX: This version addresses the `GraphRecursionError`.
+# - In the `agent_handler`, when calling `agent_graph.astream_events`,
+#   a `config` dictionary is now passed.
+# - This dictionary contains a `{"recursion_limit": 100}` key-value pair,
+#   increasing the graph's execution limit from the default of 25 to 100.
 #
-# - The `agent_handler` now correctly parses the `prompt` and `llm_config`
-#   from the frontend's JSON message.
-# - It constructs the correct `initial_state` dictionary that the latest
-#   version of `langgraph_agent.py` expects.
-# - All other API endpoints and logic are preserved.
+# This allows the agent to execute longer, more complex plans without
+# prematurely hitting the safety limit. No other changes have been made.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -194,25 +194,28 @@ async def agent_handler(websocket):
         async for message in websocket:
             logger.info("Received new message from client.")
             try:
-                # === THE FIX: Parse the incoming message as JSON from the frontend ===
                 data = json.loads(message)
                 prompt = data.get("prompt")
-                llm_config = data.get("llm_config", {}) # Get the overrides
+                llm_config = data.get("llm_config", {})
 
                 if not prompt:
                     logger.warning("Received payload without a prompt.")
                     continue
 
-                # === THE FIX: Construct the correct initial state for the agent ===
                 initial_state = {
                     "messages": [HumanMessage(content=prompt)],
-                    "llm_config": llm_config, # Pass the config into the graph
+                    "llm_config": llm_config,
                 }
+                
+                # === THE FIX: Define a config with a higher recursion limit ===
+                config = {"recursion_limit": 100}
 
                 logger.info(f"Invoking agent with prompt: {prompt[:100]}...")
                 logger.debug(f"Using LLM config for this run: {llm_config}")
+                logger.debug(f"Graph config: {config}")
 
-                async for event in agent_graph.astream_events(initial_state, version="v1"):
+                # Pass the config to the `astream_events` call
+                async for event in agent_graph.astream_events(initial_state, config=config, version="v1"):
                     event_type = event["event"]
                     if event_type in ["on_chain_start", "on_chain_end"]:
                         response = { "type": "agent_event", "event": event_type, "name": event["name"], "data": event['data'] }
