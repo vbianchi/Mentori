@@ -16,8 +16,9 @@ const CircleDotIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width
 const ChevronDownIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="m6 9 6 6 6-6"/></svg> );
 const SlidersIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><line x1="4" x2="4" y1="21" y2="14" /><line x1="4" x2="4" y1="10" y2="3" /><line x1="12" x2="12" y1="21" y2="12" /><line x1="12" x2="12" y1="8" y2="3" /><line x1="20" x2="20" y1="21" y2="16" /><line x1="20" x2="20" y1="12" y2="3" /><line x1="2" x2="6" y1="14" y2="14" /><line x1="10" x2="14" y1="8" y2="8" /><line x1="18" x2="22" y1="16" y2="16" /></svg> );
 const BrainCircuitIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M12 5a3 3 0 1 0-5.993.142" /><path d="M12 5a3 3 0 1 1 5.993.142" /><path d="M12 12a3 3 0 1 0-5.993.142" /><path d="M12 12a3 3 0 1 1 5.993.142" /><path d="M12 19a3 3 0 1 0-5.993.142" /><path d="M12 19a3 3 0 1 1 5.993.142" /><path d="M20 12h-2" /><path d="M6 12H4" /><path d="M12 15v-3" /><path d="M12 8V6" /><path d="M15 12a3 3 0 1 0-6 0" /><path d="M12 9a3 3 0 1 1-6 0" /></svg> );
+const BotIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M12 8V4H8" /><rect width="16" height="12" x="4" y="8" rx="2" /><path d="M2 14h2" /><path d="M20 14h2" /><path d="M15 13v2" /><path d="M9 13v2" /></svg> );
 
-// --- UI Components (from your version, with additions) ---
+// --- UI Components ---
 const CopyButton = ({ textToCopy, className = '' }) => {
     const [copied, setCopied] = useState(false);
     const handleCopy = (e) => {
@@ -99,7 +100,22 @@ const StepCard = ({ step }) => {
     );
 };
 
-// === New Component for Model Selection ===
+// --- NEW COMPONENT FOR DIRECT ANSWERS ---
+const AnswerCard = ({ answer, model }) => (
+    <div class="p-4 rounded-lg shadow-md bg-gray-800/50 border border-gray-700/50 mb-4">
+        <div class="flex items-center gap-3 mb-3">
+            <BotIcon class="h-6 w-6 text-green-400" />
+            <h3 class="font-bold text-sm text-gray-300 capitalize">Librarian's Answer</h3>
+        </div>
+        <p class="text-white whitespace-pre-wrap font-medium">{answer}</p>
+        <div class="mt-3 pt-2 border-t border-gray-700/50">
+            <InfoBlock icon={<BrainCircuitIcon class="h-4 w-4 text-purple-400" />} title="Model Used">
+                <span class="text-xs font-medium text-purple-300 font-mono">{model}</span>
+            </InfoBlock>
+        </div>
+    </div>
+);
+
 const ModelSelector = ({ label, roleKey, selectedModel, onModelChange, models }) => (
     <div class="mb-4 last:mb-0">
         <label class="block text-sm font-medium text-gray-400 mb-1">{label}</label>
@@ -119,7 +135,6 @@ const ModelSelector = ({ label, roleKey, selectedModel, onModelChange, models })
     </div>
 );
 
-// === New Component for Settings Panel ===
 const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     return (
@@ -158,6 +173,8 @@ export function App() {
     const [prompt, setPrompt] = useState("");
     const [planSteps, setPlanSteps] = useState([]);
     const [isThinking, setIsThinking] = useState(false);
+    // --- NEW STATE FOR DIRECT ANSWERS ---
+    const [directAnswer, setDirectAnswer] = useState(null);
     const [inputValue, setInputValue] = useState("");
     const [connectionStatus, setConnectionStatus] = useState("Disconnected");
     const [workspacePath, setWorkspacePath] = useState(null);
@@ -171,7 +188,6 @@ export function App() {
     const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
     const [runModels, setRunModels] = useState(null);
     
-    // === New State for Dynamic Models ===
     const [availableModels, setAvailableModels] = useState([]);
     const [selectedModels, setSelectedModels] = useState({});
 
@@ -236,7 +252,6 @@ export function App() {
         }
     }, [workspacePath, fetchWorkspaceFiles]);
 
-    // === Effect to fetch models on load ===
     useEffect(() => {
         const fetchModels = async () => {
             try {
@@ -266,51 +281,60 @@ export function App() {
             ws.current.onerror = () => ws.current.close();
             ws.current.onmessage = (event) => {
                 const newEvent = JSON.parse(event.data);
-                
-                const eventWorkspacePath = newEvent.data?.output?.workspace_path || newEvent.data?.input?.workspace_path;
-                if (eventWorkspacePath) {
-                    setWorkspacePath(path => path || eventWorkspacePath);
-                }
 
-                setPlanSteps(prevSteps => {
-                    const data = newEvent.data?.output || {};
-                    const inputData = newEvent.data?.input || {};
-                    if (newEvent.name === 'Chief_Architect' && newEvent.event.includes('end')) {
-                        setIsThinking(false);
-                        const plan = data.plan || [];
-                        return plan.map(step => ({ ...step, status: 'pending' }));
+                // --- LIBRARIAN FIX: Handle the new message type ---
+                if (newEvent.type === 'direct_answer') {
+                    setDirectAnswer(newEvent.data);
+                    setIsThinking(false);
+                    return; // Stop processing this event
+                }
+                
+                if (newEvent.type === 'agent_event') {
+                    const eventWorkspacePath = newEvent.data?.output?.workspace_path || newEvent.data?.input?.workspace_path;
+                    if (eventWorkspacePath) {
+                        setWorkspacePath(path => path || eventWorkspacePath);
                     }
-                    if (newEvent.name === 'Site_Foreman' && newEvent.event.includes('start')) {
-                        const stepIndex = inputData.current_step_index;
-                        if (prevSteps[stepIndex]) {
-                            const newSteps = [...prevSteps];
-                            newSteps[stepIndex] = { ...newSteps[stepIndex], status: 'in-progress' };
-                            return newSteps;
+    
+                    setPlanSteps(prevSteps => {
+                        const data = newEvent.data?.output || {};
+                        const inputData = newEvent.data?.input || {};
+                        if (newEvent.name === 'Chief_Architect' && newEvent.event.includes('end')) {
+                            setIsThinking(false);
+                            const plan = data.plan || [];
+                            return plan.map(step => ({ ...step, status: 'pending' }));
                         }
-                    }
-                    if (newEvent.name === 'Worker' && newEvent.event.includes('end')) {
-                        const stepIndex = inputData.current_step_index;
-                         if (prevSteps[stepIndex]) {
-                            const newSteps = [...prevSteps];
-                            newSteps[stepIndex] = { ...newSteps[stepIndex], status: 'completed', toolCall: inputData.current_tool_call, toolOutput: data.tool_output };
-                            return newSteps;
-                         }
-                    }
-                    return prevSteps;
-                });
+                        if (newEvent.name === 'Site_Foreman' && newEvent.event.includes('start')) {
+                            const stepIndex = inputData.current_step_index;
+                            if (prevSteps[stepIndex]) {
+                                const newSteps = [...prevSteps];
+                                newSteps[stepIndex] = { ...newSteps[stepIndex], status: 'in-progress' };
+                                return newSteps;
+                            }
+                        }
+                        if (newEvent.name === 'Worker' && newEvent.event.includes('end')) {
+                            const stepIndex = inputData.current_step_index;
+                             if (prevSteps[stepIndex]) {
+                                const newSteps = [...prevSteps];
+                                newSteps[stepIndex] = { ...newSteps[stepIndex], status: 'completed', toolCall: inputData.current_tool_call, toolOutput: data.tool_output };
+                                return newSteps;
+                             }
+                        }
+                        return prevSteps;
+                    });
+                }
             };
         }
         connect();
         return () => { if (ws.current) { ws.current.onclose = null; ws.current.close(); }};
     }, []);
 
-    useEffect(() => { scrollToBottom(); }, [planSteps, prompt]);
+    useEffect(() => { scrollToBottom(); }, [planSteps, prompt, directAnswer]);
 
     useEffect(() => {
         if (workspacePath) {
              fetchWorkspaceFiles(workspacePath);
         }
-    }, [planSteps, workspacePath, fetchWorkspaceFiles]); // Re-fetch when plan steps change
+    }, [planSteps, workspacePath, fetchWorkspaceFiles]);
 
 
     const handleSendMessage = (e) => {
@@ -318,7 +342,9 @@ export function App() {
         const message = inputValue.trim();
         if (message && ws.current?.readyState === WebSocket.OPEN) {
             setPrompt(message);
+            // --- LIBRARIAN FIX: Reset both plan steps and direct answer ---
             setPlanSteps([]);
+            setDirectAnswer(null);
             setIsThinking(true);
             setWorkspacePath(null); 
             setWorkspaceFiles([]); 
@@ -326,7 +352,6 @@ export function App() {
             setSelectedFile(null);
             setRunModels(selectedModels);
             
-            // === Send the new JSON payload ===
             const payload = {
                 prompt: message,
                 llm_config: selectedModels,
@@ -355,7 +380,6 @@ export function App() {
                         <div class="flex-grow overflow-y-auto">
                             <p class="text-gray-400">// Task list will go here.</p>
                         </div>
-                        {/* === New Settings Panel Integrated Here === */}
                         <SettingsPanel 
                             models={availableModels}
                             selectedModels={selectedModels}
@@ -388,6 +412,10 @@ export function App() {
                            <LoaderIcon class="h-5 w-5 text-yellow-400" />
                            <p class="text-gray-300 font-medium">Agent is thinking...</p>
                         </div>
+                    )}
+                    {/* --- LIBRARIAN FIX: Render the direct answer if it exists --- */}
+                    {directAnswer && (
+                        <AnswerCard answer={directAnswer} model={getModelNameById(runModels?.ROUTER_LLM_ID)} />
                     )}
                     {planSteps.length > 0 && (
                         <div class="mt-4 border-l-2 border-gray-700/50 pl-6 ml-4">

@@ -1,14 +1,13 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (v2.3 - Recursion Limit Fix)
+# ResearchAgent Backend Server (Librarian/QA Fix)
 #
-# FOCUSED FIX: This version addresses the `GraphRecursionError`.
-# - In the `agent_handler`, when calling `agent_graph.astream_events`,
-#   a `config` dictionary is now passed.
-# - This dictionary contains a `{"recursion_limit": 100}` key-value pair,
-#   increasing the graph's execution limit from the default of 25 to 100.
-#
-# This allows the agent to execute longer, more complex plans without
-# prematurely hitting the safety limit. No other changes have been made.
+# CORRECTION: This version fixes the Direct QA (Librarian) path.
+# - The `agent_handler` now inspects the final output of the graph execution
+#   after the event stream is complete.
+# - If a direct 'answer' is present in the final state, it sends a new,
+#   dedicated WebSocket message: `{"type": "direct_answer", "data": ...}`.
+# - This allows the frontend to distinguish between a multi-step plan and
+#   a simple QA response.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -207,19 +206,27 @@ async def agent_handler(websocket):
                     "llm_config": llm_config,
                 }
                 
-                # === THE FIX: Define a config with a higher recursion limit ===
                 config = {"recursion_limit": 100}
 
                 logger.info(f"Invoking agent with prompt: {prompt[:100]}...")
                 logger.debug(f"Using LLM config for this run: {llm_config}")
                 logger.debug(f"Graph config: {config}")
 
-                # Pass the config to the `astream_events` call
+                last_event = None
                 async for event in agent_graph.astream_events(initial_state, config=config, version="v1"):
+                    last_event = event
                     event_type = event["event"]
                     if event_type in ["on_chain_start", "on_chain_end"]:
                         response = { "type": "agent_event", "event": event_type, "name": event["name"], "data": event['data'] }
                         await websocket.send(json.dumps(response, default=str))
+                
+                # === THE FIX: Check for a direct answer after the stream ends ===
+                if last_event and last_event["event"] == "on_chain_end" and last_event["name"] == "Librarian":
+                    final_output = last_event.get("data", {}).get("output", {})
+                    if final_output and "answer" in final_output:
+                        logger.info(f"Found direct answer: {final_output['answer'][:100]}...")
+                        answer_response = {"type": "direct_answer", "data": final_output["answer"]}
+                        await websocket.send(json.dumps(answer_response))
 
             except json.JSONDecodeError:
                 logger.error(f"Failed to decode JSON from message: {message}")
