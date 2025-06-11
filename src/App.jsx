@@ -133,13 +133,16 @@ const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
              </div>
              {isExpanded && (
                  <div class="mt-4 pl-7">
+                     <ModelSelector label="Router Model" roleKey="ROUTER_LLM_ID" models={models} selectedModel={selectedModels.ROUTER_LLM_ID} onModelChange={onModelChange} />
+                     <p class="text-xs text-gray-500 -mt-2 mb-4">Classifies intent to route tasks.</p>
+
                      <ModelSelector label="Planner Model" roleKey="PLANNER_LLM_ID" models={models} selectedModel={selectedModels.PLANNER_LLM_ID} onModelChange={onModelChange} />
                      <p class="text-xs text-gray-500 -mt-2 mb-4">Creates the high-level plan.</p>
                      
                      <ModelSelector label="Controller Model" roleKey="CONTROLLER_LLM_ID" models={models} selectedModel={selectedModels.CONTROLLER_LLM_ID} onModelChange={onModelChange} />
                      <p class="text-xs text-gray-500 -mt-2 mb-4">Handles advanced logic (future self-correction).</p>
                      
-                      <ModelSelector label="Executor (Default)" roleKey="EXECUTOR_DEFAULT_LLM_ID" models={models} selectedModel={selectedModels.EXECUTOR_DEFAULT_LLM_ID} onModelChange={onModelChange} />
+                      <ModelSelector label="Executor (Default)" roleKey="EXECUTOR_LLM_ID" models={models} selectedModel={selectedModels.EXECUTOR_DEFAULT_LLM_ID} onModelChange={onModelChange} />
                      <p class="text-xs text-gray-500 -mt-2 mb-4">Fallback for simple tool use.</p>
 
                      <ModelSelector label="Evaluator Model" roleKey="EVALUATOR_LLM_ID" models={models} selectedModel={selectedModels.EVALUATOR_LLM_ID} onModelChange={onModelChange} />

@@ -200,14 +200,14 @@ def librarian_node(state: GraphState):
     return {"answer": response.content}
 
 # --- Conditional Routers ---
-def intent_classifier(state: GraphState):
-    """Routes based on user intent."""
-    logger.info("Classifying intent")
-    llm = get_llm(state, "INTENT_CLASSIFIER_LLM_ID", "gemini::gemini-1.5-flash")
-    prompt = f"Classify the user's last message. Respond with 'AGENT_ACTION' for a task, or 'DIRECT_QA' for a simple question.\n\nUser message: '{state['input']}'"
+def router(state: GraphState):
+    """Routes the workflow based on user intent."""
+    logger.info("Routing based on intent")
+    llm = get_llm(state, "ROUTER_LLM_ID", "gemini::gemini-1.5-flash")
+    prompt = f"You are a router. Classify the user's last message. Respond with 'AGENT_ACTION' for a complex task that requires planning, or 'DIRECT_QA' for a simple question that can be answered directly.\n\nUser message: '{state['input']}'"
     response = llm.invoke(prompt)
     decision = response.content.strip()
-    logger.info(f"Intent classified as: {decision}")
+    logger.info(f"Routing decision: {decision}")
     return "Chief_Architect" if "AGENT_ACTION" in decision else "Librarian"
 
 def should_continue(state: GraphState):
@@ -239,7 +239,7 @@ def create_agent_graph():
     
     # Set entry point and define edges
     workflow.set_entry_point("Task_Setup")
-    workflow.add_conditional_edges("Task_Setup", intent_classifier, {"Librarian": "Librarian", "Chief_Architect": "Chief_Architect"})
+    workflow.add_conditional_edges("Task_Setup", router, {"Librarian": "Librarian", "Chief_Architect": "Chief_Architect"})
     workflow.add_edge("Chief_Architect", "Site_Foreman")
     workflow.add_edge("Site_Foreman", "Worker")
     workflow.add_edge("Worker", "Project_Supervisor")
