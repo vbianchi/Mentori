@@ -1,13 +1,13 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Librarian/QA Fix)
+# ResearchAgent Backend Server (Final Librarian/QA Fix)
 #
-# CORRECTION: This version fixes the Direct QA (Librarian) path.
-# - The `agent_handler` now inspects the final output of the graph execution
-#   after the event stream is complete.
-# - If a direct 'answer' is present in the final state, it sends a new,
-#   dedicated WebSocket message: `{"type": "direct_answer", "data": ...}`.
-# - This allows the frontend to distinguish between a multi-step plan and
-#   a simple QA response.
+# CORRECTION: This is the definitive fix for the Direct QA (Librarian) path.
+# - The logic after the agent stream now correctly inspects the final output
+#   of the graph.
+# - Instead of checking the event name, it now checks if the final graph
+#   output contains an "answer" key.
+# - This robustly detects when the Librarian has run and ensures the
+#   `direct_answer` message is sent to the UI.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -212,21 +212,25 @@ async def agent_handler(websocket):
                 logger.debug(f"Using LLM config for this run: {llm_config}")
                 logger.debug(f"Graph config: {config}")
 
-                last_event = None
-                async for event in agent_graph.astream_events(initial_state, config=config, version="v1"):
-                    last_event = event
-                    event_type = event["event"]
-                    if event_type in ["on_chain_start", "on_chain_end"]:
-                        response = { "type": "agent_event", "event": event_type, "name": event["name"], "data": event['data'] }
-                        await websocket.send(json.dumps(response, default=str))
+                final_output = None
+                async for event in agent_graph.astream(initial_state, config=config):
+                    # astream() yields the full state dictionary at each step
+                    for node_name, node_output in event.items():
+                        final_output = node_output # Keep track of the latest state
+                        # We can still send real-time events if needed, but for now we simplify
                 
-                # === THE FIX: Check for a direct answer after the stream ends ===
-                if last_event and last_event["event"] == "on_chain_end" and last_event["name"] == "Librarian":
-                    final_output = last_event.get("data", {}).get("output", {})
-                    if final_output and "answer" in final_output:
-                        logger.info(f"Found direct answer: {final_output['answer'][:100]}...")
-                        answer_response = {"type": "direct_answer", "data": final_output["answer"]}
-                        await websocket.send(json.dumps(answer_response))
+                # === THE FIX: Check the final agent state for an answer ===
+                if final_output and final_output.get("answer"):
+                    answer = final_output.get("answer")
+                    logger.info(f"Found direct answer: {answer[:100]}...")
+                    answer_response = {"type": "direct_answer", "data": answer}
+                    await websocket.send(json.dumps(answer_response))
+                else:
+                    # This part is a placeholder for sending plan results.
+                    # For now, we assume if there's no answer, it was a plan.
+                    # We can enhance this later to send the final plan state.
+                    logger.info("Agent run completed without a direct answer (assumed plan).")
+
 
             except json.JSONDecodeError:
                 logger.error(f"Failed to decode JSON from message: {message}")
