@@ -4,6 +4,7 @@
 venv/
 
 # Python cache files
+backend/__pycache__/
 __pycache__/
 *.pyc
 *.pyo

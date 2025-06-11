@@ -1,10 +1,9 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Prompts (Advanced Architecture)
+# ResearchAgent Prompts (Complete)
 #
-# CORRECTION: Added a critical instruction to the planner to ensure that the
-# `tool_input` field is ALWAYS a JSON object (a dictionary). This creates a
-# more consistent and structured plan, resolving invocation errors for tools
-# that take a single argument, like `workspace_shell`.
+# This file contains the complete set of prompts required by the current
+# version of the langgraph_agent.py file, including the Planner,
+# Controller, and Evaluator prompts.
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
@@ -28,18 +27,89 @@ step-by-step execution plan in JSON format to fulfill the user's request.
   - "step_id": A unique integer for the step (e.g., 1, 2, 3).
   - "instruction": A clear, natural language description of what to do in this step.
   - "tool_name": The single most appropriate tool from the "Available Tools" list to accomplish this step.
-  - "tool_input": A JSON object where keys are the argument names for the chosen tool and values are the corresponding inputs. This MUST be an object, even for tools that take a single argument (e.g., for 'workspace_shell', use {{"command": "your command here"}}).
-  - "expected_output": A clear description of what a successful output from the tool should look like or contain.
+  - "tool_input": The precise input to provide to the chosen tool.
 - Your final output must be a single, valid JSON object containing a "plan" key, which holds a list of these step objects.
-- **CRITICAL:** Ensure the final output is a perfectly valid JSON. All strings must use double quotes. Any double quotes inside a string must be properly escaped with a backslash (e.g., "This is a \\"quoted\\" string.").
+- CRITICAL: Ensure the final output is a perfectly valid JSON. All strings must use double quotes. Any double quotes inside a string must be properly escaped with a backslash (e.g., "This is a \\"quoted\\" string.").
 - Do not add any conversational fluff or explanation. Your output must be ONLY the JSON object.
-
 ---
 **Begin!**
 
 **User Request:**
 {input}
 
-**Your Output (must be a single, valid JSON object):**
+**Your Output (must be a single JSON object):**
+"""
+)
+
+# === RESTORED: Controller Prompt ===
+controller_prompt_template = PromptTemplate.from_template(
+    """
+You are an expert controller agent. Your job is to select the most appropriate 
+tool to execute the given step of a plan, based on the history of previous steps.
+
+**Available Tools:**
+{tools}
+
+**Plan:**
+{plan}
+
+**History of Past Steps:**
+{history}
+
+**Current Step:**
+{current_step}
+
+**Instructions:**
+- Analyze the current step in the context of the plan and the history of past actions.
+- Your output must be a single, valid JSON object containing the chosen tool's name 
+  and the exact input for that tool.
+- Do not add any conversational fluff or explanation. Your output must be ONLY the JSON object.
+---
+**Begin!**
+
+**History of Past Steps:**
+{history}
+
+**Current Step:**
+{current_step}
+
+**Your Output (must be a single JSON object):**
+"""
+)
+
+# === RESTORED: Evaluator Prompt ===
+evaluator_prompt_template = PromptTemplate.from_template(
+    """
+You are an expert evaluator. Your job is to assess the outcome of a tool's 
+execution and determine if the step was successful.
+
+**Plan Step:**
+{current_step}
+
+**Controller's Action (the tool call that was just executed):**
+{tool_call}
+
+**Tool's Output:**
+{tool_output}
+
+**Instructions:**
+- Analyze the tool's output in the context of both the Plan Step and the Controller's Action.
+- Determine if the step was successfully completed. The goal is to see if the Controller's Action successfully addressed the Plan Step.
+- Your output must be a single, valid JSON object containing a "status" key, 
+  which can be "success" or "failure", and a "reasoning" key with a brief explanation.
+- Do not add any conversational fluff or explanation. Your output must be ONLY the JSON object.
+---
+**Begin!**
+
+**Plan Step:**
+{current_step}
+
+**Controller's Action:**
+{tool_call}
+
+**Tool's Output:**
+{tool_output}
+
+**Your Output (must be a single JSON object):**
 """
 )
