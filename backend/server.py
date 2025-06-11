@@ -1,14 +1,14 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (v2.1 - .env Aware)
+# ResearchAgent Backend Server (v2.2 - Corrected)
 #
-# REFACTOR: This version is completely rewritten to be aware of the detailed
-# .env schema provided by the user.
-# - `_handle_get_models` now parses the comma-separated model lists and the
-#   specific default ID for each agent role (e.g., PLANNER_LLM_ID).
-# - It sends a structured response to the frontend containing both the list of
-#   all available models and the specific defaults configured in .env, making
-#   the user's configuration the single source of truth for the UI's initial
-#   state.
+# This version uses the user-provided server code as a base and correctly
+# implements the dynamic LLM configuration logic in the WebSocket handler.
+#
+# - The `agent_handler` now correctly parses the `prompt` and `llm_config`
+#   from the frontend's JSON message.
+# - It constructs the correct `initial_state` dictionary that the latest
+#   version of `langgraph_agent.py` expects.
+# - All other API endpoints and logic are preserved.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -92,7 +92,6 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         available_models = []
         model_ids = set()
 
-        # Helper to parse comma-separated model lists
         def parse_and_add_models(env_var, provider_prefix):
             models_str = os.getenv(env_var)
             if models_str:
@@ -104,31 +103,28 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
                             available_models.append({"id": full_id, "name": format_model_name(full_id)})
                             model_ids.add(full_id)
 
-        # Parse models from both providers
         parse_and_add_models("GEMINI_AVAILABLE_MODELS", "gemini")
         parse_and_add_models("OLLAMA_AVAILABLE_MODELS", "ollama")
 
-        # Define a safe fallback if absolutely no models are configured
         safe_fallback_model = "gemini::gemini-1.5-flash-latest"
         if not available_models:
             available_models.append({"id": safe_fallback_model, "name": format_model_name(safe_fallback_model)})
-            logger.warning("No models found in GEMINI_AVAILABLE_MODELS or OLLAMA_AVAILABLE_MODELS. Using a single safe fallback.")
+            logger.warning("No models found in .env. Using a single safe fallback.")
 
-        # Read the global default LLM ID, which serves as a fallback for role-specific defaults
         global_default_llm = os.getenv("DEFAULT_LLM_ID", safe_fallback_model)
 
-        # Read role-specific defaults, using the global default if a specific role is not set
         default_models = {
-            "planner": os.getenv("PLANNER_LLM_ID", global_default_llm),
-            "controller": os.getenv("CONTROLLER_LLM_ID", global_default_llm),
-            "evaluator": os.getenv("EVALUATOR_LLM_ID", global_default_llm),
+            "PLANNER_LLM_ID": os.getenv("PLANNER_LLM_ID", global_default_llm),
+            "CONTROLLER_LLM_ID": os.getenv("CONTROLLER_LLM_ID", global_default_llm),
+            "EXECUTOR_DEFAULT_LLM_ID": os.getenv("EXECUTOR_DEFAULT_LLM_ID", global_default_llm),
+            "EVALUATOR_LLM_ID": os.getenv("EVALUATOR_LLM_ID", global_default_llm),
+            "INTENT_CLASSIFIER_LLM_ID": os.getenv("INTENT_CLASSIFIER_LLM_ID", global_default_llm),
         }
 
         response_data = {
             "available_models": available_models,
             "default_models": default_models
         }
-
         self._send_json_response(200, response_data)
 
     def _handle_list_files(self, parsed_path):
@@ -140,7 +136,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         try:
             full_path = _resolve_path(base_workspace, subdir)
             if os.path.isdir(full_path):
-                 self._send_json_response(200, {"files": os.listdir(full_path)})
+                self._send_json_response(200, {"files": os.listdir(full_path)})
             else:
                 self._send_json_response(404, {"error": f"Directory '{subdir}' not found."})
         except Exception as e:
@@ -156,7 +152,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             workspace_dir = f"/app/workspace/{workspace_id}"
             full_path = _resolve_path(workspace_dir, filename)
             with open(full_path, 'r', encoding='utf-8') as f:
-                 content = f.read()
+                content = f.read()
             self.send_response(200)
             self.send_header('Content-type', 'text/plain; charset=utf-8')
             self.send_header('Access-Control-Allow-Origin', '*')
@@ -170,23 +166,18 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             form = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': self.headers['Content-Type']})
             workspace_id = form.getvalue('workspace_id')
             file_item = form['file']
-            
             if not workspace_id or not hasattr(file_item, 'filename') or not file_item.filename:
                 return self._send_json_response(400, {'error': 'Missing workspace_id or file.'})
-
             filename = os.path.basename(file_item.filename)
             workspace_dir = f"/app/workspace/{workspace_id}"
             full_path = _resolve_path(workspace_dir, filename)
-
             with open(full_path, 'wb') as f:
                 f.write(file_item.file.read())
-
             logger.info(f"Uploaded '{filename}' to workspace '{workspace_id}'")
             self._send_json_response(200, {'message': f"File '{filename}' uploaded successfully."})
         except Exception as e:
             logger.error(f"File upload failed: {e}", exc_info=True)
             self._send_json_response(500, {'error': f'Server error during file upload: {e}'})
-
 
 def run_http_server():
     host = os.getenv("BACKEND_HOST", "0.0.0.0")
@@ -196,27 +187,30 @@ def run_http_server():
     logger.info(f"Starting HTTP file server at http://{host}:{port}")
     httpd.serve_forever()
 
-# --- WebSocket Handler ---
+# --- WebSocket Handler (Upgraded) ---
 async def agent_handler(websocket):
     logger.info(f"Client connected from {websocket.remote_address}")
     try:
         async for message in websocket:
             logger.info("Received new message from client.")
             try:
-                payload = json.loads(message)
-                prompt_text = payload.get("prompt")
-                models_config = payload.get("models", {})
+                # === THE FIX: Parse the incoming message as JSON from the frontend ===
+                data = json.loads(message)
+                prompt = data.get("prompt")
+                llm_config = data.get("llm_config", {}) # Get the overrides
 
-                if not prompt_text:
+                if not prompt:
                     logger.warning("Received payload without a prompt.")
                     continue
 
+                # === THE FIX: Construct the correct initial state for the agent ===
                 initial_state = {
-                    "messages": [HumanMessage(content=json.dumps(payload))],
+                    "messages": [HumanMessage(content=prompt)],
+                    "llm_config": llm_config, # Pass the config into the graph
                 }
 
-                logger.info(f"Invoking agent with prompt: {prompt_text[:100]}...")
-                logger.info(f"Using models: {models_config}")
+                logger.info(f"Invoking agent with prompt: {prompt[:100]}...")
+                logger.debug(f"Using LLM config for this run: {llm_config}")
 
                 async for event in agent_graph.astream_events(initial_state, version="v1"):
                     event_type = event["event"]
@@ -226,12 +220,10 @@ async def agent_handler(websocket):
 
             except json.JSONDecodeError:
                 logger.error(f"Failed to decode JSON from message: {message}")
-                error_response = {"type": "error", "data": "Invalid JSON format received."}
-                await websocket.send(json.dumps(error_response))
+                await websocket.send(json.dumps({"type": "error", "data": "Invalid JSON format received."}))
             except Exception as e:
                 logger.error(f"Error processing message: {e}", exc_info=True)
-                error_response = {"type": "error", "data": str(e)}
-                await websocket.send(json.dumps(error_response))
+                await websocket.send(json.dumps({"type": "error", "data": str(e)}))
 
     except websockets.exceptions.ConnectionClosed as e:
         logger.info(f"Client disconnected: {e}")

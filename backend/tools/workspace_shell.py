@@ -1,98 +1,67 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Tool: Workspace Shell (Structured & Robust)
+# ResearchAgent Tool: Sandboxed Workspace Shell
 #
-# FINAL CORRECTION 2: The tool is now defined with both `func` (synchronous)
-# and `coroutine` (asynchronous) methods. This makes the tool robust and fully
-# compatible with LangChain's execution model, which may use either sync or
-# async calls depending on the context. A synchronous wrapper is created to
-# run the async logic, ensuring consistent behavior. This definitively solves
-# the persistent `TypeError`.
+# This file defines a robust, sandboxed shell tool for the agent.
+# It uses a Pydantic schema to clearly define its expected arguments.
 # -----------------------------------------------------------------------------
 
-import logging
 import os
+import logging
 import asyncio
 from langchain_core.tools import StructuredTool
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
-# --- Configuration ---
-SHELL_TIMEOUT = int(os.getenv("TOOL_SHELL_TIMEOUT", 120))
+# --- Pydantic Schema for Robust Argument Parsing ---
+class ShellInput(BaseModel):
+    command: str = Field(description="The shell command to execute.")
 
-# --- Pydantic Schema for Tool Arguments ---
-class WorkspaceShellInput(BaseModel):
-    """Input schema for the workspace_shell tool."""
-    command: str = Field(..., description="The shell command to execute.")
+# --- Security Helper ---
+def _resolve_path(workspace_path: str) -> str:
+    abs_workspace_path = os.path.abspath(workspace_path)
+    if not abs_workspace_path.startswith(os.path.abspath("/app/workspace")):
+        raise PermissionError("Attempted to access a directory outside of the main workspace.")
+    return abs_workspace_path
 
-# --- Core Tool Logic (Asynchronous) ---
-async def _arun_shell_command(command: str, workspace_path: str) -> str:
-    """
-    Asynchronously executes a shell command within the specified workspace directory
-    and captures its stdout and stderr.
-    """
+# --- Core Tool Logic ---
+async def run_shell_command(command: str, workspace_path: str) -> str:
+    """Asynchronously executes a shell command in the secure workspace."""
     if not command:
         return "Error: No command provided."
-
-    logger.info(f"Executing shell command: `{command}` in workspace: `{workspace_path}`")
-
+    
     try:
+        # Securely resolve the workspace path to use as the Current Working Directory (CWD)
+        cwd = _resolve_path(workspace_path)
+        logger.info(f"Executing shell command in '{cwd}': `{command}`")
+        
         process = await asyncio.create_subprocess_shell(
             command,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
-            cwd=workspace_path  # Execute the command in the sandboxed directory
+            cwd=cwd # Execute the command in the sandboxed directory
         )
 
-        stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=SHELL_TIMEOUT)
-
-        stdout_str = stdout.decode().strip()
-        stderr_str = stderr.decode().strip()
-
-        result_parts = []
-        if stdout_str:
-            result_parts.append(f"STDOUT:\n---\n{stdout_str}\n---")
-        if stderr_str:
-            result_parts.append(f"STDERR:\n---\n{stderr_str}\n---")
-
-        output = "\n".join(result_parts)
+        stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=60)
+        
+        stdout_str = stdout.decode(errors='ignore').strip()
+        stderr_str = stderr.decode(errors='ignore').strip()
 
         if process.returncode == 0:
-            logger.info(f"Command `{command}` finished successfully.")
-            return output if output else "Command executed successfully with no output."
+            logger.info(f"Command finished successfully. Output: {stdout_str[:100]}")
+            return stdout_str if stdout_str else "Command executed successfully with no output."
         else:
-            logger.warning(f"Command `{command}` failed with exit code {process.returncode}.")
-            return f"Command failed with exit code {process.returncode}.\n{output}"
+            logger.error(f"Command failed with exit code {process.returncode}. Stderr: {stderr_str}")
+            return f"Error: Command failed with exit code {process.returncode}\n---STDERR---\n{stderr_str}"
 
-    except asyncio.TimeoutError:
-        logger.error(f"Command `{command}` timed out after {SHELL_TIMEOUT} seconds.")
-        return f"Error: Command timed out after {SHELL_TIMEOUT} seconds. The process was killed."
     except Exception as e:
         logger.error(f"An unexpected error occurred while running command `{command}`: {e}", exc_info=True)
         return f"An unexpected error occurred: {str(e)}"
 
-# --- Synchronous Wrapper for the Tool ---
-def _run_shell_command_sync(command: str, workspace_path: str) -> str:
-    """Synchronous wrapper to run the async shell command function."""
-    try:
-        # Get the existing event loop or create a new one
-        loop = asyncio.get_running_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-    
-    return loop.run_until_complete(_arun_shell_command(command, workspace_path))
-
-
 # --- Tool Definition ---
 tool = StructuredTool.from_function(
-    func=_run_shell_command_sync,     # The synchronous entry point
-    coroutine=_arun_shell_command,  # The asynchronous entry point
+    func=run_shell_command,
     name="workspace_shell",
-    description=(
-        "Executes a single, non-interactive shell command within the agent's secure workspace. "
-        "This is best for system commands, running scripts, or complex file manipulations. "
-        "For simple file creation or overwriting, prefer the `write_file` tool."
-    ),
-    args_schema=WorkspaceShellInput,
+    description="Executes a single, non-interactive shell command within the current task's secure workspace. Use it for tasks like running scripts, managing files, and version control.",
+    args_schema=ShellInput
 )

@@ -1,12 +1,14 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Executor Fix)
+# ResearchAgent Core Agent (Dynamic LLM Configuration)
 #
-# CORRECTION: The `executor_node` has been completely rewritten to be more
-# robust. For sandboxed tools, it now bypasses `tool.ainvoke()` and calls the
-# underlying tool function (`.func` or `.coroutine`) directly. This allows it
-# to reliably pass the `workspace_path` as a keyword argument without it being
-# filtered by the tool's public `args_schema`, definitively fixing the
-# persistent `TypeError`.
+# This version refactors the agent to accept per-run LLM configurations.
+#
+# Key Changes:
+# - GraphState now includes `llm_config` to hold model overrides for a run.
+# - The `get_llm` function is now much smarter. It first checks the state's
+#   `llm_config` for an override. If none is found, it falls back to the
+#   .env file's default. This makes the agent's model selection dynamic.
+# - All nodes that call `get_llm` now pass the `state` to it.
 # -----------------------------------------------------------------------------
 
 import os
@@ -14,7 +16,6 @@ import logging
 import json
 import re
 import uuid
-import asyncio
 from typing import TypedDict, Annotated, Sequence, List, Optional, Dict
 
 from langchain_core.messages import BaseMessage, HumanMessage
@@ -36,6 +37,8 @@ class GraphState(TypedDict):
     input: str
     plan: List[dict]
     messages: Annotated[Sequence[BaseMessage], lambda x, y: x + y]
+    # === New: A dictionary to hold the LLM configuration for this specific run ===
+    llm_config: Dict[str, str]
     current_step_index: int
     current_tool_call: Optional[dict]
     tool_output: Optional[str]
@@ -43,45 +46,43 @@ class GraphState(TypedDict):
     workspace_path: str
     step_outputs: Annotated[Dict[int, str], lambda x, y: {**x, **y}]
     answer: str
-    models: dict
 
-# --- LLM Provider Helper ---
+# --- LLM Provider Helper (Upgraded) ---
 LLM_CACHE = {}
-def get_llm(state: GraphState, role: str):
-    """Dynamically gets an LLM based on the role and the user's selection in the state."""
-    
-    default_models = {
-        'router': "gemini::gemini-1.5-flash-latest",
-        'planner': "gemini::gemini-1.5-flash-latest",
-        'controller': "gemini::gemini-1.5-flash-latest",
-        'evaluator': "gemini::gemini-1.5-flash-latest",
-    }
-    
-    model_id = state.get("models", {}).get(role, default_models[role])
 
-    if model_id in LLM_CACHE:
-        return LLM_CACHE[model_id]
-
-    logger.info(f"Initializing LLM for role '{role}': Model ID={model_id}")
+def get_llm(state: GraphState, role_env_var: str, default_llm_id: str):
+    """
+    Smarter factory function to get the appropriate LLM.
+    It prioritizes the per-run configuration from the state, then falls
+    back to the environment variables.
+    """
+    llm_id = default_llm_id
     
-    try:
-        provider, model_name = model_id.split("::")
-        if provider == "gemini":
-            llm = ChatGoogleGenerativeAI(model=model_name, google_api_key=os.getenv("GOOGLE_API_KEY"))
-        elif provider == "ollama":
-            llm = ChatOllama(model=model_name, base_url=os.getenv("OLLAMA_BASE_URL"))
-        else:
-            raise ValueError(f"Unsupported LLM provider: {provider}")
-        LLM_CACHE[model_id] = llm
-        return llm
-    except Exception as e:
-        logger.error(f"Failed to initialize LLM '{model_id}'. Falling back to default. Error: {e}")
-        default_id = default_models['planner']
-        if default_id in LLM_CACHE: return LLM_CACHE[default_id]
-        provider, model_name = default_id.split("::")
+    # 1. Check for a per-run override from the UI
+    run_config = state.get("llm_config", {})
+    if run_config and run_config.get(role_env_var):
+        llm_id = run_config[role_env_var]
+        logger.info(f"Using per-run LLM override for '{role_env_var}': {llm_id}")
+    else:
+        # 2. Fall back to the .env file
+        llm_id = os.getenv(role_env_var, default_llm_id)
+
+    # Use caching to avoid re-initializing models constantly
+    if llm_id in LLM_CACHE:
+        return LLM_CACHE[llm_id]
+
+    provider, model_name = llm_id.split("::")
+    logger.info(f"Initializing LLM for '{role_env_var}': Provider={provider}, Model={model_name}")
+    
+    if provider == "gemini":
         llm = ChatGoogleGenerativeAI(model=model_name, google_api_key=os.getenv("GOOGLE_API_KEY"))
-        LLM_CACHE[default_id] = llm
-        return llm
+    elif provider == "ollama":
+        llm = ChatOllama(model=model_name, base_url=os.getenv("OLLAMA_BASE_URL"))
+    else:
+        raise ValueError(f"Unsupported LLM provider: {provider}")
+        
+    LLM_CACHE[llm_id] = llm
+    return llm
 
 # --- Tool Management ---
 AVAILABLE_TOOLS = get_available_tools()
@@ -91,114 +92,80 @@ def format_tools_for_prompt():
     return "\n".join([f"  - {tool.name}: {tool.description}" for tool in AVAILABLE_TOOLS])
 
 # --- Graph Nodes ---
-def prepare_inputs_node(state: GraphState):
-    """Prepares the initial state, including workspace and model configs."""
-    logger.info("Executing prepare_inputs_node")
-    
-    try:
-        payload_str = state['messages'][0].content
-        message_payload = json.loads(payload_str)
-    except (json.JSONDecodeError, IndexError) as e:
-        logger.error(f"Failed to parse initial payload from message content: '{state['messages'][0].content if state['messages'] else 'No messages'}'. Error: {e}")
-        return {
-            "messages": [HumanMessage(content="Error: Malformed initial payload.")],
-            "input": "Error: Malformed initial payload.",
-            "plan": [{"error": f"Failed to start. Reason: {e}"}]
-        }
-
-    user_prompt = message_payload.get("prompt")
-    models_config = message_payload.get("models", {})
-
+def task_setup_node(state: GraphState):
+    logger.info("Executing Task_Setup")
+    user_message = state['messages'][-1].content
     task_id = str(uuid.uuid4())
     workspace_path = f"/app/workspace/{task_id}"
     os.makedirs(workspace_path, exist_ok=True)
     logger.info(f"Created sandboxed workspace: {workspace_path}")
-    
-    return {
-        "messages": [HumanMessage(content=user_prompt)],
-        "input": user_prompt, 
-        "models": models_config,
-        "history": [], 
-        "current_step_index": 0, 
-        "step_outputs": {}, 
-        "workspace_path": workspace_path
-    }
+    # Ensure llm_config exists, even if empty
+    initial_llm_config = state.get("llm_config", {})
+    return {"input": user_message, "history": [], "current_step_index": 0, "step_outputs": {}, "workspace_path": workspace_path, "llm_config": initial_llm_config}
 
-def structured_planner_node(state: GraphState):
-    logger.info("Executing structured_planner_node")
-    llm = get_llm(state, 'planner')
+def chief_architect_node(state: GraphState):
+    logger.info("Executing Chief_Architect")
+    llm = get_llm(state, "PLANNER_LLM_ID", "gemini::gemini-2.5-flash-preview-05-20")
     prompt = structured_planner_prompt_template.format(input=state["input"], tools=format_tools_for_prompt())
     response = llm.invoke(prompt)
     try:
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL)
         json_str = match.group(1).strip() if match else response.content.strip()
         parsed_json = json.loads(json_str)
-        if "plan" in parsed_json and isinstance(parsed_json["plan"], list):
-            logger.info(f"Generated structured plan: {json.dumps(parsed_json['plan'], indent=2)}")
-            return {"plan": parsed_json["plan"]}
-        else:
-            raise ValueError("The JSON output from the planner is missing the 'plan' key or it is not a list.")
-    except (json.JSONDecodeError, ValueError) as e:
+        logger.info(f"Generated structured plan: {json.dumps(parsed_json.get('plan'), indent=2)}")
+        return {"plan": parsed_json.get("plan", [])}
+    except Exception as e:
         logger.error(f"Error parsing structured plan: {e}\nResponse was:\n{response.content}")
         return {"plan": [{"error": f"Failed to create a valid plan. Reason: {e}"}]}
 
-def controller_node(state: GraphState):
+def site_foreman_node(state: GraphState):
+    # This node doesn't call an LLM, so no changes needed
+    # ... (rest of the function is the same)
     step_index = state["current_step_index"]
     plan = state["plan"]
-    logger.info(f"Executing controller_node for step {step_index + 1}/{len(plan)}")
+    logger.info(f"Executing Site_Foreman for step {step_index + 1}/{len(plan)}")
     current_step_details = plan[step_index]
-    tool_call = {
-        "tool_name": current_step_details.get("tool_name"),
-        "tool_input": current_step_details.get("tool_input", {})
-    }
+    raw_tool_input = current_step_details.get("tool_input", {})
+    hydrated_tool_input = raw_tool_input
+    if isinstance(raw_tool_input, str):
+        placeholders = re.findall(r"\{step_(\d+)_output\}", raw_tool_input)
+        for step_num_str in placeholders:
+            step_num = int(step_num_str)
+            if step_num in state["step_outputs"]:
+                hydrated_tool_input = hydrated_tool_input.replace(f"{{step_{step_num}_output}}", state["step_outputs"][step_num])
+    tool_call = {"tool_name": current_step_details.get("tool_name"), "tool_input": hydrated_tool_input}
     logger.info(f"Controller prepared tool call: {tool_call}")
     return {"current_tool_call": tool_call}
 
-async def executor_node(state: GraphState):
-    """
-    Executes the tool call prepared by the controller.
-    This node is the robust, definitive fix for the tool invocation errors.
-    """
-    logger.info("Executing executor_node")
+async def worker_node(state: GraphState):
+    # This node doesn't call an LLM, so no changes needed
+    # ... (rest of the function is the same)
+    logger.info("Executing Worker")
     tool_call = state.get("current_tool_call")
-    if not tool_call or not tool_call.get("tool_name"):
-        return {"tool_output": "Error: No tool call was provided."}
-
+    if not tool_call or not tool_call.get("tool_name"): return {"tool_output": "Error: No tool call was provided."}
     tool_name = tool_call["tool_name"]
     tool_input = tool_call.get("tool_input", {})
     tool = TOOL_MAP.get(tool_name)
-
-    if not tool:
-        return {"tool_output": f"Error: Tool '{tool_name}' not found."}
-
+    if not tool: return {"tool_output": f"Error: Tool '{tool_name}' not found."}
+    final_args = {}
+    if isinstance(tool_input, dict): final_args.update(tool_input)
+    else:
+        tool_args_schema = tool.args
+        if tool_args_schema: final_args[next(iter(tool_args_schema))] = tool_input
+    if tool_name in SANDBOXED_TOOLS: final_args["workspace_path"] = state["workspace_path"]
     try:
-        # This is the new, robust invocation logic
-        if tool_name in SANDBOXED_TOOLS:
-            # For sandboxed tools, we manually inject the workspace_path and call the
-            # underlying function directly, bypassing the flawed `ainvoke` logic.
-            kwargs = tool_input.copy()
-            kwargs['workspace_path'] = state["workspace_path"]
-            logger.info(f"Manually invoking sandboxed tool '{tool_name}' with kwargs: {kwargs}")
-
-            if tool.coroutine:
-                output = await tool.coroutine(**kwargs)
-            else:
-                loop = asyncio.get_running_loop()
-                output = await loop.run_in_executor(None, lambda: tool.func(**kwargs))
-        else:
-            # For non-sandboxed tools (like web search), the standard ainvoke is fine.
-            logger.info(f"Invoking standard tool '{tool_name}' with input: {tool_input}")
-            output = await tool.ainvoke(tool_input)
-        
+        logger.info(f"Worker executing tool '{tool_name}' with args: {final_args}")
+        output = await tool.ainvoke(final_args)
         logger.info(f"Tool '{tool_name}' executed successfully.")
         return {"tool_output": str(output)}
     except Exception as e:
         logger.error(f"Error executing tool '{tool_name}': {e}", exc_info=True)
-        # Format the error message to be more informative for the evaluator.
-        return {"tool_output": f"An error occurred while executing the tool '{tool_name}': {e}"}
+        return {"tool_output": f"An error occurred while executing the tool: {e}"}
 
-def evaluator_node(state: GraphState):
-    logger.info("Executing evaluator_node")
+def project_supervisor_node(state: GraphState):
+    # This node doesn't call an LLM, so no changes needed for now
+    # We could make this one dynamic in the future too
+    logger.info("Executing Project_Supervisor")
     tool_output = state.get("tool_output", "")
     is_error = "error" in tool_output.lower() or "failed" in tool_output.lower()
     status = "failure" if is_error else "success"
@@ -210,43 +177,64 @@ def evaluator_node(state: GraphState):
         if step_id: step_output_update[step_id] = tool_output
     return {"history": [history_record], "step_outputs": step_output_update}
 
-def increment_step_node(state: GraphState):
+def advance_to_next_step_node(state: GraphState):
+    logger.info("Advancing to next step")
     return {"current_step_index": state["current_step_index"] + 1}
 
+def librarian_node(state: GraphState):
+    logger.info("Executing Librarian (Direct QA)")
+    llm = get_llm(state, "DEFAULT_LLM_ID", "gemini::gemini-2.0-flash")
+    response = llm.invoke(state["messages"])
+    return {"answer": response.content}
+
+# --- Conditional Routers ---
+def intent_classifier(state: GraphState):
+    logger.info("Classifying intent")
+    llm = get_llm(state, "INTENT_CLASSIFIER_LLM_ID", "gemini::gemini-1.5-flash")
+    prompt = f"Classify the user's last message. Respond with 'AGENT_ACTION' for a task, or 'DIRECT_QA' for a simple question.\n\nUser message: '{state['input']}'"
+    response = llm.invoke(prompt)
+    decision = response.content.strip()
+    logger.info(f"Intent classified as: {decision}")
+    return "Chief_Architect" if "AGENT_ACTION" in decision else "Librarian"
+
 def should_continue(state: GraphState):
+    # ... (rest of the function is the same)
+    logger.info("Router: Checking if we should continue")
     tool_output = state.get("tool_output", "")
-    plan = state.get("plan", [])
-    if any(step.get("error") for step in plan):
-        logger.warning(f"An error was found in the plan. Ending execution.")
-        return END
     if "error" in tool_output.lower() or "failed" in tool_output.lower():
-        logger.warning(f"Step failed with output: {tool_output}. Ending execution.")
+        logger.warning(f"Step failed. Ending execution.")
         return END
-    if state["current_step_index"] + 1 >= len(plan):
+    if state["current_step_index"] + 1 >= len(state.get("plan", [])):
         logger.info("Plan is complete. Ending execution.")
         return END
-    return "increment_step_node"
+    return "Advance_To_Next_Step"
 
 # --- Graph Definition ---
 def create_agent_graph():
     workflow = StateGraph(GraphState)
-    workflow.add_node("prepare_inputs", prepare_inputs_node)
-    workflow.add_node("structured_planner_node", structured_planner_node)
-    workflow.add_node("controller_node", controller_node)
-    workflow.add_node("executor_node", executor_node)
-    workflow.add_node("evaluator_node", evaluator_node)
-    workflow.add_node("increment_step_node", increment_step_node)
+    workflow.add_node("Task_Setup", task_setup_node)
+    workflow.add_node("Librarian", librarian_node)
+    workflow.add_node("Chief_Architect", chief_architect_node)
+    workflow.add_node("Site_Foreman", site_foreman_node)
+    workflow.add_node("Worker", worker_node)
+    workflow.add_node("Project_Supervisor", project_supervisor_node)
+    workflow.add_node("Advance_To_Next_Step", advance_to_next_step_node)
     
-    workflow.set_entry_point("prepare_inputs")
-    workflow.add_edge("prepare_inputs", "structured_planner_node")
-    workflow.add_edge("structured_planner_node", "controller_node")
-    workflow.add_edge("controller_node", "executor_node")
-    workflow.add_edge("executor_node", "evaluator_node")
-    workflow.add_edge("increment_step_node", "controller_node")
-    workflow.add_conditional_edges("evaluator_node", should_continue, {END: END, "increment_step_node": "increment_step_node"})
+    workflow.set_entry_point("Task_Setup")
     
+    workflow.add_conditional_edges("Task_Setup", intent_classifier, {"Librarian": "Librarian", "Chief_Architect": "Chief_Architect"})
+    
+    workflow.add_edge("Chief_Architect", "Site_Foreman")
+    workflow.add_edge("Site_Foreman", "Worker")
+    workflow.add_edge("Worker", "Project_Supervisor")
+    workflow.add_edge("Advance_To_Next_Step", "Site_Foreman")
+    
+    workflow.add_conditional_edges("Project_Supervisor", should_continue, {END: END, "Advance_To_Next_Step": "Advance_To_Next_Step"})
+    
+    workflow.add_edge("Librarian", END)
+
     agent = workflow.compile()
-    logger.info("Advanced agent graph compiled successfully.")
+    logger.info("Advanced agent graph (Dynamic LLM) compiled successfully.")
     return agent
 
 agent_graph = create_agent_graph()

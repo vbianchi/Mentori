@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
 
-// --- SVG Icons ---
+// --- SVG Icons (from your version) ---
 const ChevronsLeftIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="m11 17-5-5 5-5" /><path d="m18 17-5-5 5-5" /></svg> );
 const ChevronsRightIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="m6 17 5-5-5-5" /><path d="m13 17 5-5-5-5" /></svg> );
 const FileIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" /><polyline points="14 2 14 8 20 8" /></svg> );
@@ -17,7 +17,7 @@ const ChevronDownIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" wid
 const SlidersIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><line x1="4" x2="4" y1="21" y2="14" /><line x1="4" x2="4" y1="10" y2="3" /><line x1="12" x2="12" y1="21" y2="12" /><line x1="12" x2="12" y1="8" y2="3" /><line x1="20" x2="20" y1="21" y2="16" /><line x1="20" x2="20" y1="12" y2="3" /><line x1="2" x2="6" y1="14" y2="14" /><line x1="10" x2="14" y1="8" y2="8" /><line x1="18" x2="22" y1="16" y2="16" /></svg> );
 const BrainCircuitIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M12 5a3 3 0 1 0-5.993.142" /><path d="M12 5a3 3 0 1 1 5.993.142" /><path d="M12 12a3 3 0 1 0-5.993.142" /><path d="M12 12a3 3 0 1 1 5.993.142" /><path d="M12 19a3 3 0 1 0-5.993.142" /><path d="M12 19a3 3 0 1 1 5.993.142" /><path d="M20 12h-2" /><path d="M6 12H4" /><path d="M12 15v-3" /><path d="M12 8V6" /><path d="M15 12a3 3 0 1 0-6 0" /><path d="M12 9a3 3 0 1 1-6 0" /></svg> );
 
-// --- UI Components ---
+// --- UI Components (from your version, with additions) ---
 const CopyButton = ({ textToCopy, className = '' }) => {
     const [copied, setCopied] = useState(false);
     const handleCopy = (e) => {
@@ -76,38 +76,39 @@ const StepCard = ({ step }) => {
                 {getStatusIcon()}
                 <p class="text-gray-200 font-medium flex-1">{step.instruction}</p>
                 <ChevronDownIcon class={`h-5 w-5 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-            </div>
-            {isExpanded && step.status === 'completed' && step.toolCall && (
-                <div class="p-4 pt-0">
-                    <div class="ml-9 pl-4 border-l border-gray-700">
+             </div>
+             {isExpanded && step.status === 'completed' && step.toolCall && (
+                 <div class="p-4 pt-0">
+                     <div class="ml-9 pl-4 border-l border-gray-700">
                          <InfoBlock icon={<ZapIcon class="h-4 w-4 text-gray-400" />} title="Action">
                             <pre class="text-xs text-cyan-300 overflow-x-auto p-2 bg-black/20 rounded-md font-mono relative">
                                 <CopyButton textToCopy={JSON.stringify(step.toolCall, null, 2)} className="absolute top-1 right-1" />
                                 <code>{JSON.stringify(step.toolCall, null, 2)}</code>
                             </pre>
-                        </InfoBlock>
-                        <InfoBlock icon={<ChevronsRightIcon class="h-4 w-4 text-gray-400" />} title="Observation">
+                         </InfoBlock>
+                         <InfoBlock icon={<ChevronsRightIcon class="h-4 w-4 text-gray-400" />} title="Observation">
                              <pre class="text-xs text-gray-300 mt-1 whitespace-pre-wrap font-mono relative">
-                                <CopyButton textToCopy={step.toolOutput} className="absolute top-1 right-1" />
-                                {step.toolOutput}
-                             </pre>
-                        </InfoBlock>
-                    </div>
-                </div>
-            )}
+                                 <CopyButton textToCopy={step.toolOutput} className="absolute top-1 right-1" />
+                                 {step.toolOutput}
+                               </pre>
+                         </InfoBlock>
+                     </div>
+                 </div>
+             )}
         </div>
     );
 };
 
-const ModelSelector = ({ label, selectedModel, onModelChange, models }) => (
+// === New Component for Model Selection ===
+const ModelSelector = ({ label, roleKey, selectedModel, onModelChange, models }) => (
     <div class="mb-4 last:mb-0">
         <label class="block text-sm font-medium text-gray-400 mb-1">{label}</label>
         <div class="relative">
             <select
                 value={selectedModel}
-                onChange={(e) => onModelChange(e.target.value)}
-                class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-blue-500 focus:outline-none appearance-none"
-                disabled={!selectedModel} // Disable if no model is selected yet
+                onChange={(e) => onModelChange(roleKey, e.target.value)}
+                class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-blue-500 focus:outline-none appearance-none text-sm"
+                disabled={!selectedModel || models.length === 0}
             >
                 {models.map(model => <option key={model.id} value={model.id}>{model.name}</option>)}
             </select>
@@ -118,47 +119,38 @@ const ModelSelector = ({ label, selectedModel, onModelChange, models }) => (
     </div>
 );
 
+// === New Component for Settings Panel ===
 const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     return (
         <div class="mt-auto border-t border-gray-700 pt-4">
              <div class="flex items-center justify-between cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
-                 <div class="flex items-center gap-2">
-                    <SlidersIcon class="h-5 w-5 text-gray-400" />
-                    <h3 class="text-lg font-semibold text-gray-200">Agent Models</h3>
-                 </div>
-                 <ChevronDownIcon class={`h-5 w-5 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                <div class="flex items-center gap-2">
+                   <SlidersIcon class="h-5 w-5 text-gray-400" />
+                   <h3 class="text-lg font-semibold text-gray-200">Agent Models</h3>
+                </div>
+                <ChevronDownIcon class={`h-5 w-5 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
              </div>
              {isExpanded && (
                  <div class="mt-4 pl-7">
-                    <ModelSelector 
-                        label="Planner Model"
-                        models={models}
-                        selectedModel={selectedModels.planner}
-                        onModelChange={(model) => onModelChange('planner', model)}
-                    />
+                     <ModelSelector label="Planner Model" roleKey="PLANNER_LLM_ID" models={models} selectedModel={selectedModels.PLANNER_LLM_ID} onModelChange={onModelChange} />
                      <p class="text-xs text-gray-500 -mt-2 mb-4">Creates the high-level plan.</p>
-                     <ModelSelector 
-                        label="Controller Model"
-                        models={models}
-                        selectedModel={selectedModels.controller}
-                        onModelChange={(model) => onModelChange('controller', model)}
-                    />
-                     <p class="text-xs text-gray-500 -mt-2 mb-4">Handles advanced logic (e.g., future self-correction).</p>
-                    <ModelSelector 
-                        label="Evaluator Model"
-                        models={models}
-                        selectedModel={selectedModels.evaluator}
-                        onModelChange={(model) => onModelChange('evaluator', model)}
-                    />
-                    <p class="text-xs text-gray-500 -mt-2 mb-4">Validates step outcomes (future feature).</p>
+                     
+                     <ModelSelector label="Controller Model" roleKey="CONTROLLER_LLM_ID" models={models} selectedModel={selectedModels.CONTROLLER_LLM_ID} onModelChange={onModelChange} />
+                     <p class="text-xs text-gray-500 -mt-2 mb-4">Handles advanced logic (future self-correction).</p>
+                     
+                      <ModelSelector label="Executor (Default)" roleKey="EXECUTOR_DEFAULT_LLM_ID" models={models} selectedModel={selectedModels.EXECUTOR_DEFAULT_LLM_ID} onModelChange={onModelChange} />
+                     <p class="text-xs text-gray-500 -mt-2 mb-4">Fallback for simple tool use.</p>
+
+                     <ModelSelector label="Evaluator Model" roleKey="EVALUATOR_LLM_ID" models={models} selectedModel={selectedModels.EVALUATOR_LLM_ID} onModelChange={onModelChange} />
+                     <p class="text-xs text-gray-500 -mt-2 mb-4">Validates step outcomes.</p>
                  </div>
              )}
         </div>
     )
 }
 
-// --- Main App Component ---
+// --- Main App Component (Integrated) ---
 export function App() {
     const [prompt, setPrompt] = useState("");
     const [planSteps, setPlanSteps] = useState([]);
@@ -176,15 +168,12 @@ export function App() {
     const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
     const [runModels, setRunModels] = useState(null);
     
-    const [models, setModels] = useState([]);
-    const [selectedModels, setSelectedModels] = useState({
-        planner: '',
-        controller: '',
-        evaluator: '',
-    });
+    // === New State for Dynamic Models ===
+    const [availableModels, setAvailableModels] = useState([]);
+    const [selectedModels, setSelectedModels] = useState({});
 
-    const handleModelChange = (role, modelId) => {
-        setSelectedModels(prev => ({ ...prev, [role]: modelId }));
+    const handleModelChange = (roleKey, modelId) => {
+        setSelectedModels(prev => ({ ...prev, [roleKey]: modelId }));
     };
 
     const ws = useRef(null);
@@ -244,30 +233,27 @@ export function App() {
         }
     }, [workspacePath, fetchWorkspaceFiles]);
 
+    // === Effect to fetch models on load ===
     useEffect(() => {
         const fetchModels = async () => {
             try {
                 const response = await fetch('http://localhost:8766/api/models');
                 if (!response.ok) throw new Error('Failed to fetch model configuration.');
-                
-                // --- FIX: Destructure the new, smarter API response ---
                 const config = await response.json();
-                
                 if (config.available_models && config.available_models.length > 0) {
-                    setModels(config.available_models);
-                    // Set the initial selections directly from the defaults provided by the backend
+                    setAvailableModels(config.available_models);
                     setSelectedModels(config.default_models);
                 } else {
-                     console.error("No available models returned from the backend.");
+                    console.error("No available models returned from the backend.");
                 }
             } catch (error) {
                 console.error("Failed to fetch models:", error);
-                // Handle UI feedback for the error here if needed
             }
         };
         fetchModels();
     }, []);
 
+    // Effect for WebSocket connection
     useEffect(() => {
         function connect() {
             setConnectionStatus("Connecting...");
@@ -278,20 +264,20 @@ export function App() {
             ws.current.onmessage = (event) => {
                 const newEvent = JSON.parse(event.data);
                 
-                const currentWorkspacePath = newEvent.data?.output?.workspace_path || newEvent.data?.input?.workspace_path;
-                if (currentWorkspacePath) {
-                   setWorkspacePath(path => path || currentWorkspacePath);
+                const eventWorkspacePath = newEvent.data?.output?.workspace_path || newEvent.data?.input?.workspace_path;
+                if (eventWorkspacePath) {
+                    setWorkspacePath(path => path || eventWorkspacePath);
                 }
 
                 setPlanSteps(prevSteps => {
                     const data = newEvent.data?.output || {};
                     const inputData = newEvent.data?.input || {};
-                    if (newEvent.name === 'structured_planner_node' && newEvent.event.includes('end')) {
+                    if (newEvent.name === 'Chief_Architect' && newEvent.event.includes('end')) {
                         setIsThinking(false);
                         const plan = data.plan || [];
                         return plan.map(step => ({ ...step, status: 'pending' }));
                     }
-                    if (newEvent.name === 'controller_node' && newEvent.event.includes('start')) {
+                    if (newEvent.name === 'Site_Foreman' && newEvent.event.includes('start')) {
                         const stepIndex = inputData.current_step_index;
                         if (prevSteps[stepIndex]) {
                             const newSteps = [...prevSteps];
@@ -299,35 +285,21 @@ export function App() {
                             return newSteps;
                         }
                     }
-                    if (newEvent.name === 'executor_node' && newEvent.event.includes('end')) {
+                    if (newEvent.name === 'Worker' && newEvent.event.includes('end')) {
                         const stepIndex = inputData.current_step_index;
                          if (prevSteps[stepIndex]) {
                             const newSteps = [...prevSteps];
-                            newSteps[stepIndex] = { 
-                                ...newSteps[stepIndex], 
-                                status: 'completed',
-                                toolCall: inputData.current_tool_call,
-                                toolOutput: data.tool_output,
-                            };
+                            newSteps[stepIndex] = { ...newSteps[stepIndex], status: 'completed', toolCall: inputData.current_tool_call, toolOutput: data.tool_output };
                             return newSteps;
-                        }
+                         }
                     }
                     return prevSteps;
                 });
-                
-                if (newEvent.name === 'executor_node' && newEvent.event.includes('end')) {
-                    setWorkspacePath(currentPath => {
-                        if (currentPath) {
-                            fetchWorkspaceFiles(currentPath);
-                        }
-                        return currentPath;
-                    });
-                }
             };
         }
         connect();
         return () => { if (ws.current) { ws.current.onclose = null; ws.current.close(); }};
-    }, [fetchWorkspaceFiles]);
+    }, []);
 
     useEffect(() => { scrollToBottom(); }, [planSteps, prompt]);
 
@@ -335,7 +307,7 @@ export function App() {
         if (workspacePath) {
              fetchWorkspaceFiles(workspacePath);
         }
-    }, [workspacePath, fetchWorkspaceFiles]);
+    }, [planSteps, workspacePath, fetchWorkspaceFiles]); // Re-fetch when plan steps change
 
 
     const handleSendMessage = (e) => {
@@ -351,9 +323,10 @@ export function App() {
             setSelectedFile(null);
             setRunModels(selectedModels);
             
+            // === Send the new JSON payload ===
             const payload = {
                 prompt: message,
-                models: selectedModels,
+                llm_config: selectedModels,
             };
             ws.current.send(JSON.stringify(payload));
             
@@ -362,7 +335,7 @@ export function App() {
     };
 
     const getModelNameById = (id) => {
-        const model = models.find(m => m.id === id);
+        const model = availableModels.find(m => m.id === id);
         return model ? model.name : id;
     }
     
@@ -377,10 +350,11 @@ export function App() {
                     </div>
                     <div class="flex flex-col flex-grow p-6 pt-4 min-h-0">
                         <div class="flex-grow overflow-y-auto">
-                           <p class="text-gray-400">// Task list will go here.</p>
+                            <p class="text-gray-400">// Task list will go here.</p>
                         </div>
+                        {/* === New Settings Panel Integrated Here === */}
                         <SettingsPanel 
-                            models={models}
+                            models={availableModels}
                             selectedModels={selectedModels}
                             onModelChange={handleModelChange}
                         />
@@ -390,26 +364,26 @@ export function App() {
             
             <div class="flex-1 flex flex-col h-full bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl min-w-0">
                 <div class="flex items-center justify-between p-6 border-b border-gray-700 flex-shrink-0">
-                     <h1 class="text-2xl font-bold text-white">ResearchAgent</h1>
-                     <div class="flex items-center gap-2">
-                        <span class="relative flex h-3 w-3">
-                          {connectionStatus === 'Connected' && <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>}
-                          <span class={`relative inline-flex rounded-full h-3 w-3 ${connectionStatus === 'Connected' ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                        </span>
-                        <span class="text-sm text-gray-400">{connectionStatus}</span>
-                     </div>
+                   <h1 class="text-2xl font-bold text-white">ResearchAgent</h1>
+                   <div class="flex items-center gap-2">
+                       <span class="relative flex h-3 w-3">
+                         {connectionStatus === 'Connected' && <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>}
+                         <span class={`relative inline-flex rounded-full h-3 w-3 ${connectionStatus === 'Connected' ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                       </span>
+                       <span class="text-sm text-gray-400">{connectionStatus}</span>
+                   </div>
                 </div>
                 <div class="flex-1 overflow-y-auto p-6">
                    {prompt && (
-                        <div class="p-4 rounded-lg shadow-md bg-blue-900/50 border border-gray-700/50 mb-4">
+                       <div class="p-4 rounded-lg shadow-md bg-blue-900/50 border border-gray-700/50 mb-4">
                            <h3 class="font-bold text-sm text-gray-300 mb-2 capitalize">You</h3>
                            <p class="text-white whitespace-pre-wrap font-medium">{prompt}</p>
-                        </div>
+                       </div>
                     )}
                     {isThinking && (
-                         <div class="flex items-center gap-4 p-4">
-                            <LoaderIcon class="h-5 w-5 text-yellow-400" />
-                            <p class="text-gray-300 font-medium">Agent is thinking...</p>
+                        <div class="flex items-center gap-4 p-4">
+                           <LoaderIcon class="h-5 w-5 text-yellow-400" />
+                           <p class="text-gray-300 font-medium">Agent is thinking...</p>
                         </div>
                     )}
                     {planSteps.length > 0 && (
@@ -417,7 +391,7 @@ export function App() {
                             <div class="mb-4 -ml-10">
                                 <InfoBlock icon={<BrainCircuitIcon class="h-5 w-5 text-purple-400" />} title="Planner Model">
                                     <span class="text-sm font-medium text-purple-300 font-mono">
-                                        {getModelNameById(runModels?.planner)}
+                                        {getModelNameById(runModels?.PLANNER_LLM_ID)}
                                     </span>
                                 </InfoBlock>
                             </div>
@@ -433,7 +407,7 @@ export function App() {
                             class="flex-1 p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
                             placeholder="Send a message to the agent..." rows="2"
                         ></textarea>
-                        <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-500 transition-colors" disabled={connectionStatus !== 'Connected'}>Send</button>
+                        <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-500 transition-colors" disabled={connectionStatus !== 'Connected' || isThinking}>Send</button>
                     </form>
                 </div>
             </div>
@@ -480,8 +454,8 @@ export function App() {
                                             ))}
                                         </ul>
                                     )}
-                                </div>
-                            </div>
+                                 </div>
+                             </div>
                         )}
                     </div>
                 </div>
