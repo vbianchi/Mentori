@@ -30,6 +30,7 @@ The core philosophy is built on **transparency, adaptive execution, and security
 │ │ └── workspace\_shell.py # Tool to execute bash commands
 │ │
 │ ├── init.py # Makes 'backend' a Python package
+│ ├── CURRENT\_PCEE\_GRAPH.md # Graph structure of the PCEE logic for mermaid.live
 │ ├── langgraph\_agent.py # Core PCEE agent logic
 │ ├── prompts.py # Centralized prompts for all agent nodes
 │ ├── server.py # WebSocket server entry point
