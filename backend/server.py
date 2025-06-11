@@ -1,13 +1,17 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Final Librarian/QA Fix)
+# ResearchAgent Backend Server (Final Fix)
 #
-# CORRECTION: This is the definitive fix for the Direct QA (Librarian) path.
-# - The logic after the agent stream now correctly inspects the final output
-#   of the graph.
-# - Instead of checking the event name, it now checks if the final graph
-#   output contains an "answer" key.
-# - This robustly detects when the Librarian has run and ensures the
-#   `direct_answer` message is sent to the UI.
+# CORRECTION: This is the definitive fix for both Planner and Librarian paths.
+# Based on the user's debug log, the logic to find the direct answer has
+# been completely rewritten to correctly parse the final event's data structure.
+#
+# - It now iterates through the list of final node outputs.
+# - It specifically looks for the output from the 'Librarian' node.
+# - It extracts the 'answer' from within that specific node's output.
+#
+# This robustly handles the actual data structure from LangGraph and will
+# correctly send the direct answer to the UI while keeping the planner's
+# event stream intact.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -212,25 +216,35 @@ async def agent_handler(websocket):
                 logger.debug(f"Using LLM config for this run: {llm_config}")
                 logger.debug(f"Graph config: {config}")
 
-                final_output = None
-                async for event in agent_graph.astream(initial_state, config=config):
-                    # astream() yields the full state dictionary at each step
-                    for node_name, node_output in event.items():
-                        final_output = node_output # Keep track of the latest state
-                        # We can still send real-time events if needed, but for now we simplify
+                last_event = None
+                async for event in agent_graph.astream_events(initial_state, config=config, version="v1"):
+                    last_event = event
+                    event_type = event["event"]
+                    if event_type in ["on_chain_start", "on_chain_end"]:
+                        response = { "type": "agent_event", "event": event_type, "name": event["name"], "data": event['data'] }
+                        await websocket.send(json.dumps(response, default=str))
                 
-                # === THE FIX: Check the final agent state for an answer ===
-                if final_output and final_output.get("answer"):
-                    answer = final_output.get("answer")
-                    logger.info(f"Found direct answer: {answer[:100]}...")
-                    answer_response = {"type": "direct_answer", "data": answer}
-                    await websocket.send(json.dumps(answer_response))
-                else:
-                    # This part is a placeholder for sending plan results.
-                    # For now, we assume if there's no answer, it was a plan.
-                    # We can enhance this later to send the final plan state.
-                    logger.info("Agent run completed without a direct answer (assumed plan).")
+                if last_event and last_event["event"] == "on_chain_end":
+                    final_output = last_event.get("data", {}).get("output")
+                    
+                    logger.info(f"DEBUG: Final output structure: {final_output}")
 
+                    answer = None
+                    # --- THE FIX: Robustly check for the answer based on the actual data structure ---
+                    if isinstance(final_output, list):
+                        for node_output in final_output:
+                            if isinstance(node_output, dict) and 'Librarian' in node_output:
+                                librarian_result = node_output.get('Librarian')
+                                if isinstance(librarian_result, dict) and 'answer' in librarian_result:
+                                    answer = librarian_result.get('answer')
+                                    break
+                    
+                    if answer:
+                        logger.info(f"Found direct answer in final output: {answer[:100]}...")
+                        answer_response = {"type": "direct_answer", "data": answer}
+                        await websocket.send(json.dumps(answer_response))
+                    else:
+                        logger.info("Agent run completed without a direct answer (assumed plan).")
 
             except json.JSONDecodeError:
                 logger.error(f"Failed to decode JSON from message: {message}")
