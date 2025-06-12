@@ -1,13 +1,13 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 7: Naming Refactor)
+# ResearchAgent Backend Server (Phase 7: Task-Aware Backend)
 #
-# This version updates the server to align with the "Company Model" naming
-# convention for environment variables and agent roles.
+# This version updates the WebSocket handler to be task-aware. It is the
+# first step in making the backend stateful.
 #
-# 1. The `_handle_get_models` function now reads the new environment variables
-#    (e.g., `CHIEF_ARCHITECT_LLM_ID`) and sends them to the frontend under
-#    the new keys.
-# 2. Configuration for every agent role is now supported, as per our plan.
+# 1. The `agent_handler` now reads the `task_id` sent by the frontend.
+# 2. It validates that both a `prompt` and a `task_id` are present.
+# 3. The `task_id` is injected into the initial state of the agent graph,
+#    allowing the agent to know which task it's working on.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -112,7 +112,6 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
 
         global_default_llm = os.getenv("DEFAULT_LLM_ID", safe_fallback_model)
 
-        # --- THE CHANGE: Using the new "Company Model" variable names ---
         default_models = {
             "ROUTER_LLM_ID": os.getenv("ROUTER_LLM_ID", global_default_llm),
             "LIBRARIAN_LLM_ID": os.getenv("LIBRARIAN_LLM_ID", global_default_llm),
@@ -122,7 +121,6 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             "PROJECT_SUPERVISOR_LLM_ID": os.getenv("PROJECT_SUPERVISOR_LLM_ID", global_default_llm),
             "EDITOR_LLM_ID": os.getenv("EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
         }
-        # --- End of Change ---
 
         response_data = {
             "available_models": available_models,
@@ -190,7 +188,7 @@ def run_http_server():
     logger.info(f"Starting HTTP file server at http://{host}:{port}")
     httpd.serve_forever()
 
-# --- WebSocket Handler ---
+# --- WebSocket Handler (Upgraded for Task Awareness) ---
 async def agent_handler(websocket):
     logger.info(f"Client connected from {websocket.remote_address}")
     try:
@@ -200,19 +198,23 @@ async def agent_handler(websocket):
                 data = json.loads(message)
                 prompt = data.get("prompt")
                 llm_config = data.get("llm_config", {})
+                # --- THE CHANGE: Get task_id from payload ---
+                task_id = data.get("task_id")
 
-                if not prompt:
-                    logger.warning("Received payload without a prompt.")
+                if not prompt or not task_id:
+                    logger.warning(f"Received payload without a prompt or task_id. Skipping. Payload: {data}")
                     continue
 
+                # --- THE CHANGE: Inject task_id into agent state ---
                 initial_state = {
                     "messages": [HumanMessage(content=prompt)],
                     "llm_config": llm_config,
+                    "task_id": task_id, 
                 }
 
                 config = {"recursion_limit": 100}
 
-                logger.info(f"Invoking agent with prompt: {prompt[:100]}...")
+                logger.info(f"Invoking agent for task '{task_id}' with prompt: {prompt[:100]}...")
                 logger.debug(f"Using LLM config for this run: {llm_config}")
                 logger.debug(f"Graph config: {config}")
 
@@ -220,10 +222,13 @@ async def agent_handler(websocket):
                 async for event in agent_graph.astream_events(initial_state, config=config, version="v1"):
                     last_event = event
                     event_type = event["event"]
-                    if event_type in ["on_chain_start", "on_chain_end"]:
-                        response = { "type": "agent_event", "event": event_type, "name": event["name"], "data": event['data'] }
-                        await websocket.send(json.dumps(response, default=str))
-
+                    # Stream all major node events to the client for real-time updates
+                    if event_type == "on_chain_start" or event_type == "on_chain_end":
+                         if event["name"] in ["Chief_Architect", "Site_Foreman", "Worker", "Project_Supervisor", "Editor", "Librarian"]:
+                            response = { "type": "agent_event", "event": event_type, "name": event["name"], "data": event['data'] }
+                            await websocket.send(json.dumps(response, default=str))
+                
+                # After the stream is complete, check for a final answer
                 if last_event and last_event["event"] == "on_chain_end":
                     final_output = last_event.get("data", {}).get("output")
                     logger.debug(f"DEBUG: Final output structure from graph: {final_output}")
@@ -248,17 +253,17 @@ async def agent_handler(websocket):
                                         break
 
                     if answer and answer_type:
-                        logger.info(f"Found answer of type '{answer_type}': {answer[:100]}...")
-                        answer_response = {"type": answer_type, "data": answer}
+                        logger.info(f"Found answer of type '{answer_type}' for task '{task_id}': {answer[:100]}...")
+                        answer_response = {"type": answer_type, "data": answer, "task_id": task_id}
                         await websocket.send(json.dumps(answer_response))
                     else:
-                        logger.info("Agent run completed without a direct answer (assumed plan).")
+                        logger.info(f"Agent run for task '{task_id}' completed without a direct/final answer.")
 
             except json.JSONDecodeError:
                 logger.error(f"Failed to decode JSON from message: {message}")
                 await websocket.send(json.dumps({"type": "error", "data": "Invalid JSON format received."}))
             except Exception as e:
-                logger.error(f"Error processing message: {e}", exc_info=True)
+                logger.error(f"Error processing message for task '{task_id}': {e}", exc_info=True)
                 await websocket.send(json.dumps({"type": "error", "data": str(e)}))
 
     except websockets.exceptions.ConnectionClosed as e:

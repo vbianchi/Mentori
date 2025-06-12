@@ -1,21 +1,20 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 7: Naming Refactor)
+# ResearchAgent Core Agent (Phase 7: Stateful Workspaces)
 #
-# This version standardizes the naming of all agent nodes and their
-# configurations to align with the "Company Model" (e.g., Chief_Architect).
+# This version makes the agent fully stateful by using the task_id passed
+# from the server to create persistent workspaces.
 #
-# 1. Node functions and graph definitions now consistently use the new names.
-#    - `final_answer_agent_node` is renamed to `editor_node`.
-# 2. All `get_llm` calls now use the new environment variable keys
-#    (e.g., `CHIEF_ARCHITECT_LLM_ID`).
-# 3. All agent roles are now configurable with their own LLM.
+# 1. GraphState now includes `task_id: str`.
+# 2. `task_setup_node` no longer generates a random UUID. It uses the
+#    injected `task_id` to ensure that all work for a given task occurs in
+#    the same sandboxed directory.
+# 3. Logging is enhanced to include the `task_id` for better traceability.
 # -----------------------------------------------------------------------------
 
 import os
 import logging
 import json
 import re
-import uuid
 from typing import TypedDict, Annotated, Sequence, List, Optional, Dict
 
 from langchain_core.messages import BaseMessage, HumanMessage
@@ -29,13 +28,14 @@ from .prompts import structured_planner_prompt_template, controller_prompt_templ
 
 # --- Logging Setup ---
 log_level = os.getenv("LOG_LEVEL", "INFO").upper()
-logging.basicConfig(level=log_level, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=log_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 # --- Agent State Definition ---
 class GraphState(TypedDict):
     """Represents the state of our graph."""
     input: str
+    task_id: str # Added task_id to the state
     plan: List[dict]
     messages: Annotated[Sequence[BaseMessage], lambda x, y: x + y]
     llm_config: Dict[str, str]
@@ -55,7 +55,7 @@ def get_llm(state: GraphState, role_env_var: str, default_llm_id: str):
     llm_id = run_config.get(role_env_var) or os.getenv(role_env_var, default_llm_id)
     if llm_id in LLM_CACHE: return LLM_CACHE[llm_id]
     provider, model_name = llm_id.split("::")
-    logger.info(f"Initializing LLM for '{role_env_var}': {llm_id}")
+    logger.info(f"Task '{state.get('task_id')}': Initializing LLM for '{role_env_var}': {llm_id}")
     if provider == "gemini": llm = ChatGoogleGenerativeAI(model=model_name, google_api_key=os.getenv("GOOGLE_API_KEY"))
     elif provider == "ollama": llm = ChatOllama(model=model_name, base_url=os.getenv("OLLAMA_BASE_URL"))
     else: raise ValueError(f"Unsupported LLM provider: {provider}")
@@ -72,18 +72,22 @@ def format_tools_for_prompt():
 # --- Graph Nodes (with "Company Model" Names) ---
 def task_setup_node(state: GraphState):
     """The "Onboarding Manager" - Creates the workspace and initializes state."""
-    logger.info("Executing Task_Setup")
+    task_id = state.get("task_id")
+    logger.info(f"Task '{task_id}': Executing Task_Setup")
     user_message = state['messages'][-1].content
-    task_id = str(uuid.uuid4())
+    
+    # --- THE CHANGE: Use the provided task_id to create the workspace path ---
     workspace_path = f"/app/workspace/{task_id}"
     os.makedirs(workspace_path, exist_ok=True)
-    logger.info(f"Created sandboxed workspace: {workspace_path}")
+    logger.info(f"Task '{task_id}': Ensured sandboxed workspace exists: {workspace_path}")
+    
     initial_llm_config = state.get("llm_config", {})
     return {"input": user_message, "history": [], "current_step_index": 0, "step_outputs": {}, "workspace_path": workspace_path, "llm_config": initial_llm_config}
 
 def chief_architect_node(state: GraphState):
     """The "Chief Architect" - Generates the structured plan."""
-    logger.info("Executing Chief_Architect")
+    task_id = state.get("task_id")
+    logger.info(f"Task '{task_id}': Executing Chief_Architect")
     llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-flash-latest")
     prompt = structured_planner_prompt_template.format(input=state["input"], tools=format_tools_for_prompt())
     response = llm.invoke(prompt)
@@ -91,17 +95,18 @@ def chief_architect_node(state: GraphState):
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL)
         json_str = match.group(1).strip() if match else response.content.strip()
         parsed_json = json.loads(json_str)
-        logger.info(f"Generated structured plan: {json.dumps(parsed_json.get('plan'), indent=2)}")
+        logger.info(f"Task '{task_id}': Generated structured plan: {json.dumps(parsed_json.get('plan'), indent=2)}")
         return {"plan": parsed_json.get("plan", [])}
     except Exception as e:
-        logger.error(f"Error parsing structured plan: {e}\nResponse was:\n{response.content}")
+        logger.error(f"Task '{task_id}': Error parsing structured plan: {e}\nResponse was:\n{response.content}")
         return {"plan": [{"error": f"Failed to create a valid plan. Reason: {e}"}]}
 
 def site_foreman_node(state: GraphState):
     """The "Site Foreman" - Prepares the tool call for the current step."""
+    task_id = state.get("task_id")
     step_index = state["current_step_index"]
     plan = state["plan"]
-    logger.info(f"Executing Site_Foreman for step {step_index + 1}/{len(plan)}")
+    logger.info(f"Task '{task_id}': Executing Site_Foreman for step {step_index + 1}/{len(plan)}")
     current_step_details = plan[step_index]
     llm = get_llm(state, "SITE_FOREMAN_LLM_ID", "gemini::gemini-1.5-flash-latest")
     history_str = "\n".join(state["history"]) if state.get("history") else "No history yet."
@@ -116,15 +121,16 @@ def site_foreman_node(state: GraphState):
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL)
         json_str = match.group(1).strip() if match else response.content.strip()
         tool_call = json.loads(json_str)
-        logger.info(f"Site Foreman prepared tool call: {tool_call}")
+        logger.info(f"Task '{task_id}': Site Foreman prepared tool call: {tool_call}")
         return {"current_tool_call": tool_call}
     except json.JSONDecodeError as e:
-        logger.error(f"Error parsing tool call from Site Foreman: {e}\nResponse was:\n{response.content}")
+        logger.error(f"Task '{task_id}': Error parsing tool call from Site Foreman: {e}\nResponse was:\n{response.content}")
         return {"current_tool_call": {"error": "Invalid JSON output from Site Foreman."}}
 
 async def worker_node(state: GraphState):
     """The "Worker" - Executes the tool call."""
-    logger.info("Executing Worker")
+    task_id = state.get("task_id")
+    logger.info(f"Task '{task_id}': Executing Worker")
     tool_call = state.get("current_tool_call")
     if not tool_call or not tool_call.get("tool_name"): return {"tool_output": "Error: No tool call was provided."}
     tool_name = tool_call["tool_name"]
@@ -142,17 +148,18 @@ async def worker_node(state: GraphState):
         final_args["workspace_path"] = state["workspace_path"]
 
     try:
-        logger.info(f"Worker executing tool '{tool_name}' with args: {final_args}")
+        logger.info(f"Task '{task_id}': Worker executing tool '{tool_name}' with args: {final_args}")
         output = await tool.ainvoke(final_args)
-        logger.info(f"Tool '{tool_name}' executed successfully.")
+        logger.info(f"Task '{task_id}': Tool '{tool_name}' executed successfully.")
         return {"tool_output": str(output)}
     except Exception as e:
-        logger.error(f"Error executing tool '{tool_name}': {e}", exc_info=True)
+        logger.error(f"Task '{task_id}': Error executing tool '{tool_name}': {e}", exc_info=True)
         return {"tool_output": f"An error occurred while executing the tool: {e}"}
 
 def project_supervisor_node(state: GraphState):
     """The "Project Supervisor" - Evaluates the step and records history."""
-    logger.info("Executing Project_Supervisor")
+    task_id = state.get("task_id")
+    logger.info(f"Task '{task_id}': Executing Project_Supervisor")
     current_step_details = state["plan"][state["current_step_index"]]
     tool_output = state.get("tool_output", "No output from tool.")
     tool_call = state.get("current_tool_call", {})
@@ -169,9 +176,9 @@ def project_supervisor_node(state: GraphState):
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL)
         json_str = match.group(1).strip() if match else response.content.strip()
         evaluation = json.loads(json_str)
-        logger.info(f"Step evaluation from Project Supervisor: {evaluation}")
+        logger.info(f"Task '{task_id}': Step evaluation from Project Supervisor: {evaluation}")
     except (json.JSONDecodeError, Exception) as e:
-        logger.error(f"Error parsing evaluation from Project Supervisor: {e}\nResponse was:\n{response.content}")
+        logger.error(f"Task '{task_id}': Error parsing evaluation from Project Supervisor: {e}\nResponse was:\n{response.content}")
         evaluation = {"status": "failure", "reasoning": "Could not parse Project Supervisor output."}
 
     history_record = (
@@ -191,19 +198,22 @@ def project_supervisor_node(state: GraphState):
 
 def advance_to_next_step_node(state: GraphState):
     """The "Clerk" - Increments the step index."""
-    logger.info("Advancing to next step")
+    task_id = state.get("task_id")
+    logger.info(f"Task '{task_id}': Advancing to next step")
     return {"current_step_index": state["current_step_index"] + 1}
 
 def librarian_node(state: GraphState):
     """The "Librarian" - Directly calls an LLM for a simple question."""
-    logger.info("Executing Librarian (Direct QA)")
+    task_id = state.get("task_id")
+    logger.info(f"Task '{task_id}': Executing Librarian (Direct QA)")
     llm = get_llm(state, "LIBRARIAN_LLM_ID", "gemini::gemini-1.5-flash-latest")
     response = llm.invoke(state["messages"])
     return {"answer": response.content}
 
 def editor_node(state: GraphState):
     """The "Editor" - Synthesizes the final answer."""
-    logger.info("Executing Editor")
+    task_id = state.get("task_id")
+    logger.info(f"Task '{task_id}': Executing Editor")
     llm = get_llm(state, "EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
     history_str = "\n".join(state["history"])
     prompt = final_answer_prompt_template.format(
@@ -211,32 +221,34 @@ def editor_node(state: GraphState):
         history=history_str
     )
     response = llm.invoke(prompt)
-    logger.info(f"Editor generated final answer: {response.content[:200]}...")
+    logger.info(f"Task '{task_id}': Editor generated final answer: {response.content[:200]}...")
     return {"answer": response.content}
 
 
 # --- Conditional Routers ---
 def router(state: GraphState):
     """The Router - Routes the workflow based on user intent."""
-    logger.info("Executing The Router")
+    task_id = state.get("task_id")
+    logger.info(f"Task '{task_id}': Executing The Router")
     llm = get_llm(state, "ROUTER_LLM_ID", "gemini::gemini-1.5-flash-latest")
     prompt = f"You are a router. Classify the user's last message. Respond with 'AGENT_ACTION' for a complex task that requires planning, or 'DIRECT_QA' for a simple question that can be answered directly.\n\nUser message: '{state['input']}'"
     response = llm.invoke(prompt)
     decision = response.content.strip()
-    logger.info(f"Routing decision: {decision}")
+    logger.info(f"Task '{task_id}': Routing decision: {decision}")
     return "Chief_Architect" if "AGENT_ACTION" in decision else "Librarian"
 
 def after_plan_step_router(state: GraphState):
     """Routes the workflow after a plan step is evaluated."""
-    logger.info("Router: Checking if plan should continue or finalize.")
+    task_id = state.get("task_id")
+    logger.info(f"Task '{task_id}': Router checking if plan should continue or finalize.")
     evaluation = state.get("step_evaluation", {})
 
     if evaluation.get("status") == "failure":
-        logger.warning(f"Step failed. Reason: {evaluation.get('reasoning', 'N/A')}. Routing to Editor.")
+        logger.warning(f"Task '{task_id}': Step failed. Reason: {evaluation.get('reasoning', 'N/A')}. Routing to Editor.")
         return "Editor"
 
     if state["current_step_index"] + 1 >= len(state.get("plan", [])):
-        logger.info("Plan is complete. Routing to Editor.")
+        logger.info(f"Task '{task_id}': Plan is complete. Routing to Editor.")
         return "Editor"
 
     return "Advance_To_Next_Step"
@@ -246,7 +258,6 @@ def create_agent_graph():
     """Builds the ResearchAgent's LangGraph."""
     workflow = StateGraph(GraphState)
     
-    # Add nodes with their "Company Model" names
     workflow.add_node("Task_Setup", task_setup_node)
     workflow.add_node("Librarian", librarian_node)
     workflow.add_node("Chief_Architect", chief_architect_node)
@@ -256,28 +267,23 @@ def create_agent_graph():
     workflow.add_node("Advance_To_Next_Step", advance_to_next_step_node)
     workflow.add_node("Editor", editor_node)
 
-    # Set entry point and define edges
     workflow.set_entry_point("Task_Setup")
 
-    # This is the initial classification of the user's request
     workflow.add_conditional_edges("Task_Setup", router, {
         "Librarian": "Librarian",
         "Chief_Architect": "Chief_Architect"
     })
 
-    # This is the main execution loop
     workflow.add_edge("Chief_Architect", "Site_Foreman")
     workflow.add_edge("Site_Foreman", "Worker")
     workflow.add_edge("Worker", "Project_Supervisor")
-    workflow.add_edge("Advance_To_Next_Step", "Site_Foreman") # The loop back
+    workflow.add_edge("Advance_To_Next_Step", "Site_Foreman")
 
-    # This router decides whether to continue the loop or finish
     workflow.add_conditional_edges("Project_Supervisor", after_plan_step_router, {
         "Editor": "Editor",
         "Advance_To_Next_Step": "Advance_To_Next_Step"
     })
 
-    # These are the terminal edges
     workflow.add_edge("Librarian", END)
     workflow.add_edge("Editor", END)
 
