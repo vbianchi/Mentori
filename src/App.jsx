@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
 
-// --- SVG Icons ---
+// --- SVG Icons (with new agent icons) ---
 const ChevronsLeftIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="m11 17-5-5 5-5" /><path d="m18 17-5-5 5-5" /></svg> );
 const ChevronsRightIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="m6 17 5-5-5-5" /><path d="m13 17 5-5-5-5" /></svg> );
 const FileIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" /><polyline points="14 2 14 8 20 8" /></svg> );
@@ -15,13 +15,17 @@ const LoaderIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="2
 const CircleDotIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1"/></svg> );
 const ChevronDownIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="m6 9 6 6 6-6"/></svg> );
 const SlidersIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><line x1="4" x2="4" y1="21" y2="14" /><line x1="4" x2="4" y1="10" y2="3" /><line x1="12" x2="12" y1="21" y2="12" /><line x1="12" x2="12" y1="8" y2="3" /><line x1="20" x2="20" y1="21" y2="16" /><line x1="20" x2="20" y1="12" y2="3" /><line x1="2" x2="6" y1="14" y2="14" /><line x1="10" x2="14" y1="8" y2="8" /><line x1="18" x2="22" y1="16" y2="16" /></svg> );
-const BrainCircuitIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M12 5a3 3 0 1 0-5.993.142" /><path d="M12 5a3 3 0 1 1 5.993.142" /><path d="M12 12a3 3 0 1 0-5.993.142" /><path d="M12 12a3 3 0 1 1 5.993.142" /><path d="M12 19a3 3 0 1 0-5.993.142" /><path d="M12 19a3 3 0 1 1 5.993.142" /><path d="M20 12h-2" /><path d="M6 12H4" /><path d="M12 15v-3" /><path d="M12 8V6" /><path d="M15 12a3 3 0 1 0-6 0" /><path d="M12 9a3 3 0 1 1-6 0" /></svg> );
 const BotIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M12 8V4H8" /><rect width="16" height="12" x="4" y="8" rx="2" /><path d="M2 14h2" /><path d="M20 14h2" /><path d="M15 13v2" /><path d="M9 13v2" /></svg> );
 const FileTextIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg> );
 const PlusCircleIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> );
 const PencilIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg> );
 const Trash2Icon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="m8 6 4-4 4 4"/></svg> );
 const UserIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> );
+const ArchitectIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M12 21v-8a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v8" /><path d="M6 11V7a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4" /><path d="M18 11V7a2 2 0 0 0-2-2h-4" /><path d="m18 21 3-3" /><path d="m2 21 3-3" /><path d="m18 9 3 3" /><path d="m6 9-3 3" /><path d="M12 9v12" /></svg> );
+const LibrarianIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M3 6h18" /><path d="M4 6V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2" /><path d="M5 6v14a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1V6" /><path d="M15 6v14a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1V6" /><path d="M9 12h6" /></svg> );
+const EditorIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M12 20h9" /><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" /><path d="m15 5 3 3" /></svg> );
+const ForemanIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M12 2a10 10 0 0 0-10 10c0 1.85.63 3.58 1.68 4.95" /><path d="m12 12-2-2" /><path d="M22 12a10 10 0 0 0-10-10" /><path d="m14 12 2-2" /><path d="M12 22a10 10 0 0 0 10-10" /><path d="m12 14 2 2" /><path d="M2.32 16.95A10 10 0 0 0 12 22" /><path d="m10 12-2 2" /></svg> );
+const WorkerIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><rect x="2" y="6" width="20" height="12" rx="2" /><path d="M12 12h.01" /><path d="M17 12h.01" /><path d="M7 12h.01" /></svg> );
 
 // --- UI Components ---
 
@@ -129,13 +133,12 @@ const ToggleButton = ({ isVisible, onToggle, side }) => {
     );
 };
 
-const InfoBlock = ({ icon, agentName, modelName }) => (
-    <div class="mt-4 first:mt-0">
-        <div class="flex items-center gap-2">
-            {icon}
-            <h4 class="text-sm font-semibold text-gray-300">{agentName}</h4>
-        </div>
-        <div class="mt-1 ml-7 text-xs text-purple-300 font-mono">{modelName}</div>
+// --- REFINED: Agent response cards for unified look ---
+
+const AgentResponseCard = ({ icon, title, children }) => (
+    <div class="p-4 rounded-lg shadow-md bg-gray-800/50 border border-gray-700/50 mb-4">
+        <h3 class="font-bold text-sm text-gray-300 mb-3 capitalize flex items-center gap-2">{icon}{title}</h3>
+        {children}
     </div>
 );
 
@@ -156,69 +159,55 @@ const StepCard = ({ step }) => {
                 <ChevronDownIcon class={`h-5 w-5 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
              </div>
              {isExpanded && step.status === 'completed' && step.toolCall && (
-                 <div class="p-4 pt-0">
-                     <div class="ml-9 pl-4 border-l border-gray-700">
-                         <div class="mt-4 first:mt-0">
-                            <div class="flex items-center gap-2">
-                                <ZapIcon class="h-4 w-4 text-gray-400" />
-                                <h4 class="text-sm font-semibold text-gray-400">Action</h4>
-                            </div>
-                            <pre class="text-xs text-cyan-300 overflow-x-auto p-2 mt-1 ml-7 bg-black/20 rounded-md font-mono relative">
-                                <CopyButton textToCopy={JSON.stringify(step.toolCall, null, 2)} className="absolute top-1 right-1" />
-                                <code>{JSON.stringify(step.toolCall, null, 2)}</code>
-                            </pre>
-                         </div>
-                         <div class="mt-4 first:mt-0">
-                            <div class="flex items-center gap-2">
-                                <ChevronsRightIcon class="h-4 w-4 text-gray-400" />
-                                <h4 class="text-sm font-semibold text-gray-400">Observation</h4>
-                            </div>
-                             <pre class="text-xs text-gray-300 mt-1 ml-7 whitespace-pre-wrap font-mono relative">
-                                 <CopyButton textToCopy={step.toolOutput} className="absolute top-1 right-1" />
-                                 {step.toolOutput}
-                               </pre>
-                         </div>
-                     </div>
-                 </div>
+                <div class="p-4 pt-0">
+                    <div class="ml-9 pl-4 border-l border-gray-700">
+                        <div class="mt-4 first:mt-0">
+                           <div class="flex items-center gap-2">
+                               <WorkerIcon class="h-4 w-4 text-gray-400" />
+                               <h4 class="text-sm font-semibold text-gray-400">Action: The Worker</h4>
+                           </div>
+                           <pre class="text-xs text-cyan-300 overflow-x-auto p-2 mt-1 ml-7 bg-black/20 rounded-md font-mono relative">
+                               <CopyButton textToCopy={JSON.stringify(step.toolCall, null, 2)} className="absolute top-1 right-1" />
+                               <code>{JSON.stringify(step.toolCall, null, 2)}</code>
+                           </pre>
+                        </div>
+                        <div class="mt-4 first:mt-0">
+                           <div class="flex items-center gap-2">
+                               <ChevronsRightIcon class="h-4 w-4 text-gray-400" />
+                               <h4 class="text-sm font-semibold text-gray-400">Observation</h4>
+                           </div>
+                            <pre class="text-xs text-gray-300 mt-1 ml-7 whitespace-pre-wrap font-mono relative bg-black/20 p-2 rounded-md">
+                                <CopyButton textToCopy={step.toolOutput || ''} className="absolute top-1 right-1" />
+                                {step.toolOutput || 'No output.'}
+                              </pre>
+                        </div>
+                    </div>
+                </div>
              )}
         </div>
     );
 };
 
-const PlanDisplay = ({ plan, model }) => (
-    <div class="mt-4 border-l-2 border-gray-700/50 pl-6 ml-4">
-        <div class="mb-4 -ml-10">
-            <InfoBlock icon={<BrainCircuitIcon class="h-5 w-5 text-purple-400" />} agentName="The Chief Architect" modelName={model} />
+const PlanDisplay = ({ plan }) => (
+    <AgentResponseCard icon={<ArchitectIcon class="h-5 w-5" />} title="The Chief Architect">
+        <div class="border-t border-gray-700/50 pt-3">
+            <h4 class="text-sm font-bold text-gray-400 mb-2">Execution Plan</h4>
+            {plan.steps.map(step => <StepCard key={step.step_id} step={step} />)}
         </div>
-        <h3 class="text-sm font-bold text-gray-400 mb-2 -ml-2">Execution Plan</h3>
-        {plan.steps.map(step => <StepCard key={step.step_id} step={step} />)}
-    </div>
+    </AgentResponseCard>
 );
 
-const DirectAnswerCard = ({ answer, model }) => (
-    <div class="p-4 rounded-lg shadow-md bg-gray-800/50 border border-gray-700/50 mb-4">
-        <div class="flex items-center gap-3 mb-3">
-            <BotIcon class="h-6 w-6 text-green-400" />
-            <h3 class="font-bold text-sm text-gray-300 capitalize">Librarian's Answer</h3>
-        </div>
-        <p class="text-white whitespace-pre-wrap font-medium">{answer}</p>
-        <div class="mt-3 pt-2 border-t border-gray-700/50">
-            <InfoBlock icon={<BrainCircuitIcon class="h-4 w-4 text-purple-400" />} agentName="The Librarian" modelName={model} />
-        </div>
-    </div>
+const DirectAnswerCard = ({ answer }) => (
+    <AgentResponseCard icon={<LibrarianIcon class="h-5 w-5" />} title="The Librarian">
+        <p class="text-white whitespace-pre-wrap font-medium border-t border-gray-700/50 pt-3">{answer}</p>
+    </AgentResponseCard>
 );
 
-const FinalAnswerCard = ({ answer, model }) => (
-    <div class="mt-6 pt-6 border-t-2 border-indigo-700/50 p-4 rounded-lg shadow-md bg-indigo-900/40 border border-indigo-700/50 mb-4">
-        <div class="flex items-center gap-3 mb-3">
-            <FileTextIcon class="h-6 w-6 text-indigo-300" />
-            <h3 class="font-bold text-sm text-gray-300 capitalize">Research Summary</h3>
-        </div>
-        {/* Using a div with whitespace-pre-wrap for better control than prose */}
-        <div class="text-gray-200 whitespace-pre-wrap text-base" dangerouslySetInnerHTML={{ __html: answer }}></div>
-        <div class="mt-3 pt-2 border-t border-indigo-700/50">
-             <InfoBlock icon={<BrainCircuitIcon class="h-4 w-4 text-purple-400" />} agentName="The Editor" modelName={model} />
-        </div>
+const FinalAnswerCard = ({ answer }) => (
+     <div class="mt-6 pt-4 border-t-2 border-indigo-700/50">
+        <AgentResponseCard icon={<EditorIcon class="h-5 w-5" />} title="The Editor">
+            <div class="text-gray-200 whitespace-pre-wrap text-base border-t border-gray-700/50 pt-3" dangerouslySetInnerHTML={{ __html: answer }}></div>
+        </AgentResponseCard>
     </div>
 );
 
@@ -278,7 +267,6 @@ const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
 export function App() {
     const [tasks, setTasks] = useState([]);
     const [activeTaskId, setActiveTaskId] = useState(null);
-    
     const [isThinking, setIsThinking] = useState(false);
     const [inputValue, setInputValue] = useState("");
     const [connectionStatus, setConnectionStatus] = useState("Disconnected");
@@ -398,13 +386,6 @@ export function App() {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
     
-    const getModelNameById = useCallback((id) => {
-        if (!id) return "Unknown Model";
-        const model = availableModels.find(m => m.id === id);
-        return model ? model.name : id;
-    }, [availableModels]);
-
-    // --- Workspace and File Handling ---
     const fetchWorkspaceFiles = useCallback(async (path) => {
         if (!path) return;
         setWorkspaceLoading(true); setWorkspaceError(null);
@@ -494,53 +475,50 @@ export function App() {
                 const newEvent = JSON.parse(event.data);
                 
                 setTasks(currentTasks => {
-                    // Find the task that this event belongs to
                     const taskIndex = currentTasks.findIndex(t => t.id === newEvent.task_id);
-                    if (taskIndex === -1) return currentTasks; // Event for a task not in state
+                    if (taskIndex === -1) return currentTasks; 
 
-                    let newHistory = [...currentTasks[taskIndex].history];
+                    const currentTask = currentTasks[taskIndex];
+                    let newHistory = [...currentTask.history];
 
-                    // --- THE FIX: Comprehensive event handler ---
                     if (newEvent.type === 'direct_answer') {
                         setIsThinking(false);
-                        newHistory.push({ type: 'direct_answer', content: newEvent.data, model: getModelNameById(runModelsRef.current?.LIBRARIAN_LLM_ID) });
+                        newHistory.push({ type: 'direct_answer', content: newEvent.data });
                     } else if (newEvent.type === 'final_answer') {
                         setIsThinking(false);
-                        newHistory.push({ type: 'final_answer', content: newEvent.data, model: getModelNameById(runModelsRef.current?.EDITOR_LLM_ID) });
+                        newHistory.push({ type: 'final_answer', content: newEvent.data });
                     } else if (newEvent.type === 'agent_event') {
                         const { name, event: chainEvent, data } = newEvent;
                         const inputData = data.input || {};
                         const outputData = data.output || {};
 
-                        // Find the plan in the history to update it
                         const planIndex = newHistory.findIndex(item => item.type === 'plan');
-                        let currentPlan = planIndex !== -1 ? { ...newHistory[planIndex] } : null;
-
+                        
                         if (name === 'Chief_Architect' && chainEvent === 'on_chain_end') {
                             setIsThinking(false);
                             if (outputData.plan && Array.isArray(outputData.plan)) {
-                                newHistory.push({ type: 'plan', model: getModelNameById(runModelsRef.current?.CHIEF_ARCHITECT_LLM_ID), steps: outputData.plan.map(step => ({ ...step, status: 'pending' })) });
+                                newHistory.push({ type: 'plan', steps: outputData.plan.map(step => ({ ...step, status: 'pending' })) });
                             }
-                        } else if (currentPlan) {
-                            // Update existing steps for other agent events
+                        } else if (planIndex !== -1) {
+                            let currentPlan = { ...newHistory[planIndex] };
+                            let newSteps = [...currentPlan.steps];
                             const stepIndex = inputData.current_step_index;
-                            if (stepIndex !== undefined && currentPlan.steps[stepIndex]) {
-                                let newSteps = [...currentPlan.steps];
+
+                            if (stepIndex !== undefined && newSteps[stepIndex]) {
                                 if (name === 'Site_Foreman' && chainEvent === 'on_chain_start') {
                                     newSteps[stepIndex] = { ...newSteps[stepIndex], status: 'in-progress' };
                                 } else if (name === 'Project_Supervisor' && chainEvent === 'on_chain_end') {
                                     newSteps[stepIndex] = { ...newSteps[stepIndex], status: 'completed', toolCall: inputData.current_tool_call, toolOutput: outputData.tool_output };
+                                    if (activeTaskId === newEvent.task_id) {
+                                      fetchWorkspaceFiles(activeTaskId);
+                                    }
                                 }
                                 currentPlan.steps = newSteps;
                                 newHistory[planIndex] = currentPlan;
                             }
                         }
                     }
-
-                    // Create a new task object with the updated history
-                    const updatedTask = { ...currentTasks[taskIndex], history: newHistory };
-                    
-                    // Create the final new array of all tasks
+                    const updatedTask = { ...currentTask, history: newHistory };
                     const newTasks = [...currentTasks];
                     newTasks[taskIndex] = updatedTask;
                     return newTasks;
@@ -556,7 +534,7 @@ export function App() {
                 ws.current.close();
             }
         };
-    }, [getModelNameById]);
+    }, [fetchWorkspaceFiles, activeTaskId]);
 
     const activeTask = tasks.find(t => t.id === activeTaskId);
 
@@ -569,7 +547,7 @@ export function App() {
             setWorkspaceFiles([]);
             setWorkspaceError(null);
         }
-    }, [activeTaskId, fetchWorkspaceFiles]);
+    }, [activeTaskId]);
 
     const handleSendMessage = (e) => {
         e.preventDefault();
@@ -583,7 +561,7 @@ export function App() {
         setTasks(currentTasks => 
             currentTasks.map(task => 
                 task.id === activeTaskId
-                    ? { ...task, history: [...task.history, newPrompt] }
+                    ? { ...task, history: [newPrompt] } // Clear old history for a new run
                     : task
             )
         );
@@ -660,11 +638,11 @@ export function App() {
                            case 'prompt':
                                return <PromptCard key={index} content={item.content} />;
                            case 'plan':
-                               return <PlanDisplay key={index} plan={item} model={item.model} />;
+                               return <PlanDisplay key={index} plan={item} />;
                            case 'direct_answer':
-                               return <DirectAnswerCard key={index} answer={item.content} model={item.model} />;
+                               return <DirectAnswerCard key={index} answer={item.content} />;
                            case 'final_answer':
-                               return <FinalAnswerCard key={index} answer={item.content} model={item.model} />;
+                               return <FinalAnswerCard key={index} answer={item.content} />;
                            default:
                                return null;
                        }
