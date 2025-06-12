@@ -1,33 +1,10 @@
 import { h } from 'preact';
 import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
+import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LibrarianIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, ArrowLeftIcon, UploadCloudIcon } from './components/Icons';
+import { ArchitectCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard } from './components/AgentCards';
+import { ToggleButton } from './components/Common';
 
-// --- SVG Icons ---
-const ChevronsLeftIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="m11 17-5-5 5-5" /><path d="m18 17-5-5 5-5" /></svg> );
-const ChevronsRightIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="m6 17 5-5-5-5" /><path d="m13 17 5-5-5-5" /></svg> );
-const FileIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" /><polyline points="14 2 14 8 20 8" /></svg> );
-const ArrowLeftIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> );
-const UploadCloudIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg> );
-const ClipboardIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><rect width="8" height="4" x="8" y="2" rx="1" ry="1" /><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /></svg> );
-const ClipboardCheckIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><rect width="8" height="4" x="8" y="2" rx="1" ry="1" /><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><path d="m9 14 2 2 4-4" /></svg> );
-const CheckCircleIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> );
-const LoaderIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin" {...props}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> );
-const CircleDotIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1"/></svg> );
-const ChevronDownIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="m6 9 6 6 6-6"/></svg> );
-const SlidersIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><line x1="4" x2="4" y1="21" y2="14" /><line x1="4" x2="4" y1="10" y2="3" /><line x1="12" x2="12" y1="21" y2="12" /><line x1="12" x2="12" y1="8" y2="3" /><line x1="20" x2="20" y1="21" y2="16" /><line x1="20" x2="20" y1="12" y2="3" /><line x1="2" x2="6" y1="14" y2="14" /><line x1="10" x2="14" y1="8" y2="8" /><line x1="18" x2="22" y1="16" y2="16" /></svg> );
-const UserIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> );
-const PlusCircleIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> );
-const PencilIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg> );
-const Trash2Icon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="m8 6 4-4 4 4"/></svg> );
-const XCircleIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><circle cx="12" cy="12" r="10" /><path d="m15 9-6 6" /><path d="m9 9 6 6" /></svg> );
-const ArchitectIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M12 21v-8a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v8" /><path d="M6 11V7a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4" /><path d="M18 11V7a2 2 0 0 0-2-2h-4" /><path d="m18 21 3-3" /><path d="m2 21 3-3" /><path d="m18 9 3 3" /><path d="m6 9-3 3" /><path d="M12 9v12" /></svg> );
-const LibrarianIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M3 6h18" /><path d="M4 6V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2" /><path d="M5 6v14a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1V6" /><path d="M15 6v14a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1V6" /><path d="M9 12h6" /></svg> );
-const EditorIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M12 20h9" /><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" /><path d="m15 5 3 3" /></svg> );
-const ForemanIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M12 2a10 10 0 0 0-10 10c0 1.85.63 3.58 1.68 4.95" /><path d="m12 12-2-2" /><path d="M22 12a10 10 0 0 0-10-10" /><path d="m14 12 2-2" /><path d="M12 22a10 10 0 0 0 10-10" /><path d="m12 14 2 2" /><path d="M2.32 16.95A10 10 0 0 0 12 22" /><path d="m10 12-2 2" /></svg> );
-const WorkerIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><rect x="2" y="6" width="20" height="12" rx="2" /><path d="M12 12h.01" /><path d="M17 12h.01" /><path d="M7 12h.01" /></svg> );
-const SupervisorIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M12 2a10 10 0 1 0 10 10" /><path d="M12 18a10 10 0 0 0-10-10" /><path d="M12 12a5 5 0 0 1 5 5" /><path d="M12 12a5 5 0 0 0-5 5" /><path d="M7 12a5 5 0 0 0 5-5" /><path d="M7 12a5 5 0 0 1 5-5" /></svg> );
-const RouterIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M2 12h20" /><path d="m5 17 5-5-5-5" /><path d="m19 17-5-5 5-5" /></svg> );
-
-// --- UI Components ---
+// --- UI Components that are specific to App.jsx ---
 
 const PromptCard = ({ content }) => (
     <div class="p-4 rounded-lg shadow-md bg-blue-900/50 border border-gray-700/50 mb-6">
@@ -51,100 +28,6 @@ const TaskItem = ({ task, isActive, onSelect, onRename, onDelete }) => {
             {isEditing ? ( <input ref={inputRef} type="text" value={editText} onInput={(e) => setEditText(e.target.value)} onBlur={handleSave} onKeyDown={handleKeyDown} onClick={(e) => e.stopPropagation()} class="w-full bg-transparent text-white outline-none"/> ) : ( <p class="font-medium text-white truncate">{task.name}</p> )}
             {!isEditing && ( <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity"> <button onClick={handleStartEditing} class="p-1 hover:text-white" title="Rename Task"><PencilIcon class="h-4 w-4" /></button> <button onClick={(e) => { e.stopPropagation(); onDelete(task.id); }} class="p-1 hover:text-red-400" title="Delete Task"><Trash2Icon class="h-4 w-4" /></button> </div> )}
         </div>
-    );
-};
-
-const CopyButton = ({ textToCopy, className = '' }) => {
-    const [copied, setCopied] = useState(false);
-    const handleCopy = (e) => {
-        e.stopPropagation();
-        const textArea = document.createElement("textarea");
-        textArea.value = textToCopy;
-        textArea.style.position = "fixed"; document.body.appendChild(textArea);
-        textArea.focus(); textArea.select();
-        try { document.execCommand('copy'); setCopied(true); setTimeout(() => setCopied(false), 2000); }
-        catch (err) { console.error('Failed to copy text: ', err); }
-        document.body.removeChild(textArea);
-    };
-    return ( <button onClick={handleCopy} class={`p-1.5 rounded-md hover:bg-gray-700 ${className}`}> {copied ? <ClipboardCheckIcon class="h-4 w-4 text-green-400" /> : <ClipboardIcon class="h-4 w-4 text-gray-400" />} </button> );
-};
-
-const ToggleButton = ({ isVisible, onToggle, side }) => {
-    if (isVisible) return null;
-    const positionClass = side === 'left' ? 'left-4' : 'right-4';
-    return ( <div class={`fixed top-1/2 -translate-y-1/2 z-20 ${positionClass}`}> <button onClick={onToggle} class="bg-gray-800 hover:bg-gray-700 text-white p-2 h-12 rounded-md border border-gray-600"> {side === 'left' ? <ChevronsRightIcon class="h-5 w-5" /> : <ChevronsLeftIcon class="h-5 w-5" />} </button> </div> );
-};
-
-const AgentResponseCard = ({ icon, title, children }) => (
-    <div class="p-4 rounded-lg shadow-md bg-gray-800/50 border border-gray-700/50">
-        <h3 class="font-bold text-sm text-gray-300 mb-3 capitalize flex items-center gap-2">{icon}{title}</h3>
-        <div class="pl-1">{children}</div>
-    </div>
-);
-
-const StepCard = ({ step }) => {
-    const [isExpanded, setIsExpanded] = useState(true);
-    const getStatusIcon = () => {
-        switch (step.status) {
-            case 'in-progress': return <LoaderIcon class="h-5 w-5 text-yellow-400" />;
-            case 'completed': return <CheckCircleIcon class="h-5 w-5 text-green-400" />;
-            case 'failure': return <XCircleIcon class="h-5 w-5 text-red-500" />;
-            case 'pending': default: return <CircleDotIcon class="h-5 w-5 text-gray-500" />;
-        }
-    };
-    return (
-        <div class="bg-gray-900/50 rounded-lg border border-gray-700/50 mb-2 last:mb-0 transition-all">
-             <div class="flex items-center gap-4 p-4 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
-                {getStatusIcon()}
-                <p class="text-gray-200 font-medium flex-1">{step.instruction}</p>
-                <ChevronDownIcon class={`h-5 w-5 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-             </div>
-             {isExpanded && (step.status === 'completed' || step.status === 'failure') && step.toolCall && (
-                <div class="p-4 pt-0">
-                    <div class="ml-9 pl-4 border-l-2 border-gray-700 space-y-4">
-                        <div>
-                           <div class="flex items-center gap-2 text-sm font-semibold text-gray-400"> <WorkerIcon class="h-4 w-4" /> <span>The Worker: Execute Step</span> </div>
-                           <pre class="text-xs text-cyan-300 overflow-x-auto p-2 mt-1 ml-7 bg-black/20 rounded-md font-mono relative"> <CopyButton textToCopy={JSON.stringify(step.toolCall, null, 2)} className="absolute top-1 right-1" /> <code>{JSON.stringify(step.toolCall, null, 2)}</code> </pre>
-                        </div>
-                        <div>
-                           <div class="flex items-center gap-2 text-sm font-semibold text-gray-400"> <SupervisorIcon class="h-4 w-4" /> <span>The Project Supervisor: Evaluation</span> </div>
-                           <pre class="text-xs text-gray-300 mt-1 ml-7 whitespace-pre-wrap font-mono relative bg-black/20 p-2 rounded-md"> <CopyButton textToCopy={step.evaluation?.reasoning || 'No evaluation.'} className="absolute top-1 right-1" /> {step.evaluation?.reasoning || 'No evaluation provided.'} </pre>
-                        </div>
-                    </div>
-                </div>
-             )}
-        </div>
-    );
-};
-
-const ArchitectCard = ({ plan }) => (
-    <AgentResponseCard icon={<ArchitectIcon class="h-5 w-5" />} title="The Chief Architect">
-        <h4 class="text-sm font-bold text-gray-400 mb-2">Proposed Plan</h4>
-        <ul class="list-decimal list-inside text-gray-300 space-y-1">
-            {plan.steps.map(step => <li key={step.step_id}>{step.instruction}</li>)}
-        </ul>
-    </AgentResponseCard>
-);
-
-const SiteForemanCard = ({ plan }) => (
-    <AgentResponseCard icon={<ForemanIcon class="h-5 w-5" />} title="The Site Foreman">
-        <h4 class="text-sm font-bold text-gray-400 mb-2">Execution Log</h4>
-        {plan.steps.map(step => <StepCard key={step.step_id} step={step} />)}
-    </AgentResponseCard>
-);
-
-const DirectAnswerCard = ({ answer }) => (
-    <AgentResponseCard icon={<LibrarianIcon class="h-5 w-5" />} title="The Librarian">
-        <p class="text-white whitespace-pre-wrap font-medium">{answer}</p>
-    </AgentResponseCard>
-);
-
-const FinalAnswerCard = ({ answer }) => {
-    const parsedHtml = window.marked ? window.marked.parse(answer, { breaks: true, gfm: true }) : answer.replace(/\n/g, '<br />');
-    return (
-        <AgentResponseCard icon={<EditorIcon class="h-5 w-5" />} title="The Editor">
-            <div class="prose prose-sm prose-invert max-w-none text-gray-200" dangerouslySetInnerHTML={{ __html: parsedHtml }}></div>
-        </AgentResponseCard>
     );
 };
 
@@ -321,7 +204,7 @@ export function App() {
                     let newHistory = [...currentTask.history];
                     let runContainer = newHistory[newHistory.length - 1]?.type === 'run_container' ? {...newHistory[newHistory.length - 1]} : null;
                     
-                    if (!runContainer) {
+                    if (!runContainer && newEvent.type !== 'prompt') { 
                         runContainer = { type: 'run_container', children: [] };
                         newHistory.push(runContainer);
                     }
@@ -333,7 +216,6 @@ export function App() {
                         const { name, event: chainEvent, data } = newEvent;
                         const inputData = data.input || {};
                         const outputData = data.output || {};
-
                         let executionPlanIndex = runContainer.children.findIndex(item => item.type === 'execution_plan');
 
                         if (name === 'Chief_Architect' && chainEvent === 'on_chain_end') {
@@ -347,14 +229,11 @@ export function App() {
                             const stepIndex = inputData.current_step_index;
 
                             if (stepIndex !== undefined && newSteps[stepIndex]) {
-                                if (name === 'Site_Foreman' && chainEvent === 'on_chain_start') {
-                                    newSteps[stepIndex] = { ...newSteps[stepIndex], status: 'in-progress' };
-                                } else if (name === 'Project_Supervisor' && chainEvent === 'on_chain_end') {
+                                if (name === 'Site_Foreman' && chainEvent === 'on_chain_start') { newSteps[stepIndex] = { ...newSteps[stepIndex], status: 'in-progress' }; }
+                                else if (name === 'Project_Supervisor' && chainEvent === 'on_chain_end') {
                                     const stepStatus = outputData.step_evaluation?.status === 'failure' ? 'failure' : 'completed';
                                     newSteps[stepIndex] = { ...newSteps[stepIndex], status: stepStatus, toolCall: inputData.current_tool_call, toolOutput: outputData.tool_output, evaluation: outputData.step_evaluation };
-                                    if (activeTaskId === newEvent.task_id) {
-                                      fetchWorkspaceFiles(activeTaskId);
-                                    }
+                                    if (activeTaskId === newEvent.task_id) { fetchWorkspaceFiles(activeTaskId); }
                                 }
                                 executionPlan.steps = newSteps;
                                 runContainer.children[executionPlanIndex] = executionPlan;
@@ -362,7 +241,9 @@ export function App() {
                         }
                     }
 
-                    newHistory[newHistory.length - 1] = runContainer;
+                    if (runContainer) {
+                        newHistory[newHistory.length -1] = runContainer;
+                    }
                     
                     const updatedTask = { ...currentTask, history: newHistory };
                     const newTasks = [...currentTasks];
@@ -387,7 +268,8 @@ export function App() {
         runModelsRef.current = selectedModels;
         
         const newPrompt = { type: 'prompt', content: message };
-        setTasks(currentTasks => currentTasks.map(task => task.id === activeTaskId ? { ...task, history: [...task.history, newPrompt] } : task ));
+        // --- FIX: Append to history, don't replace it ---
+        setTasks(currentTasks => currentTasks.map(task => task.id === activeTaskId ? { ...task, history: [...task.history, newPrompt, {type: 'run_container', children: []}] } : task ));
         
         ws.current.send(JSON.stringify({ type: 'run_agent', prompt: message, llm_config: selectedModels, task_id: activeTaskId }));
         setInputValue("");
@@ -395,7 +277,7 @@ export function App() {
     
     return (
         <div class="flex h-screen w-screen p-4 gap-4 bg-gray-900 text-gray-200" style={{fontFamily: "'Inter', sans-serif"}}>
-            {!isLeftSidebarVisible && <ToggleButton onToggle={() => setIsLeftSidebarVisible(true)} side="left" />}
+            {!isLeftSidebarVisible && <div class="fixed top-4 left-4 z-20"><button onClick={() => setIsLeftSidebarVisible(true)} class="bg-gray-800 hover:bg-gray-700 text-white p-2 rounded-md border border-gray-600"><ChevronsRightIcon class="h-5 w-5" /></button></div>}
             {isLeftSidebarVisible && (
                 <div class="h-full w-1/4 min-w-[300px] bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col">
                     <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-700 flex-shrink-0">
@@ -424,29 +306,35 @@ export function App() {
                 </div>
                 <div class="flex-1 overflow-y-auto p-6">
                    {activeTask?.history.map((item, index) => {
-                       switch (item.type) {
-                           case 'prompt':
-                               return <PromptCard key={index} content={item.content} />;
-                           case 'run_container':
-                                return (
-                                    <div class="relative pl-8">
-                                        <div class="absolute top-5 left-4 h-[calc(100%-2rem)] w-0.5 bg-gray-700" />
-                                        <div class="space-y-4">
-                                        {item.children.map((child, childIndex) => {
-                                            switch (child.type) {
-                                                case 'architect_plan': return <ArchitectCard key={childIndex} plan={child} />;
-                                                case 'execution_plan': return <SiteForemanCard key={childIndex} plan={child} />;
-                                                case 'direct_answer': return <DirectAnswerCard key={childIndex} answer={child.content} />;
-                                                case 'final_answer': return <FinalAnswerCard key={childIndex} answer={child.content} />;
-                                                default: return null;
-                                            }
-                                        })}
-                                        </div>
-                                    </div>
-                                );
-                           default:
-                               return null;
+                       if (item.type === 'prompt') {
+                           return <PromptCard key={index} content={item.content} />;
                        }
+                       if (item.type === 'run_container') {
+                            return (
+                                <div key={index} class="relative pl-8">
+                                    <div class="absolute top-5 left-4 h-[calc(100%-2.5rem)] w-0.5 bg-gray-700/50" />
+                                    <div class="space-y-4">
+                                    {item.children.map((child, childIndex) => {
+                                        return (
+                                            <div key={childIndex} class="relative">
+                                                <div class="absolute top-6 -left-4 h-0.5 w-4 bg-gray-700/50" />
+                                                {(() => {
+                                                    switch (child.type) {
+                                                        case 'architect_plan': return <ArchitectCard plan={child} />;
+                                                        case 'execution_plan': return <SiteForemanCard plan={child} />;
+                                                        case 'direct_answer': return <DirectAnswerCard answer={child.content} />;
+                                                        case 'final_answer': return <FinalAnswerCard answer={child.content} />;
+                                                        default: return null;
+                                                    }
+                                                })()}
+                                            </div>
+                                        );
+                                    })}
+                                    </div>
+                                </div>
+                            );
+                       }
+                       return null;
                    })}
 
                    {isThinking && ( <div class="flex items-center gap-4 p-4"> <LoaderIcon class="h-5 w-5 text-yellow-400" /> <p class="text-gray-300 font-medium">Agent is thinking...</p> </div> )}
@@ -460,7 +348,7 @@ export function App() {
                 </div>
             </div>
 
-            {!isRightSidebarVisible && <ToggleButton onToggle={() => setIsRightSidebarVisible(true)} side="right" />}
+            {!isRightSidebarVisible && <div class="fixed top-4 right-4 z-20"><button onClick={() => setIsRightSidebarVisible(true)} class="bg-gray-800 hover:bg-gray-700 text-white p-2 rounded-md border border-gray-600"><ChevronsLeftIcon class="h-5 w-5" /></button></div>}
             {isRightSidebarVisible && (
                 <div class="h-full w-1/4 min-w-[300px] bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col">
                     <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-700"> <h2 class="text-xl font-bold text-white">Agent Workspace</h2> <button onClick={() => setIsRightSidebarVisible(false)} class="p-1.5 rounded-md hover:bg-gray-700" title="Hide Workspace"><ChevronsRightIcon class="h-4 w-4" /></button> </div>
