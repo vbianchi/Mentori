@@ -18,6 +18,75 @@ const SlidersIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="
 const BrainCircuitIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M12 5a3 3 0 1 0-5.993.142" /><path d="M12 5a3 3 0 1 1 5.993.142" /><path d="M12 12a3 3 0 1 0-5.993.142" /><path d="M12 12a3 3 0 1 1 5.993.142" /><path d="M12 19a3 3 0 1 0-5.993.142" /><path d="M12 19a3 3 0 1 1 5.993.142" /><path d="M20 12h-2" /><path d="M6 12H4" /><path d="M12 15v-3" /><path d="M12 8V6" /><path d="M15 12a3 3 0 1 0-6 0" /><path d="M12 9a3 3 0 1 1-6 0" /></svg> );
 const BotIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M12 8V4H8" /><rect width="16" height="12" x="4" y="8" rx="2" /><path d="M2 14h2" /><path d="M20 14h2" /><path d="M15 13v2" /><path d="M9 13v2" /></svg> );
 const FileTextIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg> );
+const PlusCircleIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> );
+const PencilIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg> );
+const Trash2Icon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="m8 6 4-4 4 4"/></svg> );
+
+// --- NEW COMPONENT: TaskItem ---
+const TaskItem = ({ task, isActive, onSelect, onRename, onDelete }) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [editText, setEditText] = useState(task.name);
+    const inputRef = useRef(null);
+
+    const handleStartEditing = (e) => {
+        e.stopPropagation();
+        setIsEditing(true);
+        setEditText(task.name);
+    };
+
+    const handleSave = () => {
+        if (editText.trim()) {
+            onRename(task.id, editText.trim());
+        }
+        setIsEditing(false);
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleSave();
+        } else if (e.key === 'Escape') {
+            setIsEditing(false);
+            setEditText(task.name);
+        }
+    };
+
+    useEffect(() => {
+        if (isEditing) {
+            inputRef.current?.focus();
+            inputRef.current?.select();
+        }
+    }, [isEditing]);
+    
+    return (
+        <div 
+            onClick={() => onSelect(task.id)}
+            class={`group flex justify-between items-center p-3 mb-2 rounded-lg cursor-pointer transition-colors ${isActive ? 'bg-blue-600/50' : 'hover:bg-gray-700/50'}`}
+        >
+            {isEditing ? (
+                <input
+                    ref={inputRef}
+                    type="text"
+                    value={editText}
+                    onInput={(e) => setEditText(e.target.value)}
+                    onBlur={handleSave}
+                    onKeyDown={handleKeyDown}
+                    onClick={(e) => e.stopPropagation()}
+                    class="w-full bg-transparent text-white outline-none"
+                />
+            ) : (
+                <p class="font-medium text-white truncate">{task.name}</p>
+            )}
+
+            {!isEditing && (
+                 <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={handleStartEditing} class="p-1 hover:text-white" title="Rename Task"><PencilIcon class="h-4 w-4" /></button>
+                    <button onClick={(e) => { e.stopPropagation(); onDelete(task.id); }} class="p-1 hover:text-red-400" title="Delete Task"><Trash2Icon class="h-4 w-4" /></button>
+                </div>
+            )}
+        </div>
+    );
+};
+
 
 // --- UI Components ---
 const CopyButton = ({ textToCopy, className = '' }) => {
@@ -196,11 +265,11 @@ const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
 
 // --- Main App Component ---
 export function App() {
-    const [prompt, setPrompt] = useState("");
-    const [planSteps, setPlanSteps] = useState([]);
+    const [tasks, setTasks] = useState([]);
+    const [activeTaskId, setActiveTaskId] = useState(null);
+    
+    const [chatHistory, setChatHistory] = useState([]);
     const [isThinking, setIsThinking] = useState(false);
-    const [directAnswer, setDirectAnswer] = useState(null);
-    const [finalAnswer, setFinalAnswer] = useState(null);
     const [inputValue, setInputValue] = useState("");
     const [connectionStatus, setConnectionStatus] = useState("Disconnected");
     const [workspacePath, setWorkspacePath] = useState(null);
@@ -213,17 +282,93 @@ export function App() {
     const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
     const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
     const [runModels, setRunModels] = useState(null);
-    
     const [availableModels, setAvailableModels] = useState([]);
     const [selectedModels, setSelectedModels] = useState({});
-
-    const handleModelChange = (roleKey, modelId) => {
-        setSelectedModels(prev => ({ ...prev, [roleKey]: modelId }));
-    };
 
     const ws = useRef(null);
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
+    
+    useEffect(() => {
+        const savedTasks = localStorage.getItem('research_agent_tasks');
+        const savedActiveId = localStorage.getItem('research_agent_active_task_id');
+        const loadedTasks = savedTasks ? JSON.parse(savedTasks) : [];
+        setTasks(loadedTasks);
+        
+        if (savedActiveId && loadedTasks.some(t => t.id === savedActiveId)) {
+            setActiveTaskId(savedActiveId);
+        } else if (loadedTasks.length > 0) {
+            setActiveTaskId(loadedTasks[0].id);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (tasks.length > 0) {
+            localStorage.setItem('research_agent_tasks', JSON.stringify(tasks));
+        } else {
+             localStorage.removeItem('research_agent_tasks');
+        }
+    }, [tasks]);
+
+    useEffect(() => {
+        if (activeTaskId) {
+            localStorage.setItem('research_agent_active_task_id', activeTaskId);
+        } else {
+             localStorage.removeItem('research_agent_active_task_id');
+        }
+    }, [activeTaskId]);
+    
+    const resetChatState = () => {
+        setChatHistory([]);
+        setIsThinking(false);
+        setWorkspacePath(null);
+        setWorkspaceFiles([]);
+        setWorkspaceError(null);
+        setSelectedFile(null);
+    };
+
+    const selectTask = (taskId) => {
+        if (taskId !== activeTaskId) {
+            setActiveTaskId(taskId);
+            resetChatState();
+        }
+    };
+    
+    const createNewTask = () => {
+        const newTask = {
+            id: `task_${Date.now()}`,
+            name: `New Task ${tasks.length + 1}`,
+            history: []
+        };
+        setTasks(prevTasks => [...prevTasks, newTask]);
+        selectTask(newTask.id);
+    };
+
+    const handleRenameTask = (taskId, newName) => {
+        setTasks(prevTasks => prevTasks.map(task => 
+            task.id === taskId ? { ...task, name: newName } : task
+        ));
+    };
+
+    const handleDeleteTask = (taskIdToDelete) => {
+        const remainingTasks = tasks.filter(task => task.id !== taskIdToDelete);
+        
+        if (activeTaskId === taskIdToDelete) {
+            if (remainingTasks.length > 0) {
+                const deletedIndex = tasks.findIndex(task => task.id === taskIdToDelete);
+                const newActiveIndex = Math.max(0, deletedIndex - 1);
+                setActiveTaskId(remainingTasks[newActiveIndex].id);
+            } else {
+                setActiveTaskId(null);
+            }
+            resetChatState();
+        }
+        setTasks(remainingTasks);
+    };
+
+    const handleModelChange = (roleKey, modelId) => {
+        setSelectedModels(prev => ({ ...prev, [roleKey]: modelId }));
+    };
 
     const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 
@@ -308,89 +453,41 @@ export function App() {
             ws.current.onerror = () => ws.current.close();
             ws.current.onmessage = (event) => {
                 const newEvent = JSON.parse(event.data);
-
-                if (newEvent.type === 'direct_answer') {
-                    setDirectAnswer(newEvent.data);
-                    setIsThinking(false);
-                    return;
-                }
                 
-                if (newEvent.type === 'final_answer') {
-                    setFinalAnswer(newEvent.data);
-                    setIsThinking(false);
-                    return;
-                }
-                
-                if (newEvent.type === 'agent_event') {
-                    const eventWorkspacePath = newEvent.data?.output?.workspace_path || newEvent.data?.input?.workspace_path;
-                    if (eventWorkspacePath) {
-                        setWorkspacePath(path => path || eventWorkspacePath);
-                    }
-    
-                    setPlanSteps(prevSteps => {
-                        const data = newEvent.data?.output || {};
-                        const inputData = newEvent.data?.input || {};
-                        if (newEvent.name === 'Chief_Architect' && newEvent.event.includes('end')) {
-                            setIsThinking(false);
-                            const plan = data.plan || [];
-                            return plan.map(step => ({ ...step, status: 'pending' }));
-                        }
-                        if (newEvent.name === 'Site_Foreman' && newEvent.event.includes('start')) {
-                            const stepIndex = inputData.current_step_index;
-                            if (prevSteps[stepIndex]) {
-                                const newSteps = [...prevSteps];
-                                newSteps[stepIndex] = { ...newSteps[stepIndex], status: 'in-progress' };
-                                return newSteps;
-                            }
-                        }
-                        if (newEvent.name === 'Worker' && newEvent.event.includes('end')) {
-                            const stepIndex = inputData.current_step_index;
-                             if (prevSteps[stepIndex]) {
-                                const newSteps = [...prevSteps];
-                                newSteps[stepIndex] = { ...newSteps[stepIndex], status: 'completed', toolCall: inputData.current_tool_call, toolOutput: data.tool_output };
-                                return newSteps;
-                             }
-                        }
-                        return prevSteps;
-                    });
-                }
+                // This logic is still temporary and will be the focus of our next step.
+                console.log("Received event:", newEvent);
             };
         }
         connect();
         return () => { if (ws.current) { ws.current.onclose = null; ws.current.close(); }};
     }, []);
 
-    useEffect(() => { scrollToBottom(); }, [planSteps, prompt, directAnswer, finalAnswer]);
+    useEffect(() => { scrollToBottom(); }, [chatHistory]);
 
     useEffect(() => {
         if (workspacePath) {
              fetchWorkspaceFiles(workspacePath);
         }
-    }, [planSteps, workspacePath, fetchWorkspaceFiles]);
+    }, [workspacePath]);
 
 
     const handleSendMessage = (e) => {
         e.preventDefault();
         const message = inputValue.trim();
-        if (message && ws.current?.readyState === WebSocket.OPEN) {
-            setPrompt(message);
-            setPlanSteps([]);
-            setDirectAnswer(null);
-            setFinalAnswer(null);
+        if (message && ws.current?.readyState === WebSocket.OPEN && activeTaskId) {
             setIsThinking(true);
-            setWorkspacePath(null); 
-            setWorkspaceFiles([]); 
-            setWorkspaceError(null); 
-            setSelectedFile(null);
             setRunModels(selectedModels);
             
             const payload = {
                 prompt: message,
                 llm_config: selectedModels,
+                task_id: activeTaskId,
             };
             ws.current.send(JSON.stringify(payload));
             
             setInputValue("");
+        } else if (!activeTaskId) {
+            alert("Please create or select a task before sending a message.");
         }
     };
 
@@ -406,11 +503,33 @@ export function App() {
                 <div class="h-full w-1/4 min-w-[300px] bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col">
                     <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-700 flex-shrink-0">
                         <h2 class="text-xl font-bold text-white">Tasks</h2>
-                        <button onClick={() => setIsLeftSidebarVisible(false)} class="p-1.5 rounded-md hover:bg-gray-700" title="Hide Sidebar"><ChevronsLeftIcon class="h-4 w-4" /></button>
+                        <div class="flex items-center gap-2">
+                           <button onClick={createNewTask} class="p-1.5 rounded-md hover:bg-gray-700" title="New Task">
+                               <PlusCircleIcon class="h-5 w-5" />
+                           </button>
+                           <button onClick={() => setIsLeftSidebarVisible(false)} class="p-1.5 rounded-md hover:bg-gray-700" title="Hide Sidebar">
+                               <ChevronsLeftIcon class="h-4 w-4" />
+                           </button>
+                        </div>
                     </div>
                     <div class="flex flex-col flex-grow p-6 pt-4 min-h-0">
-                        <div class="flex-grow overflow-y-auto">
-                            <p class="text-gray-400">// Task list will go here.</p>
+                        <div class="flex-grow overflow-y-auto pr-2">
+                            {tasks.length > 0 ? (
+                                <ul>
+                                    {tasks.map(task => (
+                                        <TaskItem
+                                            key={task.id}
+                                            task={task}
+                                            isActive={activeTaskId === task.id}
+                                            onSelect={selectTask}
+                                            onRename={handleRenameTask}
+                                            onDelete={handleDeleteTask}
+                                        />
+                                    ))}
+                                </ul>
+                            ) : (
+                               <p class="text-gray-400 text-center mt-4">No tasks yet. Create one!</p>
+                            )}
                         </div>
                         <SettingsPanel 
                             models={availableModels}
@@ -433,46 +552,30 @@ export function App() {
                    </div>
                 </div>
                 <div class="flex-1 overflow-y-auto p-6">
-                   {prompt && (
-                       <div class="p-4 rounded-lg shadow-md bg-blue-900/50 border border-gray-700/50 mb-4">
-                           <h3 class="font-bold text-sm text-gray-300 mb-2 capitalize">You</h3>
-                           <p class="text-white whitespace-pre-wrap font-medium">{prompt}</p>
-                       </div>
-                    )}
-                    {isThinking && (
+                   {/* This area will render based on the 'chatHistory' state */}
+                   {chatHistory.map((item, index) => {
+                       // This will be replaced with proper component rendering
+                       return <div key={index}>{JSON.stringify(item)}</div>
+                   })}
+
+                   {isThinking && (
                         <div class="flex items-center gap-4 p-4">
                            <LoaderIcon class="h-5 w-5 text-yellow-400" />
                            <p class="text-gray-300 font-medium">Agent is thinking...</p>
                         </div>
                     )}
                     
-                    {directAnswer && (
-                        <DirectAnswerCard answer={directAnswer} model={getModelNameById(runModels?.LIBRARIAN_LLM_ID)} />
-                    )}
-
-                    {planSteps.length > 0 && (
-                        <div class="mt-4 border-l-2 border-gray-700/50 pl-6 ml-4">
-                            <div class="mb-4 -ml-10">
-                                <InfoBlock icon={<BrainCircuitIcon class="h-5 w-5 text-purple-400" />} agentName="The Chief Architect" modelName={getModelNameById(runModels?.CHIEF_ARCHITECT_LLM_ID)} />
-                            </div>
-                            <h3 class="text-sm font-bold text-gray-400 mb-2 -ml-2">Execution Plan</h3>
-                            {planSteps.map((step, index) => <StepCard key={index} step={step} />)}
-                        </div>
-                    )}
-                    
-                    {finalAnswer && (
-                        <FinalAnswerCard answer={finalAnswer} model={getModelNameById(runModels?.EDITOR_LLM_ID)} />
-                    )}
-
                    <div ref={messagesEndRef} />
                 </div>
                 <div class="p-6 border-t border-gray-700 flex-shrink-0">
                     <form onSubmit={handleSendMessage} class="flex gap-3">
                         <textarea value={inputValue} onInput={e => setInputValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) handleSendMessage(e); }}
                             class="flex-1 p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
-                            placeholder="Send a message to the agent..." rows="2"
+                            placeholder={activeTaskId ? "Send a message..." : "Please select or create a task."}
+                            rows="2"
+                            disabled={!activeTaskId}
                         ></textarea>
-                        <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-500 transition-colors" disabled={connectionStatus !== 'Connected' || isThinking}>Send</button>
+                        <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-500 transition-colors" disabled={connectionStatus !== 'Connected' || isThinking || !activeTaskId}>Send</button>
                     </form>
                 </div>
             </div>
@@ -496,7 +599,6 @@ export function App() {
                                 </div>
                                 <div class="flex-grow bg-gray-900/50 rounded-md overflow-hidden">
                                     <pre class="h-full w-full overflow-auto p-4 text-sm text-gray-300 font-mono">
-                                        {/* --- THE FIX --- */}
                                         {isFileLoading ? 'Loading...' : <code>{fileContent}</code>}
                                     </pre>
                                 </div>
