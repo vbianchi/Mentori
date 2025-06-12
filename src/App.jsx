@@ -21,8 +21,26 @@ const FileTextIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width=
 const PlusCircleIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> );
 const PencilIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg> );
 const Trash2Icon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="m8 6 4-4 4 4"/></svg> );
+// --- NEW ---
+const UserIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> );
 
-// --- NEW COMPONENT: TaskItem ---
+
+// --- UI Components ---
+
+// --- NEW COMPONENT: PromptCard ---
+// This component will display the user's message in the chat history.
+const PromptCard = ({ content }) => (
+    <div class="p-4 rounded-lg shadow-md bg-gray-700/60 border border-gray-600/50 mb-4 ml-10">
+        <div class="flex items-start gap-3">
+            <UserIcon class="h-6 w-6 text-blue-300 flex-shrink-0 mt-1" />
+            <div class="flex-1">
+                <h3 class="font-bold text-sm text-gray-300 capitalize mb-2">Your Request</h3>
+                <p class="text-white whitespace-pre-wrap font-medium">{content}</p>
+            </div>
+        </div>
+    </div>
+);
+
 const TaskItem = ({ task, isActive, onSelect, onRename, onDelete }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editText, setEditText] = useState(task.name);
@@ -87,8 +105,6 @@ const TaskItem = ({ task, isActive, onSelect, onRename, onDelete }) => {
     );
 };
 
-
-// --- UI Components ---
 const CopyButton = ({ textToCopy, className = '' }) => {
     const [copied, setCopied] = useState(false);
     const handleCopy = (e) => {
@@ -268,11 +284,13 @@ export function App() {
     const [tasks, setTasks] = useState([]);
     const [activeTaskId, setActiveTaskId] = useState(null);
     
-    const [chatHistory, setChatHistory] = useState([]);
+    // REMOVED: `chatHistory` state is no longer needed as it's part of each task.
+    // const [chatHistory, setChatHistory] = useState([]);
+    
     const [isThinking, setIsThinking] = useState(false);
     const [inputValue, setInputValue] = useState("");
     const [connectionStatus, setConnectionStatus] = useState("Disconnected");
-    const [workspacePath, setWorkspacePath] = useState(null);
+    const [workspacePath, setWorkspacePath] = useState(null); // This might be deprecated soon
     const [workspaceFiles, setWorkspaceFiles] = useState([]);
     const [workspaceLoading, setWorkspaceLoading] = useState(false);
     const [workspaceError, setWorkspaceError] = useState(null);
@@ -289,6 +307,7 @@ export function App() {
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
     
+    // --- State Initialization and Persistence ---
     useEffect(() => {
         const savedTasks = localStorage.getItem('research_agent_tasks');
         const savedActiveId = localStorage.getItem('research_agent_active_task_id');
@@ -318,8 +337,8 @@ export function App() {
         }
     }, [activeTaskId]);
     
-    const resetChatState = () => {
-        setChatHistory([]);
+    const resetWorkspaceViews = () => {
+        // This function no longer needs to reset chat state.
         setIsThinking(false);
         setWorkspacePath(null);
         setWorkspaceFiles([]);
@@ -330,16 +349,16 @@ export function App() {
     const selectTask = (taskId) => {
         if (taskId !== activeTaskId) {
             setActiveTaskId(taskId);
-            resetChatState();
+            resetWorkspaceViews(); // Still useful for clearing file viewer etc.
         }
     };
     
-const createNewTask = () => {
+    const createNewTask = () => {
         const newTaskId = `task_${Date.now()}`;
         const newTask = {
             id: newTaskId,
             name: `New Task ${tasks.length + 1}`,
-            history: []
+            history: [] // Each task now has its own history
         };
         
         if (ws.current?.readyState === WebSocket.OPEN) {
@@ -357,16 +376,14 @@ const createNewTask = () => {
         ));
     };
 
-const handleDeleteTask = (taskIdToDelete) => {
-        // Send the message to the backend first.
+    const handleDeleteTask = (taskIdToDelete) => {
         if (ws.current?.readyState === WebSocket.OPEN) {
             ws.current.send(JSON.stringify({ type: 'task_delete', task_id: taskIdToDelete }));
         } else {
             alert("Connection not ready. Please wait a moment and try again.");
-            return; // Stop if we can't send the message
+            return;
         }
 
-        // Then, update the UI state.
         setTasks(currentTasks => {
             const remainingTasks = currentTasks.filter(task => task.id !== taskIdToDelete);
             
@@ -377,10 +394,9 @@ const handleDeleteTask = (taskIdToDelete) => {
                     selectTask(remainingTasks[newActiveIndex].id);
                 } else {
                     setActiveTaskId(null);
-                    resetChatState();
+                    resetWorkspaceViews();
                 }
             }
-            
             return remainingTasks;
         });
     };
@@ -391,12 +407,13 @@ const handleDeleteTask = (taskIdToDelete) => {
 
     const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 
+    // --- Workspace and File Handling ---
     const fetchWorkspaceFiles = useCallback(async (path) => {
         if (!path) return;
         setWorkspaceLoading(true); setWorkspaceError(null);
         try {
-            const workspaceId = path.split('/').pop();
-            const response = await fetch(`http://localhost:8766/files?path=${workspaceId}`);
+            // The path is now simply the task ID.
+            const response = await fetch(`http://localhost:8766/files?path=${path}`);
             if (!response.ok) throw new Error((await response.json()).error || 'Failed to fetch files');
             const data = await response.json();
             setWorkspaceFiles(data.files || []);
@@ -408,11 +425,10 @@ const handleDeleteTask = (taskIdToDelete) => {
     }, []);
 
     const fetchFileContent = useCallback(async (filename) => {
-        if (!workspacePath || !filename) return;
+        if (!activeTaskId || !filename) return;
         setIsFileLoading(true); setSelectedFile(filename); setFileContent('');
         try {
-            const workspaceId = workspacePath.split('/').pop();
-            const response = await fetch(`http://localhost:8766/file-content?path=${workspaceId}&filename=${filename}`);
+            const response = await fetch(`http://localhost:8766/file-content?path=${activeTaskId}&filename=${filename}`);
             if (!response.ok) throw new Error((await response.json()).error || 'Failed to fetch file content');
             setFileContent(await response.text());
         } catch (error) {
@@ -420,27 +436,26 @@ const handleDeleteTask = (taskIdToDelete) => {
         } finally {
             setIsFileLoading(false);
         }
-    }, [workspacePath]);
+    }, [activeTaskId]);
 
     const handleFileUpload = useCallback(async (e) => {
         const file = e.target.files[0];
-        if (!file || !workspacePath) return;
+        if (!file || !activeTaskId) return;
         setWorkspaceLoading(true);
-        const workspaceId = workspacePath.split('/').pop();
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('workspace_id', workspaceId);
+        formData.append('workspace_id', activeTaskId);
         try {
             const response = await fetch('http://localhost:8766/upload', { method: 'POST', body: formData });
             if (!response.ok) throw new Error((await response.json()).error || 'File upload failed');
-            await fetchWorkspaceFiles(workspacePath);
+            await fetchWorkspaceFiles(activeTaskId);
         } catch (error) {
             console.error('File upload error:', error); setWorkspaceError(`Upload failed: ${error.message}`);
         } finally {
             setWorkspaceLoading(false);
             if(fileInputRef.current) fileInputRef.current.value = "";
         }
-    }, [workspacePath, fetchWorkspaceFiles]);
+    }, [activeTaskId, fetchWorkspaceFiles]);
 
     useEffect(() => {
         const fetchModels = async () => {
@@ -454,8 +469,7 @@ const handleDeleteTask = (taskIdToDelete) => {
                 } else {
                     console.error("No available models returned from the backend.");
                 }
-            } catch (error)
-            {
+            } catch (error) {
                 console.error("Failed to fetch models:", error);
             }
         };
@@ -472,42 +486,51 @@ const handleDeleteTask = (taskIdToDelete) => {
             ws.current.onerror = () => ws.current.close();
             ws.current.onmessage = (event) => {
                 const newEvent = JSON.parse(event.data);
-                
-                // This logic is still temporary and will be the focus of our next step.
-                console.log("Received event:", newEvent);
+                console.log("Received event:", newEvent); // Placeholder for next steps
             };
         }
         connect();
         return () => { if (ws.current) { ws.current.onclose = null; ws.current.close(); }};
     }, []);
 
-    useEffect(() => { scrollToBottom(); }, [chatHistory]);
+    // Get the currently active task object.
+    const activeTask = tasks.find(t => t.id === activeTaskId);
+
+    useEffect(() => { scrollToBottom(); }, [activeTask?.history]);
 
     useEffect(() => {
-        if (workspacePath) {
-             fetchWorkspaceFiles(workspacePath);
+        if (activeTaskId) {
+             fetchWorkspaceFiles(activeTaskId);
         }
-    }, [workspacePath]);
-
+    }, [activeTaskId]);
 
     const handleSendMessage = (e) => {
         e.preventDefault();
         const message = inputValue.trim();
-        if (message && ws.current?.readyState === WebSocket.OPEN && activeTaskId) {
-            setIsThinking(true);
-            setRunModels(selectedModels);
-            
-            const payload = {
-                prompt: message,
-                llm_config: selectedModels,
-                task_id: activeTaskId,
-            };
-            ws.current.send(JSON.stringify(payload));
-            
-            setInputValue("");
-        } else if (!activeTaskId) {
-            alert("Please create or select a task before sending a message.");
-        }
+        if (!message || !activeTask || connectionStatus !== 'Connected') return;
+
+        setIsThinking(true);
+        setRunModels(selectedModels);
+
+        // --- THE CHANGE: Add user's prompt to the task's history immutably ---
+        const newPrompt = { type: 'prompt', content: message };
+        setTasks(currentTasks => 
+            currentTasks.map(task => 
+                task.id === activeTaskId
+                    ? { ...task, history: [...task.history, newPrompt] }
+                    : task
+            )
+        );
+        
+        const payload = {
+            type: 'run_agent', // Specify message type for the backend router
+            prompt: message,
+            llm_config: selectedModels,
+            task_id: activeTaskId,
+        };
+        ws.current.send(JSON.stringify(payload));
+        
+        setInputValue("");
     };
 
     const getModelNameById = (id) => {
@@ -571,10 +594,15 @@ const handleDeleteTask = (taskIdToDelete) => {
                    </div>
                 </div>
                 <div class="flex-1 overflow-y-auto p-6">
-                   {/* This area will render based on the 'chatHistory' state */}
-                   {chatHistory.map((item, index) => {
-                       // This will be replaced with proper component rendering
-                       return <div key={index}>{JSON.stringify(item)}</div>
+                   {/* --- THE CHANGE: Render history from the active task --- */}
+                   {activeTask?.history.map((item, index) => {
+                       switch (item.type) {
+                           case 'prompt':
+                               return <PromptCard key={index} content={item.content} />;
+                           // We will add cases for agent messages here in the next steps
+                           default:
+                               return null;
+                       }
                    })}
 
                    {isThinking && (
@@ -592,7 +620,7 @@ const handleDeleteTask = (taskIdToDelete) => {
                             class="flex-1 p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
                             placeholder={activeTaskId ? "Send a message..." : "Please select or create a task."}
                             rows="2"
-                            disabled={!activeTaskId}
+                            disabled={!activeTaskId || isThinking}
                         ></textarea>
                         <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-500 transition-colors" disabled={connectionStatus !== 'Connected' || isThinking || !activeTaskId}>Send</button>
                     </form>
@@ -625,9 +653,9 @@ const handleDeleteTask = (taskIdToDelete) => {
                         ) : (
                              <div class="flex flex-col flex-grow min-h-0">
                                 <div class="flex justify-between items-center mb-2 flex-shrink-0">
-                                    <div class="text-xs text-gray-500 truncate" title={workspacePath || 'No active workspace'}>{workspacePath ? `Path: ...${workspacePath.slice(-36)}` : 'No active workspace'}</div>
+                                    <div class="text-xs text-gray-500 truncate" title={activeTaskId || 'No active workspace'}>{activeTaskId ? `Path: ...${activeTaskId.slice(-36)}` : 'No active workspace'}</div>
                                     <input type="file" ref={fileInputRef} onChange={handleFileUpload} class="hidden" />
-                                    <button onClick={() => fileInputRef.current?.click()} disabled={!workspacePath || workspaceLoading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed" title="Upload File">
+                                    <button onClick={() => fileInputRef.current?.click()} disabled={!activeTaskId || workspaceLoading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed" title="Upload File">
                                         <UploadCloudIcon class="h-4 w-4" />
                                     </button>
                                 </div>
