@@ -7,7 +7,8 @@ import { ToggleButton } from './components/Common';
 // --- UI Components that are specific to App.jsx ---
 
 const PromptCard = ({ content }) => (
-    <div class="p-4 rounded-lg shadow-md bg-blue-900/50 border border-gray-700/50 mb-6">
+    // --- THE FIX: Add margin-top (mt-8) to create space from the element above ---
+    <div class="mt-8 p-4 rounded-lg shadow-md bg-blue-900/50 border border-gray-700/50">
         <h3 class="font-bold text-sm text-gray-300 mb-2 capitalize flex items-center gap-2"><UserIcon class="h-5 w-5" /> You</h3>
         <p class="text-white whitespace-pre-wrap font-medium">{content}</p>
     </div>
@@ -39,7 +40,7 @@ const ModelSelector = ({ label, icon, onModelChange, models, selectedModel, role
 );
 
 const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
-    const [isExpanded, setIsExpanded] = useState(true);
+    const [isExpanded, setIsExpanded] = useState(false);
     const agentRoles = [
         { key: 'ROUTER_LLM_ID', label: 'The Router', icon: <RouterIcon className="h-4 w-4"/>, desc: "Classifies tasks." },
         { key: 'LIBRARIAN_LLM_ID', label: 'The Librarian', icon: <LibrarianIcon className="h-4 w-4"/>, desc: "Answers simple questions." },
@@ -268,8 +269,7 @@ export function App() {
         runModelsRef.current = selectedModels;
         
         const newPrompt = { type: 'prompt', content: message };
-        // --- FIX: Append to history, don't replace it ---
-        setTasks(currentTasks => currentTasks.map(task => task.id === activeTaskId ? { ...task, history: [...task.history, newPrompt, {type: 'run_container', children: []}] } : task ));
+        setTasks(currentTasks => currentTasks.map(task => task.id === activeTaskId ? { ...task, history: [...task.history, newPrompt] } : task ));
         
         ws.current.send(JSON.stringify({ type: 'run_agent', prompt: message, llm_config: selectedModels, task_id: activeTaskId }));
         setInputValue("");
@@ -277,7 +277,7 @@ export function App() {
     
     return (
         <div class="flex h-screen w-screen p-4 gap-4 bg-gray-900 text-gray-200" style={{fontFamily: "'Inter', sans-serif"}}>
-            {!isLeftSidebarVisible && <div class="fixed top-4 left-4 z-20"><button onClick={() => setIsLeftSidebarVisible(true)} class="bg-gray-800 hover:bg-gray-700 text-white p-2 rounded-md border border-gray-600"><ChevronsRightIcon class="h-5 w-5" /></button></div>}
+            {!isLeftSidebarVisible && <ToggleButton isVisible={isLeftSidebarVisible} onToggle={() => setIsLeftSidebarVisible(true)} side="left" />}
             {isLeftSidebarVisible && (
                 <div class="h-full w-1/4 min-w-[300px] bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col">
                     <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-700 flex-shrink-0">
@@ -311,7 +311,7 @@ export function App() {
                        }
                        if (item.type === 'run_container') {
                             return (
-                                <div key={index} class="relative pl-8">
+                                <div key={index} class="relative mt-6 pl-8">
                                     <div class="absolute top-5 left-4 h-[calc(100%-2.5rem)] w-0.5 bg-gray-700/50" />
                                     <div class="space-y-4">
                                     {item.children.map((child, childIndex) => {
@@ -348,7 +348,7 @@ export function App() {
                 </div>
             </div>
 
-            {!isRightSidebarVisible && <div class="fixed top-4 right-4 z-20"><button onClick={() => setIsRightSidebarVisible(true)} class="bg-gray-800 hover:bg-gray-700 text-white p-2 rounded-md border border-gray-600"><ChevronsLeftIcon class="h-5 w-5" /></button></div>}
+            {!isRightSidebarVisible && <ToggleButton isVisible={isRightSidebarVisible} onToggle={() => setIsRightSidebarVisible(true)} side="right" />}
             {isRightSidebarVisible && (
                 <div class="h-full w-1/4 min-w-[300px] bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col">
                     <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-700"> <h2 class="text-xl font-bold text-white">Agent Workspace</h2> <button onClick={() => setIsRightSidebarVisible(false)} class="p-1.5 rounded-md hover:bg-gray-700" title="Hide Workspace"><ChevronsRightIcon class="h-4 w-4" /></button> </div>

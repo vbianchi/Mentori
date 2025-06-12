@@ -61,11 +61,15 @@ export const SiteForemanCard = ({ plan }) => (
     </AgentResponseCard>
 );
 
-export const DirectAnswerCard = ({ answer }) => (
-    <AgentResponseCard icon={<LibrarianIcon class="h-5 w-5" />} title="The Librarian">
-        <p class="text-white whitespace-pre-wrap font-medium">{answer}</p>
-    </AgentResponseCard>
-);
+export const DirectAnswerCard = ({ answer }) => {
+    // --- THE FIX: Apply Markdown parsing to the Librarian's answer ---
+    const parsedHtml = window.marked ? window.marked.parse(answer, { breaks: true, gfm: true }) : answer.replace(/\n/g, '<br />');
+    return (
+        <AgentResponseCard icon={<LibrarianIcon class="h-5 w-5" />} title="The Librarian">
+            <div class="prose prose-sm prose-invert max-w-none text-gray-200" dangerouslySetInnerHTML={{ __html: parsedHtml }}></div>
+        </AgentResponseCard>
+    );
+};
 
 export const FinalAnswerCard = ({ answer }) => {
     const parsedHtml = window.marked ? window.marked.parse(answer, { breaks: true, gfm: true }) : answer.replace(/\n/g, '<br />');
