@@ -334,14 +334,21 @@ export function App() {
         }
     };
     
-    const createNewTask = () => {
+const createNewTask = () => {
+        const newTaskId = `task_${Date.now()}`;
         const newTask = {
-            id: `task_${Date.now()}`,
+            id: newTaskId,
             name: `New Task ${tasks.length + 1}`,
             history: []
         };
-        setTasks(prevTasks => [...prevTasks, newTask]);
-        selectTask(newTask.id);
+        
+        if (ws.current?.readyState === WebSocket.OPEN) {
+            ws.current.send(JSON.stringify({ type: 'task_create', task_id: newTaskId }));
+            setTasks(prevTasks => [...prevTasks, newTask]);
+            selectTask(newTaskId);
+        } else {
+            alert("Connection not ready. Please wait a moment and try again.");
+        }
     };
 
     const handleRenameTask = (taskId, newName) => {
@@ -350,20 +357,32 @@ export function App() {
         ));
     };
 
-    const handleDeleteTask = (taskIdToDelete) => {
-        const remainingTasks = tasks.filter(task => task.id !== taskIdToDelete);
-        
-        if (activeTaskId === taskIdToDelete) {
-            if (remainingTasks.length > 0) {
-                const deletedIndex = tasks.findIndex(task => task.id === taskIdToDelete);
-                const newActiveIndex = Math.max(0, deletedIndex - 1);
-                setActiveTaskId(remainingTasks[newActiveIndex].id);
-            } else {
-                setActiveTaskId(null);
-            }
-            resetChatState();
+const handleDeleteTask = (taskIdToDelete) => {
+        // Send the message to the backend first.
+        if (ws.current?.readyState === WebSocket.OPEN) {
+            ws.current.send(JSON.stringify({ type: 'task_delete', task_id: taskIdToDelete }));
+        } else {
+            alert("Connection not ready. Please wait a moment and try again.");
+            return; // Stop if we can't send the message
         }
-        setTasks(remainingTasks);
+
+        // Then, update the UI state.
+        setTasks(currentTasks => {
+            const remainingTasks = currentTasks.filter(task => task.id !== taskIdToDelete);
+            
+            if (activeTaskId === taskIdToDelete) {
+                if (remainingTasks.length > 0) {
+                    const deletedIndex = currentTasks.findIndex(task => task.id === taskIdToDelete);
+                    const newActiveIndex = Math.max(0, deletedIndex - 1);
+                    selectTask(remainingTasks[newActiveIndex].id);
+                } else {
+                    setActiveTaskId(null);
+                    resetChatState();
+                }
+            }
+            
+            return remainingTasks;
+        });
     };
 
     const handleModelChange = (roleKey, modelId) => {
