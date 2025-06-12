@@ -21,23 +21,14 @@ const FileTextIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width=
 const PlusCircleIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> );
 const PencilIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg> );
 const Trash2Icon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="m8 6 4-4 4 4"/></svg> );
-// --- NEW ---
 const UserIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> );
-
 
 // --- UI Components ---
 
-// --- NEW COMPONENT: PromptCard ---
-// This component will display the user's message in the chat history.
 const PromptCard = ({ content }) => (
-    <div class="p-4 rounded-lg shadow-md bg-gray-700/60 border border-gray-600/50 mb-4 ml-10">
-        <div class="flex items-start gap-3">
-            <UserIcon class="h-6 w-6 text-blue-300 flex-shrink-0 mt-1" />
-            <div class="flex-1">
-                <h3 class="font-bold text-sm text-gray-300 capitalize mb-2">Your Request</h3>
-                <p class="text-white whitespace-pre-wrap font-medium">{content}</p>
-            </div>
-        </div>
+    <div class="p-4 rounded-lg shadow-md bg-blue-900/50 border border-gray-700/50 mb-4">
+        <h3 class="font-bold text-sm text-gray-300 mb-2 capitalize flex items-center gap-2"><UserIcon class="h-5 w-5" /> You</h3>
+        <p class="text-white whitespace-pre-wrap font-medium">{content}</p>
     </div>
 );
 
@@ -170,7 +161,7 @@ const StepCard = ({ step }) => {
                          <div class="mt-4 first:mt-0">
                             <div class="flex items-center gap-2">
                                 <ZapIcon class="h-4 w-4 text-gray-400" />
-                                <h4 class="text-sm font-semibold text-gray-400">Action (The Worker)</h4>
+                                <h4 class="text-sm font-semibold text-gray-400">Action</h4>
                             </div>
                             <pre class="text-xs text-cyan-300 overflow-x-auto p-2 mt-1 ml-7 bg-black/20 rounded-md font-mono relative">
                                 <CopyButton textToCopy={JSON.stringify(step.toolCall, null, 2)} className="absolute top-1 right-1" />
@@ -180,7 +171,7 @@ const StepCard = ({ step }) => {
                          <div class="mt-4 first:mt-0">
                             <div class="flex items-center gap-2">
                                 <ChevronsRightIcon class="h-4 w-4 text-gray-400" />
-                                <h4 class="text-sm font-semibold text-gray-400">Observation (The Project Supervisor)</h4>
+                                <h4 class="text-sm font-semibold text-gray-400">Observation</h4>
                             </div>
                              <pre class="text-xs text-gray-300 mt-1 ml-7 whitespace-pre-wrap font-mono relative">
                                  <CopyButton textToCopy={step.toolOutput} className="absolute top-1 right-1" />
@@ -193,6 +184,16 @@ const StepCard = ({ step }) => {
         </div>
     );
 };
+
+const PlanDisplay = ({ plan, model }) => (
+    <div class="mt-4 border-l-2 border-gray-700/50 pl-6 ml-4">
+        <div class="mb-4 -ml-10">
+            <InfoBlock icon={<BrainCircuitIcon class="h-5 w-5 text-purple-400" />} agentName="The Chief Architect" modelName={model} />
+        </div>
+        <h3 class="text-sm font-bold text-gray-400 mb-2 -ml-2">Execution Plan</h3>
+        {plan.steps.map(step => <StepCard key={step.step_id} step={step} />)}
+    </div>
+);
 
 const DirectAnswerCard = ({ answer, model }) => (
     <div class="p-4 rounded-lg shadow-md bg-gray-800/50 border border-gray-700/50 mb-4">
@@ -208,18 +209,18 @@ const DirectAnswerCard = ({ answer, model }) => (
 );
 
 const FinalAnswerCard = ({ answer, model }) => (
-    <div class="mt-6 pt-6 border-t border-gray-700/50 p-4 rounded-lg shadow-md bg-indigo-900/40 border border-indigo-700/50 mb-4">
+    <div class="mt-6 pt-6 border-t-2 border-indigo-700/50 p-4 rounded-lg shadow-md bg-indigo-900/40 border border-indigo-700/50 mb-4">
         <div class="flex items-center gap-3 mb-3">
             <FileTextIcon class="h-6 w-6 text-indigo-300" />
             <h3 class="font-bold text-sm text-gray-300 capitalize">Research Summary</h3>
         </div>
-        <div class="prose prose-sm prose-invert max-w-none text-gray-200" dangerouslySetInnerHTML={{ __html: answer.replace(/\n/g, '<br />') }}></div>
+        {/* Using a div with whitespace-pre-wrap for better control than prose */}
+        <div class="text-gray-200 whitespace-pre-wrap text-base" dangerouslySetInnerHTML={{ __html: answer }}></div>
         <div class="mt-3 pt-2 border-t border-indigo-700/50">
              <InfoBlock icon={<BrainCircuitIcon class="h-4 w-4 text-purple-400" />} agentName="The Editor" modelName={model} />
         </div>
     </div>
 );
-
 
 const ModelSelector = ({ label, roleKey, selectedModel, onModelChange, models }) => (
     <div class="mb-4 last:mb-0">
@@ -255,22 +256,16 @@ const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
                  <div class="mt-4 pl-7">
                      <ModelSelector label="The Router" roleKey="ROUTER_LLM_ID" models={models} selectedModel={selectedModels.ROUTER_LLM_ID} onModelChange={onModelChange} />
                      <p class="text-xs text-gray-500 -mt-2 mb-4">Classifies tasks.</p>
-
                      <ModelSelector label="The Librarian" roleKey="LIBRARIAN_LLM_ID" models={models} selectedModel={selectedModels.LIBRARIAN_LLM_ID} onModelChange={onModelChange} />
                      <p class="text-xs text-gray-500 -mt-2 mb-4">Answers simple questions.</p>
-
                      <ModelSelector label="The Chief Architect" roleKey="CHIEF_ARCHITECT_LLM_ID" models={models} selectedModel={selectedModels.CHIEF_ARCHITECT_LLM_ID} onModelChange={onModelChange} />
                      <p class="text-xs text-gray-500 -mt-2 mb-4">Creates the high-level plan.</p>
-                     
                      <ModelSelector label="The Site Foreman" roleKey="SITE_FOREMAN_LLM_ID" models={models} selectedModel={selectedModels.SITE_FOREMAN_LLM_ID} onModelChange={onModelChange} />
                      <p class="text-xs text-gray-500 -mt-2 mb-4">Prepares tool calls.</p>
-                     
                      <ModelSelector label="The Worker" roleKey="WORKER_LLM_ID" models={models} selectedModel={selectedModels.WORKER_LLM_ID} onModelChange={onModelChange} />
                      <p class="text-xs text-gray-500 -mt-2 mb-4">Executes tools (future use).</p>
-
                      <ModelSelector label="The Project Supervisor" roleKey="PROJECT_SUPERVISOR_LLM_ID" models={models} selectedModel={selectedModels.PROJECT_SUPERVISOR_LLM_ID} onModelChange={onModelChange} />
                      <p class="text-xs text-gray-500 -mt-2 mb-4">Validates step outcomes.</p>
-
                      <ModelSelector label="The Editor" roleKey="EDITOR_LLM_ID" models={models} selectedModel={selectedModels.EDITOR_LLM_ID} onModelChange={onModelChange} />
                      <p class="text-xs text-gray-500 -mt-2 mb-4">Synthesizes the final report.</p>
                  </div>
@@ -284,13 +279,9 @@ export function App() {
     const [tasks, setTasks] = useState([]);
     const [activeTaskId, setActiveTaskId] = useState(null);
     
-    // REMOVED: `chatHistory` state is no longer needed as it's part of each task.
-    // const [chatHistory, setChatHistory] = useState([]);
-    
     const [isThinking, setIsThinking] = useState(false);
     const [inputValue, setInputValue] = useState("");
     const [connectionStatus, setConnectionStatus] = useState("Disconnected");
-    const [workspacePath, setWorkspacePath] = useState(null); // This might be deprecated soon
     const [workspaceFiles, setWorkspaceFiles] = useState([]);
     const [workspaceLoading, setWorkspaceLoading] = useState(false);
     const [workspaceError, setWorkspaceError] = useState(null);
@@ -299,14 +290,14 @@ export function App() {
     const [isFileLoading, setIsFileLoading] = useState(false);
     const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
     const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
-    const [runModels, setRunModels] = useState(null);
     const [availableModels, setAvailableModels] = useState([]);
     const [selectedModels, setSelectedModels] = useState({});
 
     const ws = useRef(null);
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
-    
+    const runModelsRef = useRef({});
+
     // --- State Initialization and Persistence ---
     useEffect(() => {
         const savedTasks = localStorage.getItem('research_agent_tasks');
@@ -338,9 +329,6 @@ export function App() {
     }, [activeTaskId]);
     
     const resetWorkspaceViews = () => {
-        // This function no longer needs to reset chat state.
-        setIsThinking(false);
-        setWorkspacePath(null);
         setWorkspaceFiles([]);
         setWorkspaceError(null);
         setSelectedFile(null);
@@ -349,7 +337,8 @@ export function App() {
     const selectTask = (taskId) => {
         if (taskId !== activeTaskId) {
             setActiveTaskId(taskId);
-            resetWorkspaceViews(); // Still useful for clearing file viewer etc.
+            setIsThinking(false);
+            resetWorkspaceViews();
         }
     };
     
@@ -358,7 +347,7 @@ export function App() {
         const newTask = {
             id: newTaskId,
             name: `New Task ${tasks.length + 1}`,
-            history: [] // Each task now has its own history
+            history: []
         };
         
         if (ws.current?.readyState === WebSocket.OPEN) {
@@ -405,14 +394,21 @@ export function App() {
         setSelectedModels(prev => ({ ...prev, [roleKey]: modelId }));
     };
 
-    const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+    
+    const getModelNameById = useCallback((id) => {
+        if (!id) return "Unknown Model";
+        const model = availableModels.find(m => m.id === id);
+        return model ? model.name : id;
+    }, [availableModels]);
 
     // --- Workspace and File Handling ---
     const fetchWorkspaceFiles = useCallback(async (path) => {
         if (!path) return;
         setWorkspaceLoading(true); setWorkspaceError(null);
         try {
-            // The path is now simply the task ID.
             const response = await fetch(`http://localhost:8766/files?path=${path}`);
             if (!response.ok) throw new Error((await response.json()).error || 'Failed to fetch files');
             const data = await response.json();
@@ -466,6 +462,7 @@ export function App() {
                 if (config.available_models && config.available_models.length > 0) {
                     setAvailableModels(config.available_models);
                     setSelectedModels(config.default_models);
+                    runModelsRef.current = config.default_models;
                 } else {
                     console.error("No available models returned from the backend.");
                 }
@@ -476,24 +473,91 @@ export function App() {
         fetchModels();
     }, []);
 
-    // Effect for WebSocket connection
+    // --- WebSocket Connection and Event Handling ---
     useEffect(() => {
         function connect() {
             setConnectionStatus("Connecting...");
-            ws.current = new WebSocket("ws://localhost:8765");
-            ws.current.onopen = () => setConnectionStatus("Connected");
-            ws.current.onclose = () => { setConnectionStatus("Disconnected"); setTimeout(connect, 3000); };
-            ws.current.onerror = () => ws.current.close();
-            ws.current.onmessage = (event) => {
+            const socket = new WebSocket("ws://localhost:8765");
+            ws.current = socket;
+
+            socket.onopen = () => setConnectionStatus("Connected");
+            socket.onclose = () => { 
+                setConnectionStatus("Disconnected");
+                setTimeout(connect, 5000); 
+            };
+            socket.onerror = (err) => {
+                console.error("WebSocket error:", err);
+                socket.close();
+            };
+
+            socket.onmessage = (event) => {
                 const newEvent = JSON.parse(event.data);
-                console.log("Received event:", newEvent); // Placeholder for next steps
+                
+                setTasks(currentTasks => {
+                    // Find the task that this event belongs to
+                    const taskIndex = currentTasks.findIndex(t => t.id === newEvent.task_id);
+                    if (taskIndex === -1) return currentTasks; // Event for a task not in state
+
+                    let newHistory = [...currentTasks[taskIndex].history];
+
+                    // --- THE FIX: Comprehensive event handler ---
+                    if (newEvent.type === 'direct_answer') {
+                        setIsThinking(false);
+                        newHistory.push({ type: 'direct_answer', content: newEvent.data, model: getModelNameById(runModelsRef.current?.LIBRARIAN_LLM_ID) });
+                    } else if (newEvent.type === 'final_answer') {
+                        setIsThinking(false);
+                        newHistory.push({ type: 'final_answer', content: newEvent.data, model: getModelNameById(runModelsRef.current?.EDITOR_LLM_ID) });
+                    } else if (newEvent.type === 'agent_event') {
+                        const { name, event: chainEvent, data } = newEvent;
+                        const inputData = data.input || {};
+                        const outputData = data.output || {};
+
+                        // Find the plan in the history to update it
+                        const planIndex = newHistory.findIndex(item => item.type === 'plan');
+                        let currentPlan = planIndex !== -1 ? { ...newHistory[planIndex] } : null;
+
+                        if (name === 'Chief_Architect' && chainEvent === 'on_chain_end') {
+                            setIsThinking(false);
+                            if (outputData.plan && Array.isArray(outputData.plan)) {
+                                newHistory.push({ type: 'plan', model: getModelNameById(runModelsRef.current?.CHIEF_ARCHITECT_LLM_ID), steps: outputData.plan.map(step => ({ ...step, status: 'pending' })) });
+                            }
+                        } else if (currentPlan) {
+                            // Update existing steps for other agent events
+                            const stepIndex = inputData.current_step_index;
+                            if (stepIndex !== undefined && currentPlan.steps[stepIndex]) {
+                                let newSteps = [...currentPlan.steps];
+                                if (name === 'Site_Foreman' && chainEvent === 'on_chain_start') {
+                                    newSteps[stepIndex] = { ...newSteps[stepIndex], status: 'in-progress' };
+                                } else if (name === 'Project_Supervisor' && chainEvent === 'on_chain_end') {
+                                    newSteps[stepIndex] = { ...newSteps[stepIndex], status: 'completed', toolCall: inputData.current_tool_call, toolOutput: outputData.tool_output };
+                                }
+                                currentPlan.steps = newSteps;
+                                newHistory[planIndex] = currentPlan;
+                            }
+                        }
+                    }
+
+                    // Create a new task object with the updated history
+                    const updatedTask = { ...currentTasks[taskIndex], history: newHistory };
+                    
+                    // Create the final new array of all tasks
+                    const newTasks = [...currentTasks];
+                    newTasks[taskIndex] = updatedTask;
+                    return newTasks;
+                });
             };
         }
+        
         connect();
-        return () => { if (ws.current) { ws.current.onclose = null; ws.current.close(); }};
-    }, []);
 
-    // Get the currently active task object.
+        return () => {
+            if (ws.current) {
+                ws.current.onclose = null;
+                ws.current.close();
+            }
+        };
+    }, [getModelNameById]);
+
     const activeTask = tasks.find(t => t.id === activeTaskId);
 
     useEffect(() => { scrollToBottom(); }, [activeTask?.history]);
@@ -501,18 +565,20 @@ export function App() {
     useEffect(() => {
         if (activeTaskId) {
              fetchWorkspaceFiles(activeTaskId);
+        } else {
+            setWorkspaceFiles([]);
+            setWorkspaceError(null);
         }
-    }, [activeTaskId]);
+    }, [activeTaskId, fetchWorkspaceFiles]);
 
     const handleSendMessage = (e) => {
         e.preventDefault();
         const message = inputValue.trim();
-        if (!message || !activeTask || connectionStatus !== 'Connected') return;
+        if (!message || !activeTask || connectionStatus !== 'Connected' || isThinking) return;
 
         setIsThinking(true);
-        setRunModels(selectedModels);
-
-        // --- THE CHANGE: Add user's prompt to the task's history immutably ---
+        runModelsRef.current = selectedModels;
+        
         const newPrompt = { type: 'prompt', content: message };
         setTasks(currentTasks => 
             currentTasks.map(task => 
@@ -523,7 +589,7 @@ export function App() {
         );
         
         const payload = {
-            type: 'run_agent', // Specify message type for the backend router
+            type: 'run_agent',
             prompt: message,
             llm_config: selectedModels,
             task_id: activeTaskId,
@@ -532,11 +598,6 @@ export function App() {
         
         setInputValue("");
     };
-
-    const getModelNameById = (id) => {
-        const model = availableModels.find(m => m.id === id);
-        return model ? model.name : id;
-    }
     
     return (
         <div class="flex h-screen w-screen p-4 gap-4 bg-gray-900 text-gray-200" style={{fontFamily: "'Inter', sans-serif"}}>
@@ -594,12 +655,16 @@ export function App() {
                    </div>
                 </div>
                 <div class="flex-1 overflow-y-auto p-6">
-                   {/* --- THE CHANGE: Render history from the active task --- */}
                    {activeTask?.history.map((item, index) => {
                        switch (item.type) {
                            case 'prompt':
                                return <PromptCard key={index} content={item.content} />;
-                           // We will add cases for agent messages here in the next steps
+                           case 'plan':
+                               return <PlanDisplay key={index} plan={item} model={item.model} />;
+                           case 'direct_answer':
+                               return <DirectAnswerCard key={index} answer={item.content} model={item.model} />;
+                           case 'final_answer':
+                               return <FinalAnswerCard key={index} answer={item.content} model={item.model} />;
                            default:
                                return null;
                        }
@@ -653,7 +718,7 @@ export function App() {
                         ) : (
                              <div class="flex flex-col flex-grow min-h-0">
                                 <div class="flex justify-between items-center mb-2 flex-shrink-0">
-                                    <div class="text-xs text-gray-500 truncate" title={activeTaskId || 'No active workspace'}>{activeTaskId ? `Path: ...${activeTaskId.slice(-36)}` : 'No active workspace'}</div>
+                                    <div class="text-xs text-gray-500 truncate" title={activeTaskId || 'No active workspace'}>{activeTaskId ? `Workspace: ${activeTaskId}` : 'No active workspace'}</div>
                                     <input type="file" ref={fileInputRef} onChange={handleFileUpload} class="hidden" />
                                     <button onClick={() => fileInputRef.current?.click()} disabled={!activeTaskId || workspaceLoading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed" title="Upload File">
                                         <UploadCloudIcon class="h-4 w-4" />
