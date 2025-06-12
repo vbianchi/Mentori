@@ -10,9 +10,9 @@ This document outlines the phased development plan for the ResearchAgent project
 
 ### Phase 7: Persistence, History & Task Management \[UP NEXT\]
 
--   \[ \] **Stateful Sessions:** Transition from a stateless model to stateful "Tasks". Each new conversation will be a persistent task with its own unique workspace and history.
--   \[ \] **Task Management UI:** Implement the UI for managing tasks in the left-hand panel. This will include creating a new task and listing existing ones.
--   \[ \] **Backend Task Logic:** Update the backend WebSocket handler to manage tasks. It will receive a `task_id` and either create a new workspace or resume work in an existing one.
+-   \[x\] **Stateful Sessions:** Transition from a stateless model to stateful "Tasks". Each new conversation will be a persistent task with its own unique workspace and history.
+-   \[x\] **Task Management UI:** Implement the UI for managing tasks in the left-hand panel. This will include creating a new task and listing existing ones.
+-   \[x\] **Backend Task Logic:** Update the backend WebSocket handler to manage tasks. It will receive a `task_id` and either create a new workspace or resume work in an existing one.
 -   \[ \] **Conversational Memory:** Feed the chat history for a given task back into the agent's prompts. This will give the agent the context of previous turns, allowing for follow-up questions and iterative work.
 -   \[ \] **Basic User Abstraction:** Introduce a concept of a `user_id` to associate tasks with a specific user, laying the groundwork for future multi-user support.
 

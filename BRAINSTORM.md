@@ -48,3 +48,38 @@ Our UI aims to be transparent, controllable, and professional, inspired by infor
 -   **Self-Correction:** The core goal of Phase 7. The agent should be able to recover from errors. If a Python script fails with `ModuleNotFoundError`, the agent should be able to diagnose the error, formulate a correction plan (e.g., `pip install <module>`), execute the fix within the task's virtual environment, and then retry the original failed step.
 -   **Cost & Token Tracking:** The UI should provide transparency into token usage for each step, comparing cloud model costs versus local Ollama models. This is critical for production use.
 -   **Persistence & Reproducibility:**
+
+
+## New Focus: The Path to a Fully Stateful UI
+
+We have successfully implemented the backend logic and the frontend UI for creating and deleting tasks. However, the main chat panel is not yet connected to this state. The final step of Phase 7 is to make the chat history visible and persistent for each task.
+
+Here is the detailed, step-by-step plan to achieve this in `App.jsx`:
+
+#### **The Core Problem: Connecting State to UI**
+
+The `tasks` array in our frontend state now holds a `history` array for each task. Our goal is to make the UI _render_ the contents of the active task's `history`.
+#### **The Step-by-Step Implementation Plan**
+We will modify `App.jsx` in small, testable increments.
+**Step 1: Display the User's Prompt \[IN PROGRESS\]**
+-   **Goal:** When a user sends a message, it should immediately appear in the chat panel for the active task.
+-   **A. Define the `PromptCard` Component:** Create a simple React component designed to display the user's prompt text.
+-   **B. Add the Prompt to History:** In the `handleSendMessage` function, when a message is sent, we add an object like `{ type: 'prompt', content: message }` to the active task's `history` array.
+-   **C. Render from History:** The main chat panel's render logic will be updated to map over the active task's history. If it finds an item with `type: 'prompt'`, it will render a `PromptCard` with the content.
+**Step 2: Display Agent Events (The Plan)**
+
+-   **Goal:** When the agent creates a plan, the plan should appear in the chat panel.
+-   **A. Define `PlanCard` and `StepCard` Components:** Create components to display the overall plan and the individual steps within it.
+-   **B. Handle WebSocket Events:** The `onmessage` handler for our WebSocket will be updated. When it receives an `agent_event` from the `Chief_Architect`, it will add a `{ type: 'plan', plan: [...] }` object to the active task's history.
+-   **C. Render the Plan:** The render logic from Step 1 will be expanded. When it sees an item with `type: 'plan'`, it will render the `PlanCard`.
+**Step 3: Update Plan Steps in Real-Time**
+
+-   **Goal:** As the agent executes each step of the plan, the `StepCard` components should update their status (e.g., from "pending" to "in-progress" to "completed").
+-   **A. Handle `Worker` Events:** The `onmessage` handler will be enhanced. When it receives events from the `Site_Foreman` and `Worker`, it will find the corresponding `plan` object in the history and update the `status` of the relevant step.
+-   **B. Immutability is Key:** This update must be done immutably. We will create a _new copy_ of the history array and the plan object to avoid the "blank screen" bug from previous attempts.
+**Step 4: Display Final Answers**
+
+-   **Goal:** Display the final synthesized summary from "The Editor" or the direct answer from "The Librarian".
+-   **A. Handle Final Answer Events:** The `onmessage` handler will listen for the `final_answer` and `direct_answer` message types from the backend.
+-   **B. Add to History:** It will add a corresponding object, like `{ type: 'final_answer', content: '...' }`, to the active task's history.
+-   **C. Render Final Cards:** The render logic will be updated to display a `FinalAnswerCard` or `DirectAnswerCard` when it encounters these history types.
