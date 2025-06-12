@@ -19,7 +19,6 @@ const BrainCircuitIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" wi
 const BotIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M12 8V4H8" /><rect width="16" height="12" x="4" y="8" rx="2" /><path d="M2 14h2" /><path d="M20 14h2" /><path d="M15 13v2" /><path d="M9 13v2" /></svg> );
 const FileTextIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg> );
 
-
 // --- UI Components ---
 const CopyButton = ({ textToCopy, className = '' }) => {
     const [copied, setCopied] = useState(false);
@@ -54,7 +53,6 @@ const ToggleButton = ({ isVisible, onToggle, side }) => {
     );
 };
 
-// Refactored InfoBlock to clearly show the role and model
 const InfoBlock = ({ icon, agentName, modelName }) => (
     <div class="mt-4 first:mt-0">
         <div class="flex items-center gap-2">
@@ -84,11 +82,10 @@ const StepCard = ({ step }) => {
              {isExpanded && step.status === 'completed' && step.toolCall && (
                  <div class="p-4 pt-0">
                      <div class="ml-9 pl-4 border-l border-gray-700">
-                         {/* TODO: We can enhance this later to show the specific agent for each action */}
                          <div class="mt-4 first:mt-0">
                             <div class="flex items-center gap-2">
                                 <ZapIcon class="h-4 w-4 text-gray-400" />
-                                <h4 class="text-sm font-semibold text-gray-400">Action</h4>
+                                <h4 class="text-sm font-semibold text-gray-400">Action (The Worker)</h4>
                             </div>
                             <pre class="text-xs text-cyan-300 overflow-x-auto p-2 mt-1 ml-7 bg-black/20 rounded-md font-mono relative">
                                 <CopyButton textToCopy={JSON.stringify(step.toolCall, null, 2)} className="absolute top-1 right-1" />
@@ -98,7 +95,7 @@ const StepCard = ({ step }) => {
                          <div class="mt-4 first:mt-0">
                             <div class="flex items-center gap-2">
                                 <ChevronsRightIcon class="h-4 w-4 text-gray-400" />
-                                <h4 class="text-sm font-semibold text-gray-400">Observation</h4>
+                                <h4 class="text-sm font-semibold text-gray-400">Observation (The Project Supervisor)</h4>
                             </div>
                              <pre class="text-xs text-gray-300 mt-1 ml-7 whitespace-pre-wrap font-mono relative">
                                  <CopyButton textToCopy={step.toolOutput} className="absolute top-1 right-1" />
@@ -120,13 +117,12 @@ const DirectAnswerCard = ({ answer, model }) => (
         </div>
         <p class="text-white whitespace-pre-wrap font-medium">{answer}</p>
         <div class="mt-3 pt-2 border-t border-gray-700/50">
-            <InfoBlock icon={<BrainCircuitIcon class="h-4 w-4 text-purple-400" />} agentName="Librarian Agent" modelName={model} />
+            <InfoBlock icon={<BrainCircuitIcon class="h-4 w-4 text-purple-400" />} agentName="The Librarian" modelName={model} />
         </div>
     </div>
 );
 
 const FinalAnswerCard = ({ answer, model }) => (
-    // Added margin-top, padding-top, and a border-top for visual separation
     <div class="mt-6 pt-6 border-t border-gray-700/50 p-4 rounded-lg shadow-md bg-indigo-900/40 border border-indigo-700/50 mb-4">
         <div class="flex items-center gap-3 mb-3">
             <FileTextIcon class="h-6 w-6 text-indigo-300" />
@@ -134,7 +130,7 @@ const FinalAnswerCard = ({ answer, model }) => (
         </div>
         <div class="prose prose-sm prose-invert max-w-none text-gray-200" dangerouslySetInnerHTML={{ __html: answer.replace(/\n/g, '<br />') }}></div>
         <div class="mt-3 pt-2 border-t border-indigo-700/50">
-             <InfoBlock icon={<BrainCircuitIcon class="h-4 w-4 text-purple-400" />} agentName="Editor Agent" modelName={model} />
+             <InfoBlock icon={<BrainCircuitIcon class="h-4 w-4 text-purple-400" />} agentName="The Editor" modelName={model} />
         </div>
     </div>
 );
@@ -159,7 +155,6 @@ const ModelSelector = ({ label, roleKey, selectedModel, onModelChange, models })
     </div>
 );
 
-// Updated settings panel with "Company Model" names
 const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     return (
@@ -173,19 +168,25 @@ const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
              </div>
              {isExpanded && (
                  <div class="mt-4 pl-7">
-                     <ModelSelector label="Router" roleKey="ROUTER_LLM_ID" models={models} selectedModel={selectedModels.ROUTER_LLM_ID} onModelChange={onModelChange} />
+                     <ModelSelector label="The Router" roleKey="ROUTER_LLM_ID" models={models} selectedModel={selectedModels.ROUTER_LLM_ID} onModelChange={onModelChange} />
                      <p class="text-xs text-gray-500 -mt-2 mb-4">Classifies tasks.</p>
 
-                     <ModelSelector label="Chief Architect (Planner)" roleKey="PLANNER_LLM_ID" models={models} selectedModel={selectedModels.PLANNER_LLM_ID} onModelChange={onModelChange} />
+                     <ModelSelector label="The Librarian" roleKey="LIBRARIAN_LLM_ID" models={models} selectedModel={selectedModels.LIBRARIAN_LLM_ID} onModelChange={onModelChange} />
+                     <p class="text-xs text-gray-500 -mt-2 mb-4">Answers simple questions.</p>
+
+                     <ModelSelector label="The Chief Architect" roleKey="CHIEF_ARCHITECT_LLM_ID" models={models} selectedModel={selectedModels.CHIEF_ARCHITECT_LLM_ID} onModelChange={onModelChange} />
                      <p class="text-xs text-gray-500 -mt-2 mb-4">Creates the high-level plan.</p>
                      
-                     <ModelSelector label="Site Foreman (Controller)" roleKey="CONTROLLER_LLM_ID" models={models} selectedModel={selectedModels.CONTROLLER_LLM_ID} onModelChange={onModelChange} />
-                     <p class="text-xs text-gray-500 -mt-2 mb-4">Handles advanced logic.</p>
+                     <ModelSelector label="The Site Foreman" roleKey="SITE_FOREMAN_LLM_ID" models={models} selectedModel={selectedModels.SITE_FOREMAN_LLM_ID} onModelChange={onModelChange} />
+                     <p class="text-xs text-gray-500 -mt-2 mb-4">Prepares tool calls.</p>
                      
-                     <ModelSelector label="Project Supervisor (Evaluator)" roleKey="EVALUATOR_LLM_ID" models={models} selectedModel={selectedModels.EVALUATOR_LLM_ID} onModelChange={onModelChange} />
+                     <ModelSelector label="The Worker" roleKey="WORKER_LLM_ID" models={models} selectedModel={selectedModels.WORKER_LLM_ID} onModelChange={onModelChange} />
+                     <p class="text-xs text-gray-500 -mt-2 mb-4">Executes tools (future use).</p>
+
+                     <ModelSelector label="The Project Supervisor" roleKey="PROJECT_SUPERVISOR_LLM_ID" models={models} selectedModel={selectedModels.PROJECT_SUPERVISOR_LLM_ID} onModelChange={onModelChange} />
                      <p class="text-xs text-gray-500 -mt-2 mb-4">Validates step outcomes.</p>
 
-                     <ModelSelector label="Editor Agent (Final Answer)" roleKey="FINAL_ANSWER_LLM_ID" models={models} selectedModel={selectedModels.FINAL_ANSWER_LLM_ID} onModelChange={onModelChange} />
+                     <ModelSelector label="The Editor" roleKey="EDITOR_LLM_ID" models={models} selectedModel={selectedModels.EDITOR_LLM_ID} onModelChange={onModelChange} />
                      <p class="text-xs text-gray-500 -mt-2 mb-4">Synthesizes the final report.</p>
                  </div>
              )}
@@ -338,7 +339,6 @@ export function App() {
                             const stepIndex = inputData.current_step_index;
                             if (prevSteps[stepIndex]) {
                                 const newSteps = [...prevSteps];
-
                                 newSteps[stepIndex] = { ...newSteps[stepIndex], status: 'in-progress' };
                                 return newSteps;
                             }
@@ -447,13 +447,13 @@ export function App() {
                     )}
                     
                     {directAnswer && (
-                        <DirectAnswerCard answer={directAnswer} model={getModelNameById(runModels?.DEFAULT_LLM_ID || runModels?.ROUTER_LLM_ID)} />
+                        <DirectAnswerCard answer={directAnswer} model={getModelNameById(runModels?.LIBRARIAN_LLM_ID)} />
                     )}
 
                     {planSteps.length > 0 && (
                         <div class="mt-4 border-l-2 border-gray-700/50 pl-6 ml-4">
                             <div class="mb-4 -ml-10">
-                                <InfoBlock icon={<BrainCircuitIcon class="h-5 w-5 text-purple-400" />} agentName="Chief Architect" modelName={getModelNameById(runModels?.PLANNER_LLM_ID)} />
+                                <InfoBlock icon={<BrainCircuitIcon class="h-5 w-5 text-purple-400" />} agentName="The Chief Architect" modelName={getModelNameById(runModels?.CHIEF_ARCHITECT_LLM_ID)} />
                             </div>
                             <h3 class="text-sm font-bold text-gray-400 mb-2 -ml-2">Execution Plan</h3>
                             {planSteps.map((step, index) => <StepCard key={index} step={step} />)}
@@ -461,7 +461,7 @@ export function App() {
                     )}
                     
                     {finalAnswer && (
-                        <FinalAnswerCard answer={finalAnswer} model={getModelNameById(runModels?.FINAL_ANSWER_LLM_ID)} />
+                        <FinalAnswerCard answer={finalAnswer} model={getModelNameById(runModels?.EDITOR_LLM_ID)} />
                     )}
 
                    <div ref={messagesEndRef} />
@@ -496,6 +496,7 @@ export function App() {
                                 </div>
                                 <div class="flex-grow bg-gray-900/50 rounded-md overflow-hidden">
                                     <pre class="h-full w-full overflow-auto p-4 text-sm text-gray-300 font-mono">
+                                        {/* --- THE FIX --- */}
                                         {isFileLoading ? 'Loading...' : <code>{fileContent}</code>}
                                     </pre>
                                 </div>

@@ -1,17 +1,14 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 7: Final Answer Synthesis)
+# ResearchAgent Core Agent (Phase 7: Naming Refactor)
 #
-# This version introduces a new "Final Answer Agent" node to synthesize the
-# results of a plan into a comprehensive, user-facing answer.
+# This version standardizes the naming of all agent nodes and their
+# configurations to align with the "Company Model" (e.g., Chief_Architect).
 #
-# 1. New Node: `final_answer_agent_node` is added to the graph. It uses the
-#    new `final_answer_prompt_template` to generate a summary.
-# 2. Updated Routing: The conditional router `should_continue` is renamed to
-#    `after_plan_step_router`. It now directs the flow to the new
-#    `Final_Answer_Agent` after a plan completes or fails, ensuring a
-#    conclusive message is always generated for the user.
-# 3. New Configurable LLM: `FINAL_ANSWER_LLM_ID` is added to allow for
-#    assigning a specific model to the final synthesis task.
+# 1. Node functions and graph definitions now consistently use the new names.
+#    - `final_answer_agent_node` is renamed to `editor_node`.
+# 2. All `get_llm` calls now use the new environment variable keys
+#    (e.g., `CHIEF_ARCHITECT_LLM_ID`).
+# 3. All agent roles are now configurable with their own LLM.
 # -----------------------------------------------------------------------------
 
 import os
@@ -28,7 +25,6 @@ from langgraph.graph import StateGraph, END
 
 # --- Local Imports ---
 from .tools import get_available_tools
-# Import all four prompts now
 from .prompts import structured_planner_prompt_template, controller_prompt_template, evaluator_prompt_template, final_answer_prompt_template
 
 # --- Logging Setup ---
@@ -56,7 +52,6 @@ class GraphState(TypedDict):
 LLM_CACHE = {}
 def get_llm(state: GraphState, role_env_var: str, default_llm_id: str):
     run_config = state.get("llm_config", {})
-    # Added FINAL_ANSWER_LLM_ID to the list of roles
     llm_id = run_config.get(role_env_var) or os.getenv(role_env_var, default_llm_id)
     if llm_id in LLM_CACHE: return LLM_CACHE[llm_id]
     provider, model_name = llm_id.split("::")
@@ -74,7 +69,7 @@ SANDBOXED_TOOLS = {"write_file", "read_file", "list_files", "workspace_shell"}
 def format_tools_for_prompt():
     return "\n".join([f"  - {tool.name}: {tool.description}" for tool in AVAILABLE_TOOLS])
 
-# --- Graph Nodes (with Conceptual Names) ---
+# --- Graph Nodes (with "Company Model" Names) ---
 def task_setup_node(state: GraphState):
     """The "Onboarding Manager" - Creates the workspace and initializes state."""
     logger.info("Executing Task_Setup")
@@ -89,7 +84,7 @@ def task_setup_node(state: GraphState):
 def chief_architect_node(state: GraphState):
     """The "Chief Architect" - Generates the structured plan."""
     logger.info("Executing Chief_Architect")
-    llm = get_llm(state, "PLANNER_LLM_ID", "gemini::gemini-1.5-flash")
+    llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-flash-latest")
     prompt = structured_planner_prompt_template.format(input=state["input"], tools=format_tools_for_prompt())
     response = llm.invoke(prompt)
     try:
@@ -108,7 +103,7 @@ def site_foreman_node(state: GraphState):
     plan = state["plan"]
     logger.info(f"Executing Site_Foreman for step {step_index + 1}/{len(plan)}")
     current_step_details = plan[step_index]
-    llm = get_llm(state, "CONTROLLER_LLM_ID", "gemini::gemini-1.5-flash")
+    llm = get_llm(state, "SITE_FOREMAN_LLM_ID", "gemini::gemini-1.5-flash-latest")
     history_str = "\n".join(state["history"]) if state.get("history") else "No history yet."
     prompt = controller_prompt_template.format(
         tools=format_tools_for_prompt(),
@@ -121,12 +116,11 @@ def site_foreman_node(state: GraphState):
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL)
         json_str = match.group(1).strip() if match else response.content.strip()
         tool_call = json.loads(json_str)
-        # Data-piping logic will be added here in the future
-        logger.info(f"Controller prepared tool call: {tool_call}")
+        logger.info(f"Site Foreman prepared tool call: {tool_call}")
         return {"current_tool_call": tool_call}
     except json.JSONDecodeError as e:
-        logger.error(f"Error parsing tool call from LLM response: {e}\nResponse was:\n{response.content}")
-        return {"current_tool_call": {"error": "Invalid JSON output from controller."}}
+        logger.error(f"Error parsing tool call from Site Foreman: {e}\nResponse was:\n{response.content}")
+        return {"current_tool_call": {"error": "Invalid JSON output from Site Foreman."}}
 
 async def worker_node(state: GraphState):
     """The "Worker" - Executes the tool call."""
@@ -163,7 +157,7 @@ def project_supervisor_node(state: GraphState):
     tool_output = state.get("tool_output", "No output from tool.")
     tool_call = state.get("current_tool_call", {})
 
-    llm = get_llm(state, "EVALUATOR_LLM_ID", "gemini::gemini-1.5-flash")
+    llm = get_llm(state, "PROJECT_SUPERVISOR_LLM_ID", "gemini::gemini-1.5-flash-latest")
     prompt = evaluator_prompt_template.format(
         current_step=current_step_details.get('instruction', ''),
         tool_call=json.dumps(tool_call),
@@ -175,10 +169,10 @@ def project_supervisor_node(state: GraphState):
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL)
         json_str = match.group(1).strip() if match else response.content.strip()
         evaluation = json.loads(json_str)
-        logger.info(f"Step evaluation: {evaluation}")
+        logger.info(f"Step evaluation from Project Supervisor: {evaluation}")
     except (json.JSONDecodeError, Exception) as e:
-        logger.error(f"Error parsing evaluation from LLM response: {e}\nResponse was:\n{response.content}")
-        evaluation = {"status": "failure", "reasoning": "Could not parse evaluator output."}
+        logger.error(f"Error parsing evaluation from Project Supervisor: {e}\nResponse was:\n{response.content}")
+        evaluation = {"status": "failure", "reasoning": "Could not parse Project Supervisor output."}
 
     history_record = (
         f"--- Step {state['current_step_index'] + 1} ---\n"
@@ -203,30 +197,29 @@ def advance_to_next_step_node(state: GraphState):
 def librarian_node(state: GraphState):
     """The "Librarian" - Directly calls an LLM for a simple question."""
     logger.info("Executing Librarian (Direct QA)")
-    llm = get_llm(state, "DEFAULT_LLM_ID", "gemini::gemini-1.5-flash")
+    llm = get_llm(state, "LIBRARIAN_LLM_ID", "gemini::gemini-1.5-flash-latest")
     response = llm.invoke(state["messages"])
     return {"answer": response.content}
 
-def final_answer_agent_node(state: GraphState):
-    """The "Expert Editor" - Synthesizes the final answer."""
-    logger.info("Executing Final_Answer_Agent")
-    # Use a powerful model for this, as it's a creative synthesis task.
-    llm = get_llm(state, "FINAL_ANSWER_LLM_ID", "gemini::gemini-1.5-flash")
+def editor_node(state: GraphState):
+    """The "Editor" - Synthesizes the final answer."""
+    logger.info("Executing Editor")
+    llm = get_llm(state, "EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
     history_str = "\n".join(state["history"])
     prompt = final_answer_prompt_template.format(
         input=state["input"],
         history=history_str
     )
     response = llm.invoke(prompt)
-    logger.info(f"Generated final answer: {response.content[:200]}...")
+    logger.info(f"Editor generated final answer: {response.content[:200]}...")
     return {"answer": response.content}
 
 
 # --- Conditional Routers ---
 def router(state: GraphState):
-    """Routes the workflow based on user intent."""
-    logger.info("Routing based on intent")
-    llm = get_llm(state, "ROUTER_LLM_ID", "gemini::gemini-1.5-flash")
+    """The Router - Routes the workflow based on user intent."""
+    logger.info("Executing The Router")
+    llm = get_llm(state, "ROUTER_LLM_ID", "gemini::gemini-1.5-flash-latest")
     prompt = f"You are a router. Classify the user's last message. Respond with 'AGENT_ACTION' for a complex task that requires planning, or 'DIRECT_QA' for a simple question that can be answered directly.\n\nUser message: '{state['input']}'"
     response = llm.invoke(prompt)
     decision = response.content.strip()
@@ -238,24 +231,22 @@ def after_plan_step_router(state: GraphState):
     logger.info("Router: Checking if plan should continue or finalize.")
     evaluation = state.get("step_evaluation", {})
 
-    # If the step failed, we go to the final answer agent to summarize the failure.
     if evaluation.get("status") == "failure":
-        logger.warning(f"Step failed. Reason: {evaluation.get('reasoning', 'N/A')}. Routing to Final Answer Agent.")
-        return "Final_Answer_Agent"
+        logger.warning(f"Step failed. Reason: {evaluation.get('reasoning', 'N/A')}. Routing to Editor.")
+        return "Editor"
 
-    # If we have completed the last step in the plan, go to the final answer agent.
     if state["current_step_index"] + 1 >= len(state.get("plan", [])):
-        logger.info("Plan is complete. Routing to Final Answer Agent.")
-        return "Final_Answer_Agent"
+        logger.info("Plan is complete. Routing to Editor.")
+        return "Editor"
 
-    # Otherwise, continue to the next step in the plan.
     return "Advance_To_Next_Step"
 
 # --- Graph Definition ---
 def create_agent_graph():
-    """Builds the advanced PCEE LangGraph."""
+    """Builds the ResearchAgent's LangGraph."""
     workflow = StateGraph(GraphState)
-    # Add nodes with new conceptual names
+    
+    # Add nodes with their "Company Model" names
     workflow.add_node("Task_Setup", task_setup_node)
     workflow.add_node("Librarian", librarian_node)
     workflow.add_node("Chief_Architect", chief_architect_node)
@@ -263,7 +254,7 @@ def create_agent_graph():
     workflow.add_node("Worker", worker_node)
     workflow.add_node("Project_Supervisor", project_supervisor_node)
     workflow.add_node("Advance_To_Next_Step", advance_to_next_step_node)
-    workflow.add_node("Final_Answer_Agent", final_answer_agent_node) # Add the new node
+    workflow.add_node("Editor", editor_node)
 
     # Set entry point and define edges
     workflow.set_entry_point("Task_Setup")
@@ -280,18 +271,18 @@ def create_agent_graph():
     workflow.add_edge("Worker", "Project_Supervisor")
     workflow.add_edge("Advance_To_Next_Step", "Site_Foreman") # The loop back
 
-    # This is the router that decides whether to continue the loop or finish
+    # This router decides whether to continue the loop or finish
     workflow.add_conditional_edges("Project_Supervisor", after_plan_step_router, {
-        "Final_Answer_Agent": "Final_Answer_Agent",
+        "Editor": "Editor",
         "Advance_To_Next_Step": "Advance_To_Next_Step"
     })
 
     # These are the terminal edges
     workflow.add_edge("Librarian", END)
-    workflow.add_edge("Final_Answer_Agent", END)
+    workflow.add_edge("Editor", END)
 
     agent = workflow.compile()
-    logger.info("Advanced agent graph (with Final Answer Agent) compiled successfully.")
+    logger.info("ResearchAgent graph compiled successfully with 'Company Model' names.")
     return agent
 
 agent_graph = create_agent_graph()

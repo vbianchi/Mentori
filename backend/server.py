@@ -1,16 +1,13 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 7: Final Answer Handling)
+# ResearchAgent Backend Server (Phase 7: Naming Refactor)
 #
-# This version updates the server to handle the output from the new
-# `Final_Answer_Agent` node in the graph.
+# This version updates the server to align with the "Company Model" naming
+# convention for environment variables and agent roles.
 #
-# 1. New Message Type: The WebSocket handler can now send a `final_answer`
-#    message type to the client, distinguishing it from the `direct_answer`.
-# 2. Updated Output Parsing: The logic that processes the final graph event
-#    now checks for output from both 'Librarian' (for direct QA) and
-#    'Final_Answer_Agent' (for synthesized plan summaries).
-# 3. New Configurable Model: The HTTP server now exposes the
-#    `FINAL_ANSWER_LLM_ID` so it can be configured from the frontend.
+# 1. The `_handle_get_models` function now reads the new environment variables
+#    (e.g., `CHIEF_ARCHITECT_LLM_ID`) and sends them to the frontend under
+#    the new keys.
+# 2. Configuration for every agent role is now supported, as per our plan.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -115,14 +112,17 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
 
         global_default_llm = os.getenv("DEFAULT_LLM_ID", safe_fallback_model)
 
+        # --- THE CHANGE: Using the new "Company Model" variable names ---
         default_models = {
-            "PLANNER_LLM_ID": os.getenv("PLANNER_LLM_ID", global_default_llm),
-            "CONTROLLER_LLM_ID": os.getenv("CONTROLLER_LLM_ID", global_default_llm),
-            "EXECUTOR_LLM_ID": os.getenv("EXECUTOR_LLM_ID", global_default_llm),
-            "EVALUATOR_LLM_ID": os.getenv("EVALUATOR_LLM_ID", global_default_llm),
             "ROUTER_LLM_ID": os.getenv("ROUTER_LLM_ID", global_default_llm),
-            "FINAL_ANSWER_LLM_ID": os.getenv("FINAL_ANSWER_LLM_ID", "gemini::gemini-1.5-pro-latest") # Added
+            "LIBRARIAN_LLM_ID": os.getenv("LIBRARIAN_LLM_ID", global_default_llm),
+            "CHIEF_ARCHITECT_LLM_ID": os.getenv("CHIEF_ARCHITECT_LLM_ID", global_default_llm),
+            "SITE_FOREMAN_LLM_ID": os.getenv("SITE_FOREMAN_LLM_ID", global_default_llm),
+            "WORKER_LLM_ID": os.getenv("WORKER_LLM_ID", global_default_llm),
+            "PROJECT_SUPERVISOR_LLM_ID": os.getenv("PROJECT_SUPERVISOR_LLM_ID", global_default_llm),
+            "EDITOR_LLM_ID": os.getenv("EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
         }
+        # --- End of Change ---
 
         response_data = {
             "available_models": available_models,
@@ -190,7 +190,7 @@ def run_http_server():
     logger.info(f"Starting HTTP file server at http://{host}:{port}")
     httpd.serve_forever()
 
-# --- WebSocket Handler (Upgraded) ---
+# --- WebSocket Handler ---
 async def agent_handler(websocket):
     logger.info(f"Client connected from {websocket.remote_address}")
     try:
@@ -231,7 +231,6 @@ async def agent_handler(websocket):
                     answer = None
                     answer_type = None
 
-                    # --- THE FIX: Check for output from EITHER final node ---
                     if isinstance(final_output, list):
                         for node_output in final_output:
                             if isinstance(node_output, dict):
@@ -241,13 +240,12 @@ async def agent_handler(websocket):
                                         answer = librarian_result.get('answer')
                                         answer_type = "direct_answer"
                                         break
-                                elif 'Final_Answer_Agent' in node_output:
-                                    final_answer_result = node_output.get('Final_Answer_Agent')
+                                elif 'Editor' in node_output:
+                                    final_answer_result = node_output.get('Editor')
                                     if isinstance(final_answer_result, dict) and 'answer' in final_answer_result:
                                         answer = final_answer_result.get('answer')
                                         answer_type = "final_answer"
                                         break
-                    # --- End of Fix ---
 
                     if answer and answer_type:
                         logger.info(f"Found answer of type '{answer_type}': {answer[:100]}...")
