@@ -8,4 +8,11 @@ fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600
 fontLink.rel = 'stylesheet';
 document.head.appendChild(fontLink);
 
-render(<App />, document.getElementById('app'))
+// --- NEW: Inject the Marked.js library for Markdown parsing ---
+const markedScript = document.createElement('script');
+markedScript.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+markedScript.onload = () => {
+    // Once the script is loaded, render the app.
+    render(<App />, document.getElementById('app'));
+};
+document.head.appendChild(markedScript);
