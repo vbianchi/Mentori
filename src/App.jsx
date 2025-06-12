@@ -18,6 +18,7 @@ const UserIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24"
 const PlusCircleIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> );
 const PencilIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg> );
 const Trash2Icon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="m8 6 4-4 4 4"/></svg> );
+const XCircleIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><circle cx="12" cy="12" r="10" /><path d="m15 9-6 6" /><path d="m9 9 6 6" /></svg> );
 const ArchitectIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M12 21v-8a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v8" /><path d="M6 11V7a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4" /><path d="M18 11V7a2 2 0 0 0-2-2h-4" /><path d="m18 21 3-3" /><path d="m2 21 3-3" /><path d="m18 9 3 3" /><path d="m6 9-3 3" /><path d="M12 9v12" /></svg> );
 const LibrarianIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M3 6h18" /><path d="M4 6V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2" /><path d="M5 6v14a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1V6" /><path d="M15 6v14a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1V6" /><path d="M9 12h6" /></svg> );
 const EditorIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" {...props}><path d="M12 20h9" /><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" /><path d="m15 5 3 3" /></svg> );
@@ -40,27 +41,10 @@ const TaskItem = ({ task, isActive, onSelect, onRename, onDelete }) => {
     const [editText, setEditText] = useState(task.name);
     const inputRef = useRef(null);
 
-    const handleStartEditing = (e) => {
-        e.stopPropagation();
-        setIsEditing(true);
-        setEditText(task.name);
-    };
-
-    const handleSave = () => {
-        if (editText.trim()) {
-            onRename(task.id, editText.trim());
-        }
-        setIsEditing(false);
-    };
-
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter') handleSave();
-        else if (e.key === 'Escape') { setIsEditing(false); setEditText(task.name); }
-    };
-
-    useEffect(() => {
-        if (isEditing) { inputRef.current?.focus(); inputRef.current?.select(); }
-    }, [isEditing]);
+    const handleStartEditing = (e) => { e.stopPropagation(); setIsEditing(true); setEditText(task.name); };
+    const handleSave = () => { if (editText.trim()) { onRename(task.id, editText.trim()); } setIsEditing(false); };
+    const handleKeyDown = (e) => { if (e.key === 'Enter') handleSave(); else if (e.key === 'Escape') { setIsEditing(false); setEditText(task.name); } };
+    useEffect(() => { if (isEditing) { inputRef.current?.focus(); inputRef.current?.select(); } }, [isEditing]);
     
     return (
         <div onClick={() => onSelect(task.id)} class={`group flex justify-between items-center p-3 mb-2 rounded-lg cursor-pointer transition-colors ${isActive ? 'bg-blue-600/50' : 'hover:bg-gray-700/50'}`}>
@@ -104,6 +88,7 @@ const StepCard = ({ step }) => {
         switch (step.status) {
             case 'in-progress': return <LoaderIcon class="h-5 w-5 text-yellow-400" />;
             case 'completed': return <CheckCircleIcon class="h-5 w-5 text-green-400" />;
+            case 'failure': return <XCircleIcon class="h-5 w-5 text-red-500" />;
             case 'pending': default: return <CircleDotIcon class="h-5 w-5 text-gray-500" />;
         }
     };
@@ -114,7 +99,7 @@ const StepCard = ({ step }) => {
                 <p class="text-gray-200 font-medium flex-1">{step.instruction}</p>
                 <ChevronDownIcon class={`h-5 w-5 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
              </div>
-             {isExpanded && step.status === 'completed' && step.toolCall && (
+             {isExpanded && (step.status === 'completed' || step.status === 'failure') && step.toolCall && (
                 <div class="p-4 pt-0">
                     <div class="ml-9 pl-4 border-l-2 border-gray-700 space-y-4">
                         <div>
@@ -131,8 +116,6 @@ const StepCard = ({ step }) => {
         </div>
     );
 };
-
-// --- NEW/REFINED: Agent Response Components ---
 
 const ArchitectCard = ({ plan }) => (
     <AgentResponseCard icon={<ArchitectIcon class="h-5 w-5" />} title="The Chief Architect">
@@ -157,7 +140,7 @@ const DirectAnswerCard = ({ answer }) => (
 );
 
 const FinalAnswerCard = ({ answer }) => {
-    const parsedHtml = window.marked ? window.marked.parse(answer) : answer.replace(/\n/g, '<br />');
+    const parsedHtml = window.marked ? window.marked.parse(answer, { breaks: true, gfm: true }) : answer.replace(/\n/g, '<br />');
     return (
         <AgentResponseCard icon={<EditorIcon class="h-5 w-5" />} title="The Editor">
             <div class="prose prose-sm prose-invert max-w-none text-gray-200" dangerouslySetInnerHTML={{ __html: parsedHtml }}></div>
@@ -190,16 +173,7 @@ const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
                 <div class="flex items-center gap-2"> <SlidersIcon class="h-5 w-5 text-gray-400" /> <h3 class="text-lg font-semibold text-gray-200">Agent Models</h3> </div>
                 <ChevronDownIcon class={`h-5 w-5 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
              </div>
-             {isExpanded && (
-                 <div class="mt-4 pl-2">
-                     {agentRoles.map(role => (
-                        <div key={role.key}>
-                            <ModelSelector label={role.label} roleKey={role.key} icon={role.icon} models={models} selectedModel={selectedModels[role.key]} onModelChange={onModelChange}/>
-                            <p class="text-xs text-gray-500 -mt-2 mb-4 pl-7">{role.desc}</p>
-                        </div>
-                     ))}
-                 </div>
-             )}
+             {isExpanded && ( <div class="mt-4 pl-2"> {agentRoles.map(role => ( <div key={role.key}> <ModelSelector label={role.label} roleKey={role.key} icon={role.icon} models={models} selectedModel={selectedModels[role.key]} onModelChange={onModelChange}/> <p class="text-xs text-gray-500 -mt-2 mb-4 pl-7">{role.desc}</p> </div> ))} </div> )}
         </div>
     )
 }
@@ -345,29 +319,27 @@ export function App() {
 
                     const currentTask = currentTasks[taskIndex];
                     let newHistory = [...currentTask.history];
-                    let runContainerIndex = newHistory.findIndex(item => item.type === 'run_container');
-                    let runContainer = runContainerIndex !== -1 ? {...newHistory[runContainerIndex]} : { type: 'run_container', children: [] };
-
-                    if (newEvent.type === 'direct_answer') {
+                    let runContainer = newHistory[newHistory.length - 1]?.type === 'run_container' ? {...newHistory[newHistory.length - 1]} : null;
+                    
+                    if (!runContainer) {
+                        runContainer = { type: 'run_container', children: [] };
+                        newHistory.push(runContainer);
+                    }
+                    
+                    if (newEvent.type === 'direct_answer' || newEvent.type === 'final_answer') {
                         setIsThinking(false);
-                        runContainer.children.push({ type: 'direct_answer', content: newEvent.data });
-                    } else if (newEvent.type === 'final_answer') {
-                        setIsThinking(false);
-                        runContainer.children.push({ type: 'final_answer', content: newEvent.data });
+                        runContainer.children.push({ type: newEvent.type, content: newEvent.data });
                     } else if (newEvent.type === 'agent_event') {
                         const { name, event: chainEvent, data } = newEvent;
                         const inputData = data.input || {};
                         const outputData = data.output || {};
 
-                        let architectPlanIndex = runContainer.children.findIndex(item => item.type === 'architect_plan');
                         let executionPlanIndex = runContainer.children.findIndex(item => item.type === 'execution_plan');
 
                         if (name === 'Chief_Architect' && chainEvent === 'on_chain_end') {
                             if (outputData.plan && Array.isArray(outputData.plan)) {
-                                const newArchitectPlan = { type: 'architect_plan', steps: outputData.plan };
-                                runContainer.children.push(newArchitectPlan);
-                                const newExecutionPlan = { type: 'execution_plan', steps: outputData.plan.map(step => ({...step, status: 'pending'})) };
-                                runContainer.children.push(newExecutionPlan);
+                                runContainer.children.push({ type: 'architect_plan', steps: outputData.plan });
+                                runContainer.children.push({ type: 'execution_plan', steps: outputData.plan.map(step => ({...step, status: 'pending'})) });
                             }
                         } else if (executionPlanIndex !== -1) {
                             let executionPlan = { ...runContainer.children[executionPlanIndex] };
@@ -378,7 +350,8 @@ export function App() {
                                 if (name === 'Site_Foreman' && chainEvent === 'on_chain_start') {
                                     newSteps[stepIndex] = { ...newSteps[stepIndex], status: 'in-progress' };
                                 } else if (name === 'Project_Supervisor' && chainEvent === 'on_chain_end') {
-                                    newSteps[stepIndex] = { ...newSteps[stepIndex], status: 'completed', toolCall: inputData.current_tool_call, toolOutput: outputData.tool_output, evaluation: outputData.step_evaluation };
+                                    const stepStatus = outputData.step_evaluation?.status === 'failure' ? 'failure' : 'completed';
+                                    newSteps[stepIndex] = { ...newSteps[stepIndex], status: stepStatus, toolCall: inputData.current_tool_call, toolOutput: outputData.tool_output, evaluation: outputData.step_evaluation };
                                     if (activeTaskId === newEvent.task_id) {
                                       fetchWorkspaceFiles(activeTaskId);
                                     }
@@ -389,8 +362,7 @@ export function App() {
                         }
                     }
 
-                    if (runContainerIndex === -1) newHistory.push(runContainer);
-                    else newHistory[runContainerIndex] = runContainer;
+                    newHistory[newHistory.length - 1] = runContainer;
                     
                     const updatedTask = { ...currentTask, history: newHistory };
                     const newTasks = [...currentTasks];
@@ -415,7 +387,7 @@ export function App() {
         runModelsRef.current = selectedModels;
         
         const newPrompt = { type: 'prompt', content: message };
-        setTasks(currentTasks => currentTasks.map(task => task.id === activeTaskId ? { ...task, history: [newPrompt] } : task));
+        setTasks(currentTasks => currentTasks.map(task => task.id === activeTaskId ? { ...task, history: [...task.history, newPrompt] } : task ));
         
         ws.current.send(JSON.stringify({ type: 'run_agent', prompt: message, llm_config: selectedModels, task_id: activeTaskId }));
         setInputValue("");
@@ -457,17 +429,19 @@ export function App() {
                                return <PromptCard key={index} content={item.content} />;
                            case 'run_container':
                                 return (
-                                    <div class="relative pl-6">
-                                        <div class="absolute top-0 left-0 h-full w-0.5 bg-gray-700 -ml-px" />
+                                    <div class="relative pl-8">
+                                        <div class="absolute top-5 left-4 h-[calc(100%-2rem)] w-0.5 bg-gray-700" />
+                                        <div class="space-y-4">
                                         {item.children.map((child, childIndex) => {
                                             switch (child.type) {
-                                                case 'architect_plan': return <div class="mb-4"><ArchitectCard key={childIndex} plan={child} /></div>;
-                                                case 'execution_plan': return <div class="mb-4"><SiteForemanCard key={childIndex} plan={child} /></div>;
-                                                case 'direct_answer': return <div class="mb-4"><DirectAnswerCard key={childIndex} answer={child.content} /></div>;
-                                                case 'final_answer': return <div class="mt-4"><FinalAnswerCard key={childIndex} answer={child.content} /></div>;
+                                                case 'architect_plan': return <ArchitectCard key={childIndex} plan={child} />;
+                                                case 'execution_plan': return <SiteForemanCard key={childIndex} plan={child} />;
+                                                case 'direct_answer': return <DirectAnswerCard key={childIndex} answer={child.content} />;
+                                                case 'final_answer': return <FinalAnswerCard key={childIndex} answer={child.content} />;
                                                 default: return null;
                                             }
                                         })}
+                                        </div>
                                     </div>
                                 );
                            default:
