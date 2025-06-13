@@ -445,7 +445,11 @@ export function App() {
                                     <div class="flex items-center gap-2 min-w-0"> <button onClick={() => setSelectedFile(null)} class="p-1.5 rounded-md hover:bg-gray-700 flex-shrink-0"><ArrowLeftIcon class="h-4 w-4" /></button> <span class="font-mono text-sm text-white truncate">{selectedFile}</span> </div>
                                     <CopyButton textToCopy={fileContent} />
                                 </div>
-                                <div class="flex-grow bg-gray-900/50 rounded-md overflow-hidden"> <pre class="h-full w-full overflow-auto p-4 text-sm text-gray-300 font-mono"> {isFileLoading ? 'Loading...' : <code>{fileContent}</code>} </pre> </div>
+                                <div class="flex-grow bg-gray-900/50 rounded-md overflow-auto p-4">
+                                    <pre class="h-full w-full text-sm text-gray-300 font-mono">
+                                        {isFileLoading ? 'Loading...' : <code>{fileContent.trim()}</code>}
+                                    </pre>
+                                </div>
                             </div>
                         ) : (
                              <div class="flex flex-col flex-grow min-h-0">
