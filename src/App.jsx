@@ -2,12 +2,11 @@ import { h } from 'preact';
 import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
 import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LibrarianIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, ArrowLeftIcon, UploadCloudIcon } from './components/Icons';
 import { ArchitectCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard } from './components/AgentCards';
-import { ToggleButton } from './components/Common';
+import { ToggleButton, CopyButton } from './components/Common';
 
 // --- UI Components that are specific to App.jsx ---
 
 const PromptCard = ({ content }) => (
-    // --- THE FIX: Add margin-top (mt-8) to create space from the element above ---
     <div class="mt-8 p-4 rounded-lg shadow-md bg-blue-900/50 border border-gray-700/50">
         <h3 class="font-bold text-sm text-gray-300 mb-2 capitalize flex items-center gap-2"><UserIcon class="h-5 w-5" /> You</h3>
         <p class="text-white whitespace-pre-wrap font-medium">{content}</p>
@@ -69,14 +68,14 @@ export function App() {
     const [isThinking, setIsThinking] = useState(false);
     const [inputValue, setInputValue] = useState("");
     const [connectionStatus, setConnectionStatus] = useState("Disconnected");
+    const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
+    const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
     const [workspaceFiles, setWorkspaceFiles] = useState([]);
     const [workspaceLoading, setWorkspaceLoading] = useState(false);
     const [workspaceError, setWorkspaceError] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
     const [fileContent, setFileContent] = useState('');
     const [isFileLoading, setIsFileLoading] = useState(false);
-    const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
-    const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
     const [availableModels, setAvailableModels] = useState([]);
     const [selectedModels, setSelectedModels] = useState({});
 
@@ -84,78 +83,144 @@ export function App() {
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
     const runModelsRef = useRef({});
+    const handlersRef = useRef();
+
+    useEffect(() => {
+        handlersRef.current = {
+            fetchWorkspaceFiles,
+            activeTaskId,
+        };
+    });
 
     useEffect(() => {
         const savedTasks = localStorage.getItem('research_agent_tasks');
         const savedActiveId = localStorage.getItem('research_agent_active_task_id');
         const loadedTasks = savedTasks ? JSON.parse(savedTasks) : [];
         setTasks(loadedTasks);
-        if (savedActiveId && loadedTasks.some(t => t.id === savedActiveId)) { setActiveTaskId(savedActiveId); }
-        else if (loadedTasks.length > 0) { setActiveTaskId(loadedTasks[0].id); }
+        if (savedActiveId && loadedTasks.some(t => t.id === savedActiveId)) {
+            setActiveTaskId(savedActiveId);
+        } else if (loadedTasks.length > 0) {
+            setActiveTaskId(loadedTasks[0].id);
+        }
     }, []);
 
     useEffect(() => {
-        if (tasks.length > 0) { localStorage.setItem('research_agent_tasks', JSON.stringify(tasks)); }
-        else { localStorage.removeItem('research_agent_tasks'); }
+        if (tasks.length > 0) {
+            localStorage.setItem('research_agent_tasks', JSON.stringify(tasks));
+        } else {
+            localStorage.removeItem('research_agent_tasks');
+        }
     }, [tasks]);
 
     useEffect(() => {
-        if (activeTaskId) { localStorage.setItem('research_agent_active_task_id', activeTaskId); }
-        else { localStorage.removeItem('research_agent_active_task_id'); }
+        if (activeTaskId) {
+            localStorage.setItem('research_agent_active_task_id', activeTaskId);
+        } else {
+            localStorage.removeItem('research_agent_active_task_id');
+        }
     }, [activeTaskId]);
     
-    const resetWorkspaceViews = () => { setWorkspaceFiles([]); setWorkspaceError(null); setSelectedFile(null); };
+    const resetWorkspaceViews = () => {
+        setWorkspaceFiles([]);
+        setWorkspaceError(null);
+        setSelectedFile(null);
+    };
 
     const selectTask = (taskId) => {
-        if (taskId !== activeTaskId) { setActiveTaskId(taskId); setIsThinking(false); resetWorkspaceViews(); }
+        if (taskId !== activeTaskId) {
+            setActiveTaskId(taskId);
+            setIsThinking(false);
+            resetWorkspaceViews();
+        }
     };
     
     const createNewTask = () => {
         const newTaskId = `task_${Date.now()}`;
         const newTask = { id: newTaskId, name: `New Task ${tasks.length + 1}`, history: [] };
-        if (ws.current?.readyState === WebSocket.OPEN) { ws.current.send(JSON.stringify({ type: 'task_create', task_id: newTaskId })); setTasks(prevTasks => [...prevTasks, newTask]); selectTask(newTaskId); }
-        else { alert("Connection not ready. Please wait a moment and try again."); }
+        if (ws.current?.readyState === WebSocket.OPEN) {
+            ws.current.send(JSON.stringify({ type: 'task_create', task_id: newTaskId }));
+            setTasks(prevTasks => [...prevTasks, newTask]);
+            selectTask(newTaskId);
+        } else {
+            alert("Connection not ready. Please wait a moment and try again.");
+        }
     };
 
-    const handleRenameTask = (taskId, newName) => { setTasks(prevTasks => prevTasks.map(task => task.id === taskId ? { ...task, name: newName } : task)); };
+    const handleRenameTask = (taskId, newName) => {
+        setTasks(prevTasks => prevTasks.map(task => task.id === taskId ? { ...task, name: newName } : task));
+    };
 
     const handleDeleteTask = (taskIdToDelete) => {
-        if (ws.current?.readyState === WebSocket.OPEN) { ws.current.send(JSON.stringify({ type: 'task_delete', task_id: taskIdToDelete })); }
-        else { alert("Connection not ready. Please wait a moment and try again."); return; }
-        setTasks(currentTasks => {
-            const remainingTasks = currentTasks.filter(task => task.id !== taskIdToDelete);
-            if (activeTaskId === taskIdToDelete) {
-                if (remainingTasks.length > 0) { const deletedIndex = currentTasks.findIndex(task => task.id === taskIdToDelete); const newActiveIndex = Math.max(0, deletedIndex - 1); selectTask(remainingTasks[newActiveIndex].id); }
-                else { setActiveTaskId(null); resetWorkspaceViews(); }
+        if (ws.current?.readyState === WebSocket.OPEN) {
+            ws.current.send(JSON.stringify({ type: 'task_delete', task_id: taskIdToDelete }));
+        } else {
+            alert("Connection not ready. Please wait a moment and try again.");
+            return;
+        }
+        
+        const currentTasks = tasks;
+        const remainingTasks = currentTasks.filter(task => task.id !== taskIdToDelete);
+        
+        if (activeTaskId === taskIdToDelete) {
+            if (remainingTasks.length > 0) {
+                const deletedIndex = currentTasks.findIndex(task => task.id === taskIdToDelete);
+                const newActiveIndex = Math.max(0, deletedIndex - 1);
+                selectTask(remainingTasks[newActiveIndex].id);
+            } else {
+                setActiveTaskId(null);
+                resetWorkspaceViews();
             }
-            return remainingTasks;
-        });
+        }
+        setTasks(remainingTasks);
     };
 
-    const handleModelChange = (roleKey, modelId) => { setSelectedModels(prev => ({ ...prev, [roleKey]: modelId })); };
-    const scrollToBottom = () => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); };
+    const handleModelChange = (roleKey, modelId) => {
+        setSelectedModels(prev => ({ ...prev, [roleKey]: modelId }));
+    };
+    
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
     
     const fetchWorkspaceFiles = useCallback(async (path) => {
         if (!path) return;
-        setWorkspaceLoading(true); setWorkspaceError(null);
+        setWorkspaceLoading(true);
+        setWorkspaceError(null);
         try {
             const response = await fetch(`http://localhost:8766/files?path=${path}`);
-            if (!response.ok) throw new Error((await response.json()).error || 'Failed to fetch files');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to fetch files');
+            }
             const data = await response.json();
             setWorkspaceFiles(data.files || []);
-        } catch (error) { console.error("Failed to fetch workspace files:", error); setWorkspaceError(error.message); }
-        finally { setWorkspaceLoading(false); }
+        } catch (error) {
+            console.error("Failed to fetch workspace files:", error);
+            setWorkspaceError(error.message);
+        } finally {
+            setWorkspaceLoading(false);
+        }
     }, []);
 
     const fetchFileContent = useCallback(async (filename) => {
         if (!activeTaskId || !filename) return;
-        setIsFileLoading(true); setSelectedFile(filename); setFileContent('');
+        setIsFileLoading(true);
+        setSelectedFile(filename);
+        setFileContent('');
         try {
             const response = await fetch(`http://localhost:8766/file-content?path=${activeTaskId}&filename=${filename}`);
-            if (!response.ok) throw new Error((await response.json()).error || 'Failed to fetch file content');
-            setFileContent(await response.text());
-        } catch (error) { console.error("Failed to fetch file content:", error); setFileContent(`Error loading file: ${error.message}`); }
-        finally { setIsFileLoading(false); }
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to fetch file content');
+            }
+            const textContent = await response.text();
+            setFileContent(textContent);
+        } catch (error) {
+            console.error("Failed to fetch file content:", error);
+            setFileContent(`Error loading file: ${error.message}`);
+        } finally {
+            setIsFileLoading(false);
+        }
     }, [activeTaskId]);
 
     const handleFileUpload = useCallback(async (e) => {
@@ -169,8 +234,13 @@ export function App() {
             const response = await fetch('http://localhost:8766/upload', { method: 'POST', body: formData });
             if (!response.ok) throw new Error((await response.json()).error || 'File upload failed');
             await fetchWorkspaceFiles(activeTaskId);
-        } catch (error) { console.error('File upload error:', error); setWorkspaceError(`Upload failed: ${error.message}`); }
-        finally { setWorkspaceLoading(false); if(fileInputRef.current) fileInputRef.current.value = ""; }
+        } catch (error) {
+            console.error('File upload error:', error);
+            setWorkspaceError(`Upload failed: ${error.message}`);
+        } finally {
+            setWorkspaceLoading(false);
+            if(fileInputRef.current) fileInputRef.current.value = "";
+        }
     }, [activeTaskId, fetchWorkspaceFiles]);
 
     useEffect(() => {
@@ -179,12 +249,25 @@ export function App() {
                 const response = await fetch('http://localhost:8766/api/models');
                 if (!response.ok) throw new Error('Failed to fetch model configuration.');
                 const config = await response.json();
-                if (config.available_models && config.available_models.length > 0) { setAvailableModels(config.available_models); setSelectedModels(config.default_models); runModelsRef.current = config.default_models; }
-                else { console.error("No available models returned from the backend."); }
-            } catch (error) { console.error("Failed to fetch models:", error); }
+                if (config.available_models && config.available_models.length > 0) {
+                    setAvailableModels(config.available_models);
+                    setSelectedModels(config.default_models);
+                    runModelsRef.current = config.default_models;
+                } else {
+                    console.error("No available models returned from the backend.");
+                }
+            } catch (error) {
+                console.error("Failed to fetch models:", error);
+            }
         };
         fetchModels();
     }, []);
+
+    useEffect(() => {
+        if (activeTaskId) {
+            fetchWorkspaceFiles(activeTaskId);
+        }
+    }, [activeTaskId, fetchWorkspaceFiles]);
 
     useEffect(() => {
         function connect() {
@@ -194,13 +277,13 @@ export function App() {
             socket.onopen = () => setConnectionStatus("Connected");
             socket.onclose = () => { setConnectionStatus("Disconnected"); setTimeout(connect, 5000); };
             socket.onerror = (err) => { console.error("WebSocket error:", err); socket.close(); };
+
             socket.onmessage = (event) => {
                 const newEvent = JSON.parse(event.data);
                 
                 setTasks(currentTasks => {
                     const taskIndex = currentTasks.findIndex(t => t.id === newEvent.task_id);
                     if (taskIndex === -1) return currentTasks; 
-
                     const currentTask = currentTasks[taskIndex];
                     let newHistory = [...currentTask.history];
                     let runContainer = newHistory[newHistory.length - 1]?.type === 'run_container' ? {...newHistory[newHistory.length - 1]} : null;
@@ -230,11 +313,14 @@ export function App() {
                             const stepIndex = inputData.current_step_index;
 
                             if (stepIndex !== undefined && newSteps[stepIndex]) {
-                                if (name === 'Site_Foreman' && chainEvent === 'on_chain_start') { newSteps[stepIndex] = { ...newSteps[stepIndex], status: 'in-progress' }; }
-                                else if (name === 'Project_Supervisor' && chainEvent === 'on_chain_end') {
+                                if (name === 'Site_Foreman' && chainEvent === 'on_chain_start') {
+                                    newSteps[stepIndex] = { ...newSteps[stepIndex], status: 'in-progress' };
+                                } else if (name === 'Project_Supervisor' && chainEvent === 'on_chain_end') {
                                     const stepStatus = outputData.step_evaluation?.status === 'failure' ? 'failure' : 'completed';
                                     newSteps[stepIndex] = { ...newSteps[stepIndex], status: stepStatus, toolCall: inputData.current_tool_call, toolOutput: outputData.tool_output, evaluation: outputData.step_evaluation };
-                                    if (activeTaskId === newEvent.task_id) { fetchWorkspaceFiles(activeTaskId); }
+                                    if (handlersRef.current.activeTaskId === newEvent.task_id) { 
+                                        handlersRef.current.fetchWorkspaceFiles(handlersRef.current.activeTaskId);
+                                    }
                                 }
                                 executionPlan.steps = newSteps;
                                 runContainer.children[executionPlanIndex] = executionPlan;
@@ -243,7 +329,7 @@ export function App() {
                     }
 
                     if (runContainer) {
-                        newHistory[newHistory.length -1] = runContainer;
+                        newHistory[newHistory.length - 1] = runContainer;
                     }
                     
                     const updatedTask = { ...currentTask, history: newHistory };
@@ -255,7 +341,7 @@ export function App() {
         }
         connect();
         return () => { if (ws.current) { ws.current.onclose = null; ws.current.close(); } };
-    }, [activeTaskId, fetchWorkspaceFiles]);
+    }, []);
 
     const activeTask = tasks.find(t => t.id === activeTaskId);
     useEffect(() => { scrollToBottom(); }, [activeTask?.history]);
@@ -363,13 +449,17 @@ export function App() {
                             </div>
                         ) : (
                              <div class="flex flex-col flex-grow min-h-0">
-                                <div class="flex justify-between items-center mb-2 flex-shrink-0">
+                                 <div class="flex justify-between items-center mb-2 flex-shrink-0">
                                     <div class="text-xs text-gray-500 truncate" title={activeTaskId || 'No active workspace'}>{activeTaskId ? `Workspace: ${activeTaskId}` : 'No active workspace'}</div>
                                     <input type="file" ref={fileInputRef} onChange={handleFileUpload} class="hidden" />
-                                    <button onClick={() => fileInputRef.current?.click()} disabled={!activeTaskId || workspaceLoading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed" title="Upload File"> <UploadCloudIcon class="h-4 w-4" /> </button>
-                                </div>
+                                    <button onClick={() => fileInputRef.current?.click()} disabled={!activeTaskId || workspaceLoading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="Upload File"> <UploadCloudIcon class="h-4 w-4" /> </button>
+                                 </div>
                                  <div class="flex-grow bg-gray-900/50 rounded-md p-4 text-sm text-gray-400 font-mono overflow-y-auto">
-                                    {workspaceLoading ? <p>Uploading/Refreshing...</p> : workspaceError ? <p class="text-red-400">Error: {workspaceError}</p> : workspaceFiles.length === 0 ? <p>// Workspace is empty.</p> : ( <ul> {workspaceFiles.map(file => ( <li key={file} onClick={() => fetchFileContent(file)} class="flex items-center gap-2 mb-1 hover:text-white cursor-pointer"> <FileIcon class="h-4 w-4 text-gray-500" />{file} </li> ))} </ul> )}
+                                    {workspaceLoading ? <p>Uploading/Refreshing...</p> : workspaceError ? <p class="text-red-400">Error: {workspaceError}</p> : workspaceFiles.length === 0 ? <p>// Workspace is empty.</p> : ( <ul> {workspaceFiles.map(file => ( 
+                                        <li key={file} onClick={() => fetchFileContent(file)} class="flex items-center gap-2 mb-1 hover:text-white cursor-pointer"> 
+                                            <FileIcon class="h-4 w-4 text-gray-500" />{file} 
+                                        </li> 
+                                    ))} </ul> )}
                                  </div>
                              </div>
                         )}
