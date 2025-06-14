@@ -1,15 +1,12 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Prompts (Phase 7 Enhancement v2)
+# ResearchAgent Prompts (Phase 9: Self-Correction)
 #
 # This file contains the prompts for the ResearchAgent.
 #
-# 1. Added `final_answer_prompt_template` to synthesize a final user-facing
-#    response after a plan is executed.
-# 2. Enhanced `evaluator_prompt_template` with more critical instructions to
-#    ensure it validates goal achievement, not just successful execution.
-# 3. Added clear JSON output examples ("few-shot" examples) to the Planner,
-#    Controller, and Evaluator prompts to increase reliability and prevent
-#    formatting errors.
+# 1. Added `correction_planner_prompt_template` to generate a single-step fix
+#    when a tool execution fails. This prompt is crucial for the self-healing
+#    loop, guiding an LLM to analyze the error and propose a direct,
+#    corrective action.
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
@@ -35,9 +32,9 @@ step-by-step execution plan in JSON format to fulfill the user's request.
   - "tool_name": The single most appropriate tool from the "Available Tools" list to accomplish this step.
   - "tool_input": The precise input to provide to the chosen tool.
 - Your final output must be a single, valid JSON object containing a "plan" key, which holds a list of these step objects.
-- CRITICAL: Ensure the final output is a perfectly valid JSON. All strings must use double quotes. Any double quotes inside a string must be properly escaped with a backslash (e.g., "This is a \\"quoted\\" string.").
+- CRITICAL: Ensure the final output is a perfectly valid JSON. All strings must use double quotes.
+- Any double quotes inside a string must be properly escaped with a backslash (e.g., "This is a \\"quoted\\" string.").
 - Do not add any conversational fluff or explanation. Your output must be ONLY the JSON object.
-
 ---
 **Example Output:**
 ```json
@@ -125,9 +122,9 @@ tool to execute the given step of a plan, based on the history of previous steps
 # 3. Evaluator Prompt (Enhanced for Criticality)
 evaluator_prompt_template = PromptTemplate.from_template(
     """
-You are an expert evaluator. Your job is to assess the outcome of a tool's
+You are an expert evaluator.
+Your job is to assess the outcome of a tool's
 execution and determine if the step was successful.
-
 **Plan Step:**
 {current_step}
 
@@ -139,10 +136,11 @@ execution and determine if the step was successful.
 
 **Instructions:**
 - **Critically assess** if the `Tool's Output` **fully and completely satisfies** the `Plan Step`'s instruction.
-- **Do not just check for a successful exit code or the presence of output.** You must verify that the *substance* of the output achieves the step's goal. For example, if the step was to find a specific fact, does the output actually contain that fact? If not, you must declare it a failure.
+- **Do not just check for a successful exit code or the presence of output.** You must verify that the *substance* of the output achieves the step's goal.
+For example, if the step was to find a specific fact, does the output actually contain that fact?
+If not, you must declare it a failure.
 - Your output must be a single, valid JSON object containing a "status" key (which can be "success" or "failure") and a "reasoning" key with a brief explanation.
 - Do not add any conversational fluff or explanation. Your output must be ONLY the JSON object.
-
 ---
 **Example Output:**
 ```json
@@ -168,7 +166,7 @@ execution and determine if the step was successful.
 """
 )
 
-# 4. Final Answer Synthesis Prompt (NEW)
+# 4. Final Answer Synthesis Prompt
 final_answer_prompt_template = PromptTemplate.from_template(
     """
 You are the final, user-facing voice of the ResearchAgent. Your role is to act as an expert editor.
@@ -188,10 +186,67 @@ Your task is to synthesize all the information from the history into a single, c
 3.  Synthesize this information into a clear and coherent response that directly answers the user's original request.
 4.  If the process failed or was unable to find a definitive answer, explain what happened based on the history, and provide the most helpful information you could find.
 5.  Format your answer in clean markdown.
-6.  Do not output JSON or any other machine-readable format. Your output must be only the final, human-readable text for the user.
-
+6.  Do not output JSON or any other machine-readable format.
+Your output must be only the final, human-readable text for the user.
 **Begin!**
 
 **Final Answer:**
+"""
+)
+
+# 5. Correction Planner Prompt (NEW)
+correction_planner_prompt_template = PromptTemplate.from_template(
+    """
+You are an expert troubleshooter and correction planner. A step in a larger plan has failed.
+Your job is to analyze the failure and create a *new, single-step plan* to fix the immediate problem.
+
+**Original Plan:**
+{plan}
+
+**Full Execution History:**
+{history}
+
+**Failed Step Instruction:**
+{failed_step}
+
+**Supervisor's Evaluation of Failure:**
+{failure_reason}
+
+**Available Tools:**
+{tools}
+
+**Instructions:**
+- Analyze the reason for the failure in the context of the history and the original plan.
+- Your goal is to formulate a *single, corrective action* to overcome this specific failure.
+- This might mean retrying the same tool with different input, or using a different tool to achieve the goal of the failed step.
+- Your output must be a single, valid JSON object representing this new, single-step plan. It must follow the exact same format as the original plan's steps.
+- Do not add any conversational fluff or explanation. Your output must be ONLY the JSON object.
+
+---
+**Example Scenario:**
+- **Failed Step:** "Write an article about the new 'Super-Car' to a file named 'car.txt'."
+- **Failure Reason:** "The web_search tool was not used, so there is no information about the 'Super-Car' available to write."
+- **Example Corrective Output:**
+```json
+{{
+    "step_id": "1-correction",
+    "instruction": "The previous attempt to write the file failed because no information was available. First, search the web to gather information about the new 'Super-Car'.",
+    "tool_name": "web_search",
+    "tool_input": {{
+        "query": "information about the new Super-Car"
+    }}
+}}
+```
+---
+
+**Begin!**
+
+**Failed Step Instruction:**
+{failed_step}
+
+**Supervisor's Evaluation of Failure:**
+{failure_reason}
+
+**Your Output (must be a single JSON object for a single corrective step):**
 """
 )

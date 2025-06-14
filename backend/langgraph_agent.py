@@ -1,14 +1,17 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 7: Stateful Workspaces)
+# ResearchAgent Core Agent (Phase 9: Self-Correction Implementation)
 #
-# This version makes the agent fully stateful by using the task_id passed
-# from the server to create persistent workspaces.
+# This version implements the core self-correction loop.
 #
-# 1. GraphState now includes `task_id: str`.
-# 2. `task_setup_node` no longer generates a random UUID. It uses the
-#    injected `task_id` to ensure that all work for a given task occurs in
-#    the same sandboxed directory.
-# 3. Logging is enhanced to include the `task_id` for better traceability.
+# 1. New `correction_planner_node`: When a step fails, this node is called. It
+#    uses a new prompt to analyze the failure and create a new, single-step
+#    plan to fix the problem.
+# 2. Updated `after_plan_step_router`: Now checks the `step_retries` counter.
+#    - If a step fails and retries are left, it routes to `Correction_Planner`.
+#    - If retries are exhausted, it routes to the `Editor` to end the run.
+# 3. New `correction_planner_prompt`: Added to prompts.py to support the new node.
+# 4. Graph Definition: The `Correction_Planner` is added to the graph, with
+#    an edge leading from it back to the `Site_Foreman` to try the new step.
 # -----------------------------------------------------------------------------
 
 import os
@@ -24,18 +27,24 @@ from langgraph.graph import StateGraph, END
 
 # --- Local Imports ---
 from .tools import get_available_tools
-from .prompts import structured_planner_prompt_template, controller_prompt_template, evaluator_prompt_template, final_answer_prompt_template
+from .prompts import (
+    structured_planner_prompt_template,
+    controller_prompt_template,
+    evaluator_prompt_template,
+    final_answer_prompt_template,
+    correction_planner_prompt_template # NEW
+)
 
 # --- Logging Setup ---
 log_level = os.getenv("LOG_LEVEL", "INFO").upper()
 logging.basicConfig(level=log_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# --- Agent State Definition ---
+# --- Agent State Definition (with Self-Correction fields) ---
 class GraphState(TypedDict):
     """Represents the state of our graph."""
     input: str
-    task_id: str # Added task_id to the state
+    task_id: str
     plan: List[dict]
     messages: Annotated[Sequence[BaseMessage], lambda x, y: x + y]
     llm_config: Dict[str, str]
@@ -47,6 +56,10 @@ class GraphState(TypedDict):
     step_outputs: Annotated[Dict[int, str], lambda x, y: {**x, **y}]
     step_evaluation: Optional[dict]
     answer: str
+    max_retries: int
+    step_retries: int
+    plan_retries: int
+
 
 # --- LLM Provider Helper ---
 LLM_CACHE = {}
@@ -54,6 +67,7 @@ def get_llm(state: GraphState, role_env_var: str, default_llm_id: str):
     run_config = state.get("llm_config", {})
     llm_id = run_config.get(role_env_var) or os.getenv(role_env_var, default_llm_id)
     if llm_id in LLM_CACHE: return LLM_CACHE[llm_id]
+ 
     provider, model_name = llm_id.split("::")
     logger.info(f"Task '{state.get('task_id')}': Initializing LLM for '{role_env_var}': {llm_id}")
     if provider == "gemini": llm = ChatGoogleGenerativeAI(model=model_name, google_api_key=os.getenv("GOOGLE_API_KEY"))
@@ -76,13 +90,22 @@ def task_setup_node(state: GraphState):
     logger.info(f"Task '{task_id}': Executing Task_Setup")
     user_message = state['messages'][-1].content
     
-    # --- THE CHANGE: Use the provided task_id to create the workspace path ---
     workspace_path = f"/app/workspace/{task_id}"
     os.makedirs(workspace_path, exist_ok=True)
     logger.info(f"Task '{task_id}': Ensured sandboxed workspace exists: {workspace_path}")
     
     initial_llm_config = state.get("llm_config", {})
-    return {"input": user_message, "history": [], "current_step_index": 0, "step_outputs": {}, "workspace_path": workspace_path, "llm_config": initial_llm_config}
+    return {
+        "input": user_message, 
+        "history": [], 
+        "current_step_index": 0, 
+        "step_outputs": {}, 
+        "workspace_path": workspace_path, 
+        "llm_config": initial_llm_config,
+        "max_retries": 3,
+        "step_retries": 0,
+        "plan_retries": 0,
+    }
 
 def chief_architect_node(state: GraphState):
     """The "Chief Architect" - Generates the structured plan."""
@@ -96,7 +119,7 @@ def chief_architect_node(state: GraphState):
         json_str = match.group(1).strip() if match else response.content.strip()
         parsed_json = json.loads(json_str)
         logger.info(f"Task '{task_id}': Generated structured plan: {json.dumps(parsed_json.get('plan'), indent=2)}")
-        return {"plan": parsed_json.get("plan", [])}
+        return {"plan": parsed_json.get("plan", []), "step_retries": 0}
     except Exception as e:
         logger.error(f"Task '{task_id}': Error parsing structured plan: {e}\nResponse was:\n{response.content}")
         return {"plan": [{"error": f"Failed to create a valid plan. Reason: {e}"}]}
@@ -106,10 +129,19 @@ def site_foreman_node(state: GraphState):
     task_id = state.get("task_id")
     step_index = state["current_step_index"]
     plan = state["plan"]
+    
+    if step_index >= len(plan):
+        logger.error(f"Task '{task_id}': Site Foreman called with invalid step index {step_index}. Plan length is {len(plan)}. Ending run.")
+        return {"current_tool_call": {"error": "Plan finished, but foreman was called again."}}
+
     logger.info(f"Task '{task_id}': Executing Site_Foreman for step {step_index + 1}/{len(plan)}")
     current_step_details = plan[step_index]
     llm = get_llm(state, "SITE_FOREMAN_LLM_ID", "gemini::gemini-1.5-flash-latest")
     history_str = "\n".join(state["history"]) if state.get("history") else "No history yet."
+    
+    # This is where we will add logic for piping previous step outputs into the prompt
+    tool_input_str = json.dumps(current_step_details.get("tool_input", {}))
+    
     prompt = controller_prompt_template.format(
         tools=format_tools_for_prompt(),
         plan=json.dumps(state["plan"], indent=2),
@@ -125,14 +157,18 @@ def site_foreman_node(state: GraphState):
         return {"current_tool_call": tool_call}
     except json.JSONDecodeError as e:
         logger.error(f"Task '{task_id}': Error parsing tool call from Site Foreman: {e}\nResponse was:\n{response.content}")
-        return {"current_tool_call": {"error": "Invalid JSON output from Site Foreman."}}
+        return {"current_tool_call": {"error": f"Invalid JSON output from Site Foreman: {e}"}}
 
 async def worker_node(state: GraphState):
     """The "Worker" - Executes the tool call."""
     task_id = state.get("task_id")
     logger.info(f"Task '{task_id}': Executing Worker")
     tool_call = state.get("current_tool_call")
-    if not tool_call or not tool_call.get("tool_name"): return {"tool_output": "Error: No tool call was provided."}
+    if not tool_call or "error" in tool_call or not tool_call.get("tool_name"):
+        error_msg = tool_call.get("error", "No tool call was provided.")
+        logger.warning(f"Task '{task_id}': Worker skipping execution due to bad tool call: {error_msg}")
+        return {"tool_output": f"Error: {error_msg}"}
+        
     tool_name = tool_call["tool_name"]
     tool_input = tool_call.get("tool_input", {})
     tool = TOOL_MAP.get(tool_name)
@@ -188,13 +224,18 @@ def project_supervisor_node(state: GraphState):
         f"Output: {tool_output}\n"
         f"Evaluation: {evaluation.get('status', 'unknown')} - {evaluation.get('reasoning', 'N/A')}"
     )
+    
+    updates = {"step_evaluation": evaluation, "history": [history_record]}
 
-    step_output_update = {}
     if evaluation.get("status") == "success":
         step_id = current_step_details.get("step_id")
-        if step_id: step_output_update[step_id] = tool_output
+        if step_id:
+            updates.setdefault("step_outputs", {})[step_id] = tool_output
+        updates["step_retries"] = 0 # Reset counter on success
+    else:
+        updates["step_retries"] = state["step_retries"] + 1 # Increment on failure
 
-    return {"step_evaluation": evaluation, "history": [history_record], "step_outputs": step_output_update}
+    return updates
 
 def advance_to_next_step_node(state: GraphState):
     """The "Clerk" - Increments the step index."""
@@ -224,6 +265,43 @@ def editor_node(state: GraphState):
     logger.info(f"Task '{task_id}': Editor generated final answer: {response.content[:200]}...")
     return {"answer": response.content}
 
+# --- NEW: Correction Planner Node ---
+def correction_planner_node(state: GraphState):
+    """The "Correction Planner" - Creates a new plan to fix a failed step."""
+    task_id = state.get("task_id")
+    logger.info(f"Task '{task_id}': Executing Correction_Planner. Attempt #{state['step_retries']}.")
+    
+    failed_step_details = state["plan"][state["current_step_index"]]
+    failure_reason = state["step_evaluation"].get("reasoning", "No reason provided.")
+    history_str = "\n".join(state["history"])
+
+    llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-flash-latest") # Reuse architect model
+    prompt = correction_planner_prompt_template.format(
+        plan=json.dumps(state["plan"]),
+        history=history_str,
+        failed_step=failed_step_details.get("instruction"),
+        failure_reason=failure_reason,
+        tools=format_tools_for_prompt()
+    )
+
+    response = llm.invoke(prompt)
+    try:
+        match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL)
+        json_str = match.group(1).strip() if match else response.content.strip()
+        new_step = json.loads(json_str)
+        
+        logger.info(f"Task '{task_id}': Correction Planner proposed new step: {new_step}")
+
+        # Create a new plan list and replace the failed step with the new one
+        new_plan = state["plan"][:]
+        new_plan[state["current_step_index"]] = new_step
+        
+        return {"plan": new_plan}
+    except Exception as e:
+        logger.error(f"Task '{task_id}': Error parsing correction plan: {e}\nResponse was:\n{response.content}")
+        # If parsing fails, we can't recover, so we fall through to the router which will likely terminate.
+        return {}
+
 
 # --- Conditional Routers ---
 def router(state: GraphState):
@@ -238,14 +316,18 @@ def router(state: GraphState):
     return "Chief_Architect" if "AGENT_ACTION" in decision else "Librarian"
 
 def after_plan_step_router(state: GraphState):
-    """Routes the workflow after a plan step is evaluated."""
+    """Routes the workflow after a plan step is evaluated, now with correction logic."""
     task_id = state.get("task_id")
     logger.info(f"Task '{task_id}': Router checking if plan should continue or finalize.")
     evaluation = state.get("step_evaluation", {})
 
     if evaluation.get("status") == "failure":
-        logger.warning(f"Task '{task_id}': Step failed. Reason: {evaluation.get('reasoning', 'N/A')}. Routing to Editor.")
-        return "Editor"
+        if state["step_retries"] < state["max_retries"]:
+            logger.warning(f"Task '{task_id}': Step failed. Retries left: {state['max_retries'] - state['step_retries']}. Routing to Correction_Planner.")
+            return "Correction_Planner"
+        else:
+            logger.error(f"Task '{task_id}': Step failed. MAX RETRIES REACHED. Routing to Editor to terminate.")
+            return "Editor"
 
     if state["current_step_index"] + 1 >= len(state.get("plan", [])):
         logger.info(f"Task '{task_id}': Plan is complete. Routing to Editor.")
@@ -266,6 +348,8 @@ def create_agent_graph():
     workflow.add_node("Project_Supervisor", project_supervisor_node)
     workflow.add_node("Advance_To_Next_Step", advance_to_next_step_node)
     workflow.add_node("Editor", editor_node)
+    # NEW NODE
+    workflow.add_node("Correction_Planner", correction_planner_node)
 
     workflow.set_entry_point("Task_Setup")
 
@@ -278,17 +362,21 @@ def create_agent_graph():
     workflow.add_edge("Site_Foreman", "Worker")
     workflow.add_edge("Worker", "Project_Supervisor")
     workflow.add_edge("Advance_To_Next_Step", "Site_Foreman")
+    
+    # NEW EDGE from the correction planner back to the foreman
+    workflow.add_edge("Correction_Planner", "Site_Foreman")
 
     workflow.add_conditional_edges("Project_Supervisor", after_plan_step_router, {
         "Editor": "Editor",
-        "Advance_To_Next_Step": "Advance_To_Next_Step"
+        "Advance_To_Next_Step": "Advance_To_Next_Step",
+        "Correction_Planner": "Correction_Planner" # NEW PATH
     })
 
     workflow.add_edge("Librarian", END)
     workflow.add_edge("Editor", END)
 
     agent = workflow.compile()
-    logger.info("ResearchAgent graph compiled successfully with 'Company Model' names.")
+    logger.info("ResearchAgent graph compiled successfully with 'Company Model' names and Self-Correction loop.")
     return agent
 
 agent_graph = create_agent_graph()
