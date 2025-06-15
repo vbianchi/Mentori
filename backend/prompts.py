@@ -1,17 +1,50 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Prompts (Phase 9: Self-Correction)
+# ResearchAgent Prompts (Phase 9.1: Three-Track Router)
 #
 # This file contains the prompts for the ResearchAgent.
 #
-# 1. Added `correction_planner_prompt_template` to generate a single-step fix
-#    when a tool execution fails. This prompt is crucial for the self-healing
-#    loop, guiding an LLM to analyze the error and propose a direct,
-#    corrective action.
+# 1. New `router_prompt_template`: This is the key addition. It's a more
+#    sophisticated prompt that guides a powerful LLM to classify a user's
+#    request into one of three specific categories: `DIRECT_QA` for simple
+#    questions, `SIMPLE_TOOL_USE` for single commands, or `COMPLEX_PROJECT`
+#    for multi-step tasks.
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
 
-# 1. Structured Planner Prompt
+# --- NEW: Three-Track Router Prompt ---
+router_prompt_template = PromptTemplate.from_template(
+    """
+You are an expert request router. Your job is to classify the user's request into one of three categories based on its complexity and the tools required.
+
+**Available Tools:**
+{tools}
+
+**Categories:**
+1.  **DIRECT_QA**: For simple, knowledge-based questions that can be answered directly by a powerful language model without using any tools.
+    -   Examples: "What is the capital of France?", "Explain the theory of relativity in simple terms.", "Who wrote 'To Kill a Mockingbird'?"
+2.  **SIMPLE_TOOL_USE**: For requests that can be fulfilled with a single tool call. This is for direct commands to use a specific tool.
+    -   Examples: "list the files in the current directory", "read the file 'main.py'", "search the web for the latest news on AI"
+3.  **COMPLEX_PROJECT**: For requests that require multiple steps, planning, or the use of several tools in a sequence to achieve the final goal.
+    -   Examples: "Research the market for electric vehicles and write a summary report.", "Create a python script to fetch data from an API and save it to a CSV file.", "Find the top 3 competitors to LangChain and create a feature comparison table."
+
+**User Request:**
+{input}
+
+**Instructions:**
+- Analyze the user's request and the list of available tools.
+- Based on your analysis, you must respond with ONLY ONE of the following three strings:
+  - "DIRECT_QA"
+  - "SIMPLE_TOOL_USE"
+  - "COMPLEX_PROJECT"
+- Do not add any other words, explanation, or punctuation. Your output must be one of the three category names and nothing else.
+
+**Your Output:**
+"""
+)
+
+
+# 2. Structured Planner Prompt
 structured_planner_prompt_template = PromptTemplate.from_template(
     """
 You are an expert architect and planner. Your job is to create a detailed,
@@ -71,7 +104,7 @@ step-by-step execution plan in JSON format to fulfill the user's request.
 """
 )
 
-# 2. Controller Prompt
+# 3. Controller Prompt
 controller_prompt_template = PromptTemplate.from_template(
     """
 You are an expert controller agent. Your job is to select the most appropriate
@@ -119,7 +152,7 @@ tool to execute the given step of a plan, based on the history of previous steps
 """
 )
 
-# 3. Evaluator Prompt (Enhanced for Criticality)
+# 4. Evaluator Prompt
 evaluator_prompt_template = PromptTemplate.from_template(
     """
 You are an expert evaluator.
@@ -166,7 +199,7 @@ If not, you must declare it a failure.
 """
 )
 
-# 4. Final Answer Synthesis Prompt
+# 5. Final Answer Synthesis Prompt
 final_answer_prompt_template = PromptTemplate.from_template(
     """
 You are the final, user-facing voice of the ResearchAgent. Your role is to act as an expert editor.
@@ -194,7 +227,7 @@ Your output must be only the final, human-readable text for the user.
 """
 )
 
-# 5. Correction Planner Prompt (NEW)
+# 6. Correction Planner Prompt
 correction_planner_prompt_template = PromptTemplate.from_template(
     """
 You are an expert troubleshooter and correction planner. A step in a larger plan has failed.
