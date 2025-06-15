@@ -1,18 +1,17 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Prompts (Phase 9.1: Three-Track Router)
+# ResearchAgent Prompts (Phase 9.2: Handyman)
 #
 # This file contains the prompts for the ResearchAgent.
 #
-# 1. New `router_prompt_template`: This is the key addition. It's a more
-#    sophisticated prompt that guides a powerful LLM to classify a user's
-#    request into one of three specific categories: `DIRECT_QA` for simple
-#    questions, `SIMPLE_TOOL_USE` for single commands, or `COMPLEX_PROJECT`
-#    for multi-step tasks.
+# 1. New `handyman_prompt_template`: This prompt is added to support the new
+#    "Handyman" node. It is specifically designed to guide an LLM to take
+#    a simple, direct user command and convert it into a single, executable
+#    JSON tool call, without the need for multi-step planning.
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
 
-# --- NEW: Three-Track Router Prompt ---
+# 1. Three-Track Router Prompt
 router_prompt_template = PromptTemplate.from_template(
     """
 You are an expert request router. Your job is to classify the user's request into one of three categories based on its complexity and the tools required.
@@ -43,8 +42,46 @@ You are an expert request router. Your job is to classify the user's request int
 """
 )
 
+# --- NEW: Handyman Prompt ---
+handyman_prompt_template = PromptTemplate.from_template(
+    """
+You are an expert "Handyman" agent. Your job is to take a simple user request and convert it into a single, valid JSON tool call.
 
-# 2. Structured Planner Prompt
+**User Request:**
+{input}
+
+**Available Tools:**
+{tools}
+
+**Instructions:**
+- Analyze the user's request and select the single most appropriate tool from the "Available Tools" list.
+- Your output must be a single, valid JSON object representing the tool call. It must contain the "tool_name" and the correct "tool_input" for that tool.
+- Do not add any conversational fluff or explanation. Your output must be ONLY the JSON object.
+
+---
+**Example Request:** "list all the files in the workspace"
+**Example Output:**
+```json
+{{
+  "tool_name": "list_files",
+  "tool_input": {{
+    "directory": "."
+  }}
+}}
+```
+---
+
+**Begin!**
+
+**User Request:**
+{input}
+
+**Your Output (must be a single JSON object):**
+"""
+)
+
+
+# 3. Structured Planner Prompt
 structured_planner_prompt_template = PromptTemplate.from_template(
     """
 You are an expert architect and planner. Your job is to create a detailed,
@@ -104,7 +141,7 @@ step-by-step execution plan in JSON format to fulfill the user's request.
 """
 )
 
-# 3. Controller Prompt
+# 4. Controller Prompt
 controller_prompt_template = PromptTemplate.from_template(
     """
 You are an expert controller agent. Your job is to select the most appropriate
@@ -152,7 +189,7 @@ tool to execute the given step of a plan, based on the history of previous steps
 """
 )
 
-# 4. Evaluator Prompt
+# 5. Evaluator Prompt
 evaluator_prompt_template = PromptTemplate.from_template(
     """
 You are an expert evaluator.
@@ -199,7 +236,7 @@ If not, you must declare it a failure.
 """
 )
 
-# 5. Final Answer Synthesis Prompt
+# 6. Final Answer Synthesis Prompt
 final_answer_prompt_template = PromptTemplate.from_template(
     """
 You are the final, user-facing voice of the ResearchAgent. Your role is to act as an expert editor.
@@ -227,7 +264,7 @@ Your output must be only the final, human-readable text for the user.
 """
 )
 
-# 6. Correction Planner Prompt
+# 7. Correction Planner Prompt
 correction_planner_prompt_template = PromptTemplate.from_template(
     """
 You are an expert troubleshooter and correction planner. A step in a larger plan has failed.

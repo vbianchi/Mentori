@@ -1,16 +1,22 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 9.1: Router Fix)
+# ResearchAgent Core Agent (Phase 9.2: Handyman Track)
 #
-# This version corrects the routing logic to resolve the InvalidUpdateError.
+# This version implements the "Handyman" track for simple, single-step tool
+# use, completing the core logic for the "Three-Track Brain".
 #
-# 1. New `route` field in `GraphState`: A dedicated field is added to the
-#    state to hold the routing decision.
-# 2. Corrected `initial_router` node: This node now correctly returns a
-#    dictionary to update the `route` field in the state, instead of a
-#    raw string.
-# 3. New `route_logic` function: A separate, simple function is created
-#    for the conditional edge. It reads the decision from the `route` field
-#    in the state and returns the name of the next node.
+# 1. New `handyman_node`: This node is added to handle requests on the
+#    `SIMPLE_TOOL_USE` track. It uses a dedicated prompt to formulate a
+#    single tool call.
+# 2. New `current_track` State: The `GraphState` now includes a `current_track`
+#    field, which is set by the router. This allows downstream components to
+#    know which path is active.
+# 3. Enhanced `worker_node`: Now creates a simple history log when run as part
+#    of the Handyman track for the Editor to use.
+# 4. New `after_worker_router`: This conditional edge is added after the
+#    `worker_node`. It checks the `current_track` to correctly route to the
+#    `Project_Supervisor` (for complex plans) or directly to the `Editor`
+#    (for simple tool use).
+# 5. Updated Graph: The graph is fully wired to support all three tracks.
 # -----------------------------------------------------------------------------
 
 import os
@@ -29,6 +35,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from .tools import get_available_tools
 from .prompts import (
     router_prompt_template,
+    handyman_prompt_template,
     structured_planner_prompt_template,
     controller_prompt_template,
     evaluator_prompt_template,
@@ -61,7 +68,8 @@ class GraphState(TypedDict):
     step_retries: int
     plan_retries: int
     user_feedback: Optional[str]
-    route: str # NEW: To hold the routing decision
+    route: str
+    current_track: str # NEW: To track which of the 3 paths is active
 
 # --- LLM Provider Helper ---
 LLM_CACHE = {}
@@ -94,46 +102,53 @@ def task_setup_node(state: GraphState):
     
     workspace_path = f"/app/workspace/{task_id}"
     os.makedirs(workspace_path, exist_ok=True)
-    logger.info(f"Task '{task_id}': Ensured sandboxed workspace exists: {workspace_path}")
     
     return {
-        "input": user_message, 
-        "history": [], 
-        "current_step_index": 0, 
-        "step_outputs": {}, 
-        "workspace_path": workspace_path, 
-        "llm_config": state.get("llm_config", {}),
-        "max_retries": 3,
-        "step_retries": 0,
-        "plan_retries": 0,
-        "user_feedback": None,
+        "input": user_message, "history": [], "current_step_index": 0, 
+        "step_outputs": {}, "workspace_path": workspace_path, 
+        "llm_config": state.get("llm_config", {}), "max_retries": 3,
+        "step_retries": 0, "plan_retries": 0, "user_feedback": None,
     }
 
 def initial_router_node(state: GraphState):
-    """The new 3-way router node. It classifies the request and saves the decision to the state."""
+    """Classifies the request and saves the decision to the state."""
     task_id = state.get("task_id")
     logger.info(f"Task '{task_id}': Executing Three-Track Router")
     llm = get_llm(state, "ROUTER_LLM_ID", "gemini::gemini-1.5-flash-latest")
     
-    prompt = router_prompt_template.format(
-        input=state["input"], 
-        tools=format_tools_for_prompt()
-    )
+    prompt = router_prompt_template.format(input=state["input"], tools=format_tools_for_prompt())
     response = llm.invoke(prompt)
     decision = response.content.strip()
     
     logger.info(f"Task '{task_id}': Routing decision: {decision}")
 
     if "DIRECT_QA" in decision:
-        return {"route": "Editor"}
+        return {"route": "Editor", "current_track": "DIRECT_QA"}
     if "SIMPLE_TOOL_USE" in decision:
-        logger.warning(f"Task '{task_id}': SIMPLE_TOOL_USE not yet implemented. Defaulting to COMPLEX_PROJECT.")
-        return {"route": "Chief_Architect"}
+        return {"route": "Handyman", "current_track": "SIMPLE_TOOL_USE"}
     if "COMPLEX_PROJECT" in decision:
-        return {"route": "Chief_Architect"}
+        return {"route": "Chief_Architect", "current_track": "COMPLEX_PROJECT"}
     else:
-        logger.warning(f"Task '{task_id}': Router gave unexpected response '{decision}'. Defaulting to Editor for QA.")
-        return {"route": "Editor"}
+        logger.warning(f"Task '{task_id}': Router gave unexpected response '{decision}'. Defaulting to Editor.")
+        return {"route": "Editor", "current_track": "DIRECT_QA"}
+
+def handyman_node(state: GraphState):
+    """Formulates a single tool call for simple requests."""
+    task_id = state.get("task_id")
+    logger.info(f"Task '{task_id}': Track 2 (Simple Tool Use) -> Handyman")
+    llm = get_llm(state, "SITE_FOREMAN_LLM_ID", "gemini::gemini-1.5-flash-latest") # Reuse Foreman model
+    
+    prompt = handyman_prompt_template.format(input=state["input"], tools=format_tools_for_prompt())
+    response = llm.invoke(prompt)
+    try:
+        match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL)
+        json_str = match.group(1).strip() if match else response.content.strip()
+        tool_call = json.loads(json_str)
+        logger.info(f"Task '{task_id}': Handyman formulated tool call: {tool_call}")
+        return {"current_tool_call": tool_call}
+    except Exception as e:
+        logger.error(f"Task '{task_id}': Error parsing tool call from Handyman: {e}")
+        return {"current_tool_call": {"error": f"Invalid JSON output from Handyman: {e}"}}
 
 def chief_architect_node(state: GraphState):
     """Generates the structured plan for complex projects."""
@@ -146,7 +161,6 @@ def chief_architect_node(state: GraphState):
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL)
         json_str = match.group(1).strip() if match else response.content.strip()
         parsed_json = json.loads(json_str)
-        logger.info(f"Task '{task_id}': Generated structured plan.")
         return {"plan": parsed_json.get("plan", [])}
     except Exception as e:
         logger.error(f"Task '{task_id}': Error parsing structured plan: {e}")
@@ -154,12 +168,11 @@ def chief_architect_node(state: GraphState):
 
 def human_in_the_loop_node(state: GraphState):
     """Placeholder for the HITL step."""
-    task_id = state.get("task_id")
-    logger.info(f"Task '{task_id}': Reached HITL node. Awaiting user feedback.")
+    logger.info(f"Task '{state.get('task_id')}': Reached HITL node. Awaiting user feedback.")
     return {}
 
 def site_foreman_node(state: GraphState):
-    """Prepares the tool call for the current step."""
+    """Prepares the tool call for a complex plan step."""
     task_id = state.get("task_id")
     step_index = state["current_step_index"]
     plan = state["plan"]
@@ -183,16 +196,15 @@ def site_foreman_node(state: GraphState):
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL)
         json_str = match.group(1).strip() if match else response.content.strip()
         tool_call = json.loads(json_str)
-        logger.info(f"Task '{task_id}': Site Foreman prepared tool call: {tool_call}")
         return {"current_tool_call": tool_call}
-    except json.JSONDecodeError as e:
+    except Exception as e:
         logger.error(f"Task '{task_id}': Error parsing tool call from Site Foreman: {e}")
         return {"current_tool_call": {"error": f"Invalid JSON output from Site Foreman: {e}"}}
 
 async def worker_node(state: GraphState):
-    """Executes the tool call."""
+    """Executes a tool call from either the Handyman or the Site Foreman."""
     task_id = state.get("task_id")
-    logger.info(f"Task '{task_id}': Executing Worker")
+    logger.info(f"Task '{task_id}': Worker executing tool call.")
     tool_call = state.get("current_tool_call")
     if not tool_call or "error" in tool_call or not tool_call.get("tool_name"):
         error_msg = tool_call.get("error", "No tool call was provided.")
@@ -213,15 +225,26 @@ async def worker_node(state: GraphState):
         final_args["workspace_path"] = state["workspace_path"]
 
     try:
-        logger.info(f"Task '{task_id}': Worker executing tool '{tool_name}' with args: {final_args}")
         output = await tool.ainvoke(final_args)
-        return {"tool_output": str(output)}
+        output_str = str(output)
+
+        # If this was a simple tool use, create a history entry for the Editor
+        if state.get("current_track") == "SIMPLE_TOOL_USE":
+            history_record = (
+                f"Handyman Action: User requested '{state['input']}'.\n"
+                f"Executed Tool: {json.dumps(tool_call)}\n"
+                f"Result: {output_str}"
+            )
+            return {"tool_output": output_str, "history": [history_record]}
+        
+        return {"tool_output": output_str}
+
     except Exception as e:
         logger.error(f"Task '{task_id}': Error executing tool '{tool_name}': {e}", exc_info=True)
         return {"tool_output": f"An error occurred while executing the tool: {e}"}
 
 def project_supervisor_node(state: GraphState):
-    """Evaluates the step and records history."""
+    """Evaluates a complex plan step and records history."""
     task_id = state.get("task_id")
     logger.info(f"Task '{task_id}': Executing Project_Supervisor")
     current_step_details = state["plan"][state["current_step_index"]]
@@ -241,8 +264,7 @@ def project_supervisor_node(state: GraphState):
         json_str = match.group(1).strip() if match else response.content.strip()
         evaluation = json.loads(json_str)
     except Exception as e:
-        logger.error(f"Task '{task_id}': Error parsing evaluation from Project Supervisor: {e}")
-        evaluation = {"status": "failure", "reasoning": "Could not parse Project Supervisor output."}
+        evaluation = {"status": "failure", "reasoning": f"Could not parse evaluation: {e}"}
 
     history_record = (
         f"--- Step {state['current_step_index'] + 1} ---\n"
@@ -255,18 +277,15 @@ def project_supervisor_node(state: GraphState):
     updates = {"step_evaluation": evaluation, "history": [history_record]}
 
     if evaluation.get("status") == "success":
-        step_id = current_step_details.get("step_id")
-        if step_id:
-            updates.setdefault("step_outputs", {})[step_id] = tool_output
         updates["step_retries"] = 0 
     else:
-        updates["step_retries"] = state["step_retries"] + 1
+        updates["step_retries"] = state.get("step_retries", 0) + 1
 
     return updates
 
 def advance_to_next_step_node(state: GraphState):
     """Increments the step index."""
-    return {"current_step_index": state["current_step_index"] + 1}
+    return {"current_step_index": state.get("current_step_index", 0) + 1}
 
 def editor_node(state: GraphState):
     """Synthesizes the final answer for all tracks."""
@@ -278,39 +297,31 @@ def editor_node(state: GraphState):
     
     if not history_str or state.get("user_feedback") == "reject":
         if state.get("user_feedback") == "reject":
-            logger.info(f"Task '{task_id}': Editor handling rejected plan.")
             history_str = "The user rejected the proposed plan."
         else:
             logger.info(f"Task '{task_id}': Editor handling as Direct Q&A.")
             response = llm.invoke(state["messages"])
             return {"answer": response.content}
 
-    logger.info(f"Task '{task_id}': Editor summarizing complex plan history.")
-    prompt = final_answer_prompt_template.format(
-        input=state["input"],
-        history=history_str
-    )
+    logger.info(f"Task '{task_id}': Editor summarizing history.")
+    prompt = final_answer_prompt_template.format(input=state["input"], history=history_str)
     response = llm.invoke(prompt)
-    logger.info(f"Task '{task_id}': Editor generated final answer from history.")
     return {"answer": response.content}
 
 def correction_planner_node(state: GraphState):
     """Creates a new plan to fix a failed step."""
+    # (No changes to this node's logic)
     task_id = state.get("task_id")
     logger.info(f"Task '{task_id}': Executing Correction_Planner.")
     failed_step_details = state["plan"][state["current_step_index"]]
     failure_reason = state["step_evaluation"].get("reasoning", "No reason provided.")
     history_str = "\n".join(state["history"])
-
     llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-flash-latest")
     prompt = correction_planner_prompt_template.format(
-        plan=json.dumps(state["plan"]),
-        history=history_str,
+        plan=json.dumps(state["plan"]), history=history_str,
         failed_step=failed_step_details.get("instruction"),
-        failure_reason=failure_reason,
-        tools=format_tools_for_prompt()
+        failure_reason=failure_reason, tools=format_tools_for_prompt()
     )
-
     response = llm.invoke(prompt)
     try:
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL)
@@ -323,12 +334,18 @@ def correction_planner_node(state: GraphState):
         logger.error(f"Task '{task_id}': Error parsing correction plan: {e}")
         return {}
 
-
 # --- Conditional Routing Logic ---
 
 def route_logic(state: GraphState) -> str:
     """The logic for the initial router's conditional edge."""
     return state.get("route", "Editor")
+
+def after_worker_router(state: GraphState) -> str:
+    """Routes after the worker has run, based on the active track."""
+    if state.get("current_track") == "SIMPLE_TOOL_USE":
+        return "Editor"
+    else:
+        return "Project_Supervisor"
 
 def after_plan_creation_router(state: GraphState) -> str:
     """Routes after the human-in-the-loop step."""
@@ -338,14 +355,13 @@ def after_plan_creation_router(state: GraphState) -> str:
         return "Editor"
 
 def after_plan_step_router(state: GraphState) -> str:
-    """Routes after a plan step is evaluated."""
+    """Routes after a complex plan step is evaluated."""
     evaluation = state.get("step_evaluation", {})
 
     if evaluation.get("status") == "failure":
         if state["step_retries"] < state["max_retries"]:
             return "Correction_Planner"
-        else:
-            return "Editor"
+        else: return "Editor"
 
     if state["current_step_index"] + 1 >= len(state.get("plan", [])):
         return "Editor"
@@ -359,6 +375,7 @@ def create_agent_graph():
     
     workflow.add_node("Task_Setup", task_setup_node)
     workflow.add_node("initial_router_node", initial_router_node)
+    workflow.add_node("Handyman", handyman_node) # NEW
     workflow.add_node("Chief_Architect", chief_architect_node)
     workflow.add_node("human_in_the_loop_node", human_in_the_loop_node)
     workflow.add_node("Site_Foreman", site_foreman_node)
@@ -373,29 +390,32 @@ def create_agent_graph():
 
     # --- THREE-TRACK ROUTING ---
     workflow.add_conditional_edges(
-        "initial_router_node",
-        route_logic,
-        {
-            "Editor": "Editor",
-            "Chief_Architect": "Chief_Architect"
-        }
+        "initial_router_node", route_logic,
+        {"Editor": "Editor", "Handyman": "Handyman", "Chief_Architect": "Chief_Architect"}
     )
 
+    # Track 2: Simple Tool Use
+    workflow.add_edge("Handyman", "Worker")
+
+    # NEW: Router after the worker node
+    workflow.add_conditional_edges(
+        "Worker", after_worker_router,
+        {"Editor": "Editor", "Project_Supervisor": "Project_Supervisor"}
+    )
+    
     # Track 3: Complex Project
     workflow.add_edge("Chief_Architect", "human_in_the_loop_node")
     workflow.add_conditional_edges("human_in_the_loop_node", after_plan_creation_router, {
-        "Site_Foreman": "Site_Foreman",
-        "Editor": "Editor"
+        "Site_Foreman": "Site_Foreman", "Editor": "Editor"
     })
     
     # Execution Loop (for Track 3)
     workflow.add_edge("Site_Foreman", "Worker")
-    workflow.add_edge("Worker", "Project_Supervisor")
+    # Note: The edge from Worker is now conditional (see above)
     workflow.add_edge("Advance_To_Next_Step", "Site_Foreman")
     workflow.add_edge("Correction_Planner", "Site_Foreman")
     workflow.add_conditional_edges("Project_Supervisor", after_plan_step_router, {
-        "Editor": "Editor",
-        "Advance_To_Next_Step": "Advance_To_Next_Step",
+        "Editor": "Editor", "Advance_To_Next_Step": "Advance_To_Next_Step",
         "Correction_Planner": "Correction_Planner"
     })
 
@@ -406,7 +426,7 @@ def create_agent_graph():
         checkpointer=MemorySaver(),
         interrupt_before=["human_in_the_loop_node"]
     )
-    logger.info("ResearchAgent graph compiled with corrected router logic.")
+    logger.info("ResearchAgent graph compiled with full Three-Track Brain logic.")
     return agent
 
 agent_graph = create_agent_graph()
