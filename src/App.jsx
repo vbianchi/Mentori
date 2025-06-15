@@ -42,7 +42,6 @@ const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const agentRoles = [
         { key: 'ROUTER_LLM_ID', label: 'The Router', icon: <RouterIcon className="h-4 w-4"/>, desc: "Classifies tasks." },
-        { key: 'LIBRARIAN_LLM_ID', label: 'The Librarian', icon: <LibrarianIcon className="h-4 w-4"/>, desc: "Answers simple questions." },
         { key: 'CHIEF_ARCHITECT_LLM_ID', label: 'The Chief Architect', icon: <ArchitectIcon className="h-4 w-4"/>, desc: "Creates the high-level plan." },
         { key: 'SITE_FOREMAN_LLM_ID', label: 'The Site Foreman', icon: <ForemanIcon className="h-4 w-4"/>, desc: "Prepares tool calls." },
         { key: 'WORKER_LLM_ID', label: 'The Worker', icon: <WorkerIcon className="h-4 w-4"/>, desc: "Executes tools (future use)." },
@@ -292,7 +291,6 @@ export function App() {
     const handleModifyAndApprove = (modifiedPlan) => handleApprovalAction('approve', modifiedPlan);
     const handleReject = () => handleApprovalAction('reject');
 
-    // --- REFACTORED WebSocket onmessage Handler ---
     useEffect(() => {
         function connect() {
             setConnectionStatus("Connecting...");
@@ -304,74 +302,87 @@ export function App() {
 
             socket.onmessage = (event) => {
                 const newEvent = JSON.parse(event.data);
+                
+                if (newEvent.type === 'final_answer' && newEvent.refresh_workspace) {
+                    if (handlersRef.current.activeTaskId === newEvent.task_id) {
+                        handlersRef.current.fetchWorkspaceFiles(handlersRef.current.activeTaskId);
+                    }
+                }
 
                 setTasks(currentTasks => {
-                    const taskIndex = currentTasks.findIndex(t => t.id === newEvent.task_id);
-                    if (taskIndex === -1) return currentTasks;
-                    
-                    const newTasks = [...currentTasks];
-                    const taskToUpdate = { ...newTasks[taskIndex] };
-                    let newHistory = [...taskToUpdate.history];
-
-                    // Find the last run container, or create one if needed
-                    let runContainer = newHistory.find(item => item.type === 'run_container' && !item.isComplete);
-                    if (!runContainer) {
-                        runContainer = { type: 'run_container', children: [], isComplete: false };
-                        newHistory.push(runContainer);
-                    }
-                    
-                    const eventType = newEvent.type;
-
-                    if (eventType === 'plan_approval_request') {
-                        setIsThinking(false);
-                        setIsAwaitingApproval(true);
-                        runContainer.children.push({ type: 'architect_plan', steps: newEvent.plan, isAwaitingApproval: true });
-                    } else if (eventType === 'direct_answer' || eventType === 'final_answer') {
-                        setIsThinking(false);
-                        setIsAwaitingApproval(false);
-                        runContainer.children.push({ type: eventType, content: newEvent.data });
-                        runContainer.isComplete = true; // Mark this run as complete
-                    } else if (eventType === 'agent_event') {
-                        const { name, event: chainEvent, data } = newEvent;
-                        const inputData = data.input || {};
-                        const outputData = data.output || {};
-
-                        // Find the architect plan to update its state
-                        let architectPlan = runContainer.children.find(c => c.type === 'architect_plan');
+                    try {
+                        const taskIndex = currentTasks.findIndex(t => t.id === newEvent.task_id);
+                        if (taskIndex === -1) return currentTasks;
                         
-                        if (name === 'Site_Foreman' && chainEvent === 'on_chain_start' && architectPlan?.isAwaitingApproval) {
-                            architectPlan.isAwaitingApproval = false;
-                            // Add execution plan card only once
-                            if (!runContainer.children.some(c => c.type === 'execution_plan')) {
-                                runContainer.children.push({ type: 'execution_plan', steps: architectPlan.steps.map(step => ({...step, status: 'pending'})) });
-                            }
-                        }
+                        const newTasks = [...currentTasks];
+                        const taskToUpdate = { ...newTasks[taskIndex] };
+                        let newHistory = [...taskToUpdate.history];
 
-                        // Find and update the execution plan
-                        let executionPlan = runContainer.children.find(c => c.type === 'execution_plan');
-                        if (executionPlan) {
-                            const stepIndex = inputData.current_step_index;
-                            if (stepIndex !== undefined && executionPlan.steps[stepIndex]) {
-                                let stepToUpdate = { ...executionPlan.steps[stepIndex] };
-                                if (name === 'Site_Foreman' && chainEvent === 'on_chain_start') {
-                                    stepToUpdate.status = 'in-progress';
-                                } else if (name === 'Project_Supervisor' && chainEvent === 'on_chain_end') {
-                                    stepToUpdate.status = outputData.step_evaluation?.status === 'failure' ? 'failure' : 'completed';
-                                    stepToUpdate.toolCall = inputData.current_tool_call;
-                                    stepToUpdate.toolOutput = outputData.tool_output;
-                                    stepToUpdate.evaluation = outputData.step_evaluation;
-                                    if (handlersRef.current.activeTaskId === newEvent.task_id) { 
-                                        handlersRef.current.fetchWorkspaceFiles(handlersRef.current.activeTaskId);
-                                    }
+                        // --- ROBUSTNESS FIX ---
+                        // Always find the last run container in the history to update.
+                        let runContainer = newHistory.length > 0 && newHistory[newHistory.length - 1].type === 'run_container' 
+                            ? newHistory[newHistory.length - 1]
+                            : null;
+
+                        // If no container exists, create one. This happens with the very first event after a prompt.
+                        if (!runContainer) {
+                            runContainer = { type: 'run_container', children: [], isComplete: false };
+                            newHistory.push(runContainer);
+                        }
+                        
+                        const eventType = newEvent.type;
+
+                        if (eventType === 'plan_approval_request') {
+                            setIsThinking(false);
+                            setIsAwaitingApproval(true);
+                            runContainer.children.push({ type: 'architect_plan', steps: newEvent.plan, isAwaitingApproval: true });
+                        } else if (eventType === 'direct_answer' || eventType === 'final_answer') {
+                            setIsThinking(false);
+                            setIsAwaitingApproval(false);
+                            runContainer.children.push({ type: eventType, content: newEvent.data });
+                            runContainer.isComplete = true;
+                        } else if (eventType === 'agent_event') {
+                            const { name, event: chainEvent, data } = newEvent;
+                            const inputData = data.input || {};
+                            const outputData = data.output || {};
+
+                            let architectPlan = runContainer.children.find(c => c.type === 'architect_plan');
+                            
+                            if (name === 'Site_Foreman' && chainEvent === 'on_chain_start' && architectPlan?.isAwaitingApproval) {
+                                architectPlan.isAwaitingApproval = false;
+                                if (!runContainer.children.some(c => c.type === 'execution_plan')) {
+                                    runContainer.children.push({ type: 'execution_plan', steps: architectPlan.steps.map(step => ({...step, status: 'pending'})) });
                                 }
-                                executionPlan.steps[stepIndex] = stepToUpdate;
+                            }
+
+                            let executionPlan = runContainer.children.find(c => c.type === 'execution_plan');
+                            if (executionPlan) {
+                                const stepIndex = inputData.current_step_index;
+                                if (stepIndex !== undefined && executionPlan.steps[stepIndex]) {
+                                    let stepToUpdate = { ...executionPlan.steps[stepIndex] };
+                                    if (name === 'Site_Foreman' && chainEvent === 'on_chain_start') {
+                                        stepToUpdate.status = 'in-progress';
+                                    } else if (name === 'Project_Supervisor' && chainEvent === 'on_chain_end') {
+                                        stepToUpdate.status = outputData.step_evaluation?.status === 'failure' ? 'failure' : 'completed';
+                                        stepToUpdate.toolCall = inputData.current_tool_call;
+                                        stepToUpdate.toolOutput = outputData.tool_output;
+                                        stepToUpdate.evaluation = outputData.step_evaluation;
+                                        if (handlersRef.current.activeTaskId === newEvent.task_id) { 
+                                            handlersRef.current.fetchWorkspaceFiles(handlersRef.current.activeTaskId);
+                                        }
+                                    }
+                                    executionPlan.steps[stepIndex] = stepToUpdate;
+                                }
                             }
                         }
-                    }
 
-                    taskToUpdate.history = newHistory;
-                    newTasks[taskIndex] = taskToUpdate;
-                    return newTasks;
+                        taskToUpdate.history = newHistory;
+                        newTasks[taskIndex] = taskToUpdate;
+                        return newTasks;
+                    } catch (error) {
+                        console.error("Error processing WebSocket message:", error, "Event:", newEvent);
+                        return currentTasks; // Return original state on error to prevent crash
+                    }
                 });
             };
         }
@@ -391,7 +402,6 @@ export function App() {
         runModelsRef.current = selectedModels;
         
         const newPrompt = { type: 'prompt', content: message };
-        // Create a new incomplete run container for this message
         const newRunContainer = { type: 'run_container', children: [], isComplete: false };
 
         setTasks(currentTasks => currentTasks.map(task => {

@@ -1,17 +1,15 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 9: Final Answer Fix)
+# ResearchAgent Backend Server (Phase 9.2: Handyman Refresh Fix)
 #
-# This version fixes the bug where the final answer from the Editor was not
-# always sent to the UI after a successful run.
+# This version adds the logic to ensure the frontend's file browser updates
+# after a file operation on the Handyman track.
 #
-# 1. Removed `_send_final_answer` Helper: The complex helper function for
-#    parsing the last event has been removed to simplify the logic.
-# 2. Robust Final State Check: Both `run_agent_handler` and
-#    `resume_agent_handler` now use `agent_graph.get_state(config)` after
-#    the stream completes. This is a more reliable way to get the final
-#    result.
-# 3. Direct Answer Transmission: The handlers now directly check for the
-#    presence of the `answer` key in the final state and send it to the client.
+# 1. Smarter Final Message: In `run_agent_handler`, after the stream for a
+#    simple tool use is complete, it inspects the final state.
+# 2. Add `refresh_workspace` Flag: If the `current_track` in the final state
+#    is `SIMPLE_TOOL_USE`, it adds a `refresh_workspace: true` flag to the
+#    `final_answer` message sent to the UI. This tells the frontend to
+#    refresh its workspace view.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -182,7 +180,6 @@ async def run_agent_handler(websocket, data):
     task_id = data.get("task_id")
 
     if not prompt or not task_id:
-        logger.warning(f"Agent run request missing prompt or task_id. Skipping.")
         return
 
     initial_state = { "messages": [HumanMessage(content=prompt)], "llm_config": llm_config, "task_id": task_id }
@@ -192,11 +189,10 @@ async def run_agent_handler(websocket, data):
     
     async for event in agent_graph.astream_events(initial_state, config=config, version="v1"):
         event_type = event["event"]
-        if event_type in ["on_chain_start", "on_chain_end"] and event["name"] in ["Chief_Architect", "Site_Foreman", "Worker", "Project_Supervisor", "Editor", "Librarian"]:
+        if event_type in ["on_chain_start", "on_chain_end"] and event["name"] in ["Chief_Architect", "Handyman", "Site_Foreman", "Worker", "Project_Supervisor", "Editor"]:
             response = {"type": "agent_event", "event": event_type, "name": event["name"], "data": event['data'], "task_id": task_id}
             await websocket.send(json.dumps(response, default=str))
 
-    # After the stream finishes, check if it was due to an interrupt or a normal end.
     current_state = agent_graph.get_state(config)
     next_node = current_state.next if current_state else None
 
@@ -205,11 +201,17 @@ async def run_agent_handler(websocket, data):
         plan = current_state.values.get("plan")
         await websocket.send(json.dumps({"type": "plan_approval_request", "plan": plan, "task_id": task_id}))
     else:
-        # It's a normal finish, check for the final answer in the state
         final_state = agent_graph.get_state(config)
         if final_state and (answer := final_state.values.get("answer")):
-            logger.info(f"Task '{task_id}': Found final answer after initial run. Sending to client.")
-            await websocket.send(json.dumps({"type": "final_answer", "data": answer, "task_id": task_id}))
+            final_answer_message = {"type": "final_answer", "data": answer, "task_id": task_id}
+            
+            # --- THIS IS THE FIX ---
+            # If the completed track was simple tool use, signal the UI to refresh.
+            if final_state.values.get("current_track") == "SIMPLE_TOOL_USE":
+                logger.info(f"Task '{task_id}': Handyman track complete. Sending workspace refresh signal.")
+                final_answer_message["refresh_workspace"] = True
+
+            await websocket.send(json.dumps(final_answer_message))
 
 
 async def resume_agent_handler(websocket, data):
@@ -219,7 +221,6 @@ async def resume_agent_handler(websocket, data):
     new_plan = data.get("plan")
 
     if not task_id or not feedback:
-        logger.warning(f"Resume request missing task_id or feedback. Skipping.")
         return
 
     logger.info(f"Task '{task_id}': Resuming agent with user feedback: '{feedback}'.")
@@ -238,24 +239,20 @@ async def resume_agent_handler(websocket, data):
             response = {"type": "agent_event", "event": event_type, "name": event["name"], "data": event['data'], "task_id": task_id}
             await websocket.send(json.dumps(response, default=str))
     
-    # After the resumed stream ends, check for the final answer
     final_state = agent_graph.get_state(config)
     if final_state and (answer := final_state.values.get("answer")):
-        logger.info(f"Task '{task_id}': Found final answer after resume. Sending to client.")
         await websocket.send(json.dumps({"type": "final_answer", "data": answer, "task_id": task_id}))
 
 
 async def handle_task_create(websocket, data):
-    """Handles the 'task_create' message type."""
     task_id = data.get("task_id")
     if not task_id: return
     logger.info(f"Task '{task_id}': Received create task request.")
     workspace_path = f"/app/workspace/{task_id}"
     os.makedirs(workspace_path, exist_ok=True)
-    logger.info(f"Task '{task_id}': Workspace created at {workspace_path}")
+
 
 async def handle_task_delete(websocket, data):
-    """Handles the 'task_delete' message type."""
     task_id = data.get("task_id")
     if not task_id: return
     logger.info(f"Task '{task_id}': Received delete task request.")
@@ -264,7 +261,6 @@ async def handle_task_delete(websocket, data):
 
 # --- Main WebSocket Router ---
 async def message_router(websocket):
-    """Routes incoming WebSocket messages to the appropriate handler."""
     logger.info(f"Client connected from {websocket.remote_address}")
     try:
         async for message in websocket:
@@ -282,12 +278,10 @@ async def message_router(websocket):
                     await handle_task_delete(websocket, data)
                 else:
                     logger.warning(f"Received unknown message type: '{message_type}'")
-
             except json.JSONDecodeError:
                 logger.error(f"Failed to decode JSON from message: {message}")
             except Exception as e:
                 logger.error(f"Error processing message: {e}", exc_info=True)
-    
     except websockets.exceptions.ConnectionClosed as e:
         logger.info(f"Client disconnected: {e}")
     except Exception as e:
