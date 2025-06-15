@@ -1,28 +1,49 @@
-# ResearchAgent - Project Roadmap
+### Project Vision:
 
-This document outlines the phased development plan for the ResearchAgent project.
+To build a transformative, AI-powered workbench. The platform will be powerful enough for scientific research and general enough for power users, with a core architecture that allows users to easily add their own tools and capabilities. The system is designed for privacy and efficiency, with a clear path to running on local LLMs.
 
-### ✔️ Phase 0-8: Core Engine, Stateful UI & Self-Correction
+### ✅ COMPLETED: Phases 0-9
 
--   \[x\] **Core Backend Engine:** The foundational PCEE architecture with self-correction and escalation logic is stable.
--   \[x\] **Stateful Task Management & UI:** The UI is fully functional, centered on persistent tasks with independent workspaces and a sophisticated, component-based rendering of the agent's activity.
+-   \[x\] **Result:** A stable application with a "Three-Track Brain" for efficient request handling, a robust self-correction loop, and an interactive GUI for approving and modifying complex plans.
 
-### ✔️ Phase 9: The "Three-Track Brain" & Interactive HITL
+### 🚀 UPCOMING PHASES 🚀
 
--   \[x\] **Three-Track Router:** Implemented an intelligent router to classify requests as `DIRECT_QA`, `SIMPLE_TOOL_USE`, or `COMPLEX_PROJECT`.
--   \[x\] **Handyman Path:** Built the new `Handyman` path for efficient single-step tool commands.
--   \[x\] **Unified Editor:** The `Editor` node now serves as the single, consistent voice of the agent for all three tracks.
--   \[x\] **Interactive GUI Plan Editor:** Replaced the raw JSON editing with a user-friendly, per-step GUI editor, allowing users to intuitively modify plans before approval.
--   \[x\] **UI Polish:** Addressed several UI/UX refinements, including cleaning up the settings panel and improving layout consistency.
+#### Phase 10: Foundational Memory & Context
 
-### 🚀 UP NEXT: Phase 10: Advanced Context & Environment
+_Goal: Give the agent a true understanding of conversational context, making it a genuine collaborative partner._
 
--   \[ \] **Full Conversational History:** The complete chat history for a given task will be fed back into the agent's prompts. This is the top priority to give the agent true contextual memory, allowing for iterative work and follow-up commands (e.g., "now refactor the script you just wrote").
--   \[ \] **Smarter Tool Usage:** The agent will learn to use the output of previous steps as input for subsequent steps without explicit user instruction.
--   \[ \] **Python Virtual Environments:** Implement full dependency sandboxing with per-task `.venv` directories to isolate Python tool executions.
+-   \[ \] **Full Conversational History:** Feed the complete chat history for the current task back into the core agent prompts. This is the top priority and a prerequisite for all subsequent features.
 
-### Future Phases
+#### Phase 11: The Secure, Extensible Environment
 
--   \[ \] **Enhanced File Viewer:** Upgrade the workspace file viewer to intelligently render different file types, including images (`.png`, `.jpg`) and potentially PDFs.
--   \[ \] **Real-time Stop/Pause Button:** Implement UI controls to safely interrupt and resume the agent's execution loop.
--   \[ \] **Full Database Integration:** Replace browser `localStorage` with a robust database backend (e.g., SQLite) for persistent tasks and history.
+_Goal: Create an isolated, user-extendable environment for each task, enabling custom tools and robust multi-user support._
+
+-   \[ \] **Per-Task Virtual Environments:** Implement logic to create and use a dedicated Python `.venv` for each task.
+-   \[ \] **Package Manager Tool:** Create a sandboxed tool to safely `pip install` user-requested libraries into the correct task's environment.
+
+#### Phase 12: The Interactive Workbench
+
+_Goal: Transform the workspace from a file list into an active workbench where outputs become the inputs for new actions._
+
+-   \[ \] **Enhanced File Viewer:** Upgrade the file browser to render images (`.png`, `.jpg`), Markdown, and potentially PDFs directly in the UI.
+-   \[ \] **Interactive Artifacts:** Add contextual "action" buttons next to files (e.g., "Analyze", "Run", "Visualize") that pre-populate the chat prompt with a relevant command, creating a seamless workflow.
+
+#### Phase 13: The "Tool Forge" - A Pluggable Tool Architecture
+
+_Goal: Allow users to create and add their own tools to the ResearchAgent without writing any backend code._
+
+-   \[ \] **Tool Creator UI:** Build a "Tool Forge" section in the UI where users can define a tool's name, description, and input arguments via a simple form.
+-   \[ \] **Dynamic Tool Generation:** The backend will take the user's definition and dynamically generate the corresponding Python tool file, making it instantly available to the agent.
+-   \[ \] **Async Job Queue:** Implement a background task queue to handle tools marked as "long-running." The UI will poll for status updates, allowing users to track progress and get results without locking up the interface.
+
+#### Phase 14: Advanced Tooling & Templates
+
+_Goal: Equip the agent with a suite of powerful, pre-built tools for common high-value tasks._
+
+-   \[ \] **Multi-Document Reporter Tool:** A tool that can synthesize information from multiple text files or PDFs.
+-   \[ \] **Scientific Data Fetcher Tool:** A specialized tool to find and download datasets from sources like NCBI, PubMed, etc.
+-   \[ \] **Website Report Generator:** A tool that can populate pre-defined website templates with data to create visual reports.
+
+This roadmap is ambitious and exciting. It lays out a clear path from where we are now to the truly powerful platform you envision.
+
+What do you think? Shall we proceed with **Phase 10: Full Conversational History** as our immediate next step?
