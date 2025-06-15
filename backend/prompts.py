@@ -1,20 +1,43 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Prompts (Phase 10.2: Conversational Memory)
+# ResearchAgent Prompts (Phase 10.3: History Summarization)
 #
-# This file is updated to make the agent's "brain" nodes aware of the
-# conversation history.
+# This file is updated to include a new prompt specifically for the history
+# summarization task.
 #
-# 1. New `{chat_history}` Variable: The three key prompt templates now accept
-#    a `chat_history` variable.
-# 2. Updated Instructions: The prompts for the Router, Handyman, and Chief
-#    Architect are explicitly instructed to consider the conversation history
-#    before analyzing the user's latest input. This allows the agent to
-#    understand follow-up commands and context.
+# 1. New `summarizer_prompt_template`: This new template is designed to
+#    instruct a powerful LLM (The Editor) to read a potentially long and
+#    complex conversation history and distill it into a concise summary.
+#    The goal is to retain all critical facts, decisions, and outcomes that
+#    are necessary for the agent to maintain context in future turns.
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
 
-# 1. Three-Track Router Prompt
+# --- NEW PROMPT ---
+# 1. Summarizer Prompt
+summarizer_prompt_template = PromptTemplate.from_template(
+    """
+You are an expert conversation summarizer. Your task is to read the following conversation history and create a concise summary.
+
+The summary must capture all critical information, including:
+- Key facts that were discovered or mentioned.
+- Important decisions made by the user or the AI.
+- Files that were created, read, or modified.
+- The outcomes of any tools that were used.
+- Any specific data points, figures, or names that were part of the conversation.
+
+The goal is to produce a summary that is dense with information, so a new AI agent can read it and have all the necessary context to continue the conversation without having access to the full history.
+
+Conversation to Summarize:
+---
+{conversation}
+---
+
+Your Output (must be a concise, information-dense paragraph):
+"""
+)
+
+# 2. Three-Track Router Prompt
 router_prompt_template = PromptTemplate.from_template(
     """
 You are an expert request router. Your job is to classify the user's latest request into one of three categories based on the conversation history and the tools required.
@@ -48,7 +71,7 @@ You are an expert request router. Your job is to classify the user's latest requ
 """
 )
 
-# 2. Handyman Prompt
+# 3. Handyman Prompt
 handyman_prompt_template = PromptTemplate.from_template(
     """
 You are an expert "Handyman" agent. Your job is to take a user's latest request, consider the conversation history, and convert it into a single, valid JSON tool call.
@@ -91,7 +114,7 @@ You are an expert "Handyman" agent. Your job is to take a user's latest request,
 )
 
 
-# 3. Structured Planner Prompt
+# 4. Structured Planner Prompt
 structured_planner_prompt_template = PromptTemplate.from_template(
     """
 You are an expert architect and planner. Your job is to create a detailed,
@@ -155,7 +178,7 @@ taking into account the entire conversation history.
 """
 )
 
-# 4. Controller Prompt
+# 5. Controller Prompt
 controller_prompt_template = PromptTemplate.from_template(
     """
 You are an expert controller agent. Your job is to select the most appropriate
@@ -203,7 +226,7 @@ tool to execute the given step of a plan, based on the history of previous steps
 """
 )
 
-# 5. Evaluator Prompt
+# 6. Evaluator Prompt
 evaluator_prompt_template = PromptTemplate.from_template(
     """
 You are an expert evaluator. Your job is to assess the outcome of a tool's
@@ -248,7 +271,7 @@ execution and determine if the step was successful.
 """
 )
 
-# 6. Final Answer Synthesis Prompt
+# 7. Final Answer Synthesis Prompt
 final_answer_prompt_template = PromptTemplate.from_template(
     """
 You are the final, user-facing voice of the ResearchAgent. Your role is to act as an expert editor.
@@ -275,7 +298,7 @@ Your task is to synthesize all the information from the history into a single, c
 """
 )
 
-# 7. Correction Planner Prompt
+# 8. Correction Planner Prompt
 correction_planner_prompt_template = PromptTemplate.from_template(
     """
 You are an expert troubleshooter and correction planner. A step in a larger plan has failed.
