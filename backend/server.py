@@ -1,16 +1,17 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 9: HITL Integration)
+# ResearchAgent Backend Server (Phase 9: Final Answer Fix)
 #
-# This version updates the server to handle the Human-in-the-Loop workflow.
+# This version fixes the bug where the final answer from the Editor was not
+# always sent to the UI after a successful run.
 #
-# 1. New Message Types: The server now understands `resume_agent` messages,
-#    which are sent from the frontend when a user approves, rejects, or
-#    modifies a plan.
-# 2. State-Aware Handlers: The `run_agent_handler` now detects when the graph
-#    is interrupted and sends a `plan_approval_request` to the UI.
-# 3. New `resume_agent_handler`: This new handler takes the user's feedback,
-#    updates the graph's state accordingly, and then resumes the agent's
-#    execution from the interruption point.
+# 1. Removed `_send_final_answer` Helper: The complex helper function for
+#    parsing the last event has been removed to simplify the logic.
+# 2. Robust Final State Check: Both `run_agent_handler` and
+#    `resume_agent_handler` now use `agent_graph.get_state(config)` after
+#    the stream completes. This is a more reliable way to get the final
+#    result.
+# 3. Direct Answer Transmission: The handlers now directly check for the
+#    presence of the `answer` key in the final state and send it to the client.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -174,29 +175,6 @@ def run_http_server():
 
 # --- WebSocket Handlers ---
 
-async def _send_final_answer(websocket, task_id, final_event):
-    """Helper to extract and send the final answer from the graph's output."""
-    if not final_event or final_event.get("event") != "on_chain_end":
-        return
-        
-    final_output = final_event.get("data", {}).get("output")
-    answer, answer_type = None, None
-    if isinstance(final_output, list):
-        for node_output in final_output:
-            if isinstance(node_output, dict):
-                if 'Librarian' in node_output:
-                    answer = node_output.get('Librarian', {}).get('answer')
-                    answer_type = "direct_answer"
-                    break
-                elif 'Editor' in node_output:
-                    answer = node_output.get('Editor', {}).get('answer')
-                    answer_type = "final_answer"
-                    break
-    if answer and answer_type:
-        logger.info(f"Task '{task_id}': Found answer of type '{answer_type}'. Sending to client.")
-        await websocket.send(json.dumps({"type": answer_type, "data": answer, "task_id": task_id}))
-
-
 async def run_agent_handler(websocket, data):
     """Handles the initial 'run_agent' message type and starts the graph execution."""
     prompt = data.get("prompt")
@@ -208,13 +186,11 @@ async def run_agent_handler(websocket, data):
         return
 
     initial_state = { "messages": [HumanMessage(content=prompt)], "llm_config": llm_config, "task_id": task_id }
-    config = {"recursion_limit": 100, "configurable": {"thread_id": task_id}} # Use task_id as thread_id
+    config = {"recursion_limit": 100, "configurable": {"thread_id": task_id}}
 
     logger.info(f"Task '{task_id}': Invoking agent with prompt: {prompt[:100]}...")
     
-    last_event = None
     async for event in agent_graph.astream_events(initial_state, config=config, version="v1"):
-        last_event = event
         event_type = event["event"]
         if event_type in ["on_chain_start", "on_chain_end"] and event["name"] in ["Chief_Architect", "Site_Foreman", "Worker", "Project_Supervisor", "Editor", "Librarian"]:
             response = {"type": "agent_event", "event": event_type, "name": event["name"], "data": event['data'], "task_id": task_id}
@@ -229,14 +205,18 @@ async def run_agent_handler(websocket, data):
         plan = current_state.values.get("plan")
         await websocket.send(json.dumps({"type": "plan_approval_request", "plan": plan, "task_id": task_id}))
     else:
-        await _send_final_answer(websocket, task_id, last_event)
+        # It's a normal finish, check for the final answer in the state
+        final_state = agent_graph.get_state(config)
+        if final_state and (answer := final_state.values.get("answer")):
+            logger.info(f"Task '{task_id}': Found final answer after initial run. Sending to client.")
+            await websocket.send(json.dumps({"type": "final_answer", "data": answer, "task_id": task_id}))
 
 
 async def resume_agent_handler(websocket, data):
     """Handles resuming the agent after a human-in-the-loop interruption."""
     task_id = data.get("task_id")
-    feedback = data.get("feedback") # "approve" or "reject"
-    new_plan = data.get("plan") # Optional modified plan
+    feedback = data.get("feedback")
+    new_plan = data.get("plan")
 
     if not task_id or not feedback:
         logger.warning(f"Resume request missing task_id or feedback. Skipping.")
@@ -245,26 +225,24 @@ async def resume_agent_handler(websocket, data):
     logger.info(f"Task '{task_id}': Resuming agent with user feedback: '{feedback}'.")
     config = {"recursion_limit": 100, "configurable": {"thread_id": task_id}}
     
-    # Prepare the state update based on user feedback
     update_values = {"user_feedback": feedback}
     if new_plan and isinstance(new_plan, list):
         logger.info(f"Task '{task_id}': User provided a modified plan.")
         update_values["plan"] = new_plan
 
-    # Update the graph's state before resuming
     agent_graph.update_state(config, update_values)
     
-    # Resume the agent by invoking the stream with None
-    last_event = None
     async for event in agent_graph.astream_events(None, config=config, version="v1"):
-        last_event = event
         event_type = event["event"]
         if event_type in ["on_chain_start", "on_chain_end"] and event["name"] in ["Site_Foreman", "Worker", "Project_Supervisor", "Editor"]:
             response = {"type": "agent_event", "event": event_type, "name": event["name"], "data": event['data'], "task_id": task_id}
             await websocket.send(json.dumps(response, default=str))
     
-    # After the resumed stream ends, send the final answer
-    await _send_final_answer(websocket, task_id, last_event)
+    # After the resumed stream ends, check for the final answer
+    final_state = agent_graph.get_state(config)
+    if final_state and (answer := final_state.values.get("answer")):
+        logger.info(f"Task '{task_id}': Found final answer after resume. Sending to client.")
+        await websocket.send(json.dumps({"type": "final_answer", "data": answer, "task_id": task_id}))
 
 
 async def handle_task_create(websocket, data):
@@ -296,7 +274,7 @@ async def message_router(websocket):
 
                 if message_type == "run_agent":
                     await run_agent_handler(websocket, data)
-                elif message_type == "resume_agent": # NEW ROUTE
+                elif message_type == "resume_agent":
                     await resume_agent_handler(websocket, data)
                 elif message_type == "task_create":
                     await handle_task_create(websocket, data)
