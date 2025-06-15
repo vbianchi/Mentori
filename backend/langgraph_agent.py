@@ -1,22 +1,21 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 9.2: Handyman Track)
+# ResearchAgent Core Agent (Phase 10.1: Conversational Memory)
 #
-# This version implements the "Handyman" track for simple, single-step tool
-# use, completing the core logic for the "Three-Track Brain".
+# This version implements the foundational logic for conversational memory,
+# which is the primary goal of Phase 10.
 #
-# 1. New `handyman_node`: This node is added to handle requests on the
-#    `SIMPLE_TOOL_USE` track. It uses a dedicated prompt to formulate a
-#    single tool call.
-# 2. New `current_track` State: The `GraphState` now includes a `current_track`
-#    field, which is set by the router. This allows downstream components to
-#    know which path is active.
-# 3. Enhanced `worker_node`: Now creates a simple history log when run as part
-#    of the Handyman track for the Editor to use.
-# 4. New `after_worker_router`: This conditional edge is added after the
-#    `worker_node`. It checks the `current_track` to correctly route to the
-#    `Project_Supervisor` (for complex plans) or directly to the `Editor`
-#    (for simple tool use).
-# 5. Updated Graph: The graph is fully wired to support all three tracks.
+# 1. New `_format_messages` Helper Function: A new utility is added to
+#    convert the list of `BaseMessage` objects from the graph's state into a
+#    clean, human-readable string format (e.g., "Human: ...\nAI: ...").
+# 2. History-Aware Nodes: The three key "thinking" nodes are now refactored
+#    to be history-aware:
+#    - `initial_router_node`
+#    - `handyman_node`
+#    - `chief_architect_node`
+# 3. Updated Prompt Formatting: Each of these nodes now calls the new
+#    `_format_messages` function and passes the resulting `chat_history` string
+#    into its respective prompt template. This is a prerequisite for the
+#    prompts themselves to be updated to handle this new variable.
 # -----------------------------------------------------------------------------
 
 import os
@@ -25,7 +24,7 @@ import json
 import re
 from typing import TypedDict, Annotated, Sequence, List, Optional, Dict
 
-from langchain_core.messages import BaseMessage, HumanMessage
+from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.chat_models import ChatOllama
 from langgraph.graph import StateGraph, END
@@ -69,7 +68,7 @@ class GraphState(TypedDict):
     plan_retries: int
     user_feedback: Optional[str]
     route: str
-    current_track: str # NEW: To track which of the 3 paths is active
+    current_track: str
 
 # --- LLM Provider Helper ---
 LLM_CACHE = {}
@@ -93,11 +92,32 @@ SANDBOXED_TOOLS = {"write_file", "read_file", "list_files", "workspace_shell"}
 def format_tools_for_prompt():
     return "\n".join([f"  - {tool.name}: {tool.description}" for tool in AVAILABLE_TOOLS])
 
+# --- NEW: History Formatting Helper ---
+def _format_messages(messages: Sequence[BaseMessage]) -> str:
+    """Formats a list of messages into a human-readable string."""
+    formatted_messages = []
+    # We start from the first message, skipping any initial system messages if they exist
+    # The actual conversation starts with the first HumanMessage.
+    first_human_message_index = next((i for i, msg in enumerate(messages) if isinstance(msg, HumanMessage)), -1)
+    if first_human_message_index == -1:
+        return "No conversation history yet."
+
+    for msg in messages[first_human_message_index:]:
+        role = "Human" if isinstance(msg, HumanMessage) else "AI" if isinstance(msg, AIMessage) else "System"
+        formatted_messages.append(f"{role}: {msg.content}")
+    
+    # We only want to return the history *before* the current user request.
+    # The 'input' field in the state holds the most recent request.
+    return "\n".join(formatted_messages[:-1]) if len(formatted_messages) > 1 else "No prior conversation history for this task."
+
+
 # --- Graph Nodes ---
 def task_setup_node(state: GraphState):
     """Creates the workspace and initializes state."""
     task_id = state.get("task_id")
     logger.info(f"Task '{task_id}': Executing Task_Setup")
+    # The 'messages' list is now the primary source of truth for conversation history.
+    # The last message is the current user input.
     user_message = state['messages'][-1].content
     
     workspace_path = f"/app/workspace/{task_id}"
@@ -113,10 +133,17 @@ def task_setup_node(state: GraphState):
 def initial_router_node(state: GraphState):
     """Classifies the request and saves the decision to the state."""
     task_id = state.get("task_id")
-    logger.info(f"Task '{task_id}': Executing Three-Track Router")
+    logger.info(f"Task '{task_id}': Executing Three-Track Router with history.")
     llm = get_llm(state, "ROUTER_LLM_ID", "gemini::gemini-1.5-flash-latest")
     
-    prompt = router_prompt_template.format(input=state["input"], tools=format_tools_for_prompt())
+    # NEW: Format the history and pass it to the prompt
+    chat_history = _format_messages(state['messages'])
+    prompt = router_prompt_template.format(
+        chat_history=chat_history, 
+        input=state["input"], 
+        tools=format_tools_for_prompt()
+    )
+    
     response = llm.invoke(prompt)
     decision = response.content.strip()
     
@@ -135,10 +162,17 @@ def initial_router_node(state: GraphState):
 def handyman_node(state: GraphState):
     """Formulates a single tool call for simple requests."""
     task_id = state.get("task_id")
-    logger.info(f"Task '{task_id}': Track 2 (Simple Tool Use) -> Handyman")
-    llm = get_llm(state, "SITE_FOREMAN_LLM_ID", "gemini::gemini-1.5-flash-latest") # Reuse Foreman model
+    logger.info(f"Task '{task_id}': Track 2 (Simple Tool Use) -> Handyman with history")
+    llm = get_llm(state, "SITE_FOREMAN_LLM_ID", "gemini::gemini-1.5-flash-latest")
+
+    # NEW: Format the history and pass it to the prompt
+    chat_history = _format_messages(state['messages'])
+    prompt = handyman_prompt_template.format(
+        chat_history=chat_history,
+        input=state["input"], 
+        tools=format_tools_for_prompt()
+    )
     
-    prompt = handyman_prompt_template.format(input=state["input"], tools=format_tools_for_prompt())
     response = llm.invoke(prompt)
     try:
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL)
@@ -153,9 +187,17 @@ def handyman_node(state: GraphState):
 def chief_architect_node(state: GraphState):
     """Generates the structured plan for complex projects."""
     task_id = state.get("task_id")
-    logger.info(f"Task '{task_id}': Track 3 (Complex Project) -> Chief_Architect")
+    logger.info(f"Task '{task_id}': Track 3 (Complex Project) -> Chief_Architect with history")
     llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-flash-latest")
-    prompt = structured_planner_prompt_template.format(input=state["input"], tools=format_tools_for_prompt())
+
+    # NEW: Format the history and pass it to the prompt
+    chat_history = _format_messages(state['messages'])
+    prompt = structured_planner_prompt_template.format(
+        chat_history=chat_history,
+        input=state["input"], 
+        tools=format_tools_for_prompt()
+    )
+
     response = llm.invoke(prompt)
     try:
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL)
@@ -228,7 +270,6 @@ async def worker_node(state: GraphState):
         output = await tool.ainvoke(final_args)
         output_str = str(output)
 
-        # If this was a simple tool use, create a history entry for the Editor
         if state.get("current_track") == "SIMPLE_TOOL_USE":
             history_record = (
                 f"Handyman Action: User requested '{state['input']}'.\n"
@@ -293,24 +334,31 @@ def editor_node(state: GraphState):
     logger.info(f"Task '{task_id}': Unified Editor generating final answer.")
     llm = get_llm(state, "EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
     
-    history_str = "\n".join(state.get("history", []))
+    # The 'history' list now contains detailed step-by-step execution logs for complex plans,
+    # or a summary of the single action for simple tool use.
+    execution_history = "\n".join(state.get("history", []))
     
-    if not history_str or state.get("user_feedback") == "reject":
+    # For Direct Q&A, there's no execution history.
+    if not execution_history:
         if state.get("user_feedback") == "reject":
-            history_str = "The user rejected the proposed plan."
+            final_prompt = "The user rejected the proposed plan. Inform them that the operation was cancelled."
         else:
             logger.info(f"Task '{task_id}': Editor handling as Direct Q&A.")
+            # We now pass the whole message history to the editor for a more contextual direct answer
             response = llm.invoke(state["messages"])
-            return {"answer": response.content}
-
-    logger.info(f"Task '{task_id}': Editor summarizing history.")
-    prompt = final_answer_prompt_template.format(input=state["input"], history=history_str)
+            # The final answer is also added to the message history to complete the turn
+            return {"answer": response.content, "messages": [AIMessage(content=response.content)]}
+    
+    logger.info(f"Task '{task_id}': Editor summarizing execution history.")
+    # For summarizing tool use, we provide the original input and the execution history
+    prompt = final_answer_prompt_template.format(input=state["input"], history=execution_history)
     response = llm.invoke(prompt)
-    return {"answer": response.content}
+    # The final answer is also added to the message history to complete the turn
+    return {"answer": response.content, "messages": [AIMessage(content=response.content)]}
+
 
 def correction_planner_node(state: GraphState):
     """Creates a new plan to fix a failed step."""
-    # (No changes to this node's logic)
     task_id = state.get("task_id")
     logger.info(f"Task '{task_id}': Executing Correction_Planner.")
     failed_step_details = state["plan"][state["current_step_index"]]
@@ -352,7 +400,10 @@ def after_plan_creation_router(state: GraphState) -> str:
     if state.get("user_feedback") == "approve":
         return "Site_Foreman"
     else:
-        return "Editor"
+        # If the user rejects the plan, we add a final AI message to the history
+        # before ending the run.
+        rejection_message = "The user rejected the plan. I will now end this operation."
+        return {"messages": [AIMessage(content=rejection_message)], "route": "Editor"}
 
 def after_plan_step_router(state: GraphState) -> str:
     """Routes after a complex plan step is evaluated."""
@@ -375,7 +426,7 @@ def create_agent_graph():
     
     workflow.add_node("Task_Setup", task_setup_node)
     workflow.add_node("initial_router_node", initial_router_node)
-    workflow.add_node("Handyman", handyman_node) # NEW
+    workflow.add_node("Handyman", handyman_node)
     workflow.add_node("Chief_Architect", chief_architect_node)
     workflow.add_node("human_in_the_loop_node", human_in_the_loop_node)
     workflow.add_node("Site_Foreman", site_foreman_node)
@@ -397,7 +448,6 @@ def create_agent_graph():
     # Track 2: Simple Tool Use
     workflow.add_edge("Handyman", "Worker")
 
-    # NEW: Router after the worker node
     workflow.add_conditional_edges(
         "Worker", after_worker_router,
         {"Editor": "Editor", "Project_Supervisor": "Project_Supervisor"}
@@ -411,7 +461,6 @@ def create_agent_graph():
     
     # Execution Loop (for Track 3)
     workflow.add_edge("Site_Foreman", "Worker")
-    # Note: The edge from Worker is now conditional (see above)
     workflow.add_edge("Advance_To_Next_Step", "Site_Foreman")
     workflow.add_edge("Correction_Planner", "Site_Foreman")
     workflow.add_conditional_edges("Project_Supervisor", after_plan_step_router, {
@@ -426,7 +475,7 @@ def create_agent_graph():
         checkpointer=MemorySaver(),
         interrupt_before=["human_in_the_loop_node"]
     )
-    logger.info("ResearchAgent graph compiled with full Three-Track Brain logic.")
+    logger.info("ResearchAgent graph compiled with conversational memory logic.")
     return agent
 
 agent_graph = create_agent_graph()

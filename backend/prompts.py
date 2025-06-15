@@ -1,12 +1,15 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Prompts (Phase 9.2: Handyman)
+# ResearchAgent Prompts (Phase 10.2: Conversational Memory)
 #
-# This file contains the prompts for the ResearchAgent.
+# This file is updated to make the agent's "brain" nodes aware of the
+# conversation history.
 #
-# 1. New `handyman_prompt_template`: This prompt is added to support the new
-#    "Handyman" node. It is specifically designed to guide an LLM to take
-#    a simple, direct user command and convert it into a single, executable
-#    JSON tool call, without the need for multi-step planning.
+# 1. New `{chat_history}` Variable: The three key prompt templates now accept
+#    a `chat_history` variable.
+# 2. Updated Instructions: The prompts for the Router, Handyman, and Chief
+#    Architect are explicitly instructed to consider the conversation history
+#    before analyzing the user's latest input. This allows the agent to
+#    understand follow-up commands and context.
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
@@ -14,7 +17,10 @@ from langchain_core.prompts import PromptTemplate
 # 1. Three-Track Router Prompt
 router_prompt_template = PromptTemplate.from_template(
     """
-You are an expert request router. Your job is to classify the user's request into one of three categories based on its complexity and the tools required.
+You are an expert request router. Your job is to classify the user's latest request into one of three categories based on the conversation history and the tools required.
+
+**Conversation History:**
+{chat_history}
 
 **Available Tools:**
 {tools}
@@ -27,11 +33,11 @@ You are an expert request router. Your job is to classify the user's request int
 3.  **COMPLEX_PROJECT**: For requests that require multiple steps, planning, or the use of several tools in a sequence to achieve the final goal.
     -   Examples: "Research the market for electric vehicles and write a summary report.", "Create a python script to fetch data from an API and save it to a CSV file.", "Find the top 3 competitors to LangChain and create a feature comparison table."
 
-**User Request:**
+**User's Latest Request:**
 {input}
 
 **Instructions:**
-- Analyze the user's request and the list of available tools.
+- Analyze the user's latest request in the context of the conversation history and the list of available tools.
 - Based on your analysis, you must respond with ONLY ONE of the following three strings:
   - "DIRECT_QA"
   - "SIMPLE_TOOL_USE"
@@ -42,19 +48,23 @@ You are an expert request router. Your job is to classify the user's request int
 """
 )
 
-# --- NEW: Handyman Prompt ---
+# 2. Handyman Prompt
 handyman_prompt_template = PromptTemplate.from_template(
     """
-You are an expert "Handyman" agent. Your job is to take a simple user request and convert it into a single, valid JSON tool call.
+You are an expert "Handyman" agent. Your job is to take a user's latest request, consider the conversation history, and convert it into a single, valid JSON tool call.
 
-**User Request:**
+**Conversation History:**
+{chat_history}
+
+**User's Latest Request:**
 {input}
 
 **Available Tools:**
 {tools}
 
 **Instructions:**
-- Analyze the user's request and select the single most appropriate tool from the "Available Tools" list.
+- Analyze the user's latest request in the context of the conversation history.
+- Select the single most appropriate tool from the "Available Tools" list.
 - Your output must be a single, valid JSON object representing the tool call. It must contain the "tool_name" and the correct "tool_input" for that tool.
 - Do not add any conversational fluff or explanation. Your output must be ONLY the JSON object.
 
@@ -73,7 +83,7 @@ You are an expert "Handyman" agent. Your job is to take a simple user request an
 
 **Begin!**
 
-**User Request:**
+**User's Latest Request:**
 {input}
 
 **Your Output (must be a single JSON object):**
@@ -85,16 +95,20 @@ You are an expert "Handyman" agent. Your job is to take a simple user request an
 structured_planner_prompt_template = PromptTemplate.from_template(
     """
 You are an expert architect and planner. Your job is to create a detailed,
-step-by-step execution plan in JSON format to fulfill the user's request.
+step-by-step execution plan in JSON format to fulfill the user's latest request,
+taking into account the entire conversation history.
 
-**User Request:**
+**Conversation History:**
+{chat_history}
+
+**User's Latest Request:**
 {input}
 
 **Available Tools:**
 {tools}
 
 **Instructions:**
-- Analyze the user's request and the available tools.
+- Analyze the user's request and the available tools in the context of the full conversation history.
 - Decompose the request into a sequence of logical steps.
 - For each step, you must specify:
   - "step_id": A unique integer for the step (e.g., 1, 2, 3).
@@ -134,7 +148,7 @@ step-by-step execution plan in JSON format to fulfill the user's request.
 
 **Begin!**
 
-**User Request:**
+**User's Latest Request:**
 {input}
 
 **Your Output (must be a single JSON object):**
@@ -192,9 +206,9 @@ tool to execute the given step of a plan, based on the history of previous steps
 # 5. Evaluator Prompt
 evaluator_prompt_template = PromptTemplate.from_template(
     """
-You are an expert evaluator.
-Your job is to assess the outcome of a tool's
+You are an expert evaluator. Your job is to assess the outcome of a tool's
 execution and determine if the step was successful.
+
 **Plan Step:**
 {current_step}
 
@@ -206,9 +220,7 @@ execution and determine if the step was successful.
 
 **Instructions:**
 - **Critically assess** if the `Tool's Output` **fully and completely satisfies** the `Plan Step`'s instruction.
-- **Do not just check for a successful exit code or the presence of output.** You must verify that the *substance* of the output achieves the step's goal.
-For example, if the step was to find a specific fact, does the output actually contain that fact?
-If not, you must declare it a failure.
+- **Do not just check for a successful exit code or the presence of output.** You must verify that the *substance* of the output achieves the step's goal. For example, if the step was to find a specific fact, does the output actually contain that fact? If not, you must declare it a failure.
 - Your output must be a single, valid JSON object containing a "status" key (which can be "success" or "failure") and a "reasoning" key with a brief explanation.
 - Do not add any conversational fluff or explanation. Your output must be ONLY the JSON object.
 ---
@@ -256,8 +268,7 @@ Your task is to synthesize all the information from the history into a single, c
 3.  Synthesize this information into a clear and coherent response that directly answers the user's original request.
 4.  If the process failed or was unable to find a definitive answer, explain what happened based on the history, and provide the most helpful information you could find.
 5.  Format your answer in clean markdown.
-6.  Do not output JSON or any other machine-readable format.
-Your output must be only the final, human-readable text for the user.
+6.  Do not output JSON or any other machine-readable format. Your output must be only the final, human-readable text for the user.
 **Begin!**
 
 **Final Answer:**
@@ -291,7 +302,6 @@ Your job is to analyze the failure and create a *new, single-step plan* to fix t
 - This might mean retrying the same tool with different input, or using a different tool to achieve the goal of the failed step.
 - Your output must be a single, valid JSON object representing this new, single-step plan. It must follow the exact same format as the original plan's steps.
 - Do not add any conversational fluff or explanation. Your output must be ONLY the JSON object.
-
 ---
 **Example Scenario:**
 - **Failed Step:** "Write an article about the new 'Super-Car' to a file named 'car.txt'."
