@@ -1,23 +1,27 @@
+```
 # ResearchAgent: An Advanced AI-Powered Research Assistant
 
 ## 1. Overview
 
-ResearchAgent is a sophisticated, AI-powered agent designed to handle complex, multi-step tasks in software engineering and scientific research. Built with a Python/LangGraph backend and a modern JavaScript frontend (Vite + Preact), it leverages a unique **Plan-Controller-Executor-Evaluator (PCEE)** architecture to autonomously create, execute, and evaluate structured plans to fulfill high-level user requests.
+ResearchAgent is a sophisticated, AI-powered agent designed to handle complex, multi-step tasks in software engineering and scientific research. Built with a Python/LangGraph backend and a modern JavaScript frontend (Vite + Preact), it leverages a unique **"Three-Track Brain"** architecture to autonomously classify, plan, and execute high-level user requests.
 
-The core philosophy is built on **transparency, adaptive execution, and security**. The agent first uses a `Router` to determine if a request requires a simple answer or a complex plan. For complex tasks, it generates a detailed blueprint and executes it step-by-step within a secure, sandboxed workspace for each persistent task. It is designed to understand the outcome of its actions and has a foundational architecture for future self-correction and human-in-the-loop collaboration.
+The core philosophy is built on **transparency, adaptive execution, and security**. The agent first uses a `Router` to determine if a request is a simple question, a single tool command, or a complex project. For complex tasks, it generates a detailed blueprint which the user can interactively edit and approve before execution begins within a secure, sandboxed workspace.
 
 ## 2. Key Features
 
 -   **Stateful, Multi-Turn Tasks:** The application is built around persistent tasks. Users can create, rename, delete, and switch between tasks, with each one maintaining its own independent chat history and sandboxed workspace.
--   **Advanced PCEE Architecture:** A robust, multi-node graph that separates routing, planning, control, execution, and evaluation for complex task management.
--   **Structured JSON Planning:** The agent's "Chief Architect" (Planner) generates detailed JSON-based plans, which are presented to the user for review before execution begins.
+-   **"Three-Track Brain" Architecture:** For maximum efficiency, an intelligent router classifies requests:
+    -   **Direct Q&A:** Simple questions are answered directly by the `Editor`.
+    -   **Simple Tool Use:** Single commands are executed by a lightweight `Handyman` agent.
+    -   **Complex Projects:** Multi-step tasks engage the full "Company Model" for robust planning and execution.
+-   **Interactive GUI Plan Editor:** For complex projects, the agent presents its plan in a user-friendly GUI. Users can edit instructions, change tools for each step, add or remove steps, and then approve the final plan before execution.
 -   **Secure Sandboxed Workspaces:** Every task is assigned a unique, isolated directory, ensuring security and preventing state-collision between different tasks.
 -   **Modular & Resilient Tools:** A flexible tool system allows for easy addition of new capabilities. Current tools include web search, a sandboxed file system (read, write, list), and a sandboxed shell.
 -   **Interactive & Transparent Frontend:** A responsive user interface built with Preact and Vite, designed to provide clear, real-time visibility into the agent's complex operations.
     -   **Hierarchical Agent Trace:** See the agent's thought process as a clear, threaded conversation. The UI visualizes the handoff from the "Chief Architect's" plan, to the "Site Foreman's" execution log, to the "Editor's" final summary.
     -   **Live Step Execution:** Watch each step of the plan update in real-time from "pending" to "in-progress" to "completed" or "failed".
     -   **Task Management Panel:** A dedicated sidebar for managing the entire lifecycle of your research tasks.
-    -   **Dynamic Model Selection:** Configure the LLM for each agent role (Router, Planner, etc.) directly from the UI.
+    -   **Dynamic Model Selection:** Configure the LLM for each agent role directly from the UI.
     -   **Interactive Workspace & Artifact Viewer:** Browse, view, and upload files directly within the agent's sandboxed workspace for each task.
 
 ## 3. Project Structure
@@ -32,7 +36,7 @@ The core philosophy is built on **transparency, adaptive execution, and security
 
 │ │ ├── ... (Modular tool files)
 
-│ ├── langgraph\_agent.py # Core PCEE agent logic
+│ ├── langgraph\_agent.py # Core agent logic
 
 │ ├── prompts.py # Centralized prompts for all agent nodes
 
@@ -64,19 +68,13 @@ The core philosophy is built on **transparency, adaptive execution, and security
 
 ├── .gitignore # Specifies files to ignore for version control
 
-├── BRAINSTORM.md # Document for future ideas
-
 ├── docker-compose.yml # Orchestrates the Docker container
 
 ├── Dockerfile # Defines the application's Docker image
 
 ├── package.json # Frontend dependencies and scripts
 
-├── PCEE\_ARCHITECTURE.md # Document detailing the agent's design
-
-├── tailwind.config.js # Tailwind CSS configuration
-
-└── ROADMAP.md # Project development plan
+└── tailwind.config.js # Tailwind CSS configuration
 
 ```
 
@@ -96,6 +94,7 @@ You will need two separate terminals to run the backend and frontend servers.
 
 ### Step 2: Frontend Server
 
-1.  **Install Dependencies:** In your second terminal, run `npm install`. This is crucial to install all dependencies, including the Tailwind CSS typography plugin.
+1.  **Install Dependencies:** In your second terminal, run `npm install`.
 2.  **Run the Frontend:** Run `npm run dev`.
 3.  **Access the Application:** Open your browser and navigate to the local URL provided by Vite (usually `http://localhost:5173`).
+```
