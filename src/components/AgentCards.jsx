@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useState } from 'preact/hooks';
+import { useState, useEffect } from 'preact/hooks';
 import { ArchitectIcon, CheckCircleIcon, ChevronDownIcon, CircleDotIcon, EditorIcon, ForemanIcon, LibrarianIcon, LoaderIcon, SupervisorIcon, WorkerIcon, XCircleIcon, ChevronsRightIcon } from './Icons';
 import { CopyButton } from './Common';
 
@@ -45,14 +45,61 @@ const StepCard = ({ step }) => {
     );
 };
 
-export const ArchitectCard = ({ plan }) => (
-    <AgentResponseCard icon={<ArchitectIcon class="h-5 w-5" />} title="The Chief Architect">
-        <h4 class="text-sm font-bold text-gray-400 mb-2">Proposed Plan</h4>
-        <ul class="list-decimal list-inside text-gray-300 space-y-1">
-            {plan.steps.map(step => <li key={step.step_id}>{step.instruction}</li>)}
-        </ul>
-    </AgentResponseCard>
-);
+// --- UPDATED ArchitectCard with HITL capabilities ---
+export const ArchitectCard = ({ plan, isAwaitingApproval, onApprove, onReject, onModify }) => {
+    const [planText, setPlanText] = useState(JSON.stringify(plan.steps, null, 2));
+
+    // Effect to update the textarea if the plan prop changes from outside
+    useEffect(() => {
+        setPlanText(JSON.stringify(plan.steps, null, 2));
+    }, [plan]);
+
+    const handleModify = () => {
+        try {
+            const modifiedPlan = JSON.parse(planText);
+            // Basic validation
+            if (Array.isArray(modifiedPlan)) {
+                onModify(modifiedPlan);
+            } else {
+                alert("Invalid format. The plan must be a JSON array of steps.");
+            }
+        } catch (e) {
+            alert("Invalid JSON. Please check the format of your plan.");
+        }
+    };
+
+    return (
+        <AgentResponseCard icon={<ArchitectIcon class="h-5 w-5" />} title="The Chief Architect">
+            {isAwaitingApproval ? (
+                <div>
+                    <h4 class="text-sm font-bold text-gray-400 mb-2">Proposed Plan (Awaiting Approval)</h4>
+                    <p class="text-sm text-gray-400 mb-3">Review the plan below. You can approve it as is, or modify the JSON and then approve.</p>
+                    <textarea
+                        class="w-full h-48 p-2 bg-gray-900/70 border border-gray-600 rounded-md text-white font-mono text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        value={planText}
+                        onInput={(e) => setPlanText(e.target.value)}
+                    />
+                    <div class="flex justify-end gap-3 mt-3">
+                        <button onClick={onReject} class="px-4 py-2 bg-red-600/50 text-white font-semibold rounded-lg hover:bg-red-600/80 transition-colors">
+                            Reject
+                        </button>
+                        <button onClick={handleModify} class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                            Approve & Run
+                        </button>
+                    </div>
+                </div>
+            ) : (
+                <div>
+                    <h4 class="text-sm font-bold text-gray-400 mb-2">Proposed Plan</h4>
+                    <ul class="list-decimal list-inside text-gray-300 space-y-1">
+                        {plan.steps.map(step => <li key={step.step_id}>{step.instruction}</li>)}
+                    </ul>
+                </div>
+            )}
+        </AgentResponseCard>
+    );
+};
+
 
 export const SiteForemanCard = ({ plan }) => (
     <AgentResponseCard icon={<ForemanIcon class="h-5 w-5" />} title="The Site Foreman">
@@ -62,7 +109,6 @@ export const SiteForemanCard = ({ plan }) => (
 );
 
 export const DirectAnswerCard = ({ answer }) => {
-    // --- THE FIX: Apply Markdown parsing to the Librarian's answer ---
     const parsedHtml = window.marked ? window.marked.parse(answer, { breaks: true, gfm: true }) : answer.replace(/\n/g, '<br />');
     return (
         <AgentResponseCard icon={<LibrarianIcon class="h-5 w-5" />} title="The Librarian">

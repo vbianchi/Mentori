@@ -1,17 +1,17 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 9: Self-Correction Implementation)
+# ResearchAgent Core Agent (Phase 9: HITL Foundation)
 #
-# This version implements the core self-correction loop.
+# This version integrates the Human-in-the-Loop (HITL) breakpoint.
 #
-# 1. New `correction_planner_node`: When a step fails, this node is called. It
-#    uses a new prompt to analyze the failure and create a new, single-step
-#    plan to fix the problem.
-# 2. Updated `after_plan_step_router`: Now checks the `step_retries` counter.
-#    - If a step fails and retries are left, it routes to `Correction_Planner`.
-#    - If retries are exhausted, it routes to the `Editor` to end the run.
-# 3. New `correction_planner_prompt`: Added to prompts.py to support the new node.
-# 4. Graph Definition: The `Correction_Planner` is added to the graph, with
-#    an edge leading from it back to the `Site_Foreman` to try the new step.
+# 1. New `human_in_the_loop_node`: A placeholder node added to serve as an
+#    explicit interruption point in the graph.
+# 2. Updated `GraphState`: A `user_feedback` field is added to store the
+#    user's decision (e.g., "approve", "reject") from the frontend.
+# 3. New `after_plan_creation_router`: A conditional edge that checks the
+#    `user_feedback` to decide whether to proceed with execution or stop.
+# 4. Graph Compilation: The graph is now compiled with an `interrupt_before`
+#    argument pointing at the new `human_in_the_loop_node`, ensuring the
+#    process pauses for user approval after a plan is created.
 # -----------------------------------------------------------------------------
 
 import os
@@ -24,6 +24,7 @@ from langchain_core.messages import BaseMessage, HumanMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.chat_models import ChatOllama
 from langgraph.graph import StateGraph, END
+from langgraph.checkpoint.memory import MemorySaver # Required for interrupts
 
 # --- Local Imports ---
 from .tools import get_available_tools
@@ -32,7 +33,7 @@ from .prompts import (
     controller_prompt_template,
     evaluator_prompt_template,
     final_answer_prompt_template,
-    correction_planner_prompt_template # NEW
+    correction_planner_prompt_template
 )
 
 # --- Logging Setup ---
@@ -40,7 +41,7 @@ log_level = os.getenv("LOG_LEVEL", "INFO").upper()
 logging.basicConfig(level=log_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# --- Agent State Definition (with Self-Correction fields) ---
+# --- Agent State Definition (with HITL fields) ---
 class GraphState(TypedDict):
     """Represents the state of our graph."""
     input: str
@@ -59,7 +60,7 @@ class GraphState(TypedDict):
     max_retries: int
     step_retries: int
     plan_retries: int
-
+    user_feedback: Optional[str] # NEW: For HITL plan approval
 
 # --- LLM Provider Helper ---
 LLM_CACHE = {}
@@ -105,6 +106,7 @@ def task_setup_node(state: GraphState):
         "max_retries": 3,
         "step_retries": 0,
         "plan_retries": 0,
+        "user_feedback": None, # Initialize feedback as None
     }
 
 def chief_architect_node(state: GraphState):
@@ -124,23 +126,33 @@ def chief_architect_node(state: GraphState):
         logger.error(f"Task '{task_id}': Error parsing structured plan: {e}\nResponse was:\n{response.content}")
         return {"plan": [{"error": f"Failed to create a valid plan. Reason: {e}"}]}
 
+# --- NEW: Human-in-the-Loop Node ---
+def human_in_the_loop_node(state: GraphState):
+    """
+    This node is a placeholder for the Human-in-the-Loop step.
+    The graph will interrupt *before* this node executes. The actual logic for
+    waiting for user input will be handled by the server and frontend.
+    This node simply allows the graph to proceed after the user has responded.
+    """
+    task_id = state.get("task_id")
+    logger.info(f"Task '{task_id}': Reached HITL node. Awaiting user feedback.")
+    # No state is changed here. The server will update the state before resuming.
+    return {}
+
 def site_foreman_node(state: GraphState):
     """The "Site Foreman" - Prepares the tool call for the current step."""
     task_id = state.get("task_id")
     step_index = state["current_step_index"]
     plan = state["plan"]
     
-    if step_index >= len(plan):
-        logger.error(f"Task '{task_id}': Site Foreman called with invalid step index {step_index}. Plan length is {len(plan)}. Ending run.")
-        return {"current_tool_call": {"error": "Plan finished, but foreman was called again."}}
+    if not plan or step_index >= len(plan):
+        logger.error(f"Task '{task_id}': Site Foreman called with invalid plan or step index {step_index}. Ending run.")
+        return {"current_tool_call": {"error": "Plan is empty or finished, but foreman was called."}}
 
     logger.info(f"Task '{task_id}': Executing Site_Foreman for step {step_index + 1}/{len(plan)}")
     current_step_details = plan[step_index]
     llm = get_llm(state, "SITE_FOREMAN_LLM_ID", "gemini::gemini-1.5-flash-latest")
     history_str = "\n".join(state["history"]) if state.get("history") else "No history yet."
-    
-    # This is where we will add logic for piping previous step outputs into the prompt
-    tool_input_str = json.dumps(current_step_details.get("tool_input", {}))
     
     prompt = controller_prompt_template.format(
         tools=format_tools_for_prompt(),
@@ -231,9 +243,9 @@ def project_supervisor_node(state: GraphState):
         step_id = current_step_details.get("step_id")
         if step_id:
             updates.setdefault("step_outputs", {})[step_id] = tool_output
-        updates["step_retries"] = 0 # Reset counter on success
+        updates["step_retries"] = 0 
     else:
-        updates["step_retries"] = state["step_retries"] + 1 # Increment on failure
+        updates["step_retries"] = state["step_retries"] + 1
 
     return updates
 
@@ -256,7 +268,13 @@ def editor_node(state: GraphState):
     task_id = state.get("task_id")
     logger.info(f"Task '{task_id}': Executing Editor")
     llm = get_llm(state, "EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
-    history_str = "\n".join(state["history"])
+    
+    # NEW: Check if the run was rejected by the user
+    if state.get("user_feedback") == "reject":
+        history_str = "The user rejected the proposed plan."
+    else:
+        history_str = "\n".join(state.get("history", []))
+
     prompt = final_answer_prompt_template.format(
         input=state["input"],
         history=history_str
@@ -265,7 +283,6 @@ def editor_node(state: GraphState):
     logger.info(f"Task '{task_id}': Editor generated final answer: {response.content[:200]}...")
     return {"answer": response.content}
 
-# --- NEW: Correction Planner Node ---
 def correction_planner_node(state: GraphState):
     """The "Correction Planner" - Creates a new plan to fix a failed step."""
     task_id = state.get("task_id")
@@ -275,7 +292,7 @@ def correction_planner_node(state: GraphState):
     failure_reason = state["step_evaluation"].get("reasoning", "No reason provided.")
     history_str = "\n".join(state["history"])
 
-    llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-flash-latest") # Reuse architect model
+    llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-flash-latest")
     prompt = correction_planner_prompt_template.format(
         plan=json.dumps(state["plan"]),
         history=history_str,
@@ -291,29 +308,38 @@ def correction_planner_node(state: GraphState):
         new_step = json.loads(json_str)
         
         logger.info(f"Task '{task_id}': Correction Planner proposed new step: {new_step}")
-
-        # Create a new plan list and replace the failed step with the new one
         new_plan = state["plan"][:]
         new_plan[state["current_step_index"]] = new_step
         
         return {"plan": new_plan}
     except Exception as e:
         logger.error(f"Task '{task_id}': Error parsing correction plan: {e}\nResponse was:\n{response.content}")
-        # If parsing fails, we can't recover, so we fall through to the router which will likely terminate.
         return {}
 
 
 # --- Conditional Routers ---
-def router(state: GraphState):
+def initial_router(state: GraphState):
     """The Router - Routes the workflow based on user intent."""
     task_id = state.get("task_id")
-    logger.info(f"Task '{task_id}': Executing The Router")
+    logger.info(f"Task '{task_id}': Executing The Initial Router")
     llm = get_llm(state, "ROUTER_LLM_ID", "gemini::gemini-1.5-flash-latest")
     prompt = f"You are a router. Classify the user's last message. Respond with 'AGENT_ACTION' for a complex task that requires planning, or 'DIRECT_QA' for a simple question that can be answered directly.\n\nUser message: '{state['input']}'"
     response = llm.invoke(prompt)
     decision = response.content.strip()
     logger.info(f"Task '{task_id}': Routing decision: {decision}")
     return "Chief_Architect" if "AGENT_ACTION" in decision else "Librarian"
+
+# --- NEW: Router after plan creation for HITL ---
+def after_plan_creation_router(state: GraphState):
+    """Routes after the human-in-the-loop step, based on user feedback."""
+    task_id = state.get("task_id")
+    logger.info(f"Task '{task_id}': HITL Router checking user feedback.")
+    if state.get("user_feedback") == "approve":
+        logger.info(f"Task '{task_id}': User approved plan. Proceeding to Site_Foreman.")
+        return "Site_Foreman"
+    else:
+        logger.warning(f"Task '{task_id}': User rejected or did not provide valid feedback. Routing to Editor to terminate.")
+        return "Editor"
 
 def after_plan_step_router(state: GraphState):
     """Routes the workflow after a plan step is evaluated, now with correction logic."""
@@ -340,43 +366,56 @@ def create_agent_graph():
     """Builds the ResearchAgent's LangGraph."""
     workflow = StateGraph(GraphState)
     
+    # Add all nodes
     workflow.add_node("Task_Setup", task_setup_node)
     workflow.add_node("Librarian", librarian_node)
     workflow.add_node("Chief_Architect", chief_architect_node)
+    workflow.add_node("human_in_the_loop_node", human_in_the_loop_node) # NEW HITL node
     workflow.add_node("Site_Foreman", site_foreman_node)
     workflow.add_node("Worker", worker_node)
     workflow.add_node("Project_Supervisor", project_supervisor_node)
     workflow.add_node("Advance_To_Next_Step", advance_to_next_step_node)
     workflow.add_node("Editor", editor_node)
-    # NEW NODE
     workflow.add_node("Correction_Planner", correction_planner_node)
 
+    # Define all edges
     workflow.set_entry_point("Task_Setup")
 
-    workflow.add_conditional_edges("Task_Setup", router, {
+    workflow.add_conditional_edges("Task_Setup", initial_router, {
         "Librarian": "Librarian",
         "Chief_Architect": "Chief_Architect"
     })
 
-    workflow.add_edge("Chief_Architect", "Site_Foreman")
+    # NEW FLOW: Architect -> Human -> Conditional Router
+    workflow.add_edge("Chief_Architect", "human_in_the_loop_node")
+    
+    workflow.add_conditional_edges("human_in_the_loop_node", after_plan_creation_router, {
+        "Site_Foreman": "Site_Foreman",
+        "Editor": "Editor"
+    })
+    
+    # Execution Loop
     workflow.add_edge("Site_Foreman", "Worker")
     workflow.add_edge("Worker", "Project_Supervisor")
     workflow.add_edge("Advance_To_Next_Step", "Site_Foreman")
-    
-    # NEW EDGE from the correction planner back to the foreman
     workflow.add_edge("Correction_Planner", "Site_Foreman")
 
     workflow.add_conditional_edges("Project_Supervisor", after_plan_step_router, {
         "Editor": "Editor",
         "Advance_To_Next_Step": "Advance_To_Next_Step",
-        "Correction_Planner": "Correction_Planner" # NEW PATH
+        "Correction_Planner": "Correction_Planner"
     })
 
+    # Endpoints
     workflow.add_edge("Librarian", END)
     workflow.add_edge("Editor", END)
 
-    agent = workflow.compile()
-    logger.info("ResearchAgent graph compiled successfully with 'Company Model' names and Self-Correction loop.")
+    # Compile the graph with the interrupt
+    agent = workflow.compile(
+        checkpointer=MemorySaver(),
+        interrupt_before=["human_in_the_loop_node"]
+    )
+    logger.info("ResearchAgent graph compiled with HITL interrupt before 'human_in_the_loop_node'.")
     return agent
 
 agent_graph = create_agent_graph()

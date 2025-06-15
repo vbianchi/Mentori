@@ -1,16 +1,16 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 7: Full Task Lifecycle)
+# ResearchAgent Backend Server (Phase 9: HITL Integration)
 #
-# This version implements the full lifecycle management for tasks. The server
-# now listens for specific commands from the frontend to create and delete
-# task workspaces on the file system.
+# This version updates the server to handle the Human-in-the-Loop workflow.
 #
-# 1. New Message Types: The server now understands `run_agent`, `task_create`,
-#    and `task_delete` message types from the client.
-# 2. Workspace Management: It can now create a directory when a task is
-#    created and safely delete it when a task is removed.
-# 3. Refactored Handler: The main WebSocket handler now acts as a router,
-#    dispatching messages to the appropriate function based on their type.
+# 1. New Message Types: The server now understands `resume_agent` messages,
+#    which are sent from the frontend when a user approves, rejects, or
+#    modifies a plan.
+# 2. State-Aware Handlers: The `run_agent_handler` now detects when the graph
+#    is interrupted and sends a `plan_approval_request` to the UI.
+# 3. New `resume_agent_handler`: This new handler takes the user's feedback,
+#    updates the graph's state accordingly, and then resumes the agent's
+#    execution from the interruption point.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -19,12 +19,13 @@ import os
 import json
 import threading
 import cgi
-import shutil # For safely deleting directories
+import shutil
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
 from dotenv import load_dotenv
 import websockets
 from langchain_core.messages import HumanMessage
+from langgraph.checkpoint.memory import MemorySaver
 
 # --- Local Imports ---
 from .langgraph_agent import agent_graph
@@ -47,17 +48,13 @@ def format_model_name(model_id):
     except:
         return model_id
 
-# --- NEW: Workspace Deletion Helper ---
+# --- Workspace Deletion Helper ---
 def _safe_delete_workspace(task_id: str):
     """Safely and recursively deletes a task's workspace directory."""
     try:
-        # Use the same path resolution logic as the tools for security
         workspace_path = _resolve_path("/app/workspace", task_id)
-        
-        # Final security check to ensure we are inside the main workspace dir
         if not os.path.abspath(workspace_path).startswith(os.path.abspath("/app/workspace")):
             raise PermissionError("Security check failed: Attempt to delete directory outside of workspace.")
-            
         if os.path.isdir(workspace_path):
             shutil.rmtree(workspace_path)
             logger.info(f"Task '{task_id}': Successfully deleted workspace directory: {workspace_path}")
@@ -65,15 +62,12 @@ def _safe_delete_workspace(task_id: str):
         else:
             logger.warning(f"Task '{task_id}': Workspace directory not found for deletion: {workspace_path}")
             return False
-            
     except Exception as e:
         logger.error(f"Task '{task_id}': Error deleting workspace: {e}", exc_info=True)
         return False
 
-
 # --- HTTP File Server for Workspace ---
 class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
-    # ... (No changes in this class)
     def do_GET(self):
         parsed_path = urlparse(self.path)
         if parsed_path.path == '/api/models': self._handle_get_models()
@@ -177,10 +171,34 @@ def run_http_server():
     logger.info(f"Starting HTTP file server at http://{host}:{port}")
     httpd.serve_forever()
 
-# --- Refactored WebSocket Handlers ---
+
+# --- WebSocket Handlers ---
+
+async def _send_final_answer(websocket, task_id, final_event):
+    """Helper to extract and send the final answer from the graph's output."""
+    if not final_event or final_event.get("event") != "on_chain_end":
+        return
+        
+    final_output = final_event.get("data", {}).get("output")
+    answer, answer_type = None, None
+    if isinstance(final_output, list):
+        for node_output in final_output:
+            if isinstance(node_output, dict):
+                if 'Librarian' in node_output:
+                    answer = node_output.get('Librarian', {}).get('answer')
+                    answer_type = "direct_answer"
+                    break
+                elif 'Editor' in node_output:
+                    answer = node_output.get('Editor', {}).get('answer')
+                    answer_type = "final_answer"
+                    break
+    if answer and answer_type:
+        logger.info(f"Task '{task_id}': Found answer of type '{answer_type}'. Sending to client.")
+        await websocket.send(json.dumps({"type": answer_type, "data": answer, "task_id": task_id}))
+
 
 async def run_agent_handler(websocket, data):
-    """Handles the 'run_agent' message type."""
+    """Handles the initial 'run_agent' message type and starts the graph execution."""
     prompt = data.get("prompt")
     llm_config = data.get("llm_config", {})
     task_id = data.get("task_id")
@@ -189,12 +207,8 @@ async def run_agent_handler(websocket, data):
         logger.warning(f"Agent run request missing prompt or task_id. Skipping.")
         return
 
-    initial_state = {
-        "messages": [HumanMessage(content=prompt)],
-        "llm_config": llm_config,
-        "task_id": task_id,
-    }
-    config = {"recursion_limit": 100}
+    initial_state = { "messages": [HumanMessage(content=prompt)], "llm_config": llm_config, "task_id": task_id }
+    config = {"recursion_limit": 100, "configurable": {"thread_id": task_id}} # Use task_id as thread_id
 
     logger.info(f"Task '{task_id}': Invoking agent with prompt: {prompt[:100]}...")
     
@@ -206,23 +220,52 @@ async def run_agent_handler(websocket, data):
             response = {"type": "agent_event", "event": event_type, "name": event["name"], "data": event['data'], "task_id": task_id}
             await websocket.send(json.dumps(response, default=str))
 
-    if last_event and last_event["event"] == "on_chain_end":
-        final_output = last_event.get("data", {}).get("output")
-        answer, answer_type = None, None
-        if isinstance(final_output, list):
-            for node_output in final_output:
-                if isinstance(node_output, dict):
-                    if 'Librarian' in node_output:
-                        answer = node_output.get('Librarian', {}).get('answer')
-                        answer_type = "direct_answer"
-                        break
-                    elif 'Editor' in node_output:
-                        answer = node_output.get('Editor', {}).get('answer')
-                        answer_type = "final_answer"
-                        break
-        if answer and answer_type:
-            logger.info(f"Task '{task_id}': Found answer of type '{answer_type}'.")
-            await websocket.send(json.dumps({"type": answer_type, "data": answer, "task_id": task_id}))
+    # After the stream finishes, check if it was due to an interrupt or a normal end.
+    current_state = agent_graph.get_state(config)
+    next_node = current_state.next if current_state else None
+
+    if next_node and "human_in_the_loop_node" in next_node:
+        logger.info(f"Task '{task_id}': Graph paused for human approval.")
+        plan = current_state.values.get("plan")
+        await websocket.send(json.dumps({"type": "plan_approval_request", "plan": plan, "task_id": task_id}))
+    else:
+        await _send_final_answer(websocket, task_id, last_event)
+
+
+async def resume_agent_handler(websocket, data):
+    """Handles resuming the agent after a human-in-the-loop interruption."""
+    task_id = data.get("task_id")
+    feedback = data.get("feedback") # "approve" or "reject"
+    new_plan = data.get("plan") # Optional modified plan
+
+    if not task_id or not feedback:
+        logger.warning(f"Resume request missing task_id or feedback. Skipping.")
+        return
+
+    logger.info(f"Task '{task_id}': Resuming agent with user feedback: '{feedback}'.")
+    config = {"recursion_limit": 100, "configurable": {"thread_id": task_id}}
+    
+    # Prepare the state update based on user feedback
+    update_values = {"user_feedback": feedback}
+    if new_plan and isinstance(new_plan, list):
+        logger.info(f"Task '{task_id}': User provided a modified plan.")
+        update_values["plan"] = new_plan
+
+    # Update the graph's state before resuming
+    agent_graph.update_state(config, update_values)
+    
+    # Resume the agent by invoking the stream with None
+    last_event = None
+    async for event in agent_graph.astream_events(None, config=config, version="v1"):
+        last_event = event
+        event_type = event["event"]
+        if event_type in ["on_chain_start", "on_chain_end"] and event["name"] in ["Site_Foreman", "Worker", "Project_Supervisor", "Editor"]:
+            response = {"type": "agent_event", "event": event_type, "name": event["name"], "data": event['data'], "task_id": task_id}
+            await websocket.send(json.dumps(response, default=str))
+    
+    # After the resumed stream ends, send the final answer
+    await _send_final_answer(websocket, task_id, last_event)
+
 
 async def handle_task_create(websocket, data):
     """Handles the 'task_create' message type."""
@@ -253,6 +296,8 @@ async def message_router(websocket):
 
                 if message_type == "run_agent":
                     await run_agent_handler(websocket, data)
+                elif message_type == "resume_agent": # NEW ROUTE
+                    await resume_agent_handler(websocket, data)
                 elif message_type == "task_create":
                     await handle_task_create(websocket, data)
                 elif message_type == "task_delete":

@@ -78,6 +78,7 @@ export function App() {
     const [isFileLoading, setIsFileLoading] = useState(false);
     const [availableModels, setAvailableModels] = useState([]);
     const [selectedModels, setSelectedModels] = useState({});
+    const [isAwaitingApproval, setIsAwaitingApproval] = useState(false);
 
     const ws = useRef(null);
     const messagesEndRef = useRef(null);
@@ -130,6 +131,7 @@ export function App() {
         if (taskId !== activeTaskId) {
             setActiveTaskId(taskId);
             setIsThinking(false);
+            setIsAwaitingApproval(false);
             resetWorkspaceViews();
         }
     };
@@ -268,73 +270,107 @@ export function App() {
             fetchWorkspaceFiles(activeTaskId);
         }
     }, [activeTaskId, fetchWorkspaceFiles]);
+    
+    const handleApprovalAction = (feedback, plan = null) => {
+        if (ws.current?.readyState !== WebSocket.OPEN) {
+            alert("Connection not ready.");
+            return;
+        }
+        setIsAwaitingApproval(false);
+        setIsThinking(true);
+        const resumeMessage = {
+            type: 'resume_agent',
+            task_id: activeTaskId,
+            feedback: feedback,
+        };
+        if (plan) {
+            resumeMessage.plan = plan;
+        }
+        ws.current.send(JSON.stringify(resumeMessage));
+    };
 
+    const handleModifyAndApprove = (modifiedPlan) => handleApprovalAction('approve', modifiedPlan);
+    const handleReject = () => handleApprovalAction('reject');
+
+    // --- REFACTORED WebSocket onmessage Handler ---
     useEffect(() => {
         function connect() {
             setConnectionStatus("Connecting...");
             const socket = new WebSocket("ws://localhost:8765");
             ws.current = socket;
             socket.onopen = () => setConnectionStatus("Connected");
-            socket.onclose = () => { setConnectionStatus("Disconnected"); setTimeout(connect, 5000); };
+            socket.onclose = () => { setConnectionStatus("Disconnected"); setIsAwaitingApproval(false); setTimeout(connect, 5000); };
             socket.onerror = (err) => { console.error("WebSocket error:", err); socket.close(); };
 
             socket.onmessage = (event) => {
                 const newEvent = JSON.parse(event.data);
-                
+
                 setTasks(currentTasks => {
                     const taskIndex = currentTasks.findIndex(t => t.id === newEvent.task_id);
-                    if (taskIndex === -1) return currentTasks; 
-                    const currentTask = currentTasks[taskIndex];
-                    let newHistory = [...currentTask.history];
-                    let runContainer = newHistory[newHistory.length - 1]?.type === 'run_container' ? {...newHistory[newHistory.length - 1]} : null;
+                    if (taskIndex === -1) return currentTasks;
                     
-                    if (!runContainer && newEvent.type !== 'prompt') { 
-                        runContainer = { type: 'run_container', children: [] };
+                    const newTasks = [...currentTasks];
+                    const taskToUpdate = { ...newTasks[taskIndex] };
+                    let newHistory = [...taskToUpdate.history];
+
+                    // Find the last run container, or create one if needed
+                    let runContainer = newHistory.find(item => item.type === 'run_container' && !item.isComplete);
+                    if (!runContainer) {
+                        runContainer = { type: 'run_container', children: [], isComplete: false };
                         newHistory.push(runContainer);
                     }
                     
-                    if (newEvent.type === 'direct_answer' || newEvent.type === 'final_answer') {
+                    const eventType = newEvent.type;
+
+                    if (eventType === 'plan_approval_request') {
                         setIsThinking(false);
-                        runContainer.children.push({ type: newEvent.type, content: newEvent.data });
-                    } else if (newEvent.type === 'agent_event') {
+                        setIsAwaitingApproval(true);
+                        runContainer.children.push({ type: 'architect_plan', steps: newEvent.plan, isAwaitingApproval: true });
+                    } else if (eventType === 'direct_answer' || eventType === 'final_answer') {
+                        setIsThinking(false);
+                        setIsAwaitingApproval(false);
+                        runContainer.children.push({ type: eventType, content: newEvent.data });
+                        runContainer.isComplete = true; // Mark this run as complete
+                    } else if (eventType === 'agent_event') {
                         const { name, event: chainEvent, data } = newEvent;
                         const inputData = data.input || {};
                         const outputData = data.output || {};
-                        let executionPlanIndex = runContainer.children.findIndex(item => item.type === 'execution_plan');
 
-                        if (name === 'Chief_Architect' && chainEvent === 'on_chain_end') {
-                            if (outputData.plan && Array.isArray(outputData.plan)) {
-                                runContainer.children.push({ type: 'architect_plan', steps: outputData.plan });
-                                runContainer.children.push({ type: 'execution_plan', steps: outputData.plan.map(step => ({...step, status: 'pending'})) });
+                        // Find the architect plan to update its state
+                        let architectPlan = runContainer.children.find(c => c.type === 'architect_plan');
+                        
+                        if (name === 'Site_Foreman' && chainEvent === 'on_chain_start' && architectPlan?.isAwaitingApproval) {
+                            architectPlan.isAwaitingApproval = false;
+                            // Add execution plan card only once
+                            if (!runContainer.children.some(c => c.type === 'execution_plan')) {
+                                runContainer.children.push({ type: 'execution_plan', steps: architectPlan.steps.map(step => ({...step, status: 'pending'})) });
                             }
-                        } else if (executionPlanIndex !== -1) {
-                            let executionPlan = { ...runContainer.children[executionPlanIndex] };
-                            let newSteps = [...executionPlan.steps];
-                            const stepIndex = inputData.current_step_index;
+                        }
 
-                            if (stepIndex !== undefined && newSteps[stepIndex]) {
+                        // Find and update the execution plan
+                        let executionPlan = runContainer.children.find(c => c.type === 'execution_plan');
+                        if (executionPlan) {
+                            const stepIndex = inputData.current_step_index;
+                            if (stepIndex !== undefined && executionPlan.steps[stepIndex]) {
+                                let stepToUpdate = { ...executionPlan.steps[stepIndex] };
                                 if (name === 'Site_Foreman' && chainEvent === 'on_chain_start') {
-                                    newSteps[stepIndex] = { ...newSteps[stepIndex], status: 'in-progress' };
+                                    stepToUpdate.status = 'in-progress';
                                 } else if (name === 'Project_Supervisor' && chainEvent === 'on_chain_end') {
-                                    const stepStatus = outputData.step_evaluation?.status === 'failure' ? 'failure' : 'completed';
-                                    newSteps[stepIndex] = { ...newSteps[stepIndex], status: stepStatus, toolCall: inputData.current_tool_call, toolOutput: outputData.tool_output, evaluation: outputData.step_evaluation };
+                                    stepToUpdate.status = outputData.step_evaluation?.status === 'failure' ? 'failure' : 'completed';
+                                    stepToUpdate.toolCall = inputData.current_tool_call;
+                                    stepToUpdate.toolOutput = outputData.tool_output;
+                                    stepToUpdate.evaluation = outputData.step_evaluation;
                                     if (handlersRef.current.activeTaskId === newEvent.task_id) { 
                                         handlersRef.current.fetchWorkspaceFiles(handlersRef.current.activeTaskId);
                                     }
                                 }
-                                executionPlan.steps = newSteps;
-                                runContainer.children[executionPlanIndex] = executionPlan;
+                                executionPlan.steps[stepIndex] = stepToUpdate;
                             }
                         }
                     }
 
-                    if (runContainer) {
-                        newHistory[newHistory.length - 1] = runContainer;
-                    }
-                    
-                    const updatedTask = { ...currentTask, history: newHistory };
-                    const newTasks = [...currentTasks];
-                    newTasks[taskIndex] = updatedTask;
+                    taskToUpdate.history = newHistory;
+                    newTasks[taskIndex] = taskToUpdate;
                     return newTasks;
                 });
             };
@@ -344,18 +380,27 @@ export function App() {
     }, []);
 
     const activeTask = tasks.find(t => t.id === activeTaskId);
-    useEffect(() => { scrollToBottom(); }, [activeTask?.history]);
+    useEffect(() => { scrollToBottom(); }, [activeTask?.history, isAwaitingApproval]);
 
     const handleSendMessage = (e) => {
         e.preventDefault();
         const message = inputValue.trim();
-        if (!message || !activeTask || connectionStatus !== 'Connected' || isThinking) return;
+        if (!message || !activeTask || connectionStatus !== 'Connected' || isThinking || isAwaitingApproval) return;
 
         setIsThinking(true);
         runModelsRef.current = selectedModels;
         
         const newPrompt = { type: 'prompt', content: message };
-        setTasks(currentTasks => currentTasks.map(task => task.id === activeTaskId ? { ...task, history: [...task.history, newPrompt] } : task ));
+        // Create a new incomplete run container for this message
+        const newRunContainer = { type: 'run_container', children: [], isComplete: false };
+
+        setTasks(currentTasks => currentTasks.map(task => {
+            if (task.id === activeTaskId) {
+                const newHistory = [...task.history, newPrompt, newRunContainer];
+                return { ...task, history: newHistory };
+            }
+            return task;
+        }));
         
         ws.current.send(JSON.stringify({ type: 'run_agent', prompt: message, llm_config: selectedModels, task_id: activeTaskId }));
         setInputValue("");
@@ -406,7 +451,13 @@ export function App() {
                                                 <div class="absolute top-6 -left-4 h-0.5 w-4 bg-gray-700/50" />
                                                 {(() => {
                                                     switch (child.type) {
-                                                        case 'architect_plan': return <ArchitectCard plan={child} />;
+                                                        case 'architect_plan': 
+                                                            return <ArchitectCard 
+                                                                plan={child} 
+                                                                isAwaitingApproval={child.isAwaitingApproval}
+                                                                onModify={handleModifyAndApprove}
+                                                                onReject={handleReject}
+                                                            />;
                                                         case 'execution_plan': return <SiteForemanCard plan={child} />;
                                                         case 'direct_answer': return <DirectAnswerCard answer={child.content} />;
                                                         case 'final_answer': return <FinalAnswerCard answer={child.content} />;
@@ -428,8 +479,8 @@ export function App() {
                 </div>
                 <div class="p-6 border-t border-gray-700 flex-shrink-0">
                     <form onSubmit={handleSendMessage} class="flex gap-3">
-                        <textarea value={inputValue} onInput={e => setInputValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) handleSendMessage(e); }} class="flex-1 p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" placeholder={activeTaskId ? "Send a message..." : "Please select or create a task."} rows="2" disabled={!activeTaskId || isThinking} ></textarea>
-                        <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-500 transition-colors" disabled={connectionStatus !== 'Connected' || isThinking || !activeTaskId}>Send</button>
+                        <textarea value={inputValue} onInput={e => setInputValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) handleSendMessage(e); }} class="flex-1 p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" placeholder={activeTaskId ? (isAwaitingApproval ? "Approve, modify, or reject the plan above." : "Send a message...") : "Please select or create a task."} rows="2" disabled={!activeTaskId || isThinking || isAwaitingApproval} ></textarea>
+                        <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-500 transition-colors" disabled={connectionStatus !== 'Connected' || isThinking || !activeTaskId || isAwaitingApproval}>Send</button>
                     </form>
                 </div>
             </div>
