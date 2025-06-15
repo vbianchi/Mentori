@@ -3,9 +3,10 @@ import { useState, useEffect } from 'preact/hooks';
 import { ArchitectIcon, CheckCircleIcon, ChevronDownIcon, CircleDotIcon, EditorIcon, ForemanIcon, LoaderIcon, PlusCircleIcon, SupervisorIcon, Trash2Icon, WorkerIcon, XCircleIcon } from './Icons';
 import { CopyButton } from './Common';
 
-const AgentResponseCard = ({ icon, title, children }) => (
-    <div class="p-4 rounded-lg shadow-md bg-gray-800/50 border border-gray-700/50">
+const AgentResponseCard = ({ icon, title, children, showCopy, copyText }) => (
+    <div class="p-4 rounded-lg shadow-md bg-gray-800/50 border border-gray-700/50 relative">
         <h3 class="font-bold text-sm text-gray-300 mb-3 capitalize flex items-center gap-2">{icon}{title}</h3>
+        {showCopy && <CopyButton textToCopy={copyText} className="absolute top-3 right-3" />}
         <div class="pl-1">{children}</div>
     </div>
 );
@@ -45,7 +46,6 @@ const StepCard = ({ step }) => {
     );
 };
 
-// --- NEW EditableStep Component ---
 const EditableStep = ({ step, index, updateStep, removeStep, availableTools }) => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -110,15 +110,12 @@ export const ArchitectCard = ({ plan, isAwaitingApproval, onModify, onReject, av
     };
 
     const handleApprove = () => {
-        // Before approving, parse the tool_input from string back to JSON object if needed
         const finalizedPlan = editablePlan.map(step => {
             try {
-                // If tool_input is a string, it's likely edited JSON that needs parsing.
                 const toolInput = typeof step.tool_input === 'string' ? JSON.parse(step.tool_input) : step.tool_input;
                 return { ...step, tool_input: toolInput };
             } catch (e) {
                 console.warn(`Could not parse tool_input for step ${step.step_id}. Leaving as is.`, e);
-                // If parsing fails, return the step as is, the backend might handle it.
                 return step;
             }
         });
@@ -162,16 +159,19 @@ export const ArchitectCard = ({ plan, isAwaitingApproval, onModify, onReject, av
 
 
 export const SiteForemanCard = ({ plan }) => (
-    <AgentResponseCard icon={<ForemanIcon class="h-5 w-5" />} title="The Site Foreman">
-        <h4 class="text-sm font-bold text-gray-400 mb-2">Execution Log</h4>
-        {plan.steps.map(step => <StepCard key={step.step_id} step={step} />)}
-    </AgentResponseCard>
+    // This wrapper div adds the indentation
+    <div class="ml-4"> 
+        <AgentResponseCard icon={<ForemanIcon class="h-5 w-5" />} title="The Site Foreman">
+            <h4 class="text-sm font-bold text-gray-400 mb-2">Execution Log</h4>
+            {plan.steps.map(step => <StepCard key={step.step_id} step={step} />)}
+        </AgentResponseCard>
+    </div>
 );
 
 export const DirectAnswerCard = ({ answer }) => {
     const parsedHtml = window.marked ? window.marked.parse(answer, { breaks: true, gfm: true }) : answer.replace(/\n/g, '<br />');
     return (
-        <AgentResponseCard icon={<EditorIcon class="h-5 w-5" />} title="The Editor">
+        <AgentResponseCard icon={<EditorIcon class="h-5 w-5" />} title="The Editor" showCopy={true} copyText={answer}>
             <div class="prose prose-sm prose-invert max-w-none text-gray-200" dangerouslySetInnerHTML={{ __html: parsedHtml }}></div>
         </AgentResponseCard>
     );
@@ -180,7 +180,7 @@ export const DirectAnswerCard = ({ answer }) => {
 export const FinalAnswerCard = ({ answer }) => {
     const parsedHtml = window.marked ? window.marked.parse(answer, { breaks: true, gfm: true }) : answer.replace(/\n/g, '<br />');
     return (
-        <AgentResponseCard icon={<EditorIcon class="h-5 w-5" />} title="The Editor">
+        <AgentResponseCard icon={<EditorIcon class="h-5 w-5" />} title="The Editor" showCopy={true} copyText={answer}>
             <div class="prose prose-sm prose-invert max-w-none text-gray-200" dangerouslySetInnerHTML={{ __html: parsedHtml }}></div>
         </AgentResponseCard>
     );

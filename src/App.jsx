@@ -38,11 +38,8 @@ const ModelSelector = ({ label, icon, onModelChange, models, selectedModel, role
     </div>
 );
 
-// --- UPDATED SettingsPanel Component ---
 const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
     const [isExpanded, setIsExpanded] = useState(false);
-    
-    // This list is now cleaned up to reflect the current agent architecture.
     const agentRoles = [
         { key: 'ROUTER_LLM_ID', label: 'The Router', icon: <RouterIcon className="h-4 w-4"/>, desc: "Classifies tasks into 3 tracks." },
         { key: 'CHIEF_ARCHITECT_LLM_ID', label: 'The Chief Architect', icon: <ArchitectIcon className="h-4 w-4"/>, desc: "Creates complex, multi-step plans." },
@@ -481,7 +478,8 @@ export function App() {
                                     {item.children.map((child, childIndex) => {
                                         return (
                                             <div key={childIndex} class="relative">
-                                                <div class="absolute top-6 -left-4 h-0.5 w-4 bg-gray-700/50" />
+                                                {/* THIS IS THE FIX */}
+                                                <div class={`absolute top-6 -left-4 h-0.5 ${child.type === 'execution_plan' ? 'w-8' : 'w-4'} bg-gray-700/50`} />
                                                 {(() => {
                                                     switch (child.type) {
                                                         case 'architect_plan': 
