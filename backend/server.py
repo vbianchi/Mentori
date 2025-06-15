@@ -1,15 +1,16 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 9.2: Handyman Refresh Fix)
+# ResearchAgent Backend Server (Phase 9.3: Tools API)
 #
-# This version adds the logic to ensure the frontend's file browser updates
-# after a file operation on the Handyman track.
+# This version adds a new API endpoint to serve the list of available tools,
+# which is required for the upcoming GUI plan editor.
 #
-# 1. Smarter Final Message: In `run_agent_handler`, after the stream for a
-#    simple tool use is complete, it inspects the final state.
-# 2. Add `refresh_workspace` Flag: If the `current_track` in the final state
-#    is `SIMPLE_TOOL_USE`, it adds a `refresh_workspace: true` flag to the
-#    `final_answer` message sent to the UI. This tells the frontend to
-#    refresh its workspace view.
+# 1. New `/api/tools` Endpoint: The server now responds to GET requests at
+#    this endpoint.
+# 2. New `_handle_get_tools` Method: This handler function is responsible
+#    for loading all available tools from the tool directory.
+# 3. Dynamic Tool List: It formats the tools into a JSON list.
+# 4. Special "Editor" Tool: As requested, "The Editor" is manually added
+#    to this list so it can be selected as an "LLM tool" in the UI.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -29,6 +30,7 @@ from langgraph.checkpoint.memory import MemorySaver
 # --- Local Imports ---
 from .langgraph_agent import agent_graph
 from .tools.file_system import _resolve_path
+from .tools import get_available_tools # NEW IMPORT
 
 # --- Configuration ---
 load_dotenv()
@@ -69,26 +71,36 @@ def _safe_delete_workspace(task_id: str):
 class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed_path = urlparse(self.path)
-        if parsed_path.path == '/api/models': self._handle_get_models()
-        elif parsed_path.path == '/files': self._handle_list_files(parsed_path)
-        elif parsed_path.path == '/file-content': self._handle_get_file_content(parsed_path)
-        else: self._send_json_response(404, {'error': 'Not Found'})
+        if parsed_path.path == '/api/models':
+            self._handle_get_models()
+        elif parsed_path.path == '/api/tools': # NEW ROUTE
+            self._handle_get_tools()
+        elif parsed_path.path == '/files':
+            self._handle_list_files(parsed_path)
+        elif parsed_path.path == '/file-content':
+            self._handle_get_file_content(parsed_path)
+        else:
+            self._send_json_response(404, {'error': 'Not Found'})
+
     def do_POST(self):
         parsed_path = urlparse(self.path)
         if parsed_path.path == '/upload': self._handle_file_upload()
         else: self._send_json_response(404, {'error': 'Not Found'})
+    
     def do_OPTIONS(self):
         self.send_response(204)
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type')
         self.end_headers()
+    
     def _send_json_response(self, status_code, data):
         self.send_response(status_code)
         self.send_header('Content-type', 'application/json')
         self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
         self.wfile.write(json.dumps(data).encode('utf-8'))
+    
     def _handle_get_models(self):
         logger.info("Parsing .env to serve available and default models.")
         available_models = []
@@ -108,19 +120,44 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         safe_fallback_model = "gemini::gemini-1.5-flash-latest"
         if not available_models:
             available_models.append({"id": safe_fallback_model, "name": format_model_name(safe_fallback_model)})
-            logger.warning("No models found in .env. Using a single safe fallback.")
         global_default_llm = os.getenv("DEFAULT_LLM_ID", safe_fallback_model)
         default_models = {
             "ROUTER_LLM_ID": os.getenv("ROUTER_LLM_ID", global_default_llm),
-            "LIBRARIAN_LLM_ID": os.getenv("LIBRARIAN_LLM_ID", global_default_llm),
             "CHIEF_ARCHITECT_LLM_ID": os.getenv("CHIEF_ARCHITECT_LLM_ID", global_default_llm),
             "SITE_FOREMAN_LLM_ID": os.getenv("SITE_FOREMAN_LLM_ID", global_default_llm),
-            "WORKER_LLM_ID": os.getenv("WORKER_LLM_ID", global_default_llm),
             "PROJECT_SUPERVISOR_LLM_ID": os.getenv("PROJECT_SUPERVISOR_LLM_ID", global_default_llm),
             "EDITOR_LLM_ID": os.getenv("EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
         }
         response_data = { "available_models": available_models, "default_models": default_models }
         self._send_json_response(200, response_data)
+
+    # --- NEW METHOD ---
+    def _handle_get_tools(self):
+        """Serves the list of available tools, plus a special one for the Editor."""
+        logger.info("Serving available tools list.")
+        try:
+            # Get the real tools from the tool loader
+            loaded_tools = get_available_tools()
+            
+            # Format the real tools for the UI
+            formatted_tools = [
+                {"name": tool.name, "description": tool.description}
+                for tool in loaded_tools
+            ]
+
+            # Add our special "Editor" tool as per our discussion
+            editor_tool = {
+                "name": "The Editor",
+                "description": "Use a powerful language model to perform tasks like rewriting, summarizing, or analyzing text."
+            }
+            # Insert it at the beginning of the list for prominence
+            all_tools = [editor_tool] + formatted_tools
+            
+            self._send_json_response(200, {"tools": all_tools})
+        except Exception as e:
+            logger.error(f"Failed to get available tools: {e}", exc_info=True)
+            self._send_json_response(500, {"error": "Could not retrieve tools."})
+
     def _handle_list_files(self, parsed_path):
         query_components = parse_qs(parsed_path.query)
         subdir = query_components.get("path", [None])[0]
@@ -131,7 +168,9 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             if os.path.isdir(full_path): self._send_json_response(200, {"files": os.listdir(full_path)})
             else: self._send_json_response(404, {"error": f"Directory '{subdir}' not found."})
         except Exception as e: self._send_json_response(500, {"error": str(e)})
+    
     def _handle_get_file_content(self, parsed_path):
+        # ... (no changes in this method)
         query_components = parse_qs(parsed_path.query)
         workspace_id = query_components.get("path", [None])[0]
         filename = query_components.get("filename", [None])[0]
@@ -146,7 +185,9 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(content.encode('utf-8'))
         except Exception as e: self._send_json_response(500, {"error": f"Error reading file: {e}"})
+
     def _handle_file_upload(self):
+        # ... (no changes in this method)
         try:
             form = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': self.headers['Content-Type']})
             workspace_id = form.getvalue('workspace_id')
@@ -172,9 +213,8 @@ def run_http_server():
 
 
 # --- WebSocket Handlers ---
-
+# ... (no changes in the rest of the file)
 async def run_agent_handler(websocket, data):
-    """Handles the initial 'run_agent' message type and starts the graph execution."""
     prompt = data.get("prompt")
     llm_config = data.get("llm_config", {})
     task_id = data.get("task_id")
@@ -205,8 +245,6 @@ async def run_agent_handler(websocket, data):
         if final_state and (answer := final_state.values.get("answer")):
             final_answer_message = {"type": "final_answer", "data": answer, "task_id": task_id}
             
-            # --- THIS IS THE FIX ---
-            # If the completed track was simple tool use, signal the UI to refresh.
             if final_state.values.get("current_track") == "SIMPLE_TOOL_USE":
                 logger.info(f"Task '{task_id}': Handyman track complete. Sending workspace refresh signal.")
                 final_answer_message["refresh_workspace"] = True
@@ -215,7 +253,6 @@ async def run_agent_handler(websocket, data):
 
 
 async def resume_agent_handler(websocket, data):
-    """Handles resuming the agent after a human-in-the-loop interruption."""
     task_id = data.get("task_id")
     feedback = data.get("feedback")
     new_plan = data.get("plan")
@@ -259,7 +296,6 @@ async def handle_task_delete(websocket, data):
     _safe_delete_workspace(task_id)
 
 
-# --- Main WebSocket Router ---
 async def message_router(websocket):
     logger.info(f"Client connected from {websocket.remote_address}")
     try:
@@ -288,7 +324,6 @@ async def message_router(websocket):
         logger.error(f"An unexpected error occurred in the handler: {e}", exc_info=True)
 
 
-# --- Main Server Function ---
 async def main():
     http_thread = threading.Thread(target=run_http_server, daemon=True)
     http_thread.start()

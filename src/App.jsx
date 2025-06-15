@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
-import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LibrarianIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, ArrowLeftIcon, UploadCloudIcon } from './components/Icons';
+import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, ArrowLeftIcon, UploadCloudIcon } from './components/Icons';
 import { ArchitectCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard } from './components/AgentCards';
 import { ToggleButton, CopyButton } from './components/Common';
 
@@ -44,7 +44,6 @@ const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
         { key: 'ROUTER_LLM_ID', label: 'The Router', icon: <RouterIcon className="h-4 w-4"/>, desc: "Classifies tasks." },
         { key: 'CHIEF_ARCHITECT_LLM_ID', label: 'The Chief Architect', icon: <ArchitectIcon className="h-4 w-4"/>, desc: "Creates the high-level plan." },
         { key: 'SITE_FOREMAN_LLM_ID', label: 'The Site Foreman', icon: <ForemanIcon className="h-4 w-4"/>, desc: "Prepares tool calls." },
-        { key: 'WORKER_LLM_ID', label: 'The Worker', icon: <WorkerIcon className="h-4 w-4"/>, desc: "Executes tools (future use)." },
         { key: 'PROJECT_SUPERVISOR_LLM_ID', label: 'The Project Supervisor', icon: <SupervisorIcon className="h-4 w-4"/>, desc: "Validates step outcomes." },
         { key: 'EDITOR_LLM_ID', label: 'The Editor', icon: <EditorIcon className="h-4 w-4"/>, desc: "Synthesizes the final report." },
     ];
@@ -78,6 +77,7 @@ export function App() {
     const [availableModels, setAvailableModels] = useState([]);
     const [selectedModels, setSelectedModels] = useState({});
     const [isAwaitingApproval, setIsAwaitingApproval] = useState(false);
+    const [availableTools, setAvailableTools] = useState([]);
 
     const ws = useRef(null);
     const messagesEndRef = useRef(null);
@@ -245,23 +245,27 @@ export function App() {
     }, [activeTaskId, fetchWorkspaceFiles]);
 
     useEffect(() => {
-        const fetchModels = async () => {
+        const fetchConfig = async () => {
             try {
-                const response = await fetch('http://localhost:8766/api/models');
-                if (!response.ok) throw new Error('Failed to fetch model configuration.');
-                const config = await response.json();
-                if (config.available_models && config.available_models.length > 0) {
-                    setAvailableModels(config.available_models);
-                    setSelectedModels(config.default_models);
-                    runModelsRef.current = config.default_models;
-                } else {
-                    console.error("No available models returned from the backend.");
+                const modelsResponse = await fetch('http://localhost:8766/api/models');
+                if (!modelsResponse.ok) throw new Error('Failed to fetch model configuration.');
+                const modelsConfig = await modelsResponse.json();
+                if (modelsConfig.available_models && modelsConfig.available_models.length > 0) {
+                    setAvailableModels(modelsConfig.available_models);
+                    setSelectedModels(modelsConfig.default_models);
+                    runModelsRef.current = modelsConfig.default_models;
                 }
+                
+                const toolsResponse = await fetch('http://localhost:8766/api/tools');
+                if (!toolsResponse.ok) throw new Error('Failed to fetch available tools.');
+                const toolsConfig = await toolsResponse.json();
+                setAvailableTools(toolsConfig.tools || []);
+
             } catch (error) {
-                console.error("Failed to fetch models:", error);
+                console.error("Failed to fetch startup config:", error);
             }
         };
-        fetchModels();
+        fetchConfig();
     }, []);
 
     useEffect(() => {
@@ -275,8 +279,27 @@ export function App() {
             alert("Connection not ready.");
             return;
         }
+
         setIsAwaitingApproval(false);
         setIsThinking(true);
+        
+        if (feedback === 'approve' && plan) {
+             setTasks(currentTasks => currentTasks.map(task => {
+                if (task.id === activeTaskId) {
+                    const newHistory = [...task.history];
+                    const runContainer = newHistory[newHistory.length-1];
+                    if (runContainer && runContainer.type === 'run_container') {
+                        const architectPlan = runContainer.children.find(c => c.type === 'architect_plan');
+                        if (architectPlan) {
+                            architectPlan.steps = plan;
+                        }
+                    }
+                    return {...task, history: newHistory};
+                }
+                return task;
+             }));
+        }
+        
         const resumeMessage = {
             type: 'resume_agent',
             task_id: activeTaskId,
@@ -318,13 +341,10 @@ export function App() {
                         const taskToUpdate = { ...newTasks[taskIndex] };
                         let newHistory = [...taskToUpdate.history];
 
-                        // --- ROBUSTNESS FIX ---
-                        // Always find the last run container in the history to update.
                         let runContainer = newHistory.length > 0 && newHistory[newHistory.length - 1].type === 'run_container' 
                             ? newHistory[newHistory.length - 1]
                             : null;
-
-                        // If no container exists, create one. This happens with the very first event after a prompt.
+                        
                         if (!runContainer) {
                             runContainer = { type: 'run_container', children: [], isComplete: false };
                             newHistory.push(runContainer);
@@ -381,7 +401,7 @@ export function App() {
                         return newTasks;
                     } catch (error) {
                         console.error("Error processing WebSocket message:", error, "Event:", newEvent);
-                        return currentTasks; // Return original state on error to prevent crash
+                        return currentTasks;
                     }
                 });
             };
@@ -467,6 +487,7 @@ export function App() {
                                                                 isAwaitingApproval={child.isAwaitingApproval}
                                                                 onModify={handleModifyAndApprove}
                                                                 onReject={handleReject}
+                                                                availableTools={availableTools}
                                                             />;
                                                         case 'execution_plan': return <SiteForemanCard plan={child} />;
                                                         case 'direct_answer': return <DirectAnswerCard answer={child.content} />;
@@ -508,7 +529,7 @@ export function App() {
                                 </div>
                                 <div class="flex-grow bg-gray-900/50 rounded-md overflow-auto p-4">
                                     <pre class="h-full w-full text-sm text-gray-300 font-mono">
-                                        {isFileLoading ? 'Loading...' : <code>{fileContent.trim()}</code>}
+                                        {isFileLoading ? 'Loading...' : <code>{fileContent}</code>}
                                     </pre>
                                 </div>
                             </div>
