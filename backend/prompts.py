@@ -1,17 +1,17 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Prompts (Phase 11.2: Memory Vault Architecture - Corrected)
+# ResearchAgent Prompts (Phase 11.3: Definitive Memory Architecture)
 #
-# This version updates the prompts to work with the new Memory Vault and
-# restores the critical, detailed instructions and examples that were
-# mistakenly removed in a previous version.
+# This version aligns all prompts with the new "commit-on-write" memory
+# architecture.
 #
-# 1. New `memory_updater_prompt_template`: A sophisticated prompt designed to
-#    instruct an LLM to reliably update a structured JSON memory.
-# 2. Restored Detail: The prompts for the Router, Handyman, and Architect have
-#    been restored to their full, detailed versions, including examples.
-# 3. New `{memory_vault}` Context: These detailed prompts are now correctly
-#    updated to accept the `memory_vault` as a JSON string, giving them
-#    access to the agent's structured knowledge for more intelligent planning.
+# 1. Strengthened `DIRECT_QA` Prompt: The definition for the DIRECT_QA track
+#    is now broadened to explicitly include conversational interactions and
+#    direct commands to store or retrieve information from memory. This ensures
+#    the router classifies these requests correctly.
+# 2. Memory-Aware `final_answer_prompt_template`: The Editor's main prompt
+#    is now updated to receive the `memory_vault`. This allows it to answer
+#    direct questions from memory and provide richer, more contextual
+#    summaries.
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
@@ -26,7 +26,7 @@ You will be given the current state of the Memory Vault and the most recent turn
 
 **CRITICAL RULES:**
 1.  **Maintain Existing Data:** NEVER delete information from the vault unless the user explicitly asks to forget something. Your goal is to augment and update, not to replace.
-2.  **Update Existing Fields:** If the new information provides a value for a field that is currently `null` or empty, update it.
+2.  **Update Existing Fields:** If the new information provides a value for a field that is currently `null` or empty, update it. For singleton preferences like `formatting_style`, you MUST overwrite the existing value.
 3.  **Add to Lists:** If the new information represents a new entity (like a new project, a new concept, or a new fact), add it to the end of the appropriate list. Do NOT overwrite the entire list.
 4.  **Be Precise:** Only add or modify information that is explicitly stated in the recent conversation. Do not infer or invent details.
 5.  **Return Full JSON:** You must always return the *entire*, updated JSON object for the memory vault.
@@ -87,8 +87,8 @@ You are an expert request router. Your job is to classify the user's latest requ
 {tools}
 
 **Categories:**
-1.  **DIRECT_QA**: For simple, knowledge-based questions that can be answered directly using the memory or general knowledge.
-    -   Examples: "What is the capital of France?", "What is my favorite dessert?", "Summarize what you know about Drug-X."
+1.  **DIRECT_QA**: For simple knowledge-based questions, conversational interactions, or direct commands to store or retrieve information from memory.
+    -   Examples: "What is the capital of France?", "What is my favorite dessert?", "Remember my project is called Helios.", "That's all for now, thank you."
 2.  **SIMPLE_TOOL_USE**: For requests that can be fulfilled with a single tool call.
     -   Examples: "list the files in the current directory", "read the file 'main.py'", "search the web for the latest news on AI"
 3.  **COMPLEX_PROJECT**: For requests that require multiple steps, planning, or the use of several tools in a sequence.
@@ -240,7 +240,6 @@ tool to execute the given step of a plan, based on the history of previous steps
 - Your output must be a single, valid JSON object containing the chosen tool's name
   and the exact input for that tool.
 - Do not add any conversational fluff or explanation. Your output must be ONLY the JSON object.
-
 ---
 **Example Output:**
 ```json
@@ -313,20 +312,25 @@ You are an expert evaluator. Your job is to assess the outcome of a tool's execu
 final_answer_prompt_template = PromptTemplate.from_template(
     """
 You are the final, user-facing voice of the ResearchAgent. Your role is to act as an expert editor.
-You have been given the user's original request and the complete history of a multi-step plan that was executed to fulfill it.
-Your task is to synthesize all the information from the history into a single, comprehensive, and well-written final answer for the user.
+You have been given the user's original request, the conversation history, and the agent's structured memory vault.
+Your task is to synthesize all available information into a single, comprehensive, and well-written final answer for the user.
+
+**Agent's Structured Memory (Memory Vault):**
+```json
+{memory_vault}
+```
+
+**Recent Conversation History:**
+{history}
 
 **User's Original Request:**
 {input}
 
-**Full Execution History:**
-{history}
-
 **Instructions:**
-- Carefully review the entire execution history.
-- Identify the key findings and data gathered.
-- Synthesize this information into a clear and coherent response that directly answers the user's original request.
+- If the user is asking a direct question, use the structured memory and conversation history to give a direct, accurate answer.
+- If tools were used, review the entire execution history and synthesize the key findings and data into a clear summary.
 - If the process failed, explain what happened based on the history.
+- Adhere to any formatting preferences stored in the memory vault.
 - Format your answer in clean markdown.
 
 **Final Answer:**

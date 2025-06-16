@@ -1,16 +1,18 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 11.1: Memory Vault Architecture - FIXED)
+# ResearchAgent Core Agent (Phase 11.3: Definitive Memory Architecture)
 #
-# This version provides the definitive fix for the `ValueError` during graph
-# compilation.
+# This version implements the final, robust "commit-on-write" memory
+# architecture.
 #
-# FIX: A conditional routing function cannot also be registered as a node.
-#      The previous attempts incorrectly called `workflow.add_node()` on the
-#      router function. The correct approach is to set the conditional
-#      branching directly as the exit point for a standard node. This version
-#      removes all incorrect `add_node` calls for the router functions and
-#      properly configures the conditional edges from the `Task_Setup` and
-#      `Memory_Updater` nodes.
+# 1. Definitive Graph Flow: The graph's data flow is now corrected to ensure
+#    maximum reliability. For every user message, the flow is:
+#       Task_Setup -> Memory_Updater -> history_management_router -> ...
+#    This guarantees that the Memory Vault is updated with the latest user
+#    information *before* any routing or planning decisions are made,
+#    preventing data loss from rejected plans or incorrect routing.
+# 2. Simplified Routing Logic: With the Memory Updater always running first,
+#    the routing logic is now cleaner and more reliable, as it always
+#    operates on the most current state of the agent's knowledge.
 # -----------------------------------------------------------------------------
 
 import os
@@ -187,7 +189,8 @@ def memory_updater_node(state: GraphState):
 
     llm = get_llm(state, "EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
     
-    recent_conversation = _format_messages(state['messages'][-2:], is_for_summary=True)
+    # Use the most recent message for the update context
+    recent_conversation = f"Human: {state['input']}"
 
     prompt = memory_updater_prompt_template.format(
         memory_vault_json=json.dumps(state['memory_vault'], indent=2),
@@ -389,18 +392,19 @@ def editor_node(state: GraphState):
     task_id = state.get("task_id")
     logger.info(f"Task '{task_id}': Unified Editor generating final answer.")
     llm = get_llm(state, "EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
-    execution_history = "\n".join(state.get("history", []))
-    if not execution_history:
-        if state.get("user_feedback") == "reject":
-            response_content = "The user rejected the plan. The operation was cancelled."
-        else:
-            logger.info(f"Task '{task_id}': Editor handling as Direct Q&A.")
-            response = llm.invoke(state["messages"])
-            response_content = response.content
-    else:
-        logger.info(f"Task '{task_id}': Editor summarizing execution history.")
-        prompt = final_answer_prompt_template.format(input=state["input"], history=execution_history)
-        response_content = llm.invoke(prompt).content
+    
+    # The Editor now also gets the memory vault for the most informed answers.
+    chat_history = _format_messages(state['messages'])
+    memory_vault_str = json.dumps(state.get('memory_vault', {}), indent=2)
+
+    # For a direct QA, the final answer prompt is more suitable than just the raw messages.
+    prompt = final_answer_prompt_template.format(
+        input=state["input"], 
+        history=chat_history,
+        memory_vault=memory_vault_str
+    )
+    response_content = llm.invoke(prompt).content
+
     return {"answer": response_content, "messages": [AIMessage(content=response_content)]}
 
 def correction_planner_node(state: GraphState):
@@ -440,7 +444,7 @@ def after_worker_router(state: GraphState) -> str:
 
 def after_plan_creation_router(state: GraphState) -> str:
     if state.get("user_feedback") == "approve": return "Site_Foreman"
-    return "Editor" # On rejection, the editor will see the feedback and generate a final message.
+    return "Editor"
 
 def after_plan_step_router(state: GraphState) -> str:
     evaluation = state.get("step_evaluation", {})
@@ -470,11 +474,8 @@ def create_agent_graph():
     
     # Define the graph's flow
     workflow.set_entry_point("Task_Setup")
-    
-    # After setup, ALWAYS update the memory vault first
     workflow.add_edge("Task_Setup", "Memory_Updater")
-
-    # After updating the memory, decide if history needs summarization
+    
     workflow.add_conditional_edges(
         "Memory_Updater",
         history_management_router,
@@ -485,13 +486,11 @@ def create_agent_graph():
     )
     workflow.add_edge("summarize_history_node", "initial_router_node")
     
-    # From the main router, branch to one of the three tracks
     workflow.add_conditional_edges(
         "initial_router_node", route_logic,
         {"Editor": "Editor", "Handyman": "Handyman", "Chief_Architect": "Chief_Architect"}
     )
 
-    # Define paths for Track 2 (Simple Tool Use) and Track 3 (Complex Project)
     workflow.add_edge("Handyman", "Worker")
     workflow.add_conditional_edges(
         "Worker", after_worker_router,
@@ -503,7 +502,6 @@ def create_agent_graph():
         "Site_Foreman": "Site_Foreman", "Editor": "Editor"
     })
     
-    # Complex Project Execution Loop
     workflow.add_edge("Site_Foreman", "Worker")
     workflow.add_edge("Advance_To_Next_Step", "Site_Foreman")
     workflow.add_edge("Correction_Planner", "Site_Foreman")
@@ -512,15 +510,13 @@ def create_agent_graph():
         "Correction_Planner": "Correction_Planner"
     })
 
-    # All paths eventually lead to the Editor for a final response
     workflow.add_edge("Editor", END)
 
-    # Compile the graph
     agent = workflow.compile(
         checkpointer=MemorySaver(),
         interrupt_before=["human_in_the_loop_node"]
     )
-    logger.info("ResearchAgent graph compiled with Memory Vault architecture.")
+    logger.info("ResearchAgent graph compiled with definitive Memory Vault architecture.")
     return agent
 
 agent_graph = create_agent_graph()
