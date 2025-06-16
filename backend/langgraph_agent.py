@@ -1,24 +1,20 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 11.4: Fully Aware Editor)
+# ResearchAgent Core Agent (Phase 11.6: Venv-Aware Worker)
 #
-# This version provides the definitive fix for the Editor's lack of awareness.
+# This version completes the implementation of per-task virtual environments.
 #
-# 1. Fully Contextual `editor_node`: The editor node is now refactored to
-#    receive and process all three major sources of context:
-#    - The conversational `messages` log.
-#    - The detailed `history` (execution log).
-#    - The structured `memory_vault`.
-# 2. Comprehensive Prompting: It passes all three context strings to the
-#    `final_answer_prompt_template`, ensuring the Editor LLM has a complete
-#    picture of the user's request, the agent's knowledge, and the work that
-#    was just performed. This eliminates the bug where the Editor was unaware
-#    of the Project Supervisor's successful reports.
+# 1. Venv-Aware `worker_node`: The worker node is updated to recognize the
+#    new `pip_install` tool as a sandboxed tool. It now correctly passes the
+#    task-specific `workspace_path` to it, ensuring that package
+#    installations are correctly routed to the appropriate virtual
+#    environment. This completes the logic for Phase 11.
 # -----------------------------------------------------------------------------
 
 import os
 import logging
 import json
 import re
+import asyncio
 from typing import TypedDict, Annotated, Sequence, List, Optional, Dict
 
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, SystemMessage
@@ -158,15 +154,43 @@ def _format_messages(messages: Sequence[BaseMessage], is_for_summary=False) -> s
     
     return "\n".join(formatted_messages)
 
+# --- Venv Creation Helper ---
+async def _create_venv_if_not_exists(workspace_path: str, task_id: str):
+    """Creates a virtual environment in the workspace if one doesn't exist."""
+    venv_path = os.path.join(workspace_path, ".venv")
+    if os.path.isdir(venv_path):
+        logger.info(f"Task '{task_id}': Virtual environment already exists. Skipping creation.")
+        return
+
+    logger.info(f"Task '{task_id}': Creating virtual environment in '{workspace_path}'")
+    command = ["uv", "venv"]
+    process = await asyncio.create_subprocess_exec(
+        *command,
+        cwd=workspace_path,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE
+    )
+    stdout, stderr = await process.communicate()
+
+    if process.returncode != 0:
+        error_message = stderr.decode()
+        logger.error(f"Task '{task_id}': Failed to create virtual environment. Error: {error_message}")
+    else:
+        logger.info(f"Task '{task_id}': Successfully created virtual environment.")
+
+
 # --- Graph Nodes ---
-def task_setup_node(state: GraphState):
+async def task_setup_node(state: GraphState):
+    """Creates the workspace and virtual environment, and initializes state."""
     task_id = state.get("task_id")
-    logger.info(f"Task '{task_id}': Executing Task_Setup")
+    logger.info(f"Task '{task_id}': Executing async Task_Setup")
     user_message = state['messages'][-1].content
     
     workspace_path = f"/app/workspace/{task_id}"
     os.makedirs(workspace_path, exist_ok=True)
     
+    await _create_venv_if_not_exists(workspace_path, task_id)
+
     initial_vault = {
         "user_profile": { "persona": {}, "preferences": { "formatting_style": "Markdown" } },
         "knowledge_graph": { "concepts": [], "relationships": [] },
@@ -349,7 +373,12 @@ async def worker_node(state: GraphState):
     else:
         tool_args_schema = tool.args
         if tool_args_schema: final_args[next(iter(tool_args_schema))] = tool_input
-    if tool_name in SANDBOXED_TOOLS: final_args["workspace_path"] = state["workspace_path"]
+        
+    # --- THIS IS THE FIX ---
+    # We now check for pip_install by name to ensure it gets the workspace path.
+    if tool_name in SANDBOXED_TOOLS or tool.name == 'pip_install':
+        final_args["workspace_path"] = state["workspace_path"]
+        
     try:
         output = await tool.ainvoke(final_args)
         output_str = str(output)
@@ -387,19 +416,15 @@ def project_supervisor_node(state: GraphState):
 def advance_to_next_step_node(state: GraphState):
     return {"current_step_index": state.get("current_step_index", 0) + 1}
 
-# --- UPDATED NODE ---
 def editor_node(state: GraphState):
-    """Synthesizes the final answer using all available context."""
     task_id = state.get("task_id")
     logger.info(f"Task '{task_id}': Unified Editor generating final answer with full context.")
     llm = get_llm(state, "EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
     
-    # Gather all three sources of context
     chat_history_str = _format_messages(state['messages'])
     execution_log_str = "\n".join(state.get("history", []))
     memory_vault_str = json.dumps(state.get('memory_vault', {}), indent=2)
 
-    # Use a comprehensive prompt that leverages all context
     prompt = final_answer_prompt_template.format(
         input=state["input"], 
         chat_history=chat_history_str,

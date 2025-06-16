@@ -2,32 +2,20 @@
 
 To build a transformative, AI-powered workbench. The platform will be powerful enough for scientific research and general enough for power users, with a core architecture that allows users to easily add their own tools and capabilities. The system is designed for privacy and efficiency, with a clear path to running on local LLMs.
 
-### ✅ COMPLETED: Phases 0-9
+### ✅ COMPLETED: Phase 11: The Secure, Extensible Environment
 
--   \[x\] **Result:** A stable application with a "Three-Track Brain" for efficient request handling, a robust self-correction loop, and an interactive GUI for approving and modifying complex plans.
-
-### ✅ COMPLETED: Phase 10: Foundational Memory & Context
-
--   \[x\] **Result:** The agent now possesses a structured "Memory Vault," allowing it to reliably store and recall facts across conversational turns. It uses a "commit-on-write" architecture, ensuring information is saved before actions are taken.
--   \[x\] **Future Refinements (Minor):**
-    -   Implement a dedicated Date/Time Normalization tool to improve date parsing.
-    -   Refine the Memory Updater prompt to better capture qualitative, descriptive details.
+-   \[x\] **Result:** The agent now operates with a robust, "commit-on-write" Memory Vault for persistent, structured knowledge. Each task is now automatically provisioned with its own isolated Python virtual environment, and the agent is equipped with a secure `pip_install` tool to manage dependencies on a per-task basis.
 
 ### 🚀 UPCOMING PHASES 🚀
 
-#### Phase 11: The Secure, Extensible Environment
-
-_Goal: Create an isolated, user-extendable environment for each task, enabling custom tools and robust multi-user support._
-
--   \[ \] **Per-Task Virtual Environments:** Implement logic to create and use a dedicated Python `.venv` for each task.
--   \[ \] **Package Manager Tool:** Create a sandboxed tool to safely `pip install` user-requested libraries into the correct task's environment.
-
 #### Phase 12: The Interactive Workbench
 
-_Goal: Transform the workspace from a file list into an active workbench where outputs become the inputs for new actions._
+_Goal: Evolve the workspace from a simple file list into a full-featured, interactive file explorer, enabling complex project management and a seamless user experience._
 
--   \[ \] **Enhanced File Viewer:** Upgrade the file browser to render images (`.png`, `.jpg`), Markdown, and potentially PDFs directly in the UI.
--   \[ \] **Interactive Artifacts:** Add contextual "action" buttons next to files (e.g., "Analyze", "Run", "Visualize") that pre-populate the chat prompt with a relevant command, creating a seamless workflow.
+-   \[ \] **Sub-Phase A: The Smart Backend API:** Refactor the backend API to provide structured information about workspace items (e.g., name, type, size) and add new endpoints for creating, deleting, and renaming files and folders.
+-   \[ \] **Sub-Phase B: The Navigable UI:** Upgrade the frontend to consume the new API, introducing folder navigation, breadcrumbs, and distinct icons for different file and folder types.
+-   \[ \] **Sub-Phase C: Core Interactivity:** Implement essential user interactions, including a "New Folder" button and a right-click context menu for "Rename" and "Delete" actions.
+-   \[ \] **Sub-Phase D: Advanced Features & Previews:** Add drag-and-drop file uploads and build a smart previewer capable of rendering various file types (images, Markdown, CSVs, source code) directly within the UI.
 
 #### Phase 13: The "Tool Forge" - A Pluggable Tool Architecture
 
@@ -44,7 +32,3 @@ _Goal: Equip the agent with a suite of powerful, pre-built tools for common high
 -   \[ \] **Multi-Document Reporter Tool:** A tool that can synthesize information from multiple text files or PDFs.
 -   \[ \] **Scientific Data Fetcher Tool:** A specialized tool to find and download datasets from sources like NCBI, PubMed, etc.
 -   \[ \] **Website Report Generator:** A tool that can populate pre-defined website templates with data to create visual reports.
-
-This roadmap is ambitious and exciting. It lays out a clear path from where we are now to the truly powerful platform you envision.
-
-What do you think? Shall we proceed with **Phase 11: The Secure, Extensible Environment** as our immediate next step?
