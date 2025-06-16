@@ -1,18 +1,18 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 11.3: Definitive Memory Architecture)
+# ResearchAgent Core Agent (Phase 11.4: Fully Aware Editor)
 #
-# This version implements the final, robust "commit-on-write" memory
-# architecture.
+# This version provides the definitive fix for the Editor's lack of awareness.
 #
-# 1. Definitive Graph Flow: The graph's data flow is now corrected to ensure
-#    maximum reliability. For every user message, the flow is:
-#       Task_Setup -> Memory_Updater -> history_management_router -> ...
-#    This guarantees that the Memory Vault is updated with the latest user
-#    information *before* any routing or planning decisions are made,
-#    preventing data loss from rejected plans or incorrect routing.
-# 2. Simplified Routing Logic: With the Memory Updater always running first,
-#    the routing logic is now cleaner and more reliable, as it always
-#    operates on the most current state of the agent's knowledge.
+# 1. Fully Contextual `editor_node`: The editor node is now refactored to
+#    receive and process all three major sources of context:
+#    - The conversational `messages` log.
+#    - The detailed `history` (execution log).
+#    - The structured `memory_vault`.
+# 2. Comprehensive Prompting: It passes all three context strings to the
+#    `final_answer_prompt_template`, ensuring the Editor LLM has a complete
+#    picture of the user's request, the agent's knowledge, and the work that
+#    was just performed. This eliminates the bug where the Editor was unaware
+#    of the Project Supervisor's successful reports.
 # -----------------------------------------------------------------------------
 
 import os
@@ -189,7 +189,6 @@ def memory_updater_node(state: GraphState):
 
     llm = get_llm(state, "EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
     
-    # Use the most recent message for the update context
     recent_conversation = f"Human: {state['input']}"
 
     prompt = memory_updater_prompt_template.format(
@@ -388,21 +387,26 @@ def project_supervisor_node(state: GraphState):
 def advance_to_next_step_node(state: GraphState):
     return {"current_step_index": state.get("current_step_index", 0) + 1}
 
+# --- UPDATED NODE ---
 def editor_node(state: GraphState):
+    """Synthesizes the final answer using all available context."""
     task_id = state.get("task_id")
-    logger.info(f"Task '{task_id}': Unified Editor generating final answer.")
+    logger.info(f"Task '{task_id}': Unified Editor generating final answer with full context.")
     llm = get_llm(state, "EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
     
-    # The Editor now also gets the memory vault for the most informed answers.
-    chat_history = _format_messages(state['messages'])
+    # Gather all three sources of context
+    chat_history_str = _format_messages(state['messages'])
+    execution_log_str = "\n".join(state.get("history", []))
     memory_vault_str = json.dumps(state.get('memory_vault', {}), indent=2)
 
-    # For a direct QA, the final answer prompt is more suitable than just the raw messages.
+    # Use a comprehensive prompt that leverages all context
     prompt = final_answer_prompt_template.format(
         input=state["input"], 
-        history=chat_history,
+        chat_history=chat_history_str,
+        execution_log=execution_log_str if execution_log_str else "No tool actions were taken in this turn.",
         memory_vault=memory_vault_str
     )
+    
     response_content = llm.invoke(prompt).content
 
     return {"answer": response_content, "messages": [AIMessage(content=response_content)]}
@@ -472,7 +476,6 @@ def create_agent_graph():
     workflow.add_node("Editor", editor_node)
     workflow.add_node("Correction_Planner", correction_planner_node)
     
-    # Define the graph's flow
     workflow.set_entry_point("Task_Setup")
     workflow.add_edge("Task_Setup", "Memory_Updater")
     

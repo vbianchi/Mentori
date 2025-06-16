@@ -1,17 +1,19 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Prompts (Phase 11.3: Definitive Memory Architecture)
+# ResearchAgent Prompts (Phase 11.5: Advanced, Context-Aware Editor)
 #
-# This version aligns all prompts with the new "commit-on-write" memory
-# architecture.
+# This version provides the definitive, advanced prompt for the Editor.
 #
-# 1. Strengthened `DIRECT_QA` Prompt: The definition for the DIRECT_QA track
-#    is now broadened to explicitly include conversational interactions and
-#    direct commands to store or retrieve information from memory. This ensures
-#    the router classifies these requests correctly.
-# 2. Memory-Aware `final_answer_prompt_template`: The Editor's main prompt
-#    is now updated to receive the `memory_vault`. This allows it to answer
-#    direct questions from memory and provide richer, more contextual
-#    summaries.
+# 1. Advanced `final_answer_prompt_template`: The Editor's prompt has been
+#    completely rewritten to include sophisticated conditional logic. It
+#    instructs the LLM to first analyze the `execution_log`.
+#    - If tools were used, it adopts a "Dutiful Project Manager" persona,
+#      summarizing the work done.
+#    - If no tools were used (a DIRECT_QA track), it adopts a "Conversational
+#      Assistant" persona, answering the user's question directly without
+#      unnecessarily summarizing past events.
+# 2. User-Suggested Focus: The prompt now incorporates the user's excellent
+#    suggestion to "focus on the last request, but expand with previous
+#    knowledge if appropriate."
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
@@ -308,34 +310,52 @@ You are an expert evaluator. Your job is to assess the outcome of a tool's execu
 """
 )
 
-# 8. Final Answer Synthesis Prompt
+# --- UPDATED PROMPT ---
+# 8. Final Answer Synthesis Prompt (Advanced)
 final_answer_prompt_template = PromptTemplate.from_template(
     """
-You are the final, user-facing voice of the ResearchAgent. Your role is to act as an expert editor.
-You have been given the user's original request, the conversation history, and the agent's structured memory vault.
-Your task is to synthesize all available information into a single, comprehensive, and well-written final answer for the user.
+You are the final, user-facing voice of the ResearchAgent, acting as an expert editor. Your goal is to provide a clear, helpful, and contextually-aware response based on all the information provided.
 
-**Agent's Structured Memory (Memory Vault):**
+**1. Agent's Structured Memory (What the agent knows):**
 ```json
 {memory_vault}
 ```
 
-**Recent Conversation History:**
-{history}
+**2. Recent Conversation History (What was said):**
+{chat_history}
 
-**User's Original Request:**
+**3. Execution Log (What the agent just did):**
+{execution_log}
+
+**4. User's Latest Request:**
 {input}
 
-**Instructions:**
-- If the user is asking a direct question, use the structured memory and conversation history to give a direct, accurate answer.
-- If tools were used, review the entire execution history and synthesize the key findings and data into a clear summary.
-- If the process failed, explain what happened based on the history.
-- Adhere to any formatting preferences stored in the memory vault.
-- Format your answer in clean markdown.
+---
+**Your Task: Choose your response style based on the context.**
+
+**RULE 1: If the "Execution Log" is NOT empty and does NOT contain "No tool actions...":**
+This means the agent just completed a task for the user. Adopt a **"Dutiful Project Manager"** persona.
+- Acknowledge the user's request has been completed.
+- Provide a concise summary of the key steps taken and the final outcome, based on the Execution Log.
+- Be clear and factual. For example: "I have successfully created the `plot_primes.py` script and used it to generate `prime_plot.png` in your workspace."
+
+**RULE 2: If the "Execution Log" IS empty or contains "No tool actions...":**
+This means the user is asking a direct question or having a conversation. Adopt a **"Conversational Assistant"** persona.
+- Focus on directly answering the "User's Latest Request."
+- Use the "Agent's Structured Memory" and "Recent Conversation History" to provide an accurate and context-aware answer.
+- Be helpful and concise. Do NOT summarize past work unless the user asks for it.
+
+**General Guidelines (Apply to both personas):**
+- **Focus:** Always prioritize addressing the user's latest request. You are allowed to expand your answer with previous knowledge from the memory vault or history if it is highly relevant and helpful.
+- **Formatting:** Check the `formatting_style` in the memory vault and format your response accordingly.
+- **Transparency:** If a task failed, explain what happened based on the execution log.
+
+**Begin!**
 
 **Final Answer:**
 """
 )
+
 
 # 9. Correction Planner Prompt
 correction_planner_prompt_template = PromptTemplate.from_template(
