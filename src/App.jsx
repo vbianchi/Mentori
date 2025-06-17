@@ -115,7 +115,6 @@ export function App() {
             fetchWorkspaceFiles,
             activeTaskId,
             setCurrentPath,
-            // --- NEW: Add currentPath to handlers for use in delete ---
             currentPath, 
         };
     });
@@ -268,7 +267,6 @@ export function App() {
             const newPath = `${currentPath}/${item.name}`;
             setCurrentPath(newPath);
         } else {
-            // Pass the directory path, not the full item path, to fetchFileContent
             fetchFileContent(currentPath, item.name);
         }
     };
@@ -278,29 +276,81 @@ export function App() {
         setSelectedFile(null);
     };
 
-    // --- NEW: Handler for deleting a file or folder ---
     const handleDeleteItem = useCallback(async (item) => {
         if (!confirm(`Are you sure you want to delete '${item.name}'?`)) {
             return;
         }
-
         const itemFullPath = `${currentPath}/${item.name}`;
-        
         setWorkspaceLoading(true);
         setWorkspaceError(null);
         try {
-            const response = await fetch(`http://localhost:8766/api/workspace/items?path=${itemFullPath}`, {
-                method: 'DELETE',
-            });
-
+            const response = await fetch(`http://localhost:8766/api/workspace/items?path=${itemFullPath}`, { method: 'DELETE' });
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to delete item');
             }
-            // Refresh the current directory to show the item has been removed
             await fetchWorkspaceFiles(currentPath);
         } catch (error) {
             console.error("Failed to delete item:", error);
+            setWorkspaceError(error.message);
+        } finally {
+            setWorkspaceLoading(false);
+        }
+    }, [currentPath, fetchWorkspaceFiles]);
+
+    const handleCreateFolder = useCallback(async () => {
+        const folderName = prompt("Enter the name for the new folder:");
+        if (!folderName || folderName.trim() === '') {
+            return;
+        }
+
+        const newFolderPath = `${currentPath}/${folderName.trim()}`;
+        setWorkspaceLoading(true);
+        setWorkspaceError(null);
+        try {
+            const response = await fetch('http://localhost:8766/api/workspace/folders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ path: newFolderPath }),
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to create folder');
+            }
+            await fetchWorkspaceFiles(currentPath);
+        } catch (error) {
+            console.error("Failed to create folder:", error);
+            setWorkspaceError(error.message);
+        } finally {
+            setWorkspaceLoading(false);
+        }
+    }, [currentPath, fetchWorkspaceFiles]);
+
+    // --- NEW: Handler for renaming a file or folder ---
+    const handleRenameItem = useCallback(async (item) => {
+        const newName = prompt(`Enter the new name for '${item.name}':`, item.name);
+        if (!newName || newName.trim() === '' || newName.trim() === item.name) {
+            return;
+        }
+        
+        const oldPath = `${currentPath}/${item.name}`;
+        const newPath = `${currentPath}/${newName.trim()}`;
+
+        setWorkspaceLoading(true);
+        setWorkspaceError(null);
+        try {
+            const response = await fetch('http://localhost:8766/api/workspace/items', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ old_path: oldPath, new_path: newPath }),
+            });
+             if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to rename item');
+            }
+            await fetchWorkspaceFiles(currentPath); // Refresh view
+        } catch (error) {
+             console.error("Failed to rename item:", error);
             setWorkspaceError(error.message);
         } finally {
             setWorkspaceLoading(false);
@@ -621,27 +671,38 @@ export function App() {
                              <div class="flex flex-col flex-grow min-h-0">
                                  <div class="flex justify-between items-center mb-2 flex-shrink-0">
                                     <Breadcrumbs path={currentPath} onNavigate={handleBreadcrumbNav} />
-                                    <input type="file" ref={fileInputRef} onChange={handleFileUpload} class="hidden" />
-                                    <button onClick={() => fileInputRef.current?.click()} disabled={!currentPath || workspaceLoading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="Upload File"> <UploadCloudIcon class="h-4 w-4" /> </button>
+                                    <div class="flex items-center">
+                                        <button onClick={handleCreateFolder} disabled={!currentPath || workspaceLoading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="New Folder"> <PlusCircleIcon class="h-4 w-4" /> </button>
+                                        <input type="file" ref={fileInputRef} onChange={handleFileUpload} class="hidden" />
+                                        <button onClick={() => fileInputRef.current?.click()} disabled={!currentPath || workspaceLoading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="Upload File"> <UploadCloudIcon class="h-4 w-4" /> </button>
+                                    </div>
                                  </div>
                                  <div class="flex-grow bg-gray-900/50 rounded-md p-4 text-sm text-gray-400 font-mono overflow-y-auto">
                                     {workspaceLoading ? <div class="flex items-center gap-2"><LoaderIcon class="h-4 w-4"/><span>Loading...</span></div> : 
                                      workspaceError ? <p class="text-red-400">Error: {workspaceError}</p> : 
                                      workspaceItems.length === 0 ? <p>// Directory is empty.</p> : ( 
                                      <ul> 
-                                        {/* --- MODIFIED: Added Delete Button --- */}
                                         {workspaceItems.map(item => ( 
                                             <li key={item.name} class="group flex justify-between items-center mb-1 hover:bg-gray-700/50 rounded-md -ml-2 -mr-2 pr-2">
                                                 <div onClick={() => handleNavigation(item)} title={item.name} class="flex items-center gap-2 cursor-pointer truncate flex-grow p-2"> 
                                                     {item.type === 'directory' ? <FolderIcon class="h-4 w-4 text-blue-400 flex-shrink-0" /> : <FileIcon class="h-4 w-4 text-gray-500 flex-shrink-0" />}
                                                     <span>{item.name}</span>
                                                 </div>
-                                                <button 
-                                                    onClick={(e) => { e.stopPropagation(); handleDeleteItem(item); }} 
-                                                    class="p-1 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" 
-                                                    title={`Delete ${item.type}`}>
-                                                    <Trash2Icon class="h-4 w-4" />
-                                                </button>
+                                                <div class="flex items-center opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                                                    {/* --- MODIFIED: Rename button is now active --- */}
+                                                    <button 
+                                                        onClick={(e) => { e.stopPropagation(); handleRenameItem(item); }}
+                                                        class="p-1 text-gray-500 hover:text-white"
+                                                        title={`Rename ${item.type}`}>
+                                                        <PencilIcon class="h-4 w-4" />
+                                                    </button>
+                                                    <button 
+                                                        onClick={(e) => { e.stopPropagation(); handleDeleteItem(item); }} 
+                                                        class="p-1 text-gray-500 hover:text-red-400" 
+                                                        title={`Delete ${item.type}`}>
+                                                        <Trash2Icon class="h-4 w-4" />
+                                                    </button>
+                                                </div>
                                             </li> 
                                         ))} 
                                      </ul> 
