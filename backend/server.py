@@ -1,19 +1,17 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 12.3: Create Folder Endpoint)
+# ResearchAgent Backend Server (Phase 12.4: Rename Endpoint - COMPLETE)
 #
-# This version implements Step 3 of the "Interactive Workbench" API by
-# adding the ability to create new directories.
+# This version completes the "Interactive Workbench" API by adding the
+# final required endpoint for renaming files and folders.
 #
-# 1. New `POST` Route: The `do_POST` method now handles a new route,
-#    `/api/workspace/folders`.
-# 2. JSON Body Parsing: The new `_handle_create_folder` method reads the
-#    request body, expecting `application/json` content.
-# 3. Secure Folder Creation: It extracts the `path` from the JSON payload,
-#    securely resolves it, and uses `os.makedirs` to create the new
-#    directory.
-# 4. Conflict Handling: The method checks if a file or folder already exists
-#    at the target path and returns a 409 Conflict status if it does,
-#    preventing accidental overwrites.
+# 1. New `do_PUT` Method: A `do_PUT` handler is added to handle rename
+#    operations, routed to `/api/workspace/items`.
+# 2. Rename Logic: The new `_handle_rename_workspace_item` method parses
+#    a JSON body containing `old_path` and `new_path`.
+# 3. Validation & Security: The method includes checks to ensure the
+#    source path exists and the destination path does *not* exist, preventing
+#    errors and accidental overwrites. It uses `os.rename` to perform the
+#    operation securely within the workspace.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -93,7 +91,6 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         parsed_path = urlparse(self.path)
         path = parsed_path.path.rstrip('/')
 
-        # --- NEW ROUTE ---
         if path == '/api/workspace/folders':
             self._handle_create_folder()
         elif path == '/upload': 
@@ -110,6 +107,16 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             self._handle_delete_workspace_item(parsed_path)
         else:
             self._send_json_response(404, {'error': f"Not Found: The path '{path}' does not match any known DELETE routes."})
+
+    # --- NEW: PUT Requests Handler ---
+    def do_PUT(self):
+        parsed_path = urlparse(self.path)
+        path = parsed_path.path.rstrip('/')
+
+        if path == '/api/workspace/items':
+            self._handle_rename_workspace_item()
+        else:
+            self._send_json_response(404, {'error': f"Not Found: The path '{path}' does not match any known PUT routes."})
 
     # --- OPTIONS Requests Handler (for CORS) ---
     def do_OPTIONS(self):
@@ -241,9 +248,8 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             logger.error(f"Error deleting workspace item '{item_path_str}': {e}", exc_info=True)
             self._send_json_response(500, {"error": str(e)})
     
-    # --- NEW METHOD for Creating Folders ---
     def _handle_create_folder(self):
-        """Handles requests to create a new folder in the workspace."""
+        # ... (no changes in this method)
         try:
             content_length = int(self.headers['Content-Length'])
             if content_length == 0:
@@ -271,6 +277,44 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         except Exception as e:
             logger.error(f"Error creating folder: {e}", exc_info=True)
             self._send_json_response(500, {'error': str(e)})
+
+    # --- NEW METHOD for Renaming Items ---
+    def _handle_rename_workspace_item(self):
+        """Handles requests to rename a file or directory."""
+        try:
+            content_length = int(self.headers['Content-Length'])
+            if content_length == 0:
+                return self._send_json_response(400, {'error': 'Request body is empty.'})
+            
+            post_data = self.rfile.read(content_length)
+            body = json.loads(post_data)
+            
+            old_path_str = body.get('old_path')
+            new_path_str = body.get('new_path')
+
+            if not old_path_str or not new_path_str:
+                return self._send_json_response(400, {'error': "Request body must contain 'old_path' and 'new_path' keys."})
+
+            base_workspace = "/app/workspace"
+            old_full_path = _resolve_path(base_workspace, old_path_str)
+            new_full_path = _resolve_path(base_workspace, new_path_str)
+
+            if not os.path.exists(old_full_path):
+                return self._send_json_response(404, {'error': f"Source item not found: '{old_path_str}'."})
+            
+            if os.path.exists(new_full_path):
+                return self._send_json_response(409, {'error': f"Destination already exists: '{new_path_str}'."})
+
+            os.rename(old_full_path, new_full_path)
+            logger.info(f"Successfully renamed '{old_full_path}' to '{new_full_path}'")
+            self._send_json_response(200, {'message': f"Item renamed successfully to '{new_path_str}'."})
+
+        except json.JSONDecodeError:
+            self._send_json_response(400, {'error': 'Invalid JSON in request body.'})
+        except Exception as e:
+            logger.error(f"Error renaming item: {e}", exc_info=True)
+            self._send_json_response(500, {'error': str(e)})
+
 
     def _handle_get_file_content(self, parsed_path):
         # ... (no changes in this method)
