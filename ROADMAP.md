@@ -2,20 +2,11 @@
 
 To build a transformative, AI-powered workbench. The platform will be powerful enough for scientific research and general enough for power users, with a core architecture that allows users to easily add their own tools and capabilities. The system is designed for privacy and efficiency, with a clear path to running on local LLMs.
 
-### ✅ COMPLETED: Phase 11: The Secure, Extensible Environment
+### ✅ COMPLETED: Phase 12: The Interactive Workbench
 
--   \[x\] **Result:** The agent now operates with a robust, "commit-on-write" Memory Vault for persistent, structured knowledge. Each task is now automatically provisioned with its own isolated Python virtual environment, and the agent is equipped with a secure `pip_install` tool to manage dependencies on a per-task basis.
+-   \[x\] **Result:** Evolved the workspace from a simple file list into a full-featured, interactive file explorer with a smart backend API, folder navigation, breadcrumbs, core interactivity (create, rename, delete), drag-and-drop uploads, and a smart previewer for images, Markdown, and CSVs.
 
 ### 🚀 UPCOMING PHASES 🚀
-
-#### Phase 12: The Interactive Workbench
-
-_Goal: Evolve the workspace from a simple file list into a full-featured, interactive file explorer, enabling complex project management and a seamless user experience._
-
--   \[ \] **Sub-Phase A: The Smart Backend API:** Refactor the backend API to provide structured information about workspace items (e.g., name, type, size) and add new endpoints for creating, deleting, and renaming files and folders.
--   \[ \] **Sub-Phase B: The Navigable UI:** Upgrade the frontend to consume the new API, introducing folder navigation, breadcrumbs, and distinct icons for different file and folder types.
--   \[ \] **Sub-Phase C: Core Interactivity:** Implement essential user interactions, including a "New Folder" button and a right-click context menu for "Rename" and "Delete" actions.
--   \[ \] **Sub-Phase D: Advanced Features & Previews:** Add drag-and-drop file uploads and build a smart previewer capable of rendering various file types (images, Markdown, CSVs, source code) directly within the UI.
 
 #### Phase 13: The "Tool Forge" - A Pluggable Tool Architecture
 
@@ -32,3 +23,12 @@ _Goal: Equip the agent with a suite of powerful, pre-built tools for common high
 -   \[ \] **Multi-Document Reporter Tool:** A tool that can synthesize information from multiple text files or PDFs.
 -   \[ \] **Scientific Data Fetcher Tool:** A specialized tool to find and download datasets from sources like NCBI, PubMed, etc.
 -   \[ \] **Website Report Generator:** A tool that can populate pre-defined website templates with data to create visual reports.
+
+#### Phase 15: UI/UX Polish & Advanced Previews (NEW)
+
+_Goal: Refine the user experience with modern, fluid interactions and expand file preview capabilities._
+
+-   \[ \] **Advanced Document Previews:** Implement client-side rendering for PDFs (using `PDF.js`) and server-side conversion for Word documents (`.docx`) to enable in-app viewing.
+-   \[ \] **Inline File/Folder Creation:** Refactor the creation process to instantly add a new item to the UI in an "editing" state, only calling the backend API after the user confirms the name.
+-   \[ \] **Drag-and-Drop File Moving:** Add support for dragging files and dropping them onto folders to trigger a move/rename operation.
+-   \[ \] **Inline Renaming:** Unify the renaming experience by refactoring the file explorer to support in-place renaming, consistent with the task list.
