@@ -103,6 +103,8 @@ export function App() {
     const [selectedModels, setSelectedModels] = useState({});
     const [isAwaitingApproval, setIsAwaitingApproval] = useState(false);
     const [availableTools, setAvailableTools] = useState([]);
+    // --- NEW: State for drag-and-drop overlay ---
+    const [isDragOver, setIsDragOver] = useState(false);
 
     const ws = useRef(null);
     const messagesEndRef = useRef(null);
@@ -326,7 +328,6 @@ export function App() {
         }
     }, [currentPath, fetchWorkspaceFiles]);
 
-    // --- NEW: Handler for renaming a file or folder ---
     const handleRenameItem = useCallback(async (item) => {
         const newName = prompt(`Enter the new name for '${item.name}':`, item.name);
         if (!newName || newName.trim() === '' || newName.trim() === item.name) {
@@ -348,7 +349,7 @@ export function App() {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to rename item');
             }
-            await fetchWorkspaceFiles(currentPath); // Refresh view
+            await fetchWorkspaceFiles(currentPath);
         } catch (error) {
              console.error("Failed to rename item:", error);
             setWorkspaceError(error.message);
@@ -357,11 +358,11 @@ export function App() {
         }
     }, [currentPath, fetchWorkspaceFiles]);
 
-
-    const handleFileUpload = useCallback(async (e) => {
-        const file = e.target.files[0];
+    // --- MODIFIED: `handleFileUpload` now accepts a File object directly ---
+    const handleFileUpload = useCallback(async (file) => {
         if (!file || !currentPath) return;
         setWorkspaceLoading(true);
+        setWorkspaceError(null); // Clear previous errors
         const formData = new FormData();
         formData.append('file', file);
         formData.append('workspace_id', currentPath); 
@@ -377,6 +378,37 @@ export function App() {
             if(fileInputRef.current) fileInputRef.current.value = "";
         }
     }, [currentPath, fetchWorkspaceFiles]);
+
+    // --- NEW: Event handlers for drag and drop ---
+    const handleDragEnter = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragOver(true);
+    };
+
+    const handleDragLeave = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragOver(false);
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+    };
+
+    const handleDrop = useCallback((e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragOver(false);
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            // We call handleFileUpload for each dropped file.
+            // Using Array.from to iterate over the FileList.
+            Array.from(e.dataTransfer.files).forEach(file => handleFileUpload(file));
+            e.dataTransfer.clearData();
+        }
+    }, [handleFileUpload]);
+
 
     useEffect(() => {
         const fetchConfig = async () => {
@@ -652,7 +684,13 @@ export function App() {
 
             {!isRightSidebarVisible && <ToggleButton isVisible={isRightSidebarVisible} onToggle={() => setIsRightSidebarVisible(true)} side="right" />}
             {isRightSidebarVisible && (
-                <div class="h-full w-1/4 min-w-[300px] bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col">
+                // --- MODIFIED: Added Drag-and-Drop Handlers ---
+                <div class="h-full w-1/4 min-w-[300px] bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col relative"
+                    onDragEnter={handleDragEnter}
+                    onDragLeave={handleDragLeave}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                >
                     <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-700"> <h2 class="text-xl font-bold text-white">Agent Workspace</h2> <button onClick={() => setIsRightSidebarVisible(false)} class="p-1.5 rounded-md hover:bg-gray-700" title="Hide Workspace"><ChevronsRightIcon class="h-4 w-4" /></button> </div>
                     <div class="flex flex-col flex-grow min-h-0 px-6 pb-6 pt-4">
                         {selectedFile ? (
@@ -673,7 +711,7 @@ export function App() {
                                     <Breadcrumbs path={currentPath} onNavigate={handleBreadcrumbNav} />
                                     <div class="flex items-center">
                                         <button onClick={handleCreateFolder} disabled={!currentPath || workspaceLoading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="New Folder"> <PlusCircleIcon class="h-4 w-4" /> </button>
-                                        <input type="file" ref={fileInputRef} onChange={handleFileUpload} class="hidden" />
+                                        <input type="file" ref={fileInputRef} onChange={(e) => handleFileUpload(e.target.files[0])} class="hidden" />
                                         <button onClick={() => fileInputRef.current?.click()} disabled={!currentPath || workspaceLoading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="Upload File"> <UploadCloudIcon class="h-4 w-4" /> </button>
                                     </div>
                                  </div>
@@ -689,7 +727,6 @@ export function App() {
                                                     <span>{item.name}</span>
                                                 </div>
                                                 <div class="flex items-center opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                                                    {/* --- MODIFIED: Rename button is now active --- */}
                                                     <button 
                                                         onClick={(e) => { e.stopPropagation(); handleRenameItem(item); }}
                                                         class="p-1 text-gray-500 hover:text-white"
@@ -711,6 +748,15 @@ export function App() {
                              </div>
                         )}
                     </div>
+                    {/* --- NEW: Drag-and-drop overlay --- */}
+                    {isDragOver && (
+                        <div class="absolute inset-0 bg-blue-500/20 border-2 border-dashed border-blue-400 rounded-lg flex items-center justify-center pointer-events-none">
+                            <div class="text-center">
+                                <UploadCloudIcon class="h-10 w-10 text-blue-300 mx-auto" />
+                                <p class="mt-2 font-semibold text-white">Drop files to upload</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
