@@ -103,7 +103,6 @@ export function App() {
     const [selectedModels, setSelectedModels] = useState({});
     const [isAwaitingApproval, setIsAwaitingApproval] = useState(false);
     const [availableTools, setAvailableTools] = useState([]);
-    // --- NEW: State for drag-and-drop overlay ---
     const [isDragOver, setIsDragOver] = useState(false);
 
     const ws = useRef(null);
@@ -111,6 +110,8 @@ export function App() {
     const fileInputRef = useRef(null);
     const runModelsRef = useRef({});
     const handlersRef = useRef();
+    // --- NEW: Ref to manage the drag counter ---
+    const dragCounter = useRef(0);
 
     useEffect(() => {
         handlersRef.current = {
@@ -358,11 +359,10 @@ export function App() {
         }
     }, [currentPath, fetchWorkspaceFiles]);
 
-    // --- MODIFIED: `handleFileUpload` now accepts a File object directly ---
     const handleFileUpload = useCallback(async (file) => {
         if (!file || !currentPath) return;
         setWorkspaceLoading(true);
-        setWorkspaceError(null); // Clear previous errors
+        setWorkspaceError(null);
         const formData = new FormData();
         formData.append('file', file);
         formData.append('workspace_id', currentPath); 
@@ -379,17 +379,23 @@ export function App() {
         }
     }, [currentPath, fetchWorkspaceFiles]);
 
-    // --- NEW: Event handlers for drag and drop ---
+    // --- MODIFIED: Drag-and-drop handlers now use a counter to prevent flickering ---
     const handleDragEnter = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        setIsDragOver(true);
+        dragCounter.current++;
+        if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+            setIsDragOver(true);
+        }
     };
 
     const handleDragLeave = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        setIsDragOver(false);
+        dragCounter.current--;
+        if (dragCounter.current === 0) {
+            setIsDragOver(false);
+        }
     };
 
     const handleDragOver = (e) => {
@@ -401,9 +407,8 @@ export function App() {
         e.preventDefault();
         e.stopPropagation();
         setIsDragOver(false);
+        dragCounter.current = 0; // Reset counter on drop
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            // We call handleFileUpload for each dropped file.
-            // Using Array.from to iterate over the FileList.
             Array.from(e.dataTransfer.files).forEach(file => handleFileUpload(file));
             e.dataTransfer.clearData();
         }
@@ -684,7 +689,6 @@ export function App() {
 
             {!isRightSidebarVisible && <ToggleButton isVisible={isRightSidebarVisible} onToggle={() => setIsRightSidebarVisible(true)} side="right" />}
             {isRightSidebarVisible && (
-                // --- MODIFIED: Added Drag-and-Drop Handlers ---
                 <div class="h-full w-1/4 min-w-[300px] bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col relative"
                     onDragEnter={handleDragEnter}
                     onDragLeave={handleDragLeave}
@@ -748,7 +752,6 @@ export function App() {
                              </div>
                         )}
                     </div>
-                    {/* --- NEW: Drag-and-drop overlay --- */}
                     {isDragOver && (
                         <div class="absolute inset-0 bg-blue-500/20 border-2 border-dashed border-blue-400 rounded-lg flex items-center justify-center pointer-events-none">
                             <div class="text-center">
