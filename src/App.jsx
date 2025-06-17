@@ -4,7 +4,67 @@ import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, Ed
 import { ArchitectCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard } from './components/AgentCards';
 import { ToggleButton, CopyButton } from './components/Common';
 
-// --- UI Components that are specific to App.jsx ---
+// --- File Previewer Component ---
+const FilePreviewer = ({ currentPath, file, isLoading, content, rawFileUrl }) => {
+    if (isLoading) {
+        return <div class="flex items-center justify-center h-full"><LoaderIcon class="h-6 w-6" /></div>;
+    }
+    if (!file) {
+        return <div class="flex items-center justify-center h-full text-gray-500">Select a file to preview</div>;
+    }
+
+    const extension = file.name.split('.').pop().toLowerCase();
+
+    // Image Preview
+    if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(extension)) {
+        return <img src={rawFileUrl} alt={file.name} class="max-w-full max-h-full object-contain mx-auto" />;
+    }
+
+    // Markdown Preview
+    if (extension === 'md' && window.marked) {
+        const parsedHtml = window.marked.parse(content, { breaks: true, gfm: true });
+        return <div class="prose prose-sm prose-invert max-w-none p-4" dangerouslySetInnerHTML={{ __html: parsedHtml }}></div>;
+    }
+    
+    // CSV/TSV Preview
+    if (['csv', 'tsv'].includes(extension)) {
+        const delimiter = extension === 'tsv' ? '\t' : ',';
+        const rows = content.split('\n').map(row => row.split(delimiter));
+        if (rows.length === 0) return <p>Empty {extension.toUpperCase()} file.</p>;
+        
+        const header = rows[0];
+        const body = rows.slice(1);
+
+        return (
+             <div class="overflow-auto h-full">
+                <table class="w-full text-left text-sm text-gray-300">
+                    <thead class="bg-gray-700/50 sticky top-0">
+                        <tr>
+                            {header.map((col, i) => <th key={i} class="p-2 border-b border-gray-600 font-semibold">{col}</th>)}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {body.map((row, i) => (
+                            <tr key={i} class="border-b border-gray-800 last:border-b-0 hover:bg-gray-700/20">
+                                {row.map((cell, j) => <td key={j} class="p-2 truncate" title={cell}>{cell}</td>)}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        );
+    }
+    
+    // Default: Code/Text Preview
+    return (
+        <pre class="h-full w-full text-sm text-gray-300 font-mono">
+            <code>{content}</code>
+        </pre>
+    );
+};
+
+
+// --- UI Components ---
 
 const PromptCard = ({ content }) => (
     <div class="mt-8 p-4 rounded-lg shadow-md bg-blue-900/50 border border-gray-700/50">
@@ -110,15 +170,12 @@ export function App() {
     const fileInputRef = useRef(null);
     const runModelsRef = useRef({});
     const handlersRef = useRef();
-    // --- NEW: Ref to manage the drag counter ---
     const dragCounter = useRef(0);
 
+    // --- FIX: handlersRef now updated inside useEffect to capture latest state ---
     useEffect(() => {
         handlersRef.current = {
             fetchWorkspaceFiles,
-            activeTaskId,
-            setCurrentPath,
-            currentPath, 
         };
     });
 
@@ -217,7 +274,8 @@ export function App() {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
     
-    const fetchWorkspaceFiles = useCallback(async (path) => {
+    // --- FIX: Removed useCallback with empty dependency array ---
+    const fetchWorkspaceFiles = async (path) => {
         if (!path) return;
         setWorkspaceLoading(true);
         setWorkspaceError(null);
@@ -241,16 +299,26 @@ export function App() {
         } finally {
             setWorkspaceLoading(false);
         }
-    }, []);
+    };
 
-    const fetchFileContent = useCallback(async (path, filename) => {
-        if (!path || !filename) return;
-        setIsFileLoading(true);
-        setSelectedFile(filename);
+    // --- FIX: Removed useCallback ---
+    const selectAndFetchFile = async (file) => {
+        if (!currentPath || !file) return;
+
+        setSelectedFile(file);
         setFileContent('');
+        
+        const extension = file.name.split('.').pop().toLowerCase();
+        const isImage = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(extension);
+
+        if (isImage) {
+            setIsFileLoading(false);
+            return;
+        }
+
+        setIsFileLoading(true);
         try {
-            const dirPath = path;
-            const response = await fetch(`http://localhost:8766/file-content?path=${dirPath}&filename=${filename}`);
+            const response = await fetch(`http://localhost:8766/file-content?path=${currentPath}&filename=${file.name}`);
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to fetch file content');
@@ -263,14 +331,15 @@ export function App() {
         } finally {
             setIsFileLoading(false);
         }
-    }, []);
+    };
     
     const handleNavigation = (item) => {
         if (item.type === 'directory') {
             const newPath = `${currentPath}/${item.name}`;
             setCurrentPath(newPath);
+            setSelectedFile(null);
         } else {
-            fetchFileContent(currentPath, item.name);
+            selectAndFetchFile(item);
         }
     };
     
@@ -279,7 +348,8 @@ export function App() {
         setSelectedFile(null);
     };
 
-    const handleDeleteItem = useCallback(async (item) => {
+    // --- FIX: Removed useCallback ---
+    const handleDeleteItem = async (item) => {
         if (!confirm(`Are you sure you want to delete '${item.name}'?`)) {
             return;
         }
@@ -292,6 +362,9 @@ export function App() {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to delete item');
             }
+            if (selectedFile && selectedFile.name === item.name) {
+                setSelectedFile(null);
+            }
             await fetchWorkspaceFiles(currentPath);
         } catch (error) {
             console.error("Failed to delete item:", error);
@@ -299,14 +372,14 @@ export function App() {
         } finally {
             setWorkspaceLoading(false);
         }
-    }, [currentPath, fetchWorkspaceFiles]);
+    };
 
-    const handleCreateFolder = useCallback(async () => {
+    // --- FIX: Removed useCallback ---
+    const handleCreateFolder = async () => {
         const folderName = prompt("Enter the name for the new folder:");
         if (!folderName || folderName.trim() === '') {
             return;
         }
-
         const newFolderPath = `${currentPath}/${folderName.trim()}`;
         setWorkspaceLoading(true);
         setWorkspaceError(null);
@@ -327,17 +400,16 @@ export function App() {
         } finally {
             setWorkspaceLoading(false);
         }
-    }, [currentPath, fetchWorkspaceFiles]);
+    };
 
-    const handleRenameItem = useCallback(async (item) => {
+    // --- FIX: Removed useCallback ---
+    const handleRenameItem = async (item) => {
         const newName = prompt(`Enter the new name for '${item.name}':`, item.name);
         if (!newName || newName.trim() === '' || newName.trim() === item.name) {
             return;
         }
-        
         const oldPath = `${currentPath}/${item.name}`;
         const newPath = `${currentPath}/${newName.trim()}`;
-
         setWorkspaceLoading(true);
         setWorkspaceError(null);
         try {
@@ -357,9 +429,10 @@ export function App() {
         } finally {
             setWorkspaceLoading(false);
         }
-    }, [currentPath, fetchWorkspaceFiles]);
+    };
 
-    const handleFileUpload = useCallback(async (file) => {
+    // --- FIX: Removed useCallback ---
+    const handleFileUpload = async (file) => {
         if (!file || !currentPath) return;
         setWorkspaceLoading(true);
         setWorkspaceError(null);
@@ -377,9 +450,8 @@ export function App() {
             setWorkspaceLoading(false);
             if(fileInputRef.current) fileInputRef.current.value = "";
         }
-    }, [currentPath, fetchWorkspaceFiles]);
+    };
 
-    // --- MODIFIED: Drag-and-drop handlers now use a counter to prevent flickering ---
     const handleDragEnter = (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -403,17 +475,17 @@ export function App() {
         e.stopPropagation();
     };
 
-    const handleDrop = useCallback((e) => {
+    // --- FIX: Removed useCallback ---
+    const handleDrop = (e) => {
         e.preventDefault();
         e.stopPropagation();
         setIsDragOver(false);
-        dragCounter.current = 0; // Reset counter on drop
+        dragCounter.current = 0;
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             Array.from(e.dataTransfer.files).forEach(file => handleFileUpload(file));
             e.dataTransfer.clearData();
         }
-    }, [handleFileUpload]);
-
+    };
 
     useEffect(() => {
         const fetchConfig = async () => {
@@ -443,7 +515,7 @@ export function App() {
         if (currentPath) {
             fetchWorkspaceFiles(currentPath);
         }
-    }, [currentPath, fetchWorkspaceFiles]);
+    }, [currentPath]); // FIX: fetchWorkspaceFiles is stable now
     
     const handleApprovalAction = (feedback, plan = null) => {
         if (ws.current?.readyState !== WebSocket.OPEN) {
@@ -498,9 +570,8 @@ export function App() {
                 const newEvent = JSON.parse(event.data);
                 
                 if (newEvent.type === 'final_answer' && newEvent.refresh_workspace) {
-                    if (handlersRef.current.activeTaskId === newEvent.task_id) {
-                        handlersRef.current.fetchWorkspaceFiles(handlersRef.current.currentPath);
-                    }
+                    // Use the handler from the ref to ensure it's the latest version
+                    handlersRef.current.fetchWorkspaceFiles(currentPath);
                 }
 
                 setTasks(currentTasks => {
@@ -558,9 +629,8 @@ export function App() {
                                         stepToUpdate.toolCall = inputData.current_tool_call;
                                         stepToUpdate.toolOutput = outputData.tool_output;
                                         stepToUpdate.evaluation = outputData.step_evaluation;
-                                        if (handlersRef.current.activeTaskId === newEvent.task_id) { 
-                                            handlersRef.current.fetchWorkspaceFiles(handlersRef.current.currentPath);
-                                        }
+                                        // Use the handler from the ref to ensure it's the latest version
+                                        handlersRef.current.fetchWorkspaceFiles(currentPath);
                                     }
                                     executionPlan.steps[stepIndex] = stepToUpdate;
                                 }
@@ -579,7 +649,7 @@ export function App() {
         }
         connect();
         return () => { if (ws.current) { ws.current.onclose = null; ws.current.close(); } };
-    }, []);
+    }, [currentPath]); // Dependency on currentPath to re-establish handler with correct scope
 
     const activeTask = tasks.find(t => t.id === activeTaskId);
     useEffect(() => { scrollToBottom(); }, [activeTask?.history, isAwaitingApproval]);
@@ -700,13 +770,16 @@ export function App() {
                         {selectedFile ? (
                             <div class="flex flex-col h-full">
                                 <div class="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-gray-700 flex-shrink-0">
-                                    <div class="flex items-center gap-2 min-w-0"> <button onClick={() => setSelectedFile(null)} class="p-1.5 rounded-md hover:bg-gray-700 flex-shrink-0"><ArrowLeftIcon class="h-4 w-4" /></button> <span class="font-mono text-sm text-white truncate">{selectedFile}</span> </div>
+                                    <div class="flex items-center gap-2 min-w-0"> <button onClick={() => setSelectedFile(null)} class="p-1.5 rounded-md hover:bg-gray-700 flex-shrink-0"><ArrowLeftIcon class="h-4 w-4" /></button> <span class="font-mono text-sm text-white truncate">{selectedFile.name}</span> </div>
                                     <CopyButton textToCopy={fileContent} />
                                 </div>
-                                <div class="flex-grow bg-gray-900/50 rounded-md overflow-auto p-4">
-                                    <pre class="h-full w-full text-sm text-gray-300 font-mono">
-                                        {isFileLoading ? 'Loading...' : <code>{fileContent}</code>}
-                                    </pre>
+                                <div class="flex-grow bg-gray-900/50 rounded-md overflow-auto flex items-center justify-center">
+                                    <FilePreviewer 
+                                        file={selectedFile} 
+                                        isLoading={isFileLoading} 
+                                        content={fileContent} 
+                                        rawFileUrl={`http://localhost:8766/api/workspace/raw?path=${currentPath}/${selectedFile.name}`} 
+                                    />
                                 </div>
                             </div>
                         ) : (

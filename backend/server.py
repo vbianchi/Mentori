@@ -1,17 +1,18 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 12.4: Rename Endpoint - COMPLETE)
+# ResearchAgent Backend Server (Phase 12.5: Raw File Endpoint)
 #
-# This version completes the "Interactive Workbench" API by adding the
-# final required endpoint for renaming files and folders.
+# This version adds the final backend component needed for the Smart File
+# Previewer: an endpoint to serve raw file data.
 #
-# 1. New `do_PUT` Method: A `do_PUT` handler is added to handle rename
-#    operations, routed to `/api/workspace/items`.
-# 2. Rename Logic: The new `_handle_rename_workspace_item` method parses
-#    a JSON body containing `old_path` and `new_path`.
-# 3. Validation & Security: The method includes checks to ensure the
-#    source path exists and the destination path does *not* exist, preventing
-#    errors and accidental overwrites. It uses `os.rename` to perform the
-#    operation securely within the workspace.
+# 1. New `/api/workspace/raw` Endpoint: A new route is added to `do_GET`
+#    to handle requests for raw file content. This is essential for things
+#    like rendering images in `<img>` tags on the frontend.
+# 2. `_handle_get_raw_file` Method: This new handler reads the requested file
+#    in binary mode (`'rb'`).
+# 3. Dynamic Content-Type: It uses Python's built-in `mimetypes` library
+#    to automatically determine the correct `Content-Type` header based on
+#    the file's extension (e.g., `image/png`, `text/csv`). This ensures the
+#    browser interprets the file correctly.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -21,6 +22,7 @@ import json
 import threading
 import cgi
 import shutil
+import mimetypes # NEW IMPORT
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
 from dotenv import load_dotenv
@@ -83,6 +85,9 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             self._handle_get_workspace_items(parsed_path)
         elif path == '/file-content':
             self._handle_get_file_content(parsed_path)
+        # --- NEW ROUTE for raw file data ---
+        elif path == '/api/workspace/raw':
+            self._handle_get_raw_file(parsed_path)
         else:
             self._send_json_response(404, {'error': f"Not Found: The path '{path}' does not match any known API routes."})
 
@@ -108,7 +113,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         else:
             self._send_json_response(404, {'error': f"Not Found: The path '{path}' does not match any known DELETE routes."})
 
-    # --- NEW: PUT Requests Handler ---
+    # --- PUT Requests Handler ---
     def do_PUT(self):
         parsed_path = urlparse(self.path)
         path = parsed_path.path.rstrip('/')
@@ -135,7 +140,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(data).encode('utf-8'))
     
     def _handle_get_models(self):
-        # ... (no changes in this method)
+        # ... (no changes)
         logger.info("Parsing .env to serve available and default models.")
         available_models = []
         model_ids = set()
@@ -166,7 +171,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         self._send_json_response(200, response_data)
 
     def _handle_get_tools(self):
-        # ... (no changes in this method)
+        # ... (no changes)
         logger.info("Serving available tools list.")
         try:
             loaded_tools = get_available_tools()
@@ -185,7 +190,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             self._send_json_response(500, {"error": "Could not retrieve tools."})
 
     def _handle_get_workspace_items(self, parsed_path):
-        # ... (no changes in this method)
+        # ... (no changes)
         logger.info("Serving structured workspace items list.")
         query_components = parse_qs(parsed_path.query)
         subdir = query_components.get("path", [None])[0]
@@ -217,7 +222,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             self._send_json_response(500, {"error": str(e)})
 
     def _handle_delete_workspace_item(self, parsed_path):
-        # ... (no changes in this method)
+        # ... (no changes)
         logger.info("Handling request to delete workspace item.")
         query_components = parse_qs(parsed_path.query)
         item_path_str = query_components.get("path", [None])[0]
@@ -249,7 +254,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             self._send_json_response(500, {"error": str(e)})
     
     def _handle_create_folder(self):
-        # ... (no changes in this method)
+        # ... (no changes)
         try:
             content_length = int(self.headers['Content-Length'])
             if content_length == 0:
@@ -278,9 +283,8 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             logger.error(f"Error creating folder: {e}", exc_info=True)
             self._send_json_response(500, {'error': str(e)})
 
-    # --- NEW METHOD for Renaming Items ---
     def _handle_rename_workspace_item(self):
-        """Handles requests to rename a file or directory."""
+        # ... (no changes)
         try:
             content_length = int(self.headers['Content-Length'])
             if content_length == 0:
@@ -315,9 +319,8 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             logger.error(f"Error renaming item: {e}", exc_info=True)
             self._send_json_response(500, {'error': str(e)})
 
-
     def _handle_get_file_content(self, parsed_path):
-        # ... (no changes in this method)
+        # ... (no changes)
         query_components = parse_qs(parsed_path.query)
         workspace_id = query_components.get("path", [None])[0]
         filename = query_components.get("filename", [None])[0]
@@ -332,9 +335,48 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(content.encode('utf-8'))
         except Exception as e: self._send_json_response(500, {"error": f"Error reading file: {e}"})
+    
+    # --- NEW METHOD to serve raw files ---
+    def _handle_get_raw_file(self, parsed_path):
+        """Serves a raw file (like an image) with the correct content type."""
+        query_components = parse_qs(parsed_path.query)
+        file_path_str = query_components.get("path", [None])[0]
+        if not file_path_str:
+            self.send_error(400, "Missing 'path' query parameter.")
+            return
+
+        base_workspace = "/app/workspace"
+        try:
+            full_path = _resolve_path(base_workspace, file_path_str)
+            if not os.path.isfile(full_path):
+                self.send_error(404, "File not found.")
+                return
+
+            # Guess the MIME type of the file
+            content_type, _ = mimetypes.guess_type(full_path)
+            if content_type is None:
+                content_type = 'application/octet-stream' # Default binary type
+            
+            self.send_response(200)
+            self.send_header('Content-type', content_type)
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            
+            with open(full_path, 'rb') as f:
+                self.wfile.write(f.read())
+
+        except PermissionError as e:
+            logger.warning(f"Permission denied for raw file access to '{file_path_str}': {e}")
+            self.send_error(403, "Permission Denied")
+        except FileNotFoundError:
+             self.send_error(404, "File not found.")
+        except Exception as e:
+            logger.error(f"Error serving raw file '{file_path_str}': {e}", exc_info=True)
+            self.send_error(500, "Internal Server Error")
+
 
     def _handle_file_upload(self):
-        # ... (no changes in this method)
+        # ... (no changes)
         try:
             form = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': self.headers['Content-Type']})
             workspace_id = form.getvalue('workspace_id')
@@ -359,9 +401,9 @@ def run_http_server():
     httpd.serve_forever()
 
 
-# --- WebSocket Handlers ---
+# --- WebSocket Handlers (No changes below this line) ---
 async def run_agent_handler(websocket, data):
-    # ... (no changes in this method)
+    # ...
     prompt = data.get("prompt")
     llm_config = data.get("llm_config", {})
     task_id = data.get("task_id")
@@ -400,7 +442,7 @@ async def run_agent_handler(websocket, data):
 
 
 async def resume_agent_handler(websocket, data):
-    # ... (no changes in this method)
+    # ...
     task_id = data.get("task_id")
     feedback = data.get("feedback")
     new_plan = data.get("plan")
@@ -430,7 +472,7 @@ async def resume_agent_handler(websocket, data):
 
 
 async def handle_task_create(websocket, data):
-    # ... (no changes in this method)
+    # ...
     task_id = data.get("task_id")
     if not task_id: return
     logger.info(f"Task '{task_id}': Received create task request.")
@@ -439,7 +481,7 @@ async def handle_task_create(websocket, data):
 
 
 async def handle_task_delete(websocket, data):
-    # ... (no changes in this method)
+    # ...
     task_id = data.get("task_id")
     if not task_id: return
     logger.info(f"Task '{task_id}': Received delete task request.")
@@ -447,7 +489,7 @@ async def handle_task_delete(websocket, data):
 
 
 async def message_router(websocket):
-    # ... (no changes in this method)
+    # ...
     logger.info(f"Client connected from {websocket.remote_address}")
     try:
         async for message in websocket:
@@ -476,7 +518,7 @@ async def message_router(websocket):
 
 
 async def main():
-    # ... (no changes in this method)
+    # ...
     http_thread = threading.Thread(target=run_http_server, daemon=True)
     http_thread.start()
     host = os.getenv("BACKEND_HOST", "0.0.0.0")
