@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
-import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, ArrowLeftIcon, UploadCloudIcon } from './components/Icons';
+import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, FolderIcon, ArrowLeftIcon, UploadCloudIcon } from './components/Icons';
 import { ArchitectCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard } from './components/AgentCards';
 import { ToggleButton, CopyButton } from './components/Common';
 
@@ -57,7 +57,30 @@ const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
              {isExpanded && ( <div class="mt-4 pl-2"> {agentRoles.map(role => ( <div key={role.key}> <ModelSelector label={role.label} roleKey={role.key} icon={role.icon} models={models} selectedModel={selectedModels[role.key]} onModelChange={onModelChange}/> <p class="text-xs text-gray-500 -mt-2 mb-4 pl-7">{role.desc}</p> </div> ))} </div> )}
         </div>
     )
-}
+};
+
+// --- NEW Component: Breadcrumbs for File Explorer ---
+const Breadcrumbs = ({ path, onNavigate }) => {
+    const parts = path.split('/').filter(Boolean);
+    
+    const handleCrumbClick = (index) => {
+        const newPath = parts.slice(0, index + 1).join('/');
+        onNavigate(newPath);
+    };
+
+    return (
+        <div class="flex items-center gap-1.5 text-xs text-gray-500 truncate mb-2 flex-shrink-0">
+            <span onClick={() => onNavigate(parts[0])} class="hover:text-white cursor-pointer">Workspace</span>
+            {parts.slice(1).map((part, index) => (
+                <div key={index} class="flex items-center gap-1.5">
+                    <span>/</span>
+                    <span onClick={() => handleCrumbClick(index + 1)} class="hover:text-white cursor-pointer">{part}</span>
+                </div>
+            ))}
+        </div>
+    );
+};
+
 
 // --- Main App Component ---
 export function App() {
@@ -68,7 +91,11 @@ export function App() {
     const [connectionStatus, setConnectionStatus] = useState("Disconnected");
     const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
     const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
-    const [workspaceFiles, setWorkspaceFiles] = useState([]);
+
+    // --- NEW State for File Explorer ---
+    const [workspaceItems, setWorkspaceItems] = useState([]);
+    const [currentPath, setCurrentPath] = useState('');
+    
     const [workspaceLoading, setWorkspaceLoading] = useState(false);
     const [workspaceError, setWorkspaceError] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
@@ -86,9 +113,11 @@ export function App() {
     const handlersRef = useRef();
 
     useEffect(() => {
+        // --- MODIFIED: Store a reference to setCurrentPath for use in the websocket handler
         handlersRef.current = {
             fetchWorkspaceFiles,
             activeTaskId,
+            setCurrentPath, // Add setCurrentPath to handlers
         };
     });
 
@@ -99,8 +128,12 @@ export function App() {
         setTasks(loadedTasks);
         if (savedActiveId && loadedTasks.some(t => t.id === savedActiveId)) {
             setActiveTaskId(savedActiveId);
+            // --- NEW: Set initial path when active task is loaded
+            setCurrentPath(savedActiveId);
         } else if (loadedTasks.length > 0) {
             setActiveTaskId(loadedTasks[0].id);
+            // --- NEW: Set initial path for the first task
+            setCurrentPath(loadedTasks[0].id);
         }
     }, []);
 
@@ -121,7 +154,8 @@ export function App() {
     }, [activeTaskId]);
     
     const resetWorkspaceViews = () => {
-        setWorkspaceFiles([]);
+        // --- MODIFIED: Now resets `workspaceItems` instead of `workspaceFiles` ---
+        setWorkspaceItems([]);
         setWorkspaceError(null);
         setSelectedFile(null);
     };
@@ -132,6 +166,8 @@ export function App() {
             setIsThinking(false);
             setIsAwaitingApproval(false);
             resetWorkspaceViews();
+            // --- NEW: Set the path to the root of the new task ---
+            setCurrentPath(taskId);
         }
     };
     
@@ -170,6 +206,7 @@ export function App() {
             } else {
                 setActiveTaskId(null);
                 resetWorkspaceViews();
+                setCurrentPath(''); // Reset path if no tasks are left
             }
         }
         setTasks(remainingTasks);
@@ -183,33 +220,44 @@ export function App() {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
     
+    // --- REFACTORED: `fetchWorkspaceFiles` is now `fetchWorkspaceItems` ---
     const fetchWorkspaceFiles = useCallback(async (path) => {
         if (!path) return;
         setWorkspaceLoading(true);
         setWorkspaceError(null);
         try {
-            const response = await fetch(`http://localhost:8766/files?path=${path}`);
+            // --- MODIFIED: Use the new API endpoint ---
+            const response = await fetch(`http://localhost:8766/api/workspace/items?path=${path}`);
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to fetch files');
+                throw new Error(errorData.error || 'Failed to fetch items');
             }
             const data = await response.json();
-            setWorkspaceFiles(data.files || []);
+            // Sort items: folders first, then by name
+            const sortedItems = (data.items || []).sort((a, b) => {
+                if (a.type === 'directory' && b.type !== 'directory') return -1;
+                if (a.type !== 'directory' && b.type === 'directory') return 1;
+                return a.name.localeCompare(b.name);
+            });
+            setWorkspaceItems(sortedItems);
         } catch (error) {
-            console.error("Failed to fetch workspace files:", error);
+            console.error("Failed to fetch workspace items:", error);
             setWorkspaceError(error.message);
+            setWorkspaceItems([]); // Clear items on error
         } finally {
             setWorkspaceLoading(false);
         }
     }, []);
 
-    const fetchFileContent = useCallback(async (filename) => {
-        if (!activeTaskId || !filename) return;
+    const fetchFileContent = useCallback(async (path, filename) => {
+        if (!path || !filename) return;
         setIsFileLoading(true);
         setSelectedFile(filename);
         setFileContent('');
         try {
-            const response = await fetch(`http://localhost:8766/file-content?path=${activeTaskId}&filename=${filename}`);
+            // The path sent to file-content is the directory containing the file
+            const dirPath = path.substring(0, path.lastIndexOf('/')) || path;
+            const response = await fetch(`http://localhost:8766/file-content?path=${dirPath}&filename=${filename}`);
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to fetch file content');
@@ -222,19 +270,35 @@ export function App() {
         } finally {
             setIsFileLoading(false);
         }
-    }, [activeTaskId]);
+    }, []);
+    
+    // --- NEW: Handler for navigating the file explorer ---
+    const handleNavigation = (item) => {
+        if (item.type === 'directory') {
+            const newPath = `${currentPath}/${item.name}`;
+            setCurrentPath(newPath);
+        } else {
+            fetchFileContent(currentPath, item.name);
+        }
+    };
+    
+    const handleBreadcrumbNav = (path) => {
+        setCurrentPath(path);
+        setSelectedFile(null); // Deselect file when navigating away
+    };
 
     const handleFileUpload = useCallback(async (e) => {
         const file = e.target.files[0];
-        if (!file || !activeTaskId) return;
+        if (!file || !currentPath) return;
         setWorkspaceLoading(true);
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('workspace_id', activeTaskId);
+        // --- MODIFIED: Upload to the current path, not just task root ---
+        formData.append('workspace_id', currentPath); 
         try {
             const response = await fetch('http://localhost:8766/upload', { method: 'POST', body: formData });
             if (!response.ok) throw new Error((await response.json()).error || 'File upload failed');
-            await fetchWorkspaceFiles(activeTaskId);
+            await fetchWorkspaceFiles(currentPath); // Refresh current directory
         } catch (error) {
             console.error('File upload error:', error);
             setWorkspaceError(`Upload failed: ${error.message}`);
@@ -242,7 +306,7 @@ export function App() {
             setWorkspaceLoading(false);
             if(fileInputRef.current) fileInputRef.current.value = "";
         }
-    }, [activeTaskId, fetchWorkspaceFiles]);
+    }, [currentPath, fetchWorkspaceFiles]);
 
     useEffect(() => {
         const fetchConfig = async () => {
@@ -268,11 +332,12 @@ export function App() {
         fetchConfig();
     }, []);
 
+    // --- MODIFIED: Fetch items whenever the currentPath changes ---
     useEffect(() => {
-        if (activeTaskId) {
-            fetchWorkspaceFiles(activeTaskId);
+        if (currentPath) {
+            fetchWorkspaceFiles(currentPath);
         }
-    }, [activeTaskId, fetchWorkspaceFiles]);
+    }, [currentPath, fetchWorkspaceFiles]);
     
     const handleApprovalAction = (feedback, plan = null) => {
         if (ws.current?.readyState !== WebSocket.OPEN) {
@@ -326,9 +391,12 @@ export function App() {
             socket.onmessage = (event) => {
                 const newEvent = JSON.parse(event.data);
                 
+                // --- MODIFIED: Refresh logic to use the current path
                 if (newEvent.type === 'final_answer' && newEvent.refresh_workspace) {
+                    // Check if the update is for the currently viewed path
                     if (handlersRef.current.activeTaskId === newEvent.task_id) {
-                        handlersRef.current.fetchWorkspaceFiles(handlersRef.current.activeTaskId);
+                         // We don't know which folder was modified, so we refresh the root
+                        handlersRef.current.setCurrentPath(handlersRef.current.activeTaskId);
                     }
                 }
 
@@ -387,8 +455,9 @@ export function App() {
                                         stepToUpdate.toolCall = inputData.current_tool_call;
                                         stepToUpdate.toolOutput = outputData.tool_output;
                                         stepToUpdate.evaluation = outputData.step_evaluation;
+                                        // Refresh the current directory after a step completes
                                         if (handlersRef.current.activeTaskId === newEvent.task_id) { 
-                                            handlersRef.current.fetchWorkspaceFiles(handlersRef.current.activeTaskId);
+                                            handlersRef.current.fetchWorkspaceFiles(currentPath);
                                         }
                                     }
                                     executionPlan.steps[stepIndex] = stepToUpdate;
@@ -408,7 +477,7 @@ export function App() {
         }
         connect();
         return () => { if (ws.current) { ws.current.onclose = null; ws.current.close(); } };
-    }, []);
+    }, [currentPath]); // Added currentPath to dependency array
 
     const activeTask = tasks.find(t => t.id === activeTaskId);
     useEffect(() => { scrollToBottom(); }, [activeTask?.history, isAwaitingApproval]);
@@ -478,7 +547,6 @@ export function App() {
                                     {item.children.map((child, childIndex) => {
                                         return (
                                             <div key={childIndex} class="relative">
-                                                {/* THIS IS THE FIX */}
                                                 <div class={`absolute top-6 -left-4 h-0.5 ${child.type === 'execution_plan' ? 'w-8' : 'w-4'} bg-gray-700/50`} />
                                                 {(() => {
                                                     switch (child.type) {
@@ -536,17 +604,26 @@ export function App() {
                             </div>
                         ) : (
                              <div class="flex flex-col flex-grow min-h-0">
+                                 {/* --- NEW: Breadcrumbs and Upload --- */}
                                  <div class="flex justify-between items-center mb-2 flex-shrink-0">
-                                    <div class="text-xs text-gray-500 truncate" title={activeTaskId || 'No active workspace'}>{activeTaskId ? `Workspace: ${activeTaskId}` : 'No active workspace'}</div>
+                                    <Breadcrumbs path={currentPath} onNavigate={handleBreadcrumbNav} />
                                     <input type="file" ref={fileInputRef} onChange={handleFileUpload} class="hidden" />
-                                    <button onClick={() => fileInputRef.current?.click()} disabled={!activeTaskId || workspaceLoading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="Upload File"> <UploadCloudIcon class="h-4 w-4" /> </button>
+                                    <button onClick={() => fileInputRef.current?.click()} disabled={!currentPath || workspaceLoading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="Upload File"> <UploadCloudIcon class="h-4 w-4" /> </button>
                                  </div>
+                                 {/* --- MODIFIED: Workspace Rendering Logic --- */}
                                  <div class="flex-grow bg-gray-900/50 rounded-md p-4 text-sm text-gray-400 font-mono overflow-y-auto">
-                                    {workspaceLoading ? <p>Uploading/Refreshing...</p> : workspaceError ? <p class="text-red-400">Error: {workspaceError}</p> : workspaceFiles.length === 0 ? <p>// Workspace is empty.</p> : ( <ul> {workspaceFiles.map(file => ( 
-                                        <li key={file} onClick={() => fetchFileContent(file)} class="flex items-center gap-2 mb-1 hover:text-white cursor-pointer"> 
-                                            <FileIcon class="h-4 w-4 text-gray-500" />{file} 
-                                        </li> 
-                                    ))} </ul> )}
+                                    {workspaceLoading ? <div class="flex items-center gap-2"><LoaderIcon class="h-4 w-4"/><span>Loading...</span></div> : 
+                                     workspaceError ? <p class="text-red-400">Error: {workspaceError}</p> : 
+                                     workspaceItems.length === 0 ? <p>// Directory is empty.</p> : ( 
+                                     <ul> 
+                                        {workspaceItems.map(item => ( 
+                                            <li key={item.name} onClick={() => handleNavigation(item)} title={item.name} class="flex items-center gap-2 mb-1 hover:text-white cursor-pointer truncate"> 
+                                                {item.type === 'directory' ? <FolderIcon class="h-4 w-4 text-blue-400 flex-shrink-0" /> : <FileIcon class="h-4 w-4 text-gray-500 flex-shrink-0" />}
+                                                <span>{item.name}</span>
+                                            </li> 
+                                        ))} 
+                                     </ul> 
+                                    )}
                                  </div>
                              </div>
                         )}
