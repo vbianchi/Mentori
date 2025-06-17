@@ -1,16 +1,15 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 9.3: Tools API)
+# ResearchAgent Backend Server (Phase 12.1: Smart Workspace API - FIX)
 #
-# This version adds a new API endpoint to serve the list of available tools,
-# which is required for the upcoming GUI plan editor.
+# This version fixes a routing bug from the previous iteration.
 #
-# 1. New `/api/tools` Endpoint: The server now responds to GET requests at
-#    this endpoint.
-# 2. New `_handle_get_tools` Method: This handler function is responsible
-#    for loading all available tools from the tool directory.
-# 3. Dynamic Tool List: It formats the tools into a JSON list.
-# 4. Special "Editor" Tool: As requested, "The Editor" is manually added
-#    to this list so it can be selected as an "LLM tool" in the UI.
+# 1. Robust Path Matching: The `do_GET` method now strips any trailing
+#    slashes from the request path before attempting to match it to a
+#    handler. This prevents errors if the browser or client adds a
+#    trailing `/` to the URL (e.g., `/api/workspace/items/`).
+# 2. Diagnostic 404 Message: The final "Not Found" error message has been
+#    upgraded to include the path that the server failed to route. This
+#    will make any future routing bugs much easier to identify.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -30,7 +29,7 @@ from langgraph.checkpoint.memory import MemorySaver
 # --- Local Imports ---
 from .langgraph_agent import agent_graph
 from .tools.file_system import _resolve_path
-from .tools import get_available_tools # NEW IMPORT
+from .tools import get_available_tools
 
 # --- Configuration ---
 load_dotenv()
@@ -69,31 +68,40 @@ def _safe_delete_workspace(task_id: str):
 
 # --- HTTP File Server for Workspace ---
 class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
+    # --- GET Requests Handler ---
     def do_GET(self):
         parsed_path = urlparse(self.path)
-        if parsed_path.path == '/api/models':
+        # --- FIX: Normalize the path to be more robust ---
+        path = parsed_path.path.rstrip('/')
+
+        if path == '/api/models':
             self._handle_get_models()
-        elif parsed_path.path == '/api/tools': # NEW ROUTE
+        elif path == '/api/tools':
             self._handle_get_tools()
-        elif parsed_path.path == '/files':
-            self._handle_list_files(parsed_path)
-        elif parsed_path.path == '/file-content':
+        elif path == '/api/workspace/items':
+            self._handle_get_workspace_items(parsed_path)
+        elif path == '/file-content':
             self._handle_get_file_content(parsed_path)
         else:
-            self._send_json_response(404, {'error': 'Not Found'})
+            # --- FIX: Improved error message for easier debugging ---
+            self._send_json_response(404, {'error': f"Not Found: The path '{path}' does not match any known API routes."})
 
+
+    # --- POST Requests Handler ---
     def do_POST(self):
         parsed_path = urlparse(self.path)
         if parsed_path.path == '/upload': self._handle_file_upload()
         else: self._send_json_response(404, {'error': 'Not Found'})
     
+    # --- OPTIONS Requests Handler (for CORS) ---
     def do_OPTIONS(self):
         self.send_response(204)
         self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE') # Allow all methods we'll use
         self.send_header('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type')
         self.end_headers()
     
+    # --- Internal Helper Methods ---
     def _send_json_response(self, status_code, data):
         self.send_response(status_code)
         self.send_header('Content-type', 'application/json')
@@ -131,46 +139,61 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         response_data = { "available_models": available_models, "default_models": default_models }
         self._send_json_response(200, response_data)
 
-    # --- NEW METHOD ---
     def _handle_get_tools(self):
         """Serves the list of available tools, plus a special one for the Editor."""
         logger.info("Serving available tools list.")
         try:
-            # Get the real tools from the tool loader
             loaded_tools = get_available_tools()
-            
-            # Format the real tools for the UI
             formatted_tools = [
                 {"name": tool.name, "description": tool.description}
                 for tool in loaded_tools
             ]
-
-            # Add our special "Editor" tool as per our discussion
             editor_tool = {
                 "name": "The Editor",
                 "description": "Use a powerful language model to perform tasks like rewriting, summarizing, or analyzing text."
             }
-            # Insert it at the beginning of the list for prominence
             all_tools = [editor_tool] + formatted_tools
-            
             self._send_json_response(200, {"tools": all_tools})
         except Exception as e:
             logger.error(f"Failed to get available tools: {e}", exc_info=True)
             self._send_json_response(500, {"error": "Could not retrieve tools."})
 
-    def _handle_list_files(self, parsed_path):
+    def _handle_get_workspace_items(self, parsed_path):
+        """Handles requests to list items in the workspace with structured details."""
+        logger.info("Serving structured workspace items list.")
         query_components = parse_qs(parsed_path.query)
         subdir = query_components.get("path", [None])[0]
-        if not subdir: return self._send_json_response(400, {"error": "Missing 'path' query parameter."})
+
+        if not subdir:
+            return self._send_json_response(400, {"error": "Missing 'path' query parameter."})
+
         base_workspace = "/app/workspace"
         try:
             full_path = _resolve_path(base_workspace, subdir)
-            if os.path.isdir(full_path): self._send_json_response(200, {"files": os.listdir(full_path)})
-            else: self._send_json_response(404, {"error": f"Directory '{subdir}' not found."})
-        except Exception as e: self._send_json_response(500, {"error": str(e)})
+            if not os.path.isdir(full_path):
+                return self._send_json_response(404, {"error": f"Directory not found: '{subdir}'"})
+
+            items = []
+            for item_name in os.listdir(full_path):
+                item_path = os.path.join(full_path, item_name)
+                item_type = 'directory' if os.path.isdir(item_path) else 'file'
+                try:
+                    # Get size for files, 0 for directories
+                    item_size = os.path.getsize(item_path) if item_type == 'file' else 0
+                except OSError:
+                    # Handle cases like broken symlinks where size cannot be retrieved
+                    item_size = 0
+                
+                items.append({"name": item_name, "type": item_type, "size": item_size})
+            
+            # Respond with a structured list of items
+            self._send_json_response(200, {"items": items})
+
+        except Exception as e:
+            logger.error(f"Error listing workspace items for path '{subdir}': {e}", exc_info=True)
+            self._send_json_response(500, {"error": str(e)})
     
     def _handle_get_file_content(self, parsed_path):
-        # ... (no changes in this method)
         query_components = parse_qs(parsed_path.query)
         workspace_id = query_components.get("path", [None])[0]
         filename = query_components.get("filename", [None])[0]
@@ -187,7 +210,6 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         except Exception as e: self._send_json_response(500, {"error": f"Error reading file: {e}"})
 
     def _handle_file_upload(self):
-        # ... (no changes in this method)
         try:
             form = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': self.headers['Content-Type']})
             workspace_id = form.getvalue('workspace_id')
@@ -213,7 +235,6 @@ def run_http_server():
 
 
 # --- WebSocket Handlers ---
-# ... (no changes in the rest of the file)
 async def run_agent_handler(websocket, data):
     prompt = data.get("prompt")
     llm_config = data.get("llm_config", {})
