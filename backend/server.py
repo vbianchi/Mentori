@@ -1,19 +1,19 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 12.2: Delete Endpoint)
+# ResearchAgent Backend Server (Phase 12.3: Create Folder Endpoint)
 #
-# This version implements Step 2 of the "Interactive Workbench" API by
-# adding the ability to delete files and folders.
+# This version implements Step 3 of the "Interactive Workbench" API by
+# adding the ability to create new directories.
 #
-# 1. New `do_DELETE` Method: A `do_DELETE` handler has been added to the
-#    `WorkspaceHTTPHandler`. It routes requests for the
-#    `/api/workspace/items` path.
-# 2. Secure Deletion Logic: The handler safely resolves the path provided in
-#    the URL query (`?path=...`). It checks if the item is a file or a
-#    directory and uses the appropriate method (`os.remove` or `shutil.rmtree`)
-#    to delete it.
-# 3. CORS Update: The `do_OPTIONS` handler has been updated to explicitly
-#    allow the `DELETE` method, which is necessary for browsers to permit
-#    such requests from the frontend.
+# 1. New `POST` Route: The `do_POST` method now handles a new route,
+#    `/api/workspace/folders`.
+# 2. JSON Body Parsing: The new `_handle_create_folder` method reads the
+#    request body, expecting `application/json` content.
+# 3. Secure Folder Creation: It extracts the `path` from the JSON payload,
+#    securely resolves it, and uses `os.makedirs` to create the new
+#    directory.
+# 4. Conflict Handling: The method checks if a file or folder already exists
+#    at the target path and returns a 409 Conflict status if it does,
+#    preventing accidental overwrites.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -91,10 +91,17 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
     # --- POST Requests Handler ---
     def do_POST(self):
         parsed_path = urlparse(self.path)
-        if parsed_path.path == '/upload': self._handle_file_upload()
-        else: self._send_json_response(404, {'error': 'Not Found'})
+        path = parsed_path.path.rstrip('/')
+
+        # --- NEW ROUTE ---
+        if path == '/api/workspace/folders':
+            self._handle_create_folder()
+        elif path == '/upload': 
+            self._handle_file_upload()
+        else: 
+            self._send_json_response(404, {'error': f"Not Found: The POST path '{path}' does not match any known API routes."})
     
-    # --- NEW: DELETE Requests Handler ---
+    # --- DELETE Requests Handler ---
     def do_DELETE(self):
         parsed_path = urlparse(self.path)
         path = parsed_path.path.rstrip('/')
@@ -108,7 +115,6 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
         self.send_response(204)
         self.send_header('Access-Control-Allow-Origin', '*')
-        # --- MODIFICATION: Added DELETE ---
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE')
         self.send_header('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type')
         self.end_headers()
@@ -203,9 +209,8 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             logger.error(f"Error listing workspace items for path '{subdir}': {e}", exc_info=True)
             self._send_json_response(500, {"error": str(e)})
 
-    # --- NEW METHOD for Deleting Items ---
     def _handle_delete_workspace_item(self, parsed_path):
-        """Handles requests to delete a file or directory from the workspace."""
+        # ... (no changes in this method)
         logger.info("Handling request to delete workspace item.")
         query_components = parse_qs(parsed_path.query)
         item_path_str = query_components.get("path", [None])[0]
@@ -221,11 +226,9 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
                 return self._send_json_response(404, {"error": f"Item not found: '{item_path_str}'"})
 
             if os.path.isdir(full_path):
-                # Recursively delete directory
                 shutil.rmtree(full_path)
                 logger.info(f"Successfully deleted directory: {full_path}")
             else:
-                # Delete file
                 os.remove(full_path)
                 logger.info(f"Successfully deleted file: {full_path}")
             
@@ -237,6 +240,37 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         except Exception as e:
             logger.error(f"Error deleting workspace item '{item_path_str}': {e}", exc_info=True)
             self._send_json_response(500, {"error": str(e)})
+    
+    # --- NEW METHOD for Creating Folders ---
+    def _handle_create_folder(self):
+        """Handles requests to create a new folder in the workspace."""
+        try:
+            content_length = int(self.headers['Content-Length'])
+            if content_length == 0:
+                return self._send_json_response(400, {'error': 'Request body is empty.'})
+            
+            post_data = self.rfile.read(content_length)
+            body = json.loads(post_data)
+            
+            new_path_str = body.get('path')
+            if not new_path_str:
+                return self._send_json_response(400, {'error': "Request body must contain a 'path' key."})
+
+            base_workspace = "/app/workspace"
+            full_path = _resolve_path(base_workspace, new_path_str)
+
+            if os.path.exists(full_path):
+                return self._send_json_response(409, {'error': f"Conflict: An item already exists at '{new_path_str}'."})
+
+            os.makedirs(full_path)
+            logger.info(f"Successfully created directory: {full_path}")
+            self._send_json_response(201, {'message': f"Folder '{new_path_str}' created successfully."})
+
+        except json.JSONDecodeError:
+            self._send_json_response(400, {'error': 'Invalid JSON in request body.'})
+        except Exception as e:
+            logger.error(f"Error creating folder: {e}", exc_info=True)
+            self._send_json_response(500, {'error': str(e)})
 
     def _handle_get_file_content(self, parsed_path):
         # ... (no changes in this method)
