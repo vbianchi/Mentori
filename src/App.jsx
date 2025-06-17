@@ -59,7 +59,6 @@ const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
     )
 };
 
-// --- NEW Component: Breadcrumbs for File Explorer ---
 const Breadcrumbs = ({ path, onNavigate }) => {
     const parts = path.split('/').filter(Boolean);
     
@@ -92,7 +91,6 @@ export function App() {
     const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
     const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
 
-    // --- NEW State for File Explorer ---
     const [workspaceItems, setWorkspaceItems] = useState([]);
     const [currentPath, setCurrentPath] = useState('');
     
@@ -113,11 +111,12 @@ export function App() {
     const handlersRef = useRef();
 
     useEffect(() => {
-        // --- MODIFIED: Store a reference to setCurrentPath for use in the websocket handler
         handlersRef.current = {
             fetchWorkspaceFiles,
             activeTaskId,
-            setCurrentPath, // Add setCurrentPath to handlers
+            setCurrentPath,
+            // --- NEW: Add currentPath to handlers for use in delete ---
+            currentPath, 
         };
     });
 
@@ -128,11 +127,9 @@ export function App() {
         setTasks(loadedTasks);
         if (savedActiveId && loadedTasks.some(t => t.id === savedActiveId)) {
             setActiveTaskId(savedActiveId);
-            // --- NEW: Set initial path when active task is loaded
             setCurrentPath(savedActiveId);
         } else if (loadedTasks.length > 0) {
             setActiveTaskId(loadedTasks[0].id);
-            // --- NEW: Set initial path for the first task
             setCurrentPath(loadedTasks[0].id);
         }
     }, []);
@@ -154,7 +151,6 @@ export function App() {
     }, [activeTaskId]);
     
     const resetWorkspaceViews = () => {
-        // --- MODIFIED: Now resets `workspaceItems` instead of `workspaceFiles` ---
         setWorkspaceItems([]);
         setWorkspaceError(null);
         setSelectedFile(null);
@@ -166,7 +162,6 @@ export function App() {
             setIsThinking(false);
             setIsAwaitingApproval(false);
             resetWorkspaceViews();
-            // --- NEW: Set the path to the root of the new task ---
             setCurrentPath(taskId);
         }
     };
@@ -206,7 +201,7 @@ export function App() {
             } else {
                 setActiveTaskId(null);
                 resetWorkspaceViews();
-                setCurrentPath(''); // Reset path if no tasks are left
+                setCurrentPath('');
             }
         }
         setTasks(remainingTasks);
@@ -220,20 +215,17 @@ export function App() {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
     
-    // --- REFACTORED: `fetchWorkspaceFiles` is now `fetchWorkspaceItems` ---
     const fetchWorkspaceFiles = useCallback(async (path) => {
         if (!path) return;
         setWorkspaceLoading(true);
         setWorkspaceError(null);
         try {
-            // --- MODIFIED: Use the new API endpoint ---
             const response = await fetch(`http://localhost:8766/api/workspace/items?path=${path}`);
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to fetch items');
             }
             const data = await response.json();
-            // Sort items: folders first, then by name
             const sortedItems = (data.items || []).sort((a, b) => {
                 if (a.type === 'directory' && b.type !== 'directory') return -1;
                 if (a.type !== 'directory' && b.type === 'directory') return 1;
@@ -243,7 +235,7 @@ export function App() {
         } catch (error) {
             console.error("Failed to fetch workspace items:", error);
             setWorkspaceError(error.message);
-            setWorkspaceItems([]); // Clear items on error
+            setWorkspaceItems([]);
         } finally {
             setWorkspaceLoading(false);
         }
@@ -255,8 +247,7 @@ export function App() {
         setSelectedFile(filename);
         setFileContent('');
         try {
-            // The path sent to file-content is the directory containing the file
-            const dirPath = path.substring(0, path.lastIndexOf('/')) || path;
+            const dirPath = path;
             const response = await fetch(`http://localhost:8766/file-content?path=${dirPath}&filename=${filename}`);
             if (!response.ok) {
                 const errorData = await response.json();
@@ -272,20 +263,50 @@ export function App() {
         }
     }, []);
     
-    // --- NEW: Handler for navigating the file explorer ---
     const handleNavigation = (item) => {
         if (item.type === 'directory') {
             const newPath = `${currentPath}/${item.name}`;
             setCurrentPath(newPath);
         } else {
+            // Pass the directory path, not the full item path, to fetchFileContent
             fetchFileContent(currentPath, item.name);
         }
     };
     
     const handleBreadcrumbNav = (path) => {
         setCurrentPath(path);
-        setSelectedFile(null); // Deselect file when navigating away
+        setSelectedFile(null);
     };
+
+    // --- NEW: Handler for deleting a file or folder ---
+    const handleDeleteItem = useCallback(async (item) => {
+        if (!confirm(`Are you sure you want to delete '${item.name}'?`)) {
+            return;
+        }
+
+        const itemFullPath = `${currentPath}/${item.name}`;
+        
+        setWorkspaceLoading(true);
+        setWorkspaceError(null);
+        try {
+            const response = await fetch(`http://localhost:8766/api/workspace/items?path=${itemFullPath}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to delete item');
+            }
+            // Refresh the current directory to show the item has been removed
+            await fetchWorkspaceFiles(currentPath);
+        } catch (error) {
+            console.error("Failed to delete item:", error);
+            setWorkspaceError(error.message);
+        } finally {
+            setWorkspaceLoading(false);
+        }
+    }, [currentPath, fetchWorkspaceFiles]);
+
 
     const handleFileUpload = useCallback(async (e) => {
         const file = e.target.files[0];
@@ -293,12 +314,11 @@ export function App() {
         setWorkspaceLoading(true);
         const formData = new FormData();
         formData.append('file', file);
-        // --- MODIFIED: Upload to the current path, not just task root ---
         formData.append('workspace_id', currentPath); 
         try {
             const response = await fetch('http://localhost:8766/upload', { method: 'POST', body: formData });
             if (!response.ok) throw new Error((await response.json()).error || 'File upload failed');
-            await fetchWorkspaceFiles(currentPath); // Refresh current directory
+            await fetchWorkspaceFiles(currentPath);
         } catch (error) {
             console.error('File upload error:', error);
             setWorkspaceError(`Upload failed: ${error.message}`);
@@ -332,7 +352,6 @@ export function App() {
         fetchConfig();
     }, []);
 
-    // --- MODIFIED: Fetch items whenever the currentPath changes ---
     useEffect(() => {
         if (currentPath) {
             fetchWorkspaceFiles(currentPath);
@@ -391,12 +410,9 @@ export function App() {
             socket.onmessage = (event) => {
                 const newEvent = JSON.parse(event.data);
                 
-                // --- MODIFIED: Refresh logic to use the current path
                 if (newEvent.type === 'final_answer' && newEvent.refresh_workspace) {
-                    // Check if the update is for the currently viewed path
                     if (handlersRef.current.activeTaskId === newEvent.task_id) {
-                         // We don't know which folder was modified, so we refresh the root
-                        handlersRef.current.setCurrentPath(handlersRef.current.activeTaskId);
+                        handlersRef.current.fetchWorkspaceFiles(handlersRef.current.currentPath);
                     }
                 }
 
@@ -455,9 +471,8 @@ export function App() {
                                         stepToUpdate.toolCall = inputData.current_tool_call;
                                         stepToUpdate.toolOutput = outputData.tool_output;
                                         stepToUpdate.evaluation = outputData.step_evaluation;
-                                        // Refresh the current directory after a step completes
                                         if (handlersRef.current.activeTaskId === newEvent.task_id) { 
-                                            handlersRef.current.fetchWorkspaceFiles(currentPath);
+                                            handlersRef.current.fetchWorkspaceFiles(handlersRef.current.currentPath);
                                         }
                                     }
                                     executionPlan.steps[stepIndex] = stepToUpdate;
@@ -477,7 +492,7 @@ export function App() {
         }
         connect();
         return () => { if (ws.current) { ws.current.onclose = null; ws.current.close(); } };
-    }, [currentPath]); // Added currentPath to dependency array
+    }, []);
 
     const activeTask = tasks.find(t => t.id === activeTaskId);
     useEffect(() => { scrollToBottom(); }, [activeTask?.history, isAwaitingApproval]);
@@ -604,22 +619,29 @@ export function App() {
                             </div>
                         ) : (
                              <div class="flex flex-col flex-grow min-h-0">
-                                 {/* --- NEW: Breadcrumbs and Upload --- */}
                                  <div class="flex justify-between items-center mb-2 flex-shrink-0">
                                     <Breadcrumbs path={currentPath} onNavigate={handleBreadcrumbNav} />
                                     <input type="file" ref={fileInputRef} onChange={handleFileUpload} class="hidden" />
                                     <button onClick={() => fileInputRef.current?.click()} disabled={!currentPath || workspaceLoading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="Upload File"> <UploadCloudIcon class="h-4 w-4" /> </button>
                                  </div>
-                                 {/* --- MODIFIED: Workspace Rendering Logic --- */}
                                  <div class="flex-grow bg-gray-900/50 rounded-md p-4 text-sm text-gray-400 font-mono overflow-y-auto">
                                     {workspaceLoading ? <div class="flex items-center gap-2"><LoaderIcon class="h-4 w-4"/><span>Loading...</span></div> : 
                                      workspaceError ? <p class="text-red-400">Error: {workspaceError}</p> : 
                                      workspaceItems.length === 0 ? <p>// Directory is empty.</p> : ( 
                                      <ul> 
+                                        {/* --- MODIFIED: Added Delete Button --- */}
                                         {workspaceItems.map(item => ( 
-                                            <li key={item.name} onClick={() => handleNavigation(item)} title={item.name} class="flex items-center gap-2 mb-1 hover:text-white cursor-pointer truncate"> 
-                                                {item.type === 'directory' ? <FolderIcon class="h-4 w-4 text-blue-400 flex-shrink-0" /> : <FileIcon class="h-4 w-4 text-gray-500 flex-shrink-0" />}
-                                                <span>{item.name}</span>
+                                            <li key={item.name} class="group flex justify-between items-center mb-1 hover:bg-gray-700/50 rounded-md -ml-2 -mr-2 pr-2">
+                                                <div onClick={() => handleNavigation(item)} title={item.name} class="flex items-center gap-2 cursor-pointer truncate flex-grow p-2"> 
+                                                    {item.type === 'directory' ? <FolderIcon class="h-4 w-4 text-blue-400 flex-shrink-0" /> : <FileIcon class="h-4 w-4 text-gray-500 flex-shrink-0" />}
+                                                    <span>{item.name}</span>
+                                                </div>
+                                                <button 
+                                                    onClick={(e) => { e.stopPropagation(); handleDeleteItem(item); }} 
+                                                    class="p-1 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" 
+                                                    title={`Delete ${item.type}`}>
+                                                    <Trash2Icon class="h-4 w-4" />
+                                                </button>
                                             </li> 
                                         ))} 
                                      </ul> 
