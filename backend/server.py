@@ -1,15 +1,19 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 12.1: Smart Workspace API - FIX)
+# ResearchAgent Backend Server (Phase 12.2: Delete Endpoint)
 #
-# This version fixes a routing bug from the previous iteration.
+# This version implements Step 2 of the "Interactive Workbench" API by
+# adding the ability to delete files and folders.
 #
-# 1. Robust Path Matching: The `do_GET` method now strips any trailing
-#    slashes from the request path before attempting to match it to a
-#    handler. This prevents errors if the browser or client adds a
-#    trailing `/` to the URL (e.g., `/api/workspace/items/`).
-# 2. Diagnostic 404 Message: The final "Not Found" error message has been
-#    upgraded to include the path that the server failed to route. This
-#    will make any future routing bugs much easier to identify.
+# 1. New `do_DELETE` Method: A `do_DELETE` handler has been added to the
+#    `WorkspaceHTTPHandler`. It routes requests for the
+#    `/api/workspace/items` path.
+# 2. Secure Deletion Logic: The handler safely resolves the path provided in
+#    the URL query (`?path=...`). It checks if the item is a file or a
+#    directory and uses the appropriate method (`os.remove` or `shutil.rmtree`)
+#    to delete it.
+# 3. CORS Update: The `do_OPTIONS` handler has been updated to explicitly
+#    allow the `DELETE` method, which is necessary for browsers to permit
+#    such requests from the frontend.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -71,7 +75,6 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
     # --- GET Requests Handler ---
     def do_GET(self):
         parsed_path = urlparse(self.path)
-        # --- FIX: Normalize the path to be more robust ---
         path = parsed_path.path.rstrip('/')
 
         if path == '/api/models':
@@ -83,9 +86,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         elif path == '/file-content':
             self._handle_get_file_content(parsed_path)
         else:
-            # --- FIX: Improved error message for easier debugging ---
             self._send_json_response(404, {'error': f"Not Found: The path '{path}' does not match any known API routes."})
-
 
     # --- POST Requests Handler ---
     def do_POST(self):
@@ -93,11 +94,22 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         if parsed_path.path == '/upload': self._handle_file_upload()
         else: self._send_json_response(404, {'error': 'Not Found'})
     
+    # --- NEW: DELETE Requests Handler ---
+    def do_DELETE(self):
+        parsed_path = urlparse(self.path)
+        path = parsed_path.path.rstrip('/')
+
+        if path == '/api/workspace/items':
+            self._handle_delete_workspace_item(parsed_path)
+        else:
+            self._send_json_response(404, {'error': f"Not Found: The path '{path}' does not match any known DELETE routes."})
+
     # --- OPTIONS Requests Handler (for CORS) ---
     def do_OPTIONS(self):
         self.send_response(204)
         self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE') # Allow all methods we'll use
+        # --- MODIFICATION: Added DELETE ---
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE')
         self.send_header('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type')
         self.end_headers()
     
@@ -110,6 +122,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(data).encode('utf-8'))
     
     def _handle_get_models(self):
+        # ... (no changes in this method)
         logger.info("Parsing .env to serve available and default models.")
         available_models = []
         model_ids = set()
@@ -140,7 +153,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         self._send_json_response(200, response_data)
 
     def _handle_get_tools(self):
-        """Serves the list of available tools, plus a special one for the Editor."""
+        # ... (no changes in this method)
         logger.info("Serving available tools list.")
         try:
             loaded_tools = get_available_tools()
@@ -159,7 +172,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             self._send_json_response(500, {"error": "Could not retrieve tools."})
 
     def _handle_get_workspace_items(self, parsed_path):
-        """Handles requests to list items in the workspace with structured details."""
+        # ... (no changes in this method)
         logger.info("Serving structured workspace items list.")
         query_components = parse_qs(parsed_path.query)
         subdir = query_components.get("path", [None])[0]
@@ -178,22 +191,55 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
                 item_path = os.path.join(full_path, item_name)
                 item_type = 'directory' if os.path.isdir(item_path) else 'file'
                 try:
-                    # Get size for files, 0 for directories
                     item_size = os.path.getsize(item_path) if item_type == 'file' else 0
                 except OSError:
-                    # Handle cases like broken symlinks where size cannot be retrieved
                     item_size = 0
                 
                 items.append({"name": item_name, "type": item_type, "size": item_size})
             
-            # Respond with a structured list of items
             self._send_json_response(200, {"items": items})
 
         except Exception as e:
             logger.error(f"Error listing workspace items for path '{subdir}': {e}", exc_info=True)
             self._send_json_response(500, {"error": str(e)})
-    
+
+    # --- NEW METHOD for Deleting Items ---
+    def _handle_delete_workspace_item(self, parsed_path):
+        """Handles requests to delete a file or directory from the workspace."""
+        logger.info("Handling request to delete workspace item.")
+        query_components = parse_qs(parsed_path.query)
+        item_path_str = query_components.get("path", [None])[0]
+
+        if not item_path_str:
+            return self._send_json_response(400, {"error": "Missing 'path' query parameter."})
+
+        base_workspace = "/app/workspace"
+        try:
+            full_path = _resolve_path(base_workspace, item_path_str)
+            
+            if not os.path.exists(full_path):
+                return self._send_json_response(404, {"error": f"Item not found: '{item_path_str}'"})
+
+            if os.path.isdir(full_path):
+                # Recursively delete directory
+                shutil.rmtree(full_path)
+                logger.info(f"Successfully deleted directory: {full_path}")
+            else:
+                # Delete file
+                os.remove(full_path)
+                logger.info(f"Successfully deleted file: {full_path}")
+            
+            self._send_json_response(200, {"message": f"Successfully deleted item: '{item_path_str}'"})
+
+        except PermissionError as e:
+            logger.warning(f"Permission denied while trying to delete '{item_path_str}': {e}")
+            self._send_json_response(403, {"error": str(e)})
+        except Exception as e:
+            logger.error(f"Error deleting workspace item '{item_path_str}': {e}", exc_info=True)
+            self._send_json_response(500, {"error": str(e)})
+
     def _handle_get_file_content(self, parsed_path):
+        # ... (no changes in this method)
         query_components = parse_qs(parsed_path.query)
         workspace_id = query_components.get("path", [None])[0]
         filename = query_components.get("filename", [None])[0]
@@ -210,6 +256,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         except Exception as e: self._send_json_response(500, {"error": f"Error reading file: {e}"})
 
     def _handle_file_upload(self):
+        # ... (no changes in this method)
         try:
             form = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': self.headers['Content-Type']})
             workspace_id = form.getvalue('workspace_id')
@@ -236,6 +283,7 @@ def run_http_server():
 
 # --- WebSocket Handlers ---
 async def run_agent_handler(websocket, data):
+    # ... (no changes in this method)
     prompt = data.get("prompt")
     llm_config = data.get("llm_config", {})
     task_id = data.get("task_id")
@@ -274,6 +322,7 @@ async def run_agent_handler(websocket, data):
 
 
 async def resume_agent_handler(websocket, data):
+    # ... (no changes in this method)
     task_id = data.get("task_id")
     feedback = data.get("feedback")
     new_plan = data.get("plan")
@@ -303,6 +352,7 @@ async def resume_agent_handler(websocket, data):
 
 
 async def handle_task_create(websocket, data):
+    # ... (no changes in this method)
     task_id = data.get("task_id")
     if not task_id: return
     logger.info(f"Task '{task_id}': Received create task request.")
@@ -311,6 +361,7 @@ async def handle_task_create(websocket, data):
 
 
 async def handle_task_delete(websocket, data):
+    # ... (no changes in this method)
     task_id = data.get("task_id")
     if not task_id: return
     logger.info(f"Task '{task_id}': Received delete task request.")
@@ -318,6 +369,7 @@ async def handle_task_delete(websocket, data):
 
 
 async def message_router(websocket):
+    # ... (no changes in this method)
     logger.info(f"Client connected from {websocket.remote_address}")
     try:
         async for message in websocket:
@@ -346,6 +398,7 @@ async def message_router(websocket):
 
 
 async def main():
+    # ... (no changes in this method)
     http_thread = threading.Thread(target=run_http_server, daemon=True)
     http_thread.start()
     host = os.getenv("BACKEND_HOST", "0.0.0.0")
