@@ -1,15 +1,17 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 13.3: Live Tool Reloading)
+# ResearchAgent Core Agent (Phase 14.2: Robust Argument Formatting)
 #
-# This version completes the live-reloading mechanism for the Tool Forge.
+# This version fixes a critical bug where the agent would hallucinate
+# incorrect argument names for tools, causing validation errors.
 #
-# 1. Dynamic Tool Loading: The static, global `AVAILABLE_TOOLS` and `TOOL_MAP`
-#    variables have been removed.
-# 2. On-Demand Tool Fetching: The `format_tools_for_prompt` and `worker_node`
-#    functions now call `get_available_tools()` from the `tools` package
-#    at runtime. This ensures that every agent execution has access to the
-#    most up-to-date list of tools, including any custom tools just created
-#    by the user, without requiring a server restart.
+# 1. Argument-Aware `format_tools_for_prompt`: This function has been
+#    significantly upgraded. It now inspects the `args_schema` for each
+#    tool and dynamically includes the name, type, and description of every
+#    required argument directly within the tool's description string that is
+#    sent to the LLM.
+# 2. Reduced Hallucination: By providing the LLM with an explicit "function
+#    signature" for each tool, we drastically reduce the likelihood of it
+#    generating incorrect tool input, making the entire system more reliable.
 # -----------------------------------------------------------------------------
 
 import os
@@ -26,7 +28,6 @@ from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.memory import MemorySaver
 
 # --- Local Imports ---
-# --- MODIFIED: get_available_tools is now the sole import for tools ---
 from .tools import get_available_tools
 from .prompts import (
     router_prompt_template,
@@ -124,16 +125,36 @@ def get_llm(state: GraphState, role_env_var: str, default_llm_id: str):
     LLM_CACHE[llm_id] = llm
     return llm
 
-# --- REMOVED: Static tool loading at module import ---
-# AVAILABLE_TOOLS = get_available_tools()
-# TOOL_MAP = {tool.name: tool for tool in AVAILABLE_TOOLS}
 SANDBOXED_TOOLS = {"write_file", "read_file", "list_files", "workspace_shell", "pip_install"}
 
-# --- MODIFIED: Tool list is now fetched dynamically ---
+# --- MODIFIED: Tool formatter is now argument-aware ---
 def format_tools_for_prompt():
-    """Dynamically fetches tools and formats them for the prompt."""
+    """
+    Dynamically fetches tools and formats them for the prompt, including
+    their arguments for better LLM guidance.
+    """
     available_tools = get_available_tools()
-    return "\n".join([f"  - {tool.name}: {tool.description}" for tool in available_tools])
+    tool_strings = []
+    for tool in available_tools:
+        # Start with the basic name and description
+        tool_string = f"  - {tool.name}: {tool.description}"
+        
+        # Inspect the args_schema to find arguments
+        if tool.args_schema:
+            args_info = []
+            schema_props = tool.args_schema.schema().get('properties', {})
+            for arg_name, arg_props in schema_props.items():
+                arg_type = arg_props.get('type', 'any')
+                arg_desc = arg_props.get('description', '')
+                args_info.append(f"{arg_name} ({arg_type}): {arg_desc}")
+            
+            if args_info:
+                tool_string += " Arguments: [" + ", ".join(args_info) + "]"
+        
+        tool_strings.append(tool_string)
+        
+    return "\n".join(tool_strings)
+
 
 # --- History Formatting Helper ---
 def _format_messages(messages: Sequence[BaseMessage], is_for_summary=False) -> str:
@@ -163,7 +184,6 @@ def _format_messages(messages: Sequence[BaseMessage], is_for_summary=False) -> s
 
 # --- Venv Creation Helper ---
 async def _create_venv_if_not_exists(workspace_path: str, task_id: str):
-    """Creates a virtual environment in the workspace if one doesn't exist."""
     venv_path = os.path.join(workspace_path, ".venv")
     if os.path.isdir(venv_path):
         logger.info(f"Task '{task_id}': Virtual environment already exists. Skipping creation.")
@@ -188,7 +208,6 @@ async def _create_venv_if_not_exists(workspace_path: str, task_id: str):
 
 # --- Graph Nodes ---
 async def task_setup_node(state: GraphState):
-    """Creates the workspace and virtual environment, and initializes state."""
     task_id = state.get("task_id")
     logger.info(f"Task '{task_id}': Executing async Task_Setup")
     user_message = state['messages'][-1].content
@@ -364,12 +383,10 @@ def site_foreman_node(state: GraphState):
         logger.error(f"Task '{task_id}': Error parsing tool call from Site Foreman: {e}")
         return {"current_tool_call": {"error": f"Invalid JSON output from Site Foreman: {e}"}}
 
-# --- MODIFIED: The worker now dynamically builds its tool map ---
 async def worker_node(state: GraphState):
     task_id = state.get("task_id")
     logger.info(f"Task '{task_id}': Worker executing tool call.")
     
-    # Dynamically fetch available tools and create a map for this run
     available_tools = get_available_tools()
     tool_map = {tool.name: tool for tool in available_tools}
     
@@ -392,7 +409,7 @@ async def worker_node(state: GraphState):
         tool_args_schema = tool.args
         if tool_args_schema: final_args[next(iter(tool_args_schema))] = tool_input
         
-    if tool_name in SANDBOXED_TOOLS:
+    if tool_name in SANDBOXED_TOOLS or "custom_" in tool.name: # Also check for custom tools
         final_args["workspace_path"] = state["workspace_path"]
         
     try:
