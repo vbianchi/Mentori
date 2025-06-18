@@ -1,32 +1,27 @@
-# WebSocket server
-websockets>=12.0
+# -----------------------------------------------------------------------------
+# Python Dependencies for the ResearchAgent
+# -----------------------------------------------------------------------------
 
-# Configuration
-python-dotenv>=1.0
+# -- Core LangChain & LangGraph Framework --
+langchain
+langgraph
+langchain-core
+langchain-google-genai
+google-generativeai
+langchain-community
 
-# HTTP Client & Server
-httpx>=0.25
-aiohttp>=3.9 # For file server
-aiohttp-cors>=0.7 # For CORS handling
+# -- Server --
+websockets
 
-# --- LangChain Core and Integrations ---
-langchain>=0.1.0
-langchain-google-genai>=1.0
-langchain-community>=0.0.20
-langchainhub>=0.1.15
-langchain-experimental>=0.0.50 # For Python REPL Tool
-langchain-ollama>=0.1.0
-langchain-tavily>=0.1.0 # MODIFIED: Added Tavily Search
+# -- Utilities --
+python-dotenv
 
-# --- Tool Dependencies ---
-duckduckgo-search>=5.0
-beautifulsoup4>=4.12
-lxml>=5.0
-aiofiles>=23.0
-matplotlib>=3.0 # Needed for plotting examples
-biopython>=1.80 # Added for PubMed/Entrez search
-pypdf>=4.0.0 # Added for PDF reading
-playwright
+# -- Tools --
+# For the Tavily web search tool.
+tavily-python
 
-# --- Database ---
-aiosqlite>=0.19 # Added for async SQLite operations
+# For web scraping, as requested by the agent's plan.
+beautifulsoup4
+
+# NEW: For securely parsing package names and versions in the package manager tool.
+packaging

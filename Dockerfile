@@ -1,57 +1,39 @@
-# Use an official Python runtime as a parent image
-# Using slim-bullseye for a smaller footprint - Explicitly 3.12
-# Match casing for FROM and AS
-FROM python:3.12-slim-bullseye AS base
+# -----------------------------------------------------------------------------
+# Dockerfile for the ResearchAgent Backend
+#
+# This file defines the steps to build a Docker image containing our
+# Python backend application and all its dependencies.
+# It uses the `uv` package manager for faster installation and includes
+# a diagnostic step to verify installed packages.
+# -----------------------------------------------------------------------------
 
-# Set environment variables using key=value format
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-# Set timezone based on user's location - Optional but can be helpful for logs
-ENV TZ=Europe/Rome
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+# -- Stage 1: Base Image --
+FROM python:3.12-slim
 
-# Set the working directory in the container
+# -- Environment Variables --
 WORKDIR /app
+ENV PYTHONUNBUFFERED=1
 
-# <<< --- START: Install curl and other system dependencies --- >>>
-# Update package lists and install curl along with build essentials if needed later
-# Using apt-get directly here for system packages
-RUN apt-get update && apt-get install -y \
-    curl \
-    # Add any other essential system packages here if needed in the future (e.g., build-essential for C extensions)
-    && rm -rf /var/lib/apt/lists/* # Clean up apt cache
-# <<< --- END: Install curl --- >>>
+# -- Install Dependencies using uv --
+RUN pip install uv
 
-
-# Install uv (faster package installer) - Recommended based on README
-# We use pip to bootstrap uv itself
-# Use python3 explicitly for pip command
-RUN python3 -m pip install uv
-
-# Copy only the requirements file first to leverage Docker cache
+# Copy the requirements file to leverage Docker's layer caching.
 COPY requirements.txt .
 
-# Install dependencies using uv (system-wide within the container)
-# Using --system as recommended by uv for Docker base images
-# Use python3 explicitly to invoke uv module
-RUN python3 -m uv pip install --system -r requirements.txt
+# Install the project dependencies using uv.
+RUN uv pip install --system -r requirements.txt
 
-# Install Playwright browser(s) and their OS dependencies.
-# We're choosing Chromium here. You can add 'firefox' or 'webkit' if needed.
-# The '--with-deps' flag attempts to install necessary OS libraries for the browser.
-RUN playwright install --with-deps chromium
-# To install all browsers:
-# RUN playwright install --with-deps
+# --- DIAGNOSTIC STEP ---
+# List all installed packages to verify the installation during the build process.
+# The output of this command will be visible in the build logs.
+RUN uv pip list
 
-# Copy the rest of the application code into the container
-# Note: For development, this will be overlaid by the volume mount in docker-compose.yml
-COPY . .
+# -- Copy Application Code --
+COPY ./backend ./backend
 
-# Expose ports used by the application (WebSocket and File Server)
+# -- Expose Ports --
 EXPOSE 8765
 EXPOSE 8766
 
-# Define the command to run the application
-# Use python3 explicitly
+# -- Run Command --
 CMD ["python3", "-m", "backend.server"]
-

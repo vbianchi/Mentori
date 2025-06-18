@@ -1,508 +1,396 @@
-# backend/server.py
+# -----------------------------------------------------------------------------
+# ResearchAgent Backend Server (Phase 12.5: True Concurrency - DEFINITIVE FIX)
+#
+# This version implements the final, robust architecture for true concurrency
+# using a simple, direct broadcast model. This resolves all previously
+# identified bugs with duplicate messages and connection handling.
+#
+# Key Architectural Changes:
+# 1. Simple, Direct Broadcast (`broadcast_event`):
+#    - The complex queueing system has been removed.
+#    - A single `broadcast_event` function now iterates through a simple set
+#      of all `ACTIVE_CONNECTIONS` and attempts to send the event directly
+#      to each one.
+# 2. Resilient Sending: The send operation is wrapped in a try/except block.
+#    If a client has disconnected, the `ConnectionClosed` error is caught
+#    gracefully, and that client is simply ignored, preventing any crashes.
+# 3. Decoupled Agent Execution: The `agent_execution_wrapper` remains fully
+#    decoupled and runs as a background task. It now calls the simple
+#    `broadcast_event` function to report its progress.
+# 4. Correct State Management: This is the definitive, stable architecture
+#    that supports concurrent runs and robustly handles client connections
+#    without message duplication.
+# -----------------------------------------------------------------------------
+
 import asyncio
-import websockets
-import json
-import datetime
 import logging
-import uuid
-from typing import Optional, List, Dict, Any, Callable, Coroutine
-from pathlib import Path
 import os
-import signal
-import re
-import functools
-import warnings
-import aiofiles
-import unicodedata
-import urllib.parse
+import json
+import threading
+import cgi
+import shutil
+import mimetypes
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib.parse import urlparse, parse_qs
+from dotenv import load_dotenv
+import websockets
+from langchain_core.messages import HumanMessage
+from langgraph.checkpoint.memory import MemorySaver
 
-# --- Web Server Imports ---
-from aiohttp import web
-from aiohttp.web import FileResponse
-import aiohttp_cors
-# -------------------------
+# --- Local Imports ---
+from .langgraph_agent import agent_graph
+from .tools.file_system import _resolve_path
+from .tools import get_available_tools
 
-# LangChain Imports
-from langchain.memory import ConversationBufferWindowMemory
-from langchain_core.language_models.base import BaseLanguageModel
-from langchain_core.language_models.chat_models import BaseChatModel
-
-# Project Imports
-from backend.config import settings
-from backend.llm_setup import get_llm
-from backend.tool_loader import get_task_workspace_path, BASE_WORKSPACE_ROOT # Now from tool_loader
-from backend.tools import get_dynamic_tools, TEXT_EXTENSIONS
-from backend.agent import create_agent_executor
-from backend.callbacks import WebSocketCallbackHandler, AgentCancelledException
-from backend.db_utils import (
-    init_db, add_task, add_message, get_messages_for_task,
-    delete_task_and_messages, rename_task_in_db
-)
-from backend.message_handlers import (
-    process_context_switch, process_user_message,
-    process_execute_confirmed_plan, process_new_task,
-    process_delete_task, process_rename_task,
-    process_set_llm, process_get_available_models,
-    process_cancel_agent, process_get_artifacts_for_task,
-    process_run_command, process_action_command,
-    process_set_session_role_llm,
-    process_cancel_plan_proposal
-)
-
-# Define Type Aliases for callback functions used in MessageHandler hint
-SendWSMessageFunc = Callable[[str, Any], Coroutine[Any, Any, None]]
-AddMonitorLogFunc = Callable[[str, str], Coroutine[Any, Any, None]]
-DBAddMessageFunc = Callable[[str, str, str, str], Coroutine[Any, Any, None]]
-DBAddTaskFunc = Callable[[str, str, str], Coroutine[Any, Any, None]]
-DBGetMessagesFunc = Callable[[str], Coroutine[Any, Any, List[Dict[str, Any]]]]
-DBDeleteTaskFunc = Callable[[str], Coroutine[Any, Any, bool]]
-DBRenameTaskFunc = Callable[[str, str], Coroutine[Any, Any, bool]]
-GetArtifactsFunc = Callable[[str], Coroutine[Any, Any, List[Dict[str, str]]]]
-ExecuteShellCommandFunc = Callable[[str, str, SendWSMessageFunc, DBAddMessageFunc, Optional[str]], Coroutine[Any, Any, bool]]
-
-
-log_level = settings.log_level
-logging.basicConfig(
-    level=log_level,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s\n'
-)
+# --- Configuration & Globals ---
+load_dotenv()
+log_level = os.getenv("LOG_LEVEL", "INFO").upper()
+logging.basicConfig(level=log_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-logger.info(f"Logging level set to {log_level}")
 
-try:
-    default_llm_instance_for_startup_checks: BaseLanguageModel = get_llm(settings, provider=settings.default_provider, model_name=settings.default_model_name)
-    logger.info(f"Default Base LLM for startup checks initialized successfully: {settings.default_provider}::{settings.default_model_name}")
-except Exception as llm_e:
-    logging.critical(f"FATAL: Failed during startup LLM initialization: {llm_e}", exc_info=True)
-    exit(1)
+RUNNING_AGENTS = {}
+ACTIVE_CONNECTIONS = set()
 
-connected_clients: Dict[str, Dict[str, Any]] = {}
-session_data: Dict[str, Dict[str, Any]] = {}
-
-FILE_SERVER_LISTEN_HOST = "0.0.0.0"
-FILE_SERVER_CLIENT_HOST = settings.file_server_hostname
-FILE_SERVER_PORT = 8766
-logger.info(f"File server will listen on {FILE_SERVER_LISTEN_HOST}:{FILE_SERVER_PORT}")
-logger.info(f"File server URLs constructed for client will use: http://{FILE_SERVER_CLIENT_HOST}:{FILE_SERVER_PORT}")
-
-async def read_stream(stream, stream_name, session_id, send_ws_message_func, db_add_message_func, current_task_id):
-    log_prefix_base = f"[{session_id[:8]}]"
-    while True:
-        try: line = await stream.readline()
-        except Exception as e: logger.error(f"[{session_id}] Error reading stream {stream_name}: {e}"); break
-        if not line: break
-        line_content = line.decode(errors='replace').rstrip();
-        log_content = f"[{stream_name}] {line_content}"
-        timestamp = datetime.datetime.now().isoformat(timespec='milliseconds')
-        await send_ws_message_func("monitor_log", f"[{timestamp}]{log_prefix_base} {log_content}")
-        if current_task_id:
-            try: await db_add_message_func(current_task_id, session_id, f"monitor_{stream_name}", line_content)
-            except Exception as db_err: logger.error(f"[{session_id}] Failed to save {stream_name} log to DB: {db_err}")
-    logger.debug(f"[{session_id}] {stream_name} stream finished.")
-
-
-async def execute_shell_command(command: str, session_id: str, send_ws_message_func: SendWSMessageFunc, db_add_message_func: DBAddMessageFunc, current_task_id: Optional[str]) -> bool:
-    log_prefix_base = f"[{session_id[:8]}]"; timestamp_start = datetime.datetime.now().isoformat(timespec='milliseconds')
-    start_log_content = f"[Direct Command] Executing: {command}"
-    logger.info(f"[{session_id}] {start_log_content}")
-    await send_ws_message_func("monitor_log", f"[{timestamp_start}]{log_prefix_base} {start_log_content}")
-    if current_task_id:
-        try: await db_add_message_func(current_task_id, session_id, "monitor_direct_cmd_start", command)
-        except Exception as db_err: logger.error(f"[{session_id}] Failed to save direct cmd start to DB: {db_err}")
-    process = None; success = False; status_msg = "failed"; return_code = -1
-    cwd = str(BASE_WORKSPACE_ROOT.resolve()); logger.info(f"[{session_id}] Direct command CWD: {cwd}")
+# --- Helper Functions (No changes) ---
+def format_model_name(model_id):
     try:
-        process = await asyncio.create_subprocess_shell(command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=cwd)
-        stdout_task = asyncio.create_task(read_stream(process.stdout, "stdout", session_id, send_ws_message_func, db_add_message_func, current_task_id))
-        stderr_task = asyncio.create_task(read_stream(process.stderr, "stderr", session_id, send_ws_message_func, db_add_message_func, current_task_id))
-        TIMEOUT_SECONDS = settings.direct_command_timeout
-        proc_wait_task = asyncio.create_task(process.wait())
-        done, pending = await asyncio.wait([stdout_task, stderr_task, proc_wait_task], timeout=TIMEOUT_SECONDS, return_when=asyncio.ALL_COMPLETED)
-        if proc_wait_task not in done:
-            logger.error(f"[{session_id}] Timeout executing direct command: {command}");
-            status_msg = f"failed (Timeout after {TIMEOUT_SECONDS}s)"; success = False
-            if process and process.returncode is None:
-                try: process.terminate()
-                except ProcessLookupError: pass
-                await process.wait()
-            for task_to_cancel in pending: task_to_cancel.cancel()
-            await asyncio.gather(*pending, return_exceptions=True)
-        else:
-            return_code = proc_wait_task.result(); await asyncio.gather(stdout_task, stderr_task, return_exceptions=True)
-            success = return_code == 0; status_msg = "succeeded" if success else f"failed (Code: {return_code})"
-    except FileNotFoundError: cmd_part = command.split()[0] if command else "Unknown"; status_msg = f"failed (Command Not Found: {cmd_part})"; logger.warning(f"[{session_id}] Direct command not found: {cmd_part}"); success = False
-    except Exception as e: status_msg = f"failed ({type(e).__name__})"; logger.error(f"[{session_id}] Error running direct command '{command}': {e}", exc_info=True); success = False
-    timestamp_end = datetime.datetime.now().isoformat(timespec='milliseconds')
-    finish_log_content = f"[Direct Command] Finished '{command[:60]}...', {status_msg}."
-    await send_ws_message_func("monitor_log", f"[{timestamp_end}]{log_prefix_base} {finish_log_content}")
-    if current_task_id:
-        try: await db_add_message_func(current_task_id, session_id, "monitor_direct_cmd_end", f"Command: {command} | Status: {status_msg}")
-        except Exception as db_err: logger.error(f"[{session_id}] Failed to save direct cmd end to DB: {db_err}")
-    if not success and status_msg.startswith("failed"): await send_ws_message_func("status_message", f"Error: Direct command {status_msg}")
-    return success
-
-
-async def handle_workspace_file(request: web.Request) -> web.Response:
-    session_id_from_header = request.headers.get("X-Session-ID", "unknown_file_request_session")
-    logger.critical(f"CRITICAL_DEBUG: [{session_id_from_header}] handle_workspace_file REACHED. Method: {request.method}, Path: {request.path}")
-    logger.info(f"[{session_id_from_header}] Request headers for handle_workspace_file: {dict(request.headers)}")
-
-    task_id = request.match_info.get('task_id')
-    filename = request.match_info.get('filename')
-    logger.info(f"[{session_id_from_header}] File server: Received request for task_id='{task_id}', filename='{filename}'")
-    if not task_id or not filename:
-        logger.warning(f"[{session_id_from_header}] File server request missing task_id or filename.")
-        raise web.HTTPBadRequest(text="Task ID and filename required")
-
-    if not re.match(r"^[a-zA-Z0-9_.-]+$", task_id):
-        logger.error(f"[{session_id_from_header}] Invalid task_id format rejected: {task_id}")
-        raise web.HTTPForbidden(text="Invalid task ID format.")
-
-    if ".." in filename or filename.startswith("/") or filename.startswith("\\"):
-        logger.error(f"[{session_id_from_header}] Invalid filename path components detected: {filename}")
-        raise web.HTTPForbidden(text="Invalid filename path components.")
-
+        provider, name = model_id.split("::")
+        name_parts = name.replace('-', ' ').split()
+        formatted_name = ' '.join(part.capitalize() for part in name_parts)
+        return f"{provider.capitalize()} {formatted_name}"
+    except: return model_id
+def _safe_delete_workspace(task_id: str):
     try:
-        task_workspace = get_task_workspace_path(task_id, create_if_not_exists=False)
-        safe_filename = Path(filename).name
+        workspace_path = _resolve_path("/app/workspace", task_id)
+        if not os.path.abspath(workspace_path).startswith(os.path.abspath("/app/workspace")): raise PermissionError("Security check failed.")
+        if os.path.isdir(workspace_path):
+            shutil.rmtree(workspace_path)
+            logger.info(f"Task '{task_id}': Successfully deleted workspace directory.")
+        else: logger.warning(f"Task '{task_id}': Workspace directory not found for deletion.")
+    except Exception as e: logger.error(f"Task '{task_id}': Error deleting workspace: {e}", exc_info=True)
 
-        file_path = (task_workspace / safe_filename).resolve()
-        logger.debug(f"[{session_id_from_header}] File server: Resolved file path: {file_path}")
-
-        if not file_path.is_relative_to(BASE_WORKSPACE_ROOT.resolve()):
-            logger.error(f"[{session_id_from_header}] Security Error: Access attempt outside base workspace! Req: {file_path}, Base: {BASE_WORKSPACE_ROOT.resolve()}")
-            raise web.HTTPForbidden(text="Access denied - outside base workspace.")
-
-    except ValueError as ve:
-        logger.error(f"[{session_id_from_header}] File server: Invalid task_id for file access: {ve}")
-        raise web.HTTPBadRequest(text=f"Invalid task ID: {ve}")
-    except OSError as e:
-        logger.error(f"[{session_id_from_header}] File server: Error resolving task workspace for file access: {e}")
-        raise web.HTTPInternalServerError(text="Error accessing task workspace.")
-    except Exception as e:
-        logger.error(f"[{session_id_from_header}] File server: Unexpected error validating file path: {e}. Req: {filename}", exc_info=True)
-        raise web.HTTPInternalServerError(text="Error validating file path")
-
-    if not file_path.is_file():
-        logger.warning(f"[{session_id_from_header}] File server: File not found request: {file_path}")
-        raise web.HTTPNotFound(text=f"File not found: {filename}")
-
-    logger.info(f"[{session_id_from_header}] File server: Serving file: {file_path}")
-    return FileResponse(path=file_path)
-
-
-def sanitize_filename(filename: str) -> str:
-    if not filename: return f"uploaded_file_{uuid.uuid4().hex[:8]}"
-    filename = unicodedata.normalize('NFKD', filename).encode('ascii', 'ignore').decode('ascii')
-    filename = re.sub(r'[^\w\s.-]', '', filename).strip(); filename = re.sub(r'\s+', '_', filename)
-    if not filename: filename = f"uploaded_file_{uuid.uuid4().hex[:8]}"
-    filename = filename.strip('._-');
-    if not filename: filename = f"uploaded_file_{uuid.uuid4().hex[:8]}"
-    return Path(filename).name
-
-async def handle_file_upload(request: web.Request) -> web.Response:
-    session_id = request.headers.get("X-Session-ID", "unknown_upload_session")
-    task_id_from_matchinfo = request.match_info.get('task_id')
-    logger.critical(f"CRITICAL_DEBUG: [{session_id}] handle_file_upload REACHED for task_id: '{task_id_from_matchinfo}' with method: {request.method}")
-    logger.info(f"[{session_id}] File Upload: Received headers: {dict(request.headers)}")
-    task_id = request.match_info.get('task_id')
-    logger.info(f"[{session_id}] File Upload: Received request for task_id: '{task_id}'")
-    if not task_id: logger.error(f"[{session_id}] File Upload: Missing task_id."); return web.json_response({'status': 'error', 'message': 'Task ID required'}, status=400)
-    if not re.match(r"^[a-zA-Z0-9_.-]+$", task_id): logger.error(f"[{session_id}] File Upload: Invalid task_id format: '{task_id}'"); return web.json_response({'status': 'error', 'message': 'Invalid task ID format'}, status=400)
-    task_workspace: Path
-    try:
-        task_workspace = get_task_workspace_path(task_id, create_if_not_exists=True)
-        logger.info(f"[{session_id}] File Upload: Ensured task workspace exists at: {task_workspace}")
-    except ValueError as ve: logger.error(f"[{session_id}] File Upload: Invalid task_id for workspace creation: {ve}"); return web.json_response({'status': 'error', 'message': f'Invalid task ID for workspace: {ve}'}, status=400)
-    except OSError as e: logger.error(f"[{session_id}] File Upload: Error getting/creating workspace for task {task_id}: {e}", exc_info=True); return web.json_response({'status': 'error', 'message': 'Error accessing/creating task workspace'}, status=500)
-    reader = None; saved_files = []; errors = []
-    try: reader = await request.multipart()
-    except Exception as e: logger.error(f"[{session_id}] File Upload: Error reading multipart form data for task {task_id}: {e}", exc_info=True); return web.json_response({'status': 'error', 'message': f'Failed to read upload data: {e}'}, status=400)
-    if not reader: return web.json_response({'status': 'error', 'message': 'No multipart data received'}, status=400)
-    while True:
-        part = await reader.next()
-        if part is None: logger.debug(f"[{session_id}] File Upload: Finished processing multipart parts for task {task_id}."); break
-        if part.name == 'file' and part.filename:
-            original_filename = part.filename; safe_filename = sanitize_filename(original_filename)
-            save_path = (task_workspace / safe_filename).resolve()
-            logger.info(f"[{session_id}] File Upload: Processing uploaded file: '{original_filename}' -> '{safe_filename}' for task {task_id}. Target path: {save_path}")
-            if not save_path.is_relative_to(task_workspace.resolve()): logger.error(f"[{session_id}] File Upload: Security Error - Upload path resolves outside task workspace!"); errors.append({'filename': original_filename, 'message': 'Invalid file path detected (path traversal attempt).'}); continue
-            try:
-                save_path.parent.mkdir(parents=True, exist_ok=True)
-                logger.debug(f"[{session_id}] File Upload: Attempting to open {save_path} for writing.")
-                async with aiofiles.open(save_path, 'wb') as f:
-                    while True: chunk = await part.read_chunk();
-                    if not chunk: break; await f.write(chunk)
-                logger.info(f"[{session_id}] File Upload: Successfully saved uploaded file to: {save_path}"); saved_files.append({'filename': safe_filename})
-                target_session_id_for_ws_notify = None
-                for sid_iter, sdata_val_iter in session_data.items():
-                    if sdata_val_iter.get("current_task_id") == task_id: target_session_id_for_ws_notify = sid_iter; logger.debug(f"[{session_id}] File Upload: Found active session {target_session_id_for_ws_notify} for task {task_id} for WS notification."); break
-                if target_session_id_for_ws_notify:
-                    try:
-                        await add_message(task_id, target_session_id_for_ws_notify, "artifact_generated", safe_filename)
-                        logger.info(f"[{session_id}] File Upload: Saved 'artifact_generated' message to DB for {safe_filename} (session: {target_session_id_for_ws_notify}).")
-                        client_info_for_ws = connected_clients.get(target_session_id_for_ws_notify)
-                        if client_info_for_ws:
-                            send_func_for_ws = client_info_for_ws.get("send_ws_message")
-                            if send_func_for_ws: logger.info(f"[{target_session_id_for_ws_notify}] File Upload: Sending trigger_artifact_refresh for task {task_id}"); await send_func_for_ws("trigger_artifact_refresh", {"taskId": task_id})
-                            else: logger.warning(f"[{session_id}] File Upload: Send function not found for target session {target_session_id_for_ws_notify} to send refresh trigger.")
-                        else: logger.warning(f"[{session_id}] File Upload: Target session {target_session_id_for_ws_notify} not found in connected_clients for WS notification.")
-                    except Exception as db_log_err: logger.error(f"[{session_id}] File Upload: Error during DB logging or WS notification after file upload for {safe_filename}: {db_log_err}", exc_info=True)
-                else: logger.warning(f"[{session_id}] File Upload: Could not find an active session for task {task_id} to notify about upload of {safe_filename} via WebSocket.")
-            except Exception as e: logger.error(f"[{session_id}] File Upload: Error saving uploaded file '{safe_filename}' for task {task_id}: {e}", exc_info=True); errors.append({'filename': original_filename, 'message': f'Server error saving file: {type(e).__name__}'})
-        else: logger.warning(f"[{session_id}] File Upload: Received non-file part or part without filename in upload: Name='{part.name if hasattr(part, 'name') else 'N/A'}', Filename='{part.filename if hasattr(part, 'filename') else 'N/A'}'")
-    logger.debug(f"[{session_id}] File Upload: Finished processing all parts. Errors: {len(errors)}, Saved: {len(saved_files)}")
-    try:
-        if errors: response_data = {'status': 'error', 'message': 'Some files failed to upload.', 'errors': errors, 'saved': saved_files}; status_code = 400 if not saved_files else 207; logger.info(f"[{session_id}] File Upload: Returning error/partial success response: Status={status_code}, Data={response_data}"); return web.json_response(response_data, status=status_code)
-        elif not saved_files: response_data = {'status': 'error', 'message': 'No valid files were uploaded.'}; status_code = 400; logger.info(f"[{session_id}] File Upload: Returning no valid files error response: Status={status_code}, Data={response_data}"); return web.json_response(response_data, status=status_code)
-        else: response_data = {'status': 'success', 'message': f'Successfully uploaded {len(saved_files)} file(s).', 'saved': saved_files}; status_code = 200; logger.info(f"[{session_id}] File Upload: Returning success response: Status={status_code}, Data={response_data}"); return web.json_response(response_data, status=status_code)
-    except Exception as return_err: logger.error(f"[{session_id}] File Upload: CRITICAL ERROR constructing final JSON response for upload: {return_err}", exc_info=True); return web.Response(status=500, text="Internal server error creating upload response.")
-
-
-async def get_artifacts(task_id: str) -> List[Dict[str, str]]:
-    logger.debug(f"Scanning workspace for artifacts for task: {task_id}")
-    artifacts = []
-    try:
-        task_workspace_path = get_task_workspace_path(task_id, create_if_not_exists=False)
-        if not task_workspace_path.exists(): logger.warning(f"Artifact scan: Workspace for task {task_id} does not exist at {task_workspace_path}. Returning empty list."); return []
-        artifact_patterns = ['*.png', '*.jpg', '*.jpeg', '*.gif', '*.svg', '*.pdf'] + [f'*{ext}' for ext in TEXT_EXTENSIONS]
-        all_potential_artifacts = []
-        for pattern in artifact_patterns:
-            for file_path in task_workspace_path.glob(pattern):
-                if file_path.is_file():
-                    try: mtime = file_path.stat().st_mtime; all_potential_artifacts.append((file_path, mtime))
-                    except FileNotFoundError: logger.warning(f"File disappeared during artifact scan: {file_path}"); continue
-        sorted_files = sorted(all_potential_artifacts, key=lambda x: x[1], reverse=True)
-        for file_path, _ in sorted_files:
-            relative_filename = str(file_path.relative_to(task_workspace_path)); artifact_type = 'unknown'; file_suffix = file_path.suffix.lower()
-            if file_suffix in ['.png', '.jpg', '.jpeg', '.gif', '.svg']: artifact_type = 'image'
-            elif file_suffix in TEXT_EXTENSIONS: artifact_type = 'text'
-            elif file_suffix == '.pdf': artifact_type = 'pdf'
-            if artifact_type != 'unknown':
-                encoded_filename = urllib.parse.quote(relative_filename)
-                artifact_url = f"http://{FILE_SERVER_CLIENT_HOST}:{FILE_SERVER_PORT}/workspace_files/{task_id}/{encoded_filename}"
-                artifacts.append({"type": artifact_type, "url": artifact_url, "filename": relative_filename})
-        logger.info(f"Found {len(artifacts)} artifacts for task {task_id}.")
-    except ValueError as ve: logger.error(f"Error scanning artifacts for task {task_id} due to invalid task ID: {ve}")
-    except Exception as e: logger.error(f"Error scanning artifacts for task {task_id}: {e}", exc_info=True)
-    return artifacts
-
-async def setup_file_server():
-    app = web.Application(); app['client_max_size'] = 100 * 1024**2
-    logger.info("FILE_SERVER: Configuring CORS..."); cors = aiohttp_cors.setup(app, defaults={ "*": aiohttp_cors.ResourceOptions(allow_credentials=True, expose_headers="*", allow_headers=("Content-Type", "X-Session-ID", "Authorization", "X-Requested-With", "Accept", "Origin"), allow_methods=["GET", "POST", "OPTIONS"] ) }); logger.info("FILE_SERVER: Default CORS options set.")
-    logger.info(f"FILE_SERVER: Configuring /workspace_files/{{task_id}}/{{filename:.+}} GET route with handler: {handle_workspace_file.__name__}"); get_resource = app.router.add_resource('/workspace_files/{task_id}/{filename:.+}'); get_route = get_resource.add_route('GET', handle_workspace_file); logger.info(f"FILE_SERVER: Route {get_route} for GET /workspace_files added."); cors.add(get_route, { "*": aiohttp_cors.ResourceOptions( allow_credentials=True, expose_headers="*", allow_headers="*", allow_methods=["GET", "OPTIONS"], ) }); logger.info(f"FILE_SERVER: Explicit CORS configured for GET /workspace_files/{{task_id}}/{{filename}} route (allow_headers='*').")
-    logger.info(f"FILE_SERVER: About to configure /upload/{{task_id}} POST route with handler: {handle_file_upload.__name__}"); post_resource = app.router.add_resource('/upload/{task_id}'); post_route = post_resource.add_route('POST', handle_file_upload); logger.info(f"FILE_SERVER: Route {post_route} for POST /upload/{{task_id}} added to router."); cors.add(post_route, { "*": aiohttp_cors.ResourceOptions( allow_credentials=True, expose_headers="*", allow_headers=("Content-Type", "X-Session-ID", "Authorization", "X-Requested-With", "Accept", "Origin"), allow_methods=["POST", "OPTIONS"], ) }); logger.info(f"FILE_SERVER: Explicit CORS configured for POST /upload/{{task_id}} route.")
-    runner = web.AppRunner(app); await runner.setup(); site = web.TCPSite(runner, FILE_SERVER_LISTEN_HOST, FILE_SERVER_PORT)
-    logger.info(f"Starting file server listening on http://{FILE_SERVER_LISTEN_HOST}:{FILE_SERVER_PORT}")
-    return site, runner
-
-
-async def handler(websocket: Any):
-    session_id = str(uuid.uuid4())
-    logger.info(f"[{session_id}] Connection attempt from {websocket.remote_address}...")
-
-    async def send_ws_message_for_session(msg_type: str, content: Any):
-        logger.debug(f"[{session_id}] Attempting to send WS message: Type='{msg_type}', Content='{str(content)[:100]}...'")
-        client_info = connected_clients.get(session_id)
-        if client_info:
-            ws = client_info.get("websocket")
-            if ws:
-                try:
-                    await ws.send(json.dumps({"type": msg_type, "content": content}))
-                    logger.debug(f"[{session_id}] Successfully sent WS message type '{msg_type}'.")
-                except (websockets.exceptions.ConnectionClosedOK, websockets.exceptions.ConnectionClosedError) as close_exc:
-                    logger.warning(f"[{session_id}] WS already closed when trying to send type '{msg_type}'. Error: {close_exc}")
-                except Exception as e:
-                    logger.error(f"[{session_id}] Error sending WS message type '{msg_type}': {e}", exc_info=True)
-            else: logger.warning(f"[{session_id}] Websocket object not found for session when trying to send type '{msg_type}'.")
-        else: logger.warning(f"[{session_id}] Session not found in connected_clients when trying to send type '{msg_type}'.")
-
-    connected_clients[session_id] = {"websocket": websocket, "agent_task": None, "send_ws_message": send_ws_message_for_session}
-    logger.info(f"[{session_id}] Client added to connected_clients dict with send function.")
-
-    try:
-        await send_ws_message_for_session("session_established", {"session_id": session_id})
-        logger.info(f"[{session_id}] Sent 'session_established' message to client with full ID.")
-    except Exception as e:
-        logger.error(f"[{session_id}] Failed to send 'session_established' message: {e}", exc_info=True)
-
-    async def add_monitor_log_and_save(text: str, log_type: str = "monitor_log"):
-        timestamp = datetime.datetime.now().isoformat(timespec='milliseconds')
-        log_prefix = f"[{timestamp}][{session_id[:8]}]"
-        type_indicator_for_log_entry = f"[{log_type.upper().replace('MONITOR_', '').replace('ERROR_', 'ERR_').replace('SYSTEM_', 'SYS_')}]"
-        if log_type == "monitor_log" and not text.startswith("["): type_indicator_for_log_entry = "[INFO]"
-        full_content_for_ui = f"{log_prefix} {type_indicator_for_log_entry} {text}"
-        await send_ws_message_for_session("monitor_log", full_content_for_ui)
-        active_task_id = session_data.get(session_id, {}).get("current_task_id")
-        if active_task_id:
-            try: await add_message(active_task_id, session_id, log_type, text)
-            except Exception as db_err: logger.error(f"[{session_id}] Failed to save monitor log '{log_type}' to DB: {db_err}")
-
-    ws_callback_handler: Optional[WebSocketCallbackHandler] = None
-    memory: Optional[ConversationBufferWindowMemory] = None
-    session_setup_ok = False
-    try:
-        logger.info(f"[{session_id}] Starting session setup...")
-        logger.debug(f"[{session_id}] Creating ConversationBufferWindowMemory (K={settings.agent_memory_window_k})...")
-        memory = ConversationBufferWindowMemory(
-            k=settings.agent_memory_window_k, memory_key="chat_history", input_key="input", output_key="output", return_messages=True
-        )
-        logger.debug(f"[{session_id}] Memory object created.")
-        logger.debug(f"[{session_id}] Creating WebSocketCallbackHandler...")
-        db_add_func = functools.partial(add_message)
-        ws_callback_handler = WebSocketCallbackHandler(session_id, send_ws_message_for_session, db_add_func, session_data.get(session_id, {})) # Pass the session-specific dict
-        logger.debug(f"[{session_id}] Callback handler created.")
-        logger.debug(f"[{session_id}] Storing session data...")
-        session_data[session_id] = {
-            "memory": memory,
-            "callback_handler": ws_callback_handler,
-            "current_task_id": None,
-            "selected_llm_provider": settings.executor_default_provider,
-            "selected_llm_model_name": settings.executor_default_model_name,
-            "cancellation_requested": False,
-            "current_plan_structured": None,
-            "current_plan_human_summary": None,
-            "current_plan_step_index": -1,
-            "plan_execution_active": False,
-            "original_user_query": None,
-            "active_plan_filename": None,
-            "current_plan_proposal_id_backend": None,
-            "session_intent_classifier_llm_id": None,
-            "session_planner_llm_id": None,
-            "session_controller_llm_id": None,
-            "session_evaluator_llm_id": None,
-        }
-        # After session_data[session_id] is created, update the callback handler's reference if it was created with an empty dict
-        if ws_callback_handler:
-            ws_callback_handler.session_data = session_data[session_id]
-
-        logger.info(f"[{session_id}] Session setup complete.")
-        session_setup_ok = True
-    except Exception as e:
-        logger.error(f"[{session_id}] CRITICAL ERROR during session setup: {e}", exc_info=True)
-        # <<< --- SYNTAX FIX START --- >>>
-        if websocket:
-            try:
-                await websocket.close(code=1011, reason="Session setup failed")
-            except Exception as close_e:
-                logger.error(f"[{session_id}] Error closing websocket during setup failure: {close_e}")
-        # <<< --- SYNTAX FIX END --- >>>
-        if session_id in connected_clients: del connected_clients[session_id]
-        if session_id in session_data: del session_data[session_id]
-        return
-
-    if not session_setup_ok:
-        logger.error(f"[{session_id}] Halting handler because session setup failed.")
-        return
-
-    MessageHandler = Callable[..., Coroutine[Any, Any, None]]
-
-    message_handler_map: Dict[str, MessageHandler] = {
-        "context_switch": process_context_switch,
-        "user_message": process_user_message,
-        "execute_confirmed_plan": process_execute_confirmed_plan,
-        "cancel_plan_proposal": process_cancel_plan_proposal,
-        "new_task": process_new_task,
-        "delete_task": process_delete_task,
-        "rename_task": process_rename_task,
-        "set_llm": process_set_llm,
-        "get_available_models": process_get_available_models,
-        "cancel_agent": process_cancel_agent,
-        "get_artifacts_for_task": process_get_artifacts_for_task,
-        "run_command": process_run_command,
-        "action_command": process_action_command,
-        "set_session_role_llm": process_set_session_role_llm,
-    }
-
-    try:
-        status_llm_info = f"Executor LLM: {settings.executor_default_provider} ({settings.executor_default_model_name})"
-        logger.info(f"[{session_id}] Sending initial status message..."); await send_ws_message_for_session("status_message", f"Connected (Session: {session_id[:8]}...). Agent Ready. {status_llm_info}.")
-        role_llm_defaults = { "intent_classifier": f"{settings.intent_classifier_provider}::{settings.intent_classifier_model_name}", "planner": f"{settings.planner_provider}::{settings.planner_model_name}", "controller": f"{settings.controller_provider}::{settings.controller_model_name}", "evaluator": f"{settings.evaluator_provider}::{settings.evaluator_model_name}", }
-        await send_ws_message_for_session("available_models", { "gemini": settings.gemini_available_models, "ollama": settings.ollama_available_models, "default_executor_llm_id": f"{settings.executor_default_provider}::{settings.executor_default_model_name}", "role_llm_defaults": role_llm_defaults })
-        logger.info(f"[{session_id}] Sent available_models (with role defaults) to client."); await add_monitor_log_and_save(f"New client connection: {websocket.remote_address}", "system_connect"); logger.info(f"[{session_id}] Added system_connect log.")
-        logger.info(f"[{session_id}] Entering message processing loop...")
-        async for message_str in websocket:
-            logger.debug(f"[{session_id}] Received raw message: {message_str[:200]}{'...' if len(message_str)>200 else ''}")
-            try:
-                parsed_data = json.loads(message_str); message_type = parsed_data.get("type")
-                handler_func = message_handler_map.get(message_type)
-                if handler_func:
-                    session_data_entry = session_data.get(session_id); connected_clients_entry = connected_clients.get(session_id)
-                    if not session_data_entry or not connected_clients_entry: logger.error(f"[{session_id}] Critical: session_data or connected_clients entry missing for active session. Type: {message_type}"); await send_ws_message_for_session("status_message", "Error: Session integrity issue. Please refresh."); continue
-                    handler_args: Dict[str, Any] = { "session_id": session_id, "data": parsed_data, "session_data_entry": session_data_entry, "connected_clients_entry": connected_clients_entry, "send_ws_message_func": send_ws_message_for_session, "add_monitor_log_func": add_monitor_log_and_save, }
-                    if message_type in ["context_switch", "user_message", "run_command", "execute_confirmed_plan"]: handler_args["db_add_message_func"] = add_message
-                    if message_type == "context_switch": handler_args["db_add_task_func"] = add_task; handler_args["db_get_messages_func"] = get_messages_for_task; handler_args["get_artifacts_func"] = get_artifacts
-                    elif message_type == "new_task" or message_type == "delete_task" or message_type == "get_artifacts_for_task": handler_args["get_artifacts_func"] = get_artifacts
-                    if message_type == "delete_task": handler_args["db_delete_task_func"] = delete_task_and_messages
-                    elif message_type == "rename_task": handler_args["db_rename_task_func"] = rename_task_in_db
-                    elif message_type == "run_command": handler_args["execute_shell_command_func"] = execute_shell_command
-                    await handler_func(**handler_args)
-                else: logger.warning(f"[{session_id}] Unknown message type received: {message_type}"); await add_monitor_log_and_save(f"Received unknown message type: {message_type}", "error_unknown_msg")
-            except json.JSONDecodeError: logger.error(f"[{session_id}] Received non-JSON message: {message_str[:200]}{'...' if len(message_str)>200 else ''}"); await add_monitor_log_and_save("Error: Received invalid message format (not JSON).", "error_json")
-            except asyncio.CancelledError: logger.info(f"[{session_id}] Message processing loop cancelled."); raise
-            except Exception as e:
-                logger.error(f"[{session_id}] Error processing message: {e}", exc_info=True)
-                try: await add_monitor_log_and_save(f"Error processing message: {e}", "error_processing"); await send_ws_message_for_session("status_message", f"Error processing message: {type(e).__name__}")
-                except Exception as inner_e: logger.error(f"[{session_id}] Further error during error reporting: {inner_e}")
-    except (websockets.exceptions.ConnectionClosedOK, websockets.exceptions.ConnectionClosedError) as ws_close_exc:
-        if isinstance(ws_close_exc, websockets.exceptions.ConnectionClosedOK): logger.info(f"Client disconnected normally: {websocket.remote_address} (Session: {session_id}) - Code: {ws_close_exc.code}, Reason: {ws_close_exc.reason}")
-        else: logger.warning(f"Connection closed abnormally: {websocket.remote_address} (Session: {session_id}) - Code: {ws_close_exc.code}, Reason: {ws_close_exc.reason}")
-    except asyncio.CancelledError:
-        logger.info(f"WebSocket handler for session {session_id} cancelled.")
-        if websocket and websocket.open:
-             await websocket.close(code=1012, reason="Server shutting down")
-    except Exception as e:
-        logger.error(f"Unhandled error in WebSocket handler: {websocket.remote_address} (Session: {session_id}): {e}", exc_info=True)
+# --- HTTP File Server Class (No changes) ---
+class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        parsed_path = urlparse(self.path)
+        path = parsed_path.path.rstrip('/')
+        if path == '/api/models': self._handle_get_models()
+        elif path == '/api/tools': self._handle_get_tools()
+        elif path == '/api/workspace/items': self._handle_get_workspace_items(parsed_path)
+        elif path == '/file-content': self._handle_get_file_content(parsed_path)
+        elif path == '/api/workspace/raw': self._handle_get_raw_file(parsed_path)
+        else: self._send_json_response(404, {'error': f"Not Found: The path '{path}' does not match any known API routes."})
+    def do_POST(self):
+        parsed_path = urlparse(self.path)
+        path = parsed_path.path.rstrip('/')
+        if path == '/api/workspace/folders': self._handle_create_folder()
+        elif path == '/upload': self._handle_file_upload()
+        else: self._send_json_response(404, {'error': f"Not Found: The POST path '{path}' does not match any known API routes."})
+    def do_DELETE(self):
+        parsed_path = urlparse(self.path)
+        path = parsed_path.path.rstrip('/')
+        if path == '/api/workspace/items': self._handle_delete_workspace_item(parsed_path)
+        else: self._send_json_response(404, {'error': f"Not Found: The path '{path}' does not match any known DELETE routes."})
+    def do_PUT(self):
+        parsed_path = urlparse(self.path)
+        path = parsed_path.path.rstrip('/')
+        if path == '/api/workspace/items': self._handle_rename_workspace_item()
+        else: self._send_json_response(404, {'error': f"Not Found: The path '{path}' does not match any known PUT routes."})
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE')
+        self.send_header('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type')
+        self.end_headers()
+    def _send_json_response(self, status_code, data):
+        self.send_response(status_code)
+        self.send_header('Content-type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.end_headers()
+        self.wfile.write(json.dumps(data).encode('utf-8'))
+    def _handle_get_models(self):
+        logger.info("Parsing .env to serve available and default models.")
+        available_models, model_ids = [], set()
+        def parse_and_add_models(env_var, provider_prefix):
+            models_str = os.getenv(env_var)
+            if models_str:
+                for model_name in models_str.split(','):
+                    model_name = model_name.strip()
+                    if model_name:
+                        full_id = f"{provider_prefix}::{model_name}"
+                        if full_id not in model_ids:
+                            available_models.append({"id": full_id, "name": format_model_name(full_id)})
+                            model_ids.add(full_id)
+        parse_and_add_models("GEMINI_AVAILABLE_MODELS", "gemini")
+        parse_and_add_models("OLLAMA_AVAILABLE_MODELS", "ollama")
+        safe_fallback_model = "gemini::gemini-1.5-flash-latest"
+        if not available_models: available_models.append({"id": safe_fallback_model, "name": format_model_name(safe_fallback_model)})
+        global_default_llm = os.getenv("DEFAULT_LLM_ID", safe_fallback_model)
+        default_models = {"ROUTER_LLM_ID": os.getenv("ROUTER_LLM_ID", global_default_llm), "CHIEF_ARCHITECT_LLM_ID": os.getenv("CHIEF_ARCHITECT_LLM_ID", global_default_llm), "SITE_FOREMAN_LLM_ID": os.getenv("SITE_FOREMAN_LLM_ID", global_default_llm), "PROJECT_SUPERVISOR_LLM_ID": os.getenv("PROJECT_SUPERVISOR_LLM_ID", global_default_llm), "EDITOR_LLM_ID": os.getenv("EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")}
+        self._send_json_response(200, {"available_models": available_models, "default_models": default_models})
+    def _handle_get_tools(self):
+        logger.info("Serving available tools list.")
         try:
-            if websocket and websocket.open:
-                await websocket.close(code=1011, reason="Internal server error")
-        except Exception as close_e:
-            logger.error(f"[{session_id}] Error closing websocket after unhandled handler error: {close_e}")
-    finally:
-        logger.info(f"Cleaning up resources for session {session_id}")
-        agent_task = connected_clients.get(session_id, {}).get("agent_task")
-        if agent_task and not agent_task.done():
-            logger.warning(f"[{session_id}] Cancelling active task during cleanup.")
-            agent_task.cancel();
-            try: await agent_task
-            except asyncio.CancelledError: pass
-            except AgentCancelledException: pass
-            except Exception as cancel_e: logger.error(f"[{session_id}] Error waiting for task cancellation during cleanup: {cancel_e}")
-        if session_id in connected_clients: del connected_clients[session_id]
-        if session_id in session_data: del session_data[session_id]
-        logger.info(f"Cleaned up session data for {session_id}. Client removed: {websocket.remote_address}. Active clients: {len(connected_clients)}")
+            loaded_tools = get_available_tools()
+            formatted_tools = [{"name": tool.name, "description": tool.description} for tool in loaded_tools]
+            editor_tool = {"name": "The Editor", "description": "Use a powerful language model to perform tasks like rewriting, summarizing, or analyzing text."}
+            self._send_json_response(200, {"tools": [editor_tool] + formatted_tools})
+        except Exception as e:
+            logger.error(f"Failed to get available tools: {e}", exc_info=True)
+            self._send_json_response(500, {"error": "Could not retrieve tools."})
+    def _handle_get_workspace_items(self, parsed_path):
+        query_components = parse_qs(parsed_path.query)
+        subdir = query_components.get("path", [None])[0]
+        if not subdir: return self._send_json_response(400, {"error": "Missing 'path' query parameter."})
+        base_workspace, items = "/app/workspace", []
+        try:
+            full_path = _resolve_path(base_workspace, subdir)
+            if not os.path.isdir(full_path): return self._send_json_response(404, {"error": f"Directory not found: '{subdir}'"})
+            for item_name in os.listdir(full_path):
+                item_path = os.path.join(full_path, item_name)
+                item_type = 'directory' if os.path.isdir(item_path) else 'file'
+                try: item_size = os.path.getsize(item_path) if item_type == 'file' else 0
+                except OSError: item_size = 0
+                items.append({"name": item_name, "type": item_type, "size": item_size})
+            self._send_json_response(200, {"items": items})
+        except Exception as e:
+            logger.error(f"Error listing workspace items for path '{subdir}': {e}", exc_info=True)
+            self._send_json_response(500, {"error": str(e)})
+    def _handle_delete_workspace_item(self, parsed_path):
+        query_components = parse_qs(parsed_path.query)
+        item_path_str = query_components.get("path", [None])[0]
+        if not item_path_str: return self._send_json_response(400, {"error": "Missing 'path' query parameter."})
+        base_workspace = "/app/workspace"
+        try:
+            full_path = _resolve_path(base_workspace, item_path_str)
+            if not os.path.exists(full_path): return self._send_json_response(404, {"error": f"Item not found: '{item_path_str}'"})
+            if os.path.isdir(full_path): shutil.rmtree(full_path)
+            else: os.remove(full_path)
+            logger.info(f"Successfully deleted item: {full_path}")
+            self._send_json_response(200, {"message": f"Successfully deleted item: '{item_path_str}'"})
+        except Exception as e:
+            logger.error(f"Error deleting item '{item_path_str}': {e}", exc_info=True)
+            self._send_json_response(500, {"error": str(e)})
+    def _handle_create_folder(self):
+        try:
+            content_length = int(self.headers['Content-Length'])
+            if content_length == 0: return self._send_json_response(400, {'error': 'Request body is empty.'})
+            body = json.loads(self.rfile.read(content_length))
+            new_path_str = body.get('path')
+            if not new_path_str: return self._send_json_response(400, {'error': "Request body must contain a 'path' key."})
+            full_path = _resolve_path("/app/workspace", new_path_str)
+            if os.path.exists(full_path): return self._send_json_response(409, {'error': f"Conflict: An item already exists at '{new_path_str}'."})
+            os.makedirs(full_path)
+            logger.info(f"Successfully created directory: {full_path}")
+            self._send_json_response(201, {'message': f"Folder '{new_path_str}' created successfully."})
+        except Exception as e:
+            logger.error(f"Error creating folder: {e}", exc_info=True)
+            self._send_json_response(500, {'error': str(e)})
+    def _handle_rename_workspace_item(self):
+        try:
+            content_length = int(self.headers['Content-Length'])
+            if content_length == 0: return self._send_json_response(400, {'error': 'Request body is empty.'})
+            body = json.loads(self.rfile.read(content_length))
+            old_path_str, new_path_str = body.get('old_path'), body.get('new_path')
+            if not old_path_str or not new_path_str: return self._send_json_response(400, {'error': "Request body must contain 'old_path' and 'new_path' keys."})
+            base_workspace = "/app/workspace"
+            old_full_path = _resolve_path(base_workspace, old_path_str)
+            new_full_path = _resolve_path(base_workspace, new_path_str)
+            if not os.path.exists(old_full_path): return self._send_json_response(404, {'error': f"Source item not found: '{old_path_str}'."})
+            if os.path.exists(new_full_path): return self._send_json_response(409, {'error': f"Destination already exists: '{new_path_str}'."})
+            os.rename(old_full_path, new_full_path)
+            logger.info(f"Successfully renamed '{old_full_path}' to '{new_full_path}'")
+            self._send_json_response(200, {'message': f"Item renamed successfully to '{new_path_str}'."})
+        except Exception as e:
+            logger.error(f"Error renaming item: {e}", exc_info=True)
+            self._send_json_response(500, {'error': str(e)})
+    def _handle_get_file_content(self, parsed_path):
+        query_components = parse_qs(parsed_path.query)
+        workspace_id, filename = query_components.get("path", [None])[0], query_components.get("filename", [None])[0]
+        if not workspace_id or not filename: return self._send_json_response(400, {"error": "Missing 'path' or 'filename' parameter."})
+        try:
+            full_path = _resolve_path(f"/app/workspace/{workspace_id}", filename)
+            with open(full_path, 'r', encoding='utf-8') as f: content = f.read()
+            self.send_response(200)
+            self.send_header('Content-type', 'text/plain; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(content.encode('utf-8'))
+        except Exception as e: self._send_json_response(500, {"error": f"Error reading file: {e}"})
+    def _handle_get_raw_file(self, parsed_path):
+        query_components = parse_qs(parsed_path.query)
+        file_path_str = query_components.get("path", [None])[0]
+        if not file_path_str: return self.send_error(400, "Missing 'path' query parameter.")
+        try:
+            full_path = _resolve_path("/app/workspace", file_path_str)
+            if not os.path.isfile(full_path): return self.send_error(404, "File not found.")
+            content_type, _ = mimetypes.guess_type(full_path)
+            self.send_response(200)
+            self.send_header('Content-type', content_type or 'application/octet-stream')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            with open(full_path, 'rb') as f: self.wfile.write(f.read())
+        except Exception as e:
+            logger.error(f"Error serving raw file '{file_path_str}': {e}", exc_info=True)
+            self.send_error(500, "Internal Server Error")
+    def _handle_file_upload(self):
+        try:
+            form = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': self.headers['Content-Type']})
+            workspace_id, file_item = form.getvalue('workspace_id'), form['file']
+            if not workspace_id or not hasattr(file_item, 'filename') or not file_item.filename: return self._send_json_response(400, {'error': 'Missing workspace_id or file.'})
+            filename = os.path.basename(file_item.filename)
+            full_path = _resolve_path(f"/app/workspace/{workspace_id}", filename)
+            with open(full_path, 'wb') as f: f.write(file_item.file.read())
+            logger.info(f"Uploaded '{filename}' to workspace '{workspace_id}'")
+            self._send_json_response(200, {'message': f"File '{filename}' uploaded successfully."})
+        except Exception as e:
+            logger.error(f"File upload failed: {e}", exc_info=True)
+            self._send_json_response(500, {'error': f'Server error during file upload: {e}'})
 
+def run_http_server():
+    httpd = HTTPServer((os.getenv("BACKEND_HOST", "0.0.0.0"), int(os.getenv("FILE_SERVER_PORT", 8766))), WorkspaceHTTPHandler)
+    logger.info(f"Starting HTTP file server on port {httpd.server_port}")
+    httpd.serve_forever()
+
+
+# --- WebSocket Core Logic ---
+
+async def broadcast_event(event):
+    """Sends an event to all active WebSocket connections."""
+    if ACTIVE_CONNECTIONS:
+        message = json.dumps(event, default=str)
+        # Create a list of tasks for sending messages to all clients
+        tasks = [conn.send(message) for conn in ACTIVE_CONNECTIONS]
+        # Gather and run all send tasks concurrently
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        for result in results:
+            if isinstance(result, Exception):
+                logger.warning(f"Failed to send message to a client: {result}")
+
+async def agent_execution_wrapper(input_state, config):
+    """Runs the agent and broadcasts events."""
+    global RUNNING_AGENTS
+    task_id = config["configurable"]["thread_id"]
+    try:
+        logger.info(f"Task '{task_id}': Agent execution starting.")
+        await broadcast_event({"type": "agent_started", "task_id": task_id})
+        
+        async for event in agent_graph.astream_events(input_state, config):
+            event_type = event["event"]
+            if event_type in ["on_chain_start", "on_chain_end"] and event.get("name") in ["Chief_Architect", "Handyman", "Site_Foreman", "Worker", "Project_Supervisor", "Editor"]:
+                await broadcast_event({"type": "agent_event", "event": event_type, "name": event.get("name"), "data": event['data'], "task_id": task_id})
+        
+        current_state = agent_graph.get_state(config)
+        if current_state.next and "human_in_the_loop_node" in current_state.next:
+            logger.info(f"Task '{task_id}': Paused for human approval.")
+            await broadcast_event({"type": "plan_approval_request", "plan": current_state.values.get("plan"), "task_id": task_id})
+        else:
+            final_state = agent_graph.get_state(config)
+            if final_state and (answer := final_state.values.get("answer")):
+                final_answer_message = {"type": "final_answer", "data": answer, "task_id": task_id}
+                if final_state.values.get("current_track") == "SIMPLE_TOOL_USE": final_answer_message["refresh_workspace"] = True
+                await broadcast_event(final_answer_message)
+            await broadcast_event({"type": "agent_stopped", "task_id": task_id, "message": "Agent run finished successfully."})
+            
+    except asyncio.CancelledError:
+        logger.info(f"Task '{task_id}': Agent execution cancelled by user.")
+        await broadcast_event({"type": "agent_stopped", "task_id": task_id, "message": "Agent run stopped by user."})
+    except Exception as e:
+        logger.error(f"Task '{task_id}': An error occurred during agent execution: {e}", exc_info=True)
+        await broadcast_event({"type": "agent_stopped", "task_id": task_id, "message": f"An error occurred: {str(e)}"})
+    finally:
+        if task_id in RUNNING_AGENTS: del RUNNING_AGENTS[task_id]
+        logger.info(f"Task '{task_id}': Cleaned up from RUNNING_AGENTS.")
+
+async def run_agent_handler(data):
+    global RUNNING_AGENTS
+    task_id, prompt = data.get("task_id"), data.get("prompt")
+    if not prompt or not task_id: return
+    if task_id in RUNNING_AGENTS:
+        logger.warning(f"Task '{task_id}': Agent is already running.")
+        return await broadcast_event({"type": "error", "message": "Agent is already running for this task.", "task_id": task_id})
+
+    config = {"recursion_limit": 100, "configurable": {"thread_id": task_id}}
+    initial_state = {"messages": [HumanMessage(content=prompt)], "llm_config": data.get("llm_config", {}), "task_id": task_id}
+    
+    logger.info(f"Task '{task_id}': Creating background task for new agent run.")
+    agent_task = asyncio.create_task(agent_execution_wrapper(initial_state, config))
+    RUNNING_AGENTS[task_id] = agent_task
+
+async def resume_agent_handler(data):
+    global RUNNING_AGENTS
+    task_id, feedback = data.get("task_id"), data.get("feedback")
+    if not task_id or not feedback: return
+    if task_id in RUNNING_AGENTS:
+        logger.warning(f"Task '{task_id}': Agent is already running, cannot resume.")
+        return
+
+    config = {"recursion_limit": 100, "configurable": {"thread_id": task_id}}
+    update_values = {"user_feedback": feedback}
+    if (plan := data.get("plan")) is not None: update_values["plan"] = plan
+    agent_graph.update_state(config, update_values)
+    
+    logger.info(f"Task '{task_id}': Creating background task to resume agent execution.")
+    agent_task = asyncio.create_task(agent_execution_wrapper(None, config))
+    RUNNING_AGENTS[task_id] = agent_task
+
+async def handle_stop_agent(data):
+    global RUNNING_AGENTS
+    task_id = data.get("task_id")
+    if not task_id: return
+    
+    logger.info(f"Task '{task_id}': Received request to stop agent.")
+    if task_id in RUNNING_AGENTS:
+        RUNNING_AGENTS[task_id].cancel()
+    else:
+        logger.warning(f"Task '{task_id}': Stop requested, but no running agent found.")
+        await broadcast_event({"type": "agent_stopped", "task_id": task_id, "message": "Agent was not running."})
+
+async def handle_task_create(data):
+    if not (task_id := data.get("task_id")): return
+    logger.info(f"Task '{task_id}': Received create task request.")
+    os.makedirs(f"/app/workspace/{task_id}", exist_ok=True)
+
+async def handle_task_delete(data):
+    global RUNNING_AGENTS
+    if not (task_id := data.get("task_id")): return
+    logger.info(f"Task '{task_id}': Received delete task request.")
+    if task_id in RUNNING_AGENTS: RUNNING_AGENTS[task_id].cancel()
+    _safe_delete_workspace(task_id)
+
+async def message_router(websocket):
+    global ACTIVE_CONNECTIONS
+    ACTIVE_CONNECTIONS.add(websocket)
+    client_id = id(websocket)
+    logger.info(f"Client {client_id} connected. Total clients: {len(ACTIVE_CONNECTIONS)}")
+    
+    try:
+        async for message in websocket:
+            try:
+                data = json.loads(message)
+                message_type = data.get("type")
+                handlers = {"run_agent": run_agent_handler, "resume_agent": resume_agent_handler, "stop_agent": handle_stop_agent, "task_create": handle_task_create, "task_delete": handle_task_delete}
+                if message_type in handlers: await handlers[message_type](data)
+                else: logger.warning(f"Received unknown message type: '{message_type}'")
+            except Exception as e: logger.error(f"Error processing message: {e}", exc_info=True)
+    
+    except websockets.exceptions.ConnectionClosed as e:
+        logger.info(f"Client {client_id} disconnected: {e.code}")
+    finally:
+        logger.info(f"Cleaning up for client {client_id}")
+        ACTIVE_CONNECTIONS.remove(websocket)
+        logger.info(f"Client removed. Total clients: {len(ACTIVE_CONNECTIONS)}")
 
 async def main():
-    await init_db(); file_server_site, file_server_runner = await setup_file_server(); await file_server_site.start(); logger.info("File server started.")
-    ws_host = "0.0.0.0"; ws_port = 8765; logger.info(f"Starting WebSocket server on ws://{ws_host}:{ws_port}"); shutdown_event = asyncio.Event()
-    stop_serving = asyncio.Future()
-    async def serve_websockets():
-        async with websockets.serve( handler, ws_host, ws_port, max_size=settings.websocket_max_size_bytes, ping_interval=settings.websocket_ping_interval, ping_timeout=settings.websocket_ping_timeout ) as server: # type: ignore
-            logger.info("WebSocket server started and serving."); await stop_serving; logger.info("WebSocket server received stop signal, closing.")
-        logger.info("WebSocket server fully stopped.")
-    server_task = asyncio.create_task(serve_websockets())
-    loop = asyncio.get_running_loop(); original_sigint_handler = signal.getsignal(signal.SIGINT); original_sigterm_handler = signal.getsignal(signal.SIGTERM)
-    def signal_handler_wrapper(sig, frame):
-        logger.info(f"Received signal {sig}. Initiating shutdown...")
-        if not stop_serving.done(): stop_serving.set_result(None)
-        signal.signal(signal.SIGINT, original_sigint_handler); signal.signal(signal.SIGTERM, original_sigterm_handler)
-    try: loop.add_signal_handler(signal.SIGINT, functools.partial(signal_handler_wrapper, signal.SIGINT, None)); loop.add_signal_handler(signal.SIGTERM, functools.partial(signal_handler_wrapper, signal.SIGTERM, None))
-    except NotImplementedError: logger.warning("Signal handlers not available on this platform. Use Ctrl+C if available, or send SIGTERM.")
-    logger.info("Application servers running. Press Ctrl+C to stop (or send SIGTERM).")
-    try: await server_task
-    except asyncio.CancelledError: logger.info("Main server task was cancelled.")
-    logger.info("Shutdown signal processed. Stopping remaining components...")
-    logger.info("Stopping file server..."); await file_server_runner.cleanup(); logger.info("File server stopped.")
-    tasks_to_cancel = [t for t in asyncio.all_tasks() if t is not asyncio.current_task() and not t.done()]
-    if tasks_to_cancel:
-        logger.info(f"Cancelling {len(tasks_to_cancel)} outstanding tasks...")
-        for task_to_cancel_item in tasks_to_cancel: task_to_cancel_item.cancel()
-        await asyncio.gather(*tasks_to_cancel, return_exceptions=True); logger.info("Outstanding tasks cancelled.")
-    logger.info("Shutdown complete.")
+    http_thread = threading.Thread(target=run_http_server, daemon=True)
+    http_thread.start()
+    async with websockets.serve(message_router, os.getenv("BACKEND_HOST", "0.0.0.0"), int(os.getenv("BACKEND_PORT", 8765))):
+        logger.info("ResearchAgent server is running.")
+        await asyncio.Future()
 
 if __name__ == "__main__":
-    warnings.filterwarnings("ignore", category=UserWarning, message=".*LangSmith API key.*"); warnings.filterwarnings("ignore", category=UserWarning, message=".*LangSmithMissingAPIKeyWarning.*")
-    try: asyncio.run(main())
-    except KeyboardInterrupt: logger.info("Server stopped manually (KeyboardInterrupt).")
-    except Exception as e: logging.critical(f"Server failed to start or crashed: {e}", exc_info=True); exit(1)
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        logger.info("Server shut down.")
+
