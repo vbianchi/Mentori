@@ -24,30 +24,24 @@ Our agent operates like a small, efficient company with specialized roles. This 
 -   **Robust Memory & Environments:** The agent uses a "Memory Vault" for persistent knowledge and automatically creates isolated Python virtual environments for each task.
 -   **Interactive Workbench v1:** A functional file explorer with structured listing, navigation, create/rename/delete actions, drag-and-drop upload, and a smart previewer for text, images, Markdown, and CSVs.
 
-## 🚀 NEXT FOCUS: Phase 12.5: Concurrent Agent Execution & Control
+## 🚀 NEXT FOCUS: Phase 12.5: Concurrent Agent Execution & Control (REVISED PLAN)
 
 _**Vision:** Refactor the server's core execution logic to enable true parallel processing of multiple agent tasks and give the user explicit control to stop any running task._
 
-### The Concurrency Bug & Solution
+### The Concurrency Bug & Revised Plan
 
--   **The Problem:** The current WebSocket handler (`run_agent_handler`) uses `await` directly on the `agent_graph.astream_events` call. This is a _blocking_ operation. While it's running, the server cannot process any other incoming messages, such as a request to start a second agent on a different task. If a second request comes in, the first one is effectively terminated.
--   **The Solution:** We must change the handler to be non-blocking. The correct approach is to wrap the agent execution in `asyncio.create_task()`. This immediately schedules the agent to run in the background and returns control to the message handler, allowing it to process new requests. This will enable true, concurrent agent runs.
+-   **The Problem:** Testing has revealed two critical flaws: 1) The agent process terminates itself when it pauses for human approval. 2) Closing a browser tab (and its WebSocket connection) incorrectly cancels the associated background agent task. The core issue is that the agent's lifecycle is too tightly coupled to the WebSocket connection's lifecycle.
+-   **The New Plan (Per Project Lead's Direction):**
+    1.  **Isolate & Simplify:** We will first create a new, minimal test script (`test_concurrency.py`) to solve the core problem in isolation. This script will not use LangGraph.
+    2.  **Prove the Pattern:** The test script will demonstrate a robust producer-consumer pattern where a background `worker` task can run to completion, totally independent of WebSocket connections opening or closing. It will use an `asyncio.Queue` to hold messages.
+    3.  **Implement in Main App:** Once the pattern is proven in the simple test script, we will confidently transfer that exact architecture back into `server.py`. This ensures we are building on a solid foundation.
 
-### The "Stop" Functionality
+### Technical Blueprint for `test_concurrency.py`
 
--   **Goal:** Provide a way for the user to terminate a long-running or misbehaving agent task without shutting down the server.
--   **Backend Implementation:**
-    1.  **Task Tracking:** Create a global dictionary on the server (e.g., `RUNNING_TASKS = {}`).
-    2.  **Store Task Reference:** When `asyncio.create_task()` is called for a new agent run, store the resulting `Task` object in the dictionary with the `task_id` as the key.
-    3.  **Cleanup:** When the task finishes naturally, remove its entry from the dictionary.
-    4.  **New WebSocket Handler:** Create a new handler for a `"stop_agent"` message type. This handler will receive a `task_id`.
-    5.  **Cancellation:** The handler will look up the task in `RUNNING_TASKS` using the `task_id`, call the `.cancel()` method on it, and then remove it from the dictionary.
--   **Frontend Implementation:**
-    1.  **Conditional Button:** In `src/App.jsx`, display a "Stop" button next to the "Send" button _only_ when the `isThinking` state is true.
-    2.  **Send Message:** The `onClick` handler for this button will send a WebSocket message: `{ "type": "stop_agent", "task_id": activeTaskId }`.
-    3.  The UI will naturally update to show the agent has stopped when the `isThinking` state is reset to `false` by the backend.
-
-### Future Ideas: Pause/Resume
-
--   **Concept:** A true "Pause" functionality is much more complex than "Stop." It would require serializing the entire state of the LangGraph execution at the exact point it was paused and then being able to perfectly restore it later.
--   **Status:** This is a high-complexity feature to be considered for a much later version of the application.
+-   **Global State:** A dictionary to hold references to running worker tasks and another to hold message queues for each task (`WORKER_QUEUES`).
+-   **`worker` function:** An `async` function that simulates a long job (e.g., looping for 10 seconds). In each loop, it prints a message to the console and `puts` a message into its dedicated queue.
+-   **`message_sender` function:** An `async` function that runs per-connection. It continuously `gets` messages from all active queues and sends them to the client.
+-   **`main_handler` function:** The main WebSocket handler. It will:
+    -   On connection, start a `message_sender` task for that client.
+    -   On receiving a "start" message, it will use `asyncio.create_task` to launch a new `worker` in the background, ensuring it is _not_ cancelled when the client disconnects.
+    -   On disconnection, it will _only_ clean up the `message_sender` task, leaving the `worker` tasks untouched.
