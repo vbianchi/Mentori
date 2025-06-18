@@ -46,3 +46,7 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# --- NEW: Ignore dynamically generated custom tools ---
+backend/tools/custom_*.py
+

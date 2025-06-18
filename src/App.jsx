@@ -1,8 +1,9 @@
 import { h } from 'preact';
 import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
-import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, FolderIcon, ArrowLeftIcon, UploadCloudIcon, StopCircleIcon } from './components/Icons';
+import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, FolderIcon, ArrowLeftIcon, UploadCloudIcon, StopCircleIcon, ForgeIcon } from './components/Icons';
 import { ArchitectCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard } from './components/AgentCards';
 import { ToggleButton, CopyButton } from './components/Common';
+import { ToolForge } from './components/ToolForge';
 
 // --- File Previewer Component ---
 const FilePreviewer = ({ currentPath, file, isLoading, content, rawFileUrl }) => {
@@ -70,7 +71,6 @@ const PromptCard = ({ content }) => (
     </div>
 );
 
-// --- MODIFIED: TaskItem now shows a loading spinner ---
 const TaskItem = ({ task, isActive, isRunning, onSelect, onRename, onDelete }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editText, setEditText] = useState(task.name);
@@ -93,7 +93,6 @@ const TaskItem = ({ task, isActive, isRunning, onSelect, onRename, onDelete }) =
 };
 
 const ModelSelector = ({ label, icon, onModelChange, models, selectedModel, roleKey }) => (
-    // ... (no changes)
     <div class="mb-4 last:mb-0">
         <label class="block text-sm font-medium text-gray-400 mb-1 flex items-center gap-2">{icon}{label}</label>
         <div class="relative"> <select value={selectedModel} onChange={(e) => onModelChange(roleKey, e.target.value)} class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-blue-500 focus:outline-none appearance-none text-sm" disabled={!selectedModel || models.length === 0}> {models.map(model => <option key={model.id} value={model.id}>{model.name}</option>)} </select> <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400"> <ChevronDownIcon class="h-4 w-4" /> </div> </div>
@@ -101,7 +100,6 @@ const ModelSelector = ({ label, icon, onModelChange, models, selectedModel, role
 );
 
 const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
-    // ... (no changes)
     const [isExpanded, setIsExpanded] = useState(false);
     const agentRoles = [
         { key: 'ROUTER_LLM_ID', label: 'The Router', icon: <RouterIcon className="h-4 w-4"/>, desc: "Classifies tasks into 3 tracks." },
@@ -123,7 +121,6 @@ const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
 };
 
 const Breadcrumbs = ({ path, onNavigate }) => {
-    // ... (no changes)
     const parts = path.split('/').filter(Boolean);
     
     const handleCrumbClick = (index) => {
@@ -149,11 +146,13 @@ const Breadcrumbs = ({ path, onNavigate }) => {
 export function App() {
     const [tasks, setTasks] = useState([]);
     const [activeTaskId, setActiveTaskId] = useState(null);
-    const [isThinking, setIsThinking] = useState(false); // Legacy, will be replaced by runningTasks
     const [inputValue, setInputValue] = useState("");
     const [connectionStatus, setConnectionStatus] = useState("Disconnected");
     const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
     const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
+
+    // --- NEW: State for view management ---
+    const [activeView, setActiveView] = useState('tasks'); // 'tasks' or 'forge'
 
     const [workspaceItems, setWorkspaceItems] = useState([]);
     const [currentPath, setCurrentPath] = useState('');
@@ -168,7 +167,6 @@ export function App() {
     const [isAwaitingApproval, setIsAwaitingApproval] = useState(false);
     const [availableTools, setAvailableTools] = useState([]);
     const [isDragOver, setIsDragOver] = useState(false);
-    // --- NEW: State to track all running tasks by their ID ---
     const [runningTasks, setRunningTasks] = useState({});
 
 
@@ -184,7 +182,6 @@ export function App() {
     });
 
     useEffect(() => {
-        // ... (no changes)
         const savedTasks = localStorage.getItem('research_agent_tasks');
         const savedActiveId = localStorage.getItem('research_agent_active_task_id');
         const loadedTasks = savedTasks ? JSON.parse(savedTasks) : [];
@@ -199,7 +196,6 @@ export function App() {
     }, []);
 
     useEffect(() => {
-        // ... (no changes)
         if (tasks.length > 0) {
             localStorage.setItem('research_agent_tasks', JSON.stringify(tasks));
         } else {
@@ -208,7 +204,6 @@ export function App() {
     }, [tasks]);
 
     useEffect(() => {
-        // ... (no changes)
         if (activeTaskId) {
             localStorage.setItem('research_agent_active_task_id', activeTaskId);
         } else {
@@ -217,24 +212,22 @@ export function App() {
     }, [activeTaskId]);
     
     const resetWorkspaceViews = () => {
-        // ... (no changes)
         setWorkspaceItems([]);
         setWorkspaceError(null);
         setSelectedFile(null);
     };
 
     const selectTask = (taskId) => {
-        // ... (no changes)
         if (taskId !== activeTaskId) {
             setActiveTaskId(taskId);
             setIsAwaitingApproval(false);
             resetWorkspaceViews();
             setCurrentPath(taskId);
+            setActiveView('tasks'); // Switch back to tasks view when a task is selected
         }
     };
     
     const createNewTask = () => {
-        // ... (no changes)
         const newTaskId = `task_${Date.now()}`;
         const newTask = { id: newTaskId, name: `New Task ${tasks.length + 1}`, history: [] };
         if (ws.current?.readyState === WebSocket.OPEN) {
@@ -247,12 +240,10 @@ export function App() {
     };
 
     const handleRenameTask = (taskId, newName) => {
-        // ... (no changes)
         setTasks(prevTasks => prevTasks.map(task => task.id === taskId ? { ...task, name: newName } : task));
     };
 
     const handleDeleteTask = (taskIdToDelete) => {
-        // ... (no changes)
         if (ws.current?.readyState === WebSocket.OPEN) {
             ws.current.send(JSON.stringify({ type: 'task_delete', task_id: taskIdToDelete }));
         } else {
@@ -278,17 +269,14 @@ export function App() {
     };
 
     const handleModelChange = (roleKey, modelId) => {
-        // ... (no changes)
         setSelectedModels(prev => ({ ...prev, [roleKey]: modelId }));
     };
     
     const scrollToBottom = () => {
-        // ... (no changes)
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
     
     const fetchWorkspaceFiles = async (path) => {
-        // ... (no changes)
         if (!path) return;
         setWorkspaceLoading(true);
         setWorkspaceError(null);
@@ -315,7 +303,6 @@ export function App() {
     };
 
     const selectAndFetchFile = async (file) => {
-        // ... (no changes)
         if (!currentPath || !file) return;
 
         setSelectedFile(file);
@@ -347,7 +334,6 @@ export function App() {
     };
     
     const handleNavigation = (item) => {
-        // ... (no changes)
         if (item.type === 'directory') {
             const newPath = `${currentPath}/${item.name}`;
             setCurrentPath(newPath);
@@ -358,13 +344,11 @@ export function App() {
     };
     
     const handleBreadcrumbNav = (path) => {
-        // ... (no changes)
         setCurrentPath(path);
         setSelectedFile(null);
     };
 
     const handleDeleteItem = async (item) => {
-        // ... (no changes)
         if (!confirm(`Are you sure you want to delete '${item.name}'?`)) {
             return;
         }
@@ -390,7 +374,6 @@ export function App() {
     };
 
     const handleCreateFolder = async () => {
-        // ... (no changes)
         const folderName = prompt("Enter the name for the new folder:");
         if (!folderName || folderName.trim() === '') {
             return;
@@ -418,7 +401,6 @@ export function App() {
     };
 
     const handleRenameItem = async (item) => {
-        // ... (no changes)
         const newName = prompt(`Enter the new name for '${item.name}':`, item.name);
         if (!newName || newName.trim() === '' || newName.trim() === item.name) {
             return;
@@ -447,7 +429,6 @@ export function App() {
     };
 
     const handleFileUpload = async (file) => {
-        // ... (no changes)
         if (!file || !currentPath) return;
         setWorkspaceLoading(true);
         setWorkspaceError(null);
@@ -468,7 +449,6 @@ export function App() {
     };
 
     const handleDragEnter = (e) => {
-        // ... (no changes)
         e.preventDefault();
         e.stopPropagation();
         dragCounter.current++;
@@ -478,7 +458,6 @@ export function App() {
     };
 
     const handleDragLeave = (e) => {
-        // ... (no changes)
         e.preventDefault();
         e.stopPropagation();
         dragCounter.current--;
@@ -488,13 +467,11 @@ export function App() {
     };
 
     const handleDragOver = (e) => {
-        // ... (no changes)
         e.preventDefault();
         e.stopPropagation();
     };
 
     const handleDrop = (e) => {
-        // ... (no changes)
         e.preventDefault();
         e.stopPropagation();
         setIsDragOver(false);
@@ -506,7 +483,6 @@ export function App() {
     };
 
     useEffect(() => {
-        // ... (no changes)
         const fetchConfig = async () => {
             try {
                 const modelsResponse = await fetch('http://localhost:8766/api/models');
@@ -531,14 +507,12 @@ export function App() {
     }, []);
 
     useEffect(() => {
-        // ... (no changes)
-        if (currentPath) {
+        if (currentPath && activeView === 'tasks') {
             fetchWorkspaceFiles(currentPath);
         }
-    }, [currentPath]);
+    }, [currentPath, activeView]);
     
     const handleApprovalAction = (feedback, plan = null) => {
-        // ... (no changes)
         if (ws.current?.readyState !== WebSocket.OPEN) {
             alert("Connection not ready.");
             return;
@@ -596,7 +570,6 @@ export function App() {
             socket.onmessage = (event) => {
                 const newEvent = JSON.parse(event.data);
                 
-                // --- NEW: Handle agent_started and agent_stopped messages ---
                 if (newEvent.type === 'agent_started' || newEvent.type === 'agent_resumed') {
                     setRunningTasks(prev => ({ ...prev, [newEvent.task_id]: true }));
                 } else if (newEvent.type === 'final_answer' || newEvent.type === 'agent_stopped') {
@@ -614,7 +587,6 @@ export function App() {
                 }
 
                 setTasks(currentTasks => {
-                    // ... (no changes to task history logic)
                     try {
                         const taskIndex = currentTasks.findIndex(t => t.id === newEvent.task_id);
                         if (taskIndex === -1) return currentTasks;
@@ -699,7 +671,6 @@ export function App() {
     useEffect(() => { scrollToBottom(); }, [activeTask?.history, isAwaitingApproval]);
 
     const handleSendMessage = (e) => {
-        // ... (no changes)
         e.preventDefault();
         const message = inputValue.trim();
         if (!message || !activeTask || connectionStatus !== 'Connected' || runningTasks[activeTaskId] || isAwaitingApproval) return;
@@ -721,7 +692,6 @@ export function App() {
         setInputValue("");
     };
 
-    // --- NEW: Handler for the stop button ---
     const handleStopAgent = () => {
         if (!runningTasks[activeTaskId] || connectionStatus !== 'Connected') return;
         ws.current.send(JSON.stringify({ type: 'stop_agent', task_id: activeTaskId }));
@@ -733,145 +703,170 @@ export function App() {
             {isLeftSidebarVisible && (
                 <div class="h-full w-1/4 min-w-[300px] bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col">
                     <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-700 flex-shrink-0">
-                        <h2 class="text-xl font-bold text-white">Tasks</h2>
+                        {/* --- NEW: View-aware Title --- */}
+                        <h2 class="text-xl font-bold text-white">
+                            {activeView === 'tasks' ? 'Tasks' : 'Tool Forge'}
+                        </h2>
                         <div class="flex items-center gap-2">
+                           {/* --- NEW: View-switching buttons --- */}
+                           {activeView === 'tasks' ? (
+                               <button onClick={() => setActiveView('forge')} class="p-1.5 rounded-md hover:bg-gray-700" title="Open Tool Forge">
+                                   <ForgeIcon class="h-5 w-5" />
+                               </button>
+                           ) : (
+                                <button onClick={() => setActiveView('tasks')} class="p-1.5 rounded-md hover:bg-gray-700" title="Back to Tasks">
+                                   <ChevronsRightIcon class="h-5 w-5" />
+                                </button>
+                           )}
                            <button onClick={createNewTask} class="p-1.5 rounded-md hover:bg-gray-700" title="New Task"><PlusCircleIcon class="h-5 w-5" /></button>
                            <button onClick={() => setIsLeftSidebarVisible(false)} class="p-1.5 rounded-md hover:bg-gray-700" title="Hide Sidebar"><ChevronsLeftIcon class="h-4 w-4" /></button>
                         </div>
                     </div>
-                    <div class="flex flex-col flex-grow p-6 pt-4 min-h-0">
-                        <div class="flex-grow overflow-y-auto pr-2">
-                            {tasks.length > 0 ? ( <ul> {tasks.map(task => ( <TaskItem key={task.id} task={task} isActive={activeTaskId === task.id} isRunning={!!runningTasks[task.id]} onSelect={selectTask} onRename={handleRenameTask} onDelete={handleDeleteTask} /> ))} </ul> ) : ( <p class="text-gray-400 text-center mt-4">No tasks yet. Create one!</p> )}
+                    {/* --- NEW: Conditionally render task list or forge info --- */}
+                    {activeView === 'tasks' ? (
+                        <div class="flex flex-col flex-grow p-6 pt-4 min-h-0">
+                            <div class="flex-grow overflow-y-auto pr-2">
+                                {tasks.length > 0 ? ( <ul> {tasks.map(task => ( <TaskItem key={task.id} task={task} isActive={activeTaskId === task.id} isRunning={!!runningTasks[task.id]} onSelect={selectTask} onRename={handleRenameTask} onDelete={handleDeleteTask} /> ))} </ul> ) : ( <p class="text-gray-400 text-center mt-4">No tasks yet. Create one!</p> )}
+                            </div>
+                            <SettingsPanel models={availableModels} selectedModels={selectedModels} onModelChange={handleModelChange} />
                         </div>
-                        <SettingsPanel models={availableModels} selectedModels={selectedModels} onModelChange={handleModelChange} />
-                    </div>
+                    ) : (
+                        <div class="p-6 text-gray-400 text-sm">
+                            <p>You are in the Tool Forge. Use the main panel to create and manage custom tools for the agent.</p>
+                        </div>
+                    )}
                 </div>
             )}
             
-            <div class="flex-1 flex flex-col h-full bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl min-w-0">
-                <div class="flex items-center justify-between p-6 border-b border-gray-700 flex-shrink-0">
-                   <h1 class="text-2xl font-bold text-white">ResearchAgent</h1>
-                   {/* ... (no changes to connection status) ... */}
-                   <div class="flex items-center gap-2">
-                       <span class="relative flex h-3 w-3"> {connectionStatus === 'Connected' && <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>} <span class={`relative inline-flex rounded-full h-3 w-3 ${connectionStatus === 'Connected' ? 'bg-green-500' : 'bg-red-500'}`}></span> </span>
-                       <span class="text-sm text-gray-400">{connectionStatus}</span>
-                   </div>
-                </div>
-                <div class="flex-1 overflow-y-auto p-6">
-                   {activeTask?.history.map((item, index) => {
-                       // ... (no changes to history rendering) ...
-                       if (item.type === 'prompt') {
-                           return <PromptCard key={index} content={item.content} />;
-                       }
-                       if (item.type === 'run_container') {
-                            return (
-                                <div key={index} class="relative mt-6 pl-8">
-                                    <div class="absolute top-5 left-4 h-[calc(100%-2.5rem)] w-0.5 bg-gray-700/50" />
-                                    <div class="space-y-4">
-                                    {item.children.map((child, childIndex) => {
-                                        return (
-                                            <div key={childIndex} class="relative">
-                                                <div class={`absolute top-6 -left-4 h-0.5 ${child.type === 'execution_plan' ? 'w-8' : 'w-4'} bg-gray-700/50`} />
-                                                {(() => {
-                                                    switch (child.type) {
-                                                        case 'architect_plan': 
-                                                            return <ArchitectCard 
-                                                                plan={child} 
-                                                                isAwaitingApproval={child.isAwaitingApproval}
-                                                                onModify={handleModifyAndApprove}
-                                                                onReject={handleReject}
-                                                                availableTools={availableTools}
-                                                            />;
-                                                        case 'execution_plan': return <SiteForemanCard plan={child} />;
-                                                        case 'direct_answer': return <DirectAnswerCard answer={child.content} />;
-                                                        case 'final_answer': return <FinalAnswerCard answer={child.content} />;
-                                                        default: return null;
-                                                    }
-                                                })()}
+            {/* --- NEW: Main area is now fully conditional --- */}
+            {activeView === 'tasks' ? (
+                <>
+                    <div class="flex-1 flex flex-col h-full bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl min-w-0">
+                        <div class="flex items-center justify-between p-6 border-b border-gray-700 flex-shrink-0">
+                           <h1 class="text-2xl font-bold text-white">ResearchAgent</h1>
+                           <div class="flex items-center gap-2">
+                               <span class="relative flex h-3 w-3"> {connectionStatus === 'Connected' && <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>} <span class={`relative inline-flex rounded-full h-3 w-3 ${connectionStatus === 'Connected' ? 'bg-green-500' : 'bg-red-500'}`}></span> </span>
+                               <span class="text-sm text-gray-400">{connectionStatus}</span>
+                           </div>
+                        </div>
+                        <div class="flex-1 overflow-y-auto p-6">
+                           {activeTask?.history.map((item, index) => {
+                               if (item.type === 'prompt') {
+                                   return <PromptCard key={index} content={item.content} />;
+                               }
+                               if (item.type === 'run_container') {
+                                    return (
+                                        <div key={index} class="relative mt-6 pl-8">
+                                            <div class="absolute top-5 left-4 h-[calc(100%-2.5rem)] w-0.5 bg-gray-700/50" />
+                                            <div class="space-y-4">
+                                            {item.children.map((child, childIndex) => {
+                                                return (
+                                                    <div key={childIndex} class="relative">
+                                                        <div class={`absolute top-6 -left-4 h-0.5 ${child.type === 'execution_plan' ? 'w-8' : 'w-4'} bg-gray-700/50`} />
+                                                        {(() => {
+                                                            switch (child.type) {
+                                                                case 'architect_plan': 
+                                                                    return <ArchitectCard 
+                                                                        plan={child} 
+                                                                        isAwaitingApproval={child.isAwaitingApproval}
+                                                                        onModify={handleModifyAndApprove}
+                                                                        onReject={handleReject}
+                                                                        availableTools={availableTools}
+                                                                    />;
+                                                                case 'execution_plan': return <SiteForemanCard plan={child} />;
+                                                                case 'direct_answer': return <DirectAnswerCard answer={child.content} />;
+                                                                case 'final_answer': return <FinalAnswerCard answer={child.content} />;
+                                                                default: return null;
+                                                            }
+                                                        })()}
+                                                    </div>
+                                                );
+                                            })}
                                             </div>
-                                        );
-                                    })}
-                                    </div>
-                                </div>
-                            );
-                       }
-                       return null;
-                   })}
+                                        </div>
+                                    );
+                               }
+                               return null;
+                           })}
 
-                   {runningTasks[activeTaskId] && !isAwaitingApproval && ( <div class="flex items-center gap-4 p-4"> <LoaderIcon class="h-5 w-5 text-yellow-400" /> <p class="text-gray-300 font-medium">Agent is running...</p> </div> )}
-                   <div ref={messagesEndRef} />
-                </div>
-                <div class="p-6 border-t border-gray-700 flex-shrink-0">
-                    <form onSubmit={handleSendMessage} class="flex gap-3">
-                        <textarea value={inputValue} onInput={e => setInputValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) handleSendMessage(e); }} class="flex-1 p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" placeholder={activeTaskId ? (isAwaitingApproval ? "Approve, modify, or reject the plan above." : (runningTasks[activeTaskId] ? "Agent is running..." : "Send a message...")) : "Please select or create a task."} rows="2" disabled={!activeTaskId || runningTasks[activeTaskId] || isAwaitingApproval} ></textarea>
-                        {/* --- NEW: Conditional Stop Button --- */}
-                        {runningTasks[activeTaskId] && !isAwaitingApproval ? (
-                             <button type="button" onClick={handleStopAgent} class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 disabled:bg-gray-500 transition-colors flex items-center gap-2">
-                                <StopCircleIcon class="h-5 w-5"/>
-                                Stop
-                            </button>
-                        ) : (
-                            <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-500 transition-colors" disabled={connectionStatus !== 'Connected' || runningTasks[activeTaskId] || !activeTaskId || isAwaitingApproval}>Send</button>
-                        )}
-                    </form>
-                </div>
-            </div>
-
-            {/* --- Workspace Panel (no changes) --- */}
-            {!isRightSidebarVisible && <ToggleButton isVisible={isRightSidebarVisible} onToggle={() => setIsRightSidebarVisible(true)} side="right" />}
-            {isRightSidebarVisible && (
-                <div class="h-full w-1/4 min-w-[300px] bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col relative"
-                    onDragEnter={handleDragEnter} onDragLeave={handleDragLeave} onDragOver={handleDragOver} onDrop={handleDrop} >
-                    <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-700"> <h2 class="text-xl font-bold text-white">Agent Workspace</h2> <button onClick={() => setIsRightSidebarVisible(false)} class="p-1.5 rounded-md hover:bg-gray-700" title="Hide Workspace"><ChevronsRightIcon class="h-4 w-4" /></button> </div>
-                    <div class="flex flex-col flex-grow min-h-0 px-6 pb-6 pt-4">
-                        {selectedFile ? (
-                            <div class="flex flex-col h-full">
-                                <div class="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-gray-700 flex-shrink-0">
-                                    <div class="flex items-center gap-2 min-w-0"> <button onClick={() => setSelectedFile(null)} class="p-1.5 rounded-md hover:bg-gray-700 flex-shrink-0"><ArrowLeftIcon class="h-4 w-4" /></button> <span class="font-mono text-sm text-white truncate">{selectedFile.name}</span> </div>
-                                    <CopyButton textToCopy={fileContent} />
-                                </div>
-                                <div class="flex-grow bg-gray-900/50 rounded-md overflow-auto flex items-center justify-center">
-                                    <FilePreviewer file={selectedFile} isLoading={isFileLoading} content={fileContent} rawFileUrl={`http://localhost:8766/api/workspace/raw?path=${currentPath}/${selectedFile.name}`} />
-                                </div>
-                            </div>
-                        ) : (
-                             <div class="flex flex-col flex-grow min-h-0">
-                                 <div class="flex justify-between items-center mb-2 flex-shrink-0">
-                                    <Breadcrumbs path={currentPath} onNavigate={handleBreadcrumbNav} />
-                                    <div class="flex items-center">
-                                        <button onClick={handleCreateFolder} disabled={!currentPath || workspaceLoading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="New Folder"> <PlusCircleIcon class="h-4 w-4" /> </button>
-                                        <input type="file" ref={fileInputRef} onChange={(e) => handleFileUpload(e.target.files[0])} class="hidden" />
-                                        <button onClick={() => fileInputRef.current?.click()} disabled={!currentPath || workspaceLoading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="Upload File"> <UploadCloudIcon class="h-4 w-4" /> </button>
-                                    </div>
-                                 </div>
-                                 <div class="flex-grow bg-gray-900/50 rounded-md p-4 text-sm text-gray-400 font-mono overflow-y-auto">
-                                    {workspaceLoading ? <div class="flex items-center gap-2"><LoaderIcon class="h-4 w-4"/><span>Loading...</span></div> : 
-                                     workspaceError ? <p class="text-red-400">Error: {workspaceError}</p> : 
-                                     workspaceItems.length === 0 ? <p>// Directory is empty.</p> : ( 
-                                     <ul> 
-                                        {workspaceItems.map(item => ( 
-                                            <li key={item.name} class="group flex justify-between items-center mb-1 hover:bg-gray-700/50 rounded-md -ml-2 -mr-2 pr-2">
-                                                <div onClick={() => handleNavigation(item)} title={item.name} class="flex items-center gap-2 cursor-pointer truncate flex-grow p-2"> 
-                                                    {item.type === 'directory' ? <FolderIcon class="h-4 w-4 text-blue-400 flex-shrink-0" /> : <FileIcon class="h-4 w-4 text-gray-500 flex-shrink-0" />}
-                                                    <span>{item.name}</span>
-                                                </div>
-                                                <div class="flex items-center opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                                                    <button onClick={(e) => { e.stopPropagation(); handleRenameItem(item); }} class="p-1 text-gray-500 hover:text-white" title={`Rename ${item.type}`}> <PencilIcon class="h-4 w-4" /> </button>
-                                                    <button onClick={(e) => { e.stopPropagation(); handleDeleteItem(item); }} class="p-1 text-gray-500 hover:text-red-400" title={`Delete ${item.type}`}> <Trash2Icon class="h-4 w-4" /> </button>
-                                                </div>
-                                            </li> 
-                                        ))} 
-                                     </ul> 
-                                    )}
-                                 </div>
-                             </div>
-                        )}
+                           {runningTasks[activeTaskId] && !isAwaitingApproval && ( <div class="flex items-center gap-4 p-4"> <LoaderIcon class="h-5 w-5 text-yellow-400" /> <p class="text-gray-300 font-medium">Agent is running...</p> </div> )}
+                           <div ref={messagesEndRef} />
+                        </div>
+                        <div class="p-6 border-t border-gray-700 flex-shrink-0">
+                            <form onSubmit={handleSendMessage} class="flex gap-3">
+                                <textarea value={inputValue} onInput={e => setInputValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) handleSendMessage(e); }} class="flex-1 p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" placeholder={activeTaskId ? (isAwaitingApproval ? "Approve, modify, or reject the plan above." : (runningTasks[activeTaskId] ? "Agent is running..." : "Send a message...")) : "Please select or create a task."} rows="2" disabled={!activeTaskId || runningTasks[activeTaskId] || isAwaitingApproval} ></textarea>
+                                {runningTasks[activeTaskId] && !isAwaitingApproval ? (
+                                     <button type="button" onClick={handleStopAgent} class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 disabled:bg-gray-500 transition-colors flex items-center gap-2">
+                                        <StopCircleIcon class="h-5 w-5"/>
+                                        Stop
+                                    </button>
+                                ) : (
+                                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-500 transition-colors" disabled={connectionStatus !== 'Connected' || runningTasks[activeTaskId] || !activeTaskId || isAwaitingApproval}>Send</button>
+                                )}
+                            </form>
+                        </div>
                     </div>
-                    {isDragOver && (
-                        <div class="absolute inset-0 bg-blue-500/20 border-2 border-dashed border-blue-400 rounded-lg flex items-center justify-center pointer-events-none">
-                            <div class="text-center"> <UploadCloudIcon class="h-10 w-10 text-blue-300 mx-auto" /> <p class="mt-2 font-semibold text-white">Drop files to upload</p> </div>
+
+                    {!isRightSidebarVisible && <ToggleButton isVisible={isRightSidebarVisible} onToggle={() => setIsRightSidebarVisible(true)} side="right" />}
+                    {isRightSidebarVisible && (
+                        <div class="h-full w-1/4 min-w-[300px] bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col relative"
+                            onDragEnter={handleDragEnter} onDragLeave={handleDragLeave} onDragOver={handleDragOver} onDrop={handleDrop} >
+                            <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-700"> <h2 class="text-xl font-bold text-white">Agent Workspace</h2> <button onClick={() => setIsRightSidebarVisible(false)} class="p-1.5 rounded-md hover:bg-gray-700" title="Hide Workspace"><ChevronsRightIcon class="h-4 w-4" /></button> </div>
+                            <div class="flex flex-col flex-grow min-h-0 px-6 pb-6 pt-4">
+                                {selectedFile ? (
+                                    <div class="flex flex-col h-full">
+                                        <div class="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-gray-700 flex-shrink-0">
+                                            <div class="flex items-center gap-2 min-w-0"> <button onClick={() => setSelectedFile(null)} class="p-1.5 rounded-md hover:bg-gray-700 flex-shrink-0"><ArrowLeftIcon class="h-4 w-4" /></button> <span class="font-mono text-sm text-white truncate">{selectedFile.name}</span> </div>
+                                            <CopyButton textToCopy={fileContent} />
+                                        </div>
+                                        <div class="flex-grow bg-gray-900/50 rounded-md overflow-auto flex items-center justify-center">
+                                            <FilePreviewer file={selectedFile} isLoading={isFileLoading} content={fileContent} rawFileUrl={`http://localhost:8766/api/workspace/raw?path=${currentPath}/${selectedFile.name}`} />
+                                        </div>
+                                    </div>
+                                ) : (
+                                     <div class="flex flex-col flex-grow min-h-0">
+                                         <div class="flex justify-between items-center mb-2 flex-shrink-0">
+                                            <Breadcrumbs path={currentPath} onNavigate={handleBreadcrumbNav} />
+                                            <div class="flex items-center">
+                                                <button onClick={handleCreateFolder} disabled={!currentPath || workspaceLoading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="New Folder"> <PlusCircleIcon class="h-4 w-4" /> </button>
+                                                <input type="file" ref={fileInputRef} onChange={(e) => handleFileUpload(e.target.files[0])} class="hidden" />
+                                                <button onClick={() => fileInputRef.current?.click()} disabled={!currentPath || workspaceLoading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="Upload File"> <UploadCloudIcon class="h-4 w-4" /> </button>
+                                            </div>
+                                         </div>
+                                         <div class="flex-grow bg-gray-900/50 rounded-md p-4 text-sm text-gray-400 font-mono overflow-y-auto">
+                                            {workspaceLoading ? <div class="flex items-center gap-2"><LoaderIcon class="h-4 w-4"/><span>Loading...</span></div> : 
+                                             workspaceError ? <p class="text-red-400">Error: {workspaceError}</p> : 
+                                             workspaceItems.length === 0 ? <p>// Directory is empty.</p> : ( 
+                                             <ul> 
+                                                {workspaceItems.map(item => ( 
+                                                    <li key={item.name} class="group flex justify-between items-center mb-1 hover:bg-gray-700/50 rounded-md -ml-2 -mr-2 pr-2">
+                                                        <div onClick={() => handleNavigation(item)} title={item.name} class="flex items-center gap-2 cursor-pointer truncate flex-grow p-2"> 
+                                                            {item.type === 'directory' ? <FolderIcon class="h-4 w-4 text-blue-400 flex-shrink-0" /> : <FileIcon class="h-4 w-4 text-gray-500 flex-shrink-0" />}
+                                                            <span>{item.name}</span>
+                                                        </div>
+                                                        <div class="flex items-center opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                                                            <button onClick={(e) => { e.stopPropagation(); handleRenameItem(item); }} class="p-1 text-gray-500 hover:text-white" title={`Rename ${item.type}`}> <PencilIcon class="h-4 w-4" /> </button>
+                                                            <button onClick={(e) => { e.stopPropagation(); handleDeleteItem(item); }} class="p-1 text-gray-500 hover:text-red-400" title={`Delete ${item.type}`}> <Trash2Icon class="h-4 w-4" /> </button>
+                                                        </div>
+                                                    </li> 
+                                                ))} 
+                                             </ul> 
+                                            )}
+                                         </div>
+                                     </div>
+                                )}
+                            </div>
+                            {isDragOver && (
+                                <div class="absolute inset-0 bg-blue-500/20 border-2 border-dashed border-blue-400 rounded-lg flex items-center justify-center pointer-events-none">
+                                    <div class="text-center"> <UploadCloudIcon class="h-10 w-10 text-blue-300 mx-auto" /> <p class="mt-2 font-semibold text-white">Drop files to upload</p> </div>
+                                </div>
+                            )}
                         </div>
                     )}
+                </>
+            ) : (
+                <div class="flex-1 flex flex-col h-full bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl min-w-0">
+                    <ToolForge />
                 </div>
             )}
         </div>
