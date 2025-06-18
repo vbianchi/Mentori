@@ -2,20 +2,12 @@
 
 To build a transformative, AI-powered workbench. The platform will be powerful enough for scientific research and general enough for power users, with a core architecture that allows users to easily add their own tools and capabilities. The system is designed for privacy and efficiency, with a clear path to running on local LLMs.
 
-### ✅ COMPLETED: Phase 12: The Interactive Workbench
+### ✅ COMPLETED PHASES
 
--   \[x\] **Result:** Evolved the workspace from a simple file list into a full-featured, interactive file explorer with a smart backend API, folder navigation, breadcrumbs, core interactivity (create, rename, delete), drag-and-drop uploads, and a smart previewer for images, Markdown, and CSVs.
+-   \[x\] **Phase 12: The Interactive Workbench:** Evolved the workspace from a simple file list into a full-featured, interactive file explorer with a smart backend API, folder navigation, breadcrumbs, core interactivity (create, rename, delete), drag-and-drop uploads, and a smart previewer for images, Markdown, and CSVs.
+-   \[x\] **Phase 12.5: Concurrent Agent Execution & Control:** Refactored the backend server to handle multiple, simultaneous agent runs and provided users with the ability to stop a running task. The architecture now correctly decouples agent execution from the client connection.
 
 ### 🚀 UPCOMING PHASES 🚀
-
-#### Phase 12.5: Concurrent Agent Execution & Control (CRITICAL FIX)
-
-_Goal: Refactor the backend server to handle multiple, simultaneous agent runs and provide users with the ability to stop a running task._
-
--   \[ \] **Enable Concurrency:** Modify the backend WebSocket handler to launch each agent invocation as a separate, non-blocking background task, allowing multiple tasks to run in parallel without interrupting each other.
--   \[ \] **Implement "Stop" Functionality:**
-    -   \[ \] **Backend:** Add server-side logic to track running agent tasks and a new WebSocket message handler to cancel a specific task on user request.
-    -   \[ \] **Frontend:** Add a "Stop" button to the UI that appears when an agent is running, which will send the "stop" message to the backend.
 
 #### Phase 13: The "Tool Forge" - A Pluggable Tool Architecture
 

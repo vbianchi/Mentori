@@ -23,25 +23,24 @@ Our agent operates like a small, efficient company with specialized roles. This 
 -   **Three-Track Brain & Interactive HITL:** The agent efficiently routes requests and allows users to review and modify complex plans before execution.
 -   **Robust Memory & Environments:** The agent uses a "Memory Vault" for persistent knowledge and automatically creates isolated Python virtual environments for each task.
 -   **Interactive Workbench v1:** A functional file explorer with structured listing, navigation, create/rename/delete actions, drag-and-drop upload, and a smart previewer for text, images, Markdown, and CSVs.
+-   **True Concurrency & Control:** The backend server now correctly handles multiple, simultaneous agent runs without interruption. The architecture is fully decoupled, and users can stop any running task from the UI.
 
-## 🚀 NEXT FOCUS: Phase 12.5: Concurrent Agent Execution & Control (REVISED PLAN)
+## 🚀 NEXT FOCUS: Phase 13: The "Tool Forge"
 
-_**Vision:** Refactor the server's core execution logic to enable true parallel processing of multiple agent tasks and give the user explicit control to stop any running task._
+_**Vision:** Allow users to create and add their own tools to the ResearchAgent without writing any backend code._
 
-### The Concurrency Bug & Revised Plan
+### The "Tool Forge" Plan
 
--   **The Problem:** Testing has revealed two critical flaws: 1) The agent process terminates itself when it pauses for human approval. 2) Closing a browser tab (and its WebSocket connection) incorrectly cancels the associated background agent task. The core issue is that the agent's lifecycle is too tightly coupled to the WebSocket connection's lifecycle.
--   **The New Plan (Per Project Lead's Direction):**
-    1.  **Isolate & Simplify:** We will first create a new, minimal test script (`test_concurrency.py`) to solve the core problem in isolation. This script will not use LangGraph.
-    2.  **Prove the Pattern:** The test script will demonstrate a robust producer-consumer pattern where a background `worker` task can run to completion, totally independent of WebSocket connections opening or closing. It will use an `asyncio.Queue` to hold messages.
-    3.  **Implement in Main App:** Once the pattern is proven in the simple test script, we will confidently transfer that exact architecture back into `server.py`. This ensures we are building on a solid foundation.
-
-### Technical Blueprint for `test_concurrency.py`
-
--   **Global State:** A dictionary to hold references to running worker tasks and another to hold message queues for each task (`WORKER_QUEUES`).
--   **`worker` function:** An `async` function that simulates a long job (e.g., looping for 10 seconds). In each loop, it prints a message to the console and `puts` a message into its dedicated queue.
--   **`message_sender` function:** An `async` function that runs per-connection. It continuously `gets` messages from all active queues and sends them to the client.
--   **`main_handler` function:** The main WebSocket handler. It will:
-    -   On connection, start a `message_sender` task for that client.
-    -   On receiving a "start" message, it will use `asyncio.create_task` to launch a new `worker` in the background, ensuring it is _not_ cancelled when the client disconnects.
-    -   On disconnection, it will _only_ clean up the `message_sender` task, leaving the `worker` tasks untouched.
+-   **Tool Creator UI:** Build a "Tool Forge" section in the UI where users can define a tool's properties via a simple form. This will include:
+    -   Tool Name (e.g., `get_weather`)
+    -   Tool Description (a clear explanation for the LLM)
+    -   Input Arguments (a list of names, types, and descriptions)
+-   **API Endpoint for Tool Creation:**
+    -   **Endpoint:** `POST /api/tools`
+    -   **Request Body:** A structured JSON object containing the user's complete tool definition.
+-   **Dynamic Tool Generation Backend:**
+    -   The server will receive the JSON definition.
+    -   It will validate the input to ensure it's a valid tool structure.
+    -   It will then use a template to dynamically generate the complete Python code for a new tool file (e.g., `backend/tools/custom_get_weather.py`).
+    -   The server will save this new file to the `backend/tools/` directory.
+-   **Live Reloading:** The tool loader in `backend/tools/__init__.py` will need to be made aware of the new tool so that it's immediately available to the agent on the next run without requiring a server restart.
