@@ -8,6 +8,15 @@ To build a transformative, AI-powered workbench. The platform will be powerful e
 
 ### 🚀 UPCOMING PHASES 🚀
 
+#### Phase 12.5: Concurrent Agent Execution & Control (CRITICAL FIX)
+
+_Goal: Refactor the backend server to handle multiple, simultaneous agent runs and provide users with the ability to stop a running task._
+
+-   \[ \] **Enable Concurrency:** Modify the backend WebSocket handler to launch each agent invocation as a separate, non-blocking background task, allowing multiple tasks to run in parallel without interrupting each other.
+-   \[ \] **Implement "Stop" Functionality:**
+    -   \[ \] **Backend:** Add server-side logic to track running agent tasks and a new WebSocket message handler to cancel a specific task on user request.
+    -   \[ \] **Frontend:** Add a "Stop" button to the UI that appears when an agent is running, which will send the "stop" message to the backend.
+
 #### Phase 13: The "Tool Forge" - A Pluggable Tool Architecture
 
 _Goal: Allow users to create and add their own tools to the ResearchAgent without writing any backend code._
@@ -24,7 +33,7 @@ _Goal: Equip the agent with a suite of powerful, pre-built tools for common high
 -   \[ \] **Scientific Data Fetcher Tool:** A specialized tool to find and download datasets from sources like NCBI, PubMed, etc.
 -   \[ \] **Website Report Generator:** A tool that can populate pre-defined website templates with data to create visual reports.
 
-#### Phase 15: UI/UX Polish & Advanced Previews (NEW)
+#### Phase 15: UI/UX Polish & Advanced Previews
 
 _Goal: Refine the user experience with modern, fluid interactions and expand file preview capabilities._
 
@@ -32,3 +41,4 @@ _Goal: Refine the user experience with modern, fluid interactions and expand fil
 -   \[ \] **Inline File/Folder Creation:** Refactor the creation process to instantly add a new item to the UI in an "editing" state, only calling the backend API after the user confirms the name.
 -   \[ \] **Drag-and-Drop File Moving:** Add support for dragging files and dropping them onto folders to trigger a move/rename operation.
 -   \[ \] **Inline Renaming:** Unify the renaming experience by refactoring the file explorer to support in-place renaming, consistent with the task list.
+-   \[ \] **Running Task Indicator:** Add a visual indicator (e.g., a spinning loader icon) next to the name of any non-active task in the sidebar that currently has a running agent process.

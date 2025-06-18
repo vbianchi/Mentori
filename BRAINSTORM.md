@@ -24,37 +24,30 @@ Our agent operates like a small, efficient company with specialized roles. This 
 -   **Robust Memory & Environments:** The agent uses a "Memory Vault" for persistent knowledge and automatically creates isolated Python virtual environments for each task.
 -   **Interactive Workbench v1:** A functional file explorer with structured listing, navigation, create/rename/delete actions, drag-and-drop upload, and a smart previewer for text, images, Markdown, and CSVs.
 
-## 🚀 FUTURE FOCUS: UI/UX Polish & Advanced Capabilities
+## 🚀 NEXT FOCUS: Phase 12.5: Concurrent Agent Execution & Control
 
-_**Vision:** Elevate the user experience to match professional IDEs with more fluid interactions and broader file support._
+_**Vision:** Refactor the server's core execution logic to enable true parallel processing of multiple agent tasks and give the user explicit control to stop any running task._
 
-### Inline & "Create-then-Commit" Interactions
+### The Concurrency Bug & Solution
 
--   **Goal:** Move away from `prompt()` and `confirm()` dialogs for a smoother, more integrated experience.
--   **Inline Renaming:** Refactor the `WorkspaceItem` into its own component with an `isEditing` state, similar to `TaskItem`. Clicking "Rename" would transform the item's text label into an input field. A "blur" or "Enter" keypress would commit the change by calling the `PUT /api/workspace/items` endpoint.
--   **Inline Creation:**
-    1.  **UI First:** When a user clicks "New Folder" or "New File", immediately add a temporary item to the `workspaceItems` state with a default name (e.g., `untitled_folder`) and in an `isEditing` state.
-    2.  **User Input:** The user types the desired name directly in the file list.
-    3.  **API Commit:** On "Enter" or "blur", the frontend makes the appropriate API call (`POST` for folders, or a `PUT` to create a new file with content).
-    4.  **Refresh:** The list refreshes with the permanent item from the server.
+-   **The Problem:** The current WebSocket handler (`run_agent_handler`) uses `await` directly on the `agent_graph.astream_events` call. This is a _blocking_ operation. While it's running, the server cannot process any other incoming messages, such as a request to start a second agent on a different task. If a second request comes in, the first one is effectively terminated.
+-   **The Solution:** We must change the handler to be non-blocking. The correct approach is to wrap the agent execution in `asyncio.create_task()`. This immediately schedules the agent to run in the background and returns control to the message handler, allowing it to process new requests. This will enable true, concurrent agent runs.
 
-### Advanced File Previews & Handling
+### The "Stop" Functionality
 
--   **Goal:** Expand the Smart Previewer to handle common document formats.
--   **PDF Rendering:**
-    -   **Library:** Use Mozilla's `PDF.js`.
-    -   **Implementation:** When a user clicks a `.pdf` file, the `FilePreviewer` component will not fetch text content. Instead, it will initialize the `PDF.js` viewer, passing it the URL to our existing `/api/workspace/raw?path=...` endpoint. The library will handle fetching and rendering the document page by page.
--   **Word Document (`.docx`) Rendering:**
-    -   **Backend Tool:** This requires a new backend tool, as browsers cannot render `.docx` files natively.
-    -   **Python Library:** Use `python-docx` to read the `.docx` file's content.
-    -   **Conversion:** The tool would convert the document's paragraphs and headings into a basic HTML string.
-    -   **Frontend:** The frontend would call an endpoint that uses this tool and then render the resulting HTML in the preview panel.
+-   **Goal:** Provide a way for the user to terminate a long-running or misbehaving agent task without shutting down the server.
+-   **Backend Implementation:**
+    1.  **Task Tracking:** Create a global dictionary on the server (e.g., `RUNNING_TASKS = {}`).
+    2.  **Store Task Reference:** When `asyncio.create_task()` is called for a new agent run, store the resulting `Task` object in the dictionary with the `task_id` as the key.
+    3.  **Cleanup:** When the task finishes naturally, remove its entry from the dictionary.
+    4.  **New WebSocket Handler:** Create a new handler for a `"stop_agent"` message type. This handler will receive a `task_id`.
+    5.  **Cancellation:** The handler will look up the task in `RUNNING_TASKS` using the `task_id`, call the `.cancel()` method on it, and then remove it from the dictionary.
+-   **Frontend Implementation:**
+    1.  **Conditional Button:** In `src/App.jsx`, display a "Stop" button next to the "Send" button _only_ when the `isThinking` state is true.
+    2.  **Send Message:** The `onClick` handler for this button will send a WebSocket message: `{ "type": "stop_agent", "task_id": activeTaskId }`.
+    3.  The UI will naturally update to show the agent has stopped when the `isThinking` state is reset to `false` by the backend.
 
-### Drag-and-Drop File Moving
+### Future Ideas: Pause/Resume
 
--   **Goal:** Allow users to organize files by dragging them into folders.
--   **Implementation:**
-    1.  **Draggable Items:** Make file items in the explorer draggable by setting the `draggable="true"` attribute.
-    2.  **Drop Zones:** Make folder items valid drop zones by adding `onDragOver` and `onDrop` event handlers.
-    3.  **API Call:** When a file is dropped on a folder, the `onDrop` handler will trigger our existing `PUT /api/workspace/items` (rename) endpoint. The `old_path` would be `current_path/file.txt` and the `new_path` would be `current_path/folder_name/file.txt`.
-    4.  **Refresh:** After a successful API call, refresh the current view to show the file has been moved.
+-   **Concept:** A true "Pause" functionality is much more complex than "Stop." It would require serializing the entire state of the LangGraph execution at the exact point it was paused and then being able to perfectly restore it later.
+-   **Status:** This is a high-complexity feature to be considered for a much later version of the application.
