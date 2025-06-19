@@ -1,17 +1,20 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 14.2: Robust Argument Formatting)
+# ResearchAgent Core Agent (Phase 14.3: Tool Toggling Logic)
 #
-# This version fixes a critical bug where the agent would hallucinate
-# incorrect argument names for tools, causing validation errors.
+# This version completes the "Active Toolbox" feature by implementing the
+# backend logic to respect the user's tool selections.
 #
-# 1. Argument-Aware `format_tools_for_prompt`: This function has been
-#    significantly upgraded. It now inspects the `args_schema` for each
-#    tool and dynamically includes the name, type, and description of every
-#    required argument directly within the tool's description string that is
-#    sent to the LLM.
-# 2. Reduced Hallucination: By providing the LLM with an explicit "function
-#    signature" for each tool, we drastically reduce the likelihood of it
-#    generating incorrect tool input, making the entire system more reliable.
+# 1. New `enabled_tools` State: The `GraphState` now includes a list of
+#    tool names that are enabled for the current run.
+# 2. Filtered `format_tools_for_prompt`: This function is upgraded to accept
+#    the state, read the `enabled_tools` list, and filter the tools it
+#    presents to the LLM in its prompts. The agent will now only "see" the
+#    tools that the user has toggled on.
+# 3. Filtered `worker_node`: The worker also filters its internal tool map
+#    based on the `enabled_tools` list, providing a hard security guarantee
+#    that it cannot execute a tool the user has disabled.
+# 4. State Initialization: The `task_setup_node` is updated to receive
+#    the `enabled_tools` list from the initial WebSocket message.
 # -----------------------------------------------------------------------------
 
 import os
@@ -46,9 +49,10 @@ log_level = os.getenv("LOG_LEVEL", "INFO").upper()
 logging.basicConfig(level=log_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# --- Constants for Summarization ---
+# --- Constants ---
 HISTORY_SUMMARY_THRESHOLD = 10
 HISTORY_SUMMARY_KEEP_RECENT = 4
+SANDBOXED_TOOLS = {"write_file", "read_file", "list_files", "workspace_shell", "pip_install"}
 
 # --- Memory Vault Schema Definition ---
 class UserProfile(TypedDict, total=False):
@@ -109,6 +113,8 @@ class GraphState(TypedDict):
     memory_vault: MemoryVault
     route: str
     current_track: str
+    # --- NEW: State for enabled tools ---
+    enabled_tools: List[str]
 
 # --- LLM Provider Helper ---
 LLM_CACHE = {}
@@ -125,21 +131,23 @@ def get_llm(state: GraphState, role_env_var: str, default_llm_id: str):
     LLM_CACHE[llm_id] = llm
     return llm
 
-SANDBOXED_TOOLS = {"write_file", "read_file", "list_files", "workspace_shell", "pip_install"}
+# --- MODIFIED: Tool formatter now filters based on enabled tools ---
+def format_tools_for_prompt(state: GraphState):
+    """Dynamically fetches and filters tools based on the state."""
+    all_tools = get_available_tools()
+    enabled_tool_names = state.get("enabled_tools")
 
-# --- MODIFIED: Tool formatter is now argument-aware ---
-def format_tools_for_prompt():
-    """
-    Dynamically fetches tools and formats them for the prompt, including
-    their arguments for better LLM guidance.
-    """
-    available_tools = get_available_tools()
+    # If enabled_tools is not in the state, use all tools by default
+    if enabled_tool_names is None:
+        logger.warning(f"Task '{state.get('task_id')}': 'enabled_tools' not found in state. Defaulting to all tools.")
+        active_tools = all_tools
+    else:
+        active_tools = [tool for tool in all_tools if tool.name in enabled_tool_names]
+        logger.info(f"Task '{state.get('task_id')}': Formatting prompt with {len(active_tools)} enabled tools.")
+
     tool_strings = []
-    for tool in available_tools:
-        # Start with the basic name and description
+    for tool in active_tools:
         tool_string = f"  - {tool.name}: {tool.description}"
-        
-        # Inspect the args_schema to find arguments
         if tool.args_schema:
             args_info = []
             schema_props = tool.args_schema.schema().get('properties', {})
@@ -147,13 +155,11 @@ def format_tools_for_prompt():
                 arg_type = arg_props.get('type', 'any')
                 arg_desc = arg_props.get('description', '')
                 args_info.append(f"{arg_name} ({arg_type}): {arg_desc}")
-            
             if args_info:
                 tool_string += " Arguments: [" + ", ".join(args_info) + "]"
-        
         tool_strings.append(tool_string)
         
-    return "\n".join(tool_strings)
+    return "\n".join(tool_strings) if tool_strings else "No tools are available for this task."
 
 
 # --- History Formatting Helper ---
@@ -167,14 +173,10 @@ def _format_messages(messages: Sequence[BaseMessage], is_for_summary=False) -> s
         start_index = first_human_message_index
 
     for msg in messages[start_index:]:
-        if isinstance(msg, SystemMessage):
-            role = "System Summary"
-        elif isinstance(msg, HumanMessage):
-            role = "Human"
-        elif isinstance(msg, AIMessage):
-            role = "AI"
-        else:
-            continue
+        if isinstance(msg, SystemMessage): role = "System Summary"
+        elif isinstance(msg, HumanMessage): role = "Human"
+        elif isinstance(msg, AIMessage): role = "AI"
+        else: continue
         formatted_messages.append(f"{role}: {msg.content}")
     
     if not is_for_summary:
@@ -192,29 +194,26 @@ async def _create_venv_if_not_exists(workspace_path: str, task_id: str):
     logger.info(f"Task '{task_id}': Creating virtual environment in '{workspace_path}'")
     command = ["uv", "venv"]
     process = await asyncio.create_subprocess_exec(
-        *command,
-        cwd=workspace_path,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE
+        *command, cwd=workspace_path,
+        stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
     )
     stdout, stderr = await process.communicate()
 
     if process.returncode != 0:
-        error_message = stderr.decode()
-        logger.error(f"Task '{task_id}': Failed to create virtual environment. Error: {error_message}")
+        logger.error(f"Task '{task_id}': Failed to create venv. Error: {stderr.decode()}")
     else:
         logger.info(f"Task '{task_id}': Successfully created virtual environment.")
 
 
 # --- Graph Nodes ---
 async def task_setup_node(state: GraphState):
+    """Creates workspace and initializes state, including enabled tools."""
     task_id = state.get("task_id")
     logger.info(f"Task '{task_id}': Executing async Task_Setup")
     user_message = state['messages'][-1].content
     
     workspace_path = f"/app/workspace/{task_id}"
     os.makedirs(workspace_path, exist_ok=True)
-    
     await _create_venv_if_not_exists(workspace_path, task_id)
 
     initial_vault = {
@@ -230,22 +229,19 @@ async def task_setup_node(state: GraphState):
         "step_outputs": {}, "workspace_path": workspace_path, 
         "llm_config": state.get("llm_config", {}), "max_retries": 3,
         "step_retries": 0, "plan_retries": 0, "user_feedback": None,
-        "memory_vault": initial_vault
+        "memory_vault": initial_vault,
+        # --- NEW: Pass enabled_tools from initial state ---
+        "enabled_tools": state.get("enabled_tools")
     }
 
 def memory_updater_node(state: GraphState):
     task_id = state.get("task_id")
     logger.info(f"Task '{task_id}': Executing memory_updater_node.")
-
     llm = get_llm(state, "EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
-    
-    recent_conversation = f"Human: {state['input']}"
-
     prompt = memory_updater_prompt_template.format(
         memory_vault_json=json.dumps(state['memory_vault'], indent=2),
-        recent_conversation=recent_conversation
+        recent_conversation=f"Human: {state['input']}"
     )
-
     try:
         response = llm.invoke(prompt)
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL)
@@ -254,30 +250,21 @@ def memory_updater_node(state: GraphState):
         logger.info(f"Task '{task_id}': Memory Vault updated successfully.")
         return {"memory_vault": updated_vault}
     except Exception as e:
-        logger.error(f"Task '{task_id}': CRITICAL: Failed to parse or validate updated memory vault JSON. Error: {e}. Keeping old vault.")
+        logger.error(f"Task '{task_id}': CRITICAL: Failed to parse updated memory vault JSON. Error: {e}. Keeping old vault.")
         return {}
 
 def summarize_history_node(state: GraphState):
     task_id = state.get("task_id")
     logger.info(f"Task '{task_id}': Executing summarize_history_node.")
-    
     messages = state['messages']
     to_summarize = messages[:-HISTORY_SUMMARY_KEEP_RECENT]
     to_keep = messages[-HISTORY_SUMMARY_KEEP_RECENT:]
-    
     conversation_str = _format_messages(to_summarize, is_for_summary=True)
-    
     llm = get_llm(state, "EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
     prompt = summarizer_prompt_template.format(conversation=conversation_str)
-    
-    logger.info(f"Task '{task_id}': Summarizing {len(to_summarize)} messages...")
-    summary_response = llm.invoke(prompt)
-    summary_text = summary_response.content
-    
+    summary_text = llm.invoke(prompt).content
     summary_message = SystemMessage(content=f"This is a summary of the conversation so far:\n{summary_text}")
-    
     new_messages = [summary_message] + to_keep
-    
     logger.info(f"Task '{task_id}': History summarized. New message count: {len(new_messages)}")
     return {"messages": new_messages}
 
@@ -286,26 +273,17 @@ def initial_router_node(state: GraphState):
     task_id = state.get("task_id")
     logger.info(f"Task '{task_id}': Executing Three-Track Router.")
     llm = get_llm(state, "ROUTER_LLM_ID", "gemini::gemini-1.5-flash-latest")
-    
-    chat_history = _format_messages(state['messages'])
-    memory_vault_str = json.dumps(state.get('memory_vault', {}), indent=2)
-
     prompt = router_prompt_template.format(
-        chat_history=chat_history,
-        memory_vault=memory_vault_str,
+        chat_history=_format_messages(state['messages']),
+        memory_vault=json.dumps(state.get('memory_vault', {}), indent=2),
         input=state["input"], 
-        tools=format_tools_for_prompt()
+        tools=format_tools_for_prompt(state)
     )
-    
-    response = llm.invoke(prompt)
-    decision = response.content.strip()
-    
+    decision = llm.invoke(prompt).content.strip()
     logger.info(f"Task '{task_id}': Routing decision: {decision}")
-
     if "DIRECT_QA" in decision: return {"route": "Editor", "current_track": "DIRECT_QA"}
     if "SIMPLE_TOOL_USE" in decision: return {"route": "Handyman", "current_track": "SIMPLE_TOOL_USE"}
     if "COMPLEX_PROJECT" in decision: return {"route": "Chief_Architect", "current_track": "COMPLEX_PROJECT"}
-    
     logger.warning(f"Task '{task_id}': Router gave unexpected response '{decision}'. Defaulting to Editor.")
     return {"route": "Editor", "current_track": "DIRECT_QA"}
 
@@ -313,17 +291,12 @@ def handyman_node(state: GraphState):
     task_id = state.get("task_id")
     logger.info(f"Task '{task_id}': Track 2 -> Handyman")
     llm = get_llm(state, "SITE_FOREMAN_LLM_ID", "gemini::gemini-1.5-flash-latest")
-
-    chat_history = _format_messages(state['messages'])
-    memory_vault_str = json.dumps(state.get('memory_vault', {}), indent=2)
-
     prompt = handyman_prompt_template.format(
-        chat_history=chat_history,
-        memory_vault=memory_vault_str,
+        chat_history=_format_messages(state['messages']),
+        memory_vault=json.dumps(state.get('memory_vault', {}), indent=2),
         input=state["input"], 
-        tools=format_tools_for_prompt()
+        tools=format_tools_for_prompt(state)
     )
-    
     response = llm.invoke(prompt)
     try:
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL)
@@ -338,17 +311,12 @@ def chief_architect_node(state: GraphState):
     task_id = state.get("task_id")
     logger.info(f"Task '{task_id}': Track 3 -> Chief_Architect")
     llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-flash-latest")
-
-    chat_history = _format_messages(state['messages'])
-    memory_vault_str = json.dumps(state.get('memory_vault', {}), indent=2)
-    
     prompt = structured_planner_prompt_template.format(
-        chat_history=chat_history,
-        memory_vault=memory_vault_str,
+        chat_history=_format_messages(state['messages']),
+        memory_vault=json.dumps(state.get('memory_vault', {}), indent=2),
         input=state["input"], 
-        tools=format_tools_for_prompt()
+        tools=format_tools_for_prompt(state)
     )
-
     response = llm.invoke(prompt)
     try:
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL)
@@ -361,7 +329,8 @@ def chief_architect_node(state: GraphState):
 
 def human_in_the_loop_node(state: GraphState):
     logger.info(f"Task '{state.get('task_id')}': Reached HITL node. Awaiting user feedback.")
-    return {}
+    # --- NEW: Pass enabled tools through the interruption ---
+    return {"enabled_tools": state.get("enabled_tools")}
 
 def site_foreman_node(state: GraphState):
     task_id = state.get("task_id")
@@ -372,7 +341,7 @@ def site_foreman_node(state: GraphState):
     current_step_details = plan[step_index]
     llm = get_llm(state, "SITE_FOREMAN_LLM_ID", "gemini::gemini-1.5-flash-latest")
     history_str = "\n".join(state["history"]) if state.get("history") else "No history yet."
-    prompt = controller_prompt_template.format(tools=format_tools_for_prompt(), plan=json.dumps(state["plan"], indent=2), history=history_str, current_step=current_step_details.get("instruction", ""))
+    prompt = controller_prompt_template.format(tools=format_tools_for_prompt(state), plan=json.dumps(state["plan"], indent=2), history=history_str, current_step=current_step_details.get("instruction", ""))
     response = llm.invoke(prompt)
     try:
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL)
@@ -387,8 +356,16 @@ async def worker_node(state: GraphState):
     task_id = state.get("task_id")
     logger.info(f"Task '{task_id}': Worker executing tool call.")
     
-    available_tools = get_available_tools()
-    tool_map = {tool.name: tool for tool in available_tools}
+    # --- MODIFIED: Filter available tools based on state ---
+    all_tools = get_available_tools()
+    enabled_tool_names = state.get("enabled_tools")
+    if enabled_tool_names is None:
+        logger.warning(f"Task '{task_id}' (Worker): 'enabled_tools' not found. Defaulting to all tools.")
+        active_tools = all_tools
+    else:
+        active_tools = [tool for tool in all_tools if tool.name in enabled_tool_names]
+    
+    tool_map = {tool.name: tool for tool in active_tools}
     
     tool_call = state.get("current_tool_call")
     if not tool_call or "error" in tool_call or not tool_call.get("tool_name"):
@@ -400,8 +377,8 @@ async def worker_node(state: GraphState):
     tool = tool_map.get(tool_name)
     
     if not tool:
-        logger.error(f"Task '{task_id}': Tool '{tool_name}' not found in dynamically loaded tools.")
-        return {"tool_output": f"Error: Tool '{tool_name}' not found."}
+        logger.error(f"Task '{task_id}': Tool '{tool_name}' not found or is not enabled for this run.")
+        return {"tool_output": f"Error: Tool '{tool_name}' not found or is disabled."}
         
     final_args = {}
     if isinstance(tool_input, dict): final_args.update(tool_input)
@@ -409,7 +386,7 @@ async def worker_node(state: GraphState):
         tool_args_schema = tool.args
         if tool_args_schema: final_args[next(iter(tool_args_schema))] = tool_input
         
-    if tool_name in SANDBOXED_TOOLS or "custom_" in tool.name: # Also check for custom tools
+    if tool_name in SANDBOXED_TOOLS:
         final_args["workspace_path"] = state["workspace_path"]
         
     try:
@@ -466,7 +443,6 @@ def editor_node(state: GraphState):
     )
     
     response_content = llm.invoke(prompt).content
-
     return {"answer": response_content, "messages": [AIMessage(content=response_content)]}
 
 def correction_planner_node(state: GraphState):
@@ -476,7 +452,10 @@ def correction_planner_node(state: GraphState):
     failure_reason = state["step_evaluation"].get("reasoning", "No reason provided.")
     history_str = "\n".join(state["history"])
     llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-flash-latest")
-    prompt = correction_planner_prompt_template.format(plan=json.dumps(state["plan"]), history=history_str, failed_step=failed_step_details.get("instruction"), failure_reason=failure_reason, tools=format_tools_for_prompt())
+    prompt = correction_planner_prompt_template.format(
+        plan=json.dumps(state["plan"]), history=history_str, failed_step=failed_step_details.get("instruction"),
+        failure_reason=failure_reason, tools=format_tools_for_prompt(state)
+    )
     response = llm.invoke(prompt)
     try:
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL)
@@ -492,9 +471,7 @@ def correction_planner_node(state: GraphState):
 # --- Conditional Routing Logic ---
 def history_management_router(state: GraphState) -> str:
     if len(state['messages']) > HISTORY_SUMMARY_THRESHOLD:
-        logger.info(f"Task '{state.get('task_id')}': History length ({len(state['messages'])}) exceeds threshold. Routing to summarizer.")
         return "summarize_history_node"
-    logger.info(f"Task '{state.get('task_id')}': History length ({len(state['messages'])}) is within threshold. Skipping summarizer.")
     return "initial_router_node"
 
 def route_logic(state: GraphState) -> str:
@@ -537,26 +514,19 @@ def create_agent_graph():
     workflow.set_entry_point("Task_Setup")
     workflow.add_edge("Task_Setup", "Memory_Updater")
     
-    workflow.add_conditional_edges(
-        "Memory_Updater",
-        history_management_router,
-        {
-            "summarize_history_node": "summarize_history_node",
-            "initial_router_node": "initial_router_node"
-        }
-    )
+    workflow.add_conditional_edges("Memory_Updater", history_management_router, {
+        "summarize_history_node": "summarize_history_node", "initial_router_node": "initial_router_node"
+    })
     workflow.add_edge("summarize_history_node", "initial_router_node")
     
-    workflow.add_conditional_edges(
-        "initial_router_node", route_logic,
-        {"Editor": "Editor", "Handyman": "Handyman", "Chief_Architect": "Chief_Architect"}
-    )
+    workflow.add_conditional_edges("initial_router_node", route_logic, {
+        "Editor": "Editor", "Handyman": "Handyman", "Chief_Architect": "Chief_Architect"
+    })
 
     workflow.add_edge("Handyman", "Worker")
-    workflow.add_conditional_edges(
-        "Worker", after_worker_router,
-        {"Editor": "Editor", "Project_Supervisor": "Project_Supervisor"}
-    )
+    workflow.add_conditional_edges("Worker", after_worker_router, {
+        "Editor": "Editor", "Project_Supervisor": "Project_Supervisor"
+    })
     
     workflow.add_edge("Chief_Architect", "human_in_the_loop_node")
     workflow.add_conditional_edges("human_in_the_loop_node", after_plan_creation_router, {
@@ -577,7 +547,7 @@ def create_agent_graph():
         checkpointer=MemorySaver(),
         interrupt_before=["human_in_the_loop_node"]
     )
-    logger.info("ResearchAgent graph compiled with definitive Memory Vault architecture.")
+    logger.info("ResearchAgent graph compiled with tool-toggling capabilities.")
     return agent
 
 agent_graph = create_agent_graph()

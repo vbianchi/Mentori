@@ -1,24 +1,17 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 14.1: LLM as an Engine)
+# ResearchAgent Backend Server (Phase 14.3: Tool Toggling FIX)
 #
-# This version makes the Tool Forge's custom tools truly functional by
-# implementing the "LLM as an Engine" concept.
+# This version fixes a bug where the backend was not correctly receiving or
+# using the list of enabled tools sent from the frontend.
 #
 # Key Architectural Changes:
-# 1. Advanced `TOOL_TEMPLATE`: The template for generated tools has been
-#    completely rewritten.
-# 2. LLM-Powered Logic: The generated tool's internal function no longer
-#    contains a placeholder. It now:
-#    a. Imports the necessary LLM libraries (`os`, `ChatGoogleGenerativeAI`, etc.).
-#    b. Constructs a detailed prompt by combining the tool's original
-#       description with the arguments provided at runtime.
-#    c. Dynamically initializes a powerful LLM (using the `EDITOR_LLM_ID`
-#       environment variable, defaulting to Gemini 1.5 Pro).
-#    d. Invokes the LLM with the prompt and returns its response as the
-#       tool's output.
-# 3. Intelligent Custom Tools: This change transforms user-created tools from
-#    static shells into dynamic, intelligent functions capable of executing
-#    complex tasks based on their natural language descriptions.
+# 1. Updated `run_agent_handler`: This function now correctly extracts the
+#    `enabled_tools` list from the incoming WebSocket message payload.
+# 2. Correct `initial_state` Population: The extracted `enabled_tools` list
+#    is now properly included in the `initial_state` dictionary that is
+#    passed to the agent graph. This ensures that the agent's state is
+#    correctly initialized with the user's tool selections from the very
+#    beginning of the run.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -52,7 +45,7 @@ RUNNING_AGENTS = {}
 ACTIVE_CONNECTIONS = set()
 
 
-# --- UPDATED: Template for LLM-Powered Dynamic Tools ---
+# --- Tool Template ---
 TOOL_TEMPLATE = """
 # -----------------------------------------------------------------------------
 # Custom Tool: {tool_name}
@@ -79,12 +72,9 @@ class {class_name}Input(BaseModel):
 def {function_name}({function_signature}) -> str:
     \"\"\"{tool_description}\"\"\"
     try:
-        # Create a dictionary of the arguments to pass to the prompt
         args_dict = {{ {function_args_dict} }}
         logger.info(f"Executing custom tool '{tool_name}' with arguments: {{args_dict}}")
         
-        # --- LLM-Powered Implementation ---
-        # 1. Construct the prompt
         prompt = f\"\"\"
 You are a specialized AI assistant. Your purpose is to execute a single, specific task based on the instructions provided.
 A user has created a tool with the following description:
@@ -99,7 +89,6 @@ You must now execute this tool with the following input arguments:
 Based on the tool's description and the provided arguments, perform the task and return a concise, direct answer.
 \"\"\"
 
-        # 2. Get and initialize the LLM
         llm_id = os.getenv("EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
         provider, model_name = llm_id.split("::")
         logger.info(f"Custom tool '{tool_name}' is using LLM: {{llm_id}}")
@@ -111,7 +100,6 @@ Based on the tool's description and the provided arguments, perform the task and
         else:
             return f"Error: Unsupported LLM provider '{{provider}}' specified in EDITOR_LLM_ID."
 
-        # 3. Invoke the LLM and return the result
         response = llm.invoke(prompt)
         return response.content
         
@@ -282,8 +270,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         try:
             loaded_tools = get_available_tools()
             formatted_tools = [{"name": tool.name, "description": tool.description} for tool in loaded_tools]
-            editor_tool = {"name": "The Editor", "description": "Use a powerful language model to perform tasks like rewriting, summarizing, or analyzing text."}
-            self._send_json_response(200, {"tools": [editor_tool] + formatted_tools})
+            self._send_json_response(200, {"tools": formatted_tools})
         except Exception as e:
             logger.error(f"Failed to get available tools: {e}", exc_info=True)
             self._send_json_response(500, {"error": "Could not retrieve tools."})
@@ -409,7 +396,7 @@ def run_http_server():
     httpd.serve_forever()
 
 
-# --- WebSocket Core Logic (No Changes) ---
+# --- WebSocket Core Logic ---
 
 async def broadcast_event(event):
     if ACTIVE_CONNECTIONS:
@@ -454,35 +441,52 @@ async def agent_execution_wrapper(input_state, config):
         if task_id in RUNNING_AGENTS: del RUNNING_AGENTS[task_id]
         logger.info(f"Task '{task_id}': Cleaned up from RUNNING_AGENTS.")
 
+# --- MODIFIED: Handler now accepts and uses enabled_tools ---
 async def run_agent_handler(data):
     global RUNNING_AGENTS
-    task_id, prompt = data.get("task_id"), data.get("prompt")
+    task_id = data.get("task_id")
+    prompt = data.get("prompt")
+    enabled_tools = data.get("enabled_tools") # Get the list from the message
+    
     if not prompt or not task_id: return
     if task_id in RUNNING_AGENTS:
         logger.warning(f"Task '{task_id}': Agent is already running.")
         return await broadcast_event({"type": "error", "message": "Agent is already running for this task.", "task_id": task_id})
 
     config = {"recursion_limit": 100, "configurable": {"thread_id": task_id}}
-    initial_state = {"messages": [HumanMessage(content=prompt)], "llm_config": data.get("llm_config", {}), "task_id": task_id}
     
-    logger.info(f"Task '{task_id}': Creating background task for new agent run.")
+    # --- FIX: Include enabled_tools in the initial state ---
+    initial_state = {
+        "messages": [HumanMessage(content=prompt)],
+        "llm_config": data.get("llm_config", {}),
+        "task_id": task_id,
+        "enabled_tools": enabled_tools
+    }
+    
+    logger.info(f"Task '{task_id}': Creating background task for new agent run with {len(enabled_tools)} tools enabled.")
     agent_task = asyncio.create_task(agent_execution_wrapper(initial_state, config))
     RUNNING_AGENTS[task_id] = agent_task
 
 async def resume_agent_handler(data):
     global RUNNING_AGENTS
-    task_id, feedback = data.get("task_id"), data.get("feedback")
+    task_id = data.get("task_id")
+    feedback = data.get("feedback")
+    enabled_tools = data.get("enabled_tools") # Also get for resume
+    
     if not task_id or not feedback: return
     if task_id in RUNNING_AGENTS:
         logger.warning(f"Task '{task_id}': Agent is already running, cannot resume.")
         return
 
     config = {"recursion_limit": 100, "configurable": {"thread_id": task_id}}
-    update_values = {"user_feedback": feedback}
+    
+    # --- FIX: Pass enabled_tools through on resume as well ---
+    update_values = {"user_feedback": feedback, "enabled_tools": enabled_tools}
     if (plan := data.get("plan")) is not None: update_values["plan"] = plan
+    
     agent_graph.update_state(config, update_values)
     
-    logger.info(f"Task '{task_id}': Creating background task to resume agent execution.")
+    logger.info(f"Task '{task_id}': Creating background task to resume agent execution with {len(enabled_tools)} tools.")
     agent_task = asyncio.create_task(agent_execution_wrapper(None, config))
     RUNNING_AGENTS[task_id] = agent_task
 

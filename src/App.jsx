@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
-import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, FolderIcon, ArrowLeftIcon, UploadCloudIcon, StopCircleIcon, ForgeIcon } from './components/Icons';
+import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, FolderIcon, ArrowLeftIcon, UploadCloudIcon, StopCircleIcon, ForgeIcon, BriefcaseIcon } from './components/Icons';
 import { ArchitectCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard } from './components/AgentCards';
 import { ToggleButton, CopyButton } from './components/Common';
 import { ToolForge } from './components/ToolForge';
@@ -99,6 +99,40 @@ const ModelSelector = ({ label, icon, onModelChange, models, selectedModel, role
     </div>
 );
 
+const ToolboxPanel = ({ tools, enabledTools, onToggleTool }) => {
+    const [isExpanded, setIsExpanded] = useState(true);
+
+    return (
+        <div class="border-t border-gray-700 pt-4 mt-4">
+            <div class="flex items-center justify-between cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
+                <div class="flex items-center gap-2">
+                    <BriefcaseIcon class="h-5 w-5 text-gray-400" />
+                    <h3 class="text-lg font-semibold text-gray-200">Active Toolbox</h3>
+                </div>
+                <ChevronDownIcon class={`h-5 w-5 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+            </div>
+            {isExpanded && (
+                <div class="mt-4 pl-2 space-y-2 max-h-48 overflow-y-auto pr-2">
+                    {tools.map(tool => (
+                        <div key={tool.name} class="flex items-center justify-between" title={tool.description}>
+                            <span class="text-sm text-gray-300 truncate">{tool.name}</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={enabledTools[tool.name] ?? true}
+                                    onChange={() => onToggleTool(tool.name)}
+                                    class="sr-only peer"
+                                />
+                                <div class="w-9 h-5 bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
+
 const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const agentRoles = [
@@ -110,7 +144,8 @@ const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
     ];
 
     return (
-        <div class="mt-auto border-t border-gray-700 pt-4">
+        // --- FIX: Added mt-4 for spacing ---
+        <div class="border-t border-gray-700 pt-4 mt-6">
              <div class="flex items-center justify-between cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
                 <div class="flex items-center gap-2"> <SlidersIcon class="h-5 w-5 text-gray-400" /> <h3 class="text-lg font-semibold text-gray-200">Agent Models</h3> </div>
                 <ChevronDownIcon class={`h-5 w-5 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
@@ -150,9 +185,7 @@ export function App() {
     const [connectionStatus, setConnectionStatus] = useState("Disconnected");
     const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
     const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
-
-    // --- NEW: State for view management ---
-    const [activeView, setActiveView] = useState('tasks'); // 'tasks' or 'forge'
+    const [activeView, setActiveView] = useState('tasks');
 
     const [workspaceItems, setWorkspaceItems] = useState([]);
     const [currentPath, setCurrentPath] = useState('');
@@ -166,9 +199,9 @@ export function App() {
     const [selectedModels, setSelectedModels] = useState({});
     const [isAwaitingApproval, setIsAwaitingApproval] = useState(false);
     const [availableTools, setAvailableTools] = useState([]);
+    const [enabledTools, setEnabledTools] = useState({});
     const [isDragOver, setIsDragOver] = useState(false);
     const [runningTasks, setRunningTasks] = useState({});
-
 
     const ws = useRef(null);
     const messagesEndRef = useRef(null);
@@ -223,7 +256,7 @@ export function App() {
             setIsAwaitingApproval(false);
             resetWorkspaceViews();
             setCurrentPath(taskId);
-            setActiveView('tasks'); // Switch back to tasks view when a task is selected
+            setActiveView('tasks'); 
         }
     };
     
@@ -270,6 +303,13 @@ export function App() {
 
     const handleModelChange = (roleKey, modelId) => {
         setSelectedModels(prev => ({ ...prev, [roleKey]: modelId }));
+    };
+
+    const handleToggleTool = (toolName) => {
+        setEnabledTools(prev => ({
+            ...prev,
+            [toolName]: !(prev[toolName] ?? true)
+        }));
     };
     
     const scrollToBottom = () => {
@@ -498,6 +538,12 @@ export function App() {
                 if (!toolsResponse.ok) throw new Error('Failed to fetch available tools.');
                 const toolsConfig = await toolsResponse.json();
                 setAvailableTools(toolsConfig.tools || []);
+                
+                const initialEnabledState = {};
+                (toolsConfig.tools || []).forEach(tool => {
+                    initialEnabledState[tool.name] = true;
+                });
+                setEnabledTools(initialEnabledState);
 
             } catch (error) {
                 console.error("Failed to fetch startup config:", error);
@@ -537,10 +583,12 @@ export function App() {
              }));
         }
         
+        const activeToolNames = Object.keys(enabledTools).filter(key => enabledTools[key]);
         const resumeMessage = {
             type: 'resume_agent',
             task_id: activeTaskId,
             feedback: feedback,
+            enabled_tools: activeToolNames,
         };
         if (plan) {
             resumeMessage.plan = plan;
@@ -688,7 +736,15 @@ export function App() {
             return task;
         }));
         
-        ws.current.send(JSON.stringify({ type: 'run_agent', prompt: message, llm_config: selectedModels, task_id: activeTaskId }));
+        const activeToolNames = Object.keys(enabledTools).filter(key => enabledTools[key]);
+        
+        ws.current.send(JSON.stringify({ 
+            type: 'run_agent', 
+            prompt: message, 
+            llm_config: selectedModels, 
+            task_id: activeTaskId,
+            enabled_tools: activeToolNames 
+        }));
         setInputValue("");
     };
 
@@ -703,12 +759,10 @@ export function App() {
             {isLeftSidebarVisible && (
                 <div class="h-full w-1/4 min-w-[300px] bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col">
                     <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-700 flex-shrink-0">
-                        {/* --- NEW: View-aware Title --- */}
                         <h2 class="text-xl font-bold text-white">
                             {activeView === 'tasks' ? 'Tasks' : 'Tool Forge'}
                         </h2>
                         <div class="flex items-center gap-2">
-                           {/* --- NEW: View-switching buttons --- */}
                            {activeView === 'tasks' ? (
                                <button onClick={() => setActiveView('forge')} class="p-1.5 rounded-md hover:bg-gray-700" title="Open Tool Forge">
                                    <ForgeIcon class="h-5 w-5" />
@@ -722,23 +776,26 @@ export function App() {
                            <button onClick={() => setIsLeftSidebarVisible(false)} class="p-1.5 rounded-md hover:bg-gray-700" title="Hide Sidebar"><ChevronsLeftIcon class="h-4 w-4" /></button>
                         </div>
                     </div>
-                    {/* --- NEW: Conditionally render task list or forge info --- */}
+                    
                     {activeView === 'tasks' ? (
                         <div class="flex flex-col flex-grow p-6 pt-4 min-h-0">
                             <div class="flex-grow overflow-y-auto pr-2">
                                 {tasks.length > 0 ? ( <ul> {tasks.map(task => ( <TaskItem key={task.id} task={task} isActive={activeTaskId === task.id} isRunning={!!runningTasks[task.id]} onSelect={selectTask} onRename={handleRenameTask} onDelete={handleDeleteTask} /> ))} </ul> ) : ( <p class="text-gray-400 text-center mt-4">No tasks yet. Create one!</p> )}
                             </div>
+                            <ToolboxPanel tools={availableTools} enabledTools={enabledTools} onToggleTool={handleToggleTool} />
                             <SettingsPanel models={availableModels} selectedModels={selectedModels} onModelChange={handleModelChange} />
                         </div>
                     ) : (
-                        <div class="p-6 text-gray-400 text-sm">
-                            <p>You are in the Tool Forge. Use the main panel to create and manage custom tools for the agent.</p>
+                        <div class="flex flex-col flex-grow p-6 pt-4 min-h-0">
+                           <div class="flex-grow overflow-y-auto pr-2">
+                                <p class="text-gray-400 text-sm">Manage and view custom tools here.</p>
+                           </div>
+                           <SettingsPanel models={availableModels} selectedModels={selectedModels} onModelChange={handleModelChange} />
                         </div>
                     )}
                 </div>
             )}
             
-            {/* --- NEW: Main area is now fully conditional --- */}
             {activeView === 'tasks' ? (
                 <>
                     <div class="flex-1 flex flex-col h-full bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl min-w-0">
