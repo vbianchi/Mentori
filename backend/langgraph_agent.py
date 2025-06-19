@@ -1,24 +1,14 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 14.2: Argument Substitution)
+# ResearchAgent Core Agent (Phase 14.2: Robust Worker Node)
 #
-# This definitive version completes the blueprint execution logic by implementing
-# context-aware argument substitution during plan expansion.
+# This version fixes a critical KeyError in the `worker_node`.
 #
 # Key Architectural Changes:
-# 1. Smarter `plan_expander_node`:
-#    - It now inspects the `tool_input` of the original blueprint step that the
-#      Chief Architect created (e.g., {"topic": "LangGraph"}).
-#    - As it unrolls the blueprint's steps, it recursively searches through the
-#      `tool_input` of each new step for placeholder strings like `{topic}`.
-#    - It replaces these placeholders with the actual values from the original
-#      context, making the blueprints truly dynamic.
-#
-# 2. Robust `site_foreman_node` Data Piping:
-#    - The Foreman now has a dedicated helper function, `_substitute_step_outputs`,
-#      to handle data piping placeholders like `{step_1_output}`.
-#    - This substitution happens *after* the LLM has generated a clean JSON
-#      tool call, which completely avoids the JSON corruption errors we saw
-#      when the raw output was large or contained special characters.
+# 1. Track-Aware `worker_node`: The worker node now checks the `current_track`
+#    in the state. It ONLY attempts to access `state['plan']` and save the
+#    output for data piping if it's on the 'COMPLEX_PROJECT' track. This
+#    prevents the KeyError when the worker is called from the 'SIMPLE_TOOL_USE'
+#    track, which does not generate a plan.
 # -----------------------------------------------------------------------------
 
 import os
@@ -194,89 +184,53 @@ def chief_architect_node(state: GraphState):
         parsed_json = json.loads(json_str); return {"plan": parsed_json.get("plan", [])}
     except Exception as e: logger.error(f"Task '{task_id}': Error parsing structured plan: {e}"); return {"plan": [{"error": f"Failed to create plan: {e}"}]}
 
-# --- MODIFIED: Upgraded plan expander with argument substitution ---
 def plan_expander_node(state: GraphState):
-    task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing Plan_Expander.")
-    original_plan = state.get("plan", [])
+    task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing Plan_Expander."); original_plan = state.get("plan", [])
     if not original_plan: return {}
-
     expanded_plan = []; all_tools_map = {tool.name: tool for tool in get_available_tools()}
-    
-    # Helper function for recursive substitution
     def _substitute(data: Any, context: Dict[str, Any]) -> Any:
         if isinstance(data, str):
             match = re.fullmatch(r"\{(\w+)\}", data)
-            if match and match.group(1) in context:
-                return context[match.group(1)]
+            if match and match.group(1) in context: return context[match.group(1)]
             return data
-        if isinstance(data, dict):
-            return {k: _substitute(v, context) for k, v in data.items()}
-        if isinstance(data, list):
-            return [_substitute(item, context) for item in data]
+        if isinstance(data, dict): return {k: _substitute(v, context) for k, v in data.items()}
+        if isinstance(data, list): return [_substitute(item, context) for item in data]
         return data
-
     for step in original_plan:
-        tool_name = step.get("tool_name")
-        tool_to_check = all_tools_map.get(tool_name)
-        
+        tool_name = step.get("tool_name"); tool_to_check = all_tools_map.get(tool_name)
         if isinstance(tool_to_check, BlueprintTool):
-            logger.info(f"Task '{task_id}': Expanding blueprint '{tool_name}'.")
-            # This is the context from the user's prompt, e.g., {"topic": "LangGraph"}
-            substitution_context = step.get("tool_input", {})
-            
+            logger.info(f"Task '{task_id}': Expanding blueprint '{tool_name}'."); substitution_context = step.get("tool_input", {})
             for blueprint_step in tool_to_check.plan.get("steps", []):
-                # Create a deep copy to avoid modifying the original blueprint
-                new_step = json.loads(json.dumps(blueprint_step))
-                # Substitute placeholders in the new step's tool_input
-                new_step["tool_input"] = _substitute(new_step["tool_input"], substitution_context)
-                expanded_plan.append(new_step)
-        else:
-            expanded_plan.append(step)
-    
+                new_step = json.loads(json.dumps(blueprint_step)); new_step["tool_input"] = _substitute(new_step["tool_input"], substitution_context); expanded_plan.append(new_step)
+        else: expanded_plan.append(step)
     for i, step in enumerate(expanded_plan): step["step_id"] = i + 1
     return {"plan": expanded_plan}
 
 def human_in_the_loop_node(state: GraphState):
     logger.info(f"Task '{state.get('task_id')}': Reached HITL node."); return {"enabled_tools": state.get("enabled_tools")}
 
-# --- MODIFIED: Upgraded site foreman with robust data piping ---
 def _substitute_step_outputs(data: Any, step_outputs: Dict[int, str]) -> Any:
-    """Recursively substitutes placeholders like {step_1_output}."""
     if isinstance(data, str):
         match = re.fullmatch(r"\{step_(\d+)_output\}", data)
-        if match:
-            step_num = int(match.group(1))
-            return step_outputs.get(step_num, f"Error: Output for step {step_num} not found.")
+        if match: step_num = int(match.group(1)); return step_outputs.get(step_num, f"Error: Output for step {step_num} not found.")
         return data
-    if isinstance(data, dict):
-        return {k: _substitute_step_outputs(v, step_outputs) for k, v in data.items()}
-    if isinstance(data, list):
-        return [_substitute_step_outputs(item, step_outputs) for item in data]
+    if isinstance(data, dict): return {k: _substitute_step_outputs(v, step_outputs) for k, v in data.items()}
+    if isinstance(data, list): return [_substitute_step_outputs(item, step_outputs) for item in data]
     return data
 
 def site_foreman_node(state: GraphState):
     task_id = state.get("task_id"); step_index = state["current_step_index"]; plan = state["plan"]
     if not plan or step_index >= len(plan): return {"current_tool_call": {"error": "Plan finished or empty."}}
     logger.info(f"Task '{task_id}': Site_Foreman executing step {step_index + 1}/{len(plan)}"); current_step_details = plan[step_index]
-    
-    # Use a clean history string, do not pass raw outputs to the LLM
     history_summary = "\n".join([f"Step {s['step_id']}: {s['instruction']}" for s in plan[:step_index]])
-    
     llm = get_llm(state, "SITE_FOREMAN_LLM_ID", "gemini::gemini-1.5-flash-latest")
     prompt = controller_prompt_template.format(tools=format_tools_for_prompt(state), plan=json.dumps(plan, indent=2), history=history_summary, current_step=current_step_details.get("instruction", ""))
-    
     try:
-        response = llm.invoke(prompt)
-        match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL); json_str = match.group(1).strip() if match else response.content.strip()
-        tool_call = json.loads(json_str)
-        
-        # Now, perform robust substitution on the clean JSON structure
-        substituted_tool_call = _substitute_step_outputs(tool_call, state.get("step_outputs", {}))
-        
-        return {"current_tool_call": substituted_tool_call}
-    except Exception as e:
-        logger.error(f"Task '{task_id}': Error in Foreman: {e}"); return {"current_tool_call": {"error": f"Invalid JSON or substitution error: {e}"}}
+        response = llm.invoke(prompt); match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL); json_str = match.group(1).strip() if match else response.content.strip()
+        tool_call = json.loads(json_str); substituted_tool_call = _substitute_step_outputs(tool_call, state.get("step_outputs", {})); return {"current_tool_call": substituted_tool_call}
+    except Exception as e: logger.error(f"Task '{task_id}': Error in Foreman: {e}"); return {"current_tool_call": {"error": f"Invalid JSON or substitution error: {e}"}}
 
+# --- MODIFIED: Robust, track-aware worker node ---
 async def worker_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Worker executing tool call."); all_tools = get_available_tools(); enabled_tool_names = state.get("enabled_tools")
     active_tools = [tool for tool in all_tools if tool.name in enabled_tool_names] if enabled_tool_names is not None else all_tools
@@ -294,15 +248,23 @@ async def worker_node(state: GraphState):
     try:
         output = await tool.ainvoke(final_args); output_str = str(output)
         
-        # --- NEW: Save the successful output for data piping ---
-        current_step_id = state["plan"][state["current_step_index"]]["step_id"]
-        step_outputs = {current_step_id: output_str}
+        # Fork logic based on the current track
+        if state.get("current_track") == "COMPLEX_PROJECT":
+            # This track is guaranteed to have a plan
+            current_step_id = state["plan"][state["current_step_index"]]["step_id"]
+            step_outputs = {current_step_id: output_str}
+            return {"tool_output": output_str, "step_outputs": step_outputs}
 
-        if state.get("current_track") == "SIMPLE_TOOL_USE":
+        elif state.get("current_track") == "SIMPLE_TOOL_USE":
+            # This track does not have a plan, so we don't save step outputs
             history_record = (f"Handyman Action: User requested '{state['input']}'.\nExecuted Tool: {json.dumps(tool_call)}\nResult: {output_str}")
-            return {"tool_output": output_str, "history": [history_record], "messages": [AIMessage(content=f"Tool execution result: {output_str}")], "step_outputs": step_outputs}
-        return {"tool_output": output_str, "step_outputs": step_outputs}
-    except Exception as e: logger.error(f"Task '{task_id}': Error executing tool '{tool_name}': {e}", exc_info=True); return {"tool_output": f"Error executing tool: {e}"}
+            return {"tool_output": output_str, "history": [history_record], "messages": [AIMessage(content=f"Tool execution result: {output_str}")]}
+            
+        # Fallback for any other case (shouldn't happen)
+        return {"tool_output": output_str}
+
+    except Exception as e:
+        logger.error(f"Task '{task_id}': Error executing tool '{tool_name}': {e}", exc_info=True); return {"tool_output": f"An error occurred while executing the tool: {e}"}
 
 def project_supervisor_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing Project_Supervisor"); current_step_details = state["plan"][state["current_step_index"]]
@@ -347,7 +309,7 @@ def after_plan_step_router(state: GraphState) -> str:
     if state["current_step_index"] + 1 >= len(state.get("plan", [])): return "Editor"
     return "Advance_To_Next_Step"
 
-# (Graph Definition remains unchanged, it already includes Plan_Expander)
+# (Graph Definition remains unchanged)
 def create_agent_graph():
     workflow = StateGraph(GraphState)
     workflow.add_node("Task_Setup", task_setup_node); workflow.add_node("Memory_Updater", memory_updater_node); workflow.add_node("summarize_history_node", summarize_history_node)
