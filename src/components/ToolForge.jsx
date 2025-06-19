@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import { BriefcaseIcon, ForgeIcon, PlusCircleIcon, SaveIcon, Trash2Icon, LoaderIcon } from './Icons';
+import { PlanVisualizer } from './PlanVisualizer'; // Import the new component
 
 // A single row in the arguments list for the tool creator form
 const ArgumentInput = ({ index, arg, updateArg, removeArg }) => {
@@ -141,6 +142,15 @@ export const ToolForge = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [selectedTool, setSelectedTool] = useState(null); // null means 'Create New' view
 
+    // --- NEW: Hardcoded example plan for visualization ---
+    const examplePlan = {
+        steps: [
+            { step_id: 1, tool_name: 'web_search', instruction: 'Search the web for the main topic.' },
+            { step_id: 2, tool_name: 'write_file', instruction: 'Write findings to a summary file.' },
+            { step_id: 3, tool_name: 'workspace_shell', instruction: 'List the files to confirm creation.' }
+        ]
+    };
+
     const fetchTools = async () => {
         setIsLoading(true);
         try {
@@ -213,13 +223,16 @@ export const ToolForge = () => {
                 </div>
             </div>
 
-            {/* Right Panel: Tool Details or Creator */}
-            <div class="w-2/3 flex-grow">
+            {/* Right Panel: Tool Details (PlanVisualizer) or Creator */}
+            <div class="w-2/3 flex-grow overflow-y-auto">
                 {selectedTool ? (
-                    <div class="p-6">
-                        <h3 class="text-lg font-bold text-white">{selectedTool.name}</h3>
-                        <p class="text-sm text-gray-400 mt-2">{selectedTool.description}</p>
-                        {/* We will add argument display here later */}
+                    <div>
+                        <div class="p-6 border-b border-gray-700/50">
+                            <h3 class="text-lg font-bold text-white">{selectedTool.name}</h3>
+                            <p class="text-sm text-gray-400 mt-2">{selectedTool.description}</p>
+                        </div>
+                        {/* --- NEW: Render the PlanVisualizer --- */}
+                        <PlanVisualizer plan={examplePlan} />
                     </div>
                 ) : (
                     <ToolCreator onSave={handleSaveTool} />

@@ -4,6 +4,10 @@ import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, Ed
 import { ArchitectCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard } from './components/AgentCards';
 import { ToggleButton, CopyButton } from './components/Common';
 import { ToolForge } from './components/ToolForge';
+import { useTasks } from './hooks/useTasks';
+import { useWorkspace } from './hooks/useWorkspace';
+import { useSettings } from './hooks/useSettings';
+import { useAgent } from './hooks/useAgent';
 
 // --- File Previewer Component ---
 const FilePreviewer = ({ currentPath, file, isLoading, content, rawFileUrl }) => {
@@ -144,7 +148,6 @@ const SettingsPanel = ({ models, selectedModels, onModelChange }) => {
     ];
 
     return (
-        // --- FIX: Added mt-4 for spacing ---
         <div class="border-t border-gray-700 pt-4 mt-6">
              <div class="flex items-center justify-between cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
                 <div class="flex items-center gap-2"> <SlidersIcon class="h-5 w-5 text-gray-400" /> <h3 class="text-lg font-semibold text-gray-200">Agent Models</h3> </div>
@@ -179,111 +182,127 @@ const Breadcrumbs = ({ path, onNavigate }) => {
 
 // --- Main App Component ---
 export function App() {
-    const [tasks, setTasks] = useState([]);
-    const [activeTaskId, setActiveTaskId] = useState(null);
+    const { tasks, setTasks, activeTaskId, selectTask: setActiveTaskId, renameTask } = useTasks();
+    const workspace = useWorkspace(activeTaskId);
+    const settings = useSettings();
+
     const [inputValue, setInputValue] = useState("");
-    const [connectionStatus, setConnectionStatus] = useState("Disconnected");
     const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
     const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
     const [activeView, setActiveView] = useState('tasks');
-
-    const [workspaceItems, setWorkspaceItems] = useState([]);
-    const [currentPath, setCurrentPath] = useState('');
-    
-    const [workspaceLoading, setWorkspaceLoading] = useState(false);
-    const [workspaceError, setWorkspaceError] = useState(null);
-    const [selectedFile, setSelectedFile] = useState(null);
-    const [fileContent, setFileContent] = useState('');
-    const [isFileLoading, setIsFileLoading] = useState(false);
-    const [availableModels, setAvailableModels] = useState([]);
-    const [selectedModels, setSelectedModels] = useState({});
     const [isAwaitingApproval, setIsAwaitingApproval] = useState(false);
-    const [availableTools, setAvailableTools] = useState([]);
-    const [enabledTools, setEnabledTools] = useState({});
-    const [isDragOver, setIsDragOver] = useState(false);
-    const [runningTasks, setRunningTasks] = useState({});
-
-    const ws = useRef(null);
+    
     const messagesEndRef = useRef(null);
-    const fileInputRef = useRef(null);
-    const runModelsRef = useRef({});
-    const handlersRef = useRef();
-    const dragCounter = useRef(0);
 
-    useEffect(() => {
-        handlersRef.current = { fetchWorkspaceFiles };
-    });
+    // --- REFACTORED: Central message handler for the useAgent hook ---
+    const handleIncomingMessage = useCallback((newEvent) => {
+        setTasks(currentTasks => {
+            try {
+                const taskIndex = currentTasks.findIndex(t => t.id === newEvent.task_id);
+                if (taskIndex === -1) return currentTasks;
+                
+                const newTasks = [...currentTasks];
+                const taskToUpdate = { ...newTasks[taskIndex] };
+                let newHistory = [...taskToUpdate.history];
 
-    useEffect(() => {
-        const savedTasks = localStorage.getItem('research_agent_tasks');
-        const savedActiveId = localStorage.getItem('research_agent_active_task_id');
-        const loadedTasks = savedTasks ? JSON.parse(savedTasks) : [];
-        setTasks(loadedTasks);
-        if (savedActiveId && loadedTasks.some(t => t.id === savedActiveId)) {
-            setActiveTaskId(savedActiveId);
-            setCurrentPath(savedActiveId);
-        } else if (loadedTasks.length > 0) {
-            setActiveTaskId(loadedTasks[0].id);
-            setCurrentPath(loadedTasks[0].id);
+                let runContainer = newHistory.length > 0 && newHistory[newHistory.length - 1].type === 'run_container' 
+                    ? newHistory[newHistory.length - 1]
+                    : null;
+                
+                if (!runContainer && !['agent_started', 'agent_stopped', 'agent_resumed'].includes(newEvent.type)) {
+                    runContainer = { type: 'run_container', children: [], isComplete: false };
+                    newHistory.push(runContainer);
+                }
+                
+                const eventType = newEvent.type;
+
+                if (eventType === 'plan_approval_request') {
+                    setIsAwaitingApproval(true);
+                    runContainer.children.push({ type: 'architect_plan', steps: newEvent.plan, isAwaitingApproval: true });
+                } else if (eventType === 'direct_answer' || eventType === 'final_answer') {
+                    setIsAwaitingApproval(false);
+                    runContainer.children.push({ type: eventType, content: newEvent.data });
+                    runContainer.isComplete = true;
+                } else if (eventType === 'agent_event') {
+                    const { name, event: chainEvent, data } = newEvent;
+                    const inputData = data.input || {};
+                    const outputData = data.output || {};
+
+                    let architectPlan = runContainer.children.find(c => c.type === 'architect_plan');
+                    
+                    if (name === 'Site_Foreman' && chainEvent === 'on_chain_start' && architectPlan?.isAwaitingApproval) {
+                        architectPlan.isAwaitingApproval = false;
+                        if (!runContainer.children.some(c => c.type === 'execution_plan')) {
+                            runContainer.children.push({ type: 'execution_plan', steps: architectPlan.steps.map(step => ({...step, status: 'pending'})) });
+                        }
+                    }
+
+                    let executionPlan = runContainer.children.find(c => c.type === 'execution_plan');
+                    if (executionPlan) {
+                        const stepIndex = inputData.current_step_index;
+                        if (stepIndex !== undefined && executionPlan.steps[stepIndex]) {
+                            let stepToUpdate = { ...executionPlan.steps[stepIndex] };
+                            if (name === 'Site_Foreman' && chainEvent === 'on_chain_start') {
+                                stepToUpdate.status = 'in-progress';
+                            } else if (name === 'Project_Supervisor' && chainEvent === 'on_chain_end') {
+                                stepToUpdate.status = outputData.step_evaluation?.status === 'failure' ? 'failure' : 'completed';
+                                stepToUpdate.toolCall = inputData.current_tool_call;
+                                stepToUpdate.toolOutput = outputData.tool_output;
+                                stepToUpdate.evaluation = outputData.step_evaluation;
+                                if (activeTaskId === newEvent.task_id) { 
+                                    workspace.fetchFiles(workspace.currentPath);
+                                }
+                            }
+                            executionPlan.steps[stepIndex] = stepToUpdate;
+                        }
+                    }
+                }
+
+                taskToUpdate.history = newHistory;
+                newTasks[taskIndex] = taskToUpdate;
+                return newTasks;
+            } catch (error) {
+                console.error("Error processing WebSocket message:", error, "Event:", newEvent);
+                return currentTasks;
+            }
+        });
+
+        if (newEvent.type === 'final_answer' && newEvent.refresh_workspace) {
+            if (activeTaskId === newEvent.task_id) {
+                workspace.fetchFiles(workspace.currentPath);
+            }
         }
-    }, []);
+    }, [activeTaskId, workspace.currentPath]);
 
-    useEffect(() => {
-        if (tasks.length > 0) {
-            localStorage.setItem('research_agent_tasks', JSON.stringify(tasks));
-        } else {
-            localStorage.removeItem('research_agent_tasks');
-        }
-    }, [tasks]);
+    // --- REFACTORED: Initialize useAgent hook ---
+    const agent = useAgent(handleIncomingMessage);
 
     useEffect(() => {
         if (activeTaskId) {
-            localStorage.setItem('research_agent_active_task_id', activeTaskId);
-        } else {
-            localStorage.removeItem('research_agent_active_task_id');
+            workspace.setCurrentPath(activeTaskId);
         }
     }, [activeTaskId]);
     
-    const resetWorkspaceViews = () => {
-        setWorkspaceItems([]);
-        setWorkspaceError(null);
-        setSelectedFile(null);
-    };
-
     const selectTask = (taskId) => {
         if (taskId !== activeTaskId) {
             setActiveTaskId(taskId);
             setIsAwaitingApproval(false);
-            resetWorkspaceViews();
-            setCurrentPath(taskId);
+            workspace.resetWorkspaceViews();
+            workspace.setCurrentPath(taskId);
             setActiveView('tasks'); 
         }
     };
     
     const createNewTask = () => {
         const newTaskId = `task_${Date.now()}`;
+        agent.createTask(newTaskId); // Inform backend
         const newTask = { id: newTaskId, name: `New Task ${tasks.length + 1}`, history: [] };
-        if (ws.current?.readyState === WebSocket.OPEN) {
-            ws.current.send(JSON.stringify({ type: 'task_create', task_id: newTaskId }));
-            setTasks(prevTasks => [...prevTasks, newTask]);
-            selectTask(newTaskId);
-        } else {
-            alert("Connection not ready. Please wait a moment and try again.");
-        }
-    };
-
-    const handleRenameTask = (taskId, newName) => {
-        setTasks(prevTasks => prevTasks.map(task => task.id === taskId ? { ...task, name: newName } : task));
+        setTasks(prevTasks => [...prevTasks, newTask]);
+        selectTask(newTaskId);
     };
 
     const handleDeleteTask = (taskIdToDelete) => {
-        if (ws.current?.readyState === WebSocket.OPEN) {
-            ws.current.send(JSON.stringify({ type: 'task_delete', task_id: taskIdToDelete }));
-        } else {
-            alert("Connection not ready. Please wait a moment and try again.");
-            return;
-        }
-        
+        agent.deleteTask(taskIdToDelete); // Inform backend
         const currentTasks = tasks;
         const remainingTasks = currentTasks.filter(task => task.id !== taskIdToDelete);
         
@@ -294,426 +313,56 @@ export function App() {
                 selectTask(remainingTasks[newActiveIndex].id);
             } else {
                 setActiveTaskId(null);
-                resetWorkspaceViews();
-                setCurrentPath('');
+                workspace.resetWorkspaceViews();
+                workspace.setCurrentPath('');
             }
         }
         setTasks(remainingTasks);
     };
 
-    const handleModelChange = (roleKey, modelId) => {
-        setSelectedModels(prev => ({ ...prev, [roleKey]: modelId }));
-    };
-
-    const handleToggleTool = (toolName) => {
-        setEnabledTools(prev => ({
-            ...prev,
-            [toolName]: !(prev[toolName] ?? true)
-        }));
-    };
-    
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
-    
-    const fetchWorkspaceFiles = async (path) => {
-        if (!path) return;
-        setWorkspaceLoading(true);
-        setWorkspaceError(null);
-        try {
-            const response = await fetch(`http://localhost:8766/api/workspace/items?path=${path}`);
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to fetch items');
-            }
-            const data = await response.json();
-            const sortedItems = (data.items || []).sort((a, b) => {
-                if (a.type === 'directory' && b.type !== 'directory') return -1;
-                if (a.type !== 'directory' && b.type === 'directory') return 1;
-                return a.name.localeCompare(b.name);
-            });
-            setWorkspaceItems(sortedItems);
-        } catch (error) {
-            console.error("Failed to fetch workspace items:", error);
-            setWorkspaceError(error.message);
-            setWorkspaceItems([]);
-        } finally {
-            setWorkspaceLoading(false);
-        }
-    };
-
-    const selectAndFetchFile = async (file) => {
-        if (!currentPath || !file) return;
-
-        setSelectedFile(file);
-        setFileContent('');
-        
-        const extension = file.name.split('.').pop().toLowerCase();
-        const isImage = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(extension);
-
-        if (isImage) {
-            setIsFileLoading(false);
-            return;
-        }
-
-        setIsFileLoading(true);
-        try {
-            const response = await fetch(`http://localhost:8766/file-content?path=${currentPath}&filename=${file.name}`);
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to fetch file content');
-            }
-            const textContent = await response.text();
-            setFileContent(textContent);
-        } catch (error) {
-            console.error("Failed to fetch file content:", error);
-            setFileContent(`Error loading file: ${error.message}`);
-        } finally {
-            setIsFileLoading(false);
-        }
-    };
-    
-    const handleNavigation = (item) => {
-        if (item.type === 'directory') {
-            const newPath = `${currentPath}/${item.name}`;
-            setCurrentPath(newPath);
-            setSelectedFile(null);
-        } else {
-            selectAndFetchFile(item);
-        }
-    };
-    
-    const handleBreadcrumbNav = (path) => {
-        setCurrentPath(path);
-        setSelectedFile(null);
-    };
-
-    const handleDeleteItem = async (item) => {
-        if (!confirm(`Are you sure you want to delete '${item.name}'?`)) {
-            return;
-        }
-        const itemFullPath = `${currentPath}/${item.name}`;
-        setWorkspaceLoading(true);
-        setWorkspaceError(null);
-        try {
-            const response = await fetch(`http://localhost:8766/api/workspace/items?path=${itemFullPath}`, { method: 'DELETE' });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to delete item');
-            }
-            if (selectedFile && selectedFile.name === item.name) {
-                setSelectedFile(null);
-            }
-            await fetchWorkspaceFiles(currentPath);
-        } catch (error) {
-            console.error("Failed to delete item:", error);
-            setWorkspaceError(error.message);
-        } finally {
-            setWorkspaceLoading(false);
-        }
-    };
-
-    const handleCreateFolder = async () => {
-        const folderName = prompt("Enter the name for the new folder:");
-        if (!folderName || folderName.trim() === '') {
-            return;
-        }
-        const newFolderPath = `${currentPath}/${folderName.trim()}`;
-        setWorkspaceLoading(true);
-        setWorkspaceError(null);
-        try {
-            const response = await fetch('http://localhost:8766/api/workspace/folders', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ path: newFolderPath }),
-            });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to create folder');
-            }
-            await fetchWorkspaceFiles(currentPath);
-        } catch (error) {
-            console.error("Failed to create folder:", error);
-            setWorkspaceError(error.message);
-        } finally {
-            setWorkspaceLoading(false);
-        }
-    };
-
-    const handleRenameItem = async (item) => {
-        const newName = prompt(`Enter the new name for '${item.name}':`, item.name);
-        if (!newName || newName.trim() === '' || newName.trim() === item.name) {
-            return;
-        }
-        const oldPath = `${currentPath}/${item.name}`;
-        const newPath = `${currentPath}/${newName.trim()}`;
-        setWorkspaceLoading(true);
-        setWorkspaceError(null);
-        try {
-            const response = await fetch('http://localhost:8766/api/workspace/items', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ old_path: oldPath, new_path: newPath }),
-            });
-             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to rename item');
-            }
-            await fetchWorkspaceFiles(currentPath);
-        } catch (error) {
-             console.error("Failed to rename item:", error);
-            setWorkspaceError(error.message);
-        } finally {
-            setWorkspaceLoading(false);
-        }
-    };
-
-    const handleFileUpload = async (file) => {
-        if (!file || !currentPath) return;
-        setWorkspaceLoading(true);
-        setWorkspaceError(null);
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('workspace_id', currentPath); 
-        try {
-            const response = await fetch('http://localhost:8766/upload', { method: 'POST', body: formData });
-            if (!response.ok) throw new Error((await response.json()).error || 'File upload failed');
-            await fetchWorkspaceFiles(currentPath);
-        } catch (error) {
-            console.error('File upload error:', error);
-            setWorkspaceError(`Upload failed: ${error.message}`);
-        } finally {
-            setWorkspaceLoading(false);
-            if(fileInputRef.current) fileInputRef.current.value = "";
-        }
-    };
-
-    const handleDragEnter = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        dragCounter.current++;
-        if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
-            setIsDragOver(true);
-        }
-    };
-
-    const handleDragLeave = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        dragCounter.current--;
-        if (dragCounter.current === 0) {
-            setIsDragOver(false);
-        }
-    };
-
-    const handleDragOver = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-    };
-
-    const handleDrop = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setIsDragOver(false);
-        dragCounter.current = 0;
-        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            Array.from(e.dataTransfer.files).forEach(file => handleFileUpload(file));
-            e.dataTransfer.clearData();
-        }
-    };
 
     useEffect(() => {
-        const fetchConfig = async () => {
-            try {
-                const modelsResponse = await fetch('http://localhost:8766/api/models');
-                if (!modelsResponse.ok) throw new Error('Failed to fetch model configuration.');
-                const modelsConfig = await modelsResponse.json();
-                if (modelsConfig.available_models && modelsConfig.available_models.length > 0) {
-                    setAvailableModels(modelsConfig.available_models);
-                    setSelectedModels(modelsConfig.default_models);
-                    runModelsRef.current = modelsConfig.default_models;
-                }
-                
-                const toolsResponse = await fetch('http://localhost:8766/api/tools');
-                if (!toolsResponse.ok) throw new Error('Failed to fetch available tools.');
-                const toolsConfig = await toolsResponse.json();
-                setAvailableTools(toolsConfig.tools || []);
-                
-                const initialEnabledState = {};
-                (toolsConfig.tools || []).forEach(tool => {
-                    initialEnabledState[tool.name] = true;
-                });
-                setEnabledTools(initialEnabledState);
-
-            } catch (error) {
-                console.error("Failed to fetch startup config:", error);
-            }
-        };
-        fetchConfig();
-    }, []);
-
-    useEffect(() => {
-        if (currentPath && activeView === 'tasks') {
-            fetchWorkspaceFiles(currentPath);
+        if (workspace.currentPath && activeView === 'tasks') {
+            workspace.fetchFiles(workspace.currentPath);
         }
-    }, [currentPath, activeView]);
+    }, [workspace.currentPath, activeView]);
     
     const handleApprovalAction = (feedback, plan = null) => {
-        if (ws.current?.readyState !== WebSocket.OPEN) {
-            alert("Connection not ready.");
-            return;
-        }
         setIsAwaitingApproval(false);
-        setRunningTasks(prev => ({ ...prev, [activeTaskId]: true }));
-        
-        if (feedback === 'approve' && plan) {
-             setTasks(currentTasks => currentTasks.map(task => {
-                if (task.id === activeTaskId) {
-                    const newHistory = [...task.history];
-                    const runContainer = newHistory[newHistory.length-1];
-                    if (runContainer && runContainer.type === 'run_container') {
-                        const architectPlan = runContainer.children.find(c => c.type === 'architect_plan');
-                        if (architectPlan) {
-                            architectPlan.steps = plan;
-                        }
-                    }
-                    return {...task, history: newHistory};
-                }
-                return task;
-             }));
-        }
-        
-        const activeToolNames = Object.keys(enabledTools).filter(key => enabledTools[key]);
-        const resumeMessage = {
-            type: 'resume_agent',
+        const payload = {
             task_id: activeTaskId,
             feedback: feedback,
-            enabled_tools: activeToolNames,
+            enabled_tools: Object.keys(settings.enabledTools).filter(key => settings.enabledTools[key]),
         };
         if (plan) {
-            resumeMessage.plan = plan;
+            payload.plan = plan;
         }
-        ws.current.send(JSON.stringify(resumeMessage));
+        agent.resumeAgent(payload); // Use agent hook
     };
 
-    const handleModifyAndApprove = (modifiedPlan) => handleApprovalAction('approve', modifiedPlan);
+    const handleModifyAndApprove = (modifiedPlan) => {
+        // Optimistically update the UI with the modified plan
+        setTasks(currentTasks => currentTasks.map(task => {
+            if (task.id === activeTaskId) {
+                const newHistory = [...task.history];
+                const runContainer = newHistory[newHistory.length-1];
+                if (runContainer?.type === 'run_container') {
+                    const architectPlan = runContainer.children.find(c => c.type === 'architect_plan');
+                    if (architectPlan) architectPlan.steps = modifiedPlan;
+                }
+                return {...task, history: newHistory};
+            }
+            return task;
+        }));
+        handleApprovalAction('approve', modifiedPlan);
+    };
+    
     const handleReject = () => {
         handleApprovalAction('reject');
-        setRunningTasks(prev => {
-            const newTasks = {...prev};
-            delete newTasks[activeTaskId];
-            return newTasks;
-        });
     }
-
-    useEffect(() => {
-        function connect() {
-            setConnectionStatus("Connecting...");
-            const socket = new WebSocket("ws://localhost:8765");
-            ws.current = socket;
-            socket.onopen = () => setConnectionStatus("Connected");
-            socket.onclose = () => { setConnectionStatus("Disconnected"); setRunningTasks({}); setTimeout(connect, 5000); };
-            socket.onerror = (err) => { console.error("WebSocket error:", err); socket.close(); };
-
-            socket.onmessage = (event) => {
-                const newEvent = JSON.parse(event.data);
-                
-                if (newEvent.type === 'agent_started' || newEvent.type === 'agent_resumed') {
-                    setRunningTasks(prev => ({ ...prev, [newEvent.task_id]: true }));
-                } else if (newEvent.type === 'final_answer' || newEvent.type === 'agent_stopped') {
-                    setRunningTasks(prev => {
-                        const newTasks = { ...prev };
-                        delete newTasks[newEvent.task_id];
-                        return newTasks;
-                    });
-                }
-                
-                if (newEvent.type === 'final_answer' && newEvent.refresh_workspace) {
-                    if (activeTaskId === newEvent.task_id) {
-                        handlersRef.current.fetchWorkspaceFiles(currentPath);
-                    }
-                }
-
-                setTasks(currentTasks => {
-                    try {
-                        const taskIndex = currentTasks.findIndex(t => t.id === newEvent.task_id);
-                        if (taskIndex === -1) return currentTasks;
-                        
-                        const newTasks = [...currentTasks];
-                        const taskToUpdate = { ...newTasks[taskIndex] };
-                        let newHistory = [...taskToUpdate.history];
-
-                        let runContainer = newHistory.length > 0 && newHistory[newHistory.length - 1].type === 'run_container' 
-                            ? newHistory[newHistory.length - 1]
-                            : null;
-                        
-                        if (!runContainer && (newEvent.type !== 'agent_started' && newEvent.type !== 'agent_stopped' && newEvent.type !== 'agent_resumed')) {
-                            runContainer = { type: 'run_container', children: [], isComplete: false };
-                            newHistory.push(runContainer);
-                        }
-                        
-                        const eventType = newEvent.type;
-
-                        if (eventType === 'plan_approval_request') {
-                            setIsAwaitingApproval(true);
-                            setRunningTasks(prev => {
-                                const newTasks = { ...prev };
-                                delete newTasks[newEvent.task_id];
-                                return newTasks;
-                            });
-                            runContainer.children.push({ type: 'architect_plan', steps: newEvent.plan, isAwaitingApproval: true });
-                        } else if (eventType === 'direct_answer' || eventType === 'final_answer') {
-                            setIsAwaitingApproval(false);
-                            runContainer.children.push({ type: eventType, content: newEvent.data });
-                            runContainer.isComplete = true;
-                        } else if (eventType === 'agent_event') {
-                            const { name, event: chainEvent, data } = newEvent;
-                            const inputData = data.input || {};
-                            const outputData = data.output || {};
-
-                            let architectPlan = runContainer.children.find(c => c.type === 'architect_plan');
-                            
-                            if (name === 'Site_Foreman' && chainEvent === 'on_chain_start' && architectPlan?.isAwaitingApproval) {
-                                architectPlan.isAwaitingApproval = false;
-                                if (!runContainer.children.some(c => c.type === 'execution_plan')) {
-                                    runContainer.children.push({ type: 'execution_plan', steps: architectPlan.steps.map(step => ({...step, status: 'pending'})) });
-                                }
-                            }
-
-                            let executionPlan = runContainer.children.find(c => c.type === 'execution_plan');
-                            if (executionPlan) {
-                                const stepIndex = inputData.current_step_index;
-                                if (stepIndex !== undefined && executionPlan.steps[stepIndex]) {
-                                    let stepToUpdate = { ...executionPlan.steps[stepIndex] };
-                                    if (name === 'Site_Foreman' && chainEvent === 'on_chain_start') {
-                                        stepToUpdate.status = 'in-progress';
-                                    } else if (name === 'Project_Supervisor' && chainEvent === 'on_chain_end') {
-                                        stepToUpdate.status = outputData.step_evaluation?.status === 'failure' ? 'failure' : 'completed';
-                                        stepToUpdate.toolCall = inputData.current_tool_call;
-                                        stepToUpdate.toolOutput = outputData.tool_output;
-                                        stepToUpdate.evaluation = outputData.step_evaluation;
-                                        if (activeTaskId === newEvent.task_id) { 
-                                            handlersRef.current.fetchWorkspaceFiles(currentPath);
-                                        }
-                                    }
-                                    executionPlan.steps[stepIndex] = stepToUpdate;
-                                }
-                            }
-                        }
-
-                        taskToUpdate.history = newHistory;
-                        newTasks[taskIndex] = taskToUpdate;
-                        return newTasks;
-                    } catch (error) {
-                        console.error("Error processing WebSocket message:", error, "Event:", newEvent);
-                        return currentTasks;
-                    }
-                });
-            };
-        }
-        connect();
-        return () => { if (ws.current) { ws.current.onclose = null; ws.current.close(); } };
-    }, [activeTaskId, currentPath]);
 
     const activeTask = tasks.find(t => t.id === activeTaskId);
     useEffect(() => { scrollToBottom(); }, [activeTask?.history, isAwaitingApproval]);
@@ -721,36 +370,27 @@ export function App() {
     const handleSendMessage = (e) => {
         e.preventDefault();
         const message = inputValue.trim();
-        if (!message || !activeTask || connectionStatus !== 'Connected' || runningTasks[activeTaskId] || isAwaitingApproval) return;
+        if (!message || !activeTask || agent.connectionStatus !== 'Connected' || agent.runningTasks[activeTaskId] || isAwaitingApproval) return;
 
-        runModelsRef.current = selectedModels;
-        
+        // Optimistically update UI with the new prompt
         const newPrompt = { type: 'prompt', content: message };
         const newRunContainer = { type: 'run_container', children: [], isComplete: false };
-
-        setTasks(currentTasks => currentTasks.map(task => {
-            if (task.id === activeTaskId) {
-                const newHistory = [...task.history, newPrompt, newRunContainer];
-                return { ...task, history: newHistory };
-            }
-            return task;
-        }));
+        setTasks(currentTasks => currentTasks.map(task => 
+            task.id === activeTaskId ? { ...task, history: [...task.history, newPrompt, newRunContainer] } : task
+        ));
         
-        const activeToolNames = Object.keys(enabledTools).filter(key => enabledTools[key]);
-        
-        ws.current.send(JSON.stringify({ 
-            type: 'run_agent', 
+        // Send the command to the agent
+        agent.runAgent({ 
             prompt: message, 
-            llm_config: selectedModels, 
+            llm_config: settings.selectedModels, 
             task_id: activeTaskId,
-            enabled_tools: activeToolNames 
-        }));
+            enabled_tools: Object.keys(settings.enabledTools).filter(key => settings.enabledTools[key]),
+        });
         setInputValue("");
     };
 
     const handleStopAgent = () => {
-        if (!runningTasks[activeTaskId] || connectionStatus !== 'Connected') return;
-        ws.current.send(JSON.stringify({ type: 'stop_agent', task_id: activeTaskId }));
+        agent.stopAgent(activeTaskId);
     };
     
     return (
@@ -780,17 +420,17 @@ export function App() {
                     {activeView === 'tasks' ? (
                         <div class="flex flex-col flex-grow p-6 pt-4 min-h-0">
                             <div class="flex-grow overflow-y-auto pr-2">
-                                {tasks.length > 0 ? ( <ul> {tasks.map(task => ( <TaskItem key={task.id} task={task} isActive={activeTaskId === task.id} isRunning={!!runningTasks[task.id]} onSelect={selectTask} onRename={handleRenameTask} onDelete={handleDeleteTask} /> ))} </ul> ) : ( <p class="text-gray-400 text-center mt-4">No tasks yet. Create one!</p> )}
+                                {tasks.length > 0 ? ( <ul> {tasks.map(task => ( <TaskItem key={task.id} task={task} isActive={activeTaskId === task.id} isRunning={!!agent.runningTasks[task.id]} onSelect={selectTask} onRename={renameTask} onDelete={handleDeleteTask} /> ))} </ul> ) : ( <p class="text-gray-400 text-center mt-4">No tasks yet. Create one!</p> )}
                             </div>
-                            <ToolboxPanel tools={availableTools} enabledTools={enabledTools} onToggleTool={handleToggleTool} />
-                            <SettingsPanel models={availableModels} selectedModels={selectedModels} onModelChange={handleModelChange} />
+                            <ToolboxPanel tools={settings.availableTools} enabledTools={settings.enabledTools} onToggleTool={settings.handleToggleTool} />
+                            <SettingsPanel models={settings.availableModels} selectedModels={settings.selectedModels} onModelChange={settings.handleModelChange} />
                         </div>
                     ) : (
                         <div class="flex flex-col flex-grow p-6 pt-4 min-h-0">
                            <div class="flex-grow overflow-y-auto pr-2">
                                 <p class="text-gray-400 text-sm">Manage and view custom tools here.</p>
                            </div>
-                           <SettingsPanel models={availableModels} selectedModels={selectedModels} onModelChange={handleModelChange} />
+                           <SettingsPanel models={settings.availableModels} selectedModels={settings.selectedModels} onModelChange={settings.handleModelChange} />
                         </div>
                     )}
                 </div>
@@ -802,8 +442,8 @@ export function App() {
                         <div class="flex items-center justify-between p-6 border-b border-gray-700 flex-shrink-0">
                            <h1 class="text-2xl font-bold text-white">ResearchAgent</h1>
                            <div class="flex items-center gap-2">
-                               <span class="relative flex h-3 w-3"> {connectionStatus === 'Connected' && <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>} <span class={`relative inline-flex rounded-full h-3 w-3 ${connectionStatus === 'Connected' ? 'bg-green-500' : 'bg-red-500'}`}></span> </span>
-                               <span class="text-sm text-gray-400">{connectionStatus}</span>
+                               <span class="relative flex h-3 w-3"> {agent.connectionStatus === 'Connected' && <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>} <span class={`relative inline-flex rounded-full h-3 w-3 ${agent.connectionStatus === 'Connected' ? 'bg-green-500' : 'bg-red-500'}`}></span> </span>
+                               <span class="text-sm text-gray-400">{agent.connectionStatus}</span>
                            </div>
                         </div>
                         <div class="flex-1 overflow-y-auto p-6">
@@ -828,7 +468,7 @@ export function App() {
                                                                         isAwaitingApproval={child.isAwaitingApproval}
                                                                         onModify={handleModifyAndApprove}
                                                                         onReject={handleReject}
-                                                                        availableTools={availableTools}
+                                                                        availableTools={settings.availableTools}
                                                                     />;
                                                                 case 'execution_plan': return <SiteForemanCard plan={child} />;
                                                                 case 'direct_answer': return <DirectAnswerCard answer={child.content} />;
@@ -846,19 +486,19 @@ export function App() {
                                return null;
                            })}
 
-                           {runningTasks[activeTaskId] && !isAwaitingApproval && ( <div class="flex items-center gap-4 p-4"> <LoaderIcon class="h-5 w-5 text-yellow-400" /> <p class="text-gray-300 font-medium">Agent is running...</p> </div> )}
+                           {agent.runningTasks[activeTaskId] && !isAwaitingApproval && ( <div class="flex items-center gap-4 p-4"> <LoaderIcon class="h-5 w-5 text-yellow-400" /> <p class="text-gray-300 font-medium">Agent is running...</p> </div> )}
                            <div ref={messagesEndRef} />
                         </div>
                         <div class="p-6 border-t border-gray-700 flex-shrink-0">
                             <form onSubmit={handleSendMessage} class="flex gap-3">
-                                <textarea value={inputValue} onInput={e => setInputValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) handleSendMessage(e); }} class="flex-1 p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" placeholder={activeTaskId ? (isAwaitingApproval ? "Approve, modify, or reject the plan above." : (runningTasks[activeTaskId] ? "Agent is running..." : "Send a message...")) : "Please select or create a task."} rows="2" disabled={!activeTaskId || runningTasks[activeTaskId] || isAwaitingApproval} ></textarea>
-                                {runningTasks[activeTaskId] && !isAwaitingApproval ? (
+                                <textarea value={inputValue} onInput={e => setInputValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) handleSendMessage(e); }} class="flex-1 p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" placeholder={activeTaskId ? (isAwaitingApproval ? "Approve, modify, or reject the plan above." : (agent.runningTasks[activeTaskId] ? "Agent is running..." : "Send a message...")) : "Please select or create a task."} rows="2" disabled={!activeTaskId || agent.runningTasks[activeTaskId] || isAwaitingApproval} ></textarea>
+                                {agent.runningTasks[activeTaskId] && !isAwaitingApproval ? (
                                      <button type="button" onClick={handleStopAgent} class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 disabled:bg-gray-500 transition-colors flex items-center gap-2">
                                         <StopCircleIcon class="h-5 w-5"/>
                                         Stop
                                     </button>
                                 ) : (
-                                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-500 transition-colors" disabled={connectionStatus !== 'Connected' || runningTasks[activeTaskId] || !activeTaskId || isAwaitingApproval}>Send</button>
+                                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-500 transition-colors" disabled={agent.connectionStatus !== 'Connected' || agent.runningTasks[activeTaskId] || !activeTaskId || isAwaitingApproval}>Send</button>
                                 )}
                             </form>
                         </div>
@@ -867,43 +507,43 @@ export function App() {
                     {!isRightSidebarVisible && <ToggleButton isVisible={isRightSidebarVisible} onToggle={() => setIsRightSidebarVisible(true)} side="right" />}
                     {isRightSidebarVisible && (
                         <div class="h-full w-1/4 min-w-[300px] bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col relative"
-                            onDragEnter={handleDragEnter} onDragLeave={handleDragLeave} onDragOver={handleDragOver} onDrop={handleDrop} >
+                            onDragEnter={workspace.handleDragEnter} onDragLeave={workspace.handleDragLeave} onDragOver={workspace.handleDragOver} onDrop={workspace.handleDrop} >
                             <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-700"> <h2 class="text-xl font-bold text-white">Agent Workspace</h2> <button onClick={() => setIsRightSidebarVisible(false)} class="p-1.5 rounded-md hover:bg-gray-700" title="Hide Workspace"><ChevronsRightIcon class="h-4 w-4" /></button> </div>
                             <div class="flex flex-col flex-grow min-h-0 px-6 pb-6 pt-4">
-                                {selectedFile ? (
+                                {workspace.selectedFile ? (
                                     <div class="flex flex-col h-full">
                                         <div class="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-gray-700 flex-shrink-0">
-                                            <div class="flex items-center gap-2 min-w-0"> <button onClick={() => setSelectedFile(null)} class="p-1.5 rounded-md hover:bg-gray-700 flex-shrink-0"><ArrowLeftIcon class="h-4 w-4" /></button> <span class="font-mono text-sm text-white truncate">{selectedFile.name}</span> </div>
-                                            <CopyButton textToCopy={fileContent} />
+                                            <div class="flex items-center gap-2 min-w-0"> <button onClick={() => workspace.setSelectedFile(null)} class="p-1.5 rounded-md hover:bg-gray-700 flex-shrink-0"><ArrowLeftIcon class="h-4 w-4" /></button> <span class="font-mono text-sm text-white truncate">{workspace.selectedFile.name}</span> </div>
+                                            <CopyButton textToCopy={workspace.fileContent} />
                                         </div>
                                         <div class="flex-grow bg-gray-900/50 rounded-md overflow-auto flex items-center justify-center">
-                                            <FilePreviewer file={selectedFile} isLoading={isFileLoading} content={fileContent} rawFileUrl={`http://localhost:8766/api/workspace/raw?path=${currentPath}/${selectedFile.name}`} />
+                                            <FilePreviewer file={workspace.selectedFile} isLoading={workspace.isFileLoading} content={workspace.fileContent} rawFileUrl={`http://localhost:8766/api/workspace/raw?path=${workspace.currentPath}/${workspace.selectedFile.name}`} />
                                         </div>
                                     </div>
                                 ) : (
                                      <div class="flex flex-col flex-grow min-h-0">
                                          <div class="flex justify-between items-center mb-2 flex-shrink-0">
-                                            <Breadcrumbs path={currentPath} onNavigate={handleBreadcrumbNav} />
+                                            <Breadcrumbs path={workspace.currentPath} onNavigate={workspace.handleBreadcrumbNav} />
                                             <div class="flex items-center">
-                                                <button onClick={handleCreateFolder} disabled={!currentPath || workspaceLoading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="New Folder"> <PlusCircleIcon class="h-4 w-4" /> </button>
-                                                <input type="file" ref={fileInputRef} onChange={(e) => handleFileUpload(e.target.files[0])} class="hidden" />
-                                                <button onClick={() => fileInputRef.current?.click()} disabled={!currentPath || workspaceLoading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="Upload File"> <UploadCloudIcon class="h-4 w-4" /> </button>
+                                                <button onClick={workspace.createFolder} disabled={!workspace.currentPath || workspace.loading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="New Folder"> <PlusCircleIcon class="h-4 w-4" /> </button>
+                                                <input type="file" ref={workspace.fileInputRef} onChange={(e) => workspace.uploadFile(e.target.files[0])} class="hidden" />
+                                                <button onClick={() => workspace.fileInputRef.current?.click()} disabled={!workspace.currentPath || workspace.loading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="Upload File"> <UploadCloudIcon class="h-4 w-4" /> </button>
                                             </div>
                                          </div>
                                          <div class="flex-grow bg-gray-900/50 rounded-md p-4 text-sm text-gray-400 font-mono overflow-y-auto">
-                                            {workspaceLoading ? <div class="flex items-center gap-2"><LoaderIcon class="h-4 w-4"/><span>Loading...</span></div> : 
-                                             workspaceError ? <p class="text-red-400">Error: {workspaceError}</p> : 
-                                             workspaceItems.length === 0 ? <p>// Directory is empty.</p> : ( 
+                                            {workspace.loading ? <div class="flex items-center gap-2"><LoaderIcon class="h-4 w-4"/><span>Loading...</span></div> : 
+                                             workspace.error ? <p class="text-red-400">Error: {workspace.error}</p> : 
+                                             workspace.items.length === 0 ? <p>// Directory is empty.</p> : ( 
                                              <ul> 
-                                                {workspaceItems.map(item => ( 
+                                                {workspace.items.map(item => ( 
                                                     <li key={item.name} class="group flex justify-between items-center mb-1 hover:bg-gray-700/50 rounded-md -ml-2 -mr-2 pr-2">
-                                                        <div onClick={() => handleNavigation(item)} title={item.name} class="flex items-center gap-2 cursor-pointer truncate flex-grow p-2"> 
+                                                        <div onClick={() => workspace.handleNavigation(item)} title={item.name} class="flex items-center gap-2 cursor-pointer truncate flex-grow p-2"> 
                                                             {item.type === 'directory' ? <FolderIcon class="h-4 w-4 text-blue-400 flex-shrink-0" /> : <FileIcon class="h-4 w-4 text-gray-500 flex-shrink-0" />}
                                                             <span>{item.name}</span>
                                                         </div>
                                                         <div class="flex items-center opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                                                            <button onClick={(e) => { e.stopPropagation(); handleRenameItem(item); }} class="p-1 text-gray-500 hover:text-white" title={`Rename ${item.type}`}> <PencilIcon class="h-4 w-4" /> </button>
-                                                            <button onClick={(e) => { e.stopPropagation(); handleDeleteItem(item); }} class="p-1 text-gray-500 hover:text-red-400" title={`Delete ${item.type}`}> <Trash2Icon class="h-4 w-4" /> </button>
+                                                            <button onClick={(e) => { e.stopPropagation(); workspace.renameItem(item); }} class="p-1 text-gray-500 hover:text-white" title={`Rename ${item.type}`}> <PencilIcon class="h-4 w-4" /> </button>
+                                                            <button onClick={(e) => { e.stopPropagation(); workspace.deleteItem(item); }} class="p-1 text-gray-500 hover:text-red-400" title={`Delete ${item.type}`}> <Trash2Icon class="h-4 w-4" /> </button>
                                                         </div>
                                                     </li> 
                                                 ))} 
@@ -913,7 +553,7 @@ export function App() {
                                      </div>
                                 )}
                             </div>
-                            {isDragOver && (
+                            {workspace.isDragOver && (
                                 <div class="absolute inset-0 bg-blue-500/20 border-2 border-dashed border-blue-400 rounded-lg flex items-center justify-center pointer-events-none">
                                     <div class="text-center"> <UploadCloudIcon class="h-10 w-10 text-blue-300 mx-auto" /> <p class="mt-2 font-semibold text-white">Drop files to upload</p> </div>
                                 </div>
