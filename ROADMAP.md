@@ -6,18 +6,20 @@ To build a transformative, AI-powered workbench. The platform will be powerful e
 
 -   \[x\] **Phase 12: The Interactive Workbench:** Evolved the workspace from a simple file list into a full-featured, interactive file explorer with a smart backend API, folder navigation, breadcrumbs, core interactivity (create, rename, delete), drag-and-drop uploads, and a smart previewer for images, Markdown, and CSVs.
 -   \[x\] **Phase 12.5: Concurrent Agent Execution & Control:** Refactored the backend server to handle multiple, simultaneous agent runs and provided users with the ability to stop a running task. The architecture now correctly decouples agent execution from the client connection.
+-   \[x\] **Phase 13: The "Tool Forge" (v1):** Implemented the foundational "LLM as an Engine" Tool Forge. Users can now define custom tools with typed arguments through a UI, which generates functional Python tool files on the backend that are immediately available to the agent without a server restart.
 
 ### 🚀 UPCOMING PHASES 🚀
 
-#### Phase 13: The "Tool Forge" - A Pluggable Tool Architecture
+#### Phase 14: The "Blueprint Canvas" - Visual Workflow Editor
 
-_Goal: Allow users to create and add their own tools to the ResearchAgent without writing any backend code._
+_Goal: Evolve the Tool Forge into a visual, node-based editor where users can create, save, and reuse complex, multi-step plans as new, high-level tools._
 
--   \[ \] **Tool Creator UI:** Build a "Tool Forge" section in the UI where users can define a tool's name, description, and input arguments via a simple form.
--   \[ \] **Dynamic Tool Generation:** The backend will take the user's definition and dynamically generate the corresponding Python tool file, making it instantly available to the agent.
--   \[ \] **Async Job Queue:** Implement a background task queue to handle tools marked as "long-running." The UI will poll for status updates, allowing users to track progress and get results without locking up the interface.
+-   \[ \] **Task 1: The Active Toolbox UI:** Implement a new UI panel that lists all available tools and allows the user to globally enable or disable them with toggle switches.
+-   \[ \] **Task 2: Read-Only Plan Visualizer:** Upgrade the UI to render an agent's multi-step plan as a static, read-only graph of nodes (tools) and arrows (data flow).
+-   \[ \] **Task 3: The Interactive Canvas:** Transform the visualizer into a full-featured editor, allowing users to drag-and-drop nodes, add/remove tools from the canvas, and manually draw connections to define the data flow.
+-   \[ \] **Task 4: Blueprint Execution Engine:** Implement the "Plan Substitution" logic on the backend. This will enable the agent to execute a saved JSON blueprint by pausing the main plan, running the blueprint's sub-plan, and then seamlessly resuming the main plan.
 
-#### Phase 14: Advanced Tooling & Templates
+#### Phase 15: Advanced Tooling & Templates
 
 _Goal: Equip the agent with a suite of powerful, pre-built tools for common high-value tasks._
 
@@ -25,7 +27,7 @@ _Goal: Equip the agent with a suite of powerful, pre-built tools for common high
 -   \[ \] **Scientific Data Fetcher Tool:** A specialized tool to find and download datasets from sources like NCBI, PubMed, etc.
 -   \[ \] **Website Report Generator:** A tool that can populate pre-defined website templates with data to create visual reports.
 
-#### Phase 15: UI/UX Polish & Advanced Previews
+#### Phase 16: UI/UX Polish & Advanced Previews
 
 _Goal: Refine the user experience with modern, fluid interactions and expand file preview capabilities._
 
