@@ -1,3 +1,4 @@
+```
 # ResearchAgent - Brainstorming & Ideas
 
 This document is a living collection of ideas, architectural concepts, and potential future features for the ResearchAgent project.
@@ -25,43 +26,52 @@ Our agent operates like a small, efficient company with specialized roles. This 
 -   **Interactive Workbench v1:** A functional file explorer with structured listing, navigation, create/rename/delete actions, drag-and-drop upload, and a smart previewer for text, images, Markdown, and CSVs.
 -   **True Concurrency & Control:** The backend server now correctly handles multiple, simultaneous agent runs without interruption. The architecture is fully decoupled, and users can stop any running task from the UI.
 -   **Tool Forge v1 ("LLM as an Engine"):** Users can define custom tools with typed arguments through a UI. The backend dynamically generates functional Python tool files that use a powerful LLM to execute the described task. The system live-reloads these new tools without a server restart.
--   **The Active Toolbox:** A global UI panel allows users to enable or disable any available tool at any time. The agent's capabilities are instantly updated to reflect the user's selection.
+-   **The Active Toolbox:** A global UI panel allows users to enable/disable any available tool at any time. The agent's capabilities are instantly updated to reflect the user's selection.
+-   **Blueprint Loading & Expansion:** The backend can now load multi-step JSON "Blueprint Tools", and the agent's planner can correctly expand them into an executable plan for the user to approve.
+-   **Interactive Canvas v1:** The Tool Forge now features a visual canvas where users can reorder steps via drag-and-drop, add new tools to the plan, and delete steps from the plan.
 
-## 🚀 NEXT FOCUS: Phase 14.2: The "Blueprint Canvas"
+## 🚀 NEXT FOCUS: Phase 14.2: Visual Data Piping
 
-_**Vision:** Evolve the Tool Forge into a visual, node-based workflow editor. This will allow users to create, save, and reuse complex, multi-step plans as new, high-level tools, turning the agent into a true automation platform._
+_**Vision:** Evolve the interactive canvas into a true visual programming environment by allowing users to define the flow of data between nodes._
 
-### The "Blueprint Tool" Concept
+### The "Data Piping" Concept
 
-We are introducing a new type of tool called a **"Blueprint Tool"** or **"Plan Tool"**.
+We need to enable users to graphically connect the output of one tool to the input of another. This is the key to creating truly useful and reusable automations.
 
--   **Current Tools ("Engine Tools"):** Single-function tools where an LLM acts as the "engine."
--   **New "Blueprint Tools":** Reusable, multi-step workflows composed of existing tools. These are saved as structured JSON "blueprints," not Python files.
+**Example Use Case:**
+A user wants to create a blueprint that takes a `topic` as input, researches it, and saves the result to a filename also provided by the user.
 
-### The Creation Workflow
+1.  The user adds a `web_search` node and a `write_file` node to the canvas.
+2.  The user can then click and drag from an **output anchor** on the `web_search` node to an **input anchor** on the `write_file` node.
+3.  This visual connection would modify the plan's JSON to specify that the output of the first step should be "piped" into the `content` argument of the second step.
+4.  The user would also need a way to define which arguments of the overall blueprint (like `topic` and `filename`) are exposed to the end-user.
 
-1.  **Conversational Scaffolding:** A user describes a multi-step goal in the Tool Forge (e.g., "I want to search for a topic, save the results, and then summarize them").
-2.  **Architect's Draft:** The `Chief Architect` creates a draft plan using existing basic tools and identifies the required inputs for the new Blueprint (e.g., `topic`, `output_filename`).
-3.  **The Visual Canvas:** This draft is rendered on a **visual, node-based canvas**. Users see nodes for each tool (`web_search`, `write_file`) connected by arrows that represent the data flow.
-4.  **User-Driven Editing:** The user can fully edit this canvas:
-    -   Drag and drop nodes to reorder them.
-    -   Add new tools from a toolbox panel.
-    -   Delete nodes to remove steps.
-    -   Draw connections between tool outputs and inputs to explicitly define the data pipeline.
-5.  **Saving the Blueprint:** Once finalized, the user gives the workflow a name (e.g., `research_and_summarize`), and the UI sends the complete JSON graph structure to the backend to be saved in a new `backend/tool_blueprints/` directory.
+### The Data Model Evolution
 
-### The Execution Model: "Plan Substitution"
+To support this, our `plan` data structure needs to evolve from a simple array of steps into a more explicit graph structure, likely containing:
+1.  A list of **`nodes`**, where each node is a tool call.
+2.  A list of **`edges`**, where each edge defines a connection from an `output` of one node to an `input` of another.
 
-This is the key to elegant implementation, as suggested by the project lead. We will not build a separate execution engine for blueprints.
+This structure is much more flexible and will allow for more complex workflows, including the conditional loops (`GOTO`, `IF/ELSE`) that we have discussed.
 
-1.  **Discovery:** The tool loader will scan both the `tools/` and `tool_blueprints/` directories, making all tool types available to the agent.
-2.  **Interception:** When the agent decides to use a Blueprint Tool, a new routing node (`Tool_Dispatcher`) intercepts the call.
-3.  **State Management:** The execution follows a "function call" model:
-    -   The main plan's state is pushed onto a "call stack" in the agent's `GraphState`.
-    -   The sub-plan from the Blueprint's JSON file is loaded.
-    -   Runtime arguments (e.g., `topic="Artificial Intelligence"`) are substituted into the sub-plan.
-    -   This new sub-plan overwrites the main plan in the `GraphState`.
-4.  **Seamless Execution:** The standard `Site Foreman` loop continues, executing the sub-plan's steps without knowing it's a "subroutine."
-5.  **Return:** Once the sub-plan is complete, the original main plan is popped from the call stack, and execution resumes exactly where it left off.
+**Visual Representation:**
+```
 
-This architecture enables **composable automation**, allowing the agent to use complex, user-defined workflows as simple, single-step tools.
+```
+        +-----------+       +----------------+       +----------+
+```
+
+\[START\] o--->| web\_search|--o-o-->| write\_file |--o-o-->| END |
+
++-----------+ +----------------+ +----------+
+
+| ^
+
+| |
+
++------------------+ (Data Pipe)
+
+```
+
+This is a significant architectural step that will unlock the full potential of the ResearchAgent as an automation platform.
+```

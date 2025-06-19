@@ -15,10 +15,11 @@ To build a transformative, AI-powered workbench. The platform will be powerful e
 
 _Goal: Evolve the Tool Forge into a visual, node-based editor where users can create, save, and reuse complex, multi-step plans as new, high-level tools._
 
--   \[ \] **Task 1: Foundational UI:** Re-architect the Tool Forge UI into a two-panel layout, with a list of existing tools on the left and a main editor/viewer panel on the right.
--   \[ \] **Task 2: Read-Only Plan Visualizer:** Upgrade the UI to render an agent's multi-step plan as a static, read-only graph of nodes (tools) and arrows (data flow).
--   \[ \] **Task 3: The Interactive Canvas:** Transform the visualizer into a full-featured editor, allowing users to drag-and-drop nodes, add/remove tools from the canvas, and manually draw connections to define the data flow.
--   \[ \] **Task 4: Blueprint Execution Engine:** Implement the "Plan Substitution" logic on the backend. This will enable the agent to execute a saved JSON blueprint by pausing the main plan, running the blueprint's sub-plan, and then seamlessly resuming the main plan.
+-   \[x\] **Task 1: Foundational UI:** Re-architected the Tool Forge UI into a two-panel layout, with a list of available tools on the left and a main editor/viewer panel on the right.
+-   \[x\] **Task 2: Read-Only Plan Visualizer:** Upgraded the UI to render an agent's multi-step plan as a static, read-only graph of nodes. The backend now correctly loads and expands blueprint tools to be displayed.
+-   \[x\] **Task 3: The Interactive Canvas:** Transformed the visualizer into a full-featured editor, allowing users to reorder steps with drag-and-drop, add new tools from the panel, and remove steps from the canvas.
+-   \[ \] **Task 4: Visual Data Piping:** Introduce input/output anchors on each node. Implement the UI and backend logic to allow users to visually draw connections between nodes to define the data flow (e.g., piping the output of a `web_search` into the input of a `summarize` tool).
+-   \[ \] **Task 5: Blueprint Execution Engine:** Implement the "Plan Substitution" logic on the backend. This will enable the agent to execute a saved JSON blueprint by pausing the main plan, running the blueprint's sub-plan, and then seamlessly resuming the main plan.
 
 #### Phase 15: Advanced Tooling & Templates
 
