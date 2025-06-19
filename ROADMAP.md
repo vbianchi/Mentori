@@ -7,14 +7,15 @@ To build a transformative, AI-powered workbench. The platform will be powerful e
 -   \[x\] **Phase 12: The Interactive Workbench:** Evolved the workspace from a simple file list into a full-featured, interactive file explorer with a smart backend API, folder navigation, breadcrumbs, core interactivity (create, rename, delete), drag-and-drop uploads, and a smart previewer for images, Markdown, and CSVs.
 -   \[x\] **Phase 12.5: Concurrent Agent Execution & Control:** Refactored the backend server to handle multiple, simultaneous agent runs and provided users with the ability to stop a running task. The architecture now correctly decouples agent execution from the client connection.
 -   \[x\] **Phase 13: The "Tool Forge" (v1):** Implemented the foundational "LLM as an Engine" Tool Forge. Users can now define custom tools with typed arguments through a UI, which generates functional Python tool files on the backend that are immediately available to the agent without a server restart.
+-   \[x\] **Phase 14.1: The Active Toolbox:** Implemented a global UI panel to enable/disable any available tool. The agent's capabilities are now filtered in real-time based on the user's selection for all subsequent operations.
 
 ### 🚀 UPCOMING PHASES 🚀
 
-#### Phase 14: The "Blueprint Canvas" - Visual Workflow Editor
+#### Phase 14.2: The "Blueprint Canvas" - Visual Workflow Editor
 
 _Goal: Evolve the Tool Forge into a visual, node-based editor where users can create, save, and reuse complex, multi-step plans as new, high-level tools._
 
--   \[ \] **Task 1: The Active Toolbox UI:** Implement a new UI panel that lists all available tools and allows the user to globally enable or disable them with toggle switches.
+-   \[ \] **Task 1: Foundational UI:** Re-architect the Tool Forge UI into a two-panel layout, with a list of existing tools on the left and a main editor/viewer panel on the right.
 -   \[ \] **Task 2: Read-Only Plan Visualizer:** Upgrade the UI to render an agent's multi-step plan as a static, read-only graph of nodes (tools) and arrows (data flow).
 -   \[ \] **Task 3: The Interactive Canvas:** Transform the visualizer into a full-featured editor, allowing users to drag-and-drop nodes, add/remove tools from the canvas, and manually draw connections to define the data flow.
 -   \[ \] **Task 4: Blueprint Execution Engine:** Implement the "Plan Substitution" logic on the backend. This will enable the agent to execute a saved JSON blueprint by pausing the main plan, running the blueprint's sub-plan, and then seamlessly resuming the main plan.

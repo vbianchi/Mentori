@@ -25,8 +25,9 @@ Our agent operates like a small, efficient company with specialized roles. This 
 -   **Interactive Workbench v1:** A functional file explorer with structured listing, navigation, create/rename/delete actions, drag-and-drop upload, and a smart previewer for text, images, Markdown, and CSVs.
 -   **True Concurrency & Control:** The backend server now correctly handles multiple, simultaneous agent runs without interruption. The architecture is fully decoupled, and users can stop any running task from the UI.
 -   **Tool Forge v1 ("LLM as an Engine"):** Users can define custom tools with typed arguments through a UI. The backend dynamically generates functional Python tool files that use a powerful LLM to execute the described task. The system live-reloads these new tools without a server restart.
+-   **The Active Toolbox:** A global UI panel allows users to enable or disable any available tool at any time. The agent's capabilities are instantly updated to reflect the user's selection.
 
-## 🚀 NEXT FOCUS: Phase 14: The "Blueprint Canvas"
+## 🚀 NEXT FOCUS: Phase 14.2: The "Blueprint Canvas"
 
 _**Vision:** Evolve the Tool Forge into a visual, node-based workflow editor. This will allow users to create, save, and reuse complex, multi-step plans as new, high-level tools, turning the agent into a true automation platform._
 
