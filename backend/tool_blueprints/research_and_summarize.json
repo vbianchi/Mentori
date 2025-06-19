@@ -1,0 +1,34 @@
+{
+  "name": "research_and_summarize",
+  "description": "A blueprint that searches the web for a topic, writes the findings to a file, and then summarizes the file's content.",
+  "type": "blueprint",
+  "plan": {
+    "steps": [
+      {
+        "step_id": 1,
+        "tool_name": "web_search",
+        "instruction": "Search the web for information on the provided topic.",
+        "tool_input": {
+          "query": "{topic}"
+        }
+      },
+      {
+        "step_id": 2,
+        "tool_name": "write_file",
+        "instruction": "Save the search results to a file named 'research_results.txt'.",
+        "tool_input": {
+          "file": "research_results.txt",
+          "content": "{step_1_output}"
+        }
+      },
+      {
+        "step_id": 3,
+        "tool_name": "read_file",
+        "instruction": "Read the content of the 'research_results.txt' file.",
+        "tool_input": {
+          "file": "research_results.txt"
+        }
+      }
+    ]
+  }
+}

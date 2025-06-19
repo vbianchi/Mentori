@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
-import { BriefcaseIcon, ForgeIcon, PlusCircleIcon, SaveIcon, Trash2Icon, LoaderIcon } from './Icons';
-import { PlanVisualizer } from './PlanVisualizer'; // Import the new component
+import { BriefcaseIcon, ForgeIcon, PlusCircleIcon, SaveIcon, Trash2Icon, LoaderIcon, FileTextIcon, GitCommitIcon } from './Icons';
+import { PlanVisualizer } from './PlanVisualizer';
 
 // A single row in the arguments list for the tool creator form
 const ArgumentInput = ({ index, arg, updateArg, removeArg }) => {
@@ -90,7 +90,6 @@ const ToolCreator = ({ onSave }) => {
         setIsSaving(true);
         await onSave(toolDefinition);
         setIsSaving(false);
-        // Reset form after successful save
         setToolName('');
         setToolDescription('');
         setArgs([]);
@@ -140,16 +139,7 @@ const ToolCreator = ({ onSave }) => {
 export const ToolForge = () => {
     const [tools, setTools] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [selectedTool, setSelectedTool] = useState(null); // null means 'Create New' view
-
-    // --- NEW: Hardcoded example plan for visualization ---
-    const examplePlan = {
-        steps: [
-            { step_id: 1, tool_name: 'web_search', instruction: 'Search the web for the main topic.' },
-            { step_id: 2, tool_name: 'write_file', instruction: 'Write findings to a summary file.' },
-            { step_id: 3, tool_name: 'workspace_shell', instruction: 'List the files to confirm creation.' }
-        ]
-    };
+    const [selectedTool, setSelectedTool] = useState(null);
 
     const fetchTools = async () => {
         setIsLoading(true);
@@ -157,7 +147,13 @@ export const ToolForge = () => {
             const response = await fetch('http://localhost:8766/api/tools');
             if (!response.ok) throw new Error('Failed to fetch tools');
             const data = await response.json();
-            setTools(data.tools || []);
+            // Sort tools to show blueprints first, then by name
+            const sortedTools = (data.tools || []).sort((a, b) => {
+                if (a.type === 'blueprint' && b.type !== 'blueprint') return -1;
+                if (a.type !== 'blueprint' && b.type === 'blueprint') return 1;
+                return a.name.localeCompare(b.name);
+            });
+            setTools(sortedTools);
         } catch (error) {
             console.error("Error fetching tools:", error);
             setTools([]);
@@ -183,9 +179,8 @@ export const ToolForge = () => {
             }
             const result = await response.json();
             alert(`Success: ${result.message}`);
-            // Refresh the tool list to show the new tool
             await fetchTools(); 
-            setSelectedTool(null); // Go back to create view
+            setSelectedTool(null);
         } catch (error) {
             console.error("Error saving tool:", error);
             alert(`Error: ${error.message}`);
@@ -198,8 +193,8 @@ export const ToolForge = () => {
             <div class="w-1/3 min-w-[250px] bg-gray-900/30 border-r border-gray-700/50 flex flex-col">
                 <div class="flex-shrink-0 p-4 border-b border-gray-700/50">
                     <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                        <BriefcaseIcon class="h-5 w-5" />
-                        Available Tools
+                        <ForgeIcon class="h-5 w-5" />
+                        Tool & Blueprint Forge
                     </h2>
                 </div>
                 <div class="flex-grow overflow-y-auto p-2">
@@ -209,8 +204,12 @@ export const ToolForge = () => {
                         <ul>
                             {tools.map(tool => (
                                 <li key={tool.name} onClick={() => setSelectedTool(tool)}
-                                    class={`p-2 rounded-md cursor-pointer text-sm mb-1 ${selectedTool?.name === tool.name ? 'bg-blue-600/50' : 'hover:bg-gray-700/50'}`}>
-                                    {tool.name}
+                                    class={`p-2 rounded-md cursor-pointer text-sm mb-1 flex items-center gap-3 ${selectedTool?.name === tool.name ? 'bg-blue-600/50 text-white' : 'text-gray-300 hover:bg-gray-700/50'}`}>
+                                    {/* --- NEW: Icon based on tool type --- */}
+                                    {tool.type === 'blueprint' ? 
+                                     <GitCommitIcon class="h-4 w-4 text-purple-400 flex-shrink-0" /> : 
+                                     <FileTextIcon class="h-4 w-4 text-cyan-400 flex-shrink-0" />}
+                                    <span class="truncate">{tool.name}</span>
                                 </li>
                             ))}
                         </ul>
@@ -223,16 +222,30 @@ export const ToolForge = () => {
                 </div>
             </div>
 
-            {/* Right Panel: Tool Details (PlanVisualizer) or Creator */}
+            {/* Right Panel: Data-driven visualizer or creator */}
             <div class="w-2/3 flex-grow overflow-y-auto">
                 {selectedTool ? (
                     <div>
                         <div class="p-6 border-b border-gray-700/50">
-                            <h3 class="text-lg font-bold text-white">{selectedTool.name}</h3>
-                            <p class="text-sm text-gray-400 mt-2">{selectedTool.description}</p>
+                             <div class="flex items-center gap-3">
+                                {selectedTool.type === 'blueprint' ? 
+                                 <GitCommitIcon class="h-6 w-6 text-purple-400 flex-shrink-0" /> : 
+                                 <FileTextIcon class="h-6 w-6 text-cyan-400 flex-shrink-0" />}
+                                <div>
+                                    <h3 class="text-lg font-bold text-white">{selectedTool.name}</h3>
+                                    <p class="text-xs text-gray-500 font-mono uppercase">{selectedTool.type} Tool</p>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-400 mt-3">{selectedTool.description}</p>
                         </div>
-                        {/* --- NEW: Render the PlanVisualizer --- */}
-                        <PlanVisualizer plan={examplePlan} />
+                        {/* --- MODIFIED: Use the tool's actual plan if it's a blueprint --- */}
+                        {selectedTool.type === 'blueprint' ? (
+                            <PlanVisualizer plan={selectedTool.plan} />
+                        ) : (
+                            <div class="p-6 text-center text-gray-500">
+                                This is a single-step "Engine Tool". It has no sub-plan to visualize.
+                            </div>
+                        )}
                     </div>
                 ) : (
                     <ToolCreator onSave={handleSaveTool} />

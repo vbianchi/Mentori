@@ -1,17 +1,17 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 14.3: Tool Toggling FIX)
+# ResearchAgent Backend Server (Phase 14.2: Data-Driven Tool Forge)
 #
-# This version fixes a bug where the backend was not correctly receiving or
-# using the list of enabled tools sent from the frontend.
+# This version updates the /api/tools endpoint to send richer data to the
+# frontend, enabling the UI to distinguish between tool types.
 #
 # Key Architectural Changes:
-# 1. Updated `run_agent_handler`: This function now correctly extracts the
-#    `enabled_tools` list from the incoming WebSocket message payload.
-# 2. Correct `initial_state` Population: The extracted `enabled_tools` list
-#    is now properly included in the `initial_state` dictionary that is
-#    passed to the agent graph. This ensures that the agent's state is
-#    correctly initialized with the user's tool selections from the very
-#    beginning of the run.
+# 1. Import BlueprintTool: The server now imports the `BlueprintTool` class
+#    from the tools package to identify blueprint tools.
+# 2. Richer Tool Serialization: The `_handle_get_tools` method is updated.
+#    Instead of just sending name and description, it now inspects each tool.
+#    - It adds a `type` field ('engine' or 'blueprint').
+#    - If a tool is a blueprint, it also serializes and includes the full
+#      JSON `plan` associated with it.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -33,7 +33,8 @@ from langgraph.checkpoint.memory import MemorySaver
 # --- Local Imports ---
 from .langgraph_agent import agent_graph
 from .tools.file_system import _resolve_path
-from .tools import get_available_tools
+# --- MODIFIED: Import BlueprintTool to check its type ---
+from .tools import get_available_tools, BlueprintTool
 
 # --- Configuration & Globals ---
 load_dotenv()
@@ -265,11 +266,26 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         default_models = {"ROUTER_LLM_ID": os.getenv("ROUTER_LLM_ID", global_default_llm), "CHIEF_ARCHITECT_LLM_ID": os.getenv("CHIEF_ARCHITECT_LLM_ID", global_default_llm), "SITE_FOREMAN_LLM_ID": os.getenv("SITE_FOREMAN_LLM_ID", global_default_llm), "PROJECT_SUPERVISOR_LLM_ID": os.getenv("PROJECT_SUPERVISOR_LLM_ID", global_default_llm), "EDITOR_LLM_ID": os.getenv("EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")}
         self._send_json_response(200, {"available_models": available_models, "default_models": default_models})
     
+    # --- MODIFIED: This method now sends richer tool data ---
     def _handle_get_tools(self):
-        logger.info("Serving available tools list.")
+        logger.info("Serving available tools list with types and plans.")
         try:
             loaded_tools = get_available_tools()
-            formatted_tools = [{"name": tool.name, "description": tool.description} for tool in loaded_tools]
+            formatted_tools = []
+            for tool in loaded_tools:
+                tool_data = {
+                    "name": tool.name,
+                    "description": tool.description,
+                }
+                # Check if the tool is an instance of BlueprintTool
+                if isinstance(tool, BlueprintTool):
+                    tool_data["type"] = "blueprint"
+                    tool_data["plan"] = tool.plan  # Include the plan data
+                else:
+                    tool_data["type"] = "engine"
+                
+                formatted_tools.append(tool_data)
+                
             self._send_json_response(200, {"tools": formatted_tools})
         except Exception as e:
             logger.error(f"Failed to get available tools: {e}", exc_info=True)
@@ -441,12 +457,11 @@ async def agent_execution_wrapper(input_state, config):
         if task_id in RUNNING_AGENTS: del RUNNING_AGENTS[task_id]
         logger.info(f"Task '{task_id}': Cleaned up from RUNNING_AGENTS.")
 
-# --- MODIFIED: Handler now accepts and uses enabled_tools ---
 async def run_agent_handler(data):
     global RUNNING_AGENTS
     task_id = data.get("task_id")
     prompt = data.get("prompt")
-    enabled_tools = data.get("enabled_tools") # Get the list from the message
+    enabled_tools = data.get("enabled_tools")
     
     if not prompt or not task_id: return
     if task_id in RUNNING_AGENTS:
@@ -455,7 +470,6 @@ async def run_agent_handler(data):
 
     config = {"recursion_limit": 100, "configurable": {"thread_id": task_id}}
     
-    # --- FIX: Include enabled_tools in the initial state ---
     initial_state = {
         "messages": [HumanMessage(content=prompt)],
         "llm_config": data.get("llm_config", {}),
@@ -471,7 +485,7 @@ async def resume_agent_handler(data):
     global RUNNING_AGENTS
     task_id = data.get("task_id")
     feedback = data.get("feedback")
-    enabled_tools = data.get("enabled_tools") # Also get for resume
+    enabled_tools = data.get("enabled_tools")
     
     if not task_id or not feedback: return
     if task_id in RUNNING_AGENTS:
@@ -480,7 +494,6 @@ async def resume_agent_handler(data):
 
     config = {"recursion_limit": 100, "configurable": {"thread_id": task_id}}
     
-    # --- FIX: Pass enabled_tools through on resume as well ---
     update_values = {"user_feedback": feedback, "enabled_tools": enabled_tools}
     if (plan := data.get("plan")) is not None: update_values["plan"] = plan
     
