@@ -1,17 +1,15 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 14.2: Data-Driven Tool Forge)
+# ResearchAgent Backend Server (Phase 14.2: Tool Forge Removed)
 #
-# This version updates the /api/tools endpoint to send richer data to the
-# frontend, enabling the UI to distinguish between tool types.
+# This version simplifies the API by removing blueprint-related logic.
 #
 # Key Architectural Changes:
-# 1. Import BlueprintTool: The server now imports the `BlueprintTool` class
-#    from the tools package to identify blueprint tools.
-# 2. Richer Tool Serialization: The `_handle_get_tools` method is updated.
-#    Instead of just sending name and description, it now inspects each tool.
-#    - It adds a `type` field ('engine' or 'blueprint').
-#    - If a tool is a blueprint, it also serializes and includes the full
-#      JSON `plan` associated with it.
+# 1. BlueprintTool Import Removed: The server no longer needs to know about
+#    the BlueprintTool class.
+# 2. Simplified Tool Serialization: The `_handle_get_tools` method is
+#    simplified. It now sends a basic list of tools with their name and
+#    description, as the concept of different tool 'types' has been
+#    temporarily removed from the API response.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -33,8 +31,8 @@ from langgraph.checkpoint.memory import MemorySaver
 # --- Local Imports ---
 from .langgraph_agent import agent_graph
 from .tools.file_system import _resolve_path
-# --- MODIFIED: Import BlueprintTool to check its type ---
-from .tools import get_available_tools, BlueprintTool
+# --- MODIFIED: BlueprintTool import is no longer needed ---
+from .tools import get_available_tools
 
 # --- Configuration & Globals ---
 load_dotenv()
@@ -266,26 +264,17 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         default_models = {"ROUTER_LLM_ID": os.getenv("ROUTER_LLM_ID", global_default_llm), "CHIEF_ARCHITECT_LLM_ID": os.getenv("CHIEF_ARCHITECT_LLM_ID", global_default_llm), "SITE_FOREMAN_LLM_ID": os.getenv("SITE_FOREMAN_LLM_ID", global_default_llm), "PROJECT_SUPERVISOR_LLM_ID": os.getenv("PROJECT_SUPERVISOR_LLM_ID", global_default_llm), "EDITOR_LLM_ID": os.getenv("EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")}
         self._send_json_response(200, {"available_models": available_models, "default_models": default_models})
     
-    # --- MODIFIED: This method now sends richer tool data ---
+    # --- MODIFIED: This method is now simplified ---
     def _handle_get_tools(self):
-        logger.info("Serving available tools list with types and plans.")
+        logger.info("Serving available tools list.")
         try:
             loaded_tools = get_available_tools()
-            formatted_tools = []
-            for tool in loaded_tools:
-                tool_data = {
-                    "name": tool.name,
-                    "description": tool.description,
-                }
-                # Check if the tool is an instance of BlueprintTool
-                if isinstance(tool, BlueprintTool):
-                    tool_data["type"] = "blueprint"
-                    tool_data["plan"] = tool.plan  # Include the plan data
-                else:
-                    tool_data["type"] = "engine"
-                
-                formatted_tools.append(tool_data)
-                
+            # The logic to differentiate tool types is no longer needed.
+            # We just format all tools into a simple list.
+            formatted_tools = [
+                {"name": tool.name, "description": tool.description}
+                for tool in loaded_tools
+            ]
             self._send_json_response(200, {"tools": formatted_tools})
         except Exception as e:
             logger.error(f"Failed to get available tools: {e}", exc_info=True)

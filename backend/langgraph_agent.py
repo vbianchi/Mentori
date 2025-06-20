@@ -1,14 +1,16 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 14.2: Robust Worker Node)
+# ResearchAgent Core Agent (Phase 14.2: Blueprint Logic Removed)
 #
-# This version fixes a critical KeyError in the `worker_node`.
+# This version removes all references to the BlueprintTool class to fix an
+# ImportError and align with the decision to temporarily disable the feature.
 #
 # Key Architectural Changes:
-# 1. Track-Aware `worker_node`: The worker node now checks the `current_track`
-#    in the state. It ONLY attempts to access `state['plan']` and save the
-#    output for data piping if it's on the 'COMPLEX_PROJECT' track. This
-#    prevents the KeyError when the worker is called from the 'SIMPLE_TOOL_USE'
-#    track, which does not generate a plan.
+# 1. `BlueprintTool` Import Removed: The import statement no longer tries to
+#    import a class that was deleted.
+# 2. Simplified `initial_router_node`: The logic that checked if the Handyman
+#    had selected a blueprint has been removed.
+# 3. Simplified `plan_expander_node`: The logic to detect and expand
+#    blueprints has been removed. The node's function is now simplified.
 # -----------------------------------------------------------------------------
 
 import os
@@ -24,7 +26,8 @@ from langchain_community.chat_models import ChatOllama
 from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.memory import MemorySaver
 
-from .tools import get_available_tools, BlueprintTool
+# MODIFIED: Removed the import of BlueprintTool
+from .tools import get_available_tools
 from .prompts import (
     router_prompt_template,
     handyman_prompt_template,
@@ -97,8 +100,8 @@ def format_tools_for_prompt(state: GraphState):
     else: active_tools = [tool for tool in all_tools if tool.name in enabled_tool_names]
     tool_strings = []
     for tool in active_tools:
-        tool_type_indicator = " (Blueprint)" if isinstance(tool, BlueprintTool) else ""
-        tool_string = f"  - {tool.name}{tool_type_indicator}: {tool.description}"
+        # MODIFIED: Removed blueprint indicator
+        tool_string = f"  - {tool.name}: {tool.description}"
         if tool.args_schema:
             schema_props = tool.args_schema.schema().get('properties', {}); args_info = []
             for arg_name, arg_props in schema_props.items(): args_info.append(f"{arg_name} ({arg_props.get('type', 'any')}): {arg_props.get('description', '')}")
@@ -154,17 +157,15 @@ def initial_router_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing Three-Track Router."); llm = get_llm(state, "ROUTER_LLM_ID", "gemini::gemini-1.5-flash-latest")
     router_prompt = router_prompt_template.format(chat_history=_format_messages(state['messages']), memory_vault=json.dumps(state.get('memory_vault', {}), indent=2), input=state["input"], tools=format_tools_for_prompt(state))
     decision = llm.invoke(router_prompt).content.strip(); logger.info(f"Task '{task_id}': Initial routing decision from LLM: {decision}")
+    
+    # MODIFIED: The check for blueprint tools has been removed.
     if "SIMPLE_TOOL_USE" in decision:
-        handyman_llm = get_llm(state, "SITE_FOREMAN_LLM_ID", "gemini::gemini-1.5-flash-latest"); handyman_prompt = handyman_prompt_template.format(chat_history=_format_messages(state['messages']), memory_vault=json.dumps(state.get('memory_vault', {}), indent=2), input=state["input"], tools=format_tools_for_prompt(state))
-        handyman_response = handyman_llm.invoke(handyman_prompt).content
-        try:
-            match = re.search(r"```json\s*([\s\S]*?)\s*```", handyman_response, re.DOTALL); json_str = match.group(1).strip() if match else handyman_response.strip()
-            tool_call = json.loads(json_str); tool_name = tool_call.get("tool_name"); all_tools = get_available_tools(); selected_tool = next((t for t in all_tools if t.name == tool_name), None)
-            if isinstance(selected_tool, BlueprintTool): logger.info(f"Task '{task_id}': OVERRIDE! Handyman chose blueprint '{tool_name}'. Upgrading to COMPLEX_PROJECT."); return {"route": "Chief_Architect", "current_track": "COMPLEX_PROJECT"}
-        except Exception as e: logger.warning(f"Task '{task_id}': Could not parse Handyman tool for blueprint check. Error: {e}")
         return {"route": "Handyman", "current_track": "SIMPLE_TOOL_USE"}
-    if "COMPLEX_PROJECT" in decision: return {"route": "Chief_Architect", "current_track": "COMPLEX_PROJECT"}
-    logger.info(f"Task '{task_id}': Routing to DIRECT_QA."); return {"route": "Editor", "current_track": "DIRECT_QA"}
+    if "COMPLEX_PROJECT" in decision: 
+        return {"route": "Chief_Architect", "current_track": "COMPLEX_PROJECT"}
+    
+    logger.info(f"Task '{task_id}': Routing to DIRECT_QA."); 
+    return {"route": "Editor", "current_track": "DIRECT_QA"}
 
 def handyman_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Track 2 -> Handyman"); llm = get_llm(state, "SITE_FOREMAN_LLM_ID", "gemini::gemini-1.5-flash-latest")
@@ -185,26 +186,15 @@ def chief_architect_node(state: GraphState):
     except Exception as e: logger.error(f"Task '{task_id}': Error parsing structured plan: {e}"); return {"plan": [{"error": f"Failed to create plan: {e}"}]}
 
 def plan_expander_node(state: GraphState):
-    task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing Plan_Expander."); original_plan = state.get("plan", [])
-    if not original_plan: return {}
-    expanded_plan = []; all_tools_map = {tool.name: tool for tool in get_available_tools()}
-    def _substitute(data: Any, context: Dict[str, Any]) -> Any:
-        if isinstance(data, str):
-            match = re.fullmatch(r"\{(\w+)\}", data)
-            if match and match.group(1) in context: return context[match.group(1)]
-            return data
-        if isinstance(data, dict): return {k: _substitute(v, context) for k, v in data.items()}
-        if isinstance(data, list): return [_substitute(item, context) for item in data]
-        return data
-    for step in original_plan:
-        tool_name = step.get("tool_name"); tool_to_check = all_tools_map.get(tool_name)
-        if isinstance(tool_to_check, BlueprintTool):
-            logger.info(f"Task '{task_id}': Expanding blueprint '{tool_name}'."); substitution_context = step.get("tool_input", {})
-            for blueprint_step in tool_to_check.plan.get("steps", []):
-                new_step = json.loads(json.dumps(blueprint_step)); new_step["tool_input"] = _substitute(new_step["tool_input"], substitution_context); expanded_plan.append(new_step)
-        else: expanded_plan.append(step)
-    for i, step in enumerate(expanded_plan): step["step_id"] = i + 1
-    return {"plan": expanded_plan}
+    task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing Plan_Expander."); plan = state.get("plan", [])
+    if not plan: return {}
+    
+    # MODIFIED: The logic for expanding blueprints has been removed.
+    # The node now just ensures step_ids are sequential.
+    for i, step in enumerate(plan):
+        step["step_id"] = i + 1
+        
+    return {"plan": plan}
 
 def human_in_the_loop_node(state: GraphState):
     logger.info(f"Task '{state.get('task_id')}': Reached HITL node."); return {"enabled_tools": state.get("enabled_tools")}
@@ -230,7 +220,6 @@ def site_foreman_node(state: GraphState):
         tool_call = json.loads(json_str); substituted_tool_call = _substitute_step_outputs(tool_call, state.get("step_outputs", {})); return {"current_tool_call": substituted_tool_call}
     except Exception as e: logger.error(f"Task '{task_id}': Error in Foreman: {e}"); return {"current_tool_call": {"error": f"Invalid JSON or substitution error: {e}"}}
 
-# --- MODIFIED: Robust, track-aware worker node ---
 async def worker_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Worker executing tool call."); all_tools = get_available_tools(); enabled_tool_names = state.get("enabled_tools")
     active_tools = [tool for tool in all_tools if tool.name in enabled_tool_names] if enabled_tool_names is not None else all_tools
@@ -248,19 +237,15 @@ async def worker_node(state: GraphState):
     try:
         output = await tool.ainvoke(final_args); output_str = str(output)
         
-        # Fork logic based on the current track
         if state.get("current_track") == "COMPLEX_PROJECT":
-            # This track is guaranteed to have a plan
             current_step_id = state["plan"][state["current_step_index"]]["step_id"]
             step_outputs = {current_step_id: output_str}
             return {"tool_output": output_str, "step_outputs": step_outputs}
 
         elif state.get("current_track") == "SIMPLE_TOOL_USE":
-            # This track does not have a plan, so we don't save step outputs
             history_record = (f"Handyman Action: User requested '{state['input']}'.\nExecuted Tool: {json.dumps(tool_call)}\nResult: {output_str}")
             return {"tool_output": output_str, "history": [history_record], "messages": [AIMessage(content=f"Tool execution result: {output_str}")]}
             
-        # Fallback for any other case (shouldn't happen)
         return {"tool_output": output_str}
 
     except Exception as e:
@@ -328,6 +313,6 @@ def create_agent_graph():
     workflow.add_conditional_edges("Project_Supervisor", after_plan_step_router, {"Editor": "Editor", "Advance_To_Next_Step": "Advance_To_Next_Step", "Correction_Planner": "Correction_Planner"})
     workflow.add_edge("Editor", END)
     agent = workflow.compile(checkpointer=MemorySaver(), interrupt_before=["human_in_the_loop_node"])
-    logger.info("ResearchAgent graph compiled with full Blueprint substitution capabilities."); return agent
+    logger.info("ResearchAgent graph compiled without Blueprint capabilities."); return agent
 
 agent_graph = create_agent_graph()
