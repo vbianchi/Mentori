@@ -1,4 +1,3 @@
-```
 # ResearchAgent - Brainstorming & Ideas
 
 This document is a living collection of ideas, architectural concepts, and potential future features for the ResearchAgent project.
@@ -55,11 +54,8 @@ To support this, our `plan` data structure needs to evolve from a simple array o
 This structure is much more flexible and will allow for more complex workflows, including the conditional loops (`GOTO`, `IF/ELSE`) that we have discussed.
 
 **Visual Representation:**
-```
 
-```
-        +-----------+       +----------------+       +----------+
-```
++-----------+       +----------------+       +----------+
 
 \[START\] o--->| web\_search|--o-o-->| write\_file |--o-o-->| END |
 
@@ -71,7 +67,5 @@ This structure is much more flexible and will allow for more complex workflows, 
 
 +------------------+ (Data Pipe)
 
-```
 
 This is a significant architectural step that will unlock the full potential of the ResearchAgent as an automation platform.
-```
