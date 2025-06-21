@@ -1,8 +1,8 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 15 - FIX)
+# ResearchAgent Core Agent (Phase 15 - Critique Tool Integration)
 #
-# FIX: This version corrects a TypeError by adding the new `query_files` tool
-# to the `SANDBOXED_TOOLS` set. This ensures the `worker_node` correctly
+# FIX: This version adds the new `critique_document` tool to the
+# `SANDBOXED_TOOLS` set. This ensures the `worker_node` correctly
 # injects the required `workspace_path` argument when the tool is called.
 # -----------------------------------------------------------------------------
 
@@ -40,8 +40,8 @@ logger = logging.getLogger(__name__)
 # --- Constants ---
 HISTORY_SUMMARY_THRESHOLD = 10
 HISTORY_SUMMARY_KEEP_RECENT = 4
-# --- MODIFIED: Added 'query_files' to the set of sandboxed tools ---
-SANDBOXED_TOOLS = {"write_file", "read_file", "list_files", "workspace_shell", "pip_install", "query_files"}
+# --- MODIFIED: Added 'critique_document' to the set of sandboxed tools ---
+SANDBOXED_TOOLS = {"write_file", "read_file", "list_files", "workspace_shell", "pip_install", "query_files", "critique_document"}
 
 
 # (Memory Vault Schemas remain unchanged)
