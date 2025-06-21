@@ -1,16 +1,9 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 14.2: Blueprint Logic Removed)
+# ResearchAgent Core Agent (Phase 15 - FIX)
 #
-# This version removes all references to the BlueprintTool class to fix an
-# ImportError and align with the decision to temporarily disable the feature.
-#
-# Key Architectural Changes:
-# 1. `BlueprintTool` Import Removed: The import statement no longer tries to
-#    import a class that was deleted.
-# 2. Simplified `initial_router_node`: The logic that checked if the Handyman
-#    had selected a blueprint has been removed.
-# 3. Simplified `plan_expander_node`: The logic to detect and expand
-#    blueprints has been removed. The node's function is now simplified.
+# FIX: This version corrects a TypeError by adding the new `query_files` tool
+# to the `SANDBOXED_TOOLS` set. This ensures the `worker_node` correctly
+# injects the required `workspace_path` argument when the tool is called.
 # -----------------------------------------------------------------------------
 
 import os
@@ -26,7 +19,6 @@ from langchain_community.chat_models import ChatOllama
 from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.memory import MemorySaver
 
-# MODIFIED: Removed the import of BlueprintTool
 from .tools import get_available_tools
 from .prompts import (
     router_prompt_template,
@@ -48,7 +40,9 @@ logger = logging.getLogger(__name__)
 # --- Constants ---
 HISTORY_SUMMARY_THRESHOLD = 10
 HISTORY_SUMMARY_KEEP_RECENT = 4
-SANDBOXED_TOOLS = {"write_file", "read_file", "list_files", "workspace_shell", "pip_install"}
+# --- MODIFIED: Added 'query_files' to the set of sandboxed tools ---
+SANDBOXED_TOOLS = {"write_file", "read_file", "list_files", "workspace_shell", "pip_install", "query_files"}
+
 
 # (Memory Vault Schemas remain unchanged)
 class UserProfile(TypedDict, total=False): persona: dict; preferences: dict
@@ -100,7 +94,6 @@ def format_tools_for_prompt(state: GraphState):
     else: active_tools = [tool for tool in all_tools if tool.name in enabled_tool_names]
     tool_strings = []
     for tool in active_tools:
-        # MODIFIED: Removed blueprint indicator
         tool_string = f"  - {tool.name}: {tool.description}"
         if tool.args_schema:
             schema_props = tool.args_schema.schema().get('properties', {}); args_info = []
@@ -158,7 +151,6 @@ def initial_router_node(state: GraphState):
     router_prompt = router_prompt_template.format(chat_history=_format_messages(state['messages']), memory_vault=json.dumps(state.get('memory_vault', {}), indent=2), input=state["input"], tools=format_tools_for_prompt(state))
     decision = llm.invoke(router_prompt).content.strip(); logger.info(f"Task '{task_id}': Initial routing decision from LLM: {decision}")
     
-    # MODIFIED: The check for blueprint tools has been removed.
     if "SIMPLE_TOOL_USE" in decision:
         return {"route": "Handyman", "current_track": "SIMPLE_TOOL_USE"}
     if "COMPLEX_PROJECT" in decision: 
@@ -189,8 +181,6 @@ def plan_expander_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing Plan_Expander."); plan = state.get("plan", [])
     if not plan: return {}
     
-    # MODIFIED: The logic for expanding blueprints has been removed.
-    # The node now just ensures step_ids are sequential.
     for i, step in enumerate(plan):
         step["step_id"] = i + 1
         

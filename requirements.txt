@@ -23,5 +23,15 @@ tavily-python
 # For web scraping, as requested by the agent's plan.
 beautifulsoup4
 
-# NEW: For securely parsing package names and versions in the package manager tool.
+# For securely parsing package names and versions in the package manager tool.
 packaging
+
+# --- NEW: Dependencies for the 'query_files' tool (Phase 15) ---
+# For reading PDF files.
+pypdf
+
+# For reading Microsoft Word (.docx) files.
+python-docx
+
+# For reading Microsoft Excel (.xlsx) files.
+openpyxl
