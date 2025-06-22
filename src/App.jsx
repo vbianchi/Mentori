@@ -354,32 +354,36 @@ export function App() {
 
     return (
         <div class="flex h-screen w-screen p-2 sm:p-4 gap-4 bg-background text-foreground">
-            {!isLeftSidebarVisible && <ToggleButton isVisible={isLeftSidebarVisible} onToggle={() => setIsLeftSidebarVisible(true)} side="left" />}
-            {isLeftSidebarVisible && (
-                <div class="h-full w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg bg-card/50 rounded-lg border border-border shadow-2xl flex flex-col">
-                    <div class="flex justify-between items-center p-4 border-b border-border flex-shrink-0">
-                        <h2 class="text-xl font-bold text-foreground">Tasks</h2>
-                        <div class="flex items-center gap-2">
-                           <button onClick={createNewTask} class="p-1.5 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground" title="New Task"><PlusCircleIcon class="h-5 w-5" /></button>
-                           <button onClick={() => setIsLeftSidebarVisible(false)} class="p-1.5 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground" title="Hide Sidebar"><ChevronsLeftIcon class="h-4 w-4" /></button>
-                        </div>
-                    </div>
-                    {/* --- MODIFIED: Restructured layout for proper scrolling --- */}
-                    <div class="flex flex-col flex-grow p-4 min-h-0">
-                        <div class="flex-shrink-0">
-                            {tasks.length > 0 ? ( <ul> {tasks.map(task => ( <TaskItem key={task.id} task={task} isActive={activeTaskId === task.id} isRunning={!!agent.runningTasks[task.id]} onSelect={selectTask} onRename={renameTask} onDelete={handleDeleteTask} /> ))} </ul> ) : ( <p class="text-muted-foreground text-center mt-4">No tasks yet.</p> )}
-                        </div>
-                        <div class="flex-grow min-h-0 overflow-y-auto mt-2 -mr-4 pr-4">
-                            <SettingsSection title="Active Toolbox" icon={<BriefcaseIcon className="h-5 w-5 text-muted-foreground" />}>
-                                {settings.availableTools.map(tool => <ToolToggleRow key={tool.name} tool={tool} isEnabled={settings.enabledTools[tool.name] ?? true} onToggle={() => settings.handleToggleTool(tool.name)} />)}
-                            </SettingsSection>
-                            <SettingsSection title="Agent Models" icon={<SlidersIcon className="h-5 w-5 text-muted-foreground" />}>
-                                {agentRoles.map(role => <ModelSelectorRow key={role.key} label={role.label} icon={role.icon} models={settings.availableModels} selectedModel={settings.selectedModels[role.key]} onModelChange={settings.handleModelChange} roleKey={role.key} description={role.description} />)}
-                            </SettingsSection>
-                        </div>
+            {/* --- MODIFIED: Wrapper for correct toggle button positioning --- */}
+            <div class="absolute top-4 left-4 z-20">
+              {!isLeftSidebarVisible && <ToggleButton onToggle={() => setIsLeftSidebarVisible(true)} side="left" />}
+            </div>
+            <div class="absolute top-4 right-4 z-20">
+               {!isRightSidebarVisible && <ToggleButton onToggle={() => setIsRightSidebarVisible(true)} side="right" />}
+            </div>
+            
+            <div class={`h-full bg-card/50 rounded-lg border border-border shadow-2xl flex flex-col transition-all duration-300 ease-in-out ${isLeftSidebarVisible ? 'w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg' : 'w-0 p-0 border-0'}`} style={{ overflow: isLeftSidebarVisible ? 'visible' : 'hidden' }}>
+                <div class={`flex justify-between items-center p-4 border-b border-border flex-shrink-0 transition-opacity duration-200 ${isLeftSidebarVisible ? 'opacity-100' : 'opacity-0'}`}>
+                    <h2 class="text-xl font-bold text-foreground">Tasks</h2>
+                    <div class="flex items-center gap-2">
+                        <button onClick={createNewTask} class="p-1.5 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground" title="New Task"><PlusCircleIcon class="h-5 w-5" /></button>
+                        <button onClick={() => setIsLeftSidebarVisible(false)} class="p-1.5 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground" title="Hide Sidebar"><ChevronsLeftIcon class="h-4 w-4" /></button>
                     </div>
                 </div>
-            )}
+                <div class={`flex flex-col flex-grow p-4 min-h-0 transition-opacity duration-200 ${isLeftSidebarVisible ? 'opacity-100' : 'opacity-0'}`}>
+                    <div class="flex-shrink-0">
+                        {tasks.length > 0 ? ( <ul> {tasks.map(task => ( <TaskItem key={task.id} task={task} isActive={activeTaskId === task.id} isRunning={!!agent.runningTasks[task.id]} onSelect={selectTask} onRename={renameTask} onDelete={handleDeleteTask} /> ))} </ul> ) : ( <p class="text-muted-foreground text-center mt-4">No tasks yet.</p> )}
+                    </div>
+                    <div class="flex-grow min-h-0 overflow-y-auto mt-2 -mr-4 pr-4">
+                        <SettingsSection title="Active Toolbox" icon={<BriefcaseIcon className="h-5 w-5 text-muted-foreground" />}>
+                            {settings.availableTools.map(tool => <ToolToggleRow key={tool.name} tool={tool} isEnabled={settings.enabledTools[tool.name] ?? true} onToggle={() => settings.handleToggleTool(tool.name)} />)}
+                        </SettingsSection>
+                        <SettingsSection title="Agent Models" icon={<SlidersIcon className="h-5 w-5 text-muted-foreground" />}>
+                            {agentRoles.map(role => <ModelSelectorRow key={role.key} label={role.label} icon={role.icon} models={settings.availableModels} selectedModel={settings.selectedModels[role.key]} onModelChange={settings.handleModelChange} roleKey={role.key} description={role.description} />)}
+                        </SettingsSection>
+                    </div>
+                </div>
+            </div>
             
             <div class="flex-1 flex flex-col h-full bg-card/50 rounded-lg border border-border shadow-2xl min-w-0">
                 <div class="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
@@ -432,68 +436,64 @@ export function App() {
                 </div>
             </div>
 
-            {!isRightSidebarVisible && <ToggleButton isVisible={isRightSidebarVisible} onToggle={() => setIsRightSidebarVisible(true)} side="right" />}
-            {isRightSidebarVisible && (
-                <div class="h-full w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg bg-card/50 rounded-lg border border-border shadow-2xl flex flex-col relative"
-                    onDragEnter={workspace.handleDragEnter} onDragLeave={workspace.handleDragLeave} onDragOver={workspace.handleDragOver} onDrop={workspace.handleDrop} >
-                    <div class="flex justify-between items-center p-4 border-b border-border"> <h2 class="text-xl font-bold text-foreground">Workspace</h2> <button onClick={() => setIsRightSidebarVisible(false)} class="p-1.5 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground" title="Hide Workspace"><ChevronsRightIcon class="h-4 w-4" /></button> </div>
-                    <div class="flex flex-col flex-grow min-h-0 px-4 pb-4 pt-4">
-                        {workspace.selectedFile ? (
-                            <div class="flex flex-col h-full">
-                                <div class="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-border flex-shrink-0">
-                                    <div class="flex items-center gap-2 min-w-0"> <button onClick={() => workspace.setSelectedFile(null)} class="p-1.5 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground flex-shrink-0"><ArrowLeftIcon class="h-4 w-4" /></button> <span class="font-mono text-sm text-foreground truncate">{workspace.selectedFile.name}</span> </div>
-                                    <CopyButton textToCopy={workspace.fileContent} />
-                                </div>
-                                <div class="flex-grow bg-background/50 rounded-md overflow-auto flex items-center justify-center">
-                                    <FilePreviewer file={workspace.selectedFile} isLoading={workspace.isFileLoading} content={workspace.fileContent} rawFileUrl={`http://localhost:8766/api/workspace/raw?path=${workspace.currentPath}/${workspace.selectedFile.name}`} />
-                                </div>
+            <div class={`h-full bg-card/50 rounded-lg border border-border shadow-2xl flex flex-col transition-all duration-300 ease-in-out ${isRightSidebarVisible ? 'w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg' : 'w-0 p-0 border-0'}`} style={{ overflow: isRightSidebarVisible ? 'visible' : 'hidden' }}>
+                <div class={`flex justify-between items-center p-4 border-b border-border transition-opacity duration-200 ${isRightSidebarVisible ? 'opacity-100' : 'opacity-0'}`}> <h2 class="text-xl font-bold text-foreground">Workspace</h2> <button onClick={() => setIsRightSidebarVisible(false)} class="p-1.5 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground" title="Hide Workspace"><ChevronsRightIcon class="h-4 w-4" /></button> </div>
+                <div class={`flex flex-col flex-grow min-h-0 px-4 pb-4 pt-4 transition-opacity duration-200 ${isRightSidebarVisible ? 'opacity-100' : 'opacity-0'}`}>
+                    {workspace.selectedFile ? (
+                        <div class="flex flex-col h-full">
+                            <div class="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-border flex-shrink-0">
+                                <div class="flex items-center gap-2 min-w-0"> <button onClick={() => workspace.setSelectedFile(null)} class="p-1.5 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground flex-shrink-0"><ArrowLeftIcon class="h-4 w-4" /></button> <span class="font-mono text-sm text-foreground truncate">{workspace.selectedFile.name}</span> </div>
+                                <CopyButton textToCopy={workspace.fileContent} />
                             </div>
-                        ) : (
-                             <div class="flex flex-col flex-grow min-h-0">
-                                 <div class="flex justify-between items-center mb-2 flex-shrink-0">
-                                    <Breadcrumbs path={workspace.currentPath} onNavigate={workspace.handleBreadcrumbNav} />
-                                    <div class="flex items-center">
-                                        <button onClick={() => workspace.startInlineCreate('folder')} disabled={!workspace.currentPath || workspace.loading} class="p-1.5 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground disabled:opacity-50" title="New Folder"> <FolderIcon class="h-4 w-4" /> </button>
-                                        <button onClick={() => workspace.startInlineCreate('file')} disabled={!workspace.currentPath || workspace.loading} class="p-1.5 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground disabled:opacity-50" title="New File"> <FileTextIcon class="h-4 w-4" /> </button>
-                                        <input type="file" ref={workspace.fileInputRef} onChange={(e) => workspace.uploadFiles(e.target.files)} class="hidden" multiple />
-                                        <button onClick={() => workspace.fileInputRef.current?.click()} disabled={!workspace.currentPath || workspace.loading} class="p-1.5 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground disabled:opacity-50" title="Upload File"> <UploadCloudIcon class="h-4 w-4" /> </button>
-                                    </div>
-                                 </div>
-                                 <div class="flex-grow bg-background/50 rounded-md p-2 text-sm text-muted-foreground font-mono overflow-y-auto">
-                                    {workspace.loading ? <div class="flex items-center gap-2"><LoaderIcon class="h-4 w-4 text-primary"/><span>Loading...</span></div> : 
-                                     workspace.error ? <p class="text-red-400">Error: {workspace.error}</p> : 
-                                     workspace.items.length === 0 ? <p>// Directory is empty.</p> : ( 
-                                     <ul> 
-                                        {workspace.items.map(item => {
-                                            if (item.isEditing) return <InlineEditor key={item.name} item={item} onConfirm={workspace.handleConfirmName} onCancel={workspace.handleConfirmName} />;
-                                            if (item.isLoading) return <li class="flex items-center gap-2 p-2 -ml-2 -mr-2 text-muted-foreground"><LoaderIcon class="h-4 w-4 flex-shrink-0 text-primary"/> <span>Uploading {item.name}...</span></li>;
-                                            return (
-                                                <li key={item.name} class="group flex justify-between items-center mb-1 hover:bg-secondary/50 rounded-md -ml-2 -mr-2 pr-2">
-                                                    <div onClick={() => workspace.handleNavigation(item)} title={item.name} class="flex items-center gap-2 cursor-pointer truncate flex-grow p-2"> 
-                                                        {item.type === 'directory' ? <FolderIcon class="h-4 w-4 text-primary flex-shrink-0" /> : <FileIcon class="h-4 w-4 text-muted-foreground flex-shrink-0" />}
-                                                        <span class="text-foreground">{item.name}</span>
-                                                    </div>
-                                                    <div class="flex items-center opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                                                        <button onClick={(e) => { e.stopPropagation(); handleSendToChat(item.name); }} class="p-1 text-muted-foreground hover:text-foreground" title="Send name to chat"> <SendToChatIcon class="h-4 w-4" /> </button>
-                                                        <button onClick={(e) => { e.stopPropagation(); workspace.startInlineRename(item); }} class="p-1 text-muted-foreground hover:text-foreground" title={`Rename ${item.type}`}> <PencilIcon class="h-4 w-4" /> </button>
-                                                        <button onClick={(e) => { e.stopPropagation(); workspace.deleteItem(item); }} class="p-1 text-muted-foreground hover:text-red-400" title={`Delete ${item.type}`}> <Trash2Icon class="h-4 w-4" /> </button>
-                                                    </div>
-                                                </li> 
-                                            );
-                                        })} 
-                                     </ul> 
-                                    )}
-                                 </div>
-                             </div>
-                        )}
-                    </div>
-                    {workspace.isDragOver && (
-                        <div class="absolute inset-0 bg-primary/20 border-2 border-dashed border-primary rounded-lg flex items-center justify-center pointer-events-none">
-                            <div class="text-center"> <UploadCloudIcon class="h-10 w-10 text-primary/80 mx-auto" /> <p class="mt-2 font-semibold text-foreground">Drop files to upload</p> </div>
+                            <div class="flex-grow bg-background/50 rounded-md overflow-auto flex items-center justify-center">
+                                <FilePreviewer file={workspace.selectedFile} isLoading={workspace.isFileLoading} content={workspace.fileContent} rawFileUrl={`http://localhost:8766/api/workspace/raw?path=${workspace.currentPath}/${workspace.selectedFile.name}`} />
+                            </div>
                         </div>
+                    ) : (
+                         <div class="flex flex-col flex-grow min-h-0">
+                             <div class="flex justify-between items-center mb-2 flex-shrink-0">
+                                <Breadcrumbs path={workspace.currentPath} onNavigate={workspace.handleBreadcrumbNav} />
+                                <div class="flex items-center">
+                                    <button onClick={() => workspace.startInlineCreate('folder')} disabled={!workspace.currentPath || workspace.loading} class="p-1.5 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground disabled:opacity-50" title="New Folder"> <FolderIcon class="h-4 w-4" /> </button>
+                                    <button onClick={() => workspace.startInlineCreate('file')} disabled={!workspace.currentPath || workspace.loading} class="p-1.5 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground disabled:opacity-50" title="New File"> <FileTextIcon class="h-4 w-4" /> </button>
+                                    <input type="file" ref={workspace.fileInputRef} onChange={(e) => workspace.uploadFiles(e.target.files)} class="hidden" multiple />
+                                    <button onClick={() => workspace.fileInputRef.current?.click()} disabled={!workspace.currentPath || workspace.loading} class="p-1.5 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground disabled:opacity-50" title="Upload File"> <UploadCloudIcon class="h-4 w-4" /> </button>
+                                </div>
+                             </div>
+                             <div class="flex-grow bg-background/50 rounded-md p-2 text-sm text-muted-foreground font-mono overflow-y-auto">
+                                {workspace.loading ? <div class="flex items-center gap-2"><LoaderIcon class="h-4 w-4 text-primary"/><span>Loading...</span></div> : 
+                                 workspace.error ? <p class="text-red-400">Error: {workspace.error}</p> : 
+                                 workspace.items.length === 0 ? <p>// Directory is empty.</p> : ( 
+                                 <ul> 
+                                    {workspace.items.map(item => {
+                                        if (item.isEditing) return <InlineEditor key={item.name} item={item} onConfirm={workspace.handleConfirmName} onCancel={workspace.handleConfirmName} />;
+                                        if (item.isLoading) return <li class="flex items-center gap-2 p-2 -ml-2 -mr-2 text-muted-foreground"><LoaderIcon class="h-4 w-4 flex-shrink-0 text-primary"/> <span>Uploading {item.name}...</span></li>;
+                                        return (
+                                            <li key={item.name} class="group flex justify-between items-center mb-1 hover:bg-secondary/50 rounded-md -ml-2 -mr-2 pr-2">
+                                                <div onClick={() => workspace.handleNavigation(item)} title={item.name} class="flex items-center gap-2 cursor-pointer truncate flex-grow p-2"> 
+                                                    {item.type === 'directory' ? <FolderIcon class="h-4 w-4 text-primary flex-shrink-0" /> : <FileIcon class="h-4 w-4 text-muted-foreground flex-shrink-0" />}
+                                                    <span class="text-foreground">{item.name}</span>
+                                                </div>
+                                                <div class="flex items-center opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                                                    <button onClick={(e) => { e.stopPropagation(); handleSendToChat(item.name); }} class="p-1 text-muted-foreground hover:text-foreground" title="Send name to chat"> <SendToChatIcon class="h-4 w-4" /> </button>
+                                                    <button onClick={(e) => { e.stopPropagation(); workspace.startInlineRename(item); }} class="p-1 text-muted-foreground hover:text-foreground" title={`Rename ${item.type}`}> <PencilIcon class="h-4 w-4" /> </button>
+                                                    <button onClick={(e) => { e.stopPropagation(); workspace.deleteItem(item); }} class="p-1 text-muted-foreground hover:text-red-400" title={`Delete ${item.type}`}> <Trash2Icon class="h-4 w-4" /> </button>
+                                                </div>
+                                            </li> 
+                                        );
+                                    })} 
+                                 </ul> 
+                                )}
+                             </div>
+                         </div>
                     )}
                 </div>
-            )}
+                {workspace.isDragOver && (
+                    <div class="absolute inset-0 bg-primary/20 border-2 border-dashed border-primary rounded-lg flex items-center justify-center pointer-events-none">
+                        <div class="text-center"> <UploadCloudIcon class="h-10 w-10 text-primary/80 mx-auto" /> <p class="mt-2 font-semibold text-foreground">Drop files to upload</p> </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
