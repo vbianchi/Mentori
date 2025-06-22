@@ -1,15 +1,13 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 15 - Inline File Creation FIX)
+# ResearchAgent Backend Server (UI Polish FIX)
 #
-# This version fixes the bug where creating a new, empty file from the UI
-# would fail.
+# This version updates the `/api/models` endpoint to provide a clean model
+# name for the UI, as requested by the user.
 #
 # Key Architectural Changes:
-# 1. New API Endpoint: The `do_POST` method in the HTTP handler now has a
-#    route for `/api/workspace/files`.
-# 2. New `_handle_create_file` Method: This new method contains the logic
-#    to securely create an empty file at the specified path, mirroring the
-#    existing folder creation logic.
+# 1. `_handle_get_models` now sends back a `name` field containing only the
+#    raw model identifier (e.g., "gemini-1.5-pro-latest") in addition to the
+#    full `id` (`gemini::gemini-1.5-pro-latest`).
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -116,14 +114,6 @@ tool = StructuredTool.from_function(
 
 
 # --- Helper Functions ---
-def format_model_name(model_id):
-    try:
-        provider, name = model_id.split("::")
-        name_parts = name.replace('-', ' ').split()
-        formatted_name = ' '.join(part.capitalize() for part in name_parts)
-        return f"{provider.capitalize()} {formatted_name}"
-    except: return model_id
-
 def _safe_delete_workspace(task_id: str):
     try:
         workspace_path = _resolve_path("/app/workspace", task_id)
@@ -146,13 +136,12 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         elif path == '/api/workspace/raw': self._handle_get_raw_file(parsed_path)
         else: self._send_json_response(404, {'error': f"Not Found: The path '{path}' does not match any known API routes."})
     
-    # --- MODIFIED: Added `/api/workspace/files` route ---
     def do_POST(self):
         parsed_path = urlparse(self.path)
         path = parsed_path.path.rstrip('/')
         if path == '/api/tools': self._handle_create_tool()
         elif path == '/api/workspace/folders': self._handle_create_folder()
-        elif path == '/api/workspace/files': self._handle_create_file() # New route
+        elif path == '/api/workspace/files': self._handle_create_file()
         elif path == '/upload': self._handle_file_upload()
         else: self._send_json_response(404, {'error': f"Not Found: The POST path '{path}' does not match any known API routes."})
 
@@ -243,7 +232,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             logger.error(f"Error creating tool: {e}", exc_info=True)
             self._send_json_response(500, {'error': str(e)})
 
-
+    # --- MODIFIED: This method now returns a clean name for UI display ---
     def _handle_get_models(self):
         logger.info("Parsing .env to serve available and default models.")
         available_models, model_ids = [], set()
@@ -255,14 +244,26 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
                     if model_name:
                         full_id = f"{provider_prefix}::{model_name}"
                         if full_id not in model_ids:
-                            available_models.append({"id": full_id, "name": format_model_name(full_id)})
+                            # Send both the full ID for logic and the clean name for display
+                            available_models.append({"id": full_id, "name": model_name})
                             model_ids.add(full_id)
+
         parse_and_add_models("GEMINI_AVAILABLE_MODELS", "gemini")
         parse_and_add_models("OLLAMA_AVAILABLE_MODELS", "ollama")
-        safe_fallback_model = "gemini::gemini-1.5-flash-latest"
-        if not available_models: available_models.append({"id": safe_fallback_model, "name": format_model_name(safe_fallback_model)})
-        global_default_llm = os.getenv("DEFAULT_LLM_ID", safe_fallback_model)
-        default_models = {"ROUTER_LLM_ID": os.getenv("ROUTER_LLM_ID", global_default_llm), "CHIEF_ARCHITECT_LLM_ID": os.getenv("CHIEF_ARCHITECT_LLM_ID", global_default_llm), "SITE_FOREMAN_LLM_ID": os.getenv("SITE_FOREMAN_LLM_ID", global_default_llm), "PROJECT_SUPERVISOR_LLM_ID": os.getenv("PROJECT_SUPERVISOR_LLM_ID", global_default_llm), "EDITOR_LLM_ID": os.getenv("EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")}
+        
+        safe_fallback_id = "gemini::gemini-1.5-flash-latest"
+        safe_fallback_name = "gemini-1.5-flash-latest"
+        if not available_models:
+             available_models.append({"id": safe_fallback_id, "name": safe_fallback_name})
+
+        global_default_llm = os.getenv("DEFAULT_LLM_ID", safe_fallback_id)
+        default_models = {
+            "ROUTER_LLM_ID": os.getenv("ROUTER_LLM_ID", global_default_llm),
+            "CHIEF_ARCHITECT_LLM_ID": os.getenv("CHIEF_ARCHITECT_LLM_ID", global_default_llm),
+            "SITE_FOREMAN_LLM_ID": os.getenv("SITE_FOREMAN_LLM_ID", global_default_llm),
+            "PROJECT_SUPERVISOR_LLM_ID": os.getenv("PROJECT_SUPERVISOR_LLM_ID", global_default_llm),
+            "EDITOR_LLM_ID": os.getenv("EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
+        }
         self._send_json_response(200, {"available_models": available_models, "default_models": default_models})
     
     def _handle_get_tools(self):
@@ -329,7 +330,6 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             logger.error(f"Error creating folder: {e}", exc_info=True)
             self._send_json_response(500, {'error': str(e)})
             
-    # --- NEW: Handler for creating empty files ---
     def _handle_create_file(self):
         try:
             content_length = int(self.headers['Content-Length'])
@@ -341,7 +341,6 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             full_path = _resolve_path("/app/workspace", new_path_str)
             if os.path.exists(full_path): return self._send_json_response(409, {'error': f"Conflict: An item already exists at '{new_path_str}'."})
 
-            # Create the file by opening it in write mode and immediately closing it.
             with open(full_path, 'w') as f:
                 pass
             
