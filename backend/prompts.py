@@ -1,19 +1,10 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Prompts (Phase 11.5: Advanced, Context-Aware Editor)
+# ResearchAgent Prompts (Phase 15 - Data Piping FIX)
 #
-# This version provides the definitive, advanced prompt for the Editor.
-#
-# 1. Advanced `final_answer_prompt_template`: The Editor's prompt has been
-#    completely rewritten to include sophisticated conditional logic. It
-#    instructs the LLM to first analyze the `execution_log`.
-#    - If tools were used, it adopts a "Dutiful Project Manager" persona,
-#      summarizing the work done.
-#    - If no tools were used (a DIRECT_QA track), it adopts a "Conversational
-#      Assistant" persona, answering the user's question directly without
-#      unnecessarily summarizing past events.
-# 2. User-Suggested Focus: The prompt now incorporates the user's excellent
-#    suggestion to "focus on the last request, but expand with previous
-#    knowledge if appropriate."
+# This version updates the planner's prompt to explicitly teach it how to
+# use the `{step_N_output}` placeholder for piping data between steps. This
+# will fix the bug where a placeholder was written to a file instead of the
+# actual summary.
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
@@ -32,7 +23,6 @@ You will be given the current state of the Memory Vault and the most recent turn
 3.  **Add to Lists:** If the new information represents a new entity (like a new project, a new concept, or a new fact), add it to the end of the appropriate list. Do NOT overwrite the entire list.
 4.  **Be Precise:** Only add or modify information that is explicitly stated in the recent conversation. Do not infer or invent details.
 5.  **Return Full JSON:** You must always return the *entire*, updated JSON object for the memory vault.
-
 ---
 **Current Memory Vault:**
 ```json
@@ -156,7 +146,7 @@ You are an expert "Handyman" agent. Your job is to take a user's latest request,
 )
 
 
-# 5. Structured Planner Prompt
+# 5. Structured Planner Prompt (MODIFIED)
 structured_planner_prompt_template = PromptTemplate.from_template(
     """
 You are an expert architect and planner. Your job is to create a detailed, step-by-step execution plan in JSON format to fulfill the user's latest request, using all available context.
@@ -179,30 +169,32 @@ You are an expert architect and planner. Your job is to create a detailed, step-
 - Analyze the user's request in the context of the structured memory and recent history.
 - Decompose the request into a sequence of logical steps.
 - For each step, specify: `step_id`, `instruction`, `tool_name`, and `tool_input`.
+- **CRITICAL DATA PIPING RULE:** If a step needs to use the output from a previous step, you MUST use the special placeholder string `{{step_N_output}}` as the value in your `tool_input`, where `N` is the `step_id` of the step that produces the required output.
 - Your final output must be a single, valid JSON object containing a "plan" key.
-- CRITICAL: Ensure the final output is a perfectly valid JSON. All strings must use double quotes.
-- Any double quotes inside a string must be properly escaped with a backslash (e.g., "This is a \\"quoted\\" string.").
+- Ensure the final output is a perfectly valid JSON. All strings must use double quotes. Any double quotes inside a string must be properly escaped with a backslash (e.g., "This is a \\"quoted\\" string.").
 - Do not add any conversational fluff or explanation. Your output must be ONLY the JSON object.
 ---
-**Example Output:**
+**Example of Data Piping:**
+*Request:* "Search for the weather in Paris and save the result to a file named 'weather.txt'."
+*Correct Output:*
 ```json
 {{
   "plan": [
     {{
       "step_id": 1,
-      "instruction": "Search the web to find the main topic of the user's request.",
+      "instruction": "Search the web to find the current weather in Paris.",
       "tool_name": "web_search",
       "tool_input": {{
-        "query": "example search query"
+        "query": "weather in Paris"
       }}
     }},
     {{
       "step_id": 2,
-      "instruction": "Write the findings from the web search to a file named 'research_summary.txt'.",
+      "instruction": "Write the weather information obtained from the previous step to a file named 'weather.txt'.",
       "tool_name": "write_file",
       "tool_input": {{
-        "file": "research_summary.txt",
-        "content": "The summary of the research findings will be placed here."
+        "file": "weather.txt",
+        "content": "{{step_1_output}}"
       }}
     }}
   ]
@@ -284,7 +276,6 @@ You are an expert evaluator. Your job is to assess the outcome of a tool's execu
 - **Critically assess** if the `Tool's Output` **fully and completely satisfies** the `Plan Step`'s instruction.
 - **Do not just check for a successful exit code.** Verify the *substance* of the output achieves the step's goal.
 - Your output must be a single, valid JSON object with a "status" ("success" or "failure") and "reasoning".
-
 ---
 **Example Output:**
 ```json
@@ -310,7 +301,7 @@ You are an expert evaluator. Your job is to assess the outcome of a tool's execu
 """
 )
 
-# --- UPDATED PROMPT ---
+
 # 8. Final Answer Synthesis Prompt (Advanced)
 final_answer_prompt_template = PromptTemplate.from_template(
     """

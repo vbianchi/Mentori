@@ -1,9 +1,60 @@
+/* --- Shadcn-Inspired Theme & High-Contrast Overhaul --- */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Add any global base styles here */
+@layer base {
+  :root {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48.2%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  /* --- MODIFIED: The incorrect @apply rule has been removed --- */
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
 html, body {
-  @apply h-full bg-gray-900 text-gray-200;
-  font-family: 'Inter', sans-serif; /* We'll add the font link in main.jsx */
+  @apply h-full;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar for a more integrated look */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(var(--secondary) / 0.5);
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.5);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
 }

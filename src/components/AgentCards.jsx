@@ -12,7 +12,9 @@ const AgentResponseCard = ({ icon, title, children, showCopy, copyText }) => (
 );
 
 const StepCard = ({ step }) => {
-    const [isExpanded, setIsExpanded] = useState(true);
+    // --- MODIFIED: A step now starts collapsed by default ---
+    const [isExpanded, setIsExpanded] = useState(false);
+    
     const getStatusIcon = () => {
         switch (step.status) {
             case 'in-progress': return <LoaderIcon class="h-5 w-5 text-yellow-400" />;
