@@ -4,37 +4,42 @@ To build a transformative, AI-powered workbench. The platform will be powerful e
 
 ### ✅ COMPLETED PHASES
 
--   \[x\] **Phase 12: The Interactive Workbench:** Evolved the workspace from a simple file list into a full-featured, interactive file explorer with a smart backend API, folder navigation, breadcrumbs, core interactivity (create, rename, delete), drag-and-drop uploads, and a smart previewer for images, Markdown, and CSVs.
--   \[x\] **Phase 12.5: Concurrent Agent Execution & Control:** Refactored the backend server to handle multiple, simultaneous agent runs and provided users with the ability to stop a running task. The architecture now correctly decouples agent execution from the client connection.
--   \[x\] **Phase 13: The "Tool Forge" (v1):** Implemented the foundational "LLM as an Engine" Tool Forge. Users can now define custom tools with typed arguments through a UI, which generates functional Python tool files on the backend that are immediately available to the agent without a server restart.
--   \[x\] **Phase 14.1: The Active Toolbox:** Implemented a global UI panel to enable/disable any available tool. The agent's capabilities are now filtered in real-time based on the user's selection for all subsequent operations.
+-   \[x\] **Phase 12: The Interactive Workbench:** Evolved the workspace from a simple file list into a full-featured, interactive file explorer.
+-   \[x\] **Phase 12.5: Concurrent Agent Execution & Control:** Refactored the backend server to handle multiple, simultaneous agent runs and provided users with the ability to stop a running task.
+-   \[x\] **Phase 13: The "Tool Forge" (v1):** Implemented the foundational "LLM as an Engine" Tool Forge.
+-   \[x\] **Phase 14: UI & Agent Simplification:** Refactored the UI and removed early blueprint logic to focus on core tooling.
+-   \[x\] **Phase 15: Advanced Tooling (v1):** Equipped the agent with a suite of powerful, pre-built tools for common high-value tasks, including `query_files` and `critique_document`.
+-   \[x\] **Phase 16: UI Polish & Enhanced File Interaction:** Overhauled the UI with a high-contrast theme, redesigned settings panels, and implemented inline file/folder creation, multi-file uploads, and other UX improvements.
 
 ### 🚀 UPCOMING PHASES 🚀
 
-#### Phase 14.2: The "Blueprint Canvas" - Visual Workflow Editor
+#### Phase 17: Production-Grade Backend Infrastructure
 
-_Goal: Evolve the Tool Forge into a visual, node-based editor where users can create, save, and reuse complex, multi-step plans as new, high-level tools._
+_Goal: Evolve the backend from a prototype to a scalable, resilient, and persistent system, inspired by best practices from projects like Suna._
 
--   \[x\] **Task 1: Foundational UI:** Re-architected the Tool Forge UI into a two-panel layout, with a list of available tools on the left and a main editor/viewer panel on the right.
--   \[x\] **Task 2: Read-Only Plan Visualizer:** Upgraded the UI to render an agent's multi-step plan as a static, read-only graph of nodes. The backend now correctly loads and expands blueprint tools to be displayed.
--   \[x\] **Task 3: The Interactive Canvas:** Transformed the visualizer into a full-featured editor, allowing users to reorder steps with drag-and-drop, add new tools from the panel, and remove steps from the canvas.
--   \[ \] **Task 4: Visual Data Piping:** Introduce input/output anchors on each node. Implement the UI and backend logic to allow users to visually draw connections between nodes to define the data flow (e.g., piping the output of a `web_search` into the input of a `summarize` tool).
--   \[ \] **Task 5: Blueprint Execution Engine:** Implement the "Plan Substitution" logic on the backend. This will enable the agent to execute a saved JSON blueprint by pausing the main plan, running the blueprint's sub-plan, and then seamlessly resuming the main plan.
+-   \[ \] **Task 1: Database Integration:** Integrate **SQLite** for portable and simple persistence. Use the **SQLAlchemy ORM** to abstract database interactions, allowing for a future migration to a larger system like Postgres if needed.
+-   \[ \] **Task 2: Task Queue Integration:** Replace the current `asyncio` background tasks with a robust task queue system like **Dramatiq with a Redis broker**. This will decouple the API from long-running agent jobs.
+-   \[ \] **Task 3: State Migration:** Refactor the agent and server to read and write all state (chat history, agent memory, task definitions) to the new SQLite database instead of being transient.
 
-#### Phase 15: Advanced Tooling & Templates
+#### Phase 18: User Management & Authentication
 
-_Goal: Equip the agent with a suite of powerful, pre-built tools for common high-value tasks._
+_Goal: Transform the application from a single-user tool to a secure, multi-user platform._
 
--   \[ \] **Multi-Document Reporter Tool:** A tool that can synthesize information from multiple text files or PDFs.
--   \[ \] **Scientific Data Fetcher Tool:** A specialized tool to find and download datasets from sources like NCBI, PubMed, etc.
--   \[ \] **Website Report Generator:** A tool that can populate pre-defined website templates with data to create visual reports.
+-   \[ \] **Task 1: Authentication Service:** Integrate a flexible authentication provider (e.g., Supabase Auth, Auth0) to handle user logins.
+-   \[ \] **Task 2: Multi-Provider SSO:** Configure the authentication service to support multiple OAuth providers, specifically **Microsoft, Google, and GitHub**.
+-   \[ \] **Task 3: Secure API Key Management:** Build a UI and backend system for users to securely store their own API keys, encrypted at rest in the database.
 
-#### Phase 16: UI/UX Polish & Advanced Previews
+#### Phase 19: Advanced Sandboxing & Collaboration
 
-_Goal: Refine the user experience with modern, fluid interactions and expand file preview capabilities._
+_Goal: Implement full isolation between tasks and introduce foundational collaboration features._
 
--   \[ \] **Advanced Document Previews:** Implement client-side rendering for PDFs (using `PDF.js`) and server-side conversion for Word documents (`.docx`) to enable in-app viewing.
--   \[ \] **Inline File/Folder Creation:** Refactor the creation process to instantly add a new item to the UI in an "editing" state, only calling the backend API after the user confirms the name.
--   \[ \] **Drag-and-Drop File Moving:** Add support for dragging files and dropping them onto folders to trigger a move/rename operation.
--   \[ \] **Inline Renaming:** Unify the renaming experience by refactoring the file explorer to support in-place renaming, consistent with the task list.
--   \[ \] **Running Task Indicator:** Add a visual indicator (e.g., a spinning loader icon) next to the name of any non-active task in the sidebar that currently has a running agent process.
+-   \[ \] **Task 1: Per-Task Docker Sandboxes:** Refactor the task queue worker to use the **Docker SDK for Python** to programmatically start and stop isolated containers for each agent task, mounting the appropriate workspace directory.
+-   \[ \] **Task 2: The "Organization" Model:** Implement the database schema and backend logic for "Organizations" to enable multi-tenancy, laying the groundwork for shared tasks.
+
+#### Phase 20: Intelligent Agent Capabilities
+
+_Goal: Enhance the core intelligence and capabilities of the agent itself._
+
+-   \[ \] **Task 1: The Intelligent Blueprint System:** Implement the full blueprint architecture, including the `plan_expander_node`, to allow the agent to discover and use pre-defined multi-step plans as high-level tools.
+-   \[ \] **Task 2: The "Committee of Critics":** Evolve the `critique_document` tool into the advanced multi-persona system we brainstormed, where a panel of AI experts collaborates to provide a comprehensive review.
+-   \[ \] **Task 3: MCP Tool Integration:** Develop a wrapper to allow the agent to connect to the Model Context Protocol (MCP) tool ecosystem, dramatically expanding its available tools.
