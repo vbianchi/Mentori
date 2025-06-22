@@ -1,15 +1,15 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 14.2: Tool Forge Removed)
+# ResearchAgent Backend Server (Phase 15 - Inline File Creation FIX)
 #
-# This version simplifies the API by removing blueprint-related logic.
+# This version fixes the bug where creating a new, empty file from the UI
+# would fail.
 #
 # Key Architectural Changes:
-# 1. BlueprintTool Import Removed: The server no longer needs to know about
-#    the BlueprintTool class.
-# 2. Simplified Tool Serialization: The `_handle_get_tools` method is
-#    simplified. It now sends a basic list of tools with their name and
-#    description, as the concept of different tool 'types' has been
-#    temporarily removed from the API response.
+# 1. New API Endpoint: The `do_POST` method in the HTTP handler now has a
+#    route for `/api/workspace/files`.
+# 2. New `_handle_create_file` Method: This new method contains the logic
+#    to securely create an empty file at the specified path, mirroring the
+#    existing folder creation logic.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -31,7 +31,6 @@ from langgraph.checkpoint.memory import MemorySaver
 # --- Local Imports ---
 from .langgraph_agent import agent_graph
 from .tools.file_system import _resolve_path
-# --- MODIFIED: BlueprintTool import is no longer needed ---
 from .tools import get_available_tools
 
 # --- Configuration & Globals ---
@@ -147,11 +146,13 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         elif path == '/api/workspace/raw': self._handle_get_raw_file(parsed_path)
         else: self._send_json_response(404, {'error': f"Not Found: The path '{path}' does not match any known API routes."})
     
+    # --- MODIFIED: Added `/api/workspace/files` route ---
     def do_POST(self):
         parsed_path = urlparse(self.path)
         path = parsed_path.path.rstrip('/')
         if path == '/api/tools': self._handle_create_tool()
         elif path == '/api/workspace/folders': self._handle_create_folder()
+        elif path == '/api/workspace/files': self._handle_create_file() # New route
         elif path == '/upload': self._handle_file_upload()
         else: self._send_json_response(404, {'error': f"Not Found: The POST path '{path}' does not match any known API routes."})
 
@@ -264,13 +265,10 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         default_models = {"ROUTER_LLM_ID": os.getenv("ROUTER_LLM_ID", global_default_llm), "CHIEF_ARCHITECT_LLM_ID": os.getenv("CHIEF_ARCHITECT_LLM_ID", global_default_llm), "SITE_FOREMAN_LLM_ID": os.getenv("SITE_FOREMAN_LLM_ID", global_default_llm), "PROJECT_SUPERVISOR_LLM_ID": os.getenv("PROJECT_SUPERVISOR_LLM_ID", global_default_llm), "EDITOR_LLM_ID": os.getenv("EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")}
         self._send_json_response(200, {"available_models": available_models, "default_models": default_models})
     
-    # --- MODIFIED: This method is now simplified ---
     def _handle_get_tools(self):
         logger.info("Serving available tools list.")
         try:
             loaded_tools = get_available_tools()
-            # The logic to differentiate tool types is no longer needed.
-            # We just format all tools into a simple list.
             formatted_tools = [
                 {"name": tool.name, "description": tool.description}
                 for tool in loaded_tools
@@ -329,6 +327,28 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             self._send_json_response(201, {'message': f"Folder '{new_path_str}' created successfully."})
         except Exception as e:
             logger.error(f"Error creating folder: {e}", exc_info=True)
+            self._send_json_response(500, {'error': str(e)})
+            
+    # --- NEW: Handler for creating empty files ---
+    def _handle_create_file(self):
+        try:
+            content_length = int(self.headers['Content-Length'])
+            if content_length == 0: return self._send_json_response(400, {'error': 'Request body is empty.'})
+            body = json.loads(self.rfile.read(content_length))
+            new_path_str = body.get('path')
+            if not new_path_str: return self._send_json_response(400, {'error': "Request body must contain a 'path' key."})
+            
+            full_path = _resolve_path("/app/workspace", new_path_str)
+            if os.path.exists(full_path): return self._send_json_response(409, {'error': f"Conflict: An item already exists at '{new_path_str}'."})
+
+            # Create the file by opening it in write mode and immediately closing it.
+            with open(full_path, 'w') as f:
+                pass
+            
+            logger.info(f"Successfully created empty file: {full_path}")
+            self._send_json_response(201, {'message': f"File '{new_path_str}' created successfully."})
+        except Exception as e:
+            logger.error(f"Error creating file: {e}", exc_info=True)
             self._send_json_response(500, {'error': str(e)})
 
     def _handle_rename_workspace_item(self):
