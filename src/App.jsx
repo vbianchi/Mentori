@@ -387,7 +387,10 @@ export function App() {
             
             <div class="flex-1 flex flex-col h-full bg-card/50 rounded-lg border border-border shadow-2xl min-w-0">
                 <div class="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
-                   <h1 class="text-2xl font-bold text-foreground">ResearchAgent</h1>
+                   <div>
+                       <h1 class="text-2xl font-bold text-foreground">ResearchAgent</h1>
+                       <p class="text-xs text-muted-foreground">by Valerio Bianchi & Gemini 2.5 Pro</p>
+                   </div>
                    <div class="flex items-center gap-2">
                        <span class="relative flex h-3 w-3"> {agent.connectionStatus === 'Connected' && <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>} <span class={`relative inline-flex rounded-full h-3 w-3 ${agent.connectionStatus === 'Connected' ? 'bg-green-500' : 'bg-red-500'}`}></span> </span>
                        <span class="text-sm text-muted-foreground">{agent.connectionStatus}</span>
