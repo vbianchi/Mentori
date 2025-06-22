@@ -140,7 +140,6 @@ const ModelSelectorRow = ({ label, icon, onModelChange, models, selectedModel, r
         </div>
         <div class="relative w-48">
              <select value={selectedModel} onChange={(e) => onModelChange(roleKey, e.target.value)} class="w-full p-2 bg-secondary border border-border rounded-md text-foreground focus:ring-2 focus:ring-primary focus:outline-none appearance-none text-sm" disabled={!selectedModel || models.length === 0}>
-                {/* --- MODIFIED: Use model.name for display --- */}
                 {models.map(model => <option key={model.id} value={model.id}>{model.name}</option>)}
             </select>
             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground">
@@ -154,7 +153,6 @@ const ToolToggleRow = ({ tool, isEnabled, onToggle }) => (
      <div class="flex items-start justify-between py-3 border-b border-border/50">
         <div class="flex-1 min-w-0 pr-4">
             <p class="font-semibold text-sm text-foreground">{tool.name}</p>
-            {/* --- MODIFIED: Removed truncate, added whitespace-normal --- */}
             <p class="text-xs text-muted-foreground whitespace-normal break-words">{tool.description}</p>
         </div>
         <label class="relative inline-flex items-center cursor-pointer mt-1">
@@ -366,16 +364,19 @@ export function App() {
                            <button onClick={() => setIsLeftSidebarVisible(false)} class="p-1.5 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground" title="Hide Sidebar"><ChevronsLeftIcon class="h-4 w-4" /></button>
                         </div>
                     </div>
+                    {/* --- MODIFIED: Restructured layout for proper scrolling --- */}
                     <div class="flex flex-col flex-grow p-4 min-h-0">
-                        <div class="flex-grow overflow-y-auto pr-2 -mr-2">
+                        <div class="flex-shrink-0">
                             {tasks.length > 0 ? ( <ul> {tasks.map(task => ( <TaskItem key={task.id} task={task} isActive={activeTaskId === task.id} isRunning={!!agent.runningTasks[task.id]} onSelect={selectTask} onRename={renameTask} onDelete={handleDeleteTask} /> ))} </ul> ) : ( <p class="text-muted-foreground text-center mt-4">No tasks yet.</p> )}
                         </div>
-                        <SettingsSection title="Active Toolbox" icon={<BriefcaseIcon className="h-5 w-5 text-muted-foreground" />}>
-                            {settings.availableTools.map(tool => <ToolToggleRow key={tool.name} tool={tool} isEnabled={settings.enabledTools[tool.name] ?? true} onToggle={() => settings.handleToggleTool(tool.name)} />)}
-                        </SettingsSection>
-                        <SettingsSection title="Agent Models" icon={<SlidersIcon className="h-5 w-5 text-muted-foreground" />}>
-                            {agentRoles.map(role => <ModelSelectorRow key={role.key} label={role.label} icon={role.icon} models={settings.availableModels} selectedModel={settings.selectedModels[role.key]} onModelChange={settings.handleModelChange} roleKey={role.key} description={role.description} />)}
-                        </SettingsSection>
+                        <div class="flex-grow min-h-0 overflow-y-auto mt-2 -mr-4 pr-4">
+                            <SettingsSection title="Active Toolbox" icon={<BriefcaseIcon className="h-5 w-5 text-muted-foreground" />}>
+                                {settings.availableTools.map(tool => <ToolToggleRow key={tool.name} tool={tool} isEnabled={settings.enabledTools[tool.name] ?? true} onToggle={() => settings.handleToggleTool(tool.name)} />)}
+                            </SettingsSection>
+                            <SettingsSection title="Agent Models" icon={<SlidersIcon className="h-5 w-5 text-muted-foreground" />}>
+                                {agentRoles.map(role => <ModelSelectorRow key={role.key} label={role.label} icon={role.icon} models={settings.availableModels} selectedModel={settings.selectedModels[role.key]} onModelChange={settings.handleModelChange} roleKey={role.key} description={role.description} />)}
+                            </SettingsSection>
+                        </div>
                     </div>
                 </div>
             )}
