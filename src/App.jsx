@@ -1,18 +1,52 @@
 import { h } from 'preact';
 import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
-import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, FolderIcon, ArrowLeftIcon, UploadCloudIcon, StopCircleIcon, ForgeIcon, BriefcaseIcon } from './components/Icons';
+import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, FolderIcon, ArrowLeftIcon, UploadCloudIcon, StopCircleIcon, ForgeIcon, BriefcaseIcon, SendToChatIcon } from './components/Icons';
 import { ArchitectCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard } from './components/AgentCards';
 import { ToggleButton, CopyButton } from './components/Common';
-// MODIFIED: ToolForge import is no longer needed as the component is not used.
-// import { ToolForge } from './components/ToolForge';
 import { useTasks } from './hooks/useTasks';
 import { useWorkspace } from './hooks/useWorkspace';
 import { useSettings } from './hooks/useSettings';
 import { useAgent } from './hooks/useAgent';
 
-// --- File Previewer Component ---
+// --- Inline Editor Component for File/Folder Creation/Renaming ---
+const InlineEditor = ({ item, onConfirm, onCancel }) => {
+    const [name, setName] = useState(item.name || '');
+    const inputRef = useRef(null);
+
+    useEffect(() => {
+        inputRef.current?.focus();
+        inputRef.current?.select();
+    }, []);
+
+    const handleConfirm = () => {
+        onConfirm(item.name, name, item.type, item.isNew);
+    };
+    
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') handleConfirm();
+        else if (e.key === 'Escape') onCancel(item.name, item.type, item.isNew);
+    };
+
+    return (
+        <li class="group flex justify-between items-center mb-1 bg-blue-900/30 rounded-md -ml-2 -mr-2 pr-2">
+            <div class="flex items-center gap-2 flex-grow p-2">
+                {item.type === 'folder' ? <FolderIcon class="h-4 w-4 text-blue-400 flex-shrink-0" /> : <FileIcon class="h-4 w-4 text-gray-500 flex-shrink-0" />}
+                <input
+                    ref={inputRef}
+                    type="text"
+                    value={name}
+                    onInput={(e) => setName(e.target.value)}
+                    onBlur={handleConfirm}
+                    onKeyDown={handleKeyDown}
+                    class="w-full bg-transparent text-white outline-none text-sm"
+                />
+            </div>
+        </li>
+    );
+};
+
+
 const FilePreviewer = ({ currentPath, file, isLoading, content, rawFileUrl }) => {
-    // ... (no changes in this component)
     if (isLoading) {
         return <div class="flex items-center justify-center h-full"><LoaderIcon class="h-6 w-6" /></div>;
     }
@@ -65,9 +99,6 @@ const FilePreviewer = ({ currentPath, file, isLoading, content, rawFileUrl }) =>
         </pre>
     );
 };
-
-
-// --- UI Components ---
 
 const PromptCard = ({ content }) => (
     <div class="mt-8 p-4 rounded-lg shadow-md bg-blue-900/50 border border-gray-700/50">
@@ -181,7 +212,6 @@ const Breadcrumbs = ({ path, onNavigate }) => {
 };
 
 
-// --- Main App Component ---
 export function App() {
     const { tasks, setTasks, activeTaskId, selectTask: setActiveTaskId, renameTask } = useTasks();
     const workspace = useWorkspace(activeTaskId);
@@ -190,13 +220,11 @@ export function App() {
     const [inputValue, setInputValue] = useState("");
     const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
     const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
-    // MODIFIED: activeView state is removed as it's no longer needed.
-    // const [activeView, setActiveView] = useState('tasks');
     const [isAwaitingApproval, setIsAwaitingApproval] = useState(false);
     
     const messagesEndRef = useRef(null);
+    const promptInputRef = useRef(null);
 
-    // --- REFACTORED: Central message handler for the useAgent hook ---
     const handleIncomingMessage = useCallback((newEvent) => {
         setTasks(currentTasks => {
             try {
@@ -276,7 +304,6 @@ export function App() {
         }
     }, [activeTaskId, workspace.currentPath]);
 
-    // --- REFACTORED: Initialize useAgent hook ---
     const agent = useAgent(handleIncomingMessage);
 
     useEffect(() => {
@@ -291,21 +318,19 @@ export function App() {
             setIsAwaitingApproval(false);
             workspace.resetWorkspaceViews();
             workspace.setCurrentPath(taskId);
-            // MODIFIED: No longer need to switch views
-            // setActiveView('tasks'); 
         }
     };
     
     const createNewTask = () => {
         const newTaskId = `task_${Date.now()}`;
-        agent.createTask(newTaskId); // Inform backend
+        agent.createTask(newTaskId);
         const newTask = { id: newTaskId, name: `New Task ${tasks.length + 1}`, history: [] };
         setTasks(prevTasks => [...prevTasks, newTask]);
         selectTask(newTaskId);
     };
 
     const handleDeleteTask = (taskIdToDelete) => {
-        agent.deleteTask(taskIdToDelete); // Inform backend
+        agent.deleteTask(taskIdToDelete);
         const currentTasks = tasks;
         const remainingTasks = currentTasks.filter(task => task.id !== taskIdToDelete);
         
@@ -328,7 +353,6 @@ export function App() {
     };
 
     useEffect(() => {
-        // MODIFIED: fetchFiles only depends on the workspace path now
         if (workspace.currentPath) {
             workspace.fetchFiles(workspace.currentPath);
         }
@@ -344,11 +368,10 @@ export function App() {
         if (plan) {
             payload.plan = plan;
         }
-        agent.resumeAgent(payload); // Use agent hook
+        agent.resumeAgent(payload);
     };
 
     const handleModifyAndApprove = (modifiedPlan) => {
-        // Optimistically update the UI with the modified plan
         setTasks(currentTasks => currentTasks.map(task => {
             if (task.id === activeTaskId) {
                 const newHistory = [...task.history];
@@ -376,14 +399,12 @@ export function App() {
         const message = inputValue.trim();
         if (!message || !activeTask || agent.connectionStatus !== 'Connected' || agent.runningTasks[activeTaskId] || isAwaitingApproval) return;
 
-        // Optimistically update UI with the new prompt
         const newPrompt = { type: 'prompt', content: message };
         const newRunContainer = { type: 'run_container', children: [], isComplete: false };
         setTasks(currentTasks => currentTasks.map(task => 
             task.id === activeTaskId ? { ...task, history: [...task.history, newPrompt, newRunContainer] } : task
         ));
         
-        // Send the command to the agent
         agent.runAgent({ 
             prompt: message, 
             llm_config: settings.selectedModels, 
@@ -396,6 +417,13 @@ export function App() {
     const handleStopAgent = () => {
         agent.stopAgent(activeTaskId);
     };
+
+    // --- NEW: Handler for the "Send to Chat" button ---
+    const handleSendToChat = (filename) => {
+        // Appends the filename in quotes to the input, focusing the textarea
+        setInputValue(prev => `${prev}${prev ? ' ' : ''}'${filename}' `);
+        promptInputRef.current?.focus();
+    };
     
     return (
         <div class="flex h-screen w-screen p-4 gap-4 bg-gray-900 text-gray-200" style={{fontFamily: "'Inter', sans-serif"}}>
@@ -403,16 +431,13 @@ export function App() {
             {isLeftSidebarVisible && (
                 <div class="h-full w-1/4 min-w-[300px] bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl flex flex-col">
                     <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-700 flex-shrink-0">
-                        {/* MODIFIED: The title is now static */}
                         <h2 class="text-xl font-bold text-white">Tasks</h2>
                         <div class="flex items-center gap-2">
-                           {/* MODIFIED: The Tool Forge button has been removed. */}
                            <button onClick={createNewTask} class="p-1.5 rounded-md hover:bg-gray-700" title="New Task"><PlusCircleIcon class="h-5 w-5" /></button>
                            <button onClick={() => setIsLeftSidebarVisible(false)} class="p-1.5 rounded-md hover:bg-gray-700" title="Hide Sidebar"><ChevronsLeftIcon class="h-4 w-4" /></button>
                         </div>
                     </div>
                     
-                    {/* MODIFIED: The main content of the left sidebar is now always the task list and settings */}
                     <div class="flex flex-col flex-grow p-6 pt-4 min-h-0">
                         <div class="flex-grow overflow-y-auto pr-2">
                             {tasks.length > 0 ? ( <ul> {tasks.map(task => ( <TaskItem key={task.id} task={task} isActive={activeTaskId === task.id} isRunning={!!agent.runningTasks[task.id]} onSelect={selectTask} onRename={renameTask} onDelete={handleDeleteTask} /> ))} </ul> ) : ( <p class="text-gray-400 text-center mt-4">No tasks yet. Create one!</p> )}
@@ -423,7 +448,6 @@ export function App() {
                 </div>
             )}
             
-            {/* MODIFIED: The main content area is no longer conditional on `activeView` */}
             <div class="flex-1 flex flex-col h-full bg-gray-800/50 rounded-lg border border-gray-700/50 shadow-2xl min-w-0">
                 <div class="flex items-center justify-between p-6 border-b border-gray-700 flex-shrink-0">
                    <h1 class="text-2xl font-bold text-white">ResearchAgent</h1>
@@ -477,7 +501,7 @@ export function App() {
                 </div>
                 <div class="p-6 border-t border-gray-700 flex-shrink-0">
                     <form onSubmit={handleSendMessage} class="flex gap-3">
-                        <textarea value={inputValue} onInput={e => setInputValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) handleSendMessage(e); }} class="flex-1 p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" placeholder={activeTaskId ? (isAwaitingApproval ? "Approve, modify, or reject the plan above." : (agent.runningTasks[activeTaskId] ? "Agent is running..." : "Send a message...")) : "Please select or create a task."} rows="2" disabled={!activeTaskId || agent.runningTasks[activeTaskId] || isAwaitingApproval} ></textarea>
+                        <textarea ref={promptInputRef} value={inputValue} onInput={e => setInputValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) handleSendMessage(e); }} class="flex-1 p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" placeholder={activeTaskId ? (isAwaitingApproval ? "Approve, modify, or reject the plan above." : (agent.runningTasks[activeTaskId] ? "Agent is running..." : "Send a message...")) : "Please select or create a task."} rows="2" disabled={!activeTaskId || agent.runningTasks[activeTaskId] || isAwaitingApproval} ></textarea>
                         {agent.runningTasks[activeTaskId] && !isAwaitingApproval ? (
                              <button type="button" onClick={handleStopAgent} class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 disabled:bg-gray-500 transition-colors flex items-center gap-2">
                                 <StopCircleIcon class="h-5 w-5"/>
@@ -511,8 +535,10 @@ export function App() {
                                  <div class="flex justify-between items-center mb-2 flex-shrink-0">
                                     <Breadcrumbs path={workspace.currentPath} onNavigate={workspace.handleBreadcrumbNav} />
                                     <div class="flex items-center">
-                                        <button onClick={workspace.createFolder} disabled={!workspace.currentPath || workspace.loading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="New Folder"> <PlusCircleIcon class="h-4 w-4" /> </button>
-                                        <input type="file" ref={workspace.fileInputRef} onChange={(e) => workspace.uploadFile(e.target.files[0])} class="hidden" />
+                                        <button onClick={() => workspace.startInlineCreate('folder')} disabled={!workspace.currentPath || workspace.loading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="New Folder"> <FolderIcon class="h-4 w-4" /> </button>
+                                        <button onClick={() => workspace.startInlineCreate('file')} disabled={!workspace.currentPath || workspace.loading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="New File"> <FileIcon class="h-4 w-4" /> </button>
+                                        {/* --- MODIFIED: Add `multiple` prop and use `uploadFiles` --- */}
+                                        <input type="file" ref={workspace.fileInputRef} onChange={(e) => workspace.uploadFiles(e.target.files)} class="hidden" multiple />
                                         <button onClick={() => workspace.fileInputRef.current?.click()} disabled={!workspace.currentPath || workspace.loading} class="p-1.5 rounded-md hover:bg-gray-700 disabled:opacity-50" title="Upload File"> <UploadCloudIcon class="h-4 w-4" /> </button>
                                     </div>
                                  </div>
@@ -521,18 +547,28 @@ export function App() {
                                      workspace.error ? <p class="text-red-400">Error: {workspace.error}</p> : 
                                      workspace.items.length === 0 ? <p>// Directory is empty.</p> : ( 
                                      <ul> 
-                                        {workspace.items.map(item => ( 
-                                            <li key={item.name} class="group flex justify-between items-center mb-1 hover:bg-gray-700/50 rounded-md -ml-2 -mr-2 pr-2">
-                                                <div onClick={() => workspace.handleNavigation(item)} title={item.name} class="flex items-center gap-2 cursor-pointer truncate flex-grow p-2"> 
-                                                    {item.type === 'directory' ? <FolderIcon class="h-4 w-4 text-blue-400 flex-shrink-0" /> : <FileIcon class="h-4 w-4 text-gray-500 flex-shrink-0" />}
-                                                    <span>{item.name}</span>
-                                                </div>
-                                                <div class="flex items-center opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                                                    <button onClick={(e) => { e.stopPropagation(); workspace.renameItem(item); }} class="p-1 text-gray-500 hover:text-white" title={`Rename ${item.type}`}> <PencilIcon class="h-4 w-4" /> </button>
-                                                    <button onClick={(e) => { e.stopPropagation(); workspace.deleteItem(item); }} class="p-1 text-gray-500 hover:text-red-400" title={`Delete ${item.type}`}> <Trash2Icon class="h-4 w-4" /> </button>
-                                                </div>
-                                            </li> 
-                                        ))} 
+                                        {workspace.items.map(item => {
+                                            if (item.isEditing) {
+                                                return <InlineEditor key={item.name} item={item} onConfirm={workspace.handleConfirmName} onCancel={workspace.handleConfirmName} />;
+                                            }
+                                            if (item.isLoading) {
+                                                return <li class="flex items-center gap-2 p-2 -ml-2 -mr-2 text-gray-500"><LoaderIcon class="h-4 w-4 flex-shrink-0"/> <span>Uploading {item.name}...</span></li>;
+                                            }
+                                            return (
+                                                <li key={item.name} class="group flex justify-between items-center mb-1 hover:bg-gray-700/50 rounded-md -ml-2 -mr-2 pr-2">
+                                                    <div onClick={() => workspace.handleNavigation(item)} title={item.name} class="flex items-center gap-2 cursor-pointer truncate flex-grow p-2"> 
+                                                        {item.type === 'directory' ? <FolderIcon class="h-4 w-4 text-blue-400 flex-shrink-0" /> : <FileIcon class="h-4 w-4 text-gray-500 flex-shrink-0" />}
+                                                        <span>{item.name}</span>
+                                                    </div>
+                                                    <div class="flex items-center opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                                                        {/* --- NEW: "Send to Chat" button --- */}
+                                                        <button onClick={(e) => { e.stopPropagation(); handleSendToChat(item.name); }} class="p-1 text-gray-500 hover:text-white" title="Send name to chat"> <SendToChatIcon class="h-4 w-4" /> </button>
+                                                        <button onClick={(e) => { e.stopPropagation(); workspace.startInlineRename(item); }} class="p-1 text-gray-500 hover:text-white" title={`Rename ${item.type}`}> <PencilIcon class="h-4 w-4" /> </button>
+                                                        <button onClick={(e) => { e.stopPropagation(); workspace.deleteItem(item); }} class="p-1 text-gray-500 hover:text-red-400" title={`Delete ${item.type}`}> <Trash2Icon class="h-4 w-4" /> </button>
+                                                    </div>
+                                                </li> 
+                                            );
+                                        })} 
                                      </ul> 
                                     )}
                                  </div>

@@ -1,8 +1,8 @@
-import { useState, useRef } from 'preact/hooks';
+import { h } from 'preact';
+import { useState, useRef, useCallback } from 'preact/hooks';
 
 export const useWorkspace = (initialPath) => {
     const [items, setItems] = useState([]);
-    // --- FIX: Ensure currentPath is always a string, even if initialPath is null ---
     const [currentPath, setCurrentPath] = useState(initialPath || '');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -15,7 +15,7 @@ export const useWorkspace = (initialPath) => {
     const dragCounter = useRef(0);
     const fileInputRef = useRef(null);
 
-    const fetchFiles = async (path) => {
+    const fetchFiles = useCallback(async (path) => {
         if (!path) return;
         setLoading(true);
         setError(null);
@@ -39,7 +39,7 @@ export const useWorkspace = (initialPath) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     const selectAndFetchFile = async (file) => {
         if (!currentPath || !file) return;
@@ -107,72 +107,105 @@ export const useWorkspace = (initialPath) => {
             setLoading(false);
         }
     };
-
-    const createFolder = async () => {
-        const folderName = prompt("Enter the name for the new folder:");
-        if (!folderName || folderName.trim() === '') return;
+    
+    // --- MODIFIED: Start the inline creation process ---
+    const startInlineCreate = (type) => {
+        // Prevent creating a new item while another is already being created/renamed
+        if (items.some(item => item.isEditing)) return;
         
-        const newFolderPath = `${currentPath}/${folderName.trim()}`;
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await fetch('http://localhost:8766/api/workspace/folders', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ path: newFolderPath }),
-            });
-            if (!response.ok) throw new Error((await response.json()).error || 'Failed to create folder');
-            await fetchFiles(currentPath);
-        } catch (err) {
-            console.error("Failed to create folder:", err);
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
+        const placeholderItem = {
+            name: '',
+            type: type, // 'folder' or 'file'
+            isEditing: true, // Flag for the UI to render an input
+            isNew: true, // Differentiate from renaming an existing item
+        };
+        setItems(prevItems => [...prevItems, placeholderItem]);
     };
 
-    const renameItem = async (item) => {
-        const newName = prompt(`Enter the new name for '${item.name}':`, item.name);
-        if (!newName || newName.trim() === '' || newName.trim() === item.name) return;
+    // --- NEW: Handle the final creation/renaming API call ---
+    const handleConfirmName = async (tempName, finalName, type, isNew) => {
+        // Remove the temporary placeholder item
+        setItems(prevItems => prevItems.filter(item => item.name !== tempName));
 
-        const oldPath = `${currentPath}/${item.name}`;
-        const newPath = `${currentPath}/${newName.trim()}`;
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await fetch('http://localhost:8766/api/workspace/items', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ old_path: oldPath, new_path: newPath }),
-            });
-             if (!response.ok) throw new Error((await response.json()).error || 'Failed to rename item');
-            await fetchFiles(currentPath);
-        } catch (err) {
-             console.error("Failed to rename item:", err);
-            setError(err.message);
-        } finally {
-            setLoading(false);
+        if (!finalName || finalName.trim() === '') {
+            console.log("Creation/Rename cancelled.");
+            return;
+        }
+        
+        const newPath = `${currentPath}/${finalName.trim()}`;
+        
+        if (isNew) {
+            const endpoint = type === 'folder' ? 'http://localhost:8766/api/workspace/folders' : 'http://localhost:8766/api/workspace/files';
+            const body = type === 'folder' ? { path: newPath } : { path: newPath, content: '' };
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body),
+                });
+                if (!response.ok) throw new Error((await response.json()).error || `Failed to create ${type}`);
+            } catch (err) {
+                console.error(`Failed to create ${type}:`, err);
+                setError(err.message);
+            } finally {
+                await fetchFiles(currentPath);
+            }
+        } else { // This is a rename operation
+             const oldPath = `${currentPath}/${tempName}`;
+             try {
+                const response = await fetch('http://localhost:8766/api/workspace/items', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ old_path: oldPath, new_path: newPath }),
+                });
+                 if (!response.ok) throw new Error((await response.json()).error || 'Failed to rename item');
+            } catch (err) {
+                 console.error("Failed to rename item:", err);
+                setError(err.message);
+            } finally {
+                await fetchFiles(currentPath);
+            }
         }
     };
+    
+    // --- NEW: Handle the rename UI logic ---
+    const startInlineRename = (itemToRename) => {
+        if (items.some(item => item.isEditing)) return;
+        setItems(prevItems => prevItems.map(item => 
+            item.name === itemToRename.name ? { ...item, isEditing: true } : item
+        ));
+    };
 
-    const uploadFile = async (file) => {
-        if (!file || !currentPath) return;
-        setLoading(true);
-        setError(null);
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('workspace_id', currentPath); 
-        try {
-            const response = await fetch('http://localhost:8766/upload', { method: 'POST', body: formData });
-            if (!response.ok) throw new Error((await response.json()).error || 'File upload failed');
-            await fetchFiles(currentPath);
-        } catch (err) {
-            console.error('File upload error:', err);
-            setError(`Upload failed: ${err.message}`);
-        } finally {
-            setLoading(false);
-            if(fileInputRef.current) fileInputRef.current.value = "";
-        }
+
+    const uploadFiles = async (files) => {
+        if (!files || files.length === 0 || !currentPath) return;
+        
+        // Use a temporary loading state for uploads specifically
+        setItems(prev => {
+            const newItems = [...prev];
+            Array.from(files).forEach(file => {
+                newItems.push({ name: file.name, type: 'file', isLoading: true });
+            });
+            return newItems;
+        });
+
+        // Process all uploads
+        await Promise.all(Array.from(files).map(async (file) => {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('workspace_id', currentPath);
+            try {
+                const response = await fetch('http://localhost:8766/upload', { method: 'POST', body: formData });
+                if (!response.ok) throw new Error((await response.json()).error || 'File upload failed');
+            } catch (err) {
+                console.error(`File upload error for ${file.name}:`, err);
+                setError(`Upload failed for ${file.name}: ${err.message}`);
+            }
+        }));
+
+        // Reset file input and refresh the file list from the server
+        if(fileInputRef.current) fileInputRef.current.value = "";
+        await fetchFiles(currentPath);
     };
 
     const handleDragEnter = (e) => { e.preventDefault(); e.stopPropagation(); dragCounter.current++; if (e.dataTransfer.items?.length > 0) setIsDragOver(true); };
@@ -184,7 +217,7 @@ export const useWorkspace = (initialPath) => {
         setIsDragOver(false);
         dragCounter.current = 0;
         if (e.dataTransfer.files?.length > 0) {
-            Array.from(e.dataTransfer.files).forEach(file => uploadFile(file));
+            uploadFiles(e.dataTransfer.files);
             e.dataTransfer.clearData();
         }
     };
@@ -196,31 +229,10 @@ export const useWorkspace = (initialPath) => {
     };
 
     return {
-        // State
-        items,
-        currentPath,
-        loading,
-        error,
-        selectedFile,
-        setSelectedFile,
-        fileContent,
-        isFileLoading,
-        isDragOver,
-        fileInputRef,
-
-        // Setters & Handlers
-        setCurrentPath,
-        fetchFiles,
-        handleNavigation,
-        handleBreadcrumbNav,
-        deleteItem,
-        createFolder,
-        renameItem,
-        uploadFile,
-        handleDragEnter,
-        handleDragLeave,
-        handleDragOver,
-        handleDrop,
-        resetWorkspaceViews,
+        items, currentPath, loading, error, selectedFile, setSelectedFile, fileContent, isFileLoading, isDragOver, fileInputRef,
+        setCurrentPath, fetchFiles, handleNavigation, handleBreadcrumbNav, deleteItem,
+        uploadFiles, handleDragEnter, handleDragLeave, handleDragOver, handleDrop, resetWorkspaceViews,
+        // --- NEW ---
+        startInlineCreate, startInlineRename, handleConfirmName,
     };
 };
