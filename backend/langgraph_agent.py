@@ -1,9 +1,20 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 15 - Critique Tool Integration)
+# ResearchAgent Core Agent (Phase 17 - Correction Insertion)
 #
-# FIX: This version adds the new `critique_document` tool to the
-# `SANDBOXED_TOOLS` set. This ensures the `worker_node` correctly
-# injects the required `workspace_path` argument when the tool is called.
+# This version significantly improves the self-correction mechanism. Instead of
+# overwriting a failed step, the agent now inserts a new corrective step
+# before it, preserving the original intent of the plan.
+#
+# Key Architectural Changes:
+# 1. Smarter `correction_planner_node`:
+#    - It now uses `list.insert()` to add a new corrective step at the
+#      current index rather than overwriting it.
+#    - After insertion, it iterates through the rest of the plan and
+#      updates the `step_id` of all subsequent steps to maintain sequential
+#      numbering. This is critical for the UI and for data piping.
+# 2. Preserved Intent: This change ensures that after fixing a problem (like
+#    installing a missing library), the agent will then retry the original
+#    step that failed, making the process more logical and robust.
 # -----------------------------------------------------------------------------
 
 import os
@@ -18,6 +29,8 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.chat_models import ChatOllama
 from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.memory import MemorySaver
+from google.api_core.exceptions import ResourceExhausted
+
 
 from .tools import get_available_tools
 from .prompts import (
@@ -40,7 +53,6 @@ logger = logging.getLogger(__name__)
 # --- Constants ---
 HISTORY_SUMMARY_THRESHOLD = 10
 HISTORY_SUMMARY_KEEP_RECENT = 4
-# --- MODIFIED: Added 'critique_document' to the set of sandboxed tools ---
 SANDBOXED_TOOLS = {"write_file", "read_file", "list_files", "workspace_shell", "pip_install", "query_files", "critique_document"}
 
 
@@ -77,7 +89,6 @@ class GraphState(TypedDict):
     current_track: str
     enabled_tools: List[str]
 
-# (LLM Provider and Tool Formatters remain unchanged)
 LLM_CACHE = {}
 def get_llm(state: GraphState, role_env_var: str, default_llm_id: str):
     run_config = state.get("llm_config", {}); llm_id = run_config.get(role_env_var) or os.getenv(role_env_var, default_llm_id)
@@ -87,6 +98,36 @@ def get_llm(state: GraphState, role_env_var: str, default_llm_id: str):
     elif provider == "ollama": llm = ChatOllama(model=model_name, base_url=os.getenv("OLLAMA_BASE_URL"))
     else: raise ValueError(f"Unsupported LLM provider: {provider}")
     LLM_CACHE[llm_id] = llm; return llm
+
+def _invoke_llm_with_fallback(llm, prompt: str, state: GraphState):
+    """
+    Invokes the given LLM with a prompt. If a ResourceExhausted error
+    (Google API rate limit) is caught, it retries the call once using the
+    globally defined DEFAULT_LLM_ID.
+    """
+    try:
+        return llm.invoke(prompt)
+    except ResourceExhausted as e:
+        task_id = state.get("task_id", "N/A")
+        logger.warning(f"Task '{task_id}': LLM call failed with rate limit error: {e}. Attempting fallback.")
+        
+        fallback_llm_id = os.getenv("DEFAULT_LLM_ID", "gemini::gemini-1.5-flash-latest")
+        logger.info(f"Task '{task_id}': Switching to fallback LLM: {fallback_llm_id}")
+        
+        try:
+            provider, model_name = fallback_llm_id.split("::")
+            if provider == "gemini":
+                fallback_llm = ChatGoogleGenerativeAI(model=model_name, google_api_key=os.getenv("GOOGLE_API_KEY"))
+            elif provider == "ollama":
+                fallback_llm = ChatOllama(model=model_name, base_url=os.getenv("OLLAMA_BASE_URL"))
+            else:
+                return AIMessage(content=f"LLM call failed due to rate limits, and the fallback model '{fallback_llm_id}' is not a valid configuration. Original error: {e}")
+            
+            return fallback_llm.invoke(prompt)
+        except Exception as fallback_e:
+            logger.error(f"Task '{task_id}': Fallback LLM call also failed: {fallback_e}")
+            return AIMessage(content=f"LLM call failed due to rate limits, and the fallback attempt also failed. Original error: {e}")
+
 
 def format_tools_for_prompt(state: GraphState):
     all_tools = get_available_tools(); enabled_tool_names = state.get("enabled_tools")
@@ -137,19 +178,19 @@ def memory_updater_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing memory_updater_node."); llm = get_llm(state, "EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
     prompt = memory_updater_prompt_template.format(memory_vault_json=json.dumps(state['memory_vault'], indent=2), recent_conversation=f"Human: {state['input']}")
     try:
-        response = llm.invoke(prompt); match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL); json_str = match.group(1).strip() if match else response.content.strip()
+        response = _invoke_llm_with_fallback(llm, prompt, state); match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL); json_str = match.group(1).strip() if match else response.content.strip()
         updated_vault = json.loads(json_str); logger.info(f"Task '{task_id}': Memory Vault updated."); return {"memory_vault": updated_vault}
     except Exception as e: logger.error(f"Task '{task_id}': Failed to parse memory vault JSON. Error: {e}. Keeping old vault."); return {}
 
 def summarize_history_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing summarize_history_node."); messages = state['messages']; to_summarize = messages[:-HISTORY_SUMMARY_KEEP_RECENT]; to_keep = messages[-HISTORY_SUMMARY_KEEP_RECENT:]
     conversation_str = _format_messages(to_summarize, is_for_summary=True); llm = get_llm(state, "EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest"); prompt = summarizer_prompt_template.format(conversation=conversation_str)
-    summary_text = llm.invoke(prompt).content; summary_message = SystemMessage(content=f"Summary of conversation:\n{summary_text}"); new_messages = [summary_message] + to_keep; logger.info(f"Task '{task_id}': History summarized."); return {"messages": new_messages}
+    response = _invoke_llm_with_fallback(llm, prompt, state); summary_text = response.content; summary_message = SystemMessage(content=f"Summary of conversation:\n{summary_text}"); new_messages = [summary_message] + to_keep; logger.info(f"Task '{task_id}': History summarized."); return {"messages": new_messages}
 
 def initial_router_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing Three-Track Router."); llm = get_llm(state, "ROUTER_LLM_ID", "gemini::gemini-1.5-flash-latest")
     router_prompt = router_prompt_template.format(chat_history=_format_messages(state['messages']), memory_vault=json.dumps(state.get('memory_vault', {}), indent=2), input=state["input"], tools=format_tools_for_prompt(state))
-    decision = llm.invoke(router_prompt).content.strip(); logger.info(f"Task '{task_id}': Initial routing decision from LLM: {decision}")
+    response = _invoke_llm_with_fallback(llm, router_prompt, state); decision = response.content.strip(); logger.info(f"Task '{task_id}': Initial routing decision from LLM: {decision}")
     
     if "SIMPLE_TOOL_USE" in decision:
         return {"route": "Handyman", "current_track": "SIMPLE_TOOL_USE"}
@@ -162,7 +203,7 @@ def initial_router_node(state: GraphState):
 def handyman_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Track 2 -> Handyman"); llm = get_llm(state, "SITE_FOREMAN_LLM_ID", "gemini::gemini-1.5-flash-latest")
     prompt = handyman_prompt_template.format(chat_history=_format_messages(state['messages']), memory_vault=json.dumps(state.get('memory_vault', {}), indent=2), input=state["input"], tools=format_tools_for_prompt(state))
-    response = llm.invoke(prompt)
+    response = _invoke_llm_with_fallback(llm, prompt, state)
     try:
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL); json_str = match.group(1).strip() if match else response.content.strip()
         tool_call = json.loads(json_str); return {"current_tool_call": tool_call}
@@ -171,7 +212,7 @@ def handyman_node(state: GraphState):
 def chief_architect_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Track 3 -> Chief_Architect"); llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-flash-latest")
     prompt = structured_planner_prompt_template.format(chat_history=_format_messages(state['messages']), memory_vault=json.dumps(state.get('memory_vault', {}), indent=2), input=state["input"], tools=format_tools_for_prompt(state))
-    response = llm.invoke(prompt)
+    response = _invoke_llm_with_fallback(llm, prompt, state)
     try:
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL); json_str = match.group(1).strip() if match else response.content.strip()
         parsed_json = json.loads(json_str); return {"plan": parsed_json.get("plan", [])}
@@ -206,7 +247,7 @@ def site_foreman_node(state: GraphState):
     llm = get_llm(state, "SITE_FOREMAN_LLM_ID", "gemini::gemini-1.5-flash-latest")
     prompt = controller_prompt_template.format(tools=format_tools_for_prompt(state), plan=json.dumps(plan, indent=2), history=history_summary, current_step=current_step_details.get("instruction", ""))
     try:
-        response = llm.invoke(prompt); match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL); json_str = match.group(1).strip() if match else response.content.strip()
+        response = _invoke_llm_with_fallback(llm, prompt, state); match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL); json_str = match.group(1).strip() if match else response.content.strip()
         tool_call = json.loads(json_str); substituted_tool_call = _substitute_step_outputs(tool_call, state.get("step_outputs", {})); return {"current_tool_call": substituted_tool_call}
     except Exception as e: logger.error(f"Task '{task_id}': Error in Foreman: {e}"); return {"current_tool_call": {"error": f"Invalid JSON or substitution error: {e}"}}
 
@@ -246,7 +287,7 @@ def project_supervisor_node(state: GraphState):
     tool_output = state.get("tool_output", "No output."); tool_call = state.get("current_tool_call", {}); llm = get_llm(state, "PROJECT_SUPERVISOR_LLM_ID", "gemini::gemini-1.5-flash-latest")
     prompt = evaluator_prompt_template.format(current_step=current_step_details.get('instruction', ''), tool_call=json.dumps(tool_call), tool_output=tool_output)
     try:
-        response = llm.invoke(prompt); match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL); json_str = match.group(1).strip() if match else response.content.strip()
+        response = _invoke_llm_with_fallback(llm, prompt, state); match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL); json_str = match.group(1).strip() if match else response.content.strip()
         evaluation = json.loads(json_str)
     except Exception as e: evaluation = {"status": "failure", "reasoning": f"Could not parse evaluation: {e}"}
     history_record = (f"--- Step {state['current_step_index'] + 1} ---\nInstruction: {current_step_details.get('instruction')}\nAction: {json.dumps(tool_call)}\nOutput: {tool_output}\nEvaluation: {evaluation.get('status', 'unknown')} - {evaluation.get('reasoning', 'N/A')}")
@@ -261,30 +302,60 @@ def editor_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Unified Editor generating final answer."); llm = get_llm(state, "EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
     chat_history_str = _format_messages(state['messages']); execution_log_str = "\n".join(state.get("history", [])); memory_vault_str = json.dumps(state.get('memory_vault', {}), indent=2)
     prompt = final_answer_prompt_template.format(input=state["input"], chat_history=chat_history_str, execution_log=execution_log_str or "No tool actions taken.", memory_vault=memory_vault_str)
-    response_content = llm.invoke(prompt).content; return {"answer": response_content, "messages": [AIMessage(content=response_content)]}
+    response = _invoke_llm_with_fallback(llm, prompt, state); response_content = response.content; return {"answer": response_content, "messages": [AIMessage(content=response_content)]}
 
+# --- MODIFIED: The correction planner now inserts a step instead of replacing it ---
 def correction_planner_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing Correction_Planner."); failed_step_details = state["plan"][state["current_step_index"]]
     failure_reason = state["step_evaluation"].get("reasoning", "N/A"); history_str = "\n".join(state["history"]); llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-flash-latest")
     prompt = correction_planner_prompt_template.format(plan=json.dumps(state["plan"]), history=history_str, failed_step=failed_step_details.get("instruction"), failure_reason=failure_reason, tools=format_tools_for_prompt(state))
-    response = llm.invoke(prompt)
+    response = _invoke_llm_with_fallback(llm, prompt, state)
     try:
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL); json_str = match.group(1).strip() if match else response.content.strip()
-        new_step = json.loads(json_str); new_plan = state["plan"][:]; new_plan[state["current_step_index"]] = new_step; return {"plan": new_plan}
-    except Exception as e: logger.error(f"Task '{task_id}': Error parsing correction plan: {e}"); return {}
+        new_step = json.loads(json_str)
+        
+        # Create a copy of the plan to modify
+        new_plan = state["plan"][:]
+        # Insert the new corrective step *before* the failed step
+        new_plan.insert(state["current_step_index"], new_step)
+        
+        # Re-number all steps in the plan to maintain sequential integrity
+        for i, step in enumerate(new_plan):
+            step["step_id"] = i + 1
+            
+        logger.info(f"Task '{task_id}': Inserted new corrective step. Plan is now {len(new_plan)} steps long.")
+        return {"plan": new_plan}
 
-# (Conditional Routing Logic remains unchanged)
+    except Exception as e:
+        logger.error(f"Task '{task_id}': Error parsing or inserting correction plan: {e}");
+        # Return an empty dictionary to indicate no change to the plan
+        return {}
+
+
+# --- MODIFIED: The router no longer advances the step after a correction ---
+def after_plan_step_router(state: GraphState) -> str:
+    evaluation = state.get("step_evaluation", {});
+    if evaluation.get("status") == "failure":
+        if state["step_retries"] < state["max_retries"]:
+            # On failure, go to the correction planner. The index is NOT advanced.
+            return "Correction_Planner"
+        else:
+            logger.warning(f"Task '{state.get('task_id')}': Max retries exceeded for step. Routing to Editor.")
+            return "Editor"
+
+    # On success, check if we are at the end of the plan
+    if state["current_step_index"] + 1 >= len(state.get("plan", [])):
+        logger.info(f"Task '{state.get('task_id')}': Plan complete. Routing to Editor.")
+        return "Editor"
+    
+    # If successful and not at the end, advance to the next step
+    return "Advance_To_Next_Step"
+
 def history_management_router(state: GraphState) -> str: return "summarize_history_node" if len(state['messages']) > HISTORY_SUMMARY_THRESHOLD else "initial_router_node"
 def route_logic(state: GraphState) -> str: return state.get("route", "Editor")
 def after_worker_router(state: GraphState) -> str: return "Editor" if state.get("current_track") == "SIMPLE_TOOL_USE" else "Project_Supervisor"
 def after_plan_creation_router(state: GraphState) -> str: return "Site_Foreman" if state.get("user_feedback") == "approve" else "Editor"
-def after_plan_step_router(state: GraphState) -> str:
-    evaluation = state.get("step_evaluation", {});
-    if evaluation.get("status") == "failure": return "Correction_Planner" if state["step_retries"] < state["max_retries"] else "Editor"
-    if state["current_step_index"] + 1 >= len(state.get("plan", [])): return "Editor"
-    return "Advance_To_Next_Step"
 
-# (Graph Definition remains unchanged)
 def create_agent_graph():
     workflow = StateGraph(GraphState)
     workflow.add_node("Task_Setup", task_setup_node); workflow.add_node("Memory_Updater", memory_updater_node); workflow.add_node("summarize_history_node", summarize_history_node)
@@ -299,10 +370,16 @@ def create_agent_graph():
     workflow.add_edge("Handyman", "Worker"); workflow.add_conditional_edges("Worker", after_worker_router, {"Editor": "Editor", "Project_Supervisor": "Project_Supervisor"})
     workflow.add_edge("Chief_Architect", "Plan_Expander"); workflow.add_edge("Plan_Expander", "human_in_the_loop_node")
     workflow.add_conditional_edges("human_in_the_loop_node", after_plan_creation_router, {"Site_Foreman": "Site_Foreman", "Editor": "Editor"})
-    workflow.add_edge("Site_Foreman", "Worker"); workflow.add_edge("Advance_To_Next_Step", "Site_Foreman"); workflow.add_edge("Correction_Planner", "Site_Foreman")
+    workflow.add_edge("Site_Foreman", "Worker")
+    
+    # --- MODIFIED: The edge from the Correction Planner goes directly back to the Foreman ---
+    # This ensures the newly inserted step is executed immediately without advancing the index.
+    workflow.add_edge("Correction_Planner", "Site_Foreman")
+    
+    workflow.add_edge("Advance_To_Next_Step", "Site_Foreman")
     workflow.add_conditional_edges("Project_Supervisor", after_plan_step_router, {"Editor": "Editor", "Advance_To_Next_Step": "Advance_To_Next_Step", "Correction_Planner": "Correction_Planner"})
     workflow.add_edge("Editor", END)
     agent = workflow.compile(checkpointer=MemorySaver(), interrupt_before=["human_in_the_loop_node"])
-    logger.info("ResearchAgent graph compiled without Blueprint capabilities."); return agent
+    logger.info("ResearchAgent graph compiled with improved correction logic."); return agent
 
 agent_graph = create_agent_graph()

@@ -229,7 +229,7 @@ export function App() {
                     const outputData = data.output || {};
 
                     let architectPlan = runContainer.children.find(c => c.type === 'architect_plan');
-                    if (name === 'Site_Foreman' && chainEvent === 'on_chain_start' && architectPlan?.isAwaitingApproval) {
+                    if (name === 'Site Foreman' && chainEvent === 'on_chain_start' && architectPlan?.isAwaitingApproval) {
                         architectPlan.isAwaitingApproval = false;
                         if (!runContainer.children.some(c => c.type === 'execution_plan')) {
                             runContainer.children.push({ type: 'execution_plan', steps: architectPlan.steps.map(step => ({...step, status: 'pending'})) });
@@ -241,8 +241,8 @@ export function App() {
                         const stepIndex = inputData.current_step_index;
                         if (stepIndex !== undefined && executionPlan.steps[stepIndex]) {
                             let stepToUpdate = { ...executionPlan.steps[stepIndex] };
-                            if (name === 'Site_Foreman' && chainEvent === 'on_chain_start') stepToUpdate.status = 'in-progress';
-                            else if (name === 'Project_Supervisor' && chainEvent === 'on_chain_end') {
+                            if (name === 'Site Foreman' && chainEvent === 'on_chain_start') stepToUpdate.status = 'in-progress';
+                            else if (name === 'Project Supervisor' && chainEvent === 'on_chain_end') {
                                 stepToUpdate.status = outputData.step_evaluation?.status === 'failure' ? 'failure' : 'completed';
                                 stepToUpdate.toolCall = inputData.current_tool_call;
                                 stepToUpdate.toolOutput = outputData.tool_output;
@@ -354,7 +354,7 @@ export function App() {
 
     return (
         <div class="flex h-screen w-screen p-2 sm:p-4 gap-4 bg-background text-foreground">
-            {/* --- MODIFIED: Wrapper for correct toggle button positioning --- */}
+            {/* Wrapper for correct toggle button positioning */}
             <div class="absolute top-4 left-4 z-20">
               {!isLeftSidebarVisible && <ToggleButton onToggle={() => setIsLeftSidebarVisible(true)} side="left" />}
             </div>
@@ -424,16 +424,40 @@ export function App() {
                        }
                        return null;
                    })}
-                   {agent.runningTasks[activeTaskId] && !isAwaitingApproval && ( <div class="flex items-center gap-4 p-4"> <LoaderIcon class="h-5 w-5 text-primary" /> <p class="text-muted-foreground font-medium">Agent is running...</p> </div> )}
+                   {/* --- MODIFIED: The status message is now dynamic --- */}
+                   {agent.runningTasks[activeTaskId] && !isAwaitingApproval && (
+                        <div class="flex items-center gap-4 p-4">
+                            <LoaderIcon class="h-5 w-5 text-primary" />
+                            <p class="text-muted-foreground font-medium">The {agent.runningTasks[activeTaskId]} is thinking...</p>
+                        </div>
+                   )}
                    <div ref={messagesEndRef} />
                 </div>
                 <div class="p-6 border-t border-border flex-shrink-0">
                     <form onSubmit={handleSendMessage} class="flex gap-3">
-                        <textarea ref={promptInputRef} value={inputValue} onInput={e => setInputValue(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) handleSendMessage(e); }} class="flex-1 p-3 bg-input border border-border rounded-lg text-foreground focus:ring-2 focus:ring-primary focus:outline-none resize-none" placeholder={activeTaskId ? (isAwaitingApproval ? "Approve, modify, or reject the plan above." : (agent.runningTasks[activeTaskId] ? "Agent is running..." : "Send a message...")) : "Please select or create a task."} rows="2" disabled={!activeTaskId || agent.runningTasks[activeTaskId] || isAwaitingApproval} ></textarea>
+                        {/* --- MODIFIED: The textarea placeholder is now dynamic --- */}
+                        <textarea
+                            ref={promptInputRef}
+                            value={inputValue}
+                            onInput={e => setInputValue(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) handleSendMessage(e); }}
+                            class="flex-1 p-3 bg-input border border-border rounded-lg text-foreground focus:ring-2 focus:ring-primary focus:outline-none resize-none"
+                            placeholder={
+                                activeTaskId
+                                ? isAwaitingApproval
+                                    ? "Approve, modify, or reject the plan above."
+                                    : agent.runningTasks[activeTaskId]
+                                        ? `The ${agent.runningTasks[activeTaskId]} is thinking...`
+                                        : "Send a message..."
+                                : "Please select or create a task."
+                            }
+                            rows="2"
+                            disabled={!activeTaskId || agent.runningTasks[activeTaskId] || isAwaitingApproval}
+                        ></textarea>
                         {agent.runningTasks[activeTaskId] && !isAwaitingApproval ? (
                             <button type="button" onClick={() => agent.stopAgent(activeTaskId)} class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center gap-2"><StopCircleIcon class="h-5 w-5"/>Stop</button>
                         ) : (
-                            <button type="submit" class="px-6 py-2 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 disabled:bg-secondary disabled:text-muted-foreground transition-colors" disabled={agent.connectionStatus !== 'Connected' || agent.runningTasks[activeTaskId] || !activeTaskId || isAwaitingApproval}>Send</button>
+                            <button type="submit" class="px-6 py-2 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 disabled:bg-secondary disabled:text-muted-foreground transition-colors" disabled={agent.connectionStatus !== 'Connected' || !!agent.runningTasks[activeTaskId] || !activeTaskId || isAwaitingApproval}>Send</button>
                         )}
                     </form>
                 </div>

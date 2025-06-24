@@ -9,7 +9,8 @@ export const useAgent = (onMessage) => {
     const ws = useRef(null);
     const [connectionStatus, setConnectionStatus] = useState("Disconnected");
     
-    // State to track which tasks have a running agent process
+    // --- MODIFIED: State now tracks the specific active node for each task ---
+    // Instead of { [taskId]: true }, it will be { [taskId]: "Node Name" }
     const [runningTasks, setRunningTasks] = useState({});
 
     // This effect establishes and manages the WebSocket lifecycle.
@@ -24,30 +25,31 @@ export const useAgent = (onMessage) => {
             socket.onclose = () => {
                 setConnectionStatus("Disconnected");
                 setRunningTasks({}); // Clear running tasks on disconnect
-                // Attempt to reconnect after a delay
-                setTimeout(connect, 5000);
+                setTimeout(connect, 5000); // Attempt to reconnect
             };
 
             socket.onerror = (err) => {
                 console.error("WebSocket error:", err);
-                socket.close(); // This will trigger the onclose event and reconnection logic
+                socket.close();
             };
 
-            // Central message handler: receives a message and passes it to the callback from App.jsx
             socket.onmessage = (event) => {
                 const newEvent = JSON.parse(event.data);
 
-                // Update the running status based on agent events
-                if (newEvent.type === 'agent_started' || newEvent.type === 'agent_resumed') {
-                    setRunningTasks(prev => ({ ...prev, [newEvent.task_id]: true }));
-                } else if (newEvent.type === 'final_answer' || newEvent.type === 'agent_stopped' || newEvent.type === 'plan_approval_request') {
-                    // Stop the spinner on final answer, stop, or when requiring approval
-                    setRunningTasks(prev => {
-                        const newTasks = { ...prev };
-                        delete newTasks[newEvent.task_id];
-                        return newTasks;
-                    });
-                }
+                // --- MODIFIED: Update running status with specific node names ---
+                setRunningTasks(prev => {
+                    const newTasks = { ...prev };
+                    const { type, task_id, name, event: chainEvent } = newEvent;
+
+                    if (type === 'agent_started' || type === 'agent_resumed') {
+                        newTasks[task_id] = "Thinking..."; // Set initial generic status
+                    } else if (type === 'agent_event' && chainEvent === 'on_chain_start') {
+                        newTasks[task_id] = name; // Update with specific node name
+                    } else if (type === 'final_answer' || type === 'agent_stopped' || type === 'plan_approval_request') {
+                        delete newTasks[task_id]; // Clear status on completion/pause
+                    }
+                    return newTasks;
+                });
                 
                 // Pass the event up to the main component's logic handler
                 if (onMessage) {
@@ -58,14 +60,14 @@ export const useAgent = (onMessage) => {
 
         connect();
 
-        // Cleanup function to close the WebSocket connection when the component unmounts
+        // Cleanup function to close the WebSocket connection
         return () => {
             if (ws.current) {
-                ws.current.onclose = null; // Prevent reconnection attempts on manual close
+                ws.current.onclose = null; // Prevent reconnection attempts
                 ws.current.close();
             }
         };
-    }, [onMessage]); // Re-run effect if the onMessage handler changes
+    }, [onMessage]);
 
     /**
      * Sends a command to the backend to run the agent for a given task.

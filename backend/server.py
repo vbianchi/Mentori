@@ -1,13 +1,17 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (UI Polish FIX)
+# ResearchAgent Backend Server (Phase 17 - Granular Status FIX)
 #
-# This version updates the `/api/models` endpoint to provide a clean model
-# name for the UI, as requested by the user.
+# FIX: This version corrects a SyntaxError caused by an accidental
+# citation marker being included in the code.
 #
 # Key Architectural Changes:
-# 1. `_handle_get_models` now sends back a `name` field containing only the
-#    raw model identifier (e.g., "gemini-1.5-pro-latest") in addition to the
-#    full `id` (`gemini::gemini-1.5-pro-latest`).
+# 1. `NODE_NAME_MAPPING`: A new dictionary is introduced to map internal
+#    node names (e.g., `initial_router_node`) to cleaner, display-friendly
+#    names for the UI (e.g., "Router").
+# 2. Expanded Event Broadcasting: The `agent_execution_wrapper` now listens
+#    for and broadcasts start/end events for a wider range of "thinking"
+#    nodes, including the Memory Updater, Router, Summarizer, and Correction
+#    Planner, providing a much more detailed view of the agent's process.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -72,7 +76,8 @@ def {function_name}({function_signature}) -> str:
         logger.info(f"Executing custom tool '{tool_name}' with arguments: {{args_dict}}")
         
         prompt = f\"\"\"
-You are a specialized AI assistant. Your purpose is to execute a single, specific task based on the instructions provided.
+You are a specialized AI assistant. Your purpose is to execute a single, specific task based
+on the instructions provided.
 A user has created a tool with the following description:
 
 **Tool Description:** "{tool_description}"
@@ -232,7 +237,6 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             logger.error(f"Error creating tool: {e}", exc_info=True)
             self._send_json_response(500, {'error': str(e)})
 
-    # --- MODIFIED: This method now returns a clean name for UI display ---
     def _handle_get_models(self):
         logger.info("Parsing .env to serve available and default models.")
         available_models, model_ids = [], set()
@@ -244,7 +248,6 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
                     if model_name:
                         full_id = f"{provider_prefix}::{model_name}"
                         if full_id not in model_ids:
-                            # Send both the full ID for logic and the clean name for display
                             available_models.append({"id": full_id, "name": model_name})
                             model_ids.add(full_id)
 
@@ -422,6 +425,23 @@ def run_http_server():
 
 # --- WebSocket Core Logic ---
 
+# --- Name mapping for cleaner UI status updates ---
+NODE_NAME_MAPPING = {
+    "initial_router_node": "Router",
+    "summarize_history_node": "Summarizer",
+    "Memory_Updater": "Memory Updater",
+    "Chief_Architect": "Chief Architect",
+    "Site_Foreman": "Site Foreman",
+    "Project_Supervisor": "Project Supervisor",
+    "Correction_Planner": "Correction Planner",
+    "Handyman": "Handyman",
+    "Worker": "Worker",
+    "Editor": "Editor"
+}
+
+# --- Expanded list of nodes to broadcast ---
+BROADCAST_NODES = set(NODE_NAME_MAPPING.keys())
+
 async def broadcast_event(event):
     if ACTIVE_CONNECTIONS:
         message = json.dumps(event, default=str)
@@ -440,8 +460,17 @@ async def agent_execution_wrapper(input_state, config):
         
         async for event in agent_graph.astream_events(input_state, config):
             event_type = event["event"]
-            if event_type in ["on_chain_start", "on_chain_end"] and event.get("name") in ["Chief_Architect", "Handyman", "Site_Foreman", "Worker", "Project_Supervisor", "Editor"]:
-                await broadcast_event({"type": "agent_event", "event": event_type, "name": event.get("name"), "data": event['data'], "task_id": task_id})
+            node_name = event.get("name")
+
+            if event_type in ["on_chain_start", "on_chain_end"] and node_name in BROADCAST_NODES:
+                display_name = NODE_NAME_MAPPING.get(node_name, node_name)
+                await broadcast_event({
+                    "type": "agent_event",
+                    "event": event_type,
+                    "name": display_name,
+                    "data": event['data'],
+                    "task_id": task_id
+                })
         
         current_state = agent_graph.get_state(config)
         if current_state.next and "human_in_the_loop_node" in current_state.next:

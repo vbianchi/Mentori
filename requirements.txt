@@ -26,7 +26,7 @@ beautifulsoup4
 # For securely parsing package names and versions in the package manager tool.
 packaging
 
-# --- NEW: Dependencies for the 'query_files' tool (Phase 15) ---
+# --- Dependencies for the 'query_files' tool ---
 # For reading PDF files.
 pypdf
 
@@ -35,3 +35,19 @@ python-docx
 
 # For reading Microsoft Excel (.xlsx) files.
 openpyxl
+
+# --- Core Data Science & Plotting Libraries ---
+# For data manipulation and analysis (DataFrames)
+pandas
+
+# For numerical operations
+numpy
+
+# For plotting and visualizations
+matplotlib
+
+# For statistical data visualization
+seaborn
+
+# For machine learning algorithms and tools
+scikit-learn
