@@ -1,9 +1,11 @@
 # -----------------------------------------------------------------------------
 # Docker Compose for the ResearchAgent
 #
-# CORRECTION: Removed `tty: true`. This setting can cause non-interactive
-# services like our Python server to exit prematurely upon starting. Removing
-# it ensures the container runs as a proper background service.
+# MODIFICATION FOR OLLAMA:
+# Added the `extra_hosts` section. This is the standard way to allow a
+# Docker container to communicate with services running on the host machine
+# (like a local Ollama server). It maps the special hostname
+# `host.docker.internal` to the host's gateway IP address.
 # -----------------------------------------------------------------------------
 
 services:
@@ -21,6 +23,12 @@ services:
       - "8765:8765"
       - "8766:8766"
 
+    # --- NEW: Added for Ollama connection ---
+    # This makes the host machine accessible from inside the container
+    # via the hostname 'host.docker.internal'.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
     # Mounts local directories (volumes) into the container.
     # This allows for live code updates and persistent storage.
     volumes:
@@ -29,5 +37,4 @@ services:
 
     # Keeps stdin open, which is useful for interactive debugging if needed.
     stdin_open: true
-    # tty: true # <-- REMOVED
 
