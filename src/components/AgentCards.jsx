@@ -1,6 +1,7 @@
+// src/components/AgentCards.jsx
 import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
-import { ArchitectIcon, CheckCircleIcon, ChevronDownIcon, CircleDotIcon, EditorIcon, ForemanIcon, LoaderIcon, PlusCircleIcon, SupervisorIcon, Trash2Icon, WorkerIcon, XCircleIcon } from './Icons';
+import { ArchitectIcon, CheckCircleIcon, ChevronDownIcon, CircleDotIcon, EditorIcon, ForemanIcon, LoaderIcon, PlusCircleIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, XCircleIcon, BoardIcon, CheckIcon } from './Icons';
 import { CopyButton } from './Common';
 
 const AgentResponseCard = ({ icon, title, children, showCopy, copyText }) => (
@@ -12,7 +13,6 @@ const AgentResponseCard = ({ icon, title, children, showCopy, copyText }) => (
 );
 
 const StepCard = ({ step }) => {
-    // --- MODIFIED: A step now starts collapsed by default ---
     const [isExpanded, setIsExpanded] = useState(false);
     
     const getStatusIcon = () => {
@@ -91,35 +91,21 @@ const EditableStep = ({ step, index, updateStep, removeStep, availableTools }) =
 export const ArchitectCard = ({ plan, isAwaitingApproval, onModify, onReject, availableTools }) => {
     const [editablePlan, setEditablePlan] = useState(plan.steps || []);
 
-    useEffect(() => {
-        setEditablePlan(plan.steps || []);
-    }, [plan]);
+    useEffect(() => { setEditablePlan(plan.steps || []); }, [plan]);
 
     const updateStep = (index, updatedStep) => {
-        const newPlan = [...editablePlan];
-        newPlan[index] = updatedStep;
-        setEditablePlan(newPlan);
+        const newPlan = [...editablePlan]; newPlan[index] = updatedStep; setEditablePlan(newPlan);
     };
-
     const addStep = () => {
-        const newStep = { step_id: editablePlan.length + 1, instruction: '', tool_name: '', tool_input: {} };
-        setEditablePlan([...editablePlan, newStep]);
+        setEditablePlan([...editablePlan, { step_id: editablePlan.length + 1, instruction: '', tool_name: '', tool_input: {} }]);
     };
-
     const removeStep = (index) => {
-        const newPlan = editablePlan.filter((_, i) => i !== index).map((step, i) => ({ ...step, step_id: i + 1 }));
-        setEditablePlan(newPlan);
+        setEditablePlan(editablePlan.filter((_, i) => i !== index).map((step, i) => ({ ...step, step_id: i + 1 })));
     };
-
     const handleApprove = () => {
         const finalizedPlan = editablePlan.map(step => {
-            try {
-                const toolInput = typeof step.tool_input === 'string' ? JSON.parse(step.tool_input) : step.tool_input;
-                return { ...step, tool_input: toolInput };
-            } catch (e) {
-                console.warn(`Could not parse tool_input for step ${step.step_id}. Leaving as is.`, e);
-                return step;
-            }
+            try { return { ...step, tool_input: typeof step.tool_input === 'string' ? JSON.parse(step.tool_input) : step.tool_input }; }
+            catch (e) { return step; }
         });
         onModify(finalizedPlan);
     };
@@ -128,8 +114,7 @@ export const ArchitectCard = ({ plan, isAwaitingApproval, onModify, onReject, av
         <AgentResponseCard icon={<ArchitectIcon class="h-5 w-5" />} title="The Chief Architect">
             {isAwaitingApproval ? (
                 <div>
-                    <h4 class="text-sm font-bold text-gray-400 mb-2">Proposed Plan (Awaiting Approval)</h4>
-                    <p class="text-sm text-gray-400 mb-3">Review and edit the plan below before running.</p>
+                    <h4 class="text-sm font-bold text-gray-400 mb-3">Proposed Plan (Awaiting Approval)</h4>
                     <div class="space-y-2">
                         {editablePlan.map((step, index) => (
                             <EditableStep key={index} index={index} step={step} updateStep={updateStep} removeStep={removeStep} availableTools={availableTools} />
@@ -139,29 +124,55 @@ export const ArchitectCard = ({ plan, isAwaitingApproval, onModify, onReject, av
                         <PlusCircleIcon class="h-4 w-4" /> Add Step
                     </button>
                     <div class="flex justify-end gap-3 mt-4">
-                        <button onClick={onReject} class="px-4 py-2 bg-red-600/50 text-white font-semibold rounded-lg hover:bg-red-600/80 transition-colors">
-                            Reject
-                        </button>
-                        <button onClick={handleApprove} class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
-                            Approve & Run
-                        </button>
+                        <button onClick={onReject} class="px-4 py-2 bg-red-600/50 text-white font-semibold rounded-lg hover:bg-red-600/80">Reject</button>
+                        <button onClick={handleApprove} class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">Approve & Run</button>
                     </div>
                 </div>
             ) : (
                 <div>
                     <h4 class="text-sm font-bold text-gray-400 mb-2">Proposed Plan</h4>
-                    <ul class="list-decimal list-inside text-gray-300 space-y-1">
-                        {plan.steps.map(step => <li key={step.step_id}>{step.instruction}</li>)}
-                    </ul>
+                    <ul class="list-decimal list-inside text-gray-300 space-y-1">{plan.steps.map(step => <li key={step.step_id}>{step.instruction}</li>)}</ul>
                 </div>
             )}
         </AgentResponseCard>
     );
 };
 
+export const BoardApprovalCard = ({ experts, onApproval }) => {
+    const [isApproved, setIsApproved] = useState(null);
+
+    const handleDecision = (approved) => {
+        setIsApproved(approved);
+        onApproval(approved);
+    };
+
+    return (
+        <AgentResponseCard icon={<BoardIcon class="h-5 w-5 text-rose-400" />} title="Board of Experts Formation">
+             <p class="text-sm text-gray-400 mb-3">The agent has proposed the following board for your approval:</p>
+             <ul class="space-y-3 mb-4">
+                {(experts || []).map(expert => (
+                    <li key={expert.title} class="p-3 bg-gray-900/50 rounded-lg border border-gray-700/50">
+                        <p class="font-semibold text-white">{expert.title}</p>
+                        <p class="text-sm text-gray-400">{expert.qualities}</p>
+                    </li>
+                ))}
+             </ul>
+             {isApproved === null ? (
+                <div class="flex justify-end gap-3">
+                    <button onClick={() => handleDecision(false)} class="px-4 py-2 bg-red-600/50 text-white font-semibold rounded-lg hover:bg-red-600/80">Reject</button>
+                    <button onClick={() => handleDecision(true)} class="px-4 py-2 bg-green-600/80 text-white font-semibold rounded-lg hover:bg-green-700">Approve Board</button>
+                </div>
+             ) : (
+                <div class={`text-sm font-bold flex items-center gap-2 justify-end ${isApproved ? 'text-green-400' : 'text-red-400'}`}>
+                    {isApproved ? <CheckIcon class="h-5 w-5" /> : <XCircleIcon class="h-5 w-5" />}
+                    Board {isApproved ? 'Approved' : 'Rejected'}
+                </div>
+             )}
+        </AgentResponseCard>
+    );
+};
 
 export const SiteForemanCard = ({ plan }) => (
-    // This wrapper div adds the indentation
     <div class="ml-4"> 
         <AgentResponseCard icon={<ForemanIcon class="h-5 w-5" />} title="The Site Foreman">
             <h4 class="text-sm font-bold text-gray-400 mb-2">Execution Log</h4>

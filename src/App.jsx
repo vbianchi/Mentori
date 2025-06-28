@@ -1,14 +1,13 @@
+// src/App.jsx
 import { h } from 'preact';
 import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
-import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, FolderIcon, ArrowLeftIcon, UploadCloudIcon, StopCircleIcon, BriefcaseIcon, SendToChatIcon, FileTextIcon } from './components/Icons';
-import { ArchitectCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard } from './components/AgentCards';
+import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, FolderIcon, ArrowLeftIcon, UploadCloudIcon, StopCircleIcon, BriefcaseIcon, SendToChatIcon, FileTextIcon, BoardIcon, CheckIcon, XCircleIcon } from './components/Icons';
+import { ArchitectCard, BoardApprovalCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard } from './components/AgentCards';
 import { ToggleButton, CopyButton } from './components/Common';
 import { useTasks } from './hooks/useTasks';
 import { useWorkspace } from './hooks/useWorkspace';
 import { useSettings } from './hooks/useSettings';
 import { useAgent } from './hooks/useAgent';
-
-// --- Re-styled & Improved Components ---
 
 const InlineEditor = ({ item, onConfirm, onCancel }) => {
     const [name, setName] = useState(item.name || '');
@@ -45,7 +44,6 @@ const InlineEditor = ({ item, onConfirm, onCancel }) => {
         </li>
     );
 };
-
 
 const FilePreviewer = ({ currentPath, file, isLoading, content, rawFileUrl }) => {
     if (isLoading) {
@@ -194,7 +192,6 @@ const Breadcrumbs = ({ path, onNavigate }) => {
     );
 };
 
-
 export function App() {
     const { tasks, setTasks, activeTaskId, selectTask: setActiveTaskId, renameTask } = useTasks();
     const workspace = useWorkspace(activeTaskId);
@@ -206,21 +203,21 @@ export function App() {
                 if (taskIndex === -1) return currentTasks;
                 
                 const newTasks = [...currentTasks];
-                const taskToUpdate = { ...newTasks[taskIndex] };
+                let taskToUpdate = { ...newTasks[taskIndex] };
                 let newHistory = [...taskToUpdate.history];
 
                 let runContainer = newHistory.length > 0 && newHistory[newHistory.length - 1].type === 'run_container' ? newHistory[newHistory.length - 1] : null;
-                if (!runContainer && !['agent_started', 'agent_stopped', 'agent_resumed'].includes(event.type)) {
+                if (!runContainer) {
                     runContainer = { type: 'run_container', children: [], isComplete: false };
                     newHistory.push(runContainer);
                 }
                 
                 const eventType = event.type;
                 if (eventType === 'plan_approval_request') {
-                    setIsAwaitingApproval(true);
                     runContainer.children.push({ type: 'architect_plan', steps: event.plan, isAwaitingApproval: true });
+                } else if (eventType === 'board_approval_request') {
+                    runContainer.children.push({ type: 'board_approval', experts: event.experts, isAwaitingApproval: true });
                 } else if (eventType === 'direct_answer' || eventType === 'final_answer') {
-                    setIsAwaitingApproval(false);
                     runContainer.children.push({ type: eventType, content: event.data });
                     runContainer.isComplete = true;
                 } else if (eventType === 'agent_event') {
@@ -269,26 +266,24 @@ export function App() {
     const [inputValue, setInputValue] = useState("");
     const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
     const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(true);
-    const [isAwaitingApproval, setIsAwaitingApproval] = useState(false);
     
     const messagesEndRef = useRef(null);
     const promptInputRef = useRef(null);
     const agentRoles = [
-        { key: 'ROUTER_LLM_ID', label: 'The Router', icon: <RouterIcon className="h-5 w-5 text-muted-foreground"/>, description: "Classifies tasks into 3 tracks." },
-        { key: 'CHIEF_ARCHITECT_LLM_ID', label: 'The Chief Architect', icon: <ArchitectIcon className="h-5 w-5 text-muted-foreground"/>, description: "Creates complex, multi-step plans." },
-        { key: 'SITE_FOREMAN_LLM_ID', label: 'The Site Foreman', icon: <ForemanIcon className="h-5 w-5 text-muted-foreground"/>, description: "Prepares tool calls for plans." },
-        { key: 'PROJECT_SUPERVISOR_LLM_ID', label: 'The Project Supervisor', icon: <SupervisorIcon className="h-5 w-5 text-muted-foreground"/>, description: "Validates complex step outcomes." },
-        { key: 'EDITOR_LLM_ID', label: 'The Editor', icon: <EditorIcon className="h-5 w-5 text-muted-foreground"/>, description: "Answers questions, summarizes." },
+        { key: 'ROUTER_LLM_ID', label: 'The Router', icon: <RouterIcon className="h-5 w-5 text-muted-foreground"/>, description: "Classifies tasks." },
+        { key: 'CHIEF_ARCHITECT_LLM_ID', label: 'The Chief Architect', icon: <ArchitectIcon className="h-5 w-5 text-muted-foreground"/>, description: "Creates complex plans." },
+        { key: 'SITE_FOREMAN_LLM_ID', label: 'The Site Foreman', icon: <ForemanIcon className="h-5 w-5 text-muted-foreground"/>, description: "Prepares tool calls." },
+        { key: 'PROJECT_SUPERVISOR_LLM_ID', label: 'The Project Supervisor', icon: <SupervisorIcon className="h-5 w-5 text-muted-foreground"/>, description: "Validates step outcomes." },
+        { key: 'EDITOR_LLM_ID', label: 'The Editor', icon: <EditorIcon className="h-5 w-5 text-muted-foreground"/>, description: "Answers & summarizes." },
     ];
 
     useEffect(() => { if (activeTaskId) workspace.setCurrentPath(activeTaskId) }, [activeTaskId]);
     useEffect(() => { if (workspace.currentPath) workspace.fetchFiles(workspace.currentPath) }, [workspace.currentPath]);
-    useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }) }, [tasks.find(t=>t.id===activeTaskId)?.history, isAwaitingApproval]);
+    useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }) }, [tasks.find(t=>t.id===activeTaskId)?.history]);
 
     const selectTask = (taskId) => {
         if (taskId !== activeTaskId) {
             setActiveTaskId(taskId);
-            setIsAwaitingApproval(false);
             workspace.resetWorkspaceViews();
         }
     };
@@ -317,9 +312,29 @@ export function App() {
         setTasks(remainingTasks);
     };
     
-    const handleApprovalAction = (feedback, plan = null) => {
-        setIsAwaitingApproval(false);
+    const handlePlanApprovalAction = (feedback, plan = null) => {
         agent.resumeAgent({ task_id: activeTaskId, feedback, plan, enabled_tools: Object.keys(settings.enabledTools).filter(key => settings.enabledTools[key]) });
+    };
+
+    const handleBoardApprovalAction = (approved) => {
+        setTasks(currentTasks => currentTasks.map(task => {
+            if (task.id === activeTaskId) {
+                const newHistory = [...task.history];
+                const runContainer = newHistory[newHistory.length-1];
+                if(runContainer?.type === 'run_container') {
+                    const approvalCard = runContainer.children.find(c => c.type === 'board_approval');
+                    if(approvalCard) approvalCard.isAwaitingApproval = false;
+                }
+                return {...task, history: newHistory};
+            }
+            return task;
+        }));
+        
+        agent.resumeAgent({
+            task_id: activeTaskId,
+            board_approved: approved,
+            enabled_tools: Object.keys(settings.enabledTools).filter(key => settings.enabledTools[key])
+        });
     };
 
     const handleModifyAndApprove = (modifiedPlan) => {
@@ -335,13 +350,18 @@ export function App() {
             }
             return task;
         }));
-        handleApprovalAction('approve', modifiedPlan);
+        handlePlanApprovalAction('approve', modifiedPlan);
     };
     
     const handleSendMessage = (e) => {
         e.preventDefault();
         const message = inputValue.trim();
-        if (!message || !activeTaskId || agent.connectionStatus !== 'Connected' || agent.runningTasks[activeTaskId] || isAwaitingApproval) return;
+        const activeTask = tasks.find(t => t.id === activeTaskId);
+        const isAgentRunning = agent.runningTasks[activeTaskId];
+        const isAwaitingInput = activeTask?.history.some(h => h.type === 'run_container' && h.children.some(c => c.isAwaitingApproval));
+
+        if (!message || !activeTaskId || agent.connectionStatus !== 'Connected' || isAgentRunning || isAwaitingInput) return;
+        
         setTasks(currentTasks => currentTasks.map(task => task.id === activeTaskId ? { ...task, history: [...task.history, { type: 'prompt', content: message }, { type: 'run_container', children: [], isComplete: false }] } : task));
         agent.runAgent({ prompt: message, llm_config: settings.selectedModels, task_id: activeTaskId, enabled_tools: Object.keys(settings.enabledTools).filter(key => settings.enabledTools[key]) });
         setInputValue("");
@@ -352,9 +372,11 @@ export function App() {
         promptInputRef.current?.focus();
     };
 
+    const activeTask = tasks.find(t=>t.id===activeTaskId);
+    const isAwaitingApproval = activeTask?.history.some(h => h.type === 'run_container' && h.children.some(c => c.isAwaitingApproval));
+
     return (
         <div class="flex h-screen w-screen p-2 sm:p-4 gap-4 bg-background text-foreground">
-            {/* Wrapper for correct toggle button positioning */}
             <div class="absolute top-4 left-4 z-20">
               {!isLeftSidebarVisible && <ToggleButton onToggle={() => setIsLeftSidebarVisible(true)} side="left" />}
             </div>
@@ -397,7 +419,7 @@ export function App() {
                    </div>
                 </div>
                 <div class="flex-1 overflow-y-auto p-6">
-                   {tasks.find(t=>t.id===activeTaskId)?.history.map((item, index) => {
+                   {activeTask?.history.map((item, index) => {
                        if (item.type === 'prompt') return <PromptCard key={index} content={item.content} />;
                        if (item.type === 'run_container') {
                             return (
@@ -409,7 +431,8 @@ export function App() {
                                             <div class={`absolute top-6 -left-4 h-px ${child.type === 'execution_plan' ? 'w-8' : 'w-4'} bg-border`} />
                                             {(() => {
                                                 switch (child.type) {
-                                                    case 'architect_plan': return <ArchitectCard plan={child} isAwaitingApproval={child.isAwaitingApproval} onModify={handleModifyAndApprove} onReject={() => handleApprovalAction('reject')} availableTools={settings.availableTools}/>;
+                                                    case 'architect_plan': return <ArchitectCard plan={child} isAwaitingApproval={child.isAwaitingApproval} onModify={handleModifyAndApprove} onReject={() => handlePlanApprovalAction('reject')} availableTools={settings.availableTools}/>;
+                                                    case 'board_approval': return <BoardApprovalCard experts={child.experts} onApproval={handleBoardApprovalAction} />;
                                                     case 'execution_plan': return <SiteForemanCard plan={child} />;
                                                     case 'direct_answer': return <DirectAnswerCard answer={child.content} />;
                                                     case 'final_answer': return <FinalAnswerCard answer={child.content} />;
@@ -424,7 +447,6 @@ export function App() {
                        }
                        return null;
                    })}
-                   {/* --- MODIFIED: The status message is now dynamic --- */}
                    {agent.runningTasks[activeTaskId] && !isAwaitingApproval && (
                         <div class="flex items-center gap-4 p-4">
                             <LoaderIcon class="h-5 w-5 text-primary" />
@@ -435,24 +457,15 @@ export function App() {
                 </div>
                 <div class="p-6 border-t border-border flex-shrink-0">
                     <form onSubmit={handleSendMessage} class="flex gap-3">
-                        {/* --- MODIFIED: The textarea placeholder is now dynamic --- */}
                         <textarea
                             ref={promptInputRef}
                             value={inputValue}
                             onInput={e => setInputValue(e.target.value)}
                             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) handleSendMessage(e); }}
                             class="flex-1 p-3 bg-input border border-border rounded-lg text-foreground focus:ring-2 focus:ring-primary focus:outline-none resize-none"
-                            placeholder={
-                                activeTaskId
-                                ? isAwaitingApproval
-                                    ? "Approve, modify, or reject the plan above."
-                                    : agent.runningTasks[activeTaskId]
-                                        ? `The ${agent.runningTasks[activeTaskId]} is thinking...`
-                                        : "Send a message..."
-                                : "Please select or create a task."
-                            }
+                            placeholder={!activeTaskId ? "Please select or create a task." : isAwaitingApproval ? "Please provide input in the card above." : agent.runningTasks[activeTaskId] ? `The ${agent.runningTasks[activeTaskId]} is thinking...` : "Send a message..."}
                             rows="2"
-                            disabled={!activeTaskId || agent.runningTasks[activeTaskId] || isAwaitingApproval}
+                            disabled={!activeTaskId || !!agent.runningTasks[activeTaskId] || isAwaitingApproval}
                         ></textarea>
                         {agent.runningTasks[activeTaskId] && !isAwaitingApproval ? (
                             <button type="button" onClick={() => agent.stopAgent(activeTaskId)} class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center gap-2"><StopCircleIcon class="h-5 w-5"/>Stop</button>
@@ -462,7 +475,6 @@ export function App() {
                     </form>
                 </div>
             </div>
-
             <div class={`h-full bg-card/50 rounded-lg border border-border shadow-2xl flex flex-col transition-all duration-300 ease-in-out ${isRightSidebarVisible ? 'w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg' : 'w-0 p-0 border-0'}`} style={{ overflow: isRightSidebarVisible ? 'visible' : 'hidden' }}>
                 <div class={`flex justify-between items-center p-4 border-b border-border transition-opacity duration-200 ${isRightSidebarVisible ? 'opacity-100' : 'opacity-0'}`}> <h2 class="text-xl font-bold text-foreground">Workspace</h2> <button onClick={() => setIsRightSidebarVisible(false)} class="p-1.5 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground" title="Hide Workspace"><ChevronsRightIcon class="h-4 w-4" /></button> </div>
                 <div class={`flex flex-col flex-grow min-h-0 px-4 pb-4 pt-4 transition-opacity duration-200 ${isRightSidebarVisible ? 'opacity-100' : 'opacity-0'}`}>
