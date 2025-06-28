@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResearchAgent - Smooth Path UI Simulation (v2)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .narrative-item { transform: translateY(10px); opacity: 0; animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn { to { transform: translateY(0); opacity: 1; } }
+        .icon-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1f2937; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+        .plan-step { display: flex; align-items: flex-start; gap: 0.5rem; color: #d1d5db; }
+        .plan-step-icon { flex-shrink: 0; margin-top: 0.25rem; height: 1rem; width: 1rem; color: #60a5fa; }
+        .plan-step-tool { font-family: monospace; background-color: #374151; color: #93c5fd; padding: 0.1rem 0.4rem; border-radius: 0.25rem; font-size: 0.75rem; margin-left: 0.5rem; }
+        .execution-sub-step { position: relative; padding-left: 1.5rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .execution-sub-step::before { content: ''; position: absolute; left: 0.5rem; top: 0; bottom: 0; width: 2px; background-color: #374151; }
+        .execution-sub-step:first-of-type::before { top: 1rem; }
+        .execution-sub-step:last-of-type::before { bottom: 1rem; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-4xl bg-gray-800 rounded-2xl shadow-2xl border border-gray-700 flex flex-col">
+        <div class="p-4 border-b border-gray-700 flex-shrink-0">
+            <h1 class="text-xl font-bold text-white">Board of Experts - Smooth Path Simulation</h1>
+            <p class="text-sm text-gray-400">A simulation of the standard Peer Review workflow.</p>
+        </div>
+
+        <div id="log-container" class="p-6 h-[75vh] overflow-y-auto custom-scrollbar flex-grow">
+            <!-- User Prompt Card -->
+            <div class="mb-6 p-4 rounded-lg shadow-md bg-blue-900/30 border border-blue-700/50">
+                <h3 class="font-bold text-sm text-white mb-2 capitalize flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    You
+                </h3>
+                <p class="text-blue-200/90 whitespace-pre-wrap font-medium">I need to analyze financial data in 'q2_earnings.csv' to identify fraudulent transactions and then generate a PDF report of the findings. @experts</p>
+            </div>
+
+            <div id="narrative-container" class="space-y-4">
+                <!-- This will be populated by JS -->
+            </div>
+        </div>
+        
+        <div class="p-4 border-t border-gray-700 text-center flex-shrink-0">
+            <button id="start-simulation" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                Start Simulation
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const narrativeContainer = document.getElementById('narrative-container');
+            const logContainer = document.getElementById('log-container');
+            const startButton = document.getElementById('start-simulation');
+
+            const icons = {
+                loading: `<svg width="24" height="24" viewBox="0 0 24 24" class="h-5 w-5 text-gray-400 icon-spin"><g><path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25" fill="currentColor"/><path d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z" fill="currentColor"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.75s" repeatCount="indefinite"/></path></g></svg>`,
+                check: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-green-400"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+                chair: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-amber-400"><path d="M12 22V8a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8Z"/><path d="M20 12a2 2 0 1 0-4 0v4a2 2 0 1 0 4 0Z"/><path d="M20 12h-4"/><path d="M12 2v2"/><path d="M12 18v2"/></svg>`,
+                critique: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-purple-400"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>`,
+                board: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-rose-400"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+                editor: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-sky-400"><path d="M12 20h9"/><path d="m9.5 12.5 1.5 1.5 5-5"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>`,
+                worker: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-cyan-400"><rect x="2" y="6" width="20" height="12" rx="2" /><path d="M12 12h.01" /><path d="M17 12h.01" /><path d="M7 12h.01" /></svg>`,
+                supervisor: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-green-400"><path d="M12 2a10 10 0 1 0 10 10" /><path d="M12 18a10 10 0 0 0-10-10" /><path d="M12 12a5 5 0 0 1 5 5" /><path d="M12 12a5 5 0 0 0-5 5" /><path d="M7 12a5 5 0 0 0 5-5" /><path d="M7 12a5 5 0 0 1 5-5" /></svg>`,
+            };
+            
+            let eventQueue = [];
+            
+            function buildSmoothPathQueue() {
+                const initialPlan = [
+                    {text:"Read financial data from 'q2_earnings.csv'", tool:"query_files"},
+                    {text:"Analyze data for statistical anomalies using LOF.", tool:"workspace_shell"},
+                    {text:"Checkpoint: Review anomalies before final classification.", tool:"checkpoint"},
+                    {text:"Generate a secure PDF report of the findings.", tool:"write_file"}
+                ];
+                const refinedPlan1 = [...initialPlan.slice(0, 1), {text:"NEW: Scale numerical features before analysis.", tool:"workspace_shell"}, ...initialPlan.slice(1)];
+                const finalPlan = [...refinedPlan1.slice(0, 3), {text:"NEW: Scrub PII from confirmed fraudulent transactions before reporting.", tool:"workspace_shell"}, ...refinedPlan1.slice(3)];
+
+
+                return [
+                    { type: 'boe_formation', personas: [
+                        {title: 'Forensic Accountant', qualities: 'Experienced in identifying anomalies and patterns indicative of corporate fraud.'},
+                        {title: 'Data Scientist', qualities: 'Specializes in using machine learning algorithms, particularly anomaly detection.'},
+                        {title: 'Cybersecurity Analyst', qualities: 'Focuses on tracing data breaches and PII scrubbing.'}
+                    ] },
+                    { type: 'add_card', cardType: 'chair_plan', plan: initialPlan },
+                    { type: 'add_card', cardType: 'expert_critique', persona: {title: 'Data Scientist'}, critique: "The LOF analysis is good, but we should scale the data first for better results. I've inserted a data scaling step.", refinedPlan: refinedPlan1 },
+                    { type: 'add_card', cardType: 'expert_critique', persona: {title: 'Cybersecurity Analyst'}, critique: "The plan is sound, but the final report needs PII scrubbing. I've added this critical security step.", refinedPlan: finalPlan },
+                    { type: 'add_card', cardType: 'chair_final_review', plan: finalPlan },
+                    { type: 'execution_phase_start' },
+                    { type: 'execution_step', step: finalPlan[0], sub_steps: [
+                        {type:'worker', text:'Executed tool. Successfully loaded 15,488 rows.'}, {type:'supervisor', text:'Evaluation: SUCCESS. The required data was loaded into memory.'},
+                    ]},
+                    { type: 'execution_step', step: finalPlan[1], sub_steps: [
+                        {type:'worker', text:'Successfully wrote and executed scaling script.'}, {type:'supervisor', text:'Evaluation: SUCCESS. The data is now scaled and ready for analysis.'},
+                    ]},
+                     { type: 'execution_step', step: finalPlan[2], sub_steps: [
+                        {type:'worker', text:'Successfully ran LOF analysis. Identified 15 potential anomalies.'}, {type:'supervisor', text:'Evaluation: SUCCESS. The analysis is complete.'},
+                    ]},
+                    { type: 'editor_report', report: "The initial analysis is complete. 15 suspicious transactions were identified and stored in 'suspicious_transactions.json'. The results are ready for board review." },
+                    { type: 'checkpoint' },
+                    { type: 'execution_step', step: finalPlan[4], sub_steps: [
+                         {type:'worker', text:'Successfully wrote and executed PII scrubbing script.'}, {type:'supervisor', text:'Evaluation: SUCCESS. The data is now anonymized.'},
+                    ]},
+                     { type: 'execution_step', step: finalPlan[5], sub_steps: [
+                         {type:'worker', text:'Successfully generated fraud_report.pdf'}, {type:'supervisor', text:'Evaluation: SUCCESS. The report has been saved to the workspace.'},
+                    ]},
+                    { type: 'final_report' }
+                ];
+            }
+
+            let queueProcessor;
+            function processNextEvent() {
+                if (eventQueue.length === 0) {
+                    if (queueProcessor) clearInterval(queueProcessor);
+                    startButton.textContent = 'Run Again';
+                    startButton.disabled = false;
+                    return;
+                }
+
+                const event = eventQueue.shift();
+                let cardElement = document.createElement('div');
+                cardElement.className = 'narrative-item';
+
+                switch(event.type) {
+                    case 'boe_formation':
+                        const personaItems = event.personas.map(p => `<li class="text-gray-300"><b>${p.title}:</b> ${p.qualities}</li>`).join('');
+                        cardElement.innerHTML = `<div id="boe_card" class="p-4 rounded-lg shadow-md bg-gray-800/50 border border-rose-800/50 relative"><h3 class="font-bold text-sm text-rose-300 mb-3 capitalize flex items-center gap-2">${icons.board} Board of Experts Formation</h3><div class="pl-1"><p class="text-sm text-gray-400 mb-2">The agent has proposed the following board:</p><ul class="space-y-2 mb-4">${personaItems}</ul><div id="boe_buttons" class="flex justify-end gap-3"><button id="approve_board_btn" class="px-4 py-2 bg-green-600/80 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors text-sm">Approve Board</button></div></div></div>`;
+                        appendCard(cardElement);
+                        clearInterval(queueProcessor); 
+                        cardElement.querySelector('#approve_board_btn').addEventListener('click', () => {
+                            const buttonContainer = cardElement.querySelector('#boe_buttons');
+                            buttonContainer.innerHTML = `<div class="text-green-400 font-bold text-sm flex items-center gap-2">${icons.check} Board Approved</div>`;
+                            queueProcessor = setInterval(processNextEvent, 1200);
+                        });
+                        break;
+                    
+                    case 'add_card':
+                        let title, icon, content, color;
+                        if (event.cardType === 'chair_plan') {
+                            title = "The Chair's Initial Plan"; icon = icons.chair; color = 'amber';
+                            content = renderPlan(event.plan, 'The Chair has drafted an initial plan for review:');
+                        } else if (event.cardType === 'expert_critique') {
+                            title = `${event.persona.title}'s Critique`; icon = icons.critique; color = 'purple';
+                            content = `<p class="text-sm text-gray-300 italic mb-3">"${event.critique}"</p>${renderPlan(event.refinedPlan, 'Refined Plan:')}`;
+                        } else if (event.cardType === 'chair_final_review') {
+                            title = "The Chair's Final Review"; icon = icons.chair; color = 'amber';
+                            content = `<div class="pl-1"><p class="text-sm text-gray-400 mb-4">All critiques have been integrated. Please give final approval to begin execution.</p>${renderPlan(event.plan, 'Final Plan for Execution:')}<div id="final_approval_buttons" class="flex justify-end gap-3 mt-4"><button class="px-4 py-2 bg-red-600/50 text-white font-semibold rounded-lg hover:bg-red-600/80 transition-colors text-sm">Abort</button><button id="approve_final_plan_btn" class="px-4 py-2 bg-green-600/80 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors text-sm">Approve & Execute</button></div></div>`;
+                        }
+                        cardElement.innerHTML = `<div class="p-4 rounded-lg shadow-md bg-gray-800/50 border border-${color}-800/50 relative"><h3 class="font-bold text-sm text-${color}-300 mb-2 capitalize flex items-center gap-2">${icon} ${title}</h3><div class="pl-1">${content}</div></div>`;
+                        appendCard(cardElement);
+                        if (event.cardType === 'chair_final_review') {
+                            clearInterval(queueProcessor);
+                            cardElement.querySelector('#approve_final_plan_btn').addEventListener('click', () => {
+                                const buttonContainer = cardElement.querySelector('#final_approval_buttons');
+                                buttonContainer.innerHTML = `<div class="text-green-400 font-bold text-sm flex items-center gap-2">${icons.check} Final Plan Approved for Execution</div>`;
+                                queueProcessor = setInterval(processNextEvent, 800);
+                            });
+                        }
+                        break;
+
+                    case 'execution_phase_start':
+                        cardElement.innerHTML = `<div class="p-4 rounded-lg shadow-md bg-gray-900/50 border-t border-b border-gray-700/50 relative"><h3 class="font-bold text-sm text-gray-300 mb-1 capitalize flex items-center gap-2">${icons.loading} Execution Phase Started</h3><p class="text-sm text-gray-400 pl-7">The Foreman is now executing the approved plan step-by-step.</p></div>`;
+                        appendCard(cardElement);
+                        break;
+                    
+                    case 'execution_step':
+                        const subStepHtml = event.sub_steps.map(ss => {
+                            const icon = icons[ss.type];
+                            const title = ss.type.charAt(0).toUpperCase() + ss.type.slice(1);
+                            return `<div class="execution-sub-step"><div class="text-xs text-gray-400 font-semibold flex items-center gap-2">${icon} ${title}</div><p class="text-xs text-gray-300 pl-6">${ss.text}</p></div>`;
+                        }).join('');
+                        cardElement.innerHTML = `<div class="p-4 rounded-lg shadow-md bg-gray-800/50 border border-gray-700/50 relative"><h3 class="font-bold text-sm text-gray-300 mb-2 capitalize flex items-center gap-2">${icons.check} Step Complete: ${event.step.text}</h3><div class="pl-1">${subStepHtml}</div></div>`;
+                        appendCard(cardElement);
+                        break;
+                    
+                    case 'editor_report':
+                         cardElement.innerHTML = `<div class="p-4 rounded-lg shadow-md bg-gray-800/50 border border-sky-800/50"><h3 class="font-bold text-sm text-sky-300 mb-2 capitalize flex items-center gap-2">${icons.editor} Editor's Report for Board Review</h3><p class="text-sm text-gray-300 pl-7">${event.report}</p></div>`;
+                         appendCard(cardElement);
+                         break;
+
+                    case 'checkpoint':
+                        cardElement.innerHTML = `<div class="p-4 rounded-lg shadow-md bg-gray-800/50 border border-rose-800/50 relative"><h3 class="font-bold text-sm text-rose-300 mb-3 capitalize flex items-center gap-2">${icons.board} Autonomous Checkpoint Review</h3><div id="checkpoint_status"><p class="text-sm text-gray-400 flex items-center gap-2">${icons.loading} The Board is reviewing the Editor's report to decide on the next action...</p></div></div>`;
+                        appendCard(cardElement);
+                        // Simulate board thinking, then automatically deciding
+                        setTimeout(() => {
+                            const statusContainer = cardElement.querySelector('#checkpoint_status');
+                            statusContainer.innerHTML = `<div class="text-green-400 font-bold text-sm flex items-center gap-2">${icons.check} Decision: Continue. The board has approved the progress and will continue execution.</div>`;
+                        }, 2500);
+                        break;
+
+                    case 'final_report':
+                        cardElement.innerHTML = `<div class="p-4 rounded-lg shadow-md bg-green-900/30 border border-green-700/50 relative"><h3 class="font-bold text-sm text-white mb-2 capitalize flex items-center gap-2">${icons.editor} Final Report</h3><div class="prose prose-sm prose-invert max-w-none text-gray-300 pl-1"><p>The analysis is complete. The agent has successfully analyzed the financial data, identified 15 suspicious transactions, and generated a secure report.</p><p><b>Key Artifacts Created:</b></p><ul><li><b>fraud_report.pdf</b>: A secure, final report detailing the findings.</li><li><b>suspicious_transactions.json</b>: Raw data of the identified transactions.</li></ul><p>The Board of Experts has reviewed the entire process and confirms the methodology and results are sound. The task is complete.</p></div></div>`;
+                        appendCard(cardElement);
+                        break;
+                }
+            }
+            
+            function appendCard(card) { narrativeContainer.appendChild(card); logContainer.scrollTop = logContainer.scrollHeight; }
+            function renderPlan(plan, title) {
+                const planItems = (plan || []).map(s => {
+                     const isNew = s.text.startsWith('NEW:');
+                    const text = isNew ? s.text.substring(5) : s.text;
+                    const style = isNew ? 'text-green-400 font-bold' : '';
+                    return `<li class="plan-step ${style}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="plan-step-icon"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>${text}<span class="plan-step-tool">${s.tool}</span></span></li>`
+                }).join('');
+                return `<p class="text-sm text-gray-400 mb-2">${title}</p><ul class="space-y-2">${planItems}</ul>`;
+            }
+
+            startButton.addEventListener('click', () => {
+                narrativeContainer.innerHTML = '';
+                startButton.disabled = true;
+                startButton.textContent = 'Simulation Running...';
+                eventQueue = buildSmoothPathQueue();
+                if (queueProcessor) clearInterval(queueProcessor);
+                queueProcessor = setInterval(processNextEvent, 1200);
+            });
+        });
+    </script>
+</body>
+</html>
