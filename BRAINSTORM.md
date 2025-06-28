@@ -6,15 +6,16 @@ This document is a living collection of ideas, architectural concepts, and poten
 
 Our agent operates like a small, efficient company with specialized roles. This separation of concerns is the key to its complex behavior.
 
--   **The "Router" (Dispatcher):** Quickly classifies user requests into one of three tracks: Direct Q&A, Simple Tool Use, or Complex Project.
+-   **The "Router" (Dispatcher):** Quickly classifies user requests into one of four tracks: Direct Q&A, Simple Tool Use, Complex Project, or **Board of Experts Review**.
 -   **The "Memory Updater" (Librarian):** A critical pre-processing step that analyzes every user message to update the agent's structured JSON "Memory Vault," ensuring all new facts are stored before any action is taken.
--   **The "Handyman" (Simple Executor):** A fast-lane agent that handles simple, single-step tool commands.
--   **The "Chief Architect" (Planner):** A strategic thinker that creates detailed, structured JSON "blueprints" for complex tasks. It can now intelligently incorporate pre-defined Blueprints as high-level steps in its plans.
--   **The "Plan Expander" (Blueprint Processor):** An intermediary node that transparently "explodes" a blueprint step into its underlying sub-steps before execution.
+-   **The "Board of Experts" (Advisory Committee):** A dynamically formed group of AI specialist personas (e.g., 'Data Scientist', 'Forensic Accountant') proposed by the agent based on the user's request. The user must approve the board before the project proceeds.
+-   **The "Chair" (BoE Moderator):** The leader of the Board of Experts. Synthesizes expert critiques and creates the initial and final strategic plans for the project.
+-   **The "Expert Critic" (BoE Member):** An individual AI persona on the board that reviews and provides structured feedback on the Chair's plan in a sequential, autonomous loop.
+-   **The "Chief Architect" (Planner):** A strategic thinker that creates detailed, structured JSON "blueprints" for complex tasks (for the non-BoE track).
 -   **The "Site Foreman" (Controller):** The project manager that executes the final, expanded blueprint step-by-step, managing data piping and correction sub-loops.
 -   **The "Worker" (Executor):** The specialist that takes precise instructions and runs the tools.
 -   **The "Project Supervisor" (Evaluator):** The quality assurance inspector that validates the outcome of each step in a complex plan.
--   **The "Editor" (Reporter):** The unified voice of the agent, capable of acting as a conversational assistant or a project manager to deliver context-aware final responses.
+-   **The "Editor" (Reporter):** The unified voice of the agent, capable of acting as a conversational assistant or a project manager to deliver context-aware final responses, checkpoint summaries, and final reports.
 
 ### 🚀 Future Architectural Evolution: Production-Grade Infrastructure 🚀
 
@@ -60,11 +61,3 @@ _A collection of features required to move from a single-user tool to a complete
 -   **Strategy:** Augment our powerful, custom-built tools with a standardized library of generic "connector" tools.
 -   **Our Custom "Reasoning" Tools:** Continue to build and refine specialized tools like `query_files` and `critique_document`. These are our core competency.
 -   **MCP for Connectors:** Develop a wrapper to connect to the **Model Context Protocol (MCP)** tool ecosystem. This will instantly give the agent access to hundreds of pre-built tools for third-party APIs (GitHub, Google Calendar, Slack, etc.) without us needing to maintain them.
-
-#### 4\. "Committee of Critics" Tool Evolution
-
--   **Vision:** Evolve the `critique_document` tool into a collaborative review by a panel of AI experts.
--   **Workflow:**
-    1.  **Persona Scoping:** The tool first analyzes the document to determine its field (e.g., genetics, finance). It then defines a committee of 3 relevant expert personas (e.g., "Expert Geneticist," "Scientific Writer," "Statistician"). The user can also specify these personas in the prompt.
-    2.  **Parallel Criticism:** The tool runs three parallel LLM calls, providing each with the document but a different "expert" system prompt.
-    3.  **Synthesized Report:** A final LLM call acts as the "chairperson," taking the three independent critiques and synthesizing them into a single, structured report for the user.

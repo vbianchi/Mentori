@@ -4,37 +4,47 @@ To build a transformative, AI-powered workbench. The platform will be powerful e
 
 ### ✅ COMPLETED PHASES
 
--   \[x\] **Phase 12: The Interactive Workbench:** Evolved the workspace from a simple file list into a full-featured, interactive file explorer.
--   \[x\] **Phase 12.5: Concurrent Agent Execution & Control:** Refactored the backend server to handle multiple, simultaneous agent runs and provided users with the ability to stop a running task.
--   \[x\] **Phase 13: The "Tool Forge" (v1):** Implemented the foundational "LLM as an Engine" Tool Forge.
--   \[x\] **Phase 14: UI & Agent Simplification:** Refactored the UI and removed early blueprint logic to focus on core tooling.
--   \[x\] **Phase 15: Advanced Tooling (v1):** Equipped the agent with a suite of powerful, pre-built tools for common high-value tasks, including `query_files` and `critique_document`.
--   \[x\] **Phase 16: UI Polish & Enhanced File Interaction:** Overhauled the UI with a high-contrast theme, redesigned settings panels, and implemented inline file/folder creation, multi-file uploads, and other UX improvements.
+-   \[x\] **Phase 0-16:** Core Engine, Advanced Tooling, & UI Foundation. This includes the three-track architecture, self-correction, interactive GUI, Memory Vault, and secure virtual environments.
 
 ### 🚀 UPCOMING PHASES 🚀
 
-#### Phase 17: Production-Grade Backend Infrastructure
+#### Phase 17: The Autonomous Board of Experts & Company Model
 
-_Goal: Evolve the backend from a prototype to a scalable, resilient, and persistent system, inspired by best practices from projects like Suna._
+_Goal: Implement the full, two-part agent architecture where the Board of Experts acts as an autonomous strategic planner and the Company Model acts as a resilient execution engine, communicating the entire process through a clear, chronological UI narrative._
 
--   \[ \] **Task 1: Database Integration:** Integrate **SQLite** for portable and simple persistence. Use the **SQLAlchemy ORM** to abstract database interactions, allowing for a future migration to a larger system like Postgres if needed.
--   \[ \] **Task 2: Task Queue Integration:** Replace the current `asyncio` background tasks with a robust task queue system like **Dramatiq with a Redis broker**. This will decouple the API from long-running agent jobs.
--   \[ \] **Task 3: State Migration:** Refactor the agent and server to read and write all state (chat history, agent memory, task definitions) to the new SQLite database instead of being transient.
+-   \[x\] **Task 1 (Part 1): Initial User Authorization - Board Approval.**
+    -   Implemented the `Propose_Experts` node to dynamically generate expert personas.
+    -   Implemented the first user interrupt, where the UI displays the proposed board and waits for the user's **"Approve"** action.
+-   \[ \] **Task 1 (Part 2): Initial User Authorization - Plan Approval.**
+    -   Implement the second user interrupt, which occurs after the autonomous planning phase is complete. The UI will display the final, synthesized plan and wait for a final **"Approve & Execute"** action.
+-   \[ \] **Task 2: Autonomous Sequential Plan Refinement.**
+    -   Implement the full, uninterrupted planning loop that runs after the user approves the board.
+    -   `Chair_Initial_Plan` node creates a strategic plan. **(Partially complete)**
+    -   Implement the `Expert_Critique` node to be called sequentially for each expert, generating critiques and programmatic plan modifications.
+    -   Implement the `Chair_Final_Review` node to synthesize all critiques into a final plan for the second user authorization gate.
+-   \[ \] **Task 3: Resilient Execution & Self-Correction Loop.**
+    -   Implement the full "Company Model" execution loop (`Foreman`, `Supervisor`, `Worker`).
+    -   Implement retry logic before escalating a failed step.
+-   \[ \] **Task 4: Autonomous Checkpoint Review Cycle.**
+    -   Implement the internal review process triggered by a `checkpoint` in the plan.
+    -   The `Editor` will compile a progress report.
+    -   The `Board_Collective_Review` node will decide whether to `continue` or `adapt` the plan without user intervention.
+-   \[ \] **Task 5: The User Guidance Escalation Path.**
+    -   Implement the edge case where the Board of Experts determines it cannot proceed and must trigger a user interrupt for guidance.
 
-#### Phase 18: User Management & Authentication
+#### Phase 18: Production-Grade Backend Infrastructure
 
-_Goal: Transform the application from a single-user tool to a secure, multi-user platform._
+_Goal: Evolve the backend from a prototype to a scalable, resilient, and persistent system._
 
--   \[ \] **Task 1: Authentication Service:** Integrate a flexible authentication provider (e.g., Supabase Auth, Auth0) to handle user logins.
--   \[ \] **Task 2: Multi-Provider SSO:** Configure the authentication service to support multiple OAuth providers, specifically **Microsoft, Google, and GitHub**.
--   \[ \] **Task 3: Secure API Key Management:** Build a UI and backend system for users to securely store their own API keys, encrypted at rest in the database.
+-   \[ \] Task 1: Database Integration (SQLite & SQLAlchemy): Integrate a portable database for all state persistence.
+-   \[ \] Task 2: Task Queue Integration (Dramatiq & Redis): Decouple the API from long-running agent jobs.
 
-#### Phase 19: Advanced Sandboxing & Collaboration
+#### Phase 19: User Management & Authentication
 
-_Goal: Implement full isolation between tasks and introduce foundational collaboration features._
+_Goal: Transform the application into a secure, multi-user platform._
 
--   \[ \] **Task 1: Per-Task Docker Sandboxes:** Refactor the task queue worker to use the **Docker SDK for Python** to programmatically start and stop isolated containers for each agent task, mounting the appropriate workspace directory.
--   \[ \] **Task 2: The "Organization" Model:** Implement the database schema and backend logic for "Organizations" to enable multi-tenancy, laying the groundwork for shared tasks.
+-   \[ \] Task 1: Authentication Service: Integrate a provider to handle logins.
+-   \[ \] Task 2: Secure API Key Management: Build a system for users to store their own encrypted API keys.
 
 #### Phase 20: Intelligent Agent Capabilities
 
