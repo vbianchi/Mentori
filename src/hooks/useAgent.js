@@ -1,3 +1,4 @@
+// src/hooks/useAgent.js
 import { useState, useEffect, useRef } from 'preact/hooks';
 
 /**
@@ -5,15 +6,10 @@ import { useState, useEffect, useRef } from 'preact/hooks';
  * @param {Function} onMessage - A callback function to process incoming messages from the agent.
  */
 export const useAgent = (onMessage) => {
-    // State for the WebSocket connection and its status
     const ws = useRef(null);
     const [connectionStatus, setConnectionStatus] = useState("Disconnected");
-    
-    // --- MODIFIED: State now tracks the specific active node for each task ---
-    // Instead of { [taskId]: true }, it will be { [taskId]: "Node Name" }
     const [runningTasks, setRunningTasks] = useState({});
 
-    // This effect establishes and manages the WebSocket lifecycle.
     useEffect(() => {
         function connect() {
             setConnectionStatus("Connecting...");
@@ -24,8 +20,8 @@ export const useAgent = (onMessage) => {
 
             socket.onclose = () => {
                 setConnectionStatus("Disconnected");
-                setRunningTasks({}); // Clear running tasks on disconnect
-                setTimeout(connect, 5000); // Attempt to reconnect
+                setRunningTasks({});
+                setTimeout(connect, 5000);
             };
 
             socket.onerror = (err) => {
@@ -36,22 +32,20 @@ export const useAgent = (onMessage) => {
             socket.onmessage = (event) => {
                 const newEvent = JSON.parse(event.data);
 
-                // --- MODIFIED: Update running status with specific node names ---
                 setRunningTasks(prev => {
                     const newTasks = { ...prev };
                     const { type, task_id, name, event: chainEvent } = newEvent;
 
                     if (type === 'agent_started' || type === 'agent_resumed') {
-                        newTasks[task_id] = "Thinking..."; // Set initial generic status
+                        newTasks[task_id] = "Thinking...";
                     } else if (type === 'agent_event' && chainEvent === 'on_chain_start') {
-                        newTasks[task_id] = name; // Update with specific node name
-                    } else if (type === 'final_answer' || type === 'agent_stopped' || type === 'plan_approval_request') {
-                        delete newTasks[task_id]; // Clear status on completion/pause
+                        newTasks[task_id] = name;
+                    } else if (type === 'final_answer' || type === 'agent_stopped' || type === 'plan_approval_request' || type === 'board_approval_request' || type === 'chair_plan_generated') {
+                        delete newTasks[task_id];
                     }
                     return newTasks;
                 });
                 
-                // Pass the event up to the main component's logic handler
                 if (onMessage) {
                     onMessage(newEvent);
                 }
@@ -60,19 +54,14 @@ export const useAgent = (onMessage) => {
 
         connect();
 
-        // Cleanup function to close the WebSocket connection
         return () => {
             if (ws.current) {
-                ws.current.onclose = null; // Prevent reconnection attempts
+                ws.current.onclose = null;
                 ws.current.close();
             }
         };
     }, [onMessage]);
 
-    /**
-     * Sends a command to the backend to run the agent for a given task.
-     * @param {object} payload - The data to send, including task_id, prompt, etc.
-     */
     const runAgent = (payload) => {
         if (ws.current?.readyState === WebSocket.OPEN) {
             ws.current.send(JSON.stringify({ type: 'run_agent', ...payload }));
@@ -81,10 +70,6 @@ export const useAgent = (onMessage) => {
         }
     };
 
-    /**
-     * Sends a command to the backend to resume a paused agent execution.
-     * @param {object} payload - The data to send, including task_id, feedback, etc.
-     */
     const resumeAgent = (payload) => {
         if (ws.current?.readyState === WebSocket.OPEN) {
             ws.current.send(JSON.stringify({ type: 'resume_agent', ...payload }));
@@ -93,37 +78,24 @@ export const useAgent = (onMessage) => {
         }
     };
     
-    /**
-     * Sends a command to the backend to stop a running agent.
-     * @param {string} taskId - The ID of the task whose agent should be stopped.
-     */
     const stopAgent = (taskId) => {
         if (ws.current?.readyState === WebSocket.OPEN && runningTasks[taskId]) {
             ws.current.send(JSON.stringify({ type: 'stop_agent', task_id: taskId }));
         }
     };
 
-    /**
-     * Sends a command to the backend to create the resources for a new task.
-     * @param {string} taskId - The ID of the new task.
-     */
     const createTask = (taskId) => {
          if (ws.current?.readyState === WebSocket.OPEN) {
             ws.current.send(JSON.stringify({ type: 'task_create', task_id: taskId }));
         }
     }
 
-    /**
-     * Sends a command to the backend to delete all resources for a task.
-     * @param {string} taskId - The ID of the task to delete.
-     */
     const deleteTask = (taskId) => {
          if (ws.current?.readyState === WebSocket.OPEN) {
             ws.current.send(JSON.stringify({ type: 'task_delete', task_id: taskId }));
         }
     }
 
-    // Expose the connection state and the sender functions
     return {
         connectionStatus,
         runningTasks,

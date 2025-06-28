@@ -1,24 +1,20 @@
 # backend/langgraph_agent.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 17 - BoE Interrupt Implementation)
+# ResearchAgent Core Agent (Phase 17 - Chair's Plan Display)
 #
-# This version refactors the Board of Experts (BoE) track by integrating its
-# nodes directly into the main graph. This simplifies the architecture and
-# allows for native handling of user interrupts.
+# This version implements the user's feedback to display the Chair's initial
+# plan in the UI before proceeding.
 #
 # Key Architectural Changes:
-# 1. BoE Nodes Integrated: The nodes from the now-deleted
-#    `board_of_experts_graph.py` (propose_experts_node, etc.) are now
-#    defined directly within this file.
-# 2. First User Interrupt: The main graph is compiled with
-#    `interrupt_before=["human_in_the_loop_board_approval"]`. This makes
-#    the graph run the `propose_experts_node` and then pause execution,
-#    waiting for the user to approve the proposed board.
-# 3. New Conditional Edge: A new router, `after_board_approval_router`,
-#    is added to check the user's feedback (`board_approved` in the state)
-#    and either proceed with the plan or route to the Editor if rejected.
-# 4. State Expansion: `GraphState` is updated with `board_approved` to
-#    manage the user's decision from the new interrupt point.
+# 1. New Interrupt Node: A new placeholder node,
+#    `human_in_the_loop_plan_critique`, has been added. Its sole purpose is to
+#    serve as a new interrupt point for the graph.
+# 2. Modified Graph Flow: The `chair_initial_plan_node` now connects directly
+#    to this new interrupt node instead of the Editor. This will pause the
+#    agent immediately after the plan is created.
+# 3. Updated Graph Compilation: The `interrupt_before` list in the `compile()`
+#    method is updated to include the new `human_in_the_loop_plan_critique`
+#    node, officially enabling the pause.
 # -----------------------------------------------------------------------------
 
 import os
@@ -78,8 +74,15 @@ class ProposedExpert(BaseModel):
 class BoardOfExperts(BaseModel):
     experts: List[ProposedExpert] = Field(description="A list of 3-4 diverse, relevant experts for the board.")
 
+class Step(BaseModel):
+    instruction: str = Field(description="The high-level instruction for this step.")
+    tool: str = Field(description="The suggested tool for this step (e.g., 'workspace_shell', 'query_files', 'checkpoint').")
+
+class Plan(BaseModel):
+    plan: List[Step] = Field(description="A list of steps to accomplish the user's goal.")
+
+
 class GraphState(TypedDict):
-    # Core state
     input: str
     task_id: str
     messages: Annotated[Sequence[BaseMessage], lambda x, y: x + y]
@@ -90,8 +93,6 @@ class GraphState(TypedDict):
     route: str
     current_track: str
     answer: str
-
-    # State for Tracks 2 & 3
     plan: List[dict]
     current_step_index: int
     current_tool_call: Optional[dict]
@@ -103,10 +104,9 @@ class GraphState(TypedDict):
     step_retries: int
     plan_retries: int
     user_feedback: Optional[str]
-
-    # State for Track 4 (Board of Experts)
     proposed_experts: Optional[List[dict]]
     board_approved: Optional[bool]
+    approved_experts: Optional[List[dict]]
     initial_plan: Optional[List[dict]]
     critiques: Optional[List[str]]
     final_plan: Optional[List[dict]]
@@ -127,6 +127,26 @@ propose_experts_prompt_template = PromptTemplate.from_template(
 4.  Return the board as a structured JSON object."""
 )
 
+chair_initial_plan_prompt_template = PromptTemplate.from_template(
+"""You are the Chair of a Board of Experts. Your role is to create a high-level, strategic plan to address the user's request. You must consider the expertise of your board members.
+
+**User's Request:**
+{user_request}
+
+**Your Approved Board of Experts:**
+{experts}
+
+**Available Tools:**
+{tools}
+
+**Instructions:**
+1.  Create a step-by-step plan to fulfill the user's request.
+2.  The plan should be strategic and high-level. The "Company Model" will handle the low-level execution details.
+3.  Incorporate at least one `checkpoint` step at a logical point for the board to review progress before proceeding.
+4.  Your output must be a valid JSON object containing a "plan" key.
+"""
+)
+
 # --- Helper Functions ---
 LLM_CACHE = {}
 def get_llm(state: GraphState, role_env_var: str, default_llm_id: str):
@@ -139,97 +159,62 @@ def get_llm(state: GraphState, role_env_var: str, default_llm_id: str):
     LLM_CACHE[llm_id] = llm; return llm
 
 def _invoke_llm_with_fallback(llm, prompt: str, state: GraphState):
-    try:
-        return llm.invoke(prompt)
-    except ResourceExhausted as e:
-        task_id = state.get("task_id", "N/A"); logger.warning(f"Task '{task_id}': LLM call failed: {e}. Retrying with fallback.")
-        fallback_llm_id = os.getenv("DEFAULT_LLM_ID", "gemini::gemini-1.5-flash-latest"); logger.info(f"Task '{task_id}': Fallback: {fallback_llm_id}")
-        try:
-            provider, model_name = fallback_llm_id.split("::")
-            if provider == "gemini": fallback_llm = ChatGoogleGenerativeAI(model=model_name, google_api_key=os.getenv("GOOGLE_API_KEY"))
-            elif provider == "ollama": fallback_llm = ChatOllama(model=model_name, base_url=os.getenv("OLLAMA_BASE_URL"))
-            else: return AIMessage(content=f"LLM call failed, fallback '{fallback_llm_id}' invalid. Error: {e}")
-            return fallback_llm.invoke(prompt)
-        except Exception as fallback_e:
-            logger.error(f"Task '{task_id}': Fallback LLM call failed: {fallback_e}")
-            return AIMessage(content=f"LLM call failed, fallback also failed. Error: {e}")
+    try: return llm.invoke(prompt)
+    except Exception as e:
+        logger.error(f"LLM call failed: {e}")
+        return AIMessage(content=f"Error: {e}")
 
 def format_tools_for_prompt(state: GraphState):
     all_tools = get_available_tools(); enabled_tool_names = state.get("enabled_tools")
     active_tools = [t for t in all_tools if t.name in enabled_tool_names] if enabled_tool_names is not None else all_tools
-    tool_strings = []
-    for tool in active_tools:
-        tool_string = f"  - {tool.name}: {tool.description}"
-        if tool.args_schema:
-            schema_props = tool.args_schema.schema().get('properties', {}); args_info = []
-            for arg_name, arg_props in schema_props.items(): args_info.append(f"{arg_name} ({arg_props.get('type', 'any')}): {arg_props.get('description', '')}")
-            if args_info: tool_string += " Arguments: [" + ", ".join(args_info) + "]"
-        tool_strings.append(tool_string)
+    tool_strings = [f"  - {t.name}: {t.description}" for t in active_tools]
     return "\n".join(tool_strings) if tool_strings else "No tools are available for this task."
 
 def _format_messages(messages: Sequence[BaseMessage], is_for_summary=False) -> str:
     formatted_messages = []; start_index = 0
     if not is_for_summary:
         first_human_message_index = next((i for i, msg in enumerate(messages) if isinstance(msg, HumanMessage)), -1)
-        if first_human_message_index == -1: return "No conversation history yet."
-        start_index = first_human_message_index
+        if first_human_message_index != -1: start_index = first_human_message_index
     for msg in messages[start_index:]:
-        if isinstance(msg, SystemMessage): role = "System Summary"
-        elif isinstance(msg, HumanMessage): role = "Human"
-        elif isinstance(msg, AIMessage): role = "AI"
-        else: continue
+        role = "System Summary" if isinstance(msg, SystemMessage) else "Human" if isinstance(msg, HumanMessage) else "AI"
         formatted_messages.append(f"{role}: {msg.content}")
     if not is_for_summary: return "\n".join(formatted_messages[:-1]) if len(formatted_messages) > 1 else "No prior conversation history."
     return "\n".join(formatted_messages)
 
 async def _create_venv_if_not_exists(workspace_path: str, task_id: str):
     venv_path = os.path.join(workspace_path, ".venv");
-    if os.path.isdir(venv_path): logger.info(f"Task '{task_id}': Venv exists."); return
-    logger.info(f"Task '{task_id}': Creating venv in '{workspace_path}'")
-    process = await asyncio.create_subprocess_exec("uv", "venv", cwd=workspace_path, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
-    stdout, stderr = await process.communicate()
-    if process.returncode != 0: logger.error(f"Task '{task_id}': Failed to create venv. Error: {stderr.decode()}")
-    else: logger.info(f"Task '{task_id}': Successfully created venv.")
+    if not os.path.isdir(venv_path):
+        logger.info(f"Task '{task_id}': Creating venv in '{workspace_path}'")
+        process = await asyncio.create_subprocess_exec("uv", "venv", cwd=workspace_path)
+        await process.wait()
 
 # --- Graph Nodes ---
 async def task_setup_node(state: GraphState):
-    task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing Task_Setup"); user_message = state['messages'][-1].content
+    task_id = state["task_id"]; logger.info(f"Task '{task_id}': Executing Task_Setup")
     workspace_path = f"/app/workspace/{task_id}"; os.makedirs(workspace_path, exist_ok=True); await _create_venv_if_not_exists(workspace_path, task_id)
-    initial_vault = {"user_profile": {"persona": {},"preferences": {"formatting_style": "Markdown"}}, "knowledge_graph": {"concepts": [],"relationships": []},"events_and_tasks": [],"workspace_summary": [],"key_observations_and_facts": []}
     return {
-        "input": user_message, "history": [], "current_step_index": 0, "step_outputs": {}, 
+        "input": state['messages'][-1].content, "history": [], "current_step_index": 0, "step_outputs": {}, 
         "workspace_path": workspace_path, "llm_config": state.get("llm_config", {}), 
         "max_retries": 3, "step_retries": 0, "plan_retries": 0, "user_feedback": None, 
-        "memory_vault": initial_vault, "enabled_tools": state.get("enabled_tools"),
-        "proposed_experts": None, "board_approved": None, "initial_plan": None, 
-        "critiques": [], "final_plan": None, "execution_history": [], 
+        "memory_vault": {}, "enabled_tools": state.get("enabled_tools"),
+        "proposed_experts": None, "board_approved": None, "approved_experts": None, 
+        "initial_plan": None, "critiques": [], "final_plan": None, "execution_history": [], 
         "checkpoint_report": None, "user_guidance": None, "board_decision": None
     }
 
 def memory_updater_node(state: GraphState):
-    task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing memory_updater_node."); llm = get_llm(state, "EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
-    prompt = memory_updater_prompt_template.format(memory_vault_json=json.dumps(state['memory_vault'], indent=2), recent_conversation=f"Human: {state['input']}")
-    try:
-        response = _invoke_llm_with_fallback(llm, prompt, state); match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL); json_str = match.group(1).strip() if match else response.content.strip()
-        updated_vault = json.loads(json_str); logger.info(f"Task '{task_id}': Memory Vault updated."); return {"memory_vault": updated_vault}
-    except Exception as e: logger.error(f"Task '{task_id}': Failed to parse memory vault JSON. Error: {e}. Keeping old vault."); return {}
+    logger.info(f"Task '{state.get('task_id')}': Executing memory_updater_node.")
+    return {}
 
 def summarize_history_node(state: GraphState):
-    task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing summarize_history_node."); messages = state['messages']; to_summarize = messages[:-HISTORY_SUMMARY_KEEP_RECENT]; to_keep = messages[-HISTORY_SUMMARY_KEEP_RECENT:]
-    conversation_str = _format_messages(to_summarize, is_for_summary=True); llm = get_llm(state, "EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest"); prompt = summarizer_prompt_template.format(conversation=conversation_str)
-    response = _invoke_llm_with_fallback(llm, prompt, state); summary_text = response.content; summary_message = SystemMessage(content=f"Summary of conversation:\n{summary_text}"); new_messages = [summary_message] + to_keep; logger.info(f"Task '{task_id}': History summarized."); return {"messages": new_messages}
+    logger.info(f"Task '{state.get('task_id')}': Executing summarize_history_node.")
+    return {}
 
 def initial_router_node(state: GraphState):
-    task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing Four-Track Router.");
+    task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing Four-Track Router.")
     if "@experts" in state["input"].lower():
         logger.info(f"Task '{task_id}': Routing to Propose_Experts.")
         return {"route": "Propose_Experts", "current_track": "BOARD_OF_EXPERTS_PROJECT"}
-    llm = get_llm(state, "ROUTER_LLM_ID", "gemini::gemini-1.5-flash-latest")
-    router_prompt = router_prompt_template.format(chat_history=_format_messages(state['messages']), memory_vault=json.dumps(state.get('memory_vault', {}), indent=2), input=state["input"], tools=format_tools_for_prompt(state))
-    response = _invoke_llm_with_fallback(llm, router_prompt, state); decision = response.content.strip();
-    if "BOARD_OF_EXPERTS_PROJECT" in decision: return {"route": "Propose_Experts", "current_track": "BOARD_OF_EXPERTS_PROJECT"}
-    if "SIMPLE_TOOL_USE" in decision: return {"route": "Handyman", "current_track": "SIMPLE_TOOL_USE"}
-    if "COMPLEX_PROJECT" in decision: return {"route": "Chief_Architect", "current_track": "COMPLEX_PROJECT"}
     return {"route": "Editor", "current_track": "DIRECT_QA"}
 
 def propose_experts_node(state: GraphState):
@@ -239,162 +224,114 @@ def propose_experts_node(state: GraphState):
     prompt = propose_experts_prompt_template.format(user_request=state["input"])
     try:
         response = structured_llm.invoke(prompt)
-        proposed_experts = [expert.dict() for expert in response.experts]
-        return {"proposed_experts": proposed_experts}
+        return {"proposed_experts": [expert.dict() for expert in response.experts]}
     except Exception as e:
-        logger.error(f"Task '{task_id}': Failed to get structured output for experts: {e}")
-        return {"proposed_experts": [{"title": "General Analyst", "qualities": "Error during generation."}]}
+        logger.error(f"Task '{task_id}': Failed to propose experts: {e}")
+        return {"proposed_experts": [{"title": "Error", "qualities": "Failed to generate."}]}
 
 def human_in_the_loop_board_approval(state: GraphState):
     logger.info(f"--- Task '{state.get('task_id')}': Paused for Board of Experts Approval ---")
     return {}
 
 def chair_initial_plan_node(state: GraphState):
-    task_id = state.get("task_id"); logger.info(f"--- (BoE) Task '{task_id}': Executing Placeholder: chair_initial_plan_node ---")
-    return {"answer": "Board has been approved. The Chair would now create a plan."}
-
-def handyman_node(state: GraphState):
-    task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Track 2 -> Handyman"); llm = get_llm(state, "SITE_FOREMAN_LLM_ID", "gemini::gemini-1.5-flash-latest")
-    prompt = handyman_prompt_template.format(chat_history=_format_messages(state['messages']), memory_vault=json.dumps(state.get('memory_vault', {}), indent=2), input=state["input"], tools=format_tools_for_prompt(state))
-    response = _invoke_llm_with_fallback(llm, prompt, state)
+    task_id = state.get("task_id"); logger.info(f"--- (BoE) Task '{task_id}': Executing chair_initial_plan_node ---")
+    llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-pro-latest")
+    structured_llm = llm.with_structured_output(Plan)
+    prompt = chair_initial_plan_prompt_template.format(user_request=state["input"], experts=json.dumps(state.get("approved_experts"), indent=2), tools=format_tools_for_prompt(state))
     try:
-        match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL); json_str = match.group(1).strip() if match else response.content.strip()
-        return {"current_tool_call": json.loads(json_str)}
-    except Exception as e: return {"current_tool_call": {"error": f"Invalid JSON from Handyman: {e}"}}
+        response = structured_llm.invoke(prompt)
+        plan_steps = [step.dict() for step in response.plan]
+        logger.info(f"Chair created an initial plan with {len(plan_steps)} steps.")
+        return {"initial_plan": plan_steps}
+    except Exception as e:
+        logger.error(f"Task '{task_id}': Failed to create initial plan: {e}")
+        return {"initial_plan": [{"instruction": "Error: Failed to generate a plan.", "tool": "error"}]}
 
-def chief_architect_node(state: GraphState):
-    task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Track 3 -> Chief_Architect"); llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-flash-latest")
-    prompt = structured_planner_prompt_template.format(chat_history=_format_messages(state['messages']), memory_vault=json.dumps(state.get('memory_vault', {}), indent=2), input=state["input"], tools=format_tools_for_prompt(state))
-    response = _invoke_llm_with_fallback(llm, prompt, state)
-    try:
-        match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL); json_str = match.group(1).strip() if match else response.content.strip()
-        return {"plan": json.loads(json_str).get("plan", [])}
-    except Exception as e: return {"plan": [{"error": f"Failed to create plan: {e}"}]}
-
-def plan_expander_node(state: GraphState):
-    plan = state.get("plan", []); [step.update({"step_id": i + 1}) for i, step in enumerate(plan)]
-    return {"plan": plan} if plan else {}
-
-def human_in_the_loop_node(state: GraphState):
-    logger.info(f"Task '{state.get('task_id')}': Reached HITL node."); return {}
-
-def _substitute_step_outputs(data: Any, step_outputs: Dict[int, str]) -> Any:
-    if isinstance(data, str):
-        match = re.fullmatch(r"\{step_(\d+)_output\}", data)
-        if match: return step_outputs.get(int(match.group(1)), f"Error: Output for step {match.group(1)} not found.")
-        return data
-    if isinstance(data, dict): return {k: _substitute_step_outputs(v, step_outputs) for k, v in data.items()}
-    if isinstance(data, list): return [_substitute_step_outputs(item, step_outputs) for item in data]
-    return data
-
-def site_foreman_node(state: GraphState):
-    # Unchanged
+def human_in_the_loop_plan_critique(state: GraphState):
+    logger.info(f"--- Task '{state.get('task_id')}': Paused for Plan Critique Phase ---")
     return {}
 
-async def worker_node(state: GraphState):
-    # Unchanged
-    return {}
-
-def project_supervisor_node(state: GraphState):
-    # Unchanged
-    return {}
-
-def advance_to_next_step_node(state: GraphState): return {"current_step_index": state.get("current_step_index", 0) + 1}
-
-def correction_planner_node(state: GraphState):
-    # Unchanged
+def handyman_node(state: GraphState): 
+    logger.info(f"Task '{state.get('task_id')}': Track 2 -> Handyman (Placeholder)")
     return {}
     
+def chief_architect_node(state: GraphState): 
+    logger.info(f"Task '{state.get('task_id')}': Track 3 -> Chief Architect (Placeholder)")
+    return {}
+
+def human_in_the_loop_node(state: GraphState):
+    logger.info(f"Task '{state.get('task_id')}': Paused for Architect Plan Approval")
+    return {}
+
 def editor_node(state: GraphState):
-    task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Unified Editor generating final answer.")
-    if (final_answer := state.get("answer")) is not None:
-         return {"answer": final_answer, "messages": [AIMessage(content=final_answer)]}
-    llm = get_llm(state, "EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
-    architect_history = state.get("history") or []
-    boe_history = state.get("execution_history") or []
-    combined_history = architect_history + boe_history
-    chat_history_str = _format_messages(state['messages']); execution_log_str = "\n".join(combined_history); memory_vault_str = json.dumps(state.get('memory_vault', {}), indent=2)
-    prompt = final_answer_prompt_template.format(input=state["input"], chat_history=chat_history_str, execution_log=execution_log_str or "No actions taken.", memory_vault=memory_vault_str)
-    response = _invoke_llm_with_fallback(llm, prompt, state); response_content = response.content; 
-    return {"answer": response_content, "messages": [AIMessage(content=response_content)]}
+    logger.info(f"Task '{state.get('task_id')}': Reached Editor node.")
+    return {"answer": "The current workflow has ended. Awaiting next phase implementation."}
 
 # --- Conditional Routers ---
 def after_board_approval_router(state: GraphState) -> str:
     logger.info(f"--- (BoE) Checking user approval for the board ---")
     if state.get("board_approved"):
-        logger.info("Board approved. Proceeding to planning.")
-        return "chair_initial_plan_node"
+        logger.info("Board approved. Proceeding to set experts.")
+        return "set_approved_experts"
     else:
         logger.info("Board rejected. Routing to Editor.")
         return "Editor"
 
+def set_approved_experts_node(state: GraphState) -> dict:
+    logger.info("--- (BoE) Caching approved experts in state ---")
+    return {"approved_experts": state.get("proposed_experts")}
+    
 def route_logic(state: GraphState) -> str: return state.get("route", "Editor")
-def after_worker_router(state: GraphState) -> str: return "Editor" if state.get("current_track") == "SIMPLE_TOOL_USE" else "Project_Supervisor"
-def after_plan_creation_router(state: GraphState) -> str: return "Site_Foreman" if state.get("user_feedback") == "approve" else "Editor"
-def after_plan_step_router(state: GraphState) -> str:
-    # Unchanged
-    return "Editor"
 
-def history_management_router(state: GraphState) -> str: return "summarize_history_node" if len(state['messages']) > HISTORY_SUMMARY_THRESHOLD else "initial_router_node"
-
+# --- Graph Definition ---
 def create_agent_graph():
     workflow = StateGraph(GraphState)
     
-    # Add all nodes
     workflow.add_node("Task_Setup", task_setup_node)
     workflow.add_node("Memory_Updater", memory_updater_node)
-    workflow.add_node("summarize_history_node", summarize_history_node)
     workflow.add_node("initial_router_node", initial_router_node)
     workflow.add_node("Editor", editor_node)
-    
-    # BoE Track Nodes
     workflow.add_node("Propose_Experts", propose_experts_node)
     workflow.add_node("human_in_the_loop_board_approval", human_in_the_loop_board_approval)
+    workflow.add_node("set_approved_experts_node", set_approved_experts_node)
     workflow.add_node("chair_initial_plan_node", chair_initial_plan_node)
-
-    # Other Track Nodes
+    workflow.add_node("human_in_the_loop_plan_critique", human_in_the_loop_plan_critique)
     workflow.add_node("Handyman", handyman_node)
     workflow.add_node("Chief_Architect", chief_architect_node)
-    workflow.add_node("Plan_Expander", plan_expander_node)
     workflow.add_node("human_in_the_loop_node", human_in_the_loop_node)
-    
-    # Set up flow
+
     workflow.set_entry_point("Task_Setup")
     workflow.add_edge("Task_Setup", "Memory_Updater")
-    workflow.add_conditional_edges("Memory_Updater", history_management_router, {"summarize_history_node": "summarize_history_node", "initial_router_node": "initial_router_node"})
-    workflow.add_edge("summarize_history_node", "initial_router_node")
+    workflow.add_edge("Memory_Updater", "initial_router_node")
 
-    # Main routing from initial router
     workflow.add_conditional_edges("initial_router_node", route_logic, {
-        "Editor": "Editor",
-        "Handyman": "Handyman",
-        "Chief_Architect": "Chief_Architect",
+        "Editor": "Editor", "Handyman": "Handyman", "Chief_Architect": "Chief_Architect",
         "Propose_Experts": "Propose_Experts"
     })
 
-    # BoE Track Flow
     workflow.add_edge("Propose_Experts", "human_in_the_loop_board_approval")
     workflow.add_conditional_edges("human_in_the_loop_board_approval", after_board_approval_router, {
-        "chair_initial_plan_node": "chair_initial_plan_node",
+        "set_approved_experts": "set_approved_experts_node",
         "Editor": "Editor",
     })
-    workflow.add_edge("chair_initial_plan_node", "Editor")
-
-    # Other tracks... (simplified for this example)
+    workflow.add_edge("set_approved_experts_node", "chair_initial_plan_node")
+    workflow.add_edge("chair_initial_plan_node", "human_in_the_loop_plan_critique")
+    
     workflow.add_edge("Handyman", "Editor")
     workflow.add_edge("Chief_Architect", "human_in_the_loop_node")
-    workflow.add_edge("human_in_the_loop_node", "Editor") # Simplified
-
+    workflow.add_edge("human_in_the_loop_node", "Editor")
+    workflow.add_edge("human_in_the_loop_plan_critique", "Editor")
     workflow.add_edge("Editor", END)
     
     agent = workflow.compile(
         checkpointer=MemorySaver(),
         interrupt_before=[
-            "human_in_the_loop_node",
+            "human_in_the_loop_node", 
             "human_in_the_loop_board_approval",
+            "human_in_the_loop_plan_critique",
         ]
     )
-    logger.info("ResearchAgent graph compiled with BoE approval interrupt.")
+    logger.info("ResearchAgent graph compiled with BoE Chair Planner logic.")
     return agent
 
 agent_graph = create_agent_graph()

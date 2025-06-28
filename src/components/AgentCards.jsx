@@ -1,7 +1,7 @@
 // src/components/AgentCards.jsx
 import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
-import { ArchitectIcon, CheckCircleIcon, ChevronDownIcon, CircleDotIcon, EditorIcon, ForemanIcon, LoaderIcon, PlusCircleIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, XCircleIcon, BoardIcon, CheckIcon } from './Icons';
+import { ArchitectIcon, CheckCircleIcon, ChevronDownIcon, CircleDotIcon, EditorIcon, ForemanIcon, LoaderIcon, PlusCircleIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, XCircleIcon, BoardIcon, CheckIcon, ChairIcon } from './Icons';
 import { CopyButton } from './Common';
 
 const AgentResponseCard = ({ icon, title, children, showCopy, copyText }) => (
@@ -168,6 +168,27 @@ export const BoardApprovalCard = ({ experts, onApproval }) => {
                     Board {isApproved ? 'Approved' : 'Rejected'}
                 </div>
              )}
+        </AgentResponseCard>
+    );
+};
+
+export const ChairPlanCard = ({ plan }) => {
+    const planItems = (plan || []).map((step, index) => (
+        <li key={index} class="flex items-start gap-3 py-1.5">
+            <CheckIcon class="h-4 w-4 text-blue-400 mt-1 flex-shrink-0" />
+            <span>
+                {step.instruction}
+                <span class="ml-2 inline-block bg-gray-700 text-blue-300 text-xs font-mono px-1.5 py-0.5 rounded">
+                    {step.tool}
+                </span>
+            </span>
+        </li>
+    ));
+
+    return (
+        <AgentResponseCard icon={<ChairIcon class="h-5 w-5 text-amber-400" />} title="The Chair's Initial Plan">
+            <p class="text-sm text-gray-400 mb-3">The Chair has drafted the following initial plan for review by the experts:</p>
+            <ul class="space-y-1 text-gray-300">{planItems}</ul>
         </AgentResponseCard>
     );
 };
