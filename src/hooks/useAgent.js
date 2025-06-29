@@ -40,9 +40,11 @@ export const useAgent = (onMessage) => {
                         newTasks[task_id] = "Thinking...";
                     } else if (type === 'agent_event' && chainEvent === 'on_chain_start') {
                         newTasks[task_id] = name;
-                    } else if (type === 'final_answer' || type === 'agent_stopped' || type === 'plan_approval_request' || type === 'board_approval_request' || type === 'chair_plan_generated') {
+                    } else if (['final_answer', 'agent_stopped', 'plan_approval_request', 'board_approval_request', 'final_plan_approval_request'].includes(type)) {
                         delete newTasks[task_id];
                     }
+                    // We intentionally do NOT delete the task for 'chair_plan_generated' or 'expert_critique_generated'
+                    // as these are intermediate steps in a longer running process.
                     return newTasks;
                 });
                 
@@ -106,3 +108,4 @@ export const useAgent = (onMessage) => {
         deleteTask,
     };
 };
+

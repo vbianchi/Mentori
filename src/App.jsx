@@ -1,8 +1,8 @@
 // src/App.jsx
 import { h } from 'preact';
 import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
-import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, FolderIcon, ArrowLeftIcon, UploadCloudIcon, StopCircleIcon, BriefcaseIcon, SendToChatIcon, FileTextIcon, BoardIcon, CheckIcon, XCircleIcon, ChairIcon } from './components/Icons';
-import { ArchitectCard, BoardApprovalCard, ChairPlanCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard } from './components/AgentCards';
+import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, FolderIcon, ArrowLeftIcon, UploadCloudIcon, StopCircleIcon, BriefcaseIcon, SendToChatIcon, FileTextIcon, BoardIcon, CheckIcon, XCircleIcon, ChairIcon, CritiqueIcon } from './components/Icons';
+import { FinalPlanApprovalCard, ExpertCritiqueCard, ArchitectCard, BoardApprovalCard, ChairPlanCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard } from './components/AgentCards';
 import { ToggleButton, CopyButton } from './components/Common';
 import { useTasks } from './hooks/useTasks';
 import { useWorkspace } from './hooks/useWorkspace';
@@ -169,12 +169,16 @@ export function App() {
                 } else if (eventType === 'board_approval_request') {
                     runContainer.children.push({ type: 'board_approval', experts: event.experts, isAwaitingApproval: true });
                 } else if (eventType === 'chair_plan_generated') {
-                    runContainer.children.push({ type: 'chair_plan', plan: event.plan, isAwaitingApproval: false }); // It's just a display, not an interrupt
+                    runContainer.children.push({ type: 'chair_plan', plan: event.plan });
+                } else if (eventType === 'expert_critique_generated') {
+                    runContainer.children.push({ type: 'expert_critique', critique: event.critique });
+                } else if (eventType === 'final_plan_approval_request') {
+                    runContainer.children.push({ type: 'final_plan_approval', plan: event.plan, critiques: event.critiques, isAwaitingApproval: true });
                 } else if (eventType === 'direct_answer' || eventType === 'final_answer') {
                     runContainer.children.push({ type: eventType, content: event.data });
                     runContainer.isComplete = true;
                 } else if (eventType === 'agent_event') {
-                    // ... (agent_event logic is unchanged) ...
+                    // This logic remains for general status updates, but specific cards are handled above
                 }
                 taskToUpdate.history = newHistory;
                 newTasks[taskIndex] = taskToUpdate;
@@ -242,6 +246,22 @@ export function App() {
         agent.resumeAgent({ task_id: activeTaskId, board_approved: approved, enabled_tools: Object.keys(settings.enabledTools).filter(key => settings.enabledTools[key]) });
     };
 
+    const handleFinalPlanApprovalAction = (approved, plan = null) => {
+        setTasks(currentTasks => currentTasks.map(task => {
+            if (task.id === activeTaskId) {
+                const newHistory = [...task.history];
+                const runContainer = newHistory[newHistory.length - 1];
+                if (runContainer?.type === 'run_container') {
+                    const approvalCard = runContainer.children.find(c => c.type === 'final_plan_approval');
+                    if (approvalCard) approvalCard.isAwaitingApproval = false;
+                }
+                return { ...task, history: newHistory };
+            }
+            return task;
+        }));
+        agent.resumeAgent({ task_id: activeTaskId, feedback: approved ? 'approve' : 'reject', plan, enabled_tools: Object.keys(settings.enabledTools).filter(key => settings.enabledTools[key]) });
+    };
+
     const handleModifyAndApprove = (modifiedPlan) => handlePlanApprovalAction('approve', modifiedPlan);
     
     const handleSendMessage = (e) => {
@@ -265,6 +285,8 @@ export function App() {
 
     const activeTask = tasks.find(t=>t.id===activeTaskId);
     const isAwaitingApproval = activeTask?.history.some(h => h.type === 'run_container' && h.children.some(c => c.isAwaitingApproval));
+    
+    const agentStatusMessage = agent.runningTasks[activeTaskId] ? `${agent.runningTasks[activeTaskId]}...` : "Send a message...";
 
     return (
         <div class="flex h-screen w-screen p-2 sm:p-4 gap-4 bg-background text-foreground">
@@ -325,6 +347,8 @@ export function App() {
                                                     case 'architect_plan': return <ArchitectCard plan={child} isAwaitingApproval={child.isAwaitingApproval} onModify={handleModifyAndApprove} onReject={() => handlePlanApprovalAction('reject')} availableTools={settings.availableTools}/>;
                                                     case 'board_approval': return <BoardApprovalCard experts={child.experts} onApproval={handleBoardApprovalAction} />;
                                                     case 'chair_plan': return <ChairPlanCard plan={child.plan} />;
+                                                    case 'expert_critique': return <ExpertCritiqueCard critique={child.critique} />;
+                                                    case 'final_plan_approval': return <FinalPlanApprovalCard plan={child.plan} critiques={child.critiques} onModify={(plan) => handleFinalPlanApprovalAction(true, plan)} onReject={() => handleFinalPlanApprovalAction(false)} />;
                                                     case 'execution_plan': return <SiteForemanCard plan={child} />;
                                                     case 'direct_answer': return <DirectAnswerCard answer={child.content} />;
                                                     case 'final_answer': return <FinalAnswerCard answer={child.content} />;
@@ -342,7 +366,7 @@ export function App() {
                    {agent.runningTasks[activeTaskId] && !isAwaitingApproval && (
                         <div class="flex items-center gap-4 p-4">
                             <LoaderIcon class="h-5 w-5 text-primary" />
-                            <p class="text-muted-foreground font-medium">The {agent.runningTasks[activeTaskId]} is thinking...</p>
+                            <p class="text-muted-foreground font-medium">{agentStatusMessage}</p>
                         </div>
                    )}
                    <div ref={messagesEndRef} />
@@ -355,7 +379,7 @@ export function App() {
                             onInput={e => setInputValue(e.target.value)}
                             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) handleSendMessage(e); }}
                             class="flex-1 p-3 bg-input border border-border rounded-lg text-foreground focus:ring-2 focus:ring-primary focus:outline-none resize-none"
-                            placeholder={!activeTaskId ? "Please select or create a task." : isAwaitingApproval ? "Please provide input in the card above." : agent.runningTasks[activeTaskId] ? `The ${agent.runningTasks[activeTaskId]} is thinking...` : "Send a message..."}
+                            placeholder={!activeTaskId ? "Please select or create a task." : isAwaitingApproval ? "Please provide input in the card above." : agent.runningTasks[activeTaskId] ? agentStatusMessage : "Send a message..."}
                             rows="2"
                             disabled={!activeTaskId || !!agent.runningTasks[activeTaskId] || isAwaitingApproval}
                         ></textarea>

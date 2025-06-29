@@ -1,16 +1,17 @@
 // src/components/AgentCards.jsx
 import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
-import { ArchitectIcon, CheckCircleIcon, ChevronDownIcon, CircleDotIcon, EditorIcon, ForemanIcon, LoaderIcon, PlusCircleIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, XCircleIcon, BoardIcon, CheckIcon, ChairIcon } from './Icons';
+import { ArchitectIcon, CheckCircleIcon, ChevronDownIcon, CircleDotIcon, EditorIcon, ForemanIcon, LoaderIcon, PlusCircleIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, XCircleIcon, BoardIcon, CheckIcon, ChairIcon, CritiqueIcon } from './Icons';
 import { CopyButton } from './Common';
 
-const AgentResponseCard = ({ icon, title, children, showCopy, copyText }) => (
-    <div class="p-4 rounded-lg shadow-md bg-gray-800/50 border border-gray-700/50 relative">
-        <h3 class="font-bold text-sm text-gray-300 mb-3 capitalize flex items-center gap-2">{icon}{title}</h3>
+const AgentResponseCard = ({ icon, title, children, showCopy, copyText, color = 'gray' }) => (
+    <div class={`p-4 rounded-lg shadow-md bg-gray-800/50 border border-${color}-700/50 relative`}>
+        <h3 class={`font-bold text-sm text-${color}-300 mb-3 capitalize flex items-center gap-2`}>{icon}{title}</h3>
         {showCopy && <CopyButton textToCopy={copyText} className="absolute top-3 right-3" />}
         <div class="pl-1">{children}</div>
     </div>
 );
+
 
 const StepCard = ({ step }) => {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -147,7 +148,7 @@ export const BoardApprovalCard = ({ experts, onApproval }) => {
     };
 
     return (
-        <AgentResponseCard icon={<BoardIcon class="h-5 w-5 text-rose-400" />} title="Board of Experts Formation">
+        <AgentResponseCard icon={<BoardIcon class="h-5 w-5" />} title="Board of Experts Formation" color="rose">
              <p class="text-sm text-gray-400 mb-3">The agent has proposed the following board for your approval:</p>
              <ul class="space-y-3 mb-4">
                 {(experts || []).map(expert => (
@@ -172,26 +173,92 @@ export const BoardApprovalCard = ({ experts, onApproval }) => {
     );
 };
 
-export const ChairPlanCard = ({ plan }) => {
-    const planItems = (plan || []).map((step, index) => (
-        <li key={index} class="flex items-start gap-3 py-1.5">
+const PlanStepView = ({ step }) => {
+    const isNew = (step.instruction || '').startsWith('NEW:');
+    const text = isNew ? step.instruction.substring(5) : step.instruction;
+    const style = isNew ? 'text-green-400 font-bold' : '';
+
+    return (
+        <li class={`flex items-start gap-3 py-1.5 ${style}`}>
             <CheckIcon class="h-4 w-4 text-blue-400 mt-1 flex-shrink-0" />
             <span>
-                {step.instruction}
+                {text}
                 <span class="ml-2 inline-block bg-gray-700 text-blue-300 text-xs font-mono px-1.5 py-0.5 rounded">
-                    {step.tool}
+                    {step.tool || step.tool_name}
                 </span>
             </span>
         </li>
-    ));
+    );
+};
+
+export const ChairPlanCard = ({ plan }) => (
+    <AgentResponseCard icon={<ChairIcon class="h-5 w-5" />} title="The Chair's Initial Plan" color="amber">
+        <p class="text-sm text-gray-400 mb-3">The Chair has drafted the following initial plan for review by the experts:</p>
+        <ul class="space-y-1 text-gray-300">
+            {(plan || []).map((step, index) => <PlanStepView key={index} step={step} />)}
+        </ul>
+    </AgentResponseCard>
+);
+
+export const ExpertCritiqueCard = ({ critique }) => (
+    <AgentResponseCard icon={<CritiqueIcon class="h-5 w-5" />} title={`${critique.title}'s Critique`} color="purple">
+        <p class="text-sm text-gray-300 italic whitespace-pre-wrap">"{critique.critique}"</p>
+    </AgentResponseCard>
+);
+
+export const FinalPlanApprovalCard = ({ plan, critiques, onModify, onReject }) => {
+    // --- MODIFIED: This card is now a read-only review screen ---
+    const [isApproved, setIsApproved] = useState(null);
+
+    const handleDecision = (approved) => {
+        setIsApproved(approved);
+        // We pass the *unmodified* plan back up, as editing is not part of this step.
+        onModify(plan);
+    };
+    
+    const handleReject = () => {
+        setIsApproved(false);
+        onReject();
+    }
 
     return (
-        <AgentResponseCard icon={<ChairIcon class="h-5 w-5 text-amber-400" />} title="The Chair's Initial Plan">
-            <p class="text-sm text-gray-400 mb-3">The Chair has drafted the following initial plan for review by the experts:</p>
-            <ul class="space-y-1 text-gray-300">{planItems}</ul>
+        <AgentResponseCard icon={<ChairIcon class="h-5 w-5" />} title="The Chair's Final Review" color="amber">
+            <p class="text-sm text-gray-400 mb-4">The board has completed its review. The critiques are summarized below. Please review the final plan and give your approval to begin execution.</p>
+            
+            <div class="mb-4">
+                <h4 class="text-sm font-bold text-gray-400 mb-2">Board Critiques:</h4>
+                <ul class="space-y-2">
+                    {(critiques || []).map((c, i) => (
+                        <li key={i} class="p-3 bg-gray-900/50 rounded-lg text-sm">
+                            <p class="font-semibold text-purple-300">{c.title}:</p>
+                            <p class="text-gray-300 italic whitespace-pre-wrap">"{c.critique}"</p>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+            
+            <div>
+                <h4 class="text-sm font-bold text-gray-400 mb-3">Final Plan for Execution:</h4>
+                 <ul class="space-y-1 text-gray-300 pl-2 border-l-2 border-gray-700">
+                    {(plan || []).map((step, index) => <PlanStepView key={index} step={step} />)}
+                </ul>
+                
+                {isApproved === null ? (
+                    <div class="flex justify-end gap-3 mt-4">
+                        <button onClick={handleReject} class="px-4 py-2 bg-red-600/50 text-white font-semibold rounded-lg hover:bg-red-600/80">Reject & End Task</button>
+                        <button onClick={() => handleDecision(true)} class="px-4 py-2 bg-green-600/80 text-white font-semibold rounded-lg hover:bg-green-700">Approve & Execute</button>
+                    </div>
+                ) : (
+                    <div class={`text-sm mt-4 font-bold flex items-center gap-2 justify-end ${isApproved ? 'text-green-400' : 'text-red-400'}`}>
+                        {isApproved ? <CheckIcon class="h-5 w-5" /> : <XCircleIcon class="h-5 w-5" />}
+                        {isApproved ? 'Plan Approved for Execution' : 'Plan Rejected'}
+                    </div>
+                )}
+            </div>
         </AgentResponseCard>
     );
 };
+
 
 export const SiteForemanCard = ({ plan }) => (
     <div class="ml-4"> 
