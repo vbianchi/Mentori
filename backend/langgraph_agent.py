@@ -1,22 +1,23 @@
 # backend/langgraph_agent.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 17 - Chair's Synthesis)
+# ResearchAgent Core Agent (Phase 17 - State Bugfix)
 #
-# This version implements the user's feedback for a more logical and
-# transparent deliberation process.
+# This version addresses the critical bug where critique history was bleeding
+# between multiple @experts runs within the same task.
 #
 # Key Architectural Changes:
-# 1. Enhanced Critique Data: The `critiques` list in the state now stores a
-#    more comprehensive object, including the plan as it existed *after* that
-#    expert's review. This allows the UI to show the plan's evolution.
-# 2. New Chair Synthesis Prompt: A new `chair_final_review_prompt_template`
-#    has been created. It instructs the Chair to perform a final validation
-#    on the sequentially-refined plan, check it against the full list of
-#    critiques, and add any final checkpoints if necessary.
-# 3. Intelligent chair_final_review_node: This node is no longer a simple
-#    pass-through. It now makes a final LLM call using the new prompt to
-#    intelligently synthesize and finalize the plan before presenting it to
-#    the user for approval.
+# 1. State Accumulator Removed: The `Annotated` type with the `lambda x, y: x + y`
+#    accumulator has been removed from the `critiques` field in the `GraphState`.
+#    This was the root cause of the bug, as it explicitly told LangGraph to
+#    always append to the list for the entire thread's lifetime.
+# 2. Manual State Updates: The `expert_critique_node` has been updated to
+#    manually handle the append operation. It now reads the current list of
+#    critiques from the state, appends the new one, and returns the full new
+#    list.
+# 3. Guaranteed Reset: The `task_setup_node` already resets `critiques: []`
+#    at the start of a run. Combined with the removal of the accumulator, this
+#    now guarantees that every @experts run starts with a clean slate,
+#    resolving the bug.
 # -----------------------------------------------------------------------------
 
 import os
@@ -115,7 +116,8 @@ class GraphState(TypedDict):
     approved_experts: Optional[List[dict]]
     initial_plan: Optional[List[dict]]
     expert_critique_index: int
-    critiques: Annotated[List[dict], lambda x, y: x + y]
+    # --- MODIFIED: Removed the accumulator to fix the state bug ---
+    critiques: Optional[List[dict]]
     refined_plan: Optional[List[dict]]
     final_plan: Optional[List[dict]]
     execution_history: Optional[List[str]]
@@ -177,7 +179,6 @@ expert_critique_prompt_template = PromptTemplate.from_template(
 """
 )
 
-# --- NEW: Prompt for the Chair's final synthesis/validation step ---
 chair_final_review_prompt_template = PromptTemplate.from_template(
 """You are the Chair of the Board of Experts. Your team of specialists has finished their sequential review of the initial plan.
 Your final responsibility is to perform a sanity check and produce the definitive, final version of the plan for user approval.
@@ -321,7 +322,6 @@ def expert_critique_node(state: GraphState):
     try:
         response = structured_llm.invoke(prompt)
         updated_plan_steps = [step.dict() for step in response.updated_plan]
-        # --- MODIFIED: Store the plan state with the critique ---
         critique_with_context = {
             "title": expert["title"],
             "critique": response.critique,
@@ -329,22 +329,24 @@ def expert_critique_node(state: GraphState):
         }
 
         logger.info(f"Critique from '{expert['title']}': {response.critique[:100]}...")
+        # --- MODIFIED: Manually handle appending to the critiques list ---
+        current_critiques = state.get("critiques", [])
         return {
-            "critiques": [critique_with_context],
+            "critiques": current_critiques + [critique_with_context],
             "refined_plan": updated_plan_steps,
             "expert_critique_index": critique_index + 1
         }
     except Exception as e:
         logger.error(f"Task '{task_id}': Failed to get critique from '{expert['title']}': {e}")
         error_critique = { "title": expert["title"], "critique": f"Error: Could not generate a critique. {e}", "plan_after_critique": state["refined_plan"] }
-        return {"critiques": [error_critique], "expert_critique_index": critique_index + 1}
+        current_critiques = state.get("critiques", [])
+        return {"critiques": current_critiques + [error_critique], "expert_critique_index": critique_index + 1}
 
 def chair_final_review_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"--- (BoE) Task '{task_id}': Executing chair_final_review_node (Synthesis) ---")
     llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-pro-latest")
     structured_llm = llm.with_structured_output(Plan)
 
-    # We only need the text of the critiques for the final review prompt
     critique_texts = [f"Critique from {c['title']}:\n{c['critique']}" for c in state['critiques']]
 
     prompt = chair_final_review_prompt_template.format(
@@ -360,7 +362,6 @@ def chair_final_review_node(state: GraphState):
         return {"final_plan": final_plan_steps}
     except Exception as e:
         logger.error(f"Task '{task_id}': Failed during Chair's final synthesis: {e}")
-        # On failure, fall back to the last refined plan to avoid losing all progress
         return {"final_plan": state["refined_plan"]}
 
 def human_in_the_loop_final_plan_approval(state: GraphState):
@@ -471,7 +472,7 @@ def create_agent_graph():
             "human_in_the_loop_final_plan_approval",
         ]
     )
-    logger.info("ResearchAgent graph compiled with BoE Synthesis logic.")
+    logger.info("ResearchAgent graph compiled with BoE State Bugfix.")
     return agent
 
 agent_graph = create_agent_graph()
