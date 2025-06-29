@@ -203,31 +203,36 @@ export const ChairPlanCard = ({ plan }) => (
 export const ExpertCritiqueCard = ({ critique }) => (
     <AgentResponseCard icon={<CritiqueIcon class="h-5 w-5" />} title={`${critique.title}'s Critique`} color="purple">
         <p class="text-sm text-gray-300 italic whitespace-pre-wrap">"{critique.critique}"</p>
+        {/* --- NEW: Display the plan as it was after this expert's review --- */}
+        <div class="mt-3 pt-3 border-t border-gray-700/50">
+             <h4 class="text-xs font-bold text-gray-400 mb-2">Plan after this critique:</h4>
+             <ul class="space-y-1 text-gray-300 text-sm">
+                {(critique.plan_after_critique || []).map((step, index) => <PlanStepView key={index} step={step} />)}
+            </ul>
+        </div>
     </AgentResponseCard>
 );
 
 export const FinalPlanApprovalCard = ({ plan, critiques, onModify, onReject }) => {
-    // --- MODIFIED: This card is now a read-only review screen ---
     const [isApproved, setIsApproved] = useState(null);
 
     const handleDecision = (approved) => {
         setIsApproved(approved);
-        // We pass the *unmodified* plan back up, as editing is not part of this step.
-        onModify(plan);
+        if (approved) {
+            onModify(plan);
+        } else {
+            onReject();
+        }
     };
     
-    const handleReject = () => {
-        setIsApproved(false);
-        onReject();
-    }
-
     return (
         <AgentResponseCard icon={<ChairIcon class="h-5 w-5" />} title="The Chair's Final Review" color="amber">
-            <p class="text-sm text-gray-400 mb-4">The board has completed its review. The critiques are summarized below. Please review the final plan and give your approval to begin execution.</p>
+            <p class="text-sm text-gray-400 mb-4">The board has completed its review and the Chair has synthesized the final plan. Please review and give your approval to begin execution.</p>
             
-            <div class="mb-4">
-                <h4 class="text-sm font-bold text-gray-400 mb-2">Board Critiques:</h4>
-                <ul class="space-y-2">
+            {/* --- MODIFIED: Show critiques in a collapsible section --- */}
+            <details class="mb-4">
+                <summary class="text-sm font-bold text-gray-400 cursor-pointer hover:text-white">View Full Board Deliberation ({critiques?.length || 0} critiques)</summary>
+                <ul class="space-y-2 mt-2 border-l-2 border-gray-700 pl-4">
                     {(critiques || []).map((c, i) => (
                         <li key={i} class="p-3 bg-gray-900/50 rounded-lg text-sm">
                             <p class="font-semibold text-purple-300">{c.title}:</p>
@@ -235,17 +240,17 @@ export const FinalPlanApprovalCard = ({ plan, critiques, onModify, onReject }) =
                         </li>
                     ))}
                 </ul>
-            </div>
+            </details>
             
             <div>
                 <h4 class="text-sm font-bold text-gray-400 mb-3">Final Plan for Execution:</h4>
-                 <ul class="space-y-1 text-gray-300 pl-2 border-l-2 border-gray-700">
+                 <ul class="space-y-1 text-gray-300 pl-2 border-l-2 border-green-700/50">
                     {(plan || []).map((step, index) => <PlanStepView key={index} step={step} />)}
                 </ul>
                 
                 {isApproved === null ? (
                     <div class="flex justify-end gap-3 mt-4">
-                        <button onClick={handleReject} class="px-4 py-2 bg-red-600/50 text-white font-semibold rounded-lg hover:bg-red-600/80">Reject & End Task</button>
+                        <button onClick={() => handleDecision(false)} class="px-4 py-2 bg-red-600/50 text-white font-semibold rounded-lg hover:bg-red-600/80">Reject & End Task</button>
                         <button onClick={() => handleDecision(true)} class="px-4 py-2 bg-green-600/80 text-white font-semibold rounded-lg hover:bg-green-700">Approve & Execute</button>
                     </div>
                 ) : (

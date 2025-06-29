@@ -1,29 +1,22 @@
 # backend/langgraph_agent.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 17 - Expert Critique Loop)
+# ResearchAgent Core Agent (Phase 17 - Chair's Synthesis)
 #
-# This version implements the autonomous expert critique loop.
+# This version implements the user's feedback for a more logical and
+# transparent deliberation process.
 #
 # Key Architectural Changes:
-# 1. New State Fields: GraphState is updated with `expert_critique_index`
-#    to track the loop and `refined_plan` to store the evolving plan.
-# 2. Pydantic Models for Critique: A new `CritiqueAndPlan` model is added to
-#    force the expert LLM to return both a textual critique and a full,
-#    programmatically-modified plan.
-# 3. New Critique Prompt: A new `expert_critique_prompt_template` is created
-#    to instruct the LLM on how to act as an expert and provide structured
-#    feedback.
-# 4. expert_critique_node: This new node iterates through the approved experts.
-#    For each one, it makes a live LLM call to get a critique and an updated
-#    plan, which are then saved back to the state.
-# 5. chair_final_review_node: This new node takes the result of the critique
-#    loop and prepares it for the user's final review.
-# 6. New Conditional Edge: `should_continue_critique` is a new router that
-#    manages the critique loop, continuing until all experts have provided
-#    feedback.
-# 7. New Final Approval Interrupt: A new `human_in_the_loop_final_plan_approval`
-#    node has been added to pause the graph after the full review cycle,
-#    awaiting the user's "Approve & Execute" command.
+# 1. Enhanced Critique Data: The `critiques` list in the state now stores a
+#    more comprehensive object, including the plan as it existed *after* that
+#    expert's review. This allows the UI to show the plan's evolution.
+# 2. New Chair Synthesis Prompt: A new `chair_final_review_prompt_template`
+#    has been created. It instructs the Chair to perform a final validation
+#    on the sequentially-refined plan, check it against the full list of
+#    critiques, and add any final checkpoints if necessary.
+# 3. Intelligent chair_final_review_node: This node is no longer a simple
+#    pass-through. It now makes a final LLM call using the new prompt to
+#    intelligently synthesize and finalize the plan before presenting it to
+#    the user for approval.
 # -----------------------------------------------------------------------------
 
 import os
@@ -90,9 +83,7 @@ class Step(BaseModel):
 class Plan(BaseModel):
     plan: List[Step] = Field(description="A list of steps to accomplish the user's goal.")
 
-# --- NEW: Pydantic model for the critique process ---
 class CritiqueAndPlan(BaseModel):
-    """A structured response containing a critique and the fully updated plan."""
     critique: str = Field(description="The detailed, constructive critique from the expert's point of view. Explain WHY you are making changes.")
     updated_plan: List[Step] = Field(description="The complete, revised step-by-step plan. This should be the full plan, not just the changed parts.")
 
@@ -119,16 +110,13 @@ class GraphState(TypedDict):
     step_retries: int
     plan_retries: int
     user_feedback: Optional[str]
-    # --- Board of Experts Fields ---
     proposed_experts: Optional[List[dict]]
     board_approved: Optional[bool]
     approved_experts: Optional[List[dict]]
     initial_plan: Optional[List[dict]]
-    # --- NEW: Fields for critique loop ---
     expert_critique_index: int
     critiques: Annotated[List[dict], lambda x, y: x + y]
     refined_plan: Optional[List[dict]]
-    # --- Final fields ---
     final_plan: Optional[List[dict]]
     execution_history: Optional[List[str]]
     checkpoint_report: Optional[str]
@@ -189,6 +177,27 @@ expert_critique_prompt_template = PromptTemplate.from_template(
 """
 )
 
+# --- NEW: Prompt for the Chair's final synthesis/validation step ---
+chair_final_review_prompt_template = PromptTemplate.from_template(
+"""You are the Chair of the Board of Experts. Your team of specialists has finished their sequential review of the initial plan.
+Your final responsibility is to perform a sanity check and produce the definitive, final version of the plan for user approval.
+
+**The Original User Request:**
+{user_request}
+
+**The Full History of Board Critiques:**
+{critiques}
+
+**The Sequentially Refined Plan (after the last expert's review):**
+{refined_plan}
+
+**Your Task:**
+1.  Review the `Sequentially Refined Plan` and ensure it is coherent and logically sound after all the modifications.
+2.  Read through the `Board Critiques` to ensure the spirit of all the experts' suggestions has been incorporated.
+3.  **Perform one final check:** Are there any other logical places to insert a `checkpoint`? A checkpoint is wise after a major data analysis step or before a step that generates a critical final output.
+4.  Return the final, validated plan. Your output must be a single, valid JSON object conforming to the `Plan` schema.
+"""
+)
 
 # --- Helper Functions ---
 LLM_CACHE = {}
@@ -233,17 +242,16 @@ async def _create_venv_if_not_exists(workspace_path: str, task_id: str):
 
 # --- Graph Nodes ---
 async def task_setup_node(state: GraphState):
-    task_id = state["task_id"]; logger.info(f"Task '{task_id}': Executing Task_Setup")
+    task_id = state["task_id"]; logger.info(f"Task '{task_id}': Executing Task_Setup and resetting BoE state.")
     workspace_path = f"/app/workspace/{task_id}"; os.makedirs(workspace_path, exist_ok=True); await _create_venv_if_not_exists(workspace_path, task_id)
     return {
-        "input": state['messages'][-1].content, "history": [], "current_step_index": 0, "step_outputs": {}, 
-        "workspace_path": workspace_path, "llm_config": state.get("llm_config", {}), 
-        "max_retries": 3, "step_retries": 0, "plan_retries": 0, "user_feedback": None, 
-        "memory_vault": {}, "enabled_tools": state.get("enabled_tools"),
-        "proposed_experts": None, "board_approved": None, "approved_experts": None, 
-        "initial_plan": None, "critiques": [], "final_plan": None, "execution_history": [], 
-        "checkpoint_report": None, "user_guidance": None, "board_decision": None,
-        "expert_critique_index": 0, "refined_plan": None
+        "input": state['messages'][-1].content, "history": [], "current_step_index": 0,
+        "step_outputs": {}, "workspace_path": workspace_path, "llm_config": state.get("llm_config", {}),
+        "max_retries": 3, "step_retries": 0, "plan_retries": 0, "user_feedback": None,
+        "memory_vault": {}, "enabled_tools": state.get("enabled_tools"), "proposed_experts": None,
+        "board_approved": None, "approved_experts": None, "initial_plan": None,
+        "critiques": [], "refined_plan": None, "final_plan": None, "expert_critique_index": 0,
+        "execution_history": [], "checkpoint_report": None, "user_guidance": None, "board_decision": None,
     }
 
 def memory_updater_node(state: GraphState):
@@ -286,11 +294,14 @@ def chair_initial_plan_node(state: GraphState):
         response = structured_llm.invoke(prompt)
         plan_steps = [step.dict() for step in response.plan]
         logger.info(f"Chair created an initial plan with {len(plan_steps)} steps.")
-        # Set both initial and refined plan to start the critique process
         return {"initial_plan": plan_steps, "refined_plan": plan_steps}
     except Exception as e:
         logger.error(f"Task '{task_id}': Failed to create initial plan: {e}")
         return {"initial_plan": [{"instruction": "Error: Failed to generate a plan.", "tool": "error"}]}
+
+def human_in_the_loop_initial_plan_review(state: GraphState):
+    logger.info(f"--- Task '{state.get('task_id')}': Paused for Initial Plan Review ---")
+    return {}
 
 def expert_critique_node(state: GraphState):
     task_id = state.get("task_id")
@@ -310,26 +321,47 @@ def expert_critique_node(state: GraphState):
     try:
         response = structured_llm.invoke(prompt)
         updated_plan_steps = [step.dict() for step in response.updated_plan]
-        critique_with_persona = { "title": expert["title"], "critique": response.critique }
+        # --- MODIFIED: Store the plan state with the critique ---
+        critique_with_context = {
+            "title": expert["title"],
+            "critique": response.critique,
+            "plan_after_critique": updated_plan_steps
+        }
 
         logger.info(f"Critique from '{expert['title']}': {response.critique[:100]}...")
         return {
-            "critiques": [critique_with_persona],
+            "critiques": [critique_with_context],
             "refined_plan": updated_plan_steps,
             "expert_critique_index": critique_index + 1
         }
     except Exception as e:
         logger.error(f"Task '{task_id}': Failed to get critique from '{expert['title']}': {e}")
-        # On failure, append an error message and increment the index to avoid an infinite loop
-        error_critique = { "title": expert["title"], "critique": f"Error: Could not generate a critique. {e}" }
+        error_critique = { "title": expert["title"], "critique": f"Error: Could not generate a critique. {e}", "plan_after_critique": state["refined_plan"] }
         return {"critiques": [error_critique], "expert_critique_index": critique_index + 1}
 
 def chair_final_review_node(state: GraphState):
-    task_id = state.get("task_id")
-    logger.info(f"--- (BoE) Task '{task_id}': Executing chair_final_review_node ---")
-    logger.info(f"Presenting final plan with {len(state['refined_plan'])} steps after {len(state['critiques'])} critiques.")
-    # For now, this is a pass-through. In the future, it could have its own LLM call to synthesize.
-    return {"final_plan": state["refined_plan"]}
+    task_id = state.get("task_id"); logger.info(f"--- (BoE) Task '{task_id}': Executing chair_final_review_node (Synthesis) ---")
+    llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-pro-latest")
+    structured_llm = llm.with_structured_output(Plan)
+
+    # We only need the text of the critiques for the final review prompt
+    critique_texts = [f"Critique from {c['title']}:\n{c['critique']}" for c in state['critiques']]
+
+    prompt = chair_final_review_prompt_template.format(
+        user_request=state["input"],
+        critiques="\n\n".join(critique_texts),
+        refined_plan=json.dumps(state['refined_plan'], indent=2)
+    )
+    
+    try:
+        response = structured_llm.invoke(prompt)
+        final_plan_steps = [step.dict() for step in response.plan]
+        logger.info(f"Chair synthesized a final plan with {len(final_plan_steps)} steps.")
+        return {"final_plan": final_plan_steps}
+    except Exception as e:
+        logger.error(f"Task '{task_id}': Failed during Chair's final synthesis: {e}")
+        # On failure, fall back to the last refined plan to avoid losing all progress
+        return {"final_plan": state["refined_plan"]}
 
 def human_in_the_loop_final_plan_approval(state: GraphState):
     logger.info(f"--- Task '{state.get('task_id')}': Paused for Final Plan Approval ---")
@@ -380,7 +412,6 @@ def route_logic(state: GraphState) -> str: return state.get("route", "Editor")
 def create_agent_graph():
     workflow = StateGraph(GraphState)
     
-    # Add all nodes
     workflow.add_node("Task_Setup", task_setup_node)
     workflow.add_node("Memory_Updater", memory_updater_node)
     workflow.add_node("initial_router_node", initial_router_node)
@@ -389,17 +420,15 @@ def create_agent_graph():
     workflow.add_node("Chief_Architect", chief_architect_node)
     workflow.add_node("human_in_the_loop_node", human_in_the_loop_node)
     
-    # Board of Experts Track Nodes
     workflow.add_node("Propose_Experts", propose_experts_node)
     workflow.add_node("human_in_the_loop_board_approval", human_in_the_loop_board_approval)
     workflow.add_node("set_approved_experts_node", set_approved_experts_node)
     workflow.add_node("chair_initial_plan_node", chair_initial_plan_node)
+    workflow.add_node("human_in_the_loop_initial_plan_review", human_in_the_loop_initial_plan_review)
     workflow.add_node("expert_critique_node", expert_critique_node)
     workflow.add_node("chair_final_review_node", chair_final_review_node)
     workflow.add_node("human_in_the_loop_final_plan_approval", human_in_the_loop_final_plan_approval)
 
-
-    # Define graph edges
     workflow.set_entry_point("Task_Setup")
     workflow.add_edge("Task_Setup", "Memory_Updater")
     workflow.add_edge("Memory_Updater", "initial_router_node")
@@ -409,19 +438,18 @@ def create_agent_graph():
         "Propose_Experts": "Propose_Experts"
     })
     
-    # Edges for Tracks 2 & 3
     workflow.add_edge("Handyman", "Editor")
     workflow.add_edge("Chief_Architect", "human_in_the_loop_node")
     workflow.add_edge("human_in_the_loop_node", "Editor")
 
-    # Edges for Board of Experts Track (Track 4)
     workflow.add_edge("Propose_Experts", "human_in_the_loop_board_approval")
     workflow.add_conditional_edges("human_in_the_loop_board_approval", after_board_approval_router, {
         "set_approved_experts": "set_approved_experts_node",
         "Editor": "Editor",
     })
     workflow.add_edge("set_approved_experts_node", "chair_initial_plan_node")
-    workflow.add_edge("chair_initial_plan_node", "expert_critique_node")
+    workflow.add_edge("chair_initial_plan_node", "human_in_the_loop_initial_plan_review")
+    workflow.add_edge("human_in_the_loop_initial_plan_review", "expert_critique_node")
 
     workflow.add_conditional_edges("expert_critique_node", should_continue_critique, {
         "continue_critique": "expert_critique_node",
@@ -430,7 +458,6 @@ def create_agent_graph():
     
     workflow.add_edge("chair_final_review_node", "human_in_the_loop_final_plan_approval")
     
-    # For now, end the flow after the final approval interrupt
     workflow.add_edge("human_in_the_loop_final_plan_approval", "Editor")
 
     workflow.add_edge("Editor", END)
@@ -440,10 +467,11 @@ def create_agent_graph():
         interrupt_before=[
             "human_in_the_loop_node", 
             "human_in_the_loop_board_approval",
+            "human_in_the_loop_initial_plan_review",
             "human_in_the_loop_final_plan_approval",
         ]
     )
-    logger.info("ResearchAgent graph compiled with BoE Critique Loop logic.")
+    logger.info("ResearchAgent graph compiled with BoE Synthesis logic.")
     return agent
 
 agent_graph = create_agent_graph()

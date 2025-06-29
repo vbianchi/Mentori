@@ -1,14 +1,19 @@
 # backend/server.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 17 - UX Refinements)
+# ResearchAgent Backend Server (Phase 17 - Final Bugfixes)
 #
-# This version addresses user feedback on the "thinking" status messages.
+# This version addresses the final UI flow issues reported during testing.
 #
 # Key Architectural Changes:
-# 1. Refined NODE_NAME_MAPPING: The display names for the Board of Experts
-#    nodes have been changed to be more descriptive, action-oriented phrases
-#    (e.g., "The Chair is drafting a plan..."). This will result in a more
-#    natural-feeling status update in the UI.
+# 1. Perceptible UI Pause: A 2-second `asyncio.sleep` delay has been added
+#    to the `agent_execution_wrapper` after the `chair_plan_generated` event
+#    is broadcast. This ensures the user has time to see the initial plan
+#    card in the UI before the server automatically resumes the agent to start
+#    the critique loop, fixing the "skipped card" UX issue.
+# 2. State-Aware Auto-Resume: The automatic call to `resume_agent_handler`
+#    now correctly passes the list of `enabled_tools` from the current state
+#    back into the agent, ensuring the subsequent critique nodes have the
+#    context they need to function correctly.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -410,14 +415,12 @@ def run_http_server():
 
 # --- WebSocket Core Logic ---
 
-# --- MODIFIED: More natural, action-oriented status messages ---
 NODE_NAME_MAPPING = {
     "initial_router_node": "Router", "summarize_history_node": "Summarizer",
     "Memory_Updater": "Memory Updater", "Chief_Architect": "Chief Architect",
     "Site_Foreman": "Site Foreman", "Project_Supervisor": "Project Supervisor",
     "Correction_Planner": "Correction Planner", "Handyman": "Handyman",
     "Worker": "Worker", "Editor": "Editor",
-    # Board of Experts Nodes
     "Propose_Experts": "The Chair is selecting the Board of Experts",
     "chair_initial_plan_node": "The Chair is drafting a plan",
     "expert_critique_node": "The Board is reviewing the plan",
@@ -440,13 +443,11 @@ async def agent_execution_wrapper(input_state, config):
         async for event in agent_graph.astream_events(input_state, config):
             event_type, node_name = event["event"], event.get("name")
             
-            # --- Broadcast standard node start/end events ---
             if event_type in ["on_chain_start", "on_chain_end"] and node_name in BROADCAST_NODES:
                 await broadcast_event({"type": "agent_event", "event": event_type,
                                        "name": NODE_NAME_MAPPING.get(node_name, node_name),
                                        "data": event['data'], "task_id": task_id})
 
-            # --- Broadcast new, specific events based on node output ---
             if event_type == "on_chain_end" and node_name == "expert_critique_node":
                 latest_critique = event["data"]["output"].get("critiques")
                 if latest_critique:
@@ -458,7 +459,6 @@ async def agent_execution_wrapper(input_state, config):
 
         current_state = agent_graph.get_state(config)
         
-        # --- Handle all possible interrupt points ---
         if current_state.next and "human_in_the_loop_node" in current_state.next:
             logger.info(f"Task '{task_id}': Paused for human plan approval.")
             await broadcast_event({"type": "plan_approval_request", "plan": current_state.values.get("plan"), "task_id": task_id})
@@ -466,6 +466,21 @@ async def agent_execution_wrapper(input_state, config):
         elif current_state.next and "human_in_the_loop_board_approval" in current_state.next:
             logger.info(f"Task '{task_id}': Paused for Board of Experts approval.")
             await broadcast_event({"type": "board_approval_request", "experts": current_state.values.get("proposed_experts"), "task_id": task_id})
+
+        elif current_state.next and "human_in_the_loop_initial_plan_review" in current_state.next:
+            logger.info(f"Task '{task_id}': Paused for Initial Plan Review.")
+            await broadcast_event({
+                "type": "chair_plan_generated", 
+                "plan": current_state.values.get("initial_plan"), 
+                "task_id": task_id
+            })
+            await asyncio.sleep(2.0) # Perceptible delay for UX
+            asyncio.create_task(resume_agent_handler({
+                "task_id": task_id,
+                "feedback": "continue",
+                "enabled_tools": current_state.values.get("enabled_tools")
+            }))
+
 
         elif current_state.next and "human_in_the_loop_final_plan_approval" in current_state.next:
             logger.info(f"Task '{task_id}': Paused for Final Plan approval.")
@@ -508,12 +523,11 @@ async def resume_agent_handler(data):
     config = {"recursion_limit": 100, "configurable": {"thread_id": task_id}}
     update_values = {"enabled_tools": data.get("enabled_tools")}
 
-    # This handles all approval/feedback types
     if (feedback := data.get("feedback")) is not None: 
         update_values["user_feedback"] = feedback
     if (plan := data.get("plan")) is not None: 
-        update_values["plan"] = plan # For Track 3 approval
-        update_values["final_plan"] = plan # For Track 4 final approval
+        update_values["plan"] = plan
+        update_values["final_plan"] = plan
     if (board_approved := data.get("board_approved")) is not None: 
         update_values["board_approved"] = board_approved
 
