@@ -1,14 +1,15 @@
 # backend/server.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 17 - Debug Logging)
+# ResearchAgent Backend Server (Phase 17 - UI Rendering Delay)
 #
-# This version adds explicit logging to confirm that the `execution_step_update`
-# event is being broadcast to the frontend.
+# This version introduces an artificial delay after sending execution step
+# updates to ensure the frontend has time to render each step individually.
 #
 # Key Architectural Changes:
-# 1. Debug Logging: Added a `logger.info` call in `agent_execution_wrapper`
-#    to print a confirmation message to the console just before broadcasting
-#    the details of a completed execution step.
+# 1. UI Rendering Delay: Added a 1-second `asyncio.sleep()` immediately
+#    after broadcasting the `execution_step_update` event. This prevents
+#    the backend from sending all step updates in a single burst, giving
+#    the UI's rendering engine time to display each card sequentially.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -469,13 +470,14 @@ async def agent_execution_wrapper(input_state, config):
                         "evaluation": state_values.get("step_evaluation"),
                         "status": state_values.get("step_evaluation", {}).get("status", "unknown")
                     }
-                    # --- ADDED: Debug logging ---
                     logger.info(f"Broadcasting execution_step_update for task '{task_id}'")
                     await broadcast_event({
                         "type": "execution_step_update",
                         "data": step_details,
                         "task_id": task_id
                     })
+                    # --- ADDED: Artificial delay for UI rendering ---
+                    await asyncio.sleep(1)
 
 
         current_state = agent_graph.get_state(config)
