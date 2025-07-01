@@ -31,6 +31,9 @@ export const useAgent = (onMessage) => {
 
             socket.onmessage = (event) => {
                 const newEvent = JSON.parse(event.data);
+                
+                // --- ADDED: Debug logging ---
+                console.log('Received WebSocket event:', newEvent);
 
                 setRunningTasks(prev => {
                     const newTasks = { ...prev };
@@ -43,8 +46,6 @@ export const useAgent = (onMessage) => {
                     } else if (['final_answer', 'agent_stopped', 'plan_approval_request', 'board_approval_request', 'final_plan_approval_request'].includes(type)) {
                         delete newTasks[task_id];
                     }
-                    // We intentionally do NOT delete the task for 'chair_plan_generated' or 'expert_critique_generated'
-                    // as these are intermediate steps in a longer running process.
                     return newTasks;
                 });
                 
@@ -108,4 +109,3 @@ export const useAgent = (onMessage) => {
         deleteTask,
     };
 };
-

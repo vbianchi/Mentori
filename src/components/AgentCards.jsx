@@ -1,4 +1,3 @@
-// src/components/AgentCards.jsx
 import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import { ArchitectIcon, CheckCircleIcon, ChevronDownIcon, CircleDotIcon, EditorIcon, ForemanIcon, LoaderIcon, PlusCircleIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, XCircleIcon, BoardIcon, CheckIcon, ChairIcon, CritiqueIcon } from './Icons';
@@ -203,7 +202,6 @@ export const ChairPlanCard = ({ plan }) => (
 export const ExpertCritiqueCard = ({ critique }) => (
     <AgentResponseCard icon={<CritiqueIcon class="h-5 w-5" />} title={`${critique.title}'s Critique`} color="purple">
         <p class="text-sm text-gray-300 italic whitespace-pre-wrap">"{critique.critique}"</p>
-        {/* --- NEW: Display the plan as it was after this expert's review --- */}
         <div class="mt-3 pt-3 border-t border-gray-700/50">
              <h4 class="text-xs font-bold text-gray-400 mb-2">Plan after this critique:</h4>
              <ul class="space-y-1 text-gray-300 text-sm">
@@ -229,7 +227,6 @@ export const FinalPlanApprovalCard = ({ plan, critiques, onModify, onReject }) =
         <AgentResponseCard icon={<ChairIcon class="h-5 w-5" />} title="The Chair's Final Review" color="amber">
             <p class="text-sm text-gray-400 mb-4">The board has completed its review and the Chair has synthesized the final plan. Please review and give your approval to begin execution.</p>
             
-            {/* --- MODIFIED: Show critiques in a collapsible section --- */}
             <details class="mb-4">
                 <summary class="text-sm font-bold text-gray-400 cursor-pointer hover:text-white">View Full Board Deliberation ({critiques?.length || 0} critiques)</summary>
                 <ul class="space-y-2 mt-2 border-l-2 border-gray-700 pl-4">
@@ -273,6 +270,39 @@ export const SiteForemanCard = ({ plan }) => (
         </AgentResponseCard>
     </div>
 );
+
+// --- NEW: Card for displaying a single execution step ---
+export const ExecutionStepCard = ({ step }) => {
+    const statusColor = step.status === 'success' ? 'green' : 'red';
+    const statusIcon = step.status === 'success' ? <CheckCircleIcon class={`h-5 w-5 text-${statusColor}-400`} /> : <XCircleIcon class={`h-5 w-5 text-${statusColor}-400`} />;
+
+    return (
+        <AgentResponseCard icon={statusIcon} title={`Step Complete: ${step.instruction}`} color={statusColor}>
+            <div class="space-y-3 text-sm">
+                <div class="p-3 bg-gray-900/50 rounded-lg border border-gray-700/50">
+                    <div class="flex items-center gap-2 font-semibold text-gray-400 mb-1">
+                        <WorkerIcon class="h-4 w-4" />
+                        <span>Worker Action</span>
+                    </div>
+                    <pre class="text-xs text-cyan-300 overflow-x-auto p-2 bg-black/20 rounded-md font-mono relative">
+                        <CopyButton textToCopy={JSON.stringify(step.tool_call, null, 2)} className="absolute top-1 right-1" />
+                        <code>{JSON.stringify(step.tool_call, null, 2)}</code>
+                    </pre>
+                </div>
+                 <div class="p-3 bg-gray-900/50 rounded-lg border border-gray-700/50">
+                    <div class="flex items-center gap-2 font-semibold text-gray-400 mb-1">
+                        <SupervisorIcon class="h-4 w-4" />
+                        <span>Supervisor Evaluation</span>
+                    </div>
+                    <p class="text-xs text-gray-300 whitespace-pre-wrap font-mono p-2 bg-black/20 rounded-md">
+                        {step.evaluation?.reasoning || 'No evaluation provided.'}
+                    </p>
+                </div>
+            </div>
+        </AgentResponseCard>
+    );
+};
+
 
 export const DirectAnswerCard = ({ answer }) => {
     const parsedHtml = window.marked ? window.marked.parse(answer, { breaks: true, gfm: true }) : answer.replace(/\n/g, '<br />');

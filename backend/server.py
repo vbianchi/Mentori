@@ -1,19 +1,14 @@
 # backend/server.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 17 - Final Bugfixes)
+# ResearchAgent Backend Server (Phase 17 - Debug Logging)
 #
-# This version addresses the final UI flow issues reported during testing.
+# This version adds explicit logging to confirm that the `execution_step_update`
+# event is being broadcast to the frontend.
 #
 # Key Architectural Changes:
-# 1. Perceptible UI Pause: A 2-second `asyncio.sleep` delay has been added
-#    to the `agent_execution_wrapper` after the `chair_plan_generated` event
-#    is broadcast. This ensures the user has time to see the initial plan
-#    card in the UI before the server automatically resumes the agent to start
-#    the critique loop, fixing the "skipped card" UX issue.
-# 2. State-Aware Auto-Resume: The automatic call to `resume_agent_handler`
-#    now correctly passes the list of `enabled_tools` from the current state
-#    back into the agent, ensuring the subsequent critique nodes have the
-#    context they need to function correctly.
+# 1. Debug Logging: Added a `logger.info` call in `agent_execution_wrapper`
+#    to print a confirmation message to the console just before broadcasting
+#    the details of a completed execution step.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -21,7 +16,7 @@ import logging
 import os
 import json
 import threading
-import cgi
+from cgi import FieldStorage
 import shutil
 import mimetypes
 import re
@@ -395,7 +390,7 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
     
     def _handle_file_upload(self):
         try:
-            form = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': self.headers['Content-Type']})
+            form = FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': self.headers['Content-Type']})
             workspace_id, file_item = form.getvalue('workspace_id'), form['file']
             if not workspace_id or not hasattr(file_item, 'filename') or not file_item.filename: return self._send_json_response(400, {'error': 'Missing workspace_id or file.'})
             filename = os.path.basename(file_item.filename)
@@ -417,14 +412,18 @@ def run_http_server():
 
 NODE_NAME_MAPPING = {
     "initial_router_node": "Router", "summarize_history_node": "Summarizer",
-    "Memory_Updater": "Memory Updater", "Chief_Architect": "Chief Architect",
-    "Site_Foreman": "Site Foreman", "Project_Supervisor": "Project Supervisor",
-    "Correction_Planner": "Correction Planner", "Handyman": "Handyman",
-    "Worker": "Worker", "Editor": "Editor",
+    "Memory_Updater": "Memory Updater",
     "Propose_Experts": "The Chair is selecting the Board of Experts",
     "chair_initial_plan_node": "The Chair is drafting a plan",
     "expert_critique_node": "The Board is reviewing the plan",
-    "chair_final_review_node": "The Chair is synthesizing feedback"
+    "chair_final_review_node": "The Chair is synthesizing feedback",
+    "chief_architect_node": "The Chief Architect is planning",
+    "site_foreman_node": "The Site Foreman is preparing the step",
+    "worker_node": "The Worker is executing the tool",
+    "project_supervisor_node": "The Supervisor is evaluating the result",
+    "editor_checkpoint_report_node": "The Editor is compiling a checkpoint report",
+    "board_checkpoint_review_node": "The Board is reviewing the checkpoint",
+    "Editor": "Editor"
 }
 BROADCAST_NODES = set(NODE_NAME_MAPPING.keys())
 
@@ -453,9 +452,31 @@ async def agent_execution_wrapper(input_state, config):
                 if latest_critique:
                     await broadcast_event({
                         "type": "expert_critique_generated",
-                        "critique": latest_critique[0],
+                        "critique": latest_critique[-1],
                         "task_id": task_id
                     })
+            
+            if event_type == "on_chain_end" and node_name == "project_supervisor_node":
+                state_values = event['data']['output']
+                tactical_plan = state_values.get("tactical_plan", [])
+                tactical_step_index = state_values.get("tactical_step_index", 0)
+                
+                if tactical_plan and tactical_step_index < len(tactical_plan):
+                    step_details = {
+                        "instruction": tactical_plan[tactical_step_index].get("instruction"),
+                        "tool_call": state_values.get("current_tool_call"),
+                        "tool_output": state_values.get("tool_output"),
+                        "evaluation": state_values.get("step_evaluation"),
+                        "status": state_values.get("step_evaluation", {}).get("status", "unknown")
+                    }
+                    # --- ADDED: Debug logging ---
+                    logger.info(f"Broadcasting execution_step_update for task '{task_id}'")
+                    await broadcast_event({
+                        "type": "execution_step_update",
+                        "data": step_details,
+                        "task_id": task_id
+                    })
+
 
         current_state = agent_graph.get_state(config)
         
@@ -474,19 +495,18 @@ async def agent_execution_wrapper(input_state, config):
                 "plan": current_state.values.get("initial_plan"), 
                 "task_id": task_id
             })
-            await asyncio.sleep(2.0) # Perceptible delay for UX
+            await asyncio.sleep(2.0)
             asyncio.create_task(resume_agent_handler({
                 "task_id": task_id,
                 "feedback": "continue",
                 "enabled_tools": current_state.values.get("enabled_tools")
             }))
 
-
         elif current_state.next and "human_in_the_loop_final_plan_approval" in current_state.next:
             logger.info(f"Task '{task_id}': Paused for Final Plan approval.")
             await broadcast_event({
                 "type": "final_plan_approval_request", 
-                "plan": current_state.values.get("final_plan"),
+                "plan": current_state.values.get("strategic_plan"),
                 "critiques": current_state.values.get("critiques"),
                 "task_id": task_id
             })
@@ -511,7 +531,7 @@ async def run_agent_handler(data):
     global RUNNING_AGENTS
     task_id = data.get("task_id")
     if task_id in RUNNING_AGENTS: return
-    config = {"recursion_limit": 100, "configurable": {"thread_id": task_id}}
+    config = {"recursion_limit": 250, "configurable": {"thread_id": task_id}}
     initial_state = { "messages": [HumanMessage(content=data.get("prompt"))], "llm_config": data.get("llm_config", {}), "task_id": task_id, "enabled_tools": data.get("enabled_tools")}
     agent_task = asyncio.create_task(agent_execution_wrapper(initial_state, config))
     RUNNING_AGENTS[task_id] = agent_task
@@ -520,14 +540,13 @@ async def resume_agent_handler(data):
     global RUNNING_AGENTS
     task_id = data.get("task_id")
     if not task_id or task_id in RUNNING_AGENTS: return
-    config = {"recursion_limit": 100, "configurable": {"thread_id": task_id}}
+    config = {"recursion_limit": 250, "configurable": {"thread_id": task_id}}
     update_values = {"enabled_tools": data.get("enabled_tools")}
 
     if (feedback := data.get("feedback")) is not None: 
         update_values["user_feedback"] = feedback
     if (plan := data.get("plan")) is not None: 
-        update_values["plan"] = plan
-        update_values["final_plan"] = plan
+        update_values["strategic_plan"] = plan
     if (board_approved := data.get("board_approved")) is not None: 
         update_values["board_approved"] = board_approved
 
