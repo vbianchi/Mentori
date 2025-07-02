@@ -4,7 +4,8 @@ To build a transformative, AI-powered workbench. The platform will be powerful e
 
 ### ✅ COMPLETED PHASES
 
--   \[x\] **Phase 0-16:** Core Engine, Advanced Tooling, & UI Foundation. This includes the three-track architecture, self-correction, interactive GUI, Memory Vault, and secure virtual environments.
+-   \[x\] **Phase 0-16:** Core Engine, Advanced Tooling, & UI Foundation.
+-   \[x\] **Phase 17 (Tasks 1 & 2):** Board of Experts proposal, user approval gates, and autonomous planning loop.
 
 ### 🚀 UPCOMING PHASES 🚀
 
@@ -12,25 +13,18 @@ To build a transformative, AI-powered workbench. The platform will be powerful e
 
 _Goal: Implement the full, two-part agent architecture where the Board of Experts acts as an autonomous strategic planner and the Company Model acts as a resilient execution engine, communicating the entire process through a clear, chronological UI narrative._
 
--   \[x\] **Task 1 (Part 1): Initial User Authorization - Board Approval.**
-    -   Implemented the `Propose_Experts` node to dynamically generate expert personas.
-    -   Implemented the first user interrupt, where the UI displays the proposed board and waits for the user's **"Approve"** action.
--   \[ \] **Task 1 (Part 2): Initial User Authorization - Plan Approval.**
-    -   Implement the second user interrupt, which occurs after the autonomous planning phase is complete. The UI will display the final, synthesized plan and wait for a final **"Approve & Execute"** action.
--   \[ \] **Task 2: Autonomous Sequential Plan Refinement.**
-    -   Implement the full, uninterrupted planning loop that runs after the user approves the board.
-    -   `Chair_Initial_Plan` node creates a strategic plan. **(Partially complete)**
-    -   Implement the `Expert_Critique` node to be called sequentially for each expert, generating critiques and programmatic plan modifications.
-    -   Implement the `Chair_Final_Review` node to synthesize all critiques into a final plan for the second user authorization gate.
--   \[ \] **Task 3: Resilient Execution & Self-Correction Loop.**
-    -   Implement the full "Company Model" execution loop (`Foreman`, `Supervisor`, `Worker`).
-    -   Implement retry logic before escalating a failed step.
+-   \[x\] **Task 1: Initial User Authorization Gates.**
+-   \[x\] **Task 2: Autonomous Sequential Plan Refinement.**
+-   \[ \] **Task 3: Hierarchical Execution & Self-Correction Loop (NEW INCREMENTAL PLAN)**
+    -   **Our Philosophy:** We will build the execution engine one node at a time. After adding each node, we will test it to ensure a corresponding card appears correctly in the UI before proceeding to the next.
+    -   \[ \] **Sub-task 3.1: The Master Router.** Implement the `master_router` as the entry point after plan approval. It will read the first strategic step and route to the `chief_architect_node`.
+    -   \[ \] **Sub-task 3.2: The Chief Architect.** Implement the `chief_architect_node`. It will receive one strategic step and expand it into a hardcoded, placeholder "tactical plan." It will then route to the `site_foreman_node`.
+    -   \[ \] **Sub-task 3.3: The Site Foreman.** Implement the `site_foreman_node`. It will read the first step of the tactical plan and prepare the tool call for the `worker_node`.
+    -   \[ \] **Sub-task 3.4: The Worker.** Implement the `worker_node`. It will receive the prepared tool call and execute it using the `tool_executor`.
+    -   \[ \] **Sub-task 3.5: The Project Supervisor.** Implement the `project_supervisor_node`. It will receive the worker's output and make a hardcoded "success" evaluation.
+    -   \[ \] **Sub-task 3.6: The Tactical Router & Loop.** Implement the `tactical_step_router` and the incrementers to correctly loop through all tactical steps. Once the tactical plan is complete, it will route back to the `master_router`.
 -   \[ \] **Task 4: Autonomous Checkpoint Review Cycle.**
-    -   Implement the internal review process triggered by a `checkpoint` in the plan.
-    -   The `Editor` will compile a progress report.
-    -   The `Board_Collective_Review` node will decide whether to `continue` or `adapt` the plan without user intervention.
 -   \[ \] **Task 5: The User Guidance Escalation Path.**
-    -   Implement the edge case where the Board of Experts determines it cannot proceed and must trigger a user interrupt for guidance.
 
 #### Phase 18: Production-Grade Backend Infrastructure
 

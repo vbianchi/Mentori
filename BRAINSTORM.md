@@ -61,3 +61,84 @@ _A collection of features required to move from a single-user tool to a complete
 -   **Strategy:** Augment our powerful, custom-built tools with a standardized library of generic "connector" tools.
 -   **Our Custom "Reasoning" Tools:** Continue to build and refine specialized tools like `query_files` and `critique_document`. These are our core competency.
 -   **MCP for Connectors:** Develop a wrapper to connect to the **Model Context Protocol (MCP)** tool ecosystem. This will instantly give the agent access to hundreds of pre-built tools for third-party APIs (GitHub, Google Calendar, Slack, etc.) without us needing to maintain them.
+
+## Core Agent Architecture: The "Company" Model
+
+... (content remains the same) ...
+
+## Hierarchical Execution Loop: Node-by-Node Breakdown
+
+This section details the precise flow and responsibility of each node in the execution engine, which begins after the user approves the final strategic plan.
+
+**Our Implementation Strategy:** We will build this loop **one node at a time**, testing the UI feedback at each stage.
+
+### 1\. `master_router` (Conditional Edge)
+
+-   **Purpose:** To act as the main traffic controller for the strategic plan.
+-   **Inputs:** `strategic_plan`, `strategic_step_index`.
+-   **Processing:**
+    1.  Checks if `strategic_step_index` is less than the total number of steps in `strategic_plan`.
+    2.  If yes, it checks if the current step is a `checkpoint`.
+-   **Outputs:** A routing decision string.
+-   **Connections:**
+    -   Receives from: `human_in_the_loop_final_plan_approval` (initial entry) and `increment_strategic_step_node` (loops).
+    -   Routes to:
+        -   `chief_architect_node` (if more non-checkpoint steps exist).
+        -   `editor_checkpoint_report_node` (if the step is a checkpoint).
+        -   `Editor` (if all steps are complete).
+
+### 2\. `chief_architect_node`
+
+-   **Purpose:** To expand a single high-level strategic goal into a detailed, low-level tactical plan of tool calls.
+-   **Inputs:** `strategic_plan`, `strategic_step_index`, `user_request`, list of available `tools`.
+-   **Processing:** Makes an LLM call with a specialized prompt, asking it to create a multi-step "tactical plan" (a list of tool calls) that will accomplish the current strategic goal.
+-   **Outputs:** `tactical_plan` (a list of dictionaries, where each is a tool call).
+-   **Connections:**
+    -   Receives from: `master_router`.
+    -   Routes to: `site_foreman_node`.
+
+### 3\. `site_foreman_node`
+
+-   **Purpose:** To prepare a single tool call from the tactical plan for execution.
+-   **Inputs:** `tactical_plan`, `tactical_step_index`, `step_outputs` (from previous steps).
+-   **Processing:**
+    1.  Reads the current tactical step (e.g., `tactical_plan[tactical_step_index]`).
+    2.  Performs "data piping": checks the `tool_input` for any `{step_N_output}` placeholders and replaces them with the actual output from the `step_outputs` dictionary.
+-   **Outputs:** `current_tool_call` (a dictionary with the final `tool_name` and hydrated `tool_input`).
+-   **Connections:**
+    -   Receives from: `chief_architect_node` (initial entry) and `human_in_the_loop_execution_step` (loops).
+    -   Routes to: `worker_node`.
+
+### 4\. `worker_node`
+
+-   **Purpose:** To execute a single tool call, and nothing more.
+-   **Inputs:** `current_tool_call`, `workspace_path`, `enabled_tools`.
+-   **Processing:**
+    1.  Initializes the `ToolExecutor` with the currently enabled tools.
+    2.  Invokes the executor with the `current_tool_call`.
+-   **Outputs:** `tool_output` (the raw string/data returned by the tool).
+-   **Connections:**
+    -   Receives from: `site_foreman_node`.
+    -   Routes to: `project_supervisor_node`.
+
+### 5\. `project_supervisor_node`
+
+-   **Purpose:** To evaluate whether the tool execution successfully accomplished the step's goal.
+-   **Inputs:** The original `instruction` for the tactical step, `current_tool_call`, and `tool_output`.
+-   **Processing:** Makes an LLM call with a specialized prompt, asking it to assess if the `tool_output` satisfies the original `instruction`.
+-   **Outputs:** `step_evaluation` (a dictionary with `status: "success" | "failure"` and `reasoning`).
+-   **Connections:**
+    -   Receives from: `worker_node`.
+    -   Routes to: `tactical_step_incrementer`.
+
+### 6\. `tactical_step_router` (Conditional Edge)
+
+-   **Purpose:** To control the flow of the inner tactical loop.
+-   **Inputs:** `tactical_plan`, `tactical_step_index`.
+-   **Processing:** Checks if `tactical_step_index` is less than the total number of steps in `tactical_plan`.
+-   **Outputs:** A routing decision string.
+-   **Connections:**
+    -   Receives from: `tactical_step_incrementer`.
+    -   Routes to:
+        -   `human_in_the_loop_execution_step` (to pause for the UI).
+        -   `increment_strategic_step_node` (when the tactical plan is complete).
