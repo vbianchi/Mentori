@@ -1,9 +1,19 @@
 # backend/server.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Reverted to Stable Work-Node Version)
+# ResearchAgent Backend Server (Phase 17 - Architect Node Test)
 #
-# This version is reverted to the simple, stable state that correctly
-# generates the 'work_card_generated' event for the UI.
+# This version adds a specific event handler for the new, simplified
+# 'chief_architect_node' to enable UI card generation.
+#
+# Key Architectural Changes:
+# 1. New Event Handler: A check for the end of 'chief_architect_node' is
+#    added to the agent wrapper. When this occurs, it broadcasts a new
+#    'architect_plan_generated' event to the frontend.
+# 2. Node Mapping Updated: The 'chief_architect_node' is added to the
+#    NODE_NAME_MAPPING to provide live status updates.
+# 3. ACK System Removed: Since we are not doing a paced, multi-step loop,
+#    the ACK system is not needed for this test and has been removed to
+#    maintain simplicity.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -414,7 +424,7 @@ NODE_NAME_MAPPING = {
     "expert_critique_node": "The Board is reviewing the plan",
     "chair_final_review_node": "The Chair is synthesizing feedback",
     "Editor": "Editor",
-    "work_node": "Executing Plan"
+    "chief_architect_node": "The Chief Architect is planning"
 }
 BROADCAST_NODES = set(NODE_NAME_MAPPING.keys())
 
@@ -447,13 +457,15 @@ async def agent_execution_wrapper(input_state, config):
                         "task_id": task_id
                     })
             
-            if event_type == "on_chain_end" and node_name == "work_node":
-                logger.info(f"Broadcasting work_card_generated for task '{task_id}'")
+            if event_type == "on_chain_end" and node_name == "chief_architect_node":
+                output = event["data"]["output"]
+                tactical_plan = output.get("tactical_plan")
+                logger.info(f"Broadcasting architect_plan_generated for task '{task_id}'")
                 await broadcast_event({
-                    "type": "work_card_generated",
+                    "type": "architect_plan_generated",
+                    "plan": tactical_plan,
                     "task_id": task_id
                 })
-
 
         current_state = agent_graph.get_state(config)
         
@@ -595,7 +607,7 @@ async def main():
     try:
         logger.info(f"Attempting to start WebSocket server on {host}:{port}")
         async with websockets.serve(message_router, host, port):
-            logger.info("ResearchAgent WebSocket server is running in SIMPLIFIED DEBUG MODE.")
+            logger.info("ResearchAgent WebSocket server is running with simplified Architect -> Editor flow.")
             await asyncio.Future()
     except Exception as e:
         logger.error(f"!!! FAILED TO START WEBSOCKET SERVER: {e} !!!", exc_info=True)

@@ -1,9 +1,18 @@
 # backend/langgraph_agent.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Reverted to Stable Work-Node Version)
+# ResearchAgent Core Agent (Phase 17 - Architect Node Test)
 #
-# This version reverts the graph to the simple, stable state where approving
-# a plan leads directly to a single 'work_node'. This is our proven baseline.
+# This version takes the next incremental step by replacing the generic
+# 'work_node' with a specific, placeholder 'chief_architect_node'.
+#
+# Key Architectural Changes:
+# 1. chief_architect_node Added: A placeholder function for the architect
+#    is now in the graph. It returns a hardcoded "tactical plan" to
+#    simulate its output.
+# 2. work_node Removed: The temporary 'work_node' is removed.
+# 3. Simplified Execution Flow: The graph now flows from final plan
+#    approval directly to the 'chief_architect_node', and then immediately
+#    to the 'Editor'. This lets us test a single execution card.
 # -----------------------------------------------------------------------------
 
 import os
@@ -103,6 +112,7 @@ class GraphState(TypedDict):
     critiques: Optional[List[dict]]
     refined_plan: Optional[List[dict]]
     strategic_plan: Optional[List[dict]]
+    tactical_plan: Optional[List[dict]]
 
 # --- Prompts ---
 propose_experts_prompt_template = PromptTemplate.from_template(
@@ -230,6 +240,7 @@ async def task_setup_node(state: GraphState):
         "memory_vault": {}, "enabled_tools": state.get("enabled_tools"), "proposed_experts": None,
         "board_approved": None, "approved_experts": None, "initial_plan": None,
         "critiques": [], "refined_plan": None, "strategic_plan": None, "expert_critique_index": 0,
+        "tactical_plan": None,
     }
 
 def memory_updater_node(state: GraphState):
@@ -344,10 +355,16 @@ def human_in_the_loop_final_plan_approval(state: GraphState):
     logger.info(f"--- Task '{state.get('task_id')}': Paused for Final Plan Approval ---")
     return {}
 
-def work_node(state: GraphState):
-    """A placeholder node to represent the entire execution phase."""
-    logger.info(f"--- Task '{state.get('task_id')}': Executing simplified 'work_node' ---")
-    return {"answer": "The agent has completed the work."}
+def chief_architect_node(state: GraphState):
+    """A placeholder node for the Chief Architect."""
+    logger.info(f"--- (EXEC) Task '{state.get('task_id')}': Chief Architect is creating a tactical plan. ---")
+    # In the real version, this would take a strategic step and expand it.
+    # For now, it returns a hardcoded tactical plan for the UI to display.
+    tactical_plan = [
+        {"instruction": "Placeholder tactical step 1: Search for information.", "tool_name": "web_search", "tool_input": {"query": "..."}},
+        {"instruction": "Placeholder tactical step 2: Write findings to a file.", "tool_name": "write_file", "tool_input": {"file": "...", "content": "..."}}
+    ]
+    return {"tactical_plan": tactical_plan, "answer": "The agent has finished the simplified execution."}
 
 
 def editor_node(state: GraphState):
@@ -382,8 +399,8 @@ def route_logic(state: GraphState) -> str: return state.get("route", "Editor")
 
 def after_final_plan_approval_router(state: GraphState) -> str:
     if state.get("user_feedback") == 'approve':
-        logger.info("--- Final plan approved by user. Starting simplified work process. ---")
-        return "start_work"
+        logger.info("--- Final plan approved by user. Routing to Chief Architect. ---")
+        return "start_execution"
     else:
         logger.info("--- Final plan rejected by user. Ending task. ---")
         return "end_task"
@@ -404,7 +421,7 @@ def create_agent_graph():
     workflow.add_node("expert_critique_node", expert_critique_node)
     workflow.add_node("chair_final_review_node", chair_final_review_node)
     workflow.add_node("human_in_the_loop_final_plan_approval", human_in_the_loop_final_plan_approval)
-    workflow.add_node("work_node", work_node)
+    workflow.add_node("chief_architect_node", chief_architect_node)
     
     workflow.set_entry_point("Task_Setup")
     workflow.add_edge("Task_Setup", "Memory_Updater")
@@ -419,11 +436,11 @@ def create_agent_graph():
     workflow.add_edge("chair_final_review_node", "human_in_the_loop_final_plan_approval")
 
     workflow.add_conditional_edges("human_in_the_loop_final_plan_approval", after_final_plan_approval_router, {
-        "start_work": "work_node",
+        "start_execution": "chief_architect_node",
         "end_task": "Editor"
     })
     
-    workflow.add_edge("work_node", "Editor")
+    workflow.add_edge("chief_architect_node", "Editor")
     workflow.add_edge("Editor", END)
     
     agent = workflow.compile(
@@ -434,7 +451,7 @@ def create_agent_graph():
             "human_in_the_loop_final_plan_approval",
         ]
     )
-    logger.info("ResearchAgent graph compiled in SIMPLIFIED DEBUG MODE.")
+    logger.info("ResearchAgent graph compiled with simplified Architect -> Editor flow.")
     return agent
 
 agent_graph = create_agent_graph()

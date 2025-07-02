@@ -2,7 +2,6 @@
 import { h } from 'preact';
 import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
 import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, FolderIcon, ArrowLeftIcon, UploadCloudIcon, StopCircleIcon, BriefcaseIcon, SendToChatIcon, FileTextIcon, BoardIcon, CheckIcon, XCircleIcon, ChairIcon, CritiqueIcon } from './components/Icons';
-// --- MODIFIED: Import the new WorkCard ---
 import { FinalPlanApprovalCard, ExpertCritiqueCard, ArchitectCard, BoardApprovalCard, ChairPlanCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard, ExecutionStepCard, WorkCard } from './components/AgentCards';
 import { ToggleButton, CopyButton } from './components/Common';
 import { useTasks } from './hooks/useTasks';
@@ -166,9 +165,7 @@ export function App() {
                 }
                 
                 const eventType = event.type;
-                if (eventType === 'plan_approval_request') {
-                    runContainer.children.push({ type: 'architect_plan', steps: event.plan, isAwaitingApproval: true });
-                } else if (eventType === 'board_approval_request') {
+                if (eventType === 'board_approval_request') {
                     runContainer.children.push({ type: 'board_approval', experts: event.experts, isAwaitingApproval: true });
                 } else if (eventType === 'chair_plan_generated') {
                     runContainer.children.push({ type: 'chair_plan', plan: event.plan });
@@ -176,16 +173,11 @@ export function App() {
                     runContainer.children.push({ type: 'expert_critique', critique: event.critique });
                 } else if (eventType === 'final_plan_approval_request') {
                     runContainer.children.push({ type: 'final_plan_approval', plan: event.plan, critiques: event.critiques, isAwaitingApproval: true });
-                // --- MODIFIED: Handle the new 'work_card_generated' event ---
-                } else if (eventType === 'work_card_generated') {
-                    runContainer.children.push({ type: 'work_card' });
+                } else if (eventType === 'architect_plan_generated') {
+                    runContainer.children.push({ type: 'architect_plan', steps: event.plan, isAwaitingApproval: false });
                 } else if (eventType === 'direct_answer' || eventType === 'final_answer') {
                     runContainer.children.push({ type: eventType, content: event.data });
                     runContainer.isComplete = true;
-                } else if (eventType === 'execution_step_update') {
-                    runContainer.children.push({ type: 'execution_step', data: event.data });
-                } else if (eventType === 'agent_event') {
-                    // This logic remains for general status updates, but specific cards are handled above
                 }
                 taskToUpdate.history = newHistory;
                 newTasks[taskIndex] = taskToUpdate;
@@ -356,12 +348,8 @@ export function App() {
                                                     case 'chair_plan': return <ChairPlanCard plan={child.plan} />;
                                                     case 'expert_critique': return <ExpertCritiqueCard critique={child.critique} />;
                                                     case 'final_plan_approval': return <FinalPlanApprovalCard plan={child.plan} critiques={child.critiques} onModify={(plan) => handleFinalPlanApprovalAction(true, plan)} onReject={() => handleFinalPlanApprovalAction(false)} />;
-                                                    case 'execution_plan': return <SiteForemanCard plan={child} />;
-                                                    case 'execution_step': return <ExecutionStepCard step={child.data} />;
                                                     case 'direct_answer': return <DirectAnswerCard answer={child.content} />;
                                                     case 'final_answer': return <FinalAnswerCard answer={child.content} />;
-                                                    // --- MODIFIED: Render the new WorkCard ---
-                                                    case 'work_card': return <WorkCard />;
                                                     default: return null;
                                                 }
                                             })()}
