@@ -1,8 +1,9 @@
+// src/App.jsx
 import { h } from 'preact';
 import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
 import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, FolderIcon, ArrowLeftIcon, UploadCloudIcon, StopCircleIcon, BriefcaseIcon, SendToChatIcon, FileTextIcon, BoardIcon, CheckIcon, XCircleIcon, ChairIcon, CritiqueIcon } from './components/Icons';
-// --- MODIFIED: Import new ExecutionStepCard ---
-import { FinalPlanApprovalCard, ExpertCritiqueCard, ArchitectCard, BoardApprovalCard, ChairPlanCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard, ExecutionStepCard } from './components/AgentCards';
+// --- MODIFIED: Import the new WorkCard ---
+import { FinalPlanApprovalCard, ExpertCritiqueCard, ArchitectCard, BoardApprovalCard, ChairPlanCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard, ExecutionStepCard, WorkCard } from './components/AgentCards';
 import { ToggleButton, CopyButton } from './components/Common';
 import { useTasks } from './hooks/useTasks';
 import { useWorkspace } from './hooks/useWorkspace';
@@ -147,6 +148,7 @@ export function App() {
     const { tasks, setTasks, activeTaskId, selectTask: setActiveTaskId, renameTask } = useTasks();
     const workspace = useWorkspace(activeTaskId);
     const settings = useSettings();
+    
     const agent = useAgent(useCallback((event) => {
         setTasks(currentTasks => {
             try {
@@ -174,10 +176,12 @@ export function App() {
                     runContainer.children.push({ type: 'expert_critique', critique: event.critique });
                 } else if (eventType === 'final_plan_approval_request') {
                     runContainer.children.push({ type: 'final_plan_approval', plan: event.plan, critiques: event.critiques, isAwaitingApproval: true });
+                // --- MODIFIED: Handle the new 'work_card_generated' event ---
+                } else if (eventType === 'work_card_generated') {
+                    runContainer.children.push({ type: 'work_card' });
                 } else if (eventType === 'direct_answer' || eventType === 'final_answer') {
                     runContainer.children.push({ type: eventType, content: event.data });
                     runContainer.isComplete = true;
-                // --- MODIFIED: Handle new execution step event ---
                 } else if (eventType === 'execution_step_update') {
                     runContainer.children.push({ type: 'execution_step', data: event.data });
                 } else if (eventType === 'agent_event') {
@@ -191,7 +195,7 @@ export function App() {
                 return currentTasks;
             }
         });
-    }, [activeTaskId]));
+    }, []), tasks, activeTaskId);
 
     const [inputValue, setInputValue] = useState("");
     const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
@@ -353,10 +357,11 @@ export function App() {
                                                     case 'expert_critique': return <ExpertCritiqueCard critique={child.critique} />;
                                                     case 'final_plan_approval': return <FinalPlanApprovalCard plan={child.plan} critiques={child.critiques} onModify={(plan) => handleFinalPlanApprovalAction(true, plan)} onReject={() => handleFinalPlanApprovalAction(false)} />;
                                                     case 'execution_plan': return <SiteForemanCard plan={child} />;
-                                                    // --- MODIFIED: Render new execution step card ---
                                                     case 'execution_step': return <ExecutionStepCard step={child.data} />;
                                                     case 'direct_answer': return <DirectAnswerCard answer={child.content} />;
                                                     case 'final_answer': return <FinalAnswerCard answer={child.content} />;
+                                                    // --- MODIFIED: Render the new WorkCard ---
+                                                    case 'work_card': return <WorkCard />;
                                                     default: return null;
                                                 }
                                             })()}

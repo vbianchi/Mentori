@@ -271,7 +271,6 @@ export const SiteForemanCard = ({ plan }) => (
     </div>
 );
 
-// --- NEW: Card for displaying a single execution step ---
 export const ExecutionStepCard = ({ step }) => {
     const statusColor = step.status === 'success' ? 'green' : 'red';
     const statusIcon = step.status === 'success' ? <CheckCircleIcon class={`h-5 w-5 text-${statusColor}-400`} /> : <XCircleIcon class={`h-5 w-5 text-${statusColor}-400`} />;
@@ -321,3 +320,10 @@ export const FinalAnswerCard = ({ answer }) => {
         </AgentResponseCard>
     );
 };
+
+// --- NEW: A simple card to show work is in progress ---
+export const WorkCard = () => (
+    <AgentResponseCard icon={<LoaderIcon class="h-5 w-5" />} title="Work In Progress" color="blue">
+        <p class="text-sm text-gray-300">The agent is now executing the approved plan.</p>
+    </AgentResponseCard>
+);

@@ -1,15 +1,9 @@
 # backend/server.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 17 - UI Rendering Delay)
+# ResearchAgent Backend Server (Reverted to Stable Work-Node Version)
 #
-# This version introduces an artificial delay after sending execution step
-# updates to ensure the frontend has time to render each step individually.
-#
-# Key Architectural Changes:
-# 1. UI Rendering Delay: Added a 1-second `asyncio.sleep()` immediately
-#    after broadcasting the `execution_step_update` event. This prevents
-#    the backend from sending all step updates in a single burst, giving
-#    the UI's rendering engine time to display each card sequentially.
+# This version is reverted to the simple, stable state that correctly
+# generates the 'work_card_generated' event for the UI.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -18,10 +12,10 @@ import os
 import json
 import threading
 from cgi import FieldStorage
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import shutil
 import mimetypes
 import re
-from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
 from dotenv import load_dotenv
 import websockets
@@ -41,6 +35,7 @@ logger = logging.getLogger(__name__)
 
 RUNNING_AGENTS = {}
 ACTIVE_CONNECTIONS = set()
+AGENT_EVENTS = {}
 
 
 # --- Tool Template ---
@@ -418,13 +413,8 @@ NODE_NAME_MAPPING = {
     "chair_initial_plan_node": "The Chair is drafting a plan",
     "expert_critique_node": "The Board is reviewing the plan",
     "chair_final_review_node": "The Chair is synthesizing feedback",
-    "chief_architect_node": "The Chief Architect is planning",
-    "site_foreman_node": "The Site Foreman is preparing the step",
-    "worker_node": "The Worker is executing the tool",
-    "project_supervisor_node": "The Supervisor is evaluating the result",
-    "editor_checkpoint_report_node": "The Editor is compiling a checkpoint report",
-    "board_checkpoint_review_node": "The Board is reviewing the checkpoint",
-    "Editor": "Editor"
+    "Editor": "Editor",
+    "work_node": "Executing Plan"
 }
 BROADCAST_NODES = set(NODE_NAME_MAPPING.keys())
 
@@ -434,7 +424,7 @@ async def broadcast_event(event):
         await asyncio.gather(*[conn.send(message) for conn in ACTIVE_CONNECTIONS], return_exceptions=True)
 
 async def agent_execution_wrapper(input_state, config):
-    global RUNNING_AGENTS
+    global RUNNING_AGENTS, AGENT_EVENTS
     task_id = config["configurable"]["thread_id"]
     try:
         logger.info(f"Task '{task_id}': Agent execution starting.")
@@ -457,36 +447,17 @@ async def agent_execution_wrapper(input_state, config):
                         "task_id": task_id
                     })
             
-            if event_type == "on_chain_end" and node_name == "project_supervisor_node":
-                state_values = event['data']['output']
-                tactical_plan = state_values.get("tactical_plan", [])
-                tactical_step_index = state_values.get("tactical_step_index", 0)
-                
-                if tactical_plan and tactical_step_index < len(tactical_plan):
-                    step_details = {
-                        "instruction": tactical_plan[tactical_step_index].get("instruction"),
-                        "tool_call": state_values.get("current_tool_call"),
-                        "tool_output": state_values.get("tool_output"),
-                        "evaluation": state_values.get("step_evaluation"),
-                        "status": state_values.get("step_evaluation", {}).get("status", "unknown")
-                    }
-                    logger.info(f"Broadcasting execution_step_update for task '{task_id}'")
-                    await broadcast_event({
-                        "type": "execution_step_update",
-                        "data": step_details,
-                        "task_id": task_id
-                    })
-                    # --- ADDED: Artificial delay for UI rendering ---
-                    await asyncio.sleep(1)
+            if event_type == "on_chain_end" and node_name == "work_node":
+                logger.info(f"Broadcasting work_card_generated for task '{task_id}'")
+                await broadcast_event({
+                    "type": "work_card_generated",
+                    "task_id": task_id
+                })
 
 
         current_state = agent_graph.get_state(config)
         
-        if current_state.next and "human_in_the_loop_node" in current_state.next:
-            logger.info(f"Task '{task_id}': Paused for human plan approval.")
-            await broadcast_event({"type": "plan_approval_request", "plan": current_state.values.get("plan"), "task_id": task_id})
-        
-        elif current_state.next and "human_in_the_loop_board_approval" in current_state.next:
+        if current_state.next and "human_in_the_loop_board_approval" in current_state.next:
             logger.info(f"Task '{task_id}': Paused for Board of Experts approval.")
             await broadcast_event({"type": "board_approval_request", "experts": current_state.values.get("proposed_experts"), "task_id": task_id})
 
@@ -527,12 +498,16 @@ async def agent_execution_wrapper(input_state, config):
         await broadcast_event({"type": "agent_stopped", "task_id": task_id, "message": f"Error: {e}"})
     finally:
         if task_id in RUNNING_AGENTS: del RUNNING_AGENTS[task_id]
-        logger.info(f"Task '{task_id}': Cleaned up from RUNNING_AGENTS.")
+        if task_id in AGENT_EVENTS: del AGENT_EVENTS[task_id]
+        logger.info(f"Task '{task_id}': Cleaned up from RUNNING_AGENTS and AGENT_EVENTS.")
 
 async def run_agent_handler(data):
-    global RUNNING_AGENTS
+    global RUNNING_AGENTS, AGENT_EVENTS
     task_id = data.get("task_id")
     if task_id in RUNNING_AGENTS: return
+    
+    AGENT_EVENTS[task_id] = asyncio.Event()
+    
     config = {"recursion_limit": 250, "configurable": {"thread_id": task_id}}
     initial_state = { "messages": [HumanMessage(content=data.get("prompt"))], "llm_config": data.get("llm_config", {}), "task_id": task_id, "enabled_tools": data.get("enabled_tools")}
     agent_task = asyncio.create_task(agent_execution_wrapper(initial_state, config))
@@ -541,7 +516,15 @@ async def run_agent_handler(data):
 async def resume_agent_handler(data):
     global RUNNING_AGENTS
     task_id = data.get("task_id")
-    if not task_id or task_id in RUNNING_AGENTS: return
+    if not task_id: return
+    
+    if task_id in RUNNING_AGENTS:
+        logger.warning(f"Task '{task_id}' is already running. Ignoring resume request.")
+        return
+
+    if task_id not in AGENT_EVENTS:
+        AGENT_EVENTS[task_id] = asyncio.Event()
+        
     config = {"recursion_limit": 250, "configurable": {"thread_id": task_id}}
     update_values = {"enabled_tools": data.get("enabled_tools")}
 
@@ -560,6 +543,15 @@ async def handle_stop_agent(data):
     task_id = data.get("task_id")
     if task_id in RUNNING_AGENTS:
         RUNNING_AGENTS[task_id].cancel()
+
+async def handle_ack(data):
+    task_id = data.get("task_id")
+    if task_id in AGENT_EVENTS:
+        logger.info(f"ACK received for task '{task_id}'. Setting event to resume agent.")
+        await resume_agent_handler({"task_id": task_id})
+    else:
+        logger.warning(f"Received ACK for unknown or completed task '{task_id}'.")
+
 
 def _safe_delete_workspace(task_id: str):
     try:
@@ -581,17 +573,40 @@ async def message_router(websocket):
     try:
         async for message in websocket:
             data = json.loads(message)
-            handlers = {"run_agent": run_agent_handler, "resume_agent": resume_agent_handler, "stop_agent": handle_stop_agent, "task_create": handle_task_create, "task_delete": handle_task_delete}
+            handlers = {
+                "run_agent": run_agent_handler, 
+                "resume_agent": resume_agent_handler, 
+                "stop_agent": handle_stop_agent, 
+                "task_create": handle_task_create, 
+                "task_delete": handle_task_delete,
+                "ack": handle_ack
+            }
             if (handler := handlers.get(data.get("type"))): await handler(data)
     finally:
         ACTIVE_CONNECTIONS.remove(websocket)
 
 async def main():
+    logger.info("--- Starting ResearchAgent Server ---")
     http_thread = threading.Thread(target=run_http_server, daemon=True)
     http_thread.start()
-    async with websockets.serve(message_router, os.getenv("BACKEND_HOST", "0.0.0.0"), int(os.getenv("BACKEND_PORT", 8765))):
-        logger.info("ResearchAgent server is running.")
-        await asyncio.Future()
+    logger.info("HTTP file server thread started.")
+    host = os.getenv("BACKEND_HOST", "0.0.0.0")
+    port = int(os.getenv("BACKEND_PORT", 8765))
+    try:
+        logger.info(f"Attempting to start WebSocket server on {host}:{port}")
+        async with websockets.serve(message_router, host, port):
+            logger.info("ResearchAgent WebSocket server is running in SIMPLIFIED DEBUG MODE.")
+            await asyncio.Future()
+    except Exception as e:
+        logger.error(f"!!! FAILED TO START WEBSOCKET SERVER: {e} !!!", exc_info=True)
+
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    logger.info("Server script execution started.")
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        logger.info("Server shut down by user (KeyboardInterrupt).")
+    except Exception as e:
+        logger.critical(f"A critical error occurred in the main asyncio loop: {e}", exc_info=True)
+    logger.info("Server script execution finished.")
