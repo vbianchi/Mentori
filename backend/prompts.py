@@ -1,13 +1,86 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Prompts (Phase 15 - Data Piping FIX)
+# ResearchAgent Prompts (Phase 17 - Intelligent Architect FIX)
 #
-# This version updates the planner's prompt to explicitly teach it how to
-# use the `{step_N_output}` placeholder for piping data between steps. This
-# will fix the bug where a placeholder was written to a file instead of the
-# actual summary.
+# This version adds the new, sophisticated prompt for the Chief Architect
+# node, which was missing and causing an ImportError.
+#
+# Key Additions:
+# 1. chief_architect_prompt_template: A new prompt that instructs the LLM
+#    to act as an expert architect. It is given a single strategic goal,
+#    the full strategic plan for context, the history of previous steps,
+#    and a list of available tools. Its task is to generate a detailed,
+#    step-by-step tactical plan of specific tool calls to achieve the goal.
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
+
+# --- NEW: Chief Architect Prompt ---
+chief_architect_prompt_template = PromptTemplate.from_template(
+"""
+You are the Chief Architect of an AI-powered research team. You are a master of breaking down high-level goals into detailed, step-by-step plans of tool calls.
+
+**Your Task:**
+Your job is to take a single high-level strategic goal and expand it into a detailed, low-level "tactical plan" of specific tool calls that will accomplish that goal.
+
+**Context:**
+1.  **Overall Strategic Plan:** This is the complete high-level plan for the entire project.
+    ```json
+    {strategic_plan}
+    ```
+2.  **Current Strategic Goal:** This is the specific high-level step you must accomplish right now.
+    > "{current_strategic_step}"
+
+3.  **History of Completed Steps:** This is a summary of what the team has already done.
+    > {history}
+
+4.  **Available Tools:** You have the following tools at your disposal.
+    ```
+    {tools}
+    ```
+
+**Instructions:**
+1.  **Analyze the Goal:** Carefully read the `Current Strategic Goal` in the context of the `Overall Strategic Plan` and the `History of Completed Steps`.
+2.  **Create a Tactical Plan:** Generate a list of precise, sequential tool calls that will achieve the goal.
+3.  **Use the Right Tools:** Select the most appropriate tool for each step from the `Available Tools` list.
+4.  **Data Piping:** If a step needs to use the output from a previous tactical step, you MUST use the special placeholder string `{{step_N_output}}` as a value in your `tool_input`, where `N` is the `step_id` of the step that produces the required output.
+5.  **Be Precise and Atomic:** Each step should be a single, clear action. Do not combine multiple actions into one step.
+6.  **Output Format:** Your final output must be a single, valid JSON object conforming to the `TacticalPlan` schema, containing a "steps" key.
+
+---
+**Example:**
+*Strategic Goal:* "Create a Python script to install pandas and print its version."
+*Correct Output:*
+```json
+{{
+  "steps": [
+    {{
+      "step_id": 1,
+      "instruction": "Create a Python script named 'install_and_verify.py' that will install pandas and then print its version.",
+      "tool_name": "write_file",
+      "tool_input": {{
+        "file": "install_and_verify.py",
+        "content": "import subprocess\\nsubprocess.run(['pip', 'install', 'pandas'], check=True)\\nimport pandas as pd\\nprint(f'Pandas version: {{pd.__version__}}')"
+      }}
+    }},
+    {{
+      "step_id": 2,
+      "instruction": "Execute the 'install_and_verify.py' script to perform the installation and confirm the version.",
+      "tool_name": "workspace_shell",
+      "tool_input": {{
+        "command": "python install_and_verify.py"
+      }}
+    }}
+  ]
+}}
+```
+---
+
+**Begin!**
+
+**Your Output (must be a single JSON object):**
+"""
+)
+
 
 # 1. Memory Updater Prompt
 memory_updater_prompt_template = PromptTemplate.from_template(
@@ -51,7 +124,7 @@ The summary must capture all critical information, including:
 - The outcomes of any tools that were used.
 - Any specific data points, figures, or names that were part of the conversation.
 
-The goal is to produce a summary that is dense with information, so a new AI agent can read it and have all the necessary context to continue the conversation without having access to the full history.
+The goal is to produce a summary that is dense with information, so a new AI agent can read it and have all the necessary context to continue the conversation without having to access to the full history.
 
 Conversation to Summarize:
 ---

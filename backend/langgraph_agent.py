@@ -1,19 +1,21 @@
 # backend/langgraph_agent.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 17 - Checkpoint FIX)
+# ResearchAgent Core Agent (Phase 17 - Pydantic Validation FIX)
 #
-# This version fixes a ValueError from the previous version. The error
-# occurred because a conditional edge was defined to start from a node named
-# 'master_router' which had not been explicitly added to the graph.
+# This version fixes a Pydantic validation error that occurred when the LLM
+# returned the `tool_input` as a JSON string instead of a JSON object.
 #
 # Key Architectural Fix:
-# 1. master_router_node Added: A new, simple node `master_router_node` has
-#    been added. Its only purpose is to act as a stable entry point and
-#    branching location for the main strategic loop.
-# 2. Graph Wiring Corrected: The conditional edge for the master router now
-#    correctly starts from the new `master_router_node`. All flows that
-#    should begin a strategic check (e.g., after plan approval or after
-#    incrementing a step) are now correctly wired to this new node.
+# 1. TacticalStep Model Updated: The `tool_input` field in the `TacticalStep`
+#    Pydantic model is changed from `Dict[str, Any]` to
+#    `Union[Dict[str, Any], str]`. This makes the model more flexible,
+#    allowing it to accept either a dictionary or a raw string without failing
+#    validation.
+# 2. Data Cleaning Logic: In the `chief_architect_node`, after the LLM call,
+#    a new data sanitization loop is added. This loop iterates through the
+#    generated steps and checks if any `tool_input` is a string. If it is,
+#    it attempts to parse it into a dictionary using `json.loads()`. This
+#    makes the agent resilient to common LLM formatting inconsistencies.
 # -----------------------------------------------------------------------------
 
 import os
@@ -21,7 +23,7 @@ import logging
 import json
 import re
 import asyncio
-from typing import TypedDict, Annotated, Sequence, List, Optional, Dict, Any
+from typing import TypedDict, Annotated, Sequence, List, Optional, Dict, Any, Union
 
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, SystemMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -43,7 +45,8 @@ from .prompts import (
     final_answer_prompt_template,
     correction_planner_prompt_template,
     summarizer_prompt_template,
-    memory_updater_prompt_template
+    memory_updater_prompt_template,
+    chief_architect_prompt_template
 )
 
 # --- Logging Setup ---
@@ -81,6 +84,18 @@ class Plan(BaseModel):
 class CritiqueAndPlan(BaseModel):
     critique: str = Field(description="The detailed, constructive critique from the expert's point of view. Explain WHY you are making changes.")
     updated_plan: List[Step] = Field(description="The complete, revised step-by-step plan. This should be the full plan, not just the changed parts.")
+
+class TacticalStep(BaseModel):
+    """A single step in a tactical plan, representing a specific tool call."""
+    step_id: int = Field(description="A unique identifier for this step within the tactical plan.")
+    instruction: str = Field(description="The detailed, specific instruction for this tool call.")
+    tool_name: str = Field(description="The name of the tool to be used for this step.")
+    # --- FIX: Allow tool_input to be a string to handle LLM formatting errors ---
+    tool_input: Union[Dict[str, Any], str] = Field(description="The dictionary of arguments to be passed to the tool.")
+
+class TacticalPlan(BaseModel):
+    """A detailed, step-by-step plan of tool calls to achieve a strategic goal."""
+    steps: List[TacticalStep] = Field(description="A list of tactical steps to be executed in sequence.")
 
 
 class GraphState(TypedDict):
@@ -371,13 +386,54 @@ def master_router_node(state: GraphState) -> dict:
     return {}
 
 def chief_architect_node(state: GraphState):
-    """A placeholder node for the Chief Architect."""
-    logger.info(f"--- (EXEC) Task '{state.get('task_id')}': Chief Architect is creating a tactical plan. ---")
-    tactical_plan = [
-        {"instruction": "Placeholder tactical step 1: Search for information.", "tool_name": "web_search", "tool_input": {"query": "..."}},
-        {"instruction": "Placeholder tactical step 2: Write findings to a file.", "tool_name": "write_file", "tool_input": {"file": "...", "content": "..."}}
-    ]
-    return {"tactical_plan": tactical_plan, "tactical_step_index": 0}
+    """Generates a detailed, tactical plan of tool calls to achieve a single strategic goal."""
+    task_id = state.get("task_id")
+    logger.info(f"--- (EXEC) Task '{task_id}': Chief Architect is creating a tactical plan. ---")
+
+    llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-pro-latest")
+    structured_llm = llm.with_structured_output(TacticalPlan)
+
+    strategic_plan = state.get("strategic_plan", [])
+    strategic_index = state.get("strategic_step_index", 0)
+    current_strategic_step = strategic_plan[strategic_index]['instruction'] if strategic_index < len(strategic_plan) else "No current goal."
+
+    prompt = chief_architect_prompt_template.format(
+        strategic_plan=json.dumps(strategic_plan, indent=2),
+        current_strategic_step=current_strategic_step,
+        history=json.dumps(state.get("history", []), indent=2),
+        tools=format_tools_for_prompt(state)
+    )
+
+    try:
+        response = structured_llm.invoke(prompt)
+        
+        # --- FIX: Sanitize the tool_input field ---
+        sanitized_steps = []
+        for step in response.steps:
+            if isinstance(step.tool_input, str):
+                try:
+                    # Attempt to parse the string into a dictionary
+                    step.tool_input = json.loads(step.tool_input)
+                except json.JSONDecodeError:
+                    # If it fails, it might be a simple string argument for a tool
+                    # like web_search. We'll wrap it in the expected dict format.
+                    logger.warning(f"Could not parse tool_input '{step.tool_input}' as JSON. Wrapping it for the tool.")
+                    # Heuristic: assume the string is the value for a common key like 'query' or 'command'
+                    if step.tool_name == "web_search":
+                        step.tool_input = {"query": step.tool_input}
+                    elif step.tool_name == "workspace_shell":
+                         step.tool_input = {"command": step.tool_input}
+                    else: # Fallback for other tools
+                        step.tool_input = {"input": step.tool_input}
+
+            sanitized_steps.append(step.dict())
+
+        logger.info(f"Architect created a tactical plan with {len(sanitized_steps)} steps for goal: '{current_strategic_step}'")
+        return {"tactical_plan": sanitized_steps, "tactical_step_index": 0}
+    except Exception as e:
+        logger.error(f"Task '{task_id}': Failed to create tactical plan: {e}")
+        return {"tactical_plan": [{"step_id": 1, "instruction": f"Error: Could not generate a tactical plan. {e}", "tool_name": "error", "tool_input": {}}], "tactical_step_index": 0}
+
 
 def site_foreman_node(state: GraphState):
     """A placeholder node for the Site Foreman."""
@@ -531,7 +587,6 @@ def create_agent_graph():
     workflow.add_node("editor_checkpoint_report_node", editor_checkpoint_report_node)
     workflow.add_node("board_checkpoint_review_node", board_checkpoint_review_node)
     workflow.add_node("increment_strategic_step_node", increment_strategic_step_node)
-    # --- FIX: Add the master_router_node ---
     workflow.add_node("master_router_node", master_router_node)
     
     # Set entry and basic flow
@@ -549,7 +604,7 @@ def create_agent_graph():
     workflow.add_conditional_edges("expert_critique_node", should_continue_critique, { "continue_critique": "expert_critique_node", "finalize_plan": "chair_final_review_node" })
     workflow.add_edge("chair_final_review_node", "human_in_the_loop_final_plan_approval")
 
-    # --- Strategic Loop Wiring (FIXED) ---
+    # Strategic Loop Wiring
     workflow.add_conditional_edges(
         "human_in_the_loop_final_plan_approval", 
         after_final_plan_approval_router, 
@@ -566,7 +621,7 @@ def create_agent_graph():
         }
     )
     
-    # --- Tactical (Inner) Loop Wiring ---
+    # Tactical (Inner) Loop Wiring
     workflow.add_edge("chief_architect_node", "site_foreman_node")
     workflow.add_edge("site_foreman_node", "worker_node")
     workflow.add_edge("worker_node", "project_supervisor_node")
@@ -580,7 +635,7 @@ def create_agent_graph():
         }
     )
 
-    # --- Checkpoint (Outer) Loop Wiring ---
+    # Checkpoint (Outer) Loop Wiring
     workflow.add_edge("editor_checkpoint_report_node", "board_checkpoint_review_node")
     workflow.add_conditional_edges(
         "board_checkpoint_review_node",
@@ -603,7 +658,7 @@ def create_agent_graph():
             "human_in_the_loop_final_plan_approval",
         ]
     )
-    logger.info("ResearchAgent graph compiled with strategic checkpoint loop (FIXED).")
+    logger.info("ResearchAgent graph compiled with INTELLIGENT architect.")
     return agent
 
 agent_graph = create_agent_graph()
