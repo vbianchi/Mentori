@@ -9,10 +9,10 @@ Our agent operates like a small, efficient company with specialized roles. This 
 -   **The "Router" (Dispatcher):** Quickly classifies user requests into one of four tracks: Direct Q&A, Simple Tool Use, Complex Project, or **Board of Experts Review**.
 -   **The "Memory Updater" (Librarian):** A critical pre-processing step that analyzes every user message to update the agent's structured JSON "Memory Vault," ensuring all new facts are stored before any action is taken.
 -   **The "Board of Experts" (Advisory Committee):** A dynamically formed group of AI specialist personas (e.g., 'Data Scientist', 'Forensic Accountant') proposed by the agent based on the user's request. The user must approve the board before the project proceeds.
--   **The "Chair" (BoE Moderator):** The leader of the Board of Experts. Synthesizes expert critiques and creates the initial and final strategic plans for the project.
+-   **The "Chair" (BoE Moderator):** The leader of the Board of Experts. Synthesizes expert critiques and creates the initial and final strategic plans for the project. It is also responsible for optimizing the final plan by consolidating redundant steps.
 -   **The "Expert Critic" (BoE Member):** An individual AI persona on the board that reviews and provides structured feedback on the Chair's plan in a sequential, autonomous loop.
--   **The "Chief Architect" (Planner):** A strategic thinker that creates detailed, structured JSON "blueprints" for complex tasks (for the non-BoE track).
--   **The "Site Foreman" (Controller):** The project manager that executes the final, expanded blueprint step-by-step, managing data piping and correction sub-loops.
+-   **The "Chief Architect" (Planner):** A strategic thinker that takes a single high-level goal from the Chair's plan and expands it into a detailed, multi-step "tactical plan" of specific tool calls.
+-   **The "Site Foreman" (Controller):** The project manager that executes the tactical plan step-by-step, managing data piping and correction sub-loops.
 -   **The "Worker" (Executor):** The specialist that takes precise instructions and runs the tools.
 -   **The "Project Supervisor" (Evaluator):** The quality assurance inspector that validates the outcome of each step in a complex plan.
 -   **The "Editor" (Reporter):** The unified voice of the agent, capable of acting as a conversational assistant or a project manager to deliver context-aware final responses, checkpoint summaries, and final reports.
@@ -62,15 +62,9 @@ _A collection of features required to move from a single-user tool to a complete
 -   **Our Custom "Reasoning" Tools:** Continue to build and refine specialized tools like `query_files` and `critique_document`. These are our core competency.
 -   **MCP for Connectors:** Develop a wrapper to connect to the **Model Context Protocol (MCP)** tool ecosystem. This will instantly give the agent access to hundreds of pre-built tools for third-party APIs (GitHub, Google Calendar, Slack, etc.) without us needing to maintain them.
 
-## Core Agent Architecture: The "Company" Model
-
-... (content remains the same) ...
-
 ## Hierarchical Execution Loop: Node-by-Node Breakdown
 
 This section details the precise flow and responsibility of each node in the execution engine, which begins after the user approves the final strategic plan.
-
-**Our Implementation Strategy:** We will build this loop **one node at a time**, testing the UI feedback at each stage.
 
 ### 1\. `master_router` (Conditional Edge)
 
@@ -106,7 +100,7 @@ This section details the precise flow and responsibility of each node in the exe
     2.  Performs "data piping": checks the `tool_input` for any `{step_N_output}` placeholders and replaces them with the actual output from the `step_outputs` dictionary.
 -   **Outputs:** `current_tool_call` (a dictionary with the final `tool_name` and hydrated `tool_input`).
 -   **Connections:**
-    -   Receives from: `chief_architect_node` (initial entry) and `human_in_the_loop_execution_step` (loops).
+    -   Receives from: `tactical_step_router` (loops) and `chief_architect_node` (initial entry).
     -   Routes to: `worker_node`.
 
 ### 4\. `worker_node`
@@ -129,7 +123,7 @@ This section details the precise flow and responsibility of each node in the exe
 -   **Outputs:** `step_evaluation` (a dictionary with `status: "success" | "failure"` and `reasoning`).
 -   **Connections:**
     -   Receives from: `worker_node`.
-    -   Routes to: `tactical_step_incrementer`.
+    -   Routes to: `increment_tactical_step_node`.
 
 ### 6\. `tactical_step_router` (Conditional Edge)
 
@@ -138,7 +132,7 @@ This section details the precise flow and responsibility of each node in the exe
 -   **Processing:** Checks if `tactical_step_index` is less than the total number of steps in `tactical_plan`.
 -   **Outputs:** A routing decision string.
 -   **Connections:**
-    -   Receives from: `tactical_step_incrementer`.
+    -   Receives from: `increment_tactical_step_node`.
     -   Routes to:
-        -   `human_in_the_loop_execution_step` (to pause for the UI).
+        -   `site_foreman_node` (to continue the loop).
         -   `increment_strategic_step_node` (when the tactical plan is complete).
