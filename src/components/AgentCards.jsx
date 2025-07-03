@@ -173,19 +173,30 @@ export const BoardApprovalCard = ({ experts, onApproval }) => {
     );
 };
 
+// MODIFIED: This component now handles highlighting for new/modified steps
 const PlanStepView = ({ step }) => {
-    const isNew = (step.instruction || '').startsWith('NEW:');
-    const text = isNew ? step.instruction.substring(5) : step.instruction;
-    const style = isNew ? 'text-green-400 font-bold' : '';
+    let text = step.instruction || '';
+    let style = '';
+    const toolName = step.tool || step.tool_name;
+
+    if (text.startsWith('**NEW:**')) {
+        text = text.substring('**NEW:**'.length).trim();
+        style = 'text-green-400 font-bold';
+    } else if (text.startsWith('**MODIFIED:**')) {
+        text = text.substring('**MODIFIED:**'.length).trim();
+        style = 'text-yellow-400 font-bold';
+    }
 
     return (
         <li class={`flex items-start gap-3 py-1.5 ${style}`}>
             <CheckIcon class="h-4 w-4 text-blue-400 mt-1 flex-shrink-0" />
             <span>
                 {text}
-                <span class="ml-2 inline-block bg-gray-700 text-blue-300 text-xs font-mono px-1.5 py-0.5 rounded">
-                    {step.tool || step.tool_name}
-                </span>
+                {toolName && (
+                    <span class="ml-2 inline-block bg-gray-700 text-blue-300 text-xs font-mono px-1.5 py-0.5 rounded">
+                        {toolName}
+                    </span>
+                )}
             </span>
         </li>
     );
@@ -306,14 +317,12 @@ export const SupervisorCard = ({ evaluation }) => {
     );
 };
 
-// --- NEW: Checkpoint Report Card ---
 export const EditorReportCard = ({ report }) => (
     <AgentResponseCard icon={<EditorIcon class="h-5 w-5" />} title="Editor's Checkpoint Report" color="sky">
         <p class="text-sm text-gray-300 whitespace-pre-wrap">{report}</p>
     </AgentResponseCard>
 );
 
-// --- NEW: Board Decision Card ---
 export const BoardDecisionCard = ({ decision }) => (
     <AgentResponseCard icon={<BoardIcon class="h-5 w-5" />} title="Board Checkpoint Review" color="rose">
         <p class="text-sm text-gray-400 mb-2">The Board has reviewed the progress and made a decision:</p>

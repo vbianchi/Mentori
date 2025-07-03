@@ -1,14 +1,24 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Prompts (Phase 17 - Role & UI Refinement)
+# ResearchAgent Prompts (Phase 17 - Role & Checkpoint FIX)
 #
-# This version implements two key improvements based on user feedback:
-# 1. Expert Highlighting: The `expert_critique_prompt_template` is updated
-#    to instruct experts to prefix new or modified steps with `**NEW:**` or
-#    `**MODIFIED:**` for better UI visibility.
-# 2. Chair as Optimizer: The `chair_final_review_prompt_template` is
-#    significantly enhanced. The Chair's primary role is now to optimize and
-#    consolidate the plan (e.g., merging `pip_install` calls) and to remove
-#    specific tool names, focusing on high-level strategic goals.
+# This version implements critical fixes to the Chair and Architect prompts
+# based on user feedback to ensure roles are respected and checkpoints are
+# preserved.
+#
+# Key Changes:
+# 1. chair_final_review_prompt_template:
+#    - A new, explicit, and critical rule has been added: "You MUST PRESERVE
+#      all `checkpoint` steps from the refined plan." This prevents the
+#      optimizer from incorrectly removing them.
+#    - The instruction to avoid tool names is reinforced.
+#
+# 2. chief_architect_prompt_template:
+#    - The instruction for the Architect to include a `tool_name` in every
+#      step is made more prominent and explicit to ensure compliance.
+#
+# 3. expert_critique_prompt_template (from previous step, retained):
+#    - Includes the rule for experts to prefix changes with `**NEW:**` or
+#      `**MODIFIED:**` for the upcoming UI refinement.
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
@@ -47,7 +57,6 @@ chair_initial_plan_prompt_template = PromptTemplate.from_template(
 """
 )
 
-# MODIFIED: Added highlighting instructions
 expert_critique_prompt_template = PromptTemplate.from_template(
 """You are a world-class expert with a specific persona. Your task is to critique a proposed plan and improve it.
 
@@ -71,7 +80,7 @@ expert_critique_prompt_template = PromptTemplate.from_template(
 """
 )
 
-# MODIFIED: Enhanced with optimization and consolidation duties
+# MODIFIED: Added explicit rule to preserve checkpoints.
 chair_final_review_prompt_template = PromptTemplate.from_template(
 """You are the Chair of the Board of Experts. Your final responsibility is to perform a sanity check, optimize the plan, and produce the definitive version for user approval.
 
@@ -89,8 +98,8 @@ chair_final_review_prompt_template = PromptTemplate.from_template(
 2.  **Optimize and Consolidate:** This is your most important duty. Scrutinize the plan for inefficiencies and merge steps where possible.
     * **Merge Redundant Calls:** If you see multiple `pip_install` steps, merge them into a single step with a list of all required packages.
     * **Combine Logically Related Steps:** If sequential steps can be performed by a single, more comprehensive action (like a single script), consolidate them into a single, clearer strategic step.
-3.  **Focus on 'What', not 'How':** Your final plan should describe the high-level goals. **DO NOT** specify tool names (e.g., `write_file`, `workspace_shell`). The Chief Architect will select the correct tools later.
-4.  **Checkpoints:** Ensure at least one `checkpoint` step exists at a logical point for the board to review progress. Add them if necessary.
+3.  **CRITICAL RULE: You MUST PRESERVE all `checkpoint` steps** from the refined plan. They are non-negotiable for the review process and must not be removed or consolidated.
+4.  **Focus on 'What', not 'How':** Your final plan should describe the high-level goals. **DO NOT** specify tool names (e.g., `write_file`, `workspace_shell`). The Chief Architect will select the correct tools later.
 5.  **Output:** Return the final, validated, and optimized plan. Your output must be a single, valid JSON object conforming to the `Plan` schema.
 """
 )
@@ -123,7 +132,7 @@ Your job is to take a single high-level strategic goal and expand it into a deta
 **CRITICAL Instructions:**
 1.  **Efficiency Principle:** Your primary goal is to solve the strategic step in the **fewest, most robust tactical steps possible**.
 2.  **Prefer Scripts Over Commands:** For any task involving data manipulation, calculations, or complex logic, you should **always prefer to write a single, complete Python script using the `write_file` tool** and then execute it with a single `workspace_shell` command. This is more efficient and reliable than a long series of individual commands.
-3.  **Specify Tools:** Every step in your plan **MUST** include a valid `tool_name` from the `Available Tools` list.
+3.  **Specify Tools:** Every step in your plan **MUST** include a valid `tool_name` from the `Available Tools` list. This is not optional.
 4.  **Data Piping:** If a step needs to use the output from a previous tactical step, you MUST use the special placeholder string `{{step_N_output}}` as a value in your `tool_input`, where `N` is the `step_id` of the step that produces the required output.
 5.  **Output Format:** Your final output must be a single, valid JSON object conforming to the `TacticalPlan` schema, containing a "steps" key.
 

@@ -2,7 +2,6 @@
 import { h } from 'preact';
 import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
 import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, FolderIcon, ArrowLeftIcon, UploadCloudIcon, StopCircleIcon, BriefcaseIcon, SendToChatIcon, FileTextIcon, BoardIcon, CheckIcon, XCircleIcon, ChairIcon, CritiqueIcon } from './components/Icons';
-// --- NEW: Import the checkpoint cards ---
 import { FinalPlanApprovalCard, ExpertCritiqueCard, ArchitectCard, BoardApprovalCard, ChairPlanCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard, ExecutionStepCard, WorkCard, ForemanCard, WorkerCard, SupervisorCard, EditorReportCard, BoardDecisionCard } from './components/AgentCards';
 import { ToggleButton, CopyButton } from './components/Common';
 import { useTasks } from './hooks/useTasks';
@@ -144,6 +143,9 @@ const Breadcrumbs = ({ path, onNavigate }) => {
     );
 };
 
+// --- MODIFIED: This is the list of cards that should be indented ---
+const EXECUTION_CARD_TYPES = new Set(['architect_plan', 'foreman_step', 'worker_step', 'supervisor_step', 'editor_report', 'board_decision']);
+
 export function App() {
     const { tasks, setTasks, activeTaskId, selectTask: setActiveTaskId, renameTask } = useTasks();
     const workspace = useWorkspace(activeTaskId);
@@ -182,7 +184,6 @@ export function App() {
                     runContainer.children.push({ type: 'worker_step', tool_call: event.tool_call, output: event.output });
                 } else if (eventType === 'supervisor_step_evaluated') {
                     runContainer.children.push({ type: 'supervisor_step', evaluation: event.evaluation });
-                // --- NEW: Handle the checkpoint events ---
                 } else if (eventType === 'editor_report_generated') {
                     runContainer.children.push({ type: 'editor_report', report: event.report });
                 } else if (eventType === 'board_decision_made') {
@@ -338,7 +339,7 @@ export function App() {
                        <p class="text-xs text-muted-foreground">by Valerio Bianchi & Gemini 2.5 Pro</p>
                    </div>
                    <div class="flex items-center gap-2">
-                       <span class="relative flex h-3 w-3"> {agent.connectionStatus === 'Connected' && <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>} <span class={`relative inline-flex rounded-full h-3 w-3 ${agent.connectionStatus === 'Connected' ? 'bg-green-500' : 'bg-red-500'}`}></span> </span>
+                       <span class="relative flex h-3 w-3"> {agent.connectionStatus === 'Connected' && <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>} <span class={`relative inline-flex rounded-full h-3 w-3 ${agent.connectionStatus === 'Connected' ? 'bg-red-500' : 'bg-red-500'}`}></span> </span>
                        <span class="text-sm text-muted-foreground">{agent.connectionStatus}</span>
                    </div>
                 </div>
@@ -346,33 +347,37 @@ export function App() {
                    {activeTask?.history.map((item, index) => {
                        if (item.type === 'prompt') return <PromptCard key={index} content={item.content} />;
                        if (item.type === 'run_container') {
+                            const executionCards = item.children.filter(child => EXECUTION_CARD_TYPES.has(child.type));
+                            const otherCards = item.children.filter(child => !EXECUTION_CARD_TYPES.has(child.type));
+                            
+                            const renderCard = (child, childIndex) => {
+                                switch (child.type) {
+                                    case 'architect_plan': return <ArchitectCard plan={child.steps} isAwaitingApproval={child.isAwaitingApproval} onModify={handleModifyAndApprove} onReject={() => handlePlanApprovalAction('reject')} availableTools={settings.availableTools}/>;
+                                    case 'board_approval': return <BoardApprovalCard experts={child.experts} onApproval={handleBoardApprovalAction} />;
+                                    case 'chair_plan': return <ChairPlanCard plan={child.plan} />;
+                                    case 'expert_critique': return <ExpertCritiqueCard critique={child.critique} />;
+                                    case 'final_plan_approval': return <FinalPlanApprovalCard plan={child.plan} critiques={child.critiques} onModify={(plan) => handleFinalPlanApprovalAction(true, plan)} onReject={() => handleFinalPlanApprovalAction(false)} />;
+                                    case 'foreman_step': return <ForemanCard step={child.step} />;
+                                    case 'worker_step': return <WorkerCard toolCall={child.tool_call} output={child.output} />;
+                                    case 'supervisor_step': return <SupervisorCard evaluation={child.evaluation} />;
+                                    case 'editor_report': return <EditorReportCard report={child.report} />;
+                                    case 'board_decision': return <BoardDecisionCard decision={child.decision} />;
+                                    case 'direct_answer': return <DirectAnswerCard answer={child.content} />;
+                                    case 'final_answer': return <FinalAnswerCard answer={child.content} />;
+                                    default: return null;
+                                }
+                            };
+
                             return (
                                 <div key={index} class="relative mt-6 pl-8">
                                     <div class="absolute top-5 left-4 h-[calc(100%-2.5rem)] w-px bg-border" />
                                     <div class="space-y-4">
-                                    {item.children.map((child, childIndex) => (
-                                        <div key={childIndex} class="relative">
-                                            <div class={`absolute top-6 -left-4 h-px ${child.type === 'execution_plan' ? 'w-8' : 'w-4'} bg-border`} />
-                                            {(() => {
-                                                switch (child.type) {
-                                                    case 'architect_plan': return <ArchitectCard plan={child.steps} isAwaitingApproval={child.isAwaitingApproval} onModify={handleModifyAndApprove} onReject={() => handlePlanApprovalAction('reject')} availableTools={settings.availableTools}/>;
-                                                    case 'board_approval': return <BoardApprovalCard experts={child.experts} onApproval={handleBoardApprovalAction} />;
-                                                    case 'chair_plan': return <ChairPlanCard plan={child.plan} />;
-                                                    case 'expert_critique': return <ExpertCritiqueCard critique={child.critique} />;
-                                                    case 'final_plan_approval': return <FinalPlanApprovalCard plan={child.plan} critiques={child.critiques} onModify={(plan) => handleFinalPlanApprovalAction(true, plan)} onReject={() => handleFinalPlanApprovalAction(false)} />;
-                                                    case 'foreman_step': return <ForemanCard step={child.step} />;
-                                                    case 'worker_step': return <WorkerCard toolCall={child.tool_call} output={child.output} />;
-                                                    case 'supervisor_step': return <SupervisorCard evaluation={child.evaluation} />;
-                                                    // --- NEW: Render the checkpoint cards ---
-                                                    case 'editor_report': return <EditorReportCard report={child.report} />;
-                                                    case 'board_decision': return <BoardDecisionCard decision={child.decision} />;
-                                                    case 'direct_answer': return <DirectAnswerCard answer={child.content} />;
-                                                    case 'final_answer': return <FinalAnswerCard answer={child.content} />;
-                                                    default: return null;
-                                                }
-                                            })()}
-                                        </div>
-                                    ))}
+                                        {otherCards.map(renderCard)}
+                                        {executionCards.length > 0 && (
+                                            <div class="execution-block space-y-4">
+                                                {executionCards.map(renderCard)}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             );

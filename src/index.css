@@ -29,7 +29,6 @@
 }
 
 @layer base {
-  /* --- MODIFIED: The incorrect @apply rule has been removed --- */
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
@@ -57,4 +56,9 @@ html, body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground));
+}
+
+/* --- NEW: Indentation style for execution blocks --- */
+.execution-block {
+  @apply ml-4 pl-4 border-l-2 border-border/50;
 }
