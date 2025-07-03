@@ -1,20 +1,25 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Prompts (Phase 17 - Intelligent Architect FIX)
+# ResearchAgent Prompts (Phase 17 - Intelligent Architect Logic)
 #
-# This version adds the new, sophisticated prompt for the Chief Architect
-# node, which was missing and causing an ImportError.
+# This version significantly enhances the `chief_architect_prompt_template`
+# to guide the LLM towards more efficient and robust planning.
 #
 # Key Additions:
-# 1. chief_architect_prompt_template: A new prompt that instructs the LLM
-#    to act as an expert architect. It is given a single strategic goal,
-#    the full strategic plan for context, the history of previous steps,
-#    and a list of available tools. Its task is to generate a detailed,
-#    step-by-step tactical plan of specific tool calls to achieve the goal.
+# 1. Efficiency Principle: A core new rule is added, instructing the
+#    Architect to solve the goal in the "fewest, most robust tactical steps
+#    possible."
+# 2. Preference for Scripts: The prompt now explicitly tells the Architect
+#    to **prefer writing a single, complete Python script** with the
+#    `write_file` tool for any complex logic, rather than using many small
+#    `workspace_shell` commands. This is the key to fixing the granularity
+#    issue.
+# 3. Updated Example: The example in the prompt is updated to reflect this
+#    new, more intelligent script-based approach.
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
 
-# --- NEW: Chief Architect Prompt ---
+# --- NEW: Enhanced Chief Architect Prompt ---
 chief_architect_prompt_template = PromptTemplate.from_template(
 """
 You are the Chief Architect of an AI-powered research team. You are a master of breaking down high-level goals into detailed, step-by-step plans of tool calls.
@@ -38,36 +43,35 @@ Your job is to take a single high-level strategic goal and expand it into a deta
     {tools}
     ```
 
-**Instructions:**
-1.  **Analyze the Goal:** Carefully read the `Current Strategic Goal` in the context of the `Overall Strategic Plan` and the `History of Completed Steps`.
-2.  **Create a Tactical Plan:** Generate a list of precise, sequential tool calls that will achieve the goal.
+**CRITICAL Instructions:**
+1.  **Efficiency Principle:** Your primary goal is to solve the strategic step in the **fewest, most robust tactical steps possible**.
+2.  **Prefer Scripts Over Commands:** For any task involving data manipulation, calculations, or complex logic, you should **always prefer to write a complete Python script using the `write_file` tool** and then execute it with a single `workspace_shell` command. This is more efficient and reliable than a long series of individual commands.
 3.  **Use the Right Tools:** Select the most appropriate tool for each step from the `Available Tools` list.
 4.  **Data Piping:** If a step needs to use the output from a previous tactical step, you MUST use the special placeholder string `{{step_N_output}}` as a value in your `tool_input`, where `N` is the `step_id` of the step that produces the required output.
-5.  **Be Precise and Atomic:** Each step should be a single, clear action. Do not combine multiple actions into one step.
-6.  **Output Format:** Your final output must be a single, valid JSON object conforming to the `TacticalPlan` schema, containing a "steps" key.
+5.  **Output Format:** Your final output must be a single, valid JSON object conforming to the `TacticalPlan` schema, containing a "steps" key.
 
 ---
-**Example:**
-*Strategic Goal:* "Create a Python script to install pandas and print its version."
+**Example of the CORRECT, script-based approach:**
+*Strategic Goal:* "For the files 'set1.txt' and 'set2.txt', calculate the mean and standard deviation for each, then write a summary."
 *Correct Output:*
 ```json
 {{
   "steps": [
     {{
       "step_id": 1,
-      "instruction": "Create a Python script named 'install_and_verify.py' that will install pandas and then print its version.",
+      "instruction": "Create a Python script to read 'set1.txt' and 'set2.txt', calculate the mean and standard deviation for each file's contents, and print the results in a formatted summary.",
       "tool_name": "write_file",
       "tool_input": {{
-        "file": "install_and_verify.py",
-        "content": "import subprocess\\nsubprocess.run(['pip', 'install', 'pandas'], check=True)\\nimport pandas as pd\\nprint(f'Pandas version: {{pd.__version__}}')"
+        "file": "analyze_sets.py",
+        "content": "import numpy as np\\n\\ndef analyze_file(filename):\\n    try:\\n        data = np.loadtxt(filename)\\n        mean = np.mean(data)\\n        std = np.std(data)\\n        print(f'Results for {{filename}}:')\\n        print(f'  Mean: {{mean:.2f}}')\\n        print(f'  Standard Deviation: {{std:.2f}}\\n')\\n    except Exception as e:\\n        print(f'Error processing {{filename}}: {{e}}')\\n\\nanalyze_file('set1.txt')\\nanalyze_file('set2.txt')"
       }}
     }},
     {{
       "step_id": 2,
-      "instruction": "Execute the 'install_and_verify.py' script to perform the installation and confirm the version.",
+      "instruction": "Execute the analysis script.",
       "tool_name": "workspace_shell",
       "tool_input": {{
-        "command": "python install_and_verify.py"
+        "command": "python analyze_sets.py"
       }}
     }}
   ]
@@ -124,7 +128,7 @@ The summary must capture all critical information, including:
 - The outcomes of any tools that were used.
 - Any specific data points, figures, or names that were part of the conversation.
 
-The goal is to produce a summary that is dense with information, so a new AI agent can read it and have all the necessary context to continue the conversation without having to access to the full history.
+The goal is to produce a summary that is dense with information, so a new AI agent can read it and have all the necessary context to continue the conversation without having access to the full history.
 
 Conversation to Summarize:
 ---
