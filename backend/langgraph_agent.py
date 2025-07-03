@@ -1,18 +1,21 @@
 # backend/langgraph_agent.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 17 - Supervisor Node Test)
+# ResearchAgent Core Agent (Phase 17 - Tactical Loop)
 #
-# This version introduces the final placeholder node, 'project_supervisor_node',
-# into the execution flow, following the 'worker_node'.
+# This version implements the full tactical execution loop, replacing the
+# static, sequential placeholder chain.
 #
 # Key Architectural Changes:
-# 1. project_supervisor_node Added: A new placeholder function for the
-#    supervisor is now in the graph. It receives the worker's output, logs
-#    its action, and returns a hardcoded success evaluation.
-# 2. Graph Edges Updated: The graph is re-wired to flow from the
-#    'worker_node' to the 'project_supervisor_node', and then from there
-#    to the 'Editor'. This completes the full placeholder sequence:
-#    A -> F -> W -> S -> E.
+# 1. State Management: A `tactical_step_index` is added to the GraphState
+#    to track the current execution step.
+# 2. Incrementer Node: A new `increment_tactical_step_node` is added to
+#    advance the loop counter.
+# 3. Tactical Router: A new conditional edge, `tactical_step_router`, is
+#    introduced. After a step is evaluated by the supervisor, this router
+#    checks if more steps remain in the tactical plan.
+# 4. Looping Logic: If more steps exist, the router directs the graph back
+#    to the `site_foreman_node` to process the next step. If the plan is
+#    complete, it routes to the `Editor` to conclude the task.
 # -----------------------------------------------------------------------------
 
 import os
@@ -115,8 +118,9 @@ class GraphState(TypedDict):
     tactical_plan: Optional[List[dict]]
     current_tactical_step: Optional[dict]
     worker_output: Optional[str]
-    # --- NEW: State for the Supervisor ---
     step_evaluation: Optional[dict]
+    # --- NEW: State for the tactical loop ---
+    tactical_step_index: int
 
 
 # --- Prompts ---
@@ -245,7 +249,8 @@ async def task_setup_node(state: GraphState):
         "memory_vault": {}, "enabled_tools": state.get("enabled_tools"), "proposed_experts": None,
         "board_approved": None, "approved_experts": None, "initial_plan": None,
         "critiques": [], "refined_plan": None, "strategic_plan": None, "expert_critique_index": 0,
-        "tactical_plan": None, "current_tactical_step": None, "worker_output": None, "step_evaluation": None
+        "tactical_plan": None, "current_tactical_step": None, "worker_output": None, "step_evaluation": None,
+        "tactical_step_index": 0
     }
 
 def memory_updater_node(state: GraphState):
@@ -371,9 +376,12 @@ def chief_architect_node(state: GraphState):
 
 def site_foreman_node(state: GraphState):
     """A placeholder node for the Site Foreman."""
-    logger.info(f"--- (EXEC) Task '{state.get('task_id')}': Site Foreman is preparing a step. ---")
+    step_index = state.get("tactical_step_index", 0)
+    logger.info(f"--- (EXEC) Task '{state.get('task_id')}': Site Foreman is preparing step {step_index}. ---")
     tactical_plan = state.get("tactical_plan", [])
-    return {"current_tactical_step": tactical_plan[0] if tactical_plan else None}
+    if step_index < len(tactical_plan):
+        return {"current_tactical_step": tactical_plan[step_index]}
+    return {"current_tactical_step": None}
 
 def worker_node(state: GraphState):
     """A placeholder node for the Worker."""
@@ -389,11 +397,17 @@ def project_supervisor_node(state: GraphState):
         "status": "success",
         "reasoning": "Placeholder evaluation: The worker's output appears to be correct and complete."
     }
-    return {"step_evaluation": evaluation, "answer": "The agent has finished the simplified execution."}
+    return {"step_evaluation": evaluation}
+
+def increment_tactical_step_node(state: GraphState):
+    """Increments the tactical step index."""
+    logger.info("--- (EXEC) Incrementing tactical step index. ---")
+    step_index = state.get("tactical_step_index", 0)
+    return {"tactical_step_index": step_index + 1}
 
 def editor_node(state: GraphState):
     logger.info(f"Task '{state.get('task_id')}': Reached Editor node for final summary.")
-    final_answer = state.get("answer", "The task has concluded.")
+    final_answer = "The agent has successfully completed the execution of the tactical plan."
     return {"answer": final_answer}
 
 # --- Conditional Routers ---
@@ -429,6 +443,19 @@ def after_final_plan_approval_router(state: GraphState) -> str:
         logger.info("--- Final plan rejected by user. Ending task. ---")
         return "end_task"
 
+def tactical_step_router(state: GraphState) -> str:
+    """Routes the execution to the next tactical step or finishes."""
+    logger.info("--- (EXEC) Routing tactical step. ---")
+    tactical_plan = state.get("tactical_plan", [])
+    step_index = state.get("tactical_step_index", 0)
+
+    if step_index < len(tactical_plan):
+        logger.info(f"More tactical steps remaining. Looping back to Foreman for step {step_index}.")
+        return "continue"
+    else:
+        logger.info("Tactical plan complete. Finishing execution.")
+        return "finish"
+
 # --- Graph Definition ---
 def create_agent_graph():
     workflow = StateGraph(GraphState)
@@ -448,8 +475,9 @@ def create_agent_graph():
     workflow.add_node("chief_architect_node", chief_architect_node)
     workflow.add_node("site_foreman_node", site_foreman_node)
     workflow.add_node("worker_node", worker_node)
-    # --- NEW: Add the supervisor node ---
     workflow.add_node("project_supervisor_node", project_supervisor_node)
+    # --- NEW: Add the incrementer node ---
+    workflow.add_node("increment_tactical_step_node", increment_tactical_step_node)
     
     workflow.set_entry_point("Task_Setup")
     workflow.add_edge("Task_Setup", "Memory_Updater")
@@ -468,11 +496,19 @@ def create_agent_graph():
         "end_task": "Editor"
     })
     
-    # --- NEW: Update graph flow ---
+    # --- Execution Loop Wiring ---
     workflow.add_edge("chief_architect_node", "site_foreman_node")
     workflow.add_edge("site_foreman_node", "worker_node")
     workflow.add_edge("worker_node", "project_supervisor_node")
-    workflow.add_edge("project_supervisor_node", "Editor")
+    workflow.add_edge("project_supervisor_node", "increment_tactical_step_node")
+    workflow.add_conditional_edges(
+        "increment_tactical_step_node",
+        tactical_step_router,
+        {
+            "continue": "site_foreman_node",
+            "finish": "Editor"
+        }
+    )
 
     workflow.add_edge("Editor", END)
     
@@ -484,7 +520,7 @@ def create_agent_graph():
             "human_in_the_loop_final_plan_approval",
         ]
     )
-    logger.info("ResearchAgent graph compiled with Supervisor -> Editor flow.")
+    logger.info("ResearchAgent graph compiled with tactical execution loop.")
     return agent
 
 agent_graph = create_agent_graph()
