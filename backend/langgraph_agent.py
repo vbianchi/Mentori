@@ -1,21 +1,16 @@
 # backend/langgraph_agent.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 17 - Pydantic Validation FIX)
+# ResearchAgent Core Agent (Phase 17 - Prompt Refactor)
 #
-# This version fixes a Pydantic validation error that occurred when the LLM
-# returned the `tool_input` as a JSON string instead of a JSON object.
+# This version cleans up the file by removing the local prompt definitions
+# that have been centralized into `backend/prompts.py`. The agent now relies
+# exclusively on importing its prompts.
 #
 # Key Architectural Fix:
-# 1. TacticalStep Model Updated: The `tool_input` field in the `TacticalStep`
-#    Pydantic model is changed from `Dict[str, Any]` to
-#    `Union[Dict[str, Any], str]`. This makes the model more flexible,
-#    allowing it to accept either a dictionary or a raw string without failing
-#    validation.
-# 2. Data Cleaning Logic: In the `chief_architect_node`, after the LLM call,
-#    a new data sanitization loop is added. This loop iterates through the
-#    generated steps and checks if any `tool_input` is a string. If it is,
-#    it attempts to parse it into a dictionary using `json.loads()`. This
-#    makes the agent resilient to common LLM formatting inconsistencies.
+# 1. Redundant Prompts Removed: All `PromptTemplate` definitions have been
+#    removed from this file.
+# 2. Clean Imports: The file now correctly imports all necessary prompts
+#    from the `prompts` module, enforcing a clean separation of concerns.
 # -----------------------------------------------------------------------------
 
 import os
@@ -46,7 +41,11 @@ from .prompts import (
     correction_planner_prompt_template,
     summarizer_prompt_template,
     memory_updater_prompt_template,
-    chief_architect_prompt_template
+    chief_architect_prompt_template,
+    propose_experts_prompt_template,
+    chair_initial_plan_prompt_template,
+    expert_critique_prompt_template,
+    chair_final_review_prompt_template
 )
 
 # --- Logging Setup ---
@@ -90,7 +89,6 @@ class TacticalStep(BaseModel):
     step_id: int = Field(description="A unique identifier for this step within the tactical plan.")
     instruction: str = Field(description="The detailed, specific instruction for this tool call.")
     tool_name: str = Field(description="The name of the tool to be used for this step.")
-    # --- FIX: Allow tool_input to be a string to handle LLM formatting errors ---
     tool_input: Union[Dict[str, Any], str] = Field(description="The dictionary of arguments to be passed to the tool.")
 
 class TacticalPlan(BaseModel):
@@ -137,80 +135,6 @@ class GraphState(TypedDict):
     checkpoint_report: Optional[str]
     board_decision: Optional[str]
 
-
-# --- Prompts ---
-propose_experts_prompt_template = PromptTemplate.from_template(
-"""You are a master project manager. Based on the user's request, your job is to assemble a small, elite "Board of Experts" to oversee the project.
-**User Request:**
-{user_request}
-**Instructions:**
-1. Analyze the user's request to understand the core domains of expertise required.
-2. Propose a board of 3 to 4 diverse and relevant expert personas.
-3. For each expert, provide a clear title and a concise summary of their essential qualities.
-4. Return the board as a structured JSON object."""
-)
-
-chair_initial_plan_prompt_template = PromptTemplate.from_template(
-"""You are the Chair of a Board of Experts. Your role is to create a high-level, strategic plan to address the user's request. You must consider the expertise of your board members.
-
-**User's Request:**
-{user_request}
-
-**Your Approved Board of Experts:**
-{experts}
-
-**Available Tools:**
-{tools}
-
-**Instructions:**
-1. Create a step-by-step plan to fulfill the user's request.
-2. The plan should be strategic and high-level. The "Company Model" will handle the low-level execution details.
-3. Incorporate at least one `checkpoint` step at a logical point for the board to review progress before proceeding.
-4. Your output must be a valid JSON object conforming to the "Plan" schema, containing a "plan" key.
-"""
-)
-
-expert_critique_prompt_template = PromptTemplate.from_template(
-"""You are a world-class expert with a specific persona. Your task is to critique a proposed plan and improve it.
-**Your Expert Persona:**
-{expert_persona}
-
-**The Original User Request:**
-{user_request}
-
-**The Current Plan (Draft):**
-{current_plan}
-
-**Instructions:**
-1.  Review the `Current Plan` from the perspective of your `Expert Persona`.
-2.  Identify weaknesses, missing steps, or potential improvements. Can you make it more efficient, robust, or secure?
-3.  Provide a concise, constructive `critique` explaining your reasoning.
-4.  Create an `updated_plan` that incorporates your suggestions. You MUST return the *entire* plan, not just the changes.
-5.  If the plan is already perfect from your perspective, state that in the critique and return the original plan unchanged.
-6.  Your final output MUST be a single, valid JSON object that conforms to the `CritiqueAndPlan` schema.
-"""
-)
-
-chair_final_review_prompt_template = PromptTemplate.from_template(
-"""You are the Chair of the Board of Experts. Your team of specialists has finished their sequential review of the initial plan.
-Your final responsibility is to perform a sanity check and produce the definitive, final version of the plan for user approval.
-
-**The Original User Request:**
-{user_request}
-
-**The Full History of Board Critiques:**
-{critiques}
-
-**The Sequentially Refined Plan (after the last expert's review):**
-{refined_plan}
-
-**Your Task:**
-1.  Review the `Sequentially Refined Plan` and ensure it is coherent and logically sound after all the modifications.
-2.  Read through the `Board Critiques` to ensure the spirit of all the experts' suggestions has been incorporated.
-3.  **Perform one final check:** Are there any other logical places to insert a `checkpoint`? A checkpoint is wise after a major data analysis step or before a step that generates a critical final output.
-4.  Return the final, validated plan. Your output must be a single, valid JSON object conforming to the `Plan` schema.
-"""
-)
 
 # --- Helper Functions ---
 LLM_CACHE = {}
@@ -407,23 +331,18 @@ def chief_architect_node(state: GraphState):
     try:
         response = structured_llm.invoke(prompt)
         
-        # --- FIX: Sanitize the tool_input field ---
         sanitized_steps = []
         for step in response.steps:
             if isinstance(step.tool_input, str):
                 try:
-                    # Attempt to parse the string into a dictionary
                     step.tool_input = json.loads(step.tool_input)
                 except json.JSONDecodeError:
-                    # If it fails, it might be a simple string argument for a tool
-                    # like web_search. We'll wrap it in the expected dict format.
                     logger.warning(f"Could not parse tool_input '{step.tool_input}' as JSON. Wrapping it for the tool.")
-                    # Heuristic: assume the string is the value for a common key like 'query' or 'command'
                     if step.tool_name == "web_search":
                         step.tool_input = {"query": step.tool_input}
                     elif step.tool_name == "workspace_shell":
                          step.tool_input = {"command": step.tool_input}
-                    else: # Fallback for other tools
+                    else:
                         step.tool_input = {"input": step.tool_input}
 
             sanitized_steps.append(step.dict())
