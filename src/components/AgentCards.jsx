@@ -276,7 +276,6 @@ export const ForemanCard = ({ step }) => (
     </AgentResponseCard>
 );
 
-// --- NEW: Worker Card Component ---
 export const WorkerCard = ({ toolCall, output }) => (
     <AgentResponseCard icon={<WorkerIcon class="h-5 w-5" />} title="The Worker" color="blue">
         <p class="text-sm text-gray-400 mb-2">Executed tool <code class="bg-gray-700 text-blue-300 text-xs font-mono px-1.5 py-0.5 rounded">{toolCall?.tool_name}</code> and received the following output:</p>
@@ -285,6 +284,28 @@ export const WorkerCard = ({ toolCall, output }) => (
         </pre>
     </AgentResponseCard>
 );
+
+// --- NEW: Supervisor Card Component ---
+export const SupervisorCard = ({ evaluation }) => {
+    const isSuccess = evaluation?.status === 'success';
+    const color = isSuccess ? 'green' : 'red';
+    const icon = isSuccess ? <CheckCircleIcon class="h-5 w-5" /> : <XCircleIcon class="h-5 w-5" />;
+
+    return (
+        <AgentResponseCard icon={<SupervisorIcon class="h-5 w-5" />} title="The Project Supervisor" color={color}>
+            <p class="text-sm text-gray-400 mb-2">Evaluated the previous step with the following result:</p>
+            <div class={`p-3 bg-gray-900/50 rounded-lg border border-${color}-700/50`}>
+                <div class="flex items-center gap-2 font-semibold mb-1">
+                    {icon}
+                    <span class={`text-${color}-400`}>Status: {evaluation?.status || 'Unknown'}</span>
+                </div>
+                <p class="text-xs text-gray-300 whitespace-pre-wrap font-mono pl-7">
+                    {evaluation?.reasoning || "No reasoning provided."}
+                </p>
+            </div>
+        </AgentResponseCard>
+    );
+};
 
 
 export const SiteForemanCard = ({ plan }) => (

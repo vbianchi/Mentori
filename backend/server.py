@@ -1,15 +1,15 @@
 # backend/server.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 17 - Worker Node Test)
+# ResearchAgent Backend Server (Phase 17 - Supervisor Node Test)
 #
 # This version adds the necessary components to handle the new
-# 'worker_node' and broadcast its actions to the UI.
+# 'project_supervisor_node' and broadcast its actions to the UI.
 #
 # Key Architectural Changes:
-# 1. New Event Handler: A check for the end of 'worker_node' is
+# 1. New Event Handler: A check for the end of 'project_supervisor_node' is
 #    added to the agent wrapper. When this occurs, it broadcasts a new
-#    'worker_step_executed' event to the frontend.
-# 2. Node Mapping Updated: The 'worker_node' is added to the
+#    'supervisor_step_evaluated' event to the frontend.
+# 2. Node Mapping Updated: The 'project_supervisor_node' is added to the
 #    NODE_NAME_MAPPING to provide a user-friendly name for live status updates.
 # -----------------------------------------------------------------------------
 
@@ -423,8 +423,9 @@ NODE_NAME_MAPPING = {
     "Editor": "Editor",
     "chief_architect_node": "The Chief Architect is planning",
     "site_foreman_node": "The Foreman is preparing a tool call",
-    # --- NEW: Add the worker mapping ---
-    "worker_node": "The Worker is executing the tool"
+    "worker_node": "The Worker is executing the tool",
+    # --- NEW: Add the supervisor mapping ---
+    "project_supervisor_node": "The Supervisor is evaluating the results"
 }
 BROADCAST_NODES = set(NODE_NAME_MAPPING.keys())
 
@@ -477,7 +478,6 @@ async def agent_execution_wrapper(input_state, config):
                     "task_id": task_id
                 })
 
-            # --- NEW: Add the worker event handler ---
             if event_type == "on_chain_end" and node_name == "worker_node":
                 output = event["data"]["output"]
                 worker_output = output.get("worker_output")
@@ -487,6 +487,17 @@ async def agent_execution_wrapper(input_state, config):
                     "type": "worker_step_executed",
                     "tool_call": tool_call,
                     "output": worker_output,
+                    "task_id": task_id
+                })
+
+            # --- NEW: Add the supervisor event handler ---
+            if event_type == "on_chain_end" and node_name == "project_supervisor_node":
+                output = event["data"]["output"]
+                evaluation = output.get("step_evaluation")
+                logger.info(f"Broadcasting supervisor_step_evaluated for task '{task_id}'")
+                await broadcast_event({
+                    "type": "supervisor_step_evaluated",
+                    "evaluation": evaluation,
                     "task_id": task_id
                 })
 
@@ -630,7 +641,7 @@ async def main():
     try:
         logger.info(f"Attempting to start WebSocket server on {host}:{port}")
         async with websockets.serve(message_router, host, port):
-            logger.info("ResearchAgent WebSocket server is running with Worker -> Editor flow.")
+            logger.info("ResearchAgent WebSocket server is running with Supervisor -> Editor flow.")
             await asyncio.Future()
     except Exception as e:
         logger.error(f"!!! FAILED TO START WEBSOCKET SERVER: {e} !!!", exc_info=True)

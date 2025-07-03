@@ -1,18 +1,18 @@
 # backend/langgraph_agent.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 17 - Worker Node Test)
+# ResearchAgent Core Agent (Phase 17 - Supervisor Node Test)
 #
-# This version introduces the placeholder 'worker_node' into the
-# execution flow, following the 'site_foreman_node'.
+# This version introduces the final placeholder node, 'project_supervisor_node',
+# into the execution flow, following the 'worker_node'.
 #
 # Key Architectural Changes:
-# 1. worker_node Added: A new placeholder function for the worker is now in
-#    the graph. It receives the step from the foreman, logs its action,
-#    and returns a hardcoded success message.
+# 1. project_supervisor_node Added: A new placeholder function for the
+#    supervisor is now in the graph. It receives the worker's output, logs
+#    its action, and returns a hardcoded success evaluation.
 # 2. Graph Edges Updated: The graph is re-wired to flow from the
-#    'site_foreman_node' to the 'worker_node', and then from the
-#    'worker_node' to the 'Editor'. This creates a clear,
-#    sequential A -> F -> W -> E path for testing the UI cards.
+#    'worker_node' to the 'project_supervisor_node', and then from there
+#    to the 'Editor'. This completes the full placeholder sequence:
+#    A -> F -> W -> S -> E.
 # -----------------------------------------------------------------------------
 
 import os
@@ -114,8 +114,9 @@ class GraphState(TypedDict):
     strategic_plan: Optional[List[dict]]
     tactical_plan: Optional[List[dict]]
     current_tactical_step: Optional[dict]
-    # --- NEW: State for the Worker ---
     worker_output: Optional[str]
+    # --- NEW: State for the Supervisor ---
+    step_evaluation: Optional[dict]
 
 
 # --- Prompts ---
@@ -244,7 +245,7 @@ async def task_setup_node(state: GraphState):
         "memory_vault": {}, "enabled_tools": state.get("enabled_tools"), "proposed_experts": None,
         "board_approved": None, "approved_experts": None, "initial_plan": None,
         "critiques": [], "refined_plan": None, "strategic_plan": None, "expert_critique_index": 0,
-        "tactical_plan": None, "current_tactical_step": None, "worker_output": None,
+        "tactical_plan": None, "current_tactical_step": None, "worker_output": None, "step_evaluation": None
     }
 
 def memory_updater_node(state: GraphState):
@@ -378,10 +379,17 @@ def worker_node(state: GraphState):
     """A placeholder node for the Worker."""
     logger.info(f"--- (EXEC) Task '{state.get('task_id')}': Worker is executing a tool. ---")
     tool_call = state.get("current_tactical_step", {})
-    # In a real scenario, this would use the tool_executor.
-    # For now, we just return a hardcoded success message.
     output = f"Successfully executed tool '{tool_call.get('tool_name')}'."
-    return {"worker_output": output, "answer": "The agent has finished the simplified execution."}
+    return {"worker_output": output}
+
+def project_supervisor_node(state: GraphState):
+    """A placeholder node for the Project Supervisor."""
+    logger.info(f"--- (EXEC) Task '{state.get('task_id')}': Supervisor is evaluating the result. ---")
+    evaluation = {
+        "status": "success",
+        "reasoning": "Placeholder evaluation: The worker's output appears to be correct and complete."
+    }
+    return {"step_evaluation": evaluation, "answer": "The agent has finished the simplified execution."}
 
 def editor_node(state: GraphState):
     logger.info(f"Task '{state.get('task_id')}': Reached Editor node for final summary.")
@@ -439,8 +447,9 @@ def create_agent_graph():
     workflow.add_node("human_in_the_loop_final_plan_approval", human_in_the_loop_final_plan_approval)
     workflow.add_node("chief_architect_node", chief_architect_node)
     workflow.add_node("site_foreman_node", site_foreman_node)
-    # --- NEW: Add the worker node ---
     workflow.add_node("worker_node", worker_node)
+    # --- NEW: Add the supervisor node ---
+    workflow.add_node("project_supervisor_node", project_supervisor_node)
     
     workflow.set_entry_point("Task_Setup")
     workflow.add_edge("Task_Setup", "Memory_Updater")
@@ -462,7 +471,8 @@ def create_agent_graph():
     # --- NEW: Update graph flow ---
     workflow.add_edge("chief_architect_node", "site_foreman_node")
     workflow.add_edge("site_foreman_node", "worker_node")
-    workflow.add_edge("worker_node", "Editor")
+    workflow.add_edge("worker_node", "project_supervisor_node")
+    workflow.add_edge("project_supervisor_node", "Editor")
 
     workflow.add_edge("Editor", END)
     
@@ -474,7 +484,7 @@ def create_agent_graph():
             "human_in_the_loop_final_plan_approval",
         ]
     )
-    logger.info("ResearchAgent graph compiled with Worker -> Editor flow.")
+    logger.info("ResearchAgent graph compiled with Supervisor -> Editor flow.")
     return agent
 
 agent_graph = create_agent_graph()

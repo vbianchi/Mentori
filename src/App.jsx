@@ -2,8 +2,8 @@
 import { h } from 'preact';
 import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
 import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, FolderIcon, ArrowLeftIcon, UploadCloudIcon, StopCircleIcon, BriefcaseIcon, SendToChatIcon, FileTextIcon, BoardIcon, CheckIcon, XCircleIcon, ChairIcon, CritiqueIcon } from './components/Icons';
-// --- NEW: Import the WorkerCard ---
-import { FinalPlanApprovalCard, ExpertCritiqueCard, ArchitectCard, BoardApprovalCard, ChairPlanCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard, ExecutionStepCard, WorkCard, ForemanCard, WorkerCard } from './components/AgentCards';
+// --- NEW: Import the SupervisorCard ---
+import { FinalPlanApprovalCard, ExpertCritiqueCard, ArchitectCard, BoardApprovalCard, ChairPlanCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard, ExecutionStepCard, WorkCard, ForemanCard, WorkerCard, SupervisorCard } from './components/AgentCards';
 import { ToggleButton, CopyButton } from './components/Common';
 import { useTasks } from './hooks/useTasks';
 import { useWorkspace } from './hooks/useWorkspace';
@@ -178,9 +178,11 @@ export function App() {
                     runContainer.children.push({ type: 'architect_plan', steps: event.plan, isAwaitingApproval: false });
                 } else if (eventType === 'foreman_step_prepared') {
                     runContainer.children.push({ type: 'foreman_step', step: event.step });
-                // --- NEW: Handle the worker event ---
                 } else if (eventType === 'worker_step_executed') {
                     runContainer.children.push({ type: 'worker_step', tool_call: event.tool_call, output: event.output });
+                // --- NEW: Handle the supervisor event ---
+                } else if (eventType === 'supervisor_step_evaluated') {
+                    runContainer.children.push({ type: 'supervisor_step', evaluation: event.evaluation });
                 } else if (eventType === 'direct_answer' || eventType === 'final_answer') {
                     runContainer.children.push({ type: eventType, content: event.data });
                     runContainer.isComplete = true;
@@ -355,8 +357,9 @@ export function App() {
                                                     case 'expert_critique': return <ExpertCritiqueCard critique={child.critique} />;
                                                     case 'final_plan_approval': return <FinalPlanApprovalCard plan={child.plan} critiques={child.critiques} onModify={(plan) => handleFinalPlanApprovalAction(true, plan)} onReject={() => handleFinalPlanApprovalAction(false)} />;
                                                     case 'foreman_step': return <ForemanCard step={child.step} />;
-                                                    // --- NEW: Render the WorkerCard ---
                                                     case 'worker_step': return <WorkerCard toolCall={child.tool_call} output={child.output} />;
+                                                    // --- NEW: Render the SupervisorCard ---
+                                                    case 'supervisor_step': return <SupervisorCard evaluation={child.evaluation} />;
                                                     case 'direct_answer': return <DirectAnswerCard answer={child.content} />;
                                                     case 'final_answer': return <FinalAnswerCard answer={child.content} />;
                                                     default: return null;
