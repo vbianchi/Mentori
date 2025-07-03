@@ -1,16 +1,19 @@
 # backend/server.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 17 - Supervisor Node Test)
+# ResearchAgent Backend Server (Phase 17 - Checkpoint UI)
 #
-# This version adds the necessary components to handle the new
-# 'project_supervisor_node' and broadcast its actions to the UI.
+# This version adds the specific event handlers needed to render the UI cards
+# for the autonomous checkpoint review cycle.
 #
 # Key Architectural Changes:
-# 1. New Event Handler: A check for the end of 'project_supervisor_node' is
-#    added to the agent wrapper. When this occurs, it broadcasts a new
-#    'supervisor_step_evaluated' event to the frontend.
-# 2. Node Mapping Updated: The 'project_supervisor_node' is added to the
-#    NODE_NAME_MAPPING to provide a user-friendly name for live status updates.
+# 1. New Event Handlers: Two new `on_chain_end` handlers are added to the
+#    `agent_execution_wrapper`:
+#    - One for `editor_checkpoint_report_node` which broadcasts an
+#      `editor_report_generated` event.
+#    - One for `board_checkpoint_review_node` which broadcasts a
+#      `board_decision_made` event.
+# 2. Node Mappings Updated: The new checkpoint nodes are added to the
+#    `NODE_NAME_MAPPING` for clear live status updates in the UI.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -424,8 +427,10 @@ NODE_NAME_MAPPING = {
     "chief_architect_node": "The Chief Architect is planning",
     "site_foreman_node": "The Foreman is preparing a tool call",
     "worker_node": "The Worker is executing the tool",
-    # --- NEW: Add the supervisor mapping ---
-    "project_supervisor_node": "The Supervisor is evaluating the results"
+    "project_supervisor_node": "The Supervisor is evaluating the results",
+    # --- NEW: Add the checkpoint node mappings ---
+    "editor_checkpoint_report_node": "The Editor is compiling a report for the Board",
+    "board_checkpoint_review_node": "The Board is reviewing progress"
 }
 BROADCAST_NODES = set(NODE_NAME_MAPPING.keys())
 
@@ -490,7 +495,6 @@ async def agent_execution_wrapper(input_state, config):
                     "task_id": task_id
                 })
 
-            # --- NEW: Add the supervisor event handler ---
             if event_type == "on_chain_end" and node_name == "project_supervisor_node":
                 output = event["data"]["output"]
                 evaluation = output.get("step_evaluation")
@@ -500,6 +504,28 @@ async def agent_execution_wrapper(input_state, config):
                     "evaluation": evaluation,
                     "task_id": task_id
                 })
+            
+            # --- NEW: Add the checkpoint event handlers ---
+            if event_type == "on_chain_end" and node_name == "editor_checkpoint_report_node":
+                output = event["data"]["output"]
+                report = output.get("checkpoint_report")
+                logger.info(f"Broadcasting editor_report_generated for task '{task_id}'")
+                await broadcast_event({
+                    "type": "editor_report_generated",
+                    "report": report,
+                    "task_id": task_id
+                })
+            
+            if event_type == "on_chain_end" and node_name == "board_checkpoint_review_node":
+                output = event["data"]["output"]
+                decision = output.get("board_decision")
+                logger.info(f"Broadcasting board_decision_made for task '{task_id}'")
+                await broadcast_event({
+                    "type": "board_decision_made",
+                    "decision": decision,
+                    "task_id": task_id
+                })
+
 
         current_state = agent_graph.get_state(config)
         

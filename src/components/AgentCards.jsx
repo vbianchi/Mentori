@@ -285,7 +285,6 @@ export const WorkerCard = ({ toolCall, output }) => (
     </AgentResponseCard>
 );
 
-// --- NEW: Supervisor Card Component ---
 export const SupervisorCard = ({ evaluation }) => {
     const isSuccess = evaluation?.status === 'success';
     const color = isSuccess ? 'green' : 'red';
@@ -306,6 +305,23 @@ export const SupervisorCard = ({ evaluation }) => {
         </AgentResponseCard>
     );
 };
+
+// --- NEW: Checkpoint Report Card ---
+export const EditorReportCard = ({ report }) => (
+    <AgentResponseCard icon={<EditorIcon class="h-5 w-5" />} title="Editor's Checkpoint Report" color="sky">
+        <p class="text-sm text-gray-300 whitespace-pre-wrap">{report}</p>
+    </AgentResponseCard>
+);
+
+// --- NEW: Board Decision Card ---
+export const BoardDecisionCard = ({ decision }) => (
+    <AgentResponseCard icon={<BoardIcon class="h-5 w-5" />} title="Board Checkpoint Review" color="rose">
+        <p class="text-sm text-gray-400 mb-2">The Board has reviewed the progress and made a decision:</p>
+        <div class="p-3 bg-gray-900/50 rounded-lg border border-gray-700/50">
+            <p class="text-white font-semibold text-center capitalize">{decision}</p>
+        </div>
+    </AgentResponseCard>
+);
 
 
 export const SiteForemanCard = ({ plan }) => (

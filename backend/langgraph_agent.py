@@ -1,21 +1,19 @@
 # backend/langgraph_agent.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 17 - Tactical Loop)
+# ResearchAgent Core Agent (Phase 17 - Checkpoint FIX)
 #
-# This version implements the full tactical execution loop, replacing the
-# static, sequential placeholder chain.
+# This version fixes a ValueError from the previous version. The error
+# occurred because a conditional edge was defined to start from a node named
+# 'master_router' which had not been explicitly added to the graph.
 #
-# Key Architectural Changes:
-# 1. State Management: A `tactical_step_index` is added to the GraphState
-#    to track the current execution step.
-# 2. Incrementer Node: A new `increment_tactical_step_node` is added to
-#    advance the loop counter.
-# 3. Tactical Router: A new conditional edge, `tactical_step_router`, is
-#    introduced. After a step is evaluated by the supervisor, this router
-#    checks if more steps remain in the tactical plan.
-# 4. Looping Logic: If more steps exist, the router directs the graph back
-#    to the `site_foreman_node` to process the next step. If the plan is
-#    complete, it routes to the `Editor` to conclude the task.
+# Key Architectural Fix:
+# 1. master_router_node Added: A new, simple node `master_router_node` has
+#    been added. Its only purpose is to act as a stable entry point and
+#    branching location for the main strategic loop.
+# 2. Graph Wiring Corrected: The conditional edge for the master router now
+#    correctly starts from the new `master_router_node`. All flows that
+#    should begin a strategic check (e.g., after plan approval or after
+#    incrementing a step) are now correctly wired to this new node.
 # -----------------------------------------------------------------------------
 
 import os
@@ -119,8 +117,10 @@ class GraphState(TypedDict):
     current_tactical_step: Optional[dict]
     worker_output: Optional[str]
     step_evaluation: Optional[dict]
-    # --- NEW: State for the tactical loop ---
     tactical_step_index: int
+    strategic_step_index: int
+    checkpoint_report: Optional[str]
+    board_decision: Optional[str]
 
 
 # --- Prompts ---
@@ -250,7 +250,7 @@ async def task_setup_node(state: GraphState):
         "board_approved": None, "approved_experts": None, "initial_plan": None,
         "critiques": [], "refined_plan": None, "strategic_plan": None, "expert_critique_index": 0,
         "tactical_plan": None, "current_tactical_step": None, "worker_output": None, "step_evaluation": None,
-        "tactical_step_index": 0
+        "tactical_step_index": 0, "strategic_step_index": 0, "checkpoint_report": None, "board_decision": None
     }
 
 def memory_updater_node(state: GraphState):
@@ -365,6 +365,11 @@ def human_in_the_loop_final_plan_approval(state: GraphState):
     logger.info(f"--- Task '{state.get('task_id')}': Paused for Final Plan Approval ---")
     return {}
 
+def master_router_node(state: GraphState) -> dict:
+    """A placeholder node that serves as a branching point for the master router."""
+    logger.info("--- (STRATEGIC) At Master Router branching point. ---")
+    return {}
+
 def chief_architect_node(state: GraphState):
     """A placeholder node for the Chief Architect."""
     logger.info(f"--- (EXEC) Task '{state.get('task_id')}': Chief Architect is creating a tactical plan. ---")
@@ -372,7 +377,7 @@ def chief_architect_node(state: GraphState):
         {"instruction": "Placeholder tactical step 1: Search for information.", "tool_name": "web_search", "tool_input": {"query": "..."}},
         {"instruction": "Placeholder tactical step 2: Write findings to a file.", "tool_name": "write_file", "tool_input": {"file": "...", "content": "..."}}
     ]
-    return {"tactical_plan": tactical_plan}
+    return {"tactical_plan": tactical_plan, "tactical_step_index": 0}
 
 def site_foreman_node(state: GraphState):
     """A placeholder node for the Site Foreman."""
@@ -405,9 +410,28 @@ def increment_tactical_step_node(state: GraphState):
     step_index = state.get("tactical_step_index", 0)
     return {"tactical_step_index": step_index + 1}
 
+def editor_checkpoint_report_node(state: GraphState):
+    """Placeholder for the Editor to generate a checkpoint report."""
+    logger.info("--- (BoE) Editor is compiling a checkpoint report. ---")
+    report = "Checkpoint reached. All steps so far have been completed successfully. The board will now review the progress to decide the next course of action."
+    return {"checkpoint_report": report}
+
+def board_checkpoint_review_node(state: GraphState):
+    """Placeholder for the Board to review progress and make a decision."""
+    logger.info("--- (BoE) The Board is reviewing the checkpoint report. ---")
+    decision = "continue"
+    logger.info(f"Board has decided to: {decision}")
+    return {"board_decision": decision}
+
+def increment_strategic_step_node(state: GraphState):
+    """Increments the strategic step index."""
+    logger.info("--- (BoE) Incrementing strategic step index. ---")
+    step_index = state.get("strategic_step_index", 0)
+    return {"strategic_step_index": step_index + 1}
+
 def editor_node(state: GraphState):
     logger.info(f"Task '{state.get('task_id')}': Reached Editor node for final summary.")
-    final_answer = "The agent has successfully completed the execution of the tactical plan."
+    final_answer = "The agent has successfully completed the entire strategic plan."
     return {"answer": final_answer}
 
 # --- Conditional Routers ---
@@ -437,7 +461,7 @@ def route_logic(state: GraphState) -> str: return state.get("route", "Editor")
 
 def after_final_plan_approval_router(state: GraphState) -> str:
     if state.get("user_feedback") == 'approve':
-        logger.info("--- Final plan approved by user. Routing to Chief Architect. ---")
+        logger.info("--- Final plan approved by user. Routing to Master Router. ---")
         return "start_execution"
     else:
         logger.info("--- Final plan rejected by user. Ending task. ---")
@@ -453,13 +477,40 @@ def tactical_step_router(state: GraphState) -> str:
         logger.info(f"More tactical steps remaining. Looping back to Foreman for step {step_index}.")
         return "continue"
     else:
-        logger.info("Tactical plan complete. Finishing execution.")
+        logger.info("Tactical plan complete. Finishing strategic step.")
         return "finish"
+
+def master_router(state: GraphState) -> str:
+    """The main router for the strategic loop."""
+    logger.info("--- (STRATEGIC) Master Router is checking the next step. ---")
+    plan = state.get("strategic_plan", [])
+    index = state.get("strategic_step_index", 0)
+    
+    if index >= len(plan):
+        logger.info("Strategic plan is complete. Routing to Editor.")
+        return "finish"
+    
+    current_step = plan[index]
+    if current_step.get("tool") == "checkpoint":
+        logger.info(f"Checkpoint found at strategic step {index}. Routing to review.")
+        return "checkpoint"
+    else:
+        logger.info(f"Next strategic step {index} is a standard execution. Routing to Architect.")
+        return "execute"
+
+def after_checkpoint_review_router(state: GraphState) -> str:
+    """Routes after the board's checkpoint review."""
+    decision = state.get("board_decision", "continue")
+    logger.info(f"--- (BoE) Routing after checkpoint review. Decision: {decision} ---")
+    if decision == "adapt":
+        return "adapt_plan"
+    return "continue_execution"
 
 # --- Graph Definition ---
 def create_agent_graph():
     workflow = StateGraph(GraphState)
     
+    # Add all nodes
     workflow.add_node("Task_Setup", task_setup_node)
     workflow.add_node("Memory_Updater", memory_updater_node)
     workflow.add_node("initial_router_node", initial_router_node)
@@ -476,13 +527,20 @@ def create_agent_graph():
     workflow.add_node("site_foreman_node", site_foreman_node)
     workflow.add_node("worker_node", worker_node)
     workflow.add_node("project_supervisor_node", project_supervisor_node)
-    # --- NEW: Add the incrementer node ---
     workflow.add_node("increment_tactical_step_node", increment_tactical_step_node)
+    workflow.add_node("editor_checkpoint_report_node", editor_checkpoint_report_node)
+    workflow.add_node("board_checkpoint_review_node", board_checkpoint_review_node)
+    workflow.add_node("increment_strategic_step_node", increment_strategic_step_node)
+    # --- FIX: Add the master_router_node ---
+    workflow.add_node("master_router_node", master_router_node)
     
+    # Set entry and basic flow
     workflow.set_entry_point("Task_Setup")
     workflow.add_edge("Task_Setup", "Memory_Updater")
     workflow.add_edge("Memory_Updater", "initial_router_node")
     workflow.add_conditional_edges("initial_router_node", route_logic, { "Editor": "Editor", "Propose_Experts": "Propose_Experts" })
+    
+    # Board of Experts and Planning Flow
     workflow.add_edge("Propose_Experts", "human_in_the_loop_board_approval")
     workflow.add_conditional_edges("human_in_the_loop_board_approval", after_board_approval_router, { "set_approved_experts": "set_approved_experts_node", "Editor": "Editor" })
     workflow.add_edge("set_approved_experts_node", "chair_initial_plan_node")
@@ -491,12 +549,24 @@ def create_agent_graph():
     workflow.add_conditional_edges("expert_critique_node", should_continue_critique, { "continue_critique": "expert_critique_node", "finalize_plan": "chair_final_review_node" })
     workflow.add_edge("chair_final_review_node", "human_in_the_loop_final_plan_approval")
 
-    workflow.add_conditional_edges("human_in_the_loop_final_plan_approval", after_final_plan_approval_router, {
-        "start_execution": "chief_architect_node",
-        "end_task": "Editor"
-    })
+    # --- Strategic Loop Wiring (FIXED) ---
+    workflow.add_conditional_edges(
+        "human_in_the_loop_final_plan_approval", 
+        after_final_plan_approval_router, 
+        { "start_execution": "master_router_node", "end_task": "Editor" }
+    )
+
+    workflow.add_conditional_edges(
+        "master_router_node",
+        master_router,
+        {
+            "execute": "chief_architect_node",
+            "checkpoint": "editor_checkpoint_report_node",
+            "finish": "Editor"
+        }
+    )
     
-    # --- Execution Loop Wiring ---
+    # --- Tactical (Inner) Loop Wiring ---
     workflow.add_edge("chief_architect_node", "site_foreman_node")
     workflow.add_edge("site_foreman_node", "worker_node")
     workflow.add_edge("worker_node", "project_supervisor_node")
@@ -506,9 +576,22 @@ def create_agent_graph():
         tactical_step_router,
         {
             "continue": "site_foreman_node",
-            "finish": "Editor"
+            "finish": "increment_strategic_step_node"
         }
     )
+
+    # --- Checkpoint (Outer) Loop Wiring ---
+    workflow.add_edge("editor_checkpoint_report_node", "board_checkpoint_review_node")
+    workflow.add_conditional_edges(
+        "board_checkpoint_review_node",
+        after_checkpoint_review_router,
+        {
+            "continue_execution": "increment_strategic_step_node",
+            "adapt_plan": "chair_initial_plan_node"
+        }
+    )
+    
+    workflow.add_edge("increment_strategic_step_node", "master_router_node")
 
     workflow.add_edge("Editor", END)
     
@@ -520,7 +603,7 @@ def create_agent_graph():
             "human_in_the_loop_final_plan_approval",
         ]
     )
-    logger.info("ResearchAgent graph compiled with tactical execution loop.")
+    logger.info("ResearchAgent graph compiled with strategic checkpoint loop (FIXED).")
     return agent
 
 agent_graph = create_agent_graph()
