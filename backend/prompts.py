@@ -1,9 +1,14 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Prompts (Phase 17 - Full Prompt Set FIX)
+# ResearchAgent Prompts (Phase 17 - Role & UI Refinement)
 #
-# This version corrects an ImportError by ensuring that ALL required prompts
-# for both the Board of Experts planning phase and the intelligent execution
-# engine are present in this centralized file.
+# This version implements two key improvements based on user feedback:
+# 1. Expert Highlighting: The `expert_critique_prompt_template` is updated
+#    to instruct experts to prefix new or modified steps with `**NEW:**` or
+#    `**MODIFIED:**` for better UI visibility.
+# 2. Chair as Optimizer: The `chair_final_review_prompt_template` is
+#    significantly enhanced. The Chair's primary role is now to optimize and
+#    consolidate the plan (e.g., merging `pip_install` calls) and to remove
+#    specific tool names, focusing on high-level strategic goals.
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
@@ -19,7 +24,7 @@ You are a master project manager. Based on the user's request, your job is to as
 
 **Instructions:**
 1.  Analyze the user's request to understand the core domains of expertise required.
-2.  Propose a board of 3 to 5 diverse and relevant expert personas.
+2.  Propose a board of 3 to 4 diverse and relevant expert personas.
 3.  For each expert, provide a clear title and a concise summary of their essential qualities.
 4.  Return the board as a structured JSON object.
 """
@@ -34,19 +39,18 @@ chair_initial_plan_prompt_template = PromptTemplate.from_template(
 **Your Approved Board of Experts:**
 {experts}
 
-**Available Tools:**
-{tools}
-
 **Instructions:**
 1. Create a step-by-step plan to fulfill the user's request.
-2. The plan should be strategic and high-level. The "Company Model" will handle the low-level execution details.
+2. The plan should be strategic and high-level, describing **what** to do, not **how** to do it. **DO NOT** include tool names like `workspace_shell` or `write_file`.
 3. Incorporate at least one `checkpoint` step at a logical point for the board to review progress before proceeding.
 4. Your output must be a valid JSON object conforming to the "Plan" schema, containing a "plan" key.
 """
 )
 
+# MODIFIED: Added highlighting instructions
 expert_critique_prompt_template = PromptTemplate.from_template(
 """You are a world-class expert with a specific persona. Your task is to critique a proposed plan and improve it.
+
 **Your Expert Persona:**
 {expert_persona}
 
@@ -61,11 +65,13 @@ expert_critique_prompt_template = PromptTemplate.from_template(
 2.  Identify weaknesses, missing steps, or potential improvements. Can you make it more efficient, robust, or secure?
 3.  Provide a concise, constructive `critique` explaining your reasoning.
 4.  Create an `updated_plan` that incorporates your suggestions. You MUST return the *entire* plan, not just the changes.
-5.  If the plan is already perfect from your perspective, state that in the critique and return the original plan unchanged.
-6.  Your final output MUST be a single, valid JSON object that conforms to the `CritiqueAndPlan` schema.
+5.  **Highlighting Rule:** When you add a completely new step, you **MUST** prefix its instruction with `**NEW:**`. When you modify an existing step, you **MUST** prefix it with `**MODIFIED:**`.
+6.  If the plan is already perfect from your perspective, state that in the critique and return the original plan unchanged.
+7.  Your final output MUST be a single, valid JSON object that conforms to the `CritiqueAndPlan` schema.
 """
 )
 
+# MODIFIED: Enhanced with optimization and consolidation duties
 chair_final_review_prompt_template = PromptTemplate.from_template(
 """You are the Chair of the Board of Experts. Your final responsibility is to perform a sanity check, optimize the plan, and produce the definitive version for user approval.
 
@@ -82,7 +88,7 @@ chair_final_review_prompt_template = PromptTemplate.from_template(
 1.  **Synthesize and Validate:** Review the `Sequentially Refined Plan` and ensure it is coherent and logically sound after all modifications. Ensure the spirit of all `Board Critiques` has been incorporated.
 2.  **Optimize and Consolidate:** This is your most important duty. Scrutinize the plan for inefficiencies and merge steps where possible.
     * **Merge Redundant Calls:** If you see multiple `pip_install` steps, merge them into a single step with a list of all required packages.
-    * **Combine Logically Related Steps:** If sequential steps can be performed by a single, more comprehensive action (like a single script), consolidate them.
+    * **Combine Logically Related Steps:** If sequential steps can be performed by a single, more comprehensive action (like a single script), consolidate them into a single, clearer strategic step.
 3.  **Focus on 'What', not 'How':** Your final plan should describe the high-level goals. **DO NOT** specify tool names (e.g., `write_file`, `workspace_shell`). The Chief Architect will select the correct tools later.
 4.  **Checkpoints:** Ensure at least one `checkpoint` step exists at a logical point for the board to review progress. Add them if necessary.
 5.  **Output:** Return the final, validated, and optimized plan. Your output must be a single, valid JSON object conforming to the `Plan` schema.
