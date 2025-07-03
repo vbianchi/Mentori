@@ -1,3 +1,4 @@
+// src/components/AgentCards.jsx
 import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import { ArchitectIcon, CheckCircleIcon, ChevronDownIcon, CircleDotIcon, EditorIcon, ForemanIcon, LoaderIcon, PlusCircleIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, XCircleIcon, BoardIcon, CheckIcon, ChairIcon, CritiqueIcon } from './Icons';
@@ -130,8 +131,8 @@ export const ArchitectCard = ({ plan, isAwaitingApproval, onModify, onReject, av
                 </div>
             ) : (
                 <div>
-                    <h4 class="text-sm font-bold text-gray-400 mb-2">Proposed Plan</h4>
-                    <ul class="list-decimal list-inside text-gray-300 space-y-1">{plan.steps.map(step => <li key={step.step_id}>{step.instruction}</li>)}</ul>
+                    <h4 class="text-sm font-bold text-gray-400 mb-2">Tactical Plan Generated</h4>
+                    <ul class="list-decimal list-inside text-gray-300 space-y-1">{plan.map(step => <li key={step.instruction}>{step.instruction}</li>)}</ul>
                 </div>
             )}
         </AgentResponseCard>
@@ -261,6 +262,30 @@ export const FinalPlanApprovalCard = ({ plan, critiques, onModify, onReject }) =
     );
 };
 
+export const ForemanCard = ({ step }) => (
+    <AgentResponseCard icon={<ForemanIcon class="h-5 w-5" />} title="The Site Foreman" color="cyan">
+        <p class="text-sm text-gray-400 mb-2">Preparing to execute the following step:</p>
+        {step ? (
+            <div class="p-3 bg-gray-900/50 rounded-lg border border-gray-700/50">
+                <p class="text-white font-medium">{step.instruction}</p>
+                <p class="text-xs text-cyan-300 font-mono mt-1">Tool: {step.tool_name}</p>
+            </div>
+        ) : (
+            <p class="text-sm text-gray-500">No step information available.</p>
+        )}
+    </AgentResponseCard>
+);
+
+// --- NEW: Worker Card Component ---
+export const WorkerCard = ({ toolCall, output }) => (
+    <AgentResponseCard icon={<WorkerIcon class="h-5 w-5" />} title="The Worker" color="blue">
+        <p class="text-sm text-gray-400 mb-2">Executed tool <code class="bg-gray-700 text-blue-300 text-xs font-mono px-1.5 py-0.5 rounded">{toolCall?.tool_name}</code> and received the following output:</p>
+        <pre class="text-xs text-gray-300 whitespace-pre-wrap font-mono p-3 bg-black/20 rounded-md">
+            {output || "No output was returned."}
+        </pre>
+    </AgentResponseCard>
+);
+
 
 export const SiteForemanCard = ({ plan }) => (
     <div class="ml-4"> 
@@ -321,7 +346,6 @@ export const FinalAnswerCard = ({ answer }) => {
     );
 };
 
-// --- NEW: A simple card to show work is in progress ---
 export const WorkCard = () => (
     <AgentResponseCard icon={<LoaderIcon class="h-5 w-5" />} title="Work In Progress" color="blue">
         <p class="text-sm text-gray-300">The agent is now executing the approved plan.</p>

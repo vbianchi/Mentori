@@ -1,19 +1,16 @@
 # backend/server.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 17 - Architect Node Test)
+# ResearchAgent Backend Server (Phase 17 - Worker Node Test)
 #
-# This version adds a specific event handler for the new, simplified
-# 'chief_architect_node' to enable UI card generation.
+# This version adds the necessary components to handle the new
+# 'worker_node' and broadcast its actions to the UI.
 #
 # Key Architectural Changes:
-# 1. New Event Handler: A check for the end of 'chief_architect_node' is
+# 1. New Event Handler: A check for the end of 'worker_node' is
 #    added to the agent wrapper. When this occurs, it broadcasts a new
-#    'architect_plan_generated' event to the frontend.
-# 2. Node Mapping Updated: The 'chief_architect_node' is added to the
-#    NODE_NAME_MAPPING to provide live status updates.
-# 3. ACK System Removed: Since we are not doing a paced, multi-step loop,
-#    the ACK system is not needed for this test and has been removed to
-#    maintain simplicity.
+#    'worker_step_executed' event to the frontend.
+# 2. Node Mapping Updated: The 'worker_node' is added to the
+#    NODE_NAME_MAPPING to provide a user-friendly name for live status updates.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -424,7 +421,10 @@ NODE_NAME_MAPPING = {
     "expert_critique_node": "The Board is reviewing the plan",
     "chair_final_review_node": "The Chair is synthesizing feedback",
     "Editor": "Editor",
-    "chief_architect_node": "The Chief Architect is planning"
+    "chief_architect_node": "The Chief Architect is planning",
+    "site_foreman_node": "The Foreman is preparing a tool call",
+    # --- NEW: Add the worker mapping ---
+    "worker_node": "The Worker is executing the tool"
 }
 BROADCAST_NODES = set(NODE_NAME_MAPPING.keys())
 
@@ -464,6 +464,29 @@ async def agent_execution_wrapper(input_state, config):
                 await broadcast_event({
                     "type": "architect_plan_generated",
                     "plan": tactical_plan,
+                    "task_id": task_id
+                })
+            
+            if event_type == "on_chain_end" and node_name == "site_foreman_node":
+                output = event["data"]["output"]
+                current_step = output.get("current_tactical_step")
+                logger.info(f"Broadcasting foreman_step_prepared for task '{task_id}'")
+                await broadcast_event({
+                    "type": "foreman_step_prepared",
+                    "step": current_step,
+                    "task_id": task_id
+                })
+
+            # --- NEW: Add the worker event handler ---
+            if event_type == "on_chain_end" and node_name == "worker_node":
+                output = event["data"]["output"]
+                worker_output = output.get("worker_output")
+                tool_call = output.get("current_tactical_step")
+                logger.info(f"Broadcasting worker_step_executed for task '{task_id}'")
+                await broadcast_event({
+                    "type": "worker_step_executed",
+                    "tool_call": tool_call,
+                    "output": worker_output,
                     "task_id": task_id
                 })
 
@@ -607,7 +630,7 @@ async def main():
     try:
         logger.info(f"Attempting to start WebSocket server on {host}:{port}")
         async with websockets.serve(message_router, host, port):
-            logger.info("ResearchAgent WebSocket server is running with simplified Architect -> Editor flow.")
+            logger.info("ResearchAgent WebSocket server is running with Worker -> Editor flow.")
             await asyncio.Future()
     except Exception as e:
         logger.error(f"!!! FAILED TO START WEBSOCKET SERVER: {e} !!!", exc_info=True)
