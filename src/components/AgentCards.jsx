@@ -1,16 +1,19 @@
 // src/components/AgentCards.jsx
 // -----------------------------------------------------------------------------
-// ResearchAgent UI Components (Phase 17 - Architect Card FIX)
+// ResearchAgent UI Components (Phase 17 - Strategic Memo UI)
 //
-// This version updates the `ArchitectCard` to provide the same level of
-// detail as the other plan cards, improving UI consistency and transparency.
+// This version completes the "Strategic Memo" feature by updating the UI to
+// display the implementation notes provided by the Chair.
 //
 // Key Change:
-// 1. ArchitectCard Enhancement: The card now uses the existing `PlanStepView`
-//    component to render each step of the tactical plan. This means that
-//    in addition to the instruction, the UI will now display the specific
-//    `tool_name` chosen by the Architect for that step, matching the style
-//    of the Chair's plan card.
+// 1. FinalPlanApprovalCard Updated:
+//    - This card now accepts a new prop: `implementationNotes`.
+//    - It renders a new section titled "Key Implementation Notes" just above
+//      the final plan.
+//    - This section displays a bulleted list of the critical constraints and
+//      details distilled by the Chair, making them visible to the user
+//      before final approval. This ensures full transparency of the agent's
+//      strategic reasoning.
 // -----------------------------------------------------------------------------
 
 import { h } from 'preact';
@@ -130,12 +133,10 @@ const PlanStepView = ({ step }) => {
     );
 };
 
-// MODIFIED: This card now uses the PlanStepView to show tool names.
 export const ArchitectCard = ({ plan, isAwaitingApproval, onModify, onReject, availableTools }) => {
     const [editablePlan, setEditablePlan] = useState([]);
 
     useEffect(() => {
-        // The plan from the backend might be called `steps`
         setEditablePlan(plan?.steps || plan || []);
     }, [plan]);
 
@@ -241,7 +242,8 @@ export const ExpertCritiqueCard = ({ critique }) => (
     </AgentResponseCard>
 );
 
-export const FinalPlanApprovalCard = ({ plan, critiques, onModify, onReject }) => {
+// MODIFIED: Now accepts and renders `implementationNotes`.
+export const FinalPlanApprovalCard = ({ plan, critiques, implementationNotes, onModify, onReject }) => {
     const [isApproved, setIsApproved] = useState(null);
 
     const handleDecision = (approved) => {
@@ -268,6 +270,16 @@ export const FinalPlanApprovalCard = ({ plan, critiques, onModify, onReject }) =
                     ))}
                 </ul>
             </details>
+
+            {/* NEW: Display Implementation Notes */}
+            {implementationNotes && implementationNotes.length > 0 && (
+                <div class="mb-4">
+                    <h4 class="text-sm font-bold text-gray-400 mb-3">Key Implementation Notes:</h4>
+                    <ul class="list-disc list-inside text-gray-300 space-y-1 text-sm bg-gray-900/50 p-3 rounded-lg border border-gray-700/50">
+                        {implementationNotes.map((note, index) => <li key={index}>{note}</li>)}
+                    </ul>
+                </div>
+            )}
             
             <div>
                 <h4 class="text-sm font-bold text-gray-400 mb-3">Final Plan for Execution:</h4>
@@ -335,14 +347,12 @@ export const SupervisorCard = ({ evaluation }) => {
     );
 };
 
-// --- NEW: Checkpoint Report Card ---
 export const EditorReportCard = ({ report }) => (
     <AgentResponseCard icon={<EditorIcon class="h-5 w-5" />} title="Editor's Checkpoint Report" color="sky">
         <p class="text-sm text-gray-300 whitespace-pre-wrap">{report}</p>
     </AgentResponseCard>
 );
 
-// --- NEW: Board Decision Card ---
 export const BoardDecisionCard = ({ decision }) => (
     <AgentResponseCard icon={<BoardIcon class="h-5 w-5" />} title="Board Checkpoint Review" color="rose">
         <p class="text-sm text-gray-400 mb-2">The Board has reviewed the progress and made a decision:</p>

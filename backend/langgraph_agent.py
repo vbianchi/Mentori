@@ -1,17 +1,28 @@
 # backend/langgraph_agent.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 17 - Structural Integrity FIX)
+# ResearchAgent Core Agent (Phase 17 - Strategic Memo IMPLEMENTATION)
 #
-# This version fixes a `KeyError: '\"tool\"'` that occurs during prompt
-# formatting in the `chair_final_review_node`.
+# This version implements the "Strategic Memo" architecture to preserve
+# critical expert details during the planning phase.
 #
-# Key Architectural Fix:
-# 1. Pydantic Model Update: The `Step` Pydantic model has been modified.
-#    The `tool` field is now explicitly `Optional[str]`, making it clear
-#    that a step may not have a tool. This aligns the data model with the
-#    agent's logic, where high-level strategic steps don't have tools.
-#    This change is the primary fix for the KeyError, as it ensures all
-#    step objects have a consistent structure, even if the tool value is None.
+# Key Architectural Changes:
+# 1. New Pydantic Models:
+#    - A `StrategicMemo` model is introduced. It contains two fields:
+#      - `plan`: The high-level, multi-step strategic milestones.
+#      - `implementation_notes`: A list of critical constraints and details
+#        distilled from expert critiques.
+#    - The `Plan` model is updated to `StrategicPlan` for clarity.
+#
+# 2. GraphState Update:
+#    - The old `strategic_plan: Optional[List[dict]]` is replaced with
+#      `strategic_memo: Optional[dict]` to hold the new, richer object.
+#
+# 3. Node Logic Updates:
+#    - `chair_final_review_node`: This node is updated to generate and return
+#      the full `StrategicMemo` object.
+#    - `chief_architect_node` & `master_router_node`: These nodes are updated
+#      to read from `state['strategic_memo']['plan']` and pass the
+#      `implementation_notes` to the Architect's prompt.
 # -----------------------------------------------------------------------------
 
 import os
@@ -74,13 +85,20 @@ class ProposedExpert(BaseModel):
 class BoardOfExperts(BaseModel):
     experts: List[ProposedExpert] = Field(description="A list of 3-4 diverse, relevant experts for the board.")
 
-# MODIFIED: The `tool` field is now optional to prevent KeyErrors.
 class Step(BaseModel):
     instruction: str = Field(description="The high-level instruction for this step.")
     tool: Optional[str] = Field(default=None, description="The suggested tool for this step (e.g., 'workspace_shell', 'checkpoint'). For high-level strategic steps without a specific tool, this should be null or omitted.")
 
-class Plan(BaseModel):
-    plan: List[Step] = Field(description="A list of steps to accomplish the user's goal.")
+# MODIFIED: Renamed for clarity
+class StrategicPlan(BaseModel):
+    """A high-level plan of strategic milestones."""
+    plan: List[Step] = Field(description="A list of high-level steps to accomplish the user's goal.")
+
+# NEW: The Strategic Memo model
+class StrategicMemo(BaseModel):
+    """The final output of the planning phase, containing the plan and key implementation details."""
+    plan: List[Step] = Field(description="The final, high-level, multi-step strategic plan.")
+    implementation_notes: List[str] = Field(description="A bulleted list of critical constraints, parameters, and considerations distilled from expert critiques that the execution team must follow.")
 
 class CritiqueAndPlan(BaseModel):
     critique: str = Field(description="The detailed, constructive critique from the expert's point of view. Explain WHY you are making changes.")
@@ -98,6 +116,7 @@ class TacticalPlan(BaseModel):
     steps: List[TacticalStep] = Field(description="A list of tactical steps to be executed in sequence.")
 
 
+# MODIFIED: Replaced `strategic_plan` with `strategic_memo`
 class GraphState(TypedDict):
     input: str
     task_id: str
@@ -127,7 +146,7 @@ class GraphState(TypedDict):
     expert_critique_index: int
     critiques: Optional[List[dict]]
     refined_plan: Optional[List[dict]]
-    strategic_plan: Optional[List[dict]]
+    strategic_memo: Optional[dict] # Replaces strategic_plan
     tactical_plan: Optional[List[dict]]
     current_tactical_step: Optional[dict]
     worker_output: Optional[str]
@@ -189,7 +208,8 @@ async def task_setup_node(state: GraphState):
         "max_retries": 3, "step_retries": 0, "plan_retries": 0, "user_feedback": None,
         "memory_vault": {}, "enabled_tools": state.get("enabled_tools"), "proposed_experts": None,
         "board_approved": None, "approved_experts": None, "initial_plan": None,
-        "critiques": [], "refined_plan": None, "strategic_plan": None, "expert_critique_index": 0,
+        "critiques": [], "refined_plan": None, "strategic_memo": None,
+        "expert_critique_index": 0,
         "tactical_plan": None, "current_tactical_step": None, "worker_output": None, "step_evaluation": None,
         "tactical_step_index": 0, "strategic_step_index": 0, "checkpoint_report": None, "board_decision": None
     }
@@ -228,7 +248,7 @@ def human_in_the_loop_board_approval(state: GraphState):
 def chair_initial_plan_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"--- (BoE) Task '{task_id}': Executing chair_initial_plan_node ---")
     llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-pro-latest")
-    structured_llm = llm.with_structured_output(Plan)
+    structured_llm = llm.with_structured_output(StrategicPlan)
     prompt = chair_initial_plan_prompt_template.format(user_request=state["input"], experts=json.dumps(state.get("approved_experts"), indent=2), tools=format_tools_for_prompt(state))
     try:
         response = structured_llm.invoke(prompt)
@@ -280,10 +300,11 @@ def expert_critique_node(state: GraphState):
         current_critiques = state.get("critiques", [])
         return {"critiques": current_critiques + [error_critique], "expert_critique_index": critique_index + 1}
 
+# MODIFIED: Now generates and returns a StrategicMemo.
 def chair_final_review_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"--- (BoE) Task '{task_id}': Executing chair_final_review_node (Synthesis) ---")
     llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-pro-latest")
-    structured_llm = llm.with_structured_output(Plan)
+    structured_llm = llm.with_structured_output(StrategicMemo)
 
     critique_texts = [f"Critique from {c['title']}:\n{c['critique']}" for c in state['critiques']]
 
@@ -295,12 +316,17 @@ def chair_final_review_node(state: GraphState):
     
     try:
         response = structured_llm.invoke(prompt)
-        final_plan_steps = [step.dict() for step in response.plan]
-        logger.info(f"Chair synthesized a final plan with {len(final_plan_steps)} steps.")
-        return {"strategic_plan": final_plan_steps}
+        final_memo = response.dict()
+        logger.info(f"Chair synthesized a final strategic memo with {len(final_memo.get('plan', []))} steps.")
+        return {"strategic_memo": final_memo}
     except Exception as e:
         logger.error(f"Task '{task_id}': Failed during Chair's final synthesis: {e}")
-        return {"strategic_plan": state["refined_plan"]}
+        # Fallback to a simple plan if memo generation fails
+        fallback_memo = {
+            "plan": state["refined_plan"],
+            "implementation_notes": ["Error: Failed to generate strategic memo."]
+        }
+        return {"strategic_memo": fallback_memo}
 
 def human_in_the_loop_final_plan_approval(state: GraphState):
     logger.info(f"--- Task '{state.get('task_id')}': Paused for Final Plan Approval ---")
@@ -311,6 +337,7 @@ def master_router_node(state: GraphState) -> dict:
     logger.info("--- (STRATEGIC) At Master Router branching point. ---")
     return {}
 
+# MODIFIED: Now receives and uses the full strategic_memo.
 def chief_architect_node(state: GraphState):
     """Generates a detailed, tactical plan of tool calls to achieve a single strategic goal."""
     task_id = state.get("task_id")
@@ -319,12 +346,16 @@ def chief_architect_node(state: GraphState):
     llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-pro-latest")
     structured_llm = llm.with_structured_output(TacticalPlan)
 
-    strategic_plan = state.get("strategic_plan", [])
+    strategic_memo = state.get("strategic_memo", {"plan": [], "implementation_notes": []})
+    strategic_plan = strategic_memo.get("plan", [])
+    implementation_notes = strategic_memo.get("implementation_notes", [])
+    
     strategic_index = state.get("strategic_step_index", 0)
     current_strategic_step = strategic_plan[strategic_index]['instruction'] if strategic_index < len(strategic_plan) else "No current goal."
 
     prompt = chief_architect_prompt_template.format(
         strategic_plan=json.dumps(strategic_plan, indent=2),
+        implementation_notes="\n- ".join(implementation_notes),
         current_strategic_step=current_strategic_step,
         history=json.dumps(state.get("history", []), indent=2),
         tools=format_tools_for_prompt(state)
@@ -466,10 +497,12 @@ def tactical_step_router(state: GraphState) -> str:
         logger.info("Tactical plan complete. Finishing strategic step.")
         return "finish"
 
+# MODIFIED: Reads from the `strategic_memo`
 def master_router(state: GraphState) -> str:
     """The main router for the strategic loop."""
     logger.info("--- (STRATEGIC) Master Router is checking the next step. ---")
-    plan = state.get("strategic_plan", [])
+    memo = state.get("strategic_memo", {})
+    plan = memo.get("plan", [])
     index = state.get("strategic_step_index", 0)
     
     if index >= len(plan):

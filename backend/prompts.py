@@ -1,18 +1,22 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Prompts (Phase 17 - Final KeyError FIX)
+# ResearchAgent Prompts (Phase 17 - Strategic Memo IMPLEMENTATION)
 #
-# This version fixes a `KeyError: 'output_dir'` that occurs when formatting
-# the `chief_architect_prompt_template`.
+# This version implements the "Strategic Memo" architecture to preserve
+# critical expert details during the planning phase.
 #
-# Key Change:
-# 1. chief_architect_prompt_template:
-#    - The f-string curly braces inside the "Good Example" Python code have
-#      been escaped by doubling them (e.g., `{output_dir}` becomes
-#      `{{output_dir}}`). This prevents Python's `.format()` method from
-#      misinterpreting the example code as a placeholder, which was the
-#      direct cause of the KeyError.
+# Key Architectural Changes:
+# 1. chair_final_review_prompt_template:
+#    - This prompt is now instructed to output a `StrategicMemo` object.
+#    - It must distill the expert critiques into a bulleted list of
+#      `implementation_notes` in addition to the high-level `plan`.
+#    - The "3-5 step" constraint has been replaced with your suggested
+#      "high-level, multi-step strategic milestones" language.
 #
-# 2. All other prompts are retained from the previous successful version.
+# 2. chief_architect_prompt_template:
+#    - This prompt is updated to accept and use the new
+#      `implementation_notes` field as a set of mandatory constraints.
+#
+# 3. All other prompts are retained.
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
@@ -34,6 +38,7 @@ You are a master project manager. Based on the user's request, your job is to as
 """
 )
 
+# MODIFIED: Using "high-level, multi-step strategic milestones"
 chair_initial_plan_prompt_template = PromptTemplate.from_template(
 """You are the Chair of a Board of Experts. Your role is to create a high-level, strategic plan to address the user's request. You must think in terms of major project milestones.
 
@@ -44,24 +49,12 @@ chair_initial_plan_prompt_template = PromptTemplate.from_template(
 {experts}
 
 **Instructions:**
-1. Create a step-by-step plan with 3-5 major, high-level milestones to fulfill the user's request.
+1. Create a series of high-level, multi-step strategic milestones to fulfill the user's request.
 2. The plan should be strategic, describing **what** to do, not **how** to do it.
 3. **CRITICAL Tool Assignment Rule:**
     - For any `checkpoint` step, you MUST assign the tool as `"checkpoint"`.
     - For all other high-level strategic steps, you MUST assign the tool as `"strategic_milestone"`.
-4. Your output must be a valid JSON object conforming to the "Plan" schema.
-
-**Example of a good strategic plan:**
-```json
-{{
-  "plan": [
-    {{"instruction": "Generate and validate three distinct datasets according to statistical best practices.", "tool": "strategic_milestone"}},
-    {{"instruction": "Perform comprehensive statistical and visual analysis on the datasets.", "tool": "strategic_milestone"}},
-    {{"instruction": "Board review of analytical findings.", "tool": "checkpoint"}},
-    {{"instruction": "Synthesize final report with conclusions and supporting evidence.", "tool": "strategic_milestone"}}
-  ]
-}}
-```
+4. Your output must be a valid JSON object conforming to the "StrategicPlan" schema.
 """
 )
 
@@ -88,8 +81,9 @@ expert_critique_prompt_template = PromptTemplate.from_template(
 """
 )
 
+# MODIFIED: Now generates a StrategicMemo with plan and implementation_notes.
 chair_final_review_prompt_template = PromptTemplate.from_template(
-"""You are the Chair of the Board of Experts, and you are a master strategist. Your final, most important duty is to take the detailed, expert-revised plan and consolidate it back into a high-level strategic plan.
+"""You are the Chair of the Board of Experts, and you are a master strategist. Your final, most important duty is to take the detailed, expert-revised plan and synthesize a final Strategic Memo.
 
 **The Original User Request:**
 {user_request}
@@ -102,26 +96,32 @@ chair_final_review_prompt_template = PromptTemplate.from_template(
 {refined_plan}
 ```
 
-**Your Task: Strategic Consolidation**
-1.  **Analyze the Details:** Read the `Detailed, Sequentially Refined Plan`. This is the "how." It contains all the valuable, specific actions suggested by your experts.
-2.  **Synthesize into Milestones:** Your job is to "roll up" these details into **3-5 major strategic milestones**. Think of these as project phases.
-3.  **Preserve Intent:** Your new high-level plan must honor the intent and incorporate the wisdom of all the expert critiques.
-4.  **CRITICAL Tool Assignment Rule:**
-    - For any `checkpoint` step, you MUST preserve the exact tool assignment: `"tool": "checkpoint"`.
-    - For all other consolidated, high-level strategic steps, you MUST assign the tool as `"tool": "strategic_milestone"`.
-5.  **Output:** Return the final, validated, and optimized plan. Your output must be a single, valid JSON object conforming to the `Plan` schema.
+**Your Task: Create the Strategic Memo**
+
+Your output must be a single JSON object conforming to the `StrategicMemo` schema. It has two parts:
+
+**1. `plan` (A list of Step objects):**
+   - **Consolidate:** "Roll up" the `Detailed, Sequentially Refined Plan` into a series of high-level, multi-step strategic milestones.
+   - **Preserve Checkpoints:** You MUST carry over any `checkpoint` steps. For these, you MUST preserve the exact tool assignment: `"tool": "checkpoint"`.
+   - **Assign Placeholder:** For all other high-level strategic steps, you MUST assign the tool as `"tool": "strategic_milestone"`.
+
+**2. `implementation_notes` (A list of strings):**
+   - **Distill Critical Details:** Review all expert critiques and the detailed plan. Extract the most critical, non-negotiable constraints, parameters, and requirements that the execution team (the Architect) MUST follow.
+   - **Be Specific:** These notes should be concise and actionable. Examples: "All datasets must be generated with 1000 data points.", "The final report must include a 'limitations' section.", "Use the Mersenne Twister PRNG with documented seeds."
+
+**Begin!**
 """
 )
 
 
 # --- Chief Architect Prompt ---
-# MODIFIED: Escaped the curly braces in the f-string within the example code.
+# MODIFIED: Now accepts and uses `implementation_notes`.
 chief_architect_prompt_template = PromptTemplate.from_template(
 """
 You are the Chief Architect of an AI-powered research team. You are a master of breaking down high-level goals into detailed, step-by-step plans of tool calls.
 
 **Your Task:**
-Your job is to take a single high-level strategic goal and expand it into a detailed, low-level "tactical plan" of specific tool calls that will accomplish that goal.
+Your job is to take a single high-level strategic goal and expand it into a detailed, low-level "tactical plan" of specific tool calls that will accomplish that goal, following all strategic guidance.
 
 **Context:**
 1.  **Overall Strategic Plan:** This is the complete high-level plan for the entire project.
@@ -131,17 +131,20 @@ Your job is to take a single high-level strategic goal and expand it into a deta
 2.  **Current Strategic Goal:** This is the specific high-level step you must accomplish right now.
     > "{current_strategic_step}"
 
-3.  **History of Completed Steps:** This is a summary of what the team has already done.
+3.  **Mandatory Implementation Notes:** These are critical constraints from the Board of Experts that you MUST follow.
+    - {implementation_notes}
+
+4.  **History of Completed Steps:** This is a summary of what the team has already done.
     > {history}
 
-4.  **Available Tools:** You have the following tools at your disposal.
+5.  **Available Tools:** You have the following tools at your disposal.
     ```
     {tools}
     ```
 
 **CRITICAL Instructions:**
-1.  **Efficiency Principle:** Your primary goal is to solve the strategic step in the **fewest, most robust tactical steps possible**.
-2.  **Prefer Scripts Over Commands:** For any task involving multiple data steps, calculations, or logic, you should **always prefer to write a single, complete Python script using the `write_file` tool** and then execute it with a single `workspace_shell` command. This is more efficient and reliable than a long series of individual commands.
+1.  **Adhere to Notes:** You must strictly follow all `Mandatory Implementation Notes`.
+2.  **Efficiency Principle:** Your primary goal is to solve the strategic step in the **fewest, most robust tactical steps possible**. Prefer a single, comprehensive script over many small steps.
 3.  **JSON String Escaping:** When creating the `content` for the `write_file` tool, you **MUST** ensure it is a valid JSON string. This means all newline characters within the code **MUST** be escaped as `\\n`, and all double quotes **MUST** be escaped as `\\"`.
 4.  **Output Format:** Your final output must be a single, valid JSON object conforming to the `TacticalPlan` schema.
 
@@ -156,9 +159,7 @@ Your job is to take a single high-level strategic goal and expand it into a deta
   "steps": [
     {{"step_id": 1, "instruction": "Install numpy", "tool_name": "pip_install", "tool_input": {{"package": "numpy"}} }},
     {{"step_id": 2, "instruction": "Write a script to calculate the mean", "tool_name": "write_file", "tool_input": {{...}} }},
-    {{"step_id": 3, "instruction": "Run the mean script", "tool_name": "workspace_shell", "tool_input": {{...}} }},
-    {{"step_id": 4, "instruction": "Write a script to calculate the median", "tool_name": "write_file", "tool_input": {{...}} }},
-    {{"step_id": 5, "instruction": "Run the median script", "tool_name": "workspace_shell", "tool_input": {{...}} }}
+    {{"step_id": 3, "instruction": "Run the mean script", "tool_name": "workspace_shell", "tool_input": {{...}} }}
   ]
 }}
 ```
@@ -177,7 +178,7 @@ Your job is to take a single high-level strategic goal and expand it into a deta
     }},
     {{
       "step_id": 2,
-      "instruction": "Create a single Python script to perform all preliminary analysis: load each dataset, calculate descriptive statistics (mean, median, std dev), generate a histogram for each, and save the plots to files.",
+      "instruction": "Create a single Python script to perform all preliminary analysis.",
       "tool_name": "write_file",
       "tool_input": {{
         "file": "preliminary_analysis.py",
@@ -186,7 +187,7 @@ Your job is to take a single high-level strategic goal and expand it into a deta
     }},
     {{
       "step_id": 3,
-      "instruction": "Execute the main analysis script to perform all calculations and generate all plots.",
+      "instruction": "Execute the main analysis script.",
       "tool_name": "workspace_shell",
       "tool_input": {{
         "command": "python preliminary_analysis.py"

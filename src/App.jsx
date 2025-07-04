@@ -1,8 +1,25 @@
 // src/App.jsx
+// -----------------------------------------------------------------------------
+// ResearchAgent Main UI (Phase 17 - Strategic Memo UI FIX)
+//
+// This version fixes the final bug in the "Strategic Memo" feature.
+//
+// Key Change:
+// 1. Event Handling in `useAgent` Callback:
+//    - The `onMessage` callback passed to the `useAgent` hook is updated.
+//    - When it receives a `final_plan_approval_request` event, it now
+//      correctly extracts the `implementation_notes` from the event payload.
+//    - It adds this new field to the history object that gets stored in the
+//      `tasks` state.
+//
+// 2. Prop Drilling in `render`:
+//    - The `FinalPlanApprovalCard` component is now correctly passed the
+//      `implementationNotes={child.implementationNotes}` prop, ensuring the
+//      data flows all the way from the WebSocket to the final component.
+// -----------------------------------------------------------------------------
 import { h } from 'preact';
 import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
 import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, FolderIcon, ArrowLeftIcon, UploadCloudIcon, StopCircleIcon, BriefcaseIcon, SendToChatIcon, FileTextIcon, BoardIcon, CheckIcon, XCircleIcon, ChairIcon, CritiqueIcon } from './components/Icons';
-// --- NEW: Import the checkpoint cards ---
 import { FinalPlanApprovalCard, ExpertCritiqueCard, ArchitectCard, BoardApprovalCard, ChairPlanCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard, ExecutionStepCard, WorkCard, ForemanCard, WorkerCard, SupervisorCard, EditorReportCard, BoardDecisionCard } from './components/AgentCards';
 import { ToggleButton, CopyButton } from './components/Common';
 import { useTasks } from './hooks/useTasks';
@@ -149,6 +166,7 @@ export function App() {
     const workspace = useWorkspace(activeTaskId);
     const settings = useSettings();
     
+    // MODIFIED: The onMessage callback now handles `implementation_notes`.
     const agent = useAgent(useCallback((event) => {
         setTasks(currentTasks => {
             try {
@@ -173,16 +191,22 @@ export function App() {
                 } else if (eventType === 'expert_critique_generated') {
                     runContainer.children.push({ type: 'expert_critique', critique: event.critique });
                 } else if (eventType === 'final_plan_approval_request') {
-                    runContainer.children.push({ type: 'final_plan_approval', plan: event.plan, critiques: event.critiques, isAwaitingApproval: true });
+                    // This is the key fix: store the implementation_notes.
+                    runContainer.children.push({ 
+                        type: 'final_plan_approval', 
+                        plan: event.plan, 
+                        critiques: event.critiques, 
+                        implementationNotes: event.implementation_notes, // Added this line
+                        isAwaitingApproval: true 
+                    });
                 } else if (eventType === 'architect_plan_generated') {
-                    runContainer.children.push({ type: 'architect_plan', steps: event.plan, isAwaitingApproval: false });
+                    runContainer.children.push({ type: 'architect_plan', plan: event.plan, isAwaitingApproval: false });
                 } else if (eventType === 'foreman_step_prepared') {
                     runContainer.children.push({ type: 'foreman_step', step: event.step });
                 } else if (eventType === 'worker_step_executed') {
                     runContainer.children.push({ type: 'worker_step', tool_call: event.tool_call, output: event.output });
                 } else if (eventType === 'supervisor_step_evaluated') {
                     runContainer.children.push({ type: 'supervisor_step', evaluation: event.evaluation });
-                // --- NEW: Handle the checkpoint events ---
                 } else if (eventType === 'editor_report_generated') {
                     runContainer.children.push({ type: 'editor_report', report: event.report });
                 } else if (eventType === 'board_decision_made') {
@@ -355,15 +379,15 @@ export function App() {
                                             <div class={`absolute top-6 -left-4 h-px ${child.type === 'execution_plan' ? 'w-8' : 'w-4'} bg-border`} />
                                             {(() => {
                                                 switch (child.type) {
-                                                    case 'architect_plan': return <ArchitectCard plan={child.steps} isAwaitingApproval={child.isAwaitingApproval} onModify={handleModifyAndApprove} onReject={() => handlePlanApprovalAction('reject')} availableTools={settings.availableTools}/>;
+                                                    case 'architect_plan': return <ArchitectCard plan={child.plan} isAwaitingApproval={child.isAwaitingApproval} onModify={handleModifyAndApprove} onReject={() => handlePlanApprovalAction('reject')} availableTools={settings.availableTools}/>;
                                                     case 'board_approval': return <BoardApprovalCard experts={child.experts} onApproval={handleBoardApprovalAction} />;
                                                     case 'chair_plan': return <ChairPlanCard plan={child.plan} />;
                                                     case 'expert_critique': return <ExpertCritiqueCard critique={child.critique} />;
-                                                    case 'final_plan_approval': return <FinalPlanApprovalCard plan={child.plan} critiques={child.critiques} onModify={(plan) => handleFinalPlanApprovalAction(true, plan)} onReject={() => handleFinalPlanApprovalAction(false)} />;
+                                                    // MODIFIED: Pass the implementationNotes prop
+                                                    case 'final_plan_approval': return <FinalPlanApprovalCard plan={child.plan} critiques={child.critiques} implementationNotes={child.implementationNotes} onModify={(plan) => handleFinalPlanApprovalAction(true, plan)} onReject={() => handleFinalPlanApprovalAction(false)} />;
                                                     case 'foreman_step': return <ForemanCard step={child.step} />;
                                                     case 'worker_step': return <WorkerCard toolCall={child.tool_call} output={child.output} />;
                                                     case 'supervisor_step': return <SupervisorCard evaluation={child.evaluation} />;
-                                                    // --- NEW: Render the checkpoint cards ---
                                                     case 'editor_report': return <EditorReportCard report={child.report} />;
                                                     case 'board_decision': return <BoardDecisionCard decision={child.decision} />;
                                                     case 'direct_answer': return <DirectAnswerCard answer={child.content} />;
