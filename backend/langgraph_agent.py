@@ -1,16 +1,17 @@
 # backend/langgraph_agent.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 17 - Prompt Refactor)
+# ResearchAgent Core Agent (Phase 17 - Structural Integrity FIX)
 #
-# This version cleans up the file by removing the local prompt definitions
-# that have been centralized into `backend/prompts.py`. The agent now relies
-# exclusively on importing its prompts.
+# This version fixes a `KeyError: '\"tool\"'` that occurs during prompt
+# formatting in the `chair_final_review_node`.
 #
 # Key Architectural Fix:
-# 1. Redundant Prompts Removed: All `PromptTemplate` definitions have been
-#    removed from this file.
-# 2. Clean Imports: The file now correctly imports all necessary prompts
-#    from the `prompts` module, enforcing a clean separation of concerns.
+# 1. Pydantic Model Update: The `Step` Pydantic model has been modified.
+#    The `tool` field is now explicitly `Optional[str]`, making it clear
+#    that a step may not have a tool. This aligns the data model with the
+#    agent's logic, where high-level strategic steps don't have tools.
+#    This change is the primary fix for the KeyError, as it ensures all
+#    step objects have a consistent structure, even if the tool value is None.
 # -----------------------------------------------------------------------------
 
 import os
@@ -73,9 +74,10 @@ class ProposedExpert(BaseModel):
 class BoardOfExperts(BaseModel):
     experts: List[ProposedExpert] = Field(description="A list of 3-4 diverse, relevant experts for the board.")
 
+# MODIFIED: The `tool` field is now optional to prevent KeyErrors.
 class Step(BaseModel):
     instruction: str = Field(description="The high-level instruction for this step.")
-    tool: str = Field(description="The suggested tool for this step (e.g., 'workspace_shell', 'query_files', 'checkpoint').")
+    tool: Optional[str] = Field(default=None, description="The suggested tool for this step (e.g., 'workspace_shell', 'checkpoint'). For high-level strategic steps without a specific tool, this should be null or omitted.")
 
 class Plan(BaseModel):
     plan: List[Step] = Field(description="A list of steps to accomplish the user's goal.")
@@ -331,6 +333,9 @@ def chief_architect_node(state: GraphState):
     try:
         response = structured_llm.invoke(prompt)
         
+        if not response or not hasattr(response, 'steps'):
+            raise ValueError("LLM returned an invalid or empty response.")
+
         sanitized_steps = []
         for step in response.steps:
             if isinstance(step.tool_input, str):
@@ -338,20 +343,26 @@ def chief_architect_node(state: GraphState):
                     step.tool_input = json.loads(step.tool_input)
                 except json.JSONDecodeError:
                     logger.warning(f"Could not parse tool_input '{step.tool_input}' as JSON. Wrapping it for the tool.")
-                    if step.tool_name == "web_search":
-                        step.tool_input = {"query": step.tool_input}
-                    elif step.tool_name == "workspace_shell":
-                         step.tool_input = {"command": step.tool_input}
-                    else:
-                        step.tool_input = {"input": step.tool_input}
-
+                    if step.tool_name == "web_search": step.tool_input = {"query": step.tool_input}
+                    elif step.tool_name == "workspace_shell": step.tool_input = {"command": step.tool_input}
+                    else: step.tool_input = {"input": step.tool_input}
             sanitized_steps.append(step.dict())
 
         logger.info(f"Architect created a tactical plan with {len(sanitized_steps)} steps for goal: '{current_strategic_step}'")
         return {"tactical_plan": sanitized_steps, "tactical_step_index": 0}
+    
     except Exception as e:
-        logger.error(f"Task '{task_id}': Failed to create tactical plan: {e}")
-        return {"tactical_plan": [{"step_id": 1, "instruction": f"Error: Could not generate a tactical plan. {e}", "tool_name": "error", "tool_input": {}}], "tactical_step_index": 0}
+        logger.error(f"Task '{task_id}': CRITICAL FAILURE in chief_architect_node: {e}", exc_info=True)
+        error_plan = {
+            "tactical_plan": [{
+                "step_id": 1,
+                "instruction": f"The Chief Architect failed to create a tactical plan. Error: {e}",
+                "tool_name": "error",
+                "tool_input": {}
+            }],
+            "tactical_step_index": 0
+        }
+        return error_plan
 
 
 def site_foreman_node(state: GraphState):

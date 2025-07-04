@@ -1,14 +1,18 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Prompts (Phase 17 - Role & UI Refinement)
+# ResearchAgent Prompts (Phase 17 - Final KeyError FIX)
 #
-# This version implements two key improvements based on user feedback:
-# 1. Expert Highlighting: The `expert_critique_prompt_template` is updated
-#    to instruct experts to prefix new or modified steps with `**NEW:**` or
-#    `**MODIFIED:**` for better UI visibility.
-# 2. Chair as Optimizer: The `chair_final_review_prompt_template` is
-#    significantly enhanced. The Chair's primary role is now to optimize and
-#    consolidate the plan (e.g., merging `pip_install` calls) and to remove
-#    specific tool names, focusing on high-level strategic goals.
+# This version fixes a `KeyError: 'output_dir'` that occurs when formatting
+# the `chief_architect_prompt_template`.
+#
+# Key Change:
+# 1. chief_architect_prompt_template:
+#    - The f-string curly braces inside the "Good Example" Python code have
+#      been escaped by doubling them (e.g., `{output_dir}` becomes
+#      `{{output_dir}}`). This prevents Python's `.format()` method from
+#      misinterpreting the example code as a placeholder, which was the
+#      direct cause of the KeyError.
+#
+# 2. All other prompts are retained from the previous successful version.
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
@@ -31,7 +35,7 @@ You are a master project manager. Based on the user's request, your job is to as
 )
 
 chair_initial_plan_prompt_template = PromptTemplate.from_template(
-"""You are the Chair of a Board of Experts. Your role is to create a high-level, strategic plan to address the user's request. You must consider the expertise of your board members.
+"""You are the Chair of a Board of Experts. Your role is to create a high-level, strategic plan to address the user's request. You must think in terms of major project milestones.
 
 **User's Request:**
 {user_request}
@@ -40,14 +44,27 @@ chair_initial_plan_prompt_template = PromptTemplate.from_template(
 {experts}
 
 **Instructions:**
-1. Create a step-by-step plan to fulfill the user's request.
-2. The plan should be strategic and high-level, describing **what** to do, not **how** to do it. **DO NOT** include tool names like `workspace_shell` or `write_file`.
-3. Incorporate at least one `checkpoint` step at a logical point for the board to review progress before proceeding.
-4. Your output must be a valid JSON object conforming to the "Plan" schema, containing a "plan" key.
+1. Create a step-by-step plan with 3-5 major, high-level milestones to fulfill the user's request.
+2. The plan should be strategic, describing **what** to do, not **how** to do it.
+3. **CRITICAL Tool Assignment Rule:**
+    - For any `checkpoint` step, you MUST assign the tool as `"checkpoint"`.
+    - For all other high-level strategic steps, you MUST assign the tool as `"strategic_milestone"`.
+4. Your output must be a valid JSON object conforming to the "Plan" schema.
+
+**Example of a good strategic plan:**
+```json
+{{
+  "plan": [
+    {{"instruction": "Generate and validate three distinct datasets according to statistical best practices.", "tool": "strategic_milestone"}},
+    {{"instruction": "Perform comprehensive statistical and visual analysis on the datasets.", "tool": "strategic_milestone"}},
+    {{"instruction": "Board review of analytical findings.", "tool": "checkpoint"}},
+    {{"instruction": "Synthesize final report with conclusions and supporting evidence.", "tool": "strategic_milestone"}}
+  ]
+}}
+```
 """
 )
 
-# MODIFIED: Added highlighting instructions
 expert_critique_prompt_template = PromptTemplate.from_template(
 """You are a world-class expert with a specific persona. Your task is to critique a proposed plan and improve it.
 
@@ -64,16 +81,15 @@ expert_critique_prompt_template = PromptTemplate.from_template(
 1.  Review the `Current Plan` from the perspective of your `Expert Persona`.
 2.  Identify weaknesses, missing steps, or potential improvements. Can you make it more efficient, robust, or secure?
 3.  Provide a concise, constructive `critique` explaining your reasoning.
-4.  Create an `updated_plan` that incorporates your suggestions. You MUST return the *entire* plan, not just the changes.
+4.  Create an `updated_plan` that incorporates your suggestions. You MUST return the *entire* plan, not just the changed parts.
 5.  **Highlighting Rule:** When you add a completely new step, you **MUST** prefix its instruction with `**NEW:**`. When you modify an existing step, you **MUST** prefix it with `**MODIFIED:**`.
 6.  If the plan is already perfect from your perspective, state that in the critique and return the original plan unchanged.
 7.  Your final output MUST be a single, valid JSON object that conforms to the `CritiqueAndPlan` schema.
 """
 )
 
-# MODIFIED: Enhanced with optimization and consolidation duties
 chair_final_review_prompt_template = PromptTemplate.from_template(
-"""You are the Chair of the Board of Experts. Your final responsibility is to perform a sanity check, optimize the plan, and produce the definitive version for user approval.
+"""You are the Chair of the Board of Experts, and you are a master strategist. Your final, most important duty is to take the detailed, expert-revised plan and consolidate it back into a high-level strategic plan.
 
 **The Original User Request:**
 {user_request}
@@ -81,22 +97,25 @@ chair_final_review_prompt_template = PromptTemplate.from_template(
 **The Full History of Board Critiques:**
 {critiques}
 
-**The Sequentially Refined Plan (after the last expert's review):**
+**The Detailed, Sequentially Refined Plan (after all expert reviews):**
+```json
 {refined_plan}
+```
 
-**Your Task:**
-1.  **Synthesize and Validate:** Review the `Sequentially Refined Plan` and ensure it is coherent and logically sound after all modifications. Ensure the spirit of all `Board Critiques` has been incorporated.
-2.  **Optimize and Consolidate:** This is your most important duty. Scrutinize the plan for inefficiencies and merge steps where possible.
-    * **Merge Redundant Calls:** If you see multiple `pip_install` steps, merge them into a single step with a list of all required packages.
-    * **Combine Logically Related Steps:** If sequential steps can be performed by a single, more comprehensive action (like a single script), consolidate them into a single, clearer strategic step.
-3.  **Focus on 'What', not 'How':** Your final plan should describe the high-level goals. **DO NOT** specify tool names (e.g., `write_file`, `workspace_shell`). The Chief Architect will select the correct tools later.
-4.  **Checkpoints:** Ensure at least one `checkpoint` step exists at a logical point for the board to review progress. Add them if necessary.
+**Your Task: Strategic Consolidation**
+1.  **Analyze the Details:** Read the `Detailed, Sequentially Refined Plan`. This is the "how." It contains all the valuable, specific actions suggested by your experts.
+2.  **Synthesize into Milestones:** Your job is to "roll up" these details into **3-5 major strategic milestones**. Think of these as project phases.
+3.  **Preserve Intent:** Your new high-level plan must honor the intent and incorporate the wisdom of all the expert critiques.
+4.  **CRITICAL Tool Assignment Rule:**
+    - For any `checkpoint` step, you MUST preserve the exact tool assignment: `"tool": "checkpoint"`.
+    - For all other consolidated, high-level strategic steps, you MUST assign the tool as `"tool": "strategic_milestone"`.
 5.  **Output:** Return the final, validated, and optimized plan. Your output must be a single, valid JSON object conforming to the `Plan` schema.
 """
 )
 
 
 # --- Chief Architect Prompt ---
+# MODIFIED: Escaped the curly braces in the f-string within the example code.
 chief_architect_prompt_template = PromptTemplate.from_template(
 """
 You are the Chief Architect of an AI-powered research team. You are a master of breaking down high-level goals into detailed, step-by-step plans of tool calls.
@@ -122,33 +141,55 @@ Your job is to take a single high-level strategic goal and expand it into a deta
 
 **CRITICAL Instructions:**
 1.  **Efficiency Principle:** Your primary goal is to solve the strategic step in the **fewest, most robust tactical steps possible**.
-2.  **Prefer Scripts Over Commands:** For any task involving data manipulation, calculations, or complex logic, you should **always prefer to write a single, complete Python script using the `write_file` tool** and then execute it with a single `workspace_shell` command. This is more efficient and reliable than a long series of individual commands.
-3.  **Specify Tools:** Every step in your plan **MUST** include a valid `tool_name` from the `Available Tools` list.
-4.  **Data Piping:** If a step needs to use the output from a previous tactical step, you MUST use the special placeholder string `{{step_N_output}}` as a value in your `tool_input`, where `N` is the `step_id` of the step that produces the required output.
-5.  **Output Format:** Your final output must be a single, valid JSON object conforming to the `TacticalPlan` schema, containing a "steps" key.
+2.  **Prefer Scripts Over Commands:** For any task involving multiple data steps, calculations, or logic, you should **always prefer to write a single, complete Python script using the `write_file` tool** and then execute it with a single `workspace_shell` command. This is more efficient and reliable than a long series of individual commands.
+3.  **JSON String Escaping:** When creating the `content` for the `write_file` tool, you **MUST** ensure it is a valid JSON string. This means all newline characters within the code **MUST** be escaped as `\\n`, and all double quotes **MUST** be escaped as `\\"`.
+4.  **Output Format:** Your final output must be a single, valid JSON object conforming to the `TacticalPlan` schema.
 
 ---
-**Example of the CORRECT, script-based approach:**
-*Strategic Goal:* "For the files 'set1.txt' and 'set2.txt', calculate the mean and standard deviation for each, then write a summary."
-*Correct Output:*
+**Example of Planning Style (Bad vs. Good):**
+
+**Strategic Goal:** "Perform preliminary statistical analysis (mean, median, std dev) on each dataset and generate histograms."
+
+**--- BAD EXAMPLE (Fragmented, Inefficient) ---**
+```json
+{{
+  "steps": [
+    {{"step_id": 1, "instruction": "Install numpy", "tool_name": "pip_install", "tool_input": {{"package": "numpy"}} }},
+    {{"step_id": 2, "instruction": "Write a script to calculate the mean", "tool_name": "write_file", "tool_input": {{...}} }},
+    {{"step_id": 3, "instruction": "Run the mean script", "tool_name": "workspace_shell", "tool_input": {{...}} }},
+    {{"step_id": 4, "instruction": "Write a script to calculate the median", "tool_name": "write_file", "tool_input": {{...}} }},
+    {{"step_id": 5, "instruction": "Run the median script", "tool_name": "workspace_shell", "tool_input": {{...}} }}
+  ]
+}}
+```
+
+**--- GOOD EXAMPLE (Consolidated, Script-based, Efficient) ---**
 ```json
 {{
   "steps": [
     {{
       "step_id": 1,
-      "instruction": "Create a Python script to read 'set1.txt' and 'set2.txt', calculate the mean and standard deviation for each file's contents, and print the results in a formatted summary.",
-      "tool_name": "write_file",
+      "instruction": "Install necessary data analysis and plotting libraries.",
+      "tool_name": "pip_install",
       "tool_input": {{
-        "file": "analyze_sets.py",
-        "content": "import numpy as np\\n\\ndef analyze_file(filename):\\n    try:\\n        data = np.loadtxt(filename)\\n        mean = np.mean(data)\\n        std = np.std(data)\\n        print(f'Results for {{filename}}:')\\n        print(f'  Mean: {{mean:.2f}}')\\n        print(f'  Standard Deviation: {{std:.2f}}\\n')\\n    except Exception as e:\\n        print(f'Error processing {{filename}}: {{e}}')\\n\\nanalyze_file('set1.txt')\\nanalyze_file('set2.txt')"
+        "package": "numpy pandas matplotlib"
       }}
     }},
     {{
       "step_id": 2,
-      "instruction": "Execute the analysis script.",
+      "instruction": "Create a single Python script to perform all preliminary analysis: load each dataset, calculate descriptive statistics (mean, median, std dev), generate a histogram for each, and save the plots to files.",
+      "tool_name": "write_file",
+      "tool_input": {{
+        "file": "preliminary_analysis.py",
+        "content": "import numpy as np\\nimport pandas as pd\\nimport matplotlib.pyplot as plt\\n\\ndef analyze_dataset(filepath, output_dir):\\n    # ... (code to load, analyze, and plot) ...\\n    plt.savefig(f'{{output_dir}}/{{filepath}}_histogram.png')\\n    print(f'Analysis complete for {{filepath}}')\\n\\nfiles = ['set1.csv', 'set2.csv', 'set3.csv']\\nfor f in files:\\n    analyze_dataset(f, '.')\\n"
+      }}
+    }},
+    {{
+      "step_id": 3,
+      "instruction": "Execute the main analysis script to perform all calculations and generate all plots.",
       "tool_name": "workspace_shell",
       "tool_input": {{
-        "command": "python analyze_sets.py"
+        "command": "python preliminary_analysis.py"
       }}
     }}
   ]

@@ -1,4 +1,18 @@
 // src/components/AgentCards.jsx
+// -----------------------------------------------------------------------------
+// ResearchAgent UI Components (Phase 17 - Architect Card FIX)
+//
+// This version updates the `ArchitectCard` to provide the same level of
+// detail as the other plan cards, improving UI consistency and transparency.
+//
+// Key Change:
+// 1. ArchitectCard Enhancement: The card now uses the existing `PlanStepView`
+//    component to render each step of the tactical plan. This means that
+//    in addition to the instruction, the UI will now display the specific
+//    `tool_name` chosen by the Architect for that step, matching the style
+//    of the Chair's plan card.
+// -----------------------------------------------------------------------------
+
 import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import { ArchitectIcon, CheckCircleIcon, ChevronDownIcon, CircleDotIcon, EditorIcon, ForemanIcon, LoaderIcon, PlusCircleIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, XCircleIcon, BoardIcon, CheckIcon, ChairIcon, CritiqueIcon } from './Icons';
@@ -89,10 +103,41 @@ const EditableStep = ({ step, index, updateStep, removeStep, availableTools }) =
 };
 
 
-export const ArchitectCard = ({ plan, isAwaitingApproval, onModify, onReject, availableTools }) => {
-    const [editablePlan, setEditablePlan] = useState(plan.steps || []);
+const PlanStepView = ({ step }) => {
+    const isNew = (step.instruction || '').startsWith('**NEW:**');
+    const isModified = (step.instruction || '').startsWith('**MODIFIED:**');
+    let text = step.instruction || '';
+    let style = '';
 
-    useEffect(() => { setEditablePlan(plan.steps || []); }, [plan]);
+    if (isNew) {
+        text = text.substring('**NEW:**'.length).trim();
+        style = 'text-green-400 font-bold';
+    } else if (isModified) {
+        text = text.substring('**MODIFIED:**'.length).trim();
+        style = 'text-yellow-400 font-bold';
+    }
+
+    return (
+        <li class={`flex items-start gap-3 py-1.5 ${style}`}>
+            <CheckIcon class="h-4 w-4 text-blue-400 mt-1 flex-shrink-0" />
+            <span>
+                {text}
+                <span class="ml-2 inline-block bg-gray-700 text-blue-300 text-xs font-mono px-1.5 py-0.5 rounded">
+                    {step.tool || step.tool_name}
+                </span>
+            </span>
+        </li>
+    );
+};
+
+// MODIFIED: This card now uses the PlanStepView to show tool names.
+export const ArchitectCard = ({ plan, isAwaitingApproval, onModify, onReject, availableTools }) => {
+    const [editablePlan, setEditablePlan] = useState([]);
+
+    useEffect(() => {
+        // The plan from the backend might be called `steps`
+        setEditablePlan(plan?.steps || plan || []);
+    }, [plan]);
 
     const updateStep = (index, updatedStep) => {
         const newPlan = [...editablePlan]; newPlan[index] = updatedStep; setEditablePlan(newPlan);
@@ -132,7 +177,9 @@ export const ArchitectCard = ({ plan, isAwaitingApproval, onModify, onReject, av
             ) : (
                 <div>
                     <h4 class="text-sm font-bold text-gray-400 mb-2">Tactical Plan Generated</h4>
-                    <ul class="list-decimal list-inside text-gray-300 space-y-1">{plan.map(step => <li key={step.instruction}>{step.instruction}</li>)}</ul>
+                    <ul class="space-y-1 text-gray-300">
+                        {(editablePlan || []).map((step, index) => <PlanStepView key={index} step={step} />)}
+                    </ul>
                 </div>
             )}
         </AgentResponseCard>
@@ -170,24 +217,6 @@ export const BoardApprovalCard = ({ experts, onApproval }) => {
                 </div>
              )}
         </AgentResponseCard>
-    );
-};
-
-const PlanStepView = ({ step }) => {
-    const isNew = (step.instruction || '').startsWith('NEW:');
-    const text = isNew ? step.instruction.substring(5) : step.instruction;
-    const style = isNew ? 'text-green-400 font-bold' : '';
-
-    return (
-        <li class={`flex items-start gap-3 py-1.5 ${style}`}>
-            <CheckIcon class="h-4 w-4 text-blue-400 mt-1 flex-shrink-0" />
-            <span>
-                {text}
-                <span class="ml-2 inline-block bg-gray-700 text-blue-300 text-xs font-mono px-1.5 py-0.5 rounded">
-                    {step.tool || step.tool_name}
-                </span>
-            </span>
-        </li>
     );
 };
 
