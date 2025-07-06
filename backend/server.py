@@ -1,18 +1,23 @@
 # backend/server.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 17 - Final Plan Broadcast FIX)
+# ResearchAgent Backend Server (Phase 17 - Escalation Path WIRING)
 #
-# This version fixes a bug where the final strategic plan was not being sent
-# to the frontend for approval.
+# This version updates the server to handle the new user guidance interrupt.
 #
-# Key Architectural Fix:
-# 1. Final Plan Event Corrected: The `agent_execution_wrapper` function is
-#    updated. When the graph pauses for `human_in_the_loop_final_plan_approval`,
-#    it now correctly retrieves the `strategic_memo` from the current state.
-# 2. Memo Deconstruction: It deconstructs the memo and sends its `plan` and
-#    `implementation_notes` as separate fields in the WebSocket event. This
-#    ensures the frontend receives all the necessary data to render the
-#    complete final approval card.
+# Key Architectural Changes:
+# 1. Event Handling in `agent_execution_wrapper`:
+#    - A new `elif` condition is added to check if the graph's `next`
+#      state is `human_in_the_loop_user_guidance`.
+#    - When this condition is met, it broadcasts a new event type:
+#      `user_guidance_approval_request`.
+#    - This event includes the `checkpoint_report` from the Editor, providing
+#      the necessary context for the user to make an informed decision.
+#
+# 2. `resume_agent_handler` Update:
+#    - The handler is updated to check for a new `guidance` field in the
+#      incoming payload from the frontend.
+#    - If present, it adds this guidance to the `GraphState` before
+#      resuming the agent execution.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -544,7 +549,6 @@ async def agent_execution_wrapper(input_state, config):
                 "enabled_tools": current_state.values.get("enabled_tools")
             }))
 
-        # MODIFIED: Correctly deconstruct the strategic_memo for broadcast.
         elif current_state.next and "human_in_the_loop_final_plan_approval" in current_state.next:
             logger.info(f"Task '{task_id}': Paused for Final Plan approval.")
             memo = current_state.values.get("strategic_memo", {})
@@ -553,6 +557,15 @@ async def agent_execution_wrapper(input_state, config):
                 "plan": memo.get("plan"),
                 "implementation_notes": memo.get("implementation_notes"),
                 "critiques": current_state.values.get("critiques"),
+                "task_id": task_id
+            })
+        
+        # NEW: Handle the user guidance interrupt
+        elif current_state.next and "human_in_the_loop_user_guidance" in current_state.next:
+            logger.info(f"Task '{task_id}': Paused for User Guidance.")
+            await broadcast_event({
+                "type": "user_guidance_approval_request",
+                "report": current_state.values.get("checkpoint_report"),
                 "task_id": task_id
             })
 
@@ -603,14 +616,16 @@ async def resume_agent_handler(data):
     if (feedback := data.get("feedback")) is not None: 
         update_values["user_feedback"] = feedback
     if (plan := data.get("plan")) is not None: 
-        # When approving, the frontend sends back the potentially modified plan.
-        # We need to reconstruct the memo to put it back into the state.
         current_state = agent_graph.get_state(config)
         memo = current_state.values.get("strategic_memo", {})
         memo['plan'] = plan
         update_values["strategic_memo"] = memo
     if (board_approved := data.get("board_approved")) is not None: 
         update_values["board_approved"] = board_approved
+    # NEW: Handle incoming user guidance
+    if (guidance := data.get("guidance")) is not None:
+        update_values["user_guidance"] = guidance
+
 
     agent_graph.update_state(config, update_values)
     agent_task = asyncio.create_task(agent_execution_wrapper(None, config))

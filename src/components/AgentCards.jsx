@@ -1,19 +1,20 @@
 // src/components/AgentCards.jsx
 // -----------------------------------------------------------------------------
-// ResearchAgent UI Components (Phase 17 - Strategic Memo UI)
+// ResearchAgent UI Components (Phase 17 - Escalation Path WIRING)
 //
-// This version completes the "Strategic Memo" feature by updating the UI to
-// display the implementation notes provided by the Chair.
+// This version adds the new placeholder component for the user guidance path.
 //
-// Key Change:
-// 1. FinalPlanApprovalCard Updated:
-//    - This card now accepts a new prop: `implementationNotes`.
-//    - It renders a new section titled "Key Implementation Notes" just above
-//      the final plan.
-//    - This section displays a bulleted list of the critical constraints and
-//      details distilled by the Chair, making them visible to the user
-//      before final approval. This ensures full transparency of the agent's
-//      strategic reasoning.
+// Key Architectural Changes:
+// 1. New `UserGuidanceCard` Component:
+//    - This component is designed to handle the `user_guidance` event.
+//    - It displays the `report` from the Editor to give the user context.
+//    - It includes a text input for the user to type their guidance.
+//    - It has a "Submit Guidance" button that, when clicked, calls the
+//      `onGuidanceSubmit` prop with the input text.
+//    - It manages its own state to switch from the input form to a
+//      "Guidance Submitted" confirmation view.
+//
+// 2. Export: The new component is exported so it can be used by `App.jsx`.
 // -----------------------------------------------------------------------------
 
 import { h } from 'preact';
@@ -242,7 +243,6 @@ export const ExpertCritiqueCard = ({ critique }) => (
     </AgentResponseCard>
 );
 
-// MODIFIED: Now accepts and renders `implementationNotes`.
 export const FinalPlanApprovalCard = ({ plan, critiques, implementationNotes, onModify, onReject }) => {
     const [isApproved, setIsApproved] = useState(null);
 
@@ -271,7 +271,6 @@ export const FinalPlanApprovalCard = ({ plan, critiques, implementationNotes, on
                 </ul>
             </details>
 
-            {/* NEW: Display Implementation Notes */}
             {implementationNotes && implementationNotes.length > 0 && (
                 <div class="mb-4">
                     <h4 class="text-sm font-bold text-gray-400 mb-3">Key Implementation Notes:</h4>
@@ -361,6 +360,50 @@ export const BoardDecisionCard = ({ decision }) => (
         </div>
     </AgentResponseCard>
 );
+
+// NEW: Component for the user guidance interrupt
+export const UserGuidanceCard = ({ report, isAwaitingApproval, submittedGuidance, onGuidanceSubmit }) => {
+    const [guidanceText, setGuidanceText] = useState('');
+
+    const handleSubmit = () => {
+        if (guidanceText.trim()) {
+            onGuidanceSubmit(guidanceText);
+        }
+    };
+
+    return (
+        <AgentResponseCard icon={<UserIcon class="h-5 w-5" />} title="User Guidance Required" color="blue">
+            <div class="mb-3 p-3 bg-gray-900/50 rounded-lg border border-sky-700/50">
+                <h4 class="text-xs font-bold text-sky-300 mb-1">Editor's Report:</h4>
+                <p class="text-sm text-gray-300 whitespace-pre-wrap">{report}</p>
+            </div>
+            <p class="text-sm text-gray-400 mb-3">The Board of Experts has escalated the task and requires your guidance on how to proceed.</p>
+
+            {isAwaitingApproval ? (
+                <div class="flex gap-2">
+                    <input
+                        type="text"
+                        value={guidanceText}
+                        onInput={(e) => setGuidanceText(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === 'Enter') handleSubmit(); }}
+                        class="flex-grow bg-input border border-border rounded-lg p-2 text-sm"
+                        placeholder="Provide guidance to the board..."
+                    />
+                    <button onClick={handleSubmit} class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 text-sm">
+                        Submit Guidance
+                    </button>
+                </div>
+            ) : (
+                <div>
+                    <h4 class="text-xs font-bold text-green-400 mb-1">Your Submitted Guidance:</h4>
+                    <p class="text-sm text-gray-300 italic p-3 bg-gray-900/50 rounded-lg border border-green-700/50">
+                        "{submittedGuidance}"
+                    </p>
+                </div>
+            )}
+        </AgentResponseCard>
+    );
+};
 
 
 export const SiteForemanCard = ({ plan }) => (

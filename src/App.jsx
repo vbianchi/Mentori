@@ -1,26 +1,31 @@
 // src/App.jsx
 // -----------------------------------------------------------------------------
-// ResearchAgent Main UI (Phase 17 - Strategic Memo UI FIX)
+// ResearchAgent Main UI (Phase 17 - Escalation Path WIRING)
 //
-// This version fixes the final bug in the "Strategic Memo" feature.
+// This version wires the frontend to handle the new user guidance interrupt.
 //
-// Key Change:
+// Key Architectural Changes:
 // 1. Event Handling in `useAgent` Callback:
-//    - The `onMessage` callback passed to the `useAgent` hook is updated.
-//    - When it receives a `final_plan_approval_request` event, it now
-//      correctly extracts the `implementation_notes` from the event payload.
-//    - It adds this new field to the history object that gets stored in the
-//      `tasks` state.
+//    - The `onMessage` callback is updated with a new `elif` condition to
+//      recognize the `user_guidance_approval_request` event type.
+//    - When this event is received, it pushes a new object with type
+//      `user_guidance` into the active task's history. This object includes
+//      the Editor's report and a flag indicating it's awaiting user input.
 //
-// 2. Prop Drilling in `render`:
-//    - The `FinalPlanApprovalCard` component is now correctly passed the
-//      `implementationNotes={child.implementationNotes}` prop, ensuring the
-//      data flows all the way from the WebSocket to the final component.
+// 2. `resumeAgent` Call for Guidance:
+//    - A new handler, `handleUserGuidanceSubmit`, is created.
+//    - It calls the `agent.resumeAgent` function, passing the user's text
+//      input in the new `guidance` field of the payload.
+//
+// 3. Component Rendering:
+//    - A new case is added to the `switch` statement in the render block to
+//      render the (soon-to-be-created) `UserGuidanceCard` when an item
+//      with type `user_guidance` is found in the history.
 // -----------------------------------------------------------------------------
 import { h } from 'preact';
 import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
 import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, FolderIcon, ArrowLeftIcon, UploadCloudIcon, StopCircleIcon, BriefcaseIcon, SendToChatIcon, FileTextIcon, BoardIcon, CheckIcon, XCircleIcon, ChairIcon, CritiqueIcon } from './components/Icons';
-import { FinalPlanApprovalCard, ExpertCritiqueCard, ArchitectCard, BoardApprovalCard, ChairPlanCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard, ExecutionStepCard, WorkCard, ForemanCard, WorkerCard, SupervisorCard, EditorReportCard, BoardDecisionCard } from './components/AgentCards';
+import { FinalPlanApprovalCard, ExpertCritiqueCard, ArchitectCard, BoardApprovalCard, ChairPlanCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard, ExecutionStepCard, WorkCard, ForemanCard, WorkerCard, SupervisorCard, EditorReportCard, BoardDecisionCard, UserGuidanceCard } from './components/AgentCards';
 import { ToggleButton, CopyButton } from './components/Common';
 import { useTasks } from './hooks/useTasks';
 import { useWorkspace } from './hooks/useWorkspace';
@@ -166,7 +171,6 @@ export function App() {
     const workspace = useWorkspace(activeTaskId);
     const settings = useSettings();
     
-    // MODIFIED: The onMessage callback now handles `implementation_notes`.
     const agent = useAgent(useCallback((event) => {
         setTasks(currentTasks => {
             try {
@@ -191,13 +195,19 @@ export function App() {
                 } else if (eventType === 'expert_critique_generated') {
                     runContainer.children.push({ type: 'expert_critique', critique: event.critique });
                 } else if (eventType === 'final_plan_approval_request') {
-                    // This is the key fix: store the implementation_notes.
                     runContainer.children.push({ 
                         type: 'final_plan_approval', 
                         plan: event.plan, 
                         critiques: event.critiques, 
-                        implementationNotes: event.implementation_notes, // Added this line
+                        implementationNotes: event.implementation_notes,
                         isAwaitingApproval: true 
+                    });
+                // NEW: Handle the user guidance request event
+                } else if (eventType === 'user_guidance_approval_request') {
+                    runContainer.children.push({
+                        type: 'user_guidance',
+                        report: event.report,
+                        isAwaitingApproval: true
                     });
                 } else if (eventType === 'architect_plan_generated') {
                     runContainer.children.push({ type: 'architect_plan', plan: event.plan, isAwaitingApproval: false });
@@ -296,6 +306,31 @@ export function App() {
         }));
         agent.resumeAgent({ task_id: activeTaskId, feedback: approved ? 'approve' : 'reject', plan, enabled_tools: Object.keys(settings.enabledTools).filter(key => settings.enabledTools[key]) });
     };
+    
+    // NEW: Handler for submitting user guidance
+    const handleUserGuidanceSubmit = (guidanceText) => {
+        setTasks(currentTasks => currentTasks.map(task => {
+            if (task.id === activeTaskId) {
+                const newHistory = [...task.history];
+                const runContainer = newHistory[newHistory.length - 1];
+                if (runContainer?.type === 'run_container') {
+                    const guidanceCard = runContainer.children.find(c => c.type === 'user_guidance');
+                    if (guidanceCard) {
+                        guidanceCard.isAwaitingApproval = false;
+                        guidanceCard.submittedGuidance = guidanceText;
+                    }
+                }
+                return { ...task, history: newHistory };
+            }
+            return task;
+        }));
+        agent.resumeAgent({
+            task_id: activeTaskId,
+            guidance: guidanceText,
+            enabled_tools: Object.keys(settings.enabledTools).filter(key => settings.enabledTools[key])
+        });
+    };
+
 
     const handleModifyAndApprove = (modifiedPlan) => handlePlanApprovalAction('approve', modifiedPlan);
     
@@ -383,7 +418,6 @@ export function App() {
                                                     case 'board_approval': return <BoardApprovalCard experts={child.experts} onApproval={handleBoardApprovalAction} />;
                                                     case 'chair_plan': return <ChairPlanCard plan={child.plan} />;
                                                     case 'expert_critique': return <ExpertCritiqueCard critique={child.critique} />;
-                                                    // MODIFIED: Pass the implementationNotes prop
                                                     case 'final_plan_approval': return <FinalPlanApprovalCard plan={child.plan} critiques={child.critiques} implementationNotes={child.implementationNotes} onModify={(plan) => handleFinalPlanApprovalAction(true, plan)} onReject={() => handleFinalPlanApprovalAction(false)} />;
                                                     case 'foreman_step': return <ForemanCard step={child.step} />;
                                                     case 'worker_step': return <WorkerCard toolCall={child.tool_call} output={child.output} />;
@@ -392,6 +426,8 @@ export function App() {
                                                     case 'board_decision': return <BoardDecisionCard decision={child.decision} />;
                                                     case 'direct_answer': return <DirectAnswerCard answer={child.content} />;
                                                     case 'final_answer': return <FinalAnswerCard answer={child.content} />;
+                                                    // NEW: Render the UserGuidanceCard
+                                                    case 'user_guidance': return <UserGuidanceCard report={child.report} isAwaitingApproval={child.isAwaitingApproval} submittedGuidance={child.submittedGuidance} onGuidanceSubmit={handleUserGuidanceSubmit} />;
                                                     default: return null;
                                                 }
                                             })()}

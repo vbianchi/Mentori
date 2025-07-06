@@ -1,22 +1,17 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Prompts (Phase 17 - Strategic Memo IMPLEMENTATION)
+# ResearchAgent Prompts (Phase 17 - Board Decision LOGIC)
 #
-# This version implements the "Strategic Memo" architecture to preserve
-# critical expert details during the planning phase.
+# This version adds the final prompt needed for the Board of Experts track.
 #
 # Key Architectural Changes:
-# 1. chair_final_review_prompt_template:
-#    - This prompt is now instructed to output a `StrategicMemo` object.
-#    - It must distill the expert critiques into a bulleted list of
-#      `implementation_notes` in addition to the high-level `plan`.
-#    - The "3-5 step" constraint has been replaced with your suggested
-#      "high-level, multi-step strategic milestones" language.
-#
-# 2. chief_architect_prompt_template:
-#    - This prompt is updated to accept and use the new
-#      `implementation_notes` field as a set of mandatory constraints.
-#
-# 3. All other prompts are retained.
+# 1. New `board_checkpoint_review_prompt_template`:
+#    - This new prompt is designed for the `board_checkpoint_review_node`.
+#    - It instructs an LLM, acting as the collective voice of the board,
+#      to make a strategic decision based on the Editor's progress report.
+#    - It provides clear definitions for the three possible choices:
+#      `continue`, `adapt`, and `escalate`.
+#    - This replaces the hardcoded "escalate" logic, making the board's
+#      review cycle truly autonomous.
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
@@ -38,7 +33,6 @@ You are a master project manager. Based on the user's request, your job is to as
 """
 )
 
-# MODIFIED: Using "high-level, multi-step strategic milestones"
 chair_initial_plan_prompt_template = PromptTemplate.from_template(
 """You are the Chair of a Board of Experts. Your role is to create a high-level, strategic plan to address the user's request. You must think in terms of major project milestones.
 
@@ -48,13 +42,20 @@ chair_initial_plan_prompt_template = PromptTemplate.from_template(
 **Your Approved Board of Experts:**
 {experts}
 
+**Available Tools:**
+{tools}
+
+**CRITICAL: User Guidance (If provided, this is your primary directive):**
+{user_guidance}
+
 **Instructions:**
-1. Create a series of high-level, multi-step strategic milestones to fulfill the user's request.
-2. The plan should be strategic, describing **what** to do, not **how** to do it.
-3. **CRITICAL Tool Assignment Rule:**
+1. If User Guidance is provided, you MUST create a new plan that directly addresses it. This guidance overrides all previous plans.
+2. If no guidance is provided, create an initial series of high-level, multi-step strategic milestones to fulfill the user's request.
+3. The plan should be strategic, describing **what** to do, not **how** to do it.
+4. **CRITICAL Tool Assignment Rule:**
     - For any `checkpoint` step, you MUST assign the tool as `"checkpoint"`.
     - For all other high-level strategic steps, you MUST assign the tool as `"strategic_milestone"`.
-4. Your output must be a valid JSON object conforming to the "StrategicPlan" schema.
+5. Your output must be a valid JSON object conforming to the "StrategicPlan" schema.
 """
 )
 
@@ -81,7 +82,6 @@ expert_critique_prompt_template = PromptTemplate.from_template(
 """
 )
 
-# MODIFIED: Now generates a StrategicMemo with plan and implementation_notes.
 chair_final_review_prompt_template = PromptTemplate.from_template(
 """You are the Chair of the Board of Experts, and you are a master strategist. Your final, most important duty is to take the detailed, expert-revised plan and synthesize a final Strategic Memo.
 
@@ -113,9 +113,32 @@ Your output must be a single JSON object conforming to the `StrategicMemo` schem
 """
 )
 
+# NEW: Prompt for the board's checkpoint review decision
+board_checkpoint_review_prompt_template = PromptTemplate.from_template(
+"""You are the collective voice of the Board of Experts. You have reached a planned checkpoint in the project. Your task is to review the progress report and decide on the next course of action.
+
+**The Original User Request:**
+{user_request}
+
+**The Approved Strategic Plan:**
+{strategic_plan}
+
+**The Editor's Progress Report (summarizing work done so far):**
+{report}
+
+**Instructions:**
+Based on the report, you must make one of three decisions:
+
+1.  **`continue`**: Choose this if the project is on track and the current plan is sound. The agent will proceed to the next step.
+2.  **`adapt`**: Choose this if the results so far suggest the strategic plan needs to be modified. This will send the project back to the planning stage.
+3.  **`escalate`**: Choose this ONLY if the agent is fundamentally stuck, the results are highly ambiguous, or you require external clarification that only the user can provide.
+
+Your output must be a single, valid JSON object conforming to the `BoardDecision` schema, containing your `decision` and a brief `reasoning`.
+"""
+)
+
 
 # --- Chief Architect Prompt ---
-# MODIFIED: Now accepts and uses `implementation_notes`.
 chief_architect_prompt_template = PromptTemplate.from_template(
 """
 You are the Chief Architect of an AI-powered research team. You are a master of breaking down high-level goals into detailed, step-by-step plans of tool calls.
@@ -288,7 +311,7 @@ You are an expert request router. Your job is to classify the user's latest requ
 {input}
 
 **Instructions:**
-- Analyze the user's latest request in the context of the structured memory and conversation history.
+- Analyze the user's latest request in the context of the structured memory and recent history.
 - Based on your analysis, respond with ONLY ONE of the following three strings: "DIRECT_QA", "SIMPLE_TOOL_USE", or "COMPLEX_PROJECT".
 - Do not add any other words or explanation.
 

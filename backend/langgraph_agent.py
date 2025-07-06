@@ -1,28 +1,21 @@
 # backend/langgraph_agent.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 17 - Strategic Memo IMPLEMENTATION)
+# ResearchAgent Core Agent (Phase 17 - Board Decision LOGIC)
 #
-# This version implements the "Strategic Memo" architecture to preserve
-# critical expert details during the planning phase.
+# This version implements the intelligent decision-making for the board's
+# checkpoint review, fixing the endless escalation loop.
 #
 # Key Architectural Changes:
-# 1. New Pydantic Models:
-#    - A `StrategicMemo` model is introduced. It contains two fields:
-#      - `plan`: The high-level, multi-step strategic milestones.
-#      - `implementation_notes`: A list of critical constraints and details
-#        distilled from expert critiques.
-#    - The `Plan` model is updated to `StrategicPlan` for clarity.
-#
-# 2. GraphState Update:
-#    - The old `strategic_plan: Optional[List[dict]]` is replaced with
-#      `strategic_memo: Optional[dict]` to hold the new, richer object.
-#
-# 3. Node Logic Updates:
-#    - `chair_final_review_node`: This node is updated to generate and return
-#      the full `StrategicMemo` object.
-#    - `chief_architect_node` & `master_router_node`: These nodes are updated
-#      to read from `state['strategic_memo']['plan']` and pass the
-#      `implementation_notes` to the Architect's prompt.
+# 1. New `BoardDecision` Pydantic Model: A new model is added to structure
+#    the output from the board's decision-making LLM call.
+# 2. `board_checkpoint_review_node` Logic Update:
+#    - This node no longer returns a hardcoded "escalate" string.
+#    - It now uses an LLM with the new `board_checkpoint_review_prompt_template`
+#      to analyze the progress report.
+#    - It requests a structured output conforming to the `BoardDecision`
+#      model.
+#    - It then returns the `decision` from the model's output ("continue",
+#      "adapt", or "escalate"), making the node autonomous.
 # -----------------------------------------------------------------------------
 
 import os
@@ -57,7 +50,8 @@ from .prompts import (
     propose_experts_prompt_template,
     chair_initial_plan_prompt_template,
     expert_critique_prompt_template,
-    chair_final_review_prompt_template
+    chair_final_review_prompt_template,
+    board_checkpoint_review_prompt_template, # NEW
 )
 
 # --- Logging Setup ---
@@ -89,12 +83,10 @@ class Step(BaseModel):
     instruction: str = Field(description="The high-level instruction for this step.")
     tool: Optional[str] = Field(default=None, description="The suggested tool for this step (e.g., 'workspace_shell', 'checkpoint'). For high-level strategic steps without a specific tool, this should be null or omitted.")
 
-# MODIFIED: Renamed for clarity
 class StrategicPlan(BaseModel):
     """A high-level plan of strategic milestones."""
     plan: List[Step] = Field(description="A list of high-level steps to accomplish the user's goal.")
 
-# NEW: The Strategic Memo model
 class StrategicMemo(BaseModel):
     """The final output of the planning phase, containing the plan and key implementation details."""
     plan: List[Step] = Field(description="The final, high-level, multi-step strategic plan.")
@@ -115,8 +107,13 @@ class TacticalPlan(BaseModel):
     """A detailed, step-by-step plan of tool calls to achieve a strategic goal."""
     steps: List[TacticalStep] = Field(description="A list of tactical steps to be executed in sequence.")
 
+# NEW: Pydantic model for the board's decision
+class BoardDecision(BaseModel):
+    """The decision made by the Board of Experts at a checkpoint."""
+    decision: str = Field(description="The board's decision. Must be one of: 'continue', 'adapt', 'escalate'.")
+    reasoning: str = Field(description="A brief justification for the board's decision.")
 
-# MODIFIED: Replaced `strategic_plan` with `strategic_memo`
+
 class GraphState(TypedDict):
     input: str
     task_id: str
@@ -146,7 +143,7 @@ class GraphState(TypedDict):
     expert_critique_index: int
     critiques: Optional[List[dict]]
     refined_plan: Optional[List[dict]]
-    strategic_memo: Optional[dict] # Replaces strategic_plan
+    strategic_memo: Optional[dict]
     tactical_plan: Optional[List[dict]]
     current_tactical_step: Optional[dict]
     worker_output: Optional[str]
@@ -155,6 +152,7 @@ class GraphState(TypedDict):
     strategic_step_index: int
     checkpoint_report: Optional[str]
     board_decision: Optional[str]
+    user_guidance: Optional[str]
 
 
 # --- Helper Functions ---
@@ -179,7 +177,6 @@ def format_tools_for_prompt(state: GraphState):
     active_tools = [t for t in all_tools if t.name in enabled_tool_names] if enabled_tool_names is not None else all_tools
     tool_strings = [f"  - {t.name}: {t.description}" for t in active_tools]
     return "\n".join(tool_strings) if tool_strings else "No tools are available for this task."
-
 def _format_messages(messages: Sequence[BaseMessage], is_for_summary=False) -> str:
     formatted_messages = []; start_index = 0
     if not is_for_summary:
@@ -211,7 +208,8 @@ async def task_setup_node(state: GraphState):
         "critiques": [], "refined_plan": None, "strategic_memo": None,
         "expert_critique_index": 0,
         "tactical_plan": None, "current_tactical_step": None, "worker_output": None, "step_evaluation": None,
-        "tactical_step_index": 0, "strategic_step_index": 0, "checkpoint_report": None, "board_decision": None
+        "tactical_step_index": 0, "strategic_step_index": 0, "checkpoint_report": None, "board_decision": None,
+        "user_guidance": None
     }
 
 def memory_updater_node(state: GraphState):
@@ -246,18 +244,37 @@ def human_in_the_loop_board_approval(state: GraphState):
     return {}
 
 def chair_initial_plan_node(state: GraphState):
-    task_id = state.get("task_id"); logger.info(f"--- (BoE) Task '{task_id}': Executing chair_initial_plan_node ---")
+    task_id = state.get("task_id")
+    logger.info(f"--- (BoE) Task '{task_id}': Executing chair_initial_plan_node (and resetting critique state) ---")
+    
+    if state.get("user_guidance"):
+        logger.info("Re-planning based on new user guidance.")
+    
     llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-pro-latest")
     structured_llm = llm.with_structured_output(StrategicPlan)
-    prompt = chair_initial_plan_prompt_template.format(user_request=state["input"], experts=json.dumps(state.get("approved_experts"), indent=2), tools=format_tools_for_prompt(state))
+    
+    prompt = chair_initial_plan_prompt_template.format(
+        user_request=state["input"],
+        experts=json.dumps(state.get("approved_experts"), indent=2),
+        tools=format_tools_for_prompt(state),
+        user_guidance=state.get("user_guidance", "") 
+    )
+    
     try:
         response = structured_llm.invoke(prompt)
         plan_steps = [step.dict() for step in response.plan]
-        logger.info(f"Chair created an initial plan with {len(plan_steps)} steps.")
-        return {"initial_plan": plan_steps, "refined_plan": plan_steps}
+        logger.info(f"Chair created a plan with {len(plan_steps)} steps.")
+        
+        return {
+            "initial_plan": plan_steps,
+            "refined_plan": plan_steps,
+            "expert_critique_index": 0,
+            "critiques": []
+        }
     except Exception as e:
         logger.error(f"Task '{task_id}': Failed to create initial plan: {e}")
         return {"initial_plan": [{"instruction": "Error: Failed to generate a plan.", "tool": "error"}]}
+
 
 def human_in_the_loop_initial_plan_review(state: GraphState):
     logger.info(f"--- Task '{state.get('task_id')}': Paused for Initial Plan Review ---")
@@ -300,7 +317,6 @@ def expert_critique_node(state: GraphState):
         current_critiques = state.get("critiques", [])
         return {"critiques": current_critiques + [error_critique], "expert_critique_index": critique_index + 1}
 
-# MODIFIED: Now generates and returns a StrategicMemo.
 def chair_final_review_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"--- (BoE) Task '{task_id}': Executing chair_final_review_node (Synthesis) ---")
     llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-pro-latest")
@@ -321,7 +337,6 @@ def chair_final_review_node(state: GraphState):
         return {"strategic_memo": final_memo}
     except Exception as e:
         logger.error(f"Task '{task_id}': Failed during Chair's final synthesis: {e}")
-        # Fallback to a simple plan if memo generation fails
         fallback_memo = {
             "plan": state["refined_plan"],
             "implementation_notes": ["Error: Failed to generate strategic memo."]
@@ -337,7 +352,6 @@ def master_router_node(state: GraphState) -> dict:
     logger.info("--- (STRATEGIC) At Master Router branching point. ---")
     return {}
 
-# MODIFIED: Now receives and uses the full strategic_memo.
 def chief_architect_node(state: GraphState):
     """Generates a detailed, tactical plan of tool calls to achieve a single strategic goal."""
     task_id = state.get("task_id")
@@ -433,12 +447,36 @@ def editor_checkpoint_report_node(state: GraphState):
     report = "Checkpoint reached. All steps so far have been completed successfully. The board will now review the progress to decide the next course of action."
     return {"checkpoint_report": report}
 
+# MODIFIED: Now uses an LLM to make a decision.
 def board_checkpoint_review_node(state: GraphState):
-    """Placeholder for the Board to review progress and make a decision."""
-    logger.info("--- (BoE) The Board is reviewing the checkpoint report. ---")
-    decision = "continue"
-    logger.info(f"Board has decided to: {decision}")
-    return {"board_decision": decision}
+    """Uses an LLM to decide whether to continue, adapt, or escalate."""
+    task_id = state.get("task_id")
+    logger.info(f"--- (BoE) Task '{task_id}': The Board is reviewing the checkpoint report (LLM Call). ---")
+
+    llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-pro-latest")
+    structured_llm = llm.with_structured_output(BoardDecision)
+
+    prompt = board_checkpoint_review_prompt_template.format(
+        user_request=state["input"],
+        strategic_plan=json.dumps(state.get("strategic_memo", {}).get("plan", []), indent=2),
+        report=state.get("checkpoint_report", "No report available.")
+    )
+
+    try:
+        response = structured_llm.invoke(prompt)
+        decision = response.decision
+        logger.info(f"Board has decided to: {decision}. Reasoning: {response.reasoning}")
+        return {"board_decision": decision}
+    except Exception as e:
+        logger.error(f"Task '{task_id}': Failed to get board decision, defaulting to 'escalate'. Error: {e}")
+        # Fallback to escalation on failure to prevent infinite loops
+        return {"board_decision": "escalate"}
+
+
+def human_in_the_loop_user_guidance(state: GraphState):
+    """This node pauses the graph to request guidance from the user."""
+    logger.info(f"--- Task '{state.get('task_id')}': Paused for User Guidance ---")
+    return {}
 
 def increment_strategic_step_node(state: GraphState):
     """Increments the strategic step index."""
@@ -497,7 +535,6 @@ def tactical_step_router(state: GraphState) -> str:
         logger.info("Tactical plan complete. Finishing strategic step.")
         return "finish"
 
-# MODIFIED: Reads from the `strategic_memo`
 def master_router(state: GraphState) -> str:
     """The main router for the strategic loop."""
     logger.info("--- (STRATEGIC) Master Router is checking the next step. ---")
@@ -523,6 +560,8 @@ def after_checkpoint_review_router(state: GraphState) -> str:
     logger.info(f"--- (BoE) Routing after checkpoint review. Decision: {decision} ---")
     if decision == "adapt":
         return "adapt_plan"
+    if decision == "escalate":
+        return "request_user_guidance"
     return "continue_execution"
 
 # --- Graph Definition ---
@@ -551,6 +590,7 @@ def create_agent_graph():
     workflow.add_node("board_checkpoint_review_node", board_checkpoint_review_node)
     workflow.add_node("increment_strategic_step_node", increment_strategic_step_node)
     workflow.add_node("master_router_node", master_router_node)
+    workflow.add_node("human_in_the_loop_user_guidance", human_in_the_loop_user_guidance)
     
     # Set entry and basic flow
     workflow.set_entry_point("Task_Setup")
@@ -605,9 +645,12 @@ def create_agent_graph():
         after_checkpoint_review_router,
         {
             "continue_execution": "increment_strategic_step_node",
-            "adapt_plan": "chair_initial_plan_node"
+            "adapt_plan": "chair_initial_plan_node",
+            "request_user_guidance": "human_in_the_loop_user_guidance"
         }
     )
+    
+    workflow.add_edge("human_in_the_loop_user_guidance", "chair_initial_plan_node")
     
     workflow.add_edge("increment_strategic_step_node", "master_router_node")
 
@@ -619,6 +662,7 @@ def create_agent_graph():
             "human_in_the_loop_board_approval",
             "human_in_the_loop_initial_plan_review",
             "human_in_the_loop_final_plan_approval",
+            "human_in_the_loop_user_guidance",
         ]
     )
     logger.info("ResearchAgent graph compiled with INTELLIGENT architect.")
