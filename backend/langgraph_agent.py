@@ -51,7 +51,7 @@ from .prompts import (
     chair_initial_plan_prompt_template,
     expert_critique_prompt_template,
     chair_final_review_prompt_template,
-    board_checkpoint_review_prompt_template, # NEW
+    board_checkpoint_review_prompt_template,
 )
 
 # --- Logging Setup ---
