@@ -1,24 +1,18 @@
 # backend/langgraph_agent.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 17 - Four-Track Graph Wiring)
+# ResearchAgent Core Agent (Phase 17 - Hotfix)
 #
-# This version completes the reintegration of all four cognitive tracks by
-# implementing the intelligent router and wiring all nodes into the final graph.
+# This version fixes a bug where the Editor node would provide unhelpful
+# summaries instead of direct tool outputs.
 #
-# Key Architectural Changes:
-# 1. Intelligent Four-Track Router: The `initial_router_node` is now powered
-#    by an LLM, using a prompt that allows it to choose between DIRECT_QA,
-#    SIMPLE_TOOL_USE, COMPLEX_PROJECT, or PEER_REVIEW.
-# 2. Fully Wired Graph (`create_agent_graph`):
-#    - The graph is now wired according to the four-track architecture.
-#    - Track 1 (DIRECT_QA) routes directly to the Editor.
-#    - Track 2 (SIMPLE_TOOL_USE) routes through `std_handyman_node` -> `std_worker_node` -> Editor.
-#    - Track 3 (COMPLEX_PROJECT) uses the full `std_` node suite (`std_chief_architect_node`,
-#      `std_site_foreman_node`, etc.) with its self-correction loop.
-#    - Track 4 (PEER_REVIEW) remains wired to the Board of Experts (`Propose_Experts` etc.).
-# 3. Track Separation: The node prefixes (`std_` and `boe_`) ensure that the
-#    execution logic for the standard complex track and the peer review track
-#    are kept completely separate, as requested.
+# Key Fixes:
+# 1. Context-Aware Editor Prompting: The `editor_node` now checks if the
+#    previous action was a simple tool use. If so, it passes the direct
+#    `tool_output` to the `final_answer_prompt_template`.
+# 2. Smarter Final Prompt: The `final_answer_prompt_template` is updated to
+#    prioritize displaying the `tool_output` if it's available, ensuring
+#    the user sees the direct result of their command (e.g., web search
+#    results) instead of a generic confirmation message.
 # -----------------------------------------------------------------------------
 
 import os
@@ -237,7 +231,6 @@ def summarize_history_node(state: GraphState):
     logger.info(f"Task '{state.get('task_id')}': Executing summarize_history_node.")
     return {}
 
-# MODIFIED: Intelligent Four-Track Router
 def initial_router_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing Four-Track Router.")
     if "@experts" in state["input"].lower():
@@ -261,21 +254,25 @@ def initial_router_node(state: GraphState):
     
     return {"route": "Editor", "current_track": "DIRECT_QA"}
 
-# --- Track 1 & Final Output Node ---
+# --- Track 1 & Final Output Node (MODIFIED) ---
 def editor_node(state: GraphState):
     task_id = state.get("task_id")
     logger.info(f"Task '{task_id}': Reached Editor node for final summary.")
     
-    # Use a more sophisticated final prompt
     llm = get_llm(state, "EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
     chat_history_str = _format_messages(state['messages'])
     execution_log_str = "\n".join(state.get("history", []))
     
+    # MODIFIED: Pass tool_output directly if it was a simple tool use case
+    tool_output_str = ""
+    if state.get("current_track") == "SIMPLE_TOOL_USE":
+        tool_output_str = state.get("tool_output", "")
+
     prompt = final_answer_prompt_template.format(
         input=state["input"],
         chat_history=chat_history_str,
         execution_log=execution_log_str or "No tool actions taken.",
-        memory_vault=json.dumps(state.get('memory_vault', {}), indent=2)
+        tool_output=tool_output_str # Pass the direct output
     )
     response = _invoke_llm_with_fallback(llm, prompt, state)
     response_content = response.content
@@ -521,8 +518,6 @@ def should_continue_critique(state: GraphState) -> str:
     if state["expert_critique_index"] < len(state["approved_experts"]): logger.info("More experts to critique. Looping back."); return "continue_critique"
     else: logger.info("All experts have provided critiques. Finalizing plan."); return "finalize_plan"
 
-def route_logic(state: GraphState) -> str: return state.get("route", "Editor")
-
 def after_final_plan_approval_router(state: GraphState) -> str:
     if state.get("user_feedback") == 'approve': logger.info("--- Final plan approved by user. Routing to Master Router. ---"); return "start_execution"
     else: logger.info("--- Final plan rejected by user. Ending task. ---"); return "end_task"
@@ -545,7 +540,6 @@ def after_checkpoint_review_router(state: GraphState) -> str:
     if decision == "escalate": return "request_user_guidance"
     return "continue_execution"
 
-# MODIFIED: New router for the standard complex project track
 def after_std_plan_step_router(state: GraphState) -> str:
     evaluation = state.get("step_evaluation", {});
     if evaluation.get("status") == "failure":
@@ -559,14 +553,12 @@ def after_std_plan_step_router(state: GraphState) -> str:
         return "Editor"
     return "std_advance_to_next_step_node"
 
-# MODIFIED: New router for the simple tool track
 def after_std_worker_router(state: GraphState) -> str:
     current_track = state.get("current_track")
     if current_track == "SIMPLE_TOOL_USE":
         return "Editor"
     return "std_project_supervisor_node"
 
-# MODIFIED: New router for the standard plan approval
 def after_std_plan_approval_router(state: GraphState) -> str:
     if state.get("user_feedback") == "approve":
         return "std_site_foreman_node"

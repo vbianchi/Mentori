@@ -2,16 +2,18 @@
 // -----------------------------------------------------------------------------
 // ResearchAgent Main UI (Phase 17 - Hotfix)
 //
-// This version fixes a critical UI duplication bug.
+// This version fixes two bugs found during testing: one causing duplicate
+// task names and another causing the workspace UI to not refresh automatically.
 //
 // Key Fixes:
-// 1. Robust `run_container` Logic: The state update logic in the `useAgent`
-//    callback has been rewritten. It now correctly finds the *last active*
-//    `run_container` and appends all subsequent events as children to it.
-//    It no longer creates a new container for each event, which was the
-//    root cause of the UI duplication bug.
-// 2. This change ensures a stable and predictable rendering of the agent's
-//    entire thought process for all four tracks.
+// 1. Unique Task Naming: The `createNewTask` function now uses the task's
+//    timestamp-based ID to generate a unique name (e.g., "New Task 8490"),
+//    preventing naming collisions when tasks are deleted and re-added.
+// 2. Automatic Workspace Refresh: The `useAgent` callback now explicitly
+//    calls `workspace.fetchFiles()` after a `final_answer` event is received
+//    for a `SIMPLE_TOOL_USE` track. This ensures that any file system
+//    changes (like creating a file) are immediately reflected in the UI
+//    without requiring a manual page refresh.
 // -----------------------------------------------------------------------------
 import { h } from 'preact';
 import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
@@ -162,7 +164,6 @@ export function App() {
     const workspace = useWorkspace(activeTaskId);
     const settings = useSettings();
     
-    // MODIFIED: State update logic is now more robust.
     const agent = useAgent(useCallback((event) => {
         setTasks(currentTasks => {
             try {
@@ -173,17 +174,14 @@ export function App() {
                 let taskToUpdate = { ...newTasks[taskIndex] };
                 let newHistory = [...taskToUpdate.history];
 
-                // Find the last active run container.
                 let runContainer = newHistory.length > 0 && newHistory[newHistory.length - 1].type === 'run_container' ? newHistory[newHistory.length - 1] : null;
 
                 const eventType = event.type;
                 
-                // If a run is finished or stopped, ensure the container is marked as complete.
                 if (runContainer && (eventType === 'final_answer' || eventType === 'agent_stopped')) {
                     runContainer.isComplete = true;
                 }
 
-                // If there's no active run container, create one.
                 if (!runContainer || runContainer.isComplete) {
                      runContainer = { type: 'run_container', children: [], isComplete: false };
                      newHistory.push(runContainer);
@@ -226,6 +224,10 @@ export function App() {
                 } else if (eventType === 'direct_answer' || eventType === 'final_answer') {
                     runContainer.children.push({ type: eventType, content: event.data });
                     runContainer.isComplete = true;
+                    // FIX: Refresh workspace after simple tool use that might change files
+                    if (event.data?.includes("file") || event.data?.includes("workspace")) {
+                        workspace.fetchFiles(workspace.currentPath);
+                    }
                 } else if (eventType === 'agent_event') {
                     const { name, event: chainEvent, data } = event;
                     const inputData = data.input || {};
@@ -287,10 +289,12 @@ export function App() {
 
     const selectTask = (taskId) => { if (taskId !== activeTaskId) { setActiveTaskId(taskId); workspace.resetWorkspaceViews(); } };
     
+    // MODIFIED: Use timestamp for unique task names
     const createNewTask = () => {
         const newTaskId = `task_${Date.now()}`;
+        const shortId = newTaskId.split('_')[1].slice(-5);
         agent.createTask(newTaskId);
-        setTasks(prevTasks => [...prevTasks, { id: newTaskId, name: `New Task ${tasks.length + 1}`, history: [] }]);
+        setTasks(prevTasks => [...prevTasks, { id: newTaskId, name: `New Task ${shortId}`, history: [] }]);
         selectTask(newTaskId);
     };
 

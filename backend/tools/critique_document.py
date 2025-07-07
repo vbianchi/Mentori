@@ -1,15 +1,22 @@
+# backend/tools/critique_document.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Tool: Qualitative Document Critiquer (Phase 15 - FINAL FIX)
+# ResearchAgent Tool: Qualitative Document Critiquer (Phase 17 - Hotfix)
 #
-# FIX: This version corrects the persistent TypeError by adding `workspace_path`
-# to the tool's explicit Pydantic input schema. The agent's worker node
-# already provides this argument; this change makes the tool's "contract"
-# aware of it, allowing LangChain's validation to pass.
+# This version fixes a Pydantic validation error by making the tool more
+# robust to variations in the planner's generated argument names.
+#
+# Key Fixes:
+# 1. Flexible Input Schema: The Pydantic model now accepts `document` as an
+#    alias for the `file` field. This allows the tool to work correctly even
+#    if the planner LLM hallucinates the argument name `document`.
+# 2. Robust Function Signature: The function signature is updated to accept
+#    the optional `document` argument and prioritize it if present, ensuring
+#    seamless execution.
 # -----------------------------------------------------------------------------
 
 import os
 import logging
-from typing import List
+from typing import List, Optional
 
 # --- Document Parsing Libraries ---
 import pypdf
@@ -17,7 +24,7 @@ import docx
 
 # --- LangChain & Pydantic Core ---
 from langchain_core.tools import StructuredTool
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, AliasChoices
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.chat_models import ChatOllama
 
@@ -58,23 +65,24 @@ def _read_docx(path: str) -> str:
 # --- Tool Input Schema (MODIFIED) ---
 class CritiqueDocumentInput(BaseModel):
     """Input schema for the critique_document tool."""
-    file: str = Field(description="The path to the single file to be critiqued.")
+    # MODIFIED: Added `AliasChoices` to accept 'document' as a valid alternative to 'file'.
+    file: str = Field(description="The path to the single file to be critiqued.", validation_alias=AliasChoices('file', 'document'))
     critique_prompt: str = Field(description="The specific prompt or instructions for the critique (e.g., 'check for clarity and tone').")
-    # --- ADDED: Make workspace_path an official part of the schema ---
     workspace_path: str = Field(description="The absolute path to the agent's workspace. This is injected by the system and should not be set by the LLM.")
 
 
-# --- Core Tool Logic ---
-
-def critique_document(file: str, critique_prompt: str, workspace_path: str) -> str:
+# --- Core Tool Logic (MODIFIED) ---
+def critique_document(file: str, critique_prompt: str, workspace_path: str, document: Optional[str] = None) -> str:
     """
     Reads a single document and provides a qualitative critique based on a
     user-provided prompt.
     """
-    logger.info(f"Critiquing file '{file}' with prompt: '{critique_prompt}'")
+    # Prioritize the aliased 'document' field if the LLM provides it.
+    file_to_process = document or file
+    logger.info(f"Critiquing file '{file_to_process}' with prompt: '{critique_prompt}'")
     
     try:
-        full_path = _resolve_path(workspace_path, file)
+        full_path = _resolve_path(workspace_path, file_to_process)
         filename = os.path.basename(full_path)
         
         content = ""
@@ -89,10 +97,10 @@ def critique_document(file: str, critique_prompt: str, workspace_path: str) -> s
              return f"Error: Could not extract readable content from '{filename}'. {content}"
 
     except FileNotFoundError:
-        return f"[Error: File not found at '{file}']"
+        return f"[Error: File not found at '{file_to_process}']"
     except Exception as e:
-        logger.error(f"Failed to read or process file '{file}': {e}", exc_info=True)
-        return f"[Error processing file '{file}': {e}]"
+        logger.error(f"Failed to read or process file '{file_to_process}': {e}", exc_info=True)
+        return f"[Error processing file '{file_to_process}': {e}]"
 
     # --- LLM Critique Step ---
     try:
