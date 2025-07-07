@@ -1,51 +1,47 @@
-### Project Vision:
+# ResearchAgent - Brainstorming & Ideas
 
-To build a transformative, AI-powered workbench. The platform will be powerful enough for scientific research and general enough for power users, with a core architecture that allows users to easily add their own tools and capabilities. The system is designed for privacy and efficiency, with a clear path to running on local LLMs.
+This document is a living collection of ideas, architectural concepts, and potential future features for the ResearchAgent project.
 
-### ✅ COMPLETED PHASES
+## Core Agent Architecture: The "Four-Track Brain"
 
--   \[x] **Phase 0-16:** Core Engine, Advanced Tooling, & UI Foundation.
--   \[x] **Phase 17 (Tasks 1 & 2):** Board of Experts proposal, user approval gates, and autonomous planning loop.
+Our agent operates on a sophisticated four-track cognitive architecture. This separation of concerns allows for a dynamic response tailored to the complexity of the user's request.
 
-### 🚀 UPCOMING PHASES 🚀
+-   **The "Router" (Dispatcher):** The central decision-maker. It analyzes every user request and directs it down one of four distinct tracks.
+-   **Track 1: Direct Q&A:** For simple questions and conversational interactions. This track routes directly to the `Editor` node for a standard LLM response.
+-   **Track 2: Simple Tool Use:** For single-step commands that can be fulfilled by one tool call. This track uses a `std_handyman_node` to format the tool call, which is then executed by the `std_worker_node`.
+-   **Track 3: Standard Complex Project:** For multi-step tasks that require a clear plan but not deep scientific critique. This track uses a dedicated `std_chief_architect_node` to create a plan, which is then executed by the `std_site_foreman_node`, `std_worker_node`, and `std_project_supervisor_node` in a self-correcting loop.
+-   **Track 4: Peer Review Session:** An advanced, user-invoked mode (`@experts`) for complex research questions. This track engages a `Board of Experts` to collaboratively debate and create a `StrategicMemo`. The memo is then executed by a dedicated set of "Company Model" nodes (`boe_chief_architect_node`, `boe_site_foreman_node`, etc.) that includes autonomous checkpoint reviews and user escalation paths.
 
-#### Phase 17: The Autonomous Board of Experts & Company Model
+### 🚀 Future Architectural Evolution: Production-Grade Infrastructure 🚀
 
-_Goal: Implement the full, two-part agent architecture where the Board of Experts acts as an autonomous strategic planner and the Company Model acts as a resilient execution engine, communicating the entire process through a clear, chronological UI narrative._
+_Inspired by our analysis of the Suna project, this outlines the path to evolving ResearchAgent from a powerful prototype into a robust, scalable, and multi-user-ready platform._
 
--   \[x] **Task 1: Initial User Authorization Gates.**
--   \[x] **Task 2: Autonomous Sequential Plan Refinement.**
--   \[x] **Task 3: Hierarchical Execution Loop.** (Placeholder nodes are fully wired).
-    -   \[x] **Sub-task 3.1: The Master Router.**
-    -   \[x] **Sub-task 3.2: The Chief Architect.**
-    -   \[x] **Sub-task 3.3: The Site Foreman.**
-    -   \[x] **Sub-task 3.4: The Worker.**
-    -   \[x] **Sub-task 3.5: The Project Supervisor.**
-    -   \[x] **Sub-task 3.6: The Tactical Router & Loop.**
--   \[x] **Task 4: Autonomous Checkpoint Review Cycle.**
--   \[ \] **Task 5: The User Guidance Escalation Path (IN PROGRESS)**
-    - \[ \] Implement the `escalate` decision logic in the `board_checkpoint_review_node`.
-    - \[ \] Add the `human_in_the_loop_user_guidance` node and interrupt.
-    - \[ \] **NEXT UP:** Fully test and debug the end-to-end user guidance workflow to ensure the UI card appears correctly and the agent resumes with the new guidance.
+#### 1\. Asynchronous Task Queuing
 
-#### Phase 18: Production-Grade Backend Infrastructure
+-   **Problem:** Currently, agent tasks run as `asyncio` tasks within the main server process. If the server restarts, all running tasks are lost.
+-   **Solution:** Replace the in-process execution with a dedicated task queue system (e.g., **Dramatiq with Redis**).
+-   **Benefit:** Decouples the API from agent execution, allowing for resilient, long-running background jobs and better scalability.
 
-_Goal: Evolve the backend from a prototype to a scalable, resilient, and persistent system._
+#### 2\. Database & Persistence Layer
 
--   \[ \] Task 1: Database Integration (SQLite & SQLAlchemy): Integrate a portable database for all state persistence.
--   \[ \] Task 2: Task Queue Integration (Dramatiq & Redis): Decouple the API from long-running agent jobs.
+-   **Problem:** All agent memory and history are currently transient.
+-   **Solution:** Integrate a portable, file-based database.
+-   **Proposed Tech:** Use **SQLite** for maximum portability, with **SQLAlchemy** as an ORM. This allows us to start simple and provides a clear path to migrating to a larger system like Postgres if future needs require it.
 
-#### Phase 19: User Management & Authentication
+### 💡 Future Platform Features & User Experience 💡
 
-_Goal: Transform the application into a secure, multi-user platform._
+_A collection of features required to move from a single-user tool to a complete, user-friendly platform._
 
--   \[ \] Task 1: Authentication Service: Integrate a provider to handle logins.
--   \[ \] Task 2: Secure API Key Management: Build a system for users to store their own encrypted API keys.
+#### 1\. User Management & Onboarding
 
-#### Phase 20: Intelligent Agent Capabilities
+-   **Onboarding Flow:** A guided, multi-step process for new users to set up their account and connect their first tools.
+-   **Multi-Provider Authentication:** Instead of handling passwords directly, we will use an authentication service (e.g., Supabase Auth, Auth0) to enable Single Sign-On (SSO).
+-   **Secure API Key Management:** A dedicated UI section where users can securely add, view, and manage their own API keys for the tools they want to use. Keys should be encrypted at rest in the database.
 
-_Goal: Enhance the core intelligence and capabilities of the agent itself._
+#### 2\. "Committee of Critics" Tool Evolution
 
--   \[ \] **Task 1: The Intelligent Blueprint System:** Implement the full blueprint architecture, including the `plan_expander_node`, to allow the agent to discover and use pre-defined multi-step plans as high-level tools.
--   \[ \] **Task 2: The "Committee of Critics":** Evolve the `critique_document` tool into the advanced multi-persona system we brainstormed, where a panel of AI experts collaborates to provide a comprehensive review.
--   \[ \] **Task 3: MCP Tool Integration:** Develop a wrapper to allow the agent to connect to the Model Context Protocol (MCP) tool ecosystem, dramatically expanding its available tools.
+-   **Vision:** Evolve the `critique_document` tool into a collaborative review by a panel of AI experts.
+-   **Workflow:**
+    1.  **Persona Scoping:** The tool first analyzes the document to determine its field (e.g., genetics, finance). It then defines a committee of 3 relevant expert personas (e.g., "Expert Geneticist," "Scientific Writer," "Statistician"). The user can also specify these personas in the prompt.
+    2.  **Parallel Criticism:** The tool runs three parallel LLM calls, providing each with the document but a different "expert" system prompt.
+    3.  **Synthesized Report:** A final LLM call acts as the "chairperson," taking the three independent critiques and synthesizing them into a single, structured report for the user.
