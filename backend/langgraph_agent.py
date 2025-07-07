@@ -1,21 +1,24 @@
 # backend/langgraph_agent.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 17 - Board Decision LOGIC)
+# ResearchAgent Core Agent (Phase 17 - Four-Track Graph Wiring)
 #
-# This version implements the intelligent decision-making for the board's
-# checkpoint review, fixing the endless escalation loop.
+# This version completes the reintegration of all four cognitive tracks by
+# implementing the intelligent router and wiring all nodes into the final graph.
 #
 # Key Architectural Changes:
-# 1. New `BoardDecision` Pydantic Model: A new model is added to structure
-#    the output from the board's decision-making LLM call.
-# 2. `board_checkpoint_review_node` Logic Update:
-#    - This node no longer returns a hardcoded "escalate" string.
-#    - It now uses an LLM with the new `board_checkpoint_review_prompt_template`
-#      to analyze the progress report.
-#    - It requests a structured output conforming to the `BoardDecision`
-#      model.
-#    - It then returns the `decision` from the model's output ("continue",
-#      "adapt", or "escalate"), making the node autonomous.
+# 1. Intelligent Four-Track Router: The `initial_router_node` is now powered
+#    by an LLM, using a prompt that allows it to choose between DIRECT_QA,
+#    SIMPLE_TOOL_USE, COMPLEX_PROJECT, or PEER_REVIEW.
+# 2. Fully Wired Graph (`create_agent_graph`):
+#    - The graph is now wired according to the four-track architecture.
+#    - Track 1 (DIRECT_QA) routes directly to the Editor.
+#    - Track 2 (SIMPLE_TOOL_USE) routes through `std_handyman_node` -> `std_worker_node` -> Editor.
+#    - Track 3 (COMPLEX_PROJECT) uses the full `std_` node suite (`std_chief_architect_node`,
+#      `std_site_foreman_node`, etc.) with its self-correction loop.
+#    - Track 4 (PEER_REVIEW) remains wired to the Board of Experts (`Propose_Experts` etc.).
+# 3. Track Separation: The node prefixes (`std_` and `boe_`) ensure that the
+#    execution logic for the standard complex track and the peer review track
+#    are kept completely separate, as requested.
 # -----------------------------------------------------------------------------
 
 import os
@@ -107,7 +110,6 @@ class TacticalPlan(BaseModel):
     """A detailed, step-by-step plan of tool calls to achieve a strategic goal."""
     steps: List[TacticalStep] = Field(description="A list of tactical steps to be executed in sequence.")
 
-# NEW: Pydantic model for the board's decision
 class BoardDecision(BaseModel):
     """The decision made by the Board of Experts at a checkpoint."""
     decision: str = Field(description="The board's decision. Must be one of: 'continue', 'adapt', 'escalate'.")
@@ -115,6 +117,7 @@ class BoardDecision(BaseModel):
 
 
 class GraphState(TypedDict):
+    # Core fields
     input: str
     task_id: str
     messages: Annotated[Sequence[BaseMessage], lambda x, y: x + y]
@@ -125,6 +128,9 @@ class GraphState(TypedDict):
     route: str
     current_track: str
     answer: str
+    user_feedback: Optional[str]
+    
+    # Standard Complex Project Track fields
     plan: List[dict]
     current_step_index: int
     current_tool_call: Optional[dict]
@@ -135,7 +141,8 @@ class GraphState(TypedDict):
     max_retries: int
     step_retries: int
     plan_retries: int
-    user_feedback: Optional[str]
+
+    # Board of Experts (Peer Review) Track fields
     proposed_experts: Optional[List[dict]]
     board_approved: Optional[bool]
     approved_experts: Optional[List[dict]]
@@ -147,7 +154,6 @@ class GraphState(TypedDict):
     tactical_plan: Optional[List[dict]]
     current_tactical_step: Optional[dict]
     worker_output: Optional[str]
-    step_evaluation: Optional[dict]
     tactical_step_index: int
     strategic_step_index: int
     checkpoint_report: Optional[str]
@@ -177,6 +183,7 @@ def format_tools_for_prompt(state: GraphState):
     active_tools = [t for t in all_tools if t.name in enabled_tool_names] if enabled_tool_names is not None else all_tools
     tool_strings = [f"  - {t.name}: {t.description}" for t in active_tools]
     return "\n".join(tool_strings) if tool_strings else "No tools are available for this task."
+
 def _format_messages(messages: Sequence[BaseMessage], is_for_summary=False) -> str:
     formatted_messages = []; start_index = 0
     if not is_for_summary:
@@ -195,21 +202,31 @@ async def _create_venv_if_not_exists(workspace_path: str, task_id: str):
         process = await asyncio.create_subprocess_exec("uv", "venv", cwd=workspace_path)
         await process.wait()
 
+def _substitute_step_outputs(data: Any, step_outputs: Dict[int, str]) -> Any:
+    if isinstance(data, str):
+        match = re.fullmatch(r"\{step_(\d+)_output\}", data)
+        if match: step_num = int(match.group(1)); return step_outputs.get(step_num, f"Error: Output for step {step_num} not found.")
+        return data
+    if isinstance(data, dict): return {k: _substitute_step_outputs(v, step_outputs) for k, v in data.items()}
+    if isinstance(data, list): return [_substitute_step_outputs(item, step_outputs) for item in data]
+    return data
+
 # --- Graph Nodes ---
+
+# --- Core Pre-Processing Nodes ---
 async def task_setup_node(state: GraphState):
     task_id = state["task_id"]; logger.info(f"Task '{task_id}': Executing Task_Setup and resetting state.")
     workspace_path = f"/app/workspace/{task_id}"; os.makedirs(workspace_path, exist_ok=True); await _create_venv_if_not_exists(workspace_path, task_id)
     return {
-        "input": state['messages'][-1].content, "history": [], "current_step_index": 0,
-        "step_outputs": {}, "workspace_path": workspace_path, "llm_config": state.get("llm_config", {}),
-        "max_retries": 3, "step_retries": 0, "plan_retries": 0, "user_feedback": None,
-        "memory_vault": {}, "enabled_tools": state.get("enabled_tools"), "proposed_experts": None,
-        "board_approved": None, "approved_experts": None, "initial_plan": None,
-        "critiques": [], "refined_plan": None, "strategic_memo": None,
-        "expert_critique_index": 0,
+        "input": state['messages'][-1].content, "history": [], "plan": [], "current_step_index": 0,
+        "current_tool_call": None, "tool_output": None, "step_outputs": {}, "workspace_path": workspace_path,
+        "llm_config": state.get("llm_config", {}), "max_retries": 3, "step_retries": 0, "plan_retries": 0,
+        "user_feedback": None, "memory_vault": {}, "enabled_tools": state.get("enabled_tools"),
+        "proposed_experts": None, "board_approved": None, "approved_experts": None, "initial_plan": None,
+        "critiques": [], "refined_plan": None, "strategic_memo": None, "expert_critique_index": 0,
         "tactical_plan": None, "current_tactical_step": None, "worker_output": None, "step_evaluation": None,
         "tactical_step_index": 0, "strategic_step_index": 0, "checkpoint_report": None, "board_decision": None,
-        "user_guidance": None
+        "user_guidance": None,
     }
 
 def memory_updater_node(state: GraphState):
@@ -220,13 +237,143 @@ def summarize_history_node(state: GraphState):
     logger.info(f"Task '{state.get('task_id')}': Executing summarize_history_node.")
     return {}
 
+# MODIFIED: Intelligent Four-Track Router
 def initial_router_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing Four-Track Router.")
     if "@experts" in state["input"].lower():
-        logger.info(f"Task '{task_id}': Routing to Propose_Experts.")
-        return {"route": "Propose_Experts", "current_track": "BOARD_OF_EXPERTS_PROJECT"}
+        logger.info(f"Task '{task_id}': Routing to PEER_REVIEW.")
+        return {"route": "Propose_Experts", "current_track": "PEER_REVIEW"}
+    
+    llm = get_llm(state, "ROUTER_LLM_ID", "gemini::gemini-1.5-flash-latest")
+    prompt = router_prompt_template.format(
+        chat_history=_format_messages(state['messages']),
+        input=state["input"],
+        tools=format_tools_for_prompt(state)
+    )
+    response = _invoke_llm_with_fallback(llm, prompt, state)
+    decision = response.content.strip()
+    logger.info(f"Task '{task_id}': Router LLM decided: {decision}")
+
+    if "SIMPLE_TOOL_USE" in decision:
+        return {"route": "std_handyman_node", "current_track": "SIMPLE_TOOL_USE"}
+    if "COMPLEX_PROJECT" in decision:
+        return {"route": "std_chief_architect_node", "current_track": "COMPLEX_PROJECT"}
+    
     return {"route": "Editor", "current_track": "DIRECT_QA"}
 
+# --- Track 1 & Final Output Node ---
+def editor_node(state: GraphState):
+    task_id = state.get("task_id")
+    logger.info(f"Task '{task_id}': Reached Editor node for final summary.")
+    
+    # Use a more sophisticated final prompt
+    llm = get_llm(state, "EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
+    chat_history_str = _format_messages(state['messages'])
+    execution_log_str = "\n".join(state.get("history", []))
+    
+    prompt = final_answer_prompt_template.format(
+        input=state["input"],
+        chat_history=chat_history_str,
+        execution_log=execution_log_str or "No tool actions taken.",
+        memory_vault=json.dumps(state.get('memory_vault', {}), indent=2)
+    )
+    response = _invoke_llm_with_fallback(llm, prompt, state)
+    response_content = response.content
+    
+    return {"answer": response_content, "messages": state['messages'] + [AIMessage(content=response_content)]}
+
+
+# --- Track 2: Simple Tool Use Nodes ---
+def std_handyman_node(state: GraphState):
+    task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Track 2 -> std_handyman_node"); llm = get_llm(state, "SITE_FOREMAN_LLM_ID", "gemini::gemini-1.5-flash-latest")
+    prompt = handyman_prompt_template.format(chat_history=_format_messages(state['messages']), input=state["input"], tools=format_tools_for_prompt(state))
+    response = _invoke_llm_with_fallback(llm, prompt, state)
+    try:
+        match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL); json_str = match.group(1).strip() if match else response.content.strip()
+        tool_call = json.loads(json_str); return {"current_tool_call": tool_call}
+    except Exception as e: logger.error(f"Task '{task_id}': Error parsing Handyman tool call: {e}"); return {"current_tool_call": {"error": f"Invalid JSON from Handyman: {e}"}}
+
+# --- Track 3: Standard Complex Project Nodes ---
+def std_chief_architect_node(state: GraphState):
+    task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Track 3 -> std_chief_architect_node"); llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-flash-latest")
+    prompt = structured_planner_prompt_template.format(chat_history=_format_messages(state['messages']), input=state["input"], tools=format_tools_for_prompt(state))
+    response = _invoke_llm_with_fallback(llm, prompt, state)
+    try:
+        match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL); json_str = match.group(1).strip() if match else response.content.strip()
+        parsed_json = json.loads(json_str); return {"plan": parsed_json.get("plan", [])}
+    except Exception as e: logger.error(f"Task '{task_id}': Error parsing structured plan: {e}"); return {"plan": [{"error": f"Failed to create plan: {e}"}]}
+
+def std_plan_expander_node(state: GraphState):
+    task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing std_plan_expander_node."); plan = state.get("plan", [])
+    if not plan: return {}
+    for i, step in enumerate(plan): step["step_id"] = i + 1
+    return {"plan": plan}
+
+def std_human_in_the_loop_node(state: GraphState):
+    logger.info(f"Task '{state.get('task_id')}': Paused for standard plan approval."); return {}
+
+def std_site_foreman_node(state: GraphState):
+    task_id = state.get("task_id"); step_index = state["current_step_index"]; plan = state["plan"]
+    if not plan or step_index >= len(plan): return {"current_tool_call": {"error": "Plan finished or empty."}}
+    logger.info(f"Task '{task_id}': std_site_foreman executing step {step_index + 1}/{len(plan)}"); current_step_details = plan[step_index]
+    substituted_tool_call = _substitute_step_outputs(current_step_details, state.get("step_outputs", {}))
+    return {"current_tool_call": substituted_tool_call}
+
+async def std_worker_node(state: GraphState):
+    task_id = state.get("task_id"); logger.info(f"Task '{task_id}': std_worker executing tool call."); all_tools = get_available_tools(); enabled_tool_names = state.get("enabled_tools")
+    active_tools = [tool for tool in all_tools if tool.name in enabled_tool_names] if enabled_tool_names is not None else all_tools
+    tool_map = {tool.name: tool for tool in active_tools}
+    tool_call = state.get("current_tool_call")
+    if not tool_call or "error" in tool_call or not tool_call.get("tool_name"): return {"tool_output": f"Error: {tool_call.get('error', 'No tool call provided.')}"}
+    tool_name = tool_call["tool_name"]; tool_input = tool_call.get("tool_input", {}); tool = tool_map.get(tool_name)
+    if not tool: logger.error(f"Task '{task_id}': Tool '{tool_name}' not found or disabled."); return {"tool_output": f"Error: Tool '{tool_name}' not found or disabled."}
+    final_args = {};
+    if isinstance(tool_input, dict): final_args.update(tool_input)
+    else:
+        tool_args_schema = tool.args
+        if tool_args_schema: final_args[next(iter(tool_args_schema))] = tool_input
+    if tool_name in SANDBOXED_TOOLS: final_args["workspace_path"] = state["workspace_path"]
+    try:
+        output = await tool.ainvoke(final_args); output_str = str(output)
+        updates = {"tool_output": output_str}
+        if state.get("current_track") == "COMPLEX_PROJECT":
+            current_step_id = state["plan"][state["current_step_index"]]["step_id"]
+            updates["step_outputs"] = {current_step_id: output_str}
+        return updates
+    except Exception as e:
+        logger.error(f"Task '{task_id}': Error executing tool '{tool_name}': {e}", exc_info=True); return {"tool_output": f"An error occurred while executing the tool: {e}"}
+
+def std_project_supervisor_node(state: GraphState):
+    task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing std_project_supervisor"); current_step_details = state["plan"][state["current_step_index"]]
+    tool_output = state.get("tool_output", "No output."); tool_call = state.get("current_tool_call", {}); llm = get_llm(state, "PROJECT_SUPERVISOR_LLM_ID", "gemini::gemini-1.5-flash-latest")
+    prompt = evaluator_prompt_template.format(current_step=current_step_details.get('instruction', ''), tool_call=json.dumps(tool_call), tool_output=tool_output)
+    try:
+        response = _invoke_llm_with_fallback(llm, prompt, state); match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL); json_str = match.group(1).strip() if match else response.content.strip()
+        evaluation = json.loads(json_str)
+    except Exception as e: evaluation = {"status": "failure", "reasoning": f"Could not parse evaluation: {e}"}
+    history_record = (f"--- Step {state['current_step_index'] + 1} ---\nInstruction: {current_step_details.get('instruction')}\nAction: {json.dumps(tool_call)}\nOutput: {tool_output}\nEvaluation: {evaluation.get('status', 'unknown')} - {evaluation.get('reasoning', 'N/A')}")
+    updates = {"step_evaluation": evaluation, "history": [history_record]}
+    if evaluation.get("status") == "success": updates["step_retries"] = 0 
+    else: updates["step_retries"] = state.get("step_retries", 0) + 1
+    return updates
+
+def std_correction_planner_node(state: GraphState):
+    task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing std_correction_planner."); failed_step_details = state["plan"][state["current_step_index"]]
+    failure_reason = state["step_evaluation"].get("reasoning", "N/A"); history_str = "\n".join(state["history"]); llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-flash-latest")
+    prompt = correction_planner_prompt_template.format(plan=json.dumps(state["plan"]), history=history_str, failed_step=failed_step_details.get("instruction"), failure_reason=failure_reason, tools=format_tools_for_prompt(state))
+    response = _invoke_llm_with_fallback(llm, prompt, state)
+    try:
+        match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL); json_str = match.group(1).strip() if match else response.content.strip()
+        new_step = json.loads(json_str); new_plan = state["plan"][:]; new_plan.insert(state["current_step_index"], new_step)
+        for i, step in enumerate(new_plan): step["step_id"] = i + 1
+        logger.info(f"Task '{task_id}': Inserted new corrective step. Plan is now {len(new_plan)} steps long.")
+        return {"plan": new_plan}
+    except Exception as e:
+        logger.error(f"Task '{task_id}': Error parsing or inserting correction plan: {e}"); return {}
+
+def std_advance_to_next_step_node(state: GraphState): return {"current_step_index": state.get("current_step_index", 0) + 1}
+
+# --- Track 4: Peer Review (Board of Experts) Nodes ---
 def propose_experts_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"--- (BoE) Task '{task_id}': Executing propose_experts_node ---")
     llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-pro-latest")
@@ -244,325 +391,186 @@ def human_in_the_loop_board_approval(state: GraphState):
     return {}
 
 def chair_initial_plan_node(state: GraphState):
-    task_id = state.get("task_id")
-    logger.info(f"--- (BoE) Task '{task_id}': Executing chair_initial_plan_node (and resetting critique state) ---")
-    
-    if state.get("user_guidance"):
-        logger.info("Re-planning based on new user guidance.")
-    
+    task_id = state.get("task_id"); logger.info(f"--- (BoE) Task '{task_id}': Executing chair_initial_plan_node ---")
+    if state.get("user_guidance"): logger.info("Re-planning based on new user guidance.")
     llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-pro-latest")
     structured_llm = llm.with_structured_output(StrategicPlan)
-    
-    prompt = chair_initial_plan_prompt_template.format(
-        user_request=state["input"],
-        experts=json.dumps(state.get("approved_experts"), indent=2),
-        tools=format_tools_for_prompt(state),
-        user_guidance=state.get("user_guidance", "") 
-    )
-    
+    prompt = chair_initial_plan_prompt_template.format(user_request=state["input"], experts=json.dumps(state.get("approved_experts"), indent=2), tools=format_tools_for_prompt(state), user_guidance=state.get("user_guidance", ""))
     try:
-        response = structured_llm.invoke(prompt)
-        plan_steps = [step.dict() for step in response.plan]
+        response = structured_llm.invoke(prompt); plan_steps = [step.dict() for step in response.plan]
         logger.info(f"Chair created a plan with {len(plan_steps)} steps.")
-        
-        return {
-            "initial_plan": plan_steps,
-            "refined_plan": plan_steps,
-            "expert_critique_index": 0,
-            "critiques": []
-        }
+        return {"initial_plan": plan_steps, "refined_plan": plan_steps, "expert_critique_index": 0, "critiques": []}
     except Exception as e:
-        logger.error(f"Task '{task_id}': Failed to create initial plan: {e}")
-        return {"initial_plan": [{"instruction": "Error: Failed to generate a plan.", "tool": "error"}]}
-
+        logger.error(f"Task '{task_id}': Failed to create initial plan: {e}"); return {"initial_plan": [{"instruction": "Error: Failed to generate a plan.", "tool": "error"}]}
 
 def human_in_the_loop_initial_plan_review(state: GraphState):
     logger.info(f"--- Task '{state.get('task_id')}': Paused for Initial Plan Review ---")
     return {}
 
 def expert_critique_node(state: GraphState):
-    task_id = state.get("task_id")
-    critique_index = state["expert_critique_index"]
-    expert = state["approved_experts"][critique_index]
-    logger.info(f"--- (BoE) Task '{task_id}': Executing expert_critique_node for '{expert['title']}' ({critique_index + 1}/{len(state['approved_experts'])}) ---")
-
-    llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-pro-latest")
-    structured_llm = llm.with_structured_output(CritiqueAndPlan)
-    
-    prompt = expert_critique_prompt_template.format(
-        expert_persona=json.dumps(expert, indent=2),
-        user_request=state["input"],
-        current_plan=json.dumps(state["refined_plan"], indent=2)
-    )
-
+    task_id = state.get("task_id"); critique_index = state["expert_critique_index"]; expert = state["approved_experts"][critique_index]
+    logger.info(f"--- (BoE) Task '{task_id}': Executing expert_critique_node for '{expert['title']}' ---")
+    llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-pro-latest"); structured_llm = llm.with_structured_output(CritiqueAndPlan)
+    prompt = expert_critique_prompt_template.format(expert_persona=json.dumps(expert, indent=2), user_request=state["input"], current_plan=json.dumps(state["refined_plan"], indent=2))
     try:
-        response = structured_llm.invoke(prompt)
-        updated_plan_steps = [step.dict() for step in response.updated_plan]
-        critique_with_context = {
-            "title": expert["title"],
-            "critique": response.critique,
-            "plan_after_critique": updated_plan_steps
-        }
-
-        logger.info(f"Critique from '{expert['title']}': {response.critique[:100]}...")
-        current_critiques = state.get("critiques", [])
-        return {
-            "critiques": current_critiques + [critique_with_context],
-            "refined_plan": updated_plan_steps,
-            "expert_critique_index": critique_index + 1
-        }
+        response = structured_llm.invoke(prompt); updated_plan_steps = [step.dict() for step in response.updated_plan]
+        critique_with_context = {"title": expert["title"], "critique": response.critique, "plan_after_critique": updated_plan_steps}
+        logger.info(f"Critique from '{expert['title']}': {response.critique[:100]}..."); current_critiques = state.get("critiques", [])
+        return {"critiques": current_critiques + [critique_with_context], "refined_plan": updated_plan_steps, "expert_critique_index": critique_index + 1}
     except Exception as e:
         logger.error(f"Task '{task_id}': Failed to get critique from '{expert['title']}': {e}")
         error_critique = { "title": expert["title"], "critique": f"Error: Could not generate a critique. {e}", "plan_after_critique": state["refined_plan"] }
-        current_critiques = state.get("critiques", [])
-        return {"critiques": current_critiques + [error_critique], "expert_critique_index": critique_index + 1}
+        current_critiques = state.get("critiques", []); return {"critiques": current_critiques + [error_critique], "expert_critique_index": critique_index + 1}
 
 def chair_final_review_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"--- (BoE) Task '{task_id}': Executing chair_final_review_node (Synthesis) ---")
-    llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-pro-latest")
-    structured_llm = llm.with_structured_output(StrategicMemo)
-
+    llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-pro-latest"); structured_llm = llm.with_structured_output(StrategicMemo)
     critique_texts = [f"Critique from {c['title']}:\n{c['critique']}" for c in state['critiques']]
-
-    prompt = chair_final_review_prompt_template.format(
-        user_request=state["input"],
-        critiques="\n\n".join(critique_texts),
-        refined_plan=json.dumps(state['refined_plan'], indent=2)
-    )
-    
+    prompt = chair_final_review_prompt_template.format(user_request=state["input"], critiques="\n\n".join(critique_texts), refined_plan=json.dumps(state['refined_plan'], indent=2))
     try:
-        response = structured_llm.invoke(prompt)
-        final_memo = response.dict()
+        response = structured_llm.invoke(prompt); final_memo = response.dict()
         logger.info(f"Chair synthesized a final strategic memo with {len(final_memo.get('plan', []))} steps.")
         return {"strategic_memo": final_memo}
     except Exception as e:
         logger.error(f"Task '{task_id}': Failed during Chair's final synthesis: {e}")
-        fallback_memo = {
-            "plan": state["refined_plan"],
-            "implementation_notes": ["Error: Failed to generate strategic memo."]
-        }
+        fallback_memo = {"plan": state["refined_plan"], "implementation_notes": ["Error: Failed to generate strategic memo."]}
         return {"strategic_memo": fallback_memo}
 
 def human_in_the_loop_final_plan_approval(state: GraphState):
     logger.info(f"--- Task '{state.get('task_id')}': Paused for Final Plan Approval ---")
     return {}
 
-def master_router_node(state: GraphState) -> dict:
-    """A placeholder node that serves as a branching point for the master router."""
-    logger.info("--- (STRATEGIC) At Master Router branching point. ---")
-    return {}
+def boe_master_router_node(state: GraphState) -> dict:
+    logger.info("--- (BoE) At Master Router branching point. ---"); return {}
 
-def chief_architect_node(state: GraphState):
-    """Generates a detailed, tactical plan of tool calls to achieve a single strategic goal."""
-    task_id = state.get("task_id")
-    logger.info(f"--- (EXEC) Task '{task_id}': Chief Architect is creating a tactical plan. ---")
-
-    llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-pro-latest")
-    structured_llm = llm.with_structured_output(TacticalPlan)
-
-    strategic_memo = state.get("strategic_memo", {"plan": [], "implementation_notes": []})
-    strategic_plan = strategic_memo.get("plan", [])
-    implementation_notes = strategic_memo.get("implementation_notes", [])
-    
-    strategic_index = state.get("strategic_step_index", 0)
-    current_strategic_step = strategic_plan[strategic_index]['instruction'] if strategic_index < len(strategic_plan) else "No current goal."
-
-    prompt = chief_architect_prompt_template.format(
-        strategic_plan=json.dumps(strategic_plan, indent=2),
-        implementation_notes="\n- ".join(implementation_notes),
-        current_strategic_step=current_strategic_step,
-        history=json.dumps(state.get("history", []), indent=2),
-        tools=format_tools_for_prompt(state)
-    )
-
+def boe_chief_architect_node(state: GraphState):
+    task_id = state.get("task_id"); logger.info(f"--- (BoE-EXEC) Task '{task_id}': boe_chief_architect is creating a tactical plan. ---")
+    llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-pro-latest"); structured_llm = llm.with_structured_output(TacticalPlan)
+    strategic_memo = state.get("strategic_memo", {"plan": [], "implementation_notes": []}); strategic_plan = strategic_memo.get("plan", []); implementation_notes = strategic_memo.get("implementation_notes", [])
+    strategic_index = state.get("strategic_step_index", 0); current_strategic_step = strategic_plan[strategic_index]['instruction'] if strategic_index < len(strategic_plan) else "No current goal."
+    prompt = chief_architect_prompt_template.format(strategic_plan=json.dumps(strategic_plan, indent=2), implementation_notes="\n- ".join(implementation_notes), current_strategic_step=current_strategic_step, history=json.dumps(state.get("history", []), indent=2), tools=format_tools_for_prompt(state))
     try:
         response = structured_llm.invoke(prompt)
-        
-        if not response or not hasattr(response, 'steps'):
-            raise ValueError("LLM returned an invalid or empty response.")
-
+        if not response or not hasattr(response, 'steps'): raise ValueError("LLM returned an invalid or empty response.")
         sanitized_steps = []
         for step in response.steps:
             if isinstance(step.tool_input, str):
-                try:
-                    step.tool_input = json.loads(step.tool_input)
+                try: step.tool_input = json.loads(step.tool_input)
                 except json.JSONDecodeError:
                     logger.warning(f"Could not parse tool_input '{step.tool_input}' as JSON. Wrapping it for the tool.")
                     if step.tool_name == "web_search": step.tool_input = {"query": step.tool_input}
                     elif step.tool_name == "workspace_shell": step.tool_input = {"command": step.tool_input}
                     else: step.tool_input = {"input": step.tool_input}
             sanitized_steps.append(step.dict())
-
-        logger.info(f"Architect created a tactical plan with {len(sanitized_steps)} steps for goal: '{current_strategic_step}'")
+        logger.info(f"Boe_architect created a tactical plan with {len(sanitized_steps)} steps for goal: '{current_strategic_step}'")
         return {"tactical_plan": sanitized_steps, "tactical_step_index": 0}
-    
     except Exception as e:
-        logger.error(f"Task '{task_id}': CRITICAL FAILURE in chief_architect_node: {e}", exc_info=True)
-        error_plan = {
-            "tactical_plan": [{
-                "step_id": 1,
-                "instruction": f"The Chief Architect failed to create a tactical plan. Error: {e}",
-                "tool_name": "error",
-                "tool_input": {}
-            }],
-            "tactical_step_index": 0
-        }
+        logger.error(f"Task '{task_id}': CRITICAL FAILURE in boe_chief_architect_node: {e}", exc_info=True)
+        error_plan = {"tactical_plan": [{"step_id": 1, "instruction": f"The BoE Chief Architect failed to create a tactical plan. Error: {e}", "tool_name": "error", "tool_input": {}}], "tactical_step_index": 0}
         return error_plan
 
+def boe_site_foreman_node(state: GraphState):
+    step_index = state.get("tactical_step_index", 0); logger.info(f"--- (BoE-EXEC) Task '{state.get('task_id')}': boe_site_foreman is preparing step {step_index}. ---")
+    tactical_plan = state.get("tactical_plan", []); return {"current_tactical_step": tactical_plan[step_index]} if step_index < len(tactical_plan) else {"current_tactical_step": None}
 
-def site_foreman_node(state: GraphState):
-    """A placeholder node for the Site Foreman."""
-    step_index = state.get("tactical_step_index", 0)
-    logger.info(f"--- (EXEC) Task '{state.get('task_id')}': Site Foreman is preparing step {step_index}. ---")
-    tactical_plan = state.get("tactical_plan", [])
-    if step_index < len(tactical_plan):
-        return {"current_tactical_step": tactical_plan[step_index]}
-    return {"current_tactical_step": None}
-
-def worker_node(state: GraphState):
-    """A placeholder node for the Worker."""
-    logger.info(f"--- (EXEC) Task '{state.get('task_id')}': Worker is executing a tool. ---")
-    tool_call = state.get("current_tactical_step", {})
-    output = f"Successfully executed tool '{tool_call.get('tool_name')}'."
+def boe_worker_node(state: GraphState):
+    logger.info(f"--- (BoE-EXEC) Task '{state.get('task_id')}': boe_worker is executing a tool. ---")
+    tool_call = state.get("current_tactical_step", {}); output = f"Successfully executed tool '{tool_call.get('tool_name')}'."
     return {"worker_output": output}
 
-def project_supervisor_node(state: GraphState):
-    """A placeholder node for the Project Supervisor."""
-    logger.info(f"--- (EXEC) Task '{state.get('task_id')}': Supervisor is evaluating the result. ---")
-    evaluation = {
-        "status": "success",
-        "reasoning": "Placeholder evaluation: The worker's output appears to be correct and complete."
-    }
+def boe_project_supervisor_node(state: GraphState):
+    logger.info(f"--- (BoE-EXEC) Task '{state.get('task_id')}': boe_supervisor is evaluating the result. ---")
+    evaluation = {"status": "success", "reasoning": "Placeholder evaluation: The worker's output appears to be correct and complete."}
     return {"step_evaluation": evaluation}
 
 def increment_tactical_step_node(state: GraphState):
-    """Increments the tactical step index."""
-    logger.info("--- (EXEC) Incrementing tactical step index. ---")
-    step_index = state.get("tactical_step_index", 0)
-    return {"tactical_step_index": step_index + 1}
+    logger.info("--- (BoE-EXEC) Incrementing tactical step index. ---"); step_index = state.get("tactical_step_index", 0); return {"tactical_step_index": step_index + 1}
 
 def editor_checkpoint_report_node(state: GraphState):
-    """Placeholder for the Editor to generate a checkpoint report."""
-    logger.info("--- (BoE) Editor is compiling a checkpoint report. ---")
-    report = "Checkpoint reached. All steps so far have been completed successfully. The board will now review the progress to decide the next course of action."
+    logger.info("--- (BoE) Editor is compiling a checkpoint report. ---"); report = "Checkpoint reached. All steps so far have been completed successfully. The board will now review the progress to decide the next course of action."
     return {"checkpoint_report": report}
 
-# MODIFIED: Now uses an LLM to make a decision.
 def board_checkpoint_review_node(state: GraphState):
-    """Uses an LLM to decide whether to continue, adapt, or escalate."""
-    task_id = state.get("task_id")
-    logger.info(f"--- (BoE) Task '{task_id}': The Board is reviewing the checkpoint report (LLM Call). ---")
-
-    llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-pro-latest")
-    structured_llm = llm.with_structured_output(BoardDecision)
-
-    prompt = board_checkpoint_review_prompt_template.format(
-        user_request=state["input"],
-        strategic_plan=json.dumps(state.get("strategic_memo", {}).get("plan", []), indent=2),
-        report=state.get("checkpoint_report", "No report available.")
-    )
-
+    task_id = state.get("task_id"); logger.info(f"--- (BoE) Task '{task_id}': The Board is reviewing the checkpoint report (LLM Call). ---")
+    llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-pro-latest"); structured_llm = llm.with_structured_output(BoardDecision)
+    prompt = board_checkpoint_review_prompt_template.format(user_request=state["input"], strategic_plan=json.dumps(state.get("strategic_memo", {}).get("plan", []), indent=2), report=state.get("checkpoint_report", "No report available."))
     try:
-        response = structured_llm.invoke(prompt)
-        decision = response.decision
-        logger.info(f"Board has decided to: {decision}. Reasoning: {response.reasoning}")
-        return {"board_decision": decision}
+        response = structured_llm.invoke(prompt); decision = response.decision
+        logger.info(f"Board has decided to: {decision}. Reasoning: {response.reasoning}"); return {"board_decision": decision}
     except Exception as e:
-        logger.error(f"Task '{task_id}': Failed to get board decision, defaulting to 'escalate'. Error: {e}")
-        # Fallback to escalation on failure to prevent infinite loops
-        return {"board_decision": "escalate"}
-
+        logger.error(f"Task '{task_id}': Failed to get board decision, defaulting to 'escalate'. Error: {e}"); return {"board_decision": "escalate"}
 
 def human_in_the_loop_user_guidance(state: GraphState):
-    """This node pauses the graph to request guidance from the user."""
-    logger.info(f"--- Task '{state.get('task_id')}': Paused for User Guidance ---")
-    return {}
+    logger.info(f"--- Task '{state.get('task_id')}': Paused for User Guidance ---"); return {}
 
 def increment_strategic_step_node(state: GraphState):
-    """Increments the strategic step index."""
-    logger.info("--- (BoE) Incrementing strategic step index. ---")
-    step_index = state.get("strategic_step_index", 0)
-    return {"strategic_step_index": step_index + 1}
+    logger.info("--- (BoE) Incrementing strategic step index. ---"); step_index = state.get("strategic_step_index", 0); return {"strategic_step_index": step_index + 1}
 
-def editor_node(state: GraphState):
-    logger.info(f"Task '{state.get('task_id')}': Reached Editor node for final summary.")
-    final_answer = "The agent has successfully completed the entire strategic plan."
-    return {"answer": final_answer}
 
 # --- Conditional Routers ---
 def after_board_approval_router(state: GraphState) -> str:
     logger.info(f"--- (BoE) Checking user approval for the board ---")
-    if state.get("board_approved"):
-        logger.info("Board approved. Proceeding to set experts.")
-        return "set_approved_experts"
-    else:
-        logger.info("Board rejected. Routing to Editor.")
-        return "Editor"
+    if state.get("board_approved"): logger.info("Board approved. Proceeding to set experts."); return "set_approved_experts"
+    else: logger.info("Board rejected. Routing to Editor."); return "Editor"
 
 def set_approved_experts_node(state: GraphState) -> dict:
-    logger.info(f"--- (BoE) Caching approved experts in state ---")
-    return {"approved_experts": state.get("proposed_experts")}
+    logger.info(f"--- (BoE) Caching approved experts in state ---"); return {"approved_experts": state.get("proposed_experts")}
 
 def should_continue_critique(state: GraphState) -> str:
     logger.info("--- (BoE) Checking: should_continue_critique ---")
-    if state["expert_critique_index"] < len(state["approved_experts"]):
-        logger.info("More experts to critique. Looping back.")
-        return "continue_critique"
-    else:
-        logger.info("All experts have provided critiques. Finalizing plan.")
-        return "finalize_plan"
+    if state["expert_critique_index"] < len(state["approved_experts"]): logger.info("More experts to critique. Looping back."); return "continue_critique"
+    else: logger.info("All experts have provided critiques. Finalizing plan."); return "finalize_plan"
 
 def route_logic(state: GraphState) -> str: return state.get("route", "Editor")
 
 def after_final_plan_approval_router(state: GraphState) -> str:
-    if state.get("user_feedback") == 'approve':
-        logger.info("--- Final plan approved by user. Routing to Master Router. ---")
-        return "start_execution"
-    else:
-        logger.info("--- Final plan rejected by user. Ending task. ---")
-        return "end_task"
+    if state.get("user_feedback") == 'approve': logger.info("--- Final plan approved by user. Routing to Master Router. ---"); return "start_execution"
+    else: logger.info("--- Final plan rejected by user. Ending task. ---"); return "end_task"
 
 def tactical_step_router(state: GraphState) -> str:
-    """Routes the execution to the next tactical step or finishes."""
-    logger.info("--- (EXEC) Routing tactical step. ---")
-    tactical_plan = state.get("tactical_plan", [])
-    step_index = state.get("tactical_step_index", 0)
-
-    if step_index < len(tactical_plan):
-        logger.info(f"More tactical steps remaining. Looping back to Foreman for step {step_index}.")
-        return "continue"
-    else:
-        logger.info("Tactical plan complete. Finishing strategic step.")
-        return "finish"
+    logger.info("--- (BoE-EXEC) Routing tactical step. ---"); tactical_plan = state.get("tactical_plan", []); step_index = state.get("tactical_step_index", 0)
+    if step_index < len(tactical_plan): logger.info(f"More tactical steps remaining. Looping back to Foreman for step {step_index}."); return "continue"
+    else: logger.info("Tactical plan complete. Finishing strategic step."); return "finish"
 
 def master_router(state: GraphState) -> str:
-    """The main router for the strategic loop."""
-    logger.info("--- (STRATEGIC) Master Router is checking the next step. ---")
-    memo = state.get("strategic_memo", {})
-    plan = memo.get("plan", [])
-    index = state.get("strategic_step_index", 0)
-    
-    if index >= len(plan):
-        logger.info("Strategic plan is complete. Routing to Editor.")
-        return "finish"
-    
+    logger.info("--- (BoE) Master Router is checking the next step. ---"); memo = state.get("strategic_memo", {}); plan = memo.get("plan", []); index = state.get("strategic_step_index", 0)
+    if index >= len(plan): logger.info("Strategic plan is complete. Routing to Editor."); return "finish"
     current_step = plan[index]
-    if current_step.get("tool") == "checkpoint":
-        logger.info(f"Checkpoint found at strategic step {index}. Routing to review.")
-        return "checkpoint"
-    else:
-        logger.info(f"Next strategic step {index} is a standard execution. Routing to Architect.")
-        return "execute"
+    if current_step.get("tool") == "checkpoint": logger.info(f"Checkpoint found at strategic step {index}. Routing to review."); return "checkpoint"
+    else: logger.info(f"Next strategic step {index} is a standard execution. Routing to Architect."); return "execute"
 
 def after_checkpoint_review_router(state: GraphState) -> str:
-    """Routes after the board's checkpoint review."""
-    decision = state.get("board_decision", "continue")
-    logger.info(f"--- (BoE) Routing after checkpoint review. Decision: {decision} ---")
-    if decision == "adapt":
-        return "adapt_plan"
-    if decision == "escalate":
-        return "request_user_guidance"
+    decision = state.get("board_decision", "continue"); logger.info(f"--- (BoE) Routing after checkpoint review. Decision: {decision} ---")
+    if decision == "adapt": return "adapt_plan"
+    if decision == "escalate": return "request_user_guidance"
     return "continue_execution"
+
+# MODIFIED: New router for the standard complex project track
+def after_std_plan_step_router(state: GraphState) -> str:
+    evaluation = state.get("step_evaluation", {});
+    if evaluation.get("status") == "failure":
+        if state["step_retries"] < state["max_retries"]:
+            return "std_correction_planner_node"
+        else:
+            logger.warning(f"Task '{state.get('task_id')}': Max retries exceeded for step. Routing to Editor.")
+            return "Editor"
+    if state["current_step_index"] + 1 >= len(state.get("plan", [])):
+        logger.info(f"Task '{state.get('task_id')}': Standard plan complete. Routing to Editor.")
+        return "Editor"
+    return "std_advance_to_next_step_node"
+
+# MODIFIED: New router for the simple tool track
+def after_std_worker_router(state: GraphState) -> str:
+    current_track = state.get("current_track")
+    if current_track == "SIMPLE_TOOL_USE":
+        return "Editor"
+    return "std_project_supervisor_node"
+
+# MODIFIED: New router for the standard plan approval
+def after_std_plan_approval_router(state: GraphState) -> str:
+    if state.get("user_feedback") == "approve":
+        return "std_site_foreman_node"
+    return "Editor"
 
 # --- Graph Definition ---
 def create_agent_graph():
@@ -573,6 +581,19 @@ def create_agent_graph():
     workflow.add_node("Memory_Updater", memory_updater_node)
     workflow.add_node("initial_router_node", initial_router_node)
     workflow.add_node("Editor", editor_node)
+    
+    # Track 2 & 3 nodes
+    workflow.add_node("std_handyman_node", std_handyman_node)
+    workflow.add_node("std_chief_architect_node", std_chief_architect_node)
+    workflow.add_node("std_plan_expander_node", std_plan_expander_node)
+    workflow.add_node("std_human_in_the_loop_node", std_human_in_the_loop_node)
+    workflow.add_node("std_site_foreman_node", std_site_foreman_node)
+    workflow.add_node("std_worker_node", std_worker_node)
+    workflow.add_node("std_project_supervisor_node", std_project_supervisor_node)
+    workflow.add_node("std_correction_planner_node", std_correction_planner_node)
+    workflow.add_node("std_advance_to_next_step_node", std_advance_to_next_step_node)
+
+    # Track 4 (BoE) nodes
     workflow.add_node("Propose_Experts", propose_experts_node)
     workflow.add_node("human_in_the_loop_board_approval", human_in_the_loop_board_approval)
     workflow.add_node("set_approved_experts_node", set_approved_experts_node)
@@ -581,24 +602,58 @@ def create_agent_graph():
     workflow.add_node("expert_critique_node", expert_critique_node)
     workflow.add_node("chair_final_review_node", chair_final_review_node)
     workflow.add_node("human_in_the_loop_final_plan_approval", human_in_the_loop_final_plan_approval)
-    workflow.add_node("chief_architect_node", chief_architect_node)
-    workflow.add_node("site_foreman_node", site_foreman_node)
-    workflow.add_node("worker_node", worker_node)
-    workflow.add_node("project_supervisor_node", project_supervisor_node)
+    workflow.add_node("boe_chief_architect_node", boe_chief_architect_node)
+    workflow.add_node("boe_site_foreman_node", boe_site_foreman_node)
+    workflow.add_node("boe_worker_node", boe_worker_node)
+    workflow.add_node("boe_project_supervisor_node", boe_project_supervisor_node)
     workflow.add_node("increment_tactical_step_node", increment_tactical_step_node)
     workflow.add_node("editor_checkpoint_report_node", editor_checkpoint_report_node)
     workflow.add_node("board_checkpoint_review_node", board_checkpoint_review_node)
     workflow.add_node("increment_strategic_step_node", increment_strategic_step_node)
-    workflow.add_node("master_router_node", master_router_node)
+    workflow.add_node("master_router_node", boe_master_router_node)
     workflow.add_node("human_in_the_loop_user_guidance", human_in_the_loop_user_guidance)
     
-    # Set entry and basic flow
+    # --- Graph Wiring ---
     workflow.set_entry_point("Task_Setup")
     workflow.add_edge("Task_Setup", "Memory_Updater")
     workflow.add_edge("Memory_Updater", "initial_router_node")
-    workflow.add_conditional_edges("initial_router_node", route_logic, { "Editor": "Editor", "Propose_Experts": "Propose_Experts" })
+
+    # Branch from the main router to the four tracks
+    workflow.add_conditional_edges(
+        "initial_router_node",
+        lambda state: state.get("route"),
+        {
+            "Editor": "Editor",
+            "std_handyman_node": "std_handyman_node",
+            "std_chief_architect_node": "std_chief_architect_node",
+            "Propose_Experts": "Propose_Experts",
+        }
+    )
+
+    # --- Track 2: Simple Tool Use Wiring ---
+    workflow.add_edge("std_handyman_node", "std_worker_node")
+    workflow.add_conditional_edges("std_worker_node", after_std_worker_router, {
+        "Editor": "Editor",
+        "std_project_supervisor_node": "std_project_supervisor_node"
+    })
+
+    # --- Track 3: Standard Complex Project Wiring ---
+    workflow.add_edge("std_chief_architect_node", "std_plan_expander_node")
+    workflow.add_edge("std_plan_expander_node", "std_human_in_the_loop_node")
+    workflow.add_conditional_edges("std_human_in_the_loop_node", after_std_plan_approval_router, {
+        "std_site_foreman_node": "std_site_foreman_node",
+        "Editor": "Editor"
+    })
+    workflow.add_edge("std_site_foreman_node", "std_worker_node")
+    workflow.add_edge("std_correction_planner_node", "std_site_foreman_node")
+    workflow.add_edge("std_advance_to_next_step_node", "std_site_foreman_node")
+    workflow.add_conditional_edges("std_project_supervisor_node", after_std_plan_step_router, {
+        "std_correction_planner_node": "std_correction_planner_node",
+        "std_advance_to_next_step_node": "std_advance_to_next_step_node",
+        "Editor": "Editor"
+    })
     
-    # Board of Experts and Planning Flow
+    # --- Track 4: Peer Review (Board of Experts) Wiring ---
     workflow.add_edge("Propose_Experts", "human_in_the_loop_board_approval")
     workflow.add_conditional_edges("human_in_the_loop_board_approval", after_board_approval_router, { "set_approved_experts": "set_approved_experts_node", "Editor": "Editor" })
     workflow.add_edge("set_approved_experts_node", "chair_initial_plan_node")
@@ -607,65 +662,35 @@ def create_agent_graph():
     workflow.add_conditional_edges("expert_critique_node", should_continue_critique, { "continue_critique": "expert_critique_node", "finalize_plan": "chair_final_review_node" })
     workflow.add_edge("chair_final_review_node", "human_in_the_loop_final_plan_approval")
 
-    # Strategic Loop Wiring
-    workflow.add_conditional_edges(
-        "human_in_the_loop_final_plan_approval", 
-        after_final_plan_approval_router, 
-        { "start_execution": "master_router_node", "end_task": "Editor" }
-    )
-
-    workflow.add_conditional_edges(
-        "master_router_node",
-        master_router,
-        {
-            "execute": "chief_architect_node",
-            "checkpoint": "editor_checkpoint_report_node",
-            "finish": "Editor"
-        }
-    )
+    workflow.add_conditional_edges("human_in_the_loop_final_plan_approval", after_final_plan_approval_router, { "start_execution": "master_router_node", "end_task": "Editor" })
+    workflow.add_conditional_edges("master_router_node", master_router, {"execute": "boe_chief_architect_node", "checkpoint": "editor_checkpoint_report_node", "finish": "Editor"})
     
-    # Tactical (Inner) Loop Wiring
-    workflow.add_edge("chief_architect_node", "site_foreman_node")
-    workflow.add_edge("site_foreman_node", "worker_node")
-    workflow.add_edge("worker_node", "project_supervisor_node")
-    workflow.add_edge("project_supervisor_node", "increment_tactical_step_node")
-    workflow.add_conditional_edges(
-        "increment_tactical_step_node",
-        tactical_step_router,
-        {
-            "continue": "site_foreman_node",
-            "finish": "increment_strategic_step_node"
-        }
-    )
+    workflow.add_edge("boe_chief_architect_node", "boe_site_foreman_node")
+    workflow.add_edge("boe_site_foreman_node", "boe_worker_node")
+    workflow.add_edge("boe_worker_node", "boe_project_supervisor_node")
+    workflow.add_edge("boe_project_supervisor_node", "increment_tactical_step_node")
+    workflow.add_conditional_edges("increment_tactical_step_node", tactical_step_router, {"continue": "boe_site_foreman_node", "finish": "increment_strategic_step_node"})
 
-    # Checkpoint (Outer) Loop Wiring
     workflow.add_edge("editor_checkpoint_report_node", "board_checkpoint_review_node")
-    workflow.add_conditional_edges(
-        "board_checkpoint_review_node",
-        after_checkpoint_review_router,
-        {
-            "continue_execution": "increment_strategic_step_node",
-            "adapt_plan": "chair_initial_plan_node",
-            "request_user_guidance": "human_in_the_loop_user_guidance"
-        }
-    )
+    workflow.add_conditional_edges("board_checkpoint_review_node", after_checkpoint_review_router, {"continue_execution": "increment_strategic_step_node", "adapt_plan": "chair_initial_plan_node", "request_user_guidance": "human_in_the_loop_user_guidance"})
     
     workflow.add_edge("human_in_the_loop_user_guidance", "chair_initial_plan_node")
-    
     workflow.add_edge("increment_strategic_step_node", "master_router_node")
 
+    # --- Final Exit Point ---
     workflow.add_edge("Editor", END)
     
     agent = workflow.compile(
         checkpointer=MemorySaver(),
         interrupt_before=[
+            "std_human_in_the_loop_node",
             "human_in_the_loop_board_approval",
             "human_in_the_loop_initial_plan_review",
             "human_in_the_loop_final_plan_approval",
             "human_in_the_loop_user_guidance",
         ]
     )
-    logger.info("ResearchAgent graph compiled with INTELLIGENT architect.")
+    logger.info("ResearchAgent graph compiled with FULL FOUR-TRACK logic.")
     return agent
 
 agent_graph = create_agent_graph()

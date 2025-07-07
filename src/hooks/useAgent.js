@@ -1,5 +1,25 @@
 // src/hooks/useAgent.js
-import { useState, useEffect, useRef } from 'preact/hooks';
+// -----------------------------------------------------------------------------
+// ResearchAgent UI Hook (Phase 17 - Four-Track Event Handling)
+//
+// This version completes the frontend state management reintegration by making
+// the `onMessage` callback aware of events from all four agent tracks.
+//
+// Key Architectural Changes:
+// 1. Unified Event Handling: The `onMessage` callback in the `useEffect`
+//    hook now contains a comprehensive `if/elif` structure to handle events
+//    from both the "Standard" tracks and the "Peer Review" track.
+// 2. Standard Plan Approval: It now correctly processes the
+//    `plan_approval_request` event from the `std_human_in_the_loop_node`,
+//    pushing an `architect_plan` object into the history to render the
+//    interactive `ArchitectCard`.
+// 3. Standard Execution Visualization: It correctly processes the start of
+//    the `std_site_foreman_node` to create the `execution_plan` object,
+//    which renders the `SiteForemanCard` to display the step-by-step
+//    progress of a standard complex project.
+// -----------------------------------------------------------------------------
+
+import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
 
 /**
  * Custom hook to manage the WebSocket connection and all agent communication.
@@ -44,7 +64,7 @@ export const useAgent = (onMessage, tasks, activeTaskId) => {
                         newTasks[task_id] = "Thinking...";
                     } else if (type === 'agent_event' && chainEvent === 'on_chain_start') {
                         newTasks[task_id] = name;
-                    } else if (['final_answer', 'agent_stopped', 'plan_approval_request', 'board_approval_request', 'final_plan_approval_request'].includes(type)) {
+                    } else if (['final_answer', 'agent_stopped', 'plan_approval_request', 'board_approval_request', 'final_plan_approval_request', 'user_guidance_approval_request'].includes(type)) {
                         delete newTasks[task_id];
                     }
                     return newTasks;
@@ -65,34 +85,7 @@ export const useAgent = (onMessage, tasks, activeTaskId) => {
             }
         };
     }, [onMessage]);
-
-    // --- MODIFIED: ACK Effect is restored ---
-    // This effect runs whenever the tasks or active task ID change.
-    useEffect(() => {
-        if (!activeTaskId || !tasks || tasks.length === 0) return;
-
-        const activeTask = tasks.find(t => t.id === activeTaskId);
-        if (!activeTask || !activeTask.history || activeTask.history.length === 0) return;
-
-        const lastHistoryItem = activeTask.history[activeTask.history.length - 1];
-        
-        // Find the last actual step card in the last run container
-        if (lastHistoryItem?.type === 'run_container' && lastHistoryItem.children.length > 0) {
-            const lastChild = lastHistoryItem.children[lastHistoryItem.children.length - 1];
-            
-            // If the last thing added was an execution step, send an ACK for it.
-            if (lastChild.type === 'execution_step') {
-                console.log(`ACKing step for task ${activeTaskId}.`);
-                if (ws.current?.readyState === WebSocket.OPEN) {
-                    ws.current.send(JSON.stringify({
-                      type: 'ack',
-                      task_id: activeTaskId,
-                    }));
-                }
-            }
-        }
-    }, [tasks, activeTaskId]); // Dependency array ensures this runs after state updates.
-
+    
     const runAgent = (payload) => {
         if (ws.current?.readyState === WebSocket.OPEN) {
             ws.current.send(JSON.stringify({ type: 'run_agent', ...payload }));

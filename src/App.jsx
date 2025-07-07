@@ -1,31 +1,22 @@
 // src/App.jsx
 // -----------------------------------------------------------------------------
-// ResearchAgent Main UI (Phase 17 - Escalation Path WIRING)
+// ResearchAgent Main UI (Phase 17 - Hotfix)
 //
-// This version wires the frontend to handle the new user guidance interrupt.
+// This version fixes a critical UI duplication bug.
 //
-// Key Architectural Changes:
-// 1. Event Handling in `useAgent` Callback:
-//    - The `onMessage` callback is updated with a new `elif` condition to
-//      recognize the `user_guidance_approval_request` event type.
-//    - When this event is received, it pushes a new object with type
-//      `user_guidance` into the active task's history. This object includes
-//      the Editor's report and a flag indicating it's awaiting user input.
-//
-// 2. `resumeAgent` Call for Guidance:
-//    - A new handler, `handleUserGuidanceSubmit`, is created.
-//    - It calls the `agent.resumeAgent` function, passing the user's text
-//      input in the new `guidance` field of the payload.
-//
-// 3. Component Rendering:
-//    - A new case is added to the `switch` statement in the render block to
-//      render the (soon-to-be-created) `UserGuidanceCard` when an item
-//      with type `user_guidance` is found in the history.
+// Key Fixes:
+// 1. Robust `run_container` Logic: The state update logic in the `useAgent`
+//    callback has been rewritten. It now correctly finds the *last active*
+//    `run_container` and appends all subsequent events as children to it.
+//    It no longer creates a new container for each event, which was the
+//    root cause of the UI duplication bug.
+// 2. This change ensures a stable and predictable rendering of the agent's
+//    entire thought process for all four tracks.
 // -----------------------------------------------------------------------------
 import { h } from 'preact';
 import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
 import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, FolderIcon, ArrowLeftIcon, UploadCloudIcon, StopCircleIcon, BriefcaseIcon, SendToChatIcon, FileTextIcon, BoardIcon, CheckIcon, XCircleIcon, ChairIcon, CritiqueIcon } from './components/Icons';
-import { FinalPlanApprovalCard, ExpertCritiqueCard, ArchitectCard, BoardApprovalCard, ChairPlanCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard, ExecutionStepCard, WorkCard, ForemanCard, WorkerCard, SupervisorCard, EditorReportCard, BoardDecisionCard, UserGuidanceCard } from './components/AgentCards';
+import { ArchitectCard, BoardApprovalCard, ChairPlanCard, DirectAnswerCard, EditorReportCard, ExpertCritiqueCard, FinalAnswerCard, FinalPlanApprovalCard, ForemanCard, SiteForemanCard, SupervisorCard, UserGuidanceCard, WorkerCard, BoardDecisionCard } from './components/AgentCards';
 import { ToggleButton, CopyButton } from './components/Common';
 import { useTasks } from './hooks/useTasks';
 import { useWorkspace } from './hooks/useWorkspace';
@@ -171,6 +162,7 @@ export function App() {
     const workspace = useWorkspace(activeTaskId);
     const settings = useSettings();
     
+    // MODIFIED: State update logic is now more robust.
     const agent = useAgent(useCallback((event) => {
         setTasks(currentTasks => {
             try {
@@ -181,14 +173,25 @@ export function App() {
                 let taskToUpdate = { ...newTasks[taskIndex] };
                 let newHistory = [...taskToUpdate.history];
 
+                // Find the last active run container.
                 let runContainer = newHistory.length > 0 && newHistory[newHistory.length - 1].type === 'run_container' ? newHistory[newHistory.length - 1] : null;
-                if (!runContainer) {
-                    runContainer = { type: 'run_container', children: [], isComplete: false };
-                    newHistory.push(runContainer);
+
+                const eventType = event.type;
+                
+                // If a run is finished or stopped, ensure the container is marked as complete.
+                if (runContainer && (eventType === 'final_answer' || eventType === 'agent_stopped')) {
+                    runContainer.isComplete = true;
+                }
+
+                // If there's no active run container, create one.
+                if (!runContainer || runContainer.isComplete) {
+                     runContainer = { type: 'run_container', children: [], isComplete: false };
+                     newHistory.push(runContainer);
                 }
                 
-                const eventType = event.type;
-                if (eventType === 'board_approval_request') {
+                if (eventType === 'plan_approval_request') {
+                     runContainer.children.push({ type: 'architect_plan', steps: event.plan, isAwaitingApproval: true });
+                } else if (eventType === 'board_approval_request') {
                     runContainer.children.push({ type: 'board_approval', experts: event.experts, isAwaitingApproval: true });
                 } else if (eventType === 'chair_plan_generated') {
                     runContainer.children.push({ type: 'chair_plan', plan: event.plan });
@@ -202,7 +205,6 @@ export function App() {
                         implementationNotes: event.implementation_notes,
                         isAwaitingApproval: true 
                     });
-                // NEW: Handle the user guidance request event
                 } else if (eventType === 'user_guidance_approval_request') {
                     runContainer.children.push({
                         type: 'user_guidance',
@@ -224,7 +226,37 @@ export function App() {
                 } else if (eventType === 'direct_answer' || eventType === 'final_answer') {
                     runContainer.children.push({ type: eventType, content: event.data });
                     runContainer.isComplete = true;
+                } else if (eventType === 'agent_event') {
+                    const { name, event: chainEvent, data } = event;
+                    const inputData = data.input || {};
+                    const outputData = data.output || {};
+
+                    let architectPlan = runContainer.children.find(c => c.type === 'architect_plan' && c.isAwaitingApproval);
+                    if (name === 'Standard Foreman' && chainEvent === 'on_chain_start' && architectPlan) {
+                        architectPlan.isAwaitingApproval = false;
+                        if (!runContainer.children.some(c => c.type === 'execution_plan')) {
+                            runContainer.children.push({ type: 'execution_plan', steps: architectPlan.steps.map(step => ({...step, status: 'pending'})) });
+                        }
+                    }
+
+                    let executionPlan = runContainer.children.find(c => c.type === 'execution_plan');
+                    if (executionPlan) {
+                        const stepIndex = inputData.current_step_index;
+                        if (stepIndex !== undefined && executionPlan.steps[stepIndex]) {
+                            let stepToUpdate = { ...executionPlan.steps[stepIndex] };
+                            if (name === 'Standard Foreman' && chainEvent === 'on_chain_start') stepToUpdate.status = 'in-progress';
+                            else if (name === 'Standard Supervisor' && chainEvent === 'on_chain_end') {
+                                stepToUpdate.status = outputData.step_evaluation?.status === 'failure' ? 'failure' : 'completed';
+                                stepToUpdate.toolCall = inputData.current_tool_call;
+                                stepToUpdate.toolOutput = outputData.tool_output;
+                                stepToUpdate.evaluation = outputData.step_evaluation;
+                                if (activeTaskId === event.task_id) workspace.fetchFiles(workspace.currentPath);
+                            }
+                            executionPlan.steps[stepIndex] = stepToUpdate;
+                        }
+                    }
                 }
+                
                 taskToUpdate.history = newHistory;
                 newTasks[taskIndex] = taskToUpdate;
                 return newTasks;
@@ -233,7 +265,7 @@ export function App() {
                 return currentTasks;
             }
         });
-    }, []), tasks, activeTaskId);
+    }, [activeTaskId, workspace.currentPath]));
 
     const [inputValue, setInputValue] = useState("");
     const [isLeftSidebarVisible, setIsLeftSidebarVisible] = useState(true);
@@ -307,7 +339,6 @@ export function App() {
         agent.resumeAgent({ task_id: activeTaskId, feedback: approved ? 'approve' : 'reject', plan, enabled_tools: Object.keys(settings.enabledTools).filter(key => settings.enabledTools[key]) });
     };
     
-    // NEW: Handler for submitting user guidance
     const handleUserGuidanceSubmit = (guidanceText) => {
         setTasks(currentTasks => currentTasks.map(task => {
             if (task.id === activeTaskId) {
@@ -331,7 +362,6 @@ export function App() {
         });
     };
 
-
     const handleModifyAndApprove = (modifiedPlan) => handlePlanApprovalAction('approve', modifiedPlan);
     
     const handleSendMessage = (e) => {
@@ -343,7 +373,7 @@ export function App() {
 
         if (!message || !activeTaskId || agent.connectionStatus !== 'Connected' || isAgentRunning || isAwaitingInput) return;
         
-        setTasks(currentTasks => currentTasks.map(task => task.id === activeTaskId ? { ...task, history: [...task.history, { type: 'prompt', content: message }, { type: 'run_container', children: [], isComplete: false }] } : task));
+        setTasks(currentTasks => currentTasks.map(task => task.id === activeTaskId ? { ...task, history: [...task.history, { type: 'prompt', content: message }] } : task));
         agent.runAgent({ prompt: message, llm_config: settings.selectedModels, task_id: activeTaskId, enabled_tools: Object.keys(settings.enabledTools).filter(key => settings.enabledTools[key]) });
         setInputValue("");
     };
@@ -414,7 +444,8 @@ export function App() {
                                             <div class={`absolute top-6 -left-4 h-px ${child.type === 'execution_plan' ? 'w-8' : 'w-4'} bg-border`} />
                                             {(() => {
                                                 switch (child.type) {
-                                                    case 'architect_plan': return <ArchitectCard plan={child.plan} isAwaitingApproval={child.isAwaitingApproval} onModify={handleModifyAndApprove} onReject={() => handlePlanApprovalAction('reject')} availableTools={settings.availableTools}/>;
+                                                    case 'architect_plan': return <ArchitectCard plan={child} isAwaitingApproval={child.isAwaitingApproval} onModify={handleModifyAndApprove} onReject={() => handlePlanApprovalAction('reject')} availableTools={settings.availableTools}/>;
+                                                    case 'execution_plan': return <SiteForemanCard plan={child} />;
                                                     case 'board_approval': return <BoardApprovalCard experts={child.experts} onApproval={handleBoardApprovalAction} />;
                                                     case 'chair_plan': return <ChairPlanCard plan={child.plan} />;
                                                     case 'expert_critique': return <ExpertCritiqueCard critique={child.critique} />;
@@ -426,7 +457,6 @@ export function App() {
                                                     case 'board_decision': return <BoardDecisionCard decision={child.decision} />;
                                                     case 'direct_answer': return <DirectAnswerCard answer={child.content} />;
                                                     case 'final_answer': return <FinalAnswerCard answer={child.content} />;
-                                                    // NEW: Render the UserGuidanceCard
                                                     case 'user_guidance': return <UserGuidanceCard report={child.report} isAwaitingApproval={child.isAwaitingApproval} submittedGuidance={child.submittedGuidance} onGuidanceSubmit={handleUserGuidanceSubmit} />;
                                                     default: return null;
                                                 }

@@ -1,20 +1,22 @@
 // src/components/AgentCards.jsx
 // -----------------------------------------------------------------------------
-// ResearchAgent UI Components (Phase 17 - Escalation Path WIRING)
+// ResearchAgent UI Components (Phase 17 - Four-Track Card Consolidation)
 //
-// This version adds the new placeholder component for the user guidance path.
+// This version reintegrates the UI components from the original three-track
+// agent, making them available for the unified four-track system.
 //
 // Key Architectural Changes:
-// 1. New `UserGuidanceCard` Component:
-//    - This component is designed to handle the `user_guidance` event.
-//    - It displays the `report` from the Editor to give the user context.
-//    - It includes a text input for the user to type their guidance.
-//    - It has a "Submit Guidance" button that, when clicked, calls the
-//      `onGuidanceSubmit` prop with the input text.
-//    - It manages its own state to switch from the input form to a
-//      "Guidance Submitted" confirmation view.
-//
-// 2. Export: The new component is exported so it can be used by `App.jsx`.
+// 1. `ArchitectCard` Restored: The interactive plan editor component has been
+//    re-added. This card will be used to display, edit, and approve plans
+//    from the `std_chief_architect_node`.
+// 2. `SiteForemanCard` Restored: The execution log component, which displays
+//    a list of collapsable `StepCard` components, has been re-added. This
+//    will be used to visualize the step-by-step execution of a standard
+//    complex project.
+// 3. `StepCard` Restored: The dependent `StepCard` component is also included,
+//    providing the detailed view for each step within the `SiteForemanCard`.
+// 4. All components from both codebases are now consolidated into this single
+//    file, ready for the state management and rendering logic updates.
 // -----------------------------------------------------------------------------
 
 import { h } from 'preact';
@@ -361,7 +363,6 @@ export const BoardDecisionCard = ({ decision }) => (
     </AgentResponseCard>
 );
 
-// NEW: Component for the user guidance interrupt
 export const UserGuidanceCard = ({ report, isAwaitingApproval, submittedGuidance, onGuidanceSubmit }) => {
     const [guidanceText, setGuidanceText] = useState('');
 
@@ -415,38 +416,6 @@ export const SiteForemanCard = ({ plan }) => (
     </div>
 );
 
-export const ExecutionStepCard = ({ step }) => {
-    const statusColor = step.status === 'success' ? 'green' : 'red';
-    const statusIcon = step.status === 'success' ? <CheckCircleIcon class={`h-5 w-5 text-${statusColor}-400`} /> : <XCircleIcon class={`h-5 w-5 text-${statusColor}-400`} />;
-
-    return (
-        <AgentResponseCard icon={statusIcon} title={`Step Complete: ${step.instruction}`} color={statusColor}>
-            <div class="space-y-3 text-sm">
-                <div class="p-3 bg-gray-900/50 rounded-lg border border-gray-700/50">
-                    <div class="flex items-center gap-2 font-semibold text-gray-400 mb-1">
-                        <WorkerIcon class="h-4 w-4" />
-                        <span>Worker Action</span>
-                    </div>
-                    <pre class="text-xs text-cyan-300 overflow-x-auto p-2 bg-black/20 rounded-md font-mono relative">
-                        <CopyButton textToCopy={JSON.stringify(step.tool_call, null, 2)} className="absolute top-1 right-1" />
-                        <code>{JSON.stringify(step.tool_call, null, 2)}</code>
-                    </pre>
-                </div>
-                 <div class="p-3 bg-gray-900/50 rounded-lg border border-gray-700/50">
-                    <div class="flex items-center gap-2 font-semibold text-gray-400 mb-1">
-                        <SupervisorIcon class="h-4 w-4" />
-                        <span>Supervisor Evaluation</span>
-                    </div>
-                    <p class="text-xs text-gray-300 whitespace-pre-wrap font-mono p-2 bg-black/20 rounded-md">
-                        {step.evaluation?.reasoning || 'No evaluation provided.'}
-                    </p>
-                </div>
-            </div>
-        </AgentResponseCard>
-    );
-};
-
-
 export const DirectAnswerCard = ({ answer }) => {
     const parsedHtml = window.marked ? window.marked.parse(answer, { breaks: true, gfm: true }) : answer.replace(/\n/g, '<br />');
     return (
@@ -464,9 +433,3 @@ export const FinalAnswerCard = ({ answer }) => {
         </AgentResponseCard>
     );
 };
-
-export const WorkCard = () => (
-    <AgentResponseCard icon={<LoaderIcon class="h-5 w-5" />} title="Work In Progress" color="blue">
-        <p class="text-sm text-gray-300">The agent is now executing the approved plan.</p>
-    </AgentResponseCard>
-);

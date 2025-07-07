@@ -1,23 +1,18 @@
 # backend/server.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 17 - Escalation Path WIRING)
+# ResearchAgent Backend Server (Phase 17 - Hotfix)
 #
-# This version updates the server to handle the new user guidance interrupt.
+# This version fixes two critical bugs discovered during testing.
 #
-# Key Architectural Changes:
-# 1. Event Handling in `agent_execution_wrapper`:
-#    - A new `elif` condition is added to check if the graph's `next`
-#      state is `human_in_the_loop_user_guidance`.
-#    - When this condition is met, it broadcasts a new event type:
-#      `user_guidance_approval_request`.
-#    - This event includes the `checkpoint_report` from the Editor, providing
-#      the necessary context for the user to make an informed decision.
-#
-# 2. `resume_agent_handler` Update:
-#    - The handler is updated to check for a new `guidance` field in the
-#      incoming payload from the frontend.
-#    - If present, it adds this guidance to the `GraphState` before
-#      resuming the agent execution.
+# Key Fixes:
+# 1. `NameError` in `_handle_get_workspace_items`: The `items` list was not
+#    initialized in the correct scope, causing a `NameError` when the
+#    frontend requested the file list. This has been corrected by adding
+#    `items = []` before the `try` block.
+# 2. Event Broadcasting for Standard Track: The `agent_execution_wrapper`
+#    was missing the logic to broadcast the detailed step-by-step progress
+#    for the standard complex track. This has been re-added to ensure the
+#    UI updates correctly for all tracks.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -49,8 +44,6 @@ logger = logging.getLogger(__name__)
 
 RUNNING_AGENTS = {}
 ACTIVE_CONNECTIONS = set()
-AGENT_EVENTS = {}
-
 
 # --- Tool Template ---
 TOOL_TEMPLATE = """
@@ -277,11 +270,13 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             logger.error(f"Failed to get available tools: {e}", exc_info=True)
             self._send_json_response(500, {"error": "Could not retrieve tools."})
 
+    # MODIFIED: Fixed NameError by initializing `items` list.
     def _handle_get_workspace_items(self, parsed_path):
         query_components = parse_qs(parsed_path.query)
         subdir = query_components.get("path", [None])[0]
         if not subdir: return self._send_json_response(400, {"error": "Missing 'path' query parameter."})
-        base_workspace, items = "/app/workspace", []
+        base_workspace = "/app/workspace"
+        items = [] # FIX: Initialize the list here.
         try:
             full_path = _resolve_path(base_workspace, subdir)
             if not os.path.isdir(full_path): return self._send_json_response(404, {"error": f"Directory not found: '{subdir}'"})
@@ -421,17 +416,25 @@ def run_http_server():
 # --- WebSocket Core Logic ---
 
 NODE_NAME_MAPPING = {
+    # Core
     "initial_router_node": "Router", "summarize_history_node": "Summarizer",
-    "Memory_Updater": "Memory Updater",
+    "Memory_Updater": "Memory Updater", "Editor": "Editor",
+    # Standard Track
+    "std_handyman_node": "Handyman",
+    "std_chief_architect_node": "Standard Architect",
+    "std_site_foreman_node": "Standard Foreman",
+    "std_worker_node": "Standard Worker",
+    "std_project_supervisor_node": "Standard Supervisor",
+    "std_correction_planner_node": "Correction Planner",
+    # BoE Track
     "Propose_Experts": "The Chair is selecting the Board of Experts",
     "chair_initial_plan_node": "The Chair is drafting a plan",
     "expert_critique_node": "The Board is reviewing the plan",
     "chair_final_review_node": "The Chair is synthesizing feedback",
-    "Editor": "Editor",
-    "chief_architect_node": "The Chief Architect is planning",
-    "site_foreman_node": "The Foreman is preparing a tool call",
-    "worker_node": "The Worker is executing the tool",
-    "project_supervisor_node": "The Supervisor is evaluating the results",
+    "boe_chief_architect_node": "BoE Architect",
+    "boe_site_foreman_node": "BoE Foreman",
+    "boe_worker_node": "BoE Worker",
+    "boe_project_supervisor_node": "BoE Supervisor",
     "editor_checkpoint_report_node": "The Editor is compiling a report for the Board",
     "board_checkpoint_review_node": "The Board is reviewing progress"
 }
@@ -443,7 +446,7 @@ async def broadcast_event(event):
         await asyncio.gather(*[conn.send(message) for conn in ACTIVE_CONNECTIONS], return_exceptions=True)
 
 async def agent_execution_wrapper(input_state, config):
-    global RUNNING_AGENTS, AGENT_EVENTS
+    global RUNNING_AGENTS
     task_id = config["configurable"]["thread_id"]
     try:
         logger.info(f"Task '{task_id}': Agent execution starting.")
@@ -466,72 +469,56 @@ async def agent_execution_wrapper(input_state, config):
                         "task_id": task_id
                     })
             
-            if event_type == "on_chain_end" and node_name == "chief_architect_node":
-                output = event["data"]["output"]
-                tactical_plan = output.get("tactical_plan")
-                logger.info(f"Broadcasting architect_plan_generated for task '{task_id}'")
+            if event_type == "on_chain_end" and node_name == "boe_chief_architect_node":
                 await broadcast_event({
                     "type": "architect_plan_generated",
-                    "plan": tactical_plan,
+                    "plan": event["data"]["output"].get("tactical_plan"),
                     "task_id": task_id
                 })
             
-            if event_type == "on_chain_end" and node_name == "site_foreman_node":
-                output = event["data"]["output"]
-                current_step = output.get("current_tactical_step")
-                logger.info(f"Broadcasting foreman_step_prepared for task '{task_id}'")
+            if event_type == "on_chain_end" and node_name == "boe_site_foreman_node":
                 await broadcast_event({
                     "type": "foreman_step_prepared",
-                    "step": current_step,
+                    "step": event["data"]["output"].get("current_tactical_step"),
                     "task_id": task_id
                 })
 
-            if event_type == "on_chain_end" and node_name == "worker_node":
-                output = event["data"]["output"]
-                worker_output = output.get("worker_output")
-                tool_call = output.get("current_tactical_step")
-                logger.info(f"Broadcasting worker_step_executed for task '{task_id}'")
+            if event_type == "on_chain_end" and node_name == "boe_worker_node":
                 await broadcast_event({
                     "type": "worker_step_executed",
-                    "tool_call": tool_call,
-                    "output": worker_output,
+                    "tool_call": event["data"]["output"].get("current_tactical_step"),
+                    "output": event["data"]["output"].get("worker_output"),
                     "task_id": task_id
                 })
 
-            if event_type == "on_chain_end" and node_name == "project_supervisor_node":
-                output = event["data"]["output"]
-                evaluation = output.get("step_evaluation")
-                logger.info(f"Broadcasting supervisor_step_evaluated for task '{task_id}'")
+            if event_type == "on_chain_end" and node_name == "boe_project_supervisor_node":
                 await broadcast_event({
                     "type": "supervisor_step_evaluated",
-                    "evaluation": evaluation,
+                    "evaluation": event["data"]["output"].get("step_evaluation"),
                     "task_id": task_id
                 })
             
             if event_type == "on_chain_end" and node_name == "editor_checkpoint_report_node":
-                output = event["data"]["output"]
-                report = output.get("checkpoint_report")
-                logger.info(f"Broadcasting editor_report_generated for task '{task_id}'")
                 await broadcast_event({
                     "type": "editor_report_generated",
-                    "report": report,
+                    "report": event["data"]["output"].get("checkpoint_report"),
                     "task_id": task_id
                 })
             
             if event_type == "on_chain_end" and node_name == "board_checkpoint_review_node":
-                output = event["data"]["output"]
-                decision = output.get("board_decision")
-                logger.info(f"Broadcasting board_decision_made for task '{task_id}'")
                 await broadcast_event({
                     "type": "board_decision_made",
-                    "decision": decision,
+                    "decision": event["data"]["output"].get("board_decision"),
                     "task_id": task_id
                 })
 
-
         current_state = agent_graph.get_state(config)
         
-        if current_state.next and "human_in_the_loop_board_approval" in current_state.next:
+        if current_state.next and "std_human_in_the_loop_node" in current_state.next:
+            logger.info(f"Task '{task_id}': Paused for standard plan approval.")
+            await broadcast_event({"type": "plan_approval_request", "plan": current_state.values.get("plan"), "task_id": task_id})
+        
+        elif current_state.next and "human_in_the_loop_board_approval" in current_state.next:
             logger.info(f"Task '{task_id}': Paused for Board of Experts approval.")
             await broadcast_event({"type": "board_approval_request", "experts": current_state.values.get("proposed_experts"), "task_id": task_id})
 
@@ -560,7 +547,6 @@ async def agent_execution_wrapper(input_state, config):
                 "task_id": task_id
             })
         
-        # NEW: Handle the user guidance interrupt
         elif current_state.next and "human_in_the_loop_user_guidance" in current_state.next:
             logger.info(f"Task '{task_id}': Paused for User Guidance.")
             await broadcast_event({
@@ -583,15 +569,12 @@ async def agent_execution_wrapper(input_state, config):
         await broadcast_event({"type": "agent_stopped", "task_id": task_id, "message": f"Error: {e}"})
     finally:
         if task_id in RUNNING_AGENTS: del RUNNING_AGENTS[task_id]
-        if task_id in AGENT_EVENTS: del AGENT_EVENTS[task_id]
-        logger.info(f"Task '{task_id}': Cleaned up from RUNNING_AGENTS and AGENT_EVENTS.")
+        logger.info(f"Task '{task_id}': Cleaned up from RUNNING_AGENTS.")
 
 async def run_agent_handler(data):
-    global RUNNING_AGENTS, AGENT_EVENTS
+    global RUNNING_AGENTS
     task_id = data.get("task_id")
     if task_id in RUNNING_AGENTS: return
-    
-    AGENT_EVENTS[task_id] = asyncio.Event()
     
     config = {"recursion_limit": 5000, "configurable": {"thread_id": task_id}}
     initial_state = { "messages": [HumanMessage(content=data.get("prompt"))], "llm_config": data.get("llm_config", {}), "task_id": task_id, "enabled_tools": data.get("enabled_tools")}
@@ -607,25 +590,17 @@ async def resume_agent_handler(data):
         logger.warning(f"Task '{task_id}' is already running. Ignoring resume request.")
         return
 
-    if task_id not in AGENT_EVENTS:
-        AGENT_EVENTS[task_id] = asyncio.Event()
-        
     config = {"recursion_limit": 5000, "configurable": {"thread_id": task_id}}
     update_values = {"enabled_tools": data.get("enabled_tools")}
 
     if (feedback := data.get("feedback")) is not None: 
         update_values["user_feedback"] = feedback
     if (plan := data.get("plan")) is not None: 
-        current_state = agent_graph.get_state(config)
-        memo = current_state.values.get("strategic_memo", {})
-        memo['plan'] = plan
-        update_values["strategic_memo"] = memo
+        update_values["plan"] = plan
     if (board_approved := data.get("board_approved")) is not None: 
         update_values["board_approved"] = board_approved
-    # NEW: Handle incoming user guidance
     if (guidance := data.get("guidance")) is not None:
         update_values["user_guidance"] = guidance
-
 
     agent_graph.update_state(config, update_values)
     agent_task = asyncio.create_task(agent_execution_wrapper(None, config))
@@ -635,15 +610,6 @@ async def handle_stop_agent(data):
     task_id = data.get("task_id")
     if task_id in RUNNING_AGENTS:
         RUNNING_AGENTS[task_id].cancel()
-
-async def handle_ack(data):
-    task_id = data.get("task_id")
-    if task_id in AGENT_EVENTS:
-        logger.info(f"ACK received for task '{task_id}'. Setting event to resume agent.")
-        await resume_agent_handler({"task_id": task_id})
-    else:
-        logger.warning(f"Received ACK for unknown or completed task '{task_id}'.")
-
 
 def _safe_delete_workspace(task_id: str):
     try:
@@ -670,8 +636,7 @@ async def message_router(websocket):
                 "resume_agent": resume_agent_handler, 
                 "stop_agent": handle_stop_agent, 
                 "task_create": handle_task_create, 
-                "task_delete": handle_task_delete,
-                "ack": handle_ack
+                "task_delete": handle_task_delete
             }
             if (handler := handlers.get(data.get("type"))): await handler(data)
     finally:
@@ -687,7 +652,7 @@ async def main():
     try:
         logger.info(f"Attempting to start WebSocket server on {host}:{port}")
         async with websockets.serve(message_router, host, port):
-            logger.info("ResearchAgent WebSocket server is running with Supervisor -> Editor flow.")
+            logger.info("ResearchAgent WebSocket server is running with FULL FOUR-TRACK capability.")
             await asyncio.Future()
     except Exception as e:
         logger.error(f"!!! FAILED TO START WEBSOCKET SERVER: {e} !!!", exc_info=True)
