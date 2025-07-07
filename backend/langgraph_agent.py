@@ -1,6 +1,6 @@
 # backend/langgraph_agent.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 17 - Hotfix)
+# ResearchAgent Core Agent (Phase 17 - Hotfix 2)
 #
 # This version fixes a bug where the Editor node would provide unhelpful
 # summaries instead of direct tool outputs.

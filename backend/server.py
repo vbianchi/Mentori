@@ -1,18 +1,16 @@
 # backend/server.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 17 - Hotfix)
+# ResearchAgent Backend Server (Phase 17 - Hotfix 2)
 #
-# This version fixes two critical bugs discovered during testing.
+# This version includes a critical fix for a race condition that occurred
+# when creating new tasks.
 #
 # Key Fixes:
-# 1. `NameError` in `_handle_get_workspace_items`: The `items` list was not
-#    initialized in the correct scope, causing a `NameError` when the
-#    frontend requested the file list. This has been corrected by adding
-#    `items = []` before the `try` block.
-# 2. Event Broadcasting for Standard Track: The `agent_execution_wrapper`
-#    was missing the logic to broadcast the detailed step-by-step progress
-#    for the standard complex track. This has been re-added to ensure the
-#    UI updates correctly for all tracks.
+# 1. Self-Healing Workspace Endpoint: The `_handle_get_workspace_items`
+#    function is now more robust. If it receives a request for a path that
+#    doesn't exist, it will now create it on-the-fly instead of returning a
+#    404 error. This resolves the race condition where the frontend would
+#    request a workspace directory before the backend had finished creating it.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -270,16 +268,20 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             logger.error(f"Failed to get available tools: {e}", exc_info=True)
             self._send_json_response(500, {"error": "Could not retrieve tools."})
 
-    # MODIFIED: Fixed NameError by initializing `items` list.
+    # MODIFIED: Now creates the directory if it doesn't exist.
     def _handle_get_workspace_items(self, parsed_path):
         query_components = parse_qs(parsed_path.query)
         subdir = query_components.get("path", [None])[0]
         if not subdir: return self._send_json_response(400, {"error": "Missing 'path' query parameter."})
         base_workspace = "/app/workspace"
-        items = [] # FIX: Initialize the list here.
+        items = []
         try:
             full_path = _resolve_path(base_workspace, subdir)
-            if not os.path.isdir(full_path): return self._send_json_response(404, {"error": f"Directory not found: '{subdir}'"})
+            # FIX: If the directory doesn't exist, create it.
+            if not os.path.isdir(full_path):
+                logger.warning(f"Workspace path '{subdir}' not found. Creating it now.")
+                os.makedirs(full_path, exist_ok=True)
+            
             for item_name in os.listdir(full_path):
                 item_path = os.path.join(full_path, item_name)
                 item_type = 'directory' if os.path.isdir(item_path) else 'file'

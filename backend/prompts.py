@@ -1,16 +1,19 @@
 # backend/prompts.py
 # -----------------------------------------------------------------------------
-# ResearchAgent Prompts (Phase 17 - Four-Track Prompt Consolidation)
+# ResearchAgent Prompts (Phase 17 - Hotfix 2)
 #
-# This version consolidates all prompts from both the original three-track
-# agent and the new Board of Experts track into a single, unified file.
+# This version includes fixes to the Router and Editor prompts to improve
+# conversational tool use and the clarity of final answers.
 #
-# Key Architectural Changes:
-# 1. Prompt Consolidation: All prompts required for all four cognitive
-#    tracks (Direct QA, Simple Tool Use, Standard Complex Project, and
-#    Peer Review) are now present in this file.
-# 2. Clear Organization: Comments have been added to group the prompts by
-#    their corresponding agent or track, improving readability and maintainability.
+# Key Fixes:
+# 1. Smarter `router_prompt_template`: Added more explicit instructions and
+#    examples to help the LLM better distinguish between a direct question
+#    and a conversational command to use a tool.
+# 2. Context-Aware `final_answer_prompt_template`: This prompt is updated to
+#    accept a new `tool_output` variable. It's instructed to prioritize
+#    displaying this direct output for simple tool calls, ensuring the user
+#    sees the results of their command (like web search results) instead of
+#    just a generic confirmation.
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
@@ -67,7 +70,7 @@ Your Output (must be a concise, information-dense paragraph):
 """
 )
 
-# --- Initial Four-Track Router Prompt ---
+# --- Initial Four-Track Router Prompt (MODIFIED) ---
 
 router_prompt_template = PromptTemplate.from_template(
     """
@@ -82,8 +85,8 @@ You are an expert request router. Your job is to classify the user's latest requ
 **Categories:**
 1.  **DIRECT_QA**: For simple knowledge-based questions, conversational interactions, or direct commands to store or retrieve information from memory.
     -   Examples: "What is the capital of France?", "What is my favorite dessert?", "Remember my project is called Helios.", "That's all for now, thank you."
-2.  **SIMPLE_TOOL_USE**: For requests that can be fulfilled with a single tool call.
-    -   Examples: "list the files in the current directory", "read the file 'main.py'", "search the web for the latest news on AI"
+2.  **SIMPLE_TOOL_USE**: For requests that can be fulfilled with a single tool call. This includes conversational requests that imply a tool should be used.
+    -   Examples: "list the files in the current directory", "read the file 'main.py'", "search the web for the latest news on AI", "what did you find out about Vanya Mantek?", "show me the three poems by reading them"
 3.  **COMPLEX_PROJECT**: For requests that require multiple steps, planning, or the use of several tools in a sequence.
     -   Examples: "Research the market for electric vehicles and write a summary report.", "Create a python script to fetch data from an API and save it to a CSV file.", "Find the top 3 competitors to LangChain and create a feature comparison table."
 4.  **PEER_REVIEW**: For complex research questions that demand the highest level of analytical rigor, critique, and strategic planning. This track is invoked when the user explicitly asks for expert review.
@@ -94,8 +97,8 @@ You are an expert request router. Your job is to classify the user's latest requ
 
 **Instructions:**
 - If the user's request contains the special tag **`@experts`**, you **MUST** classify it as **`PEER_REVIEW`**.
-- Otherwise, analyze the user's request in the context of the conversation history and available tools.
-- Based on your analysis, respond with ONLY ONE of the following strings: "DIRECT_QA", "SIMPLE_TOOL_USE", "COMPLEX_PROJECT", or "PEER_REVIEW".
+- Pay close attention to action verbs (e.g., "search", "find", "read", "list", "show me"). If the request implies an action that matches an available tool, classify it as `SIMPLE_TOOL_USE` or `COMPLEX_PROJECT`.
+- Based on your analysis, respond with ONLY ONE of the following three strings: "DIRECT_QA", "SIMPLE_TOOL_USE", "COMPLEX_PROJECT", or "PEER_REVIEW".
 - Do not add any other words or explanation.
 
 **Your Output:**
@@ -447,7 +450,7 @@ Your job is to take a single high-level strategic goal and expand it into a deta
 )
 
 
-# --- Unified Final Answer Prompt ---
+# --- Unified Final Answer Prompt (MODIFIED) ---
 
 final_answer_prompt_template = PromptTemplate.from_template(
     """
@@ -456,28 +459,34 @@ You are the final, user-facing voice of the ResearchAgent, acting as an expert e
 **1. Recent Conversation History (What was said):**
 {chat_history}
 
-**2. Execution Log (What the agent just did):**
+**2. Direct Tool Output (If a simple tool was just used):**
+{tool_output}
+
+**3. Execution Log (What the agent did in a complex plan):**
 {execution_log}
 
-**3. User's Latest Request:**
+**4. User's Latest Request:**
 {input}
 
 ---
 **Your Task: Choose your response style based on the context.**
 
-**RULE 1: If the "Execution Log" is NOT empty and does NOT contain "No tool actions...":**
-This means the agent just completed a task for the user. Adopt a **"Dutiful Project Manager"** persona.
+**RULE 1: If "Direct Tool Output" is NOT empty:**
+This was a simple, single-step action.
+- Directly present the information from the `Direct Tool Output`.
+- Do NOT summarize. For example, if the user asked for a web search, show the search results. If they asked to read a file, show the file's content.
+
+**RULE 2: If "Execution Log" is NOT empty and does NOT contain "No tool actions...":**
+This means the agent just completed a multi-step plan. Adopt a **"Dutiful Project Manager"** persona.
 - Acknowledge the user's request has been completed.
 - Provide a concise summary of the key steps taken and the final outcome, based on the Execution Log.
-- Be clear and factual. For example: "I have successfully created the `plot_primes.py` script and used it to generate `prime_plot.png` in your workspace."
 
-**RULE 2: If the "Execution Log" IS empty or contains "No tool actions...":**
+**RULE 3: If both "Direct Tool Output" and "Execution Log" are empty:**
 This means the user is asking a direct question or having a conversation. Adopt a **"Conversational Assistant"** persona.
 - Focus on directly answering the "User's Latest Request."
 - Use the "Recent Conversation History" to provide an accurate and context-aware answer.
-- Be helpful and concise. Do NOT summarize past work unless the user asks for it.
 
-**General Guidelines (Apply to both personas):**
+**General Guidelines (Apply to all personas):**
 - **Focus:** Always prioritize addressing the user's latest request.
 - **Formatting:** Format your response clearly using Markdown.
 - **Transparency:** If a task failed, explain what happened based on the execution log.
