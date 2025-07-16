@@ -389,7 +389,7 @@ export function App() {
                 <div class="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
                    <div>
                        <h1 class="text-2xl font-bold text-foreground">Mentor::i</h1>
-                       <p class="text-xs text-muted-foreground">by Valerio Bianchi, Dirkjan Schokker, Google Gemini</p>
+                       <p class="text-xs text-muted-foreground">by Valerio Bianchi & Gemini 2.5 Pro</p>
                    </div>
                    <div class="flex items-center gap-2">
                        <span class="relative flex h-3 w-3"> {agent.connectionStatus === 'Connected' && <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>} <span class={`relative inline-flex rounded-full h-3 w-3 ${agent.connectionStatus === 'Connected' ? 'bg-green-500' : 'bg-red-500'}`}></span> </span>
@@ -478,7 +478,8 @@ export function App() {
                                 <CopyButton textToCopy={workspace.fileContent} />
                             </div>
                             <div class="flex-grow bg-background/50 rounded-md overflow-auto flex items-center justify-center">
-                                <FilePreviewer file={workspace.selectedFile} isLoading={workspace.isFileLoading} content={workspace.fileContent} rawFileUrl={`http://localhost:8766/api/workspace/raw?path=${workspace.currentPath}/${workspace.selectedFile.name}`} />
+                                {/* --- MODIFIED: Use dynamic hostname for the image URL --- */}
+                                <FilePreviewer file={workspace.selectedFile} isLoading={workspace.isFileLoading} content={workspace.fileContent} rawFileUrl={`http://${window.location.hostname}:8766/api/workspace/raw?path=${workspace.currentPath}/${workspace.selectedFile.name}`} />
                             </div>
                         </div>
                     ) : (
