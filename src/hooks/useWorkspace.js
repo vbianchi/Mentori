@@ -1,6 +1,9 @@
 import { h } from 'preact';
 import { useState, useRef, useCallback } from 'preact/hooks';
 
+// --- NEW: Use the window's hostname to determine the backend API address ---
+const API_BASE_URL = `http://${window.location.hostname}:8766`;
+
 export const useWorkspace = (initialPath) => {
     const [items, setItems] = useState([]);
     const [currentPath, setCurrentPath] = useState(initialPath || '');
@@ -20,7 +23,8 @@ export const useWorkspace = (initialPath) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`http://localhost:8766/api/workspace/items?path=${path}`);
+            // --- MODIFIED: Use dynamic base URL ---
+            const response = await fetch(`${API_BASE_URL}/api/workspace/items?path=${path}`);
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to fetch items');
@@ -57,7 +61,8 @@ export const useWorkspace = (initialPath) => {
 
         setIsFileLoading(true);
         try {
-            const response = await fetch(`http://localhost:8766/file-content?path=${currentPath}&filename=${file.name}`);
+            // --- MODIFIED: Use dynamic base URL ---
+            const response = await fetch(`${API_BASE_URL}/file-content?path=${currentPath}&filename=${file.name}`);
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to fetch file content');
@@ -94,7 +99,8 @@ export const useWorkspace = (initialPath) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`http://localhost:8766/api/workspace/items?path=${itemFullPath}`, { method: 'DELETE' });
+            // --- MODIFIED: Use dynamic base URL ---
+            const response = await fetch(`${API_BASE_URL}/api/workspace/items?path=${itemFullPath}`, { method: 'DELETE' });
             if (!response.ok) throw new Error((await response.json()).error || 'Failed to delete item');
             if (selectedFile && selectedFile.name === item.name) {
                 setSelectedFile(null);
@@ -108,23 +114,19 @@ export const useWorkspace = (initialPath) => {
         }
     };
     
-    // --- MODIFIED: Start the inline creation process ---
     const startInlineCreate = (type) => {
-        // Prevent creating a new item while another is already being created/renamed
         if (items.some(item => item.isEditing)) return;
         
         const placeholderItem = {
             name: '',
-            type: type, // 'folder' or 'file'
-            isEditing: true, // Flag for the UI to render an input
-            isNew: true, // Differentiate from renaming an existing item
+            type: type,
+            isEditing: true,
+            isNew: true,
         };
         setItems(prevItems => [...prevItems, placeholderItem]);
     };
 
-    // --- NEW: Handle the final creation/renaming API call ---
     const handleConfirmName = async (tempName, finalName, type, isNew) => {
-        // Remove the temporary placeholder item
         setItems(prevItems => prevItems.filter(item => item.name !== tempName));
 
         if (!finalName || finalName.trim() === '') {
@@ -135,7 +137,8 @@ export const useWorkspace = (initialPath) => {
         const newPath = `${currentPath}/${finalName.trim()}`;
         
         if (isNew) {
-            const endpoint = type === 'folder' ? 'http://localhost:8766/api/workspace/folders' : 'http://localhost:8766/api/workspace/files';
+            // --- MODIFIED: Use dynamic base URL ---
+            const endpoint = type === 'folder' ? `${API_BASE_URL}/api/workspace/folders` : `${API_BASE_URL}/api/workspace/files`;
             const body = type === 'folder' ? { path: newPath } : { path: newPath, content: '' };
             try {
                 const response = await fetch(endpoint, {
@@ -150,10 +153,11 @@ export const useWorkspace = (initialPath) => {
             } finally {
                 await fetchFiles(currentPath);
             }
-        } else { // This is a rename operation
+        } else {
              const oldPath = `${currentPath}/${tempName}`;
              try {
-                const response = await fetch('http://localhost:8766/api/workspace/items', {
+                // --- MODIFIED: Use dynamic base URL ---
+                const response = await fetch(`${API_BASE_URL}/api/workspace/items`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ old_path: oldPath, new_path: newPath }),
@@ -168,7 +172,6 @@ export const useWorkspace = (initialPath) => {
         }
     };
     
-    // --- NEW: Handle the rename UI logic ---
     const startInlineRename = (itemToRename) => {
         if (items.some(item => item.isEditing)) return;
         setItems(prevItems => prevItems.map(item => 
@@ -176,11 +179,9 @@ export const useWorkspace = (initialPath) => {
         ));
     };
 
-
     const uploadFiles = async (files) => {
         if (!files || files.length === 0 || !currentPath) return;
         
-        // Use a temporary loading state for uploads specifically
         setItems(prev => {
             const newItems = [...prev];
             Array.from(files).forEach(file => {
@@ -189,13 +190,13 @@ export const useWorkspace = (initialPath) => {
             return newItems;
         });
 
-        // Process all uploads
         await Promise.all(Array.from(files).map(async (file) => {
             const formData = new FormData();
             formData.append('file', file);
             formData.append('workspace_id', currentPath);
             try {
-                const response = await fetch('http://localhost:8766/upload', { method: 'POST', body: formData });
+                // --- MODIFIED: Use dynamic base URL ---
+                const response = await fetch(`${API_BASE_URL}/upload`, { method: 'POST', body: formData });
                 if (!response.ok) throw new Error((await response.json()).error || 'File upload failed');
             } catch (err) {
                 console.error(`File upload error for ${file.name}:`, err);
@@ -203,7 +204,6 @@ export const useWorkspace = (initialPath) => {
             }
         }));
 
-        // Reset file input and refresh the file list from the server
         if(fileInputRef.current) fileInputRef.current.value = "";
         await fetchFiles(currentPath);
     };
@@ -232,7 +232,6 @@ export const useWorkspace = (initialPath) => {
         items, currentPath, loading, error, selectedFile, setSelectedFile, fileContent, isFileLoading, isDragOver, fileInputRef,
         setCurrentPath, fetchFiles, handleNavigation, handleBreadcrumbNav, deleteItem,
         uploadFiles, handleDragEnter, handleDragLeave, handleDragOver, handleDrop, resetWorkspaceViews,
-        // --- NEW ---
         startInlineCreate, startInlineRename, handleConfirmName,
     };
 };

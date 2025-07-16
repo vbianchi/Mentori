@@ -16,7 +16,7 @@ export const useAgent = (onMessage, tasks, activeTaskId) => {
         function connect() {
             setConnectionStatus("Connecting...");
             
-            // MERGED: This uses the dynamic hostname fix for robust networking.
+            // This uses the dynamic hostname for robust networking.
             const backendHost = window.location.hostname;
             const wsUrl = `ws://${backendHost}:8765`;
             console.log(`Attempting to connect WebSocket to: ${wsUrl}`);
@@ -45,7 +45,6 @@ export const useAgent = (onMessage, tasks, activeTaskId) => {
                 const newEvent = JSON.parse(event.data);
                 console.log('Received WebSocket event:', newEvent);
 
-                // MERGED: This uses your more descriptive status update logic.
                 setRunningTasks(prev => {
                     const newTasks = { ...prev };
                     const { type, task_id, name, event: chainEvent } = newEvent;
@@ -54,7 +53,6 @@ export const useAgent = (onMessage, tasks, activeTaskId) => {
                         newTasks[task_id] = "Thinking...";
                     } else if (type === 'agent_event' && chainEvent === 'on_chain_start') {
                         newTasks[task_id] = name;
-                    // MERGED: Added the BoE approval requests to the list of events that clear the status.
                     } else if (['final_answer', 'agent_stopped', 'plan_approval_request', 'board_approval_request', 'final_plan_approval_request', 'user_guidance_approval_request'].includes(type)) {
                         delete newTasks[task_id];
                     }
@@ -77,7 +75,6 @@ export const useAgent = (onMessage, tasks, activeTaskId) => {
         };
     }, [onMessage]);
 
-    // MERGED: Re-introduced the ACK effect, which requires 'tasks' and 'activeTaskId'.
     useEffect(() => {
         if (!activeTaskId || !tasks || tasks.length === 0) return;
         const activeTask = tasks.find(t => t.id === activeTaskId);

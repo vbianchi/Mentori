@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'preact/hooks';
 
+// --- NEW: Use the window's hostname to determine the backend API address ---
+const API_BASE_URL = `http://${window.location.hostname}:8766`;
+
 /**
  * Custom hook for managing global application settings, including models and tools.
  */
@@ -16,8 +19,8 @@ export const useSettings = () => {
     useEffect(() => {
         const fetchConfig = async () => {
             try {
-                // Fetch model configuration
-                const modelsResponse = await fetch('http://localhost:8766/api/models');
+                // --- MODIFIED: Use the dynamic API_BASE_URL ---
+                const modelsResponse = await fetch(`${API_BASE_URL}/api/models`);
                 if (!modelsResponse.ok) throw new Error('Failed to fetch model configuration.');
                 const modelsConfig = await modelsResponse.json();
                 if (modelsConfig.available_models && modelsConfig.available_models.length > 0) {
@@ -25,8 +28,8 @@ export const useSettings = () => {
                     setSelectedModels(modelsConfig.default_models);
                 }
                 
-                // Fetch tool configuration
-                const toolsResponse = await fetch('http://localhost:8766/api/tools');
+                // --- MODIFIED: Use the dynamic API_BASE_URL ---
+                const toolsResponse = await fetch(`${API_BASE_URL}/api/tools`);
                 if (!toolsResponse.ok) throw new Error('Failed to fetch available tools.');
                 const toolsConfig = await toolsResponse.json();
                 const loadedTools = toolsConfig.tools || [];
