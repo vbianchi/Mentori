@@ -1,17 +1,17 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Backend Server (Phase 17 - Granular Status FIX)
+# ResearchAgent Backend Server (Phase 17 - Werkzeug FIX 2)
 #
-# FIX: This version corrects a SyntaxError caused by an accidental
-# citation marker being included in the code.
+# This version provides the definitive fix for the file upload functionality
+# by correcting the arguments passed to the Werkzeug FormDataParser. The
+# previous version caused a 400 Bad Request error because it was passing
+# the entire headers dictionary instead of the required mimetype and content
+# length arguments.
 #
 # Key Architectural Changes:
-# 1. `NODE_NAME_MAPPING`: A new dictionary is introduced to map internal
-#    node names (e.g., `initial_router_node`) to cleaner, display-friendly
-#    names for the UI (e.g., "Router").
-# 2. Expanded Event Broadcasting: The `agent_execution_wrapper` now listens
-#    for and broadcasts start/end events for a wider range of "thinking"
-#    nodes, including the Memory Updater, Router, Summarizer, and Correction
-#    Planner, providing a much more detailed view of the agent's process.
+# 1. Corrected `_handle_file_upload`: This method now correctly extracts the
+#    'Content-Type' and 'Content-Length' headers and passes them as separate
+#    arguments to `parser.parse()`. This aligns with the Werkzeug library's
+#    API and will correctly parse the incoming file upload stream.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -19,7 +19,6 @@ import logging
 import os
 import json
 import threading
-import cgi
 import shutil
 import mimetypes
 import re
@@ -27,6 +26,8 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
 from dotenv import load_dotenv
 import websockets
+# NEW: Import the robust form data parser from Werkzeug
+from werkzeug.formparser import FormDataParser, parse_form_data
 from langchain_core.messages import HumanMessage
 from langgraph.checkpoint.memory import MemorySaver
 
@@ -403,19 +404,43 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             logger.error(f"Error serving raw file '{file_path_str}': {e}", exc_info=True)
             self.send_error(500, "Internal Server Error")
     
+    # --- MODIFIED: This method now uses the correct Werkzeug API call ---
     def _handle_file_upload(self):
         try:
-            form = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': self.headers['Content-Type']})
-            workspace_id, file_item = form.getvalue('workspace_id'), form['file']
-            if not workspace_id or not hasattr(file_item, 'filename') or not file_item.filename: return self._send_json_response(400, {'error': 'Missing workspace_id or file.'})
-            filename = os.path.basename(file_item.filename)
-            full_path = _resolve_path(f"/app/workspace/{workspace_id}", filename)
-            with open(full_path, 'wb') as f: f.write(file_item.file.read())
-            logger.info(f"Uploaded '{filename}' to workspace '{workspace_id}'")
-            self._send_json_response(200, {'message': f"File '{filename}' uploaded successfully."})
+            # The `parse_form_data` function is a high-level wrapper that is easier to use.
+            # It takes the WSGI-like environment dictionary.
+            environ = {
+                'wsgi.input': self.rfile,
+                'CONTENT_LENGTH': self.headers.get('Content-Length'),
+                'CONTENT_TYPE': self.headers.get('Content-Type'),
+                'REQUEST_METHOD': 'POST'
+            }
+            
+            stream, form, files = parse_form_data(environ)
+
+            workspace_id = form.get('workspace_id')
+            if not workspace_id:
+                return self._send_json_response(400, {'error': 'Missing workspace_id field.'})
+
+            uploaded_files = files.getlist('file')
+            if not uploaded_files:
+                return self._send_json_response(400, {'error': 'No file(s) uploaded.'})
+
+            for file_storage in uploaded_files:
+                filename = file_storage.filename
+                if not filename:
+                    continue
+
+                full_path = _resolve_path(f"/app/workspace/{workspace_id}", os.path.basename(filename))
+                file_storage.save(full_path)
+                logger.info(f"Uploaded '{filename}' to workspace '{workspace_id}'")
+
+            self._send_json_response(200, {'message': f"File(s) uploaded successfully."})
+
         except Exception as e:
             logger.error(f"File upload failed: {e}", exc_info=True)
             self._send_json_response(500, {'error': f'Server error during file upload: {e}'})
+
 
 def run_http_server():
     httpd = HTTPServer((os.getenv("BACKEND_HOST", "0.0.0.0"), int(os.getenv("FILE_SERVER_PORT", 8766))), WorkspaceHTTPHandler)

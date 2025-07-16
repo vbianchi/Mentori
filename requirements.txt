@@ -12,6 +12,8 @@ langchain-community
 
 # -- Server --
 websockets
+# NEW: Use Werkzeug for robustly parsing file uploads, replacing 'cgi'.
+Werkzeug
 
 # -- Utilities --
 python-dotenv
