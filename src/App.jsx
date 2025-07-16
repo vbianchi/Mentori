@@ -424,7 +424,6 @@ export function App() {
                        }
                        return null;
                    })}
-                   {/* --- MODIFIED: The status message is now dynamic --- */}
                    {agent.runningTasks[activeTaskId] && !isAwaitingApproval && (
                         <div class="flex items-center gap-4 p-4">
                             <LoaderIcon class="h-5 w-5 text-primary" />
@@ -435,7 +434,6 @@ export function App() {
                 </div>
                 <div class="p-6 border-t border-border flex-shrink-0">
                     <form onSubmit={handleSendMessage} class="flex gap-3">
-                        {/* --- MODIFIED: The textarea placeholder is now dynamic --- */}
                         <textarea
                             ref={promptInputRef}
                             value={inputValue}
@@ -473,7 +471,13 @@ export function App() {
                                 <CopyButton textToCopy={workspace.fileContent} />
                             </div>
                             <div class="flex-grow bg-background/50 rounded-md overflow-auto flex items-center justify-center">
-                                <FilePreviewer file={workspace.selectedFile} isLoading={workspace.isFileLoading} content={workspace.fileContent} rawFileUrl={`http://localhost:8766/api/workspace/raw?path=${workspace.currentPath}/${workspace.selectedFile.name}`} />
+                                {/* --- THIS IS THE FIX --- */}
+                                <FilePreviewer 
+                                    file={workspace.selectedFile} 
+                                    isLoading={workspace.isFileLoading} 
+                                    content={workspace.fileContent} 
+                                    rawFileUrl={`http://${window.location.hostname}:8766/api/workspace/raw?path=${workspace.currentPath}/${workspace.selectedFile.name}`} 
+                                />
                             </div>
                         </div>
                     ) : (
