@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# Dockerfile for the ResearchAgent Backend
+# Dockerfile for the Mentor::i Backend
 #
 # This file defines the steps to build a Docker image containing our
 # Python backend application and all its dependencies.

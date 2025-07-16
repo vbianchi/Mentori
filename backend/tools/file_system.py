@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Tool: Sandboxed File System
+# Mentor::i Tool: Sandboxed File System
 #
 # Definitive Fix: This version is simplified. All complex Pydantic aliasing
 # has been removed. The tool now has a simple, clear function signature.

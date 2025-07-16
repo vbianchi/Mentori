@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Tool: Secure, Venv-Aware Package Manager
+# Mentor::i Tool: Secure, Venv-Aware Package Manager
 #
 # This version completes the logic for Phase 11 by making the package
 # installer aware of the per-task virtual environments.

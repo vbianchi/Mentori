@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Tool: Qualitative Document Critiquer (Phase 15 - FINAL FIX)
+# Mentor::i Tool: Qualitative Document Critiquer (Phase 15 - FINAL FIX)
 #
 # FIX: This version corrects the persistent TypeError by adding `workspace_path`
 # to the tool's explicit Pydantic input schema. The agent's worker node

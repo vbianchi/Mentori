@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Tool: Tavily Web Search (Robust)
+# Mentor::i Tool: Tavily Web Search (Robust)
 #
 # CORRECTION: The tool is now explicitly configured with a Pydantic args_schema
 # to enforce the input argument name `query`. This prevents the planner from

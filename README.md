@@ -1,8 +1,8 @@
-# ResearchAgent: An Advanced AI-Powered Research Assistant
+# Mentor::i: An Advanced AI-Powered Research Assistant
 
 ## 1. Overview
 
-ResearchAgent is a sophisticated, AI-powered agent designed to handle complex, multi-step tasks in software engineering and scientific research. Built with a Python/LangGraph backend and a modern JavaScript frontend (Vite + Preact), it leverages a unique **"Three-Track Brain"** architecture and a persistent **"Memory Vault"** to autonomously classify, plan, and execute high-level user requests with full conversational context.
+Mentor::i is a sophisticated, AI-powered agent designed to handle complex, multi-step tasks in software engineering and scientific research. Built with a Python/LangGraph backend and a modern JavaScript frontend (Vite + Preact), it leverages a unique **"Three-Track Brain"** architecture and a persistent **"Memory Vault"** to autonomously classify, plan, and execute high-level user requests with full conversational context.
 
 The core philosophy is built on **transparency, adaptive execution, and security**. The agent first uses a `Router` to determine if a request is a simple question, a single tool command, or a complex project. For complex tasks, it generates a detailed blueprint which the user can interactively edit and approve before execution begins within a secure, sandboxed workspace.
 
@@ -75,4 +75,3 @@ You will need two separate terminals to run the backend and frontend servers.
 1.  **Install Dependencies:** In your second terminal, run `npm install`.
 2.  **Run the Frontend:** Run `npm run dev`.
 3.  **Access the Application:** Open your browser and navigate to the local URL provided by Vite (usually `http://localhost:5173`).
-

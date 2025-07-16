@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Tool: Sandboxed Workspace Shell (Venv-Aware FIX)
+# Mentor::i Tool: Sandboxed Workspace Shell (Venv-Aware FIX)
 #
 # This version fixes a critical bug where the shell would use the global
 # Python interpreter instead of the task's dedicated virtual environment,

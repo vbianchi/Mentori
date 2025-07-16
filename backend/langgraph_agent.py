@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Core Agent (Phase 17 - Correction Insertion)
+# Mentor::i Core Agent (Phase 17 - Correction Insertion)
 #
 # This version significantly improves the self-correction mechanism. Instead of
 # overwriting a failed step, the agent now inserts a new corrective step
@@ -380,6 +380,6 @@ def create_agent_graph():
     workflow.add_conditional_edges("Project_Supervisor", after_plan_step_router, {"Editor": "Editor", "Advance_To_Next_Step": "Advance_To_Next_Step", "Correction_Planner": "Correction_Planner"})
     workflow.add_edge("Editor", END)
     agent = workflow.compile(checkpointer=MemorySaver(), interrupt_before=["human_in_the_loop_node"])
-    logger.info("ResearchAgent graph compiled with improved correction logic."); return agent
+    logger.info("Mentor::i agent graph compiled with improved correction logic."); return agent
 
 agent_graph = create_agent_graph()

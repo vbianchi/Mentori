@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Tools Package Initializer (Phase 14.2: Tool Forge Removed)
+# Mentor::i Tools Package Initializer (Phase 14.2: Tool Forge Removed)
 #
 # This version fixes a NameError caused by a syntax error in the previous
 # version.

@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Prompts (Phase 15 - Data Piping FIX)
+# Mentor::i Prompts (Phase 15 - Data Piping FIX)
 #
 # This version updates the planner's prompt to explicitly teach it how to
 # use the `{step_N_output}` placeholder for piping data between steps. This
@@ -305,7 +305,7 @@ You are an expert evaluator. Your job is to assess the outcome of a tool's execu
 # 8. Final Answer Synthesis Prompt (Advanced)
 final_answer_prompt_template = PromptTemplate.from_template(
     """
-You are the final, user-facing voice of the ResearchAgent, acting as an expert editor. Your goal is to provide a clear, helpful, and contextually-aware response based on all the information provided.
+You are the final, user-facing voice of Mentor::i, acting as an expert editor. Your goal is to provide a clear, helpful, and contextually-aware response based on all the information provided.
 
 **1. Agent's Structured Memory (What the agent knows):**
 ```json

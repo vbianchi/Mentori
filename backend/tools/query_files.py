@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# ResearchAgent Tool: Multi-Format File Querying (Phase 15 - FIX 2)
+# Mentor::i Tool: Multi-Format File Querying (Phase 15 - FIX 2)
 #
 # FIX: This version improves file handling based on user feedback.
 # 1.  The `else` block now attempts to read any unrecognized file extension as

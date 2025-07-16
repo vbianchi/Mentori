@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# Docker Compose for the ResearchAgent
+# Docker Compose for Mentor::i
 #
 # MODIFICATION FOR OLLAMA:
 # Added the `extra_hosts` section. This is the standard way to allow a
@@ -37,4 +37,3 @@ services:
 
     # Keeps stdin open, which is useful for interactive debugging if needed.
     stdin_open: true
-
