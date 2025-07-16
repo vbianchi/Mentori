@@ -1,31 +1,39 @@
+// src/hooks/useAgent.js
 import { useState, useEffect, useRef } from 'preact/hooks';
 
 /**
  * Custom hook to manage the WebSocket connection and all agent communication.
  * @param {Function} onMessage - A callback function to process incoming messages from the agent.
+ * @param {Array} tasks - The full list of tasks from the useTasks hook.
+ * @param {string} activeTaskId - The ID of the currently active task.
  */
-export const useAgent = (onMessage) => {
-    // State for the WebSocket connection and its status
+export const useAgent = (onMessage, tasks, activeTaskId) => {
     const ws = useRef(null);
     const [connectionStatus, setConnectionStatus] = useState("Disconnected");
-    
-    // --- MODIFIED: State now tracks the specific active node for each task ---
-    // Instead of { [taskId]: true }, it will be { [taskId]: "Node Name" }
     const [runningTasks, setRunningTasks] = useState({});
 
-    // This effect establishes and manages the WebSocket lifecycle.
     useEffect(() => {
         function connect() {
             setConnectionStatus("Connecting...");
-            const socket = new WebSocket("ws://localhost:8765");
+            
+            // MERGED: This uses the dynamic hostname fix for robust networking.
+            const backendHost = window.location.hostname;
+            const wsUrl = `ws://${backendHost}:8765`;
+            console.log(`Attempting to connect WebSocket to: ${wsUrl}`);
+            
+            const socket = new WebSocket(wsUrl);
             ws.current = socket;
 
-            socket.onopen = () => setConnectionStatus("Connected");
+            socket.onopen = () => {
+                console.log("WebSocket connection established.");
+                setConnectionStatus("Connected");
+            }
 
             socket.onclose = () => {
+                console.warn("WebSocket connection closed. Attempting to reconnect in 5 seconds...");
                 setConnectionStatus("Disconnected");
-                setRunningTasks({}); // Clear running tasks on disconnect
-                setTimeout(connect, 5000); // Attempt to reconnect
+                setRunningTasks({});
+                setTimeout(connect, 5000);
             };
 
             socket.onerror = (err) => {
@@ -35,23 +43,24 @@ export const useAgent = (onMessage) => {
 
             socket.onmessage = (event) => {
                 const newEvent = JSON.parse(event.data);
+                console.log('Received WebSocket event:', newEvent);
 
-                // --- MODIFIED: Update running status with specific node names ---
+                // MERGED: This uses your more descriptive status update logic.
                 setRunningTasks(prev => {
                     const newTasks = { ...prev };
                     const { type, task_id, name, event: chainEvent } = newEvent;
 
                     if (type === 'agent_started' || type === 'agent_resumed') {
-                        newTasks[task_id] = "Thinking..."; // Set initial generic status
+                        newTasks[task_id] = "Thinking...";
                     } else if (type === 'agent_event' && chainEvent === 'on_chain_start') {
-                        newTasks[task_id] = name; // Update with specific node name
-                    } else if (type === 'final_answer' || type === 'agent_stopped' || type === 'plan_approval_request') {
-                        delete newTasks[task_id]; // Clear status on completion/pause
+                        newTasks[task_id] = name;
+                    // MERGED: Added the BoE approval requests to the list of events that clear the status.
+                    } else if (['final_answer', 'agent_stopped', 'plan_approval_request', 'board_approval_request', 'final_plan_approval_request', 'user_guidance_approval_request'].includes(type)) {
+                        delete newTasks[task_id];
                     }
                     return newTasks;
                 });
                 
-                // Pass the event up to the main component's logic handler
                 if (onMessage) {
                     onMessage(newEvent);
                 }
@@ -60,19 +69,32 @@ export const useAgent = (onMessage) => {
 
         connect();
 
-        // Cleanup function to close the WebSocket connection
         return () => {
             if (ws.current) {
-                ws.current.onclose = null; // Prevent reconnection attempts
+                ws.current.onclose = null;
                 ws.current.close();
             }
         };
     }, [onMessage]);
 
-    /**
-     * Sends a command to the backend to run the agent for a given task.
-     * @param {object} payload - The data to send, including task_id, prompt, etc.
-     */
+    // MERGED: Re-introduced the ACK effect, which requires 'tasks' and 'activeTaskId'.
+    useEffect(() => {
+        if (!activeTaskId || !tasks || tasks.length === 0) return;
+        const activeTask = tasks.find(t => t.id === activeTaskId);
+        if (!activeTask || !activeTask.history || activeTask.history.length === 0) return;
+        
+        const lastHistoryItem = activeTask.history[activeTask.history.length - 1];
+        if (lastHistoryItem?.type === 'run_container' && lastHistoryItem.children.length > 0) {
+            const lastChild = lastHistoryItem.children[lastHistoryItem.children.length - 1];
+            if (lastChild.type === 'execution_step') {
+                if (ws.current?.readyState === WebSocket.OPEN) {
+                    console.log(`ACKing step for task ${activeTaskId}.`);
+                    ws.current.send(JSON.stringify({ type: 'ack', task_id: activeTaskId }));
+                }
+            }
+        }
+    }, [tasks, activeTaskId]);
+
     const runAgent = (payload) => {
         if (ws.current?.readyState === WebSocket.OPEN) {
             ws.current.send(JSON.stringify({ type: 'run_agent', ...payload }));
@@ -81,10 +103,6 @@ export const useAgent = (onMessage) => {
         }
     };
 
-    /**
-     * Sends a command to the backend to resume a paused agent execution.
-     * @param {object} payload - The data to send, including task_id, feedback, etc.
-     */
     const resumeAgent = (payload) => {
         if (ws.current?.readyState === WebSocket.OPEN) {
             ws.current.send(JSON.stringify({ type: 'resume_agent', ...payload }));
@@ -93,37 +111,24 @@ export const useAgent = (onMessage) => {
         }
     };
     
-    /**
-     * Sends a command to the backend to stop a running agent.
-     * @param {string} taskId - The ID of the task whose agent should be stopped.
-     */
     const stopAgent = (taskId) => {
         if (ws.current?.readyState === WebSocket.OPEN && runningTasks[taskId]) {
             ws.current.send(JSON.stringify({ type: 'stop_agent', task_id: taskId }));
         }
     };
 
-    /**
-     * Sends a command to the backend to create the resources for a new task.
-     * @param {string} taskId - The ID of the new task.
-     */
     const createTask = (taskId) => {
          if (ws.current?.readyState === WebSocket.OPEN) {
             ws.current.send(JSON.stringify({ type: 'task_create', task_id: taskId }));
         }
     }
 
-    /**
-     * Sends a command to the backend to delete all resources for a task.
-     * @param {string} taskId - The ID of the task to delete.
-     */
     const deleteTask = (taskId) => {
          if (ws.current?.readyState === WebSocket.OPEN) {
             ws.current.send(JSON.stringify({ type: 'task_delete', task_id: taskId }));
         }
     }
 
-    // Expose the connection state and the sender functions
     return {
         connectionStatus,
         runningTasks,
