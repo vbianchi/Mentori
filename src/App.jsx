@@ -461,7 +461,15 @@ export function App() {
                 </div>
             </div>
 
-            <div class={`h-full bg-card/50 rounded-lg border border-border shadow-2xl flex flex-col transition-all duration-300 ease-in-out ${isRightSidebarVisible ? 'w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg' : 'w-0 p-0 border-0'}`} style={{ overflow: isRightSidebarVisible ? 'visible' : 'hidden' }}>
+            {/* --- MODIFIED: Added drag-and-drop event handlers to the main wrapper --- */}
+            <div 
+                class={`relative h-full bg-card/50 rounded-lg border border-border shadow-2xl flex flex-col transition-all duration-300 ease-in-out ${isRightSidebarVisible ? 'w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg' : 'w-0 p-0 border-0'}`} 
+                style={{ overflow: isRightSidebarVisible ? 'visible' : 'hidden' }}
+                onDragEnter={workspace.handleDragEnter}
+                onDragLeave={workspace.handleDragLeave}
+                onDragOver={workspace.handleDragOver}
+                onDrop={workspace.handleDrop}
+            >
                 <div class={`flex justify-between items-center p-4 border-b border-border transition-opacity duration-200 ${isRightSidebarVisible ? 'opacity-100' : 'opacity-0'}`}> <h2 class="text-xl font-bold text-foreground">Workspace</h2> <button onClick={() => setIsRightSidebarVisible(false)} class="p-1.5 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground" title="Hide Workspace"><ChevronsRightIcon class="h-4 w-4" /></button> </div>
                 <div class={`flex flex-col flex-grow min-h-0 px-4 pb-4 pt-4 transition-opacity duration-200 ${isRightSidebarVisible ? 'opacity-100' : 'opacity-0'}`}>
                     {workspace.selectedFile ? (
@@ -471,13 +479,7 @@ export function App() {
                                 <CopyButton textToCopy={workspace.fileContent} />
                             </div>
                             <div class="flex-grow bg-background/50 rounded-md overflow-auto flex items-center justify-center">
-                                {/* --- THIS IS THE FIX --- */}
-                                <FilePreviewer 
-                                    file={workspace.selectedFile} 
-                                    isLoading={workspace.isFileLoading} 
-                                    content={workspace.fileContent} 
-                                    rawFileUrl={`http://${window.location.hostname}:8766/api/workspace/raw?path=${workspace.currentPath}/${workspace.selectedFile.name}`} 
-                                />
+                                <FilePreviewer file={workspace.selectedFile} isLoading={workspace.isFileLoading} content={workspace.fileContent} rawFileUrl={`http://localhost:8766/api/workspace/raw?path=${workspace.currentPath}/${workspace.selectedFile.name}`} />
                             </div>
                         </div>
                     ) : (
