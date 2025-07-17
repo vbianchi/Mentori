@@ -1,10 +1,18 @@
 # -----------------------------------------------------------------------------
-# Mentor::i Prompts (Phase 15 - Data Piping FIX)
+# Mentor::i Prompts (Phase 17 - Stricter Evaluation FIX)
 #
-# This version updates the planner's prompt to explicitly teach it how to
-# use the `{step_N_output}` placeholder for piping data between steps. This
-# will fix the bug where a placeholder was written to a file instead of the
-# actual summary.
+# This version fixes a critical behavioral bug where the agent would get stuck
+# in a "Tool Fixation Loop."
+#
+# Key Architectural Changes:
+# 1. Stricter Supervisor (`evaluator_prompt_template`): The prompt for the
+#    Project Supervisor has been completely rewritten. It is now explicitly
+#    forbidden from making logical leaps or accepting outputs that are merely
+#    "useful prerequisites." It is forced to be brutally literal and is given
+#    a specific example of what constitutes a failure (the exact bug we saw).
+# 2. Focused Foreman (`controller_prompt_template`): The prompt for the Site
+#    Foreman has been updated to explicitly remind it to focus only on the
+#    current step's instruction and not to be biased by previously used tools.
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
@@ -146,7 +154,7 @@ You are an expert "Handyman" agent. Your job is to take a user's latest request,
 )
 
 
-# 5. Structured Planner Prompt (MODIFIED)
+# 5. Structured Planner Prompt
 structured_planner_prompt_template = PromptTemplate.from_template(
     """
 You are an expert architect and planner. Your job is to create a detailed, step-by-step execution plan in JSON format to fulfill the user's latest request, using all available context.
@@ -211,16 +219,17 @@ You are an expert architect and planner. Your job is to create a detailed, step-
 """
 )
 
-# 6. Controller Prompt
+# 6. Controller Prompt (MODIFIED)
 controller_prompt_template = PromptTemplate.from_template(
     """
-You are an expert controller agent. Your job is to select the most appropriate
-tool to execute the given step of a plan, based on the history of previous steps.
+You are an expert and focused controller agent. Your job is to select the single most appropriate tool to execute the given step of a plan.
+
+**CRITICAL INSTRUCTION:** Your decision must be based **only** on the `Current Step` instruction. Do NOT be biased by tools used in previous steps. Re-evaluate the best tool for the current task from scratch.
 
 **Available Tools:**
 {tools}
 
-**Plan:**
+**Full Plan:**
 {plan}
 
 **History of Past Steps:**
@@ -230,9 +239,8 @@ tool to execute the given step of a plan, based on the history of previous steps
 {current_step}
 
 **Instructions:**
-- Analyze the current step in the context of the plan and the history of past actions.
-- Your output must be a single, valid JSON object containing the chosen tool's name
-  and the exact input for that tool.
+- Analyze the `Current Step` instruction.
+- Your output must be a single, valid JSON object containing the chosen tool's name and the exact input for that tool.
 - Do not add any conversational fluff or explanation. Your output must be ONLY the JSON object.
 ---
 **Example Output:**
@@ -248,9 +256,6 @@ tool to execute the given step of a plan, based on the history of previous steps
 
 **Begin!**
 
-**History of Past Steps:**
-{history}
-
 **Current Step:**
 {current_step}
 
@@ -258,10 +263,25 @@ tool to execute the given step of a plan, based on the history of previous steps
 """
 )
 
-# 7. Evaluator Prompt
+# 7. Evaluator Prompt (MODIFIED)
 evaluator_prompt_template = PromptTemplate.from_template(
     """
-You are an expert evaluator. Your job is to assess the outcome of a tool's execution and determine if the step was successful.
+You are a brutally literal and strict quality assurance inspector. Your only job is to determine if the `Tool's Output` directly and completely fulfills the `Plan Step` instruction.
+
+**CRITICAL RULES:**
+1.  **Be Literal:** Compare the primary action of the `Plan Step` (e.g., "read", "write", "extract") with the `Tool's Output`.
+2.  **Forbid Inference:** Do NOT make logical leaps. Do NOT assume the output is a "useful prerequisite" for a future step. If the output does not contain the direct result of the requested action, you MUST declare it a failure.
+3.  **Check for Substance:** Do not just check for a successful exit code or a simple "success" message. The substance of the output must match the instruction's goal.
+
+---
+**FAILURE EXAMPLE (This is what you must prevent):**
+- **Plan Step:** "Read all PDF files from the current directory."
+- **Tool's Output:** `["file1.pdf", "file2.pdf"]`
+- **Your Correct Evaluation:** `failure`.
+- **Your Correct Reasoning:** "The instruction was to 'Read' the files, which means I expect to see the *content* of the files in the output. The tool only listed the filenames, which is not what was asked. The step failed."
+---
+
+**Begin!**
 
 **Plan Step:**
 {current_step}
@@ -272,37 +292,12 @@ You are an expert evaluator. Your job is to assess the outcome of a tool's execu
 **Tool's Output:**
 {tool_output}
 
-**Instructions:**
-- **Critically assess** if the `Tool's Output` **fully and completely satisfies** the `Plan Step`'s instruction.
-- **Do not just check for a successful exit code.** Verify the *substance* of the output achieves the step's goal.
-- Your output must be a single, valid JSON object with a "status" ("success" or "failure") and "reasoning".
----
-**Example Output:**
-```json
-{{
-  "status": "success",
-  "reasoning": "The tool output successfully provided the requested information, which was the capital of France."
-}}
-```
----
-
-**Begin!**
-
-**Plan Step:**
-{current_step}
-
-**Controller's Action:**
-{tool_call}
-
-**Tool's Output:**
-{tool_output}
-
-**Your Output (must be a single JSON object):**
+**Your Output (must be a single, valid JSON object with a "status" of "success" or "failure" and "reasoning"):**
 """
 )
 
 
-# 8. Final Answer Synthesis Prompt (Advanced)
+# 8. Final Answer Synthesis Prompt
 final_answer_prompt_template = PromptTemplate.from_template(
     """
 You are the final, user-facing voice of Mentor::i, acting as an expert editor. Your goal is to provide a clear, helpful, and contextually-aware response based on all the information provided.
