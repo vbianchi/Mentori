@@ -1,16 +1,15 @@
 # -----------------------------------------------------------------------------
-# Mentor::i Backend Server (Phase 17 - Configurable Recursion Limit)
+# Mentor::i Backend Server (Phase 17 - Download Header FIX)
 #
-# This version makes the LangGraph recursion limit configurable via the .env
-# file, allowing users to increase it for very complex, long-running tasks.
+# This version fixes the file download functionality. Previously, clicking the
+# download button would open the file in a new tab instead of triggering a
+# download prompt.
 #
 # Key Architectural Changes:
-# 1. New Environment Variable: The server now reads the
-#    `LANGGRAPH_RECURSION_LIMIT` from the environment.
-# 2. Dynamic Configuration: In `run_agent_handler` and `resume_agent_handler`,
-#    the hardcoded recursion limit of 100 has been replaced. The code now
-#    dynamically sets the limit based on the environment variable, with a
-#    safe default if the variable is not set.
+# 1. Added `Content-Disposition` Header: The `_handle_get_raw_file` method
+#    now sends the `Content-Disposition: attachment` header. This is the
+#    standard way to instruct browsers to treat the response as a file to be
+#    downloaded, rather than content to be displayed, fixing the bug.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -393,11 +392,18 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         try:
             full_path = _resolve_path("/app/workspace", file_path_str)
             if not os.path.isfile(full_path): return self.send_error(404, "File not found.")
+            
+            filename = os.path.basename(full_path)
             content_type, _ = mimetypes.guess_type(full_path)
+            
             self.send_response(200)
             self.send_header('Content-type', content_type or 'application/octet-stream')
             self.send_header('Access-Control-Allow-Origin', '*')
+            # --- THIS IS THE FIX ---
+            # This header tells the browser to download the file instead of displaying it.
+            self.send_header('Content-Disposition', f'attachment; filename="{filename}"')
             self.end_headers()
+            
             with open(full_path, 'rb') as f: self.wfile.write(f.read())
         except Exception as e:
             logger.error(f"Error serving raw file '{file_path_str}': {e}", exc_info=True)
@@ -536,7 +542,6 @@ async def run_agent_handler(data):
         logger.warning(f"Task '{task_id}': Agent is already running.")
         return await broadcast_event({"type": "error", "message": "Agent is already running for this task.", "task_id": task_id})
 
-    # --- MODIFIED: Read recursion limit from environment ---
     try:
         recursion_limit = int(os.getenv("LANGGRAPH_RECURSION_LIMIT", 100))
     except (ValueError, TypeError):
@@ -567,7 +572,6 @@ async def resume_agent_handler(data):
         logger.warning(f"Task '{task_id}': Agent is already running, cannot resume.")
         return
 
-    # --- MODIFIED: Read recursion limit from environment ---
     try:
         recursion_limit = int(os.getenv("LANGGRAPH_RECURSION_LIMIT", 100))
     except (ValueError, TypeError):

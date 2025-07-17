@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
-import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, FolderIcon, ArrowLeftIcon, UploadCloudIcon, StopCircleIcon, BriefcaseIcon, SendToChatIcon, FileTextIcon } from './components/Icons';
+import { ArchitectIcon, ChevronsLeftIcon, ChevronsRightIcon, ChevronDownIcon, EditorIcon, ForemanIcon, LoaderIcon, PencilIcon, PlusCircleIcon, RouterIcon, SlidersIcon, SupervisorIcon, Trash2Icon, UserIcon, WorkerIcon, FileIcon, FolderIcon, ArrowLeftIcon, UploadCloudIcon, StopCircleIcon, BriefcaseIcon, SendToChatIcon, FileTextIcon, DownloadIcon } from './components/Icons';
 import { ArchitectCard, DirectAnswerCard, FinalAnswerCard, SiteForemanCard } from './components/AgentCards';
 import { ToggleButton, CopyButton } from './components/Common';
 import { useTasks } from './hooks/useTasks';
@@ -223,14 +223,11 @@ export function App() {
                     setIsAwaitingApproval(false);
                     runContainer.children.push({ type: eventType, content: event.data });
                     runContainer.isComplete = true;
-                // --- NEW: Handle the plan_updated event ---
                 } else if (eventType === 'plan_updated') {
                     if (runContainer) {
                         const executionPlan = runContainer.children.find(c => c.type === 'execution_plan');
                         if (executionPlan) {
-                            // Update the steps of the existing execution plan
                             executionPlan.steps = event.plan.map(step => {
-                                // Find the old step to preserve its status if it exists
                                 const oldStep = executionPlan.steps.find(s => s.step_id === step.step_id);
                                 return oldStep ? { ...step, status: oldStep.status } : { ...step, status: 'pending' };
                             });
@@ -521,6 +518,18 @@ export function App() {
                                                 </div>
                                                 <div class="flex items-center opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                                                     <button onClick={(e) => { e.stopPropagation(); handleSendToChat(item.name); }} class="p-1 text-muted-foreground hover:text-foreground" title="Send name to chat"> <SendToChatIcon class="h-4 w-4" /> </button>
+                                                    {/* --- MODIFIED: Add the download button for files --- */}
+                                                    {item.type === 'file' && (
+                                                        <a
+                                                            href={`http://${window.location.hostname}:8766/api/workspace/raw?path=${workspace.currentPath}/${item.name}`}
+                                                            download={item.name}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                            class="p-1 text-muted-foreground hover:text-foreground"
+                                                            title={`Download ${item.name}`}
+                                                        >
+                                                            <DownloadIcon class="h-4 w-4" />
+                                                        </a>
+                                                    )}
                                                     <button onClick={(e) => { e.stopPropagation(); workspace.startInlineRename(item); }} class="p-1 text-muted-foreground hover:text-foreground" title={`Rename ${item.type}`}> <PencilIcon class="h-4 w-4" /> </button>
                                                     <button onClick={(e) => { e.stopPropagation(); workspace.deleteItem(item); }} class="p-1 text-muted-foreground hover:text-red-400" title={`Delete ${item.type}`}> <Trash2Icon class="h-4 w-4" /> </button>
                                                 </div>
