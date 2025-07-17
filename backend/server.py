@@ -1,17 +1,16 @@
 # -----------------------------------------------------------------------------
-# Mentor::i Backend Server (Phase 17 - Plan Update Event FIX)
+# Mentor::i Backend Server (Phase 17 - Configurable Recursion Limit)
 #
-# This version fixes a UI synchronization bug where corrective steps added
-# by the agent were not displayed on the frontend.
+# This version makes the LangGraph recursion limit configurable via the .env
+# file, allowing users to increase it for very complex, long-running tasks.
 #
 # Key Architectural Changes:
-# 1. New `plan_updated` Event: The `agent_execution_wrapper` now specifically
-#    listens for the `on_chain_end` event from the `Correction_Planner` node.
-# 2. Proactive Broadcasting: When this event is detected, the server extracts
-#    the newly modified plan from the event data and broadcasts a custom
-#    `plan_updated` event to all connected clients. This ensures the UI is
-#    always in sync with the agent's true execution plan, even after
-#    self-correction.
+# 1. New Environment Variable: The server now reads the
+#    `LANGGRAPH_RECURSION_LIMIT` from the environment.
+# 2. Dynamic Configuration: In `run_agent_handler` and `resume_agent_handler`,
+#    the hardcoded recursion limit of 100 has been replaced. The code now
+#    dynamically sets the limit based on the environment variable, with a
+#    safe default if the variable is not set.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -494,9 +493,7 @@ async def agent_execution_wrapper(input_state, config):
                     "task_id": task_id
                 })
             
-            # --- NEW: Check for the end of the correction planner ---
             if event_type == "on_chain_end" and node_name == "Correction_Planner":
-                # The output of the correction planner contains the new plan
                 new_plan = event.get("data", {}).get("output", {}).get("plan")
                 if new_plan:
                     logger.info(f"Task '{task_id}': Broadcasting plan update to frontend.")
@@ -539,7 +536,14 @@ async def run_agent_handler(data):
         logger.warning(f"Task '{task_id}': Agent is already running.")
         return await broadcast_event({"type": "error", "message": "Agent is already running for this task.", "task_id": task_id})
 
-    config = {"recursion_limit": 100, "configurable": {"thread_id": task_id}}
+    # --- MODIFIED: Read recursion limit from environment ---
+    try:
+        recursion_limit = int(os.getenv("LANGGRAPH_RECURSION_LIMIT", 100))
+    except (ValueError, TypeError):
+        logger.warning("Invalid LANGGRAPH_RECURSION_LIMIT. Falling back to 100.")
+        recursion_limit = 100
+
+    config = {"recursion_limit": recursion_limit, "configurable": {"thread_id": task_id}}
     
     initial_state = {
         "messages": [HumanMessage(content=prompt)],
@@ -548,7 +552,7 @@ async def run_agent_handler(data):
         "enabled_tools": enabled_tools
     }
     
-    logger.info(f"Task '{task_id}': Creating background task for new agent run with {len(enabled_tools)} tools enabled.")
+    logger.info(f"Task '{task_id}': Creating background task for new agent run with recursion limit of {recursion_limit}.")
     agent_task = asyncio.create_task(agent_execution_wrapper(initial_state, config))
     RUNNING_AGENTS[task_id] = agent_task
 
@@ -563,14 +567,21 @@ async def resume_agent_handler(data):
         logger.warning(f"Task '{task_id}': Agent is already running, cannot resume.")
         return
 
-    config = {"recursion_limit": 100, "configurable": {"thread_id": task_id}}
+    # --- MODIFIED: Read recursion limit from environment ---
+    try:
+        recursion_limit = int(os.getenv("LANGGRAPH_RECURSION_LIMIT", 100))
+    except (ValueError, TypeError):
+        logger.warning("Invalid LANGGRAPH_RECURSION_LIMIT. Falling back to 100.")
+        recursion_limit = 100
+
+    config = {"recursion_limit": recursion_limit, "configurable": {"thread_id": task_id}}
     
     update_values = {"user_feedback": feedback, "enabled_tools": enabled_tools}
     if (plan := data.get("plan")) is not None: update_values["plan"] = plan
     
     agent_graph.update_state(config, update_values)
     
-    logger.info(f"Task '{task_id}': Creating background task to resume agent execution with {len(enabled_tools)} tools.")
+    logger.info(f"Task '{task_id}': Creating background task to resume agent execution with recursion limit of {recursion_limit}.")
     agent_task = asyncio.create_task(agent_execution_wrapper(None, config))
     RUNNING_AGENTS[task_id] = agent_task
 
