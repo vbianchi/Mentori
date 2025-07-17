@@ -1,18 +1,17 @@
 # -----------------------------------------------------------------------------
-# Mentor::i Backend Server (Phase 17 - Werkzeug FIX 2)
+# Mentor::i Backend Server (Phase 17 - Plan Update Event FIX)
 #
-# This version provides the definitive fix for the file upload functionality
-# by correcting the arguments passed to the Werkzeug FormDataParser. The
-# previous version caused a 400 Bad Request error because it was passing
-# the entire headers dictionary instead of the required mimetype and content
-# length arguments.
+# This version fixes a UI synchronization bug where corrective steps added
+# by the agent were not displayed on the frontend.
 #
 # Key Architectural Changes:
-# 1. Corrected `_handle_file_upload`: This method now correctly extracts the
-#    'Content-Type' and 'Content-Length' headers and passes them as separate
-#    arguments to `parser.parse()` a high-level wrapper function. This aligns
-#    with the Werkzeug library's API and will correctly parse the incoming
-#    file upload stream.
+# 1. New `plan_updated` Event: The `agent_execution_wrapper` now specifically
+#    listens for the `on_chain_end` event from the `Correction_Planner` node.
+# 2. Proactive Broadcasting: When this event is detected, the server extracts
+#    the newly modified plan from the event data and broadcasts a custom
+#    `plan_updated` event to all connected clients. This ensures the UI is
+#    always in sync with the agent's true execution plan, even after
+#    self-correction.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -494,6 +493,18 @@ async def agent_execution_wrapper(input_state, config):
                     "data": event['data'],
                     "task_id": task_id
                 })
+            
+            # --- NEW: Check for the end of the correction planner ---
+            if event_type == "on_chain_end" and node_name == "Correction_Planner":
+                # The output of the correction planner contains the new plan
+                new_plan = event.get("data", {}).get("output", {}).get("plan")
+                if new_plan:
+                    logger.info(f"Task '{task_id}': Broadcasting plan update to frontend.")
+                    await broadcast_event({
+                        "type": "plan_updated",
+                        "plan": new_plan,
+                        "task_id": task_id
+                    })
         
         current_state = agent_graph.get_state(config)
         if current_state.next and "human_in_the_loop_node" in current_state.next:

@@ -223,6 +223,19 @@ export function App() {
                     setIsAwaitingApproval(false);
                     runContainer.children.push({ type: eventType, content: event.data });
                     runContainer.isComplete = true;
+                // --- NEW: Handle the plan_updated event ---
+                } else if (eventType === 'plan_updated') {
+                    if (runContainer) {
+                        const executionPlan = runContainer.children.find(c => c.type === 'execution_plan');
+                        if (executionPlan) {
+                            // Update the steps of the existing execution plan
+                            executionPlan.steps = event.plan.map(step => {
+                                // Find the old step to preserve its status if it exists
+                                const oldStep = executionPlan.steps.find(s => s.step_id === step.step_id);
+                                return oldStep ? { ...step, status: oldStep.status } : { ...step, status: 'pending' };
+                            });
+                        }
+                    }
                 } else if (eventType === 'agent_event') {
                     const { name, event: chainEvent, data } = event;
                     const inputData = data.input || {};
@@ -478,7 +491,6 @@ export function App() {
                                 <CopyButton textToCopy={workspace.fileContent} />
                             </div>
                             <div class="flex-grow bg-background/50 rounded-md overflow-auto flex items-center justify-center">
-                                {/* --- MODIFIED: Use dynamic hostname for the image URL --- */}
                                 <FilePreviewer file={workspace.selectedFile} isLoading={workspace.isFileLoading} content={workspace.fileContent} rawFileUrl={`http://${window.location.hostname}:8766/api/workspace/raw?path=${workspace.currentPath}/${workspace.selectedFile.name}`} />
                             </div>
                         </div>
