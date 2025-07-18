@@ -49,8 +49,10 @@ export const useAgent = (onMessage, tasks, activeTaskId) => {
                     const newTasks = { ...prev };
                     const { type, task_id, name, event: chainEvent } = newEvent;
 
+                    // --- THIS IS THE FIX ---
+                    // Changed the generic "Thinking..." to "Agent" for a cleaner UI message.
                     if (type === 'agent_started' || type === 'agent_resumed') {
-                        newTasks[task_id] = "Thinking...";
+                        newTasks[task_id] = "Agent";
                     } else if (type === 'agent_event' && chainEvent === 'on_chain_start') {
                         newTasks[task_id] = name;
                     } else if (['final_answer', 'agent_stopped', 'plan_approval_request', 'board_approval_request', 'final_plan_approval_request', 'user_guidance_approval_request'].includes(type)) {

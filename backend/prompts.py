@@ -1,19 +1,18 @@
 # -----------------------------------------------------------------------------
-# Mentor::i Prompts (Phase 17 - "Scripting Mindset" Enhancement)
+# Mentor::i Prompts (Phase 17 - Plan Reviewer)
 #
-# This version updates the planner's prompt to ground it in a "scripting-first"
-# methodology.
+# This version introduces a new prompt for the "Plan Reviewer" node and
+# updates the Chief Architect's prompt to handle feedback.
 #
 # Key Architectural Changes:
-# 1.  **Enforced Scripting:** Added a critical rule that FORCES the planner to
-#     generate self-contained scripts for complex tasks (data analysis,
-#     plotting, etc.) rather than using one-line shell commands.
-# 2.  **Dependency-First Logic:** Added a critical rule that ensures any needed
-#     `pip_install` commands are the very first steps in any generated plan.
-# 3.  **Environment Context:** The prompt now informs the planner which common
-#     libraries are already installed, preventing redundant installation steps.
-# 4.  **Improved Example:** The example in the prompt has been updated to
-#     demonstrate the new, preferred `write_file` -> `workspace_shell` pattern.
+# 1.  **NEW: `plan_reviewer_prompt_template`**: A new prompt designed to make
+#     an LLM act as a critical quality assurance step. It evaluates a plan
+#     based on efficiency, logic, and adherence to rules, outputting a
+#     structured JSON response (`status` and `feedback`).
+# 2.  **MODIFIED: `structured_planner_prompt_template`**: The planner's prompt
+#     is now updated to accept an optional `review_feedback` field. This allows
+#     it to receive and incorporate the Reviewer's critique to improve the
+#     plan in a self-correction loop.
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
@@ -179,6 +178,8 @@ You are an expert architect and planner. Your job is to create a detailed, step-
 The following common data science and utility libraries are pre-installed in the environment and DO NOT need to be installed again: `pandas`, `numpy`, `matplotlib`, `seaborn`, `scikit-learn`, `beautifulsoup4`, `pypdf`, `python-docx`, `openpyxl`. Only use `pip_install` for libraries NOT on this list.
 ---
 
+{review_feedback}
+
 **Instructions & Rules:**
 - Analyze the user's request in the context of all available information.
 - Decompose the request into a sequence of logical steps.
@@ -222,6 +223,65 @@ The following common data science and utility libraries are pre-installed in the
 **Your Output (must be a single JSON object):**
 """
 )
+
+# --- NEW: Plan Reviewer Prompt ---
+plan_reviewer_prompt_template = PromptTemplate.from_template(
+    """
+You are an expert project manager and quality assurance AI. Your sole purpose is to review a proposed execution plan and determine if it is logical, efficient, and follows all rules.
+
+**The Plan to Review:**
+```json
+{plan_to_review}
+```
+
+**Review Criteria (You must check ALL of these):**
+1.  **Logical Correctness:** Does the sequence of steps make sense? Will it actually accomplish the user's goal?
+2.  **Efficiency:** Are there redundant steps? Could multiple steps be combined into a single, more efficient script?
+3.  **Rule Adherence:** Does the plan follow all critical rules?
+    -   Does it correctly use `pip_install` for non-standard libraries *at the beginning* of the plan?
+    -   Does it use the `write_file` -> `workspace_shell` pattern for any complex task (analysis, plotting, etc.)?
+    -   Does it use data piping (`{{step_N_output}}`) correctly?
+
+**Your Task:**
+Based on your review, you must return a single JSON object with two keys:
+1.  `"status"`: Must be either `"approved"` or `"needs_revision"`.
+2.  `"feedback"`:
+    -   If the status is `"approved"`, this should be a brief confirmation (e.g., "The plan is logical and efficient.").
+    -   If the status is `"needs_revision"`, this must be a **clear and actionable** set of instructions for the original planner on exactly what to change.
+
+---
+**Example 1: Good Plan**
+*Plan:* A two-step plan to write a python script and then execute it.
+*Your Output:*
+```json
+{{
+  "status": "approved",
+  "feedback": "The plan correctly follows the script-first methodology and is well-structured."
+}}
+```
+---
+**Example 2: Flawed Plan**
+*Plan:* A plan that uses `workspace_shell` with a complex, multi-line `python -c` command.
+*Your Output:*
+```json
+{{
+  "status": "needs_revision",
+  "feedback": "The plan violates the 'script-first' rule. The complex python logic in the shell command must be refactored into a dedicated `.py` file using the `write_file` tool, which should then be executed in a subsequent step."
+}}
+```
+---
+
+**Begin!**
+
+**The Plan to Review:**
+```json
+{plan_to_review}
+```
+
+**Your Output (must be a single JSON object):**
+"""
+)
+
 
 # 6. Controller Prompt
 controller_prompt_template = PromptTemplate.from_template(

@@ -1,20 +1,22 @@
 # -----------------------------------------------------------------------------
-# Mentor::i Core Agent (Phase 17 - Venv Pre-Installation FIX)
+# Mentor::i Core Agent (Phase 17 - Plan Reviewer Loop)
 #
-# This version fixes a critical flaw in the agent's environment setup.
-# Previously, new virtual environments were created empty, contradicting the
-# planner's prompt which assumed common libraries were pre-installed.
+# This version introduces a new "Plan Reviewer" node to create a self-
+# correction loop for the planning phase.
 #
 # Key Architectural Changes:
-# 1.  **Venv Pre-warming:** The `_create_venv_if_not_exists` function has been
-#     updated. After creating a new venv with `uv venv`, it now immediately
-#     runs a `uv pip install` command to pre-install a standard set of
-#     scientific and data handling libraries (`pandas`, `numpy`, `matplotlib`,
-#     `seaborn`, `scikit-learn`, and file parsers).
-# 2.  **Guaranteed Environment:** This ensures that every new task starts with
-#     a consistent, isolated, but fully-equipped environment. This makes the
-#     agent's script execution far more reliable and aligns the actual
-#     environment with the context provided in the planner's prompt.
+# 1.  **NEW `plan_reviewer_node`**: This node takes the Chief Architect's plan
+#     and uses a specialized prompt to critique it for logic, efficiency, and
+#     rule adherence.
+# 2.  **NEW `plan_review` State**: A `plan_review` dictionary has been added
+#     to the `GraphState` to hold the reviewer's feedback.
+# 3.  **Feedback-Aware Architect**: The `chief_architect_node` is updated to
+#     receive the `plan_review` feedback and incorporate it into its prompt,
+#     allowing it to revise the plan based on the critique.
+# 4.  **NEW Conditional Router**: A new `after_plan_review_router` manages the
+#     correction loop. It will loop between the Architect and Reviewer up to
+#     a `max_retries` limit before presenting the final, refined plan to the
+#     user for approval, as we discussed.
 # -----------------------------------------------------------------------------
 
 import os
@@ -37,6 +39,7 @@ from .prompts import (
     router_prompt_template,
     handyman_prompt_template,
     structured_planner_prompt_template,
+    plan_reviewer_prompt_template, # <-- NEW
     controller_prompt_template,
     evaluator_prompt_template,
     final_answer_prompt_template,
@@ -54,17 +57,9 @@ logger = logging.getLogger(__name__)
 HISTORY_SUMMARY_THRESHOLD = 10
 HISTORY_SUMMARY_KEEP_RECENT = 4
 SANDBOXED_TOOLS = {"write_file", "read_file", "list_files", "workspace_shell", "pip_install", "query_files", "critique_document"}
-# --- NEW: Define the standard library set for pre-installation ---
 CORE_PACKAGES = [
-    "pandas",
-    "numpy",
-    "matplotlib",
-    "seaborn",
-    "scikit-learn",
-    "beautifulsoup4",
-    "pypdf",
-    "python-docx",
-    "openpyxl"
+    "pandas", "numpy", "matplotlib", "seaborn", "scikit-learn",
+    "beautifulsoup4", "pypdf", "python-docx", "openpyxl"
 ]
 
 
@@ -77,7 +72,7 @@ class EventOrTask(TypedDict, total=False): description: str; date: str
 class WorkspaceFileSummary(TypedDict, total=False): filename: str; summary: str; status: str
 class MemoryVault(TypedDict, total=False): user_profile: UserProfile; knowledge_graph: KnowledgeGraph; events_and_tasks: List[EventOrTask]; workspace_summary: List[WorkspaceFileSummary]; key_observations_and_facts: List[str]
 
-# --- Agent State Definition ---
+# --- Agent State Definition (MODIFIED) ---
 class GraphState(TypedDict):
     input: str
     task_id: str
@@ -100,6 +95,8 @@ class GraphState(TypedDict):
     route: str
     current_track: str
     enabled_tools: List[str]
+    plan_review: Optional[dict] # <-- NEW: To hold reviewer feedback
+
 
 LLM_CACHE = {}
 def get_llm(state: GraphState, role_env_var: str, default_llm_id: str):
@@ -112,20 +109,13 @@ def get_llm(state: GraphState, role_env_var: str, default_llm_id: str):
     LLM_CACHE[llm_id] = llm; return llm
 
 def _invoke_llm_with_fallback(llm, prompt: str, state: GraphState):
-    """
-    Invokes the given LLM with a prompt. If a ResourceExhausted error
-    (Google API rate limit) is caught, it retries the call once using the
-    globally defined DEFAULT_LLM_ID.
-    """
     try:
         return llm.invoke(prompt)
     except ResourceExhausted as e:
         task_id = state.get("task_id", "N/A")
         logger.warning(f"Task '{task_id}': LLM call failed with rate limit error: {e}. Attempting fallback.")
-        
         fallback_llm_id = os.getenv("DEFAULT_LLM_ID", "gemini::gemini-1.5-flash-latest")
         logger.info(f"Task '{task_id}': Switching to fallback LLM: {fallback_llm_id}")
-        
         try:
             provider, model_name = fallback_llm_id.split("::")
             if provider == "gemini":
@@ -134,7 +124,6 @@ def _invoke_llm_with_fallback(llm, prompt: str, state: GraphState):
                 fallback_llm = ChatOllama(model=model_name, base_url=os.getenv("OLLAMA_BASE_URL"))
             else:
                 return AIMessage(content=f"LLM call failed due to rate limits, and the fallback model '{fallback_llm_id}' is not a valid configuration. Original error: {e}")
-            
             return fallback_llm.invoke(prompt)
         except Exception as fallback_e:
             logger.error(f"Task '{task_id}': Fallback LLM call also failed: {fallback_e}")
@@ -170,48 +159,23 @@ def _format_messages(messages: Sequence[BaseMessage], is_for_summary=False) -> s
     if not is_for_summary: return "\n".join(formatted_messages[:-1]) if len(formatted_messages) > 1 else "No prior conversation history."
     return "\n".join(formatted_messages)
 
-# --- MODIFIED: This function now pre-installs core packages into the new venv ---
 async def _create_venv_if_not_exists(workspace_path: str, task_id: str):
-    """
-    Creates a Python virtual environment using `uv` in the specified workspace
-    if it doesn't already exist. Then, it pre-installs a standard set of
-    libraries into that venv.
-    """
     venv_path = os.path.join(workspace_path, ".venv")
-    
     if os.path.isdir(venv_path):
         logger.info(f"Task '{task_id}': Virtual environment already exists. Skipping creation and installation.")
         return
-
-    # --- Step 1: Create the virtual environment ---
     logger.info(f"Task '{task_id}': Creating virtual environment in '{workspace_path}'...")
-    create_process = await asyncio.create_subprocess_exec(
-        "uv", "venv",
-        cwd=workspace_path,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE
-    )
+    create_process = await asyncio.create_subprocess_exec("uv", "venv", cwd=workspace_path, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
     create_stdout, create_stderr = await create_process.communicate()
-
     if create_process.returncode != 0:
         logger.error(f"Task '{task_id}': Failed to create venv. Error: {create_stderr.decode()}")
-        # Stop here if venv creation fails
         return
     else:
         logger.info(f"Task '{task_id}': Successfully created virtual environment.")
-
-    # --- Step 2: Install the core packages into the new venv ---
     logger.info(f"Task '{task_id}': Pre-installing core packages: {', '.join(CORE_PACKAGES)}")
     install_command = ["uv", "pip", "install"] + CORE_PACKAGES
-    
-    install_process = await asyncio.create_subprocess_exec(
-        *install_command,
-        cwd=workspace_path,  # uv automatically uses the .venv in the cwd
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE
-    )
+    install_process = await asyncio.create_subprocess_exec(*install_command, cwd=workspace_path, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
     install_stdout, install_stderr = await install_process.communicate()
-
     if install_process.returncode != 0:
         logger.error(f"Task '{task_id}': Failed to pre-install core packages. Error: {install_stderr.decode()}")
     else:
@@ -223,7 +187,7 @@ async def task_setup_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing Task_Setup"); user_message = state['messages'][-1].content
     workspace_path = f"/app/workspace/{task_id}"; os.makedirs(workspace_path, exist_ok=True); await _create_venv_if_not_exists(workspace_path, task_id)
     initial_vault = {"user_profile": {"persona": {},"preferences": {"formatting_style": "Markdown"}}, "knowledge_graph": {"concepts": [],"relationships": []},"events_and_tasks": [],"workspace_summary": [],"key_observations_and_facts": []}
-    return {"input": user_message, "history": [], "current_step_index": 0, "step_outputs": {}, "workspace_path": workspace_path, "llm_config": state.get("llm_config", {}), "max_retries": 3, "step_retries": 0, "plan_retries": 0, "user_feedback": None, "memory_vault": initial_vault, "enabled_tools": state.get("enabled_tools")}
+    return {"input": user_message, "history": [], "current_step_index": 0, "step_outputs": {}, "workspace_path": workspace_path, "llm_config": state.get("llm_config", {}), "max_retries": 3, "step_retries": 0, "plan_retries": 0, "user_feedback": None, "memory_vault": initial_vault, "enabled_tools": state.get("enabled_tools"), "plan_review": None}
 
 def memory_updater_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing memory_updater_node."); llm = get_llm(state, "EDITOR_LLM_ID", "gemini::gemini-1.5-pro-latest")
@@ -242,14 +206,9 @@ def initial_router_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing Three-Track Router."); llm = get_llm(state, "ROUTER_LLM_ID", "gemini::gemini-1.5-flash-latest")
     router_prompt = router_prompt_template.format(chat_history=_format_messages(state['messages']), memory_vault=json.dumps(state.get('memory_vault', {}), indent=2), input=state["input"], tools=format_tools_for_prompt(state))
     response = _invoke_llm_with_fallback(llm, router_prompt, state); decision = response.content.strip(); logger.info(f"Task '{task_id}': Initial routing decision from LLM: {decision}")
-    
-    if "SIMPLE_TOOL_USE" in decision:
-        return {"route": "Handyman", "current_track": "SIMPLE_TOOL_USE"}
-    if "COMPLEX_PROJECT" in decision: 
-        return {"route": "Chief_Architect", "current_track": "COMPLEX_PROJECT"}
-    
-    logger.info(f"Task '{task_id}': Routing to DIRECT_QA."); 
-    return {"route": "Editor", "current_track": "DIRECT_QA"}
+    if "SIMPLE_TOOL_USE" in decision: return {"route": "Handyman", "current_track": "SIMPLE_TOOL_USE"}
+    if "COMPLEX_PROJECT" in decision: return {"route": "Chief_Architect", "current_track": "COMPLEX_PROJECT"}
+    logger.info(f"Task '{task_id}': Routing to DIRECT_QA."); return {"route": "Editor", "current_track": "DIRECT_QA"}
 
 def handyman_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Track 2 -> Handyman"); llm = get_llm(state, "SITE_FOREMAN_LLM_ID", "gemini::gemini-1.5-flash-latest")
@@ -260,22 +219,58 @@ def handyman_node(state: GraphState):
         tool_call = json.loads(json_str); return {"current_tool_call": tool_call}
     except Exception as e: logger.error(f"Task '{task_id}': Error parsing Handyman tool call: {e}"); return {"current_tool_call": {"error": f"Invalid JSON from Handyman: {e}"}}
 
+# --- MODIFIED: Architect now accepts feedback ---
 def chief_architect_node(state: GraphState):
-    task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Track 3 -> Chief_Architect"); llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-flash-latest")
-    prompt = structured_planner_prompt_template.format(chat_history=_format_messages(state['messages']), memory_vault=json.dumps(state.get('memory_vault', {}), indent=2), input=state["input"], tools=format_tools_for_prompt(state))
+    task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Track 3 -> Chief_Architect")
+    llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-pro-latest") # Use a more powerful model for planning
+    
+    review_feedback_str = ""
+    if (review := state.get("plan_review")) and review.get("status") == "needs_revision":
+        logger.info(f"Task '{task_id}': Architect is revising plan based on feedback.")
+        review_feedback_str = f"**Reviewer Feedback (You MUST address this):**\n{review.get('feedback')}\n\nPlease generate a new, revised plan."
+    
+    prompt = structured_planner_prompt_template.format(
+        chat_history=_format_messages(state['messages']),
+        memory_vault=json.dumps(state.get('memory_vault', {}), indent=2),
+        input=state["input"],
+        tools=format_tools_for_prompt(state),
+        review_feedback=review_feedback_str
+    )
     response = _invoke_llm_with_fallback(llm, prompt, state)
     try:
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL); json_str = match.group(1).strip() if match else response.content.strip()
-        parsed_json = json.loads(json_str); return {"plan": parsed_json.get("plan", [])}
-    except Exception as e: logger.error(f"Task '{task_id}': Error parsing structured plan: {e}"); return {"plan": [{"error": f"Failed to create plan: {e}"}]}
+        parsed_json = json.loads(json_str)
+        # Always reset plan review after generating a new plan
+        return {"plan": parsed_json.get("plan", []), "plan_review": None}
+    except Exception as e:
+        logger.error(f"Task '{task_id}': Error parsing structured plan: {e}")
+        return {"plan": [{"error": f"Failed to create plan: {e}"}], "plan_review": None}
+
+# --- NEW: Plan Reviewer Node ---
+def plan_reviewer_node(state: GraphState):
+    task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing Plan_Reviewer")
+    llm = get_llm(state, "PROJECT_SUPERVISOR_LLM_ID", "gemini::gemini-1.5-pro-latest") # A powerful model for critique
+    
+    plan_to_review = state.get("plan")
+    if not plan_to_review:
+        return {"plan_review": {"status": "approved", "feedback": "No plan was generated, so nothing to review."}}
+
+    prompt = plan_reviewer_prompt_template.format(plan_to_review=json.dumps(plan_to_review, indent=2))
+    response = _invoke_llm_with_fallback(llm, prompt, state)
+    try:
+        match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL); json_str = match.group(1).strip() if match else response.content.strip()
+        review = json.loads(json_str)
+        logger.info(f"Task '{task_id}': Plan review complete. Status: {review.get('status')}")
+        return {"plan_review": review}
+    except Exception as e:
+        logger.error(f"Task '{task_id}': Error parsing plan review: {e}")
+        return {"plan_review": {"status": "approved", "feedback": f"Reviewer failed to parse its own output: {e}"}}
+
 
 def plan_expander_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing Plan_Expander."); plan = state.get("plan", [])
     if not plan: return {}
-    
-    for i, step in enumerate(plan):
-        step["step_id"] = i + 1
-        
+    for i, step in enumerate(plan): step["step_id"] = i + 1
     return {"plan": plan}
 
 def human_in_the_loop_node(state: GraphState):
@@ -318,18 +313,14 @@ async def worker_node(state: GraphState):
     if tool_name in SANDBOXED_TOOLS: final_args["workspace_path"] = state["workspace_path"]
     try:
         output = await tool.ainvoke(final_args); output_str = str(output)
-        
         if state.get("current_track") == "COMPLEX_PROJECT":
             current_step_id = state["plan"][state["current_step_index"]]["step_id"]
             step_outputs = {current_step_id: output_str}
             return {"tool_output": output_str, "step_outputs": step_outputs}
-
         elif state.get("current_track") == "SIMPLE_TOOL_USE":
             history_record = (f"Handyman Action: User requested '{state['input']}'.\nExecuted Tool: {json.dumps(tool_call)}\nResult: {output_str}")
             return {"tool_output": output_str, "history": [history_record], "messages": [AIMessage(content=f"Tool execution result: {output_str}")]}
-            
         return {"tool_output": output_str}
-
     except Exception as e:
         logger.error(f"Task '{task_id}': Error executing tool '{tool_name}': {e}", exc_info=True); return {"tool_output": f"An error occurred while executing the tool: {e}"}
 
@@ -365,8 +356,7 @@ def correction_planner_node(state: GraphState):
         new_step = json.loads(json_str)
         new_plan = state["plan"][:]
         new_plan.insert(state["current_step_index"], new_step)
-        for i, step in enumerate(new_plan):
-            step["step_id"] = i + 1
+        for i, step in enumerate(new_plan): step["step_id"] = i + 1
         logger.info(f"Task '{task_id}': Inserted new corrective step. Plan is now {len(new_plan)} steps long.")
         return {"plan": new_plan}
     except Exception as e:
@@ -374,17 +364,40 @@ def correction_planner_node(state: GraphState):
         return {}
 
 
+# --- Conditional Routers (MODIFIED) ---
+
+def after_plan_review_router(state: GraphState) -> str:
+    """
+    Routes after the Plan Reviewer node.
+    - If approved, go to the user.
+    - If needs revision and retries are left, go back to the Architect.
+    - If needs revision and no retries are left, go to the user anyway.
+    """
+    review = state.get("plan_review", {})
+    if review.get("status") == "approved":
+        logger.info(f"Task '{state.get('task_id')}': Plan approved by reviewer. Proceeding to user.")
+        return "human_in_the_loop_node"
+    
+    plan_retries = state.get("plan_retries", 0)
+    if plan_retries < state.get("max_retries", 3):
+        logger.warning(f"Task '{state.get('task_id')}': Plan needs revision. Looping back to Architect. Retry {plan_retries + 1}")
+        # IMPORTANT: We must return a dictionary here to update the state with the incremented counter
+        return "Chief_Architect"
+    else:
+        logger.warning(f"Task '{state.get('task_id')}': Max plan retries reached. Presenting final plan to user.")
+        return "human_in_the_loop_node"
+
+def increment_plan_retries_node(state: GraphState):
+    """Simple node to increment the plan retry counter."""
+    return {"plan_retries": state.get("plan_retries", 0) + 1}
+
 def after_plan_step_router(state: GraphState) -> str:
     evaluation = state.get("step_evaluation", {});
     if evaluation.get("status") == "failure":
-        if state["step_retries"] < state["max_retries"]:
-            return "Correction_Planner"
-        else:
-            logger.warning(f"Task '{state.get('task_id')}': Max retries exceeded for step. Routing to Editor.")
-            return "Editor"
+        if state["step_retries"] < state["max_retries"]: return "Correction_Planner"
+        else: logger.warning(f"Task '{state.get('task_id')}': Max retries exceeded for step. Routing to Editor."); return "Editor"
     if state["current_step_index"] + 1 >= len(state.get("plan", [])):
-        logger.info(f"Task '{state.get('task_id')}': Plan complete. Routing to Editor.")
-        return "Editor"
+        logger.info(f"Task '{state.get('task_id')}': Plan complete. Routing to Editor."); return "Editor"
     return "Advance_To_Next_Step"
 
 def history_management_router(state: GraphState) -> str: return "summarize_history_node" if len(state['messages']) > HISTORY_SUMMARY_THRESHOLD else "initial_router_node"
@@ -392,26 +405,63 @@ def route_logic(state: GraphState) -> str: return state.get("route", "Editor")
 def after_worker_router(state: GraphState) -> str: return "Editor" if state.get("current_track") == "SIMPLE_TOOL_USE" else "Project_Supervisor"
 def after_plan_creation_router(state: GraphState) -> str: return "Site_Foreman" if state.get("user_feedback") == "approve" else "Editor"
 
+# --- Graph Definition (MODIFIED) ---
 def create_agent_graph():
     workflow = StateGraph(GraphState)
-    workflow.add_node("Task_Setup", task_setup_node); workflow.add_node("Memory_Updater", memory_updater_node); workflow.add_node("summarize_history_node", summarize_history_node)
-    workflow.add_node("initial_router_node", initial_router_node); workflow.add_node("Handyman", handyman_node); workflow.add_node("Chief_Architect", chief_architect_node)
-    workflow.add_node("Plan_Expander", plan_expander_node); workflow.add_node("human_in_the_loop_node", human_in_the_loop_node); workflow.add_node("Site_Foreman", site_foreman_node)
-    workflow.add_node("Worker", worker_node); workflow.add_node("Project_Supervisor", project_supervisor_node); workflow.add_node("Advance_To_Next_Step", advance_to_next_step_node)
-    workflow.add_node("Editor", editor_node); workflow.add_node("Correction_Planner", correction_planner_node)
-    workflow.set_entry_point("Task_Setup"); workflow.add_edge("Task_Setup", "Memory_Updater")
+    
+    # Add all nodes
+    workflow.add_node("Task_Setup", task_setup_node)
+    workflow.add_node("Memory_Updater", memory_updater_node)
+    workflow.add_node("summarize_history_node", summarize_history_node)
+    workflow.add_node("initial_router_node", initial_router_node)
+    workflow.add_node("Handyman", handyman_node)
+    workflow.add_node("Chief_Architect", chief_architect_node)
+    workflow.add_node("Plan_Reviewer", plan_reviewer_node) # <-- NEW
+    workflow.add_node("increment_plan_retries_node", increment_plan_retries_node) # <-- NEW
+    workflow.add_node("human_in_the_loop_node", human_in_the_loop_node)
+    workflow.add_node("Site_Foreman", site_foreman_node)
+    workflow.add_node("Worker", worker_node)
+    workflow.add_node("Project_Supervisor", project_supervisor_node)
+    workflow.add_node("Advance_To_Next_Step", advance_to_next_step_node)
+    workflow.add_node("Editor", editor_node)
+    workflow.add_node("Correction_Planner", correction_planner_node)
+    
+    # Define graph edges
+    workflow.set_entry_point("Task_Setup")
+    workflow.add_edge("Task_Setup", "Memory_Updater")
     workflow.add_conditional_edges("Memory_Updater", history_management_router, {"summarize_history_node": "summarize_history_node", "initial_router_node": "initial_router_node"})
     workflow.add_edge("summarize_history_node", "initial_router_node")
+    
+    # Main routing
     workflow.add_conditional_edges("initial_router_node", route_logic, {"Editor": "Editor", "Handyman": "Handyman", "Chief_Architect": "Chief_Architect"})
-    workflow.add_edge("Handyman", "Worker"); workflow.add_conditional_edges("Worker", after_worker_router, {"Editor": "Editor", "Project_Supervisor": "Project_Supervisor"})
-    workflow.add_edge("Chief_Architect", "Plan_Expander"); workflow.add_edge("Plan_Expander", "human_in_the_loop_node")
+    
+    # Handyman track
+    workflow.add_edge("Handyman", "Worker")
+    
+    # Architect track (with new review loop)
+    workflow.add_edge("Chief_Architect", "Plan_Reviewer")
+    workflow.add_conditional_edges(
+        "Plan_Reviewer",
+        after_plan_review_router,
+        {
+            "human_in_the_loop_node": "human_in_the_loop_node",
+            "Chief_Architect": "increment_plan_retries_node" # Go to incrementer first
+        }
+    )
+    workflow.add_edge("increment_plan_retries_node", "Chief_Architect") # Then loop back
+    
+    # Execution track
     workflow.add_conditional_edges("human_in_the_loop_node", after_plan_creation_router, {"Site_Foreman": "Site_Foreman", "Editor": "Editor"})
     workflow.add_edge("Site_Foreman", "Worker")
+    workflow.add_conditional_edges("Worker", after_worker_router, {"Editor": "Editor", "Project_Supervisor": "Project_Supervisor"})
+    workflow.add_conditional_edges("Project_Supervisor", after_plan_step_router, {"Editor": "Editor", "Advance_To_Next_Step": "Advance_To_Next_Step", "Correction_Planner": "Correction_Planner"})
     workflow.add_edge("Correction_Planner", "Site_Foreman")
     workflow.add_edge("Advance_To_Next_Step", "Site_Foreman")
-    workflow.add_conditional_edges("Project_Supervisor", after_plan_step_router, {"Editor": "Editor", "Advance_To_Next_Step": "Advance_To_Next_Step", "Correction_Planner": "Correction_Planner"})
+    
+    # End point
     workflow.add_edge("Editor", END)
+    
     agent = workflow.compile(checkpointer=MemorySaver(), interrupt_before=["human_in_the_loop_node"])
-    logger.info("Mentor::i agent graph compiled with venv pre-warming logic."); return agent
+    logger.info("Mentor::i agent graph compiled with Plan Reviewer loop."); return agent
 
 agent_graph = create_agent_graph()
