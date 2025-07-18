@@ -1,49 +1,68 @@
 import { useState, useEffect, useCallback } from 'preact/hooks';
 
-// --- NEW: Use the window's hostname to determine the backend API address ---
+// --- Use the window's hostname to determine the backend API address ---
 const API_BASE_URL = `http://${window.location.hostname}:8766`;
 
 /**
- * Custom hook for managing task state, now backed by a persistent database via a REST API.
- * All localStorage logic has been removed.
+ * Custom hook for managing task state, now with correct initial history loading.
  */
 export const useTasks = () => {
     const [tasks, setTasks] = useState([]);
     const [activeTaskId, setActiveTaskId] = useState(null);
 
-    // Effect to load all tasks from the database on initial component mount.
+    // --- THIS IS THE FIX ---
+    // This effect is now responsible for loading the initial task list AND the
+    // history for the initially active task.
     useEffect(() => {
-        const fetchTasks = async () => {
+        const fetchInitialData = async () => {
             try {
-                const response = await fetch(`${API_BASE_URL}/api/tasks`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch tasks from the server.');
+                // Step 1: Fetch the list of all tasks
+                const tasksResponse = await fetch(`${API_BASE_URL}/api/tasks`);
+                if (!tasksResponse.ok) throw new Error('Failed to fetch tasks.');
+                const loadedTasks = await tasksResponse.json();
+
+                if (loadedTasks.length === 0) {
+                    setTasks([]);
+                    setActiveTaskId(null);
+                    return;
                 }
-                const loadedTasks = await response.json();
+
+                // Step 2: Determine the initial active task ID
+                const savedActiveId = localStorage.getItem('research_agent_active_task_id');
+                const initialActiveId = savedActiveId && loadedTasks.some(t => t.id === savedActiveId)
+                    ? savedActiveId
+                    : loadedTasks[0].id;
                 
-                // Initialize history for each task, to be loaded on demand later.
-                const tasksWithHistory = loadedTasks.map(task => ({ ...task, history: [] }));
+                setActiveTaskId(initialActiveId);
+
+                // Step 3: Fetch the history for ONLY the active task
+                let activeTaskHistory = [];
+                if (initialActiveId) {
+                    const historyResponse = await fetch(`${API_BASE_URL}/api/tasks/${initialActiveId}/history`);
+                    if (historyResponse.ok) {
+                        activeTaskHistory = await historyResponse.json();
+                    } else {
+                        console.error(`Failed to fetch history for task ${initialActiveId}`);
+                    }
+                }
+
+                // Step 4: Initialize the tasks state, injecting the history into the active task
+                const tasksWithHistory = loadedTasks.map(task => ({
+                    ...task,
+                    history: task.id === initialActiveId ? activeTaskHistory : []
+                }));
+                
                 setTasks(tasksWithHistory);
 
-                // Determine which task should be active.
-                const savedActiveId = localStorage.getItem('research_agent_active_task_id');
-                if (savedActiveId && loadedTasks.some(t => t.id === savedActiveId)) {
-                    setActiveTaskId(savedActiveId);
-                } else if (loadedTasks.length > 0) {
-                    setActiveTaskId(loadedTasks[0].id);
-                }
-
             } catch (error) {
-                console.error("Error loading tasks:", error);
-                // In case of an error, start with an empty list.
+                console.error("Error loading initial data:", error);
                 setTasks([]);
             }
         };
-        fetchTasks();
+        fetchInitialData();
     }, []);
 
     // Effect to save only the active task ID to localStorage whenever it changes.
-    // The task list itself is no longer saved here.
     useEffect(() => {
         if (activeTaskId) {
             localStorage.setItem('research_agent_active_task_id', activeTaskId);
@@ -66,17 +85,15 @@ export const useTasks = () => {
             });
             if (!response.ok) throw new Error('Failed to rename task on the server.');
             
-            // Update the local state only after the server confirms success.
             setTasks(prevTasks => prevTasks.map(task =>
                 task.id === taskId ? { ...task, name: newName } : task
             ));
         } catch (error) {
             console.error("Error renaming task:", error);
-            // Optionally, show an error to the user here.
         }
     };
 
-    // The selectTask function remains the same, it only manages local state.
+    // The selectTask function is now passed into App.jsx to be used there
     const selectTask = (taskId) => {
         setActiveTaskId(taskId);
     };
