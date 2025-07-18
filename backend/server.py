@@ -1,25 +1,20 @@
 # -----------------------------------------------------------------------------
-# Mentor::i Backend Server (Phase 17 - Task API Endpoints)
+# Mentor::i Backend Server (Phase 17 - History Write FIX)
 #
-# This version adds a full suite of RESTful API endpoints for managing tasks
-# and their history, backed by our new SQLite database. This replaces the
-# previous WebSocket-based task management and prepares for the removal of
-# localStorage on the frontend.
+# This version fixes a critical bug where message history was never written
+# to the database.
 #
 # Key Architectural Changes:
-# 1.  **Database Session Management**: A `get_db` context manager is added to
-#     ensure that each API request gets a dedicated database session that is
-#     properly closed, even if errors occur.
-# 2.  **CRUD API for Tasks**:
-#     - `GET /api/tasks`: Fetches all tasks from the database.
-#     - `POST /api/tasks`: Creates a new task.
-#     - `PUT /api/tasks/{task_id}`: Renames a specific task.
-#     - `DELETE /api/tasks/{task_id}`: Deletes a task and its history.
-# 3.  **History Endpoint**: `GET /api/tasks/{task_id}/history` retrieves the
-#     full message history for a given task.
-# 4.  **Updated WebSocket Handlers**: The `handle_task_create` and
-#     `handle_task_delete` WebSocket handlers are updated to perform their
-#     operations against the database, ensuring consistency.
+# 1.  **History Persistence Logic**: The `agent_execution_wrapper` function
+#     now contains a new block at the end of a successful run. This block:
+#     - Opens a database session using `get_db()`.
+#     - Deletes the old message history for the completed task.
+#     - Serializes the final, complete message history from the agent's state
+#       into JSON.
+#     - Commits the new message history to the `message_history` table.
+# 2.  **Stateful Conversations**: With this change, conversations are now
+#     truly persistent. The frontend's logic to fetch history on task selection
+#     will now correctly retrieve the saved conversation from the database.
 # -----------------------------------------------------------------------------
 
 import asyncio
@@ -36,7 +31,7 @@ from contextlib import contextmanager
 from dotenv import load_dotenv
 import websockets
 from werkzeug.formparser import parse_form_data
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, messages_to_dict # <-- MODIFIED
 from langgraph.checkpoint.memory import MemorySaver
 from sqlalchemy.orm import Session
 
@@ -56,7 +51,7 @@ RUNNING_AGENTS = {}
 ACTIVE_CONNECTIONS = set()
 
 
-# --- NEW: Database Session Context Manager ---
+# --- Database Session Context Manager ---
 @contextmanager
 def get_db():
     """Provides a transactional scope around a series of operations."""
@@ -151,23 +146,16 @@ def _safe_delete_workspace(task_id: str):
         else: logger.warning(f"Task '{task_id}': Workspace directory not found for deletion.")
     except Exception as e: logger.error(f"Task '{task_id}': Error deleting workspace: {e}", exc_info=True)
 
-# --- HTTP File Server Class (MODIFIED) ---
+# --- HTTP File Server Class (Unchanged) ---
 class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed_path = urlparse(self.path)
         path_parts = parsed_path.path.strip('/').split('/')
-        
-        # --- NEW: API Routes for Tasks ---
         if path_parts[0] == 'api' and path_parts[1] == 'tasks':
-            if len(path_parts) == 2:
-                self._handle_get_tasks()
-            elif len(path_parts) == 4 and path_parts[3] == 'history':
-                self._handle_get_task_history(path_parts[2])
-            else:
-                self._send_json_response(404, {'error': 'Not Found'})
+            if len(path_parts) == 2: self._handle_get_tasks()
+            elif len(path_parts) == 4 and path_parts[3] == 'history': self._handle_get_task_history(path_parts[2])
+            else: self._send_json_response(404, {'error': 'Not Found'})
             return
-
-        # Existing routes
         path = parsed_path.path.rstrip('/')
         if path == '/api/models': self._handle_get_models()
         elif path == '/api/tools': self._handle_get_tools()
@@ -179,13 +167,9 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         parsed_path = urlparse(self.path)
         path_parts = parsed_path.path.strip('/').split('/')
-
-        # --- NEW: API Route for Creating Tasks ---
         if path_parts[0] == 'api' and path_parts[1] == 'tasks' and len(path_parts) == 2:
             self._handle_create_task()
             return
-            
-        # Existing routes
         path = parsed_path.path.rstrip('/')
         if path == '/api/tools': self._handle_create_tool()
         elif path == '/api/workspace/folders': self._handle_create_folder()
@@ -196,13 +180,9 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
     def do_DELETE(self):
         parsed_path = urlparse(self.path)
         path_parts = parsed_path.path.strip('/').split('/')
-        
-        # --- NEW: API Route for Deleting Tasks ---
         if path_parts[0] == 'api' and path_parts[1] == 'tasks' and len(path_parts) == 3:
             self._handle_delete_task(path_parts[2])
             return
-
-        # Existing routes
         path = parsed_path.path.rstrip('/')
         if path == '/api/workspace/items': self._handle_delete_workspace_item(parsed_path)
         else: self._send_json_response(404, {'error': f"Not Found: The path '{path}' does not match any known DELETE routes."})
@@ -210,13 +190,9 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
     def do_PUT(self):
         parsed_path = urlparse(self.path)
         path_parts = parsed_path.path.strip('/').split('/')
-
-        # --- NEW: API Route for Renaming Tasks ---
         if path_parts[0] == 'api' and path_parts[1] == 'tasks' and len(path_parts) == 3:
             self._handle_rename_task(path_parts[2])
             return
-
-        # Existing routes
         path = parsed_path.path.rstrip('/')
         if path == '/api/workspace/items': self._handle_rename_workspace_item()
         else: self._send_json_response(404, {'error': f"Not Found: The path '{path}' does not match any known PUT routes."})
@@ -235,7 +211,6 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json.dumps(data).encode('utf-8'))
 
-    # --- NEW: Task API Handlers ---
     def _handle_get_tasks(self):
         with get_db() as db:
             tasks = db.query(Task).all()
@@ -243,56 +218,38 @@ class WorkspaceHTTPHandler(BaseHTTPRequestHandler):
             self._send_json_response(200, tasks_data)
 
     def _handle_create_task(self):
-        content_length = int(self.headers['Content-Length'])
-        body = json.loads(self.rfile.read(content_length))
-        task_id = body.get('id')
-        task_name = body.get('name')
-        if not task_id or not task_name:
-            return self._send_json_response(400, {'error': 'Missing id or name'})
-        
+        content_length = int(self.headers['Content-Length']); body = json.loads(self.rfile.read(content_length))
+        task_id = body.get('id'); task_name = body.get('name')
+        if not task_id or not task_name: return self._send_json_response(400, {'error': 'Missing id or name'})
         with get_db() as db:
-            db_task = Task(id=task_id, name=task_name)
-            db.add(db_task)
-            db.commit()
-            db.refresh(db_task)
-            # Also create workspace directory
+            db_task = Task(id=task_id, name=task_name); db.add(db_task); db.commit(); db.refresh(db_task)
             os.makedirs(f"/app/workspace/{task_id}", exist_ok=True)
             self._send_json_response(201, {"id": db_task.id, "name": db_task.name})
 
     def _handle_rename_task(self, task_id: str):
-        content_length = int(self.headers['Content-Length'])
-        body = json.loads(self.rfile.read(content_length))
+        content_length = int(self.headers['Content-Length']); body = json.loads(self.rfile.read(content_length))
         new_name = body.get('name')
-        if not new_name:
-            return self._send_json_response(400, {'error': 'Missing name'})
-            
+        if not new_name: return self._send_json_response(400, {'error': 'Missing name'})
         with get_db() as db:
             db_task = db.query(Task).filter(Task.id == task_id).first()
-            if not db_task:
-                return self._send_json_response(404, {'error': 'Task not found'})
-            db_task.name = new_name
-            db.commit()
+            if not db_task: return self._send_json_response(404, {'error': 'Task not found'})
+            db_task.name = new_name; db.commit()
             self._send_json_response(200, {"id": db_task.id, "name": db_task.name})
 
     def _handle_delete_task(self, task_id: str):
         with get_db() as db:
             db_task = db.query(Task).filter(Task.id == task_id).first()
-            if not db_task:
-                return self._send_json_response(404, {'error': 'Task not found'})
-            db.delete(db_task)
-            db.commit()
-        # Also delete workspace directory
+            if not db_task: return self._send_json_response(404, {'error': 'Task not found'})
+            db.delete(db_task); db.commit()
         _safe_delete_workspace(task_id)
         self._send_json_response(200, {'message': 'Task deleted successfully'})
 
     def _handle_get_task_history(self, task_id: str):
         with get_db() as db:
             messages = db.query(MessageHistory).filter(MessageHistory.task_id == task_id).all()
-            # The messages are stored as JSON strings, so we need to parse them back
             history_data = [json.loads(msg.message_json) for msg in messages]
             self._send_json_response(200, history_data)
 
-    # --- Existing Handlers (Unchanged) ---
     def _handle_create_tool(self):
         try:
             content_length = int(self.headers['Content-Length'])
@@ -477,6 +434,7 @@ async def broadcast_event(event):
         for result in results:
             if isinstance(result, Exception): logger.warning(f"Failed to send message to a client: {result}")
 
+# --- MODIFIED: agent_execution_wrapper now saves history to the database ---
 async def agent_execution_wrapper(input_state, config):
     global RUNNING_AGENTS; task_id = config["configurable"]["thread_id"]
     try:
@@ -490,6 +448,7 @@ async def agent_execution_wrapper(input_state, config):
             if event_type == "on_chain_end" and node_name == "Correction_Planner":
                 new_plan = event.get("data", {}).get("output", {}).get("plan")
                 if new_plan: logger.info(f"Task '{task_id}': Broadcasting plan update to frontend."); await broadcast_event({"type": "plan_updated", "plan": new_plan, "task_id": task_id})
+        
         current_state = agent_graph.get_state(config)
         if current_state.next and "human_in_the_loop_node" in current_state.next:
             logger.info(f"Task '{task_id}': Paused for human approval.")
@@ -500,7 +459,32 @@ async def agent_execution_wrapper(input_state, config):
                 final_answer_message = {"type": "final_answer", "data": answer, "task_id": task_id}
                 if final_state.values.get("current_track") == "SIMPLE_TOOL_USE": final_answer_message["refresh_workspace"] = True
                 await broadcast_event(final_answer_message)
+            
+            # --- THIS IS THE FIX ---
+            # After a successful run, save the final message history to the database.
+            if final_state:
+                with get_db() as db:
+                    task = db.query(Task).filter(Task.id == task_id).first()
+                    if task:
+                        # Clear old history
+                        db.query(MessageHistory).filter(MessageHistory.task_id == task_id).delete()
+                        
+                        # Add new history
+                        final_messages = final_state.values.get("messages", [])
+                        message_dicts = messages_to_dict(final_messages)
+                        
+                        for msg_dict in message_dicts:
+                            db_msg = MessageHistory(
+                                task_id=task_id,
+                                message_json=json.dumps(msg_dict)
+                            )
+                            db.add(db_msg)
+                        
+                        db.commit()
+                        logger.info(f"Task '{task_id}': Successfully saved {len(message_dicts)} messages to the database.")
+
             await broadcast_event({"type": "agent_stopped", "task_id": task_id, "message": "Agent run finished successfully."})
+            
     except asyncio.CancelledError: logger.info(f"Task '{task_id}': Agent execution cancelled by user."); await broadcast_event({"type": "agent_stopped", "task_id": task_id, "message": "Agent run stopped by user."})
     except Exception as e: logger.error(f"Task '{task_id}': An error occurred during agent execution: {e}", exc_info=True); await broadcast_event({"type": "agent_stopped", "task_id": task_id, "message": f"An error occurred: {str(e)}"})
     finally:
@@ -540,7 +524,6 @@ async def handle_stop_agent(data):
     if task_id in RUNNING_AGENTS: RUNNING_AGENTS[task_id].cancel()
     else: logger.warning(f"Task '{task_id}': Stop requested, but no running agent found."); await broadcast_event({"type": "agent_stopped", "task_id": task_id, "message": "Agent was not running."})
 
-# --- MODIFIED: These handlers now use the database ---
 async def handle_task_create(data):
     task_id = data.get("task_id"); task_name = data.get("name")
     if not task_id or not task_name: return
@@ -548,8 +531,7 @@ async def handle_task_create(data):
     with get_db() as db:
         if not db.query(Task).filter(Task.id == task_id).first():
             db_task = Task(id=task_id, name=task_name)
-            db.add(db_task)
-            db.commit()
+            db.add(db_task); db.commit()
             os.makedirs(f"/app/workspace/{task_id}", exist_ok=True)
             logger.info(f"Task '{task_id}': Created in database.")
 
@@ -560,10 +542,7 @@ async def handle_task_delete(data):
     if task_id in RUNNING_AGENTS: RUNNING_AGENTS[task_id].cancel()
     with get_db() as db:
         db_task = db.query(Task).filter(Task.id == task_id).first()
-        if db_task:
-            db.delete(db_task)
-            db.commit()
-            logger.info(f"Task '{task_id}': Deleted from database.")
+        if db_task: db.delete(db_task); db.commit(); logger.info(f"Task '{task_id}': Deleted from database.")
     _safe_delete_workspace(task_id)
 
 async def message_router(websocket):
