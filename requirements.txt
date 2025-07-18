@@ -12,11 +12,14 @@ langchain-community
 
 # -- Server --
 websockets
-# NEW: Use Werkzeug for robustly parsing file uploads, replacing 'cgi'.
+# Use Werkzeug for robustly parsing file uploads, replacing 'cgi'.
 Werkzeug
 
 # -- Utilities --
 python-dotenv
+
+# -- NEW: Database ORM --
+SQLAlchemy
 
 # -- Tools --
 # For the Tavily web search tool.

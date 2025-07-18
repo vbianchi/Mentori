@@ -8,7 +8,11 @@ import { useWorkspace } from './hooks/useWorkspace';
 import { useSettings } from './hooks/useSettings';
 import { useAgent } from './hooks/useAgent';
 
-// --- Re-styled & Improved Components ---
+// --- NEW: Define the API base URL for consistency ---
+const API_BASE_URL = `http://${window.location.hostname}:8766`;
+
+
+// --- Re-styled & Improved Components (Unchanged) ---
 
 const InlineEditor = ({ item, onConfirm, onCancel }) => {
     const [name, setName] = useState(item.name || '');
@@ -295,36 +299,83 @@ export function App() {
     useEffect(() => { if (workspace.currentPath) workspace.fetchFiles(workspace.currentPath) }, [workspace.currentPath]);
     useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }) }, [tasks.find(t=>t.id===activeTaskId)?.history, isAwaitingApproval]);
 
-    const selectTask = (taskId) => {
-        if (taskId !== activeTaskId) {
-            setActiveTaskId(taskId);
-            setIsAwaitingApproval(false);
-            workspace.resetWorkspaceViews();
+    // --- MODIFIED: `selectTask` is now async and fetches history ---
+    const selectTask = async (taskId) => {
+        if (taskId === activeTaskId) return;
+
+        setActiveTaskId(taskId);
+        setIsAwaitingApproval(false);
+        workspace.resetWorkspaceViews();
+
+        // Find the task in the current state
+        const task = tasks.find(t => t.id === taskId);
+        // Only fetch history if it hasn't been loaded yet (or is empty)
+        if (task && (!task.history || task.history.length === 0)) {
+            try {
+                console.log(`Fetching history for task: ${taskId}`);
+                const response = await fetch(`${API_BASE_URL}/api/tasks/${taskId}/history`);
+                if (!response.ok) throw new Error('Failed to fetch history');
+                const history = await response.json();
+                
+                // Update the specific task with its fetched history
+                setTasks(prevTasks => prevTasks.map(t => 
+                    t.id === taskId ? { ...t, history: history } : t
+                ));
+            } catch (error) {
+                console.error("Error fetching task history:", error);
+                // Optionally handle the error, e.g., show a notification
+            }
         }
     };
     
-    const createNewTask = () => {
+    // --- MODIFIED: `createNewTask` now uses the API ---
+    const createNewTask = async () => {
         const newTaskId = `task_${Date.now()}`;
-        agent.createTask(newTaskId);
-        setTasks(prevTasks => [...prevTasks, { id: newTaskId, name: `New Task ${tasks.length + 1}`, history: [] }]);
-        selectTask(newTaskId);
+        const newTaskName = `New Task ${tasks.length + 1}`;
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/tasks`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: newTaskId, name: newTaskName }),
+            });
+            if (!response.ok) throw new Error('Failed to create task on server.');
+            const createdTask = await response.json();
+            
+            // Add the new task to the local state with an empty history array
+            setTasks(prevTasks => [...prevTasks, { ...createdTask, history: [] }]);
+            selectTask(createdTask.id);
+
+        } catch (error) {
+            console.error("Error creating new task:", error);
+        }
     };
 
-    const handleDeleteTask = (taskIdToDelete) => {
-        agent.deleteTask(taskIdToDelete);
-        const currentTasks = tasks;
-        const remainingTasks = currentTasks.filter(task => task.id !== taskIdToDelete);
-        if (activeTaskId === taskIdToDelete) {
-            if (remainingTasks.length > 0) {
-                const deletedIndex = currentTasks.findIndex(task => task.id === taskIdToDelete);
-                selectTask(remainingTasks[Math.max(0, deletedIndex - 1)].id);
-            } else {
-                setActiveTaskId(null);
-                workspace.resetWorkspaceViews();
-                workspace.setCurrentPath('');
+    // --- MODIFIED: `handleDeleteTask` now uses the API ---
+    const handleDeleteTask = async (taskIdToDelete) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/tasks/${taskIdToDelete}`, {
+                method: 'DELETE',
+            });
+            if (!response.ok) throw new Error('Failed to delete task on server.');
+            
+            // Update local state after successful deletion
+            const currentTasks = tasks;
+            const remainingTasks = currentTasks.filter(task => task.id !== taskIdToDelete);
+            if (activeTaskId === taskIdToDelete) {
+                if (remainingTasks.length > 0) {
+                    const deletedIndex = currentTasks.findIndex(task => task.id === taskIdToDelete);
+                    selectTask(remainingTasks[Math.max(0, deletedIndex - 1)].id);
+                } else {
+                    setActiveTaskId(null);
+                    workspace.resetWorkspaceViews();
+                    workspace.setCurrentPath('');
+                }
             }
+            setTasks(remainingTasks);
+
+        } catch (error) {
+            console.error("Error deleting task:", error);
         }
-        setTasks(remainingTasks);
     };
     
     const handleApprovalAction = (feedback, plan = null) => {
@@ -488,7 +539,7 @@ export function App() {
                                 <CopyButton textToCopy={workspace.fileContent} />
                             </div>
                             <div class="flex-grow bg-background/50 rounded-md overflow-auto flex items-center justify-center">
-                                <FilePreviewer file={workspace.selectedFile} isLoading={workspace.isFileLoading} content={workspace.fileContent} rawFileUrl={`http://${window.location.hostname}:8766/api/workspace/raw?path=${workspace.currentPath}/${workspace.selectedFile.name}`} />
+                                <FilePreviewer file={workspace.selectedFile} isLoading={workspace.isFileLoading} content={workspace.fileContent} rawFileUrl={`${API_BASE_URL}/api/workspace/raw?path=${workspace.currentPath}/${workspace.selectedFile.name}`} />
                             </div>
                         </div>
                     ) : (
@@ -518,10 +569,9 @@ export function App() {
                                                 </div>
                                                 <div class="flex items-center opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                                                     <button onClick={(e) => { e.stopPropagation(); handleSendToChat(item.name); }} class="p-1 text-muted-foreground hover:text-foreground" title="Send name to chat"> <SendToChatIcon class="h-4 w-4" /> </button>
-                                                    {/* --- MODIFIED: Add the download button for files --- */}
                                                     {item.type === 'file' && (
                                                         <a
-                                                            href={`http://${window.location.hostname}:8766/api/workspace/raw?path=${workspace.currentPath}/${item.name}`}
+                                                            href={`${API_BASE_URL}/api/workspace/raw?path=${workspace.currentPath}/${item.name}`}
                                                             download={item.name}
                                                             onClick={(e) => e.stopPropagation()}
                                                             class="p-1 text-muted-foreground hover:text-foreground"

@@ -1,11 +1,11 @@
 # -----------------------------------------------------------------------------
 # Docker Compose for Mentor::i
 #
-# MODIFICATION FOR OLLAMA:
-# Added the `extra_hosts` section. This is the standard way to allow a
-# Docker container to communicate with services running on the host machine
-# (like a local Ollama server). It maps the special hostname
-# `host.docker.internal` to the host's gateway IP address.
+# MODIFICATION FOR DATA PERSISTENCE:
+# Added a new volume mapping: `./data:/app/data`. This creates a `data`
+# directory in your project folder and makes it available inside the
+# container. This is where the application's main SQLite database will be
+# stored, separating it from the agent's temporary workspace files.
 # -----------------------------------------------------------------------------
 
 services:
@@ -23,17 +23,16 @@ services:
       - "8765:8765"
       - "8766:8766"
 
-    # --- NEW: Added for Ollama connection ---
-    # This makes the host machine accessible from inside the container
-    # via the hostname 'host.docker.internal'.
+    # Makes the host machine accessible from inside the container.
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
     # Mounts local directories (volumes) into the container.
-    # This allows for live code updates and persistent storage.
     volumes:
       - ./backend:/app/backend
       - ./workspace:/app/workspace
+      # --- NEW: Add a dedicated volume for persistent application data ---
+      - ./data:/app/data
 
     # Keeps stdin open, which is useful for interactive debugging if needed.
     stdin_open: true
