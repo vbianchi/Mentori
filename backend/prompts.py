@@ -1,10 +1,19 @@
 # -----------------------------------------------------------------------------
-# Mentor::i Prompts (Phase 15 - Data Piping FIX)
+# Mentor::i Prompts (Phase 17 - "Scripting Mindset" Enhancement)
 #
-# This version updates the planner's prompt to explicitly teach it how to
-# use the `{step_N_output}` placeholder for piping data between steps. This
-# will fix the bug where a placeholder was written to a file instead of the
-# actual summary.
+# This version updates the planner's prompt to ground it in a "scripting-first"
+# methodology.
+#
+# Key Architectural Changes:
+# 1.  **Enforced Scripting:** Added a critical rule that FORCES the planner to
+#     generate self-contained scripts for complex tasks (data analysis,
+#     plotting, etc.) rather than using one-line shell commands.
+# 2.  **Dependency-First Logic:** Added a critical rule that ensures any needed
+#     `pip_install` commands are the very first steps in any generated plan.
+# 3.  **Environment Context:** The prompt now informs the planner which common
+#     libraries are already installed, preventing redundant installation steps.
+# 4.  **Improved Example:** The example in the prompt has been updated to
+#     demonstrate the new, preferred `write_file` -> `workspace_shell` pattern.
 # -----------------------------------------------------------------------------
 
 from langchain_core.prompts import PromptTemplate
@@ -165,37 +174,40 @@ You are an expert architect and planner. Your job is to create a detailed, step-
 **Available Tools:**
 {tools}
 
-**Instructions:**
-- Analyze the user's request in the context of the structured memory and recent history.
+---
+**Available Environment Libraries:**
+The following common data science and utility libraries are pre-installed in the environment and DO NOT need to be installed again: `pandas`, `numpy`, `matplotlib`, `seaborn`, `scikit-learn`, `beautifulsoup4`, `pypdf`, `python-docx`, `openpyxl`. Only use `pip_install` for libraries NOT on this list.
+---
+
+**Instructions & Rules:**
+- Analyze the user's request in the context of all available information.
 - Decompose the request into a sequence of logical steps.
 - For each step, specify: `step_id`, `instruction`, `tool_name`, and `tool_input`.
+- **CRITICAL RULE for Task Execution:** For any request that involves data generation, analysis, plotting, scientific calculation, or complex file manipulation, you MUST generate a complete, self-contained script (e.g., a `.py` file) and then execute it. Your plan must have distinct steps: 1. A `write_file` step to create the script. 2. A `workspace_shell` step to execute the script. Do not attempt to perform complex logic in a single shell command.
+- **CRITICAL RULE for Dependencies:** If you determine a script requires a library that is not on the pre-installed list above, the `pip_install` steps for those libraries MUST be the VERY FIRST steps in your plan. Group all necessary installations at the beginning.
 - **CRITICAL DATA PIPING RULE:** If a step needs to use the output from a previous step, you MUST use the special placeholder string `{{step_N_output}}` as the value in your `tool_input`, where `N` is the `step_id` of the step that produces the required output.
-- Your final output must be a single, valid JSON object containing a "plan" key.
-- Ensure the final output is a perfectly valid JSON. All strings must use double quotes. Any double quotes inside a string must be properly escaped with a backslash (e.g., "This is a \\"quoted\\" string.").
-- Do not add any conversational fluff or explanation. Your output must be ONLY the JSON object.
+- **Output Format:** Your final output must be a single, valid JSON object containing a "plan" key. Ensure all strings use double quotes and escape any internal quotes (e.g., "a \\"quoted\\" string."). Do not add any conversational fluff or explanation.
+
 ---
-**Example of Data Piping:**
-*Request:* "Search for the weather in Paris and save the result to a file named 'weather.txt'."
-*Correct Output:*
+**Example Request:** "Generate a scatter plot with 50 random data points and save it as 'plot.png'."
+**Example Correct Output:**
 ```json
 {{
   "plan": [
     {{
       "step_id": 1,
-      "instruction": "Search the web to find the current weather in Paris.",
-      "tool_name": "web_search",
+      "instruction": "Write a Python script that uses numpy and matplotlib to generate 50 random data points and create a scatter plot, saving it to 'plot.png'.",
+      "tool_name": "write_file",
       "tool_input": {{
-        "query": "weather in Paris"
+        "file": "generate_plot.py",
+        "content": "import numpy as np\\nimport matplotlib.pyplot as plt\\n\\nx = np.random.rand(50)\\ny = np.random.rand(50)\\n\\nplt.figure(figsize=(8, 6))\\nplt.scatter(x, y)\\nplt.title('Random Scatter Plot')\\nplt.xlabel('X Value')\\nplt.ylabel('Y Value')\\nplt.savefig('plot.png')\\nprint('Plot successfully generated and saved to plot.png')"
       }}
     }},
     {{
       "step_id": 2,
-      "instruction": "Write the weather information obtained from the previous step to a file named 'weather.txt'.",
-      "tool_name": "write_file",
-      "tool_input": {{
-        "file": "weather.txt",
-        "content": "{{step_1_output}}"
-      }}
+      "instruction": "Execute the Python script to generate and save the plot.",
+      "tool_name": "workspace_shell",
+      "tool_input": "python generate_plot.py"
     }}
   ]
 }}

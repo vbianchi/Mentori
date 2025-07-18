@@ -1,20 +1,20 @@
 # -----------------------------------------------------------------------------
-# Mentor::i Core Agent (Phase 17 - Correction Insertion)
+# Mentor::i Core Agent (Phase 17 - Venv Pre-Installation FIX)
 #
-# This version significantly improves the self-correction mechanism. Instead of
-# overwriting a failed step, the agent now inserts a new corrective step
-# before it, preserving the original intent of the plan.
+# This version fixes a critical flaw in the agent's environment setup.
+# Previously, new virtual environments were created empty, contradicting the
+# planner's prompt which assumed common libraries were pre-installed.
 #
 # Key Architectural Changes:
-# 1. Smarter `correction_planner_node`:
-#    - It now uses `list.insert()` to add a new corrective step at the
-#      current index rather than overwriting it.
-#    - After insertion, it iterates through the rest of the plan and
-#      updates the `step_id` of all subsequent steps to maintain sequential
-#      numbering. This is critical for the UI and for data piping.
-# 2. Preserved Intent: This change ensures that after fixing a problem (like
-#    installing a missing library), the agent will then retry the original
-#    step that failed, making the process more logical and robust.
+# 1.  **Venv Pre-warming:** The `_create_venv_if_not_exists` function has been
+#     updated. After creating a new venv with `uv venv`, it now immediately
+#     runs a `uv pip install` command to pre-install a standard set of
+#     scientific and data handling libraries (`pandas`, `numpy`, `matplotlib`,
+#     `seaborn`, `scikit-learn`, and file parsers).
+# 2.  **Guaranteed Environment:** This ensures that every new task starts with
+#     a consistent, isolated, but fully-equipped environment. This makes the
+#     agent's script execution far more reliable and aligns the actual
+#     environment with the context provided in the planner's prompt.
 # -----------------------------------------------------------------------------
 
 import os
@@ -54,6 +54,18 @@ logger = logging.getLogger(__name__)
 HISTORY_SUMMARY_THRESHOLD = 10
 HISTORY_SUMMARY_KEEP_RECENT = 4
 SANDBOXED_TOOLS = {"write_file", "read_file", "list_files", "workspace_shell", "pip_install", "query_files", "critique_document"}
+# --- NEW: Define the standard library set for pre-installation ---
+CORE_PACKAGES = [
+    "pandas",
+    "numpy",
+    "matplotlib",
+    "seaborn",
+    "scikit-learn",
+    "beautifulsoup4",
+    "pypdf",
+    "python-docx",
+    "openpyxl"
+]
 
 
 # (Memory Vault Schemas remain unchanged)
@@ -158,14 +170,53 @@ def _format_messages(messages: Sequence[BaseMessage], is_for_summary=False) -> s
     if not is_for_summary: return "\n".join(formatted_messages[:-1]) if len(formatted_messages) > 1 else "No prior conversation history."
     return "\n".join(formatted_messages)
 
+# --- MODIFIED: This function now pre-installs core packages into the new venv ---
 async def _create_venv_if_not_exists(workspace_path: str, task_id: str):
-    venv_path = os.path.join(workspace_path, ".venv");
-    if os.path.isdir(venv_path): logger.info(f"Task '{task_id}': Venv exists."); return
-    logger.info(f"Task '{task_id}': Creating venv in '{workspace_path}'")
-    process = await asyncio.create_subprocess_exec("uv", "venv", cwd=workspace_path, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
-    stdout, stderr = await process.communicate()
-    if process.returncode != 0: logger.error(f"Task '{task_id}': Failed to create venv. Error: {stderr.decode()}")
-    else: logger.info(f"Task '{task_id}': Successfully created venv.")
+    """
+    Creates a Python virtual environment using `uv` in the specified workspace
+    if it doesn't already exist. Then, it pre-installs a standard set of
+    libraries into that venv.
+    """
+    venv_path = os.path.join(workspace_path, ".venv")
+    
+    if os.path.isdir(venv_path):
+        logger.info(f"Task '{task_id}': Virtual environment already exists. Skipping creation and installation.")
+        return
+
+    # --- Step 1: Create the virtual environment ---
+    logger.info(f"Task '{task_id}': Creating virtual environment in '{workspace_path}'...")
+    create_process = await asyncio.create_subprocess_exec(
+        "uv", "venv",
+        cwd=workspace_path,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE
+    )
+    create_stdout, create_stderr = await create_process.communicate()
+
+    if create_process.returncode != 0:
+        logger.error(f"Task '{task_id}': Failed to create venv. Error: {create_stderr.decode()}")
+        # Stop here if venv creation fails
+        return
+    else:
+        logger.info(f"Task '{task_id}': Successfully created virtual environment.")
+
+    # --- Step 2: Install the core packages into the new venv ---
+    logger.info(f"Task '{task_id}': Pre-installing core packages: {', '.join(CORE_PACKAGES)}")
+    install_command = ["uv", "pip", "install"] + CORE_PACKAGES
+    
+    install_process = await asyncio.create_subprocess_exec(
+        *install_command,
+        cwd=workspace_path,  # uv automatically uses the .venv in the cwd
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE
+    )
+    install_stdout, install_stderr = await install_process.communicate()
+
+    if install_process.returncode != 0:
+        logger.error(f"Task '{task_id}': Failed to pre-install core packages. Error: {install_stderr.decode()}")
+    else:
+        logger.info(f"Task '{task_id}': Successfully pre-installed all core packages into the venv.")
+
 
 # --- Graph Nodes ---
 async def task_setup_node(state: GraphState):
@@ -304,7 +355,6 @@ def editor_node(state: GraphState):
     prompt = final_answer_prompt_template.format(input=state["input"], chat_history=chat_history_str, execution_log=execution_log_str or "No tool actions taken.", memory_vault=memory_vault_str)
     response = _invoke_llm_with_fallback(llm, prompt, state); response_content = response.content; return {"answer": response_content, "messages": [AIMessage(content=response_content)]}
 
-# --- MODIFIED: The correction planner now inserts a step instead of replacing it ---
 def correction_planner_node(state: GraphState):
     task_id = state.get("task_id"); logger.info(f"Task '{task_id}': Executing Correction_Planner."); failed_step_details = state["plan"][state["current_step_index"]]
     failure_reason = state["step_evaluation"].get("reasoning", "N/A"); history_str = "\n".join(state["history"]); llm = get_llm(state, "CHIEF_ARCHITECT_LLM_ID", "gemini::gemini-1.5-flash-latest")
@@ -313,42 +363,28 @@ def correction_planner_node(state: GraphState):
     try:
         match = re.search(r"```json\s*([\s\S]*?)\s*```", response.content, re.DOTALL); json_str = match.group(1).strip() if match else response.content.strip()
         new_step = json.loads(json_str)
-        
-        # Create a copy of the plan to modify
         new_plan = state["plan"][:]
-        # Insert the new corrective step *before* the failed step
         new_plan.insert(state["current_step_index"], new_step)
-        
-        # Re-number all steps in the plan to maintain sequential integrity
         for i, step in enumerate(new_plan):
             step["step_id"] = i + 1
-            
         logger.info(f"Task '{task_id}': Inserted new corrective step. Plan is now {len(new_plan)} steps long.")
         return {"plan": new_plan}
-
     except Exception as e:
         logger.error(f"Task '{task_id}': Error parsing or inserting correction plan: {e}");
-        # Return an empty dictionary to indicate no change to the plan
         return {}
 
 
-# --- MODIFIED: The router no longer advances the step after a correction ---
 def after_plan_step_router(state: GraphState) -> str:
     evaluation = state.get("step_evaluation", {});
     if evaluation.get("status") == "failure":
         if state["step_retries"] < state["max_retries"]:
-            # On failure, go to the correction planner. The index is NOT advanced.
             return "Correction_Planner"
         else:
             logger.warning(f"Task '{state.get('task_id')}': Max retries exceeded for step. Routing to Editor.")
             return "Editor"
-
-    # On success, check if we are at the end of the plan
     if state["current_step_index"] + 1 >= len(state.get("plan", [])):
         logger.info(f"Task '{state.get('task_id')}': Plan complete. Routing to Editor.")
         return "Editor"
-    
-    # If successful and not at the end, advance to the next step
     return "Advance_To_Next_Step"
 
 def history_management_router(state: GraphState) -> str: return "summarize_history_node" if len(state['messages']) > HISTORY_SUMMARY_THRESHOLD else "initial_router_node"
@@ -371,15 +407,11 @@ def create_agent_graph():
     workflow.add_edge("Chief_Architect", "Plan_Expander"); workflow.add_edge("Plan_Expander", "human_in_the_loop_node")
     workflow.add_conditional_edges("human_in_the_loop_node", after_plan_creation_router, {"Site_Foreman": "Site_Foreman", "Editor": "Editor"})
     workflow.add_edge("Site_Foreman", "Worker")
-    
-    # --- MODIFIED: The edge from the Correction Planner goes directly back to the Foreman ---
-    # This ensures the newly inserted step is executed immediately without advancing the index.
     workflow.add_edge("Correction_Planner", "Site_Foreman")
-    
     workflow.add_edge("Advance_To_Next_Step", "Site_Foreman")
     workflow.add_conditional_edges("Project_Supervisor", after_plan_step_router, {"Editor": "Editor", "Advance_To_Next_Step": "Advance_To_Next_Step", "Correction_Planner": "Correction_Planner"})
     workflow.add_edge("Editor", END)
     agent = workflow.compile(checkpointer=MemorySaver(), interrupt_before=["human_in_the_loop_node"])
-    logger.info("Mentor::i agent graph compiled with improved correction logic."); return agent
+    logger.info("Mentor::i agent graph compiled with venv pre-warming logic."); return agent
 
 agent_graph = create_agent_graph()
