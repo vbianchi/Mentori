@@ -1,0 +1,194 @@
+/* src/styles/variables.css */
+
+/* Import design tokens first */
+@import './tokens.css';
+
+:root {
+    /* --- Palette: Cosmic Night --- */
+
+    /* Backgrounds */
+    --bg-app: #09090b;
+    /* Deepest Void (Main background) */
+    --bg-panel: #18181b;
+    /* Panel / Card background */
+    --bg-surface: #27272a;
+    /* Inputs / Hover states */
+    --bg-glass: rgba(24, 24, 27, 0.75);
+    /* Glassmorphism overlay */
+
+    /* Borders */
+    --border-subtle: #27272a;
+    --border-active: #3f3f46;
+
+    /* Accents */
+    --accent-primary: #8b5cf6;
+    /* Electric Purple (AI / Action) */
+    --accent-secondary: #06b6d4;
+    /* Cyan (User / Info) */
+    --accent-success: #10b981;
+    /* Emerald (Success state) */
+    --accent-error: #ef4444;
+    /* Red (Error / High Token Usage) */
+    --accent-warning: #f59e0b;
+    /* Amber (Warning) */
+
+    /* Accent Hover States */
+    --accent-primary-hover: #9d6fff;
+    --accent-secondary-hover: #08c5e0;
+    --accent-error-hover: #f87171;
+
+    /* Primary Accent with Opacity Levels */
+    --accent-primary-5: rgba(139, 92, 246, 0.05);
+    --accent-primary-10: rgba(139, 92, 246, 0.1);
+    --accent-primary-15: rgba(139, 92, 246, 0.15);
+    --accent-primary-20: rgba(139, 92, 246, 0.2);
+    --accent-primary-30: rgba(139, 92, 246, 0.3);
+
+    /* Secondary Accent with Opacity Levels */
+    --accent-secondary-10: rgba(6, 182, 212, 0.1);
+    --accent-secondary-20: rgba(6, 182, 212, 0.2);
+    --accent-secondary-30: rgba(6, 182, 212, 0.3);
+
+    /* Success with Opacity Levels */
+    --accent-success-10: rgba(16, 185, 129, 0.1);
+    --accent-success-20: rgba(16, 185, 129, 0.2);
+    --accent-success-30: rgba(16, 185, 129, 0.3);
+
+    /* Error with Opacity Levels */
+    --accent-error-10: rgba(239, 68, 68, 0.1);
+    --accent-error-20: rgba(239, 68, 68, 0.2);
+    --accent-error-30: rgba(239, 68, 68, 0.3);
+
+    /* Warning with Opacity Levels */
+    --accent-warning-10: rgba(245, 158, 11, 0.1);
+    --accent-warning-20: rgba(245, 158, 11, 0.2);
+    --accent-warning-30: rgba(245, 158, 11, 0.3);
+
+    /* Text */
+    --text-main: #e4e4e7;
+    /* Zinc-200 (Primary text) */
+    --text-muted: #a1a1aa;
+    /* Zinc-400 (Secondary text) */
+    --text-dim: #71717a;
+    /* Zinc-500 (Tertiary / Placeholders) */
+    --text-inverse: #ffffff;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-glow: 0 0 20px -5px rgba(139, 92, 246, 0.15);
+    /* Purple glow */
+
+    /* Typography */
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+    /* Grid / Layout */
+    --width-sidebar: 260px;
+    --width-artifact: 450px;
+    /* Default right panel width */
+    --header-height: 56px;
+
+    /* Animation */
+    --trans-fast: 0.15s ease;
+    --trans-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Global Reset & Base Styles */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background-color: var(--bg-app);
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+    /* App interaction handles scrolling */
+}
+
+/* Utilities */
+.glass-panel {
+    background: var(--bg-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-subtle);
+}
+
+.scroll-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.scroll-thin::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scroll-thin::-webkit-scrollbar-thumb {
+    background: var(--bg-surface);
+    border-radius: 3px;
+}
+
+.scroll-thin::-webkit-scrollbar-thumb:hover {
+    background: var(--border-active);
+}
+
+:root[data-theme="light"] {
+    /* Backgrounds — clear layering: app < surface < panel (cards rise above) */
+    --bg-app: #e8e8ed;
+    --bg-panel: #f5f5f8;
+    --bg-surface: #dddde4;
+    --bg-glass: rgba(245, 245, 248, 0.92);
+
+    /* Borders — visible but not heavy */
+    --border-subtle: #c8c8d0;
+    --border-active: #a8a8b8;
+
+    /* Primary Accent */
+    --accent-primary: #7c3aed;
+    --accent-primary-hover: #6d28d9;
+    --accent-primary-5: rgba(124, 58, 237, 0.06);
+    --accent-primary-10: rgba(124, 58, 237, 0.10);
+    --accent-primary-15: rgba(124, 58, 237, 0.15);
+    --accent-primary-20: rgba(124, 58, 237, 0.20);
+    --accent-primary-30: rgba(124, 58, 237, 0.28);
+
+    /* Secondary Accent */
+    --accent-secondary: #0891b2;
+    --accent-secondary-hover: #0e7490;
+    --accent-secondary-10: rgba(8, 145, 178, 0.10);
+    --accent-secondary-20: rgba(8, 145, 178, 0.18);
+    --accent-secondary-30: rgba(8, 145, 178, 0.25);
+
+    /* Status Colors */
+    --accent-success: #059669;
+    --accent-success-hover: #047857;
+    --accent-success-10: rgba(5, 150, 105, 0.10);
+    --accent-success-20: rgba(5, 150, 105, 0.18);
+    --accent-success-30: rgba(5, 150, 105, 0.25);
+
+    --accent-error: #dc2626;
+    --accent-error-hover: #b91c1c;
+    --accent-error-10: rgba(220, 38, 38, 0.10);
+    --accent-error-20: rgba(220, 38, 38, 0.18);
+    --accent-error-30: rgba(220, 38, 38, 0.25);
+
+    --accent-warning: #d97706;
+    --accent-warning-hover: #b45309;
+    --accent-warning-10: rgba(217, 119, 6, 0.10);
+    --accent-warning-20: rgba(217, 119, 6, 0.18);
+    --accent-warning-30: rgba(217, 119, 6, 0.25);
+
+    /* Text — strong contrast for readability */
+    --text-main: #1a1a24;
+    --text-muted: #4a4a5e;
+    --text-dim: #7a7a90;
+    --text-inverse: #111118;
+
+    /* Shadows — slightly stronger for depth on light bg */
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.10);
+    --shadow-glow: 0 0 16px -4px rgba(124, 58, 237, 0.12);
+
+    color-scheme: light;
+}

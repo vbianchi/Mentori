@@ -1,0 +1,62 @@
+[project]
+name = "mentori"
+version = "2.0.0"
+description = "Mentori Backend"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "sqlalchemy",
+    "httpx",
+    "uvloop",
+    "python-multipart",
+    "mcp",
+    "sqlmodel>=0.0.31",
+    "pydantic-settings>=2.12.0",
+    "alembic>=1.18.0",
+    "passlib[bcrypt]>=1.7.4",
+    "pyjwt>=2.10.1",
+    "python-jose[cryptography]>=3.5.0",
+    "chromadb>=1.4.0",
+    "sentence-transformers>=5.2.0",
+    "pymupdf>=1.26.7",
+    "tiktoken>=0.12.0",
+    "python-magic>=0.4.27",
+    "rank-bm25>=0.2.2",
+    "pytesseract>=0.3.13",
+    "pdf2image>=1.17.0",
+    "tabula-py>=2.10.0",
+    "aiohttp>=3.13.3",
+    "aiofiles>=25.1.0",
+    "pytest-asyncio>=1.3.0",
+    "tabulate>=0.9.0",
+    "jpype1>=1.5.0",
+    "huggingface-hub>=0.36.0",
+    "peft>=0.18.1",
+    "einops>=0.8.0",
+    "accelerate>=0.27.0",
+    "numpy>=2.4.1",
+    "pandas>=2.3.3",
+    "matplotlib>=3.10.8",
+    "seaborn>=0.13.2",
+    "openai>=2.15.0",
+    "ollama",
+    "psutil>=7.2.1",
+    "spacy>=3.7.0",
+    "tenacity>=8.0.0",
+    "jupyter-client>=8.8.0",
+    "ipykernel>=7.1.0",
+    "nbformat>=5.10.4",
+    "nbconvert>=7.17.0",
+    "lifelines>=0.30.1",
+    "google-genai>=1.64.0",
+    "pypdf>=6.7.5",
+    "rouge-score>=0.1.2",
+    "python-docx>=1.2.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]

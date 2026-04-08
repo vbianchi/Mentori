@@ -1,0 +1,172 @@
+{
+  "paper_id": "29_16s_best_practices",
+  "filename": "29_16s_best_practices.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "The paper provides a comprehensive review of considerations and best practices for conducting 16S ribosomal RNA gene sequencing microbiome studies specifically within the field of animal science, aiming to bridge the gap for researchers less familiar with these techniques.",
+    "methods": [
+      "Literature review and synthesis of best practices",
+      "Categorization of experimental design considerations (sample size, pooling, location)",
+      "Review of wet lab techniques (cell lysis methods, DNA extraction, library preparation)",
+      "Overview of bioinformatics pipelines and computational approaches (OTU vs. ASV, normalization, diversity metrics)",
+      "Analysis of statistical methods for microbiome data (PERMANOVA, Kruskal-Wallis, differential abundance testing)"
+    ],
+    "findings": [
+      {
+        "finding": "Amplicon Sequence Variants (ASVs) are increasingly preferred over Operational Taxonomic Units (OTUs) because they allow for valid comparisons across independent studies and capture finer biological variation.",
+        "evidence": "ASV-based analyses distinguish sequencing errors from bona fide biological variation... enabling valid comparison of ASVs independently generated from different samples.",
+        "page": 10
+      },
+      {
+        "finding": "A raw read number target of 10,000 reads per sample is a recommended starting point for 16S rRNA gene sequencing studies in the absence of pilot data.",
+        "evidence": "In the absence of any data on your matrix, 10,000 reads per sample would be a good starting point for a raw read number target.",
+        "page": 9
+      },
+      {
+        "finding": "Mechanical lysis, such as bead beating, is essential for improving the recovery of genomic DNA from Gram-positive and endospore-forming bacteria.",
+        "evidence": "the mechanical bead beating step has been shown to improve DNA yield, increase observed bacterial diversity, and improve recovery of genomic DNA from Gram-positive and endospore-forming bacteria.",
+        "page": 7
+      },
+      {
+        "finding": "Rarefaction equalizes sample variance by subsampling but discards potentially valuable data, while scaling normalization methods like TMM or DESeq2's median of ratios are robust alternatives.",
+        "evidence": "rarefying equalizes sample variance by adding artificial uncertainty... alternative to subsampling data is to apply different types of transformation called normalizing.",
+        "page": 11
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "An overview diagram illustrating the stages of a 16S rRNA study from pre-study considerations to data availability.",
+        "page": 4
+      },
+      {
+        "id": "Figure 2",
+        "description": "A plot showing the standardized entropy across the base positions of the 16S rRNA gene, highlighting the nine hypervariable regions and common primer sets.",
+        "page": 5
+      },
+      {
+        "id": "Figure 3",
+        "description": "A flowchart classifying common mechanical and non-mechanical microbial cell lysis procedures used in research.",
+        "page": 7
+      },
+      {
+        "id": "Figure 4",
+        "description": "Visual aids illustrating concepts of sampling depth bias, the relationship between richness and evenness, and the difference between alpha and beta diversity.",
+        "page": 11
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "A glossary defining commonly used microbiome and sequencing terms for researchers.",
+        "columns": [
+          "Term",
+          "Definition"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "A summary table classifying popular alpha and beta diversity metrics based on their mathematical features.",
+        "columns": [
+          "Metric",
+          "Alpha or Beta",
+          "Richness",
+          "Evenness",
+          "Phylogenetic"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "ASV (Amplicon Sequence Variant)",
+      "OTU (Operational Taxonomic Unit)",
+      "Alpha diversity",
+      "Beta diversity",
+      "Rarefaction",
+      "Metagenome",
+      "16S rRNA gene",
+      "Hypervariable regions",
+      "Lysis",
+      "Mock Community",
+      "PERMANOVA",
+      "Great plate count anomaly"
+    ],
+    "limitations": [
+      "16S rRNA gene sequencing cannot describe metabolic potential or activity, only phylogeny.",
+      "The method cannot distinguish between dead and alive microorganisms.",
+      "Absolute microbial load (abundance) is not reflected; data only shows relative abundance.",
+      "Results are biased toward organisms with higher 16S rRNA gene copy numbers.",
+      "Choice of hypervariable region can lead to different taxonomic resolutions and biases."
+    ],
+    "connections": [
+      "Staley and Konopka (1985) - defined the 'great plate count anomaly'.",
+      "Caporaso et al. (2011) - Earth Microbiome Project standards for V4 region.",
+      "Callahan et al. (2016) - DADA2 pipeline and the push for ASVs.",
+      "McMurdie and Holmes (2014) - critique of rarefaction as a normalization method.",
+      "Bolyen et al. (2019) - QIIME2 bioinformatics pipeline.",
+      "Weiss et al. (2017) - comparison of normalization methods."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "29_16s_best_practices_FR1",
+      "paper_id": "29_16s_best_practices",
+      "question": "What is the recommended target for raw read numbers per sample when starting a 16S rRNA gene sequencing study without prior pilot data?",
+      "category": "factual_recall",
+      "expected_answer": "In the absence of pilot data for a specific matrix, the paper recommends a raw read number target of 10,000 reads per sample. This serves as a good starting point for researchers to ensure sufficient sequencing depth.",
+      "expected_concepts": [
+        "10,000 reads",
+        "raw read number",
+        "pilot data",
+        "16S rRNA gene sequencing"
+      ],
+      "difficulty": "easy",
+      "source_page": "9",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "29_16s_best_practices_CO2",
+      "paper_id": "29_16s_best_practices",
+      "question": "Why are Amplicon Sequence Variants (ASVs) considered superior to Operational Taxonomic Units (OTUs) for modern microbiome comparative analyses?",
+      "category": "conceptual",
+      "expected_answer": "ASVs are preferred because they can distinguish sequencing errors from true biological variation, allowing for finer biological resolution. Furthermore, unlike OTUs, ASVs can be independently generated and compared across different studies, making them more suitable for large-scale or meta-analysis research.",
+      "expected_concepts": [
+        "sequencing errors",
+        "biological variation",
+        "cross-study comparison",
+        "taxonomic resolution"
+      ],
+      "difficulty": "medium",
+      "source_page": "10",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "29_16s_best_practices_TE3",
+      "paper_id": "29_16s_best_practices",
+      "question": "How does the technical approach of rarefaction differ from scaling normalization methods like TMM or DESeq2 in handling sample variance?",
+      "category": "technical",
+      "expected_answer": "Rarefaction equalizes sample variance by subsampling data to a common depth, which has the drawback of discarding potentially valuable data and introducing artificial uncertainty. In contrast, scaling normalization methods like TMM or DESeq2's median of ratios use mathematical transformations to normalize data without the need to discard sequences.",
+      "expected_concepts": [
+        "rarefaction",
+        "subsampling",
+        "TMM",
+        "DESeq2",
+        "scaling normalization",
+        "artificial uncertainty"
+      ],
+      "difficulty": "hard",
+      "source_page": "11",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:26:37.356546"
+}

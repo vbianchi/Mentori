@@ -1,0 +1,153 @@
+{
+  "paper_id": "46_methylpipe",
+  "filename": "46_methylpipe.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "The paper addresses the lack of comprehensive software solutions for the integrative analysis of large-scale, heterogeneous epigenomics data, particularly the challenge of combining DNA methylation data with histone marks, transcription factor binding, and other -omics datasets.",
+    "methods": [
+      "methylPipe: An R/Bioconductor package for analyzing high- and low-resolution DNA methylomes (WGBS, RRBS, etc.).",
+      "compEpiTools: An R/Bioconductor package for integrative analysis, scoring regions of interest, and functional annotation.",
+      "Tabix indexing: Used for fast access to large compressed genomic datasets.",
+      "Binomial testing: Used to determine the confidence of methyl-cytosine (mC) calls.",
+      "Wilcoxon/Kruskal-Wallis tests: Algorithms for identifying differentially methylated regions (DMRs).",
+      "GRannotate method: For fast genomic annotation based on Bioconductor standard libraries.",
+      "Heatmap-based integration: A flexible method to combine continuous and categorical data tracks."
+    ],
+    "findings": [
+      {
+        "finding": "methylPipe can profile 100 human promoters in approximately 50 seconds using a single core and less than 1GB of RAM.",
+        "evidence": "On the performance side... with one core, it can profile 100 human promoters in a sample in about 50 s (max 1GB RAM peak usage).",
+        "page": 9
+      },
+      {
+        "finding": "Genome-wide DMR identification between two WGBS samples took 45 minutes using 10 cores.",
+        "evidence": "DMRs identification... 45 min with 10 cores for a genome-wide analysis (max 28GB RAM peak usage on a cluster).",
+        "page": 9
+      },
+      {
+        "finding": "Only methylPipe and radMeth were able to successfully complete all proposed WGBS analysis tasks with standard resources compared to other tools like BiSeq or bsseq.",
+        "evidence": "In summary, only methPipe and radMeth were able to efficiently complete the proposed tasks with standard resources.",
+        "page": 8
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "A diagram illustrating the input/output flow for the methylPipe and compEpiTools packages, showing how DNA methylation and epigenomics data are processed into various analytical outputs.",
+        "page": 3
+      },
+      {
+        "id": "Figure 2",
+        "description": "An integrative heatmap showcasing the combination of diverse data tracks (DNA methylation, histone marks, RNA-seq) across genomic regions of interest.",
+        "page": 7
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "A comprehensive feature comparison of methylPipe and compEpiTools against several other existing tools for DNA methylation and epigenomics analysis.",
+        "columns": [
+          "Feature description",
+          "BiSeq",
+          "M3D",
+          "Bsseq",
+          "DSS",
+          "methylKit",
+          "methPipe",
+          "radMeth",
+          "methylSig",
+          "WBSA",
+          "DMAP",
+          "methylPipe/compEpiTools"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "WGBS (Whole-Genome Bisulfite Sequencing)",
+      "RRBS (Reduced Representation Bisulfite Sequencing)",
+      "DMRs (Differentially Methylated Regions)",
+      "mC (Methyl-cytosine)",
+      "hmC (5-hydroxy-methylcytosine)",
+      "ROIs (Regions of Interest)",
+      "RNAPII stalling index",
+      "lncRNAs (Long non-coding RNAs)",
+      "GeneOntology (GO)"
+    ],
+    "limitations": [
+      "The binomial test for mC confidence may be less direct if contaminants or sub-populations are present in the sample.",
+      "Dynamic sliding window approaches for DMR identification might exclude regions with negligible variation.",
+      "Comparison with certain tools (like WBSA or DMAP) was limited by server upload constraints or lack of specific version details."
+    ],
+    "connections": [
+      "Bioconductor project",
+      "Bismark aligner (Krueger and Andrews)",
+      "Tabix indexing (Li)",
+      "fastcluster R package (M\u00fcllner)",
+      "Lister et al. (2009) methodology for mC calling",
+      "Rahl et al. (2010) logic for RNAPII stalling index"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "46_methylpipe_FR1",
+      "paper_id": "46_methylpipe",
+      "question": "According to the performance metrics, how many human promoters can methylPipe profile in approximately 50 seconds using a single core?",
+      "category": "factual_recall",
+      "expected_answer": "In a performance test using a single core and less than 1GB of RAM peak usage, methylPipe is able to profile 100 human promoters in a sample in approximately 50 seconds.",
+      "expected_concepts": [
+        "100 human promoters",
+        "50 seconds",
+        "single core",
+        "1GB RAM"
+      ],
+      "difficulty": "easy",
+      "source_page": "9",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "46_methylpipe_CO2",
+      "paper_id": "46_methylpipe",
+      "question": "Based on the comparative analysis against other software tools, what distinguishes methylPipe and radMeth from packages such as BiSeq or bsseq for WGBS tasks?",
+      "category": "conceptual",
+      "expected_answer": "MethylPipe and radMeth are distinguished by their efficiency and scalability; they were the only tools evaluated that successfully completed all proposed Whole Genome Bisulfite Sequencing (WGBS) analysis tasks using standard computational resources. In contrast, other tools like BiSeq, M3D, and bsseq failed to complete all tasks under the same standard resource constraints.",
+      "expected_concepts": [
+        "WGBS analysis tasks",
+        "standard resources",
+        "efficiency",
+        "radMeth",
+        "scalability"
+      ],
+      "difficulty": "medium",
+      "source_page": "8",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "46_methylpipe_TE3",
+      "paper_id": "46_methylpipe",
+      "question": "What statistical algorithms does the system use for identifying Differentially Methylated Regions (DMRs), and what are the resource requirements for genome-wide identification?",
+      "category": "technical",
+      "expected_answer": "The system utilizes Wilcoxon and Kruskal-Wallis tests for the identification of Differentially Methylated Regions (DMRs). For a full genome-wide analysis between two WGBS samples, this process requires approximately 45 minutes of computation time using 10 cores and reaches a peak memory usage of 28GB RAM.",
+      "expected_concepts": [
+        "Wilcoxon test",
+        "Kruskal-Wallis test",
+        "45 minutes",
+        "10 cores",
+        "28GB RAM"
+      ],
+      "difficulty": "hard",
+      "source_page": "9",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:35:59.290953"
+}

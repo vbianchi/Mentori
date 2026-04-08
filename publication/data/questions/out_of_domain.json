@@ -1,0 +1,502 @@
+{
+  "version": "v4",
+  "category": "out_of_domain",
+  "total": 50,
+  "by_type": {
+    "general_knowledge": 20,
+    "excluded_topic": 20,
+    "contradictory": 10
+  },
+  "questions": [
+    {
+      "id": "OOD_001",
+      "question": "What is the chemical formula for water?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_002",
+      "question": "Who wrote the novel 'One Hundred Years of Solitude'?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_003",
+      "question": "What is the speed of light in a vacuum?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_004",
+      "question": "In what year did the Berlin Wall fall?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_005",
+      "question": "What is the largest planet in our solar system?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_006",
+      "question": "What is the Pythagorean theorem?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_007",
+      "question": "What is the boiling point of ethanol at standard atmospheric pressure?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_008",
+      "question": "Who proposed the theory of general relativity?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_009",
+      "question": "What are the main causes of the French Revolution?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_010",
+      "question": "What programming language was originally developed by Guido van Rossum?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_011",
+      "question": "How many chromosomes do humans have?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_012",
+      "question": "What is the capital of Japan?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_013",
+      "question": "What is the primary function of mitochondria in eukaryotic cells?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_014",
+      "question": "What are Newton's three laws of motion?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_015",
+      "question": "What is the molecular weight of glucose?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_016",
+      "question": "Who painted the ceiling of the Sistine Chapel?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_017",
+      "question": "What is the half-life of carbon-14?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_018",
+      "question": "What is the difference between TCP and UDP protocols?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_019",
+      "question": "What are the noble gases in the periodic table?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_020",
+      "question": "What is the distance from the Earth to the Moon?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_021",
+      "question": "What spectral classification system is used to categorize main-sequence stars, and how does surface temperature relate to stellar luminosity on the Hertzsprung-Russell diagram?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "astrophysics",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_022",
+      "question": "How does the subduction of oceanic plates at convergent boundaries lead to the formation of volcanic arcs and deep-sea trenches?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "geology",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_023",
+      "question": "What is the role of the Higgs boson in the Standard Model of particle physics, and how was it experimentally confirmed at the Large Hadron Collider?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "particle_physics",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_024",
+      "question": "What are the key differences between Keynesian and monetarist approaches to managing economic recessions?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "economics",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_025",
+      "question": "How do superconducting materials achieve zero electrical resistance, and what is the BCS theory of superconductivity?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "materials_science",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_026",
+      "question": "What is the Riemann hypothesis, and why is it considered one of the most important unsolved problems in pure mathematics?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "pure_mathematics",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_027",
+      "question": "How does the Coriolis effect influence large-scale atmospheric circulation patterns and the formation of cyclones?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "atmospheric_science",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_028",
+      "question": "What are the main principles of Chomsky's theory of Universal Grammar, and how has it influenced modern computational linguistics?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "linguistics",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_029",
+      "question": "What archaeological evidence supports the theory that ancient Polynesians navigated the Pacific Ocean using celestial observations and ocean swells?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "archaeology",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_030",
+      "question": "How do semiconductor doping processes create p-type and n-type materials for use in transistor fabrication?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "materials_science",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_031",
+      "question": "What are the psychological mechanisms behind confirmation bias, and how do they affect decision-making in clinical settings?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "psychology",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_032",
+      "question": "How does the carbon cycle operate in deep-sea hydrothermal vent ecosystems, and what chemosynthetic organisms dominate these environments?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "deep_sea_ecology",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_033",
+      "question": "What are the legal principles governing the doctrine of stare decisis in common law jurisdictions?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "legal_studies",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_034",
+      "question": "How does crop rotation with leguminous plants improve soil nitrogen content through biological nitrogen fixation?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "agricultural_engineering",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_035",
+      "question": "What role does the photoperiod play in regulating flowering time in Arabidopsis thaliana, and which genes are involved?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "plant_biology",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_036",
+      "question": "How do tidal forces from the Moon cause ocean tides, and what determines the difference between spring and neap tides?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "oceanography",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_037",
+      "question": "What are the primary differences between Gothic and Romanesque architectural styles in medieval European cathedrals?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "art_history",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_038",
+      "question": "What is the mechanism of action of perovskite solar cells, and how does their efficiency compare to traditional silicon photovoltaics?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "materials_science",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_039",
+      "question": "How does the Monte Carlo tree search algorithm work in game-playing AI systems like AlphaGo?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "artificial_intelligence",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_040",
+      "question": "What are the harmonic principles underlying the Circle of Fifths in Western music theory?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "music_theory",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_041",
+      "question": "According to the Sarek paper, the pipeline only supports Illumina short-read sequencing data and cannot process any other data types. Is this correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "01_sarek.pdf",
+      "contradiction": "Sarek supports multiple data types including WGS, WES, and targeted sequencing, not only Illumina short reads.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim based on information in the Sarek paper, which describes support for WGS, WES, and targeted panels.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_042",
+      "question": "The fastp paper states that fastp requires separate tools for adapter trimming and quality filtering, processing data in multiple sequential passes. Is this accurate?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "04_fastp.pdf",
+      "contradiction": "fastp performs adapter trimming, quality filtering, and QC in a single scan, which is its key innovation.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting that fastp's key feature is all-in-one single-scan processing.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_043",
+      "question": "According to the DESeq2 paper, the method uses raw read counts without any normalization or variance stabilization. Is this true?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "08_deseq2.pdf",
+      "contradiction": "DESeq2 uses size factor normalization and Empirical Bayes shrinkage for dispersion and fold change estimates.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting DESeq2's normalization and shrinkage methods.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_044",
+      "question": "The Snakemake paper describes a system that uses a simple first-come-first-served job queue without any optimization of task scheduling. Is this correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "02_snakemake.pdf",
+      "contradiction": "Snakemake uses Mixed Integer Linear Programming (MILP) for optimized job scheduling.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting Snakemake's MILP-based scheduler.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_045",
+      "question": "The nf-core framework paper reports that switching from BAM to CRAM format increased storage requirements by 65%. Is this finding correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "03_nfcore_framework.pdf",
+      "contradiction": "The nf-core framework paper shows CRAM reduced storage by 65%, not increased it.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting that CRAM reduced (not increased) storage by 65%.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_046",
+      "question": "According to the Salmon paper, transcript quantification is performed using traditional full alignment of reads to the reference genome. Is this accurate?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "07_salmon.pdf",
+      "contradiction": "Salmon uses lightweight quasi-mapping, not traditional full alignment, for ultra-fast transcript quantification.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting Salmon's quasi-mapping approach.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_047",
+      "question": "The LSD Nepal paper reports that pregnant cows had a significantly lower risk of LSD infection compared to non-pregnant cattle. Is this correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "13_lsd_nepal.pdf",
+      "contradiction": "The Nepal paper identifies pregnant cows as having higher risk, not lower risk.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting that pregnancy was identified as a risk factor.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_048",
+      "question": "The HPAI Netherlands paper found that clinical signs of avian influenza are identical across all poultry species, with no species-dependent differences. Is this true?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "12_hpai_netherlands.pdf",
+      "contradiction": "The paper found clinical signs were highly species-dependent: ducks showed mainly nervous/locomotor signs while chickens showed mucosal/skin signs.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting the species-dependent clinical sign differences.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_049",
+      "question": "According to the MultiQC paper, the tool can only process output from a single bioinformatics tool at a time and does not support aggregation across tools. Is this correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "05_multiqc.pdf",
+      "contradiction": "MultiQC aggregates output from 22+ bioinformatics tools into a single report.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting MultiQC's multi-tool aggregation capability.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_050",
+      "question": "The rabies Tanzania paper concludes that vaccination campaigns in the Serengeti achieved uniform coverage across all areas, completely eliminating spatial heterogeneity. Is this accurate?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "15_rabies_tanzania.pdf",
+      "contradiction": "The paper identifies spatial heterogeneity in vaccination coverage as a primary driver of rabies persistence.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting that spatial heterogeneity was the main problem identified.",
+      "answerable": false
+    }
+  ]
+}

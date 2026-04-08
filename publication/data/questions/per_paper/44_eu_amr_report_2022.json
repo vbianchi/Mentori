@@ -1,0 +1,105 @@
+{
+  "paper_id": "44_eu_amr_report_2022",
+  "filename": "44_eu_amr_report_2022.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "Summarizes AMR resistance data in zoonotic and indicator bacteria from humans, animals, and food across EU Member States in 2021-2022.",
+    "methods": [
+      "Harmonised AMR monitoring across 27 EU Member States + non-MSs",
+      "Epidemiological cut-off (ECOFF) values for microbiological resistance",
+      "Whole genome sequencing (WGS) as alternative to phenotypic testing",
+      "Sampling of imported fresh meat at border control posts",
+      "Combined analysis by EFSA and ECDC"
+    ],
+    "findings": [
+      {
+        "finding": "High resistance to ampicillin, sulfonamides and tetracyclines in human Salmonella cases; low resistance to 3rd-gen cephalosporins",
+        "evidence": "Summary section",
+        "page": 5
+      },
+      {
+        "finding": "Salmonella Kentucky showed 72.7% ciprofloxacin resistance in human cases",
+        "evidence": "Summary section",
+        "page": 5
+      },
+      {
+        "finding": "Fluoroquinolones can no longer be recommended for Campylobacter treatment due to high resistance",
+        "evidence": "Summary section",
+        "page": 5
+      }
+    ],
+    "figures": [],
+    "tables": [],
+    "technical_terms": [
+      "ECOFF (Epidemiological cut-off values)",
+      "ESBL (Extended-Spectrum Beta-Lactamases)",
+      "WGS (Whole Genome Sequencing)",
+      "MDR (Multidrug Resistance)",
+      "MRSA (Methicillin-Resistant Staphylococcus aureus)"
+    ],
+    "limitations": [
+      "Text extraction based analysis limited to pages 5-30 due to large PDF size (195 pages)"
+    ],
+    "connections": []
+  },
+  "draft_questions": [
+    {
+      "q_id": "44_eu_amr_report_2022_FR1",
+      "paper_id": "44_eu_amr_report_2022",
+      "question": "According to the 2022 data for human Salmonella cases, what was the specific resistance percentage observed for S. Kentucky against ciprofloxacin?",
+      "category": "factual_recall",
+      "expected_answer": "An extremely high proportion of 72.7% resistance was noted in S. Kentucky isolates from human cases in 2022.",
+      "expected_concepts": [
+        "72.7%",
+        "S. Kentucky",
+        "ciprofloxacin resistance"
+      ],
+      "difficulty": "easy",
+      "source_page": "5",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "44_eu_amr_report_2022_CO2",
+      "paper_id": "44_eu_amr_report_2022",
+      "question": "Based on the reported resistance levels in 2021-2022, what is the clinical implication regarding the use of fluoroquinolones for treating human Campylobacter infections?",
+      "category": "conceptual",
+      "expected_answer": "Fluoroquinolones can no longer be recommended for the treatment of Campylobacter infections in humans because C. jejuni and C. coli from both human and animal origins showed high to extremely high levels of resistance to these antimicrobials.",
+      "expected_concepts": [
+        "no longer recommended for treatment",
+        "high to extremely high resistance",
+        "human and animal origins"
+      ],
+      "difficulty": "medium",
+      "source_page": "5",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "44_eu_amr_report_2022_TE3",
+      "paper_id": "44_eu_amr_report_2022",
+      "question": "From 2021 onwards, what method was authorized as an alternative to the supplementary (panel 2) phenotypic testing for Salmonella and indicator E. coli isolates showing resistance to extended-spectrum cephalosporins and/or carbapenems?",
+      "category": "technical",
+      "expected_answer": "Whole genome sequencing (WGS) was authorized as an alternative method to supplementary phenotypic testing for these resistant isolates.",
+      "expected_concepts": [
+        "whole genome sequencing",
+        "WGS",
+        "phenotypic testing alternative",
+        "extended-spectrum cephalosporins",
+        "carbapenems"
+      ],
+      "difficulty": "hard",
+      "source_page": "5",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T19:00:43.344603"
+}

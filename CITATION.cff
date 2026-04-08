@@ -1,0 +1,48 @@
+cff-version: 1.2.0
+message: "If you use Mentori or the evaluation methodology in your own work, please cite both the paper and this software."
+type: software
+title: "Mentori: a locally-hosted agentic AI workspace for scientists"
+abstract: >-
+  Mentori is a multi-agent AI workspace that combines a chat interface,
+  retrieval-augmented document analysis, and a Jupyter-based code execution
+  sandbox. This repository accompanies the paper "Systematic Ablation Reveals
+  Hidden Failures in Multi-Agent AI for Science" (Bianchi & Schokker,
+  Nature Machine Intelligence 2026), which introduces a triple-triangulation
+  evaluation methodology for retrieval-augmented multi-agent systems and
+  applies it to over 36,000 individual evaluations spanning 200 scientific
+  papers and 250 expert-curated questions.
+authors:
+  - family-names: "Bianchi"
+    given-names: "Valerio"
+    affiliation: "Wageningen Bioveterinary Research, Wageningen University & Research"
+  - family-names: "Schokker"
+    given-names: "Dirkjan"
+    affiliation: "Wageningen Bioveterinary Research, Wageningen University & Research"
+version: "1.0.0"
+date-released: "2026-04-09"
+license: MIT
+repository-code: "https://github.com/vbianchi/Mentori"
+url: "https://github.com/vbianchi/Mentori"
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.19476756
+    description: "Data and code archive on Zenodo"
+keywords:
+  - retrieval-augmented generation
+  - multi-agent AI
+  - RAG evaluation
+  - LLM-as-judge
+  - scientific AI
+  - benchmark
+  - ablation
+  - bioinformatics
+preferred-citation:
+  type: article
+  title: "Systematic Ablation Reveals Hidden Failures in Multi-Agent AI for Science"
+  authors:
+    - family-names: "Bianchi"
+      given-names: "Valerio"
+    - family-names: "Schokker"
+      given-names: "Dirkjan"
+  journal: "Nature Machine Intelligence"
+  year: 2026

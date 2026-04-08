@@ -1,0 +1,171 @@
+{
+  "paper_id": "18_fmd_review",
+  "filename": "18_fmd_review.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "This review paper summarizes the current understanding and critical knowledge gaps in the pathogenesis of foot-and-mouth disease virus (FMDV), specifically focusing on how the interaction between the pathogen and various host species (cattle, pigs, sheep, and buffalo) affects transmission, maintenance, and control of the disease.",
+    "methods": [
+      "Literature review and synthesis of a decade of research",
+      "Gap-analysis workshop methodology (organized by the Global Foot-and-Mouth Disease Research Alliance - GFRA)",
+      "Comparison of in-vitro (cell culture) and in-vivo (animal) models",
+      "Synthesis of transcriptomic and genomic data regarding host-virus interactions",
+      "Review of mathematical and Bayesian modeling for transmission dynamics"
+    ],
+    "findings": [
+      {
+        "finding": "Primary sites of FMDV infection vary by species: the nasopharynx in ruminants and the oropharynx in pigs.",
+        "evidence": "Cattle are highly susceptible to aerogenous spread (nasopharyngeal mucosa), while pigs require higher infectious doses and typically oral exposure (oropharyngeal tonsils).",
+        "page": 5
+      },
+      {
+        "finding": "Preclinical transmission is significant and quantifiable.",
+        "evidence": "The proportion of preclinical transmission (theta) is estimated at 0.12 (12%) for pigs and ranges up to 0.44 for cattle when using proxy measures of viral presence.",
+        "page": 11
+      },
+      {
+        "finding": "The 'FMDV carrier state' threshold of 28 days lacks specific biological relevance.",
+        "evidence": "Historical definitions were limited to 4-week study durations; recent work shows the transition to persistence occurs between 7-21 days post-infection.",
+        "page": 8
+      },
+      {
+        "finding": "Pigs do not develop a persistent 'carrier' state, unlike ruminants.",
+        "evidence": "Pigs efficiently clear FMDV from all tissues following recovery from the clinical phase.",
+        "page": 5
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "An overview of the FMDV life cycle, detailing stages from cell surface receptor binding to viral exit via cell lysis or non-lytic mechanisms.",
+        "page": 3
+      },
+      {
+        "id": "Figure 2",
+        "description": "A schematic illustration of FMDV progression and disease outcomes (clinical, neoteric, recovered, or carrier states) in cattle, sheep, and pigs.",
+        "page": 5
+      },
+      {
+        "id": "Figure 3",
+        "description": "Visual documentation of early-stage FMD lesions, such as epithelial blanching and subtle vesiculation, across different host species.",
+        "page": 6
+      },
+      {
+        "id": "Figure 4",
+        "description": "Photographs of advanced FMD lesions on the feet of infected cattle, pigs, and sheep, showing thickened epithelium and ruptures.",
+        "page": 7
+      },
+      {
+        "id": "Figure 5",
+        "description": "Comparison of a porcine heart with FMDV-associated myocarditis (pale areas of pallor) versus a normal heart, debunking the 'tiger heart' misnomer.",
+        "page": 10
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Summarizes FMDV-host interactions and immune evasion strategies categorizing innate response, viral evasion, species differences, and persistence.",
+        "columns": [
+          "Type",
+          "Key findings",
+          "Mechanisms/Proteins involved",
+          "References"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "Comprehensive list of identified FMDV pathogenesis knowledge gaps across basic pathogenesis, subclinical infection, and wildlife transmission.",
+        "columns": [
+          "Category (Basic pathogenesis, Subclinical neoteric and persistent FMDV infection, Wildlife and transmission)"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "Pathogenesis",
+      "Neoteric subclinical infection",
+      "FMDV carrier state",
+      "Probang sampling",
+      "Oropharyngeal fluid (OPF)",
+      "Viremia",
+      "Host shut-off",
+      "Integrins (\u03b1V\u03b21, \u03b1V\u03b23, \u03b1V\u03b26, \u03b1V\u03b28)",
+      "PCP-FMD (Progressive Control Pathway)"
+    ],
+    "limitations": [
+      "Most detailed experimental studies are based on a narrow range of host breeds and age groups, which may not reflect field dynamics.",
+      "The host factors that drive the divergence between FMDV carriers and non-carriers remain unsatisfactorily explained.",
+      "Transmission from long-term asymptomatic carriers has never been documented experimentally despite historical circumstantial evidence.",
+      "Ex-vivo (in-vitro) systems cannot fully simulate complex biological processes like the host adaptive immune system."
+    ],
+    "connections": [
+      "GFRA (Global Foot-and-Mouth Disease Research Alliance) gap-analysis workshops.",
+      "FAO/EuFMD Progressive Control Pathway (PCP-FMD).",
+      "Bayesian modeling frameworks by Charleston et al. and Arzt et al. for transmission parameters.",
+      "Transcriptomic studies using RNA-seq and laser capture microdissection (LCM) to analyze infected tissues."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "18_fmd_review_FR1",
+      "paper_id": "18_fmd_review",
+      "question": "According to the paper, what are the primary sites of FMDV infection in ruminants and pigs?",
+      "category": "factual_recall",
+      "expected_answer": "The primary site of FMDV infection in ruminants is the nasopharynx (specifically the nasopharyngeal mucosa). In pigs, the primary infection site is the oropharynx, typically involving the oropharyngeal tonsils.",
+      "expected_concepts": [
+        "nasopharynx",
+        "oropharynx",
+        "ruminants",
+        "pigs",
+        "primary site of infection"
+      ],
+      "difficulty": "easy",
+      "source_page": "5",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "18_fmd_review_CO2",
+      "paper_id": "18_fmd_review",
+      "question": "How does the FMDV 'carrier state' differ between pigs and ruminants, and what biological evidence challenges the historical 28-day threshold for this state?",
+      "category": "conceptual",
+      "expected_answer": "Pigs do not develop a persistent carrier state and efficiently clear FMDV from all tissues following recovery, whereas ruminants can maintain the virus long-term. The historical 28-day threshold for defining this state is considered biologically arbitrary because it was based on fixed study durations; current research shows the biological transition to a persistent state actually occurs between 7-21 days post-infection.",
+      "expected_concepts": [
+        "carrier state",
+        "persistence",
+        "28-day threshold",
+        "ruminants",
+        "viral clearance",
+        "7-21 days"
+      ],
+      "difficulty": "hard",
+      "source_page": "5, 8",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "18_fmd_review_TE3",
+      "paper_id": "18_fmd_review",
+      "question": "What are the specific quantitative estimates for preclinical transmission (theta) in pigs and cattle as identified in the research synthesis?",
+      "category": "technical",
+      "expected_answer": "The proportion of preclinical transmission, represented as theta, is estimated at 0.12 (12%) for pigs. In cattle, this value is significantly higher, ranging up to 0.44 (44%) when using proxy measures of viral presence.",
+      "expected_concepts": [
+        "preclinical transmission",
+        "theta",
+        "0.12",
+        "0.44",
+        "proxy measures"
+      ],
+      "difficulty": "medium",
+      "source_page": "11",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:20:09.712079"
+}

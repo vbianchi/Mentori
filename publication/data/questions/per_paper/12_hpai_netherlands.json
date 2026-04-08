@@ -1,0 +1,232 @@
+{
+  "paper_id": "12_hpai_netherlands",
+  "filename": "12_hpai_netherlands.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "The paper compares the clinical manifestations and mortality of highly pathogenic avian influenza (HPAI) H5Nx outbreaks among different poultry types (laying-type chickens, meat-type chickens, and ducks) and age groups (juvenile vs. adult) in the Netherlands between 2014 and 2022 to improve early warning criteria.",
+    "methods": [
+      "Data collection from 92 HPAI-infected Dutch commercial farms (2014\u20132022) using NVWA and Royal GD visit reports, production charts, and interviews.",
+      "Categorization of poultry by genetic background: Galliformes layer-type, Galliformes meat-type, and Anseriformes (ducks).",
+      "Categorization by age: Juvenile (e.g., broilers, laying pullets, meat ducks) vs. Adult (e.g., layers, breeders).",
+      "Systematic assessment of clinical signs using a standardized checkbox list covering six organ systems (general, respiratory, nervous/locomotor, mucosal/skin, gastrointestinal, reproductive).",
+      "Calculation of Mortality Ratio (MR) comparing mortality on the day before notification to the average of the previous week.",
+      "Statistical analysis using Fisher\u2019s exact tests (p < 0.05) to find associations between poultry types, ages, and clinical manifestations.",
+      "Temporal analysis comparing two periods: 2014\u20132018 (H5N8/H5N6) vs. 2020\u20132022 (H5N8/H5N1)."
+    ],
+    "findings": [
+      {
+        "finding": "Outbreak distribution shifted significantly over time, with meat-type poultry cases increasing from 6.3% (2014\u20132018) to 39.5% (2020\u20132022).",
+        "evidence": "Table 4",
+        "page": 6
+      },
+      {
+        "finding": "Clinical signs varied by species: Ducks showed higher rates of nervous/locomotor signs (66.7%) and reproductive tract signs (100%), while chickens showed more mucosal/skin signs (55.0%\u201367.8%).",
+        "evidence": "Table 5",
+        "page": 7
+      },
+      {
+        "finding": "Juveniles (chickens and ducks) exhibited neurological and locomotor signs significantly more often than adults (p < 0.001).",
+        "evidence": "Section 3.2.2",
+        "page": 7
+      },
+      {
+        "finding": "A Mortality Ratio (MR) > 3 on the day before notification was more common in chickens (80\u201382.6%) than in ducks (53.8%).",
+        "evidence": "Table 6",
+        "page": 9
+      },
+      {
+        "finding": "Mortality typically increased exponentially within the four days prior to notification for most chicken and duck flocks.",
+        "evidence": "Figure 2 and Figure 3",
+        "page": 8
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "Bar chart comparing the frequency of clinical signs by organ system across four groups: adult ducks, juvenile ducks, adult chickens, and juvenile chickens.",
+        "page": 8
+      },
+      {
+        "id": "Figure 2",
+        "description": "Log10 scale plot of daily mortality percentages for layer-type poultry, meat-type poultry, and ducks during the 26 days prior to notification.",
+        "page": 9
+      },
+      {
+        "id": "Figure 3",
+        "description": "Log10 scale plot of daily mortality percentages categorized by age group (juvenile vs. adult for both chickens and ducks) prior to notification.",
+        "page": 10
+      },
+      {
+        "id": "Figure 4",
+        "description": "Stacked bar chart showing the proportion of farms with increased, normal, or unknown mortality ratios (MR) one day before notification by poultry group.",
+        "page": 11
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Provides the raw counts of infected farms per season and poultry subtype.",
+        "columns": [
+          "Season",
+          "Virus",
+          "Layer Rearing",
+          "Layer",
+          "Broiler",
+          "Broiler Breeder",
+          "Broiler Grandparent",
+          "Turkey",
+          "Meat Duck",
+          "Duck Breeder",
+          "Total"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "Summarizes the availability of various data sources used in the study.",
+        "columns": [
+          "Data Source",
+          "Number of Farms",
+          "Total"
+        ]
+      },
+      {
+        "id": "Table 3",
+        "description": "Details how specific poultry subtypes were aggregated into larger categories for statistical analysis.",
+        "columns": [
+          "Poultry",
+          "Farms (n)",
+          "Order",
+          "Genus",
+          "Poultry Type",
+          "Age"
+        ]
+      },
+      {
+        "id": "Table 4",
+        "description": "Compares the distribution of infected farms by type and age between the two main study periods.",
+        "columns": [
+          "Season",
+          "2014-2018 (n, %)",
+          "2020-2022 (n, %)"
+        ]
+      },
+      {
+        "id": "Table 5",
+        "description": "Statistical summary of clinical signs observed on farms, grouped by production type.",
+        "columns": [
+          "Clinical Signs",
+          "Layer-Type (n, Total, %)",
+          "Meat-Type (n, Total, %)",
+          "Ducks (n, Total, %)",
+          "Total"
+        ]
+      },
+      {
+        "id": "Table 6",
+        "description": "Displays the number and percentage of farms that reached the 'early warning' threshold of MR > 3.",
+        "columns": [
+          "Mortality Ratio > 3",
+          "n (MR > 3)",
+          "n (Total)",
+          "%"
+        ]
+      },
+      {
+        "id": "Table 7",
+        "description": "Compares clinical sign frequencies on layer farms between the 2014\u20132018 and 2020\u20132022 periods.",
+        "columns": [
+          "Clinical Signs",
+          "2014\u20132018 (n, %)",
+          "2020\u20132022 (n, %)"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "HPAI (Highly Pathogenic Avian Influenza)",
+      "Clade 2.3.4.4",
+      "Mortality Ratio (MR)",
+      "Galliformes",
+      "Anseriformes",
+      "IVPI (Intravenous Pathogenicity Index)",
+      "Passive surveillance",
+      "Early warning criteria"
+    ],
+    "limitations": [
+      "Small sample sizes for certain subgroups, such as adult ducks (n=5) and turkey farms (n=6).",
+      "Reliance on passive surveillance, which depends on farmer/veterinarian recognition of signs to trigger notification.",
+      "Unavailability of reliable farm production charts for 36 out of 92 farms, limiting mortality ratio calculations.",
+      "Intertwining of virus strains, housing systems, and management practices, which makes it difficult to isolate host vs. virus factors."
+    ],
+    "connections": [
+      "Builds on the mortality ratio (MR) calculation method established by Gonzales and Elbers (2018).",
+      "Utilizes clinical sign categorization and epidemiological framework from Schreuder et al. (2021).",
+      "Integrates data with European-wide trends reported by the European Food Safety Authority (EFSA).",
+      "References IVPI and susceptibility studies by Vreman et al. (2022) and Beerens et al. (2021)."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "12_hpai_netherlands_FR1",
+      "paper_id": "12_hpai_netherlands",
+      "question": "What was the specific percentage increase in the distribution of HPAI outbreaks in meat-type poultry when comparing the 2014\u20132018 period to the 2020\u20132022 period?",
+      "category": "factual_recall",
+      "expected_answer": "The distribution of HPAI outbreaks in meat-type poultry increased from 6.3% in the 2014\u20132018 period to 39.5% in the 2020\u20132022 period.",
+      "expected_concepts": [
+        "meat-type poultry",
+        "6.3%",
+        "39.5%",
+        "2014\u20132018",
+        "2020\u20132022"
+      ],
+      "difficulty": "easy",
+      "source_page": "6",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "12_hpai_netherlands_CO2",
+      "paper_id": "12_hpai_netherlands",
+      "question": "How do the clinical presentations and mortality detection thresholds of HPAI differ between chicken populations (Galliformes) and duck populations (Anseriformes) according to the study?",
+      "category": "conceptual",
+      "expected_answer": "Ducks are more likely to exhibit nervous/locomotor (66.7%) and reproductive signs (100%), whereas chickens primarily show mucosal/skin signs (55.0\u201367.8%). Additionally, chickens are more easily detected via mortality monitoring, with over 80% reaching a Mortality Ratio (MR) > 3 before notification, compared to only 53.8% of duck flocks.",
+      "expected_concepts": [
+        "nervous/locomotor signs",
+        "reproductive tract signs",
+        "mucosal/skin signs",
+        "Mortality Ratio (MR)",
+        "Galliformes",
+        "Anseriformes"
+      ],
+      "difficulty": "hard",
+      "source_page": "7, 9",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "12_hpai_netherlands_TE3",
+      "paper_id": "12_hpai_netherlands",
+      "question": "How did the researchers define and calculate the Mortality Ratio (MR) metric used to assess early warning signals on the infected farms?",
+      "category": "technical",
+      "expected_answer": "The Mortality Ratio (MR) was calculated by comparing the mortality recorded on the day before notification to the average mortality recorded during the previous week. A threshold of MR > 3 was specifically used to identify farms that reached an early warning level of increased mortality.",
+      "expected_concepts": [
+        "day-before-notification mortality",
+        "average of the previous week",
+        "Mortality Ratio",
+        "MR > 3",
+        "early warning threshold"
+      ],
+      "difficulty": "medium",
+      "source_page": "Methods, 9",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T13:35:04.100136"
+}

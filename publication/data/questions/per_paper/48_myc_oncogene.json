@@ -1,0 +1,147 @@
+{
+  "paper_id": "48_myc_oncogene",
+  "filename": "48_myc_oncogene.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "The paper addresses the unknown gene expression programs that depend upon sustained MYC activity for tumor maintenance in oncogene-addicted liver tumors, specifically distinguishing between direct (primary) and indirect (secondary) transcriptional targets.",
+    "methods": [
+      "Reversible tet-MYC transgene mouse model (wild-type and V394D mutant)",
+      "RNA-sequencing (RNA-seq) for expression profiling",
+      "Chromatin Immunoprecipitation sequencing (ChIP-seq) for MYC, RNA Pol II, H3K4me3, and H3K27ac",
+      "Doxycycline-mediated oncogene shutdown (16-hour short-term inactivation)",
+      "Immunohistochemistry (IHC)",
+      "Flow cytometry (FACS) and BrdUrd staining",
+      "In vitro sphere-forming and cellular transformation assays"
+    ],
+    "findings": [
+      {
+        "finding": "MYC is required for the continuous activation and repression of a distinct subset of genes, constituting no more than half of all genes deregulated during tumor progression.",
+        "evidence": "RNA-seq following 16-hour MYC inactivation revealed approximately 1,200\u20131,400 primary MYC-induced and repressed genes.",
+        "page": 1
+      },
+      {
+        "finding": "The interaction between MYC and the corepressor MIZ1 is essential for liver tumor initiation and the repression of specific target genes.",
+        "evidence": "Mice harboring the MYC-V394D mutant (unable to bind MIZ1) showed impaired cellular transformation and significantly delayed tumorigenesis compared to WT.",
+        "page": 3
+      },
+      {
+        "finding": "Genomic MYC-binding profiles alone are not predictive of whether a gene will be up- or downregulated by MYC activity.",
+        "evidence": "ChIP-seq showed that overexpressed MYC associates widely with already active promoters, but binding intensities did not distinguish primary from secondary MYC-responsive genes.",
+        "page": 7
+      },
+      {
+        "finding": "MYC influences gene expression primarily at the level of RNA Polymerase II (RNAPII) loading at both activated and repressed loci.",
+        "evidence": "Changes in RNAPII activity on promoters and gene bodies corresponded with the defined MYC-dependent DEG categories.",
+        "page": 8
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "Demonstrates that the MYC-V394D mutant is impaired in liver tumor induction and cellular transformation compared to wild-type MYC.",
+        "page": 4
+      },
+      {
+        "id": "Figure 2",
+        "description": "Classifies MYC-regulated genes into primary and secondary categories based on RNA-seq analyses after short-term (16h) MYC inactivation.",
+        "page": 6
+      },
+      {
+        "id": "Figure 3",
+        "description": "Shows that the MYC-V394D mutant is selectively deficient in MYC-dependent gene repression, specifically affecting MIZ1-dependent targets.",
+        "page": 7
+      },
+      {
+        "id": "Figure 4",
+        "description": "Analyzes genome-wide MYC binding and RNA Polymerase II activity (loading and stalling) across different regulatory categories of genes.",
+        "page": 8
+      }
+    ],
+    "tables": [],
+    "technical_terms": [
+      "Oncogene addiction",
+      "tet-MYC",
+      "bHLH-LZ (basic helix-loop-helix leucine zipper)",
+      "MIZ1 (ZBTB17)",
+      "Chromatin invasion",
+      "Primary vs. Secondary regulatory events",
+      "RNA Polymerase II (RNAPII) stalling index",
+      "DEG (Differentially Expressed Genes)"
+    ],
+    "limitations": [
+      "The principles underlying the specificity of MYC-driven transcriptional responses remain largely unknown and likely involve complex cell- or promoter-dependent cues.",
+      "Transcriptional repression by MYC is still not fully understood mechanistically beyond its interaction with MIZ1.",
+      "Binding at a locus is insufficient to predict gene regulation."
+    ],
+    "connections": [
+      "Builds on previous tet-MYC mouse models of liver carcinoma (Shachaf et al., 2004; Beer et al., 2004).",
+      "Utilizes the MYC-V394D mutant model developed to study MYC-MIZ1 interactions (van Riggelen et al., 2010).",
+      "Refers to the 'transcriptional invasion' phenomenon (Sabo et al., 2014; Lin et al., 2012).",
+      "Builds on studies suggesting MYC regulates global RNAPII activity at elongation or loading steps (Rahl et al., 2010)."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "48_myc_oncogene_FR1",
+      "paper_id": "48_myc_oncogene",
+      "question": "How many primary MYC-induced and repressed genes were identified via RNA-seq following a 16-hour inactivation of MYC?",
+      "category": "factual_recall",
+      "expected_answer": "Following a 16-hour short-term inactivation of MYC, RNA-seq analysis identified approximately 1,200\u20131,400 primary MYC-induced and repressed genes. These genes represent the subset that requires continuous MYC activity for their activation or repression.",
+      "expected_concepts": [
+        "1,200\u20131,400",
+        "primary genes",
+        "16-hour inactivation",
+        "RNA-seq",
+        "MYC-induced"
+      ],
+      "difficulty": "easy",
+      "source_page": "1",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "48_myc_oncogene_CO2",
+      "paper_id": "48_myc_oncogene",
+      "question": "Based on the findings regarding the V394D mutant, what is the functional significance of the MYC-MIZ1 interaction in the context of liver tumor development?",
+      "category": "conceptual",
+      "expected_answer": "The interaction between MYC and the corepressor MIZ1 is essential for liver tumor initiation and the effective repression of specific target genes. Mice with the MYC-V394D mutant, which cannot bind MIZ1, exhibit impaired cellular transformation and significantly delayed tumorigenesis compared to wild-type MYC, indicating that MYC's ability to repress genes via MIZ1 is a critical driver of oncogenesis.",
+      "expected_concepts": [
+        "MIZ1",
+        "tumor initiation",
+        "V394D mutant",
+        "gene repression",
+        "cellular transformation"
+      ],
+      "difficulty": "medium",
+      "source_page": "3, 7",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "48_myc_oncogene_TE3",
+      "paper_id": "48_myc_oncogene",
+      "question": "How does MYC activity influence RNA Polymerase II (RNAPII) across different gene categories, and how does this relate to the predictive power of MYC-binding profiles?",
+      "category": "technical",
+      "expected_answer": "MYC influences gene expression primarily by regulating the loading of RNA Polymerase II (RNAPII) at both activated and repressed loci. Despite this regulatory role, genomic MYC-binding profiles obtained by ChIP-seq are not predictive of whether a gene will be up- or downregulated, because overexpressed MYC associates widely with already active promoters regardless of whether those genes are primary or secondary MYC targets.",
+      "expected_concepts": [
+        "RNAPII loading",
+        "ChIP-seq",
+        "active promoters",
+        "binding profiles",
+        "up- or downregulated"
+      ],
+      "difficulty": "hard",
+      "source_page": "7, 8",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:36:57.548638"
+}

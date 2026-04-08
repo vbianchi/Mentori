@@ -1,0 +1,199 @@
+{
+  "paper_id": "23_swine_cultivation",
+  "filename": "23_swine_cultivation.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "This paper addresses the lack of knowledge regarding the culturability of the swine gut microbiota compared to humans. It aims to develop a comprehensive culturomics approach to understand which bacterial taxa can be cultivated in vitro, identify optimal growth conditions, and establish causal relationships between the microbiota and pig health.",
+    "methods": [
+      "53 bacterial cultivation methods (combinations of media and gas)",
+      "Culture-dependent (CD) and culture-independent (CI) molecular profiling",
+      "16S rRNA gene amplicon sequencing (V4 region) using MiSeq",
+      "Deblur algorithm for high-resolution ASV assignment",
+      "Sanger sequencing of isolates (V3-V7 hypervariable regions)",
+      "SparCC (Sparse Correlations for Compositional data) for co-occurrence network analysis",
+      "Random Forest analysis and PERMANOVA for identifying factors affecting cultivation",
+      "QIIME2 bioinformatics platform"
+    ],
+    "findings": [
+      {
+        "finding": "Culture-dependent (CD) methods detected significantly higher microbial diversity (measured in ASVs) than culture-independent (CI) methods at all growth stages.",
+        "evidence": "CD methods detected 415, 675, 808, and 823 observed ASVs at the lactation, nursery, growing, and finishing stages, respectively, compared to 378, 482, 565, and 555 ASVs in CI samples.",
+        "page": 1
+      },
+      {
+        "finding": "Approximately half of the bacterial ASVs detected by CI methods were successfully recovered using the 53 culture methods.",
+        "evidence": "On average, 45.2%, 54.8%, 53.3%, and 56.4% of CI-detected ASVs were observed on the plates at the end of lactation, nursery, growing, and finishing stages, respectively.",
+        "page": 4
+      },
+      {
+        "finding": "Oxygen was identified as the primary factor shaping the culturable bacterial community.",
+        "evidence": "Oxygen ranked as the top driver with an F-score mean of 142.1 (P < 0.001) based on PERMANOVA analysis.",
+        "page": 8
+      },
+      {
+        "finding": "The study successfully isolated a wide range of bacterial taxa, including potentially novel strains.",
+        "evidence": "1,299 colonies were isolated, clustering into 148 different bacterial taxa covering 28 genera. Near-full-length 16S rRNA sequencing revealed 13 sub-ASVs within a single V4-defined ASV (Lactobacillus ASV5).",
+        "page": 1
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "Presents Venn diagrams of CI vs. CD ASVs at four stages and a phylogenetic tree of all detected bacterial ASVs.",
+        "page": 4
+      },
+      {
+        "id": "Figure 2",
+        "description": "Displays stacked bar charts showing the relative abundance of phyla and the top 20 genera across growth stages for CI and CD methods.",
+        "page": 6
+      },
+      {
+        "id": "Figure 3",
+        "description": "A heatmap illustrating the enrichment of specific bacterial ASVs of interest across the 53 different cultivation methods.",
+        "page": 7
+      },
+      {
+        "id": "Figure 4",
+        "description": "A circular phylogenetic tree analysis showing the top 200 bacterial ASVs detected on agar plates under aerobic and anaerobic conditions.",
+        "page": 9
+      },
+      {
+        "id": "Figure 5",
+        "description": "Visualizes shared co-occurrence networks between CI and CD models and provides correlation plots for key co-occurring ASV pairs.",
+        "page": 11
+      },
+      {
+        "id": "Figure 6",
+        "description": "Features a phylogenetic tree of 148 isolated bacterial taxa and a detailed tree showing the 13 sub-ASVs belonging to ASV5 Lactobacillus.",
+        "page": 13
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Lists the 53 culture methods, including media names, abbreviations, supplements, and specific oxygen conditions.",
+        "columns": [
+          "Medium full name",
+          "Abbreviation(s)",
+          "Additional supplement(s)",
+          "Aerobic (method #)",
+          "Anaerobic (method #)"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "Provides the number of bacterial taxa observed and their recovery rates at different taxonomic levels across four time points.",
+        "columns": [
+          "Taxonomy, total observed",
+          "End of lactation, d20 (CI, CD, Recovery rate)",
+          "End of nursery, d61 (CI, CD, Recovery rate)",
+          "End of growing, d116 (CI, CD, Recovery rate)",
+          "End of finishing, d174 (CI, CD, Recovery rate)"
+        ]
+      },
+      {
+        "id": "Table 3",
+        "description": "Summarizes pairwise correlations (SparCC) among bacterial ASVs in CI and CD datasets.",
+        "columns": [
+          "Correlations, pairs",
+          "d20",
+          "d61",
+          "d116",
+          "d174"
+        ]
+      },
+      {
+        "id": "Table 4",
+        "description": "Lists specific ASVs detected in colony mixtures and those successfully isolated as pure cultures across growth stages.",
+        "columns": [
+          "Stage and isolation method",
+          "ASVs"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "Culturomics",
+      "ASV (Amplicon Sequence Variant)",
+      "CI (Culture-Independent)",
+      "CD (Culture-Dependent)",
+      "16S rRNA gene sequencing",
+      "SparCC",
+      "Deblur",
+      "PERMANOVA"
+    ],
+    "limitations": [
+      "Approximately 44% to 54% of bacterial ASVs detected by CI methods still remain uncultured.",
+      "Standard MiSeq sequencing (targeting the V4 region) may underestimate diversity compared to near-full-length Sanger sequencing.",
+      "The sample size for network construction in the CD group was limited (n = 3)."
+    ],
+    "connections": [
+      "Builds on previous longitudinal studies of the swine gut microbiome by the same group (Wang et al., 2019).",
+      "Adopts culturomics strategies from human studies (Lau et al., 2016; Lagier et al., 2016; Rettedal et al., 2014).",
+      "Utilizes standardized bioinformatics tools like QIIME2, Deblur, and the Greengenes database."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "23_swine_cultivation_FR1",
+      "paper_id": "23_swine_cultivation",
+      "question": "How many bacterial colonies were isolated in total, and how many distinct sub-ASVs were identified within the Lactobacillus ASV5 group?",
+      "category": "factual_recall",
+      "expected_answer": "The study isolated a total of 1,299 colonies, which clustered into 148 different bacterial taxa across 28 genera. Specifically, near-full-length 16S rRNA sequencing revealed the presence of 13 sub-ASVs within the single V4-defined ASV5 (Lactobacillus).",
+      "expected_concepts": [
+        "1,299 colonies",
+        "148 bacterial taxa",
+        "13 sub-ASVs",
+        "Lactobacillus ASV5",
+        "16S rRNA sequencing"
+      ],
+      "difficulty": "easy",
+      "source_page": "1",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "23_swine_cultivation_CO2",
+      "paper_id": "23_swine_cultivation",
+      "question": "How does the microbial diversity identified by culture-dependent (CD) methods compare to culture-independent (CI) methods across the four growth stages, and what does this imply about the overlap between the two approaches?",
+      "category": "conceptual",
+      "expected_answer": "Culture-dependent (CD) methods detected significantly higher microbial diversity (measured in ASVs) than culture-independent (CI) methods at all stages, such as 823 vs 555 ASVs at the finishing stage. However, only about half (45.2% to 56.4%) of the ASVs detected by CI methods were actually recovered using the 53 culture methods, suggesting that while CD methods capture more total variants, many taxa seen in sequencing remain uncultured.",
+      "expected_concepts": [
+        "CD vs CI diversity",
+        "ASV counts",
+        "Growth stages",
+        "Recovery rate",
+        "Overlap"
+      ],
+      "difficulty": "medium",
+      "source_page": "1, 4",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "23_swine_cultivation_TE3",
+      "paper_id": "23_swine_cultivation",
+      "question": "Based on the PERMANOVA analysis, what was the most significant factor influencing the culturable bacterial community composition, and what specific statistical result supports this?",
+      "category": "technical",
+      "expected_answer": "Oxygen was identified as the primary factor shaping the culturable bacterial community. This was supported by PERMANOVA analysis, where oxygen ranked as the top driver with a mean F-score of 142.1 (P < 0.001).",
+      "expected_concepts": [
+        "Oxygen",
+        "PERMANOVA",
+        "F-score",
+        "142.1",
+        "culturable bacterial community"
+      ],
+      "difficulty": "medium",
+      "source_page": "8",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:22:44.112311"
+}

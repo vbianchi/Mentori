@@ -1,0 +1,131 @@
+{
+  "paper_id": "10_cutadapt",
+  "filename": "10_cutadapt.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "How to efficiently and error-tolerantly remove adapter sequences from high-throughput sequencing reads, particularly for small RNA and color-space data, using a standalone command-line tool.",
+    "methods": [
+      "Semi-global alignment (end-space free alignment)",
+      "Gapped alignment to support insertions and deletions",
+      "Python implementation with C extensions for alignment speed",
+      "Quality-based trimming (using the BWA algorithm)",
+      "Double encoding for color-space (SOLiD) data compatibility",
+      "Length-based read filtering"
+    ],
+    "findings": [
+      {
+        "finding": "Cutadapt can process approximately 1 million reads per minute.",
+        "evidence": "With 35 bp colour-space reads and an adapter of length 18, cutadapt trims approximately 1 million reads per minute (0.06 ms per read) on a single core of a 2.66 GHz Intel Core 2 processor.",
+        "page": 2
+      },
+      {
+        "finding": "Cutadapt is the only standalone tool providing correct color-space read trimming.",
+        "evidence": "Cutadapt is the only stand-alone tool that can correctly trim colour-space reads.",
+        "page": 1
+      },
+      {
+        "finding": "Input/output operations are a significant performance bottleneck.",
+        "evidence": "In practice, other operations, such as reading and parsing the input files, take up more than half of the time.",
+        "page": 2
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "An illustration showing all possible alignment configurations between a read and an adapter sequence under the '-a' and '-b' options.",
+        "page": 2
+      }
+    ],
+    "tables": [],
+    "technical_terms": [
+      "Adapter sequence",
+      "Color-space (SOLiD)",
+      "Semi-global alignment",
+      "End-space free alignment",
+      "Gapped alignment",
+      "Homopolymer runs",
+      "Double encoding",
+      "3\u2019 end",
+      "Library preparation"
+    ],
+    "limitations": [
+      "Alignment calculation is O(nk) in theory, though I/O operations often dominate execution time.",
+      "Short random matches at the beginning of a read could lead to false-positive removal of the entire read if not for specific penalties in the '-a' parameter algorithm.",
+      "Requires Python environment to be available on the host platform."
+    ],
+    "connections": [
+      "HTSeq (Simon Anders)",
+      "Biostrings (Pages et al.)",
+      "SOAP (Li et al.)",
+      "MAQ (Li et al.)",
+      "Novoalign",
+      "BWA (Li and Durbin)",
+      "EMBOSS / Vectorstrip (Rice et al.)",
+      "FASTX Toolkit / fastx_clipper (Assaf Gordon)",
+      "Zeschnigk et al. (454 sequencing data)",
+      "Schulte et al. (small RNA data analysis)"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "10_cutadapt_FR1",
+      "paper_id": "10_cutadapt",
+      "question": "What unique capability does Cutadapt offer compared to other standalone tools in the context of read trimming?",
+      "category": "factual_recall",
+      "expected_answer": "Cutadapt is the only standalone tool that is capable of correctly trimming color-space reads (SOLiD data). This distinguishes it from other tools that may require integrated pipelines or lack support for double encoding.",
+      "expected_concepts": [
+        "standalone tool",
+        "color-space",
+        "trimming",
+        "SOLiD"
+      ],
+      "difficulty": "easy",
+      "source_page": "1",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "10_cutadapt_CO2",
+      "paper_id": "10_cutadapt",
+      "question": "How does the implementation of Cutadapt balance the trade-off between user accessibility and computational efficiency?",
+      "category": "conceptual",
+      "expected_answer": "Cutadapt is primarily implemented in Python to ensure ease of use and flexibility, but it utilizes C extensions for the core alignment tasks to achieve high speed. Despite these optimizations, the overall performance is often limited by input/output operations, such as file parsing, which can consume more than half of the total processing time.",
+      "expected_concepts": [
+        "Python implementation",
+        "C extensions",
+        "alignment speed",
+        "I/O bottleneck",
+        "parsing"
+      ],
+      "difficulty": "medium",
+      "source_page": "1-2",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "10_cutadapt_TE3",
+      "paper_id": "10_cutadapt",
+      "question": "What are the specific performance metrics for Cutadapt when processing 35 bp colour-space reads with an 18 bp adapter on a 2.66 GHz Intel Core 2 processor?",
+      "category": "technical",
+      "expected_answer": "Under these specific hardware and sequence parameters, Cutadapt can process approximately 1 million reads per minute. This performance corresponds to a per-read trimming speed of approximately 0.06 ms on a single processor core.",
+      "expected_concepts": [
+        "1 million reads per minute",
+        "0.06 ms per read",
+        "single core",
+        "2.66 GHz Intel Core 2"
+      ],
+      "difficulty": "hard",
+      "source_page": "2",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:15:04.236018"
+}

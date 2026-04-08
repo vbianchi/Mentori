@@ -1,0 +1,103 @@
+/* Mentori Design Tokens
+ * Establishes consistent spacing, typography, and sizing scales
+ * to eliminate arbitrary values throughout the codebase.
+ */
+
+:root {
+    /* ========== Spacing Scale (8px base) ========== */
+    /* Use these instead of arbitrary rem values */
+    --space-0: 0;
+    --space-1: 0.25rem;  /* 4px - Extra tight */
+    --space-2: 0.5rem;   /* 8px - Tight */
+    --space-3: 0.75rem;  /* 12px - Comfortable */
+    --space-4: 1rem;     /* 16px - Standard */
+    --space-5: 1.5rem;   /* 24px - Generous */
+    --space-6: 2rem;     /* 32px - Loose */
+    --space-8: 3rem;     /* 48px - Extra loose */
+    --space-10: 4rem;    /* 64px - Spacious */
+
+    /* ========== Border Radius Scale ========== */
+    --radius-sm: 4px;    /* Small elements (badges, pills) */
+    --radius-md: 6px;    /* Standard (buttons, inputs) */
+    --radius-lg: 8px;    /* Cards, panels */
+    --radius-xl: 12px;   /* Large surfaces (modals) */
+    --radius-full: 9999px; /* Fully rounded (circular buttons) */
+
+    /* ========== Typography Scale ========== */
+    --text-xs: 0.75rem;    /* 12px - Captions, metadata */
+    --text-sm: 0.85rem;    /* 13.6px - Small text, labels */
+    --text-base: 0.95rem;  /* 15.2px - Body text */
+    --text-lg: 1.125rem;   /* 18px - Subheadings */
+    --text-xl: 1.25rem;    /* 20px - Headings */
+    --text-2xl: 1.5rem;    /* 24px - Large headings */
+
+    /* ========== Font Weights ========== */
+    --weight-normal: 400;
+    --weight-medium: 500;
+    --weight-semibold: 600;
+    --weight-bold: 700;
+
+    /* ========== Line Heights ========== */
+    --leading-tight: 1.25;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.75;
+
+    /* ========== Z-Index Scale ========== */
+    /* Use these to prevent z-index wars */
+    --z-base: 1;
+    --z-sidebar: 10;
+    --z-header: 20;
+    --z-dropdown: 30;
+    --z-overlay: 50;
+    --z-modal: 100;
+    --z-toast: 200;
+    --z-tooltip: 300;
+
+    /* ========== Shadows ========== */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+    /* ========== Icon Sizes ========== */
+    --icon-xs: 12px;
+    --icon-sm: 14px;
+    --icon-md: 16px;
+    --icon-lg: 20px;
+    --icon-xl: 24px;
+
+    /* ========== Component Sizes ========== */
+    --input-height-sm: 32px;
+    --input-height-md: 40px;
+    --input-height-lg: 48px;
+
+    --button-height-sm: 32px;
+    --button-height-md: 40px;
+    --button-height-lg: 48px;
+
+    /* ========== Layout Constraints ========== */
+    --content-max-width: 1400px;
+    --sidebar-min-width: 200px;
+    --sidebar-max-width: 400px;
+
+    /* ========== Transition Durations ========== */
+    /* Use with transition timing functions from variables.css */
+    --duration-fast: 0.15s;
+    --duration-normal: 0.2s;
+    --duration-slow: 0.3s;
+    --duration-slower: 0.6s;
+    --duration-slowest: 1s;
+
+    /* ========== Focus Ring ========== */
+    --focus-ring-width: 2px;
+    --focus-ring-offset: 2px;
+
+    /* ========== Disabled State ========== */
+    --disabled-opacity: 0.5;
+
+    /* ========== Breakpoints (Reference Values) ========== */
+    /* Note: CSS variables can't be used in media queries directly */
+    /* These serve as documentation for consistent breakpoint usage */
+    /* sm: 480px, md: 640px, lg: 768px, xl: 1024px */
+}

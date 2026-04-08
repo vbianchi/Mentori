@@ -1,0 +1,77 @@
+/* PhaseIndicator - Orchestrator phase progress bar
+   Using global design tokens from tokens.css and variables.css */
+
+.phase-indicator {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-panel);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-subtle);
+    /* Match feed-container positioning */
+    margin-left: 11%;
+    margin-right: 10%;
+    margin-top: var(--space-2);
+    margin-bottom: var(--space-1);
+    max-width: 85%;
+}
+
+.phase {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    transition: all var(--trans-fast);
+}
+
+.phase.active {
+    background: var(--accent-primary);
+    color: var(--text-inverse);
+}
+
+.phase.completed {
+    background: var(--accent-success);
+    color: var(--text-inverse);
+}
+
+.phase.pending {
+    background: var(--bg-surface);
+    color: var(--text-dim);
+}
+
+.phase-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background: currentColor;
+    flex-shrink: 0;
+}
+
+.phase.active .phase-dot {
+    animation: phase-pulse 1.5s infinite;
+}
+
+.phase-label {
+    font-weight: var(--weight-medium);
+}
+
+@keyframes phase-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Responsive: stack vertically on small screens */
+@media (max-width: 640px) {
+    .phase-indicator {
+        flex-direction: column;
+        gap: var(--space-2);
+        padding: var(--space-3);
+    }
+
+    .phase {
+        justify-content: center;
+    }
+}

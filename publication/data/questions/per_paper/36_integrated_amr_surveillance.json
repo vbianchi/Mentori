@@ -1,0 +1,169 @@
+{
+  "paper_id": "36_integrated_amr_surveillance",
+  "filename": "36_integrated_amr_surveillance.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "The paper addresses the lack of a comprehensive overview of existing organizational models for the integrated surveillance of antibiotic resistance (ABR) within a One Health context, aiming to characterize these systems, their implementation contexts, and their levels of integration and outcomes.",
+    "methods": [
+      "Scoping review following PRISMA-ScR guidelines",
+      "Systematic search of databases (PubMed, Scopus, Web of Science, Embase) for literature published between 2000 and 2022",
+      "Descriptive analysis of 39 organizational and functional variables",
+      "Multiple-correspondence analysis (MCA)",
+      "Hierarchical cluster analysis (HCA) to identify system typologies"
+    ],
+    "findings": [
+      {
+        "finding": "The review identified 14 distinct integrated surveillance systems for ABR out of an initial 1,330 records.",
+        "evidence": "Results section: 'The literature search identified a total of 1,330 records... we identified 14 integrated surveillance systems.'",
+        "page": 8
+      },
+      {
+        "finding": "All identified systems operate exclusively in high-income countries (11 in Europe, 2 in North America, 1 in Asia).",
+        "evidence": "Results section: 'The retrieved systems were found to exclusively operate in high income countries... 11 in Europe, two in North America, and one in Asia.'",
+        "page": 8
+      },
+      {
+        "finding": "The 14 systems were categorized into four distinct typology clusters based on their level of informational and structural integration.",
+        "evidence": "Typology of the integrated surveillance systems section: 'The HCA applied to the MCA results demonstrates that the 14 integrated surveillance systems group into four distinct clusters.'",
+        "page": 14
+      },
+      {
+        "finding": "Evidence regarding the actual outcomes and impacts of integration in these surveillance systems is sparse and poorly described in the literature.",
+        "evidence": "Results section: 'The outcomes of integration are poorly described and evidenced.'",
+        "page": 1
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "A PRISMA-ScR flow chart detailing the selection process from 2,163 initial records down to the 59 included in the qualitative synthesis.",
+        "page": 9
+      },
+      {
+        "id": "Figure 2",
+        "description": "A conceptual diagram illustrating the integration of human, animal, and environmental health sectors at governance and operational levels.",
+        "page": 14
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Lists the search concepts (Surveillance, Integration, ABR) and their corresponding search terms used in bibliographic databases.",
+        "columns": [
+          "Concepts",
+          "Search terms"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "Presents the 39 variables used to characterize the systems across domains like general characteristics, scope, and collaboration.",
+        "columns": [
+          "Domains",
+          "Variable groups",
+          "Variables",
+          "Values"
+        ]
+      },
+      {
+        "id": "Table 3",
+        "description": "Summarizes the main characteristics of the 14 retrieved systems, including their integration levels and assigned typology group.",
+        "columns": [
+          "Surveillance system, country",
+          "Information integration",
+          "Structural integration",
+          "Typology group",
+          "References"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "One Health",
+      "ABR (Antibiotic Resistance)",
+      "AMR (Antimicrobial Resistance)",
+      "Structural Integration",
+      "Informational Integration",
+      "LMICs (Low and Middle-Income Countries)",
+      "PRISMA-ScR",
+      "MCA (Multiple-Correspondence Analysis)",
+      "HCA (Hierarchical Cluster Analysis)"
+    ],
+    "limitations": [
+      "Identification of systems was limited to high-income countries; operational systems in LMICs may exist but are not documented in peer-reviewed literature.",
+      "The study relied on published reports which may not always reflect current operational reality.",
+      "Lack of standardized tools and methods to evaluate the effectiveness and impact of integrated surveillance.",
+      "Information on system performance provided by those in charge may lack objectivity.",
+      "Direct causal links between integration and positive outcomes are difficult to establish."
+    ],
+    "connections": [
+      "Builds on PRISMA-ScR guidelines for scoping reviews.",
+      "Utilizes the Global Database for the Tripartite Antimicrobial Resistance (AMR) Country Self-assessment Survey (TrACSS).",
+      "References established surveillance models like CIPARS (Canada), NARMS (USA), and DANMAP (Denmark).",
+      "Incorporates demographic data from the World Bank and FAOSTAT."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "36_integrated_amr_surveillance_FR1",
+      "paper_id": "36_integrated_amr_surveillance",
+      "question": "How many integrated surveillance systems for ABR were identified in the review, and what is their geographic distribution?",
+      "category": "factual_recall",
+      "expected_answer": "The scoping review identified 14 distinct integrated surveillance systems for ABR. All of these systems operate exclusively in high-income countries, with 11 located in Europe, 2 in North America, and 1 in Asia.",
+      "expected_concepts": [
+        "14 systems",
+        "high-income countries",
+        "Europe",
+        "North America",
+        "Asia"
+      ],
+      "difficulty": "easy",
+      "source_page": "8",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "36_integrated_amr_surveillance_CO2",
+      "paper_id": "36_integrated_amr_surveillance",
+      "question": "Based on the study's findings, what is the current state of knowledge regarding the outcomes and impacts of integrating ABR surveillance systems?",
+      "category": "conceptual",
+      "expected_answer": "The study concludes that evidence regarding the actual outcomes and impacts of integration within these surveillance systems is sparse and poorly described in existing literature. While the systems can be categorized by their structural and informational integration, the specific benefits or results stemming from this integration remain under-evidenced.",
+      "expected_concepts": [
+        "sparse evidence",
+        "outcomes",
+        "impacts",
+        "poorly described",
+        "integration"
+      ],
+      "difficulty": "medium",
+      "source_page": "1",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "36_integrated_amr_surveillance_TE3",
+      "paper_id": "36_integrated_amr_surveillance",
+      "question": "Describe the statistical methodology and the number of variables used to generate the typology of the identified surveillance systems.",
+      "category": "technical",
+      "expected_answer": "The researchers conducted a descriptive analysis of 39 organizational and functional variables across domains like scope and collaboration. A subset of 16 variables was then used in Multiple-correspondence analysis (MCA) and Hierarchical cluster analysis (HCA) to group the 14 systems into four distinct typology clusters based on their levels of informational and structural integration.",
+      "expected_concepts": [
+        "39 variables",
+        "16 variables for MCA/HCA",
+        "Multiple-correspondence analysis (MCA)",
+        "Hierarchical cluster analysis (HCA)",
+        "four typology clusters",
+        "informational and structural integration"
+      ],
+      "difficulty": "hard",
+      "source_page": "1, 14",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:30:29.489281"
+}

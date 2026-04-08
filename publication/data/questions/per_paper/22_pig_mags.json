@@ -1,0 +1,168 @@
+{
+  "paper_id": "22_pig_mags",
+  "filename": "22_pig_mags.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "The paper addresses the lack of genomic characterization for the majority of the swine gut microbiome, specifically by using metagenome-assembled genomes (MAGs) to connect taxonomic identity with functional potentials like carbohydrate degradation, short-chain fatty acid (SCFA) production, and antimicrobial resistance (AMR).",
+    "methods": [
+      "Shotgun metagenomic sequencing (Illumina NovaSeq 6000)",
+      "De novo assembly using MEGAHIT",
+      "Metagenomic binning using MetaBAT 2",
+      "Quality assessment of MAGs using CheckM",
+      "Dereplication of MAGs using dRep (99% ANI threshold)",
+      "Taxonomic assignment via GTDB-tk (Genome Taxonomy Database)",
+      "Functional annotation using DRAM (Distilled and Refined Annotation of Metabolism)",
+      "Antimicrobial resistance gene (ARG) screening using CARD (Comprehensive Antibiotic Resistance Database)"
+    ],
+    "findings": [
+      {
+        "finding": "Assembly of high-quality non-redundant MAGs",
+        "evidence": "1,150 dereplicated MAGs were recovered with >90% completeness and <5% contamination, representing 472 archaeal and bacterial species.",
+        "page": 2
+      },
+      {
+        "finding": "High prevalence of uncultured species",
+        "evidence": "82% of the MAGs were assigned to species that lack cultured representatives, indicating a large portion of the swine gut microbiome is still poorly characterized.",
+        "page": 1
+      },
+      {
+        "finding": "Metabolic potential for SCFA production",
+        "evidence": "Genes for acetate, butyrate, and propionate production were identified in 68.5%, 18.8%, and 8.3% of the MAGs, respectively.",
+        "page": 1
+      },
+      {
+        "finding": "Identification of antimicrobial resistance genes",
+        "evidence": "ARGs were detected in 327 MAGs, with tetracycline resistance genes (tet(44), tet(Q), tet(W)) being the most common.",
+        "page": 1
+      },
+      {
+        "finding": "Impact of weaning on microbial abundance",
+        "evidence": "Weaning was associated with a decrease in the relative abundance of 69 MAGs (e.g., E. coli) and an increase in 140 MAGs (e.g., Clostridium sp000435835).",
+        "page": 1
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "A maximum likelihood phylogenetic tree of the 1,150 MAGs showing taxonomic classification, CAZyme counts, and relative abundance in nursing vs. weaned pigs.",
+        "page": 3
+      },
+      {
+        "id": "Figure 2",
+        "description": "A heatmap illustrating specific MAGs identified in >85% of samples and their associated pathways for SCFA production and carbohydrate degradation.",
+        "page": 6
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table S1 (Supplemental)",
+        "description": "Summary of MAG statistics including size, completeness, and taxonomic assignment.",
+        "columns": [
+          "MAG ID",
+          "Size (Mb)",
+          "Completeness",
+          "Contamination",
+          "GTDB Taxonomy"
+        ]
+      },
+      {
+        "id": "Table S3 (Supplemental)",
+        "description": "Distribution of genes involved in SCFA production and methanogenesis across the MAGs.",
+        "columns": [
+          "MAG ID",
+          "Acetate genes",
+          "Butyrate genes",
+          "Propionate genes",
+          "Methanogenesis genes"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "MAG (Metagenome-Assembled Genome)",
+      "ANI (Average Nucleotide Identity)",
+      "CAZymes (Carbohydrate-Active Enzymes)",
+      "SCFA (Short-Chain Fatty Acid)",
+      "ARG (Antimicrobial Resistance Gene)",
+      "GTDB (Genome Taxonomy Database)",
+      "Dereplication",
+      "Binning"
+    ],
+    "limitations": [
+      "Binning ARGs from short reads is challenging as they are often flanked by repeat sequences or located on mobile genetic elements like plasmids.",
+      "The number and diversity of ARGs detected in MAGs was lower than in previous studies using unassembled short reads.",
+      "A large portion of the identified species still lack cultured representatives, limiting phenotypic validation."
+    ],
+    "connections": [
+      "Holman et al. (2021) - Previous study by the authors on the effects of weaning age on the swine microbiome.",
+      "GTDB (Genome Taxonomy Database) - Used for standardized bacterial and archaeal taxonomy.",
+      "CARD (Comprehensive Antibiotic Resistance Database) - Used for ARG identification.",
+      "DRAM - Used for high-throughput functional annotation."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "22_pig_mags_FR1",
+      "paper_id": "22_pig_mags",
+      "question": "What percentage of the recovered metagenome-assembled genomes (MAGs) were assigned to species without cultured representatives, and what does this suggest about the swine gut microbiome?",
+      "category": "factual_recall",
+      "expected_answer": "82% of the MAGs were assigned to species that lack cultured representatives. This finding indicates that a large portion of the swine gut microbiome remains poorly characterized and potentially contains many novel species.",
+      "expected_concepts": [
+        "82%",
+        "uncultured species",
+        "swine gut microbiome",
+        "poorly characterized",
+        "MAGs"
+      ],
+      "difficulty": "easy",
+      "source_page": "1",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "22_pig_mags_CO2",
+      "paper_id": "22_pig_mags",
+      "question": "Based on the study's findings, how does the transition from nursing to weaning impact the taxonomic composition and relative abundance of specific bacterial groups in pigs?",
+      "category": "conceptual",
+      "expected_answer": "Weaning is associated with a significant shift in the microbiome, characterized by a decrease in the relative abundance of 69 MAGs, such as E. coli, and an increase in 140 MAGs, including Clostridium sp000435835. This transition is further visualized in a phylogenetic tree (Figure 1) which maps these changes alongside taxonomic classification and CAZyme counts to show how the community structure adapts to post-weaning conditions.",
+      "expected_concepts": [
+        "weaning",
+        "relative abundance",
+        "E. coli",
+        "Clostridium sp000435835",
+        "taxonomic classification",
+        "microbial shift"
+      ],
+      "difficulty": "medium",
+      "source_page": "1, 3",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "22_pig_mags_TE3",
+      "paper_id": "22_pig_mags",
+      "question": "Describe the bioinformatic workflow and specific quality thresholds used to identify, assess, and dereplicate the non-redundant MAGs reported in this research.",
+      "category": "technical",
+      "expected_answer": "The study utilized MEGAHIT for de novo assembly and MetaBAT 2 for binning. Quality assessment was performed using CheckM, requiring >90% completeness and <5% contamination for high-quality MAGs, which were then dereplicated using dRep with a 99% Average Nucleotide Identity (ANI) threshold.",
+      "expected_concepts": [
+        "MEGAHIT",
+        "MetaBAT 2",
+        "CheckM",
+        "dRep",
+        "99% ANI",
+        "completeness and contamination"
+      ],
+      "difficulty": "hard",
+      "source_page": "1, 2",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:22:03.168553"
+}

@@ -1,0 +1,42 @@
+/* src/components/ui/GlobalStatus.css */
+.global-status-bar {
+    width: 100%;
+    background: rgba(20, 20, 25, 0.95);
+    border-bottom: 1px solid var(--border-subtle);
+    backdrop-filter: blur(10px);
+    z-index: var(--z-dropdown);
+    transition: all var(--trans-fast);
+}
+
+.status-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    height: 36px;
+    /* Compact height */
+}
+
+.status-header:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.status-text {
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+.status-details {
+    padding: 0.5rem 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-subtle);
+}
+
+/* Animation for spinner is reused from App.css (.spin-slow) */

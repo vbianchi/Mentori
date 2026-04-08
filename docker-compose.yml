@@ -1,0 +1,82 @@
+services:
+  # ---------------------------------------------------------------------------
+  # Backend Service
+  # ---------------------------------------------------------------------------
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8766:8766"
+    volumes:
+      - ./backend:/app/backend # Hot reload mount
+      - ./data/mentori_app.db:/app/mentori_app.db
+      - ./data/workspace:/workspace_data # Persist workspace files (Outside /app to prevent reload loop)
+      - ./tests:/app/tests # Mount test files for RAG ingestion
+      - ./scripts:/app/scripts # Mount scripts for multi-agent testing
+      # Mount ChromaDB persistence directory
+      - ./data/chroma_db:/app/chroma_db
+      # Persist HF model cache across container rebuilds (avoids re-downloading BGE-M3)
+      - ./data/hf_cache:/root/.cache/huggingface
+    environment:
+      # URL to connect to the Tool Server.
+      # Can be 'http://tool-server:8777' (internal docker)
+      # OR 'http://host.docker.internal:8777' (external/local)
+      - TOOL_SERVER_URL=${TOOL_SERVER_URL:-http://tool-server:8777}
+      - FRONTEND_ORIGIN=${FRONTEND_ORIGIN:-http://localhost:5173}
+      # Ollama running on host machine
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - WORKSPACE_DIR=/workspace_data
+      # Debug: Enable message flow logging (writes to /workspace_data/debug_flow_{task_id}.log)
+      - MENTORI_DEBUG_FLOW=1
+    command: uvicorn backend.main:app --host 0.0.0.0 --port 8766 --reload --reload-dir /app/backend
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - tool-server
+      # Note: 'depends_on' waits for container start, not health.
+      # If running tool-server locally, you might want to remove this dependency
+      # or run 'docker-compose up backend frontend' only.
+
+      # ---------------------------------------------------------------------------
+      # Tool Server Service (Optional if running locally)
+      # ---------------------------------------------------------------------------
+  tool-server:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.tool_server
+    ports:
+      - "8777:8777"
+    volumes:
+      - ./backend:/app/backend
+      # Mount artifacts/workspaces so tool server can persist files
+      - ./data/workspace:/workspace_data
+      - ./data/mentori_app.db:/app/mentori_app.db
+      # Mount ChromaDB persistence directory so tools can query embeddings created by backend
+      - ./data/chroma_db:/app/chroma_db
+    environment:
+      - PYTHONPATH=/app
+      # Ollama running on host machine (same as backend)
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - WORKSPACE_DIR=/workspace_data
+      - BACKEND_INTERNAL_URL=http://backend:8766
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # ---------------------------------------------------------------------------
+  # Frontend Service
+  # ---------------------------------------------------------------------------
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules # Prevent host node_modules from overwriting container's
+    environment:
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:8766}
+
+# volumes:
+#   db_data:

@@ -1,0 +1,137 @@
+{
+  "paper_id": "31_amr_one_health",
+  "filename": "31_amr_one_health.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "How can the problem of antimicrobial resistance (AMR) be analyzed and addressed through the multidisciplinary One Health approach involving the interaction between humans, animals, and the environment?",
+    "methods": [
+      "Literature review of publications including the terms 'antimicrobial resistance' and 'One Health'",
+      "Analysis of international surveillance systems and guidelines (WHO, OIE, FAO)",
+      "Review of epidemiological data and antimicrobial usage statistics in human and veterinary medicine"
+    ],
+    "findings": [
+      {
+        "finding": "In 2019, the WHO identified 32 antimicrobials in hospital development, but only six were classified as innovative, highlighting a lack of new treatments.",
+        "evidence": "In 2019, the World Health Organization (WHO) identified 32 antimicrobials in hospital development, of which only six were classified as innovative.",
+        "page": 1
+      },
+      {
+        "finding": "The volume of antimicrobials used in animals worldwide is estimated to be greater than that used in humans.",
+        "evidence": "The volume of antimicrobials used in animals worldwide is estimated to be greater than in humans.",
+        "page": 3
+      },
+      {
+        "finding": "Third- and fourth-generation cephalosporin use in animals reached 18 tons in Europe (2017) and 31.44 tons in the USA (2018).",
+        "evidence": "approximately 18 tons of third- and fourth generation cephalosporins were used in 2017... In the USA, the total cephalosporin use for animals was approximately 31.44 tons in 2018.",
+        "page": 3
+      },
+      {
+        "finding": "Fluoroquinolone use in animals was recorded at 216 tons in Europe (2017) and 23.3 tons in the USA (2018).",
+        "evidence": "approximately 216 tons of fluoroquinolones were used in Europe... the total fluoroquinolone used in animals in the USA was approximately 23.3 tons in 2018.",
+        "page": 4
+      },
+      {
+        "finding": "Animals excrete a significant percentage of antimicrobials without them being metabolized, leading to environmental dispersion.",
+        "evidence": "it has been documented that animal excretes a significant percentage (75%\u201390%) of antimicrobials without being metabolized and dispersed into the environment.",
+        "page": 4
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "A schematic diagram illustrating the interconnectedness of Human Health, Animal Health, and Environmental Health within the One Health perspective of antimicrobial resistance.",
+        "page": 2
+      }
+    ],
+    "tables": [],
+    "technical_terms": [
+      "One Health",
+      "Antimicrobial resistance (AMR)",
+      "Zoonosis",
+      "GLASS (Global Antimicrobial Resistance Surveillance System)",
+      "mcr-1 gene",
+      "Ceftiofur",
+      "Fluoroquinolones",
+      "ESBL (Extended-spectrum beta-lactamases)",
+      "MRSA (Methicillin-resistant Staphylococcus aureus)"
+    ],
+    "limitations": [
+      "Competing interests of multiple economic sectors and organizations involved in animal, human, and environmental health.",
+      "Difficulty in predicting exactly how and when AMR will develop, creating uncertainty for pharmaceutical investment.",
+      "The lack of innovative new antimicrobials in the development pipeline."
+    ],
+    "connections": [
+      "WHO Global Action Plan on Antimicrobial Resistance (2015)",
+      "GLASS (Global Antimicrobial Resistance Surveillance System)",
+      "Manhattan Principles (2004)",
+      "Rudolf Virchow's 19th-century concept of zoonosis",
+      "Calvin Schwabe's concept of 'one medicine'",
+      "The Interagency Coordination Group on Antimicrobial Resistance (WHO, OIE, and FAO) 2019 report"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "31_amr_one_health_FR1",
+      "paper_id": "31_amr_one_health",
+      "question": "According to the World Health Organization's 2019 data, how many of the 32 antimicrobials in hospital development were classified as innovative?",
+      "category": "factual_recall",
+      "expected_answer": "In 2019, the World Health Organization (WHO) identified 32 antimicrobials in hospital development, but only six of these were classified as innovative. This finding highlights a critical lack of new and innovative treatments in the development pipeline.",
+      "expected_concepts": [
+        "WHO",
+        "32 antimicrobials",
+        "six innovative",
+        "hospital development",
+        "lack of new treatments"
+      ],
+      "difficulty": "easy",
+      "source_page": "1",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "31_amr_one_health_CO2",
+      "paper_id": "31_amr_one_health",
+      "question": "How does the metabolism and excretion of antimicrobials in animals contribute to environmental concerns within the One Health framework?",
+      "category": "conceptual",
+      "expected_answer": "Within the One Health perspective, animal health and environmental health are linked by the fact that animals excrete a significant percentage (75%\u201390%) of antimicrobials without them being metabolized. Because the volume of antimicrobials used in animals is greater than in humans, this leads to the widespread dispersion of active substances into the environment, potentially driving resistance.",
+      "expected_concepts": [
+        "One Health",
+        "75%\u201390%",
+        "unmetabolized",
+        "environmental dispersion",
+        "animal excretion"
+      ],
+      "difficulty": "medium",
+      "source_page": "2, 3, 4",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "31_amr_one_health_TE3",
+      "paper_id": "31_amr_one_health",
+      "question": "Compare the recorded usage in tons of fluoroquinolones and third- and fourth-generation cephalosporins in animals between Europe (2017) and the USA (2018).",
+      "category": "technical",
+      "expected_answer": "In Europe (2017), animal usage was recorded at 18 tons of third- and fourth-generation cephalosporins and 216 tons of fluoroquinolones. In contrast, the USA (2018) recorded higher cephalosporin usage at 31.44 tons but significantly lower fluoroquinolone usage at 23.3 tons.",
+      "expected_concepts": [
+        "18 tons",
+        "216 tons",
+        "31.44 tons",
+        "23.3 tons",
+        "fluoroquinolones",
+        "cephalosporins"
+      ],
+      "difficulty": "hard",
+      "source_page": "3, 4",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:27:48.744188"
+}

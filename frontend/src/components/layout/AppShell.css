@@ -1,0 +1,78 @@
+/* src/components/layout/AppShell.css */
+
+/* ========== Main Shell Container ========== */
+.app-shell {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--bg-app);
+}
+
+/* ========== Shell Layout (Flex) ========== */
+.shell-layout {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    gap: 0;
+}
+
+/* --- Sidebars --- */
+.shell-sidebar,
+.shell-right {
+    display: flex;
+    flex-direction: column;
+    /* transition: width var(--trans-smooth); */
+    /* Handled by JS inline for perf */
+    transition: width 0.2s ease-in-out;
+    overflow: hidden;
+    background: var(--bg-panel);
+    z-index: var(--z-sidebar);
+}
+
+.sidebar-header {
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    flex-shrink: 0;
+    font-weight: var(--weight-semibold);
+    letter-spacing: -0.02em;
+    color: var(--text-main);
+}
+
+.app-logo {
+    background: linear-gradient(to right, var(--accent-secondary), var(--accent-primary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-4);
+}
+
+/* ========== Center Panel ========== */
+.shell-center {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex: 1;
+    min-width: 0;
+    background: var(--bg-app);
+    position: relative;
+}
+
+/* ========== Right Panel (Artifact) ========== */
+.shell-right {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex-shrink: 0;
+    background: var(--bg-panel);
+    border-left: 1px solid var(--border-subtle);
+    transition: width 0.2s ease-in-out;
+}

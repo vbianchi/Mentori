@@ -1,0 +1,149 @@
+{
+  "paper_id": "05_multiqc",
+  "filename": "05_multiqc.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "How to efficiently integrate and visualize quality control (QC) metrics from multiple bioinformatics tools and large sample sets into a single, comprehensive report to identify global trends and batch effects.",
+    "methods": [
+      "Python-based command-line tool",
+      "Recursive directory searching for recognized log files and QC reports",
+      "Modular architecture with submodules for parsing output from specific bioinformatics tools",
+      "Jinja2 template engine for rendering HTML reports",
+      "HighCharts JavaScript library for interactive data visualization",
+      "MatPlotLib for rendering static plots in extremely large datasets",
+      "Plugin system using Python setuptools entry points for custom extensions",
+      "Data export in tab-delimited text, YAML, or JSON formats"
+    ],
+    "findings": [
+      {
+        "finding": "MultiQC successfully aggregates output from 22 common bioinformatics tools into a single report.",
+        "evidence": "At the time of writing, MultiQC supports 22 common bioinformatics tools including aligners, processing tools and QC programs.",
+        "page": 2
+      },
+      {
+        "finding": "The tool enables rapid identification of batch effects and outliers across large projects.",
+        "evidence": "Collecting data within a single report provides a fast way to scan key statistics quickly and easily... Shared plots allow accurate comparison between samples, allowing detection of subtle differences.",
+        "page": 1
+      },
+      {
+        "finding": "MultiQC has seen rapid community adoption and integration into existing pipelines.",
+        "evidence": "MultiQC has been downloaded thousands of times within the past few months and is already integrated as standard within the popular bcbio-nextgen analysis toolkit.",
+        "page": 2
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "A screenshot of the 'General Statistics' table in a MultiQC report, showing various metrics (e.g., % Assigned, % Mapped, % GC) gathered from different tools for multiple samples.",
+        "page": 2
+      }
+    ],
+    "tables": [
+      {
+        "id": "General Statistics Table (Fig 1)",
+        "description": "Aggregates key metrics from different bioinformatics tools for each sample in the project.",
+        "columns": [
+          "Sample Name",
+          "% Assigned",
+          "M assigned",
+          "% Mapped",
+          "M Mapped",
+          "Trimmed",
+          "% Dups",
+          "% GC",
+          "Length",
+          "M Seqs"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "Next-generation sequencing (NGS)",
+      "Quality Control (QC)",
+      "Batch effects",
+      "LIMS (Laboratory Information Management System)",
+      "Jinja2",
+      "HighCharts",
+      "MatPlotLib",
+      "YAML/JSON",
+      "Bioconda"
+    ],
+    "limitations": [
+      "Reports with hundreds of samples can become too large for interactive HighCharts plots, requiring a fallback to static MatPlotLib images to maintain performance.",
+      "The tool's utility depends on the existence of submodules for specific bioinformatics tools (though it is designed to be easily extensible)."
+    ],
+    "connections": [
+      "FastQC",
+      "Qualimap",
+      "RSeQC",
+      "bcbio-nextgen",
+      "Pandoc",
+      "Leek et al. (2010) - regarding batch effects",
+      "Hunter (2007) - MatPlotLib",
+      "GitHub/Bioconda/PyPI distribution"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "05_multiqc_FR1",
+      "paper_id": "05_multiqc",
+      "question": "According to the paper, how many common bioinformatics tools does MultiQC support at the time of writing?",
+      "category": "factual_recall",
+      "expected_answer": "MultiQC successfully aggregates output from 22 common bioinformatics tools. This includes a variety of tools such as aligners, processing tools, and quality control (QC) programs.",
+      "expected_concepts": [
+        "22",
+        "bioinformatics tools",
+        "aligners",
+        "processing tools",
+        "QC programs"
+      ],
+      "difficulty": "easy",
+      "source_page": "2",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "05_multiqc_CO2",
+      "paper_id": "05_multiqc",
+      "question": "How does MultiQC's approach to data presentation assist researchers in identifying quality issues across large-scale projects?",
+      "category": "conceptual",
+      "expected_answer": "By aggregating data from multiple samples into a single report with shared plots, MultiQC allows for a fast scan of key statistics across an entire project. This centralized view facilitates the identification of batch effects and outliers through accurate comparison between samples, revealing subtle differences that might be missed in individual reports.",
+      "expected_concepts": [
+        "batch effects",
+        "outliers",
+        "shared plots",
+        "sample comparison",
+        "centralized report"
+      ],
+      "difficulty": "medium",
+      "source_page": "1-2",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "05_multiqc_TE3",
+      "paper_id": "05_multiqc",
+      "question": "Which specific software libraries and architectural mechanisms does MultiQC use to handle data visualization and support custom extensions?",
+      "category": "technical",
+      "expected_answer": "MultiQC utilizes the Jinja2 template engine for rendering HTML reports, with HighCharts for interactive JavaScript visualizations and MatPlotLib for static plots in large datasets. For extensibility, it employs a plugin system using Python setuptools entry points to allow for custom submodules and extensions.",
+      "expected_concepts": [
+        "HighCharts",
+        "MatPlotLib",
+        "Jinja2",
+        "setuptools entry points",
+        "plugin system"
+      ],
+      "difficulty": "hard",
+      "source_page": "Methods",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:12:33.350470"
+}

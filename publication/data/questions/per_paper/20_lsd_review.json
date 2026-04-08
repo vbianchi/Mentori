@@ -1,0 +1,166 @@
+{
+  "paper_id": "20_lsd_review",
+  "filename": "20_lsd_review.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "This paper provides a systematic review of Lumpy Skin Disease (LSD), focusing on its mode of transmission, risk of emergence, etiology, clinical symptoms, and prevention/treatment strategies to address its growing threat as a transboundary disease.",
+    "methods": [
+      "Systematic literature review",
+      "Chronological mapping of disease outbreaks",
+      "Comparative analysis of vaccine types and efficacy",
+      "Synthesis of host-pathogen interaction and transmission mechanisms"
+    ],
+    "findings": [
+      {
+        "finding": "LSDV shares a high cross-protection rate with Sheep Pox Virus and Goat Pox Virus when used in vaccinations.",
+        "evidence": "These viruses share a high cross-protection rate of approximately 96% when vaccinated against.",
+        "page": 2
+      },
+      {
+        "finding": "The disease has extremely high morbidity but relatively low mortality rates.",
+        "evidence": "Although the mortality rate is typically less than 10%, illness morbidity can reach 100%.",
+        "page": 4
+      },
+      {
+        "finding": "The homologous vaccine Lumpi-ProVacInd developed in India shows perfect efficacy.",
+        "evidence": "According to ICAR scientists, the efficacy of the homologous vaccination Lumpi-ProVacInd is 100%.",
+        "page": 6
+      },
+      {
+        "finding": "LSDV exhibits high environmental resilience, particularly in skin lesions.",
+        "evidence": "This virus can endure in skin lesions for as long as 35 days at room temperature.",
+        "page": 3
+      }
+    ],
+    "figures": [
+      {
+        "id": "Graphical abstract",
+        "description": "Illustrates the LSD transmission cycle involving weather factors, vectors (ticks, flies, mosquitoes), cattle infestation, and secondary routes like milk-borne or intrauterine transmission.",
+        "page": 1
+      },
+      {
+        "id": "Figure 1",
+        "description": "Provides clinical photographs of infected cattle showing cutaneous nodules, ocular discharge, and lesions on the limbs and eyes.",
+        "page": 4
+      },
+      {
+        "id": "Figure 2",
+        "description": "A diagram mapping common symptoms of LSD, including fever, skin nodules, decreased milk production, excessive salivation, and lameness.",
+        "page": 4
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Chronological onset of LSD outbreaks across various countries from 1929 to 2021.",
+        "columns": [
+          "Country",
+          "Year of outbreak",
+          "References"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "Summary of different categories of LSD vaccines and their specific features.",
+        "columns": [
+          "Vaccine type",
+          "Features"
+        ]
+      },
+      {
+        "id": "Table 3",
+        "description": "Directory of commonly used registered vaccines for LSD, including manufacturers and target species.",
+        "columns": [
+          "Manufacturer",
+          "Product name and virus strain",
+          "Target species",
+          "Links"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "Capripoxvirus (CaPV)",
+      "Neethling strain",
+      "Enzootic",
+      "Epizootic",
+      "Transboundary disease",
+      "Homologous recombination",
+      "Agalactia",
+      "Chordopoxvirinae"
+    ],
+    "limitations": [
+      "The precise intricacies of the interaction between LSDV and its host remain unclear.",
+      "The duration of both cellular and humoral immunity following infection or vaccination is uncertain.",
+      "There is no specific treatment for LSD; only supportive care is available.",
+      "The impact of the disease is worsened by the dissemination of misinformation via social media during outbreaks."
+    ],
+    "connections": [
+      "Builds upon the original 1929 description of the virus in Zambia.",
+      "References the World Organisation for Animal Health (WOAH) classification of LSD as a notifiable disease.",
+      "Cites research on the Gorgan goatpox strain vaccine and its performance in Ethiopian cattle.",
+      "Incorporates data from the ICAR-NRCE and IVRI regarding the development of the Lumpi-ProVacInd vaccine."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "20_lsd_review_FR1",
+      "paper_id": "20_lsd_review",
+      "question": "What is the reported efficacy of the homologous vaccine Lumpi-ProVacInd developed in India?",
+      "category": "factual_recall",
+      "expected_answer": "The homologous vaccine Lumpi-ProVacInd, which was developed by scientists at the Indian Council of Agricultural Research (ICAR), has an efficacy rate of 100%.",
+      "expected_concepts": [
+        "Lumpi-ProVacInd",
+        "ICAR",
+        "100%",
+        "homologous vaccine"
+      ],
+      "difficulty": "easy",
+      "source_page": "6",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "20_lsd_review_CO2",
+      "paper_id": "20_lsd_review",
+      "question": "How does the clinical impact of Lumpy Skin Disease Virus (LSDV) differ in terms of its spread within a herd versus its lethality?",
+      "category": "conceptual",
+      "expected_answer": "LSDV is characterized by extremely high morbidity but relatively low mortality. While the illness can spread to up to 100% of a cattle herd (high morbidity), the mortality rate typically remains below 10%. The impact is primarily seen through widespread clinical symptoms like fever, skin nodules, and decreased milk production rather than high death rates.",
+      "expected_concepts": [
+        "high morbidity",
+        "low mortality",
+        "100% morbidity",
+        "10% mortality",
+        "clinical symptoms"
+      ],
+      "difficulty": "medium",
+      "source_page": "4",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "20_lsd_review_TE3",
+      "paper_id": "20_lsd_review",
+      "question": "According to the comparative analysis of vaccinations, what is the specific cross-protection rate between LSDV and related poxviruses, and which viruses are involved?",
+      "category": "technical",
+      "expected_answer": "LSDV shares a high cross-protection rate of approximately 96% when vaccinations are administered using the Sheep Pox Virus and the Goat Pox Virus. This high rate of protection is a key factor in using these related virus strains for immunization strategies.",
+      "expected_concepts": [
+        "96% cross-protection",
+        "Sheep Pox Virus",
+        "Goat Pox Virus",
+        "vaccination efficacy"
+      ],
+      "difficulty": "hard",
+      "source_page": "2",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:21:03.025660"
+}

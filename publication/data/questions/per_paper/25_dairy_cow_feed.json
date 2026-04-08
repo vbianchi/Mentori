@@ -1,0 +1,158 @@
+{
+  "paper_id": "25_dairy_cow_feed",
+  "filename": "25_dairy_cow_feed.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "The paper investigates the gene-microbiome-phenotype networks underlying feed efficiency in dairy cows by integrating genotypic, microbial, and phenotypic data to understand how the host genome directly and indirectly influences the rumen microbiome and efficiency traits.",
+    "methods": [
+      "Genomic scans (pQTL and rmQTL) using linear models",
+      "16S rRNA sequencing for microbial abundance profiling",
+      "Incremental Association Markov Blanket (IAMB) algorithm for causal structural learning",
+      "Fisher\u2019s Z test for conditional independence",
+      "Jackknife resampling for causal network stability evaluation",
+      "Centered log-ratio (CLR) transformation for microbial data compositionality",
+      "SimpleM method for multiple testing correction"
+    ],
+    "findings": [
+      {
+        "finding": "Identified significant genomic regions co-localizing the rumen microbiome and feed efficiency traits, specifically on BTA3, BTA7, and BTA11.",
+        "evidence": "Two significant co-localized SNP between DMI and rumen microbiome clustered in the region 6.1\u20136.2 Mb on BTA11.",
+        "page": 6
+      },
+      {
+        "finding": "The cow genome (Chr3: 116.5 Mb) indirectly affects RFI mediated by the abundance of Syntrophococcus, Prevotella, and an unknown genus of Class Bacilli.",
+        "evidence": "Figure 4a shows two QTL on BTA3 directly and indirectly associated with RFI mediated by ASV1047, ASV666, and ASV57.",
+        "page": 8
+      },
+      {
+        "finding": "Dry matter intake (DMI) mediates the host genetic effect on the abundance of specific microbes like Rikenellaceae RC9 gut group.",
+        "evidence": "QTL on BTA7 (Chr7: 52.8 Mb) and BTA11 (Chr11: 6.1\u20136.2 Mb) affect Rikenellaceae RC9 gut group mediated by DMI.",
+        "page": 1
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "Manhattan plots showing genomic scans for dry matter intake (DMI), net energy secreted in milk (NESec), and residual feed intake (RFI).",
+        "page": 5
+      },
+      {
+        "id": "Figure 2",
+        "description": "Manhattan plot showing genomic scans for various rumen microbial abundances across the cattle genome.",
+        "page": 5
+      },
+      {
+        "id": "Figure 3",
+        "description": "Plot of co-localized quantitative trait loci (QTL) for phenotypes (DMI and RFI) and rumen microbial abundances.",
+        "page": 6
+      },
+      {
+        "id": "Figure 4",
+        "description": "Three causal networks (a, b, and c) illustrating the direct and indirect relationships between the host genome, microbial abundances, and feed efficiency traits.",
+        "page": 8
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Summary of co-localized SNPs between phenotypic and microbial traits including chromosome locations and significance levels.",
+        "columns": [
+          "Phenotypic trait",
+          "Chr",
+          "Position (bp)",
+          "Microbial trait",
+          "-log10(P-value)",
+          "Adjusted P-value"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "Residual feed intake (RFI)",
+      "Dry matter intake (DMI)",
+      "Net energy secreted in milk (NESec)",
+      "Quantitative trait loci (QTL)",
+      "pQTL (phenotypic QTL)",
+      "rmQTL (rumen microbial QTL)",
+      "Amplicon sequence variant (ASV)",
+      "Markov Blanket",
+      "Centered log-ratio (CLR) transformation"
+    ],
+    "limitations": [
+      "Limited sample size of 448 cows, which may have prevented the detection of certain major gene effects like DGAT1 on BTA14.",
+      "The use of a reduced number of candidate microbes (272) might be too simplistic and not fully account for the total dimensionality of the rumen microbiome.",
+      "The study focused on mid-lactation Holstein cows, which may not represent all lactation stages or breeds."
+    ],
+    "connections": [
+      "Pe\u00f1agaricano et al. (2015) regarding the integration of genotypic and phenotypic data for causal networks.",
+      "Martinez-Boggio et al. (2024) regarding the pre-selection of rumen microbes for selective breeding.",
+      "DADA2 pipeline for microbial sequence processing.",
+      "bnlearn R package for Bayesian network analysis.",
+      "WOMBAT software for model fitting and estimating SNP solutions."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "25_dairy_cow_feed_FR1",
+      "paper_id": "25_dairy_cow_feed",
+      "question": "Which specific genomic regions were identified as co-localizing the rumen microbiome and feed efficiency traits, and where was the cluster on BTA11 located?",
+      "category": "factual_recall",
+      "expected_answer": "Significant genomic regions co-localizing the rumen microbiome and feed efficiency traits were identified on BTA3, BTA7, and BTA11. Specifically, on BTA11, two significant co-localized SNPs between dry matter intake (DMI) and the rumen microbiome clustered in the region of 6.1\u20136.2 Mb.",
+      "expected_concepts": [
+        "BTA3",
+        "BTA7",
+        "BTA11",
+        "6.1\u20136.2 Mb",
+        "co-localization"
+      ],
+      "difficulty": "easy",
+      "source_page": "6",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "25_dairy_cow_feed_CO2",
+      "paper_id": "25_dairy_cow_feed",
+      "question": "How does the host genome at Chr3: 116.5 Mb influence residual feed intake (RFI), and what role do microbes play in this relationship?",
+      "category": "conceptual",
+      "expected_answer": "The cow genome at Chr3: 116.5 Mb does not affect residual feed intake (RFI) directly; instead, it affects RFI indirectly through mediation. This relationship is mediated by the abundance of specific microbes, including Syntrophococcus, Prevotella, and an unknown genus belonging to the Class Bacilli.",
+      "expected_concepts": [
+        "indirect effect",
+        "mediation",
+        "Syntrophococcus",
+        "Prevotella",
+        "Class Bacilli",
+        "RFI"
+      ],
+      "difficulty": "medium",
+      "source_page": "8",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "25_dairy_cow_feed_TE3",
+      "paper_id": "25_dairy_cow_feed",
+      "question": "What specific algorithm was used for causal structural learning in the study, and how was the stability of the resulting causal networks evaluated?",
+      "category": "technical",
+      "expected_answer": "The researchers used the Incremental Association Markov Blanket (IAMB) algorithm for causal structural learning, which utilized Fisher\u2019s Z test for conditional independence. The stability of the resulting causal networks was evaluated using Jackknife resampling.",
+      "expected_concepts": [
+        "Incremental Association Markov Blanket",
+        "IAMB",
+        "Jackknife resampling",
+        "Fisher\u2019s Z test",
+        "causal structural learning"
+      ],
+      "difficulty": "hard",
+      "source_page": "1",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:23:47.816033"
+}

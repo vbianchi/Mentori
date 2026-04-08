@@ -1,0 +1,159 @@
+{
+  "paper_id": "21_livestock_gut_microbiome_review",
+  "filename": "21_livestock_gut_microbiome_review.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "This review paper assesses the current body of research on the livestock gut microbiome, evaluates the state-of-the-art sequencing techniques, identifies major knowledge gaps\u2014such as the over-reliance on a few cosmopolitan breeds and the neglect of non-bacterial microbes\u2014and provides suggestions for future research directions.",
+    "methods": [
+      "Literature Review",
+      "Amplicon Metabarcoding (16S rRNA, 18S rRNA, ITS)",
+      "Shotgun Metagenomic Sequencing",
+      "Metatranscriptomics (RNASeq)",
+      "Bioinformatics analysis using tools like QIIME, PICRUSt, and Tax4Fun",
+      "Metaproteomics"
+    ],
+    "findings": [
+      {
+        "finding": "The vast majority of gut microbiome research is biased toward a small number of globally distributed, highly selected cosmopolitan breeds, overlooking local breeds adapted to harsh environments.",
+        "evidence": "We found that the enormous volumes of available data are biased toward a small number of globally distributed and carefully chosen varieties...",
+        "page": 1
+      },
+      {
+        "finding": "In cattle, the most abundant bacterial phyla are Bacteroidetes and Firmicutes, which can account for more than 90% of the entire gastrointestinal tract (GIT) bacterial community.",
+        "evidence": "The most abundant phyla are represented by Bacteroidetes and Firmicutes, which may account for more than 90% of the entire GIT bacterial community...",
+        "page": 4
+      },
+      {
+        "finding": "The sheep gut microbiome is similar to cattle, with Bacteroidetes and Firmicutes making up more than 80% to 90% of the community.",
+        "evidence": "...with Bacteroidetes and Firmicutes making up more than 80 to 90 percent of the gut microbial community.",
+        "page": 6
+      },
+      {
+        "finding": "Research is heavily skewed toward bacteria; non-bacterial components like protists, fungi, and viruses receive far less attention.",
+        "evidence": "Furthermore, the bulk of this research has mostly focused on bacteria, whereas other microbial components such as protists, fungi, and viruses have received far less attention.",
+        "page": 1
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "A list and diagram of the most abundant bacterial orders found across different segments of the gastrointestinal tracts (GITs) of ruminant livestock species (cattle, sheep, and goats).",
+        "page": 5
+      },
+      {
+        "id": "Figure 2",
+        "description": "A list and diagram of the most abundant bacterial orders found across the gastrointestinal tracts (GITs) of monogastric livestock species (pigs and chickens).",
+        "page": 8
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table S1",
+        "description": "A supplementary table providing a detailed list of GIT-associated bacterial taxa and bibliographic references for ruminant species (cattle, sheep, goats).",
+        "columns": [
+          "Not visible in main PDF",
+          "Referenced as: List of most abundant eubacterial genera found across the GIT of ruminant livestock species"
+        ]
+      },
+      {
+        "id": "Table S2",
+        "description": "A supplementary table providing a detailed list of GIT-associated bacterial taxa and bibliographic references for monogastric species (pigs, chickens).",
+        "columns": [
+          "Not visible in main PDF",
+          "Referenced as: List of most abundant eubacterial genera found across the GIT of monogastric livestock species"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "Microbiota",
+      "Microbiome",
+      "Metagenomics",
+      "Metatranscriptomics",
+      "Amplicon Metabarcoding",
+      "Shotgun Sequencing",
+      "Resistome",
+      "OTUs (Operational Taxonomic Units)",
+      "GIT (Gastrointestinal Tract)",
+      "One Health"
+    ],
+    "limitations": [
+      "High sequencing and computational costs associated with shotgun metagenomics and metatranscriptomics.",
+      "Reference databases (e.g., SILVA, Greengenes) are often not updated regularly.",
+      "Geographic bias: most studies are conducted in China or Europe, with less focus on Africa and tropical regions.",
+      "Limited resolution of 16S rRNA sequencing compared to whole-genome approaches.",
+      "Lack of functional prediction accuracy in current bioinformatics tools due to a paucity of available reference genomes."
+    ],
+    "connections": [
+      "Builds upon the 'One Health' strategy connecting animal health, human health, and the environment.",
+      "References the QIIME pipeline for taxonomic assignment.",
+      "Uses PICRUSt and Tax4Fun for functional metagenome prediction.",
+      "Builds on standard livestock microbiome studies such as the Global Rumen Census (Henderson et al. 2015)."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "21_livestock_gut_microbiome_review_FR1",
+      "paper_id": "21_livestock_gut_microbiome_review",
+      "question": "In cattle, which two bacterial phyla are the most abundant and what percentage of the gastrointestinal tract bacterial community can they represent?",
+      "category": "factual_recall",
+      "expected_answer": "In cattle, the most abundant bacterial phyla are Bacteroidetes and Firmicutes. Together, these two phyla can account for more than 90% of the entire gastrointestinal tract (GIT) bacterial community.",
+      "expected_concepts": [
+        "Bacteroidetes",
+        "Firmicutes",
+        "90%",
+        "gastrointestinal tract",
+        "bacterial phyla"
+      ],
+      "difficulty": "easy",
+      "source_page": "4",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "21_livestock_gut_microbiome_review_CO2",
+      "paper_id": "21_livestock_gut_microbiome_review",
+      "question": "What are the primary biases currently existing in livestock gut microbiome research regarding breed selection and taxonomic focus?",
+      "category": "conceptual",
+      "expected_answer": "Research is currently biased toward a small number of globally distributed, highly selected cosmopolitan breeds, which leads to an oversight of local breeds adapted to harsh environments. Furthermore, there is a significant taxonomic bias where the bulk of research focuses almost exclusively on bacteria, leaving other components like protists, fungi, and viruses under-studied.",
+      "expected_concepts": [
+        "cosmopolitan breeds",
+        "local breeds",
+        "taxonomic bias",
+        "non-bacterial components",
+        "protists",
+        "fungi"
+      ],
+      "difficulty": "medium",
+      "source_page": "1",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "21_livestock_gut_microbiome_review_TE3",
+      "paper_id": "21_livestock_gut_microbiome_review",
+      "question": "Which specific bioinformatics tools and molecular sequencing techniques are utilized in the analysis of the livestock microbiome as described in the paper's methods?",
+      "category": "technical",
+      "expected_answer": "The study utilizes molecular techniques including Amplicon Metabarcoding (targeting 16S, 18S, and ITS rRNA), Shotgun Metagenomic Sequencing, and Metatranscriptomics (RNASeq). For data processing and functional prediction, bioinformatics tools such as QIIME, PICRUSt, and Tax4Fun are employed.",
+      "expected_concepts": [
+        "Amplicon Metabarcoding",
+        "Shotgun Metagenomic Sequencing",
+        "QIIME",
+        "PICRUSt",
+        "Tax4Fun",
+        "Metatranscriptomics"
+      ],
+      "difficulty": "hard",
+      "source_page": "1",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:21:31.409934"
+}

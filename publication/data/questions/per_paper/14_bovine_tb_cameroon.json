@@ -1,0 +1,215 @@
+{
+  "paper_id": "14_bovine_tb_cameroon",
+  "filename": "14_bovine_tb_cameroon.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "This paper aims to estimate the prevalence and zoonotic risk factors of bovine tuberculosis (bTB) in cattle within the cattle-wildlife-human interface in the South and East regions of Cameroon, where the epidemiology of the disease is poorly understood.",
+    "methods": [
+      "Descriptive cross-sectional study conducted from May to October 2022.",
+      "Comparative Intradermal Tuberculin Testing (CIDT) using bovine and avian purified protein derivatives (PPD).",
+      "Simple Intradermal Tuberculin Test (SITT) performed on a sample of 160 cattle.",
+      "Interviewee-administered questionnaire with 90 cattle professionals to gather sociodemographic and epidemiological data.",
+      "Statistical analysis using Pearson's Chi-square and McNemar's Chi-square tests.",
+      "Univariate and multivariate logistic regression modeling (using R software) to identify risk factors.",
+      "Akaike Information Criterion (AIC) used for model quality and selection.",
+      "Variance Inflation Factor (VIF) to test for multi-collinearity."
+    ],
+    "findings": [
+      {
+        "finding": "The prevalence of bTB varied significantly depending on the diagnostic test and threshold used.",
+        "evidence": "Estimated prevalence was 6.8% (95% CI: 4.35%\u20139.41%) for CIDT at a 3 mm threshold, and 0.6% (95% CI: 0%\u20131.2%) for CIDT at a 4 mm threshold. SITT at a 4 mm threshold yielded a prevalence of 1.8% (95% CI: 0%\u20133.6%).",
+        "page": 4
+      },
+      {
+        "finding": "Specific animal and herd characteristics were identified as significant risk factors for bTB exposure.",
+        "evidence": "Univariate analysis showed herds with 21\u2013160 heads were 4.88 times more exposed (OR = 4.88, p < 0.05). Cattle aged >10 years (OR = 0.17, p < 0.05) and farms with a history of tuberculous organ seizures (OR = 0.015, p < 0.05) were also significant.",
+        "page": 4
+      },
+      {
+        "finding": "Multivariate analysis highlighted profession and environmental factors in bTB transmission.",
+        "evidence": "Being a cattle herder and contact between wildlife and livestock due to forage were significantly associated with bTB exposure (adjusted OR = 0.02; p = 0.001).",
+        "page": 1
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "A map of Cameroon identifying study animal locations (herds) in proximity to or away from protected areas (parks) in the South and East regions.",
+        "page": 3
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "The interpretation grid for intradermal tuberculin tests based on skinfold thickness variation.",
+        "columns": [
+          "Bovine tuberculin",
+          "WOAH manual [13]",
+          "Result 'reaction'"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "Distribution of apparent bTB prevalence results comparing SITT and CIDT at different thresholds.",
+        "columns": [
+          "IDT",
+          "Total (n)",
+          "Positive",
+          "AP % (95% CI)"
+        ]
+      },
+      {
+        "id": "Table 3",
+        "description": "Bovine TB prevalence distributed across various sociodemographic parameters like sex, breed, age, and body condition.",
+        "columns": [
+          "Variables",
+          "Herd size",
+          "AP (%) (95% CI) [CIDT \u22653, CIDT \u22654, SITT \u22654]",
+          "Comparison of AP for CIDT and SITT Chi-square (p-value)"
+        ]
+      },
+      {
+        "id": "Table 4",
+        "description": "Univariate analysis of factors (profession, breeding system, signs) associated with bTB exposure.",
+        "columns": [
+          "Variables",
+          "Modalities",
+          "Tuberculosis status, No, n=73",
+          "Tuberculosis status, Yes, n=16",
+          "Odds ratio (95% CI)",
+          "p-value"
+        ]
+      },
+      {
+        "id": "Table 5",
+        "description": "Multivariate analysis of factors significantly associated with bTB exposure in the study regions.",
+        "columns": [
+          "Variables",
+          "Modalities",
+          "Adjusted OR",
+          "95% CI",
+          "p-value"
+        ]
+      },
+      {
+        "id": "Table 6",
+        "description": "Statistical evaluation (Deviance, AIC, LRT) to identify variables with significant effects on the initial regression model.",
+        "columns": [
+          "Variable",
+          "Df",
+          "Deviance",
+          "AIC",
+          "LRT",
+          "Pr"
+        ]
+      },
+      {
+        "id": "Table 7",
+        "description": "Final model selection results showing factors most significantly associated with bTB.",
+        "columns": [
+          "Variable",
+          "Df",
+          "Deviance",
+          "AIC"
+        ]
+      },
+      {
+        "id": "Table 8",
+        "description": "Variance Inflation Factor (VIF) values used to check for multi-collinearity among final model variables.",
+        "columns": [
+          "Factor Forage reason",
+          "Cattle herder",
+          "Age >10 years",
+          "Tuberculous organs seizure"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "bTB (Bovine Tuberculosis)",
+      "Mycobacterium bovis",
+      "CIDT (Comparative Intradermal Tuberculin Test)",
+      "SITT (Simple Intradermal Tuberculin Test)",
+      "PPD (Purified Protein Derivative)",
+      "Zoonotic",
+      "Prevalence (Apparent Prevalence)",
+      "AIC (Akaike Information Criterion)",
+      "VIF (Variance Inflation Factor)"
+    ],
+    "limitations": [
+      "The role of wildlife in transmission is still poorly understood despite identifying forage contact as a risk factor.",
+      "Sample size was determined using a non-random technique.",
+      "The study focused only on two specific regions (South and East Cameroon), which may not represent the entire country.",
+      "Reliance on interviewee-administered questionnaires may introduce self-reporting bias among cattle professionals."
+    ],
+    "connections": [
+      "Ndukum et al. (2012): Previous study on bTB in the highlands of Cameroon used as a reference for prevalence rates.",
+      "WOAH (World Organization for Animal Health) Manual (2023): Standardized guidelines used for diagnostic test thresholds and interpretation.",
+      "Studies in Ethiopia (Ameni et al., 2008; Kemal et al., 2019) and Taiwan (Heng-Ching et al., 2022) were used to validate the use of lower CIDT thresholds (3 mm vs 4 mm)."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "14_bovine_tb_cameroon_FR1",
+      "paper_id": "14_bovine_tb_cameroon",
+      "question": "What were the specific bovine tuberculosis (bTB) prevalence estimates calculated in this study based on the different diagnostic tests and thresholds used?",
+      "category": "factual_recall",
+      "expected_answer": "The study estimated the prevalence of bTB as 6.8% (95% CI: 4.35%\u20139.41%) for the Comparative Intradermal Tuberculin Test (CIDT) at a 3 mm threshold, 0.6% (95% CI: 0%\u20131.2%) for the CIDT at a 4 mm threshold, and 1.8% (95% CI: 0%\u20133.6%) for the Simple Intradermal Tuberculin Test (SITT) at a 4 mm threshold.",
+      "expected_concepts": [
+        "CIDT",
+        "SITT",
+        "threshold",
+        "prevalence",
+        "3 mm",
+        "4 mm"
+      ],
+      "difficulty": "easy",
+      "source_page": "4",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "14_bovine_tb_cameroon_CO2",
+      "paper_id": "14_bovine_tb_cameroon",
+      "question": "How does the choice of diagnostic method and skinfold thickness threshold impact the assessment of bTB exposure according to the study's findings?",
+      "category": "conceptual",
+      "expected_answer": "The prevalence of bTB is highly sensitive to both the type of test (CIDT vs. SITT) and the specific millimeter threshold applied to the skinfold reaction. The results show that using a more stringent 4 mm threshold for CIDT results in a much lower prevalence (0.6%) compared to a 3 mm threshold (6.8%), indicating that the diagnostic interpretation grid significantly shifts the perceived disease burden within the same cattle population.",
+      "expected_concepts": [
+        "diagnostic test",
+        "skinfold thickness",
+        "interpretation grid",
+        "sensitivity",
+        "threshold variation"
+      ],
+      "difficulty": "medium",
+      "source_page": "4",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "14_bovine_tb_cameroon_TE3",
+      "paper_id": "14_bovine_tb_cameroon",
+      "question": "Which specific statistical software and metrics were employed to refine the logistic regression models and verify the independence of the identified risk factors?",
+      "category": "technical",
+      "expected_answer": "The researchers used R software for univariate and multivariate logistic regression modeling. To ensure the quality and proper selection of the models, the Akaike Information Criterion (AIC) was utilized, and the Variance Inflation Factor (VIF) was calculated to test for multi-collinearity among the variables in the final model.",
+      "expected_concepts": [
+        "R software",
+        "Akaike Information Criterion (AIC)",
+        "Variance Inflation Factor (VIF)",
+        "multi-collinearity",
+        "logistic regression"
+      ],
+      "difficulty": "medium",
+      "source_page": "1",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:17:45.593240"
+}

@@ -1,0 +1,183 @@
+{
+  "paper_id": "30_aquaculture_metagenomics",
+  "filename": "30_aquaculture_metagenomics.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "How do experimental choices in sequencing approaches (short-read 16S metabarcoding, long-read amplicons, and shotgun metagenomics) impact the characterization of microbial communities in freshwater recirculating aquaculture systems (RAS)?",
+    "methods": [
+      "16S rRNA short-amplicon sequencing (V1-V3, V3-V4, V4 variable regions)",
+      "PacBio long-read amplicon sequencing (Shoreline StrainID targeting 16S-ITS-23S)",
+      "Illumina shotgun metagenomics (amplification-free)",
+      "DADA2 pipeline for ASV determination",
+      "Kraken2 and Bracken for shotgun metagenomics classification",
+      "SBAnalyzer and Athena for PacBio data processing",
+      "Multidimensional scaling (MDS) and alpha/beta diversity analysis"
+    ],
+    "findings": [
+      {
+        "finding": "16S primer choice and amplicon length significantly affect richness and diversity values but do not impact the observed spatio-temporal patterns between samples.",
+        "evidence": "Earth primers (V4) yielded higher alpha richness (1070\u20132240 ASVs) compared to MiSeq primers (V3-4: 441\u20131962 ASVs), yet both showed identical community structure patterns in MDS plots.",
+        "page": 9
+      },
+      {
+        "finding": "Long-read amplicons (PacBio) provide high-resolution species identification suitable for detecting pathogens and functional service microbes.",
+        "evidence": "PacBio sequencing resulted in the identification of 204 unique species, including pathogens like Aeromonas hydrophila.",
+        "page": 11
+      },
+      {
+        "finding": "Shotgun metagenomics expands the community profile to include non-bacterial domains such as fungi, viruses, and eukaryotes.",
+        "evidence": "Shotgun data identified 75.55% prokaryotes, 23.97% eukaryotes, 0.24% archaea, and 0.24% viruses.",
+        "page": 11
+      },
+      {
+        "finding": "Environmental conditions (farm identity) and biofilm maturation state are the primary drivers of microbial community composition.",
+        "evidence": "MDS analysis showed clear separation between Farm A and Farm B, and between young (<1 week) and mature (>1 week) biofilms.",
+        "page": 10
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "Visual summary of the study design, including sample types, sampling locations at two farms, DNA extraction testing, and the sequencing/analysis approaches used.",
+        "page": 3
+      },
+      {
+        "id": "Figure 2",
+        "description": "Comparative analysis of read quality, richness, Shannon diversity, and phylum-level community composition between Earth and MiSeq 16S primers.",
+        "page": 9
+      },
+      {
+        "id": "Figure 3",
+        "description": "MDS plots showing how community structure is influenced by primer choice, farm location, and biofilm maturation stage.",
+        "page": 10
+      },
+      {
+        "id": "Figure 4",
+        "description": "PERMANOVA coefficient plots identifying specific ASVs enriched in different RAS compartments (water vs. biofilm) as detected by different 16S primers.",
+        "page": 12
+      },
+      {
+        "id": "Figure 5",
+        "description": "Distribution and functional information (gram stain, respiration) of the ten most abundant species identified by PacBio long-read sequencing across various samples.",
+        "page": 13
+      },
+      {
+        "id": "Figure 6",
+        "description": "Shotgun metagenomics data visualized via Sankey diagrams and bar plots to show the relative abundance of prokaryotic and eukaryotic phyla.",
+        "page": 14
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Technical details of the primers used in the study, facilitating reproducibility and comparison of targeted regions.",
+        "columns": [
+          "Targeted region",
+          "Short-hand",
+          "FW primer",
+          "FW primer sequence",
+          "FW primer length",
+          "FW melting temperatures",
+          "REV primer",
+          "REV primer sequence",
+          "REV primer length",
+          "REV melting temperatures",
+          "Amplicon length",
+          "Primer target species"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "Recirculating Aquaculture Systems (RAS)",
+      "Metabarcoding",
+      "ASVs (Amplicon Sequence Variants)",
+      "Shotgun Metagenomics",
+      "Biofilter",
+      "Nitrification",
+      "Alpha-diversity",
+      "Beta-diversity",
+      "Phred score",
+      "DADA2",
+      "Kraken2",
+      "SMRT sequencing"
+    ],
+    "limitations": [
+      "The 27F_534R primer pair underperformed in read quality and failed to merge forward/reverse reads when co-sequenced with shorter amplicons.",
+      "PacBio long-read sequencing suffered from low read depth due to harsh lysis conditions and the over-sequencing of the mock community standard.",
+      "Mock community inclusion can compromise overall sequencing depth for environmental samples.",
+      "Long-read amplicons may not be optimal for large-scale quantitative spatio-temporal studies compared to short-reads."
+    ],
+    "connections": [
+      "Earth Microbiome Project (515F/806R primers)",
+      "DADA2 (Callahan et al., 2016)",
+      "SILVA v138 gene reference database",
+      "Kraken2 and Bracken (Wood et al., 2014; Lu et al., 2017)",
+      "Phyloseq R package (McMurdie and Holmes, 2013)"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "30_aquaculture_metagenomics_FR1",
+      "paper_id": "30_aquaculture_metagenomics",
+      "question": "What specific percentages of prokaryotes, eukaryotes, archaea, and viruses were identified using the shotgun metagenomics data?",
+      "category": "factual_recall",
+      "expected_answer": "According to the shotgun metagenomics data, the community profile consisted of 75.55% prokaryotes, 23.97% eukaryotes, 0.24% archaea, and 0.24% viruses.",
+      "expected_concepts": [
+        "shotgun metagenomics",
+        "prokaryotes",
+        "eukaryotes",
+        "archaea",
+        "viruses"
+      ],
+      "difficulty": "easy",
+      "source_page": "11",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "30_aquaculture_metagenomics_CO2",
+      "paper_id": "30_aquaculture_metagenomics",
+      "question": "How do the three sequencing approaches (16S rRNA, PacBio long-read, and shotgun metagenomics) differ in their contribution to the study's characterization of the microbial environment?",
+      "category": "conceptual",
+      "expected_answer": "16S rRNA sequencing is used to track spatio-temporal patterns and alpha richness across samples. PacBio long-read amplicons provide higher taxonomic resolution to identify specific species and pathogens, while shotgun metagenomics provides a cross-domain view that includes non-bacterial organisms such as fungi and viruses.",
+      "expected_concepts": [
+        "spatio-temporal patterns",
+        "taxonomic resolution",
+        "pathogen detection",
+        "non-bacterial domains",
+        "community composition"
+      ],
+      "difficulty": "medium",
+      "source_page": "9, 11",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "30_aquaculture_metagenomics_TE3",
+      "paper_id": "30_aquaculture_metagenomics",
+      "question": "Based on the comparative analysis of the Earth (V4) and MiSeq (V3-V4) primers, what were the quantitative differences in alpha richness and how did this impact the interpretation of community structure?",
+      "category": "technical",
+      "expected_answer": "The Earth primers (V4) yielded a higher alpha richness (1070\u20132240 ASVs) compared to the MiSeq primers (V3-4: 441\u20131962 ASVs). However, the choice of primer did not impact the observed community structure, as both primers resulted in identical patterns when analyzed via Multidimensional scaling (MDS) plots.",
+      "expected_concepts": [
+        "alpha richness",
+        "ASVs",
+        "V4 region",
+        "V3-V4 region",
+        "MDS plots",
+        "community structure"
+      ],
+      "difficulty": "hard",
+      "source_page": "9",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:27:21.222677"
+}

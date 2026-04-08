@@ -1,0 +1,389 @@
+/* src/components/panels/ArtifactPanel.css */
+.artifact-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    /* Create stacking context for absolute children */
+    z-index: var(--z-base);
+    /* Ensure it's above other content */
+}
+
+.artifact-header {
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    background: var(--bg-panel);
+    flex-shrink: 0;
+}
+
+.artifact-header-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    background: var(--bg-panel);
+    flex-shrink: 0;
+}
+
+.artifact-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.tabs {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all var(--trans-fast);
+}
+
+.tab-btn:hover {
+    color: var(--text-main);
+}
+
+.tab-btn.active {
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dirty-indicator {
+    font-size: 0.75rem;
+    color: var(--accent-warning);
+    margin-right: 0.5rem;
+}
+
+.action-icon-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--trans-fast);
+}
+
+.action-icon-btn:hover {
+    background: var(--bg-surface);
+    color: var(--text-main);
+}
+
+.action-icon-btn.highlight {
+    color: var(--accent-warning);
+}
+
+/* Editor Area */
+.artifact-content {
+    flex: 1;
+    background: #1e1e1e;
+    /* VS Code dark default approx */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* Prevent spillover */
+}
+
+.code-editor {
+    flex: 1;
+    width: 100%;
+    resize: none;
+    background: transparent;
+    color: #d4d4d4;
+    border: none;
+    padding: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    outline: none;
+    white-space: pre;
+}
+
+/* Markdown Preview Styles */
+.markdown-preview {
+    font-family: var(--font-sans, system-ui, sans-serif);
+    font-size: 1rem;
+    /* Base size */
+    line-height: 1.6;
+    color: var(--text-main, #e2e8f0);
+    white-space: normal;
+    /* Override pre from code-editor */
+    overflow-y: auto;
+    /* Enable vertical scrolling */
+    overflow-x: hidden;
+    /* Prevent horizontal scroll on container */
+    height: 100%;
+    /* Ensure it fills parent */
+
+    /* Hide Scrollbars but allow scrolling */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+/* Chrome, Safari, Opera */
+.markdown-preview::-webkit-scrollbar {
+    display: none;
+}
+
+.markdown-content {
+    width: 100%;
+    max-width: 100%;
+    /* Ensure it doesn't overflow container width */
+    padding-bottom: 2rem;
+    /* Add some bottom padding */
+}
+
+/* Headings */
+.markdown-content h1 {
+    font-size: 1.75em;
+    /* Scale relative to base */
+    font-weight: 700;
+    margin-bottom: 0.75em;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text-main);
+}
+
+.markdown-content h2 {
+    font-size: 1.5em;
+    font-weight: 600;
+    margin-top: 1.5em;
+    margin-bottom: 0.75em;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text-main);
+}
+
+.markdown-content h3 {
+    font-size: 1.25em;
+    font-weight: 600;
+    margin-top: 1.25em;
+    margin-bottom: 0.5em;
+}
+
+.markdown-content h4 {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+.markdown-content p {
+    margin-bottom: 1em;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+    margin-bottom: 1em;
+    padding-left: 1.5em;
+}
+
+.markdown-content li {
+    margin-bottom: 0.25em;
+}
+
+.markdown-content blockquote {
+    border-left: 4px solid var(--accent-secondary);
+    padding-left: 1em;
+    margin-left: 0;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.markdown-content code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+}
+
+.markdown-content pre {
+    background: transparent;
+    /* Handled by wrapper now */
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+}
+
+.markdown-content strong {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.markdown-content a {
+    color: var(--accent-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.markdown-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-sm);
+    margin: 1em 0;
+}
+
+.markdown-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1em;
+}
+
+.markdown-content th,
+.markdown-content td {
+    padding: 0.5em;
+    border: 1px solid var(--border-subtle);
+    text-align: left;
+}
+
+.markdown-content th {
+    background: var(--bg-surface);
+    font-weight: 600;
+}
+
+/* Sub-header for filename */
+.filename-header {
+    background: var(--bg-surface);
+    padding: 2px 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+}
+
+.filename-bubble {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-surface);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-subtle);
+}
+
+/* Inline rename input */
+.rename-input {
+    width: 100%;
+    background: var(--bg-panel);
+    border: 1px solid var(--accent-secondary);
+    border-radius: var(--radius-sm);
+    padding: 0.25rem 0.5rem;
+    color: var(--text-main);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    outline: none;
+}
+
+.rename-input:focus {
+    border-color: var(--accent-secondary);
+    box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
+}
+
+.branding-footer {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+/* ========== Media Viewer (Images & PDFs) ========== */
+.media-viewer {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-panel);
+    overflow: hidden;
+}
+
+.media-viewer-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+    overflow: auto;
+    background: repeating-conic-gradient(rgba(255, 255, 255, 0.03) 0% 25%,
+            transparent 0% 50%) 50% / 20px 20px;
+}
+
+.preview-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.pdf-viewer {
+    flex: 1;
+    width: 100%;
+    border: none;
+    background: white;
+}
+
+.media-viewer-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-2) var(--space-4);
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-subtle);
+}
+
+.media-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.media-download-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    background: var(--accent-primary-10);
+    border: 1px solid var(--accent-primary-20);
+    border-radius: var(--radius-sm);
+    color: var(--accent-primary);
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition: all var(--trans-fast);
+}
+
+.media-download-btn:hover {
+    background: var(--accent-primary-20);
+    color: var(--text-main);
+}

@@ -1,0 +1,151 @@
+{
+  "paper_id": "26_gut_meat_quality",
+  "filename": "26_gut_meat_quality.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "How does the gut microbiota influence the meat quality (color, flavor, fat deposition, etc.) of livestock and poultry, and what are the underlying microbial mechanisms and dietary factors involved?",
+    "methods": [
+      "Literature review and synthesis of recent studies",
+      "16S rRNA gene sequencing (referenced in studies)",
+      "Metagenomic analysis (referenced in studies)",
+      "Transcriptomic analysis (referenced in studies)",
+      "Metabolic profiling (referenced in studies)",
+      "Germ-free animal models (referenced in studies)"
+    ],
+    "findings": [
+      {
+        "finding": "Specific bacterial genera are positively correlated with higher intramuscular fat (IMF) content in pigs, including Ruminococcaceae_NK4A214_group, Parabacteroides, and Christensenellaaceae_R-7_group.",
+        "evidence": "Gut microbiome studies showed that higher relative abundances of these genera might correlate with higher IMF content.",
+        "page": 3
+      },
+      {
+        "finding": "The gut microbiome explains a significant portion of the variation in the finishing weight of animals.",
+        "evidence": "In rabbits, the gut microbiome explained nearly 11% of the variation in finishing weight.",
+        "page": 5
+      },
+      {
+        "finding": "Short-chain fatty acids (SCFAs) produced by gut microbes regulate fat accumulation and host health through specific signaling pathways.",
+        "evidence": "Acetate-dependent GPR43 stimulation in white adipose tissue improved glucose and lipid metabolism; SCFAs also impact the TLR4 and mTOR signaling pathways.",
+        "page": 2
+      },
+      {
+        "finding": "Rearing systems significantly impact the diversity and composition of the gut microbiota.",
+        "evidence": "Free-range hens were found to have richer Actinobacteria, Bacteroidetes, and Proteobacteria species diversity compared to indoor-raised birds.",
+        "page": 8
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "An overview diagram illustrating how the gut microbiota interacts with the host genome, diet, environment, and metabolic processes to influence meat quality.",
+        "page": 3
+      },
+      {
+        "id": "Figure 2",
+        "description": "A diagram showing specific gut microorganisms (e.g., Prevotella, Alistipes), genes (e.g., Fabp9, Scd1), and pathways (e.g., mTOR, PPAR) related to intramuscular fat accumulation.",
+        "page": 4
+      },
+      {
+        "id": "Figure 3",
+        "description": "A detailed map of the metabolism of short-chain fatty acids (SCFAs) from dietary fiber and their circulation to the liver, muscle, and adipose tissue.",
+        "page": 6
+      },
+      {
+        "id": "Figure 4",
+        "description": "An illustration showing how dietary antioxidants affect the composition of the gut microbiota and subsequently improve meat quality parameters like tenderness and color.",
+        "page": 8
+      },
+      {
+        "id": "Figure 5",
+        "description": "A summary graphic depicting the pathway from dietary fiber through microbial fermentation to systemic impacts on meat quality.",
+        "page": 9
+      }
+    ],
+    "tables": [],
+    "technical_terms": [
+      "Intramuscular fat (IMF)",
+      "Short-chain fatty acids (SCFAs)",
+      "Polyunsaturated fatty acids (PUFA)",
+      "Zoonotic pathogens",
+      "GPR43",
+      "Biohydrogenation",
+      "Metagenomics",
+      "Saccharolytic microbiota"
+    ],
+    "limitations": [
+      "Meat quality is a complex concept that is difficult to define precisely as it is largely determined by consumer preferences.",
+      "Intensive artificial selection for growth has led to an unexpected decrease in meat quality.",
+      "Understanding the host-microbiota interaction is still a developing field requiring more knowledge-based strategies."
+    ],
+    "connections": [
+      "Builds upon the work of Joo et al. (2013) regarding meat quality definitions.",
+      "Utilizes SCFA research frameworks from Koh et al. (2016) and Dalile et al. (2019).",
+      "Aligns with the 'One Health' approach for managing zoonotic diseases and food safety."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "26_gut_meat_quality_FR1",
+      "paper_id": "26_gut_meat_quality",
+      "question": "Which specific bacterial genera are positively correlated with higher intramuscular fat (IMF) content in pigs according to the gut microbiome studies cited?",
+      "category": "factual_recall",
+      "expected_answer": "According to the paper, the specific bacterial genera positively correlated with higher intramuscular fat (IMF) content in pigs are Ruminococcaceae_NK4A214_group, Parabacteroides, and Christensenellaaceae_R-7_group. These genera were found to have higher relative abundances in correlation with increased IMF.",
+      "expected_concepts": [
+        "Ruminococcaceae_NK4A214_group",
+        "Parabacteroides",
+        "Christensenellaaceae_R-7_group",
+        "intramuscular fat",
+        "pigs"
+      ],
+      "difficulty": "easy",
+      "source_page": "3",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "26_gut_meat_quality_CO2",
+      "paper_id": "26_gut_meat_quality",
+      "question": "How do short-chain fatty acids (SCFAs) bridge the gap between dietary fiber intake and the regulation of host fat accumulation and metabolism?",
+      "category": "conceptual",
+      "expected_answer": "SCFAs are produced through the microbial fermentation of dietary fiber. They regulate host health and meat quality by acting as signaling molecules; specifically, acetate-dependent stimulation of GPR43 in white adipose tissue improves glucose and lipid metabolism, while other SCFA-driven pathways involve the modulation of TLR4, mTOR, and PPAR signaling to influence fat accumulation.",
+      "expected_concepts": [
+        "microbial fermentation",
+        "GPR43",
+        "mTOR",
+        "PPAR",
+        "lipid metabolism",
+        "signaling pathways"
+      ],
+      "difficulty": "medium",
+      "source_page": "2, 4, 6, 9",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "26_gut_meat_quality_TE3",
+      "paper_id": "26_gut_meat_quality",
+      "question": "What metric is used to quantify the impact of the gut microbiome on rabbit finishing weight, and which specific host genes are highlighted as part of the microbial-influenced pathway for intramuscular fat accumulation?",
+      "category": "technical",
+      "expected_answer": "The gut microbiome explains nearly 11% of the variation in the finishing weight of rabbits. In terms of molecular pathways, the host genes Fabp9 and Scd1 are specifically identified as being related to intramuscular fat accumulation in connection with gut microorganisms like Prevotella and Alistipes.",
+      "expected_concepts": [
+        "11% variation",
+        "finishing weight",
+        "Fabp9",
+        "Scd1",
+        "intramuscular fat"
+      ],
+      "difficulty": "hard",
+      "source_page": "4, 5",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:24:25.339262"
+}

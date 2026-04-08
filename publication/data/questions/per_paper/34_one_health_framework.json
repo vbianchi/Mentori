@@ -1,0 +1,144 @@
+{
+  "paper_id": "34_one_health_framework",
+  "filename": "34_one_health_framework.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "How can a structured, generalizable framework be developed to improve multisectoral collaboration (human health, animal health, and environment) for the prevention and control of zoonotic diseases at local, national, and international levels?",
+    "methods": [
+      "Expert consultation involving subject matter experts in One Health, zoonotic diseases, and public health from the CDC and FAO.",
+      "Synthesis of successful existing processes and idealized models for zoonotic disease programming.",
+      "Review and integration of specific disease strategies including anthrax, brucellosis, rabies, Rift Valley fever, and zoonotic influenza.",
+      "Development of a five-step stepwise framework (GOHF) coupled with a resource toolkit."
+    ],
+    "findings": [
+      {
+        "finding": "The PulseNet laboratory network is estimated to avert 270,000 foodborne illnesses and save US $507 million annually through data sharing.",
+        "evidence": "An example of success through laboratory data sharing is PulseNet... estimated to have averted 270,000 foodborne illnesses and saved US $507 million each year",
+        "page": 6
+      },
+      {
+        "finding": "Dog vaccination coverage of 70% or higher is a critical threshold for reducing human rabies cases.",
+        "evidence": "For rabies, previous research has established that vaccination coverage of 70% or higher in dog populations can reduce the frequency of human dog-bite injuries...",
+        "page": 6
+      },
+      {
+        "finding": "Smartphone-based diagnostic systems for H5N1 avian influenza can achieve significantly higher detectability than traditional field methods.",
+        "evidence": "...a smartphone-based system for detecting H5N1 avian influenza in clinical patient samples has a two-folder higher detectability than traditional fluorescent strip readers...",
+        "page": 5
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "A conceptual diagram distinguishing between overarching One Health systems and specific zoonotic disease programs.",
+        "page": 2
+      },
+      {
+        "id": "Figure 2",
+        "description": "Visualization of the Generalized One Health Framework (GOHF) showing five steps and cross-cutting technical domains.",
+        "page": 3
+      },
+      {
+        "id": "Figure 3",
+        "description": "A flowchart demonstrating a One Health approach to event-based surveillance from the community level to international organizations.",
+        "page": 7
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Outlines the specific objectives and intended outcomes for each of the five stages of the GOHF.",
+        "columns": [
+          "Objective",
+          "Outcome(s)"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "One Health",
+      "Zoonotic Diseases",
+      "GOHF (Generalized One Health Framework)",
+      "OH-MCMs (One Health coordination mechanisms)",
+      "OHZDP (One Health Zoonotic Disease Prioritization)",
+      "JEE (Joint External Evaluation)",
+      "NAPHS (National Action Plans for Health Security)",
+      "SARE (Stepwise Approach towards Rabies Elimination)",
+      "Event-based surveillance"
+    ],
+    "limitations": [
+      "The compiled toolkit in the supplementary tables is not an exhaustive list of all available resources.",
+      "There is a lack of standardized or systematic monitoring and evaluation frameworks to demonstrate One Health effectiveness.",
+      "Published records for successful multisectoral prevention and control are limited to a few specific examples (e.g., rabies, influenza).",
+      "Environmental health practitioners are often underrepresented, and formal processes for their engagement are still needed."
+    ],
+    "connections": [
+      "Tripartite Zoonoses Guide (TZG) by FAO, OIE, and WHO",
+      "CDC's One Health Zoonotic Disease Prioritization (OHZDP) process",
+      "Joint External Evaluation (JEE) and PVS Pathway for capacity assessment",
+      "Stepwise Approach towards Rabies Elimination (SARE)"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "34_one_health_framework_FR1",
+      "paper_id": "34_one_health_framework",
+      "question": "What are the estimated annual public health and economic benefits of the PulseNet laboratory network according to the paper?",
+      "category": "factual_recall",
+      "expected_answer": "The PulseNet laboratory network is estimated to avert 270,000 foodborne illnesses and save US $507 million annually. These results are achieved through the effective sharing of laboratory data.",
+      "expected_concepts": [
+        "PulseNet",
+        "270,000 foodborne illnesses",
+        "US $507 million",
+        "data sharing"
+      ],
+      "difficulty": "easy",
+      "source_page": "6",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "34_one_health_framework_CO2",
+      "paper_id": "34_one_health_framework",
+      "question": "How does the Generalized One Health Framework (GOHF) aim to improve zoonotic disease programming?",
+      "category": "conceptual",
+      "expected_answer": "The GOHF improves zoonotic disease programming by providing a five-step stepwise framework coupled with a resource toolkit that synthesizes successful existing processes and idealized models. It distinguishes between overarching One Health systems and specific disease programs, utilizing cross-cutting technical domains to achieve defined objectives and outcomes at each stage.",
+      "expected_concepts": [
+        "Generalized One Health Framework",
+        "five-step stepwise framework",
+        "resource toolkit",
+        "zoonotic disease programming",
+        "technical domains"
+      ],
+      "difficulty": "medium",
+      "source_page": "2, 3",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "34_one_health_framework_TE3",
+      "paper_id": "34_one_health_framework",
+      "question": "According to the paper, what is the specific threshold for dog vaccination coverage required for rabies control, and how does smartphone-based H5N1 detection compare to traditional methods?",
+      "category": "technical",
+      "expected_answer": "For rabies control, a critical threshold of 70% or higher vaccination coverage in dog populations is required to reduce human cases. Regarding H5N1 avian influenza, smartphone-based diagnostic systems achieve a two-fold higher detectability than traditional fluorescent strip readers in clinical samples.",
+      "expected_concepts": [
+        "70% vaccination coverage",
+        "rabies",
+        "H5N1 avian influenza",
+        "two-fold higher detectability",
+        "fluorescent strip readers"
+      ],
+      "difficulty": "hard",
+      "source_page": "5, 6",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:29:29.192629"
+}

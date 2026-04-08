@@ -1,0 +1,148 @@
+/* IconButton Primitive Component Styles */
+
+/* ========== Base IconButton ========== */
+.icon-btn {
+    /* Layout - Always square */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+
+    /* Appearance */
+    background: none;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    user-select: none;
+
+    /* Animation */
+    transition: all var(--trans-fast);
+
+    /* Reset browser defaults */
+    margin: 0;
+    font: inherit;
+}
+
+.icon-btn:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+}
+
+.icon-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Icon content wrapper */
+.icon-btn-content {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.icon-btn-content svg {
+    display: block;
+}
+
+/* ========== Sizes ========== */
+
+/* Small: 28x28px - for compact UI elements */
+.icon-btn-sm {
+    width: 28px;
+    height: 28px;
+}
+
+.icon-btn-sm .icon-btn-content svg {
+    width: var(--icon-xs);
+    height: var(--icon-xs);
+}
+
+/* Medium: 36px - default size */
+.icon-btn-md {
+    width: 36px;
+    height: 36px;
+}
+
+.icon-btn-md .icon-btn-content svg {
+    width: var(--icon-md);
+    height: var(--icon-md);
+}
+
+/* Large: 44px - for prominent actions */
+.icon-btn-lg {
+    width: 44px;
+    height: 44px;
+}
+
+.icon-btn-lg .icon-btn-content svg {
+    width: var(--icon-lg);
+    height: var(--icon-lg);
+}
+
+/* ========== Variants ========== */
+
+/* Ghost: Transparent by default, background on hover (most common) */
+.icon-btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+}
+
+.icon-btn-ghost:hover:not(:disabled) {
+    background: var(--bg-surface);
+    color: var(--text-main);
+}
+
+.icon-btn-ghost:active:not(:disabled) {
+    background: var(--border-subtle);
+}
+
+/* Surface: Light background always visible */
+.icon-btn-surface {
+    background: var(--bg-surface);
+    color: var(--text-main);
+    border-color: var(--border-subtle);
+}
+
+.icon-btn-surface:hover:not(:disabled) {
+    background: var(--border-subtle);
+    border-color: var(--border-active);
+}
+
+.icon-btn-surface:active:not(:disabled) {
+    background: var(--border-active);
+}
+
+/* Primary: Accent color - for active/selected states */
+.icon-btn-primary {
+    background: var(--accent-primary);
+    color: var(--text-inverse);
+}
+
+.icon-btn-primary:hover:not(:disabled) {
+    background: var(--accent-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.icon-btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* Danger: For destructive actions (delete, remove) */
+.icon-btn-danger {
+    background: transparent;
+    color: var(--accent-error);
+}
+
+.icon-btn-danger:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--accent-error);
+}
+
+.icon-btn-danger:active:not(:disabled) {
+    background: rgba(239, 68, 68, 0.2);
+}

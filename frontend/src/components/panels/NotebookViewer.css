@@ -1,0 +1,1007 @@
+/* NotebookViewer.css */
+
+.notebook-viewer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 200px;
+    background: var(--bg-primary);
+    overflow-y: auto;
+}
+
+.notebook-viewer-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 1rem;
+    color: var(--text-muted);
+}
+
+.loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--border-primary);
+    border-top-color: var(--accent-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Notebook Header — two-row layout */
+.notebook-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0.5rem 0.75rem 0.375rem;
+    background: #1e1e2e;
+    border-bottom: 1px solid var(--border-primary);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Top row: name + kernel badge LEFT | add-cell buttons RIGHT */
+.notebook-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+/* Bottom row: cell count LEFT | kernel controls RIGHT */
+.notebook-header-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: 0.3rem;
+}
+
+.notebook-add-btns {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.notebook-run-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.notebook-title {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.notebook-name-text {
+    font-size: 0.875rem;
+}
+
+.notebook-back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.2rem;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.15s;
+    margin-right: 0.1rem;
+}
+
+.notebook-back-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.notebook-stats {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    padding: 0.25rem 0.5rem;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+}
+
+/* ─── Unified kernel control buttons (Stop / Run All / Restart) ─────────── */
+.nb-ctrl-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    white-space: nowrap;
+}
+
+.nb-ctrl-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Stop — red tint */
+.nb-ctrl-stop {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+}
+.nb-ctrl-stop:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.5);
+    color: #ef4444;
+}
+
+/* Run All — accent purple */
+.nb-ctrl-run {
+    background: var(--accent-primary);
+    border-color: transparent;
+    color: white;
+}
+.nb-ctrl-run:hover:not(:disabled) {
+    background: var(--accent-primary-hover, #7c5edc);
+    transform: translateY(-1px);
+}
+.nb-ctrl-run.is-running {
+    opacity: 0.8;
+}
+
+/* Restart — yellow tint */
+.nb-ctrl-restart {
+    background: rgba(234, 179, 8, 0.1);
+    border-color: rgba(234, 179, 8, 0.3);
+    color: #fde68a;
+}
+.nb-ctrl-restart:hover:not(:disabled) {
+    background: rgba(234, 179, 8, 0.2);
+    border-color: rgba(234, 179, 8, 0.5);
+    color: #eab308;
+}
+
+.notebook-run-all-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.notebook-run-all-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.notebook-run-all-btn.is-running {
+    background: var(--bg-tertiary);
+    color: var(--text-muted);
+}
+
+.notebook-run-all-btn svg {
+    flex-shrink: 0;
+}
+
+/* Cells Container */
+.notebook-cells {
+    flex: 1;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.notebook-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 200px;
+    gap: 0.5rem;
+    color: var(--text-muted);
+}
+
+.notebook-empty p {
+    margin: 0;
+}
+
+/* Cell Styles */
+.notebook-cell {
+    background: var(--bg-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.12);  /* stronger than --border-primary */
+    border-left: 3px solid rgba(139, 92, 246, 0.4);  /* accent stripe — code cells */
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.notebook-cell:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    border-left-color: rgba(139, 92, 246, 0.7);
+}
+
+.notebook-cell.markdown-cell {
+    border-left-color: rgba(34, 211, 238, 0.4);  /* cyan for markdown */
+}
+
+.notebook-cell.markdown-cell:hover {
+    border-left-color: rgba(34, 211, 238, 0.7);
+}
+
+.notebook-cell.is-active {
+    border-color: rgba(255, 255, 255, 0.2);
+    border-left-color: var(--accent-primary);
+    box-shadow: 0 0 0 1px var(--accent-primary), 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.notebook-cell.is-editing {
+    border-color: rgba(255, 255, 255, 0.2);
+    border-left-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25), 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.notebook-cell.has-error {
+    border-left-color: var(--error-color, #ef4444);
+}
+
+.notebook-cell.is-running {
+    border-left-color: var(--warning-color, #eab308);
+}
+
+/* Cell Header */
+.cell-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-primary);
+    font-size: 0.75rem;
+}
+
+.cell-header-left,
+.cell-header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cell-collapse-btn {
+    padding: 0.125rem;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cell-collapse-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.cell-type-icon {
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+}
+
+.code-cell .cell-type-icon {
+    color: var(--accent-primary);
+}
+
+.markdown-cell .cell-type-icon {
+    color: var(--accent-secondary, #22d3ee);
+}
+
+.cell-index {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    min-width: 2rem;
+}
+
+.cell-status {
+    display: flex;
+    align-items: center;
+}
+
+.cell-id {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-size: 0.65rem;
+    opacity: 0.7;
+}
+
+/* Cell Content */
+.cell-content {
+    padding: 0;
+}
+
+.cell-code-block {
+    margin: 0;
+    padding: 0.75rem 1rem;
+    background: var(--bg-primary);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+}
+
+.cell-code-block code {
+    background: transparent !important;
+    padding: 0 !important;
+    color: var(--text-primary);
+}
+
+.markdown-cell .cell-content {
+    padding: 0.75rem 1rem;
+}
+
+.markdown-cell .markdown-content {
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+.markdown-cell .markdown-content h1,
+.markdown-cell .markdown-content h2,
+.markdown-cell .markdown-content h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.markdown-cell .markdown-content p {
+    margin: 0.5rem 0;
+}
+
+.markdown-cell .markdown-content code {
+    background: var(--bg-tertiary);
+    padding: 0.125rem 0.375rem;
+    border-radius: 4px;
+    font-size: 0.85em;
+}
+
+/* Cell Outputs */
+.cell-outputs {
+    border-top: 1px solid var(--border-primary);
+    background: var(--bg-primary);
+    margin-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.cell-output-stream,
+.cell-output-text {
+    padding: 0.5rem 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.cell-output-stream pre,
+.cell-output-text pre {
+    margin: 0;
+    font-family: inherit;
+}
+
+.cell-output-stream.stderr {
+    color: var(--warning-color, #eab308);
+    background: rgba(234, 179, 8, 0.05);
+}
+
+/* Error Output */
+.cell-output-error {
+    padding: 0.75rem 1rem;
+    background: rgba(239, 68, 68, 0.05);
+    border-left: 3px solid var(--error-color, #ef4444);
+}
+
+.error-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--error-color, #ef4444);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.error-name {
+    font-family: var(--font-mono);
+}
+
+.error-value {
+    font-weight: normal;
+    color: var(--text-secondary);
+}
+
+.error-traceback {
+    margin: 0;
+    padding: 0.5rem;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    overflow-x: auto;
+    color: var(--text-secondary);
+}
+
+/* Image Output */
+.cell-output-image {
+    padding: 0.5rem 1rem;
+    text-align: center;
+    background: white;  /* white so plot backgrounds are correct on dark UI */
+    border-radius: 0 0 6px 6px;
+}
+
+.cell-output-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* HTML Output */
+.cell-output-html {
+    padding: 0.5rem 1rem;
+    overflow-x: auto;
+}
+
+.cell-output-html table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.8125rem;
+}
+
+.cell-output-html th,
+.cell-output-html td {
+    border: 1px solid var(--border-primary);
+    padding: 0.375rem 0.75rem;
+    text-align: left;
+}
+
+.cell-output-html th {
+    background: var(--bg-tertiary);
+    font-weight: 600;
+}
+
+.cell-output-html tr:nth-child(even) {
+    background: var(--bg-tertiary);
+}
+
+/* Scrollbar styling */
+.notebook-viewer::-webkit-scrollbar {
+    width: 8px;
+}
+
+.notebook-viewer::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+
+.notebook-viewer::-webkit-scrollbar-thumb {
+    background: var(--border-primary);
+    border-radius: 4px;
+}
+
+.notebook-viewer::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* Empty State with Notebook Selector */
+.notebook-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 300px;
+    gap: 1rem;
+    padding: 2rem;
+    text-align: center;
+}
+
+.notebook-empty-state h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.notebook-empty-state p {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.notebook-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 280px;
+    margin-top: 0.5rem;
+}
+
+.notebook-list-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.notebook-list-item:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+.notebook-list-item svg {
+    color: var(--accent-primary);
+    flex-shrink: 0;
+}
+
+.notebook-refresh-btn {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.notebook-refresh-btn:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+/* Notebook create form */
+.notebook-create-form {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.notebook-name-input {
+    padding: 0.375rem 0.625rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    outline: none;
+    width: 140px;
+}
+
+.notebook-name-input:focus {
+    border-color: var(--accent-primary);
+}
+
+.notebook-create-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    background: var(--accent-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+}
+
+.notebook-create-btn:hover {
+    opacity: 0.85;
+}
+
+.notebook-create-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Add cell buttons in notebook header */
+.notebook-add-cell-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.1rem;
+    padding: 0.25rem 0.375rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: 5px;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.7rem;
+    transition: all 0.15s;
+}
+
+.notebook-add-cell-btn:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+/* Add-first-cell section in empty notebook */
+.notebook-add-first-cell {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.notebook-add-cell-btn-large {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    background: var(--accent-primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+.notebook-add-cell-btn-large:hover { opacity: 0.85; }
+
+.notebook-add-cell-btn-large.secondary {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    color: var(--text-secondary);
+}
+
+.notebook-add-cell-btn-large.secondary:hover {
+    border-color: var(--accent-primary);
+    color: var(--text-primary);
+}
+
+/* Delete button style */
+.cell-action-btn.delete-btn:hover {
+    color: var(--error-color, #ef4444);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* Cell Action Buttons */
+.cell-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+}
+
+.cell-action-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.cell-action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.cell-action-btn.run-btn:hover {
+    color: var(--success-color, #22c55e);
+}
+
+.cell-action-btn.run-btn.is-running {
+    color: var(--warning-color, #eab308);
+}
+
+.cell-action-btn.edit-btn:hover {
+    color: var(--accent-primary);
+}
+
+.cell-action-btn.save-btn {
+    color: var(--success-color, #22c55e);
+}
+
+.cell-action-btn.save-btn:hover {
+    background: rgba(34, 197, 94, 0.1);
+}
+
+.cell-action-btn.cancel-btn {
+    color: var(--text-muted);
+}
+
+.cell-action-btn.cancel-btn:hover {
+    color: var(--error-color, #ef4444);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* Edit Mode — see the combined rule above in Cell Styles */
+
+.cell-edit-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 0.75rem 1rem;
+    background: var(--bg-primary);
+    border: none;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    resize: vertical;
+    outline: none;
+}
+
+.cell-edit-textarea:focus {
+    background: var(--bg-secondary);
+}
+
+.cell-edit-textarea::placeholder {
+    color: var(--text-muted);
+}
+
+/* Animation for running state */
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* ─── Kernel badge (shown in open notebook header) ─────────────────────── */
+.notebook-kernel-badge {
+    display: inline-block;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: white;
+    margin-left: 0.1rem;
+    opacity: 0.9;
+}
+
+/* ─── Kernel selector in create form ───────────────────────────────────── */
+.notebook-kernel-select {
+    padding: 0.375rem 0.5rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    outline: none;
+    cursor: pointer;
+}
+
+.notebook-kernel-select:focus {
+    border-color: var(--accent-primary);
+}
+
+.notebook-kernel-select option {
+    background: var(--bg-secondary);
+}
+
+/* ─── Notebook Selector Panel ──────────────────────────────────────────── */
+.notebook-selector-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 0.75rem;
+    gap: 0.75rem;
+}
+
+.nb-selector-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nb-selector-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+}
+
+.nb-selector-title svg { color: var(--accent-primary); }
+
+.nb-selector-refresh {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.2rem;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s;
+}
+.nb-selector-refresh:hover { color: var(--text-primary); }
+
+/* Notebook table */
+.nb-selector-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8125rem;
+}
+
+.nb-selector-table th {
+    padding: 0.375rem 0.625rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.nb-selector-row {
+    cursor: pointer;
+    transition: background 0.12s;
+}
+
+.nb-selector-row:hover td { background: var(--bg-hover, rgba(255,255,255,0.04)); }
+
+.nb-selector-row td {
+    padding: 0.5rem 0.625rem;
+    border-bottom: 1px solid var(--border-subtle, rgba(255,255,255,0.04));
+    color: var(--text-secondary);
+    vertical-align: middle;
+}
+
+.nb-selector-row:hover .nb-name-col { color: var(--accent-primary); }
+
+.nb-name-col {
+    color: var(--text-primary);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.nb-name-icon { color: var(--text-muted); flex-shrink: 0; }
+
+.nb-kernel-chip {
+    display: inline-block;
+    padding: 0.08rem 0.35rem;
+    border-radius: 3px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: white;
+    margin-right: 0.35rem;
+    vertical-align: middle;
+}
+
+.nb-kernel-text { font-size: 0.75rem; color: var(--text-muted); }
+
+.nb-count-col { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+.nb-selector-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 2rem;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+/* Create row at bottom */
+.nb-create-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-subtle, rgba(255,255,255,0.06));
+}
+
+/* ─── Kernel control buttons (in open notebook header) ──────────────────── */
+.notebook-kernel-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.4rem;
+    border: 1px solid var(--border-primary);
+    border-radius: 5px;
+    background: var(--bg-tertiary);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.7rem;
+    transition: all 0.15s;
+    gap: 0.2rem;
+}
+
+.notebook-kernel-btn.stop-btn:hover {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #ef4444;
+}
+
+.notebook-kernel-btn.restart-btn:hover {
+    background: rgba(234, 179, 8, 0.1);
+    border-color: rgba(234, 179, 8, 0.4);
+    color: #eab308;
+}
+
+/* ─── Cell insertion divider ────────────────────────────────────────────── */
+.cell-insert-divider {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 10px;
+    margin: 0 0.5rem;
+    cursor: default;
+    transition: height 0.15s ease;
+}
+
+.cell-insert-divider.is-hovered {
+    height: 32px;
+}
+
+.cell-insert-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1.5px;
+    background: var(--accent-primary);
+    border-radius: 1px;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.cell-insert-divider.is-hovered .cell-insert-line {
+    opacity: 0.6;
+}
+
+.cell-insert-btns {
+    position: relative;
+    display: flex;
+    gap: 0.25rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+}
+
+.cell-insert-divider.is-hovered .cell-insert-btns {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.cell-insert-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.2rem 0.5rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--accent-primary);
+    border-radius: 4px;
+    color: var(--accent-primary);
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.12s;
+}
+
+.cell-insert-btn:hover {
+    background: rgba(139, 92, 246, 0.15);
+}

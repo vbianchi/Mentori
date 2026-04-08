@@ -1,0 +1,44 @@
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+This license applies to all figures, manuscript text, and derived data in
+this repository, specifically the contents of:
+
+  - publication/figures/
+  - publication/drafts/
+  - publication/data/ground_truth.json
+  - publication/data/questions/
+  - publication/data/validation_*.json
+  - publication/reports/
+
+(Note: any third-party scientific papers or data subject to external licenses
+are NOT covered by this CC BY 4.0 grant. The 200-paper evaluation corpus
+itself is not redistributed in this repository — see
+publication/data/download_papers.py and the Zenodo deposit at
+https://doi.org/10.5281/zenodo.19476756 for details.)
+
+Full license text:
+https://creativecommons.org/licenses/by/4.0/legalcode
+
+You are free to:
+
+  Share — copy and redistribute the material in any medium or format
+  Adapt — remix, transform, and build upon the material for any purpose,
+          even commercially.
+
+Under the following terms:
+
+  Attribution — You must give appropriate credit, provide a link to the
+                license, and indicate if changes were made. You may do so in
+                any reasonable manner, but not in any way that suggests the
+                licensor endorses you or your use.
+
+  No additional restrictions — You may not apply legal terms or technological
+                                measures that legally restrict others from
+                                doing anything the license permits.
+
+Suggested citation:
+
+  Bianchi, V. & Schokker, D. Systematic Ablation Reveals Hidden Failures in
+  Multi-Agent AI for Science. Nature Machine Intelligence (2026).
+  Code and data: https://github.com/vbianchi/Mentori
+  Archive: https://doi.org/10.5281/zenodo.19476756

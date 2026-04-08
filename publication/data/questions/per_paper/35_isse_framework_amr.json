@@ -1,0 +1,171 @@
+{
+  "paper_id": "35_isse_framework_amr",
+  "filename": "35_isse_framework_amr.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "How can the integration and added value of a One Health (OH) approach in surveillance systems for antimicrobial use (AMU) and antimicrobial resistance (AMR) be systematically evaluated?",
+    "methods": [
+      "Participatory qualitative research design",
+      "Focus Group Discussions (FGDs) with CIPARS team members and end-users",
+      "Stakeholder workshop to refine models and tools",
+      "Individual web-based questionnaires for validation",
+      "Review and mapping of 12 existing surveillance evaluation tools (e.g., EcoSurTool, NEOH, ATLASS)",
+      "Logic model development for integrated surveillance systems"
+    ],
+    "findings": [
+      {
+        "finding": "Development of the Integrated Surveillance System Evaluation (ISSE) framework consisting of five levels: integration, production of information, generation of knowledge, influence on decisions, and impact on outcomes.",
+        "evidence": "The framework was developed based on a four-phase participatory process and includes specific evaluation questions for each level.",
+        "page": 4
+      },
+      {
+        "finding": "There is a lack of consensus among stakeholders on how to define 'integrated surveillance' for AMR and AMU, with perspectives varying based on expertise and objectives.",
+        "evidence": "FGD results showed that integration was described as a continuum of activities rather than a simple dichotomy.",
+        "page": 5
+      },
+      {
+        "finding": "None of the 12 existing evaluation tools examined covers all five levels of the proposed ISSE framework, highlighting a gap in assessing the full value chain of integrated surveillance.",
+        "evidence": "A mapping exercise showed that while tools like ATLASS cover multiple levels, most focus on Level 1 (integration) or Level 2 (production of information).",
+        "page": 8
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "Outlines the four-phase methodological approach used to develop the ISSE framework, from focus groups to identifying complementary tools.",
+        "page": 3
+      },
+      {
+        "id": "Figure 2",
+        "description": "Presents the final ISSE framework, illustrating the logic model for integrated OH surveillance alongside five corresponding evaluation levels and questions.",
+        "page": 4
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Profiles of the individuals from the CIPARS team and end-users who participated in the focus group discussions.",
+        "columns": [
+          "FGDs",
+          "Profiles"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "Definitions of core concepts essential to the framework, including integrated surveillance and level of integration.",
+        "columns": [
+          "Concept",
+          "Definition"
+        ]
+      },
+      {
+        "id": "Table 3",
+        "description": "A semi-quantitative measurement scale (0-5) for assessing One Health integration levels across four surveillance activities: collection, analysis, interpretation, and dissemination.",
+        "columns": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ]
+      },
+      {
+        "id": "Table 4",
+        "description": "A summary of 12 available evaluation tools, their general purpose, and which ISSE evaluation levels they correspond to.",
+        "columns": [
+          "Tool (Reference)",
+          "Year of publication",
+          "General purpose",
+          "Levels of evaluation"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "Antimicrobial Resistance (AMR)",
+      "Antimicrobial Use (AMU)",
+      "One Health (OH)",
+      "ISSE framework (Integrated Surveillance System Evaluation)",
+      "Logic model",
+      "Knowledge translation",
+      "CIPARS (Canadian Integrated Program for Antimicrobial Resistance Surveillance)"
+    ],
+    "limitations": [
+      "The small group of end-users participating in focus groups may not reflect the perspectives of all CIPARS stakeholders.",
+      "The framework was developed based on a mature system (CIPARS) and may better reflect those needs than newer, less integrated systems.",
+      "Evaluating Level 5 (outcomes) is challenging due to the lack of longitudinal data and standardized economic impact metrics.",
+      "A full evaluation using all five levels constitutes a significant investment in time and resources."
+    ],
+    "connections": [
+      "Builds on the definition of OH surveillance proposed by St\u00e4rk et al. (2015).",
+      "References the CDC framework (2001) as a common but insufficient generic framework for OH evaluation.",
+      "Integrates concepts from existing tools such as EcoSurTool (Bordier et al., 2019), NEOH (R\u00fcegg et al., 2018), and ATLASS (FAO, 2020).",
+      "Specifically designed in partnership with the Canadian Integrated Program for Antimicrobial Resistance Surveillance (CIPARS)."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "35_isse_framework_amr_FR1",
+      "paper_id": "35_isse_framework_amr",
+      "question": "What are the five distinct levels of evaluation defined in the Integrated Surveillance System Evaluation (ISSE) framework?",
+      "category": "factual_recall",
+      "expected_answer": "The ISSE framework consists of five levels: level 1 is integration, level 2 is the production of information, level 3 is the generation of knowledge, level 4 is the influence on decisions, and level 5 is the impact on outcomes. These levels were developed using a participatory process to assess the entire value chain of a surveillance system.",
+      "expected_concepts": [
+        "integration",
+        "production of information",
+        "generation of knowledge",
+        "influence on decisions",
+        "impact on outcomes"
+      ],
+      "difficulty": "easy",
+      "source_page": "4",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "35_isse_framework_amr_CO2",
+      "paper_id": "35_isse_framework_amr",
+      "question": "Why did the authors conclude that existing evaluation tools like ATLASS and NEOH were insufficient for assessing the full value of integrated surveillance systems?",
+      "category": "conceptual",
+      "expected_answer": "Based on a mapping exercise of 12 existing tools, the authors found that none of the tools covered all five levels of the ISSE framework. While tools like ATLASS cover multiple levels, most focus heavily on the early stages like integration (Level 1) or information production (Level 2), leaving a gap in evaluating how surveillance actually influences decisions and impacts public health outcomes.",
+      "expected_concepts": [
+        "review of 12 existing tools",
+        "none specifically developed for OH integrated surveillance",
+        "coverage gaps in evaluation levels",
+        "decision-making",
+        "impact on outcomes"
+      ],
+      "difficulty": "medium",
+      "source_page": "8",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "35_isse_framework_amr_TE3",
+      "paper_id": "35_isse_framework_amr",
+      "question": "How does the ISSE framework technically measure the level of One Health integration across different surveillance activities?",
+      "category": "technical",
+      "expected_answer": "The framework utilizes a semi-quantitative measurement scale ranging from 0 to 5 to assess the degree of integration. This measurement is specifically applied across four core surveillance activities: data collection, analysis, interpretation, and dissemination.",
+      "expected_concepts": [
+        "semi-quantitative scale",
+        "0-5 scale",
+        "collection",
+        "analysis",
+        "interpretation",
+        "dissemination"
+      ],
+      "difficulty": "hard",
+      "source_page": "Table 3",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:29:59.408407"
+}

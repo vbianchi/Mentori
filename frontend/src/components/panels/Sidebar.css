@@ -1,0 +1,474 @@
+/* src/components/panels/Sidebar.css */
+.sidebar-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: var(--space-5);
+    padding: var(--space-4) 0;
+    /* Vertical Padding */
+}
+
+.nav-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.nav-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+    font-weight: 600;
+    padding-left: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-4);
+    margin: 0 var(--space-2);
+    border-radius: var(--radius-md);
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all var(--trans-fast);
+    text-align: left;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    background: var(--bg-surface);
+    color: var(--text-main);
+}
+
+.nav-item.active {
+    /* border-left: 2px solid var(--accent-primary); */
+    /* Changed from border to background highlight for tab feel */
+    background: var(--bg-surface);
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+/* Task List */
+.task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.sidebar-task-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all var(--trans-fast);
+    min-width: 0;
+    /* Critical for flex truncation */
+    position: relative;
+    /* For drag-over indicator */
+}
+
+.sidebar-task-item:hover {
+    background: var(--bg-surface);
+}
+
+.sidebar-task-item.active {
+    background: rgba(139, 92, 246, 0.1);
+    border-color: rgba(139, 92, 246, 0.3);
+}
+
+.sidebar-task-item:hover .task-actions {
+    opacity: 1;
+}
+
+/* Task name container - takes remaining space but truncates */
+.task-name-container {
+    flex: 1;
+    min-width: 0;
+    /* Critical for truncation */
+    overflow: hidden;
+}
+
+.task-title {
+    font-size: 0.9rem;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+/* Task actions - fixed width, always visible space */
+.task-actions {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity var(--trans-fast);
+}
+
+.sidebar-task-item:hover .task-actions {
+    opacity: 1;
+}
+
+/* Drag handle */
+.task-drag-handle {
+    flex-shrink: 0;
+    color: var(--text-dim);
+    cursor: grab;
+    opacity: 0;
+    transition: opacity var(--trans-fast);
+    padding: 2px;
+}
+
+.sidebar-task-item:hover .task-drag-handle {
+    opacity: 0.5;
+}
+
+.task-drag-handle:hover {
+    opacity: 1 !important;
+    color: var(--text-muted);
+}
+
+.task-drag-handle:active {
+    cursor: grabbing;
+}
+
+/* Dragging states */
+.sidebar-task-item.dragging {
+    opacity: 0.5;
+    background: var(--bg-surface);
+}
+
+.sidebar-task-item.drag-over {
+    border-color: var(--accent-primary);
+    background: rgba(139, 92, 246, 0.1);
+}
+
+.sidebar-task-item.drag-over::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--accent-primary);
+    border-radius: 1px;
+}
+
+/* File Explorer */
+.file-explorer {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.file-item {
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text-main);
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+.file-item:hover .file-name {
+    color: var(--accent-secondary);
+    text-decoration: underline;
+}
+
+.file-name {
+    white-space: nowrap;
+}
+
+.text-secondary {
+    color: var(--accent-secondary);
+}
+
+/* Token Badges */
+.token-badge {
+    align-self: flex-start;
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--bg-surface);
+    color: var(--text-dim);
+}
+
+.badge-green {
+    color: var(--accent-success);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.badge-yellow {
+    color: var(--accent-warning);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.badge-red {
+    color: var(--accent-error);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Footer Status */
+.sidebar-footer {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-subtle);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-dim);
+}
+
+.status-dot.success {
+    background: var(--accent-success);
+    box-shadow: 0 0 5px rgba(16, 185, 129, 0.4);
+}
+
+/* User Profile */
+.user-profile-card {
+    padding-bottom: 0.75rem;
+}
+
+.avatar-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.user-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.user-action {
+    transition: color var(--trans-fast);
+}
+
+/* Settings Panel */
+.settings-panel {
+    padding: 0 0.5rem;
+}
+
+.settings-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    text-transform: none;
+}
+
+.settings-textarea {
+    width: 100%;
+    min-height: 60px;
+    padding: 0.5rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    color: var(--text-main);
+    font-size: 0.85rem;
+    font-family: var(--font-sans);
+    resize: vertical;
+    transition: border-color var(--trans-fast);
+}
+
+.settings-textarea-code {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+}
+
+.settings-textarea:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+.settings-textarea::placeholder {
+    color: var(--text-dim);
+    opacity: 0.6;
+}
+
+.settings-input {
+    width: 100%;
+    padding: 0.5rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    color: var(--text-main);
+    font-size: 0.85rem;
+    font-family: var(--font-sans);
+    transition: border-color var(--trans-fast);
+}
+
+.settings-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+.settings-hint {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-top: 0.25rem;
+}
+
+/* Utility */
+.text-success {
+    color: var(--accent-success);
+}
+
+.text-error {
+    color: var(--accent-error);
+}
+
+.text-muted {
+    color: var(--text-dim);
+}
+
+/* User Badge & Footer */
+.user-badge {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 0.5rem;
+}
+
+.user-profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    overflow: hidden;
+    flex: 1;
+    /* allow it to take space */
+    min-width: 0;
+    /* for truncation */
+}
+
+.user-main-identity {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.user-divider {
+    color: var(--text-tertiary);
+}
+
+.user-email {
+    opacity: 0.8;
+}
+
+.user-id-badge {
+    font-family: monospace;
+    font-size: 0.65rem;
+    color: var(--text-tertiary);
+    background: rgba(0, 0, 0, 0.2);
+    padding: 2px 6px;
+    border-radius: 99px;
+    align-self: flex-start;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-badge-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-shrink: 0;
+}
+
+.user-action-btn {
+    color: var(--text-dim);
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    transition: all var(--trans-fast);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-action-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+}
+
+.user-action-btn.admin:hover {
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--accent-primary);
+}
+
+.user-action-btn.logout:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--accent-error);
+}
+
+.sidebar-action-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    transition: all var(--trans-fast);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-action-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--accent-warning);
+}

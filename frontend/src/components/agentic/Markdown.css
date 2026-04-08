@@ -1,0 +1,176 @@
+/* Markdown Theme — uses CSS variables for dark/light mode support */
+.markdown-content {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-main);
+}
+
+/* --- Typography --- */
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.75em;
+    font-weight: 600;
+    color: var(--text-main);
+    line-height: 1.25;
+}
+
+.markdown-content h1 {
+    font-size: 1.5em;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 0.3em;
+}
+
+.markdown-content h2 {
+    font-size: 1.3em;
+}
+
+.markdown-content h3 {
+    font-size: 1.1em;
+    color: var(--text-muted);
+}
+
+.markdown-content p {
+    margin-bottom: 1em;
+}
+
+.markdown-content strong {
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.markdown-content em {
+    font-style: italic;
+    color: var(--text-muted);
+}
+
+/* --- Links --- */
+.markdown-content a {
+    color: var(--accent-secondary);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.markdown-content a:hover {
+    color: var(--accent-secondary-hover);
+    border-bottom-color: currentColor;
+}
+
+/* --- Code & Pre --- */
+.markdown-content code {
+    background: var(--accent-primary-5);
+    border: 1px solid var(--border-subtle);
+    border-radius: 4px;
+    padding: 0.2em 0.4em;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.85em;
+    color: var(--text-main);
+}
+
+.markdown-content pre {
+    background: var(--bg-app);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    margin: 1em 0;
+    padding: 0;
+    overflow-x: auto;
+    position: relative;
+    box-shadow: var(--shadow-sm);
+}
+
+.markdown-content pre code {
+    background: transparent;
+    border: none;
+    padding: 1em;
+    display: block;
+    color: inherit;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+/* --- Blockquotes --- */
+.markdown-content blockquote {
+    border-left: 4px solid var(--accent-secondary);
+    background: var(--accent-secondary-10);
+    margin: 1em 0;
+    padding: 0.5em 1em;
+    border-radius: 0 4px 4px 0;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* --- Lists --- */
+.markdown-content ul,
+.markdown-content ol {
+    margin-bottom: 1em;
+    padding-left: 1.5em;
+}
+
+.markdown-content li {
+    margin-bottom: 0.25em;
+}
+
+.markdown-content ul li::marker {
+    color: var(--text-dim);
+}
+
+/* --- Tables --- */
+.markdown-content table {
+    width: 100%;
+    margin: 1.5em 0;
+    border-collapse: collapse;
+    font-size: 0.9em;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border-subtle);
+}
+
+.markdown-content thead {
+    background: var(--accent-primary-10);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.markdown-content th {
+    text-align: left;
+    padding: 0.75em 1em;
+    font-weight: 600;
+    color: var(--text-main);
+    text-transform: uppercase;
+    font-size: 0.8em;
+    letter-spacing: 0.05em;
+}
+
+.markdown-content td {
+    padding: 0.75em 1em;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text-main);
+}
+
+.markdown-content tr:last-child td {
+    border-bottom: none;
+}
+
+.markdown-content tr:hover {
+    background: var(--accent-primary-5);
+}
+
+/* --- Horizontal Rule --- */
+.markdown-content hr {
+    border: 0;
+    height: 1px;
+    background: var(--border-subtle);
+    margin: 2em 0;
+}
+
+/* --- Images --- */
+.markdown-content img {
+    max-width: 100%;
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+    margin: 1em 0;
+}

@@ -1,0 +1,166 @@
+{
+  "paper_id": "06_star_aligner",
+  "filename": "06_star_aligner.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "How to achieve accurate and ultrafast alignment of high-throughput RNA-seq data, specifically addressing challenges like non-contiguous transcript structures (splicing), long read lengths, and the discovery of novel/non-canonical junctions.",
+    "methods": [
+      "Sequential Maximum Mappable Prefix (MMP) seed search",
+      "Uncompressed Suffix Arrays (SAs) for fast binary string searching",
+      "Seed clustering and stitching procedure using a local alignment scoring scheme",
+      "Frugal dynamic programming algorithm for stitching seeds with mismatches/indels",
+      "Parallel processing across multiple CPU threads",
+      "De novo detection of canonical, non-canonical, and chimeric (fusion) splice junctions"
+    ],
+    "findings": [
+      {
+        "finding": "STAR achieves a mapping speed approximately 50 times faster than other existing RNA-seq aligners.",
+        "evidence": "STAR can align 550 million 2 x 76 bp paired-end reads per hour to the human genome on a 12-core server.",
+        "page": 1
+      },
+      {
+        "finding": "STAR demonstrates high precision in novel splice junction detection.",
+        "evidence": "Experimental validation of 1960 novel intergenic splice junctions showed an 80\u201390% success rate.",
+        "page": 1
+      },
+      {
+        "finding": "STAR maintains high sensitivity and precision across both short and long read lengths.",
+        "evidence": "Demonstrated potential for accurately aligning long reads (several kilobases) and outperformed others in ROC-curve analysis of simulated 100nt reads.",
+        "page": 3
+      },
+      {
+        "finding": "STAR and GSNAP aligned the highest percentage of reads in experimental ENCODE datasets.",
+        "evidence": "Both STAR and GSNAP aligned 94% of reads, compared to RUM (86%), MapSplice (85%), and TopHat2 (71%).",
+        "page": 3
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "Schematic representation of the Maximum Mappable Prefix (MMP) search for detecting splice junctions, mismatches, and sequence tails (like poly-A or adapters).",
+        "page": 2
+      },
+      {
+        "id": "Figure 2",
+        "description": "ROC-curve comparing the true-positive vs. false-positive rates of various aligners (STAR, TopHat2, GSNAP, RUM, MapSplice) using simulated RNA-seq data.",
+        "page": 3
+      },
+      {
+        "id": "Figure 3",
+        "description": "Multiple plots showing accuracy metrics (annotated/unannotated junctions, ROC curves) for splice junction detection in experimental ENCODE RNA-seq data.",
+        "page": 4
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Mapping speed and RAM usage benchmarks for various aligners using 6 and 12 threads.",
+        "columns": [
+          "Aligner",
+          "Mapping speed: million read pairs/hour (6 threads)",
+          "Mapping speed: million read pairs/hour (12 threads)",
+          "Peak physical RAM, GB (6 threads)",
+          "Peak physical RAM, GB (12 threads)"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "Validation results for novel splice junctions across two cell lines (H1ES and HUVEC) based on RNA-seq read counts.",
+        "columns": [
+          "Read count per junction from two replicates",
+          "Number of tested junctions",
+          "Proportion of junctions validated by at least two 454 reads (%)"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "RNA-seq",
+      "Maximal Mappable Prefix (MMP)",
+      "Suffix Array (SA)",
+      "Chimeric (fusion) transcripts",
+      "Splice junction",
+      "De novo detection",
+      "Multimapping",
+      "Indels (Insertions/Deletions)"
+    ],
+    "limitations": [
+      "High RAM requirement (~28 GB for human genome) due to the use of uncompressed suffix arrays.",
+      "Inability to accurately detect splicing events with very short sequence overhangs (less than 5-10 nt) on donor or acceptor sides.",
+      "Potential alignment bias toward processed pseudogenes when overhangs are short."
+    ],
+    "connections": [
+      "Mummer (Maximal Exact Match concept)",
+      "MAUVE (Maximal Exact Match concept)",
+      "Manber and Myers (Suffix Arrays algorithm)",
+      "TopHat/TopHat2 (Comparison baseline)",
+      "GSNAP (Comparison baseline)",
+      "RUM (Comparison baseline)",
+      "MapSplice (Comparison baseline)",
+      "BLAT (Long read alignment comparison)",
+      "ENCODE project (Dataset source and consortium context)"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "06_star_aligner_FR1",
+      "paper_id": "06_star_aligner",
+      "question": "What is the reported mapping speed of STAR when using a 12-core server for 2 x 76 bp paired-end reads, and how does this compare to other aligners?",
+      "category": "factual_recall",
+      "expected_answer": "STAR can align 550 million 2 x 76 bp paired-end reads per hour to the human genome on a 12-core server. This performance makes STAR approximately 50 times faster than other existing RNA-seq aligners available at the time of the study.",
+      "expected_concepts": [
+        "550 million reads per hour",
+        "12-core server",
+        "50 times faster",
+        "paired-end reads"
+      ],
+      "difficulty": "easy",
+      "source_page": "1",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "06_star_aligner_CO2",
+      "paper_id": "06_star_aligner",
+      "question": "How does the Maximum Mappable Prefix (MMP) search mechanism facilitate the identification of diverse sequence features beyond simple genomic mapping?",
+      "category": "conceptual",
+      "expected_answer": "The MMP search identifies the longest prefix of a read that matches the reference genome perfectly. By sequentially applying this search to the unmapped portions of a read, STAR can discovery diverse features such as splice junctions (canonical and non-canonical), mismatches, and sequence tails like poly-A stretches or adapters, as well as chimeric/fusion junctions.",
+      "expected_concepts": [
+        "Sequential search",
+        "splice junctions",
+        "mismatches",
+        "sequence tails",
+        "chimeric junctions"
+      ],
+      "difficulty": "medium",
+      "source_page": "1-2",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "06_star_aligner_TE3",
+      "paper_id": "06_star_aligner",
+      "question": "According to the experimental benchmarks using ENCODE datasets, what percentage of reads did STAR successfully align, and which other aligner achieved a similar percentage?",
+      "category": "technical",
+      "expected_answer": "In the experimental ENCODE datasets, STAR aligned 94% of the reads. This percentage was the highest among the tested tools and was matched only by the GSNAP aligner, while other tools like RUM, MapSplice, and TopHat2 aligned significantly fewer reads (86%, 85%, and 71% respectively).",
+      "expected_concepts": [
+        "94%",
+        "ENCODE datasets",
+        "GSNAP",
+        "TopHat2",
+        "alignment percentage"
+      ],
+      "difficulty": "medium",
+      "source_page": "3",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:13:02.100319"
+}

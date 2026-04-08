@@ -1,0 +1,173 @@
+{
+  "paper_id": "08_deseq2",
+  "filename": "08_deseq2.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "The paper addresses the problem of accurately estimating fold changes and dispersion in RNA-seq count data, particularly when sample sizes are small. It seeks to reduce the impact of noise in low-count genes and outliers to improve the stability and interpretability of differential expression analysis.",
+    "methods": [
+      "Generalized Linear Models (GLMs) with a negative binomial distribution",
+      "Empirical Bayes shrinkage for dispersion estimation (shrinking gene-wise estimates toward a mean-dependent trend line)",
+      "Empirical Bayes shrinkage for logarithmic fold change (LFC) estimates (MAP estimation using a zero-centered normal prior)",
+      "Wald tests for statistical significance of LFCs",
+      "Regularized logarithm (rlog) transformation for variance stabilization",
+      "Independent filtering based on mean expression to increase power",
+      "Outlier detection using Cook's distance"
+    ],
+    "findings": [
+      {
+        "finding": "Shrunken LFC estimates (MAP) are significantly more reproducible than standard MLE estimates.",
+        "evidence": "When splitting a dataset into two independent halves, the overlap of the top 100 genes ranked by fold change improved from 21% (MLE) to 81% (MAP).",
+        "page": 5
+      },
+      {
+        "finding": "DESeq2 provides higher sensitivity for small fold changes compared to other methods while controlling the false discovery rate (FDR).",
+        "evidence": "In simulation benchmarks (m=6 to m=20), DESeq2 and edgeR often had the highest sensitivity among algorithms that controlled type-I error.",
+        "page": 9
+      },
+      {
+        "finding": "The rlog transformation effectively stabilizes variance across the dynamic range of count data.",
+        "evidence": "Diagnostic plots show that the gene-wise standard deviation remains stable across the range of mean counts using rlog, whereas it is highly variable using ordinary log transformation.",
+        "page": 8
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "Visualizes the shrinkage of gene-wise dispersion estimates (MLE) toward a fitted trend line to produce final MAP estimates.",
+        "page": 3
+      },
+      {
+        "id": "Figure 2",
+        "description": "Shows the effect of LFC shrinkage on MA-plots, demonstrating how noisy estimates for low-count genes are pulled toward zero.",
+        "page": 4
+      },
+      {
+        "id": "Figure 3",
+        "description": "Compares the stability of LFC estimates between two independent halves of a dataset, highlighting the consistency of shrunken estimates.",
+        "page": 5
+      },
+      {
+        "id": "Figure 4",
+        "description": "Illustrates hypothesis testing for composite null hypotheses where LFC must be greater than or less than a specific threshold.",
+        "page": 7
+      },
+      {
+        "id": "Figure 5",
+        "description": "Compares ordinary log transformation and rlog transformation for variance stabilization and sample clustering.",
+        "page": 8
+      },
+      {
+        "id": "Figure 6",
+        "description": "Presents a benchmark of sensitivity and precision across different sample sizes and effect sizes for several tools.",
+        "page": 10
+      },
+      {
+        "id": "Figure 7",
+        "description": "Benchmarks the false positive rate of various differential expression tools using mock comparisons.",
+        "page": 11
+      },
+      {
+        "id": "Figure 8",
+        "description": "Displays sensitivity estimates based on experimental reproducibility (agreement between evaluation and verification sets).",
+        "page": 12
+      },
+      {
+        "id": "Figure 9",
+        "description": "Displays precision estimates based on experimental reproducibility across different algorithms.",
+        "page": 13
+      }
+    ],
+    "tables": [],
+    "technical_terms": [
+      "Logarithmic Fold Change (LFC)",
+      "Dispersion",
+      "Shrinkage estimation",
+      "Empirical Bayes",
+      "Maximum a Posteriori (MAP)",
+      "Maximum Likelihood Estimate (MLE)",
+      "Regularized Logarithm (rlog)",
+      "Cook's distance",
+      "Heteroskedasticity"
+    ],
+    "limitations": [
+      "Shrinkage of LFC estimates may be inappropriate when specifically searching for genes with very weak differential expression, as the zero-centered prior favors the null.",
+      "There may be a minor loss of power in the low-count range due to a tendency to overestimate dispersion when the variance is dominated by the Poisson component.",
+      "Basu's theorem-based independence for filtering may fail if size factors are perfectly confounded with experimental conditions."
+    ],
+    "connections": [
+      "DESeq (predecessor method)",
+      "edgeR (moderated dispersion estimation)",
+      "DSS (Bayesian dispersion approach)",
+      "limma/voom (linear modeling for RNA-seq)",
+      "Cuffdiff 2 (isoform-level abundance analysis)",
+      "GFOLD (ranking by fold change)",
+      "BBSeq (dispersion modeling)"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "08_deseq2_FR1",
+      "paper_id": "08_deseq2",
+      "question": "In the reproducibility analysis where a dataset was split into two independent halves, what specific improvement in the overlap of the top 100 genes was observed when using shrunken MAP estimates compared to standard MLE estimates?",
+      "category": "factual_recall",
+      "expected_answer": "The overlap of the top 100 genes ranked by fold change improved from 21% using standard MLE estimates to 81% when using shrunken MAP estimates. This demonstrates that shrunken LFC estimates are significantly more reproducible than standard estimates.",
+      "expected_concepts": [
+        "MAP estimates",
+        "MLE estimates",
+        "reproducibility",
+        "fold change",
+        "overlap percentage"
+      ],
+      "difficulty": "easy",
+      "source_page": "5",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "08_deseq2_CO2",
+      "paper_id": "08_deseq2",
+      "question": "How does the DESeq2 framework utilize Empirical Bayes shrinkage to handle the high uncertainty associated with low-count genes in both dispersion and fold change estimation?",
+      "category": "conceptual",
+      "expected_answer": "DESeq2 applies Empirical Bayes shrinkage in two distinct steps: first, gene-wise dispersion estimates are shrunk toward a mean-dependent trend line to stabilize variance. Second, logarithmic fold change (LFC) estimates are shrunk toward zero using a zero-centered normal prior (MAP estimation), which effectively filters out noisy, high-fold-change estimates caused by low-count genes and improves the ranking of genes for downstream analysis.",
+      "expected_concepts": [
+        "Empirical Bayes shrinkage",
+        "dispersion estimation",
+        "MAP estimation",
+        "low-count genes",
+        "logarithmic fold change",
+        "trend line"
+      ],
+      "difficulty": "medium",
+      "source_page": "3, 4, 5",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "08_deseq2_TE3",
+      "paper_id": "08_deseq2",
+      "question": "What is the specific purpose of the regularized logarithm (rlog) transformation, and how does its performance compare to an ordinary log transformation in terms of variance stabilization?",
+      "category": "technical",
+      "expected_answer": "The rlog transformation is designed for variance stabilization across the entire dynamic range of count data. Unlike the ordinary log transformation, where gene-wise standard deviation remains highly variable and dependent on the mean, rlog ensures that the standard deviation remains stable across the range of mean counts, which is particularly beneficial for sample clustering and distance visualizations.",
+      "expected_concepts": [
+        "regularized logarithm (rlog)",
+        "variance stabilization",
+        "standard deviation",
+        "mean expression",
+        "dynamic range",
+        "clustering"
+      ],
+      "difficulty": "hard",
+      "source_page": "8",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:14:09.724248"
+}

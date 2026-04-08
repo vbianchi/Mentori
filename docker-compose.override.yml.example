@@ -1,0 +1,16 @@
+# docker-compose.override.yml.example
+# Copy this file to docker-compose.override.yml and customize for your environment.
+# This file overrides values in docker-compose.yml for local/server-specific settings.
+#
+# Usage: docker-compose automatically merges docker-compose.override.yml if it exists.
+
+services:
+  backend:
+    environment:
+      # Set to your server's IP or hostname if accessing remotely
+      - FRONTEND_ORIGIN=http://YOUR_SERVER_IP:5173
+
+  frontend:
+    environment:
+      # Set to your server's IP or hostname if accessing remotely
+      - VITE_API_BASE_URL=http://YOUR_SERVER_IP:8766

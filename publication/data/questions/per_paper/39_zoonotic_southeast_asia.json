@@ -1,0 +1,235 @@
+{
+  "paper_id": "39_zoonotic_southeast_asia",
+  "filename": "39_zoonotic_southeast_asia.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "What is the status and prevalence of emerging zoonotic diseases in Southeast Asia among pigs, poultry, ruminants, companion animals, and wildlife during the period 2011\u20132022?",
+    "methods": [
+      "Systematic literature review following a predefined protocol",
+      "Database searching (PubMed, Web of Science, Science Direct) using specific syntaxes",
+      "Screening based on inclusion/exclusion criteria (e.g., peer-reviewed original research, random selection of individuals, specific timeframe)",
+      "Data extraction into a standardized template (author, pathogen, species, diagnostic method, prevalence, etc.)",
+      "Descriptive statistical summary by animal species and country",
+      "One Health approach framework for analysis"
+    ],
+    "findings": [
+      {
+        "finding": "Out of 2,329 retrieved articles, 95 publications were included in the final qualitative synthesis based on strict quality criteria.",
+        "evidence": "The qualitative synthesis yielded 26 published articles reporting on 35 studies related to pigs... 95 publications were included in the final qualitative synthesis (Figure 1).",
+        "page": 3
+      },
+      {
+        "finding": "Parasitic pathogens were the most studied (52%), followed by bacterial (34%) and viral (14%) pathogens.",
+        "evidence": "14% (51/358) focused on viral pathogens, 34% (120/358) on bacterial pathogens and 52% (187/358) on parasitic pathogens (Figure 3).",
+        "page": 3
+      },
+      {
+        "finding": "Japanese encephalitis showed very high seroprevalence in pigs in Cambodia (92.9%) and Vietnam (100%).",
+        "evidence": "Table 2: Japanese encephalitis | Cambodia | 2019 | % positive: 92.9. Vietnam | 2009 | % positive: 100.",
+        "page": 5
+      },
+      {
+        "finding": "Rabies remains a critical zoonosis in the region, particularly in Indonesia where it is endemic in 33 provinces.",
+        "evidence": "Rabies was first reported in Indonesia in 1889 and it is currently endemic in 33 provinces.",
+        "page": 7
+      },
+      {
+        "finding": "Cambodia and Vietnam have the highest number of reported studies regarding zoonotic diseases originating from pigs and poultry.",
+        "evidence": "The findings from the review showed that emerging zoonotic diseases were prevalent across the region and identified a few zoonotic diseases associated with poultry, mainly stemming from Cambodia and Vietnam, as high priority.",
+        "page": 1
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "A schematic flow chart detailing the identification, screening, and inclusion process of the systematic literature review.",
+        "page": 3
+      },
+      {
+        "id": "Figure 2",
+        "description": "A heat map showing the geographical distribution of the 358 assessed studies on zoonotic pathogens across Southeast Asian countries.",
+        "page": 4
+      },
+      {
+        "id": "Figure 3",
+        "description": "A pie chart illustrating the percentage of studies focused on each pathogen type: Viruses (14%), Bacteria (34%), and Parasites (52%).",
+        "page": 4
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Summary of inclusion and exclusion criteria for the two-stage screening process.",
+        "columns": [
+          "Inclusion criteria",
+          "Exclusion criteria"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "Comprehensive list of studies focused on zoonotic diseases in domestic pigs, sorted by pathogen and country.",
+        "columns": [
+          "Pathogen",
+          "Country",
+          "Year of sampling",
+          "Sample size",
+          "% positive",
+          "Diagnostic test",
+          "95% CI",
+          "References"
+        ]
+      },
+      {
+        "id": "Table 3",
+        "description": "Summary of studies focusing on zoonotic pathogens in poultry species.",
+        "columns": [
+          "Pathogen",
+          "Country",
+          "Year of sampling",
+          "Species",
+          "Sample size",
+          "% positive",
+          "Diagnostic test",
+          "95% CI",
+          "References"
+        ]
+      },
+      {
+        "id": "Table 4",
+        "description": "List of research studies examining zoonotic diseases in ruminants (cattle, goats, sheep, buffalo).",
+        "columns": [
+          "Pathogen",
+          "Country",
+          "Year of sampling",
+          "Species",
+          "Sample size",
+          "% positive",
+          "Diagnostic test",
+          "95% CI",
+          "References"
+        ]
+      },
+      {
+        "id": "Table 5",
+        "description": "Detailed list of studies regarding zoonotic diseases in companion animals like dogs and cats.",
+        "columns": [
+          "Pathogen",
+          "Country",
+          "Year of sampling",
+          "Species",
+          "Sample size",
+          "% positive",
+          "Diagnostic test",
+          "95% CI",
+          "References"
+        ]
+      },
+      {
+        "id": "Table 6",
+        "description": "Summary of zoonotic disease findings in wildlife including bats, rodents, macaques, and others.",
+        "columns": [
+          "Pathogen",
+          "Country",
+          "Year of sampling",
+          "Species",
+          "Sample size",
+          "% positive",
+          "Diagnostic test",
+          "95% CI",
+          "References"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "Zoonoses",
+      "One Health",
+      "LMICs (Low- and middle-income countries)",
+      "Prevalence",
+      "Systematic literature review",
+      "Pathogen spillover",
+      "ELISA (Enzyme-linked immunosorbent assay)",
+      "PCR (Polymerase Chain Reaction)",
+      "MAT (Modified agglutination test)",
+      "FECT (Formalin-ether concentration technique)"
+    ],
+    "limitations": [
+      "Only articles written in English and available in online databases were considered.",
+      "Studies focusing on avian influenza were excluded as it is already defined as a regional priority transboundary disease.",
+      "Potential publication bias towards certain countries (Thailand, Malaysia, Vietnam) over others with fewer resources (Brunei, Timor-Leste).",
+      "Possible underreporting of pig diseases due to reliance on indexed databases rather than local veterinary journals.",
+      "Exclusion of articles with poor descriptions of animal selection or non-random sampling methods."
+    ],
+    "connections": [
+      "Builds on the 'One Health' strategy for emerging infectious diseases (Wu et al. 2022).",
+      "References the foundational work on host range of emerging pathogens by Woolhouse and Gowtage-Sequeria (2005).",
+      "Connects to regional zoonotic threat assessments like the Nipah virus studies in Malaysia (Chua 2003).",
+      "Utilizes standard systematic review methodologies similar to those referenced for disease prevalence studies."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "39_zoonotic_southeast_asia_FR1",
+      "paper_id": "39_zoonotic_southeast_asia",
+      "question": "According to the study's findings, what was the reported seroprevalence of Japanese encephalitis in pigs in Vietnam in 2009?",
+      "category": "factual_recall",
+      "expected_answer": "In 2009, the reported seroprevalence (percentage of positive cases) for Japanese encephalitis in pigs in Vietnam reached 100%.",
+      "expected_concepts": [
+        "Japanese encephalitis",
+        "Vietnam",
+        "100%",
+        "2009",
+        "seroprevalence"
+      ],
+      "difficulty": "easy",
+      "source_page": "5",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "39_zoonotic_southeast_asia_CO2",
+      "paper_id": "39_zoonotic_southeast_asia",
+      "question": "How does the research focus on different pathogen types (viral, bacterial, and parasitic) compare across the reviewed literature, and which countries were identified as high priority for pig and poultry zoonoses?",
+      "category": "conceptual",
+      "expected_answer": "The literature is predominantly focused on parasitic pathogens, which account for 52% of studies, followed by bacterial pathogens at 34% and viral pathogens at 14%. Within this regional context, Cambodia and Vietnam are identified as high-priority areas due to having the highest number of reported studies regarding zoonotic diseases originating from pigs and poultry.",
+      "expected_concepts": [
+        "parasitic pathogens (52%)",
+        "bacterial pathogens (34%)",
+        "viral pathogens (14%)",
+        "Cambodia",
+        "Vietnam",
+        "high priority"
+      ],
+      "difficulty": "medium",
+      "source_page": "1, 3, 4",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "39_zoonotic_southeast_asia_TE3",
+      "paper_id": "39_zoonotic_southeast_asia",
+      "question": "Describe the systematic methodology used to select the final 95 publications from the initial search results, including the databases and criteria involved.",
+      "category": "technical",
+      "expected_answer": "The researchers conducted a systematic literature review by searching PubMed, Web of Science, and Science Direct, which initially retrieved 2,329 articles. These were subjected to a two-stage screening process using predefined inclusion and exclusion criteria (such as peer-reviewed original research and specific timeframes), ultimately resulting in 95 publications selected for qualitative synthesis. Data from these articles were then extracted into a standardized template and analyzed using a One Health approach framework.",
+      "expected_concepts": [
+        "2,329 articles",
+        "95 publications",
+        "inclusion/exclusion criteria",
+        "PubMed/Web of Science/Science Direct",
+        "One Health approach",
+        "qualitative synthesis"
+      ],
+      "difficulty": "hard",
+      "source_page": "1, 3",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T20:01:11.652207"
+}

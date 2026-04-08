@@ -1,0 +1,723 @@
+{
+  "version": "v4_expanded",
+  "category": "out_of_domain",
+  "total": 70,
+  "by_type": {
+    "general_knowledge": 20,
+    "excluded_topic": 20,
+    "contradictory": 30
+  },
+  "note": "Expanded from original 50 OOD questions with 20 additional contradictory questions targeting papers 11-30. Original questions: OOD_001-OOD_050. New contradictory questions: OOD_051-OOD_070.",
+  "questions": [
+    {
+      "id": "OOD_001",
+      "question": "What is the chemical formula for water?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_002",
+      "question": "Who wrote the novel 'One Hundred Years of Solitude'?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_003",
+      "question": "What is the speed of light in a vacuum?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_004",
+      "question": "In what year did the Berlin Wall fall?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_005",
+      "question": "What is the largest planet in our solar system?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_006",
+      "question": "What is the Pythagorean theorem?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_007",
+      "question": "What is the boiling point of ethanol at standard atmospheric pressure?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_008",
+      "question": "Who proposed the theory of general relativity?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_009",
+      "question": "What are the main causes of the French Revolution?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_010",
+      "question": "What programming language was originally developed by Guido van Rossum?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_011",
+      "question": "How many chromosomes do humans have?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_012",
+      "question": "What is the capital of Japan?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_013",
+      "question": "What is the primary function of mitochondria in eukaryotic cells?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_014",
+      "question": "What are Newton's three laws of motion?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_015",
+      "question": "What is the molecular weight of glucose?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_016",
+      "question": "Who painted the ceiling of the Sistine Chapel?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_017",
+      "question": "What is the half-life of carbon-14?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_018",
+      "question": "What is the difference between TCP and UDP protocols?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_019",
+      "question": "What are the noble gases in the periodic table?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_020",
+      "question": "What is the distance from the Earth to the Moon?",
+      "category": "out_of_domain",
+      "ood_type": "general_knowledge",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_021",
+      "question": "What spectral classification system is used to categorize main-sequence stars, and how does surface temperature relate to stellar luminosity on the Hertzsprung-Russell diagram?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "astrophysics",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_022",
+      "question": "How does the subduction of oceanic plates at convergent boundaries lead to the formation of volcanic arcs and deep-sea trenches?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "geology",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_023",
+      "question": "What is the role of the Higgs boson in the Standard Model of particle physics, and how was it experimentally confirmed at the Large Hadron Collider?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "particle_physics",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_024",
+      "question": "What are the key differences between Keynesian and monetarist approaches to managing economic recessions?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "economics",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_025",
+      "question": "How do superconducting materials achieve zero electrical resistance, and what is the BCS theory of superconductivity?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "materials_science",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_026",
+      "question": "What is the Riemann hypothesis, and why is it considered one of the most important unsolved problems in pure mathematics?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "pure_mathematics",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_027",
+      "question": "How does the Coriolis effect influence large-scale atmospheric circulation patterns and the formation of cyclones?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "atmospheric_science",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_028",
+      "question": "What are the main principles of Chomsky's theory of Universal Grammar, and how has it influenced modern computational linguistics?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "linguistics",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_029",
+      "question": "What archaeological evidence supports the theory that ancient Polynesians navigated the Pacific Ocean using celestial observations and ocean swells?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "archaeology",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_030",
+      "question": "How do semiconductor doping processes create p-type and n-type materials for use in transistor fabrication?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "materials_science",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_031",
+      "question": "What are the psychological mechanisms behind confirmation bias, and how do they affect decision-making in clinical settings?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "psychology",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_032",
+      "question": "How does the carbon cycle operate in deep-sea hydrothermal vent ecosystems, and what chemosynthetic organisms dominate these environments?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "deep_sea_ecology",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_033",
+      "question": "What are the legal principles governing the doctrine of stare decisis in common law jurisdictions?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "legal_studies",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_034",
+      "question": "How does crop rotation with leguminous plants improve soil nitrogen content through biological nitrogen fixation?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "agricultural_engineering",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_035",
+      "question": "What role does the photoperiod play in regulating flowering time in Arabidopsis thaliana, and which genes are involved?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "plant_biology",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_036",
+      "question": "How do tidal forces from the Moon cause ocean tides, and what determines the difference between spring and neap tides?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "oceanography",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_037",
+      "question": "What are the primary differences between Gothic and Romanesque architectural styles in medieval European cathedrals?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "art_history",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_038",
+      "question": "What is the mechanism of action of perovskite solar cells, and how does their efficiency compare to traditional silicon photovoltaics?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "materials_science",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_039",
+      "question": "How does the Monte Carlo tree search algorithm work in game-playing AI systems like AlphaGo?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "artificial_intelligence",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_040",
+      "question": "What are the harmonic principles underlying the Circle of Fifths in Western music theory?",
+      "category": "out_of_domain",
+      "ood_type": "excluded_topic",
+      "excluded_domain": "music_theory",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should indicate this information is not available in the indexed documents.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_041",
+      "question": "According to the Sarek paper, the pipeline only supports Illumina short-read sequencing data and cannot process any other data types. Is this correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "01_sarek.pdf",
+      "contradiction": "Sarek supports multiple data types including WGS, WES, and targeted sequencing, not only Illumina short reads.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim based on information in the Sarek paper, which describes support for WGS, WES, and targeted panels.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_042",
+      "question": "The fastp paper states that fastp requires separate tools for adapter trimming and quality filtering, processing data in multiple sequential passes. Is this accurate?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "04_fastp.pdf",
+      "contradiction": "fastp performs adapter trimming, quality filtering, and QC in a single scan, which is its key innovation.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting that fastp's key feature is all-in-one single-scan processing.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_043",
+      "question": "According to the DESeq2 paper, the method uses raw read counts without any normalization or variance stabilization. Is this true?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "08_deseq2.pdf",
+      "contradiction": "DESeq2 uses size factor normalization and Empirical Bayes shrinkage for dispersion and fold change estimates.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting DESeq2's normalization and shrinkage methods.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_044",
+      "question": "The Snakemake paper describes a system that uses a simple first-come-first-served job queue without any optimization of task scheduling. Is this correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "02_snakemake.pdf",
+      "contradiction": "Snakemake uses Mixed Integer Linear Programming (MILP) for optimized job scheduling.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting Snakemake's MILP-based scheduler.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_045",
+      "question": "The nf-core framework paper reports that switching from BAM to CRAM format increased storage requirements by 65%. Is this finding correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "03_nfcore_framework.pdf",
+      "contradiction": "The nf-core framework paper shows CRAM reduced storage by 65%, not increased it.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting that CRAM reduced (not increased) storage by 65%.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_046",
+      "question": "According to the Salmon paper, transcript quantification is performed using traditional full alignment of reads to the reference genome. Is this accurate?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "07_salmon.pdf",
+      "contradiction": "Salmon uses lightweight quasi-mapping, not traditional full alignment, for ultra-fast transcript quantification.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting Salmon's quasi-mapping approach.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_047",
+      "question": "The LSD Nepal paper reports that pregnant cows had a significantly lower risk of LSD infection compared to non-pregnant cattle. Is this correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "13_lsd_nepal.pdf",
+      "contradiction": "The Nepal paper identifies pregnant cows as having higher risk, not lower risk.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting that pregnancy was identified as a risk factor.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_048",
+      "question": "The HPAI Netherlands paper found that clinical signs of avian influenza are identical across all poultry species, with no species-dependent differences. Is this true?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "12_hpai_netherlands.pdf",
+      "contradiction": "The paper found clinical signs were highly species-dependent: ducks showed mainly nervous/locomotor signs while chickens showed mucosal/skin signs.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting the species-dependent clinical sign differences.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_049",
+      "question": "According to the MultiQC paper, the tool can only process output from a single bioinformatics tool at a time and does not support aggregation across tools. Is this correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "05_multiqc.pdf",
+      "contradiction": "MultiQC aggregates output from 22+ bioinformatics tools into a single report.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting MultiQC's multi-tool aggregation capability.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_050",
+      "question": "The rabies Tanzania paper concludes that vaccination campaigns in the Serengeti achieved uniform coverage across all areas, completely eliminating spatial heterogeneity. Is this accurate?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "15_rabies_tanzania.pdf",
+      "contradiction": "The paper identifies spatial heterogeneity in vaccination coverage as a primary driver of rabies persistence.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting that spatial heterogeneity was the main problem identified.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_051",
+      "question": "According to the ASF Burkina Faso paper, phylogenetic analysis showed that the 2018 ASFV outbreaks were caused by Genotype II strains, the same genotype responsible for the ongoing pandemic in Eastern Europe. Is this correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "11_asf_burkina_faso.pdf",
+      "contradiction": "The paper found the outbreaks were caused by Genotype I and Serogroup 4, not Genotype II.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting that the Burkina Faso ASFV strains belong to Genotype I and Serogroup 4, not Genotype II.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_052",
+      "question": "The HPAI Netherlands paper reports that meat-type poultry accounted for the majority of HPAI outbreaks throughout the entire study period from 2014 to 2022. Is this finding accurate?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "12_hpai_netherlands.pdf",
+      "contradiction": "Meat-type poultry cases were only 6.3% during 2014-2018 and increased to 39.5% during 2020-2022; they did not account for the majority throughout the entire period.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting the shift from 6.3% to 39.5% in meat-type poultry cases across the two time periods.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_053",
+      "question": "The LSD Nepal paper found that the morbidity rate was extremely low at approximately 3%, suggesting the outbreak had minimal clinical impact on the cattle population. Is this correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "13_lsd_nepal.pdf",
+      "contradiction": "The paper reports the overall morbidity rate was 28.02%, not 3%. The 3.06% figure was the mortality rate.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting the morbidity rate was 28.02% (high), while 3.06% was the mortality rate.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_054",
+      "question": "According to the bovine TB Cameroon paper, the study used a longitudinal cohort design following cattle herds over a five-year period to track bTB progression. Is this accurate?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "14_bovine_tb_cameroon.pdf",
+      "contradiction": "The paper describes a descriptive cross-sectional study conducted from May to October 2022, not a longitudinal cohort design.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting the study used a cross-sectional design, not a longitudinal cohort study.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_055",
+      "question": "The rabies Tanzania paper found that achieving the WHO-recommended 70% vaccination coverage threshold uniformly across all villages was the primary reason for the decline in rabies cases. Is this correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "15_rabies_tanzania.pdf",
+      "contradiction": "The paper found rabies incidence declined to low levels even WITHOUT reaching the 70% threshold, as long as spatial heterogeneity in coverage was reduced.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting that reducing spatial heterogeneity was more important than the absolute 70% coverage threshold.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_056",
+      "question": "According to the PPR Ethiopia paper, the seroprevalence of PPRV antibodies in vaccinated animals was only 32.1%, well below the FAO-WOAH recommended threshold for herd immunity. Is this accurate?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "16_ppr_ethiopia.pdf",
+      "contradiction": "The 32.1% seroprevalence was in NON-vaccinated animals. Vaccinated animals showed 68.8% seroprevalence, which was still below the 80% FAO-WOAH threshold.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting that the 32.1% figure applies to non-vaccinated animals, while vaccinated animals had 68.8% seroprevalence.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_057",
+      "question": "The brucellosis Ethiopia paper reports that small herd size is the primary risk factor for brucellosis transmission in small ruminants. Is this finding correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "17_brucellosis_ethiopia.pdf",
+      "contradiction": "The paper identifies LARGE herd size (not small) and history of retained fetal membranes as significant risk factors for brucellosis in small ruminants.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting that large herd size was the risk factor, not small herd size.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_058",
+      "question": "According to the FMD review paper, the primary site of FMDV infection is the same in all species, with the virus consistently targeting the oropharynx regardless of the host. Is this correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "18_fmd_review.pdf",
+      "contradiction": "The paper states that primary infection sites vary by species: the nasopharynx in ruminants and the oropharynx in pigs.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting the species-specific differences in primary infection sites.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_059",
+      "question": "The HPAI Canada paper states that the H5N1 clade 2.3.4.4b virus has remained strictly confined to avian species in Canada, with no documented spillover into mammals. Is this accurate?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "19_hpai_canada.pdf",
+      "contradiction": "The paper documents significant spillover into multiple mammalian species, often with severe neurological signs, and identifies mammalian adaptation mutations.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting the documented mammalian spillover and adaptation mutations like PB2-E627K.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_060",
+      "question": "According to the LSD review paper, Lumpy Skin Disease has a low morbidity rate but extremely high mortality, making it a lethal disease for most infected cattle. Is this correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "20_lsd_review.pdf",
+      "contradiction": "The paper states the opposite: LSD has extremely high morbidity but relatively LOW mortality rates.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting that LSD is characterized by high morbidity but low mortality.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_061",
+      "question": "The livestock gut microbiome review states that gut microbiome research in livestock has been evenly distributed across diverse indigenous and cosmopolitan breeds worldwide. Is this accurate?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "21_livestock_gut_microbiome_review.pdf",
+      "contradiction": "The review found the vast majority of research is biased toward a small number of globally distributed, highly selected cosmopolitan breeds, overlooking indigenous breeds.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting the strong bias toward cosmopolitan breeds.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_062",
+      "question": "According to the pig MAGs paper, the majority of swine gut microbial species identified through metagenome-assembled genomes had already been cultivated and characterized in the laboratory. Is this correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "22_pig_mags.pdf",
+      "contradiction": "The paper found a high prevalence of uncultured species among the assembled MAGs, indicating most were NOT previously cultivated.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting the high prevalence of uncultured species among the pig gut MAGs.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_063",
+      "question": "The swine cultivation paper found that culture-independent methods detected substantially more microbial diversity than any combination of culture-dependent approaches. Is this finding correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "23_swine_cultivation.pdf",
+      "contradiction": "The paper found the opposite: culture-dependent methods detected significantly HIGHER diversity (measured in ASVs) than culture-independent methods at all growth stages.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting that culture-dependent methods actually captured more diversity.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_064",
+      "question": "According to the chicken microbiome paper, the gut microbiota continuously increases in abundance and diversity throughout the entire 42-day production cycle without reaching a plateau. Is this accurate?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "24_chicken_microbiome.pdf",
+      "contradiction": "The paper found that chicken gut microbiota abundance and diversity reach a plateau at 7 days posthatch, not continuing to increase through the full production cycle.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting the early plateau at 7 days posthatch.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_065",
+      "question": "The dairy cow feed efficiency paper reports that the rumen microbiome has no detectable genetic basis and is entirely determined by diet and environmental factors. Is this correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "25_dairy_cow_feed.pdf",
+      "contradiction": "The paper identified significant genomic regions (on BTA3, BTA7, BTA11) co-localizing with rumen microbiome and feed efficiency traits, demonstrating a host genetic basis for microbiome composition.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting the identified genomic regions that influence rumen microbiome composition.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_066",
+      "question": "According to the gut-meat quality review, the gut microbiome has negligible influence on intramuscular fat content in livestock, with genetics being the sole determinant of meat quality traits. Is this accurate?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "26_gut_meat_quality.pdf",
+      "contradiction": "The review found specific bacterial genera positively correlated with higher intramuscular fat content and that the gut microbiome explains a significant portion of variation in finishing weight.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting the documented correlations between gut microbiota and meat quality traits.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_067",
+      "question": "The iNAP pipeline paper describes a command-line-only tool that requires users to manually construct and visualize microbial interaction networks using custom scripts. Is this correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "27_inap_pipeline.pdf",
+      "contradiction": "iNAP is implemented on the Galaxy project framework as a comprehensive online pipeline with automated visualization outputs, not a command-line-only tool.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting iNAP is a Galaxy-based online pipeline with automated visualization.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_068",
+      "question": "According to the OTU vs ASV comparison paper, the choice of bioinformatic pipeline (OTU clustering vs ASV denoising) has no measurable effect on the resulting community composition profiles. Is this accurate?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "28_otu_vs_asv.pdf",
+      "contradiction": "The paper found community compositions differed between 6.75% and 10.81% depending purely on the pipeline used, demonstrating a measurable effect.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting the documented 6.75-10.81% difference in community composition attributable to pipeline choice.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_069",
+      "question": "The 16S best practices paper recommends using Operational Taxonomic Units (OTUs) over Amplicon Sequence Variants (ASVs) as the preferred method for modern microbiome studies. Is this correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "29_16s_best_practices.pdf",
+      "contradiction": "The paper states that ASVs are increasingly preferred over OTUs because they allow for valid comparisons across independent studies.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should contradict this claim, noting the preference for ASVs over OTUs in the paper's recommendations.",
+      "answerable": false
+    },
+    {
+      "id": "OOD_070",
+      "question": "According to the aquaculture metagenomics paper, 16S primer choice and amplicon length have no effect on the observed spatio-temporal patterns of microbial communities. Is this finding correct?",
+      "category": "out_of_domain",
+      "ood_type": "contradictory",
+      "target_paper": "30_aquaculture_metagenomics.pdf",
+      "contradiction": "While the paper confirms spatio-temporal patterns are not impacted, it explicitly states that primer choice and amplicon length DO significantly affect richness and diversity VALUES. The question falsely implies no effect at all.",
+      "expected_answer": "NOT_IN_CORPUS",
+      "expected_behavior": "The system should clarify that while spatio-temporal patterns are robust, primer choice and amplicon length DO significantly affect richness and diversity metrics.",
+      "answerable": false
+    }
+  ]
+}

@@ -1,0 +1,183 @@
+{
+  "paper_id": "11_asf_burkina_faso",
+  "filename": "11_asf_burkina_faso.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "The study aims to perform the molecular characterization and phylogenetic analysis of African swine fever viruses (ASFV) responsible for the October 2018 outbreaks in Burkina Faso to understand the genetic diversity and link between the epidemics.",
+    "methods": [
+      "Real-time PCR for diagnostic confirmation",
+      "DNA extraction from blood using DNeasy Blood & Tissue kit",
+      "Amplification and sequencing of partial P72 (B646L), complete p54 (E183L), partial CD2v, and partial B602L (CVR) genes",
+      "Phylogenetic analysis using Neighbor-Joining (NJ), Minimum Evolution, and Maximum Likelihood (ML) methods in MEGA 7",
+      "Field epidemiological investigations on farm management and morbidity/mortality rates"
+    ],
+    "findings": [
+      {
+        "finding": "ASFV DNA was confirmed in 20 out of 62 collected blood samples.",
+        "evidence": "The real-time PCR results confirmed ASFV DNA in twenty, out of sixty-two blood samples...",
+        "page": 4
+      },
+      {
+        "finding": "The outbreaks were caused by ASFV strains belonging to Genotype I and Serogroup 4.",
+        "evidence": "The sequencing and phylogenetic analysis showed that ASFVs causing these outbreaks belong to genotype I and serogroup 4.",
+        "page": 1
+      },
+      {
+        "finding": "The study identified four variants of the Tetrameric Repeat Sequence (TRS) within the Central Variable Region (CVR).",
+        "evidence": "The analysis of 20 CVRs revealed four variants of the tetrameric repeat sequence (TRS) with 32, 24, 23, and 12 TRS (Table 2).",
+        "page": 4
+      },
+      {
+        "finding": "Five variants were identified based on the number of deleted KPCPPP motifs in the CD2v protein.",
+        "evidence": "...the CD2v amino acid sequence revealed five variants based on the number of deleted KCPPPK motifs in the C-terminal proline-reach region of the protein.",
+        "page": 1
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "Map of Kadiogo province showing confirmed and non-confirmed ASF outbreak suspicion areas in Ouagadougou and its surroundings.",
+        "page": 2
+      },
+      {
+        "id": "Figure 2",
+        "description": "Neighbor-joining phylogenetic tree of the partial p72 gene showing that the 2018 Burkina Faso isolates cluster within Genotype I.",
+        "page": 5
+      },
+      {
+        "id": "Figure 3",
+        "description": "Minimum Evolution tree based on full-length p54 gene sequences showing the isolates belong to Genotype Ia.",
+        "page": 6
+      },
+      {
+        "id": "Figure 4",
+        "description": "Amino acid sequence alignment of the p54 protein illustrating variations in PAAA repeats among the isolates.",
+        "page": 7
+      },
+      {
+        "id": "Figure 5",
+        "description": "Maximum Likelihood tree based on partial CD2v amino acid sequences clustering the isolates into Serogroup 4.",
+        "page": 8
+      },
+      {
+        "id": "Figure 6",
+        "description": "Amino acid sequence alignment of the C-terminal of the CD2v protein showing variations in the KPCPPP repeat units.",
+        "page": 9
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Summary of outbreak information including sampling locations, morbidity/mortality rates, and sample counts.",
+        "columns": [
+          "Sampling location",
+          "Morbidity",
+          "Mortality",
+          "Sample collect date",
+          "Number of samples collected"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "Comparison of genetic profiles (CVR, p54, and CD2v) for the 2018 ASFV outbreak isolates.",
+        "columns": [
+          "Isolate name",
+          "CVR",
+          "Number of repeats (CVR)",
+          "p54 (PAAA repeats)",
+          "CD2v (number of deleted PCPPPK)",
+          "Location",
+          "Outbreak date"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "African swine fever (ASF)",
+      "Central variable region (CVR)",
+      "Tetrameric repeat sequence (TRS)",
+      "B646L (p72 gene)",
+      "E183L (p54 gene)",
+      "CD2v",
+      "Genotype",
+      "Serogroup",
+      "KPCPPP motif"
+    ],
+    "limitations": [
+      "Fresh carcasses were not available for necropsy to determine pathology.",
+      "Small sample size for sequence analysis (only 20 confirmed positives).",
+      "Inability to sequence the p72 gene for one specific profile found in Nioko II due to technical limitations."
+    ],
+    "connections": [
+      "P72 genotyping builds on the method by Bastos et al. (2003).",
+      "p54 discrimination follows the approach by Gallardo et al. (2009).",
+      "CVR analysis is based on methods by Irusta et al. (1996) and Nix et al. (2006).",
+      "Serogrouping via CD2v builds on the work by Malogolovkin et al. (2015).",
+      "Historical comparisons refer to previous studies of ASF in Burkina Faso by Sidi et al. (2021) and Alkhamis et al. (2018)."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "11_asf_burkina_faso_FR1",
+      "paper_id": "11_asf_burkina_faso",
+      "question": "In the study of the 2018 African Swine Fever Virus (ASFV) outbreaks, how many blood samples were collected in total and how many of those were confirmed positive for ASFV DNA?",
+      "category": "factual_recall",
+      "expected_answer": "According to the study, a total of 62 blood samples were collected from pigs during the field investigations. Out of these sixty-two samples, real-time PCR results confirmed the presence of ASFV DNA in 20 samples.",
+      "expected_concepts": [
+        "62 blood samples",
+        "20 positive",
+        "real-time PCR",
+        "ASFV DNA"
+      ],
+      "difficulty": "easy",
+      "source_page": "4",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "11_asf_burkina_faso_CO2",
+      "paper_id": "11_asf_burkina_faso",
+      "question": "How did the researchers use multi-gene analysis to establish the genetic identity and classification of the ASFV strains responsible for the outbreaks?",
+      "category": "conceptual",
+      "expected_answer": "The researchers combined sequencing and phylogenetic analysis of several genes to classify the isolates. They used the partial p72 (B646L) and complete p54 (E183L) genes to identify the virus as Genotype I (specifically Genotype Ia), while the analysis of partial CD2v amino acid sequences allowed them to cluster the isolates into Serogroup 4. This multi-locus approach provided a higher resolution of the virus's identity than single-gene sequencing alone.",
+      "expected_concepts": [
+        "Genotype I",
+        "Serogroup 4",
+        "p72",
+        "p54",
+        "CD2v",
+        "phylogenetic analysis"
+      ],
+      "difficulty": "medium",
+      "source_page": "1, 5, 6, 8",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "11_asf_burkina_faso_TE3",
+      "paper_id": "11_asf_burkina_faso",
+      "question": "What specific software and phylogenetic methods were utilized for the analysis of the ASFV sequences, and what variation was found in the Central Variable Region (CVR)?",
+      "category": "technical",
+      "expected_answer": "The study utilized MEGA 7 software to perform phylogenetic analysis using Neighbor-Joining (NJ), Minimum Evolution (ME), and Maximum Likelihood (ML) methods. Analysis of the B602L gene's Central Variable Region (CVR) revealed four distinct variants of the Tetrameric Repeat Sequence (TRS), containing 32, 24, 23, and 12 repeat units respectively.",
+      "expected_concepts": [
+        "MEGA 7",
+        "Neighbor-Joining",
+        "Minimum Evolution",
+        "Maximum Likelihood",
+        "Central Variable Region",
+        "Tetrameric Repeat Sequence"
+      ],
+      "difficulty": "hard",
+      "source_page": "4",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T18:57:00.419934"
+}

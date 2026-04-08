@@ -1,0 +1,169 @@
+{
+  "paper_id": "42_campylobacter_wgs_thailand",
+  "filename": "42_campylobacter_wgs_thailand.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "This study aims to characterize Campylobacter spp. isolates (C. jejuni and C. coli) from commercial broilers and native chickens in Southern Thailand using whole-genome sequencing (WGS) to understand their genomic characteristics, antimicrobial resistance (AMR), and virulence factors.",
+    "methods": [
+      "Whole Genome Sequencing (WGS) using Illumina MiSeq",
+      "De novo assembly using SPAdes",
+      "Multilocus sequencing typing (MLST)",
+      "Antimicrobial Susceptibility Testing (AST) via agar dilution method",
+      "Bioinformatic analysis using ResFinder (for ARG), Kmerfinder, and VFDB (for virulence factors)",
+      "SNP-based phylogenetic analysis using CSI Phylogeny and iTOL"
+    ],
+    "findings": [
+      {
+        "finding": "Identification of 13 sequence types (ST) in C. jejuni and 5 in C. coli, with ST 2274 being the most prominent (19.2%).",
+        "evidence": "Among the 26 isolates, 13 sequence types (ST) were identified in C. jejuni and 5 ST in C. coli. The prominent ST was ST 2274 (5 isolates, 19.2%)",
+        "page": 1
+      },
+      {
+        "finding": "High prevalence of antimicrobial resistance genes and specific point mutations.",
+        "evidence": "The blaOXA resistance gene was present in all isolates, the gyrA mutations was in 95.2% of C. jejuni and 80.0% of C. coli, and the tet(O) resistance gene in 76.2% of C. jejuni and 80.0% of C. coli.",
+        "page": 1
+      },
+      {
+        "finding": "Significant phenotypic resistance to fluoroquinolones in C. jejuni.",
+        "evidence": "The C. jejuni isolates were all resistant to ciprofloxacin, enrofloxacin, and nalidixic acid.",
+        "page": 1
+      },
+      {
+        "finding": "Discovery of a novel sequence type.",
+        "evidence": "1 isolate was defined as a novel ST with the assigned ST number by PubMLST being ST 13540.",
+        "page": 5
+      },
+      {
+        "finding": "Substantial genetic divergence compared to reference isolates.",
+        "evidence": "Single-nucleotide polymorphisms concordance varied widely, with differences of up to 13,375 single-nucleotide polymorphisms compared to the reference Campylobacter isolates.",
+        "page": 1
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "Visualizes the relationship and overlap of sequence types (ST) found in this study compared to previous Thai studies using a Venn diagram and a minimum spanning tree.",
+        "page": 5
+      },
+      {
+        "id": "Figure 2",
+        "description": "A SNP-based phylogenetic tree of the isolates mapped against their MLST, phenotypic resistance, ARGs, and virulence factor profiles.",
+        "page": 6
+      },
+      {
+        "id": "Figure 3",
+        "description": "A Sankey plot illustrating the flow of associations between sample sources, Campylobacter species, sequence types, resistance genes, and phenotypic resistance.",
+        "page": 7
+      },
+      {
+        "id": "Figure 4",
+        "description": "A circular SNP-based phylogenetic tree comparing the 26 study isolates with 28 reference Campylobacter genomes from other Asian countries.",
+        "page": 8
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Summarizes the genome characteristics, MLST profiles, and GenBank accession numbers for all 26 isolates.",
+        "columns": [
+          "ID",
+          "Campylobacter spp.",
+          "Totals raw reads",
+          "No. reads (after trimming)",
+          "Estimated genome length (bp)",
+          "No. of contigs",
+          "GC (%)",
+          "N50 (bp)",
+          "L50",
+          "MLST profile",
+          "Clonal complex",
+          "GenBank Accession number"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "WGS (Whole Genome Sequencing)",
+      "MLST (Multilocus Sequencing Typing)",
+      "ST (Sequence Type)",
+      "ARG (Antimicrobial Resistance Gene)",
+      "SNP (Single-Nucleotide Polymorphism)",
+      "MIC (Minimum Inhibitory Concentration)",
+      "LMIC (Low- to middle-income countries)",
+      "MGE (Mobile Genetic Elements)",
+      "VF (Virulence Factors)"
+    ],
+    "limitations": [
+      "Antimicrobial susceptibility testing was restricted to only three main classes (macrolides, quinolones, and tetracyclines).",
+      "The accuracy of genotypic predictions depends on the comprehensiveness of the reference databases used.",
+      "The study focused exclusively on poultry isolates, without including human clinical samples for a direct zoonotic comparison."
+    ],
+    "connections": [
+      "Builds on previous Thai surveillance studies by Thomrongsuwannakij et al. (2017) and Wangroongsarb et al. (2021).",
+      "Uses standard bioinformatics pipelines including Galaxy, ResFinder 4.1, and the PubMLST database.",
+      "Compares findings to the NARMS (National Antimicrobial Resistance Monitoring System) approach used in the US."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "42_campylobacter_wgs_thailand_FR1",
+      "paper_id": "42_campylobacter_wgs_thailand",
+      "question": "Which specific sequence type was identified as the most prominent in the study, and what was the assigned number for the novel sequence type discovered?",
+      "category": "factual_recall",
+      "expected_answer": "The most prominent sequence type identified was ST 2274, which accounted for 19.2% of the isolates (5 out of 26). The study also discovered a novel sequence type assigned the number ST 13540 by PubMLST.",
+      "expected_concepts": [
+        "ST 2274",
+        "ST 13540",
+        "PubMLST",
+        "prominent sequence type"
+      ],
+      "difficulty": "easy",
+      "source_page": "1, 5",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "42_campylobacter_wgs_thailand_CO2",
+      "paper_id": "42_campylobacter_wgs_thailand",
+      "question": "Based on the findings, how do the genotypic markers for resistance in C. jejuni relate to its observed phenotypic resistance against fluoroquinolones?",
+      "category": "conceptual",
+      "expected_answer": "There is a high correlation between genotypic markers and phenotypic resistance in C. jejuni; 95.2% of the isolates possessed gyrA point mutations, which aligns with the finding that 100% of the C. jejuni isolates demonstrated phenotypic resistance to the fluoroquinolones ciprofloxacin and enrofloxacin, as well as nalidixic acid.",
+      "expected_concepts": [
+        "gyrA mutations",
+        "fluoroquinolones",
+        "ciprofloxacin",
+        "phenotypic resistance",
+        "genotype-phenotype correlation"
+      ],
+      "difficulty": "medium",
+      "source_page": "1",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "42_campylobacter_wgs_thailand_TE3",
+      "paper_id": "42_campylobacter_wgs_thailand",
+      "question": "Describe the bioinformatic tools and methods used for the de novo assembly and the subsequent identification of antimicrobial resistance genes and virulence factors.",
+      "category": "technical",
+      "expected_answer": "The study performed de novo assembly of Illumina MiSeq reads using SPAdes. For bioinformatic analysis, ResFinder was utilized to identify antimicrobial resistance genes (ARGs), while the Virulence Factor Database (VFDB) was used to detect virulence factors and Kmerfinder was used for species identification.",
+      "expected_concepts": [
+        "SPAdes",
+        "ResFinder",
+        "VFDB",
+        "Kmerfinder",
+        "Illumina MiSeq"
+      ],
+      "difficulty": "medium",
+      "source_page": "1",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:33:58.972655"
+}

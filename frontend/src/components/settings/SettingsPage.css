@@ -1,0 +1,852 @@
+/* frontend/src/components/settings/SettingsPage.css */
+/* Compact Professional Design - Matching Admin Panel & Agent Cards */
+
+/* --- Animations --- */
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Alert Messages --- */
+.alert-error {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(239, 68, 68, 0.1);
+    /* Keep alerts semantic colors as they are robust */
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: rgb(248, 113, 113);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+}
+
+.alert-success {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    color: rgb(74, 222, 128);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+}
+
+.alert-warning {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: rgba(234, 179, 8, 0.1);
+    border: 1px solid rgba(234, 179, 8, 0.2);
+    color: rgb(250, 204, 21);
+    font-size: 0.75rem;
+    border-radius: 4px;
+}
+
+/* --- Settings Content Container --- */
+.settings-content-wrapper {
+    max-width: 64rem;
+    margin: 0 auto;
+}
+
+.settings-content-narrow {
+    max-width: 42rem;
+    margin: 0 auto;
+}
+
+/* --- Agent Role Grid --- */
+.agent-roles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.agent-role-card {
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    transition: var(--trans-fast);
+}
+
+.agent-role-card:hover {
+    border-color: var(--border-active);
+    background: rgba(0, 0, 0, 0.3);
+    /* Slight darken on hover */
+}
+
+.agent-role-title {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.agent-role-title.lead {
+    color: rgb(192, 132, 252);
+}
+
+.agent-role-title.coder {
+    color: rgb(96, 165, 250);
+}
+
+.agent-role-title.handyman {
+    color: rgb(251, 146, 60);
+}
+
+.agent-role-title.editor {
+    color: rgb(74, 222, 128);
+}
+
+.agent-role-title.transcriber {
+    color: rgb(236, 72, 153);
+}
+
+.agent-role-title.default {
+    color: rgb(156, 163, 175);
+}
+
+.agent-role-subtitle {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-bottom: 0.75rem;
+}
+
+/* --- API Keys Section --- */
+.api-keys-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.api-key-help-text {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-top: 0.25rem;
+}
+
+/* --- Profile Section --- */
+.profile-info-card {
+    padding: 1rem;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+}
+
+.profile-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.profile-value {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    user-select: all;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-subtle);
+    word-break: break-all;
+    color: var(--accent-secondary);
+}
+
+.profile-help-text {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-top: 0.5rem;
+}
+
+.profile-help-text code {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0.125rem 0.375rem;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 0.675rem;
+}
+
+/* --- Profile Name Row --- */
+.profile-name-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 480px) {
+    .profile-name-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- Form Textarea --- */
+.form-textarea {
+    min-height: 120px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+/* --- Password Change Section --- */
+.password-change-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.password-strength-indicator {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin-top: 0.5rem;
+    overflow: hidden;
+}
+
+.password-strength-bar {
+    height: 100%;
+    transition: var(--trans-smooth);
+    border-radius: 2px;
+}
+
+.password-strength-bar.weak {
+    width: 33%;
+    background: rgb(239, 68, 68);
+}
+
+.password-strength-bar.medium {
+    width: 66%;
+    background: rgb(234, 179, 8);
+}
+
+.password-strength-bar.strong {
+    width: 100%;
+    background: rgb(34, 197, 94);
+}
+
+/* --- Settings Sections --- */
+.settings-section {
+    margin-bottom: 2rem;
+}
+
+.settings-section-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.settings-section-divider {
+    height: 1px;
+    background: linear-gradient(to right,
+            transparent,
+            rgba(255, 255, 255, 0.1),
+            transparent);
+    margin: 2rem 0;
+}
+
+/* --- Toggle Switches --- */
+.toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    margin-bottom: 0.75rem;
+    transition: var(--trans-fast);
+}
+
+.toggle-container:hover {
+    border-color: var(--border-active);
+}
+
+.toggle-label-group {
+    flex: 1;
+}
+
+.toggle-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-main);
+    display: block;
+    margin-bottom: 0.125rem;
+}
+
+.toggle-description {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+}
+
+.toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: var(--trans-smooth);
+}
+
+.toggle-switch.active {
+    background: var(--accent-primary);
+}
+
+.toggle-switch-knob {
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    transition: var(--trans-smooth);
+}
+
+.toggle-switch.active .toggle-switch-knob {
+    left: 22px;
+}
+
+/* --- Stat Cards (for usage stats) --- */
+.usage-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.usage-stat-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.usage-stat-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+    font-weight: 600;
+}
+
+.usage-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-inverse);
+}
+
+.usage-stat-subtitle {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+/* --- Danger Zone --- */
+.danger-zone {
+    margin-top: 3rem;
+    padding: 1.5rem;
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: var(--radius-md);
+}
+
+.danger-zone-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgb(248, 113, 113);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.danger-zone-description {
+    font-size: 0.75rem;
+    color: rgb(248, 113, 113);
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+.btn-danger {
+    background: transparent;
+    border: 1px solid rgb(239, 68, 68);
+    color: rgb(248, 113, 113);
+    padding: 0.625rem 1rem;
+    border-radius: 4px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--trans-fast);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgb(248, 113, 113);
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .agent-roles-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .usage-stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- Data Tables --- */
+.data-table-container {
+    overflow-x: auto;
+    margin-top: 1rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background: var(--bg-panel);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8125rem;
+}
+
+.data-table th,
+.data-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.data-table th {
+    background: rgba(255, 255, 255, 0.05);
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+}
+
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* --- Badges --- */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 99px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-dim);
+}
+
+.badge-success {
+    background: rgba(34, 197, 94, 0.15);
+    color: rgb(74, 222, 128);
+}
+
+.badge-warning {
+    background: rgba(234, 179, 8, 0.15);
+    color: rgb(250, 204, 21);
+}
+
+.badge-error {
+    background: rgba(239, 68, 68, 0.15);
+    color: rgb(248, 113, 113);
+}
+
+.badge-neutral {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-dim);
+}
+
+/* --- Modals --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: var(--z-modal);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem;
+    overflow-y: auto;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    margin: auto 0;
+}
+
+.modal-content h3 {
+    margin: 0 0 1.5rem 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+/* --- Utils --- */
+.card-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.card-footer-actions {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.font-medium {
+    font-weight: 500;
+}
+
+.text-sm {
+    font-size: 0.8125rem;
+}
+
+.text-muted {
+    color: var(--text-dim);
+}
+
+.block {
+    display: block;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+/* --- File Info Cell --- */
+.file-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.file-count {
+    white-space: nowrap;
+}
+
+.btn-link {
+    background: transparent;
+    border: none;
+    color: var(--accent-primary);
+    font-size: 0.75rem;
+    cursor: pointer;
+    text-decoration: underline;
+    opacity: 0.8;
+}
+
+.btn-link:hover {
+    opacity: 1;
+}
+
+.file-list-preview {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.file-path-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    padding: 0.125rem 0;
+    white-space: nowrap;
+}
+
+.file-path-item svg {
+    opacity: 0.7;
+}
+
+.path-tooltip {
+    display: none;
+}
+
+/* --- Thinking Controls --- */
+.thinking-controls {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.thinking-toggle {
+    display: flex;
+    align-items: center;
+}
+
+.thinking-toggle .toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    font-weight: 500;
+    margin-bottom: 0;
+}
+
+.thinking-toggle .toggle-label:hover {
+    color: var(--text-main);
+}
+
+.thinking-toggle input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent-primary);
+    cursor: pointer;
+}
+
+.thinking-toggle svg {
+    color: var(--accent-secondary);
+}
+
+.thinking-level {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    padding-left: 1.5rem;
+}
+
+.thinking-level .level-label {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+}
+
+.form-input-small {
+    padding: 0.375rem 0.625rem;
+    font-size: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    color: var(--text-main);
+    min-width: 100px;
+}
+
+.form-input-small:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+/* --- Progress Bar for Ingestion --- */
+.progress-info {
+    margin-top: 0.5rem;
+    width: 100%;
+}
+
+.progress-bar-container {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 0.25rem;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+    border-radius: 2px;
+    transition: width 0.3s ease-out;
+}
+
+.progress-text {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    display: block;
+}
+
+.progress-text .text-error {
+    color: rgb(248, 113, 113);
+}
+
+/* --- Status cell with progress --- */
+.data-table td:has(.progress-info) {
+    min-width: 180px;
+}
+
+/* --- Full-width progress detail row --- */
+.progress-detail-row td {
+    padding: 0 !important;
+    border-top: none !important;
+    background: rgba(var(--accent-primary-rgb, 99, 102, 241), 0.04);
+}
+
+.progress-detail-panel {
+    padding: 0.6rem 1.25rem 0.75rem;
+    border-left: 2px solid rgba(var(--accent-primary-rgb, 99, 102, 241), 0.35);
+    margin: 0 1.25rem 0.5rem;
+    border-radius: 0 0 4px 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.pdp-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.pdp-bar-track {
+    flex: 1;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    max-width: 280px;
+}
+
+.pdp-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-primary, #6366f1), var(--accent-secondary, #8b5cf6));
+    border-radius: 2px;
+    transition: width 0.4s ease-out;
+}
+
+.pdp-bar-label {
+    font-size: 0.65rem;
+    color: var(--text-dim, rgba(255,255,255,0.4));
+    white-space: nowrap;
+}
+
+.pdp-error {
+    color: rgb(248, 113, 113);
+}
+
+.pdp-log {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.pdp-log-line {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.72rem;
+    line-height: 1.3;
+}
+
+.pdp-log-line.pdp-done {
+    color: var(--text-dim, rgba(255,255,255,0.35));
+}
+
+.pdp-log-line.pdp-active {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.pdp-icon-done {
+    color: rgba(74, 222, 128, 0.7);
+    flex-shrink: 0;
+}
+
+.pdp-icon-spin {
+    color: var(--accent-primary, #6366f1);
+    flex-shrink: 0;
+    animation: spin 1.2s linear infinite;
+}
+
+.pdp-file-name {
+    font-family: var(--font-mono, monospace);
+    font-size: 0.68rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 420px;
+}
+
+.pdp-file-status {
+    font-size: 0.62rem;
+    color: var(--accent-secondary, #8b5cf6);
+    background: rgba(139, 92, 246, 0.12);
+    border-radius: 3px;
+    padding: 1px 5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.pdp-extraction-stats {
+    display: flex;
+    gap: 0.6rem;
+    font-size: 0.62rem;
+    color: var(--text-dim, rgba(255,255,255,0.3));
+}
+
+.pdp-extraction-stats span {
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px;
+    padding: 1px 6px;
+}

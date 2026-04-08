@@ -1,0 +1,80 @@
+.citation-wrapper {
+    display: inline;
+    position: relative;
+}
+
+.citation-btn {
+    display: inline;
+    padding: 0 1px;
+    font-size: 0.85em;
+    color: var(--accent-secondary);
+    background: none;
+    border: none;
+    cursor: default;
+    font-family: inherit;
+    vertical-align: baseline;
+    line-height: inherit;
+    transition: color var(--trans-fast);
+}
+
+.citation-btn.has-source {
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 2px;
+}
+
+.citation-btn.has-source:hover {
+    color: var(--accent-primary);
+}
+
+.citation-tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 320px;
+    max-width: 90vw;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-active);
+    border-radius: var(--radius-lg);
+    padding: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    z-index: var(--z-tooltip);
+    animation: citation-fade-in 0.15s ease;
+}
+
+@keyframes citation-fade-in {
+    from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.citation-tooltip-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.citation-tooltip-file {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent-secondary);
+    font-family: var(--font-mono);
+}
+
+.citation-tooltip-page {
+    font-size: 11px;
+    color: var(--text-dim);
+}
+
+.citation-tooltip-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    font-style: italic;
+    max-height: 150px;
+    overflow-y: auto;
+}

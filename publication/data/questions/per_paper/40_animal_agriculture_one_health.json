@@ -1,0 +1,160 @@
+{
+  "paper_id": "40_animal_agriculture_one_health",
+  "filename": "40_animal_agriculture_one_health.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "How does the industrialization of animal agriculture impact 'One Health'\u2014the interconnected health of ecosystems, animals, and humans\u2014specifically regarding bacterial zoonotic infections, the emergence of antimicrobial resistance (AMR), and broader environmental factors?",
+    "methods": [
+      "Literature review and synthesis of multidisciplinary research (biological, sociological, economic, and policy-based).",
+      "Evaluation of current and emerging disease surveillance programs (e.g., CAHSS, NAHSS).",
+      "Comparative analysis of antimicrobial usage between human medicine and animal agriculture.",
+      "Review of novel therapeutic strategies including combination therapy, anti-virulence drugs, bacteriophage therapy, and microbiome modulation."
+    ],
+    "findings": [
+      {
+        "finding": "Approximately 60% of all human pathogens and 75% of emerging diseases affecting humans are zoonotic.",
+        "evidence": "Cited from historical epidemiological data; zoonoses are estimated to cause about one billion cases worldwide each year.",
+        "page": 2
+      },
+      {
+        "finding": "Antimicrobial use in animal agriculture vastly outstrips medical use in humans, often for non-therapeutic purposes like growth promotion.",
+        "evidence": "In 2016, the volume of antimicrobials used for Canadian livestock was nearly four times the amount used in humans; global use is predicted to increase 67% by 2030.",
+        "page": 2
+      },
+      {
+        "finding": "Agricultural AMR poses a severe global health and economic threat, with resistant bacteria capable of spreading through food products and environmental contamination.",
+        "evidence": "AMR is predicted to result in 10 million human deaths annually by 2050, with global healthcare costs exceeding $1 trillion USD per year.",
+        "page": 6
+      },
+      {
+        "finding": "Animal agriculture is a major driver of climate change through greenhouse gas emissions and land use.",
+        "evidence": "Food animal production is responsible for approximately 15% to 24% of total global greenhouse gas (GHG) emissions.",
+        "page": 12
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "A diagram illustrating the complex transmission pathways of bacterial zoonoses between animals, humans, and the environment, including direct contact and indirect environmental routes.",
+        "page": 4
+      },
+      {
+        "id": "Figure 2",
+        "description": "A summary of the biological mechanisms (HGT, vertical transmission) and agricultural factors (mass treatment, close quarters) that drive the development and spread of AMR from farms to humans.",
+        "page": 8
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "A list of bacterial zoonotic diseases associated with animal agriculture, detailing the specific pathogens and their hosts.",
+        "columns": [
+          "Pathogen(s)",
+          "Disease in humans",
+          "Disease in animals",
+          "Agricultural animal host",
+          "Transmission"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "An overview of common antimicrobial classes used in animal agriculture and their associated resistance mechanisms.",
+        "columns": [
+          "Antimicrobial class",
+          "Main animal drugs",
+          "Usage and specificity",
+          "Hazard of zoonotic relevance",
+          "Resistance mechanisms"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "One Health",
+      "Zoonosis",
+      "Antimicrobial Resistance (AMR)",
+      "Horizontal Gene Transfer (HGT)",
+      "Mobile Genetic Elements (MGEs)",
+      "Metaphylactic use",
+      "Prophylactic use",
+      "ESKAPE pathogens",
+      "Bacteriophage therapy",
+      "Low- and middle-income countries (LMICs)"
+    ],
+    "limitations": [
+      "The review explicitly excludes viral zoonoses (like H1N1 or avian flu) to focus specifically on bacterial infections.",
+      "The scope is limited to terrestrial agriculture, excluding the unique dynamics of aquaculture.",
+      "The authors acknowledge significant data and infrastructure gaps in LMICs, making surveillance and regulation difficult in those regions.",
+      "Regulatory and technical hurdles remain for the clinical implementation of novel therapies like bacteriophages."
+    ],
+    "connections": [
+      "One Health Initiative (global collaborative framework)",
+      "ESKAPE pathogens framework (Enterococcus faecium, S. aureus, Klebsiella pneumoniae, Acinetobacter baumannii, Pseudomonas aeruginosa, and Enterobacter spp.)",
+      "Canadian Animal Health Surveillance System (CAHSS)",
+      "World Health Organization (WHO) global estimates of foodborne diseases",
+      "Biorender.com (used for figure creation)"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "40_animal_agriculture_one_health_FR1",
+      "paper_id": "40_animal_agriculture_one_health",
+      "question": "What percentage of all human pathogens and emerging diseases affecting humans are estimated to be zoonotic in origin?",
+      "category": "factual_recall",
+      "expected_answer": "According to the paper, approximately 60% of all human pathogens and 75% of emerging diseases affecting humans are zoonotic. These diseases are estimated to cause about one billion cases worldwide each year.",
+      "expected_concepts": [
+        "60% of human pathogens",
+        "75% of emerging diseases",
+        "zoonotic",
+        "one billion cases"
+      ],
+      "difficulty": "easy",
+      "source_page": "2",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "40_animal_agriculture_one_health_CO2",
+      "paper_id": "40_animal_agriculture_one_health",
+      "question": "How does animal agriculture facilitate the development and transmission of antimicrobial resistance (AMR) from farms to the human population?",
+      "category": "conceptual",
+      "expected_answer": "Animal agriculture facilitates AMR through the high-volume use of antimicrobials for non-therapeutic purposes like growth promotion, which creates selective pressure for resistant bacteria. These resistant strains develop through biological mechanisms like horizontal gene transfer (HGT) and vertical transmission, eventually spreading to humans via direct contact, contaminated food products, and environmental routes.",
+      "expected_concepts": [
+        "growth promotion",
+        "horizontal gene transfer (HGT)",
+        "environmental contamination",
+        "non-therapeutic use",
+        "selective pressure"
+      ],
+      "difficulty": "medium",
+      "source_page": "2, 4, 8",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "40_animal_agriculture_one_health_TE3",
+      "paper_id": "40_animal_agriculture_one_health",
+      "question": "Based on the paper's findings, what are the specific projected global health and economic impacts of antimicrobial resistance (AMR) by the year 2050?",
+      "category": "technical",
+      "expected_answer": "By the year 2050, antimicrobial resistance is predicted to result in 10 million human deaths annually. Furthermore, the economic burden is expected to be significant, with global healthcare costs exceeding $1 trillion USD per year.",
+      "expected_concepts": [
+        "10 million deaths",
+        "$1 trillion USD",
+        "2050",
+        "healthcare costs",
+        "annual mortality"
+      ],
+      "difficulty": "medium",
+      "source_page": "6",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:32:48.925710"
+}

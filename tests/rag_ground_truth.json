@@ -1,0 +1,202 @@
+{
+  "test_suite": "RAG Quality Validation",
+  "description": "Ground truth questions and answers for RAG system validation",
+  "test_papers": [
+    "fgene-07-00075.pdf",
+    "1-s2.0-S1046202318304742-main.pdf",
+    "1471-2105-13-S4-S17.pdf",
+    "3463.pdf",
+    "s12859-015-0742-6.pdf"
+  ],
+  "test_categories": [
+    {
+      "category": "factual_recall",
+      "description": "Direct factual questions that require exact information retrieval",
+      "questions": [
+        {
+          "id": "FR001",
+          "question": "Who are the authors of the paper on Integrated Systems for NGS Data Management?",
+          "expected_answer": "Valerio Bianchi, Arnaud Ceol, Alessandro G. E. Ogier, Stefano de Pretis, Eugenia Galeota, Kamal Kishore, Pranami Bora, Ottavio Croci, Stefano Campaner, Bruno Amati, Marco J. Morelli, and Mattia Pelizzola",
+          "expected_in_chunk": ["Bianchi", "Ceol", "Pelizzola"],
+          "source_file": "fgene-07-00075.pdf",
+          "difficulty": "easy"
+        },
+        {
+          "id": "FR002",
+          "question": "What is HTS-flow?",
+          "expected_answer": "HTS-flow is a workflow management system designed to address NGS data management concerns, able to retrieve information from a LIMS database, manage data analyses through a GUI, output data in standard locations, and allow complete traceability of datasets",
+          "expected_in_chunk": ["HTS-flow", "workflow management", "LIMS"],
+          "source_file": "fgene-07-00075.pdf",
+          "difficulty": "easy"
+        },
+        {
+          "id": "FR003",
+          "question": "What are the five key issues identified for research groups approaching NGS technologies?",
+          "expected_answer": "1) Adopting a LIMS and safeguarding data structure, 2) Monitoring data flow and standardizing directories/filenames, 3) Ensuring complete traceability, 4) Enabling non-expert users through GUI, 5) Using standard metadata and controlled vocabularies",
+          "expected_in_chunk": ["five key issues", "LIMS", "traceability", "GUI", "metadata"],
+          "source_file": "fgene-07-00075.pdf",
+          "difficulty": "medium"
+        },
+        {
+          "id": "FR004",
+          "question": "When was the Integrated Systems for NGS Data Management paper published?",
+          "expected_answer": "06 May 2016",
+          "expected_in_chunk": ["May 2016", "Published: 06 May 2016"],
+          "source_file": "fgene-07-00075.pdf",
+          "difficulty": "easy"
+        }
+      ]
+    },
+    {
+      "category": "conceptual_understanding",
+      "description": "Questions requiring semantic understanding and synthesis",
+      "questions": [
+        {
+          "id": "CU001",
+          "question": "Why is data management challenging for NGS technologies?",
+          "expected_concepts": ["large data volumes", "storage", "analysis complexity", "lack of IT skills"],
+          "source_file": "fgene-07-00075.pdf",
+          "difficulty": "medium"
+        },
+        {
+          "id": "CU002",
+          "question": "What problems does a LIMS solve in NGS workflows?",
+          "expected_concepts": ["data structure", "traceability", "standardization", "metadata management"],
+          "source_file": "fgene-07-00075.pdf",
+          "difficulty": "medium"
+        }
+      ]
+    },
+    {
+      "category": "cross_document",
+      "description": "Questions requiring information from multiple papers",
+      "questions": [
+        {
+          "id": "CD001",
+          "question": "What bioinformatics methods are discussed across these papers?",
+          "expected_concepts": ["NGS analysis", "data management", "workflow systems"],
+          "source_files": ["fgene-07-00075.pdf", "1471-2105-13-S4-S17.pdf"],
+          "difficulty": "hard"
+        }
+      ]
+    },
+    {
+      "category": "technical_terms",
+      "description": "Questions about specific technical terminology (tests BM25 sparse search)",
+      "questions": [
+        {
+          "id": "TT001",
+          "question": "What is LIMS?",
+          "expected_answer": "Laboratory Information Management System",
+          "expected_in_chunk": ["LIMS", "laboratory management system"],
+          "source_file": "fgene-07-00075.pdf",
+          "difficulty": "easy",
+          "search_type": "sparse"
+        },
+        {
+          "id": "TT002",
+          "question": "What does NGS stand for?",
+          "expected_answer": "Next-generation sequencing",
+          "expected_in_chunk": ["NGS", "Next-generation sequencing"],
+          "source_file": "fgene-07-00075.pdf",
+          "difficulty": "easy",
+          "search_type": "sparse"
+        }
+      ]
+    },
+    {
+      "category": "numerical_data",
+      "description": "Questions about numbers, dates, statistics (tests table/figure extraction)",
+      "questions": [
+        {
+          "id": "ND001",
+          "question": "What year was the paper published?",
+          "expected_answer": "2016",
+          "expected_in_chunk": ["2016"],
+          "source_file": "fgene-07-00075.pdf",
+          "difficulty": "easy"
+        }
+      ]
+    },
+    {
+      "category": "unanswerable",
+      "description": "Questions that should return 'information not found' (tests false positive rate)",
+      "questions": [
+        {
+          "id": "UN001",
+          "question": "What is the cost of running HTS-flow?",
+          "expected_answer": "NOT_IN_DOCUMENTS",
+          "should_be_unanswerable": true,
+          "difficulty": "n/a"
+        },
+        {
+          "id": "UN002",
+          "question": "Who won the 2023 Nobel Prize in Chemistry?",
+          "expected_answer": "NOT_IN_DOCUMENTS",
+          "should_be_unanswerable": true,
+          "difficulty": "n/a"
+        }
+      ]
+    },
+    {
+      "category": "citation_accuracy",
+      "description": "Questions with expected intra-document citations that should be preserved, and expected corpus citation counts",
+      "questions": [
+        {
+          "id": "CA001",
+          "question": "Summarize the methods section of fgene-07-00075.pdf, preserving all paper references",
+          "expected_intra_citations": ["(Bianchi et al., 2016)", "(Goecks et al., 2010)"],
+          "min_corpus_citations": 3,
+          "source_file": "fgene-07-00075.pdf",
+          "difficulty": "medium",
+          "notes": "Output should contain both verbatim author-year refs AND numbered [N] corpus refs"
+        },
+        {
+          "id": "CA002",
+          "question": "What tools does the paper reference for NGS analysis?",
+          "expected_intra_citations": [],
+          "min_corpus_citations": 2,
+          "source_file": "fgene-07-00075.pdf",
+          "difficulty": "easy",
+          "notes": "Check that corpus citations point to real chunks, not hallucinated pages"
+        }
+      ]
+    },
+    {
+      "category": "cross_document_synthesis",
+      "description": "Questions requiring multi-paper synthesis with proper multi-source attribution",
+      "questions": [
+        {
+          "id": "CDS001",
+          "question": "Compare the data management approaches described across these papers",
+          "expected_source_files": ["fgene-07-00075.pdf", "1471-2105-13-S4-S17.pdf"],
+          "min_sources_cited": 2,
+          "expected_concepts": ["workflow", "pipeline", "data management", "reproducibility"],
+          "difficulty": "hard",
+          "notes": "Output must cite at least 2 different source documents in the Sources section"
+        },
+        {
+          "id": "CDS002",
+          "question": "What are the common challenges in bioinformatics data analysis discussed across the corpus?",
+          "expected_source_files": ["fgene-07-00075.pdf", "s12859-015-0742-6.pdf"],
+          "min_sources_cited": 2,
+          "expected_concepts": ["scalability", "reproducibility", "data volume"],
+          "difficulty": "hard",
+          "notes": "Synthesis quality: does the answer integrate findings rather than just listing per-paper?"
+        }
+      ]
+    }
+  ],
+  "evaluation_metrics": [
+    "retrieval_precision",
+    "retrieval_recall",
+    "answer_accuracy",
+    "answer_completeness",
+    "hallucination_rate",
+    "unanswerable_detection_rate",
+    "corpus_citation_accuracy",
+    "intra_citation_preservation",
+    "hallucinated_citation_rate",
+    "cross_document_source_coverage"
+  ]
+}

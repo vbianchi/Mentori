@@ -1,0 +1,128 @@
+{
+  "paper_id": "19_hpai_canada",
+  "filename": "19_hpai_canada.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "The paper addresses the unprecedented scale of highly pathogenic avian influenza (HPAI) H5N1 outbreaks in Canadian wildlife and poultry in 2022, the resulting interspecies spillover into mammals, and the urgent need for clinician awareness and a 'One Health' response.",
+    "methods": [
+      "Epidemiological review of 2022 HPAI H5N1 outbreaks in Canada and globally.",
+      "Literature review of viral genetics, specifically mammalian adaptation mutations.",
+      "Analysis of migratory bird flyways and their role in virus introduction to North America.",
+      "Review of clinical presentation and diagnostic recommendations for human H5N1 cases."
+    ],
+    "findings": [
+      {
+        "finding": "In 2022, Canada experienced a massive wave of HPAI H5N1 infections, leading to the culling of over 7 million birds.",
+        "evidence": "Over 7 million birds have been culled in Canada, and outbreaks continue to profoundly affect commercial bird farms across the world.",
+        "page": 1
+      },
+      {
+        "finding": "The current H5N1 clade (2.3.4.4b) has shown significant spillover into multiple mammalian species, often presenting with severe neurological signs.",
+        "evidence": "This virus can and has infected multiple species, including skunks, foxes, bears, mink, seals, porpoises, sea lions, and dolphins... Most infected mammals presented with severe neurological signs and died from encephalitis or meningoencephalitis.",
+        "page": 2
+      },
+      {
+        "finding": "Mammalian adaptation mutations (PB2-E627K, E627V, and D701N) have been identified in the brains of infected carnivores in Canada and Europe.",
+        "evidence": "Viruses with mammalian adaptations such as the mutations PB2-E627K, E627V, and D701N were found in the brain of various carnivores in Europe and Canada.",
+        "page": 2
+      },
+      {
+        "finding": "Human infection with this specific H5N1 clade remains rare, with very few cases reported globally.",
+        "evidence": "To date this specific clade of H5N1 virus has been identified in less than 10 humans.",
+        "page": 2
+      }
+    ],
+    "figures": [],
+    "tables": [],
+    "technical_terms": [
+      "HPAI (Highly Pathogenic Avian Influenza)",
+      "H5N1 Clade 2.3.4.4b",
+      "Zoonotic",
+      "One Health",
+      "Spillover",
+      "Reassortment",
+      "Hemagglutinin (HA)",
+      "Neuraminidase (NA)",
+      "PB2-E627K",
+      "Encephalitis"
+    ],
+    "limitations": [
+      "Wildlife testing is inherently biased towards severely infected or dead animals, likely underrepresenting the prevalence of milder disease.",
+      "There is a limited scope of surveillance for sick and dead wildlife.",
+      "The authors note limited preparedness and knowledge dissemination regarding H5N1 within the human health care sector.",
+      "Significant gaps exist in understanding the impact of climate disruption on HPAI ecology."
+    ],
+    "connections": [
+      "Draws parallels to other zoonotic emergencies like SARS-CoV-2, Ebola, Zika, and Mpox.",
+      "Builds on WHO reports regarding clinical aspects of human H5N1 infection (Ref 6).",
+      "Utilizes research on the introduction of H5N1 to North America via migratory flyways (Ref 7, 8, 11).",
+      "References specific studies on mammalian adaptive mutations in mesocarnivores (Ref 16, 17)."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "19_hpai_canada_FR1",
+      "paper_id": "19_hpai_canada",
+      "question": "According to the epidemiological review of the 2022 H5N1 outbreak, how many birds were culled in Canada?",
+      "category": "factual_recall",
+      "expected_answer": "In 2022, Canada experienced a massive wave of HPAI H5N1 infections that resulted in the culling of over 7 million birds. These outbreaks have continued to profoundly affect commercial bird farms both in Canada and across the world.",
+      "expected_concepts": [
+        "7 million",
+        "birds",
+        "culled",
+        "Canada",
+        "HPAI H5N1"
+      ],
+      "difficulty": "easy",
+      "source_page": "1",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "19_hpai_canada_CO2",
+      "paper_id": "19_hpai_canada",
+      "question": "What are the common clinical presentations and relative frequency of H5N1 clade 2.3.4.4b infections when comparing mammals to humans?",
+      "category": "conceptual",
+      "expected_answer": "Infected mammals, including species like skunks and foxes, frequently present with severe neurological signs such as encephalitis or meningoencephalitis which often lead to death. Conversely, human infection with this specific clade remains extremely rare, with fewer than 10 cases reported globally despite the widespread mammalian spillover.",
+      "expected_concepts": [
+        "neurological signs",
+        "encephalitis",
+        "spillover",
+        "human infection",
+        "rare",
+        "clade 2.3.4.4b"
+      ],
+      "difficulty": "medium",
+      "source_page": "2",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "19_hpai_canada_TE3",
+      "paper_id": "19_hpai_canada",
+      "question": "Which specific viral mutations linked to mammalian adaptation were detected in the neurological tissues of carnivores in Canada and Europe?",
+      "category": "technical",
+      "expected_answer": "The mutations identified in the brains of various carnivores include PB2-E627K, PB2-E627V, and D701N. These specific genetic markers are recognized as mammalian adaptation mutations and were found in samples collected from both European and Canadian animals.",
+      "expected_concepts": [
+        "PB2-E627K",
+        "E627V",
+        "D701N",
+        "mammalian adaptation",
+        "brain",
+        "carnivores"
+      ],
+      "difficulty": "hard",
+      "source_page": "2",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T13:36:04.509775"
+}

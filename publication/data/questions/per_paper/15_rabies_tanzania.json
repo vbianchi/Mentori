@@ -1,0 +1,190 @@
+{
+  "paper_id": "15_rabies_tanzania",
+  "filename": "15_rabies_tanzania.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "The paper investigates how spatial heterogeneity in vaccination coverage impacts the effectiveness of dog vaccination campaigns against rabies and why rabies continues to circulate in the Serengeti district despite annual vaccination efforts.",
+    "methods": [
+      "Analysis of two decades of rabies contact tracing and dog vaccination campaign data (2002-2022).",
+      "Negative binomial generalized linear mixed models (GLMMs) to identify drivers of focal (village-level) rabies incidence.",
+      "Power mean susceptibility calculation (using a parameter p) to quantify the impact of spatial heterogeneity in vaccination.",
+      "Transmission-tree reconstruction using the 'treerabid' R package to identify disease incursions from outside the district.",
+      "Dog population estimation using human:dog ratios from georeferenced censuses and national census data."
+    ],
+    "findings": [
+      {
+        "finding": "Spatial heterogeneity in vaccination coverage is a significant driver of rabies persistence; increased heterogeneity among non-focal villages leads to increased focal incidence.",
+        "evidence": "Power mean susceptibility models showed that for the same average coverage, uneven distribution of vaccines resulted in higher effective susceptibility and incidence (e.g., 2.6 times greater focal incidence in a high-heterogeneity scenario vs. a homogeneous one).",
+        "page": 9
+      },
+      {
+        "finding": "Rabies incidence declined to low levels (<0.4 cases/1,000 dogs annually) when heterogeneity in coverage was reduced, even without reaching the 70% target.",
+        "evidence": "Cases remained low from 2018 onwards despite occasional lapses in vaccination campaigns.",
+        "page": 2
+      },
+      {
+        "finding": "Incursions from outside the district are a major source of residual transmission, becoming more prominent as local transmission is interrupted.",
+        "evidence": "Inferred incursions reached 50% of all recorded cases in 2022, up from 3% pre-2018.",
+        "page": 10
+      },
+      {
+        "finding": "A total of 48 human rabies deaths were identified over the study period, peaking in 2011.",
+        "evidence": "48 human rabies deaths were recorded; none of the victims completed a full course of post-exposure vaccinations.",
+        "page": 8
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "Maps of the Serengeti District showing dog population distribution, growth over time, human:dog ratios, and village-level dog density.",
+        "page": 4
+      },
+      {
+        "id": "Figure 2",
+        "description": "Time series (2002-2022) of campaign completeness, vaccination counts, rolling coverage, monthly cases (dog and human), and yearly spatial maps of coverage and cases.",
+        "page": 7
+      },
+      {
+        "id": "Figure 3",
+        "description": "Visual summary of the GLMM coefficients for monthly village-level dog rabies cases and comparison of model predictions to observed data.",
+        "page": 11
+      },
+      {
+        "id": "Figure 4",
+        "description": "Analysis using power mean susceptibility to show how spatial heterogeneity in vaccination impacts village-level rabies incidence.",
+        "page": 13
+      },
+      {
+        "id": "Figure 5",
+        "description": "Estimated annual numbers and proportions of rabies incursions into the district, including spatial maps of incursion locations.",
+        "page": 14
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Regression coefficients for five different monthly village-level GLMMs modeling rabies cases per dog.",
+        "columns": [
+          "Coefficient",
+          "1. Arithmetic mean rolling coverage model",
+          "2. Arithmetic mean rolling coverage model without prior incidence",
+          "3. Power mean susceptibility model",
+          "4. Power mean susceptibility model without prior incidence beyond focal village",
+          "5. Power mean susceptibility model without prior incidence at any scale"
+        ]
+      },
+      {
+        "id": "Table S1",
+        "description": "Summary of annual vaccination data for the Serengeti District from 2002 to 2022.",
+        "columns": [
+          "Year",
+          "Number of dogs that received a vaccination",
+          "Campaign coverage",
+          "Campaign completeness"
+        ]
+      },
+      {
+        "id": "Table S5",
+        "description": "Fitted statistical distributions (Gamma, Lognormal, Weibull) for rabies incubation periods, serial intervals, and distance kernels.",
+        "columns": [
+          "n",
+          "Distribution",
+          "Parameter 1: Name/Value",
+          "Parameter 2: Name/Value",
+          "AIC",
+          "95th percentile",
+          "97.5th percentile",
+          "99th percentile"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "Spatial heterogeneity",
+      "Rolling coverage",
+      "Campaign completeness",
+      "Focal incidence",
+      "Power mean susceptibility",
+      "Effective susceptibility",
+      "Transmission-tree reconstruction",
+      "Incursion",
+      "Pruning threshold"
+    ],
+    "limitations": [
+      "Rolling coverage estimates assume all dogs are equally likely to be vaccinated, potentially ignoring owner behavior biases.",
+      "The 70% vaccination target may be overestimated by some methods due to owner recall bias or missing sub-populations.",
+      "Dog population estimates relied on constant human:dog ratios and a simple exponential growth model.",
+      "Transmission-tree reconstruction methods may misidentify local transmission as incursions or vice-versa due to unobserved cases.",
+      "The study focused on a single district, which might limit the generalizability of some specific parameter estimates."
+    ],
+    "connections": [
+      "Hampson et al. [44] (Contact tracing and outbreak analysis methods)",
+      "WHO 'Zero by 30' initiative [20] (Global rabies elimination strategy)",
+      "Ferguson et al. [36, 38] (Simulation-based models of heterogeneous coverage)",
+      "treerabid R package [78] (Transmission-tree reconstruction algorithms)",
+      "brms and RStan packages [75, 76] (Bayesian modeling frameworks)"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "15_rabies_tanzania_FR1",
+      "paper_id": "15_rabies_tanzania",
+      "question": "How many human rabies deaths were recorded during the study period, and what was observed regarding their treatment status?",
+      "category": "factual_recall",
+      "expected_answer": "A total of 48 human rabies deaths were identified over the 2002-2022 study period, with the number of deaths peaking in 2011. Notably, none of the victims of these recorded deaths had completed a full course of post-exposure vaccinations.",
+      "expected_concepts": [
+        "48 human rabies deaths",
+        "post-exposure vaccinations",
+        "2011 peak",
+        "Serengeti District"
+      ],
+      "difficulty": "easy",
+      "source_page": "8",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "15_rabies_tanzania_CO2",
+      "paper_id": "15_rabies_tanzania",
+      "question": "Explain how spatial heterogeneity in vaccination coverage impacts the persistence of rabies even when average coverage targets are met.",
+      "category": "conceptual",
+      "expected_answer": "Spatial heterogeneity in vaccination coverage acts as a significant driver of rabies persistence because uneven distribution among villages creates pockets of high susceptibility. The study's power mean susceptibility models demonstrated that for the same average coverage, high heterogeneity among non-focal villages resulted in an effective focal incidence 2.6 times greater than a scenario with homogeneous coverage.",
+      "expected_concepts": [
+        "spatial heterogeneity",
+        "power mean susceptibility",
+        "focal incidence",
+        "homogeneous distribution",
+        "rabies persistence"
+      ],
+      "difficulty": "hard",
+      "source_page": "9, 13",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "15_rabies_tanzania_TE3",
+      "paper_id": "15_rabies_tanzania",
+      "question": "What methodological approach and software tool were used to distinguish between local rabies transmission and disease incursions, and how did the proportion of incursions change by 2022?",
+      "category": "technical",
+      "expected_answer": "The study utilized transmission-tree reconstruction using the 'treerabid' R package to identify rabies incursions from outside the district. The analysis found that as local transmission was interrupted, the proportion of cases attributed to incursions rose significantly, reaching 50% of all recorded cases in 2022, compared to only 3% prior to 2018.",
+      "expected_concepts": [
+        "treerabid R package",
+        "transmission-tree reconstruction",
+        "disease incursions",
+        "local transmission",
+        "50% of cases"
+      ],
+      "difficulty": "medium",
+      "source_page": "10, 14",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:18:21.046692"
+}

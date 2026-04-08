@@ -1,0 +1,205 @@
+{
+  "paper_id": "17_brucellosis_ethiopia",
+  "filename": "17_brucellosis_ethiopia.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "The study aims to estimate the seroprevalence and identify risk factors for brucellosis in camels, small ruminants (sheep and goats), and occupationally linked humans (pastoralists) in the Somali region of Eastern Ethiopia using a One Health approach.",
+    "methods": [
+      "Cross-sectional study design",
+      "Multistage sampling combined with convenient sampling",
+      "Rose Bengal Plate Test (RBPT) for screening serum samples",
+      "Competitive enzyme-linked immunosorbent assay (cELISA) for confirmation",
+      "Structured questionnaires for bio-data and risk factor collection",
+      "Univariable and multivariable logistic regression analysis using R software"
+    ],
+    "findings": [
+      {
+        "finding": "The overall animal level seroprevalence of brucellosis was determined for different species.",
+        "evidence": "Prevalence was 5% (95% CI, 6.1\u20137.2.0) in small ruminants, 2.9% (95% CI, 1.5\u20134.9) in camels, and 2.0% (95% CI, 0.2\u20133.7) in occupationally linked humans.",
+        "page": 4
+      },
+      {
+        "finding": "Large herd size and history of retained fetal membranes (RFM) are significant risk factors for brucellosis in small ruminants.",
+        "evidence": "Animals in large herds were 5.01 times more likely to be seropositive (OR: 5.01, 95% CI: 1.2\u201321.4, p=0.02) and those with RFM history were 9 times more likely (OR: 9, 95% CI: 1.9\u201342).",
+        "page": 4
+      },
+      {
+        "finding": "History of retained fetal membranes is the primary risk factor for seropositivity in camels.",
+        "evidence": "Camels with a history of RFM had a significant association with seropositivity (OR: 35, 95% CI: 12.7\u201360, p<0.05).",
+        "page": 4
+      },
+      {
+        "finding": "Handling and disposing of aborted fetal materials is the most significant risk factor for human brucellosis.",
+        "evidence": "This practice was significantly associated with seropositivity in humans (OR: 37.4, 95% CI: 5.1\u201318.5, p=0.001).",
+        "page": 7
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "A map showing the study areas (districts Goro Baqaqsa, Guradamole, and Dolo Ado) within the Somali Region of Ethiopia.",
+        "page": 3
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Univariable logistic regression analysis for brucella seropositivity in small ruminants.",
+        "columns": [
+          "Variables",
+          "Category",
+          "Samples",
+          "No positive (%)",
+          "OR (95% CI)",
+          "Value of p"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "Multivariable logistic regression analysis for brucella seropositivity in small ruminants.",
+        "columns": [
+          "Variable category",
+          "Category",
+          "Samples",
+          "No positive (%)",
+          "OR (95% Cl)",
+          "Value of p"
+        ]
+      },
+      {
+        "id": "Table 3",
+        "description": "Univariable logistic regression analysis for brucella seropositivity in camel.",
+        "columns": [
+          "Variables",
+          "Category",
+          "Samples",
+          "No positive (%)",
+          "OR (95% CI)",
+          "p-value"
+        ]
+      },
+      {
+        "id": "Table 4",
+        "description": "Multivariable logistic regression for brucella seropositivity in camel brucellosis.",
+        "columns": [
+          "Variables",
+          "Category",
+          "Samples",
+          "No positive (%)",
+          "OR (95% CI)",
+          "p-value"
+        ]
+      },
+      {
+        "id": "Table 5",
+        "description": "Univariable logistic regression analysis for brucella seropositivity in humans.",
+        "columns": [
+          "Variables",
+          "Categories",
+          "Samples",
+          "No positive (%)",
+          "OR (95% CI)",
+          "p-value"
+        ]
+      },
+      {
+        "id": "Table 6",
+        "description": "Multivariable logistic regression analysis for brucella seropositivity in humans.",
+        "columns": [
+          "Variables",
+          "Categories",
+          "Samples",
+          "No positive (%)",
+          "OR (95%Cl)",
+          "p-value"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "One Health",
+      "Zoonotic",
+      "Seroprevalence",
+      "Rose Bengal Plate Test (RBPT)",
+      "Competitive enzyme-linked immunosorbent assay (cELISA)",
+      "Retained Fetal Membranes (RFM)",
+      "Pathognomonic",
+      "Seroepidemiology"
+    ],
+    "limitations": [
+      "Some pastoralists refused to allow blood sample collection, preventing the study from reaching the desired sample size for humans and camels.",
+      "The number of districts surveyed was limited to areas with fewer security concerns.",
+      "The findings are non-generalizable due to the limited geographic scope and sampling constraints."
+    ],
+    "connections": [
+      "Builds on the list of prioritized zoonotic diseases in Ethiopia (Pieracci et al., 2016).",
+      "Uses laboratory protocols recommended by the World Organisation for Animal Health (WOAH/OIE).",
+      "Compares findings with previous seroepidemiological studies in Mali (Traor\u00e9 et al.), Tanzania (Cash-Goldwasser et al.), and other regions of Ethiopia (Edao et al., Ibrahim et al.)."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "17_brucellosis_ethiopia_FR1",
+      "paper_id": "17_brucellosis_ethiopia",
+      "question": "What specific districts in the Somali Region of Ethiopia were included as study areas for this research?",
+      "category": "factual_recall",
+      "expected_answer": "The study was conducted in three specific districts within the Somali Region of Ethiopia: Goro Baqaqsa, Guradamole, and Dolo Ado. These locations are represented in the study's map of the study areas.",
+      "expected_concepts": [
+        "Somali Region",
+        "Goro Baqaqsa",
+        "Guradamole",
+        "Dolo Ado",
+        "Ethiopia"
+      ],
+      "difficulty": "easy",
+      "source_page": "3",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "17_brucellosis_ethiopia_CO2",
+      "paper_id": "17_brucellosis_ethiopia",
+      "question": "Based on the study's findings, how does the clinical history of livestock relate to the likelihood of brucellosis seropositivity in both small ruminants and camels?",
+      "category": "conceptual",
+      "expected_answer": "In both species, a history of reproductive health issues, specifically Retained Fetal Membranes (RFM), is a major predictor of seropositivity. Camels with a history of RFM showed the strongest association with the disease (OR: 35), while small ruminants with the same history were 9 times more likely to test positive compared to those without.",
+      "expected_concepts": [
+        "Retained fetal membranes (RFM)",
+        "seropositivity",
+        "risk factors",
+        "small ruminants",
+        "camels",
+        "Odds Ratio (OR)"
+      ],
+      "difficulty": "medium",
+      "source_page": "4",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "17_brucellosis_ethiopia_TE3",
+      "paper_id": "17_brucellosis_ethiopia",
+      "question": "Describe the laboratory diagnostic sequence and the statistical methods used to identify significant risk factors for brucellosis in this study.",
+      "category": "technical",
+      "expected_answer": "The researchers employed a two-step diagnostic approach, starting with the Rose Bengal Plate Test (RBPT) for initial screening of serum samples, followed by a competitive enzyme-linked immunosorbent assay (cELISA) for confirmation. Statistical analysis was performed using R software, utilizing both univariable and multivariable logistic regression to calculate odds ratios and determine p-values for risk factors.",
+      "expected_concepts": [
+        "Rose Bengal Plate Test (RBPT)",
+        "cELISA",
+        "multivariable logistic regression",
+        "R software",
+        "screening",
+        "serum samples"
+      ],
+      "difficulty": "hard",
+      "source_page": "4, 7",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:19:35.899881"
+}

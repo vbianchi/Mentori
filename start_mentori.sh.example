@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# Mentori System Startup Script
+# Copy this file to start_mentori.sh and customize for your environment.
+
+SESSION="mentori_sys"
+PROJECT_DIR="/path/to/your/Mentori"  # <-- Change this to your project path
+
+# Colima configuration - adjust memory/cpu based on your machine
+COLIMA_MEMORY=64      # GB of RAM for Colima
+COLIMA_CPU=8          # Number of CPU cores
+COLIMA_DISK=100       # GB of disk space
+
+# Check if session exists to avoid creating duplicate windows
+tmux has-session -t $SESSION 2>/dev/null
+
+if [ $? != 0 ]; then
+    echo "Creating new tmux session: $SESSION"
+    # Create session with first window 'colima'
+    tmux new-session -d -s $SESSION -n colima
+
+    # Window 1: Colima setup
+    # Stops colima first, then starts it with the specific configuration
+    tmux send-keys -t $SESSION:colima "echo 'Stopping Colima...'" C-m
+    tmux send-keys -t $SESSION:colima "colima stop" C-m
+    tmux send-keys -t $SESSION:colima "echo 'Starting Colima with custom config...'" C-m
+    tmux send-keys -t $SESSION:colima "colima start --memory $COLIMA_MEMORY --cpu $COLIMA_CPU --disk $COLIMA_DISK" C-m
+
+    # Window 2: Ollama Setup
+    tmux new-window -t $SESSION -n ollama-1
+    tmux send-keys -t $SESSION:ollama-1 "echo 'Starting Ollama Server...'" C-m
+    tmux send-keys -t $SESSION:ollama-1 "export OLLAMA_HOST=0.0.0.0:11434" C-m
+    tmux send-keys -t $SESSION:ollama-1 "ollama serve" C-m
+
+    # Window 3: Mentori Docker Stack
+    tmux new-window -t $SESSION -n mentori
+    tmux send-keys -t $SESSION:mentori "cd $PROJECT_DIR" C-m
+    tmux send-keys -t $SESSION:mentori "echo 'Rebuilding and starting Mentori stack...'" C-m
+    # Sequential execution: ensure down completes before building up
+    tmux send-keys -t $SESSION:mentori "docker compose down && docker compose up --build" C-m
+
+    # Return focus to first window
+    tmux select-window -t $SESSION:colima
+
+    echo "Session $SESSION created successfully."
+else
+    echo "Session $SESSION already exists."
+fi
+
+echo "To attach to the session, run:"
+echo "tmux attach -t $SESSION"

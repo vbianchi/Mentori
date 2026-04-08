@@ -1,0 +1,152 @@
+{
+  "paper_id": "45_kenya_amr_digital",
+  "filename": "45_kenya_amr_digital.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "The paper addresses the lack of integrated, digitalized antimicrobial resistance (AMR) surveillance data across human and animal health sectors in Kenya, describing the development and utility of the One Health AMR Surveillance System (OHAMRS) to support evidence-based policy.",
+    "methods": [
+      "One Health approach integrating human and animal health data",
+      "Development of a national Central Data Warehouse (CDW) for archiving AMR data",
+      "Use of Open Interop middleware for data integration and interoperability",
+      "Deployment of District Health Information Software 2 (DHIS2) for data analysis and visualization",
+      "Alignment with WHO Global Antimicrobial Resistance and Use Surveillance System (GLASS) reporting standards",
+      "Stakeholder engagement and training for sustainable system implementation"
+    ],
+    "findings": [
+      {
+        "finding": "The development of the One Health AMR Surveillance System (OHAMRS) featuring 42 customizable dashboards.",
+        "evidence": "Currently, the OHAMRS boasts 42 dashboards... including 17 that are dedicated to human and animal health AMR priority pathogens.",
+        "page": 1
+      },
+      {
+        "finding": "Significant scaling of human AMR surveillance sites.",
+        "evidence": "To date, the number of laboratories enrolled in the surveillance system has increased to 17.",
+        "page": 3
+      },
+      {
+        "finding": "Diversification of data submission methods in the human health sector.",
+        "evidence": "Of the 17 surveillance sites... 43% submit data using a LIMS, 38% via the MS-Excel template, and 19% via WHONET.",
+        "page": 4
+      },
+      {
+        "finding": "Improved reporting capacity to WHO GLASS.",
+        "evidence": "In the 2021 and 2022 data calls, Kenya submitted data from 6 and 16 surveillance sites, respectively.",
+        "page": 4
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "A map of Kenya illustrating the geographic distribution of 17 human and 7 animal AMR surveillance sites.",
+        "page": 3
+      },
+      {
+        "id": "Figure 2",
+        "description": "A flow diagram showing how AMR data moves from human and animal surveillance sites through the Central Data Warehouse and Open Interop middleware to the DHIS2 portal.",
+        "page": 5
+      },
+      {
+        "id": "Figure 3",
+        "description": "Screenshots of the OHAMRS dashboard interface, showcasing data visualizations such as specimen type distribution (e.g., Urine at 55.0%) and antibiotic susceptibility bar charts.",
+        "page": 6
+      }
+    ],
+    "tables": [
+      {
+        "id": "Supplementary Table 1",
+        "description": "Provides a comprehensive list of the 42 dashboards available within the OHAMRS.",
+        "columns": [
+          "Not explicitly listed in main text (Supplementary material)"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "One Health",
+      "AMR (Antimicrobial Resistance)",
+      "OHAMRS (One Health AMR Surveillance System)",
+      "DHIS2 (District Health Information Software 2)",
+      "Open Interop",
+      "WHO GLASS",
+      "LIMS (Laboratory Information Management System)",
+      "SILAB (Sistema Laboratorio)",
+      "AWaRe (Access, Watch, Reserve)"
+    ],
+    "limitations": [
+      "Lack of integrated antimicrobial consumption (AMC) and use (AMU) data.",
+      "Limited representativeness as the number of surveillance sites is still relatively small for the country.",
+      "Environmental sector data is currently not incorporated into the system.",
+      "Ongoing gaps in laboratory infrastructure and funding to further expand the surveillance network."
+    ],
+    "connections": [
+      "Kenya National Policy and Action Plan (NAP) on AMR (2017)",
+      "WHO Global Antimicrobial Resistance and Use Surveillance System (GLASS)",
+      "Pilot implementation of similar systems in Zambia (2019\u20132020)",
+      "District Health Information Software 2 (DHIS2) platform",
+      "Fleming Fund (Funding source)",
+      "FIND (Foundation for Innovative New Diagnostics)"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "45_kenya_amr_digital_FR1",
+      "paper_id": "45_kenya_amr_digital",
+      "question": "How many surveillance sites submitted data to the WHO Global Antimicrobial Resistance and Use Surveillance System (GLASS) during the 2022 data call?",
+      "category": "factual_recall",
+      "expected_answer": "In the 2022 data call, Kenya submitted data from 16 surveillance sites. This represents a significant increase from the 6 sites that submitted data in 2021.",
+      "expected_concepts": [
+        "16 surveillance sites",
+        "WHO GLASS",
+        "2022 data call",
+        "reporting capacity"
+      ],
+      "difficulty": "easy",
+      "source_page": "4",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "45_kenya_amr_digital_CO2",
+      "paper_id": "45_kenya_amr_digital",
+      "question": "How does the OHAMRS architecture enable a One Health approach to antimicrobial resistance surveillance?",
+      "category": "conceptual",
+      "expected_answer": "The OHAMRS integrates human and animal health data by routing information from various surveillance sites into a centralized national Central Data Warehouse (CDW). Using Open Interop middleware for interoperability and DHIS2 for visualization, the system creates a unified platform where 17 of the 42 dashboards are specifically dedicated to monitoring priority pathogens across both sectors.",
+      "expected_concepts": [
+        "One Health approach",
+        "Central Data Warehouse (CDW)",
+        "Open Interop middleware",
+        "DHIS2",
+        "human and animal health integration"
+      ],
+      "difficulty": "medium",
+      "source_page": "1, 5",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "45_kenya_amr_digital_TE3",
+      "paper_id": "45_kenya_amr_digital",
+      "question": "What are the three specific methods used by the 17 human health surveillance sites to submit data to the system, and what is the percentage breakdown for each method?",
+      "category": "technical",
+      "expected_answer": "The data submission methods for the 17 sites include Laboratory Information Management Systems (LIMS) at 43%, MS-Excel templates at 38%, and WHONET at 19%. This variety in submission methods allows for flexibility depending on the technological capacity of the individual laboratory.",
+      "expected_concepts": [
+        "LIMS (43%)",
+        "MS-Excel template (38%)",
+        "WHONET (19%)",
+        "data submission methods",
+        "human health sector"
+      ],
+      "difficulty": "hard",
+      "source_page": "4",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:35:27.741894"
+}

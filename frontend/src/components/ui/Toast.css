@@ -1,0 +1,131 @@
+/* Toast.css - Professional Toast Notifications */
+
+.toast-container {
+    position: fixed;
+    top: 4rem;
+    right: 1rem;
+    z-index: var(--z-toast);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    min-width: 300px;
+    max-width: 400px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    font-size: 0.875rem;
+    color: var(--text-main);
+    pointer-events: auto;
+    animation: toast-slide-in 0.2s ease-out;
+}
+
+.toast-icon {
+    flex-shrink: 0;
+}
+
+.toast-message {
+    flex: 1;
+    line-height: 1.4;
+}
+
+.toast-close {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--trans-fast);
+}
+
+.toast-close:hover {
+    background: var(--bg-surface);
+    color: var(--text-main);
+}
+
+/* Toast Types */
+.toast-success {
+    border-color: var(--accent-success);
+}
+
+.toast-success .toast-icon {
+    color: var(--accent-success);
+}
+
+.toast-error {
+    border-color: var(--accent-error);
+}
+
+.toast-error .toast-icon {
+    color: var(--accent-error);
+}
+
+.toast-warning {
+    border-color: var(--accent-warning);
+}
+
+.toast-warning .toast-icon {
+    color: var(--accent-warning);
+}
+
+.toast-info {
+    border-color: var(--accent-secondary);
+}
+
+.toast-info .toast-icon {
+    color: var(--accent-secondary);
+}
+
+/* Animations */
+@keyframes toast-slide-in {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.toast.removing {
+    animation: toast-slide-out 0.2s ease-out forwards;
+}
+
+@keyframes toast-slide-out {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .toast-container {
+        left: 1rem;
+        right: 1rem;
+    }
+
+    .toast {
+        min-width: unset;
+        max-width: unset;
+    }
+}

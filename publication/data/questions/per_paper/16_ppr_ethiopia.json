@@ -1,0 +1,221 @@
+{
+  "paper_id": "16_ppr_ethiopia",
+  "filename": "16_ppr_ethiopia.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "The study aims to estimate the seroprevalence and associated risk factors of Peste des petits ruminants (PPR) in small ruminants in the Borena Zone, Ethiopia, while also analyzing the spatial and temporal distribution of outbreaks over a five-year period (2018\u20132022).",
+    "methods": [
+      "Cross-sectional study design for seroprevalence estimation.",
+      "Retrospective analysis of five years of outbreak data (DOVAR-II system).",
+      "Competitive Enzyme-Linked Immunosorbent Assay (c-ELISA) for antibody detection.",
+      "Univariable and multivariable logistic regression analysis to identify risk factors.",
+      "Questionnaire-based interviews with pastoralists for animal history and risk factor profiling.",
+      "Sample size determination using the Thrusfield formula."
+    ],
+    "findings": [
+      {
+        "finding": "The seroprevalence of PPRV antibodies was 32.1% in nonvaccinated animals and 68.8% in vaccinated animals.",
+        "evidence": "Out of 234 nonvaccinated animals, 75 were positive (32.1%); out of 128 vaccinated animals, 88 were positive (68.8%).",
+        "page": 4
+      },
+      {
+        "finding": "Older animals were significantly more likely to be seropositive than adult animals.",
+        "evidence": "Multivariable analysis showed older animals were 7.3 times more likely to be seropositive (OR: 7.3; 95%CI: 2.7\u201319.4; P=0.000).",
+        "page": 4
+      },
+      {
+        "finding": "Animal origin significantly impacts risk, with gifted and purchased animals showing higher seropositivity than those born in the flock.",
+        "evidence": "Gifted animals had an OR of 8.3 (95%CI: 2.1\u201332.6) and purchased animals an OR of 4 (95%CI: 1.4\u201311.3).",
+        "page": 4
+      },
+      {
+        "finding": "PPR herd immunity in the region (68.8%) is below the FAO-WOAH recommended threshold of 80%.",
+        "evidence": "The study revealed significant gaps... with herd immunity levels falling below the FAO-WOAH recommended threshold of 80%.",
+        "page": 1
+      },
+      {
+        "finding": "A total of 53 PPR outbreaks occurred in the Borena Zone between 2018 and 2022, with a seasonal peak in the dry season.",
+        "evidence": "Retrospective analysis revealed 53 PPR outbreaks... most outbreaks occurring in January (20.8%).",
+        "page": 1
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "Map showing the study area districts (Dubluk, Elweye, and Yabelo) within the Borena zone of the Oromia region, Ethiopia.",
+        "page": 3
+      },
+      {
+        "id": "Figure 2",
+        "description": "Bar chart illustrating the number of PPR outbreaks by district in the Borena zone from 2018 to 2022, with Arero having the highest count.",
+        "page": 6
+      },
+      {
+        "id": "Figure 3",
+        "description": "Bar chart showing the annual distribution of PPR outbreaks in the Borena zone, peaking in 2019 with 24 outbreaks.",
+        "page": 6
+      },
+      {
+        "id": "Figure 4",
+        "description": "Line graph showing monthly variation in PPR outbreaks, indicating a significant peak in January.",
+        "page": 7
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Summary of small ruminant populations, sampled animal counts, and number of interviewed participants across selected districts and kebeles.",
+        "columns": [
+          "District",
+          "Small ruminants population (2021/22) [Sheep, Goats]",
+          "No. of sampled animals",
+          "Kebele",
+          "No. of Interviewed respondents"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "Seroprevalence results categorized by animal species (sheep/goat) and vaccination status across the study districts.",
+        "columns": [
+          "Vaccination status in districts",
+          "Sheep [No. tested, Positive (%)]",
+          "Goat [No. tested, Positive (%)]",
+          "Overall [No. tested, Positive (%)]"
+        ]
+      },
+      {
+        "id": "Table 3",
+        "description": "Results of the univariable logistic regression for various risk factors in nonvaccinated populations.",
+        "columns": [
+          "Risk factors",
+          "Category",
+          "Number of sampled",
+          "Number of Positive (%)",
+          "Odds ratio (95% CI)",
+          "P value"
+        ]
+      },
+      {
+        "id": "Table 4",
+        "description": "Multivariable logistic regression model showing significant risk factors for PPR positivity in nonvaccinated ruminants.",
+        "columns": [
+          "Risk factors",
+          "Category",
+          "Odd ratio (95% CI)",
+          "Coefficients",
+          "P value"
+        ]
+      },
+      {
+        "id": "Table 5",
+        "description": "Univariable analysis of factors influencing seroconversion (antibody presence) specifically in vaccinated animals.",
+        "columns": [
+          "Risk factors",
+          "Category",
+          "No. sampled",
+          "Sero positive (%)",
+          "Odd ratio (95% CI)",
+          "P-value"
+        ]
+      },
+      {
+        "id": "Table 6",
+        "description": "Multivariable regression identifying species and body condition as primary factors for PPR positivity among vaccinated populations.",
+        "columns": [
+          "Variables",
+          "Category",
+          "Odds Ratio",
+          "95% Conf. Interval",
+          "P value"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "Peste des petits ruminants (PPR)",
+      "PPRV (PPR Virus)",
+      "c-ELISA (competition Enzyme-Linked Immune Sorbent Assay)",
+      "Seroprevalence",
+      "S/N% (Sample Negativity percentage)",
+      "Herd immunity",
+      "Kebeles (Village administrations)",
+      "DOVAR-II (Digital Disease Reporting System)",
+      "Seroconversion"
+    ],
+    "limitations": [
+      "Vaccination status for the cross-sectional study relied on oral confirmation from pastoralists as formal records were not maintained.",
+      "Logistical challenges, including poor cold chain management and vaccine handling, were identified as potential reasons for low seroconversion but were not directly measured.",
+      "Significant geographical areas within the Borena zone face accessibility and safety barriers, potentially leading to underreporting of outbreaks."
+    ],
+    "connections": [
+      "Builds upon the FAO-WOAH Global PPR Eradication Strategy target of 2030 (and Ethiopia's internal target of 2027).",
+      "Uses Thrusfield (2005) for epidemiological sample size calculation methodology.",
+      "References seroprevalence findings from Alemu (2014), Dubie et al. (2022), and Senbeto (2022) to compare regional trends.",
+      "Adopts age determination and body condition scoring based on ESGPIP (Ethiopia Sheep and Goat Productivity Improvement Program) guidelines."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "16_ppr_ethiopia_FR1",
+      "paper_id": "16_ppr_ethiopia",
+      "question": "How many total PPR outbreaks were recorded in the Borena Zone between 2018 and 2022, and which specific month saw the highest percentage of these outbreaks?",
+      "category": "factual_recall",
+      "expected_answer": "According to the retrospective analysis of the DOVAR-II system, a total of 53 PPR outbreaks occurred in the Borena Zone between 2018 and 2022. The seasonal peak for these outbreaks was in January, which accounted for 20.8% of the total recorded cases.",
+      "expected_concepts": [
+        "53 outbreaks",
+        "Borena Zone",
+        "2018-2022",
+        "January",
+        "20.8%"
+      ],
+      "difficulty": "easy",
+      "source_page": "1",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "16_ppr_ethiopia_CO2",
+      "paper_id": "16_ppr_ethiopia",
+      "question": "Why does the study conclude that the current PPR herd immunity in the Borena Zone is insufficient according to international standards?",
+      "category": "conceptual",
+      "expected_answer": "The study found that the herd immunity level in the region was 68.8% among vaccinated animals. This is considered insufficient because it falls below the 80% threshold recommended by the FAO and WOAH (World Organisation for Animal Health) to effectively control and eliminate the disease within a population.",
+      "expected_concepts": [
+        "68.8%",
+        "80% threshold",
+        "FAO-WOAH",
+        "herd immunity",
+        "vaccination coverage"
+      ],
+      "difficulty": "medium",
+      "source_page": "1, 4",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "16_ppr_ethiopia_TE3",
+      "paper_id": "16_ppr_ethiopia",
+      "question": "Using the multivariable logistic regression results, how do animal age and origin (gifted or purchased) quantify the risk of PPR seropositivity in nonvaccinated animals?",
+      "category": "technical",
+      "expected_answer": "The multivariable logistic regression showed that older animals were 7.3 times more likely to be seropositive (OR: 7.3; 95%CI: 2.7\u201319.4) compared to adult animals. Furthermore, animal origin was a significant risk factor, with gifted animals being 8.3 times more likely (OR: 8.3) and purchased animals being 4 times more likely (OR: 4) to be seropositive than those born within the flock.",
+      "expected_concepts": [
+        "multivariable logistic regression",
+        "odds ratio",
+        "older animals",
+        "gifted animals",
+        "purchased animals",
+        "OR: 7.3"
+      ],
+      "difficulty": "hard",
+      "source_page": "4",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:19:01.566241"
+}

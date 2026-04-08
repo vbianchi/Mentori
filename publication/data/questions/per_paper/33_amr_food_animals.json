@@ -1,0 +1,188 @@
+{
+  "paper_id": "33_amr_food_animals",
+  "filename": "33_amr_food_animals.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "This review paper addresses the global threat to public health caused by the development and spread of antibiotic-resistant bacteria (ARB) and antibiotic resistance genes (ARGs) resulting from the overuse of antibiotics in food animals.",
+    "methods": [
+      "Literature review and synthesis of recent studies (2010\u20132022)",
+      "Metagenomic data analysis from cited research regarding microbial diversity in farms",
+      "Analysis of antibiotic consumption statistics and environmental impact data",
+      "Evaluation of mitigation strategies including novel technologies (nanotechnology, biochar), alternatives (probiotics, plant extracts), and regulatory administration"
+    ],
+    "findings": [
+      {
+        "finding": "Antibiotic use in food animals is projected to increase by 11.5%, reaching over 200,000 tons by 2030.",
+        "evidence": "Tiseo et al., 2020",
+        "page": 1
+      },
+      {
+        "finding": "Approximately 75% of antibiotics administered to food animals are not absorbed and are excreted via feces and urine.",
+        "evidence": "Mackie et al., 2006; Zhou et al., 2022",
+        "page": 1
+      },
+      {
+        "finding": "ARB and ARGs in farm bioaerosols can be dispersed up to a distance of 10 km from the farms.",
+        "evidence": "Bai et al. (2021)",
+        "page": 2
+      },
+      {
+        "finding": "Slaughterhouse workers face high occupational risk, with one study showing 50% prevalence of MDR E. coli among butchers.",
+        "evidence": "Aworh et al. (2021)",
+        "page": 7
+      },
+      {
+        "finding": "Graphene oxide (GO) nanosheets can remove approximately 80% of ARGs from water via \u03c0-stacking interactions.",
+        "evidence": "Yu et al. (2017)",
+        "page": 8
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "A flowchart outlining the exposure routes of antibiotic resistance from farms to humans via contact, environmental contamination, and food consumption.",
+        "page": 2
+      },
+      {
+        "id": "Figure 2",
+        "description": "An illustration of the four-step process of how bacterial resistance to antibiotics occurs and transfers to humans.",
+        "page": 3
+      },
+      {
+        "id": "Figure 3",
+        "description": "A complex map of multiple transmission pathways for ARB and ARGs through the food chain, environment, and healthcare systems.",
+        "page": 7
+      },
+      {
+        "id": "Figure 4",
+        "description": "A summary of three main strategies to minimize antibiotic resistance: novel technologies, alternatives, and administration.",
+        "page": 10
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Lists typical antibiotics, their corresponding ARGs, and the ARB commonly found in food animal farms.",
+        "columns": [
+          "ARB",
+          "Antibiotics",
+          "ARGs"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "Summarizes novel methods for reducing ARB and ARGs in various samples.",
+        "columns": [
+          "Methods",
+          "Characteristics",
+          "Samples",
+          "References"
+        ]
+      },
+      {
+        "id": "Table 3",
+        "description": "Details different types of reactors used to treat antibiotic-contaminated wastewater.",
+        "columns": [
+          "Methods",
+          "Characteristics",
+          "Sources",
+          "References"
+        ]
+      },
+      {
+        "id": "Table 4",
+        "description": "Provides a list of antibiotics prohibited in specific countries/regions over time.",
+        "columns": [
+          "Antibiotics",
+          "Countries",
+          "Time"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "ARB (Antibiotic-Resistant Bacteria)",
+      "ARGs (Antibiotic Resistance Genes)",
+      "MGEs (Mobile Genetic Elements)",
+      "MDR (Multidrug-Resistant)",
+      "ESBL (Extended-Spectrum \u03b2-Lactamase)",
+      "MIC (Minimum Inhibitory Concentration)",
+      "Bioaerosols",
+      "Metagenomics"
+    ],
+    "limitations": [
+      "The authors note that simple waste treatments like anaerobic digesters or lagoons often do not effectively remove antibiotics.",
+      "There is a lack of global uniformity in antibiotic regulations, especially in developing countries where unregulated use remains common.",
+      "Most cited success in ARB removal comes from pilot-scale or laboratory settings rather than widespread farm implementation."
+    ],
+    "connections": [
+      "Builds upon the transmission pathway model by Koch et al. (2017).",
+      "Utilizes antibiotic consumption projections from Tiseo et al. (2020) and the National Research Council (1980).",
+      "References the mobile resistome transfer network work of Hu et al. (2016b)."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "33_amr_food_animals_FR1",
+      "paper_id": "33_amr_food_animals",
+      "question": "What percentage of antibiotics administered to food animals is estimated to be excreted without being absorbed, and through what primary mediums does this occur?",
+      "category": "factual_recall",
+      "expected_answer": "According to the paper, approximately 75% of antibiotics administered to food animals are not absorbed by their bodies. These substances are subsequently excreted into the environment through the animal's feces and urine.",
+      "expected_concepts": [
+        "75%",
+        "excreted",
+        "feces",
+        "urine",
+        "not absorbed"
+      ],
+      "difficulty": "easy",
+      "source_page": "1",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "33_amr_food_animals_CO2",
+      "paper_id": "33_amr_food_animals",
+      "question": "How do antibiotic-resistant bacteria (ARB) and genes (ARGs) originate in food animal farms and eventually reach the human population through different environmental and occupational pathways?",
+      "category": "conceptual",
+      "expected_answer": "ARB and ARGs spread from farms to humans via a multi-faceted process involving direct contact, environmental dispersion, and the food chain. Occupational risks are high for slaughterhouse workers (e.g., 50% MDR E. coli prevalence), while environmental transmission occurs through bioaerosols that can travel up to 10 km and the contamination of water and soil that eventually enters the human food supply or healthcare systems.",
+      "expected_concepts": [
+        "bioaerosols",
+        "occupational risk",
+        "food chain",
+        "environmental contamination",
+        "transmission pathways",
+        "direct contact"
+      ],
+      "difficulty": "medium",
+      "source_page": "2, 7",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "33_amr_food_animals_TE3",
+      "paper_id": "33_amr_food_animals",
+      "question": "Based on the findings regarding novel mitigation technologies, what is the specific mechanism and efficiency of using graphene oxide (GO) nanosheets for water treatment?",
+      "category": "technical",
+      "expected_answer": "Graphene oxide (GO) nanosheets are used to remove antibiotic resistance genes (ARGs) from water with an efficiency of approximately 80%. This removal is achieved through a specific chemical mechanism known as \u03c0-stacking (pi-stacking) interactions between the ARGs and the nanosheets.",
+      "expected_concepts": [
+        "Graphene oxide",
+        "80% removal",
+        "\u03c0-stacking",
+        "nanosheets",
+        "ARGs"
+      ],
+      "difficulty": "hard",
+      "source_page": "8",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:28:50.726848"
+}

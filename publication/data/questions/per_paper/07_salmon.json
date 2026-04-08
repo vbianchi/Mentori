@@ -1,0 +1,155 @@
+{
+  "paper_id": "07_salmon",
+  "filename": "07_salmon.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "The paper addresses the challenge of accurate and fast transcript abundance quantification from RNA-seq data, specifically focusing on correcting for technical biases, such as fragment GC content, which existing fast methods lack.",
+    "methods": [
+      "Dual-phase parallel inference algorithm (online and offline phases)",
+      "Lightweight-mapping (quasi-mapping) for ultra-fast read mapping",
+      "Sample-specific bias models (sequence-specific, fragment-GC, and positional biases)",
+      "Rich equivalence classes to reduce data representation while retaining conditional probabilities",
+      "Variational Bayesian (VB) and Expectation-Maximization (EM) optimization",
+      "Stochastic, collapsed variational Bayesian inference"
+    ],
+    "findings": [
+      {
+        "finding": "Salmon is the first transcriptome-wide quantifier to correct for fragment GC content bias, which improves accuracy and reliability of differential expression (DE) analysis.",
+        "evidence": "Demonstrated through comparisons with kallisto and eXpress.",
+        "page": 1
+      },
+      {
+        "finding": "Salmon exhibits significantly higher sensitivity in differential expression testing compared to other tools.",
+        "evidence": "Sensitivity was 53% to 450% higher at the same False Discovery Rates (FDRs).",
+        "page": 2
+      },
+      {
+        "finding": "Salmon reduces false-positive differential expression calls caused by technical artifacts.",
+        "evidence": "Decreased the number of genes called as DE by a factor of ~2.6 in GEUVADIS data comparisons expected to have no true differences.",
+        "page": 2
+      },
+      {
+        "finding": "Salmon achieves speed comparable to ultra-fast alignment-free tools.",
+        "evidence": "Quantified 600 million reads in ~23 minutes using 30 threads, matching the speed of kallisto.",
+        "page": 3
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "Comparison of accuracy and sensitivity between Salmon, kallisto, and eXpress using MARD, log fold changes, and DE call counts.",
+        "page": 21
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1c (inside Figure 1)",
+        "description": "Sensitivity of finding truly DE transcripts at typical FDR values.",
+        "columns": [
+          "FDR",
+          "Salmon",
+          "Salmon (a)",
+          "kallisto",
+          "eXpress"
+        ]
+      },
+      {
+        "id": "Table 1d (inside Figure 1)",
+        "description": "Number of transcripts/genes called as DE for 30 GEUVADIS samples under a technical confound.",
+        "columns": [
+          "Type",
+          "Salmon",
+          "Salmon (a)",
+          "kallisto",
+          "eXpress"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "Transcripts per million (TPM)",
+      "Fragment GC content bias",
+      "Quasi-mapping",
+      "Dual-phase inference",
+      "Nucleotide fraction",
+      "Rich equivalence classes",
+      "Mean Absolute Relative Difference (MARD)",
+      "CIGAR symbols",
+      "Variational Bayesian (VB) inference"
+    ],
+    "limitations": [
+      "Salmon addresses transcript quantification but does not identify or assemble novel transcripts.",
+      "The use of sampling options like --biasSpeedSamp can coarsen the model, potentially leading to a slight increase in false positives, though the effect is noted as moderate."
+    ],
+    "connections": [
+      "Sailfish (previous work by authors achieving speed through k-mer allocation)",
+      "kallisto (alignment-free method using pseudoalignment)",
+      "eXpress (quantification tool using streaming fragment assignment and bias models)",
+      "Bowtie2 (traditional alignment tool used for Salmon's alignment-based mode)",
+      "Polyester and RSEM-sim (software used for generating ground-truth simulated data)",
+      "GEUVADIS and SEQC (large-scale experimental datasets used for benchmarking)"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "07_salmon_FR1",
+      "paper_id": "07_salmon",
+      "question": "By what percentage range was Salmon's sensitivity higher in differential expression testing compared to other tools at the same False Discovery Rates (FDRs)?",
+      "category": "factual_recall",
+      "expected_answer": "Salmon exhibited significantly higher sensitivity in differential expression testing, showing a range of 53% to 450% higher sensitivity compared to other tools at the same False Discovery Rates.",
+      "expected_concepts": [
+        "sensitivity",
+        "False Discovery Rates",
+        "FDR",
+        "differential expression testing"
+      ],
+      "difficulty": "easy",
+      "source_page": "2",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "07_salmon_CO2",
+      "paper_id": "07_salmon",
+      "question": "How does Salmon's method of bias correction specifically improve the outcomes of differential expression (DE) analysis?",
+      "category": "conceptual",
+      "expected_answer": "Salmon is the first transcriptome-wide quantifier to correct for fragment GC content bias, alongside sequence-specific and positional biases. By modeling these technical artifacts, Salmon reduces false-positive DE calls (decreasing them by a factor of ~2.6 in specific GEUVADIS comparisons) and improves the overall accuracy and reliability of the analysis.",
+      "expected_concepts": [
+        "fragment GC content bias",
+        "technical artifacts",
+        "false-positive",
+        "differential expression analysis",
+        "reliability"
+      ],
+      "difficulty": "medium",
+      "source_page": "1-2",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "07_salmon_TE3",
+      "paper_id": "07_salmon",
+      "question": "Describe the algorithmic components and optimization techniques Salmon uses to achieve speed comparable to ultra-fast alignment-free tools while maintaining accuracy.",
+      "category": "technical",
+      "expected_answer": "Salmon utilizes a dual-phase parallel inference algorithm consisting of online and offline phases, combined with lightweight-mapping (quasi-mapping) for ultra-fast read mapping. For quantification, it employs variational Bayesian (VB) and Expectation-Maximization (EM) optimization, specifically utilizing stochastic, collapsed variational Bayesian inference and rich equivalence classes.",
+      "expected_concepts": [
+        "dual-phase parallel inference",
+        "lightweight-mapping",
+        "variational Bayesian",
+        "Expectation-Maximization",
+        "rich equivalence classes"
+      ],
+      "difficulty": "hard",
+      "source_page": "1, 3",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:13:36.348966"
+}

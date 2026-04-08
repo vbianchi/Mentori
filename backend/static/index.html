@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentori MVP Chat</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-area {
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            background-color: var(--bg-color);
+        }
+
+        input,
+        button,
+        select {
+            background-color: #334155;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+        }
+
+        button {
+            background-color: var(--accent);
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            line-height: 1.5;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .message.assistant {
+            align-self: flex-start;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+        }
+
+        .thinking {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            border-left: 2px solid #64748b;
+            padding-left: 10px;
+            margin-bottom: 8px;
+            font-style: italic;
+            display: block;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        h1,
+        h2,
+        h3 {
+            margin: 0;
+        }
+
+        .status {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>Mentori MVP</h2>
+
+        <!-- Auth Section -->
+        <div id="auth-section">
+            <input type="email" id="email" placeholder="Email" value="valerio.bianchi@wur.nl">
+            <input type="password" id="password" placeholder="Password" value="password123">
+            <button onclick="login()" style="width:100%; margin-top:10px;">Login</button>
+            <div id="login-status" class="status"></div>
+        </div>
+
+        <!-- Task Section -->
+        <div id="task-section" class="hidden">
+            <h3>Tasks</h3>
+            <button onclick="createTask()" style="width:100%; margin-top:10px;">+ New Chat</button>
+            <div id="task-list" style="margin-top:15px; overflow-y:auto; flex:1;"></div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div id="chat-container" class="chat-container">
+            <div style="text-align:center; color: #64748b; margin-top: 40px;">
+                Please Login and Select a Task to start chatting.
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="chat-input" style="flex:1;" placeholder="Type a message..." disabled>
+                <button id="send-btn" onclick="sendMessage()" disabled>Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://localhost:8000";
+        let token = localStorage.getItem("mentori_token");
+        let currentTaskId = null;
+        let currentUser = "valerio.bianchi@wur.nl"; // Default for demo convenience
+
+        // Init
+        if (token) {
+            document.getElementById("auth-section").classList.add("hidden");
+            document.getElementById("task-section").classList.remove("hidden");
+            loadTasks();
+        }
+
+        async function login() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            currentUser = email;
+
+            try {
+                // 1. Ensure user exists (auto-register for demo friction reduction?)
+                // Let's just try login, if fails try register
+                let resp = await fetch(`${API_URL}/auth/token`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: `username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+                });
+
+                if (resp.status === 401 || resp.status === 400) {
+                    // Try register
+                    await fetch(`${API_URL}/auth/register`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email, password })
+                    });
+                    // Retry login
+                    resp = await fetch(`${API_URL}/auth/token`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: `username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+                    });
+                }
+
+                if (!resp.ok) throw new Error("Login failed");
+
+                const data = await resp.json();
+                token = data.access_token;
+                localStorage.setItem("mentori_token", token);
+
+                document.getElementById("login-status").innerText = "Logged in!";
+                setTimeout(() => {
+                    document.getElementById("auth-section").classList.add("hidden");
+                    document.getElementById("task-section").classList.remove("hidden");
+                    loadTasks();
+                }, 500);
+
+            } catch (e) {
+                document.getElementById("login-status").innerText = "Error: " + e.message;
+            }
+        }
+
+        async function loadTasks() {
+            const resp = await fetch(`${API_URL}/tasks/`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            const tasks = await resp.json();
+            const list = document.getElementById("task-list");
+            list.innerHTML = "";
+            tasks.forEach(t => {
+                const div = document.createElement("div");
+                div.style.padding = "10px";
+                div.style.cursor = "pointer";
+                div.style.borderBottom = "1px solid #334155";
+                div.innerText = t.title || "Untitled Task";
+                div.onclick = () => openTask(t.id);
+                list.appendChild(div);
+            });
+        }
+
+        async function createTask() {
+            const title = prompt("Task Title:", "New Chat");
+            if (!title) return;
+
+            const resp = await fetch(`${API_URL}/tasks/`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    title,
+                    mode: "chat",
+                    model_identifier: "ollama::gpt-oss:20b" // Force working model
+                })
+            });
+            if (resp.ok) loadTasks();
+        }
+
+        function openTask(taskId) {
+            currentTaskId = taskId;
+            document.getElementById("chat-input").disabled = false;
+            document.getElementById("send-btn").disabled = false;
+            document.getElementById("chat-container").innerHTML = `<div style='text-align:center; color:#64748b'>Started Task ${taskId.slice(0, 8)}...</div>`;
+            // Note: In real app we load previous history here. skipped for MVP demo simplicity,
+            // or we could fetch it if we had a GET /tasks/{id}/messages endpoint.
+            // For now just fresh slate visually.
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById("chat-input");
+            const text = input.value;
+            if (!text) return;
+
+            // Add User Message
+            appendMessage("user", text);
+            input.value = "";
+
+            // Create Assistant Message Placeholder
+            const assistantMsgDiv = appendMessage("assistant", "");
+            const thinkingDiv = document.createElement("div");
+            thinkingDiv.className = "thinking";
+            thinkingDiv.innerText = "Thinking...";
+            assistantMsgDiv.appendChild(thinkingDiv);
+
+            const contentDiv = document.createElement("div");
+            assistantMsgDiv.appendChild(contentDiv);
+
+            try {
+                const response = await fetch(`${API_URL}/tasks/${currentTaskId}/chat`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ content: text })
+                });
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder("utf-8");
+                let thinkingText = "";
+                let contentText = "";
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value, { stream: true });
+                    // Chunk might contain multiple JSONs or partial JSONs
+                    // Simplistic splitting by newline for demo
+                    const lines = chunk.split("\n");
+
+                    for (const line of lines) {
+                        if (!line.trim()) continue;
+                        try {
+                            const data = JSON.parse(line);
+                            if (data.message) {
+                                if (data.message.thinking) {
+                                    thinkingText += data.message.thinking;
+                                    thinkingDiv.innerText = thinkingText;
+                                }
+                                if (data.message.content) {
+                                    contentText += data.message.content;
+                                    contentDiv.innerText = contentText;
+                                }
+                            }
+                        } catch (e) {
+                            // ignore partial json
+                        }
+                    }
+                }
+                if (!thinkingText) thinkingDiv.style.display = 'none';
+
+            } catch (e) {
+                contentDiv.innerText += "\n[Error: Connection failed]";
+            }
+        }
+
+        function appendMessage(role, text) {
+            const container = document.getElementById("chat-container");
+            const div = document.createElement("div");
+            div.className = `message ${role}`;
+            div.innerText = text;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+            return div;
+        }
+
+        document.getElementById("chat-input").addEventListener("keypress", (e) => {
+            if (e.key === "Enter") sendMessage();
+        });
+    </script>
+</body>
+
+</html>

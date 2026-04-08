@@ -1,0 +1,142 @@
+{
+  "paper_id": "37_data_driven_one_health",
+  "filename": "37_data_driven_one_health.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "This paper addresses how the One Health approach\u2014recognizing the interconnectedness of humans, animals, and the environment\u2014can be prioritized and enhanced through data-driven methods (like machine learning) to mitigate the global threat of emerging and re-emerging zoonotic infectious diseases.",
+    "methods": [
+      "One Health multisectoral framework (collaboration between human, animal, and environmental health sectors)",
+      "Literature review and commentary on historical zoonotic outbreaks (SARS, MERS, Ebola, Hendra, Nipah)",
+      "Machine learning modelling for zoonotic risk prediction (referenced from Mollentze et al.)",
+      "Comparative medicine and sentinel surveillance in animal populations",
+      "Economic cost-benefit analysis of integrated health systems",
+      "Surveillance system mapping to identify gaps and synergies"
+    ],
+    "findings": [
+      {
+        "finding": "Integrated surveillance and response to West Nile virus resulted in over \u20ac1 million in savings.",
+        "evidence": "Table 1 (citing Paternoster et al. [14])",
+        "page": 3
+      },
+      {
+        "finding": "Hosting human and animal health laboratories under one roof can provide 26% savings in operational costs.",
+        "evidence": "Table 1 (citing World-Bank [15])",
+        "page": 3
+      },
+      {
+        "finding": "Machine learning models using viral and human genome sequence features correctly identified 70.8% of human viruses with high or very high zoonotic potential.",
+        "evidence": "Section 2, paragraph 2 (citing Mollentze et al. [21])",
+        "page": 4
+      },
+      {
+        "finding": "The Ebola epidemic caused massive economic damage, such as Sierra Leone\u2019s GDP dropping from 4.6% in 2014 to -12.5% in 2015, which could have been mitigated by a resilient One Health system.",
+        "evidence": "Section 3, Conclusions (citing reference [23])",
+        "page": 5
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "A two-part diagram illustrating (A) how infection amplifies from wild animals through livestock to humans and (B) how early detection and One Health control efforts significantly reduce disease incidence in both people and animals.",
+        "page": 4
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Summarizes the specific added value of adopting a One Health approach across five domains: Health services, Zoonoses control, Surveillance and response, Infrastructure, and Communication.",
+        "columns": [
+          "Domain",
+          "Added Value",
+          "Reference"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "One Health",
+      "Zoonotic",
+      "Spillover",
+      "Sentinel surveillance",
+      "Genomic sequence analysis",
+      "Bi-directional transmission",
+      "Tripartite guide (FAO, WHO, WOAH collaboration)"
+    ],
+    "limitations": [
+      "Lack of basic mechanisms for inter-ministerial collaboration in many countries, especially resource-limited ones.",
+      "Existing surveillance plans are often developed by and for single sectors, leading to disjointed activities.",
+      "Limited data on financing and cost projections for implementing One Health in countries with limited infrastructure.",
+      "The complexity of managing political, social, and biological systems during outbreaks."
+    ],
+    "connections": [
+      "Mollentze et al. (Machine learning for predicting zoonotic potential)",
+      "Karesh et al. (Disease ecology and transmission dynamics)",
+      "World Bank (Economic impact reports on One Health and the Ebola crisis)",
+      "FAO/WHO/OIE Tripartite Guide (Multisectoral frameworks)",
+      "Hammer et al. (SARS-CoV-2 genomic analysis in mink populations)"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "37_data_driven_one_health_FR1",
+      "paper_id": "37_data_driven_one_health",
+      "question": "According to the World Bank, what specific percentage of operational savings can be achieved by co-locating human and animal health laboratories?",
+      "category": "factual_recall",
+      "expected_answer": "Hosting human and animal health laboratories under one roof can provide 26% savings in operational costs, as cited from the World Bank [15] in Table 1.",
+      "expected_concepts": [
+        "26%",
+        "operational costs",
+        "laboratories",
+        "World Bank",
+        "one roof"
+      ],
+      "difficulty": "easy",
+      "source_page": "3",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "37_data_driven_one_health_CO2",
+      "paper_id": "37_data_driven_one_health",
+      "question": "How does the One Health multisectoral framework theoretically reduce disease incidence and economic damage during a zoonotic spillover event?",
+      "category": "conceptual",
+      "expected_answer": "The One Health framework utilizes integrated surveillance and early detection to identify infections as they amplify from wild animals through livestock. By intervening early, the system reduces disease incidence in both humans and animals, thereby preventing the severe economic damage seen in cases like Sierra Leone's GDP drop during the Ebola epidemic.",
+      "expected_concepts": [
+        "early detection",
+        "integrated surveillance",
+        "amplification",
+        "economic damage",
+        "disease incidence"
+      ],
+      "difficulty": "medium",
+      "source_page": "4-5",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "37_data_driven_one_health_TE3",
+      "paper_id": "37_data_driven_one_health",
+      "question": "Regarding the machine learning modeling referenced from Mollentze et al., what features were used for zoonotic risk prediction and what was the reported accuracy for high-potential viruses?",
+      "category": "technical",
+      "expected_answer": "The machine learning models utilized viral and human genome sequence features to predict risk. These models successfully identified 70.8% of human viruses that possessed high or very high zoonotic potential.",
+      "expected_concepts": [
+        "viral and human genome sequence features",
+        "70.8%",
+        "zoonotic potential",
+        "Mollentze et al.",
+        "machine learning"
+      ],
+      "difficulty": "medium",
+      "source_page": "4",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:31:02.696881"
+}

@@ -1,0 +1,217 @@
+{
+  "paper_id": "50_4cseq_protocol",
+  "filename": "50_4cseq_protocol.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "How can researchers reliably prepare high-quality 4C-seq libraries and process the resulting sequencing data to identify and interpret genomic contact frequencies from a specific viewpoint?",
+    "methods": [
+      "Chromosome Conformation Capture (3C)",
+      "Circular Chromosome Conformation Capture (4C-seq)",
+      "Formaldehyde-mediated crosslinking",
+      "In situ ligation",
+      "Inverse PCR",
+      "Two-step PCR library preparation strategy",
+      "Next-generation sequencing (NGS)",
+      "Data processing pipeline (pipe4C) for demultiplexing, trimming, and mapping",
+      "Peak calling using the peakC R package"
+    ],
+    "findings": [
+      {
+        "finding": "Approximately 1 million sequencing reads are sufficient for a typical 4C-seq analysis.",
+        "evidence": "As only roughly 1 million reads are required for 4C-seq analysis (see note 14)...",
+        "page": 24
+      },
+      {
+        "finding": "Subsampling analysis indicates that 50,000 to 100,000 cis-mapped reads are enough to generate reproducible profiles.",
+        "evidence": "...roughly 50,000\u2013100,000 cis-mapped 4C reads are sufficient to generate reproducible 4C profiles.",
+        "page": 31
+      },
+      {
+        "finding": "Successful experiments should show strong enrichment on the cis chromosome, typically >60% of reads.",
+        "evidence": "Preferably >60% of the reads should map to the chromosome that contains the viewpoint (the cis chromosome)...",
+        "page": 28
+      },
+      {
+        "finding": "Primary restriction enzyme motif position (motifPosperc) should typically be >90% to indicate high specificity.",
+        "evidence": "First the percentage of reads in the FASTQ file in which the first RE motif position is equal to the most occurring first RE enzyme motif position (motifPosperc) should typically be >90%.",
+        "page": 28
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "Outline of the 4C-seq procedure showing the workflow from crosslinking and fragmentation to ligation, purification, and inverse PCR.",
+        "page": 18
+      },
+      {
+        "id": "Figure 2",
+        "description": "Visual guide for viewpoint selection criteria and the two-step PCR strategy for sequencing library generation.",
+        "page": 21
+      },
+      {
+        "id": "Figure 3",
+        "description": "Schematic representation of quality control gel images for intermediate steps like digestion, ligation, and the final 4C-seq PCR.",
+        "page": 22
+      },
+      {
+        "id": "Figure 4",
+        "description": "Workflow diagram of the 4C-seq data processing pipeline (pipe4C), covering demultiplexing, trimming, mapping, and peak calling.",
+        "page": 25
+      },
+      {
+        "id": "Figure 5",
+        "description": "Genome-wide coverage plots showing typical read mapping to the cis chromosome versus a randomly integrated viewpoint.",
+        "page": 29
+      },
+      {
+        "id": "Figure 6",
+        "description": "Comparison of 4C-seq contact profiles with Hi-C data, TAD boundaries, and A/B chromatin compartments.",
+        "page": 30
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Sequences for the universal forward and indexed reverse primers used in the second round of PCR.",
+        "columns": [
+          "Primer name",
+          "Sequence (5\u2019-3\u2019)"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "Parameters that must be defined in the global configuration file for the data pipeline.",
+        "columns": [
+          "Name",
+          "Description"
+        ]
+      },
+      {
+        "id": "Table 3",
+        "description": "Example of a viewpoint file layout where multiple experiments are demultiplexed from a single FASTQ file.",
+        "columns": [
+          "expname",
+          "primer",
+          "firstenzyme",
+          "secondenzyme",
+          "genome",
+          "vpchr",
+          "vppos",
+          "analysis",
+          "Fastq"
+        ]
+      },
+      {
+        "id": "Table 4",
+        "description": "Specific parameters required within the viewpoint file for processing each individual 4C-seq experiment.",
+        "columns": [
+          "Name",
+          "Description"
+        ]
+      },
+      {
+        "id": "Table 5",
+        "description": "A list of required and optional command-line arguments recognized by the pipe4C.R script.",
+        "columns": [
+          "Name",
+          "Description"
+        ]
+      },
+      {
+        "id": "Table 6",
+        "description": "Detailed list of data quality metrics provided in the final report file for experiment assessment.",
+        "columns": [
+          "Name",
+          "Description"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "Chromosome conformation capture (3C)",
+      "4C-seq (Circularized 3C)",
+      "Viewpoint (VP)",
+      "Cis-interactions",
+      "Trans-interactions",
+      "Inverse PCR",
+      "Topologically Associated Domains (TADs)",
+      "A/B Compartments",
+      "Blind fragments",
+      "Capture length"
+    ],
+    "limitations": [
+      "Far-cis and inter-chromosomal contacts are rare and often not reproducible between biological replicates.",
+      "Blind fragments (lacking a secondary restriction site) give systematically lower read coverage and may need exclusion.",
+      "Low-complexity libraries often result from poor template quality rather than lack of sequencing depth.",
+      "Peak calling without replicates relies on arbitrary thresholds as significance cannot be computed for single experiments."
+    ],
+    "connections": [
+      "Builds upon original 3C [1, 2] and 4C-seq [10, 18, 26, 27] methodologies.",
+      "Integrates the peakC R package for statistical analysis [23].",
+      "Utilizes Bowtie2 for sequence alignment [32].",
+      "Validates results by comparing against Hi-C [11, 12, 15] and ChIP-seq data [32]."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "50_4cseq_protocol_FR1",
+      "paper_id": "50_4cseq_protocol",
+      "question": "According to the paper's subsampling analysis, what is the minimum number of cis-mapped reads required to generate reproducible 4C profiles?",
+      "category": "factual_recall",
+      "expected_answer": "Subsampling analysis indicates that roughly 50,000\u2013100,000 cis-mapped 4C reads are sufficient to generate reproducible 4C profiles. This allows for reliable contact profile generation even with relatively low sequencing depth.",
+      "expected_concepts": [
+        "50,000\u2013100,000",
+        "cis-mapped reads",
+        "reproducible 4C profiles",
+        "subsampling analysis"
+      ],
+      "difficulty": "easy",
+      "source_page": "31",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "50_4cseq_protocol_CO2",
+      "paper_id": "50_4cseq_protocol",
+      "question": "How does the distribution of sequencing reads across the genome serve as an indicator of a successful 4C-seq experiment?",
+      "category": "conceptual",
+      "expected_answer": "A successful 4C-seq experiment is characterized by a high concentration of reads on the 'cis chromosome,' which is the chromosome containing the viewpoint. Specifically, preferably >60% of the reads should map to this chromosome, reflecting the higher frequency of local chromatin interactions compared to distal or trans-chromosomal interactions.",
+      "expected_concepts": [
+        "cis chromosome",
+        "viewpoint",
+        "60% of reads",
+        "chromatin interactions",
+        "mapping distribution"
+      ],
+      "difficulty": "medium",
+      "source_page": "28, 29",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "50_4cseq_protocol_TE3",
+      "paper_id": "50_4cseq_protocol",
+      "question": "What is the function of the 'motifPosperc' metric within the pipe4C data processing pipeline, and what value indicates high specificity?",
+      "category": "technical",
+      "expected_answer": "The 'motifPosperc' metric represents the percentage of reads in the FASTQ file where the first restriction enzyme (RE) motif position matches the most frequently occurring first RE motif position. To indicate high specificity of the 4C-seq library, this value should typically be greater than 90%.",
+      "expected_concepts": [
+        "motifPosperc",
+        "restriction enzyme motif",
+        "90%",
+        "specificity",
+        "pipe4C"
+      ],
+      "difficulty": "hard",
+      "source_page": "25, 28",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:38:24.643297"
+}

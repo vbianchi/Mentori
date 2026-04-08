@@ -1,0 +1,128 @@
+{
+  "paper_id": "43_esbl_ecoli_food",
+  "filename": "43_esbl_ecoli_food.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "This review explores the prevalence, transmission pathways, and public health implications of extended-spectrum beta-lactamase (ESBL)-producing Escherichia coli in food-producing animals and animal-derived foods, aiming to underscore the need for a One Health approach to mitigate antimicrobial resistance (AMR).",
+    "methods": [
+      "Literature review and synthesis of recent global research",
+      "Analysis of epidemiological data and transmission routes",
+      "Comparison of genetic markers (plasmids, sequence types like ST10 and ST131) between animal and human isolates",
+      "Review of environmental impact studies (aquatic ecosystems, soil, manure)"
+    ],
+    "findings": [
+      {
+        "finding": "High prevalence of ESBL-producing E. coli in commercial poultry products.",
+        "evidence": "An estimated 80% prevalence of ESBL-producing E. coli was reported in commercial chicken meat samples in Hong Kong, with a high frequency of the blaCTX-M-1 gene.",
+        "page": 5
+      },
+      {
+        "finding": "Genetic similarities and identical plasmid backbones found between animal and human isolates.",
+        "evidence": "Plasmid analysis showed that backbones across various lineages can be nearly identical among animals (chickens, cattle, swine) and humans.",
+        "page": 2
+      },
+      {
+        "finding": "ESBL-producing E. coli significantly impacts European public health.",
+        "evidence": "A study in Europe documented approximately 300,000 infections and 9,000 deaths attributed to ESBL-producing E. coli.",
+        "page": 6
+      },
+      {
+        "finding": "Reduction of ESBL-producing E. coli in poultry parent stock can drastically reduce human prevalence.",
+        "evidence": "Modeling studies suggest that reducing the presence of ESBL-producing E. coli in parent stock and broiler environments to less than 1% could effectively reduce subsequent prevalence in humans.",
+        "page": 4
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "An epidemiological diagram illustrating the complex transmission pathways of ESBL-producing E. coli between farms (animal husbandry), food industries, the environment (water/soil contamination), and human consumers/hospitals.",
+        "page": 4
+      }
+    ],
+    "tables": [],
+    "technical_terms": [
+      "ESBL (Extended-Spectrum Beta-Lactamase)",
+      "AMR (Antimicrobial Resistance)",
+      "One Health",
+      "ExPEC (Extraintestinal Pathogenic E. coli)",
+      "Commensal microbiota",
+      "ST (Sequence Type)",
+      "Plasmid-mediated resistance",
+      "blaCTX-M / blaTEM / blaSHV (specific beta-lactamase genes)"
+    ],
+    "limitations": [
+      "The authors note that more comprehensive and longitudinal studies are required to fully understand the evolving landscape of ESBLs.",
+      "Occurrence and prevalence vary significantly between countries due to distinct regional approaches to antimicrobial use in livestock.",
+      "Some studies (e.g., Reunion Island) suggest that animals might not always be the primary reservoir for human infections, indicating a complex, multi-directional transmission network."
+    ],
+    "connections": [
+      "World Health Organization (WHO) Global Report on Surveillance of AMR",
+      "One Health framework for public health policies",
+      "Cites modeling studies by Furusawa et al. (2024) on broiler production systems",
+      "Builds on European epidemiological data from Ramos et al. (2020)"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "43_esbl_ecoli_food_FR1",
+      "paper_id": "43_esbl_ecoli_food",
+      "question": "What are the reported annual figures for infections and deaths attributed to ESBL-producing E. coli in the European public health sector?",
+      "category": "factual_recall",
+      "expected_answer": "In Europe, ESBL-producing E. coli has a significant impact on public health, causing approximately 300,000 infections annually. These infections are associated with an estimated 9,000 deaths.",
+      "expected_concepts": [
+        "300,000 infections",
+        "9,000 deaths",
+        "Europe",
+        "ESBL-producing E. coli"
+      ],
+      "difficulty": "easy",
+      "source_page": "6",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "43_esbl_ecoli_food_CO2",
+      "paper_id": "43_esbl_ecoli_food",
+      "question": "How does the paper support the claim that ESBL-producing E. coli transmission constitutes a cycle between animals, the environment, and humans?",
+      "category": "conceptual",
+      "expected_answer": "The paper illustrates complex transmission pathways through an epidemiological diagram involving farms, food industries, and environmental vectors like water and soil. This conceptual framework is supported by genetic analysis showing nearly identical plasmid backbones across various lineages in chickens, cattle, swine, and humans, indicating that the resistance markers are shared across these diverse sectors.",
+      "expected_concepts": [
+        "transmission pathways",
+        "plasmid backbones",
+        "environmental contamination",
+        "animal-to-human",
+        "genetic similarity"
+      ],
+      "difficulty": "medium",
+      "source_page": "2, 4",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "43_esbl_ecoli_food_TE3",
+      "paper_id": "43_esbl_ecoli_food",
+      "question": "According to the modeling studies reviewed, what specific reduction in ESBL-producing E. coli prevalence within poultry parent stock is necessary to impact human prevalence?",
+      "category": "technical",
+      "expected_answer": "Modeling studies indicate that the prevalence of ESBL-producing E. coli in poultry parent stock and their associated broiler environments must be reduced to a threshold of less than 1%. Reaching this specific target is projected to drastically reduce the subsequent prevalence of these bacteria in the human population.",
+      "expected_concepts": [
+        "modeling studies",
+        "parent stock",
+        "less than 1%",
+        "prevalence reduction",
+        "broiler environments"
+      ],
+      "difficulty": "hard",
+      "source_page": "4",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:34:36.890741"
+}

@@ -1,0 +1,192 @@
+{
+  "paper_id": "03_nfcore_framework",
+  "filename": "03_nfcore_framework.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "How to optimize DNA sequencing analysis workflows for large-scale variant discovery to achieve better scalability, portability, and cost-efficiency across various compute infrastructures?",
+    "methods": [
+      "Nextflow DSL2 framework for modular pipeline design",
+      "Intra-sample parallelization by sharding FastQ files",
+      "Switching internal file formats from BAM to CRAM to reduce storage",
+      "Containerization using Docker and Singularity via Biocontainers",
+      "Integration of modern tools like fastP, DragMap, and DeepVariant",
+      "Cloud benchmarking on AWS Batch using Tower Forge"
+    ],
+    "findings": [
+      {
+        "finding": "Achieved a 70% cost reduction in commercial clouds for large-scale data analysis.",
+        "evidence": "Both [CRAM usage and parallelization] are leading to a 70% cost reduction in commercial clouds...",
+        "page": 1
+      },
+      {
+        "finding": "Using the CRAM format reduced storage usage for the work directory by 65%.",
+        "evidence": "The storage usage for the work directory for pre-processing these samples drops by 65%, from 170.4 TB (BAM) to 59.7 TB (CRAM).",
+        "page": 7
+      },
+      {
+        "finding": "Compute costs on AWS Batch dropped by 69% compared to the previous version.",
+        "evidence": "Our findings demonstrate a 69% reduction in compute costs when utilizing the nf-core/sarek 3.1.1 pipeline, in comparison to a previous version, nf-core/sarek 2.7.2.",
+        "page": 2
+      },
+      {
+        "finding": "The median runtime of mapping processes was reduced by 37% through sharding.",
+        "evidence": "The overall runtime for the mapping processes decreases until it reaches a plateau at 12 shards, achieving a reduction of the median runtime to 37%.",
+        "page": 7
+      },
+      {
+        "finding": "For a single sample, CPU hours were reduced by approximately 70% and runtime by 84%.",
+        "evidence": "For a single sample the needed CPU hours are reduced by approximately 70%, and the runtime by 84%.",
+        "page": 8
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "A comparative table of various published variant calling pipelines highlighting their workflow languages and supported features like germline or somatic analysis.",
+        "page": 3
+      },
+      {
+        "id": "Figure 2",
+        "description": "An architectural overview of the nf-core/sarek pipeline showing the sequential stages of pre-processing, variant calling, and annotation.",
+        "page": 6
+      },
+      {
+        "id": "Figure 3",
+        "description": "Resource usage comparison (time, CPU, memory, and storage) between BAM and CRAM formats for main pipeline processes.",
+        "page": 7
+      },
+      {
+        "id": "Figure 4",
+        "description": "Graphs showing the impact of sharding input files and parallelizing interval groups on runtime, storage, and CPU consumption.",
+        "page": 8
+      },
+      {
+        "id": "Figure 5",
+        "description": "Performance benchmarking (precision, recall, and F1-score) of different variant callers against ground-truth datasets for germline and somatic variants.",
+        "page": 9
+      },
+      {
+        "id": "Figure 6",
+        "description": "Comparison of copy-number variation calls across tools and patients, categorized by deletions and amplifications.",
+        "page": 10
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Lists the ICGC LICA-FR cohort datasets used for benchmarking, specifying donor IDs and file characteristics.",
+        "columns": [
+          "Donor ID",
+          "Normal: File size [GB]",
+          "Normal: Median coverage [X]",
+          "Tumor: File size [GB]",
+          "Tumor: Median coverage [X]"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "Compares average costs, runtime, and CPU hours per patient on AWS Batch between sarek versions 2.7.2 and 3.1.1.",
+        "columns": [
+          "Version",
+          "Samples",
+          "Avg. costs [$]",
+          "Runtime",
+          "CPU hours"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "CRAM",
+      "BAM",
+      "DSL2 (Domain Specific Language version 2)",
+      "BQSR (Base Quality Score Recalibration)",
+      "WGS (Whole Genome Sequencing)",
+      "WES (Whole Exome Sequencing)",
+      "Sharding",
+      "Germline",
+      "Somatic",
+      "CNV (Copy-Number Variation)",
+      "SV (Structural Variant)",
+      "MSI (Micro-satellite Instability)"
+    ],
+    "limitations": [
+      "Switching to CRAM increases memory usage by approximately 34%.",
+      "Excessive sharding can increase storage usage because sub-FastQ files are written to disk.",
+      "Parallelization benefits plateau; for example, no significant runtime reduction was found beyond 21 interval groups.",
+      "Performance of copy-number variation tools varies significantly between different samples."
+    ],
+    "connections": [
+      "Nextflow",
+      "nf-core project",
+      "GATK Best Practices",
+      "ICGC/TCGA (International Cancer Genome Consortium)",
+      "Biocontainers",
+      "GiaB (Genome in a Bottle)",
+      "PCAWG (Pan-Cancer Analysis of Whole Genomes)"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "03_nfcore_framework_FR1",
+      "paper_id": "03_nfcore_framework",
+      "question": "According to the findings, what was the specific reduction in storage usage for the work directory when switching from BAM to CRAM, and what were the corresponding data volumes?",
+      "category": "factual_recall",
+      "expected_answer": "Switching from BAM to CRAM format reduced the storage usage for the work directory by 65%. Specifically, the storage volume dropped from 170.4 TB when using BAM to 59.7 TB when using CRAM.",
+      "expected_concepts": [
+        "65% reduction",
+        "CRAM",
+        "170.4 TB",
+        "59.7 TB",
+        "work directory"
+      ],
+      "difficulty": "easy",
+      "source_page": "7",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "03_nfcore_framework_CO2",
+      "paper_id": "03_nfcore_framework",
+      "question": "How does the nf-core/sarek 3.1.1 pipeline leverage architectural and methodological changes to optimize cost and performance for large-scale data analysis?",
+      "category": "conceptual",
+      "expected_answer": "The pipeline achieves significant optimization by transitioning to the Nextflow DSL2 framework, which allows for modular design and intra-sample parallelization through FastQ sharding. By combining these parallelization techniques with a switch from BAM to CRAM internal file formats and the integration of modern tools like DeepVariant, the system realizes a 70% reduction in commercial cloud costs and up to an 84% reduction in runtime for single samples.",
+      "expected_concepts": [
+        "Nextflow DSL2",
+        "intra-sample parallelization",
+        "sharding",
+        "CRAM",
+        "70% cost reduction"
+      ],
+      "difficulty": "medium",
+      "source_page": "1, 2, 6, 8",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "03_nfcore_framework_TE3",
+      "paper_id": "03_nfcore_framework",
+      "question": "Based on the benchmarking of mapping processes, what was the numerical impact of input sharding on median runtime, and at what point was the maximum efficiency plateau reached?",
+      "category": "technical",
+      "expected_answer": "Sharding the input files for intra-sample parallelization reduced the median runtime of the mapping processes to 37% of the original time. The benchmarking results show that this reduction in runtime reaches a performance plateau when the input is divided into 12 shards.",
+      "expected_concepts": [
+        "sharding",
+        "median runtime",
+        "37%",
+        "12 shards",
+        "plateau"
+      ],
+      "difficulty": "hard",
+      "source_page": "7, 8",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:11:26.692818"
+}

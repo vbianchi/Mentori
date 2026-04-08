@@ -1,0 +1,181 @@
+{
+  "paper_id": "02_snakemake",
+  "filename": "02_snakemake.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "How can data analysis be made 'sustainable'\u2014defined as being reproducible, adaptable, and transparent\u2014using the Snakemake workflow management system?",
+    "methods": [
+      "Workflow Management System (WMS) implementation using Snakemake",
+      "Domain Specific Language (DSL) based on Python",
+      "Mixed Integer Linear Programming (MILP) for job scheduling",
+      "Blockchain-style SHA-256 hashing for cross-workflow result caching",
+      "Software stack management via Conda and Container (Singularity/Docker) integration",
+      "Directed Acyclic Graph (DAG) for job dependency inference",
+      "Automatic unit test generation",
+      "Graph partitioning for job grouping in cluster/cloud environments"
+    ],
+    "findings": [
+      {
+        "finding": "Snakemake has achieved massive adoption with over 3000 citations and 1 million downloads, demonstrating its utility in the scientific community.",
+        "evidence": "Figure 2 showing growth in commits and citations (reaching ~12 new citations per week).",
+        "page": 5
+      },
+      {
+        "finding": "The Snakemake scheduler efficiently handles massive job graphs, showing linear performance scaling.",
+        "evidence": "Benchmarks reached 37 seconds and 1.1 GB of memory to compute a graph for 90,000 jobs.",
+        "page": 18
+      },
+      {
+        "finding": "Readability is enhanced by Snakemake's DSL, where the majority of code lines in a typical workflow are understandable with only domain or technical knowledge, rather than tool-specific knowledge.",
+        "evidence": "Analysis in Figure 3d showing knowledge requirement distribution.",
+        "page": 7
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "A hierarchy of aspects (Automation, Scalability, Portability, Readability, Traceability, Documentation) contributing to sustainable data analysis.",
+        "page": 5
+      },
+      {
+        "id": "Figure 2",
+        "description": "Graphs showing the cumulative number of git commits, citations per year, and distribution of citations across scientific disciplines.",
+        "page": 6
+      },
+      {
+        "id": "Figure 3",
+        "description": "An example Snakemake workflow illustrating syntax, its corresponding DAG, and a readability analysis based on required knowledge types.",
+        "page": 7
+      },
+      {
+        "id": "Figure 4",
+        "description": "Visual representation of the job scheduling problem, contrasting suboptimal and optimal scheduling solutions for temporary file management.",
+        "page": 10
+      },
+      {
+        "id": "Figure 5",
+        "description": "Schematic of the blockchain-style hashing scheme used to cache and reuse results across different workflows.",
+        "page": 12
+      },
+      {
+        "id": "Figure 6",
+        "description": "Illustration of job graph partitioning where multiple rules are grouped into a single submitted cluster/cloud job.",
+        "page": 13
+      },
+      {
+        "id": "Figure 7",
+        "description": "Examples of workflow composition, showing how external workflows can be declared as modules and extended.",
+        "page": 14
+      },
+      {
+        "id": "Figure 8",
+        "description": "A collection of advanced design patterns including scatter/gather, streaming, iteration, and parameter space exploration.",
+        "page": 15
+      },
+      {
+        "id": "Figure 9",
+        "description": "Performance benchmarks showing linear increases in runtime and memory usage as the number of jobs increases.",
+        "page": 18
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "The mixed integer linear program (MILP) formulation for Snakemake's scheduling problem, defining the objective function and constraints.",
+        "columns": [
+          "Objective",
+          "Variables",
+          "Parameters"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "Directed Acyclic Graph (DAG)",
+      "Domain Specific Language (DSL)",
+      "Wildcards",
+      "Mixed Integer Linear Program (MILP)",
+      "Blockchain-style hashing",
+      "Graph partitioning",
+      "Snakefile",
+      "Conda integration",
+      "Unit test generation"
+    ],
+    "limitations": [
+      "Snakemake currently cannot combine different execution backends (e.g., two different cluster systems) in a single run.",
+      "Caching is only effective if the workflow developer ensures results are generated in a deterministic way.",
+      "While simple workflows are highly readable, complex dependency structures can still become difficult to parse mentally."
+    ],
+    "connections": [
+      "Unix 'make' (conceptual ancestor)",
+      "Python (base language and DSL implementation)",
+      "Conda (software package management)",
+      "CWL/WDL (alternative system-independent workflow languages)",
+      "JUDI (inspiration for Paramspace functionality)",
+      "Git (version control integration)",
+      "Jupyter (interactive notebook integration)"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "02_snakemake_FR1",
+      "paper_id": "02_snakemake",
+      "question": "According to the performance benchmarks provided in the paper, what are the specific time and memory requirements for the Snakemake scheduler to compute a graph of 90,000 jobs?",
+      "category": "factual_recall",
+      "expected_answer": "The Snakemake scheduler requires 37 seconds and 1.1 GB of memory to compute a graph for 90,000 jobs. This performance demonstrates that the scheduler scales linearly as the number of jobs increases.",
+      "expected_concepts": [
+        "37 seconds",
+        "1.1 GB",
+        "90,000 jobs",
+        "linear scaling"
+      ],
+      "difficulty": "medium",
+      "source_page": "18",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "02_snakemake_CO2",
+      "paper_id": "02_snakemake",
+      "question": "How does Snakemake's implementation of a blockchain-style hashing scheme facilitate cross-workflow result caching?",
+      "category": "conceptual",
+      "expected_answer": "Snakemake employs a blockchain-style SHA-256 hashing scheme to create unique identifiers for job states based on code, parameters, and input data. This allows the system to recognize identical tasks across different workflow runs or projects, enabling the reuse of cached results and ensuring traceability of the data provenance.",
+      "expected_concepts": [
+        "SHA-256",
+        "hashing",
+        "result caching",
+        "cross-workflow",
+        "provenance"
+      ],
+      "difficulty": "medium",
+      "source_page": "12",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "02_snakemake_TE3",
+      "paper_id": "02_snakemake",
+      "question": "Explain the technical approach Snakemake uses to optimize job scheduling and how it handles job submission overhead in cluster or cloud environments.",
+      "category": "technical",
+      "expected_answer": "Snakemake uses Mixed Integer Linear Programming (MILP) to solve the scheduling problem by defining an objective function and constraints related to resources and temporary files. To handle overhead in cluster or cloud environments, it utilizes graph partitioning to group multiple rules/jobs into a single submitted unit, which reduces the frequency and cost of job submissions.",
+      "expected_concepts": [
+        "Mixed Integer Linear Programming (MILP)",
+        "objective function",
+        "graph partitioning",
+        "job grouping",
+        "cluster/cloud overhead"
+      ],
+      "difficulty": "hard",
+      "source_page": "10, 13",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:10:51.776554"
+}

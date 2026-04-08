@@ -1,0 +1,209 @@
+{
+  "paper_id": "13_lsd_nepal",
+  "filename": "13_lsd_nepal.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "What are the epidemiological characteristics, potential sources, risk factors, and financial impacts of the 2022 Lumpy Skin Disease (LSD) outbreak in Nawalpur, Nepal?",
+    "methods": [
+      "Descriptive outbreak investigation",
+      "Analytical case-control study (1:1.5 ratio)",
+      "Face-to-face interviews using semistructured questionnaires",
+      "Univariable logistic regression analysis",
+      "Multivariable logistic regression analysis (using R Studio)",
+      "Geospatial visualization (using QGIS)"
+    ],
+    "findings": [
+      {
+        "finding": "The overall morbidity rate of LSD in the study area was 28.02%, with a mortality rate of 3.06%.",
+        "evidence": "n = 431/1,538 for morbidity and n = 47/1,538 for mortality.",
+        "page": 1
+      },
+      {
+        "finding": "The case fatality rate (CFR) was determined to be 10.90%.",
+        "evidence": "n = 47/431",
+        "page": 1
+      },
+      {
+        "finding": "Dry cattle, including pregnant cows and heifers, were the most affected animal groups.",
+        "evidence": "Morbidity in dry cattle was 47.62% compared to 31.24% in milking cattle.",
+        "page": 5
+      },
+      {
+        "finding": "The presence of clinical signs in neighboring farms was identified as the most significant risk factor.",
+        "evidence": "Multivariable analysis showed an Odds Ratio of 88.45 (95% CI: 13.27\u2013589.36) for symptoms in neighbor farms (p < 0.001).",
+        "page": 7
+      },
+      {
+        "finding": "The most common clinical signs were skin nodules, decreased milk production, and lameness.",
+        "evidence": "Observed in 97%, 87%, and 55% of case farms, respectively.",
+        "page": 6
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "A schematic layout of the index farm illustrating areas for animal roaming, feed storage, and forage cultivation relative to local roads.",
+        "page": 4
+      },
+      {
+        "id": "Figure 2",
+        "description": "A map showing the geographical distribution of the index case farm and other case farms across the Devchuli and Gaidakot municipalities in Nawalpur, Nepal.",
+        "page": 4
+      },
+      {
+        "id": "Figure 3",
+        "description": "The epidemic curve of the LSD outbreak showing the number of affected farms by date of onset from August to December 2022.",
+        "page": 5
+      },
+      {
+        "id": "Figure 4",
+        "description": "A bar chart representing the percentage of case farms (n=38) that exhibited specific clinical signs of LSD, such as skin nodules and lacrimation.",
+        "page": 6
+      },
+      {
+        "id": "Figure 5",
+        "description": "A comparison of probable risk factors (e.g., sharing feed, vector control, fencing) between case farms and noncase farms.",
+        "page": 6
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Distribution of the LSD outbreak across different municipalities in the Nawalpur district.",
+        "columns": [
+          "Municipalities",
+          "Number of animals",
+          "Number of sick animals",
+          "Number of dead animals",
+          "Morbidity (%)",
+          "Mortality (%)",
+          "Case fatality (%)"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "Epidemiological data (morbidity, mortality, case fatality) categorized by specific animal groups (milking cattle, dry cattle, calves, etc.).",
+        "columns": [
+          "Animal group",
+          "Number of animals",
+          "Number of sick animals",
+          "Number of dead animals",
+          "Morbidity (%)",
+          "Mortality (%)",
+          "Case fatality (%)"
+        ]
+      },
+      {
+        "id": "Table 3",
+        "description": "Results of the univariable logistic regression analysis for various potential risk factors.",
+        "columns": [
+          "Variables",
+          "Category",
+          "Cases (n = 38)",
+          "Noncases (n = 49)",
+          "OR (95% CI)",
+          "p values"
+        ]
+      },
+      {
+        "id": "Table 4",
+        "description": "Results of the multivariable logistic regression analysis showing the variables most significantly associated with the outbreak.",
+        "columns": [
+          "Variables",
+          "Odds ratio",
+          "95% CI",
+          "p value"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "Lumpy Skin Disease (LSD)",
+      "Lumpy Skin Disease Virus (LSDV)",
+      "Transboundary viral disease",
+      "Arthropod vectors",
+      "Morbidity rate",
+      "Mortality rate",
+      "Case fatality rate (CFR)",
+      "Index farm",
+      "Notifiable disease"
+    ],
+    "limitations": [
+      "Many previous outbreaks were not thoroughly investigated, resulting in limited background information.",
+      "Small sample size for the case-control study (n=87 total farms).",
+      "Case-control selection ratio (1:1.5) was based on expert opinion rather than statistical power due to time and budget constraints.",
+      "Potential for recall bias in data collected via phone interviews for noncase farms."
+    ],
+    "connections": [
+      "FAO Manual for Veterinarians (Tuppurainen et al.)",
+      "World Organization for Animal Health (WOAH) notification standards",
+      "Epidemiological studies from Thailand (Punyapornwithaya et al.), Jordan (Abutarbush et al.), and India (Sudhakar et al.)",
+      "Mathematical modeling studies on transmission routes (Magori-Cohen et al.)"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "13_lsd_nepal_FR1",
+      "paper_id": "13_lsd_nepal",
+      "question": "What were the overall morbidity, mortality, and case fatality rates recorded during the LSD outbreak in the study area?",
+      "category": "factual_recall",
+      "expected_answer": "The overall morbidity rate of LSD in the study area was 28.02%, while the mortality rate was 3.06%. Additionally, the case fatality rate (CFR) for the outbreak was calculated to be 10.90%, based on 47 deaths out of 431 sick animals.",
+      "expected_concepts": [
+        "morbidity rate 28.02%",
+        "mortality rate 3.06%",
+        "case fatality rate",
+        "10.90%",
+        "Nawalpur district"
+      ],
+      "difficulty": "easy",
+      "source_page": "1",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "13_lsd_nepal_CO2",
+      "paper_id": "13_lsd_nepal",
+      "question": "Based on the epidemiological data, which specific cattle group was most affected by the outbreak and what were the primary clinical manifestations observed?",
+      "category": "conceptual",
+      "expected_answer": "Dry cattle, including pregnant cows and heifers, were the most affected group with a morbidity rate of 47.62%, which was higher than that of milking cattle. The outbreak was primarily characterized by skin nodules, found in 97% of case farms, followed by a significant decrease in milk production and lameness.",
+      "expected_concepts": [
+        "dry cattle",
+        "morbidity",
+        "skin nodules",
+        "milk production",
+        "heifers",
+        "lameness"
+      ],
+      "difficulty": "medium",
+      "source_page": "5-6",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "13_lsd_nepal_TE3",
+      "paper_id": "13_lsd_nepal",
+      "question": "According to the multivariable logistic regression analysis, what was identified as the most significant risk factor for LSD transmission and what were its associated statistical metrics?",
+      "category": "technical",
+      "expected_answer": "The multivariable analysis identified the presence of clinical signs in neighboring farms as the most significant risk factor for the spread of LSD. This variable showed an Odds Ratio (OR) of 88.45, with a 95% Confidence Interval of 13.27\u2013589.36 and a statistical significance of p < 0.001.",
+      "expected_concepts": [
+        "multivariable logistic regression",
+        "Odds Ratio",
+        "neighboring farms",
+        "88.45",
+        "95% CI",
+        "p-value"
+      ],
+      "difficulty": "hard",
+      "source_page": "7",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T13:35:35.795357"
+}

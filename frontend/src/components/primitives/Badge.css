@@ -1,0 +1,143 @@
+/* Badge Primitive Component Styles */
+
+/* ========== Base Badge ========== */
+.badge {
+    /* Layout */
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+
+    /* Typography */
+    font-family: var(--font-sans);
+    font-weight: var(--weight-medium);
+    white-space: nowrap;
+    line-height: 1;
+
+    /* Appearance */
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+
+    /* Animation */
+    transition: all var(--trans-fast);
+}
+
+/* ========== Sizes ========== */
+
+/* Small: Compact badges for inline text */
+.badge-sm {
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--text-xs);
+}
+
+/* Medium: Default size */
+.badge-md {
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-sm);
+}
+
+/* ========== Variants ========== */
+
+/* Default: Neutral gray */
+.badge-default {
+    background: var(--bg-surface);
+    color: var(--text-main);
+    border-color: var(--border-subtle);
+}
+
+/* Primary: Purple accent - for active states, important labels */
+.badge-primary {
+    background: rgba(139, 92, 246, 0.15);
+    color: var(--accent-primary);
+    border-color: rgba(139, 92, 246, 0.3);
+}
+
+/* Success: Green - connected, completed, success states */
+.badge-success {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--accent-success);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+/* Warning: Amber - warnings, attention needed */
+.badge-warning {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--accent-warning);
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+/* Error: Red - errors, disconnected, failures */
+.badge-error {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--accent-error);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* ========== Modifiers ========== */
+
+/* Pill: Fully rounded edges */
+.badge-pill {
+    border-radius: var(--radius-full);
+}
+
+/* Dot: Status indicator with colored dot */
+.badge-dot {
+    padding-left: var(--space-2);
+}
+
+.badge-dot-indicator {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* Dot colors match variant */
+.badge-default .badge-dot-indicator {
+    background: var(--text-muted);
+}
+
+.badge-primary .badge-dot-indicator {
+    background: var(--accent-primary);
+    box-shadow: 0 0 6px rgba(139, 92, 246, 0.5);
+}
+
+.badge-success .badge-dot-indicator {
+    background: var(--accent-success);
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+    animation: pulse-success 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.badge-warning .badge-dot-indicator {
+    background: var(--accent-warning);
+    box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
+}
+
+.badge-error .badge-dot-indicator {
+    background: var(--accent-error);
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.5);
+    animation: pulse-error 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ========== Animations ========== */
+
+/* Pulse animation for success (connected) status */
+@keyframes pulse-success {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Pulse animation for error (disconnected) status */
+@keyframes pulse-error {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}

@@ -1,0 +1,2660 @@
+[
+  {
+    "id": "04_fastp_TE3",
+    "stage": "main",
+    "category": "technical",
+    "question": "How does fastp's methodology for adapter detection differ between single-end and paired-end sequencing data?",
+    "papers": [
+      "04_fastp.pdf"
+    ],
+    "paper_status": {
+      "04_fastp.pdf": "OK (32737 chars)"
+    },
+    "flag_reason": "The expected answer includes 'base correction' as a key feature of the paired-end methodology, but this specific fact is absent from all three LLM runs. Additionally, the runs describe the single-end method as 'assembling high-frequency read tails' rather than using the specific term 'K-mer based'.",
+    "concepts_in_validation": "3/6",
+    "concepts_verified": "6/6",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "K-mer based",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "iles, per-cycle base contents, adapter trimming results and k-mer counts. These values will be merged after all reads are pro"
+      },
+      {
+        "concept": "automatic adapter detection",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "n of quality statistics altered by preprocessing. fastp can automatically detect adapter sequences for single-end and paired- end"
+      },
+      {
+        "concept": "single-end",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ssing. fastp can automatically detect adapter sequences for single-end and paired- end Illumina data. In contrast with the aforeme"
+      },
+      {
+        "concept": "overlap-analysis",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ols like Cutadapt and Trimmomatic, a clear advantage of the overlap-analysis-based method is that it can trim adapters with few bases in"
+      },
+      {
+        "concept": "paired-end",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "018, i884–i890 doi: 10.1093/bioinformatics/bty560 ECCB 2018 paired-end reads. However, because AfterQC was developed in Python, it"
+      },
+      {
+        "concept": "base correction",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ra-fast tool to perform quality control, read filtering and base correction for FASTQ data. It includes most features of FASTQC þ Cutad"
+      }
+    ]
+  },
+  {
+    "id": "07_salmon_CO2",
+    "stage": "main",
+    "category": "conceptual",
+    "question": "How does Salmon's method of bias correction specifically improve the outcomes of differential expression (DE) analysis?",
+    "papers": [
+      "07_salmon.pdf"
+    ],
+    "paper_status": {
+      "07_salmon.pdf": "OK (65291 chars)"
+    },
+    "flag_reason": "The runs contradict each other on the upper bound of sensitivity (250% in Runs 1 and 2 vs 450% in Run 3). Additionally, the specific 'factor of ~2.6' mentioned in the expected answer is absent from all three LLM runs.",
+    "concepts_in_validation": "4/5",
+    "concepts_verified": "5/5",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "fragment GC content bias",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "bias models rich enough to capture important  effects, like fragment GC content bias. When uncorrected, these biases can lead to, e.g., high  fa"
+      },
+      {
+        "concept": "technical artifacts",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "scripts with false  quantification differences arising from technical artifacts. SEQC data— The consistency analysis presented in Supplemen"
+      },
+      {
+        "concept": "false-positive",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "higher, at the same FDRs. Likewise,  Salmon produces fewer false-positive differential expression calls in comparisons that are  expe"
+      },
+      {
+        "concept": "differential expression analysis",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "y of abundance estimates  and the reliability of subsequent differential expression analysis. Salmon combines a new dual- phase parallel inference algor"
+      },
+      {
+        "concept": "reliability",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ially improves the accuracy of abundance estimates  and the reliability of subsequent differential expression analysis. Salmon comb"
+      }
+    ]
+  },
+  {
+    "id": "10_cutadapt_CO2",
+    "stage": "main",
+    "category": "conceptual",
+    "question": "How does the implementation of Cutadapt balance the trade-off between user accessibility and computational efficiency?",
+    "papers": [
+      "10_cutadapt.pdf"
+    ],
+    "paper_status": {
+      "10_cutadapt.pdf": "OK (10953 chars)"
+    },
+    "flag_reason": "The expected answer contains specific facts regarding I/O bottlenecks and parsing time that are absent from all three LLM runs.",
+    "concepts_in_validation": "3/5",
+    "concepts_verified": "3/5",
+    "verdict": "MOSTLY VERIFIED",
+    "concept_details": [
+      {
+        "concept": "Python implementation",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "ly detected.  Implementation  Cutadapt is mainly written in Python, but for  speed, the alignment algorithm is implemented  in"
+      },
+      {
+        "concept": "C extensions",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "alignment speed",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "Cutadapt is mainly written in Python, but for  speed, the alignment algorithm is implemented  in C as a Python extension module"
+      },
+      {
+        "concept": "I/O bottleneck",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "parsing",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "pters. In practice, other op- erations, such as reading and parsing the input  files, take up more than half of the time. With"
+      }
+    ]
+  },
+  {
+    "id": "12_hpai_netherlands_CO2",
+    "stage": "main",
+    "category": "conceptual",
+    "question": "How do the clinical presentations and mortality detection thresholds of HPAI differ between chicken populations (Galliformes) and duck populations (Anseriformes) according to the study?",
+    "papers": [
+      "12_hpai_netherlands.pdf"
+    ],
+    "paper_status": {
+      "12_hpai_netherlands.pdf": "OK (80417 chars)"
+    },
+    "flag_reason": "The expected answer contains several specific statistical percentages (66.7%, 100%, 55.0–67.8%, 80%, 53.8%) that are entirely absent from all three LLM runs, which instead provide qualitative descriptions.",
+    "concepts_in_validation": "4/6",
+    "concepts_verified": "4/6",
+    "verdict": "MOSTLY VERIFIED",
+    "concept_details": [
+      {
+        "concept": "nervous/locomotor signs",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "reproductive tract signs",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ncreased for meat-type poultry. Neurological, locomotor and reproductive tract signs were often observed in ducks, whereas laying- and meat-type"
+      },
+      {
+        "concept": "mucosal/skin signs",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "Mortality Ratio (MR)",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "in ducks and meat-type poultry than in layers. For ducks, a mortality ratio (MR) > 3, compared to the average mortality of the previous week"
+      },
+      {
+        "concept": "Galliformes",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "also between domestic poultry species, i.e., gallinaeceous (Galliformes) poultry, such as chickens and turkeys, and domestic ducks"
+      },
+      {
+        "concept": "Anseriformes",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "poultry, such as chickens and turkeys, and domestic ducks (Anseriformes), have been described previously [12,13]. Also, age-related"
+      }
+    ]
+  },
+  {
+    "id": "15_rabies_tanzania_CO2",
+    "stage": "main",
+    "category": "conceptual",
+    "question": "Explain how spatial heterogeneity in vaccination coverage impacts the persistence of rabies even when average coverage targets are met.",
+    "papers": [
+      "15_rabies_tanzania.pdf"
+    ],
+    "paper_status": {
+      "15_rabies_tanzania.pdf": "OK (118757 chars)"
+    },
+    "flag_reason": "The expected answer contains specific technical details (power mean susceptibility models, 2.6 times greater) that are absent from all three LLM runs.",
+    "concepts_in_validation": "3/5",
+    "concepts_verified": "5/5",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "spatial heterogeneity",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "1  Reducing spatial heterogeneity in coverage improves the effectiveness of dog  vaccination"
+      },
+      {
+        "concept": "power mean susceptibility",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "Fig. 3A, Fig. S5A).   We find that incidence increases with power mean susceptibility in bordering and non- bordering villages only when prior in"
+      },
+      {
+        "concept": "focal incidence",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ion connectivity. Removing the masking effects of prior non-focal incidence shows that,  for the same average prior non-focal (wider-di"
+      },
+      {
+        "concept": "homogeneous distribution",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "rI: 1.3-1.6) times greater  than if prior coverage had been homogeneous at 40%. If we further increase heterogeneity by  assuming h"
+      },
+      {
+        "concept": "rabies persistence",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "ves the effectiveness of dog  vaccination campaigns against rabies  Short title: Reducing spatial heterogeneity improves rabie"
+      }
+    ]
+  },
+  {
+    "id": "17_brucellosis_ethiopia_TE3",
+    "stage": "main",
+    "category": "technical",
+    "question": "Describe the laboratory diagnostic sequence and the statistical methods used to identify significant risk factors for brucellosis in this study.",
+    "papers": [
+      "17_brucellosis_ethiopia.pdf"
+    ],
+    "paper_status": {
+      "17_brucellosis_ethiopia.pdf": "OK (55022 chars)"
+    },
+    "flag_reason": "The expected concept 'R software' is absent from all three LLM runs, suggesting it may be a hallucination in the ground truth or a detail not present in the provided context.",
+    "concepts_in_validation": "5/6",
+    "concepts_verified": "6/6",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "Rose Bengal Plate Test (RBPT)",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "les were screened for anti- Brucella spp. antibodies using  Rose Bengal Plate Test (RBPT) and further confirmed using a competitive  enzyme-linked im"
+      },
+      {
+        "concept": "cELISA",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "med using a competitive  enzyme-linked immunosorbent assay (cELISA). A structured questionnaire  was used to collect the bioda"
+      },
+      {
+        "concept": "multivariable logistic regression",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ella spp.  seropositivity (p < 0.05; Table 1). In the final multivariable logistic regression model, all variables  with a value of p less than or equal"
+      },
+      {
+        "concept": "R software",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "atory were entered into Microsoft  Excel and analyzed using R software version R-3.3.0. Univariate  logistic regression model was"
+      },
+      {
+        "concept": "screening",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "test  sera samples from sheep and goats. RBPT was used as a screening test  because of its high sensitivity (20). Competitive ELI"
+      },
+      {
+        "concept": "serum samples",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "i Pastoral region,” Eastern Ethiopia. In this study,  1,000 serum samples were screened for anti- Brucella spp. antibodies using  Ros"
+      }
+    ]
+  },
+  {
+    "id": "20_lsd_review_CO2",
+    "stage": "main",
+    "category": "conceptual",
+    "question": "How does the clinical impact of Lumpy Skin Disease Virus (LSDV) differ in terms of its spread within a herd versus its lethality?",
+    "papers": [
+      "20_lsd_review.pdf"
+    ],
+    "paper_status": {
+      "20_lsd_review.pdf": "OK (34255 chars)"
+    },
+    "flag_reason": "The specific clinical symptoms (fever, skin nodules, and decreased milk production) mentioned in the expected answer are absent from all three LLM runs, suggesting they may not be present in the source text or are unnecessary for the specific comparison requested.",
+    "concepts_in_validation": "4/5",
+    "concepts_verified": "5/5",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "high morbidity",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "tion  [2]. In recent times, LSD has gained recognition as a highly  destructive and emerging peril to sizable domesticated r"
+      },
+      {
+        "concept": "low mortality",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "- tion. The LSDV genome appeared stable for many years,  following its initial description in Zambia in 1929 and sub- seque"
+      },
+      {
+        "concept": "100% morbidity",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "e is typically less than 10%, illness morbid- ity can reach 100%. Effects of LSD on cattle health The LSD-infected calves ha"
+      },
+      {
+        "concept": "10% mortality",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "41 °C. Although  the mortality rate is typically less than 10%, illness morbid- ity can reach 100%. Effects of LSD on catt"
+      },
+      {
+        "concept": "clinical symptoms",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "y, it's worth noting that  calves often exhibit more severe clinical symptoms com - pared to adult cattle [33]. Environmental conditions"
+      }
+    ]
+  },
+  {
+    "id": "24_chicken_microbiome_TE3",
+    "stage": "main",
+    "category": "technical",
+    "question": "Using the ecological modeling metrics employed in the study, what are the primary assembly processes for bacterial versus fungal communities in the chicken gut?",
+    "papers": [
+      "24_chicken_microbiome.pdf"
+    ],
+    "paper_status": {
+      "24_chicken_microbiome.pdf": "OK (88320 chars)"
+    },
+    "flag_reason": "Fewer than half of the expected concepts appear in the LLM runs. Specifically, the metrics (beta nearest taxon index, βNTI, and RCBray) are absent from all three responses despite being listed as key concepts.",
+    "concepts_in_validation": "2/5",
+    "concepts_verified": "4/5",
+    "verdict": "MOSTLY VERIFIED",
+    "concept_details": [
+      {
+        "concept": "beta nearest taxon index",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "e vegan [ 75]. Statistical analyses for alpha diversity and beta diversity were performed using the Kruskal–Wallis test/Wilc"
+      },
+      {
+        "concept": "βNTI",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "of different ecological processes (heterogeneous selection: βNTI < −2, homogeneous selection: βNTI > 2, dispersal limitation"
+      },
+      {
+        "concept": "deterministic processes",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "nity types after 1 DPH. The bacteriome was more impacted by deterministic processes, and the mycobiome was more affected by stochastic processe"
+      },
+      {
+        "concept": "stochastic processes",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "inistic processes (56.7%) played a more important role than stochastic processes (43.3%) in bacterial communities, and stochastic processes"
+      },
+      {
+        "concept": "RCBray",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      }
+    ]
+  },
+  {
+    "id": "26_gut_meat_quality_CO2",
+    "stage": "main",
+    "category": "conceptual",
+    "question": "How do short-chain fatty acids (SCFAs) bridge the gap between dietary fiber intake and the regulation of host fat accumulation and metabolism?",
+    "papers": [
+      "26_gut_meat_quality.pdf"
+    ],
+    "paper_status": {
+      "26_gut_meat_quality.pdf": "OK (79316 chars)"
+    },
+    "flag_reason": "The expected answer contains specific signaling pathways (mTOR, PPAR, TLR4) that are absent from all three LLM runs, suggesting these details may be missing from the source context or are potentially hallucinated in the ground truth.",
+    "concepts_in_validation": "3/6",
+    "concepts_verified": "6/6",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "microbial fermentation",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "rointestinal tract of animals harbors a diverse and complex microbial community that plays a vital role in the digestion and abso"
+      },
+      {
+        "concept": "GPR43",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "lood-brain barrier (Frost et al., 2014). Acetate- dependent GPR43 stimulation in the white adipose tissue improved glucose an"
+      },
+      {
+        "concept": "mTOR",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ing host chronic inﬂammatory responses through the TLR4 and mTOR signaling pathways. This also signiﬁcantly upregulated the"
+      },
+      {
+        "concept": "PPAR",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "via increasing fatty acid uptake and fatty acid oxidation. PPARα was also found to be associated with the acetate-reduced i"
+      },
+      {
+        "concept": "lipid metabolism",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "timulation in the white adipose tissue improved glucose and lipid metabolism (Kimura et al., 2013). High-ﬁber diet (produce high amounts"
+      },
+      {
+        "concept": "signaling pathways",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "ost chronic inﬂammatory responses through the TLR4 and mTOR signaling pathways. This also signiﬁcantly upregulated the expression"
+      }
+    ]
+  },
+  {
+    "id": "27_inap_pipeline_CO2",
+    "stage": "main",
+    "category": "conceptual",
+    "question": "How does the iNAP system facilitate the visualization and downstream interpretation of the generated ecological networks?",
+    "papers": [
+      "27_inap_pipeline.pdf"
+    ],
+    "paper_status": {
+      "27_inap_pipeline.pdf": "OK (43112 chars)"
+    },
+    "flag_reason": "The expected answer mentions specific visualization lenses (taxonomic groups and module compartments) that are absent from all three LLM runs; the runs instead focus on statistical tools (Mantel test, Module-EigenGene) and topological reports for downstream interpretation.",
+    "concepts_in_validation": "3/5",
+    "concepts_verified": "5/5",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "Cytoscape",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "with different visualization approaches, that is, Gephi or Cytoscape. Method 2: SPIEC ‐EASI 4. SpiecEasi calculation . The param"
+      },
+      {
+        "concept": "Gephi",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ordingly, with different visualization approaches, that is, Gephi or Cytoscape. Method 2: SPIEC ‐EASI 4. SpiecEasi calculatio"
+      },
+      {
+        "concept": "taxonomic group",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "pe (A) and Gephi (B). The nodes were colored with different taxonomic groups (A) and their module compartments (B). iNAP, integrated ne"
+      },
+      {
+        "concept": "module compartments",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "were colored with different taxonomic groups (A) and their module compartments (B). iNAP, integrated network analysis pipeline INTEGRATED"
+      },
+      {
+        "concept": "network visualization",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "uary 2022 DOI: 10.1002/imt2.13 PROTOCOL iNAP: An integrated network analysis pipeline for microbiome studies Kai Feng 1 | Xi Pe"
+      }
+    ]
+  },
+  {
+    "id": "31_amr_one_health_CO2",
+    "stage": "main",
+    "category": "conceptual",
+    "question": "How does the metabolism and excretion of antimicrobials in animals contribute to environmental concerns within the One Health framework?",
+    "papers": [
+      "31_amr_one_health.pdf"
+    ],
+    "paper_status": {
+      "31_amr_one_health.pdf": "OK (40570 chars)"
+    },
+    "flag_reason": "The expected answer contains a specific fact (that the volume of antimicrobials used in animals is greater than in humans) which is absent from all three LLM runs, suggesting it may not be supported by the source text.",
+    "concepts_in_validation": "5/5",
+    "concepts_verified": "2/5",
+    "verdict": "NEEDS REVIEW",
+    "concept_details": [
+      {
+        "concept": "One Health",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "27.pdf REVIEW ARTICLE Open Access Antimicrobial resistance: One Health approach Maria Elena Velazquez-Meza , Miguel Galarde-López"
+      },
+      {
+        "concept": "75%–90%",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "u - mented that animal excretes a significant percent- age (75%–90%) of antimicrobials without being  metabolized and dispersed"
+      },
+      {
+        "concept": "unmetabolized",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "environmental dispersion",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "animal excretion",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      }
+    ]
+  },
+  {
+    "id": "32_amr_livestock_environment_CO2",
+    "stage": "main",
+    "category": "conceptual",
+    "question": "How do the interconnected domains of the One Health framework contribute to the cycle of antimicrobial resistance dissemination?",
+    "papers": [
+      "32_amr_livestock_environment.pdf"
+    ],
+    "paper_status": {
+      "32_amr_livestock_environment.pdf": "OK (50028 chars)"
+    },
+    "flag_reason": "The specific term 'global resistome' and the '30-90%' excretion rate mentioned in the expected answer are absent from all three LLM runs.",
+    "concepts_in_validation": "4/5",
+    "concepts_verified": "5/5",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "One Health",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ing it a challenging issue to address. AR is regarded as an One Health issue, as  it has been found that livestock, human, and env"
+      },
+      {
+        "concept": "livestock reservoirs",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "9 pISSN 2672-0191  eISSN 2055-0391 Antibiotic resistance in livestock,  environment and humans: One  Health perspective Sriniwas"
+      },
+      {
+        "concept": "global resistome",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "tract Antibiotic resistance (AR) is a complex, multifaceted global health issue that poses a serious  threat to livestock, hum"
+      },
+      {
+        "concept": "antibiotic excretion",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "org/10.5187/jast.2023.e129 pISSN 2672-0191  eISSN 2055-0391 Antibiotic resistance in livestock,  environment and humans: One  Heal"
+      },
+      {
+        "concept": "AR dissemination",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": ". Environmental contamination is also a major factor in the dissemination of antibiotic- resistant bacteria and genes. Antibiotic-res"
+      }
+    ]
+  },
+  {
+    "id": "33_amr_food_animals_CO2",
+    "stage": "main",
+    "category": "conceptual",
+    "question": "How do antibiotic-resistant bacteria (ARB) and genes (ARGs) originate in food animal farms and eventually reach the human population through different environmental and occupational pathways?",
+    "papers": [
+      "33_amr_food_animals.pdf"
+    ],
+    "paper_status": {
+      "33_amr_food_animals.pdf": "OK (101210 chars)"
+    },
+    "flag_reason": "The expected answer contains specific facts (50% MDR E. coli prevalence, 10 km travel distance) that are absent from all three LLM runs.",
+    "concepts_in_validation": "6/6",
+    "concepts_verified": "6/6",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "bioaerosols",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "f some ARGs (such as tet, sul, erm, bla, mec, etc.) in farm bioaerosols are up to 2.3 ∼10.6 log copies/m3 (Sancheza et al., 2016; S"
+      },
+      {
+        "concept": "occupational risk",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "laughterhouses are a revisor of MDR bacteria, indicating an occupational risk to workers (Aworh et al., 2021). Aworh et al. (2021) analyz"
+      },
+      {
+        "concept": "food chain",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "milk (Balemi et al., 2021). These ﬁndings suggest that the food chain of animal products has been one of the important sources of"
+      },
+      {
+        "concept": "environmental contamination",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "ironment. Zhou et al. investigated the excretion masses and environmental occurrence of 50 antibiotics of 11 types in diﬀerent livest"
+      },
+      {
+        "concept": "transmission pathways",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "ao et al., 2022). Therefore, we should pay attention to the transmission of ARGs by bacteria and phages in wastewater treatment faci"
+      },
+      {
+        "concept": "direct contact",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "d ARGs originated in farms to humans, including direct or indirect contact with animals, manure or products, and inhalation of bioaero"
+      }
+    ]
+  },
+  {
+    "id": "35_isse_framework_amr_CO2",
+    "stage": "main",
+    "category": "conceptual",
+    "question": "Why did the authors conclude that existing evaluation tools like ATLASS and NEOH were insufficient for assessing the full value of integrated surveillance systems?",
+    "papers": [
+      "35_isse_framework_amr.pdf"
+    ],
+    "paper_status": {
+      "35_isse_framework_amr.pdf": "OK (65409 chars)"
+    },
+    "flag_reason": "The specific number of tools (12) and the concept of 'decision-making' mentioned in the expected answer are absent from all three LLM runs, which may indicate a hallucination or overly specific detail in the ground truth.",
+    "concepts_in_validation": "3/5",
+    "concepts_verified": "3/5",
+    "verdict": "MOSTLY VERIFIED",
+    "concept_details": [
+      {
+        "concept": "review of 12 existing tools",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "io Alvarez, VISAVET Health Surveillance Centre (UCM), Spain Reviewed by: Lucie Collineau, Agence Nationale de Sécurité Sanitai"
+      },
+      {
+        "concept": "none specifically developed for OH integrated surveillance",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "coverage gaps in evaluation levels",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "decision-making",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "expertise, [3] generate actionable knowledge, [4] inﬂu ence decision-making, and [5] positively impact outcomes. For each component, a"
+      },
+      {
+        "concept": "impact on outcomes",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "nowledge, [4] inﬂu ence decision-making, and [5] positively impact outcomes. For each component, a set of evaluation questions"
+      }
+    ]
+  },
+  {
+    "id": "36_integrated_amr_surveillance_TE3",
+    "stage": "main",
+    "category": "technical",
+    "question": "Describe the statistical methodology and the number of variables used to generate the typology of the identified surveillance systems.",
+    "papers": [
+      "36_integrated_amr_surveillance.pdf"
+    ],
+    "paper_status": {
+      "36_integrated_amr_surveillance.pdf": "OK (95377 chars)"
+    },
+    "flag_reason": "The expected answer contains specific facts ('four typology clusters' and 'informational and structural integration') that are absent from all three LLM runs, suggesting they may be results rather than part of the methodology requested or are difficult to locate.",
+    "concepts_in_validation": "4/6",
+    "concepts_verified": "5/6",
+    "verdict": "MOSTLY VERIFIED",
+    "concept_details": [
+      {
+        "concept": "39 variables",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "integrated surveillance  systems were assessed according to 39 variables related to their organization and functioning, the socio-ec"
+      },
+      {
+        "concept": "16 variables for MCA/HCA",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "Multiple-correspondence analysis (MCA)",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "aracteristics of the integrated surveillance systems, and a multiple-correspondence analysis  (MCA) followed by a hierarchical cluster analysis"
+      },
+      {
+        "concept": "Hierarchical cluster analysis (HCA)",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "and a multiple-correspondence analysis  (MCA) followed by a hierarchical cluster analysis (HCA) to identify potential typology for surveillance systems. Re"
+      },
+      {
+        "concept": "four typology clusters",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "evidenced. The 14 surveillance systems can be grouped into four distinct clusters, characterized  by integration level in t"
+      },
+      {
+        "concept": "informational and structural integration",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "income countries and vary  in terms of integration, both at informational and structural levels. The different systems combine inform"
+      }
+    ]
+  },
+  {
+    "id": "37_data_driven_one_health_CO2",
+    "stage": "main",
+    "category": "conceptual",
+    "question": "How does the One Health multisectoral framework theoretically reduce disease incidence and economic damage during a zoonotic spillover event?",
+    "papers": [
+      "37_data_driven_one_health.pdf"
+    ],
+    "paper_status": {
+      "37_data_driven_one_health.pdf": "OK (26753 chars)"
+    },
+    "flag_reason": "The expected answer contains a specific fact (Sierra Leone's GDP drop during the Ebola epidemic) that is absent from all three LLM runs, and the specific concept of 'amplification' did not appear in the runs.",
+    "concepts_in_validation": "4/5",
+    "concepts_verified": "4/5",
+    "verdict": "MOSTLY VERIFIED",
+    "concept_details": [
+      {
+        "concept": "early detection",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "nd improving local, na- tional, and global surveillance for early detection of zoonotic disease events and facilitating prompt sharing"
+      },
+      {
+        "concept": "integrated surveillance",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "pathogenic avian inﬂuenza. Timely implementation of robust integrated disease surveillance and monitoring, urban planning, and he"
+      },
+      {
+        "concept": "amplification",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "om Karesh et al.  [20]. (A)  Transmission of infection and  amplification in people (bright red) occurs after a pathogen from  wild a"
+      },
+      {
+        "concept": "economic damage",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "disease incidence",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "to people. ( B) Early detection and control efforts reduce  disease incidence in people (light blue) and animals (dark green). Spillover"
+      }
+    ]
+  },
+  {
+    "id": "39_zoonotic_southeast_asia_TE3",
+    "stage": "main",
+    "category": "technical",
+    "question": "Describe the systematic methodology used to select the final 95 publications from the initial search results, including the databases and criteria involved.",
+    "papers": [
+      "39_zoonotic_southeast_asia.pdf"
+    ],
+    "paper_status": {
+      "39_zoonotic_southeast_asia.pdf": "OK (78037 chars)"
+    },
+    "flag_reason": "The expected concept 'One Health approach' is absent from all three LLM runs, suggesting it may be related to the analysis phase rather than the selection methodology or is a detail the models consistently overlooked.",
+    "concepts_in_validation": "5/6",
+    "concepts_verified": "4/6",
+    "verdict": "MOSTLY VERIFIED",
+    "concept_details": [
+      {
+        "concept": "2,329 articles",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "heast Asia 3.1.1.  Article finding and screening A total of 2,329 articles were retrieved from PubMed  (n = 1043), Web of Science ( n"
+      },
+      {
+        "concept": "95 publications",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "r the results not being presented  clearly ( n = 84). Thus, 95 publications were included  in the final qualitative synthesis ( Figure"
+      },
+      {
+        "concept": "inclusion/exclusion criteria",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "PubMed/Web of Science/Science Direct",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "One Health approach",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": ". Therefore, further epidemiological inves - tigation using One health approach is necessary to  reduce the gaps in disease surveillance an"
+      },
+      {
+        "concept": "qualitative synthesis",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "n = 84). Thus, 95 publications were included  in the final qualitative synthesis ( Figure 1 ). 3.1.2.  Descriptions of 358 articles Most of"
+      }
+    ]
+  },
+  {
+    "id": "40_animal_agriculture_one_health_CO2",
+    "stage": "main",
+    "category": "conceptual",
+    "question": "How does animal agriculture facilitate the development and transmission of antimicrobial resistance (AMR) from farms to the human population?",
+    "papers": [
+      "40_animal_agriculture_one_health.pdf"
+    ],
+    "paper_status": {
+      "40_animal_agriculture_one_health.pdf": "OK (138381 chars)"
+    },
+    "flag_reason": "The expected answer includes 'vertical transmission' and the key concept 'non-therapeutic use', both of which are absent from all three LLM runs. Additionally, 'growth promotion' appears in only one of the three runs.",
+    "concepts_in_validation": "3/5",
+    "concepts_verified": "3/5",
+    "verdict": "MOSTLY VERIFIED",
+    "concept_details": [
+      {
+        "concept": "growth promotion",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "r than infection treatment, such as  disease prevention and growth promotion, contributing to the huge  volumes of their usage [27]. Rec"
+      },
+      {
+        "concept": "horizontal gene transfer (HGT)",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "environmental contamination",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "robial stewardship. Finally, we touch upon additional major environmental and health factors impacted  by animal agriculture within t"
+      },
+      {
+        "concept": "non-therapeutic use",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "selective pressure",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "have the potential to persist in the  environment, exerting selective pressure for the development of resis - tance in environmental bacte"
+      }
+    ]
+  },
+  {
+    "id": "40_animal_agriculture_one_health_FR1",
+    "stage": "main",
+    "category": "factual_recall",
+    "question": "What percentage of all human pathogens and emerging diseases affecting humans are estimated to be zoonotic in origin?",
+    "papers": [
+      "40_animal_agriculture_one_health.pdf"
+    ],
+    "paper_status": {
+      "40_animal_agriculture_one_health.pdf": "OK (138381 chars)"
+    },
+    "flag_reason": "The expected answer includes 'one billion cases' as a key concept, but this fact was absent from all three LLM runs, likely because it was not requested by the specific question.",
+    "concepts_in_validation": "3/4",
+    "concepts_verified": "4/4",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "60% of human pathogens",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "ce.  2. Bacterial zoonotic infections  It is estimated that 60% of all human pathogens and 75% of emerging  diseases affect"
+      },
+      {
+        "concept": "75% of emerging diseases",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "ctions  It is estimated that 60% of all human pathogens and 75% of emerging  diseases affecting humans are zoonotic [35]. M"
+      },
+      {
+        "concept": "zoonotic",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ons by elaborating on how modern animal agriculture affects zoonotic in - fections, specifically those of bacterial origin, and"
+      },
+      {
+        "concept": "one billion cases",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "impacts particularly in LMICs. It is estimated  that about one billion cases of zoonoses occur worldwide each year [37].  Animal agricul"
+      }
+    ]
+  },
+  {
+    "id": "41_salmonella_wgs_amr_CO2",
+    "stage": "main",
+    "category": "conceptual",
+    "question": "Based on the findings, how do the antimicrobial resistance (AMR) profiles and serovar distributions differ between Salmonella found in imported raw chicken versus imported edible leaves?",
+    "papers": [
+      "41_salmonella_wgs_amr.pdf"
+    ],
+    "paper_status": {
+      "41_salmonella_wgs_amr.pdf": "OK (56715 chars)"
+    },
+    "flag_reason": "The runs contradict each other on the specific number of serovars identified in edible leaves (Run 1 and 3 say 29, while Run 2 says 33). Additionally, the expected answer contains specific details (the origin 'Brazil' and a reference to 'Figure 1') that are absent from all three LLM runs.",
+    "concepts_in_validation": "5/5",
+    "concepts_verified": "4/5",
+    "verdict": "MOSTLY VERIFIED",
+    "concept_details": [
+      {
+        "concept": "multidrug resistance (MDR)",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "S. Heidelberg",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "total of 16 serovars were detected,  the most common being S. Heidelberg (n  =  138, 60%)  followed by S. Minnesota (n  = 22, 9%) an"
+      },
+      {
+        "concept": "prevalence",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ndriksen et al., 2019; Neuert et al., 2018). These data  on prevalence of AMR in food products are particularly in- formative when"
+      },
+      {
+        "concept": "raw chicken",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "rminants (AMR genes) of Salmonella enterica  recovered from raw chicken and ready- to- eat leaves  imported into England between 20"
+      },
+      {
+        "concept": "edible leaves",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ons: Resistance was rare among the Salmonella isolates from edible leaves  but common (including MDR) among those from raw chicken. S"
+      }
+    ]
+  },
+  {
+    "id": "41_salmonella_wgs_amr_TE3",
+    "stage": "main",
+    "category": "technical",
+    "question": "What bioinformatics pipeline and specific quantitative threshold did the researchers use to establish genetic relatedness between Salmonella isolates?",
+    "papers": [
+      "41_salmonella_wgs_amr.pdf"
+    ],
+    "paper_status": {
+      "41_salmonella_wgs_amr.pdf": "OK (56715 chars)"
+    },
+    "flag_reason": "The expected answer contains specific facts (MOST and Illumina HiSeq 2500) that are absent from all three LLM runs, suggesting they may be overly specific or not directly related to the primary question about genetic relatedness.",
+    "concepts_in_validation": "4/6",
+    "concepts_verified": "6/6",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "SNP typing",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "f  the 346 isolates) belonged to ‘uncommon’ serovars where  SNP typing was not available for further analysis. The re - lationship"
+      },
+      {
+        "concept": "≤5 SNPs",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ST was assessed by pairwise SNP differences: isolates with  ≤5 SNPs difference from each other were considered to be  indisting"
+      },
+      {
+        "concept": "KmerID",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "(Bolger  et al.,  2014). As previously described, the UKHSA KmerID  pipeline (https://github.com/phe- bioin forma tics/kmerid)"
+      },
+      {
+        "concept": "MOST",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "using the Achtman seven  gene scheme (Achtman et al., 2012; MOST, https://github. com/phe- bioin forma tics/MOST; Tewolde et"
+      },
+      {
+        "concept": "Illumina HiSeq 2500",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "sing the  NexteraXT (Illumina Inc) and sequenced using the  Illumina HiSeq 2500 platform with 2 × 100 bp reads  (Illumina Inc). Short reads"
+      },
+      {
+        "concept": "pairwise SNP difference",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "en isolates within an individual eBG or  ST was assessed by pairwise SNP differences: isolates with  ≤5 SNPs difference from each other were co"
+      }
+    ]
+  },
+  {
+    "id": "42_campylobacter_wgs_thailand_TE3",
+    "stage": "main",
+    "category": "technical",
+    "question": "Describe the bioinformatic tools and methods used for the de novo assembly and the subsequent identification of antimicrobial resistance genes and virulence factors.",
+    "papers": [
+      "42_campylobacter_wgs_thailand.pdf"
+    ],
+    "paper_status": {
+      "42_campylobacter_wgs_thailand.pdf": "OK (65021 chars)"
+    },
+    "flag_reason": "The expected answer contains specific facts (Kmerfinder and Illumina MiSeq) that are absent from all three LLM runs, suggesting potential hallucinations in the ground truth or issues with document retrieval for those specific details.",
+    "concepts_in_validation": "3/5",
+    "concepts_verified": "4/5",
+    "verdict": "MOSTLY VERIFIED",
+    "concept_details": [
+      {
+        "concept": "SPAdes",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "., 2014 ). The paird-end reads were de novo assembled using SPAdes program incorporated in Gal- axy version 3.15.4 platform ("
+      },
+      {
+        "concept": "ResFinder",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": ", 2018). Antimicrobial resistance genes were detected using ResFinder tool (ver- sion 4.1) ( https://cge.food.dtu.dk/services/Res"
+      },
+      {
+        "concept": "VFDB",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "Kmerfinder",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "der tools (version 3.2) ( https://cge.food. dtu.dk/services/KmerFinder/) (accessed on June, 2023) (Hasman et al., 2014) was used f"
+      },
+      {
+        "concept": "Illumina MiSeq",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "embly The genomic DNA was sequenced using MiSeq plat- form (Illumina) generating paired-end reads by a private company (Macrogen"
+      }
+    ]
+  },
+  {
+    "id": "43_esbl_ecoli_food_CO2",
+    "stage": "main",
+    "category": "conceptual",
+    "question": "How does the paper support the claim that ESBL-producing E. coli transmission constitutes a cycle between animals, the environment, and humans?",
+    "papers": [
+      "43_esbl_ecoli_food.pdf"
+    ],
+    "paper_status": {
+      "43_esbl_ecoli_food.pdf": "OK (55814 chars)"
+    },
+    "flag_reason": "The specific concept 'plasmid backbones' is absent from all three LLM runs, which instead refer to 'clonal lineages' or 'genetic similarities'. This suggests the ground truth may contain a specific detail that is either a hallucination or not easily extracted by the models.",
+    "concepts_in_validation": "4/5",
+    "concepts_verified": "4/5",
+    "verdict": "MOSTLY VERIFIED",
+    "concept_details": [
+      {
+        "concept": "transmission pathways",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "com- passes a multifaceted landscape, elucidating intricate transmission pathways implicated in antimi- crobial use within animal husbandry s"
+      },
+      {
+        "concept": "plasmid backbones",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "of ESBL-producing E. coli, plasmid analysis showed that the plasmid backbones across various lineages exhibit significant similarity and"
+      },
+      {
+        "concept": "environmental contamination",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "ion routes of ESBL-producing E. coli strains. Additionally, environmental con- tamination emerges as a critical facet, with the aquat"
+      },
+      {
+        "concept": "animal-to-human",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "genetic similarity",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "als and animal- derived foods, with some studies indicating genetic similarities between these isolates and those found in huma"
+      }
+    ]
+  },
+  {
+    "id": "44_eu_amr_report_2022_CO2",
+    "stage": "main",
+    "category": "conceptual",
+    "question": "Based on the reported resistance levels in 2021-2022, what is the clinical implication regarding the use of fluoroquinolones for treating human Campylobacter infections?",
+    "papers": [
+      "44_eu_amr_report_2022.pdf"
+    ],
+    "paper_status": {
+      "44_eu_amr_report_2022.pdf": "OK (672382 chars)"
+    },
+    "flag_reason": "All three LLM runs failed to generate a response, making it impossible to verify the ground truth or the answerability of the question.",
+    "concepts_in_validation": "0/3",
+    "concepts_verified": "3/3",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "no longer recommended for treatment",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "Due to these levels of resistance, fluoroquinolones can no longer be  recommended for the treatment of Campylobacter infectio"
+      },
+      {
+        "concept": "high to extremely high resistance",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ed for the treatment of Campylobacter infections in humans. High to extremely high resistance levels to cipro- floxacin were observed in human C. jejuni"
+      },
+      {
+        "concept": "human and animal origins",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "data obtained in 2021–2022 from C. jejuni and C. coli from human and animal origins showed high to ex - tremely high levels of resistance to fl"
+      }
+    ]
+  },
+  {
+    "id": "44_eu_amr_report_2022_FR1",
+    "stage": "main",
+    "category": "factual_recall",
+    "question": "According to the 2022 data for human Salmonella cases, what was the specific resistance percentage observed for S. Kentucky against ciprofloxacin?",
+    "papers": [
+      "44_eu_amr_report_2022.pdf"
+    ],
+    "paper_status": {
+      "44_eu_amr_report_2022.pdf": "OK (672382 chars)"
+    },
+    "flag_reason": "All LLM runs failed with errors, preventing any verification of the expected answer or concepts.",
+    "concepts_in_validation": "0/3",
+    "concepts_verified": "3/3",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "72.7%",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "proportion of resistant  isolates was noted in S. Kentucky (72.7%) and increasing trends in ciprofloxacin resistance were obs"
+      },
+      {
+        "concept": "S. Kentucky",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "tremely high proportion of resistant  isolates was noted in S. Kentucky (72.7%) and increasing trends in ciprofloxacin resistance w"
+      },
+      {
+        "concept": "ciprofloxacin resistance",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "......................................19 2.3.7. High- level ciprofloxacin resistance ..........................................................."
+      }
+    ]
+  },
+  {
+    "id": "44_eu_amr_report_2022_TE3",
+    "stage": "main",
+    "category": "technical",
+    "question": "From 2021 onwards, what method was authorized as an alternative to the supplementary (panel 2) phenotypic testing for Salmonella and indicator E. coli isolates showing resistance to extended-spectrum cephalosporins and/or carbapenems?",
+    "papers": [
+      "44_eu_amr_report_2022.pdf"
+    ],
+    "paper_status": {
+      "44_eu_amr_report_2022.pdf": "OK (672382 chars)"
+    },
+    "flag_reason": "All LLM runs failed (ERROR: call failed), making it impossible to verify the ground truth against the document or evaluate concept coverage.",
+    "concepts_in_validation": "0/5",
+    "concepts_verified": "5/5",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "whole genome sequencing",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "d ertapenem for Campylobacter spp. Additionally, from 2021, whole genome sequencing (WGS) was  authorised as an alternative method to supplemen"
+      },
+      {
+        "concept": "WGS",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "resumptive ESBL- ,  AmpC-  and/or CP- producers and related WGS data ......................................................"
+      },
+      {
+        "concept": "phenotypic testing alternative",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": ".................................................31 2.4.7.  Phenotypic characterisation of third- generation cephalosporin and car"
+      },
+      {
+        "concept": "extended-spectrum cephalosporins",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "bouring a presumptive ESBL-/AmpC-producing E. coli ; ESBL,  extended-spectrum beta lactamase; AmpC, AmpC beta lactamase; CP , carbapenema"
+      },
+      {
+        "concept": "carbapenems",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "with resistance to extended- spectrum cephalosporins and/or carbapenems and for presumptive ESBL-  /AmpC- / CP- producing isolates"
+      }
+    ]
+  },
+  {
+    "id": "45_kenya_amr_digital_CO2",
+    "stage": "main",
+    "category": "conceptual",
+    "question": "How does the OHAMRS architecture enable a One Health approach to antimicrobial resistance surveillance?",
+    "papers": [
+      "45_kenya_amr_digital.pdf"
+    ],
+    "paper_status": {
+      "45_kenya_amr_digital.pdf": "OK (37541 chars)"
+    },
+    "flag_reason": "The expected concept 'Central Data Warehouse (CDW)' and the specific statistic '17 of the 42 dashboards' are absent from all three LLM runs, suggesting these details may be hallucinations in the ground truth or extremely difficult to extract.",
+    "concepts_in_validation": "4/5",
+    "concepts_verified": "4/5",
+    "verdict": "MOSTLY VERIFIED",
+    "concept_details": [
+      {
+        "concept": "One Health approach",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "system that integrates AMR data  from various sectors, in a One Health approach, is critical. Methodology: Acknowledging the interconnected"
+      },
+      {
+        "concept": "Central Data Warehouse (CDW)",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "m, developed a  national data repository referred to as the Central Data Warehouse  (CDW) which archives the AMR data. The AMR"
+      },
+      {
+        "concept": "Open Interop middleware",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "mation on AMR required to address the  AMR crisis in Kenya. OPEN ACCESS EDITED BY Prashant Kumar,   University of Kansas, Un"
+      },
+      {
+        "concept": "DHIS2",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "middleware for integrating data from  various sources and a DHIS2 web portal for the analysis and visualization of AMR  surve"
+      },
+      {
+        "concept": "human and animal health integration",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      }
+    ]
+  },
+  {
+    "id": "CD_002",
+    "stage": "cross_document",
+    "category": "cross_document",
+    "question": "How does the 'all-in-one' preprocessing approach of fastp complement the visualization and quality control capabilities of MultiQC in a bioinformatics pipeline?",
+    "papers": [
+      "04_fastp.pdf",
+      "05_multiqc.pdf"
+    ],
+    "paper_status": {
+      "04_fastp.pdf": "OK (32737 chars)",
+      "05_multiqc.pdf": "OK (9950 chars)"
+    },
+    "flag_reason": "The expected answer contains specific technical details (I/O overhead, Jinja2) that are absent from all three LLM runs.",
+    "concepts_in_validation": "4/7",
+    "concepts_verified": "5/7",
+    "verdict": "MOSTLY VERIFIED",
+    "concept_details": [
+      {
+        "concept": "single-scan",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "I/O overhead",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "ing data multiple times also renders preprocessing slow and I/O inefﬁcient. Results: We developed fastp as an ultra-fast FA"
+      },
+      {
+        "concept": "adapter trimming",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "t tool is used for each operation, such as quality control, adapter trimming and quality ﬁltering. These tools are often insufﬁciently f"
+      },
+      {
+        "concept": "batch effects",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ss an entire project can be time consuming and error prone; batch effects and outlier samples can easily be missed in the early stage"
+      },
+      {
+        "concept": "Jinja2",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "shed, the specified template is loaded and parsed using the Jinja2 package to render the final report. Parsed data is saved as"
+      },
+      {
+        "concept": "aggregated report",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "log files",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ses this problem by scanning given analysis directories for log files and QC reports, creating a single summary report visualizin"
+      }
+    ]
+  },
+  {
+    "id": "CD_004",
+    "stage": "cross_document",
+    "category": "cross_document",
+    "question": "How could integrating fastp and the nf-core framework's data management optimizations improve the performance and resource usage of the Sarek WGS workflow?",
+    "papers": [
+      "01_sarek.pdf",
+      "03_nfcore_framework.pdf",
+      "04_fastp.pdf"
+    ],
+    "paper_status": {
+      "01_sarek.pdf": "OK (64084 chars)",
+      "03_nfcore_framework.pdf": "OK (72800 chars)",
+      "04_fastp.pdf": "OK (32737 chars)"
+    },
+    "flag_reason": "Fewer than half of the expected concepts appear across the runs, and specific details from the expected answer (48-hour processing time, 90x coverage) are absent from all three LLM runs.",
+    "concepts_in_validation": "3/7",
+    "concepts_verified": "6/7",
+    "verdict": "MOSTLY VERIFIED",
+    "concept_details": [
+      {
+        "concept": "CRAM",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "significant reduction of storage requirements by using the CRAM format and runtime by increasing intra-sample  parallelizat"
+      },
+      {
+        "concept": "WGS",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "f1000research.16665.2 v2 Abstract  Whole-genome sequencing (WGS) is a fundamental technology for  research to advance preci"
+      },
+      {
+        "concept": "single-scan",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "I/O overhead",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "ing data multiple times also renders preprocessing slow and I/O inefﬁcient. Results: We developed fastp as an ultra-fast FA"
+      },
+      {
+        "concept": "storage usage",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "s, achieving a  reduction of the median runtime to 37%. The storage usage  increased as soon as any sharding was done due to the sub-"
+      },
+      {
+        "concept": "48 hours",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "h germline and somatic variant calling and annotation took  48 hours and 21 minutes, and required about three times more   stora"
+      },
+      {
+        "concept": "90x coverage",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ce   usage.  Resource usage during a Sarek run on a WGS 90X/90X coverage  medulloblastoma dataset on a 48-threaded computer node, st"
+      }
+    ]
+  },
+  {
+    "id": "CD_007",
+    "stage": "cross_document",
+    "category": "cross_document",
+    "question": "In the context of RNA-seq analysis, how do the mapping and quantification methods of STAR and Salmon address technical challenges before downstream differential expression analysis in DESeq2?",
+    "papers": [
+      "06_star_aligner.pdf",
+      "07_salmon.pdf",
+      "08_deseq2.pdf"
+    ],
+    "paper_status": {
+      "06_star_aligner.pdf": "OK (35393 chars)",
+      "07_salmon.pdf": "OK (65291 chars)",
+      "08_deseq2.pdf": "OK (98255 chars)"
+    },
+    "flag_reason": "The specific technical terms 'Suffix Arrays' and 'Quasi-mapping' included in the expected answer are absent from all three LLM runs, although the runs describe the processes they refer to.",
+    "concepts_in_validation": "4/7",
+    "concepts_verified": "7/7",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "Suffix Arrays",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "s sequential maximum map- pable seed search in uncompressed suffix arrays followed by seed clustering and stitching procedure. STAR o"
+      },
+      {
+        "concept": "Maximal Mappable Prefix",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "the STAR seed finding phase is the sequential search for a Maximal Mappable Prefix ( MMP). MMP is similar to the Maximal Exact (Unique) Match"
+      },
+      {
+        "concept": "Quasi-mapping",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "gnment” and “quantification” in a single tool. When run in  quasi-mapping mode, Salmon takes as input an index of the transcriptome a"
+      },
+      {
+        "concept": "GC content bias",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ls rich enough to capture important  effects, like fragment GC content bias. When uncorrected, these biases can lead to, e.g., high  fa"
+      },
+      {
+        "concept": "Empirical Bayes",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "mplex designs, as is often useful in genomic studies [15]. Empirical Bayes shrinkage for dispersion estimation Within-group variability"
+      },
+      {
+        "concept": "Shrinkage estimation",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "2, a method for differential analysis of count data, using shrinkage estimation for dispersions and fold changes to improve stability and in"
+      },
+      {
+        "concept": "Splicing",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "erally reorganize the informa- tion in the transcriptome by splicing together non-contiguous exons to create mature transcripts"
+      }
+    ]
+  },
+  {
+    "id": "CD_009",
+    "stage": "cross_document",
+    "category": "cross_document",
+    "question": "How do the quality control and preprocessing capabilities of fastp and Cutadapt integrate with the visualization goals of MultiQC in high-throughput sequencing pipelines?",
+    "papers": [
+      "04_fastp.pdf",
+      "05_multiqc.pdf",
+      "10_cutadapt.pdf"
+    ],
+    "paper_status": {
+      "04_fastp.pdf": "OK (32737 chars)",
+      "05_multiqc.pdf": "OK (9950 chars)",
+      "10_cutadapt.pdf": "OK (10953 chars)"
+    },
+    "flag_reason": "The expected key concepts 'color-space', 'Jinja2', and 'single-scan' did not appear in any of the LLM runs, suggesting the ground truth may be overly specific or these details are not central to the integration logic as perceived by the models.",
+    "concepts_in_validation": "4/7",
+    "concepts_verified": "4/7",
+    "verdict": "MOSTLY VERIFIED",
+    "concept_details": [
+      {
+        "concept": "single-scan",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "adapter trimming",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "t tool is used for each operation, such as quality control, adapter trimming and quality ﬁltering. These tools are often insufﬁciently f"
+      },
+      {
+        "concept": "color-space",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "batch effects",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ss an entire project can be time consuming and error prone; batch effects and outlier samples can easily be missed in the early stage"
+      },
+      {
+        "concept": "log files",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ses this problem by scanning given analysis directories for log files and QC reports, creating a single summary report visualizin"
+      },
+      {
+        "concept": "aggregation",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "Jinja2",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "shed, the specified template is loaded and parsed using the Jinja2 package to render the final report. Parsed data is saved as"
+      }
+    ]
+  },
+  {
+    "id": "CD_016",
+    "stage": "cross_document",
+    "category": "cross_document",
+    "question": "Contrast the epidemiological findings of the 2022 Lumpy Skin Disease (LSD) outbreak in Nawalpur, Nepal, with the general disease characteristics and prevention strategies outlined in global systematic reviews.",
+    "papers": [
+      "13_lsd_nepal.pdf",
+      "20_lsd_review.pdf"
+    ],
+    "paper_status": {
+      "13_lsd_nepal.pdf": "OK (38457 chars)",
+      "20_lsd_review.pdf": "OK (34255 chars)"
+    },
+    "flag_reason": "Fewer than half of the expected concepts appear in the LLM runs. Additionally, there is a discrepancy in factual interpretation: the expected answer claims the Nepal outbreak had 'significantly higher' mortality/CFR than global averages, whereas all three LLM runs concluded that the 3.06% mortality rate 'aligns' with the global range (<10%). Specific technical terms like 'Lumpi-ProVacInd' and 'cross-protection' were also entirely absent from the runs.",
+    "concepts_in_validation": "2/6",
+    "concepts_verified": "6/6",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "morbidity rate",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "gation (as shown in Table 2), it was found that the overall morbidity rate of the disease was 28.02 % with the highest percentage of c"
+      },
+      {
+        "concept": "case fatality rate",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "the mortality rate was 3.06% (n = 47/1,538), resulting in a case fatality rate of 10.90% (n = 47/431). The predominant clinical symptoms w"
+      },
+      {
+        "concept": "low mortality",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "The morbidity of LSD was found to be less than 30 % with a low mortality rate. Presence of skin nodules was the most predominant cli"
+      },
+      {
+        "concept": "Lumpi-ProVacInd",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "kers to increase output to satisfy  continuous demands. The Lumpi-ProVacInd vaccine was  developed by the Indian Council for Agricultur"
+      },
+      {
+        "concept": "cross-protection",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "umpy Skin Disease Virus (LSDV). These viruses  share a high cross-protection rate of approximately 96%  when vaccinated against [12, 22,"
+      },
+      {
+        "concept": "transboundary disease",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ion for Animal Health (WOAH) has listed LSD as a noti ﬁable transboundary disease due to Wiley Transboundary and Emerging Diseases Volume 202"
+      }
+    ]
+  },
+  {
+    "id": "CD_019",
+    "stage": "cross_document",
+    "category": "cross_document",
+    "question": "How do the implementation strategies for NGS workflow management and reproducibility differ between Nextflow-based systems like Sarek, the Snakemake system, and the HTS-flow platform?",
+    "papers": [
+      "01_sarek.pdf",
+      "02_snakemake.pdf",
+      "47_htsflow.pdf"
+    ],
+    "paper_status": {
+      "01_sarek.pdf": "OK (64084 chars)",
+      "02_snakemake.pdf": "OK (122934 chars)",
+      "47_htsflow.pdf": "OK (39301 chars)"
+    },
+    "flag_reason": "The expected concept 'MILP' (Mixed Integer Linear Programming) is absent from all three LLM runs, although it is listed as a key concept in the ground truth.",
+    "concepts_in_validation": "6/7",
+    "concepts_verified": "7/7",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "Nextflow",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ive quality metrics reporting.  Sarek is implemented in the Nextflow workflow language and  Open Peer Review Reviewer Status"
+      },
+      {
+        "concept": "Containerization",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "lowing easy integration info Snakemake workflows. Automatic containerization  The downside of using contain - ers is that generating and"
+      },
+      {
+        "concept": "DSL",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "workflows   are specified using a domain specific language (DSL). Here,  the advantages of the second niche are shared, whi"
+      },
+      {
+        "concept": "MILP",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "e scheduling problem via a mixed integer linear pro - gram (MILP) as follows. Let R be the set of resources used  in the wor"
+      },
+      {
+        "concept": "GUI",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "and adheres to the nf-core portability and documentation  guidelines ( Ewels et al ., 2019 ). To facilitate easy installa"
+      },
+      {
+        "concept": "LIMS",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "dered concern: (1) adopting a laboratory management system (LIMS) and safeguard the resulting raw data structure in downstre"
+      },
+      {
+        "concept": "Reproducibility",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "put and engagement of the user   community. Portability and reproducibility Sarek is implemented in Nextflow ( Di Tommaso et al ., 2017"
+      }
+    ]
+  },
+  {
+    "id": "CD_020",
+    "stage": "cross_document",
+    "category": "cross_document",
+    "question": "How does Kenya's One Health AMR Surveillance System (OHAMRS) align with the Integrated Surveillance System Evaluation (ISSE) framework's levels of surveillance?",
+    "papers": [
+      "45_kenya_amr_digital.pdf",
+      "35_isse_framework_amr.pdf"
+    ],
+    "paper_status": {
+      "45_kenya_amr_digital.pdf": "OK (37541 chars)",
+      "35_isse_framework_amr.pdf": "OK (65409 chars)"
+    },
+    "flag_reason": "The question can be answered using only Paper 45 (kenya_amr_digital.pdf), as it describes the OHAMRS system and explicitly evaluates its alignment with the ISSE framework levels. The LLM runs are highly consistent in mapping specific system features to the framework's levels, which is a level of detail typically found in the application paper itself.",
+    "concepts_in_validation": "5/6",
+    "concepts_verified": "6/6",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "OHAMRS",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "tory and developed the One  Health AMR Surveillance System (OHAMRS). The OHAMRS comprises two  core digital components: intero"
+      },
+      {
+        "concept": "DHIS2",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "middleware for integrating data from  various sources and a DHIS2 web portal for the analysis and visualization of AMR  surve"
+      },
+      {
+        "concept": "ISSE framework",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "d the Integrated Surveillance System Evaluation framework ( ISSE framework). The ISSE framework aims to assist stakeholders and resear"
+      },
+      {
+        "concept": "Integration",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ennani H, Stärk KDC and Buckeridge DL (2021) Evaluating the Integration of One Health in Surveillance Systems for Antimicrobial Use"
+      },
+      {
+        "concept": "Knowledge translation",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "eing conducted by the surveillance team . The last element (knowledge translation and transfer to inc rease awareness) can be assessed using"
+      },
+      {
+        "concept": "Decision making",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "tic collection and management of  AMR data to inform policy decisions and improve clinical practice  outcomes. The sector identi"
+      }
+    ]
+  },
+  {
+    "id": "CD_021",
+    "stage": "cross_document",
+    "category": "cross_document",
+    "question": "Contrast the impact of using Operational Taxonomic Units (OTUs) versus Amplicon Sequence Variants (ASVs) on microbial community interpretation as discussed in recent microbiome studies.",
+    "papers": [
+      "28_otu_vs_asv.pdf",
+      "29_16s_best_practices.pdf",
+      "23_swine_cultivation.pdf"
+    ],
+    "paper_status": {
+      "28_otu_vs_asv.pdf": "OK (65371 chars)",
+      "29_16s_best_practices.pdf": "OK (146615 chars)",
+      "23_swine_cultivation.pdf": "OK (93440 chars)"
+    },
+    "flag_reason": "The expected answer contains specific facts (DADA2, Deblur, and swine cultivation research) that are absent from all three LLM runs. While the runs are consistent with each other and provide detailed alternative metrics (e.g., the 6.75% to 10.81% difference and citations for Jeske et al.), the omission of the specific case study and algorithms mentioned in the ground truth suggests a potential mismatch in focus or source extraction.",
+    "concepts_in_validation": "5/7",
+    "concepts_verified": "7/7",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "OTU",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "Citation: Jeske, J.T.; Gallert, C. Microbiome Analysis via OTU and ASV-Based Pipelines—A Comparative Interpretation of Eco"
+      },
+      {
+        "concept": "ASV",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "n: Jeske, J.T.; Gallert, C. Microbiome Analysis via OTU and ASV-Based Pipelines—A Comparative Interpretation of Ecological"
+      },
+      {
+        "concept": "DADA2",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "vidual operational taxonomic units (OTUs), while the other (DADA2) is based on sequencing error correction algorithms and gen"
+      },
+      {
+        "concept": "Denoising",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "Nearing, J.T.; Douglas, G.M.; Comeau, A.M.; Langille, M.G. Denoising the Denoisers: An independent evaluation of microbiome sequ"
+      },
+      {
+        "concept": "Diversity",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "eration for further processing and combined analysis. Alpha diversity was analyzed using vegan and microbiome. The relative abund"
+      },
+      {
+        "concept": "Biological variation",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "sed analyses distin- guish sequencing errors from bona fide biological variation  among 16S rRNA gene sequences using a model-based ap - pro"
+      },
+      {
+        "concept": "97% similarity",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "e then clustered into operational taxonomic units (OTUs) at 97% similarity level with VSEARCH [16] and classiﬁed using the SINA-classi"
+      }
+    ]
+  },
+  {
+    "id": "CD_023",
+    "stage": "cross_document",
+    "category": "cross_document",
+    "question": "In what ways do quantitative microbiome profiling (QMP) and culturomics address the biases of traditional relative microbiome profiling (RMP) in livestock research?",
+    "papers": [
+      "21_livestock_gut_microbiome_review.pdf",
+      "24_chicken_microbiome.pdf",
+      "23_swine_cultivation.pdf"
+    ],
+    "paper_status": {
+      "21_livestock_gut_microbiome_review.pdf": "OK (93993 chars)",
+      "24_chicken_microbiome.pdf": "OK (88320 chars)",
+      "23_swine_cultivation.pdf": "OK (93440 chars)"
+    },
+    "flag_reason": "The specific technical terms 'qPCR' and 'ASVs' included in the expected answer were absent from all three LLM runs, although the runs correctly identified the broader concepts of absolute abundance and increased diversity.",
+    "concepts_in_validation": "4/6",
+    "concepts_verified": "6/6",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "Quantitative Microbiome Profiling",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "epted: 15 March 2023 DOI: 10.1002/imt2.105 RESEARCH ARTICLE Quantitative microbiome profiling reveals the developmental trajectory of the chicken gut mic"
+      },
+      {
+        "concept": "Relative Microbiome Profiling",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "evelopmental trajectory, quantitative microbiome profiling, relative microbiome profiling, serum metabolites iMeta. 2023;2:e105. wileyonlinelibrary.c"
+      },
+      {
+        "concept": "qPCR",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ungal Abundance and Diversity in Mixed ‐Template Samples By qPCR and Length Heterogeneity Analysis. ” Journal of Microbiolog"
+      },
+      {
+        "concept": "Absolute abundance",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "stated that the latter is more reliable when estimating the absolute abundance of different microbial taxa. In addition, it is worth menti"
+      },
+      {
+        "concept": "Culturomics",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "terestingly, some studies evidenced that the combination of culturomics and shotgun metagenomics—an approach seldom applied to othe"
+      },
+      {
+        "concept": "ASVs",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "78, 482, 565, and 555 bacterial amplicon sequence variants (ASVs) were observed in the CI samples, higher microbial diversit"
+      }
+    ]
+  },
+  {
+    "id": "CD_024",
+    "stage": "cross_document",
+    "category": "cross_document",
+    "question": "Based on WGS and genomic studies of foodborne pathogens (Salmonella, Campylobacter, and E. coli), how does the prevalence and transmission of antimicrobial resistance vary between different poultry-related sources and geographic regions?",
+    "papers": [
+      "41_salmonella_wgs_amr.pdf",
+      "42_campylobacter_wgs_thailand.pdf",
+      "43_esbl_ecoli_food.pdf"
+    ],
+    "paper_status": {
+      "41_salmonella_wgs_amr.pdf": "OK (56715 chars)",
+      "42_campylobacter_wgs_thailand.pdf": "OK (65021 chars)",
+      "43_esbl_ecoli_food.pdf": "OK (55814 chars)"
+    },
+    "flag_reason": "The question specifically limits the scope to Salmonella and Campylobacter, but the expected answer and key concepts (specifically 'Plasmids') incorporate information about E. coli from a third paper (43_esbl_ecoli_food.pdf). As a result, the LLM runs correctly focused on the requested species and did not mention 'plasmids', leading to a mismatch with the expected key concepts.",
+    "concepts_in_validation": "5/7",
+    "concepts_verified": "7/7",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "WGS",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "U; Chattaway  et al.,  2019) where whole genome sequencing (WGS) has  been implemented for the routine characterization of"
+      },
+      {
+        "concept": "AMR",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "sequencing reveals antimicrobial resistance  determinants (AMR genes) of Salmonella enterica  recovered from raw chicken a"
+      },
+      {
+        "concept": "Salmonella",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "| 2569 wileyonlinelibrary.com/journal/jam INTRODUCTION Salmonella is a major cause of bacterial gastroenteritis  worldwide an"
+      },
+      {
+        "concept": "Campylobacter",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "://doi.org/10.1111/ jam.15728 Molecular characterization of Campylobacter spp. isolates obtained from commercial broilers and native"
+      },
+      {
+        "concept": "S. Heidelberg",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "total of 16 serovars were detected,  the most common being S. Heidelberg (n  =  138, 60%)  followed by S. Minnesota (n  = 22, 9%) an"
+      },
+      {
+        "concept": "Fluoroquinolones",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "n in gyrA[87:D- N]/parC[57:T- S] conferring resist- ance to fluoroquinolones. Another S. Weltevreden isolate  (412029) from an unnamed c"
+      },
+      {
+        "concept": "Plasmids",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "sms of antimicrobial resistance, such as enzymes encoded by plasmids [3]. The utilization of antimicrobial agents has precipitat"
+      }
+    ]
+  },
+  {
+    "id": "CD_025",
+    "stage": "cross_document",
+    "category": "cross_document",
+    "question": "How do One Health frameworks like GOHF and data-driven approaches incorporate technology to improve zoonotic disease detection and response?",
+    "papers": [
+      "34_one_health_framework.pdf",
+      "37_data_driven_one_health.pdf",
+      "45_kenya_amr_digital.pdf"
+    ],
+    "paper_status": {
+      "34_one_health_framework.pdf": "OK (60040 chars)",
+      "37_data_driven_one_health.pdf": "OK (26753 chars)",
+      "45_kenya_amr_digital.pdf": "OK (37541 chars)"
+    },
+    "flag_reason": "The expected concept 'PulseNet' is absent from all three LLM runs, which triggers the requirement to flag for potential hallucination in the ground truth or lack of prominence in the source text.",
+    "concepts_in_validation": "6/7",
+    "concepts_verified": "6/7",
+    "verdict": "MOSTLY VERIFIED",
+    "concept_details": [
+      {
+        "concept": "GOHF",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": ". Here we describe the Generalizable One Health  Framework (GOHF), a five-step framework that provides structure for using a"
+      },
+      {
+        "concept": "Machine learning",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "inated through a data- driven One Health approach, includes machine learning modelling capability. Coupled with data variables from prep"
+      },
+      {
+        "concept": "OHAMRS",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "tory and developed the One  Health AMR Surveillance System (OHAMRS). The OHAMRS comprises two  core digital components: intero"
+      },
+      {
+        "concept": "H5N1",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "stating public health and socio-economic effects of avian  (H5N1) and pan- demic  (H1N1) influenza in 2004 and 2009, respect"
+      },
+      {
+        "concept": "PulseNet",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": ".  An example of success through laboratory data sharing is PulseNet, a US-based domestic and international  network of food, an"
+      },
+      {
+        "concept": "Digitalization",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "Zoonotic potential",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "tly identiﬁed 70.8% of human viruses with high or very high zoonotic potential, demonstrates the potential of machine learning modelling c"
+      }
+    ]
+  },
+  {
+    "id": "CD_026",
+    "stage": "cross_document",
+    "category": "cross_document",
+    "question": "How does the host genome indirectly and directly influence animal phenotypes through the gut microbiome in dairy cows and pigs?",
+    "papers": [
+      "25_dairy_cow_feed.pdf",
+      "26_gut_meat_quality.pdf",
+      "22_pig_mags.pdf"
+    ],
+    "paper_status": {
+      "25_dairy_cow_feed.pdf": "OK (50124 chars)",
+      "26_gut_meat_quality.pdf": "OK (79316 chars)",
+      "22_pig_mags.pdf": "OK (59752 chars)"
+    },
+    "flag_reason": "The expected answer contains specific technical details, such as the specific chromosomes (BTA3, BTA7, BTA11) and the use of MAGs, which are absent from all three LLM runs.",
+    "concepts_in_validation": "4/7",
+    "concepts_verified": "7/7",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "RFI",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "MI), net energy secreted in milk, and residual feed intake (RFI) records, SNP genotype,  and 16S rRNA rumen microbial abund"
+      },
+      {
+        "concept": "Syntrophococcus",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": ".5 Mb) indirectly affects RFI, mediated by the abundance of Syntrophococcus,  Prevotella, and an unknown genus of Class Bacilli; and (3"
+      },
+      {
+        "concept": "QTL",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "wed no large peaks or significant  quantitative trait loci (QTL) 11,12, suggesting polygenic inheritance. Similarly, recent"
+      },
+      {
+        "concept": "Intramuscular fat",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ucture, chemical composition (i.e., fatty acid composition, intramuscular fat, and carbohydrate content), chemical environment, interacti"
+      },
+      {
+        "concept": "IMF",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "in muscle includes intermuscular fat and intramuscular fat (IMF). As IMF is a key factor aﬀecting meat qualities such as te"
+      },
+      {
+        "concept": "SCFA",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "and subsequently ferment them into short-chain fatty acids (SCFAs) (Tremaroli and Bäckhed, 2012; Koh et al., 2016), which ca"
+      },
+      {
+        "concept": "MAGs",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "o assemble 1,150 dereplicated metagenome-assembled genomes (MAGs) that were at least 90% complete and had less than 5% conta"
+      }
+    ]
+  },
+  {
+    "id": "SY_002",
+    "stage": "synthesis",
+    "category": "synthesis",
+    "question": "How do the collective methodologies across Sarek, Snakemake, nf-core, and MultiQC redefine the concept of 'quality control' from a single-sample metric to a system-wide diagnostic process?",
+    "papers": [
+      "01_sarek.pdf",
+      "02_snakemake.pdf",
+      "03_nfcore_framework.pdf",
+      "05_multiqc.pdf"
+    ],
+    "paper_status": {
+      "01_sarek.pdf": "OK (64084 chars)",
+      "02_snakemake.pdf": "OK (122934 chars)",
+      "03_nfcore_framework.pdf": "OK (72800 chars)",
+      "05_multiqc.pdf": "OK (9950 chars)"
+    },
+    "flag_reason": "The specific technical detail 'SHA-256 hashing' included in the expected answer was not mentioned in any of the three LLM runs, although it is a factual detail present in the Snakemake paper.",
+    "concepts_in_validation": "5/7",
+    "concepts_verified": "6/7",
+    "verdict": "MOSTLY VERIFIED",
+    "concept_details": [
+      {
+        "concept": "Batch effects",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ss an entire project can be time consuming and error prone; batch effects and outlier samples can easily be missed in the early stage"
+      },
+      {
+        "concept": "Data provenance",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "ermline  variants and somatic mutations based on sequencing data from WGS,  whole-exome sequencing (WES), or gene panels. Sa"
+      },
+      {
+        "concept": "SHA-256 hashing",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "and the hashes of its dependencies are used to calculate a SHA-256 hash value, under which the  output files are stored in a c"
+      },
+      {
+        "concept": "Best-practice recommendations",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ers and cloud compute environments. Sarek  follows the GATK best-practice recommendations for read alignment  and pre-processing, and includes a wide"
+      },
+      {
+        "concept": "Global trends",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ng output from multiple tools across many samples, enabling global trends and biases to be quickly identiﬁed. MultiQC can plot data f"
+      },
+      {
+        "concept": "Modular architecture",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": ", per-sample configurations, etc.  Since Snakemake supports modularization of workflow defini - tions ( subsubsection 2.2.1 ),"
+      },
+      {
+        "concept": "System-wide diagnostics",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      }
+    ]
+  },
+  {
+    "id": "SY_003",
+    "stage": "synthesis",
+    "category": "synthesis",
+    "question": "How does the corpus demonstrate an evolution from localized tool optimization to systemic computational efficiency across different layers of the bioinformatics stack?",
+    "papers": [
+      "03_nfcore_framework.pdf",
+      "04_fastp.pdf",
+      "06_star_aligner.pdf",
+      "09_seqkit.pdf"
+    ],
+    "paper_status": {
+      "03_nfcore_framework.pdf": "OK (72800 chars)",
+      "04_fastp.pdf": "OK (32737 chars)",
+      "06_star_aligner.pdf": "OK (35393 chars)",
+      "09_seqkit.pdf": "OK (25090 chars)"
+    },
+    "flag_reason": "The expected answer mentions Snakemake and Goroutines, which are absent from all LLM runs. Snakemake is only mentioned in passing in the source papers as an alternative workflow manager, not as a primary tool demonstrating the evolution described.",
+    "concepts_in_validation": "5/7",
+    "concepts_verified": "6/7",
+    "verdict": "MOSTLY VERIFIED",
+    "concept_details": [
+      {
+        "concept": "Suffix Arrays",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "s sequential maximum map- pable seed search in uncompressed suffix arrays followed by seed clustering and stitching procedure. STAR o"
+      },
+      {
+        "concept": "single-scan processing",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "Goroutines",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": ", most CPU-intensive processes are parallelized by multiple Goroutines in the Go programming language, which are similar to, but l"
+      },
+      {
+        "concept": "intra-sample parallelization",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "or 40 interval groups and 8 FastQ file  chunks:  Listing 5: Intra-sample parallelization  nextﬂow run nf-core/sarek -r 3.1.1 -proﬁl  e cfc - - input"
+      },
+      {
+        "concept": "DSL2",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ntation of the nf-core / sarek  pipeline using the Nextflow DSL2 framework, an extension  of the Nextflow syntax allowing to"
+      },
+      {
+        "concept": "scalability",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "essential aspect of high-throughput processing is seamless  scalability, one of the main advantages of using a dedicated  workflow"
+      },
+      {
+        "concept": "CRAM format",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "significant reduction of storage requirements by using the CRAM format and runtime by increasing intra-sample  parallelization. Bo"
+      }
+    ]
+  },
+  {
+    "id": "SY_008",
+    "stage": "synthesis",
+    "category": "synthesis",
+    "question": "What meta-conclusion can be drawn regarding the evolving clinical presentation of livestock and wildlife viral diseases and its impact on traditional early-warning surveillance systems?",
+    "papers": [
+      "12_hpai_netherlands.pdf",
+      "18_fmd_review.pdf",
+      "19_hpai_canada.pdf",
+      "20_lsd_review.pdf"
+    ],
+    "paper_status": {
+      "12_hpai_netherlands.pdf": "OK (80417 chars)",
+      "18_fmd_review.pdf": "OK (135744 chars)",
+      "19_hpai_canada.pdf": "OK (22823 chars)",
+      "20_lsd_review.pdf": "OK (34255 chars)"
+    },
+    "flag_reason": "Fewer than half of the expected concepts (2 out of 6) appear in at least 2 of the 3 runs. Specifically, 'Clade 2.3.4.4b' and 'Carrier state' were absent from all runs, and 'Neurological signs' appeared in only one run despite being a central point in the expected answer.",
+    "concepts_in_validation": "2/6",
+    "concepts_verified": "6/6",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "Neoteric subclinical infection",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ing different  phases of infection. The characterization of neoteric subclinical infection as a disease stage that is distinct  from the persistent “F"
+      },
+      {
+        "concept": "Neurological signs",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ased susceptibility to pathological signs [51]. More severe neurological signs and 100% mortality were also found in 8-week-old Pekin duck"
+      },
+      {
+        "concept": "Carrier state",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "a disease stage that is distinct  from the persistent “FMDV carrier state” has emphasized the importance of sample collection from cl"
+      },
+      {
+        "concept": "Pathogenesis",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": ". (In Dutch). 12. Brown, C.C.; Olander, H.J.; Senne, D.A. A pathogenesis study of highly pathogenic avian influenza virus H5N2 in ch"
+      },
+      {
+        "concept": "Clade 2.3.4.4b",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "have been detected since 2014, and from 2021 onwards H5N1 (clade 2.3.4.4b) has been predominant across Europe. It is known that clini"
+      },
+      {
+        "concept": "Subclinical transmission",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "rent  phases of infection. The characterization of neoteric subclinical infection as a disease stage that is distinct  from the per"
+      }
+    ]
+  },
+  {
+    "id": "SY_010",
+    "stage": "synthesis",
+    "category": "synthesis",
+    "question": "How do high-performance sequence manipulation tools and modular workflow management systems collectively address the technical challenges of modern genomic surveillance for transboundary pathogens?",
+    "papers": [
+      "02_snakemake.pdf",
+      "05_multiqc.pdf",
+      "09_seqkit.pdf",
+      "11_asf_burkina_faso.pdf"
+    ],
+    "paper_status": {
+      "02_snakemake.pdf": "OK (122934 chars)",
+      "05_multiqc.pdf": "OK (9950 chars)",
+      "09_seqkit.pdf": "OK (25090 chars)",
+      "11_asf_burkina_faso.pdf": "OK (35646 chars)"
+    },
+    "flag_reason": "Fewer than half of the expected concepts (2 out of 6) appeared in at least two of the three LLM runs. Specifically, technical terms like 'Directed Acyclic Graph (DAG)', 'SHA-256 hashing', 'Batch effects', and 'Multi-threading' were missing from the majority of the responses.",
+    "concepts_in_validation": "2/6",
+    "concepts_verified": "6/6",
+    "verdict": "ALL VERIFIED",
+    "concept_details": [
+      {
+        "concept": "Directed Acyclic Graph (DAG)",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "is color-coded  on the left next to the line numbers. ( b) directed acyclic graph (DAG) of jobs, representing the automatically derived execution p"
+      },
+      {
+        "concept": "Goroutines",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": ", most CPU-intensive processes are parallelized by multiple Goroutines in the Go programming language, which are similar to, but l"
+      },
+      {
+        "concept": "Batch effects",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ss an entire project can be time consuming and error prone; batch effects and outlier samples can easily be missed in the early stage"
+      },
+      {
+        "concept": "Reproducibility",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "nalyses should ideally be  conducted in a reproducible way. Reproducibility enables technical  validation and regeneration of results o"
+      },
+      {
+        "concept": "SHA-256 hashing",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "and the hashes of its dependencies are used to calculate a SHA-256 hash value, under which the  output files are stored in a c"
+      },
+      {
+        "concept": "Molecular characterization",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "18:69   https://doi.org/10.1186/s12917-022-03166-y RESEARCH Molecular characterization of African swine  fever viruses from Burkina Faso, 2018 Moc"
+      }
+    ]
+  },
+  {
+    "id": "SY_015",
+    "stage": "synthesis",
+    "category": "synthesis",
+    "question": "How do spatial and host-species heterogeneities influence the persistence of viral pathogens, and what are the implications for designing sentinel surveillance systems?",
+    "papers": [
+      "12_hpai_netherlands.pdf",
+      "15_rabies_tanzania.pdf",
+      "19_hpai_canada.pdf",
+      "37_data_driven_one_health.pdf"
+    ],
+    "paper_status": {
+      "12_hpai_netherlands.pdf": "OK (80417 chars)",
+      "15_rabies_tanzania.pdf": "OK (118757 chars)",
+      "19_hpai_canada.pdf": "OK (22823 chars)",
+      "37_data_driven_one_health.pdf": "OK (26753 chars)"
+    },
+    "flag_reason": "The expected answer contains specific technical facts (PB2-E627K mutation, machine learning) that are absent from all three LLM runs, suggesting the ground truth may be overly specific or the models are missing key details.",
+    "concepts_in_validation": "4/6",
+    "concepts_verified": "5/6",
+    "verdict": "MOSTLY VERIFIED",
+    "concept_details": [
+      {
+        "concept": "Spatial heterogeneity",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "tions or products referred to in the content.   1  Reducing spatial heterogeneity in coverage improves the effectiveness of dog  vaccination"
+      },
+      {
+        "concept": "Spillover/Spillback",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "Sentinel surveillance",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "e veterinary community of associated wild bird mortalities. Sentinel surveillance in mosquitoes, birds, and horses is now routin"
+      },
+      {
+        "concept": "Mammalian adaptation",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "seals, porpoises, sea lions, and dol - phins. Viruses with mammalian adaptations such as the mutations PB2-E627K, E627V, and D701N were fou"
+      },
+      {
+        "concept": "Focal incidence",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "ion connectivity. Removing the masking effects of prior non-focal incidence shows that,  for the same average prior non-focal (wider-di"
+      },
+      {
+        "concept": "Machine learning",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "formation Criterion in Singular Learning Theory. Journal of Machine Learning Research.  2010;11: 3571–3594.   46.  van den Hof S, Meffre"
+      }
+    ]
+  },
+  {
+    "id": "SY_017",
+    "stage": "synthesis",
+    "category": "synthesis",
+    "question": "Assess the role of Whole Genome Sequencing (WGS) in replacing or augmenting phenotypic testing for international antimicrobial resistance (AMR) monitoring.",
+    "papers": [
+      "41_salmonella_wgs_amr.pdf",
+      "42_campylobacter_wgs_thailand.pdf",
+      "43_esbl_ecoli_food.pdf"
+    ],
+    "paper_status": {
+      "41_salmonella_wgs_amr.pdf": "OK (56715 chars)",
+      "42_campylobacter_wgs_thailand.pdf": "OK (65021 chars)",
+      "43_esbl_ecoli_food.pdf": "OK (55814 chars)"
+    },
+    "flag_reason": "All three LLM runs failed to generate a response, making it impossible to evaluate the ground truth against model output.",
+    "concepts_in_validation": "0/6",
+    "concepts_verified": "4/6",
+    "verdict": "MOSTLY VERIFIED",
+    "concept_details": [
+      {
+        "concept": "Sequence Typing (ST)",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "d between  2014 and 2018. Methods and Results: Whole genome sequence was used to detect AMR genes or  chromosomal mutations asso"
+      },
+      {
+        "concept": "SNPs (Single Nucleotide Polymorphisms)",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "Plasmid-mediated resistance",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "as- mids. The majority of these resilient isolates harbored plasmid-mediated resistance genes,  encompassing aph(3″) -Ib, aph(6)-Id, blaCMY-2, ﬂoR,"
+      },
+      {
+        "concept": "QRDR mutations",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "mutation in the quinolone resistance- determining region  (QRDR). Different mutations for QRDRs of the DNA gyrase  subunit"
+      },
+      {
+        "concept": "ESBL-producing E. coli",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "nt strains. Recent research has highlighted the presence of ESBL-producing E. coli in animals and animal- derived foods, with some studies ind"
+      },
+      {
+        "concept": "WGS-based monitoring",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      }
+    ]
+  },
+  {
+    "id": "SY_018",
+    "stage": "synthesis",
+    "category": "synthesis",
+    "question": "Identify the critical gaps in current bioinformatics pipelines and experimental designs regarding the integration of non-bacterial domains and epigenetic data into microbial network models.",
+    "papers": [
+      "21_livestock_gut_microbiome_review.pdf",
+      "27_inap_pipeline.pdf",
+      "30_aquaculture_metagenomics.pdf",
+      "46_methylpipe.pdf"
+    ],
+    "paper_status": {
+      "21_livestock_gut_microbiome_review.pdf": "OK (93993 chars)",
+      "27_inap_pipeline.pdf": "OK (43112 chars)",
+      "30_aquaculture_metagenomics.pdf": "OK (108014 chars)",
+      "46_methylpipe.pdf": "OK (52484 chars)"
+    },
+    "flag_reason": "Run 3 explicitly states 'NOT IN DOCUMENTS' regarding the integration of epigenetic data into microbial network models. Additionally, specific technical limitations of iNAP mentioned in the expected answer (high dimensionality and sparse correlations) were not captured by any of the three runs.",
+    "concepts_in_validation": "4/6",
+    "concepts_verified": "4/6",
+    "verdict": "MOSTLY VERIFIED",
+    "concept_details": [
+      {
+        "concept": "Bacteriocentric bias",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "Interdomain Ecological Network Analysis",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "that is, molecular ecological network analysis pipeline and interdomain ecological network analysis pipeline. • iNAP provides multiple approaches and methods f"
+      },
+      {
+        "concept": "High dimensionality",
+        "status": "NOT FOUND",
+        "match_type": null,
+        "context": null
+      },
+      {
+        "concept": "Sparse correlations",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "man's rank correlation along with random matrix theory, and sparse correlations for compositional data) and conditional dependence‐based me"
+      },
+      {
+        "concept": "DNA methylation",
+        "status": "FOUND",
+        "match_type": "exact",
+        "context": "tone marks, TFs binding and other -omics data together with DNA methylation data, complicating the analysis of these data and their int"
+      },
+      {
+        "concept": "Non-bacterial microbes",
+        "status": "FOUND",
+        "match_type": "partial (all words present)",
+        "context": "groups. However, compared to other  livestock species, the non-bacterial component  of the gut microbiome has been given more attent"
+      }
+    ]
+  },
+  {
+    "id": "OOD_041",
+    "stage": "ood",
+    "category": "out_of_domain",
+    "question": "According to the Sarek paper, the pipeline only supports Illumina short-read sequencing data and cannot process any other data types. Is this correct?",
+    "papers": [
+      "01_sarek.pdf"
+    ],
+    "paper_status": {
+      "01_sarek.pdf": "OK (64084 chars)"
+    },
+    "flag_reason": "Marked as answerable from corpus. Potential papers: ['01_sarek.pdf']",
+    "concepts_in_validation": "N/A",
+    "concepts_verified": "N/A",
+    "verdict": "OOD - REFUTABLE",
+    "concept_details": []
+  },
+  {
+    "id": "OOD_042",
+    "stage": "ood",
+    "category": "out_of_domain",
+    "question": "The fastp paper states that fastp requires separate tools for adapter trimming and quality filtering, processing data in multiple sequential passes. Is this accurate?",
+    "papers": [
+      "04_fastp.pdf"
+    ],
+    "paper_status": {
+      "04_fastp.pdf": "OK (32737 chars)"
+    },
+    "flag_reason": "Marked as answerable from corpus. Potential papers: ['04_fastp.pdf']",
+    "concepts_in_validation": "N/A",
+    "concepts_verified": "N/A",
+    "verdict": "OOD - REFUTABLE",
+    "concept_details": []
+  },
+  {
+    "id": "OOD_043",
+    "stage": "ood",
+    "category": "out_of_domain",
+    "question": "According to the DESeq2 paper, the method uses raw read counts without any normalization or variance stabilization. Is this true?",
+    "papers": [
+      "08_deseq2.pdf"
+    ],
+    "paper_status": {
+      "08_deseq2.pdf": "OK (98255 chars)"
+    },
+    "flag_reason": "Marked as answerable from corpus. Potential papers: ['08_deseq2.pdf']",
+    "concepts_in_validation": "N/A",
+    "concepts_verified": "N/A",
+    "verdict": "OOD - REFUTABLE",
+    "concept_details": []
+  },
+  {
+    "id": "OOD_044",
+    "stage": "ood",
+    "category": "out_of_domain",
+    "question": "The Snakemake paper describes a system that uses a simple first-come-first-served job queue without any optimization of task scheduling. Is this correct?",
+    "papers": [
+      "02_snakemake.pdf"
+    ],
+    "paper_status": {
+      "02_snakemake.pdf": "OK (122934 chars)"
+    },
+    "flag_reason": "Marked as answerable from corpus. Potential papers: ['02_snakemake.pdf']",
+    "concepts_in_validation": "N/A",
+    "concepts_verified": "N/A",
+    "verdict": "OOD - REFUTABLE",
+    "concept_details": []
+  },
+  {
+    "id": "OOD_045",
+    "stage": "ood",
+    "category": "out_of_domain",
+    "question": "The nf-core framework paper reports that switching from BAM to CRAM format increased storage requirements by 65%. Is this finding correct?",
+    "papers": [
+      "03_nfcore_framework.pdf"
+    ],
+    "paper_status": {
+      "03_nfcore_framework.pdf": "OK (72800 chars)"
+    },
+    "flag_reason": "Marked as answerable from corpus. Potential papers: ['03_nfcore_framework.pdf']",
+    "concepts_in_validation": "N/A",
+    "concepts_verified": "N/A",
+    "verdict": "OOD - REFUTABLE",
+    "concept_details": []
+  },
+  {
+    "id": "OOD_046",
+    "stage": "ood",
+    "category": "out_of_domain",
+    "question": "According to the Salmon paper, transcript quantification is performed using traditional full alignment of reads to the reference genome. Is this accurate?",
+    "papers": [
+      "07_salmon.pdf"
+    ],
+    "paper_status": {
+      "07_salmon.pdf": "OK (65291 chars)"
+    },
+    "flag_reason": "Marked as answerable from corpus. Potential papers: ['07_salmon.pdf']",
+    "concepts_in_validation": "N/A",
+    "concepts_verified": "N/A",
+    "verdict": "OOD - REFUTABLE",
+    "concept_details": []
+  },
+  {
+    "id": "OOD_047",
+    "stage": "ood",
+    "category": "out_of_domain",
+    "question": "The LSD Nepal paper reports that pregnant cows had a significantly lower risk of LSD infection compared to non-pregnant cattle. Is this correct?",
+    "papers": [
+      "13_lsd_nepal.pdf"
+    ],
+    "paper_status": {
+      "13_lsd_nepal.pdf": "OK (38457 chars)"
+    },
+    "flag_reason": "Marked as answerable from corpus. Potential papers: ['13_lsd_nepal.pdf']",
+    "concepts_in_validation": "N/A",
+    "concepts_verified": "N/A",
+    "verdict": "OOD - REFUTABLE",
+    "concept_details": []
+  },
+  {
+    "id": "OOD_048",
+    "stage": "ood",
+    "category": "out_of_domain",
+    "question": "The HPAI Netherlands paper found that clinical signs of avian influenza are identical across all poultry species, with no species-dependent differences. Is this true?",
+    "papers": [
+      "12_hpai_netherlands.pdf"
+    ],
+    "paper_status": {
+      "12_hpai_netherlands.pdf": "OK (80417 chars)"
+    },
+    "flag_reason": "Marked as answerable from corpus. Potential papers: ['12_hpai_netherlands.pdf']",
+    "concepts_in_validation": "N/A",
+    "concepts_verified": "N/A",
+    "verdict": "OOD - REFUTABLE",
+    "concept_details": []
+  },
+  {
+    "id": "OOD_049",
+    "stage": "ood",
+    "category": "out_of_domain",
+    "question": "According to the MultiQC paper, the tool can only process output from a single bioinformatics tool at a time and does not support aggregation across tools. Is this correct?",
+    "papers": [
+      "05_multiqc.pdf"
+    ],
+    "paper_status": {
+      "05_multiqc.pdf": "OK (9950 chars)"
+    },
+    "flag_reason": "Marked as answerable from corpus. Potential papers: ['05_multiqc.pdf']",
+    "concepts_in_validation": "N/A",
+    "concepts_verified": "N/A",
+    "verdict": "OOD - REFUTABLE",
+    "concept_details": []
+  },
+  {
+    "id": "OOD_050",
+    "stage": "ood",
+    "category": "out_of_domain",
+    "question": "The rabies Tanzania paper concludes that vaccination campaigns in the Serengeti achieved uniform coverage across all areas, completely eliminating spatial heterogeneity. Is this accurate?",
+    "papers": [
+      "15_rabies_tanzania.pdf"
+    ],
+    "paper_status": {
+      "15_rabies_tanzania.pdf": "OK (118757 chars)"
+    },
+    "flag_reason": "Marked as answerable from corpus. Potential papers: ['15_rabies_tanzania.pdf']",
+    "concepts_in_validation": "N/A",
+    "concepts_verified": "N/A",
+    "verdict": "OOD - REFUTABLE",
+    "concept_details": []
+  }
+]

@@ -1,0 +1,198 @@
+{
+  "paper_id": "04_fastp",
+  "filename": "04_fastp.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "How to create an ultra-fast, all-in-one FASTQ preprocessor that integrates quality control, adapter trimming, filtering, and other functions into a single scan of the data to improve efficiency and speed over existing multi-tool workflows.",
+    "methods": [
+      "C++ implementation for high performance",
+      "Multi-threading support using a thread pool and data packing (N=1000 reads per pack)",
+      "Single-scan processing to minimize I/O overhead",
+      "K-mer based automatic adapter detection for single-end data",
+      "Overlap-analysis based adapter detection and base correction for paired-end data",
+      "Sliding window quality pruning algorithm",
+      "PolyG/PolyX tail trimming for Illumina two-color chemistry data",
+      "UMI (Unique Molecular Identifier) preprocessing and shifting",
+      "Output splitting (by line number or file number) for parallel downstream pipelines"
+    ],
+    "findings": [
+      {
+        "finding": "fastp is significantly faster than traditional tools, often 2\u20135 times faster than Trimmomatic or Cutadapt.",
+        "evidence": "In a speed evaluation on a 9316 M base dataset, fastp (PE) took 13.3 minutes compared to FASTQC (25.8 min), Cutadapt (24.6 min), and Trimmomatic (60.9 min).",
+        "page": 5
+      },
+      {
+        "finding": "fastp provides superior adapter trimming performance compared to sequence-matching tools.",
+        "evidence": "Table 2 shows fastp had the lowest mismatched bases (10.6M) and clipped reads (0.30M) compared to Raw data or other tools like SOAPnuke (3.46M clipped) and Cutadapt (1.05M clipped).",
+        "page": 6
+      },
+      {
+        "finding": "fastp is highly efficient for UMI preprocessing.",
+        "evidence": "fastp is ~2.7 times faster than 'umis' and ~6.1 times faster than 'UMI-tools', processing 4 Gb of data in 4.6 minutes compared to 12.43 and 28.38 minutes respectively.",
+        "page": 6
+      },
+      {
+        "finding": "Using fastp improves the specificity of downstream variant calling.",
+        "evidence": "Data filtered by fastp resulted in the lowest number of false positive variants (6708) compared to Trimmomatic (7174) and SOAPnuke (7040).",
+        "page": 6
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "Workflow diagram of fastp showing the main workflow for paired-end data and the internal modules of the paired-end preprocessor.",
+        "page": 2
+      },
+      {
+        "id": "Figure 2",
+        "description": "A demonstration of the algorithm used to extend an adapter seed in both forward and backward directions to identify full adapter sequences.",
+        "page": 3
+      },
+      {
+        "id": "Figure 3",
+        "description": "Base content ratio curves showing the abnormal G curve caused by polyG tails before processing and the corrected curve after fastp preprocessing.",
+        "page": 4
+      },
+      {
+        "id": "Figure 4",
+        "description": "Bar chart illustrating duplication estimation, showing read percentages and mean GC ratios across different duplication levels.",
+        "page": 5
+      },
+      {
+        "id": "Figure 5",
+        "description": "Visualization of overrepresented sequence analysis results as they appear in the fastp HTML report.",
+        "page": 5
+      },
+      {
+        "id": "Figure 6",
+        "description": "Comparison of adapter trimming performance across different tools based on the number of suspected adapters remaining after various mismatch tolerances.",
+        "page": 6
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Speed comparison of fastp against other common FASTQ tools in both single-end (SE) and paired-end (PE) modes.",
+        "columns": [
+          "Tool",
+          "Input",
+          "Time (min)",
+          "Throughput (reads/s)"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "Evaluation of filtering effectiveness by comparing mapping results (mismatches, clips, and single-read maps) on the reference genome hg19.",
+        "columns": [
+          "NS_PE150",
+          "Total map base (M)",
+          "Mismatched base (M)",
+          "Total map read (M)",
+          "Clip read (M)",
+          "Single-read map"
+        ]
+      },
+      {
+        "id": "Table 3",
+        "description": "Performance comparison specifically for UMI preprocessing tasks between fastp and specialized UMI tools.",
+        "columns": [
+          "Tools",
+          "Time (min)",
+          "Throughput (read/s)"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "FASTQ",
+      "Adapter trimming",
+      "UMI (Unique Molecular Identifier)",
+      "ctDNA (cell-free tumor DNA)",
+      "polyG tail",
+      "Base correction",
+      "Sliding window quality pruning",
+      "K-mer",
+      "MAF (Mutation Allele Frequency)",
+      "NGS (Next-Generation Sequencing)"
+    ],
+    "limitations": [
+      "Adapter detection assumes only one adapter exists in the data.",
+      "Adapter detection assumes sequences exist only in the read tails.",
+      "Duplication analysis may still overestimate levels in high-depth sequencing where different fragments share starting sequences."
+    ],
+    "connections": [
+      "AfterQC (previous tool developed by the same authors)",
+      "FASTQC (standard QC tool compared against)",
+      "Cutadapt (adapter trimmer compared against)",
+      "Trimmomatic (trimming tool compared against)",
+      "SOAPnuke (preprocessing tool compared against)",
+      "UMI-tools and umis (specialized UMI tools compared against)",
+      "BWA-MEM and Samtools (used for downstream analysis evaluation)"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "04_fastp_FR1",
+      "paper_id": "04_fastp",
+      "question": "In a speed evaluation on a 9,316 M base dataset, what were the specific processing times for fastp (PE) compared to Trimmomatic?",
+      "category": "factual_recall",
+      "expected_answer": "In the evaluation, fastp (PE) took 13.3 minutes to process the dataset. In contrast, Trimmomatic required 60.9 minutes, making fastp approximately 4.5 times faster in this specific comparison.",
+      "expected_concepts": [
+        "13.3 minutes",
+        "60.9 minutes",
+        "fastp (PE)",
+        "Trimmomatic",
+        "speed evaluation"
+      ],
+      "difficulty": "easy",
+      "source_page": "5",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "04_fastp_CO2",
+      "paper_id": "04_fastp",
+      "question": "What design choices and implementation strategies allow fastp to achieve higher performance and lower I/O overhead than traditional FASTQ tools?",
+      "category": "conceptual",
+      "expected_answer": "fastp achieves high performance by being implemented in C++ and utilizing multi-threading via a thread pool with data packing (N=1000 reads per pack). To minimize I/O overhead, it employs a single-scan processing architecture, which allows it to perform multiple QC and filtering tasks in one pass rather than reading and writing data multiple times.",
+      "expected_concepts": [
+        "C++ implementation",
+        "multi-threading",
+        "thread pool",
+        "single-scan processing",
+        "I/O overhead",
+        "data packing"
+      ],
+      "difficulty": "medium",
+      "source_page": "Methods",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "04_fastp_TE3",
+      "paper_id": "04_fastp",
+      "question": "How does fastp's methodology for adapter detection differ between single-end and paired-end sequencing data?",
+      "category": "technical",
+      "expected_answer": "For single-end data, fastp utilizes a K-mer based automatic adapter detection method. For paired-end data, it uses an overlap-analysis based approach, which not only detects adapters but also enables base correction in the overlapping regions of the reads.",
+      "expected_concepts": [
+        "K-mer based",
+        "automatic adapter detection",
+        "single-end",
+        "overlap-analysis",
+        "paired-end",
+        "base correction"
+      ],
+      "difficulty": "hard",
+      "source_page": "Methods, 3",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:12:05.912521"
+}

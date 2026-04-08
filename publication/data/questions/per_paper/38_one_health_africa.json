@@ -1,0 +1,126 @@
+{
+  "paper_id": "38_one_health_africa",
+  "filename": "38_one_health_africa.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "How can the coordination and collaboration of the One Health approach be strengthened and harmonized across Africa to effectively prevent, detect, and respond to zoonotic diseases?",
+    "methods": [
+      "Commentary and strategic review of institutional progress in Africa.",
+      "Burden of disease and economic impact analysis based on existing literature.",
+      "Description of the establishment and role of the African Union's 'One Health Coordinating Group on Zoonotic Diseases'.",
+      "Review of the implementation of the 'Framework for One Health Practice in National Public Health Institutes (NPHIs)'."
+    ],
+    "findings": [
+      {
+        "finding": "Zoonotic diseases represent the majority of emerging health threats with significant global impacts.",
+        "evidence": "About 60% of existing and 75% of newly emerging infectious diseases in humans are zoonotic; they result in an estimated 2.5 billion cases of human illness and 2.7 million deaths annually in low- and middle-income countries.",
+        "page": 2
+      },
+      {
+        "finding": "Africa faces a disproportionately high and fatal burden of zoonotic diseases.",
+        "evidence": "There is a reported 61% case fatality rate for bat-originated viral zoonotic diseases in Africa, and rabies specifically results in approximately 21,000 deaths per year on the continent.",
+        "page": 2
+      },
+      {
+        "finding": "Primary prevention of zoonotic diseases is highly cost-effective.",
+        "evidence": "Zoonotic disease prevention actions cost less than 1/20th the value of lives lost each year, presenting a strong 'business case' for the One Health approach.",
+        "page": 2
+      },
+      {
+        "finding": "The African Union is leading a continental push to institutionalize One Health coordination.",
+        "evidence": "The AU has established an interagency multidisciplinary 'One Health Coordinating Group on Zoonotic Diseases' and a 'Framework for One Health Practice' to support Member States.",
+        "page": 3
+      }
+    ],
+    "figures": [],
+    "tables": [],
+    "technical_terms": [
+      "One Health",
+      "Zoonoses",
+      "Public Health Emergencies of International Concern (PHEICs)",
+      "Reverse zoonosis",
+      "Spillover",
+      "Quadripartite Collaboration",
+      "National Public Health Institutes (NPHIs)",
+      "Human\u2013animal\u2013environment interface"
+    ],
+    "limitations": [
+      "Many African countries still lack formal and funded national One Health programs.",
+      "A significant gap exists in political commitment, skilled workforce, and domestic financing.",
+      "Established professional and programmatic silos within government agencies remain a challenge for institutionalization.",
+      "Countries often lack diagnostic capacity and coordinated surveillance mechanisms."
+    ],
+    "connections": [
+      "Tripartite collaboration between WHO, FAO, and WOAH (2010)",
+      "Quadripartite Collaboration for One Health (including UNEP, 2022)",
+      "African Union Agenda 2063: The Africa We Want",
+      "Africa CDC\u2019s Framework for One Health Practice in National Public Health Institutes"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "38_one_health_africa_FR1",
+      "paper_id": "38_one_health_africa",
+      "question": "What is the reported case fatality rate for bat-originated viral zoonotic diseases in Africa according to the paper?",
+      "category": "factual_recall",
+      "expected_answer": "The paper reports a 61% case fatality rate for bat-originated viral zoonotic diseases in Africa. This high rate contributes to the disproportionately fatal burden of zoonotic diseases on the continent.",
+      "expected_concepts": [
+        "61%",
+        "case fatality rate",
+        "bat-originated",
+        "viral zoonotic diseases",
+        "Africa"
+      ],
+      "difficulty": "easy",
+      "source_page": "2",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "38_one_health_africa_CO2",
+      "paper_id": "38_one_health_africa",
+      "question": "How does the paper justify the 'business case' for the One Health approach in the context of zoonotic disease prevention?",
+      "category": "conceptual",
+      "expected_answer": "The economic justification, or 'business case,' for the One Health approach is based on the high cost-effectiveness of primary prevention. The paper notes that prevention actions cost less than 1/20th of the value of lives lost each year to these diseases, making a strong argument for institutionalizing these strategies to mitigate the high burden of illness and death.",
+      "expected_concepts": [
+        "business case",
+        "primary prevention",
+        "cost-effective",
+        "1/20th",
+        "value of lives lost",
+        "One Health approach"
+      ],
+      "difficulty": "medium",
+      "source_page": "2",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "38_one_health_africa_TE3",
+      "paper_id": "38_one_health_africa",
+      "question": "According to the disease burden metrics provided, what percentages of existing and emerging infectious diseases in humans are zoonotic, and what is the resulting impact in low- and middle-income countries?",
+      "category": "technical",
+      "expected_answer": "The paper cites that 60% of existing and 75% of newly emerging infectious diseases in humans are zoonotic. These diseases result in an estimated 2.5 billion cases of human illness and 2.7 million deaths annually within low- and middle-income countries.",
+      "expected_concepts": [
+        "60%",
+        "75%",
+        "emerging infectious diseases",
+        "2.5 billion cases",
+        "2.7 million deaths",
+        "low- and middle-income countries"
+      ],
+      "difficulty": "medium",
+      "source_page": "2",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:31:35.967424"
+}

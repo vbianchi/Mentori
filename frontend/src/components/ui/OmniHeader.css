@@ -1,0 +1,170 @@
+/* src/components/ui/OmniHeader.css */
+
+/* ========== Main Header Container ========== */
+.omni-header {
+    height: var(--header-height);
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--space-5);
+    border-bottom: 1px solid var(--border-subtle);
+    background: rgba(10, 10, 12, 0.6);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header);
+}
+
+/* ========== Header Sections ========== */
+.header-section {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+/* Left section: Activity + Task badge (don't grow) */
+.header-section.left {
+    flex: 0 1 auto;
+    gap: var(--space-4);
+}
+
+/* Center section: Controls (take available space, center content) */
+.header-section.center {
+    flex: 1;
+    justify-content: center;
+    gap: var(--space-2);
+}
+
+/* Right section: Connection + Tokens (don't grow, align right) */
+.header-section.right {
+    flex: 0 1 auto;
+    gap: var(--space-4);
+    justify-content: flex-end;
+}
+
+/* ========== Status Indicator ========== */
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-main);
+}
+
+.status-indicator.pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.activity-text {
+    font-size: var(--text-base);
+    font-weight: var(--weight-medium);
+    color: var(--text-main);
+}
+
+/* ========== Icon Animations ========== */
+.spin-slow {
+    animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.text-success {
+    color: var(--accent-success);
+}
+
+/* ========== Connection Status ========== */
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+/* ========== Token Badge ========== */
+.token-badge-container {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-1) var(--space-3);
+}
+
+.token-label {
+    font-size: 0.65rem;
+    font-weight: var(--weight-semibold);
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.token-total {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    color: var(--text-main);
+}
+
+.token-details {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    padding-left: var(--space-2);
+    border-left: 1px solid var(--border-subtle);
+}
+
+.token-in {
+    color: var(--accent-success);
+}
+
+.token-out {
+    color: var(--accent-secondary);
+}
+
+/* ========== Task Info ========== */
+.task-id-badge {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: var(--weight-semibold);
+    color: var(--accent-primary);
+    background: var(--accent-primary-10);
+    border: 1px solid var(--accent-primary-20);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+}
+
+.task-context {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--text-main);
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ========== Thinking Toggle ========== */
+/* Now just an IconButton, no special wrapper needed */

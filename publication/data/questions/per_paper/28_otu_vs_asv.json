@@ -1,0 +1,185 @@
+{
+  "paper_id": "28_otu_vs_asv",
+  "filename": "28_otu_vs_asv.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "This paper investigates how different bioinformatic pipelines (OTU-based clustering via VSEARCH versus ASV-based error correction via DADA2) affect the interpretation of microbial community data and ecological conclusions in wastewater treatment plant (WWTP) systems.",
+    "methods": [
+      "Lab-scale thermophilic anaerobic co-digestion (Co-AD) experiments",
+      "16S rRNA gene amplicon sequencing (V3\u2013V4 region) using Illumina MiSeq",
+      "OTU-based pipeline using VSEARCH (97% similarity clustering)",
+      "ASV-based pipeline using DADA2 (sequencing error correction algorithms)",
+      "Rarefaction and alpha-diversity analysis (Shannon Wiener index, richness, evenness)",
+      "Beta-diversity analysis (NMDS ordination and Bray-Curtis dissimilarity)",
+      "Permanova statistical analysis using the adonis2 function"
+    ],
+    "findings": [
+      {
+        "finding": "Community compositions differed between 6.75% and 10.81% depending purely on the pipeline used.",
+        "evidence": "Pipeline-based deviations in abundances... community composition differed between 6.75% and 10.81% (sum \u0394 of total community per treatment).",
+        "page": 7
+      },
+      {
+        "finding": "The OTU-based pipeline reported significantly higher numbers of unique sequences compared to the ASV-based pipeline before filtering.",
+        "evidence": "Table 1 shows the full dataset for OTU Based had 67,015 taxa, while ASV Based had 8,005.",
+        "page": 5
+      },
+      {
+        "finding": "The OTU-based pipeline typically reported slightly higher alpha-diversity than the ASV pipeline.",
+        "evidence": "Trends for diversity development... were similar across time... although the OTU-based pipeline data typically reported slightly higher diversity.",
+        "page": 5
+      },
+      {
+        "finding": "Inconsistencies were more prominent in biological samples with higher variability, such as primary and waste-activated sewage sludge (PWASS).",
+        "evidence": "Differences were observed for the PWASS microbial communities, where... diversity estimators strongly differed between the two pipelines.",
+        "page": 5
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "Comparison of alpha-diversity indices (Inverse Simpson, Shannon Wiener, and Species richness) over 170 days for different reactor treatments and pipelines.",
+        "page": 6
+      },
+      {
+        "id": "Figure 2",
+        "description": "Taxonomic profiles at the Phylum level (>2% abundance) comparing ASV and OTU pipelines across all samples.",
+        "page": 7
+      },
+      {
+        "id": "Figure 3",
+        "description": "Divergence bar plot showing the relative abundance of the top 20 Genus-level taxa identified as responses to the specific pipeline used.",
+        "page": 9
+      },
+      {
+        "id": "Figure 4",
+        "description": "Nonmetric multidimensional scaling (NMDS) plots identifying microbial population clusters by pipeline and treatment types.",
+        "page": 10
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Comparison of the number of taxa derived from OTU and ASV pipelines across various abundance and taxonomic thresholds.",
+        "columns": [
+          "Threshold",
+          "OTU Based 1 (unrarefied)",
+          "OTU Based 2 (rarefied)",
+          "ASV Based",
+          "Merged 3"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "Detailed differences in Phylum-level abundances based on the choice of pipeline for different treatments.",
+        "columns": [
+          "Phylum",
+          "Treatment",
+          "ASV",
+          "OTU",
+          "\u0394 of Total Community",
+          "Fold Deviation"
+        ]
+      },
+      {
+        "id": "Table 3",
+        "description": "Simplified Permanova results showing the statistical significance of explanatory variables with and without pipeline interaction.",
+        "columns": [
+          "Explanatory Variable",
+          "AD Reactors Only (Without/Including Pipeline)",
+          "AD and PWASS (Without/Including Pipeline)"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "OTU (Operational Taxonomic Unit)",
+      "ASV (Amplicon Sequence Variant)",
+      "PWASS (Primary and Waste-Activated Sewage Sludge)",
+      "Co-AD (Anaerobic Co-Digestion)",
+      "NGS (Next-Generation Sequencing)",
+      "Rarefaction",
+      "Permanova (Permutational Multivariate Analysis of Variance)",
+      "NMDS (Nonmetric Multidimensional Scaling)",
+      "V3\u2013V4 region",
+      "Thermophilic"
+    ],
+    "limitations": [
+      "ASV pipelines have a limited capability to deal with small or missing overlap regions in sequences.",
+      "ASV pipelines cannot handle undefined bases (N\u2019s), which are less problematic for OTU approaches.",
+      "The names of ASVs (long sequences) are difficult to incorporate into text compared to OTU short-hands.",
+      "Pipeline ease-of-use might allow user-defined biases or errors to go unnoticed."
+    ],
+    "connections": [
+      "VSEARCH (Rognes et al., 2016)",
+      "DADA2 (Callahan et al., 2016)",
+      "SILVA database v138.1",
+      "Phyloseq R package (McMurdie and Holmes, 2013)",
+      "Vegan R package (Oksanen et al., 2020)",
+      "Standard clustering threshold of 97% identity (Edgar, 2010)"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "28_otu_vs_asv_FR1",
+      "paper_id": "28_otu_vs_asv",
+      "question": "How many total taxa were identified in the full dataset by the OTU-based pipeline compared to the ASV-based pipeline prior to filtering?",
+      "category": "factual_recall",
+      "expected_answer": "According to the study's results and Table 1, the OTU-based pipeline identified 67,015 taxa in the full dataset. In contrast, the ASV-based pipeline reported significantly fewer unique sequences, identifying only 8,005 taxa.",
+      "expected_concepts": [
+        "67,015",
+        "8,005",
+        "OTU-based pipeline",
+        "ASV-based pipeline",
+        "Table 1"
+      ],
+      "difficulty": "easy",
+      "source_page": "5",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "28_otu_vs_asv_CO2",
+      "paper_id": "28_otu_vs_asv",
+      "question": "How does the choice of bioinformatic pipeline influence the interpretation of microbial community diversity and composition across different sample types?",
+      "category": "conceptual",
+      "expected_answer": "The choice of pipeline results in deviations in community composition ranging from 6.75% to 10.81%, with the OTU-based approach generally reporting higher alpha-diversity and significantly more unique taxa. These inconsistencies are not uniform across all samples; they are more pronounced in biological samples with high variability, such as primary and waste-activated sewage sludge (PWASS), compared to more stable reactor treatments.",
+      "expected_concepts": [
+        "alpha-diversity",
+        "community composition",
+        "pipeline-based deviation",
+        "PWASS",
+        "variability"
+      ],
+      "difficulty": "medium",
+      "source_page": "5, 7",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "28_otu_vs_asv_TE3",
+      "paper_id": "28_otu_vs_asv",
+      "question": "What specific software tools and clustering parameters were utilized to define the OTU-based and ASV-based pipelines in this research?",
+      "category": "technical",
+      "expected_answer": "The OTU-based pipeline utilized VSEARCH for sequence clustering using a 97% similarity threshold. The ASV-based pipeline was implemented using the DADA2 package, which employs specific sequencing error correction algorithms to identify exact amplicon sequence variants rather than clustering by a fixed percentage.",
+      "expected_concepts": [
+        "VSEARCH",
+        "97% similarity",
+        "DADA2",
+        "error correction algorithms",
+        "clustering"
+      ],
+      "difficulty": "medium",
+      "source_page": "Methods",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:25:32.675495"
+}

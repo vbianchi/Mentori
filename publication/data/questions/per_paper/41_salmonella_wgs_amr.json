@@ -1,0 +1,172 @@
+{
+  "paper_id": "41_salmonella_wgs_amr",
+  "filename": "41_salmonella_wgs_amr.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "To compare the antimicrobial resistance (AMR) genes in a genetically diverse group of Salmonella enterica recovered from imported edible leaves versus raw chicken imported into England between 2014 and 2019, utilizing whole genome sequencing (WGS).",
+    "methods": [
+      "Whole genome sequencing (WGS) using Illumina HiSeq 2500 platform",
+      "ISO 6579-1 standard method for Salmonella detection",
+      "Bioinformatics pipelines: KmerID for species/subspecies identification, MOST for MLST typing, and SNP typing for genomic relationships",
+      "Genefinder V1-5 algorithm for identifying AMR determinants (genes and chromosomal mutations)",
+      "Pairwise SNP difference analysis (isloates with \u22645 SNPs considered genetically related)"
+    ],
+    "findings": [
+      {
+        "finding": "Antimicrobial resistance is significantly more prevalent in Salmonella from raw chicken compared to edible leaves.",
+        "evidence": "Resistance to at least one antimicrobial agent was detected in 93% (214/231) of chicken isolates compared to only 3% (3/115) of isolates from edible leaves.",
+        "page": 1
+      },
+      {
+        "finding": "Multidrug resistance (MDR) is common in Salmonella from imported chicken.",
+        "evidence": "71% (164/231) of chicken isolates showed MDR (resistance to three or more antimicrobial classes), while only 2% (2/115) of leaf isolates were MDR.",
+        "page": 1
+      },
+      {
+        "finding": "S. Heidelberg is the predominant serovar in imported chicken from Brazil and is highly resistant.",
+        "evidence": "S. Heidelberg accounted for 60% (138/231) of chicken isolates, and all of these isolates had resistance genes for fluoroquinolones, tetracyclines, and sulphonamides.",
+        "page": 4
+      },
+      {
+        "finding": "Specific beta-lactam resistance genes are highly prevalent in chicken isolates.",
+        "evidence": "74% (170/231) of chicken isolates carried determinants for beta-lactam resistance, with blaCMY-2 being the most common (54%).",
+        "page": 7
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "World map showing the distribution and variety of Salmonella serovars recovered from imported edible leaves by their country of origin.",
+        "page": 5
+      },
+      {
+        "id": "Figure 2",
+        "description": "World map showing the distribution of Salmonella serovars from imported raw chicken, highlighting the predominance of S. Heidelberg and S. Minnesota in Brazilian imports.",
+        "page": 5
+      },
+      {
+        "id": "Figure 3",
+        "description": "Bar graph displaying the frequency of various antimicrobial resistance determinants (e.g., Beta-Lactams, Quinolones, MDR) in Salmonella from chicken, categorized by country of import.",
+        "page": 7
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Summary of food types, collection settings, countries of origin, and identified Salmonella serovars for the 346 isolates studied.",
+        "columns": [
+          "Food group",
+          "No. isolates tested",
+          "Food type (No. isolates)",
+          "Collection setting (No. isolates)",
+          "Countries of origin (No. isolates)",
+          "Salmonella serovars/subspecies identified (No. cultures)"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "Analysis of the genetic diversity (SNP levels) within Salmonella isolates recovered from individual chicken meat batches.",
+        "columns": [
+          "Diversity of salmonella isolates",
+          "Number of batches with (2, 3, 4, 5 isolates)",
+          "Total number of batches where \u22652 isolates",
+          "% of batches with two or more isolates typed for each diversity level indicated"
+        ]
+      },
+      {
+        "id": "Table 3",
+        "description": "Detailed listing of AMR genotypic combinations found in Salmonella serovars from imported chicken, organized by serovar and country of origin.",
+        "columns": [
+          "Serovar (No. isolates), country year",
+          "Number of isolates (number of batches)",
+          "Genotypic combinations"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "AMR (Antimicrobial Resistance)",
+      "WGS (Whole Genome Sequencing)",
+      "MDR (Multidrug Resistant)",
+      "SNP (Single Nucleotide Polymorphism)",
+      "BCP (Border Control Post)",
+      "QRDR (Quinolone Resistance-Determining Region)",
+      "ESBL (Extended-spectrum Beta-Lactamase)",
+      "RASFF (Rapid Alert System for Food and Feed)"
+    ],
+    "limitations": [
+      "The authors acknowledge that while WGS provides high-quality information, it 'cannot totally replace phenotypic methods' for AMR characterization.",
+      "The extreme diversity of Salmonella types in certain foods (like betel leaves) makes matching food isolates to specific human clinical cases rare.",
+      "The study highlights the need for more direct comparison with clinical case data to fully assess the public health impact of imported AMR genes."
+    ],
+    "connections": [
+      "Builds on previous UKHSA work implementing WGS for routine Salmonella characterization (Chattaway et al., 2019).",
+      "References established AMR prediction methodologies using WGS (Neuert et al., 2018; Hendriksen et al., 2019).",
+      "Builds on previous studies of Salmonella contamination in imported betel leaves (McLauchlin et al., 2018, 2019) and associated outbreaks (Waldram et al., 2018b).",
+      "Links findings to EU-level food safety monitoring systems like RASFF."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "41_salmonella_wgs_amr_FR1",
+      "paper_id": "41_salmonella_wgs_amr",
+      "question": "Which specific beta-lactam resistance gene was most commonly identified in Salmonella isolates from imported chicken, and what was its prevalence?",
+      "category": "factual_recall",
+      "expected_answer": "The most common determinant for beta-lactam resistance was blaCMY-2, which was found in 54% of the chicken isolates.",
+      "expected_concepts": [
+        "blaCMY-2",
+        "54%",
+        "beta-lactam resistance",
+        "chicken isolates"
+      ],
+      "difficulty": "easy",
+      "source_page": "7",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "41_salmonella_wgs_amr_CO2",
+      "paper_id": "41_salmonella_wgs_amr",
+      "question": "Based on the findings, how do the antimicrobial resistance (AMR) profiles and serovar distributions differ between Salmonella found in imported raw chicken versus imported edible leaves?",
+      "category": "conceptual",
+      "expected_answer": "Salmonella from imported raw chicken shows a much higher prevalence of resistance (93%) and multidrug resistance (71%) compared to isolates from edible leaves (3% resistance and 2% MDR). Furthermore, chicken isolates are dominated by specific highly resistant serovars like S. Heidelberg from Brazil, while leaves show a different variety of serovars distributed across various countries of origin as seen in Figure 1.",
+      "expected_concepts": [
+        "multidrug resistance (MDR)",
+        "S. Heidelberg",
+        "prevalence",
+        "raw chicken",
+        "edible leaves"
+      ],
+      "difficulty": "medium",
+      "source_page": "1, 4, 5",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "41_salmonella_wgs_amr_TE3",
+      "paper_id": "41_salmonella_wgs_amr",
+      "question": "What bioinformatics pipeline and specific quantitative threshold did the researchers use to establish genetic relatedness between Salmonella isolates?",
+      "category": "technical",
+      "expected_answer": "The researchers used Whole Genome Sequencing (WGS) on the Illumina HiSeq 2500 platform and analyzed the data using KmerID for identification, MOST for MLST typing, and SNP typing for genomic relationships. They defined isolates as being genetically related if they exhibited a pairwise SNP difference of \u22645.",
+      "expected_concepts": [
+        "SNP typing",
+        "\u22645 SNPs",
+        "KmerID",
+        "MOST",
+        "Illumina HiSeq 2500",
+        "pairwise SNP difference"
+      ],
+      "difficulty": "hard",
+      "source_page": "Methods",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:33:24.834809"
+}

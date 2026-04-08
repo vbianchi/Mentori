@@ -1,0 +1,181 @@
+{
+  "paper_id": "01_sarek",
+  "filename": "01_sarek.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "How to create a portable, user-friendly, and reproducible open-source workflow for whole-genome sequencing (WGS) analysis that detects both germline and somatic variants while being compatible across various computing environments?",
+    "methods": [
+      "Implemented using the Nextflow workflow language for scalability and portability.",
+      "Containerization using Docker and Singularity, and environment management with Conda.",
+      "Read alignment using BWA-MEM.",
+      "Data pre-processing (deduplication and recalibration) following GATK best-practice recommendations.",
+      "Germline variant calling using HaplotypeCaller and Strelka2.",
+      "Somatic variant calling using GATK4 Mutect2 and Strelka2.",
+      "Structural variant detection using Manta and TIDDIT.",
+      "Somatic copy-number variation and ploidy analysis using ASCAT and Control-FREEC.",
+      "Variant annotation using snpEff and VEP.",
+      "Quality control metrics aggregation using MultiQC."
+    ],
+    "findings": [
+      {
+        "finding": "Sarek successfully processed a 90x/90x WGS tumor/normal dataset in approximately 48 hours using a single 48-thread node.",
+        "evidence": "The complete Sarek run... took 48 hours and 21 minutes... on a single 48-thread node.",
+        "page": 5
+      },
+      {
+        "finding": "Sarek demonstrates high accuracy for somatic single-base mutations (SSM), achieving an F1 score of 0.80 at the intersection of two callers.",
+        "evidence": "Intersection (GATK4 Mutect2, Strelka2) ... F1-score 0.80",
+        "page": 6
+      },
+      {
+        "finding": "Germline variant calling is highly accurate, with SNV detection reaching an F1 score of 0.99 with Strelka2.",
+        "evidence": "Strelka2 ... F1-score 0.99 (for SNV)",
+        "page": 7
+      },
+      {
+        "finding": "The workflow is storage-intensive, requiring approximately 1.4 TB for result files (excluding temporary data) for a 90x/90x dataset.",
+        "evidence": "Of this, about 1.4 TB will be allocated for BAM files, annotated VCF files and CNV files... (Table 2 shows Total Storage 1378 GB)",
+        "page": 4
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "A schematic flowchart illustrating the Sarek workflow stages from raw FASTQ input through preprocessing, variant calling, annotation, and final reporting.",
+        "page": 5
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "Lists the required and included software tools in Sarek, their specific analysis roles, and download availability.",
+        "columns": [
+          "Software/Resource",
+          "Analyses",
+          "Availability"
+        ]
+      },
+      {
+        "id": "Table 2",
+        "description": "Provides a breakdown of resource usage (storage, CPU time, wall clock time, and memory) for a standard WGS run.",
+        "columns": [
+          "Metric (e.g., Storage, Process time)",
+          "Input data",
+          "Mapping, merging, deduplication",
+          "Quality score recalibration",
+          "Variant calling, annotation",
+          "Total"
+        ]
+      },
+      {
+        "id": "Table 3",
+        "description": "Summarizes the benchmarking results (Recall, Precision, F1) for somatic variant callers used in Sarek against a 'Gold Set'.",
+        "columns": [
+          "Somatic caller",
+          "Recall",
+          "Precision",
+          "F1-score"
+        ]
+      },
+      {
+        "id": "Table 4",
+        "description": "Summarizes the benchmarking results for germline variant callers for both SNVs and INDELs.",
+        "columns": [
+          "Germline caller",
+          "Recall",
+          "Precision",
+          "F1-score"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "Nextflow",
+      "Germline variants",
+      "Somatic mutations",
+      "WGS (Whole-Genome Sequencing)",
+      "WES (Whole-Exome Sequencing)",
+      "VCF (Variant Call Format)",
+      "POSIX-compatible",
+      "Scatter-gather approach",
+      "Indels (Insertions and Deletions)",
+      "Ploidy"
+    ],
+    "limitations": [
+      "The workflow is relatively narrow in scope to maintain optimal usability and transparency.",
+      "Benchmarking for complex somatic variants is limited by the lack of robust, relevant benchmark datasets.",
+      "The authors acknowledge that Sarek does not provide novel algorithms per se but focuses on the integration of existing state-of-the-art tools.",
+      "The workflow requires significant computational resources (minimum 16 cores and 128 GB RAM recommended for full WGS)."
+    ],
+    "connections": [
+      "Built upon the Nextflow workflow language.",
+      "Follows GATK (Genome Analysis Toolkit) best-practice recommendations.",
+      "Part of the nf-core community effort.",
+      "Integrates tools like BWA-MEM, Strelka2, Manta, and MultiQC.",
+      "Builds upon benchmarking studies such as Alioto et al. (2015) and the Genome In a Bottle (GIAB) project."
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "01_sarek_FR1",
+      "paper_id": "01_sarek",
+      "question": "What is the total storage capacity required for the resulting BAM, annotated VCF, and CNV files for a 90x/90x tumor/normal WGS dataset processed by Sarek?",
+      "category": "factual_recall",
+      "expected_answer": "Processing a 90x/90x WGS dataset requires approximately 1.4 TB (specifically 1378 GB) for the final result files, excluding temporary data. This storage allocation covers BAM files, annotated VCF files, and CNV files.",
+      "expected_concepts": [
+        "1.4 TB",
+        "1378 GB",
+        "90x/90x dataset",
+        "BAM files",
+        "VCF files"
+      ],
+      "difficulty": "easy",
+      "source_page": "4",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "01_sarek_CO2",
+      "paper_id": "01_sarek",
+      "question": "How does the Sarek workflow architecture address the dual needs of computational reproducibility and scientific best practices in variant calling?",
+      "category": "conceptual",
+      "expected_answer": "Sarek ensures computational reproducibility and portability by utilizing the Nextflow workflow language alongside containerization (Docker, Singularity) and environment management (Conda). Scientifically, it adheres to GATK best-practice recommendations for pre-processing steps, such as deduplication and recalibration, before performing variant calling using established tools like HaplotypeCaller or Mutect2.",
+      "expected_concepts": [
+        "Nextflow",
+        "Containerization",
+        "GATK best-practice",
+        "Reproducibility",
+        "Portability"
+      ],
+      "difficulty": "medium",
+      "source_page": "1-2",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "01_sarek_TE3",
+      "paper_id": "01_sarek",
+      "question": "Based on the benchmarking results, what is the specific F1 score achieved for somatic single-base mutations (SSM) when using the intersection of GATK4 Mutect2 and Strelka2?",
+      "category": "technical",
+      "expected_answer": "Sarek achieves an F1 score of 0.80 for somatic single-base mutations (SSM) when evaluating the intersection of the GATK4 Mutect2 and Strelka2 callers. This result is based on benchmarking against a defined 'Gold Set' as described in the somatic variant calling analysis.",
+      "expected_concepts": [
+        "F1 score",
+        "0.80",
+        "Mutect2",
+        "Strelka2",
+        "Intersection"
+      ],
+      "difficulty": "hard",
+      "source_page": "6",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:10:21.030382"
+}

@@ -1,0 +1,155 @@
+{
+  "paper_id": "27_inap_pipeline",
+  "filename": "27_inap_pipeline.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "How to provide a comprehensive, integrated, and user-friendly online pipeline for constructing and analyzing both intradomain and interdomain microbial ecological networks for researchers without extensive bioinformatics or programming skills?",
+    "methods": [
+      "Galaxy project framework implementation",
+      "Correlation-based approaches (Pearson, Spearman, SparCC, FastSpar)",
+      "Conditional dependence-based methods (eLSA, SPIEC-EASI)",
+      "Random Matrix Theory (RMT) for threshold identification",
+      "Topological feature analysis (degree, centrality, modularity)",
+      "Environmental factor correlation (Mantel test, Module-EigenGene analysis)",
+      "Network randomization"
+    ],
+    "findings": [
+      {
+        "finding": "iNAP integrates two specialized pipelines: the molecular ecological network analysis pipeline (MENAP) and the interdomain ecological network analysis pipeline (IDENAP).",
+        "evidence": "iNAP contains the molecular ecological network analysis pipeline and interdomain ecological network analysis pipeline (IDENAP), which correspond to the intradomain and interdomain associations of microbial species.",
+        "page": 1
+      },
+      {
+        "finding": "The pipeline is designed to handle both non-temporal and temporal microbial datasets using specific algorithms.",
+        "evidence": "For nontemporal data sets, SparCC, SPIEC-EASI, and RMT-based Pearson's and Spearman's could be alternative options, while for temporal data sets, eLSA/LA and RMT-based Pearson's and Spearman's approaches might be candidate methods.",
+        "page": 2
+      },
+      {
+        "finding": "iNAP provides automated visualization outputs compatible with major external software.",
+        "evidence": "For the visualization of networks, the output of iNAP can be directly imported to two public-friendly software programs, Cytoscape and Gephi.",
+        "page": 5
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "A simplified schematic plot illustrating the tool sections in iNAP, including input data types (abundance data), association methods for non-temporal/temporal datasets, and output network types (MENs and IDENs).",
+        "page": 3
+      },
+      {
+        "id": "Figure 2",
+        "description": "The comprehensive workflow and tool architecture exhibiting the sequential steps of network construction, reporting, visualization, and statistical analysis for both IDENAP and MENAP.",
+        "page": 4
+      },
+      {
+        "id": "Figure 3",
+        "description": "Example visualizations of networks generated from iNAP data using Cytoscape (colored by taxonomic group) and Gephi (colored by module compartments).",
+        "page": 7
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "A troubleshooting table providing solutions for common issues encountered while using the iNAP tools.",
+        "columns": [
+          "Step",
+          "Problem",
+          "Possible reason",
+          "Solutions"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "MENA (Molecular Ecological Network Analysis)",
+      "IDENA (Interdomain Ecological Network Analysis)",
+      "SparCC (Sparse Correlations for Compositional data)",
+      "SPIEC-EASI (Sparse Inverse Covariance Estimation for Ecological Association Inference)",
+      "eLSA (Extended Local Similarity Analysis)",
+      "RMT (Random Matrix Theory)",
+      "Bipartite network matrix",
+      "Adjacent network matrix",
+      "Module-EigenGene Analysis",
+      "Mantel Test"
+    ],
+    "limitations": [
+      "Requires a minimum of eight samples as replicates for network construction.",
+      "Online processing is limited to datasets with fewer than 1000 species/OTUs due to high computational resource requirements.",
+      "Large number of shuffles in SparCC can consume significant computation time."
+    ],
+    "connections": [
+      "Molecular ecological network analyses (MENA) (Deng et al. 2012)",
+      "Interdomain ecological networks (IDENs) (Feng et al. 2019)",
+      "Galaxy project framework (Goecks et al. 2010)",
+      "SparCC algorithm (Friedman and Alm 2012)",
+      "SPIEC-EASI (Kurtz et al. 2015)",
+      "eLSA (Xia et al. 2011)",
+      "Cytoscape visualization software (Shannon et al. 2003)",
+      "Gephi visualization software (Bastian et al. 2009)"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "27_inap_pipeline_FR1",
+      "paper_id": "27_inap_pipeline",
+      "question": "What are the names of the two specialized pipelines integrated into iNAP, and what specific types of microbial associations do they represent?",
+      "category": "factual_recall",
+      "expected_answer": "iNAP integrates the molecular ecological network analysis pipeline (MENAP) and the interdomain ecological network analysis pipeline (IDENAP). These pipelines correspond to the intradomain and interdomain associations of microbial species, respectively.",
+      "expected_concepts": [
+        "MENAP",
+        "IDENAP",
+        "intradomain",
+        "interdomain",
+        "microbial species"
+      ],
+      "difficulty": "easy",
+      "source_page": "1",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "27_inap_pipeline_CO2",
+      "paper_id": "27_inap_pipeline",
+      "question": "How does the iNAP system facilitate the visualization and downstream interpretation of the generated ecological networks?",
+      "category": "conceptual",
+      "expected_answer": "iNAP provides automated visualization outputs that are directly compatible with major public-friendly software programs, specifically Cytoscape and Gephi. This allows users to interpret the data by visualizing networks through different lenses, such as coloring by taxonomic groups or module compartments to reveal the underlying biological structure.",
+      "expected_concepts": [
+        "Cytoscape",
+        "Gephi",
+        "taxonomic group",
+        "module compartments",
+        "network visualization"
+      ],
+      "difficulty": "medium",
+      "source_page": "5, 7",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "27_inap_pipeline_TE3",
+      "paper_id": "27_inap_pipeline",
+      "question": "Which specific algorithms and methods does iNAP recommend for constructing networks from non-temporal versus temporal microbial datasets?",
+      "category": "technical",
+      "expected_answer": "For non-temporal datasets, iNAP recommends SparCC, SPIEC-EASI, and RMT-based Pearson's and Spearman's correlations. For temporal datasets, the system suggests using eLSA/LA along with RMT-based Pearson's and Spearman's approaches to identify associations.",
+      "expected_concepts": [
+        "SparCC",
+        "SPIEC-EASI",
+        "eLSA",
+        "Random Matrix Theory (RMT)",
+        "non-temporal",
+        "temporal"
+      ],
+      "difficulty": "hard",
+      "source_page": "2, 3",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:24:55.252378"
+}

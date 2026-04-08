@@ -1,0 +1,145 @@
+{
+  "paper_id": "32_amr_livestock_environment",
+  "filename": "32_amr_livestock_environment.pdf",
+  "metadata": {},
+  "content_analysis": {
+    "research_question": "How do antibiotic resistance (AR) and antibiotic-resistant bacteria (ARB) emerge and spread through the interconnected domains of livestock, humans, and the environment, and why is a One Health approach necessary to address this global health threat?",
+    "methods": [
+      "Literature review and synthesis of existing research (94 references)",
+      "One Health conceptual framework analysis",
+      "Review of global antibiotic consumption data and statistical modeling estimates",
+      "Synthesis of World Health Organization (WHO) and Centers for Disease Control and Prevention (CDC) health reports"
+    ],
+    "findings": [
+      {
+        "finding": "Antibiotic resistance is projected to cause massive human mortality by the mid-21st century.",
+        "evidence": "Anticipation of 10 million annual AR-associated deaths by 2050 if current trends continue.",
+        "page": 1
+      },
+      {
+        "finding": "Antimicrobial usage in livestock is high and expected to continue growing.",
+        "evidence": "Global antimicrobial usage was estimated at 99,502 tons in 2020 and is projected to increase by 8% to 107,472 tons by 2030.",
+        "page": 2
+      },
+      {
+        "finding": "Livestock farms serve as significant reservoirs for various pathogenic zoonotic bacteria.",
+        "evidence": "Farms act as reservoirs for Staphylococcus aureus, Salmonella species, Campylobacter species, E. coli, and Listeria species, which carry ARGs.",
+        "page": 2
+      },
+      {
+        "finding": "The environment acts as a 'global resistome' and a repository for acquired ARGs.",
+        "evidence": "Soil and water ecosystems serve as natural habitats for ARGs, with human activities transforming them into accumulation sites for acquired resistance genes.",
+        "page": 4
+      },
+      {
+        "finding": "A significant portion of antibiotics administered to humans and animals is excreted unchanged.",
+        "evidence": "Approximately 30% to 90% of antibiotics are excreted in urine and feces within 8\u201324 hours after consumption, persisting in the environment.",
+        "page": 5
+      }
+    ],
+    "figures": [
+      {
+        "id": "Figure 1",
+        "description": "A diagrammatic representation of the One Health perspective on antimicrobial resistance flow, illustrating the pathways of AR dissemination between livestock (red), humans (blue), and the environment (green).",
+        "page": 7
+      }
+    ],
+    "tables": [
+      {
+        "id": "Table 1",
+        "description": "The 2017 WHO priority pathogens list identifying 12 families of bacteria that pose the greatest threat to human health and require new antibiotics.",
+        "columns": [
+          "Priority level",
+          "Pathogens",
+          "Antibiotic Resistance"
+        ]
+      }
+    ],
+    "technical_terms": [
+      "Antibiotic resistance (AR)",
+      "Antibiotic-resistant bacteria (ARB)",
+      "Antibiotic resistance genes (ARGs)",
+      "One Health",
+      "Mobile genetic elements (MGEs)",
+      "Horizontal gene transfer (HGT)",
+      "Intrinsic resistance",
+      "Global resistome",
+      "Zoonotic",
+      "NDM-1 (New Delhi metallo-\u03b2-lactamase 1)"
+    ],
+    "limitations": [
+      "It is not yet clear to what extent livestock-derived transmission routes contribute to the spread of AR compared to human-derived routes.",
+      "There is still a lack of concrete explanation regarding the exact directions of AR spread in complex parameter spaces.",
+      "The resistance observed in food-related bacteria accounts for only 17% of all AR studies published as of 2020, indicating a need for more research in the livestock domain."
+    ],
+    "connections": [
+      "World Health Organization (WHO) 2017 priority pathogens list",
+      "Global Action Plan on AR (OIE, FAO, and WHO collaborative effort)",
+      "Muchandani et al. (2023) statistical models for antimicrobial usage estimates",
+      "Lancet Commission reports on global health threats",
+      "Centers for Disease Control and Prevention (CDC) antibiotic prescription data"
+    ]
+  },
+  "draft_questions": [
+    {
+      "q_id": "32_amr_livestock_environment_FR1",
+      "paper_id": "32_amr_livestock_environment",
+      "question": "What is the projected annual human mortality rate associated with antimicrobial resistance by the year 2050 if current trends continue?",
+      "category": "factual_recall",
+      "expected_answer": "According to the paper, there is an anticipation of 10 million annual AR-associated deaths by 2050 if current trends continue.",
+      "expected_concepts": [
+        "10 million",
+        "annual deaths",
+        "2050",
+        "current trends"
+      ],
+      "difficulty": "easy",
+      "source_page": "1",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "32_amr_livestock_environment_CO2",
+      "paper_id": "32_amr_livestock_environment",
+      "question": "How do the interconnected domains of the One Health framework contribute to the cycle of antimicrobial resistance dissemination?",
+      "category": "conceptual",
+      "expected_answer": "The One Health perspective describes a flow where livestock act as significant reservoirs for zoonotic pathogens (like E. coli and Salmonella) carrying resistance genes. These resistance genes and unchanged antibiotics (excreted at rates of 30-90%) are released into soil and water ecosystems, which serve as a 'global resistome' and repository, ultimately allowing resistance to cycle back to humans through environmental and animal contact.",
+      "expected_concepts": [
+        "One Health",
+        "livestock reservoirs",
+        "global resistome",
+        "antibiotic excretion",
+        "AR dissemination"
+      ],
+      "difficulty": "hard",
+      "source_page": "2, 4, 5, 7",
+      "requires_iteration": true,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    },
+    {
+      "q_id": "32_amr_livestock_environment_TE3",
+      "paper_id": "32_amr_livestock_environment",
+      "question": "Based on statistical modeling estimates, what was the estimated global antimicrobial usage in livestock for 2020 and what is the projected usage for 2030?",
+      "category": "technical",
+      "expected_answer": "Global antimicrobial usage in livestock was estimated at 99,502 tons in 2020. It is projected to increase by 8% to reach a total of 107,472 tons by 2030.",
+      "expected_concepts": [
+        "99,502 tons",
+        "107,472 tons",
+        "8% increase",
+        "2030 projection"
+      ],
+      "difficulty": "medium",
+      "source_page": "2",
+      "requires_iteration": false,
+      "status": "pending",
+      "reviewer_notes": "",
+      "corrected_answer": ""
+    }
+  ],
+  "status": "pending_review",
+  "processed_at": "2026-03-03T11:28:18.620643"
+}

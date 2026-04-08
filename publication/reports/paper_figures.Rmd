@@ -1,0 +1,2149 @@
+---
+title: "NMI Paper Figures — Evidence-Based Context Engineering"
+author: "Bianchi & Schokker"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+params:
+  output_dir: "figures_nmi"
+  format: "tiff"
+  dpi: 300
+  width_mm: 180
+  height_mm: 120
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE, warning = FALSE, message = FALSE,
+  fig.retina = 2,
+  dev = if (requireNamespace("ragg", quietly = TRUE)) "ragg_png" else "png"
+)
+
+library(tidyverse)
+library(jsonlite)
+library(scales)
+library(patchwork)
+library(ggrepel)
+library(here)
+
+# Output directory for TIFF/PNG figures
+fig_dir <- here::here("publication", "figures")
+dir.create(fig_dir, recursive = TRUE, showWarnings = FALSE)
+
+# Helper to save figures as both TIFF and PDF.
+#
+# NMI submission format rules (verified 2026-04-09 against
+# nature.com/natmachintell/submission-guidelines/aip-and-formatting and
+# research-figure-guide.nature.com/figures/extended-data-formatting-guidelines/):
+#
+#   - Main figures (Fig 1-6):
+#       Width   <= 180 mm  (single col 88 mm or double col 180 mm)
+#       Height  <= 247 mm  (depending on caption length)
+#       Format  -> PDF / EPS / AI (vector, PREFERRED for ggplot output)
+#                  TIFF also accepted but rasterised
+#       Size    <= 50 MB
+#
+#   - Extended Data figures (ED Fig 1-6):
+#       Width   <= 180 mm
+#       Height  <= 170 mm  (figure + legend must fit a single PDF page)
+#       Format  -> JPEG / TIFF / EPS ONLY  (PDF is NOT accepted by the
+#                  ED submission pipeline; the .pdf files emitted here are
+#                  for in-repo review/preview only and must NOT be uploaded
+#                  to the NMI portal as ED submissions)
+#       Size    <= 10 MB per item
+#
+# Practical upload guidance:
+#   - For Fig 1-6 in the NMI portal, upload the .pdf files written here.
+#   - For ED Fig 1-6 in the NMI portal, upload the .tiff files written here.
+#
+# TIFFs use LZW compression so chart-style content (mostly background +
+# line art) compresses 95-99% — every ED .tiff stays well under 1 MB.
+save_figure <- function(plot, filename, w = params$width_mm, h = params$height_mm) {
+  # TIFF — required submission format for Extended Data, also accepted
+  # (but not preferred) for main figures.
+  tiff_path <- file.path(fig_dir, paste0(filename, ".tiff"))
+  ggsave(tiff_path, plot = plot, width = w, height = h, units = "mm",
+         dpi = params$dpi, bg = "white", compression = "lzw")
+  # PDF — preferred submission format for main figures (vector). NOT
+  # accepted for ED submissions: keep this output for in-repo preview
+  # via paper_figures.html and as the source for the figures embedded
+  # in the manuscript draft.
+  pdf_path <- file.path(fig_dir, paste0(filename, ".pdf"))
+  ggsave(pdf_path, plot = plot, width = w, height = h, units = "mm",
+         bg = "white")
+  cat(sprintf("Saved: %s + .pdf (%d x %d mm, %d dpi)\n", tiff_path, w, h, params$dpi))
+  invisible(tiff_path)
+}
+```
+
+```{r palette-and-theme}
+# --- Colorblind-safe palette (Wong 2011, Nat. Methods 8, 441) ---
+# Diverging triple: vermillion / yellow / bluish-green
+col_bad    <- "#D55E00"  # Wong vermillion
+col_mid    <- "#F0E442"  # Wong yellow
+col_good   <- "#009E73"  # Wong bluish green
+col_info   <- "#0072B2"  # Wong blue
+col_muted  <- "#666666"  # neutral grey
+
+# Categorical: Wong 2011 base 8 + Tol "muted" extension for >8 categories
+# (all colorblind-friendly, contrast-tested)
+model_palette <- c(
+  "#E69F00", "#56B4E9", "#009E73", "#F0E442",
+  "#0072B2", "#D55E00", "#CC79A7", "#000000",
+  "#332288", "#117733", "#88CCEE", "#DDCC77",
+  "#CC6677", "#AA4499", "#882255", "#44AA99",
+  "#999933", "#661100", "#6699CC", "#888888"
+)
+
+# Tick label formatter: turn 0-1 fraction into 0-100 integer.
+# Use this on axes whose title already contains "(%)" so the tick
+# labels do not redundantly print the "%" symbol.
+pct100 <- function(x) round(x * 100)
+
+config_palette <- c(
+  "single_pass"   = "#56B4E9",
+  "multi_hop"     = "#E69F00",
+  "rlm_5"         = "#009E73",
+  "rlm_10"        = "#0072B2",
+  "rlm_20"        = "#CC79A7",
+  "verified_pass" = "#D55E00"
+)
+
+config_labels <- c(
+  "single_pass"   = "Single Pass",
+  "multi_hop"     = "Multi-Hop",
+  "rlm_5"         = "RLM-5",
+  "rlm_10"        = "RLM-10",
+  "rlm_20"        = "RLM-20",
+  "verified_pass" = "Verified Pass"
+)
+
+config_order <- c("single_pass", "multi_hop", "rlm_5", "rlm_10", "rlm_20", "verified_pass")
+
+# NMI-compliant theme (Nature Machine Intelligence submission guidelines):
+#   - Font: Arial/Helvetica (sans-serif)
+#   - Body text 5-7 pt; panel labels 8 pt bold lowercase
+#   - No background gridlines; no 3D/patterns/drop shadows
+#   - Colorblind-accessible palette (Wong 2011)
+theme_nmi <- function(base_size = 7) {
+  font_family <- if ("Helvetica" %in% names(grDevices::postscriptFonts())) "Helvetica" else "sans"
+  theme_minimal(base_size = base_size, base_family = font_family) +
+    theme(
+      # Panel labels (a, b, c) at 8 pt bold lowercase, left-aligned to plot
+      plot.title       = element_text(face = "bold", size = 8, hjust = 0,
+                                       margin = margin(b = 3)),
+      plot.subtitle    = element_text(color = col_muted, size = 6,
+                                       margin = margin(b = 3)),
+      plot.title.position = "plot",
+      # Axes: 7 pt titles, 6 pt tick labels
+      axis.title       = element_text(size = 7),
+      axis.text        = element_text(size = 6, color = "grey20"),
+      axis.line        = element_line(linewidth = 0.3, color = "black"),
+      axis.ticks       = element_line(linewidth = 0.25, color = "grey40"),
+      # Legend
+      legend.position  = "bottom",
+      legend.title     = element_text(size = 7, face = "bold"),
+      legend.text      = element_text(size = 6),
+      legend.key.size  = unit(3, "mm"),
+      # Facet strips: 7 pt bold (NMI disallows decorative strips)
+      strip.text       = element_text(face = "bold", size = 7),
+      strip.background = element_blank(),
+      # No gridlines (NMI: "Avoid background gridlines")
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      # Margins
+      plot.margin      = margin(4, 4, 4, 4)
+    )
+}
+```
+
+```{r load-data}
+# --- JSON utilities ---
+fix_json <- function(path) {
+  text <- readLines(path, warn = FALSE) |> paste(collapse = "\n")
+  gsub(": NaN", ": null", text) |> fromJSON(flatten = TRUE)
+}
+
+safe_load <- function(path) {
+  if (file.exists(path)) fix_json(path) else NULL
+}
+
+short_name <- function(x) {
+  x |>
+    str_remove("^ollama::") |>
+    str_remove("^gemini::") |>
+    str_remove(":latest$") |>
+    str_replace("gemini-3-flash-preview", "gemini-3-flash")
+}
+
+# Canonical model naming: enforces consistent `family:size[b]` format across all figures.
+# Handles hyphenated, colon, and [think:X] suffixed inputs from all data sources.
+canonical_model_name <- function(x) {
+  # Step 1: strip backend prefixes
+  x <- x |>
+    str_remove("^ollama::") |>
+    str_remove("^gemini::")
+
+  # Step 2: separate the think-mode suffix (if any) from the model base
+  think_suffix <- str_extract(x, "[_\\s]?\\[?think[:=-]\\w+\\]?$|[_\\s]\\+think$")
+  base <- if (!is.na(think_suffix)) str_remove(x, stringr::fixed(think_suffix)) else x
+
+  # Normalise think suffix to " [think:X]"
+  think_norm <- ""
+  if (!is.na(think_suffix)) {
+    m <- str_match(think_suffix, "think[:=-]?(\\w+)")
+    mode <- if (!is.na(m[1,2])) m[1,2] else "on"
+    if (mode %in% c("True", "true", "TRUE", "on", "On")) mode <- "on"
+    if (mode %in% c("False", "false", "FALSE")) mode <- "off"
+    if (grepl("\\+think", think_suffix)) mode <- "on"
+    if (mode != "off") think_norm <- paste0(" [think:", mode, "]")
+  }
+
+  # Step 3: canonicalise the base model name
+  base <- base |>
+    # Canonicalise Gemini preview → gemini-3-flash
+    str_replace("gemini-3-flash-preview", "gemini-3-flash") |>
+    str_replace("^Gemini$", "gemini-3-flash") |>
+    # Resolve models with ambiguous tags to explicit sizes
+    str_replace("qwen3-coder-next[:-]q4[_ ]K[_ ]M", "qwen3-coder-next:80b") |>
+    str_replace("qwen3-coder-next-q4_K_M", "qwen3-coder-next:80b") |>
+    str_replace("qwen3-coder:latest", "qwen3-coder:30b") |>
+    str_replace("qwen3-coder-latest", "qwen3-coder:30b") |>
+    str_replace("^qwen3-coder$", "qwen3-coder:30b") |>
+    str_replace("glm-4\\.7-flash:latest", "glm-4.7-flash:30b") |>
+    str_replace("glm-4\\.7-flash-bf16", "glm-4.7-flash:30b") |>
+    str_replace("glm-4\\.7-flash:bf16", "glm-4.7-flash:30b") |>
+    # Normalise hyphen-before-size → colon-before-size
+    # Apply to well-known model families
+    str_replace("^(nemotron-3-nano)-(\\d+b)$", "\\1:\\2") |>
+    str_replace("^(devstral-small-2)-(\\d+b)$", "\\1:\\2") |>
+    str_replace("^(gemma3)-(\\d+b)$", "\\1:\\2") |>
+    str_replace("^(llama3)-(\\d+b)$", "\\1:\\2") |>
+    str_replace("^(gpt-oss)-(\\d+b)$", "\\1:\\2") |>
+    str_replace("^(deepseek-r1)-(\\d+b)$", "\\1:\\2") |>
+    str_replace("^(olmo-3)-(\\d+b)$", "\\1:\\2") |>
+    str_replace("^(qwen3\\.5)-(\\d+b)$", "\\1:\\2")
+
+  paste0(base, think_norm)
+}
+canonical_model_name <- Vectorize(canonical_model_name, USE.NAMES = FALSE)
+
+results_dir <- here::here("publication", "results")
+
+# --- V4-4 Generation Strategy ---
+data <- fix_json(file.path(results_dir, "exp04_generation_latest.json"))
+pqr_tbl <- data$per_question_results |> as_tibble()
+# Ensure optional columns exist (OOD fields may be missing in answerable-only rows)
+for (col in c("judge_scores.refusal_accuracy", "citation_metrics.total_citations",
+              "citation_metrics.source_coverage")) {
+  if (!col %in% names(pqr_tbl)) pqr_tbl[[col]] <- NA_real_
+}
+pqr <- pqr_tbl |>
+  mutate(
+    config       = factor(config, levels = config_order),
+    config_label = factor(config_labels[as.character(config)], levels = config_labels),
+    is_rlm       = grepl("^rlm_", config),
+    category     = factor(category),
+    correctness  = judge_scores.correctness,
+    completeness = judge_scores.completeness,
+    faithfulness = judge_scores.faithfulness,
+    citation_quality = judge_scores.citation_quality,
+    refusal_accuracy = judge_scores.refusal_accuracy,
+    passed       = ifelse(answerable, !is.na(correctness) & correctness >= 3, NA),
+    latency_s    = generation.latency_s,
+    llm_calls    = generation.llm_calls,
+    total_citations = citation_metrics.total_citations,
+    source_coverage = citation_metrics.source_coverage
+  )
+
+ans   <- pqr |> filter(answerable == TRUE)
+unans <- pqr |> filter(answerable == FALSE)
+
+config_summary <- ans |>
+  group_by(config, config_label) |>
+  summarise(
+    n = n(), pass_rate = mean(passed, na.rm = TRUE),
+    mean_corr = mean(correctness, na.rm = TRUE),
+    mean_comp = mean(completeness, na.rm = TRUE),
+    mean_faith = mean(faithfulness, na.rm = TRUE),
+    mean_cite = mean(citation_quality, na.rm = TRUE),
+    med_latency = median(latency_s, na.rm = TRUE),
+    mean_citations = mean(total_citations, na.rm = TRUE),
+    mean_coverage = mean(source_coverage, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# --- Deterministic vs Judge ---
+det_files <- list.files(results_dir, pattern = "analysis_deterministic_.*\\.json$", full.names = TRUE)
+det_file  <- sort(det_files, decreasing = TRUE)[1]
+det_data  <- fix_json(det_file)
+det <- det_data$per_result |>
+  as_tibble() |>
+  mutate(
+    config = factor(config, levels = config_order),
+    config_label = factor(config_labels[as.character(config)], levels = config_labels),
+    det_correctness      = deterministic_scores.correctness,
+    det_completeness     = deterministic_scores.completeness,
+    det_faithfulness     = deterministic_scores.faithfulness,
+    det_citation_quality = deterministic_scores.citation_quality,
+    judge_correctness    = judge_scores.correctness,
+    judge_completeness   = judge_scores.completeness,
+    judge_faithfulness   = judge_scores.faithfulness,
+    judge_citation_quality = judge_scores.citation_quality
+  )
+det_ans <- det |> filter(answerable == TRUE)
+
+# Extract objective metrics (concept recall, semantic similarity) for Fig. 2
+# fromJSON(flatten=TRUE) creates dotted column names
+det_ans <- det_ans |>
+  mutate(
+    concept_recall       = objective_metrics.concept_recall,
+    semantic_similarity  = objective_metrics.semantic_similarity,
+    citation_density     = objective_metrics.citation_density
+  )
+
+det_summary <- det_ans |>
+  group_by(config, config_label) |>
+  summarise(
+    n = n(),
+    det_corr = mean(det_correctness, na.rm = TRUE),
+    det_faith = mean(det_faithfulness, na.rm = TRUE),
+    judge_corr = mean(judge_correctness, na.rm = TRUE),
+    judge_faith = mean(judge_faithfulness, na.rm = TRUE),
+    det_mean = mean((det_correctness + det_completeness + det_faithfulness + det_citation_quality) / 4, na.rm = TRUE),
+    judge_mean = mean((judge_correctness + judge_completeness + judge_faithfulness + judge_citation_quality) / 4, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# --- MiniCheck ---
+mc_files <- list.files(results_dir, pattern = "exp04_minicheck_.*\\.json$", full.names = TRUE)
+if (length(mc_files) == 0)
+  mc_files <- list.files(results_dir, pattern = "analysis_minicheck_.*\\.json$", full.names = TRUE)
+mc_file <- sort(mc_files, decreasing = TRUE)[1]
+has_minicheck <- !is.na(mc_file) && file.exists(mc_file)
+if (has_minicheck) {
+  mc_data <- fix_json(mc_file)
+  mc <- mc_data$per_result |>
+    as_tibble() |>
+    mutate(
+      config = factor(config, levels = config_order),
+      config_label = factor(config_labels[as.character(config)], levels = config_labels),
+      mc_precision = minicheck.precision,
+      mc_recall = minicheck.recall,
+      mc_f1 = minicheck.f1,
+      judge_faith = judge_scores.faithfulness
+    )
+  mc_summary <- mc |>
+    group_by(config, config_label) |>
+    summarise(
+      n = n(), Precision = mean(mc_precision, na.rm = TRUE),
+      Recall = mean(mc_recall, na.rm = TRUE), F1 = mean(mc_f1, na.rm = TRUE),
+      `Judge Faith.` = mean(judge_faith, na.rm = TRUE), .groups = "drop"
+    )
+}
+
+# --- Paper Validation (TPR/TNR, Kendall's W, ECE) ---
+val_data <- safe_load(file.path(results_dir, "analysis_paper_validation.json"))
+has_validation <- !is.null(val_data)
+
+# --- Saturation / Per-turn ---
+pt_raw <- safe_load(file.path(results_dir, "analysis_perturn_analysis_latest.json"))
+has_perturn <- !is.null(pt_raw)
+
+# --- Flip Rate ---
+fr_raw <- safe_load(file.path(results_dir, "analysis_fliprate_analysis.json"))
+has_fliprate <- !is.null(fr_raw)
+
+# --- V4-1/2/3 Retrieval ---
+v41 <- safe_load(file.path(results_dir, "exp01_embedding_latest.json"))
+v42 <- safe_load(file.path(results_dir, "exp02_search_latest.json"))
+v43a <- safe_load(file.path(results_dir, "exp03a_chunking_latest.json"))
+v43b <- safe_load(file.path(results_dir, "exp03b_scalability_latest.json"))
+
+# --- V4-0 Model Selection ---
+triage_data <- safe_load(file.path(results_dir, "exp00_triage_latest.json"))
+obj_data    <- safe_load(file.path(results_dir, "exp00_objective_latest.json"))
+cal_data    <- safe_load(file.path(results_dir, "exp00_calibration_latest.json"))
+
+# --- V4-5 Scaling ---
+v45_raw <- safe_load(file.path(results_dir, "exp05_scaling_latest.json"))
+has_v45 <- !is.null(v45_raw)
+
+if (has_v45) {
+  v45_tbl <- v45_raw$per_question_results |> as_tibble()
+  # Add missing columns with NA if they don't exist (OOD vs answerable have different judge fields)
+  if (!"judge_scores.refusal_accuracy" %in% names(v45_tbl))
+    v45_tbl$judge_scores.refusal_accuracy <- NA_real_
+  if (!"generation.error" %in% names(v45_tbl))
+    v45_tbl$generation.error <- NA_character_
+  if (!"judge_scores.correctness" %in% names(v45_tbl))
+    v45_tbl$judge_scores.correctness <- NA_real_
+  if (!"generation.latency_s" %in% names(v45_tbl))
+    v45_tbl$generation.latency_s <- NA_real_
+
+  v45 <- v45_tbl |>
+    mutate(
+      index_id    = index_name,
+      core_size   = as.integer(str_extract(index_name, "(?<=_s)\\d+")),
+      noise_ratio = as.integer(str_extract(index_name, "(?<=_n)\\d+")),
+      config      = factor(config, levels = config_order),
+      config_label = factor(config_labels[as.character(config)], levels = config_labels),
+      correctness = judge_scores.correctness,
+      pass        = !is.na(correctness) & correctness >= 3,
+      latency_s   = generation.latency_s,
+      refusal_accuracy = judge_scores.refusal_accuracy,
+      gen_error   = generation.error
+    )
+
+  # Flag broken results: 429 in answer or explicit error
+  v45 <- v45 |>
+    mutate(
+      answer_text = as.character(generation.answer),
+      is_quota_error = str_detect(answer_text, fixed("429")) |
+                       str_detect(answer_text, fixed("RESOURCE_EXHAUSTED")),
+      is_broken = is_quota_error | (!is.na(gen_error) & gen_error != ""),
+      is_broken = replace_na(is_broken, FALSE)
+    )
+
+  n_broken <- sum(v45$is_broken)
+  n_clean  <- sum(!v45$is_broken)
+  cat(sprintf("V4-5 data: %d results (%d clean, %d broken/error)\n",
+    nrow(v45), n_clean, n_broken))
+
+  # Clean subset: exclude broken results
+  v45_clean <- v45 |> filter(!is_broken)
+} else {
+  cat("V4-5 scaling results not yet available.\n")
+}
+
+# --- V4-6 Pipeline Ablation ---
+v46_raw <- safe_load(file.path(results_dir, "exp06_orchestration_ablation_latest.json"))
+has_v46 <- !is.null(v46_raw)
+
+if (has_v46) {
+  v46_pqr <- v46_raw$per_question_results |> as_tibble()
+  v46_answerable <- v46_pqr |> filter(answerable == TRUE)
+  v46_unanswerable <- v46_pqr |> filter(answerable == FALSE)
+
+  v46_pass <- v46_answerable |>
+    group_by(config) |>
+    summarise(
+      pass_rate = mean(judge_scores.correctness >= 3, na.rm = TRUE) * 100,
+      mean_correctness = mean(judge_scores.correctness, na.rm = TRUE),
+      n_answerable = n(), .groups = "drop"
+    )
+
+  v46_refusal <- v46_unanswerable |>
+    group_by(config) |>
+    summarise(
+      refusal_rate = mean(judge_scores.refusal_accuracy >= 3, na.rm = TRUE) * 100,
+      n_unanswerable = n(), .groups = "drop"
+    )
+
+  v46_latency <- v46_pqr |>
+    group_by(config) |>
+    summarise(
+      median_latency = median(generation.latency_s, na.rm = TRUE),
+      n_total = n(), .groups = "drop"
+    )
+
+  v46_summary <- v46_pass |>
+    left_join(v46_refusal, by = "config") |>
+    left_join(v46_latency, by = "config")
+
+  cat(sprintf("V4-6 data: %d results across %d configs\n",
+    nrow(v46_pqr), n_distinct(v46_pqr$config)))
+} else {
+  cat("V4-6 ablation results not yet available.\n")
+}
+
+# --- V4-8 Code Generation ---
+v48_comp   <- safe_load(file.path(results_dir, "exp08_comparison_v2_vs_v4.json"))
+has_v48    <- !is.null(v48_comp)
+v48_files  <- list.files(results_dir, pattern = "exp08_coder_benchmark_.*_latest\\.json", full.names = TRUE)
+v48_models <- list()
+for (f in v48_files) {
+  d <- safe_load(f)
+  if (!is.null(d) && !is.null(d$summary)) {
+    think_tag <- d$think %||% "off"
+    key <- paste0(d$gen_model %||% basename(f),
+                  if (think_tag != "off") paste0("[think:", think_tag, "]") else "")
+    v48_models[[key]] <- d
+  }
+}
+has_v48_models <- length(v48_models) > 0
+
+cat("All data loaded.\n")
+```
+
+---
+
+# Figure 2 — Generation Strategy Comparison {.tabset}
+
+```{r fig2-build, fig.width=10, fig.height=10}
+# Panel a: Pass rate
+p2a <- config_summary |>
+  ggplot(aes(x = config_label, y = pass_rate, fill = config)) +
+  geom_col(width = 0.7) +
+  geom_hline(yintercept = 0.8, linetype = "dashed", color = col_muted, linewidth = 0.5) +
+  geom_text(aes(label = percent(pass_rate, accuracy = 0.1)),
+            vjust = -0.5, size = 2.8, fontface = "bold") +
+  scale_fill_manual(values = config_palette, guide = "none") +
+  scale_y_continuous(labels = pct100, limits = c(0, 1.05), expand = expansion(mult = c(0, 0.02))) +
+  labs(title = "a",
+       x = NULL, y = "Pass rate (%)") +
+  theme_nmi() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Panel b: Concept recall (deterministic ground truth)
+cr_summary <- det_ans |>
+  group_by(config, config_label) |>
+  summarise(mean_cr = mean(concept_recall, na.rm = TRUE),
+            se_cr = sd(concept_recall, na.rm = TRUE) / sqrt(n()),
+            .groups = "drop")
+
+p2b <- cr_summary |>
+  ggplot(aes(x = config_label, y = mean_cr, fill = config)) +
+  geom_col(width = 0.7) +
+  geom_errorbar(aes(ymin = mean_cr - se_cr, ymax = mean_cr + se_cr), width = 0.25, linewidth = 0.4) +
+  geom_text(aes(label = sprintf("%.1f%%", mean_cr * 100), y = mean_cr + se_cr),
+            vjust = -0.5, size = 2.8, fontface = "bold") +
+  scale_fill_manual(values = config_palette, guide = "none") +
+  scale_y_continuous(labels = pct100, limits = c(0, 1.0), expand = expansion(mult = c(0, 0.08))) +
+  labs(title = "b",
+       x = NULL, y = "Concept recall (%)") +
+  theme_nmi() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Panel c: Latency vs quality bubble plot
+p2c <- config_summary |>
+  ggplot(aes(x = med_latency, y = mean_corr, color = config, size = pass_rate)) +
+  geom_point(alpha = 0.85) +
+  geom_text_repel(aes(label = config_label), size = 2.5, show.legend = FALSE,
+                  max.overlaps = 20, min.segment.length = 0,
+                  box.padding = 1.0, point.padding = 0.8, force = 6,
+                  force_pull = 0.2, seed = 42) +
+  scale_color_manual(values = config_palette, guide = "none") +
+  scale_size_continuous(range = c(3, 10), labels = pct100, name = "Pass rate (%)") +
+  scale_x_continuous(limits = c(0, 115), breaks = seq(0, 100, 25)) +
+  scale_y_continuous(limits = c(2.5, 4.5), breaks = seq(2.5, 4.5, 0.5)) +
+  labs(title = "c",
+       x = "Median latency (s)", y = "Score") +
+  theme_nmi() + theme(legend.position = "right",
+                       legend.key.size = unit(0.35, "cm"),
+                       legend.text = element_text(size = 7),
+                       axis.title.x = element_text(margin = margin(t = 2, b = 0)),
+                       plot.margin = margin(4, 4, 0, 4))
+
+# Panel d: OOD refusal rate
+refusal_summary <- unans |>
+  group_by(config, config_label) |>
+  summarise(
+    n = n(),
+    refusal_rate = mean(!is.na(refusal_accuracy) & refusal_accuracy >= 3, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+p2d <- refusal_summary |>
+  ggplot(aes(x = config_label, y = refusal_rate, fill = config)) +
+  geom_col(width = 0.7) +
+  geom_text(aes(label = percent(refusal_rate, accuracy = 0.1)),
+            vjust = -0.5, size = 2.8, fontface = "bold") +
+  scale_fill_manual(values = config_palette, guide = "none") +
+  scale_y_continuous(labels = pct100, limits = c(0, 1.05), expand = expansion(mult = c(0, 0.02))) +
+  labs(title = "d",
+       x = NULL, y = "Refusal rate (%)") +
+  theme_nmi() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Panel e: Outcome flips (answerable questions only, threshold >= 3)
+# Compute directly from per-question results to ensure answerable-only denominator
+sp_ans <- ans |> filter(config == "single_pass") |>
+  select(question_id, sp_passed = passed)
+
+flip_df_2e <- ans |>
+  filter(config != "single_pass") |>
+  inner_join(sp_ans, by = "question_id") |>
+  group_by(config, config_label) |>
+  summarise(
+    harmful = sum(sp_passed & !passed, na.rm = TRUE),   # correct -> incorrect
+    helpful = sum(!sp_passed & passed, na.rm = TRUE),   # incorrect -> correct
+    .groups = "drop"
+  ) |>
+  mutate(
+    total_flips = harmful + helpful,
+    harmful_rate = harmful / pmax(total_flips, 1),
+    strategy = config_label |>
+      str_replace("Single Pass", "Single pass") |>
+      str_replace("Verified Pass", "Verified pass"),
+    strategy = factor(strategy, levels = rev(unique(strategy)))
+  )
+
+flip_long_2e <- flip_df_2e |>
+  pivot_longer(c(harmful, helpful), names_to = "type", values_to = "count") |>
+  mutate(count_plot = ifelse(type == "harmful", -count, count))
+
+p2e <- ggplot(flip_long_2e, aes(x = count_plot, y = strategy, fill = type)) +
+  geom_col(width = 0.6) +
+  geom_text(aes(label = abs(count)),
+            hjust = ifelse(flip_long_2e$type == "harmful", 1.3, -0.3),
+            size = 2.8, fontface = "bold") +
+  geom_text(data = flip_df_2e,
+            aes(x = max(flip_df_2e$helpful) + 4, y = strategy,
+                label = sprintf("%.0f%%", harmful_rate * 100)),
+            inherit.aes = FALSE, size = 2.5, hjust = 0, color = col_muted) +
+  geom_vline(xintercept = 0, color = "grey30", linewidth = 0.8) +
+  scale_fill_manual(values = c("harmful" = col_bad, "helpful" = col_good),
+                    labels = c("Harmful (correct\u2192incorrect)", "Helpful (incorrect\u2192correct)")) +
+  scale_x_continuous(labels = function(x) abs(x)) +
+  labs(title = "e",
+       x = "Flipped questions", y = NULL, fill = NULL) +
+  theme_nmi() + theme(panel.grid.major.y = element_blank(),
+                       legend.position = "bottom",
+                       legend.key.size = unit(0.3, "cm"))
+
+# Assemble: 3 rows — (a, b), (c, d), (e)
+top_row <- (p2a | p2b) + plot_layout(axes = "collect_x")
+mid_row <- (free(p2c, type = "label", side = "b") | p2d)
+
+fig2 <- (top_row / mid_row / free(p2e)) +
+  plot_layout(heights = c(1, 1, 0.8)) +
+  plot_annotation(
+    theme = theme_nmi() + theme(plot.title = element_text(size = 9, face = "bold", margin = margin(b = 4)))
+  )
+
+fig2
+save_figure(fig2, "fig2_generation_strategy", w = 180, h = 240)
+```
+
+---
+
+# Figure 3 — Scaling Behavior: Depth and Corpus Size {.tabset}
+
+Merged figure: saturation (V4-4/V4-9) + corpus scaling (V4-5).
+Source coverage (old Fig 3b) moved to Extended Data.
+
+```{r fig3-build, fig.width=12, fig.height=12, eval=has_perturn}
+# ── Shared: load V4-9 data and fit logistic models ──
+library(minpack.lm)
+
+ylim_sat <- c(0, 0.70)  # shared y-axis for panels a and b
+
+# V4-9: load ALL models (Gemini + local) from merged files
+v49_files <- list.files(results_dir,
+                        pattern = "exp09_depth_sweep_.*_merged\\.json$", full.names = TRUE)
+v49_all <- map_dfr(v49_files, function(f) {
+  d <- fromJSON(f, flatten = TRUE)
+  model_name <- gsub("ollama::", "", d$model %||% gsub(".*sweep_(.*)_merged\\.json", "\\1", basename(f)))
+  model_name <- gsub("_", " ", model_name)
+  d$results |> as_tibble() |> mutate(model = model_name)
+}) |>
+  filter(!is.na(concept_recall))
+
+# Separate Gemini and local models
+v49_gemini <- v49_all |>
+  filter(grepl("gemini", model, ignore.case = TRUE)) |>
+  group_by(model, depth) |>
+  summarise(mean_cr = mean(concept_recall), se = sd(concept_recall)/sqrt(n()),
+            n = n(), .groups = "drop") |>
+  mutate(ci_lower = mean_cr - 1.96*se, ci_upper = mean_cr + 1.96*se,
+         model = "gemini-3-flash")
+
+v49_data <- v49_all |>
+  filter(!grepl("gemini", model, ignore.case = TRUE)) |>
+  group_by(model, depth) |>
+  summarise(mean_cr = mean(concept_recall), se = sd(concept_recall)/sqrt(n()),
+            n = n(), .groups = "drop") |>
+  mutate(ci_lower = mean_cr - 1.96*se, ci_upper = mean_cr + 1.96*se)
+
+# Model spec for local models (panel b) — all 8 local models from V4-9
+local_spec <- tribble(
+  ~model_key,                  ~display,                   ~params_B, ~color,
+  "qwen3-coder-next:q4 K M",  "qwen3-coder-next:80b",     80,        "#009E73",
+  "qwen3-coder:latest",       "qwen3-coder:30b",          30,        "#0072B2",
+  "nemotron-3-nano:30b",      "nemotron-3-nano:30b",      30,        "#E69F00",
+  "gemma3:27b",               "gemma3:27b",               27,        "#CC79A7",
+  "devstral-small-2:24b",     "devstral-small-2:24b",     24,        "#56B4E9",
+  "gpt-oss:20b",              "gpt-oss:20b",              20,        "#D55E00",
+  "glm-4.7-flash:latest",     "glm-4.7-flash:30b",       30,        "#F0E442",
+  "llama3:8b",                "llama3:8b",                 8,        "#999999",
+)
+
+# Fit logistic to all models (Gemini + 8 local)
+all_models_spec <- bind_rows(
+  tibble(model_key = "gemini-3-flash", display = "gemini-3-flash", params_B = NA_real_, color = "grey40"),
+  local_spec
+)
+
+fit_types <- c("Logistic", "Sat. Exp.", "Logarithmic", "Linear")
+r2_matrix <- matrix(NA, nrow = nrow(all_models_spec), ncol = length(fit_types),
+                    dimnames = list(all_models_spec$display, fit_types))
+logistic_params <- list()
+d_seq <- seq(0.8, 55, by = 0.2)
+
+for (i in seq_len(nrow(all_models_spec))) {
+  mk <- all_models_spec$model_key[i]
+  dn <- all_models_spec$display[i]
+  mdata <- if (mk == "gemini-3-flash") v49_gemini else v49_data |> filter(model == mk)
+  if (nrow(mdata) < 3) next
+  d <- mdata$depth; cr <- mdata$mean_cr
+
+  # Linear
+  tryCatch({ fit <- lm(cr ~ d); r2_matrix[dn, "Linear"] <- 1 - sum(residuals(fit)^2)/sum((cr-mean(cr))^2) }, error=function(e){})
+  # Logarithmic
+  tryCatch({ fit <- lm(cr ~ log(d)); r2_matrix[dn, "Logarithmic"] <- 1 - sum(residuals(fit)^2)/sum((cr-mean(cr))^2) }, error=function(e){})
+  # Saturating exponential
+  tryCatch({ fit <- nlsLM(cr ~ L*(1-exp(-k*d)), start=list(L=max(cr)*1.1, k=0.3), lower=c(0.01,0.001), upper=c(1,10), control=nls.lm.control(maxiter=200)); r2_matrix[dn, "Sat. Exp."] <- 1-sum(residuals(fit)^2)/sum((cr-mean(cr))^2) }, error=function(e){})
+  # Logistic
+  tryCatch({
+    fit <- nlsLM(cr ~ L/(1+exp(-k*(d-d0))), data=mdata, start=list(L=max(cr)*1.1, k=0.5, d0=median(d)), lower=c(0.01,0.01,-10), upper=c(1.5,5,50), control=nls.lm.control(maxiter=500))
+    ss_res <- sum(residuals(fit)^2); ss_tot <- sum((cr-mean(cr))^2)
+    r2_matrix[dn, "Logistic"] <- 1 - ss_res/ss_tot
+    L_val <- coef(fit)["L"]; k_val <- coef(fit)["k"]; d0_val <- coef(fit)["d0"]
+    logistic_params[[dn]] <- list(L=L_val, k=k_val, d0=d0_val, r2=1-ss_res/ss_tot,
+                                   curve=tibble(depth=d_seq, cr=L_val/(1+exp(-k_val*(d_seq-d0_val)))))
+  }, error=function(e){})
+}
+
+# ── Panel a: Gemini (10 depths from V4-9) ──
+gemini_curve <- logistic_params[["gemini-3-flash"]]$curve
+gemini_p <- logistic_params[["gemini-3-flash"]]
+gemini_label_1 <- sprintf("italic(L)==%.2f*','~~italic(k)==%.2f*','~~italic(d)[0]==%.1f", gemini_p$L, gemini_p$k, gemini_p$d0)
+gemini_label_2 <- sprintf("italic(R)^2==%.3f", gemini_p$r2)
+
+# Compute 80%-of-gain depth for subtitle
+gemini_80pct_depth <- v49_gemini |>
+  mutate(gain_frac = (mean_cr - min(mean_cr)) / (max(mean_cr) - min(mean_cr))) |>
+  filter(gain_frac >= 0.8) |> slice_min(depth) |> pull(depth)
+
+p3a <- ggplot() +
+  annotate("rect", xmin=0.5, xmax=gemini_80pct_depth, ymin=-Inf, ymax=Inf, fill=col_good, alpha=0.15) +
+  annotate("text", x=gemini_80pct_depth/1.5, y=0.67, label="80% of gain", size=2, color="#009E73", fontface="italic") +
+  geom_line(data=gemini_curve, aes(x=depth, y=cr), color="grey40", linewidth=1) +
+  geom_errorbar(data=v49_gemini, aes(x=depth, ymin=ci_lower, ymax=ci_upper), width=0.5, color="grey40", alpha=0.5) +
+  geom_point(data=v49_gemini, aes(x=depth, y=mean_cr), size=3, shape=21, fill="white", color="grey40", stroke=1.2) +
+  geom_hline(yintercept=max(v49_gemini$mean_cr), linetype="dotted", color=col_muted) +
+  annotate("text", x=1.5, y=0.10, label=gemini_label_1, parse=TRUE, size=2.5, color="grey40", hjust=0) +
+  annotate("text", x=1.5, y=0.04, label=gemini_label_2, parse=TRUE, size=2.5, color="grey40", hjust=0) +
+  scale_x_continuous(breaks=c(1, 2, 5, 10, 20, 50), trans="log2") +
+  coord_cartesian(ylim=ylim_sat) +
+  labs(title = "a",
+       x="RLM depth (turns)", y="Mean concept recall (%)") +
+  theme_nmi() + theme(plot.margin=margin(2, 2, 2, 2),
+                       plot.title.position = "plot")
+
+# ── Panel b: Local models (8 models, logistic fits, same y-axis) ──
+# Separate models by logistic fit quality (R² >= 0.8 = good fit)
+R2_THRESHOLD <- 0.8
+local_curves <- tibble()
+local_points <- tibble()
+for (i in seq_len(nrow(local_spec))) {
+  mk <- local_spec$model_key[i]
+  dn <- local_spec$display[i]
+  col <- local_spec$color[i]
+  mdata <- v49_data |> filter(model == mk)
+  if (nrow(mdata) == 0) next
+  model_r2 <- if (!is.null(logistic_params[[dn]])) logistic_params[[dn]]$r2 else 0
+  local_points <- bind_rows(local_points, mdata |> mutate(display=dn, color=col,
+                                                            params_B=local_spec$params_B[i],
+                                                            good_fit=model_r2 >= R2_THRESHOLD))
+  if (!is.null(logistic_params[[dn]])) {
+    local_curves <- bind_rows(local_curves, logistic_params[[dn]]$curve |>
+                                mutate(display=dn, color=col, params_B=local_spec$params_B[i],
+                                       good_fit=model_r2 >= R2_THRESHOLD))
+  }
+}
+
+# Compute L vs model size Spearman correlation over ALL open-weight models
+# (regardless of fit quality). Filtering on fit quality would be a post-hoc
+# selection that biases against the "no parameter-count pattern" finding.
+L_vals <- tibble(
+  display = names(logistic_params),
+  L = map_dbl(logistic_params, ~.x$L),
+  r2 = map_dbl(logistic_params, ~.x$r2)
+) |> inner_join(all_models_spec |> select(display, params_B), by = "display") |>
+  filter(!is.na(params_B))
+
+if (nrow(L_vals) >= 3) {
+  L_cor <- cor.test(L_vals$params_B, L_vals$L, method = "spearman", exact = FALSE)
+  L_subtitle <- sprintf("L does not track model size (\u03c1 = %.2f, p = %.2f, n = %d)",
+                         L_cor$estimate, L_cor$p.value, nrow(L_vals))
+} else {
+  L_subtitle <- "Ceiling L variable across models"
+}
+
+# Models with poor logistic fit (R² < 0.8) shown with dashed lines
+p3b <- ggplot() +
+  annotate("rect", xmin=0.5, xmax=10, ymin=-Inf, ymax=Inf, fill=col_good, alpha=0.04) +
+  # Curves: solid for good fit, dashed for poor fit
+  geom_line(data=local_curves |> filter(good_fit),
+            aes(x=depth, y=cr, color=display), linewidth=0.8) +
+  geom_line(data=local_curves |> filter(!good_fit),
+            aes(x=depth, y=cr, color=display), linewidth=0.6, linetype="dashed") +
+  # Points
+  geom_errorbar(data=local_points, aes(x=depth, ymin=ci_lower, ymax=ci_upper, color=display),
+                width=0.5, alpha=0.4) +
+  geom_point(data=local_points |> filter(good_fit),
+             aes(x=depth, y=mean_cr, color=display), size=2, shape=21, fill="white", stroke=0.8) +
+  geom_point(data=local_points |> filter(!good_fit),
+             aes(x=depth, y=mean_cr, color=display), size=1.5, shape=4, stroke=0.6) +
+  # Annotation
+  annotate("text", x=50, y=0.03, label="\u2190 dashed: R\u00b2 < 0.8",
+           size=2, color="grey50", fontface="italic", hjust=1) +
+  scale_color_manual(values=setNames(local_spec$color, local_spec$display), name=NULL) +
+  scale_x_continuous(breaks=c(1, 2, 5, 10, 20, 50), trans="log2") +
+  coord_cartesian(ylim=ylim_sat) +
+  labs(title = "b",
+       x="RLM depth (turns)", y=NULL) +
+  theme_nmi() +
+  theme(legend.position=c(0.12, 0.78), legend.key.size=unit(2.5, "mm"),
+        legend.text=element_text(size=4.5), legend.background=element_blank(),
+        plot.margin=margin(2, 2, 2, 2),
+        plot.title.position = "plot")
+
+# ── Panel c: R² heatmap ──
+r2_df <- as_tibble(r2_matrix, rownames="model") |>
+  pivot_longer(cols=all_of(fit_types), names_to="fit_type", values_to="r2") |>
+  mutate(fit_type=factor(fit_type, levels=fit_types),
+         model=factor(model, levels=rev(all_models_spec$display)))
+
+p3c <- ggplot(r2_df, aes(x=fit_type, y=model, fill=r2)) +
+  geom_tile(color="white", linewidth=0.5) +
+  geom_text(aes(label=ifelse(is.na(r2), "-", sprintf("%.3f", r2))), size=2.5, fontface="bold") +
+  scale_fill_gradient2(low="#D55E00", mid="#F0E442", high="#009E73", midpoint=0.7, na.value="grey90", limits=c(0,1), name="R\u00b2") +
+  labs(title = "c", x=NULL, y=NULL) +
+  theme_nmi() +
+  theme(axis.text.x=element_text(angle=45, hjust=1),
+        axis.text.y=element_text(size=7),
+        legend.position="none",
+        plot.margin=margin(10, 2, 2, 2),
+        plot.title.position = "plot")
+
+# ── Panel b: Strategy crossover by corpus size (all from V4-5 clean) ──
+if (has_v45) {
+  scaling_data <- v45_clean |>
+    filter(answerable == TRUE, noise_ratio == 0) |>
+    group_by(config, config_label, core_size) |>
+    summarise(
+      mean_corr = mean(correctness, na.rm = TRUE),
+      pass_rate = mean(pass, na.rm = TRUE),
+      n = n(), .groups = "drop"
+    ) |>
+    filter(n >= 20)  # exclude unreliable small-N conditions (e.g. multi_hop s50 N=6)
+} else {
+  scaling_data <- ans |>
+    group_by(config, config_label) |>
+    summarise(
+      mean_corr = mean(correctness, na.rm = TRUE),
+      pass_rate = mean(passed, na.rm = TRUE),
+      n = n(), .groups = "drop"
+    ) |>
+    mutate(core_size = 20L)
+}
+
+p3b_scaling <- scaling_data |>
+  ggplot(aes(x = factor(core_size), y = pass_rate,
+             color = config, group = config)) +
+  geom_line(linewidth = 0.7) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = config_palette, labels = config_labels, name = NULL) +
+  scale_y_continuous(labels = pct100, limits = c(0, 1.05)) +
+  labs(title = "d",
+       x = "Corpus size (papers)", y = "Pass rate (%)") +
+  theme_nmi() +
+  theme(legend.position = c(0.5, 0.12), legend.direction = "horizontal",
+        legend.key.size = unit(2.5, "mm"),
+        legend.text = element_text(size = 5),
+        legend.background = element_rect(fill = alpha("white", 0.85), color = NA),
+        plot.margin = margin(10, 2, 2, 2),
+        plot.title.position = "plot")
+
+# ── Panels e+f: Noise robustness (answerable pass rate + OOD refusal) ──
+# Combined into a single faceted plot with shared noise legend
+if (has_v45) {
+  noise_pass <- v45_clean |>
+    filter(answerable == TRUE, !is.na(correctness), core_size == 20) |>
+    mutate(noise_label = factor(noise_ratio, levels = c(0, 1, 3),
+                                labels = c("0\u00d7", "1\u00d7", "3\u00d7"))) |>
+    group_by(config_label, config, noise_label) |>
+    summarise(value = mean(pass, na.rm = TRUE), n = n(), .groups = "drop") |>
+    mutate(metric = "e  Pass rate (answerable)")
+
+  v45_ood_clean <- v45_clean |>
+    filter(answerable == FALSE, !is.na(refusal_accuracy))
+
+  noise_refusal <- if (nrow(v45_ood_clean) > 0) {
+    v45_ood_clean |>
+      mutate(noise_label = factor(noise_ratio, levels = c(0, 1, 3),
+                                  labels = c("0\u00d7", "1\u00d7", "3\u00d7"))) |>
+      group_by(config_label, config, noise_label) |>
+      summarise(value = mean(refusal_accuracy >= 3, na.rm = TRUE),
+                n = n(), .groups = "drop") |>
+      filter(n >= 5) |>
+      mutate(metric = "f  Refusal rate (OOD)")
+  } else { tibble() }
+
+  noise_combined <- bind_rows(noise_pass, noise_refusal) |>
+    mutate(metric = factor(metric, levels = c("e  Pass rate (answerable)", "f  Refusal rate (OOD)")))
+
+  p3ef <- noise_combined |>
+    ggplot(aes(x = config_label, y = value, fill = noise_label)) +
+    geom_col(position = "dodge", width = 0.7, alpha = 0.85) +
+    scale_fill_manual(values = c(col_good, "#fd7e14", col_bad), name = "Noise") +
+    scale_y_continuous(labels = pct100, limits = c(0, 1.05),
+                       expand = expansion(mult = c(0, 0.05))) +
+    facet_wrap(~metric, ncol = 2) +
+    labs(x = NULL, y = "Rate (%)") +
+    theme_nmi() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          strip.text = element_text(face = "bold", size = 11, hjust = 0),
+          strip.background = element_blank(),
+          strip.placement = "outside",
+          legend.position = "bottom",
+          legend.direction = "horizontal",
+          legend.key.size = unit(3, "mm"), legend.text = element_text(size = 7),
+          plot.margin = margin(10, 4, 2, 4),
+          plot.title.position = "plot")
+} else {
+  p3ef <- ggplot() + annotate("text", x = 0.5, y = 0.5, label = "V4-5 data not available") + theme_void()
+}
+
+# ── Rename scaling panel ──
+p3d <- p3b_scaling
+
+# ── Compose: all rows share 1:2 width ratio for consistent alignment ──
+# Row 2 built with gridExtra to bypass patchwork's axis alignment
+# (prevents panel c's rotated labels from forcing a gap under panel d)
+library(grid)
+library(gridExtra)
+row2_grid <- arrangeGrob(
+  ggplotGrob(p3c), ggplotGrob(p3d),
+  ncol = 2, widths = unit(c(1, 2), "null")
+)
+
+fig3 <- (free(p3a) + p3b + plot_layout(widths = c(1, 2))) /
+        wrap_elements(full = row2_grid) /
+        free(p3ef) +
+  plot_layout(heights = c(1.1, 0.9, 1)) +
+  plot_annotation(
+    theme = theme_nmi() + theme(plot.title = element_text(size = 9, face = "bold", margin = margin(b = 4)))
+  )
+
+fig3
+save_figure(fig3, "fig3_scaling_behavior", w = 180, h = 230)
+```
+
+---
+
+# Figure 4 — Pipeline Ablation {.tabset}
+
+Four additive pipeline configurations evaluated on the same 20-paper corpus
+(138 questions, 552 total evaluations). Data from V4-6 experiment.
+
+```{r fig5-ablation-build, fig.width=10, fig.height=9, eval=has_v46}
+
+# ── Shared config ──
+ablation_order <- c("raw_gemini", "naive_rag", "rlm_10", "full_orchestrator")
+ablation_labels <- c(
+  raw_gemini = "Baseline", naive_rag = "Naive RAG",
+  rlm_10 = "RLM-10", full_orchestrator = "Full Orchestrator"
+)
+ablation_palette <- c(
+  raw_gemini = "#fd7e14", naive_rag = col_info,
+  rlm_10 = col_good, full_orchestrator = "#6f42c1"
+)
+
+# Shared theme for all 4 panels — identical margins so titles align
+fig4_theme <- theme_nmi() +
+  theme(plot.margin = margin(2, 4, 2, 4),
+        plot.title.position = "plot")
+
+# ── Data prep ──
+abl_data <- v46_pass |>
+  filter(config %in% ablation_order) |>
+  mutate(config = factor(config, levels = ablation_order),
+         pass_frac = pass_rate / 100)
+
+scat_data <- v46_summary |>
+  filter(!is.na(pass_rate), !is.na(refusal_rate)) |>
+  mutate(pass_frac = pass_rate / 100, refusal_frac = refusal_rate / 100,
+         label_clean = ablation_labels[config])
+
+bar_data <- v46_summary |>
+  filter(config %in% ablation_order) |>
+  mutate(config = factor(config, levels = ablation_order))
+
+# ── Panel a: Pass rate ──
+p5a <- ggplot(abl_data, aes(x = config, y = pass_frac, fill = config)) +
+  geom_col(width = 0.6) +
+  geom_text(aes(label = sprintf("%.1f%%", pass_rate)), vjust = -0.5, size = 2.5, fontface = "bold") +
+  geom_hline(yintercept = 0.8, linetype = "dashed", linewidth = 0.25, color = "grey50") +
+  scale_fill_manual(values = ablation_palette, guide = "none") +
+  scale_x_discrete(labels = ablation_labels) +
+  scale_y_continuous(labels = pct100, limits = c(0, 1.05)) +
+  labs(title = "a",
+       x = NULL, y = "Pass rate (%)") +
+  fig4_theme +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1, size = 6))
+
+# ── Panel b: Safety scatter ──
+p5b <- ggplot(scat_data, aes(x = pass_frac, y = refusal_frac, color = config)) +
+  geom_point(size = 4) +
+  ggrepel::geom_text_repel(aes(label = label_clean), size = 2.5, show.legend = FALSE,
+                            color = "grey30", max.overlaps = 10, nudge_y = 0.05) +
+  scale_color_manual(values = ablation_palette, guide = "none") +
+  scale_x_continuous(labels = pct100, limits = c(0, 1.05)) +
+  scale_y_continuous(labels = pct100, limits = c(-0.05, 1.05)) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", linewidth = 0.25, color = "grey50") +
+  geom_vline(xintercept = 0.5, linetype = "dashed", linewidth = 0.25, color = "grey50") +
+  annotate("text", x = 0.53, y = -0.04, label = "Accurate but uncritical",
+           size = 1.8, color = col_bad, fontface = "italic", hjust = 0) +
+  labs(title = "b",
+       x = "Pass rate, answerable (%)", y = "Refusal rate, unanswerable (%)") +
+  fig4_theme
+
+# ── Panel c: Mean correctness ──
+p5c <- ggplot(bar_data, aes(x = config, y = mean_correctness, fill = config)) +
+  geom_col(width = 0.6) +
+  geom_text(aes(label = sprintf("%.2f", mean_correctness)), vjust = -0.5, size = 2.5, fontface = "bold") +
+  scale_fill_manual(values = ablation_palette, guide = "none") +
+  scale_x_discrete(labels = ablation_labels) +
+  scale_y_continuous(limits = c(0, 4.8), breaks = 0:5) +
+  labs(title = "c",
+       x = NULL, y = "Mean correctness (0-5)") +
+  fig4_theme +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1, size = 6))
+
+# ── Panel d: Component accuracy heatmap (V4-7) ──
+load_v47_fig4 <- function(component) {
+  files <- list.files(results_dir, pattern = paste0("exp07_bench_", component, "_.*\\.json"),
+                      full.names = TRUE)
+  files <- files[!grepl("dataset|_results_", basename(files))]
+  all_results <- list()
+  for (f in files) {
+    d <- tryCatch(fix_json(f), error = function(e) NULL)
+    if (is.null(d) || is.null(d$results) || length(d$results) == 0) next
+    df <- tryCatch(as_tibble(d$results), error = function(e) NULL)
+    if (is.null(df) || nrow(df) == 0) next
+    all_results[[length(all_results) + 1]] <- df
+  }
+  if (length(all_results) == 0) return(tibble())
+  bind_rows(all_results) |>
+    mutate(model_short = canonical_model_name(model_key),
+           component = component)
+}
+
+v47_fig4 <- map(c("supervisor", "distiller", "analyzer", "synthesizer", "planner"),
+                load_v47_fig4) |> bind_rows()
+benchmarks_fig4 <- c("supervisor", "distiller", "analyzer", "synthesizer", "planner")
+
+met_fig4_rows <- list()
+for (comp in benchmarks_fig4) {
+  df <- v47_fig4 |> filter(component == comp)
+  if (nrow(df) == 0) next
+  for (mk in unique(df$model_key)) {
+    sub <- df |> filter(model_key == mk, is.na(error) | error == "" | !grepl("404", error))
+    n <- nrow(sub)
+    if (n == 0) next
+    acc <- switch(comp,
+      supervisor = {
+        qs <- sub$quality_score[!is.na(sub$quality_score) & sub$score_valid]
+        jc <- sub$`_judge_correctness`[!is.na(sub$quality_score) & sub$score_valid]
+        if (length(qs) > 10 && length(jc) == length(qs))
+          100 * abs(cor(qs, jc, method = "spearman", use = "complete.obs"))
+        else NA_real_
+      },
+      distiller   = 100 * mean(sub$number_retention, na.rm = TRUE),
+      analyzer    = 100 * sum(sub$decision_correct, na.rm = TRUE) / n,
+      synthesizer = {
+        sc <- sub$judge_scores.correctness
+        if (!is.null(sc) && sum(!is.na(sc)) > 0) 100 * mean(sc, na.rm = TRUE) / 5 else NA_real_
+      },
+      planner     = 100 * sum(sub$tool_correct, na.rm = TRUE) / n
+    )
+    met_fig4_rows[[length(met_fig4_rows) + 1]] <- tibble(
+      model = sub$model_short[1], component = comp, accuracy = acc, n = n)
+  }
+}
+
+met_fig4 <- bind_rows(met_fig4_rows) |>
+  mutate(component = factor(component, levels = benchmarks_fig4),
+         comp_label = recode(component, supervisor = "Supervisor", distiller = "Distiller",
+                             analyzer = "Analyzer", synthesizer = "Synthesizer", planner = "Planner")) |>
+  filter(!grepl("qwen3\\.5.*\\+think", model)) |>
+  group_by(model) |> filter(sum(!is.na(accuracy)) >= 4) |> ungroup()
+
+model_ord <- met_fig4 |> filter(!is.na(accuracy)) |>
+  group_by(model) |> summarise(ma = mean(accuracy)) |> arrange(desc(ma)) |> pull(model)
+met_fig4 <- met_fig4 |> mutate(model = factor(model, levels = rev(model_ord)))
+
+heat_fig4 <- met_fig4 |>
+  mutate(label = ifelse(is.na(accuracy), "\u2014", sprintf("%.0f%%", accuracy)),
+         fill_val = ifelse(is.na(accuracy), 50, accuracy),
+         text_col = "black")  # always black per author preference
+
+p5d <- ggplot(heat_fig4, aes(x = comp_label, y = model, fill = fill_val)) +
+  geom_tile(color = "white", linewidth = 1) +
+  geom_text(aes(label = label, color = text_col), size = 2.2, fontface = "bold", show.legend = FALSE) +
+  scale_fill_gradient2(low = col_bad, mid = col_mid, high = col_good,
+                       midpoint = 60, limits = c(0, 100), name = "%") +
+  scale_color_identity() +
+  labs(title = "d",
+       x = NULL, y = NULL) +
+  fig4_theme +
+  theme(legend.key.height = unit(0.25, "cm"), legend.key.width = unit(0.5, "cm"),
+        legend.position = "none",
+        axis.text.x = element_text(angle = 30, hjust = 1))
+
+# ── Compose with patchwork: per-row alignment ──
+# Each row is built independently with `(left | right) + plot_layout(widths)`,
+# then wrapped as an opaque element so cross-row alignment is NOT enforced.
+# Why: the heatmap in panel d has long y-axis labels (model names like
+# "nemotron-3-nano:30b") that would otherwise inflate the left margin of
+# panel b above it, leaving an ugly gap between panel b's y-axis title and
+# its short tick labels (0, 25, 50, 75, 100). Per-row layout keeps panel b's
+# left margin tight to its own content, and panels a vs c (with similar
+# y-axis label widths) still appear visually aligned even without strict
+# cross-row enforcement.
+top_row <- (p5a | p5b) + plot_layout(widths = c(1, 1.8))
+bot_row <- (p5c | p5d) + plot_layout(widths = c(1, 1.8))
+
+fig5_ablation <- (wrap_elements(full = top_row) /
+                  wrap_elements(full = bot_row)) +
+  plot_layout(heights = c(1, 1.1)) +
+  plot_annotation(
+    theme = theme_nmi() + theme(plot.title = element_text(size = 9, face = "bold", margin = margin(b = 4)))
+  )
+
+fig5_ablation
+save_figure(fig5_ablation, "fig4_pipeline_ablation", w = 180, h = 230)
+```
+
+---
+
+# Figure 5 — Triple-Triangulation Evaluation {.tabset}
+
+```{r fig6-triangulation-build, fig.width=10, fig.height=10}
+
+# ── Panel a: Judge faithfulness score distribution ──
+faith_scores <- det_ans |>
+  filter(!is.na(judge_faithfulness)) |>
+  pull(judge_faithfulness)
+
+faith_dist <- tibble(score = faith_scores) |>
+  count(score) |>
+  complete(score = 0:5, fill = list(n = 0)) |>
+  mutate(pct = n / sum(n))
+
+p6a <- faith_dist |>
+  ggplot(aes(x = factor(score), y = pct, fill = ifelse(score == 5, "ceiling", "other"))) +
+  geom_col(width = 0.7) +
+  geom_text(aes(label = ifelse(pct > 0, sprintf("%.1f%%", pct * 100), "")),
+            vjust = -0.3, size = 2.5, fontface = "bold") +
+  scale_fill_manual(values = c("ceiling" = col_bad, "other" = col_muted), guide = "none") +
+  scale_y_continuous(labels = pct100, limits = c(0, 0.9)) +
+  labs(title = "a",
+       x = "Judge faithfulness score", y = "Fraction of answers (%)") +
+  theme_nmi()
+
+# ── Panel b: Judge faithfulness vs MiniCheck precision (scatter) ──
+if (has_minicheck) {
+  mc_box <- mc |>
+    filter(!is.na(judge_faith) & !is.na(mc_precision)) |>
+    mutate(judge_bin = factor(as.integer(judge_faith)))
+
+  rho_faith_mc <- cor(mc_box$judge_faith, mc_box$mc_precision, method = "spearman")
+
+  # Compute per-bin stats for annotation
+  bin_stats <- mc_box |>
+    group_by(judge_bin) |>
+    summarise(med = median(mc_precision), mean_val = mean(mc_precision),
+              n = n(), .groups = "drop")
+
+  p6b <- mc_box |>
+    ggplot(aes(x = judge_bin, y = mc_precision)) +
+    geom_boxplot(fill = col_muted, alpha = 0.3, outlier.size = 0.8, outlier.alpha = 0.4) +
+    geom_text(data = bin_stats, aes(x = judge_bin, y = 1.05,
+              label = sprintf("n=%d", n)), size = 2, color = "grey50") +
+    geom_text(data = bin_stats, aes(x = judge_bin, y = med,
+              label = sprintf("%.0f%%", mean_val * 100)),
+              size = 2.5, fontface = "bold", color = col_bad, vjust = -0.5) +
+    scale_y_continuous(limits = c(0, 1.1), labels = pct100, breaks = seq(0, 1, 0.25)) +
+    labs(title = "b",
+         x = "Judge faithfulness score", y = "MiniCheck precision (%)") +
+    theme_nmi()
+} else {
+  p6b <- ggplot() + annotate("text", x = 0.5, y = 0.5, label = "MiniCheck data not available") + theme_void()
+  rho_faith_mc <- NA
+}
+
+# ── Panel c: Cross-method correlation by dimension ──
+dims <- c("correctness", "completeness", "faithfulness", "citation_quality")
+dim_labels_v <- c("Correctness", "Completeness", "Faithfulness", "Citation\nQuality")
+
+agreement_stats <- map_dfr(seq_along(dims), function(i) {
+  dim <- dims[i]
+  d_vals <- det_ans[[paste0("det_", dim)]]
+  j_vals <- det_ans[[paste0("judge_", dim)]]
+  valid <- !is.na(d_vals) & !is.na(j_vals)
+  d <- d_vals[valid]; j <- j_vals[valid]
+  tibble(
+    Dimension = dim_labels_v[i],
+    `Spearman rho` = if (length(d) > 2 & sd(d) > 0 & sd(j) > 0)
+      cor(d, j, method = "spearman") else NA_real_
+  )
+})
+
+p6c <- agreement_stats |>
+  ggplot(aes(x = Dimension, y = `Spearman rho`,
+             fill = ifelse(`Spearman rho` > 0.3, "moderate", "weak"))) +
+  geom_col(width = 0.6) +
+  geom_text(aes(label = round(`Spearman rho`, 3)), vjust = -0.5, size = 3, fontface = "bold") +
+  scale_fill_manual(values = c("moderate" = col_info, "weak" = col_bad), guide = "none") +
+  scale_y_continuous(limits = c(0, 0.8)) +
+  labs(title = "c",
+       x = NULL, y = expression(paste("Spearman ", rho))) +
+  theme_nmi() + theme(axis.text.x = element_text(angle = 0, hjust = 0.5))
+
+# ── Panel d: Bump chart — overall strategy rankings across three methods ──
+# Use pre-computed rankings from analysis_paper_validation.json (source of W = 0.911)
+# In validation: rank 1 = worst, rank 6 = best. Invert for display: rank 1 = best.
+if (has_minicheck) {
+  val_data <- safe_load(file.path(results_dir, "analysis_paper_validation.json"))
+  kw <- val_data$kendalls_w$config_details
+
+  rank_data <- map_dfr(names(kw), function(cfg) {
+    info <- kw[[cfg]]
+    lbl <- config_labels[cfg]
+    tibble(
+      Strategy = factor(lbl, levels = config_labels),
+      Method = c("MiniCheck", "Deterministic", "Judge"),
+      Rank = 7 - c(info$mc_f1_rank, info$det_rank, info$judge_rank)  # invert: 1=best
+    )
+  }) |>
+    mutate(Method = factor(Method, levels = c("MiniCheck", "Deterministic", "Judge")))
+
+  p6d <- rank_data |>
+    ggplot(aes(x = Method, y = Rank, group = Strategy, color = Strategy)) +
+    geom_line(linewidth = 0.9, alpha = 0.7) +
+    geom_point(size = 3.5) +
+    scale_y_reverse(breaks = 1:6, labels = paste0("#", 1:6)) +
+    scale_color_manual(values = setNames(config_palette, config_labels), name = NULL) +
+    labs(title = "d",
+         subtitle = "Kendall\u2019s W = 0.91, P = 0.018",
+         x = NULL, y = "Rank (1 = best)") +
+    theme_nmi() +
+    theme(panel.grid.major.x = element_blank(),
+          legend.position = "bottom",
+          legend.key.size = unit(3, "mm"),
+          legend.text = element_text(size = 6))
+} else {
+  p6d <- ggplot() + annotate("text", x = 0.5, y = 0.5, label = "MiniCheck data not available") + theme_void()
+}
+
+# ── Compose (2x2 grid) ──
+fig6_tri <- (p6a | p6b) / (p6c | p6d) +
+  plot_annotation(
+    theme = theme_nmi() + theme(plot.title = element_text(size = 9, face = "bold", margin = margin(b = 4)))
+  )
+
+fig6_tri
+save_figure(fig6_tri, "fig5_triangulation", w = 180, h = 200)
+```
+
+---
+
+---
+
+# Extended Data Figure 6 — Per-Dimension Ranking Concordance {.tabset}
+
+Shows that strategy ranking convergence (W = 0.911 overall) holds for
+correctness and completeness but breaks down for faithfulness and citation quality,
+visually confirming the dimension-specific failure from Fig 6c.
+
+```{r ed-fig10-dimension-rankings, fig.width=10, fig.height=8, eval=has_minicheck}
+
+# Compute rankings per dimension across three methods
+dims_for_rank <- c("correctness", "completeness", "faithfulness", "citation_quality")
+dim_titles <- c("Correctness", "Completeness", "Faithfulness", "Citation Quality")
+
+# MiniCheck only measures grounding — include it only for faithfulness and citation quality
+dims_with_mc <- c("faithfulness", "citation_quality")
+
+dim_rank_data <- map_dfr(seq_along(dims_for_rank), function(i) {
+  dim <- dims_for_rank[i]
+  include_mc <- dim %in% dims_with_mc
+
+  # Deterministic and Judge scores from det_ans
+  det_judge <- det_ans |>
+    group_by(config_label) |>
+    summarise(
+      det_score = mean(.data[[paste0("det_", dim)]], na.rm = TRUE),
+      judge_score = mean(.data[[paste0("judge_", dim)]], na.rm = TRUE),
+      .groups = "drop"
+    )
+
+  if (include_mc) {
+    mc_dim <- mc |>
+      group_by(config_label) |>
+      summarise(mc_score = mean(mc_precision, na.rm = TRUE), .groups = "drop")
+
+    combined <- det_judge |>
+      left_join(mc_dim, by = "config_label") |>
+      transmute(
+        Strategy = config_label, Dimension = dim_titles[i],
+        MiniCheck = mc_score, Deterministic = det_score, Judge = judge_score
+      ) |>
+      pivot_longer(c(MiniCheck, Deterministic, Judge),
+                   names_to = "Method", values_to = "score")
+  } else {
+    combined <- det_judge |>
+      transmute(
+        Strategy = config_label, Dimension = dim_titles[i],
+        Deterministic = det_score, Judge = judge_score
+      ) |>
+      pivot_longer(c(Deterministic, Judge),
+                   names_to = "Method", values_to = "score")
+  }
+
+  combined |>
+    group_by(Method) |>
+    mutate(Rank = rank(-score, ties.method = "first")) |>
+    ungroup() |>
+    mutate(Method = factor(Method, levels = c("MiniCheck", "Deterministic", "Judge")))
+})
+
+ed_fig10 <- dim_rank_data |>
+  ggplot(aes(x = Method, y = Rank, group = Strategy, color = Strategy)) +
+  geom_line(linewidth = 0.8, alpha = 0.7) +
+  geom_point(size = 2.5) +
+  scale_y_reverse(breaks = 1:6, labels = paste0("#", 1:6)) +
+  scale_color_manual(values = setNames(config_palette, config_labels), name = NULL) +
+  facet_wrap(~ Dimension, nrow = 2) +
+  labs(x = NULL, y = "Rank (1 = best)") +
+  theme_nmi() +
+  theme(panel.grid.major.x = element_blank(),
+        legend.position = "bottom",
+        legend.key.size = unit(3, "mm"),
+        strip.text = element_text(face = "bold", size = 10))
+
+ed_fig10
+save_figure(ed_fig10, "ed_fig6_dimension_rankings", w = 180, h = 160)
+```
+
+---
+
+# Figure 6 — Code Generation {.tabset}
+
+```{r fig6-build, fig.width=10, fig.height=10, eval=has_v48 && has_v48_models}
+# --- Build per-model × strategy data from V4-8 results ---
+all_strategies <- c("free_form", "free_form_n3_best", "free_form_n3_combined",
+                    "coder_v2_n1", "coder_v2_n1_cell3_best", "coder_v2_n1_cell3_combined",
+                    "coder_v2_n3", "introspect_then_code", "error_recovery_introspect",
+                    "thinker_coder_split", "introspect_with_recovery")
+
+v48_config_data <- map_dfr(v48_models, function(d) {
+  think_mode <- d$think %||% "off"
+  # Normalise think_mode: True -> on, False/off/NULL -> off
+  if (think_mode %in% c("True", "true", "TRUE")) think_mode <- "on"
+  if (think_mode %in% c("False", "false", "FALSE", "")) think_mode <- "off"
+  raw_name <- d$gen_model %||% "unknown"
+  base_label <- canonical_model_name(raw_name)
+  label <- if (think_mode != "off") paste0(base_label, " [think:", think_mode, "]") else base_label
+  is_gemini <- grepl("gemini", raw_name, ignore.case = TRUE)
+  # Build rows for every strategy; mark missing ones as NA (not 0)
+  map_dfr(all_strategies, function(cfg) {
+    s <- d$summary[[cfg]]
+    tibble(
+      model      = label,
+      config     = cfg,
+      pass_rate  = if (!is.null(s)) (s$pass_rate %||% NA_real_) else NA_real_,
+      n          = if (!is.null(s)) (s$n %||% NA_integer_) else NA_integer_,
+      is_gemini  = is_gemini
+    )
+  })
+})
+
+# Clean strategy labels (reused in panels a & c)
+strategy_label <- function(x) {
+  x |>
+    str_replace("coder_v2_n1_cell3_best", "Structured Best-of-3") |>
+    str_replace("coder_v2_n1_cell3_combined", "Structured Combined") |>
+    str_replace("coder_v2_n1$", "Structured") |>
+    str_replace("coder_v2_n3", "Structured \u00d73") |>
+    str_replace("free_form_n3_best", "Free-form Best-of-3") |>
+    str_replace("free_form_n3_combined", "Free-form Combined") |>
+    str_replace("free_form", "Free-form") |>
+    str_replace("error_recovery_introspect", "Error Recovery Introspect") |>
+    str_replace("introspect_then_code", "Introspect Then Code") |>
+    str_replace("introspect_with_recovery", "Introspect With Recovery") |>
+    str_replace("thinker_coder_split", "Thinker-Coder Split")
+}
+
+# Model ordering: mean pass rate (descending), computed only on non-NA cells
+model_order <- v48_config_data |>
+  filter(!is.na(pass_rate)) |>
+  group_by(model) |>
+  summarise(mean_pr = mean(pass_rate), .groups = "drop") |>
+  arrange(mean_pr) |>
+  pull(model)
+
+# Strategy order: grouped by family (free-form, introspection, structured)
+strategy_family_order <- c(
+  "Free-form", "Free-form Best-of-3", "Free-form Combined",
+  "Error Recovery Introspect", "Introspect Then Code",
+  "Introspect With Recovery", "Thinker-Coder Split",
+  "Structured", "Structured Best-of-3", "Structured Combined", "Structured \u00d73"
+)
+
+v48_config_data <- v48_config_data |>
+  mutate(model = factor(model, levels = model_order),
+         config_label = factor(strategy_label(config), levels = strategy_family_order))
+
+# ── Panel a: Pass rate heatmap ─────────────────────────────────────────
+p6a <- v48_config_data |>
+  ggplot(aes(x = config_label, y = model, fill = pass_rate / 100)) +
+  geom_tile(color = "white", linewidth = 0.5) +
+  geom_text(aes(label = ifelse(is.na(pass_rate), "", sprintf("%.0f%%", pass_rate))),
+            size = 2) +
+  scale_fill_gradient2(low = col_bad, mid = col_mid, high = col_good,
+                       midpoint = 0.5, limits = c(0, 1), name = "Pass rate (%)",
+                       labels = pct100, na.value = "grey85") +
+  labs(title = "c",
+       x = "Strategy", y = NULL) +
+  theme_nmi() + theme(axis.text.x = element_text(angle = 45, hjust = 1),
+                      legend.position = "bottom",
+                      legend.margin = margin(t = 14),
+                      legend.key.height = unit(0.3, "cm"),
+                      legend.key.width = unit(0.8, "cm"))
+
+# ── Panel b: Context window effect (V2-8 vs V4-8) ─────────────────────
+v48_df <- map_dfr(names(v48_comp$models), function(model_key) {
+  m <- v48_comp$models[[model_key]]
+  tibble(
+    model     = model_key,
+    ctx_2k    = m$v2_8_pass_rate %||% NA_real_,
+    ctx_24k   = m$v4_8_pass_rate %||% NA_real_,
+    is_gemini = m$is_gemini %||% FALSE
+  )
+}) |> filter(!is.na(ctx_24k), !is.na(ctx_2k), !is_gemini)
+
+# Prepare wide data for right-aligned labels
+v48_wide <- v48_df |>
+  mutate(model_short = canonical_model_name(model),
+         label = sprintf("%.0f%% > %.0f%%", ctx_2k, ctx_24k))
+
+v48_long <- v48_df |>
+  pivot_longer(cols = c(ctx_2k, ctx_24k), names_to = "version", values_to = "pass_rate") |>
+  mutate(
+    version = ifelse(version == "ctx_2k",
+                     "Default Context (2K)", "Expanded Context (24K)"),
+    version = factor(version, levels = c("Default Context (2K)", "Expanded Context (24K)")),
+    model_short = canonical_model_name(model)
+  )
+
+# Order by expanded context pass rate
+model_ctx_order <- v48_wide |> arrange(ctx_24k) |> pull(model_short)
+v48_long <- v48_long |> mutate(model_short = factor(model_short, levels = model_ctx_order))
+v48_wide <- v48_wide |> mutate(model_short = factor(model_short, levels = model_ctx_order))
+
+p6b <- ggplot(v48_long, aes(x = model_short, y = pass_rate, fill = version)) +
+  geom_col(position = position_dodge2(width = 0.7, reverse = TRUE), width = 0.6) +
+  geom_text(data = v48_wide, aes(x = model_short, y = 103, label = label, fill = NULL),
+            size = 2.0, hjust = 0, fontface = "bold") +
+  scale_fill_manual(values = c("Default Context (2K)" = col_bad,
+                                "Expanded Context (24K)" = col_good)) +
+  scale_y_continuous(limits = c(0, 140), breaks = seq(0, 100, 25)) +
+  coord_flip() +
+  labs(title = "b",
+       x = NULL, y = "Pass rate (%)", fill = NULL) +
+  theme_nmi() + theme(legend.position = "bottom",
+                      legend.direction = "horizontal",
+                      legend.key.size = unit(3, "mm"),
+                      legend.text = element_text(size = 5),
+                      legend.margin = margin(t = 12),
+                      plot.margin = margin(2, 2, -2, 2))
+
+# ── Panel c: Strategy effectiveness (mean across models) ──────────────
+strategy_data <- v48_config_data |>
+  filter(!is.na(pass_rate)) |>
+  group_by(config, config_label) |>
+  summarise(mean_pass = mean(pass_rate, na.rm = TRUE),
+            n_models = n(), .groups = "drop")
+
+p6c <- if (nrow(strategy_data) > 0) {
+  strategy_data |>
+    ggplot(aes(x = reorder(config_label, mean_pass), y = mean_pass)) +
+    geom_col(width = 0.6, fill = col_info) +
+    geom_text(aes(label = sprintf("%.1f%%", mean_pass)),
+              hjust = -0.1, size = 2.5, fontface = "bold") +
+    scale_y_continuous(limits = c(0, 105)) +
+    coord_flip() +
+    labs(title = "a",
+         x = NULL, y = "Mean pass rate (%)") +
+    theme_nmi()
+} else {
+  ggplot() +
+    annotate("text", x = 0.5, y = 0.5,
+             label = "Strategy config data not available") +
+    theme_void()
+}
+
+# ── Compose Figure 6 using grid for alignment ────────────────────────
+library(grid)
+library(gridExtra)
+
+g6a <- ggplotGrob(p6c)  # strategy = panel a
+g6b <- ggplotGrob(p6a)  # heatmap = panel b
+g6c <- ggplotGrob(p6b)  # context window = panel c
+
+top_row_fig6 <- cbind(g6a, g6c, size = "first")
+
+fig6_grid <- arrangeGrob(
+  top_row_fig6,
+  nullGrob(),
+  g6b,
+  nrow = 3,
+  heights = unit(c(1, 0.05, 1.3), "null")
+)
+
+fig6 <- wrap_elements(full = fig6_grid) +
+  plot_annotation(
+    theme = theme_nmi() + theme(plot.title = element_text(size = 9, face = "bold", margin = margin(b = 4)))
+  )
+
+fig6
+save_figure(fig6, "fig6_code_generation", w = 180, h = 220)
+```
+
+---
+
+# Extended Data Figure 1 — Retrieval Pipeline Optimization {.tabset}
+
+```{r ed-fig1-retrieval-build, fig.width=10, fig.height=10, eval=!is.null(v41) && !is.null(v42) && !is.null(v43a) && !is.null(v43b)}
+# Panel a: V4-1 Embedding — with model labels on the right side and distinct line types
+v41_df <- v41$results |>
+  as_tibble() |>
+  mutate(model_short = model |> str_remove("sentence-transformers/") |> str_remove("_base$"))
+
+v41_overall <- v41_df |>
+  select(model_short, corpus_size, starts_with("overall.")) |>
+  rename_with(~str_remove(.x, "overall\\."), starts_with("overall."))
+
+ed1a <- v41_overall |>
+  ggplot(aes(x = factor(corpus_size), y = MRR, color = model_short,
+             group = model_short, linetype = model_short)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = model_palette[1:4]) +
+  scale_linetype_manual(values = c("solid", "dashed", "dotted", "dotdash")) +
+  scale_y_continuous(limits = c(0.3, 1.05)) +
+  labs(title = "a",
+       x = "Corpus size (papers)", y = "MRR",
+       color = NULL, linetype = NULL) +
+  theme_nmi() +
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.95, 0.05),
+        legend.justification = c(1, 0),
+        legend.background = element_rect(fill = alpha("white", 0.85), color = NA),
+        legend.key.width = unit(8, "mm"),
+        legend.key.height = unit(3, "mm"),
+        plot.margin = margin(4, 2, 4, 2)) +
+  guides(color = guide_legend(ncol = 2),
+         linetype = guide_legend(ncol = 2))
+
+# Panel b: V4-2 Search Strategy
+v42_df <- v42$results |>
+  as_tibble() |>
+  mutate(config_short = config |> str_remove("^exp_v4_") |> str_remove("_30$"))
+
+v42_overall <- v42_df |>
+  select(config_short, corpus_size, starts_with("overall.")) |>
+  rename_with(~str_remove(.x, "overall\\."), starts_with("overall."))
+
+ed1b <- v42_overall |>
+  ggplot(aes(x = factor(corpus_size), y = MRR, color = config_short, group = config_short)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = model_palette[1:7]) +
+  scale_y_continuous(limits = c(0.8, 1.02)) +
+  labs(title = "b",
+       x = "Corpus size (papers)", y = "MRR", color = NULL) +
+  theme_nmi() +
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.95, 0.05),
+        legend.justification = c(1, 0),
+        legend.background = element_rect(fill = alpha("white", 0.85), color = NA),
+        legend.key.width = unit(6, "mm"),
+        legend.key.height = unit(3, "mm"),
+        plot.margin = margin(4, 2, 4, 2)) +
+  guides(color = guide_legend(ncol = 2))
+
+# Panel c: V4-3a Chunking — horizontal bar plot (clearer than tight vertical)
+chunk_df <- v43a$results |>
+  as_tibble() |>
+  mutate(config_short = config |> str_remove("^exp_v4_") |> str_remove("_30$"))
+
+chunk_summary <- chunk_df |>
+  group_by(config_short) |>
+  summarise(mean_mrr = mean(overall.MRR, na.rm = TRUE),
+            sd_mrr = sd(overall.MRR, na.rm = TRUE),
+            n = n(), .groups = "drop")
+
+ed1c <- chunk_summary |>
+  mutate(config_short = fct_reorder(config_short, mean_mrr)) |>
+  ggplot(aes(y = config_short, x = mean_mrr)) +
+  geom_point(color = col_info, size = 2.5) +
+  geom_errorbarh(aes(xmin = mean_mrr - sd_mrr, xmax = pmin(mean_mrr + sd_mrr, 1.05)), height = 0.3) +
+  geom_text(aes(label = sprintf("%.3f", mean_mrr), x = 1.06), hjust = 0, size = 2.8) +
+  scale_x_continuous(limits = c(0.5, 1.15)) +
+  labs(title = "c",
+       x = "MRR", y = NULL) +
+  theme_nmi()
+
+# Panel d: V4-3b Scalability — horizontal bar plot (clearer for tight data)
+scale_df <- v43b$results |>
+  as_tibble()
+
+ed1d <- scale_df |>
+  mutate(corpus_label = factor(corpus_size)) |>
+  ggplot(aes(y = corpus_label, x = overall.MRR)) +
+  geom_segment(aes(x = 0.8, xend = overall.MRR, yend = corpus_label),
+               color = col_info, linewidth = 0.8) +
+  geom_point(color = col_info, size = 3) +
+  geom_text(aes(label = sprintf("%.3f", overall.MRR)), hjust = -0.3, size = 2.8, fontface = "bold") +
+  geom_vline(xintercept = 0.9, linetype = "dashed", color = col_muted, linewidth = 0.5) +
+  scale_x_continuous(limits = c(0.8, 1.08)) +
+  labs(title = "d",
+       x = "MRR", y = "Corpus size (papers)") +
+  theme_nmi()
+
+top_row <- (ed1a | ed1b)
+bottom_row <- (ed1c | ed1d)
+
+ed_fig1_retr <- (wrap_elements(full = top_row)) / bottom_row +
+  plot_layout(heights = c(1.1, 1)) +
+  plot_annotation(
+    theme = theme_nmi() + theme(plot.title = element_text(size = 9, face = "bold", margin = margin(b = 4)))
+  )
+
+ed_fig1_retr
+save_figure(ed_fig1_retr, "ed_fig1_retrieval_optimisation", w = 180, h = 170)
+```
+
+# Extended Data Figure 4 — Component Benchmarks (V4-7)
+
+**Purpose**: Show that orchestrator component performance varies dramatically by model. Six panels: (a) accuracy heatmap, (b-f) per-component latency vs accuracy vs token cost.
+
+```{r ed-fig3-build, fig.width=7.09, fig.height=9.45}
+# --- Load V4-7 data ---
+load_v47_component_fig <- function(component) {
+  files <- list.files(results_dir, pattern = paste0("exp07_bench_", component, "_.*\\.json"),
+                      full.names = TRUE)
+  files <- files[!grepl("dataset|_results_", basename(files))]
+  all_results <- list()
+  for (f in files) {
+    d <- tryCatch(fix_json(f), error = function(e) NULL)
+    if (is.null(d) || is.null(d$results) || length(d$results) == 0) next
+    df <- tryCatch(as_tibble(d$results), error = function(e) NULL)
+    if (is.null(df) || nrow(df) == 0) next
+    all_results[[length(all_results) + 1]] <- df
+  }
+  if (length(all_results) == 0) return(tibble())
+  bind_rows(all_results) |>
+    mutate(
+      model_short = canonical_model_name(model_key),
+      component = component
+    )
+}
+
+v47 <- list(
+  supervisor  = load_v47_component_fig("supervisor"),
+  distiller   = load_v47_component_fig("distiller"),
+  analyzer    = load_v47_component_fig("analyzer"),
+  synthesizer = load_v47_component_fig("synthesizer"),
+  planner     = load_v47_component_fig("planner")
+)
+
+ds_sizes <- c(supervisor = 200, distiller = 97, analyzer = 345, synthesizer = 100, planner = 90)
+benchmarks <- c("supervisor", "distiller", "analyzer", "synthesizer", "planner")
+
+# --- Build accuracy + latency data ---
+metrics_rows <- list()
+for (comp in benchmarks) {
+  df <- v47[[comp]]
+  if (nrow(df) == 0) next
+  for (mk in unique(df$model_key)) {
+    sub <- df |> filter(model_key == mk, is.na(error) | error == "" | !grepl("404", error))
+    n <- nrow(sub)
+    if (n == 0) next
+    acc <- switch(comp,
+      supervisor  = {
+        qs <- sub$quality_score[!is.na(sub$quality_score) & sub$score_valid]
+        jc <- sub$`_judge_correctness`[!is.na(sub$quality_score) & sub$score_valid]
+        if (length(qs) > 10 && length(jc) == length(qs))
+          100 * abs(cor(qs, jc, method = "spearman", use = "complete.obs"))
+        else NA_real_
+      },
+      distiller   = 100 * mean(sub$number_retention, na.rm = TRUE),
+      analyzer    = 100 * sum(sub$decision_correct, na.rm = TRUE) / n,
+      synthesizer = {
+        sc <- sub$judge_scores.correctness
+        if (!is.null(sc) && sum(!is.na(sc)) > 0) 100 * mean(sc, na.rm = TRUE) / 5 else NA_real_
+      },
+      planner     = 100 * sum(sub$tool_correct, na.rm = TRUE) / n
+    )
+    ms <- sub$model_short[1]
+    lat <- mean(sub$latency_s[sub$latency_s > 0], na.rm = TRUE)
+    tok <- mean(sub$tokens_out[sub$tokens_out > 0], na.rm = TRUE)
+    metrics_rows[[length(metrics_rows) + 1]] <- tibble(
+      model = ms, component = comp, accuracy = acc, latency = lat, tokens = tok, n = n
+    )
+  }
+}
+
+has_v47_data <- length(metrics_rows) > 0
+if (!has_v47_data) {
+  warning("No V4-7 data available — ED Figure 8 will be a placeholder")
+}
+
+if (has_v47_data) {
+met_df <- bind_rows(metrics_rows) |>
+  mutate(
+    component = factor(component, levels = benchmarks),
+    comp_label = recode(component,
+      supervisor = "Supervisor", distiller = "Distiller",
+      analyzer = "Analyzer", synthesizer = "Synthesizer", planner = "Planner")
+  )
+
+# Order models by mean accuracy
+model_order <- met_df |>
+  filter(!is.na(accuracy)) |>
+  group_by(model) |> summarise(ma = mean(accuracy)) |>
+  arrange(desc(ma)) |> pull(model)
+met_df <- met_df |> mutate(model = factor(model, levels = rev(model_order)))
+
+# --- Panel a: Accuracy heatmap ---
+heat_df <- met_df |>
+  mutate(
+    label = ifelse(is.na(accuracy), "—", sprintf("%.0f%%", accuracy)),
+    fill_val = ifelse(is.na(accuracy), 50, accuracy),
+    text_col = "black"  # always black per author preference
+  )
+
+ed3a <- ggplot(heat_df, aes(x = comp_label, y = model, fill = fill_val)) +
+  geom_tile(color = "white", linewidth = 1) +
+  geom_text(aes(label = label, color = text_col), size = 2.2, fontface = "bold", show.legend = FALSE) +
+  scale_fill_gradient2(low = col_bad, mid = col_mid, high = col_good,
+                       midpoint = 60, limits = c(0, 100), name = "%") +
+  scale_color_identity() +
+  labs(title = "a", x = NULL, y = NULL) +
+  theme_nmi() + theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.8, "cm"))
+
+# --- Panel b: Latency heatmap ---
+lat_df <- met_df |>
+  mutate(
+    label = ifelse(is.na(latency) | latency <= 0, "\u2014", sprintf("%.0fs", latency)),
+    fill_val = ifelse(is.na(latency) | latency <= 0, NA_real_, log10(latency)),
+    text_col = "black"  # always black per author preference
+  )
+
+ed3b <- ggplot(lat_df, aes(x = comp_label, y = model, fill = fill_val)) +
+  geom_tile(color = "white", linewidth = 1) +
+  geom_text(aes(label = label, color = text_col), size = 2.2, fontface = "bold", show.legend = FALSE) +
+  scale_fill_gradient2(low = col_good, mid = col_mid, high = col_bad,
+                       midpoint = 1.2, na.value = "grey85",
+                       breaks = c(0.7, 1.0, 1.3, 1.6, 1.9, 2.2),
+                       labels = c("5s", "10s", "20s", "40s", "80s", "160s"),
+                       name = "Latency (s)") +
+  scale_color_identity() +
+  labs(title = "b", x = NULL, y = NULL) +
+  theme_nmi() + theme(legend.key.height = unit(0.3, "cm"), legend.key.width = unit(0.8, "cm"))
+
+# --- Panel g: Supervisor Spearman ρ per model (signed values) ---
+# Loaded from the raw supervisor benchmark dataset
+sup_files <- list.files(results_dir,
+                        pattern = "exp07_bench_supervisor_results_.*\\.json",
+                        full.names = TRUE)
+sup_files <- sup_files[!grepl("latest", basename(sup_files))]
+sup_rows <- list()
+for (f in sup_files) {
+  d <- tryCatch(fix_json(f), error = function(e) NULL)
+  if (is.null(d) || is.null(d$summary)) next
+  for (mk in names(d$summary)) {
+    m <- d$summary[[mk]]
+    sup_rows[[length(sup_rows) + 1]] <- tibble(
+      model = mk,
+      rho = m$score_judge_spearman %||% NA_real_,
+      n = m$n %||% NA_integer_
+    )
+  }
+}
+sup_df <- bind_rows(sup_rows) |>
+  filter(!is.na(rho)) |>
+  mutate(model = canonical_model_name(model)) |>
+  group_by(model) |>
+  slice_tail(n = 1) |>   # keep latest entry per model if duplicated across files
+  ungroup() |>
+  arrange(rho) |>
+  mutate(model = factor(model, levels = model),
+         is_best = rho == max(rho))
+
+ed3c <- ggplot(sup_df, aes(x = rho, y = model, fill = is_best)) +
+  geom_col(width = 0.7) +
+  geom_vline(xintercept = 0, linewidth = 0.3, color = "grey40") +
+  geom_text(aes(label = sprintf("%.2f", rho)),
+            hjust = -0.15, size = 2.2, fontface = "bold") +
+  scale_fill_manual(values = c(`TRUE` = col_good, `FALSE` = col_info), guide = "none") +
+  scale_x_continuous(limits = c(0, 0.45), expand = expansion(mult = c(0, 0.02))) +
+  labs(title = "c",
+       subtitle = sprintf("Best Spearman rho = %.2f (%s); n = 200 items per model",
+                          max(sup_df$rho),
+                          as.character(sup_df$model[which.max(sup_df$rho)])),
+       x = "Spearman \u03c1 (supervisor score vs judge correctness)",
+       y = NULL) +
+  theme_nmi() +
+  theme(plot.subtitle = element_text(size = 7, color = "grey40"),
+        axis.text.y = element_text(size = 6),
+        plot.margin = margin(4, 8, 4, 4))
+
+# --- Combine: accuracy heatmap + latency heatmap + supervisor Spearman ---
+ed_fig3 <- ed3a / ed3b / ed3c +
+  plot_layout(heights = c(1.4, 1.4, 1.1)) +
+  plot_annotation(
+    theme = theme_nmi() + theme(plot.title = element_text(size = 9, face = "bold", margin = margin(b = 4)))
+  )
+
+ed_fig3
+save_figure(ed_fig3, "ed_fig4_component_benchmarks", w = 180, h = 170)
+} # end if has_v47_data
+```
+
+---
+
+# Extended Data Figure 5 — Distiller Prompt Ablation (V4-7.5)
+
+**Purpose**: Show that few-shot examples (F1) provide the largest improvement for distiller
+number and source retention, with diminishing returns from combining variants.
+Three panels: (a) number retention heatmap, (b) source retention heatmap, (c) marginal
+improvement over baseline.
+
+```{r ed-fig4-distiller-ablation, fig.width=7.09, fig.height=9.45}
+# --- Load ALL exp07b files and merge ---
+abl_files <- list.files(results_dir,
+                        pattern = "exp07b_distiller_ablation_.*\\.json$",
+                        full.names = TRUE)
+# Exclude the "latest" symlink to avoid double-counting
+abl_files <- abl_files[!grepl("_latest\\.json$", abl_files)]
+
+variant_levels <- c("baseline", "F1", "F2", "F3", "F1_F3", "F2_F3", "F1_F2_F3")
+
+abl_items <- map_dfr(abl_files, function(f) {
+  d <- fix_json(f)
+  models <- names(d$results)
+  map_dfr(models, function(m) {
+    variants <- names(d$results[[m]])
+    map_dfr(variants, function(v) {
+      items <- d$results[[m]][[v]]$per_item
+      if (is.null(items) || length(items) == 0) return(tibble())
+      as_tibble(items) |>
+        mutate(model = m, variant = v)
+    })
+  })
+})
+
+# Clean model display names (canonical `family:size` format)
+abl_items <- abl_items |>
+  mutate(
+    model_display = canonical_model_name(model),
+    variant = factor(variant, levels = variant_levels),
+    has_error = !is.na(error) & error != "" & error != "None"
+  )
+
+# Filter out error rows and models with >50% error rate on baseline
+baseline_errors <- abl_items |>
+  filter(variant == "baseline") |>
+  group_by(model) |>
+  summarise(err_rate = mean(has_error, na.rm = TRUE), .groups = "drop")
+
+viable_models <- baseline_errors |> filter(err_rate <= 0.5) |> pull(model)
+abl_clean <- abl_items |>
+  filter(model %in% viable_models, !has_error)
+
+# Deduplicate: keep latest per model×variant×question_id
+abl_clean <- abl_clean |>
+  group_by(model, model_display, variant, question_id) |>
+  slice_tail(n = 1) |>
+  ungroup()
+
+n_abl_evals <- nrow(abl_clean)
+n_abl_models <- n_distinct(abl_clean$model)
+cat(sprintf("Distiller ablation: %d evals, %d models, %d variants\n",
+            n_abl_evals, n_abl_models, n_distinct(abl_clean$variant)))
+
+# --- Summary stats per model × variant ---
+abl_summary <- abl_clean |>
+  group_by(model_display, variant) |>
+  summarise(
+    mean_nr = mean(number_retention, na.rm = TRUE),
+    mean_sr = mean(source_retention, na.rm = TRUE),
+    sd_nr = sd(number_retention, na.rm = TRUE),
+    n = n(),
+    .groups = "drop"
+  )
+
+# Baseline values per model
+abl_baseline <- abl_summary |>
+  filter(variant == "baseline") |>
+  select(model_display, baseline_nr = mean_nr, baseline_sr = mean_sr)
+
+abl_summary <- abl_summary |>
+  left_join(abl_baseline, by = "model_display") |>
+  mutate(delta_nr = mean_nr - baseline_nr,
+         delta_sr = mean_sr - baseline_sr)
+
+# Order models by baseline number retention
+model_nr_order <- abl_baseline |> arrange(baseline_nr) |> pull(model_display)
+abl_summary <- abl_summary |>
+  mutate(model_display = factor(model_display, levels = model_nr_order))
+
+# --- Panel a: Number retention heatmap ---
+ed4a <- abl_summary |>
+  ggplot(aes(x = variant, y = model_display, fill = mean_nr)) +
+  geom_tile(color = "white", linewidth = 0.8) +
+  geom_text(aes(label = sprintf("%.0f%%", mean_nr * 100)),
+            size = 2.5, fontface = "bold") +
+  scale_fill_gradient2(low = col_bad, mid = col_mid, high = col_good,
+                       midpoint = 0.55, limits = c(0, 1), name = "Retention (%)",
+                       labels = pct100) +
+  labs(title = "a",
+       x = NULL, y = NULL) +
+  theme_nmi() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.key.height = unit(0.3, "cm"),
+        legend.key.width = unit(0.6, "cm"))
+
+# --- Panel b: Source retention heatmap ---
+ed4b <- abl_summary |>
+  ggplot(aes(x = variant, y = model_display, fill = mean_sr)) +
+  geom_tile(color = "white", linewidth = 0.8) +
+  geom_text(aes(label = sprintf("%.0f%%", mean_sr * 100)),
+            size = 2.5, fontface = "bold") +
+  scale_fill_gradient2(low = col_bad, mid = col_mid, high = col_good,
+                       midpoint = 0.55, limits = c(0, 1), name = "Retention (%)",
+                       labels = pct100) +
+  labs(title = "b",
+       x = NULL, y = NULL) +
+  theme_nmi() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.key.height = unit(0.3, "cm"),
+        legend.key.width = unit(0.6, "cm"))
+
+# --- Panel c: Marginal improvement over baseline (pooled across models) ---
+marginal <- abl_summary |>
+  filter(variant != "baseline") |>
+  group_by(variant) |>
+  summarise(
+    mean_delta_nr = mean(delta_nr, na.rm = TRUE),
+    se_delta_nr = sd(delta_nr, na.rm = TRUE) / sqrt(n()),
+    mean_delta_sr = mean(delta_sr, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+marginal_long <- marginal |>
+  pivot_longer(cols = c(mean_delta_nr, mean_delta_sr),
+               names_to = "metric", values_to = "delta") |>
+  mutate(metric = ifelse(metric == "mean_delta_nr", "Number retention", "Source retention"))
+
+ed4c <- marginal_long |>
+  ggplot(aes(x = variant, y = delta, fill = metric)) +
+  geom_col(position = position_dodge(width = 0.7), width = 0.6) +
+  geom_hline(yintercept = 0, linewidth = 0.4, color = "grey30") +
+  geom_text(aes(label = sprintf("%+.1f", delta * 100),
+                vjust = ifelse(delta >= 0, -0.5, 1.3)),
+            position = position_dodge(width = 0.7), size = 2.3, fontface = "bold") +
+  scale_fill_manual(values = c("Number retention" = col_info, "Source retention" = col_good),
+                    name = NULL) +
+  scale_y_continuous(labels = function(x) sprintf("%+.0f", x * 100)) +
+  labs(title = "c",
+       x = "Prompt variant", y = "Change from baseline (pp)") +
+  theme_nmi() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "bottom",
+        legend.key.size = unit(3, "mm"))
+
+# --- Compose ---
+ed_fig4 <- ed4a / ed4b / ed4c +
+  plot_layout(heights = c(1, 1, 1)) +
+  plot_annotation(
+    theme = theme_nmi() + theme(plot.title = element_text(size = 9, face = "bold", margin = margin(b = 4)))
+  )
+
+ed_fig4
+save_figure(ed_fig4, "ed_fig5_distiller_ablation", w = 180, h = 170)
+```
+
+---
+
+# Extended Data Figure 3 — Strategy Replication Across Models
+
+**Purpose**: Show that strategy rankings generalise to capable non-Gemini models (122B)
+but invert with smaller models (32B), demonstrating capability-gated RLM benefit.
+
+```{r ed-fig6-strategy-replication, fig.width=7.09, fig.height=7}
+# --- Load replication data ---
+rep_122b <- safe_load(file.path(results_dir, "deep_analyses/reviewer_strategy_replication_122b.json"))
+rep_32b  <- safe_load(file.path(results_dir, "deep_analyses/reviewer_strategy_replication.json"))
+has_replication <- !is.null(rep_122b) && !is.null(rep_32b)
+
+if (has_replication) {
+  # Build combined data from pre-computed metrics
+  strat_order <- c("single_pass", "rlm_10", "verified_pass")
+  strat_labels <- c(single_pass = "Single Pass", rlm_10 = "RLM-10", verified_pass = "Verified Pass")
+
+  build_model_df <- function(metrics, model_label) {
+    map_dfr(names(metrics), function(cfg) {
+      m <- metrics[[cfg]]
+      tibble(
+        model = model_label,
+        config = cfg,
+        pass_rate = m$pass_rate,
+        refusal_rate = m$refusal_rate,
+        mean_correctness = m$mean_correctness
+      )
+    })
+  }
+
+  rep_data <- bind_rows(
+    build_model_df(rep_122b$gemini_metrics, "gemini-3-flash"),
+    build_model_df(rep_122b$qwen3_metrics, "qwen3.5:122b"),
+    build_model_df(rep_32b$qwen3_metrics, "qwen3-coder:30b")
+  ) |>
+    filter(config %in% strat_order) |>
+    mutate(
+      config = factor(config, levels = strat_order),
+      config_label = factor(strat_labels[as.character(config)], levels = strat_labels),
+      model = factor(model, levels = c("gemini-3-flash", "qwen3.5:122b", "qwen3-coder:30b"))
+    )
+
+  model_rep_palette <- c("gemini-3-flash" = "grey40",
+                          "qwen3.5:122b" = col_info,
+                          "qwen3-coder:30b" = col_bad)
+
+  # Spearman annotations
+  rho_122b <- rep_122b$ranking_comparison$spearman_rho
+  rho_32b  <- rep_32b$ranking_comparison$spearman_rho
+
+  # --- Panel a: Pass rate (answerable) ---
+  ed6a <- rep_data |>
+    ggplot(aes(x = config_label, y = pass_rate / 100, fill = model)) +
+    geom_col(position = position_dodge(width = 0.7), width = 0.6) +
+    geom_text(aes(label = sprintf("%.1f%%", pass_rate)),
+              position = position_dodge(width = 0.7), vjust = -0.4,
+              size = 2.3, fontface = "bold") +
+    scale_fill_manual(values = model_rep_palette, name = NULL) +
+    scale_y_continuous(labels = pct100, limits = c(0, 1.05)) +
+    labs(title = "a",
+         x = NULL, y = "Pass rate (%)") +
+    theme_nmi() +
+    theme(legend.position = "bottom",
+          legend.key.size = unit(3, "mm"))
+
+  # --- Panel b: OOD refusal rate ---
+  ed6b <- rep_data |>
+    ggplot(aes(x = config_label, y = refusal_rate / 100, fill = model)) +
+    geom_col(position = position_dodge(width = 0.7), width = 0.6) +
+    geom_text(aes(label = sprintf("%.0f%%", refusal_rate)),
+              position = position_dodge(width = 0.7), vjust = -0.4,
+              size = 2.3, fontface = "bold") +
+    scale_fill_manual(values = model_rep_palette, name = NULL) +
+    scale_y_continuous(labels = pct100, limits = c(0, 1.05)) +
+    labs(title = "b",
+         x = NULL, y = "Refusal rate (%)") +
+    theme_nmi() +
+    theme(legend.position = "bottom",
+          legend.key.size = unit(3, "mm"))
+
+  # --- Compose ---
+  ed_fig6 <- ed6a / ed6b +
+    plot_layout(heights = c(1, 1), guides = "collect") +
+    plot_annotation(
+      theme = theme_nmi() + theme(plot.title = element_text(size = 9, face = "bold", margin = margin(b = 4)))
+    ) &
+    theme(legend.position = "bottom")
+
+  ed_fig6
+  save_figure(ed_fig6, "ed_fig3_strategy_replication", w = 180, h = 170)
+} else {
+  cat("Strategy replication data not available.\n")
+}
+```
+
+---
+
+# Extended Data Figure 2 — Contradictory OOD Response Classification {.tabset}
+
+```{r ed-fig7-ood-contradictory, fig.width=8, fig.height=5}
+ood_verif <- fromJSON(here::here("publication", "results", "deep_analyses",
+                                  "reviewer_ood_manual_verification.json"))
+ood_cfg <- ood_verif$summary_per_config
+
+ood_stacked <- tibble(
+  config = names(ood_cfg),
+  refused      = map_int(ood_cfg, ~ .x$refused),
+  contradicted = map_int(ood_cfg, ~ .x$contradicted),
+  hedged       = map_int(ood_cfg, ~ .x$hedged)
+) |>
+  mutate(
+    n = refused + contradicted + hedged,
+    config_label = factor(config_labels[config], levels = config_labels)
+  ) |>
+  pivot_longer(c(refused, contradicted, hedged),
+               names_to = "outcome", values_to = "count") |>
+  mutate(
+    frac = count / n,
+    outcome = factor(outcome,
+                     levels = c("hedged", "contradicted", "refused"),
+                     labels = c("Hedged", "Contradicted", "Refused"))
+  )
+
+ood_outcome_pal <- c("Refused" = "#0072B2", "Contradicted" = "#009E73", "Hedged" = "#E69F00")
+
+ed_fig7 <- ood_stacked |>
+  ggplot(aes(x = config_label, y = frac, fill = outcome)) +
+  geom_col(width = 0.7, position = "stack") +
+  geom_text(aes(label = ifelse(count > 0, count, "")),
+            position = position_stack(vjust = 0.5), size = 3.5, fontface = "bold") +
+  scale_fill_manual(values = ood_outcome_pal, name = NULL) +
+  scale_y_continuous(labels = pct100, expand = expansion(mult = c(0, 0.02))) +
+  labs(x = NULL, y = "Proportion (%)") +
+  theme_nmi() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "bottom",
+        legend.key.size = unit(0.35, "cm")) +
+  plot_annotation(
+    subtitle = "Manual verification of 60 responses to 10 false-premise questions (0 affirmed false claims)",
+    theme = theme_nmi() + theme(
+      plot.title = element_text(size = 9, face = "bold", margin = margin(b = 4)),
+      plot.subtitle = element_text(size = 7, color = "grey40")
+    )
+  )
+
+ed_fig7
+save_figure(ed_fig7, "ed_fig2_ood_contradictory", w = 120, h = 100)
+```
+
+---
+
+# Summary: Output Files
+
+```{r summary}
+output_files <- list.files(fig_dir, pattern = paste0("\\.", params$format, "$"), full.names = TRUE)
+cat(sprintf("\n%d figure files generated in %s/:\n\n", length(output_files), fig_dir))
+for (f in sort(output_files)) {
+  info <- file.info(f)
+  cat(sprintf("  %s  (%.1f KB)\n", basename(f), info$size / 1024))
+}
+cat(sprintf("\nFormat: %s | Resolution: %d dpi | Width: %d mm\n",
+            toupper(params$format), params$dpi, params$width_mm))
+```
