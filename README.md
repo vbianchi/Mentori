@@ -77,8 +77,15 @@ Ollama (host :11434) / Gemini API
 
 ## Reproducing the paper
 
+Figure generation reads raw experiment outputs from `publication/results/`. Those JSONs (~200 MB across 553 files) are **not bundled in this Git repository** — they live at the Zenodo deposit [10.5281/zenodo.19476756](https://doi.org/10.5281/zenodo.19476756). Download them once:
+
 ```bash
-# Render all figures (~5 min on a modern laptop, requires R)
+./publication/data/download_results.sh
+```
+
+Then render all figures (~5 min on a modern laptop, requires R):
+
+```bash
 Rscript -e "rmarkdown::render('publication/reports/paper_figures.Rmd')"
 
 # Outputs: publication/figures/{fig2..fig6, ed_fig1..ed_fig6}.{tiff,pdf}
