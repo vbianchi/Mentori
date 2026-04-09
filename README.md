@@ -9,7 +9,6 @@ This repository accompanies the paper:
 > **Systematic Ablation Reveals Hidden Failures in Multi-Agent AI for Science**
 > Valerio Bianchi & Dirkjan Schokker
 > Wageningen Bioveterinary Research, Wageningen University & Research
-> *Nature Machine Intelligence* (2026, in press)
 > DOI: TBD · Data and code archive: [10.5281/zenodo.19476756](https://doi.org/10.5281/zenodo.19476756)
 
 The figure-generation code, experiment scripts, and the manuscript itself are in [`publication/`](publication/). The raw experiment outputs (~200 MB across 10 experiments) and the 200-paper evaluation corpus manifest are deposited at Zenodo: [10.5281/zenodo.19476756](https://doi.org/10.5281/zenodo.19476756).
@@ -309,7 +308,6 @@ If you use Mentori or the evaluation methodology in your own work, please cite:
 @article{bianchi2026mentori,
   title   = {Systematic Ablation Reveals Hidden Failures in Multi-Agent AI for Science},
   author  = {Bianchi, Valerio and Schokker, Dirkjan},
-  journal = {Nature Machine Intelligence},
   year    = {2026},
   doi     = {TBD}
 }
