@@ -30,15 +30,14 @@ from scipy import stats
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
+PUBLIC_RESULTS_DIR = Path(__file__).resolve().parents[1] / "results"
 RESULTS_DIR = Path(__file__).parent / "results_v4"
-V44_FILE = RESULTS_DIR / "v4_4_generation_latest.json"
+V44_FILE = PUBLIC_RESULTS_DIR / "exp04_generation_latest.json"
 V45_FILES = [
-    RESULTS_DIR / "v4_5_intermediate.json",
-    RESULTS_DIR / "v4_5_intermediate_s20.json",
-    RESULTS_DIR / "v4_5_intermediate_s50.json",
+    PUBLIC_RESULTS_DIR / "exp05_scaling_latest.json",
 ]
-MINICHECK_FILE = RESULTS_DIR / "v4_4_minicheck_latest.json"
-PAPER_VAL_FILE = RESULTS_DIR / "v4_paper_validation.json"
+MINICHECK_FILE = PUBLIC_RESULTS_DIR / "exp04_minicheck_latest.json"
+PAPER_VAL_FILE = PUBLIC_RESULTS_DIR / "analysis_paper_validation.json"
 OUTPUT_FILE = RESULTS_DIR / "v4_statistical_tests.json"
 
 RNG = np.random.default_rng(42)
@@ -189,6 +188,8 @@ def load_v45_all() -> list[dict]:
         d = load_json(f)
         if d and "results" in d:
             all_results.extend(d["results"])
+        elif d and "per_question_results" in d:
+            all_results.extend(d["per_question_results"])
     return all_results
 
 
