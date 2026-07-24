@@ -18,6 +18,36 @@ Reproduction instructions:
   (publisher copyright); download it via `download_corpus.py` in the Zenodo
   deposit, using the DOI manifest in `publication/data/`.
 
+## Harness layout and experiment-to-script map
+
+The `tests/experiments`, `tests/experiments_v2` and `tests/experiments_v4` packages are
+successive generations of the experiment harness, retained **as run** rather than merged, so
+that the archived code matches the code that produced the deposited results. Same-named
+modules in different generations (e.g. `exp_common.py` in both `experiments/` and
+`experiments_v4/`) are different files, and the publication scripts import both; merging the
+packages would break the recorded imports. In addition, most publication scripts import the
+local `publication/scripts/exp_common.py`, which builds on `tests/experiments_v4`.
+
+| Paper experiment | Figures | Main scripts (`publication/scripts/`) | Harness package(s) |
+|---|---|---|---|
+| Judge selection & calibration (exp00) | ED Fig 2 | `exp_00_judge_scoring.py`, `exp_00_judge_comparison.py`, `exp_00_objective_metrics.py`, `exp_00_rlm_model_comparison.py` | `experiments_v4` (direct and via local `exp_common`) |
+| Retrieval/index ablation (exp01-03b) | ED Fig 1 | run inside the Mentori stack (no standalone script); per-query outputs in `results/create_indexes_*` and `results/exp0{1,2,3}*` | `experiments_v4` |
+| Generation strategies (exp04) | Figs 2, 5 | `exp_01_generation.py` (+ `_fixup`); analyses: `analysis_deterministic_scorer.py`, `analysis_minicheck.py`, `analysis_fliprate.py`, `analysis_paper_validation.py`, `analysis_statistical_tests.py` | `experiments` + `experiments_v4` (via local `exp_common`) |
+| Open-weight replication (qwen) | ED Fig 3 | generating script not retained (ad-hoc, pre-submission); deposited outputs: `results/deep_analyses/reviewer_strategy_replication{,_122b}.json` | run against the Mentori stack |
+| Corpus scaling (exp05) | Fig 3d-f | `exp_02_scaling_factorial.py`, `exp_02_scaling_generate_rlm.py`, `exp_02_scaling_judge_rlm.py`, `exp_02_scaling_regen_nonrlm.py`, `exp_02_scaling_rerun.py` (+ `_fixup`) | `experiments` + `experiments_v4` (via local `exp_common`) |
+| Orchestration ablation (exp06) | Fig 4a-c | `exp_03_orchestration_ablation.py` | `experiments` + `experiments_v4` (via local `exp_common`) |
+| Component benchmarks (exp07) | Fig 4d, ED Fig 4 | `exp_04_component_bench.py`, `exp_04_system.py` | `experiments_v2` + `experiments_v4` (via local `exp_common`) |
+| Distiller ablation (exp07b) | ED Fig 5 | `exp_04b_distiller_ablation.py` | `experiments_v4` (via local `exp_common`) |
+| Code-generation benchmark (exp08) | Fig 6 | `exp_05_coder_benchmark.py`, `exp_05_coder_analysis.py` | `experiments` + `experiments_v2` |
+| Retrieval depth sweep (exp09) | Fig 3a-c | `exp_06_depth_sweep.py` | `experiments_v4` (via local `exp_common`) |
+| Passive baseline | Fig 4 context | `analysis_naive_baseline.py` | `experiments` + `experiments_v4` (via local `exp_common`) |
+
+*Note:* the `results/deep_analyses/reviewer_*.json` files were produced by ad-hoc analysis
+scripts during pre-submission checks and those scripts were not retained; their statistics are
+independently re-derived and verified by the revision's verification scripts (see the change
+log accompanying the revised manuscript).
+
+
 Generated 2026-07-21 21:55 UTC at repository commit `2c0e7e5`
 (file listing produced by an inventory script; sizes are bytes on disk).
 
