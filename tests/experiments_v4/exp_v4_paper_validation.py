@@ -28,9 +28,8 @@ from scipy import stats
 # Project imports
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-PUBLIC_RESULTS_DIR = Path(__file__).resolve().parents[1] / "results"
 RESULTS_DIR = Path(__file__).resolve().parent / "results_v4"
-GT_PATH = Path(__file__).resolve().parents[1] / "data" / "ground_truth.json"
+GT_PATH = Path(__file__).resolve().parents[2] / "datasets" / "ground_truth_v4.json"
 OUTPUT_PATH = RESULTS_DIR / "v4_paper_validation.json"
 
 DIMS = ["correctness", "completeness", "faithfulness", "citation_quality"]
@@ -39,9 +38,9 @@ CONFIGS = ["single_pass", "multi_hop", "rlm_5", "rlm_10", "rlm_20", "verified_pa
 
 def load_data():
     """Load all required data files."""
-    gen = json.load(open(PUBLIC_RESULTS_DIR / "exp04_generation_latest.json"))
-    det = json.load(open(PUBLIC_RESULTS_DIR / "analysis_deterministic_latest.json"))
-    mc = json.load(open(PUBLIC_RESULTS_DIR / "exp04_minicheck_latest.json"))
+    gen = json.load(open(RESULTS_DIR / "v4_4_generation_latest.json"))
+    det = json.load(open(RESULTS_DIR / "v4_deterministic_latest.json"))
+    mc = json.load(open(RESULTS_DIR / "v4_4_minicheck_latest.json"))
     gt = json.load(open(GT_PATH))
 
     # Build lookup dicts keyed by (question_id, config)
@@ -698,7 +697,6 @@ def main():
                 return obj.tolist()
             return super().default(obj)
 
-    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     with open(OUTPUT_PATH, "w") as f:
         json.dump(results, f, indent=2, cls=NumpyEncoder)
 

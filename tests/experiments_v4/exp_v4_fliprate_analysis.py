@@ -15,7 +15,7 @@ Computes:
 7. Comparison with Snell et al. (2025) 38% harmful revision rate
 
 Usage:
-    uv run python publication/scripts/analysis_fliprate.py
+    uv run python tests/experiments_v4/exp_v4_fliprate_analysis.py
 """
 
 import json
@@ -30,9 +30,8 @@ from scipy import stats
 # Project path setup
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-PUBLIC_RESULTS_DIR = Path(__file__).resolve().parents[1] / "results"
 RESULTS_DIR = Path(__file__).resolve().parent / "results_v4"
-V4_4_PATH = PUBLIC_RESULTS_DIR / "exp04_generation_latest.json"
+V4_4_PATH = RESULTS_DIR / "v4_4_generation_latest.json"
 OUTPUT_PATH = RESULTS_DIR / "v4_fliprate_analysis.json"
 
 CONFIGS = ["single_pass", "multi_hop", "rlm_5", "rlm_10", "rlm_20", "verified_pass"]
@@ -378,7 +377,7 @@ def main():
     output = {
         "experiment": "v4_fliprate_analysis",
         "timestamp": datetime.now().strftime("%Y%m%d_%H%M%S"),
-        "source_file": V4_4_PATH.name,
+        "source_file": "v4_4_generation_latest.json",
         "description": "Flip rate analysis: how self-correction strategies change correctness outcomes vs single_pass",
         "methodology": {
             "baseline": "single_pass",
@@ -394,7 +393,6 @@ def main():
         "n_results": len(raw_data["per_question_results"]),
     }
 
-    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     with open(OUTPUT_PATH, "w") as f:
         json.dump(output, f, indent=2)
     print(f"\nResults saved to {OUTPUT_PATH}")
