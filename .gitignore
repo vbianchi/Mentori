@@ -111,3 +111,8 @@ ckpts/
 # Legacy user data
 legacy/
 indexes_export.tar.gz
+
+# Raw evaluation results: 230 MB fetched from the Zenodo deposit by
+# publication/data/download_results.sh, not stored in git. The archive is the
+# record; this directory is a working copy of it.
+publication/results/
