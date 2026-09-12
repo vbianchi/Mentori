@@ -55,7 +55,8 @@ Generated 2026-07-21 21:55 UTC at repository commit `2c0e7e5`
 
 | File | Size |
 |---|---|
-| `data/download_papers.py` | 10.4 KB |
+| `data/corpus_papers.csv` | 44.4 KB |
+| `data/download_papers.py` | 4.7 KB |
 | `data/download_results.sh` | 2.3 KB |
 | `data/ground_truth.json` | 229.1 KB |
 | `data/paper_candidates.md` | 16.8 KB |

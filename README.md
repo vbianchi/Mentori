@@ -230,7 +230,7 @@ The paper's triple-triangulation evaluation (deterministic ground truth, calibra
 - [`publication/data/validation_main.json`](publication/data/validation_main.json) — main validation results
 - [`publication/data/validation_cross_document.json`](publication/data/validation_cross_document.json), `validation_synthesis.json`, `validation_ood.json` — category-specific validation
 
-The 200-paper corpus itself is not redistributed in this repository (publisher copyright); download it via the Zenodo deposit and its `download_corpus.py` script. See [`publication/data/download_papers.py`](publication/data/download_papers.py) for the core-paper download plan.
+The 200-paper corpus itself is not redistributed in this repository (publisher copyright). [`publication/data/corpus_papers.csv`](publication/data/corpus_papers.csv) is the manifest, one row per paper with title, DOI or PMC id, arXiv id and source URL, the same file as in the Zenodo deposit; [`publication/data/download_papers.py`](publication/data/download_papers.py) reads it and rebuilds the corpus into `core/` and `noise/`.
 
 ### 4.4. Experiment scripts
 
@@ -330,7 +330,7 @@ A [`CITATION.cff`](CITATION.cff) file at the repository root enables automatic c
 - **Code** (`backend/`, `frontend/`, `scripts/`, `tests/`, `publication/scripts/`, `publication/data/download_*.{sh,py}`, etc.): MIT — see [`LICENSE`](LICENSE)
 - **Figures, manuscript, and derived data** (`publication/figures/`, `publication/drafts/`, `publication/data/ground_truth.json`, `publication/data/questions/`, `publication/data/validation_*.json`, `publication/reports/`): CC-BY 4.0 — see [`LICENSE-CC-BY`](LICENSE-CC-BY)
 
-The 200-paper evaluation corpus is **not** redistributed in this repository; third-party papers remain under their original publisher licenses. Download instructions are in [`publication/data/download_papers.py`](publication/data/download_papers.py) and the Zenodo deposit.
+The 200-paper evaluation corpus is **not** redistributed in this repository; third-party papers remain under their original publisher licenses. [`publication/data/corpus_papers.csv`](publication/data/corpus_papers.csv) lists every paper with its identifiers and licence, and [`publication/data/download_papers.py`](publication/data/download_papers.py) fetches them from their sources.
 
 ---
 
