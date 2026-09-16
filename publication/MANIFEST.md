@@ -47,11 +47,10 @@ scripts during pre-submission checks and those scripts were not retained; their 
 independently re-derived and verified by the revision's verification scripts (see the change
 log accompanying the revised manuscript).
 
-
-Generated 2026-07-21 21:55 UTC at repository commit `2c0e7e5`
+Generated 2026-09-16 10:01 UTC at repository commit `b164641`
 (file listing produced by an inventory script; sizes are bytes on disk).
 
-## 1. `publication/data/` — questions, ground truth, validation (72 files, 2.1 MB total)
+## 1. `publication/data/` — questions, ground truth, validation (73 files, 2.1 MB total)
 
 | File | Size |
 |---|---|
