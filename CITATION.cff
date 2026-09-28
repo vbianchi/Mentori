@@ -5,12 +5,12 @@ title: "Mentori: a locally-hosted agentic AI workspace for scientists"
 abstract: >-
   Mentori is a multi-agent AI workspace that combines a chat interface,
   retrieval-augmented document analysis, and a Jupyter-based code execution
-  sandbox. This repository accompanies the paper "Systematic Ablation Reveals
-  Hidden Failures in Multi-Agent AI for Science" (Bianchi & Schokker,
-  Nature Machine Intelligence 2026), which introduces a triple-triangulation
-  evaluation methodology for retrieval-augmented multi-agent systems and
-  applies it to over 36,000 individual evaluations spanning 200 scientific
-  papers and 250 expert-curated questions.
+  sandbox. This repository accompanies the paper "Systematic ablation of
+  multiagent artificial intelligence for the life sciences" (Bianchi &
+  Schokker, submitted to Communications AI & Computing), which applies a
+  triple-triangulation evaluation methodology for retrieval-augmented
+  multi-agent systems to more than 50,000 individual evaluations spanning
+  200 scientific papers and 250 expert-curated questions.
 authors:
   - family-names: "Bianchi"
     given-names: "Valerio"
@@ -38,11 +38,12 @@ keywords:
   - bioinformatics
 preferred-citation:
   type: article
-  title: "Systematic Ablation Reveals Hidden Failures in Multi-Agent AI for Science"
+  title: "Systematic ablation of multiagent artificial intelligence for the life sciences"
   authors:
     - family-names: "Bianchi"
       given-names: "Valerio"
     - family-names: "Schokker"
       given-names: "Dirkjan"
-  journal: "Nature Machine Intelligence"
+  journal: "Communications AI & Computing"
+  status: submitted
   year: 2026
