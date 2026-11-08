@@ -1,0 +1,5 @@
+Data stamp: PROVISIONAL two raters, 49 of 49 answers drawn
+
+**Supplementary Figure 3 | Human evaluation in full.**
+
+The 49 answers of Figure 2. Where boxes are drawn, they show 2,000 resamples of the answers (seed 42): box, quartiles; line, median; whiskers, two-sided 95% percentile interval. **a**, Reliability of the raters on faithfulness; dashed line, the protocol's gate on Krippendorff's alpha, 0.667. **b**, Spearman's ρ of each signal with each rater; the second judge's row is exploratory, added after the early look. **c**, Completeness: answers in each pair of bands of the judge's score and the raters' score; outlined cells, agreeing bands. **d**, Accuracy (%) of the 2 of 3 rule at each cut-off of Concepts and Papers, at judge and raters' pass marks 4 and 3; outlined cell, the primary cell. **e**, Spearman's ρ of ROUGE-L, METEOR, number overlap and bge-m3 similarity with the raters, exploratory, added after the early look; the judge for reference; diamond, the estimate on all answers. **f**, Mean of the judge's score minus the raters' score, exploratory. n = 49 answers; 48 in b's Papers rows; 48 in d; 48 in e's bge-m3 similarity row.

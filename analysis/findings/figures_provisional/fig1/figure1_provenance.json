@@ -1,0 +1,649 @@
+{
+ "script": "scripts/S456_fig1_design.py",
+ "script_sha256": "e1a944b116dc9b93301088a36006369ef5231f0534ed51477666beef18da389f",
+ "command": "uv run --frozen python scripts/S456_fig1_design.py figure",
+ "python": "3.13.11",
+ "inputs_read": "every file at its committed version (the blob at git HEAD; the file itself outside a git checkout), every check and tripwire on those; each design file (DESIGN_FILES) read again as it stood at DESIGN_AT f83c10b4 (git cat-file), its sha256 there recorded in inputs_sha256 under a name carrying @f83c10b4, and every value drawn or recorded from them required equal at HEAD and at DESIGN_AT (plan.csv's T2 status taken at DESIGN_AT); the files read through an import (experiments/runner, experiments/rlm_ref/__init__.py, experiments/rlm_ref/run_rlm_ref.py, experiments/LOCK.toml, data/ground_truth_v2, data/judge_system_prompts) required equal to HEAD, and the definitions S456 uses from experiment.py, lock.py and run_rlm_ref.py (IMPORT_USES) required the same at HEAD as at f83c10b4; the submitted retrieval runs from the committed frozen set upstream (findings/recompute/upstream_inputs, checked against findings/recompute/frozen_inputs/SHA256SUMS). S520's summary is read at HEAD for its total alone, and recorded while committed. No write time, HEAD or working-copy state is recorded (D155).",
+ "inputs_sha256": {
+  "experiments/LOCK.toml": "8730d401a5d7b6baa1780e656f844261eaead60e45b5199afa29d57f989ad495",
+  "experiments/FIGURE_LOCK.toml": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "experiments/mentori/publication/scripts/exp_01_generation.py@f83c10b4": "00bd041e276bfed60b97f531cff622d34b741926c9ff487bc71e5a4043880825",
+  "experiments/mentori/publication/scripts/exp_02_scaling_factorial.py@f83c10b4": "513165acb80e2956f7d9e6409b9a14b87753175d204e8bc68a83791680c9cbee",
+  "experiments/mentori/publication/scripts/exp_03_orchestration_ablation.py@f83c10b4": "55f2562d68a8ffea4e68a7069b62cf9c58859a9fbfb7f6cbf0bb696fcc99efd7",
+  "experiments/mentori/publication/scripts/exp_05_coder_benchmark.py@f83c10b4": "6d629b08be05904bbed406f4bab91d96aa53cd8da1a6826b53e3ed8db4353c41",
+  "experiments/mentori/publication/scripts/exp_06_depth_sweep.py@f83c10b4": "ff100863be133f26b41eb240b37ebe87dc11b2f2a747d66708fbf6f1d2c62786",
+  "experiments/mentori/tests/experiments_v2/exp_v2_8_coder_benchmark.py@f83c10b4": "12e40624ffb3badebc4a989a9c5aadc49b80dc2b3fdfb3596cd443b8309eb778",
+  "experiments/mentori/tests/experiments_v4/exp_common.py@f83c10b4": "7f4ec8b186a5948d88a3b795db3eb20f70e5013391ef9da5614ef07fff9b7ca4",
+  "experiments/rlm_ref/run_rlm_ref.py@f83c10b4": "327d18987c9faa092ce525a4f6b3c7d6c88dcaafe42b9ff8e7de74676fcbba48",
+  "experiments/rlm_ref/pyproject.toml@f83c10b4": "7b8b26c479d8fe9ef349ed5e283902fe8bab1b4725633909c532fb72fe22b2cb",
+  "experiments/runner/experiment.py@f83c10b4": "ca35a8aac2381d4a4dfcc0d7685f76c82dea8ed5531396cb7ef0aea6891a52b3",
+  "experiments/runner/lock.py@f83c10b4": "2200a0ab1a55ac1af293d05106f7e0dec421b6cd9251c070eb78cf10972233e9",
+  "findings/recompute/G3_runs/preflight.sh@f83c10b4": "271a642cd48d0bb6064fdaa93d534613789fa98d6a3f7edafc92df8b8c762238",
+  "findings/recompute/G4_runs/g4_lib.sh@f83c10b4": "a5b22dd9c1d3596e2984b8469176acaf5fc4d2ffe0e39478cb33d0ba41558f58",
+  "findings/recompute/G5_runs/g5_lib.sh@f83c10b4": "7447338cff92a799f897ef41d1f107b9d8ffff542d563dbb5dfc99c1062926dc",
+  "experiments/draws.csv@f83c10b4": "b03b6f655409e75943e4c41e74395d65d1306b6f7fab1108df2e92029e5fdc69",
+  "experiments/plan.csv@f83c10b4": "5e151a97d360f7a4e1e40fffc7e001200312dd89d4dcbbdeef04569d93b246bc",
+  "scripts/S162_figure1_final.py@f83c10b4": "71c12d1739606bf02786776bfe785c7e92a63321d4efb1e9762a4fb84e8a8e86",
+  "scripts/S447_fig6_panels.py@f83c10b4": "8c60e8a96d4dac395d12bff3e57c1d437b8485d8374553997c75e88ecd011ae1",
+  "data/ground_truth_v2/all_v2_4.json": "5d8362ae931dc0fe0cc132be6b5e57187e3ae7d3131d86f63cdf1a44633fadd5",
+  "data/ground_truth_v2/ground_truth_v2_4_as_v1.json": "e971de522df6fab54a070e44736b6cb28a5ebd26bab07ca9e1513230bb86f4ef",
+  "frozen:upstream/publication/results/exp01_embedding_latest.json": "c0742536a88770487c3a3336468f49ac676a97a107d7518de394e541dfbef9db",
+  "frozen:upstream/publication/results/exp02_search_latest.json": "199227eae91cbb9f7bc9cb03fcf90fb975d380efc17885a615cb994aad84b2f4",
+  "frozen:upstream/publication/results/exp03a_chunking_latest.json": "4d772c4c1f8e2be1803b936c49f5ceea927110842e5394cf5a59401cf1484f0e",
+  "experiments/mentori/tests/experiments_v2/datasets/coder_ground_truth.json@f83c10b4": "afcef9ffea67b2ea1659dad7513948693027648f02f887e6db4e07f6ca3b9c35",
+  "findings/recompute/T1_runs/assignment.toml@f83c10b4": "00a2edf751d95da58c9ace10c7ee6c0b66d648016aa94bb0319fa436569e3ec1",
+  "findings/recompute/T1_runs/check_t1.py@f83c10b4": "d8466bd75cd32715be22521c03c934433b20a37cb2df456cd51a3a09498bce5c",
+  "findings/recompute/S483_d85_check/repro_check.json@f83c10b4": "9400c41a7d39cf2951a2853cb5d86e9c5d76450902343663ef4644ca59eead11",
+  "scripts/S483_second_judge.py@f83c10b4": "03bd3af1611ff86a0e52e29275a6a6c9ee8b0992ff7b875263443797ad4fed02",
+  "findings/recompute/T2_runs/check_t2.py@f83c10b4": "0306d354b73113245b982d4fe0d14405ee457c9f2271fb0229be021d739bf6bc",
+  "findings/recompute/T2_runs/t2_lib.sh@f83c10b4": "68d7c0af04d7895dace468d2389b2880e2074eea115a4ab13fcb69a6be5f183d",
+  "findings/recompute/D98_subset/d98_subset.json@f83c10b4": "957c79b6b0f3afb12b70be51d0802e7853b4d4ff12e2bdb519d44a10111046bc",
+  "findings/S08b_PROTOCOL_HUMAN_EVAL_V22.md@f83c10b4": "3e637c72a3990dc8666c25cea886bcaa28304e2fef72ce61221a5b8be78c941b",
+  "findings/recompute/S520_llm_calls/summary.json": "633090f4389a2c9c40369de0b23a4a312de2eec4a3432e8526def67ad2fa50c4",
+  "findings/recompute/S492_answer_registry/registry.json": "50ec28658dfedaef28fe4489c50e5ef5289393960613e69e13c23c762b6b9dcb",
+  "findings/figures_provisional/fig2_human/legend_draft.md": "6a5843d54ff44ba0ef8e46a875f8aa32ba95680c22cd27e08b8aefc6536027ca",
+  "findings/figures_provisional/fig3_strategies/legend_draft.md": "8d274dbce02d14f99e451d261ef1fcd2d58d1770373d2d6e57d0a57a14c706ee",
+  "findings/figures_provisional/fig4_depth/legend_draft.md": "bbd86cd9f630fbcb9a2c61ca77738f43e88dba72913e13f5bbe508dc3698548e",
+  "findings/figures_provisional/fig4/legend_draft.md": "de13d9c3f3b004e27308421edd58eb9500f07dd7ea7fcfb67bbef2642a89385c",
+  "findings/figures_provisional/fig5/legend_draft.md": "259953ab7c87ec8e2bd8231bfbbffa25d351ebe1685c17db8911a8dd68af5068",
+  "findings/figures_provisional/fig6/legend_draft.md": "fcb649a3f740cccb9e953772124863840703a66db803783c75fb31ebca96941d",
+  "findings/figures_provisional/supp_fig2/legend_draft.md": "baa95ab2812cc473c516d4f4ebe1f40f6b96d66656d2b1d711db3d45fade1b18"
+ },
+ "inputs_digest": "8e7dd85af144355de73d674c49c6031d10bd433f76e9402afc16c895ada30c7a",
+ "model_calls": 0,
+ "lock": {
+  "path": "experiments/LOCK.toml",
+  "sha256": "8730d401a5d7b6baa1780e656f844261eaead60e45b5199afa29d57f989ad495"
+ },
+ "figure_lock": {
+  "path": "experiments/FIGURE_LOCK.toml",
+  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "status": "agreed"
+ },
+ "reproduced": [
+  "Corpus scale: 12 = known",
+  "Embedding model: 20 = known",
+  "Chunking: 24 = known",
+  "Search strategy: 35 = known",
+  "Retrieval depth (gemini-3-flash-preview's caps of one RLM): 10 = known",
+  "Generation strategy (the six, no reference arm): 6 = known",
+  "Figure 6 runner variants (exp_05 variants() against S447 VARIANTS): 16 = known",
+  "Figure 6 runner attempts (D71): 3520 = known",
+  "Figure 6 design attempts (D100, D116; draws.csv S2 answers): 2420 = known"
+ ],
+ "stamp": "PROVISIONAL: 2 of 2 panels (panel a, the signals; panel b, the design), 11 settings read from the design files (inputs sha256 8e7dd85af144)",
+ "page_mm": [
+  183.0,
+  118.0
+ ],
+ "geometry_mm": {
+  "signal_boxes": [
+   0.8,
+   62.8,
+   124.8
+  ],
+  "signal_box_w": 57.4,
+  "stage_boxes_w": [
+   41.0,
+   37.27,
+   54.33,
+   30.8
+  ],
+  "y_signal_boxes": 20.0,
+  "y_stage_boxes": 72.0,
+  "tightest_gap_panel_b": 3.84
+ },
+ "type_pt": {
+  "panel letter (bold)": 8.0,
+  "the tool line in a signal box": 8.0,
+  "answer, signal names and the totals line": 12.0,
+  "stage names": 11.0,
+  "all other text": 10.0
+ },
+ "font": "Helvetica",
+ "colours": {
+  "text, box borders, stem, fork, arrows and signal bands": "#000000",
+  "box fills": "#FFFFFF",
+  "the tool line": "#595959",
+  "the rule in a signal box": "#999999",
+  "stage head bands": "#EEEEEE"
+ },
+ "llm_calls_total": 1158418,
+ "answers_total": 51441,
+ "design": {
+  "core": [
+   5,
+   10,
+   20,
+   50
+  ],
+  "noise": [
+   0,
+   1,
+   3
+  ],
+  "per_size": {
+   "5": 66,
+   "10": 90,
+   "20": 135,
+   "50": 244
+  },
+  "g4_strats": 6,
+  "emb_models": [
+   "all-MiniLM-L6-v2",
+   "all-mpnet-base-v2",
+   "allenai/specter2_base",
+   "BAAI/bge-m3"
+  ],
+  "chunk": {
+   "runs": [
+    "A",
+    "B",
+    "C"
+   ],
+   "model": "BAAI/bge-m3",
+   "search": "RRF",
+   "corpus_size": 30,
+   "configs_tested": [
+    "simple_128",
+    "simple_256",
+    "simple_512",
+    "simple_1024",
+    "semantic_500",
+    "semantic_1000",
+    "semantic_2000",
+    "semantic_4000"
+   ],
+   "k_values": [
+    5,
+    10,
+    20
+   ]
+  },
+  "queries": 28,
+  "queries_chunk": {
+   "A": 28,
+   "B": 27,
+   "C": 27
+  },
+  "retrieval_dates": [
+   "20260211",
+   "20260213"
+  ],
+  "depths": [
+   1,
+   2,
+   3,
+   5,
+   7,
+   10,
+   15,
+   20,
+   30,
+   50
+  ],
+  "n86": 86,
+  "cap2": [
+   5,
+   10,
+   20
+  ],
+  "capd": [
+   1,
+   2,
+   3,
+   7,
+   15,
+   30,
+   50
+  ],
+  "rlms": "0.1.3",
+  "n_questions": 135,
+  "gen_model": "gemini-3-flash-preview",
+  "draws_fig": {
+   "2": [
+    1,
+    2,
+    3
+   ],
+   "4": [
+    1,
+    2,
+    3
+   ],
+   "3": [
+    1,
+    2,
+    3
+   ],
+   "6": [
+    1
+   ]
+  },
+  "matched_budget": "matched_budget",
+  "system": [
+   "raw_gemini",
+   "naive_rag",
+   "rlm_10",
+   "full_orchestrator"
+  ],
+  "orch_setups": [
+   "full_orchestrator",
+   "orch_no_analyser",
+   "orch_no_planner",
+   "orch_no_supervisor",
+   "orch_no_synthesiser",
+   "orch_factual_to_documents",
+   "orch_distil_every_step",
+   "orch_distil_every_step_f1"
+  ],
+  "orch_run": [
+   "full_orchestrator",
+   "orch_no_analyser",
+   "orch_no_planner",
+   "orch_no_supervisor",
+   "orch_no_synthesiser",
+   "orch_factual_to_documents"
+  ],
+  "stress": [
+   "orch_distil_every_step",
+   "orch_distil_every_step_f1"
+  ],
+  "wave2": [
+   "orch_no_distiller",
+   "orch_distiller_f1"
+  ],
+  "t1_models": [
+   "devstral-small-2:24b",
+   "gemma3:27b",
+   "qwen3-coder:30b",
+   "qwen3-coder-next:q4_K_M"
+  ],
+  "t1_held": [
+   "glm-4.7-flash:bf16",
+   "gpt-oss:20b",
+   "llama3:8b"
+  ],
+  "t1_held_why": {
+   "glm-4.7-flash:bf16": "D83 Q181: when glm answers questions it takes a general-task row from Z.ai's page, read on the day, before launch; the lock holds only its coding row ([sampling.thinking_on], temperature 0.7, top_p 1.0) and no code sends another (README A1)",
+   "gpt-oss:20b": "D121 (Valerio, 23 Oct, Q2 O-a): out of T1. Its smoke (23 Oct 09:44, 83fe603) stored 6 of 6 answers with an error: 4 root calls ended on a tool call Ollama could not parse ('error parsing tool call'), 2 reached the one-turn cap with no code block; the paper states it was tested and none of its tool calls could be parsed and used automatically",
+   "llama3:8b": "D83 Q167: one llama3:8b test call on a free Studio server first (it never answered under the lock, plan.csv C5); kept at 8,192 if it answers, its machine decided then (README A2)"
+  },
+  "t1_caps": [
+   1,
+   3,
+   5,
+   7,
+   20,
+   50
+  ],
+  "t1_questions": 15,
+  "judge2_sets": [
+   "G1"
+  ],
+  "draws_figures": {
+   "generation strategy": [
+    "3"
+   ],
+   "Zhang RLM": [
+    "3"
+   ],
+   "no retrieval and naive RAG": [
+    "4"
+   ],
+   "corpus scale": [
+    "3; Supp 8"
+   ],
+   "RLM with gemini-3-flash-preview": [
+    "Supp 8"
+   ],
+   "the 6 orchestrator set-ups": [
+    "4"
+   ],
+   "the 2 stress set-ups": [
+    "4"
+   ],
+   "the local models": [
+    "Supp 8"
+   ],
+   "code-generation strategy": [
+    "6"
+   ],
+   "the other generation models": [
+    "3"
+   ],
+   "generation model claude-haiku-4-5": [
+    "3"
+   ],
+   "generation model gemini-2.5-pro": [
+    "3"
+   ]
+  },
+  "runs_once": [
+   "embedding model",
+   "chunking",
+   "search strategy"
+  ],
+  "n_ops": 20,
+  "variants": 11,
+  "per_model": {
+   "qwen3-coder:30b": [
+    "default"
+   ],
+   "qwen3-coder-next:q4_K_M": [
+    "default"
+   ],
+   "gpt-oss:20b": [
+    "low",
+    "medium",
+    "high"
+   ],
+   "gemma3:27b": [
+    "default"
+   ],
+   "devstral-small-2:24b": [
+    "default"
+   ],
+   "gemini-2.5-pro": [
+    "default",
+    "off"
+   ],
+   "gemini-3-flash-preview": [
+    "default",
+    "off"
+   ]
+  },
+  "fig6_models": 7,
+  "judges": [
+   "devstral-small-2:24b",
+   "qwen3.8:27b"
+  ],
+  "judge_temperature": 0,
+  "judge2_check_n": 107,
+  "t2_generators": [
+   "claude-haiku-4-5",
+   "gemini-2.5-pro",
+   "gemma3:27b",
+   "qwen3-coder:30b"
+  ],
+  "t2_providers": [
+   "anthropic",
+   "gemini",
+   "ollama",
+   "ollama"
+  ],
+  "t2_configs": 6,
+  "t2_draws": {
+   "claude-haiku-4-5": "3",
+   "gemini-2.5-pro": "d98",
+   "gemma3:27b": "rlm45",
+   "qwen3-coder:30b": "rlm45"
+  },
+  "d98_n": 45,
+  "rlm_configs": [
+   "rlm_5",
+   "rlm_10",
+   "rlm_20"
+  ],
+  "human_rating": {
+   "items": 49,
+   "scale": [
+    1,
+    5
+   ],
+   "scales": [
+    "correctness",
+    "completeness",
+    "faithfulness"
+   ],
+   "protocol_scales": [
+    "correctness",
+    "completeness",
+    "faithfulness",
+    "overall"
+   ],
+   "figures": [
+    "2"
+   ]
+  },
+  "providers": [
+   "anthropic",
+   "gemini",
+   "ollama"
+  ],
+  "gemini_lowest": {
+   "gemini-3-flash-preview": "minimal",
+   "gemini-2.5-pro": 128
+  },
+  "t2_status": "done",
+  "cg": 11,
+  "draws_by": {
+   "generation strategy": "3",
+   "the other generation models": "rlm45",
+   "generation model claude-haiku-4-5": "3",
+   "generation model gemini-2.5-pro": "d98",
+   "Zhang RLM": "3",
+   "no retrieval and naive RAG": "3",
+   "corpus scale": "d98",
+   "RLM with gemini-3-flash-preview": "3",
+   "the 6 orchestrator set-ups": "d98",
+   "the 2 stress set-ups": "1",
+   "the local models": "1",
+   "code-generation strategy": "1"
+  },
+  "runner_variants": 16,
+  "left_out": {
+   "glm-4.7-flash:bf16 default": "D100",
+   "glm-4.7-flash:bf16 off": "D100",
+   "nemotron-3-nano:30b default": "D116",
+   "nemotron-3-nano:30b off": "D116",
+   "deepseek-r1:70b default": "D100"
+  }
+ },
+ "rows": [
+  {
+   "stage": "INDEX",
+   "axis": "Corpus scale",
+   "levels": 12,
+   "levels_as": "4 \u00d7 3",
+   "figure": "Figure 3",
+   "plan_row": "G4",
+   "source": "exp_02 CORE_SIZES, NOISE_RATIOS; g4_lib.sh ORDER"
+  },
+  {
+   "stage": "INDEX",
+   "axis": "Embedding model",
+   "levels": 20,
+   "levels_as": "4 \u00d7 5",
+   "figure": "Supplementary Figure 2",
+   "plan_row": "",
+   "source": "exp01_embedding_latest.json config.models, config.corpus_sizes, results"
+  },
+  {
+   "stage": "INDEX",
+   "axis": "Chunking",
+   "levels": 24,
+   "levels_as": "8 \u00d7 3",
+   "figure": "Supplementary Figure 2",
+   "plan_row": "",
+   "source": "exp03a_chunking_latest.json config.configs_tested, config.runs, results"
+  },
+  {
+   "stage": "RETRIEVE",
+   "axis": "Search strategy",
+   "levels": 35,
+   "levels_as": "7 \u00d7 5",
+   "figure": "Supplementary Figure 2",
+   "plan_row": "",
+   "source": "exp02_search_latest.json config.configs_tested, config.corpus_sizes, results"
+  },
+  {
+   "stage": "RETRIEVE",
+   "axis": "Retrieval depth",
+   "levels": 44,
+   "levels_as": "10 \u00d7 2 + 6 \u00d7 4",
+   "figure": "Figure 4",
+   "plan_row": "G5, G6, T1",
+   "source": "exp_06 DEFAULT_DEPTHS; g5_lib.sh SMOKE_OPTS; run_rlm_ref.py FIGURE2_CAPS, DEPTH_SWEEP_CAPS; T1 assignment.toml models, depths, less check_t1.py HELD"
+  },
+  {
+   "stage": "GENERATE",
+   "axis": "Generation model",
+   "levels": 5,
+   "levels_as": "1 + 4",
+   "figure": "Figure 3",
+   "plan_row": "G1, T2",
+   "source": "experiments_v4/exp_common.py GEN_MODEL (G1); T2_runs/check_t2.py GENERATORS (= t2_lib.sh's case), CONFIGS"
+  },
+  {
+   "stage": "GENERATE",
+   "axis": "Generation strategy",
+   "levels": 10,
+   "levels_as": "6 + 4",
+   "figure": "Figure 3",
+   "plan_row": "G1, G2, G6",
+   "source": "exp_01 CONFIG_NAMES, MATCHED_BUDGET; run_rlm_ref.py FIGURE2_CAPS"
+  },
+  {
+   "stage": "GENERATE",
+   "axis": "System configuration",
+   "levels": 4,
+   "levels_as": "4",
+   "figure": "Figure 5",
+   "plan_row": "G3",
+   "source": "exp_03 CONFIG_NAMES (those not in ORCHESTRATOR_CONFIGS, and full_orchestrator); G3 preflight.sh WAVE1"
+  },
+  {
+   "stage": "GENERATE",
+   "axis": "Orchestrator set-up",
+   "levels": 8,
+   "levels_as": "6 + 2",
+   "figure": "Figure 5",
+   "plan_row": "G3, G9",
+   "source": "exp_03 ORCHESTRATOR_CONFIGS in G3 preflight.sh WAVE1, and STRESS_CONFIG_NAMES (G9)"
+  },
+  {
+   "stage": "GENERATE",
+   "axis": "Code-generation strategy",
+   "levels": 121,
+   "levels_as": "11 \u00d7 11",
+   "figure": "Figure 7",
+   "plan_row": "S2",
+   "source": "exp_v2_8_coder_benchmark.py CONFIG_NAMES (labels: S447 STRATEGIES); exp_05 FIG6_MODELS, variants() on LOCK.toml"
+  },
+  {
+   "stage": "JUDGE",
+   "axis": "Judge model",
+   "levels": 2,
+   "levels_as": "2",
+   "figure": "Figures 2, 3, 5 and 6",
+   "plan_row": "S3",
+   "source": "LOCK.toml [judge] model, second_model (lock.judges()); S483_d85_check/repro_check.json; S483 S3_SET G1"
+  }
+ ],
+ "panel_a": [
+  {
+   "name": "Judge correctness",
+   "signal": "Judge",
+   "readout": "Correctness (pass 4+)",
+   "figure": "2, 3, 5, 6",
+   "source": "S456 MEASURES and READOUT; legend drafts of Figure 2, 3, 5, 6"
+  },
+  {
+   "name": "Judge refusal",
+   "signal": "Judge",
+   "readout": "Refusal",
+   "figure": "3, 5",
+   "source": "S456 MEASURES and READOUT; legend drafts of Figure 3, 5"
+  },
+  {
+   "name": "Judge faithfulness",
+   "signal": "Judge",
+   "readout": "Faithfulness",
+   "figure": "2, 6",
+   "source": "S456 MEASURES and READOUT; legend drafts of Figure 2, 6"
+  },
+  {
+   "name": "Concept recall",
+   "signal": "Concepts",
+   "readout": "Concept recall",
+   "figure": "2, 4, 5, 6",
+   "source": "S456 MEASURES and READOUT; legend drafts of Figure 2, 4, 5, 6"
+  },
+  {
+   "name": "Papers precision",
+   "signal": "Papers",
+   "readout": "Claims supported",
+   "figure": "2, 6",
+   "source": "S456 MEASURES and READOUT; legend drafts of Figure 2, 6"
+  }
+ ],
+ "draw_kinds": [
+  {
+   "key": "3",
+   "name": "3 draws",
+   "means": "every question answered three times",
+   "settings": [
+    "generation strategy",
+    "generation model claude-haiku-4-5",
+    "Zhang RLM",
+    "no retrieval and naive RAG",
+    "RLM with gemini-3-flash-preview"
+   ]
+  },
+  {
+   "key": "d98",
+   "name": "1 + 2 draws",
+   "means": "every question answered once, and a fixed third of them twice more",
+   "settings": [
+    "generation model gemini-2.5-pro",
+    "corpus scale",
+    "the 6 orchestrator set-ups"
+   ]
+  },
+  {
+   "key": "rlm45",
+   "name": "3 draws, RLM on a third",
+   "means": "every question answered three times, except by the RLM set-ups, which answer a fixed third of them three times",
+   "settings": [
+    "the other generation models"
+   ]
+  },
+  {
+   "key": "1",
+   "name": "1 draw",
+   "means": "every question answered once",
+   "settings": [
+    "the 2 stress set-ups",
+    "the local models",
+    "code-generation strategy"
+   ]
+  },
+  {
+   "key": "run",
+   "name": "1 run",
+   "means": "each retrieval query scored once",
+   "settings": [
+    "embedding model",
+    "chunking",
+    "search strategy"
+   ]
+  }
+ ],
+ "not_drawn": {
+  "RAGAS and RAGChecker": "D136 Q6 (Fig5.Q1 O-a): a Supplementary figure; D33 shows RAGAS only if Figure 6 uses it",
+  "distiller set-ups": "G3 wave 2 (orch_no_distiller, orch_distiller_f1): D154 as amended, Rule 12's zero branch (distiller count 0 on the full pipeline's draw 1)",
+  "draws": "D183 FD6 B: the draws per setting are drawn in Supplementary Figure 1 (scripts/S496_supp_fig1_experiment_graph.py, from draw_kinds)",
+  "published and simple evaluators": "D183 FD7 a: no panel a row (D136 Q6)",
+  "measures outside the signals": "D307 (alt2): Human rating, Execution, Mean reciprocal rank not drawn; panel a draws the three signals alone"
+ },
+ "files": {
+  "Figure 1 (provisional, 2 of 2).pdf": "21c989d5a914693662b2b5d3b8368f70105c3853dae011cf68a44ba1750a74ee",
+  "Figure 1 (provisional, 2 of 2).svg": "888f88c5a2721ba01a121275d94589a620a20e78e1ab839015496eb5b3ac86f1",
+  "Figure 1 (provisional, 2 of 2).png": "9947630e810a89b9829201e5ee629101064d7a7f3ca88776f084a54bcc092196",
+  "Source Data Fig. 1 (provisional, 2 of 2).xlsx": "2e176378f839175e1d9c76c4811a618343b5296ec6aa1e0f080ad4034bab8cd7",
+  "Source Data Fig. 1 caption (provisional, 2 of 2).md": "f4417334bd85b8e4bce753673802f28881be2273d961c5b03cd6ea62eb65621d",
+  "figure1_numbers.json": "2cd5897867a2b6942d28e4d76d97c07c492b10a6a1b2c4b6cfb042e7a24b8b82",
+  "legend_draft.md": "5639cdbf844ac2bbe2ad7be6f08946fe7f987319657b722e7d26878f03325e85"
+ }
+}

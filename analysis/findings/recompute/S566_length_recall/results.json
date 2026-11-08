@@ -1,0 +1,198 @@
+{
+ "_provenance": {
+  "script": "scripts/S566_length_recall.py",
+  "script_sha256": "9445cdff1e6d50a3f0ce1dfd37919d4adfd91ae4fb766e9956d04aeacb8e45fc",
+  "command": "uv run python scripts/S566_length_recall.py",
+  "git_head": "cb6e51840a9a02621371788721ad58002cb37aba",
+  "written_utc": "2026-11-03T15:48:40Z",
+  "method": "experiments/README.md D220",
+  "reader": {
+   "function": "S463_fig2_ranking.read_answers",
+   "sha256": "78dea40def8280cbe46dd699982f7f080414531e04bba2271735ef2b199787d9",
+   "S457_sha256": "194fbacd4fe8016436f986fb53c337180df381cfc7b9971295d1e260d64a82f7",
+   "S463_differs_from_head": false
+  },
+  "inputs_sha256": {
+   "frozen:k1_inputs_runs.tar/k1_inputs_runs/exp_01__single_pass__exp_v4_s20_n0/answers.jsonl": "bc43f45f211b64ad625db677110d6346dfd6d5bdda9387a6647d0d957cc5dccd",
+   "frozen:k1_inputs_runs.tar/k1_inputs_runs/exp_01__multi_hop__exp_v4_s20_n0/answers.jsonl": "518b0efefd170ec4e172b8ba1d8218aa25612a4eaf27ebab98a824343864ad42",
+   "frozen:k1_inputs_runs.tar/k1_inputs_runs/exp_01__verified_pass__exp_v4_s20_n0/answers.jsonl": "8489392b4723a8d4fa8bd3727e83853256d8d68d30e7d44c8d81bbf4beb2e6b7",
+   "frozen:k1_inputs_runs.tar/k1_inputs_runs/exp_01__rlm_5__exp_v4_s20_n0/answers.jsonl": "fa8a221fd22f11e516d8204116a8a25b51e4eabe654615d16516456373276b81",
+   "frozen:k1_inputs_runs.tar/k1_inputs_runs/exp_01__rlm_10__exp_v4_s20_n0/answers.jsonl": "7d5d2651b0111d96cc863af5a5e9349d07466d6028be2407c1644ef31e7ab90b",
+   "frozen:k1_inputs_runs.tar/k1_inputs_runs/exp_01__rlm_20__exp_v4_s20_n0/answers.jsonl": "18ba730cee1865455aa5ce7481ffdb205271791a35d67a71a222819f924e27dc",
+   "frozen:fig2_g1r15_inputs.tar/fig2_g1r15_inputs/runs/exp_01__verified_pass__exp_v4_s20_n0/answers.jsonl": "1ce4b1052912d8592b912da29ed987df9c2a4baca575cf80cc2b9d33334f8148",
+   "frozen:fig2_g1r15_inputs.tar/fig2_g1r15_inputs/runs/exp_01__rlm_5__exp_v4_s20_n0/answers.jsonl": "cc10c9eb881fa9618ff2fb8ec7a3f1bb9cf58662827cd67b326e47f67b51d42c",
+   "frozen:fig2_g1r15_inputs.tar/fig2_g1r15_inputs/runs/exp_01__rlm_10__exp_v4_s20_n0/answers.jsonl": "ecb6de5343d172894fd56d57997e3301d70ca3fb509ae2cd65f8e47eb8c268b7",
+   "frozen:fig2_g1r15_inputs.tar/fig2_g1r15_inputs/runs/exp_01__rlm_20__exp_v4_s20_n0/answers.jsonl": "1e5b124d8bbd98640c87051916305ed0c04d668447967c60a08d6945fca32c62",
+   "findings/recompute/frozen_inputs/members/k1_inputs_runs.sha256": "887040484e341ed67017e53746b0ccf3d0f7d93bf8ef08cbf0c4dd923c1a731c"
+  },
+  "concept_recall": {
+   "workbook": "findings/figures_provisional/fig3_strategies/Source Data Fig. 3 (provisional, 14860 of 21402).xlsx",
+   "read_at": "HEAD",
+   "last_commit": "dfc503b7ab8ec64154af645749a7533d697c9095",
+   "sha256": "447f128b2efaac48057b185584c2a334f3d2dca7176400ccf9d2c91bd6c4f477",
+   "sheet": "Fig. 3a",
+   "rows": "concept recall (not drawn): question (grey dot)",
+   "column": "concept_recall_question_pct"
+  },
+  "figure4_words": {
+   "workbook": "findings/figures_provisional/fig4/Source Data Fig. 4 (provisional, 1485 of 3015).xlsx",
+   "commit": "698b22c6322454c175f02dda971d898f53368fd4",
+   "sha256": "649dd7e071263a728f0ca0c9ae4cce7dfb1ac2c136d9797a2cb44a57931a8f57",
+   "sheet": "Fig. 4d",
+   "rows": "answer, config rlm_10",
+   "read_with": "git show"
+  },
+  "words": "len(generation.answer.split()); 0 where S463 status is not ok",
+  "draws": [
+   1,
+   2,
+   3
+  ],
+  "resamples": 10000,
+  "seed": 20261013,
+  "interval": "two-sided 95% percentile"
+ },
+ "gates": {
+  "concept_recall_means": {
+   "single_pass": {
+    "computed_pct": 69.3431912617907,
+    "sheet_pct": 69.343191262,
+    "abs_diff": 2.093116791002103e-10
+   },
+   "multi_hop": {
+    "computed_pct": 54.031492839569765,
+    "sheet_pct": 54.03149284,
+    "abs_diff": 4.3023362650274066e-10
+   },
+   "verified_pass": {
+    "computed_pct": 69.7219737626628,
+    "sheet_pct": 69.721973763,
+    "abs_diff": 3.3719516068231314e-10
+   },
+   "rlm_5": {
+    "computed_pct": 73.99234271323256,
+    "sheet_pct": 73.992342713,
+    "abs_diff": 2.325606374142808e-10
+   },
+   "rlm_10": {
+    "computed_pct": 76.1900620912093,
+    "sheet_pct": 76.190062091,
+    "abs_diff": 2.092974682454951e-10
+   },
+   "rlm_20": {
+    "computed_pct": 75.12705748172094,
+    "sheet_pct": 75.127057482,
+    "abs_diff": 2.7905855404242175e-10
+   }
+  },
+  "rlm10_draw1_words": {
+   "answers_compared": 135,
+   "equal": 135,
+   "empty_cells_as_0": 1
+  },
+  "answers_files_equal_figure3_provenance": 10
+ },
+ "per_strategy": {
+  "single_pass": {
+   "label": "single pass",
+   "questions": 86,
+   "median_words": 277.5,
+   "mean_words": 237.45736434108525,
+   "failed_answers_counted_0": 0,
+   "failed_answers": []
+  },
+  "multi_hop": {
+   "label": "multi-hop",
+   "questions": 86,
+   "median_words": 99.5,
+   "mean_words": 125.22093023255815,
+   "failed_answers_counted_0": 0,
+   "failed_answers": []
+  },
+  "verified_pass": {
+   "label": "verified pass",
+   "questions": 86,
+   "median_words": 234.33333333333331,
+   "mean_words": 220.89922480620157,
+   "failed_answers_counted_0": 1,
+   "failed_answers": [
+    {
+     "answer_key": "exp_v4_s20_n0|verified_pass|19_hpai_canada_TE3|d3",
+     "status": "no_answer",
+     "tokens_in_text": 0
+    }
+   ]
+  },
+  "rlm_5": {
+   "label": "RLM-5",
+   "questions": 86,
+   "median_words": 819.6666666666667,
+   "mean_words": 919.7054263565892,
+   "failed_answers_counted_0": 1,
+   "failed_answers": [
+    {
+     "answer_key": "exp_v4_s20_n0|rlm_5|02_snakemake_CO2|d1",
+     "status": "error",
+     "tokens_in_text": 0
+    }
+   ]
+  },
+  "rlm_10": {
+   "label": "RLM-10",
+   "questions": 86,
+   "median_words": 831.6666666666667,
+   "mean_words": 985.7596899224806,
+   "failed_answers_counted_0": 1,
+   "failed_answers": [
+    {
+     "answer_key": "exp_v4_s20_n0|rlm_10|02_snakemake_CO2|d1",
+     "status": "error",
+     "tokens_in_text": 0
+    }
+   ]
+  },
+  "rlm_20": {
+   "label": "RLM-20",
+   "questions": 86,
+   "median_words": 829.0,
+   "mean_words": 938.0193798449613,
+   "failed_answers_counted_0": 0,
+   "failed_answers": []
+  }
+ },
+ "pearson": {
+  "rlm_10": {
+   "role": "primary",
+   "contrast": "RLM-10 minus single pass",
+   "r": 0.40595595799767054,
+   "ci95_lo": 0.22134811231551524,
+   "ci95_hi": 0.5815195245892167,
+   "resamples": 10000,
+   "questions": 86,
+   "mean_words_difference": 748.3023255813953,
+   "mean_recall_difference_pp": 6.846870829418605
+  },
+  "rlm_5": {
+   "role": "secondary",
+   "contrast": "RLM-5 minus single pass",
+   "r": 0.5080738076652693,
+   "ci95_lo": 0.3143636807351168,
+   "ci95_hi": 0.6788958785599787,
+   "resamples": 10000,
+   "questions": 86,
+   "mean_words_difference": 682.2480620155039,
+   "mean_recall_difference_pp": 4.649151451441861
+  },
+  "rlm_20": {
+   "role": "secondary",
+   "contrast": "RLM-20 minus single pass",
+   "r": 0.47720109767372104,
+   "ci95_lo": 0.2677199156285573,
+   "ci95_hi": 0.6646945899306754,
+   "resamples": 10000,
+   "questions": 86,
+   "mean_words_difference": 700.562015503876,
+   "mean_recall_difference_pp": 5.783866219930234
+  }
+ }
+}

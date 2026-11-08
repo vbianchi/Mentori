@@ -1,0 +1,238 @@
+{
+ "caps": [
+  1,
+  2,
+  3,
+  5,
+  7,
+  10,
+  15,
+  20,
+  30,
+  50
+ ],
+ "code_sha256": {
+  "concept_recall_loose (source)": "374e5bd4969cff5825f0a919632320b6a618b494d5f1c33b903c34c63d9caebe",
+  "experiments/rlm_ref/run_rlm_ref.py": "327d18987c9faa092ce525a4f6b3c7d6c88dcaafe42b9ff8e7de74676fcbba48",
+  "scripts/S470_l1_signals.py": "e301c6a6d7c4f50bcc3ab8ba679be2d8caf1211d95c67241b9031c1aacaa5b37",
+  "scripts/concept_match_loose.py": "85bf57a09929dfb88c9bf221cd2a969b0cd78c22c97b77c129ce74a278934609",
+  "scripts/turn_limit_note.py": "34fcfb8a71b478b0fc61d66bdf34aa590e19d87f235c969f239be17ea429c3da",
+  "turn_limit_note.strip (source)": "df1e3b8a1b6bd445b87378476d841d89166577afeb8940e3a7a9b42f715803dc"
+ },
+ "command": "uv run --frozen python scripts/S474_l2_concept_recall.py --frozen",
+ "counts": {
+  "G5": {
+   "d92_action_by_failed": {
+    "rebuild": [
+     0,
+     0
+    ],
+    "rerun": [
+     0,
+     0
+    ],
+    "stays_failed": [
+     0,
+     0
+    ]
+   },
+   "empty_text_scored": 33,
+   "failed_with_text": 0,
+   "flagged": 72,
+   "note_removed": 72,
+   "note_removed_by_cap": {
+    "1": 47,
+    "15": 1,
+    "2": 15,
+    "3": 6,
+    "5": 1,
+    "7": 2
+   },
+   "rows": 860,
+   "status": {
+    "error": 33,
+    "ok": 827
+   },
+   "stop_reason": {
+    "call_error": 18,
+    "final": 753,
+    "max_turns_auto_generated": 2,
+    "max_turns_empty": 15,
+    "max_turns_partial": 72
+   },
+   "unflagged_holding_note_text": 0
+  },
+  "G6": {
+   "d92_action_by_failed": {
+    "rebuild": [
+     72,
+     0
+    ],
+    "rerun": [
+     29,
+     5
+    ],
+    "stays_failed": [
+     15,
+     0
+    ]
+   },
+   "empty_text_scored": 126,
+   "failed_with_text": 0,
+   "flagged": 0,
+   "note_removed": 0,
+   "note_removed_by_cap": {},
+   "rows": 2580,
+   "status": {
+    "error": 117,
+    "no_answer": 9,
+    "ok": 2454
+   },
+   "stop_reason": {
+    "answer_ready": 2246,
+    "forced_final_failed": 72,
+    "root_call_failed": 45,
+    "turn_cap": 217
+   },
+   "unflagged_holding_note_text": 0
+  }
+ },
+ "d92_pending": "G6 rows carry d92_action from S455's list (D92 Q187, D93 Q-a); not applied: the stored answers are scored as they stand",
+ "failed_answers": "LIST.md Rule 10: in every denominator, the stored (empty) text scored 0; cap_tables also gives every table with them left out",
+ "frozen_inputs_sha256": {
+  "findings/recompute/L2_inputs/PULL.json": "6b5bc6ae88edb7a0e1ff8ab71b1f1a64e6710893b9d19541c50c4a426fd63420",
+  "findings/recompute/L2_inputs/g6/b4_rlm_ref__cap10__all135/answers.jsonl": "9ae10c34487d289179bebdcbefb2c7ff6bbb45c896ff57090dcd1d375c229f13",
+  "findings/recompute/L2_inputs/g6/b4_rlm_ref__cap15__depthsweep86/answers.jsonl": "968638245804c9e124a9f2460d1491d42e14d5a2542c463377f096048cb2751a",
+  "findings/recompute/L2_inputs/g6/b4_rlm_ref__cap1__depthsweep86/answers.jsonl": "9ff176b3b488e37e121dfd2c4f732628cf205414986acca83af1a3a6b0e58e9e",
+  "findings/recompute/L2_inputs/g6/b4_rlm_ref__cap20__all135/answers.jsonl": "8bad956400ff99a261126a514c579ce1fb4f3961ae9552aa64b8d7bd88f9f330",
+  "findings/recompute/L2_inputs/g6/b4_rlm_ref__cap2__depthsweep86/answers.jsonl": "2430fdf9a0c83a3287841d5d6fe286b1687121b87fdb12db7b6371b10be7e308",
+  "findings/recompute/L2_inputs/g6/b4_rlm_ref__cap30__depthsweep86/answers.jsonl": "c901e8fdcf812223551ea32e159b586a741117c701ede720c6c2084a81438414",
+  "findings/recompute/L2_inputs/g6/b4_rlm_ref__cap3__depthsweep86/answers.jsonl": "4e6d063b1a773396db10d7bbfbd645bd256dec33c62407a012b62b591fdd8ef1",
+  "findings/recompute/L2_inputs/g6/b4_rlm_ref__cap50__depthsweep86/answers.jsonl": "62ea5d47d9910cbc83c26700adf1e734606328379de6b150664edb9a5e040791",
+  "findings/recompute/L2_inputs/g6/b4_rlm_ref__cap5__all135/answers.jsonl": "f7effb589f8a85aba1d9969d8a4696723e2a941e4c334697366ffad768feac4b",
+  "findings/recompute/L2_inputs/g6/b4_rlm_ref__cap7__depthsweep86/answers.jsonl": "842ac920a0f9377f0dc538772f532dc901da61ffd74d7d2ff71b464d749c9d59",
+  "findings/recompute/L2_inputs/results_v4/v4_9_depth_sweep_depthsweep86_gemini-3-flash-preview_127.0.0.1-11453_20261018_095502.json": "52abab8629d54c78902479532b7e28fe0753ef58b66f0c839871961332850779"
+ },
+ "gate": {
+  "answers": {
+   "<upstream>/publication/results/exp09_depth_sweep_devstral-small-2-24b_merged.json": "f8b0ade42fab52f74f58a4a8a3a987c626e0fd05770c203849537be26a18446b",
+   "<upstream>/publication/results/exp09_depth_sweep_gemini-3-flash-preview_merged.json": "e63242b7943c0121fde86e5af86c8bf36656ce474e1f70150ba555d6df07ae91",
+   "<upstream>/publication/results/exp09_depth_sweep_gemma3-27b_merged.json": "4ff66a2d32962961c4c2f501505fcb1891b29f025a0be2854d71117d8d801fef",
+   "<upstream>/publication/results/exp09_depth_sweep_glm-4.7-flash_merged.json": "a1c1f4561facf8e7e0ad23ff515affd3e93ca0a31afc9d05253c42d2ac934968",
+   "<upstream>/publication/results/exp09_depth_sweep_gpt-oss_20b_merged.json": "b507ba55260f6b8b9c5322d355ba023c6e9c37319b6c98ebed20a500c2b128f1",
+   "<upstream>/publication/results/exp09_depth_sweep_llama3-8b_merged.json": "63c3ce88d6e454685b64fdc3316d38da6d3da621cffea3a071ead55fddf4a2db",
+   "<upstream>/publication/results/exp09_depth_sweep_nemotron-3-nano_30b_merged.json": "24d977acbe68e0a99a696718af917d9064146a8b488c5e21a507fbc662ce6294",
+   "<upstream>/publication/results/exp09_depth_sweep_qwen3-coder-next_q4_K_M_merged.json": "170d7b24e87969697b738a94c0d3816e319a095d498d0f1b69ddefa3d7529f37",
+   "<upstream>/publication/results/exp09_depth_sweep_qwen3-coder_latest_merged.json": "26674c661c8c2ab4bfbdfb83dc2ffcd1013a08869648e5188984f189aa3f0d36"
+  },
+  "compared": "concept_recall_loose = concept_recall_loose_v22, concept_recall_exact = concept_recall_v22 (exp_06's compute_concept_recall), on every row S383 rescored against the v2.4 key",
+  "reference": "<repo>/findings/recompute/S383_depth_concept_recall_v22.csv",
+  "reference_sha256": "ef04132287efd2aeab908fec6fa7d4c2c29d3c8db78d3cc8f87cd476592168e2",
+  "reproduced": "1362 of 1362"
+ },
+ "inputs": {
+  "D92_list": {
+   "by_action": {
+    "rebuild": 72,
+    "rerun": 44,
+    "stays_failed": 15
+   },
+   "g6_keys": 131,
+   "path": "<repo>/findings/recompute/Q145/S455_d92_affected.json",
+   "sha256": "c8fce3c6241ecdd1f3e2276f1ad3f532c7a199c8626bcd5c72b312b492ab97a3"
+  },
+  "G5": {
+   "copy": "<repo>/findings/recompute/L2_inputs",
+   "files": {
+    "v4_9_depth_sweep_depthsweep86_gemini-3-flash-preview_127.0.0.1-11453_20261018_095502.json": "52abab8629d54c78902479532b7e28fe0753ef58b66f0c839871961332850779"
+   },
+   "pull": {
+    "files": {
+     "v4_9_depth_sweep_depthsweep86_gemini-3-flash-preview_127.0.0.1-11453_20261018_095502.json": {
+      "bytes": 47386216,
+      "mtime_utc": "2026-10-20T01:57:46Z",
+      "sha256": "52abab8629d54c78902479532b7e28fe0753ef58b66f0c839871961332850779"
+     },
+     "v4_9_depth_sweep_depthsweep86_gemini-3-flash-preview_127.0.0.1-11453_latest.json": {
+      "bytes": 47386216,
+      "mtime_utc": "2026-10-20T01:57:46Z",
+      "sha256": "52abab8629d54c78902479532b7e28fe0753ef58b66f0c839871961332850779"
+     }
+    },
+    "from": "Studio ~/projects/mentori-runs-g5/experiments/mentori/publication/scripts/results_v4",
+    "g5_clone_head": "fd20b16c9bdbd475368d7b18ba5061e965129564",
+    "pulled_utc": "2026-10-22T15:15:29Z"
+   },
+   "rows_in_files": 860,
+   "rows_outside_draw_1": 0
+  },
+  "G6": {
+   "<repo>/findings/recompute/L2_inputs/g6/b4_rlm_ref__cap10__all135/answers.jsonl": {
+    "kept": 258,
+    "records": 405,
+    "sha256": "9ae10c34487d289179bebdcbefb2c7ff6bbb45c896ff57090dcd1d375c229f13"
+   },
+   "<repo>/findings/recompute/L2_inputs/g6/b4_rlm_ref__cap15__depthsweep86/answers.jsonl": {
+    "kept": 258,
+    "records": 258,
+    "sha256": "968638245804c9e124a9f2460d1491d42e14d5a2542c463377f096048cb2751a"
+   },
+   "<repo>/findings/recompute/L2_inputs/g6/b4_rlm_ref__cap1__depthsweep86/answers.jsonl": {
+    "kept": 258,
+    "records": 258,
+    "sha256": "9ff176b3b488e37e121dfd2c4f732628cf205414986acca83af1a3a6b0e58e9e"
+   },
+   "<repo>/findings/recompute/L2_inputs/g6/b4_rlm_ref__cap20__all135/answers.jsonl": {
+    "kept": 258,
+    "records": 405,
+    "sha256": "8bad956400ff99a261126a514c579ce1fb4f3961ae9552aa64b8d7bd88f9f330"
+   },
+   "<repo>/findings/recompute/L2_inputs/g6/b4_rlm_ref__cap2__depthsweep86/answers.jsonl": {
+    "kept": 258,
+    "records": 258,
+    "sha256": "2430fdf9a0c83a3287841d5d6fe286b1687121b87fdb12db7b6371b10be7e308"
+   },
+   "<repo>/findings/recompute/L2_inputs/g6/b4_rlm_ref__cap30__depthsweep86/answers.jsonl": {
+    "kept": 258,
+    "records": 258,
+    "sha256": "c901e8fdcf812223551ea32e159b586a741117c701ede720c6c2084a81438414"
+   },
+   "<repo>/findings/recompute/L2_inputs/g6/b4_rlm_ref__cap3__depthsweep86/answers.jsonl": {
+    "kept": 258,
+    "records": 258,
+    "sha256": "4e6d063b1a773396db10d7bbfbd645bd256dec33c62407a012b62b591fdd8ef1"
+   },
+   "<repo>/findings/recompute/L2_inputs/g6/b4_rlm_ref__cap50__depthsweep86/answers.jsonl": {
+    "kept": 258,
+    "records": 258,
+    "sha256": "62ea5d47d9910cbc83c26700adf1e734606328379de6b150664edb9a5e040791"
+   },
+   "<repo>/findings/recompute/L2_inputs/g6/b4_rlm_ref__cap5__all135/answers.jsonl": {
+    "kept": 258,
+    "records": 405,
+    "sha256": "f7effb589f8a85aba1d9969d8a4696723e2a941e4c334697366ffad768feac4b"
+   },
+   "<repo>/findings/recompute/L2_inputs/g6/b4_rlm_ref__cap7__depthsweep86/answers.jsonl": {
+    "kept": 258,
+    "records": 258,
+    "sha256": "842ac920a0f9377f0dc538772f532dc901da61ffd74d7d2ff71b464d749c9d59"
+   }
+  }
+ },
+ "key": {
+  "path": "<repo>/data/ground_truth_v2/ground_truth_v2_4_as_v1.json",
+  "sha256": "e971de522df6fab54a070e44736b6cb28a5ebd26bab07ca9e1513230bb86f4ef",
+  "source": {
+   "path": "<repo>/data/ground_truth_v2/all_v2_4.json",
+   "sha256": "5d8362ae931dc0fe0cc132be6b5e57187e3ae7d3131d86f63cdf1a44633fadd5"
+  },
+  "version": "2.4"
+ },
+ "matcher": "loose (D12, scripts/concept_match_loose.py), provisional until P2's labels choose one (D17); exact = its rule 1, the substring test, beside it (D12)",
+ "plan_row": "L2",
+ "provisional": true,
+ "questions": 86,
+ "script": "scripts/S474_l2_concept_recall.py",
+ "script_sha256": "cb46b9252eaa0565fc6c3201725320a60dccf3f809d10bdf91e2cef6328a91af",
+ "turn_limit_note": "removed exactly before matching where G5's rlm.turn_limit_note is True (D115 L1e O-a, scripts/turn_limit_note.py); G6's package appends no note"
+}

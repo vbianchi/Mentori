@@ -1,0 +1,954 @@
+{
+ "header": {
+  "script": "scripts/S489_fig4_by_question_type.py",
+  "script_sha256": "ad85780f4ecf151115a285e9bd5fdfb71cf223d8ccf3d887a95df538cf302369",
+  "command": "uv run python scripts/S489_fig4_by_question_type.py",
+  "inputs": {
+   "findings/recompute/fig4_inputs/g3_collect.jsonl": "41d3105db493fa05fe6fc702ce315c4c4417f528699dc51b05da5b9240e7ec37",
+   "findings/recompute/fig4_inputs/g3_collect.jsonl.json": "8ad99ba4071eb289166ca16b9ff48c541f7208cc55f2bbf151d893ec9b1451c7",
+   "findings/recompute/fig2_inputs/g1_collect.jsonl": "f5ff75bc244cda492a48e7e11f54f2007ed7d586a8f49e78921edd7244b28965",
+   "findings/recompute/fig2_inputs/g1_collect.jsonl.json": "04996e9dd9c3cca49177068f0143fbe0d1c7fa265a4eb6f617d24551f501f895",
+   "findings/figures_provisional/fig4/Source Data Fig. 5 (provisional, 1485 of 3015).xlsx": "aa90b86ddfda998826864c8f6cf42f17a881c71044b83ddfb6a1a6d008b31d20",
+   "findings/recompute/S281_exp06_per_answer.csv": "492890420b3218588d68e935ab0ffa0b92bd515341d6c2c580598b6012b4f1f8",
+   "findings/recompute/S281_exp06_per_config.csv": "f92e3bd306a7b9e7cde9103e26fc94e4cb1c6a078ffa14599ee11b0bede3fb96",
+   "experiments/runner/experiment.py": "ca35a8aac2381d4a4dfcc0d7685f76c82dea8ed5531396cb7ef0aea6891a52b3",
+   "findings/recompute/G1_runs/rerun_d89.sh": "8549210c7e829229ba83b0dd5afcc804454cda00aed665ce586ede5e24d98260",
+   "scripts/judge_rows_v25.py": "aa90f42264e2ce21acfca52c2421d852607418981b6e9be8d8984a716b1ebddd",
+   "findings/recompute/fig3_s6_inputs/SHA256SUMS": "49fd1d0b39a4588abd4b13ece27efc4a8759710111de8fe475e785601ab361a4"
+  },
+  "judge_run_sha256": "38ae79ab023b97562b69b2875b3c8001b02f887d5578121103b85d4a0b4729da",
+  "judge_rows_v25": {
+   "what": "D188: current_draw1 is on the draw-1 rows scripts/judge_rows_v25.py chooses (key v2.5 where S6 judged, else key v2.4), as Figure 5 draws them; current_draw1_v24 and compare on the collects' key v2.4 rows",
+   "G3": {
+    "s6_absent": [],
+    "from_v25": 480,
+    "awaiting_s6": 0,
+    "run_sha256": {
+     "G3": "38ae79ab023b97562b69b2875b3c8001b02f887d5578121103b85d4a0b4729da",
+     "S6G3": "211568dbdfa09482e9c0abfb3b1da92d0bbd62d14a7646058663a990cbb54235"
+    }
+   },
+   "G1": {
+    "s6_absent": [],
+    "from_v25": 60,
+    "awaiting_s6": 0,
+    "run_sha256": {
+     "G1": "38ae79ab023b97562b69b2875b3c8001b02f887d5578121103b85d4a0b4729da",
+     "S6G1": "211568dbdfa09482e9c0abfb3b1da92d0bbd62d14a7646058663a990cbb54235"
+    }
+   },
+   "provisional": false,
+   "cells_differ_from_v24": 31
+  },
+  "sheet_rows_set_aside": {
+   "rows": 176,
+   "set_ups": [
+    "orch_distil_every_step",
+    "orch_distil_every_step_f1"
+   ],
+   "why": "D201 Q2: G9's two stress set-ups are on sheet 4a and outside this split's nine"
+  },
+  "reproduced": {
+   "values_equal": 1719,
+   "per_source": {
+    "Fig. 5a": 1584,
+    "S281_exp06_per_config": 12,
+    "split sums and types": 88,
+    "stated values (REVIEW_LOG, F14)": 35
+   },
+   "mismatches": 0
+  },
+  "exploratory": "REVIEW_LOG.md:56-61: settle on draws 2 and 3 before any claim"
+ },
+ "rule": {
+  "current": "draw 1; a question passes at t when the judge scores it t or more; a failed answer (no text) is a fail; an unscored judge row is left out (S463.shares, S480)",
+  "resubmission": "S281_exp06_per_answer.csv, half 'answerable', correctness_corrected (judge qwen3-coder:30b, the submitted answers); a blank score left out; only the questions in the D5 key's 86 answerable, typed by the key"
+ },
+ "answerable_by_type": {
+  "extractive": 60,
+  "synthesis": 26
+ },
+ "current_draw1": {
+  "raw_gemini": {
+   "setup": "no retrieval",
+   "extractive_pass4": {
+    "passed": 21,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 37,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 11,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 25,
+    "judged": 26,
+    "questions": 26
+   }
+  },
+  "naive_rag": {
+   "setup": "naive RAG",
+   "extractive_pass4": {
+    "passed": 58,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 60,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 14,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 22,
+    "judged": 26,
+    "questions": 26
+   }
+  },
+  "full_orchestrator": {
+   "setup": "full pipeline",
+   "extractive_pass4": {
+    "passed": 55,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 58,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 10,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 26,
+    "judged": 26,
+    "questions": 26
+   }
+  },
+  "orch_no_analyser": {
+   "setup": "analyser off",
+   "extractive_pass4": {
+    "passed": 49,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 56,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 18,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 26,
+    "judged": 26,
+    "questions": 26
+   }
+  },
+  "orch_no_planner": {
+   "setup": "planner off",
+   "extractive_pass4": {
+    "passed": 48,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 54,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 15,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 26,
+    "judged": 26,
+    "questions": 26
+   }
+  },
+  "orch_no_supervisor": {
+   "setup": "supervisor off",
+   "extractive_pass4": {
+    "passed": 46,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 55,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 20,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 26,
+    "judged": 26,
+    "questions": 26
+   }
+  },
+  "orch_no_synthesiser": {
+   "setup": "synthesiser off",
+   "extractive_pass4": {
+    "passed": 50,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 56,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 18,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 25,
+    "judged": 26,
+    "questions": 26
+   }
+  },
+  "orch_factual_to_documents": {
+   "setup": "routing fix",
+   "extractive_pass4": {
+    "passed": 44,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 54,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 16,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 25,
+    "judged": 26,
+    "questions": 26
+   }
+  },
+  "rlm_10": {
+   "setup": "RLM-10",
+   "extractive_pass4": {
+    "passed": 44,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 54,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 20,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 26,
+    "judged": 26,
+    "questions": 26
+   }
+  }
+ },
+ "current_draw1_v24": {
+  "raw_gemini": {
+   "setup": "no retrieval",
+   "extractive_pass4": {
+    "passed": 21,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 37,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 11,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 25,
+    "judged": 26,
+    "questions": 26
+   }
+  },
+  "naive_rag": {
+   "setup": "naive RAG",
+   "extractive_pass4": {
+    "passed": 58,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 60,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 15,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 22,
+    "judged": 26,
+    "questions": 26
+   }
+  },
+  "full_orchestrator": {
+   "setup": "full pipeline",
+   "extractive_pass4": {
+    "passed": 55,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 58,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 10,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 26,
+    "judged": 26,
+    "questions": 26
+   }
+  },
+  "orch_no_analyser": {
+   "setup": "analyser off",
+   "extractive_pass4": {
+    "passed": 49,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 56,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 17,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 26,
+    "judged": 26,
+    "questions": 26
+   }
+  },
+  "orch_no_planner": {
+   "setup": "planner off",
+   "extractive_pass4": {
+    "passed": 47,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 54,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 16,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 26,
+    "judged": 26,
+    "questions": 26
+   }
+  },
+  "orch_no_supervisor": {
+   "setup": "supervisor off",
+   "extractive_pass4": {
+    "passed": 46,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 55,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 19,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 26,
+    "judged": 26,
+    "questions": 26
+   }
+  },
+  "orch_no_synthesiser": {
+   "setup": "synthesiser off",
+   "extractive_pass4": {
+    "passed": 50,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 56,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 18,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 25,
+    "judged": 26,
+    "questions": 26
+   }
+  },
+  "orch_factual_to_documents": {
+   "setup": "routing fix",
+   "extractive_pass4": {
+    "passed": 44,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 54,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 16,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 25,
+    "judged": 26,
+    "questions": 26
+   }
+  },
+  "rlm_10": {
+   "setup": "RLM-10",
+   "extractive_pass4": {
+    "passed": 44,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 54,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 22,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 26,
+    "judged": 26,
+    "questions": 26
+   }
+  }
+ },
+ "resubmission": {
+  "raw_gemini": {
+   "extractive_pass4": {
+    "passed": 31,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 51,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 26,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 26,
+    "judged": 26,
+    "questions": 26
+   }
+  },
+  "naive_rag": {
+   "extractive_pass4": {
+    "passed": 33,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 47,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 15,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 21,
+    "judged": 26,
+    "questions": 26
+   }
+  },
+  "full_orchestrator": {
+   "extractive_pass4": {
+    "passed": 21,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 30,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 16,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 17,
+    "judged": 26,
+    "questions": 26
+   }
+  },
+  "rlm_10": {
+   "extractive_pass4": {
+    "passed": 51,
+    "judged": 60,
+    "questions": 60
+   },
+   "extractive_pass3": {
+    "passed": 57,
+    "judged": 60,
+    "questions": 60
+   },
+   "synthesis_pass4": {
+    "passed": 17,
+    "judged": 26,
+    "questions": 26
+   },
+   "synthesis_pass3": {
+    "passed": 22,
+    "judged": 26,
+    "questions": 26
+   }
+  }
+ },
+ "resubmission_questions": {
+  "answerable_rows_questions": 88,
+  "in_the_86": 86,
+  "outside_the_86": [
+   "CD_015",
+   "SY_010"
+  ]
+ },
+ "compare": {
+  "source": "REVIEW_LOG.md:56-69 (findings/audits/figures_review_2026-10-22); inventory F14 names the score-4 draw-1 values extractive 55 / 58 / 44 (full pipeline / naive RAG / RLM-10), synthesis 10 / 15 / 22 and routing fix 44 of 60",
+  "rows": [
+   {
+    "run": "current draw 1",
+    "setup": "full pipeline",
+    "type": "extractive",
+    "threshold": 3,
+    "computed": 58,
+    "of": 60,
+    "stated": 58,
+    "equal": true
+   },
+   {
+    "run": "current draw 1",
+    "setup": "full pipeline",
+    "type": "extractive",
+    "threshold": 4,
+    "computed": 55,
+    "of": 60,
+    "stated": 55,
+    "equal": true
+   },
+   {
+    "run": "current draw 1",
+    "setup": "full pipeline",
+    "type": "synthesis",
+    "threshold": 3,
+    "computed": 26,
+    "of": 26,
+    "stated": 26,
+    "equal": true
+   },
+   {
+    "run": "current draw 1",
+    "setup": "full pipeline",
+    "type": "synthesis",
+    "threshold": 4,
+    "computed": 10,
+    "of": 26,
+    "stated": 10,
+    "equal": true
+   },
+   {
+    "run": "current draw 1",
+    "setup": "naive RAG",
+    "type": "extractive",
+    "threshold": 3,
+    "computed": 60,
+    "of": 60,
+    "stated": 60,
+    "equal": true
+   },
+   {
+    "run": "current draw 1",
+    "setup": "naive RAG",
+    "type": "extractive",
+    "threshold": 4,
+    "computed": 58,
+    "of": 60,
+    "stated": 58,
+    "equal": true
+   },
+   {
+    "run": "current draw 1",
+    "setup": "naive RAG",
+    "type": "synthesis",
+    "threshold": 3,
+    "computed": 22,
+    "of": 26,
+    "stated": 22,
+    "equal": true
+   },
+   {
+    "run": "current draw 1",
+    "setup": "naive RAG",
+    "type": "synthesis",
+    "threshold": 4,
+    "computed": 15,
+    "of": 26,
+    "stated": 15,
+    "equal": true
+   },
+   {
+    "run": "current draw 1",
+    "setup": "routing fix",
+    "type": "extractive",
+    "threshold": 4,
+    "computed": 44,
+    "of": 60,
+    "stated": 44,
+    "equal": true
+   },
+   {
+    "run": "current draw 1",
+    "setup": "no retrieval",
+    "type": "extractive",
+    "threshold": 3,
+    "computed": 37,
+    "of": 60,
+    "stated": 37,
+    "equal": true
+   },
+   {
+    "run": "current draw 1",
+    "setup": "no retrieval",
+    "type": "extractive",
+    "threshold": 4,
+    "computed": 21,
+    "of": 60,
+    "stated": 21,
+    "equal": true
+   },
+   {
+    "run": "current draw 1",
+    "setup": "no retrieval",
+    "type": "synthesis",
+    "threshold": 3,
+    "computed": 25,
+    "of": 26,
+    "stated": 25,
+    "equal": true
+   },
+   {
+    "run": "current draw 1",
+    "setup": "no retrieval",
+    "type": "synthesis",
+    "threshold": 4,
+    "computed": 11,
+    "of": 26,
+    "stated": 11,
+    "equal": true
+   },
+   {
+    "run": "current draw 1",
+    "setup": "RLM-10",
+    "type": "extractive",
+    "threshold": 3,
+    "computed": 54,
+    "of": 60,
+    "stated": 54,
+    "equal": true
+   },
+   {
+    "run": "current draw 1",
+    "setup": "RLM-10",
+    "type": "extractive",
+    "threshold": 4,
+    "computed": 44,
+    "of": 60,
+    "stated": 44,
+    "equal": true
+   },
+   {
+    "run": "current draw 1",
+    "setup": "RLM-10",
+    "type": "synthesis",
+    "threshold": 3,
+    "computed": 26,
+    "of": 26,
+    "stated": 26,
+    "equal": true
+   },
+   {
+    "run": "current draw 1",
+    "setup": "RLM-10",
+    "type": "synthesis",
+    "threshold": 4,
+    "computed": 22,
+    "of": 26,
+    "stated": 22,
+    "equal": true
+   },
+   {
+    "run": "current draw 1",
+    "setup": "phases off (range over the four)",
+    "type": "extractive",
+    "threshold": 4,
+    "computed": [
+     46,
+     50
+    ],
+    "stated": [
+     46,
+     50
+    ],
+    "equal": true
+   },
+   {
+    "run": "current draw 1",
+    "setup": "phases off (range over the four)",
+    "type": "synthesis",
+    "threshold": 4,
+    "computed": [
+     16,
+     19
+    ],
+    "stated": [
+     16,
+     19
+    ],
+    "equal": true
+   },
+   {
+    "run": "resubmission",
+    "setup": "full pipeline",
+    "type": "extractive",
+    "threshold": 3,
+    "computed": 30,
+    "of": 60,
+    "stated": 30,
+    "equal": true
+   },
+   {
+    "run": "resubmission",
+    "setup": "full pipeline",
+    "type": "extractive",
+    "threshold": 4,
+    "computed": 21,
+    "of": 60,
+    "stated": 21,
+    "equal": true
+   },
+   {
+    "run": "resubmission",
+    "setup": "full pipeline",
+    "type": "synthesis",
+    "threshold": 3,
+    "computed": 17,
+    "of": 26,
+    "stated": 17,
+    "equal": true
+   },
+   {
+    "run": "resubmission",
+    "setup": "full pipeline",
+    "type": "synthesis",
+    "threshold": 4,
+    "computed": 16,
+    "of": 26,
+    "stated": 16,
+    "equal": true
+   },
+   {
+    "run": "resubmission",
+    "setup": "naive RAG",
+    "type": "extractive",
+    "threshold": 3,
+    "computed": 47,
+    "of": 60,
+    "stated": 47,
+    "equal": true
+   },
+   {
+    "run": "resubmission",
+    "setup": "naive RAG",
+    "type": "extractive",
+    "threshold": 4,
+    "computed": 33,
+    "of": 60,
+    "stated": 33,
+    "equal": true
+   },
+   {
+    "run": "resubmission",
+    "setup": "naive RAG",
+    "type": "synthesis",
+    "threshold": 3,
+    "computed": 21,
+    "of": 26,
+    "stated": 21,
+    "equal": true
+   },
+   {
+    "run": "resubmission",
+    "setup": "naive RAG",
+    "type": "synthesis",
+    "threshold": 4,
+    "computed": 15,
+    "of": 26,
+    "stated": 15,
+    "equal": true
+   },
+   {
+    "run": "resubmission",
+    "setup": "no retrieval",
+    "type": "extractive",
+    "threshold": 3,
+    "computed": 51,
+    "of": 60,
+    "stated": 51,
+    "equal": true
+   },
+   {
+    "run": "resubmission",
+    "setup": "no retrieval",
+    "type": "extractive",
+    "threshold": 4,
+    "computed": 31,
+    "of": 60,
+    "stated": 31,
+    "equal": true
+   },
+   {
+    "run": "resubmission",
+    "setup": "no retrieval",
+    "type": "synthesis",
+    "threshold": 3,
+    "computed": 26,
+    "of": 26,
+    "stated": 26,
+    "equal": true
+   },
+   {
+    "run": "resubmission",
+    "setup": "no retrieval",
+    "type": "synthesis",
+    "threshold": 4,
+    "computed": 26,
+    "of": 26,
+    "stated": 26,
+    "equal": true
+   },
+   {
+    "run": "resubmission",
+    "setup": "RLM-10",
+    "type": "extractive",
+    "threshold": 3,
+    "computed": 57,
+    "of": 60,
+    "stated": 57,
+    "equal": true
+   },
+   {
+    "run": "resubmission",
+    "setup": "RLM-10",
+    "type": "extractive",
+    "threshold": 4,
+    "computed": 51,
+    "of": 60,
+    "stated": 51,
+    "equal": true
+   },
+   {
+    "run": "resubmission",
+    "setup": "RLM-10",
+    "type": "synthesis",
+    "threshold": 3,
+    "computed": 22,
+    "of": 26,
+    "stated": 22,
+    "equal": true
+   },
+   {
+    "run": "resubmission",
+    "setup": "RLM-10",
+    "type": "synthesis",
+    "threshold": 4,
+    "computed": 17,
+    "of": 26,
+    "stated": 17,
+    "equal": true
+   }
+  ],
+  "equal": 35,
+  "of": 35
+ }
+}

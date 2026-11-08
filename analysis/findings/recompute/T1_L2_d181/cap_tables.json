@@ -1,0 +1,372 @@
+{
+ "caps": [
+  1,
+  3,
+  5,
+  7,
+  20,
+  50
+ ],
+ "cells": [
+  {
+   "answers": 15,
+   "cap": 1,
+   "cap_reached_n": 15,
+   "ci95": [
+    0.0,
+    0.1
+   ],
+   "failed": 14,
+   "mean": 0.03333333333333333,
+   "model": "devstral-small-2:24b",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 15
+  },
+  {
+   "answers": 15,
+   "cap": 3,
+   "cap_reached_n": 14,
+   "ci95": [
+    0.2758971666666667,
+    0.5814801666666668
+   ],
+   "failed": 3,
+   "mean": 0.42685333333333336,
+   "model": "devstral-small-2:24b",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 12
+  },
+  {
+   "answers": 15,
+   "cap": 5,
+   "cap_reached_n": 9,
+   "ci95": [
+    0.30741333333333337,
+    0.607436333333333
+   ],
+   "failed": 1,
+   "mean": 0.45648666666666665,
+   "model": "devstral-small-2:24b",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 8
+  },
+  {
+   "answers": 15,
+   "cap": 7,
+   "cap_reached_n": 6,
+   "ci95": [
+    0.43704,
+    0.6992165
+   ],
+   "failed": 0,
+   "mean": 0.56958,
+   "model": "devstral-small-2:24b",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 5
+  },
+  {
+   "answers": 15,
+   "cap": 20,
+   "cap_reached_n": 0,
+   "ci95": [
+    0.44445333333333337,
+    0.7420668333333332
+   ],
+   "failed": 0,
+   "mean": 0.5941799999999999,
+   "model": "devstral-small-2:24b",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 0
+  },
+  {
+   "answers": 15,
+   "cap": 50,
+   "cap_reached_n": 2,
+   "ci95": [
+    0.4287066666666667,
+    0.7388965000000001
+   ],
+   "failed": 0,
+   "mean": 0.5858466666666666,
+   "model": "devstral-small-2:24b",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 2
+  },
+  {
+   "answers": 15,
+   "cap": 1,
+   "cap_reached_n": 15,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "failed": 15,
+   "mean": 0.0,
+   "model": "gemma3:27b",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 15
+  },
+  {
+   "answers": 15,
+   "cap": 3,
+   "cap_reached_n": 15,
+   "ci95": [
+    0.28451999999999994,
+    0.6002829999999998
+   ],
+   "failed": 0,
+   "mean": 0.43637333333333334,
+   "model": "gemma3:27b",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 15
+  },
+  {
+   "answers": 15,
+   "cap": 5,
+   "cap_reached_n": 15,
+   "ci95": [
+    0.35356666666666664,
+    0.6833333333333333
+   ],
+   "failed": 0,
+   "mean": 0.5193133333333334,
+   "model": "gemma3:27b",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 13
+  },
+  {
+   "answers": 15,
+   "cap": 7,
+   "cap_reached_n": 13,
+   "ci95": [
+    0.4296135,
+    0.7314866666666667
+   ],
+   "failed": 0,
+   "mean": 0.5828066666666667,
+   "model": "gemma3:27b",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 10
+  },
+  {
+   "answers": 15,
+   "cap": 20,
+   "cap_reached_n": 0,
+   "ci95": [
+    0.5248633333333333,
+    0.8041296666666663
+   ],
+   "failed": 0,
+   "mean": 0.66892,
+   "model": "gemma3:27b",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 0
+  },
+  {
+   "answers": 15,
+   "cap": 50,
+   "cap_reached_n": 0,
+   "ci95": [
+    0.5248633333333333,
+    0.8041296666666663
+   ],
+   "failed": 0,
+   "mean": 0.66892,
+   "model": "gemma3:27b",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 0
+  },
+  {
+   "answers": 15,
+   "cap": 1,
+   "cap_reached_n": 15,
+   "ci95": [
+    0.03333333333333333,
+    0.24445333333333333
+   ],
+   "failed": 10,
+   "mean": 0.13056,
+   "model": "qwen3-coder:30b",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 13
+  },
+  {
+   "answers": 15,
+   "cap": 3,
+   "cap_reached_n": 10,
+   "ci95": [
+    0.33132683333333335,
+    0.58968
+   ],
+   "failed": 0,
+   "mean": 0.4563466666666667,
+   "model": "qwen3-coder:30b",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 9
+  },
+  {
+   "answers": 15,
+   "cap": 5,
+   "cap_reached_n": 7,
+   "ci95": [
+    0.29166000000000003,
+    0.5738066666666666
+   ],
+   "failed": 0,
+   "mean": 0.43134666666666666,
+   "model": "qwen3-coder:30b",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 4
+  },
+  {
+   "answers": 15,
+   "cap": 7,
+   "cap_reached_n": 3,
+   "ci95": [
+    0.2900798333333333,
+    0.6055533333333333
+   ],
+   "failed": 0,
+   "mean": 0.4456333333333333,
+   "model": "qwen3-coder:30b",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 3
+  },
+  {
+   "answers": 15,
+   "cap": 20,
+   "cap_reached_n": 0,
+   "ci95": [
+    0.33412649999999994,
+    0.6749933333333333
+   ],
+   "failed": 0,
+   "mean": 0.5039666666666667,
+   "model": "qwen3-coder:30b",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 0
+  },
+  {
+   "answers": 15,
+   "cap": 50,
+   "cap_reached_n": 0,
+   "ci95": [
+    0.3261866666666666,
+    0.6666666666666666
+   ],
+   "failed": 0,
+   "mean": 0.4956333333333333,
+   "model": "qwen3-coder:30b",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 0
+  },
+  {
+   "answers": 15,
+   "cap": 1,
+   "cap_reached_n": 15,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "failed": 15,
+   "mean": 0.0,
+   "model": "qwen3-coder-next:q4_K_M",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 15
+  },
+  {
+   "answers": 15,
+   "cap": 3,
+   "cap_reached_n": 15,
+   "ci95": [
+    0.3822635,
+    0.6145566666666665
+   ],
+   "failed": 0,
+   "mean": 0.49708666666666673,
+   "model": "qwen3-coder-next:q4_K_M",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 15
+  },
+  {
+   "answers": 15,
+   "cap": 5,
+   "cap_reached_n": 15,
+   "ci95": [
+    0.44721999999999995,
+    0.6369133333333333
+   ],
+   "failed": 0,
+   "mean": 0.5369066666666666,
+   "model": "qwen3-coder-next:q4_K_M",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 13
+  },
+  {
+   "answers": 15,
+   "cap": 7,
+   "cap_reached_n": 13,
+   "ci95": [
+    0.42222000000000004,
+    0.6638933333333333
+   ],
+   "failed": 0,
+   "mean": 0.5369066666666666,
+   "model": "qwen3-coder-next:q4_K_M",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 11
+  },
+  {
+   "answers": 15,
+   "cap": 20,
+   "cap_reached_n": 0,
+   "ci95": [
+    0.55278,
+    0.8111133333333334
+   ],
+   "failed": 0,
+   "mean": 0.6797599999999999,
+   "model": "qwen3-coder-next:q4_K_M",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 0
+  },
+  {
+   "answers": 15,
+   "cap": 50,
+   "cap_reached_n": 0,
+   "ci95": [
+    0.5861133333333334,
+    0.8242066666666668
+   ],
+   "failed": 0,
+   "mean": 0.7019866666666666,
+   "model": "qwen3-coder-next:q4_K_M",
+   "questions_complete": 15,
+   "stopped_by_cap_n": 0
+  }
+ ],
+ "complete_questions": [
+  "01_sarek_CO2",
+  "01_sarek_FR1",
+  "01_sarek_TE3",
+  "02_snakemake_CO2",
+  "02_snakemake_FR1",
+  "02_snakemake_TE3",
+  "03_nfcore_framework_CO2",
+  "03_nfcore_framework_FR1",
+  "03_nfcore_framework_TE3",
+  "CD_001",
+  "CD_002",
+  "CD_003",
+  "SY_001",
+  "SY_002",
+  "SY_003"
+ ],
+ "k": 15,
+ "models": [
+  "devstral-small-2:24b",
+  "gemma3:27b",
+  "qwen3-coder:30b",
+  "qwen3-coder-next:q4_K_M"
+ ]
+}

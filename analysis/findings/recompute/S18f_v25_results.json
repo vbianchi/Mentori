@@ -1,0 +1,801 @@
+{
+ "_provenance": {
+  "script": "scripts/S18f_judge_evidence_v25.py analyze",
+  "at": "2026-11-05T08:38:57",
+  "s18f_py": "15533e759b9525a654d04dc6e402bb1b082dbae529189bc0af1d3ee8183fc717",
+  "lock_sha256_now": "8730d401a5d7b6baa1780e656f844261eaead60e45b5199afa29d57f989ad495",
+  "rows_files": {
+   "findings/recompute/S18f_runs/out_v25/B2_shard0of2/judge_evidence_v25.jsonl": "cbfaf8d19f9550cc1f4b0ec678b49fa6b2f6f7bac140d251d720c292873774d1",
+   "findings/recompute/S18f_runs/out_v25/B2_shard1of2/judge_evidence_v25.jsonl": "b6e9f8048b02f946373b2fda188958a199bb53cf6a4400a0b1e94731a98bdfcb",
+   "findings/recompute/S18f_runs/out_v25/B_shard0of2/judge_evidence_v25.jsonl": "ec18d6ba8433dccf4493bb9397be59e2dcd41cbf2bdbebeedde3a41a1a28e08e",
+   "findings/recompute/S18f_runs/out_v25/B_shard1of2/judge_evidence_v25.jsonl": "9de2a75358d56208210622c28c9e49e61c35a1217e0519aafa8860af0dead9de",
+   "findings/recompute/S18f_runs/out_v25/C_shard0of2/judge_evidence_v25.jsonl": "10fd55304bc06189cf0f6e8510a2b5a341c17a2ee9cadd2ff3f36aec559bc9c0",
+   "findings/recompute/S18f_runs/out_v25/C_shard1of2/judge_evidence_v25.jsonl": "f10d700d9811758259a3258408b32c2b6c88c8b4cffc79f636299049f4ca5f6f",
+   "findings/recompute/S18f_runs/out_v25/D_shard0of2/judge_evidence_v25.jsonl": "41dcb69fc6cd39032f07a583d21733b206160f5093a584f9e1661b0eb9bfe2b9",
+   "findings/recompute/S18f_runs/out_v25/D_shard1of2/judge_evidence_v25.jsonl": "56c82b638045257bd24dd1d1dfca4d86506a815c17fa50768abcc609e891ec1e"
+  },
+  "run_sha256": "cf05e84cf800d53e4bf359bace6d4b54feab506abe0cfd21c55f22f996ec04a5",
+  "rows_of_other_items": 0,
+  "reproduction": {
+   "s18e_results_json": "ed33f1638b86a0a66025c0738e1277ce4a1d3a876298108594a756b791d19b38",
+   "passed": true,
+   "note": "366 answers; contrasts True, shares True, noise rule True, B/B2 True; C vs D 44.26 [36.34, 52.46]"
+  },
+  "gate": [
+   {
+    "check": "G1 frozen set sha256",
+    "pass": true,
+    "note": "75c9b8fe0a2cc133"
+   },
+   {
+    "check": "G1 frozen set is S18c's 'full' questions",
+    "pass": true,
+    "note": "62 'full', 62 frozen"
+   },
+   {
+    "check": "G2 S18c.compare reproduces S18_results_full.json, B vs B2",
+    "pass": true,
+    "note": "all four dimensions, every statistic"
+   },
+   {
+    "check": "G2 S18c.compare reproduces S18_results_full.json, A vs A2",
+    "pass": true,
+    "note": "all four dimensions, every statistic"
+   },
+   {
+    "check": "G2 S18c.compare reproduces S18_results_full.json, A2 vs B",
+    "pass": true,
+    "note": "all four dimensions, every statistic"
+   },
+   {
+    "check": "G2 S18c.compare reproduces S18_results_full.json, C vs B",
+    "pass": true,
+    "note": "all four dimensions, every statistic"
+   },
+   {
+    "check": "G2 no equivalence at the 5-point margin (MT-51)",
+    "pass": true,
+    "note": "TOST CI [-6.45, 4.84]"
+   },
+   {
+    "check": "G2 S18c.compare reproduces S18_results_full.json, D vs B",
+    "pass": true,
+    "note": "all four dimensions, every statistic"
+   },
+   {
+    "check": "G2 S18c.compare reproduces S18_results_full.json, C vs D",
+    "pass": true,
+    "note": "all four dimensions, every statistic"
+   },
+   {
+    "check": "G2 printed 5/5 share, arm C",
+    "pass": true,
+    "note": "81.7% of 372"
+   },
+   {
+    "check": "G2 printed 5/5 share, arm B",
+    "pass": true,
+    "note": "82.5% of 372"
+   },
+   {
+    "check": "G2 printed 5/5 share, arm D",
+    "pass": true,
+    "note": "26.1% of 372"
+   },
+   {
+    "check": "G2 printed difference and 95% CI, C vs B",
+    "pass": true,
+    "note": "-0.8 points [-6.5, 4.8]"
+   },
+   {
+    "check": "G2 printed difference and 95% CI, C vs D",
+    "pass": true,
+    "note": "55.6 points [47.6, 63.7]"
+   },
+   {
+    "check": "G2 printed n",
+    "pass": true,
+    "note": "372 answers, 62 questions"
+   },
+   {
+    "check": "G2 retrieved passages for 2 of the 62 questions (ME-21)",
+    "pass": true,
+    "note": "08_deseq2_FR1, 08_deseq2_TE3"
+   },
+   {
+    "check": "G2 B and B2 identical on all four dimensions (MT-44)",
+    "pass": true,
+    "note": "528 answers"
+   },
+   {
+    "check": "G3 deposited prompts rebuilt byte for byte",
+    "pass": true,
+    "note": "{'B': 372, 'C': 372, 'D': 372, 'B2': 372}; mismatches 0"
+   },
+   {
+    "check": "G4 S18b's template is the archived one judge_passages sends",
+    "pass": true,
+    "note": "sha256 863d7838791a"
+   },
+   {
+    "check": "G3 every block built without bge-m3",
+    "pass": true,
+    "note": "unbuilt []"
+   },
+   {
+    "check": "G5 B is S512's plain call on key v2.5; C and D are B plus one section at the anchor",
+    "pass": true,
+    "note": "1464 prompts; problems 0"
+   },
+   {
+    "check": "G6 every block's sha256 equals S18e's evidence_sha256",
+    "pass": true,
+    "note": "852 S18e rows; differing []"
+   },
+   {
+    "check": "G6 every donor equals S18e's arm D donor",
+    "pass": true,
+    "note": "426 S18e rows; differing []"
+   },
+   {
+    "check": "G7 the set: S18's frozen 62 less D7 less key v2.5's drops",
+    "pass": true,
+    "note": "61 questions; D7 ['CD_015']; v2.5 none"
+   },
+   {
+    "check": "G7 key v2.5's question text is the one S18e sent",
+    "pass": true,
+    "note": "differing []"
+   },
+   {
+    "check": "G8 on the questions v2.5 leaves unchanged, every prompt equals S18e's byte for byte",
+    "pass": true,
+    "note": "25 unchanged questions, 600 prompts equal, 0 differ; 36 changed questions, 0 of their prompts equal S18e's (0 expected)"
+   }
+  ]
+ },
+ "key_version": "v2.5",
+ "judge": "devstral-small-2:24b (LOCK.toml [judge], S512's call)",
+ "analysis_set": {
+  "questions": 61,
+  "answers": 366,
+  "frozen_set_sha256": "75c9b8fe0a2cc1335f1e0d03bf65d748ac009c8d8073b9af792768e4a03ca85d",
+  "dropped_d7": [
+   "CD_015"
+  ],
+  "dropped_v25": {},
+  "questions_v25_changed": 36
+ },
+ "health": {
+  "B": {
+   "expected": 366,
+   "counted": 366,
+   "statuses": {
+    "ok": 366
+   },
+   "max_prompt_tokens": 11850,
+   "stop_reasons": {
+    "stop": 366
+   },
+   "dates": {
+    "2026-11-04": 366
+   }
+  },
+  "C": {
+   "expected": 366,
+   "counted": 366,
+   "statuses": {
+    "ok": 366
+   },
+   "max_prompt_tokens": 36393,
+   "stop_reasons": {
+    "stop": 366
+   },
+   "dates": {
+    "2026-11-04": 366
+   }
+  },
+  "D": {
+   "expected": 366,
+   "counted": 366,
+   "statuses": {
+    "ok": 366
+   },
+   "max_prompt_tokens": 36294,
+   "stop_reasons": {
+    "stop": 366
+   },
+   "dates": {
+    "2026-11-04": 184,
+    "2026-11-05": 182
+   }
+  },
+  "B2": {
+   "expected": 366,
+   "counted": 366,
+   "statuses": {
+    "ok": 366
+   },
+   "max_prompt_tokens": 11850,
+   "stop_reasons": {
+    "stop": 366
+   },
+   "dates": {
+    "2026-11-05": 366
+   }
+  }
+ },
+ "share5_faithfulness": {
+  "B": {
+   "share5": 0.40437158469945356,
+   "n": 366
+  },
+  "C": {
+   "share5": 0.5491803278688525,
+   "n": 366
+  },
+  "D": {
+   "share5": 0.10655737704918032,
+   "n": 366
+  },
+  "B2": {
+   "share5": 0.40437158469945356,
+   "n": 366
+  }
+ },
+ "contrasts": [
+  {
+   "contrast": "B vs B2",
+   "label": "noise floor: identical inputs, two runs",
+   "dims": {
+    "faithfulness": {
+     "n": 366,
+     "mean_x": 3.7077,
+     "mean_y": 3.7077,
+     "mean_diff": 0.0,
+     "mean_diff_ci95": [
+      0.0,
+      0.0
+     ],
+     "exact_agreement": 1.0,
+     "mean_abs_diff": 0.0,
+     "share5_x": 0.4044,
+     "share5_y": 0.4044,
+     "share5_diff_pp": 0.0,
+     "share5_diff_ci95_pp": [
+      0.0,
+      0.0
+     ],
+     "wilcoxon_p": 1.0,
+     "mcnemar_5_b": 0,
+     "mcnemar_5_c": 0,
+     "mcnemar_5_p": 1.0,
+     "mcnemar_note": "unclustered; 6 answers per question are not independent. The cluster bootstrap CI above is the primary inference; this p-value is descriptive only.",
+     "n_discordant_bc": 0,
+     "tost": {
+      "margin_pp": 5.0,
+      "ci95_pp": [
+       0.0,
+       0.0
+      ],
+      "equivalent": true,
+      "n_boot": 10000
+     }
+    },
+    "correctness": {
+     "n": 366,
+     "mean_x": 3.1694,
+     "mean_y": 3.1694,
+     "mean_diff": 0.0,
+     "mean_diff_ci95": [
+      0.0,
+      0.0
+     ],
+     "exact_agreement": 1.0,
+     "mean_abs_diff": 0.0,
+     "share5_x": 0.2077,
+     "share5_y": 0.2077,
+     "share5_diff_pp": 0.0,
+     "share5_diff_ci95_pp": [
+      0.0,
+      0.0
+     ],
+     "wilcoxon_p": 1.0,
+     "mcnemar_5_b": 0,
+     "mcnemar_5_c": 0,
+     "mcnemar_5_p": 1.0,
+     "mcnemar_note": "unclustered; 6 answers per question are not independent. The cluster bootstrap CI above is the primary inference; this p-value is descriptive only.",
+     "n_discordant_bc": 0,
+     "tost": null
+    },
+    "completeness": {
+     "n": 366,
+     "mean_x": 3.1175,
+     "mean_y": 3.1175,
+     "mean_diff": 0.0,
+     "mean_diff_ci95": [
+      0.0,
+      0.0
+     ],
+     "exact_agreement": 1.0,
+     "mean_abs_diff": 0.0,
+     "share5_x": 0.306,
+     "share5_y": 0.306,
+     "share5_diff_pp": 0.0,
+     "share5_diff_ci95_pp": [
+      0.0,
+      0.0
+     ],
+     "wilcoxon_p": 1.0,
+     "mcnemar_5_b": 0,
+     "mcnemar_5_c": 0,
+     "mcnemar_5_p": 1.0,
+     "mcnemar_note": "unclustered; 6 answers per question are not independent. The cluster bootstrap CI above is the primary inference; this p-value is descriptive only.",
+     "n_discordant_bc": 0,
+     "tost": null
+    },
+    "citation_quality": {
+     "n": 366,
+     "mean_x": 3.1639,
+     "mean_y": 3.1639,
+     "mean_diff": 0.0,
+     "mean_diff_ci95": [
+      0.0,
+      0.0
+     ],
+     "exact_agreement": 1.0,
+     "mean_abs_diff": 0.0,
+     "share5_x": 0.2896,
+     "share5_y": 0.2896,
+     "share5_diff_pp": 0.0,
+     "share5_diff_ci95_pp": [
+      0.0,
+      0.0
+     ],
+     "wilcoxon_p": 1.0,
+     "mcnemar_5_b": 0,
+     "mcnemar_5_c": 0,
+     "mcnemar_5_p": 1.0,
+     "mcnemar_note": "unclustered; 6 answers per question are not independent. The cluster bootstrap CI above is the primary inference; this p-value is descriptive only.",
+     "n_discordant_bc": 0,
+     "tost": null
+    }
+   }
+  },
+  {
+   "contrast": "C vs B",
+   "label": "evidence effect, total",
+   "dims": {
+    "faithfulness": {
+     "n": 366,
+     "mean_x": 3.7158,
+     "mean_y": 3.7077,
+     "mean_diff": 0.0082,
+     "mean_diff_ci95": [
+      -0.1722,
+      0.1776
+     ],
+     "exact_agreement": 0.6093,
+     "mean_abs_diff": 0.6913,
+     "share5_x": 0.5492,
+     "share5_y": 0.4044,
+     "share5_diff_pp": 14.48,
+     "share5_diff_ci95_pp": [
+      7.65,
+      20.77
+     ],
+     "wilcoxon_p": 0.3950063612579685,
+     "mcnemar_5_b": 70,
+     "mcnemar_5_c": 17,
+     "mcnemar_5_p": 8.35091635811369e-09,
+     "mcnemar_note": "unclustered; 6 answers per question are not independent. The cluster bootstrap CI above is the primary inference; this p-value is descriptive only.",
+     "n_discordant_bc": 87,
+     "tost": {
+      "margin_pp": 5.0,
+      "ci95_pp": [
+       7.65,
+       20.77
+      ],
+      "equivalent": false,
+      "n_boot": 10000
+     }
+    },
+    "correctness": {
+     "n": 366,
+     "mean_x": 3.2158,
+     "mean_y": 3.1694,
+     "mean_diff": 0.0464,
+     "mean_diff_ci95": [
+      -0.041,
+      0.1285
+     ],
+     "exact_agreement": 0.7541,
+     "mean_abs_diff": 0.3033,
+     "share5_x": 0.3087,
+     "share5_y": 0.2077,
+     "share5_diff_pp": 10.11,
+     "share5_diff_ci95_pp": [
+      6.28,
+      13.93
+     ],
+     "wilcoxon_p": 0.06359331635330222,
+     "mcnemar_5_b": 40,
+     "mcnemar_5_c": 3,
+     "mcnemar_5_p": 3.0213413992896676e-09,
+     "mcnemar_note": "unclustered; 6 answers per question are not independent. The cluster bootstrap CI above is the primary inference; this p-value is descriptive only.",
+     "n_discordant_bc": 43,
+     "tost": null
+    },
+    "completeness": {
+     "n": 366,
+     "mean_x": 2.959,
+     "mean_y": 3.1175,
+     "mean_diff": -0.1585,
+     "mean_diff_ci95": [
+      -0.2869,
+      -0.0492
+     ],
+     "exact_agreement": 0.7131,
+     "mean_abs_diff": 0.3825,
+     "share5_x": 0.2869,
+     "share5_y": 0.306,
+     "share5_diff_pp": -1.91,
+     "share5_diff_ci95_pp": [
+      -5.46,
+      1.37
+     ],
+     "wilcoxon_p": 0.00019854263570895066,
+     "mcnemar_5_b": 14,
+     "mcnemar_5_c": 21,
+     "mcnemar_5_p": 0.31050465907901537,
+     "mcnemar_note": "unclustered; 6 answers per question are not independent. The cluster bootstrap CI above is the primary inference; this p-value is descriptive only.",
+     "n_discordant_bc": 35,
+     "tost": null
+    },
+    "citation_quality": {
+     "n": 366,
+     "mean_x": 2.9044,
+     "mean_y": 3.1639,
+     "mean_diff": -0.2596,
+     "mean_diff_ci95": [
+      -0.5027,
+      -0.0436
+     ],
+     "exact_agreement": 0.5355,
+     "mean_abs_diff": 0.8934,
+     "share5_x": 0.2432,
+     "share5_y": 0.2896,
+     "share5_diff_pp": -4.64,
+     "share5_diff_ci95_pp": [
+      -11.2,
+      1.64
+     ],
+     "wilcoxon_p": 0.0032775631395158236,
+     "mcnemar_5_b": 27,
+     "mcnemar_5_c": 44,
+     "mcnemar_5_p": 0.05681467793283902,
+     "mcnemar_note": "unclustered; 6 answers per question are not independent. The cluster bootstrap CI above is the primary inference; this p-value is descriptive only.",
+     "n_discordant_bc": 71,
+     "tost": null
+    }
+   }
+  },
+  {
+   "contrast": "D vs B",
+   "label": "irrelevant-text effect: same bulk, wrong paper",
+   "dims": {
+    "faithfulness": {
+     "n": 366,
+     "mean_x": 1.5027,
+     "mean_y": 3.7077,
+     "mean_diff": -2.2049,
+     "mean_diff_ci95": [
+      -2.5192,
+      -1.8879
+     ],
+     "exact_agreement": 0.2705,
+     "mean_abs_diff": 2.3306,
+     "share5_x": 0.1066,
+     "share5_y": 0.4044,
+     "share5_diff_pp": -29.78,
+     "share5_diff_ci95_pp": [
+      -36.61,
+      -23.5
+     ],
+     "wilcoxon_p": 6.836870506565303e-42,
+     "mcnemar_5_b": 8,
+     "mcnemar_5_c": 117,
+     "mcnemar_5_p": 5.928488920821206e-26,
+     "mcnemar_note": "unclustered; 6 answers per question are not independent. The cluster bootstrap CI above is the primary inference; this p-value is descriptive only.",
+     "n_discordant_bc": 125,
+     "tost": {
+      "margin_pp": 5.0,
+      "ci95_pp": [
+       -36.34,
+       -23.5
+      ],
+      "equivalent": false,
+      "n_boot": 10000
+     }
+    },
+    "correctness": {
+     "n": 366,
+     "mean_x": 1.3798,
+     "mean_y": 3.1694,
+     "mean_diff": -1.7896,
+     "mean_diff_ci95": [
+      -2.0766,
+      -1.5082
+     ],
+     "exact_agreement": 0.3115,
+     "mean_abs_diff": 1.806,
+     "share5_x": 0.071,
+     "share5_y": 0.2077,
+     "share5_diff_pp": -13.66,
+     "share5_diff_ci95_pp": [
+      -19.13,
+      -8.74
+     ],
+     "wilcoxon_p": 4.9670933426758385e-43,
+     "mcnemar_5_b": 2,
+     "mcnemar_5_c": 52,
+     "mcnemar_5_p": 1.6497914145929826e-13,
+     "mcnemar_note": "unclustered; 6 answers per question are not independent. The cluster bootstrap CI above is the primary inference; this p-value is descriptive only.",
+     "n_discordant_bc": 54,
+     "tost": null
+    },
+    "completeness": {
+     "n": 366,
+     "mean_x": 1.2486,
+     "mean_y": 3.1175,
+     "mean_diff": -1.8689,
+     "mean_diff_ci95": [
+      -2.1695,
+      -1.5819
+     ],
+     "exact_agreement": 0.3197,
+     "mean_abs_diff": 1.8743,
+     "share5_x": 0.0683,
+     "share5_y": 0.306,
+     "share5_diff_pp": -23.77,
+     "share5_diff_ci95_pp": [
+      -30.05,
+      -17.76
+     ],
+     "wilcoxon_p": 6.188534204790617e-43,
+     "mcnemar_5_b": 0,
+     "mcnemar_5_c": 87,
+     "mcnemar_5_p": 1.2924697071141057e-26,
+     "mcnemar_note": "unclustered; 6 answers per question are not independent. The cluster bootstrap CI above is the primary inference; this p-value is descriptive only.",
+     "n_discordant_bc": 87,
+     "tost": null
+    },
+    "citation_quality": {
+     "n": 366,
+     "mean_x": 0.959,
+     "mean_y": 3.1639,
+     "mean_diff": -2.2049,
+     "mean_diff_ci95": [
+      -2.4863,
+      -1.9316
+     ],
+     "exact_agreement": 0.2213,
+     "mean_abs_diff": 2.3087,
+     "share5_x": 0.0628,
+     "share5_y": 0.2896,
+     "share5_diff_pp": -22.68,
+     "share5_diff_ci95_pp": [
+      -29.78,
+      -15.85
+     ],
+     "wilcoxon_p": 3.7779111532865165e-46,
+     "mcnemar_5_b": 6,
+     "mcnemar_5_c": 89,
+     "mcnemar_5_p": 4.697192490523779e-20,
+     "mcnemar_note": "unclustered; 6 answers per question are not independent. The cluster bootstrap CI above is the primary inference; this p-value is descriptive only.",
+     "n_discordant_bc": 95,
+     "tost": null
+    }
+   }
+  },
+  {
+   "contrast": "C vs D",
+   "label": "PRIMARY: evidence content effect",
+   "dims": {
+    "faithfulness": {
+     "n": 366,
+     "mean_x": 3.7158,
+     "mean_y": 1.5027,
+     "mean_diff": 2.2131,
+     "mean_diff_ci95": [
+      1.877,
+      2.5602
+     ],
+     "exact_agreement": 0.2732,
+     "mean_abs_diff": 2.3989,
+     "share5_x": 0.5492,
+     "share5_y": 0.1066,
+     "share5_diff_pp": 44.26,
+     "share5_diff_ci95_pp": [
+      36.07,
+      52.73
+     ],
+     "wilcoxon_p": 4.0998309115617747e-39,
+     "mcnemar_5_b": 168,
+     "mcnemar_5_c": 6,
+     "mcnemar_5_p": 3.0586745552809425e-42,
+     "mcnemar_note": "unclustered; 6 answers per question are not independent. The cluster bootstrap CI above is the primary inference; this p-value is descriptive only.",
+     "n_discordant_bc": 174,
+     "tost": {
+      "margin_pp": 5.0,
+      "ci95_pp": [
+       36.06,
+       52.73
+      ],
+      "equivalent": false,
+      "n_boot": 10000
+     }
+    },
+    "correctness": {
+     "n": 366,
+     "mean_x": 3.2158,
+     "mean_y": 1.3798,
+     "mean_diff": 1.8361,
+     "mean_diff_ci95": [
+      1.5464,
+      2.1421
+     ],
+     "exact_agreement": 0.3333,
+     "mean_abs_diff": 1.8579,
+     "share5_x": 0.3087,
+     "share5_y": 0.071,
+     "share5_diff_pp": 23.77,
+     "share5_diff_ci95_pp": [
+      17.21,
+      30.33
+     ],
+     "wilcoxon_p": 2.2663984663888048e-41,
+     "mcnemar_5_b": 87,
+     "mcnemar_5_c": 0,
+     "mcnemar_5_p": 1.2924697071141057e-26,
+     "mcnemar_note": "unclustered; 6 answers per question are not independent. The cluster bootstrap CI above is the primary inference; this p-value is descriptive only.",
+     "n_discordant_bc": 87,
+     "tost": null
+    },
+    "completeness": {
+     "n": 366,
+     "mean_x": 2.959,
+     "mean_y": 1.2486,
+     "mean_diff": 1.7104,
+     "mean_diff_ci95": [
+      1.4289,
+      2.0082
+     ],
+     "exact_agreement": 0.3607,
+     "mean_abs_diff": 1.7377,
+     "share5_x": 0.2869,
+     "share5_y": 0.0683,
+     "share5_diff_pp": 21.86,
+     "share5_diff_ci95_pp": [
+      15.57,
+      28.42
+     ],
+     "wilcoxon_p": 7.551543442672373e-40,
+     "mcnemar_5_b": 82,
+     "mcnemar_5_c": 2,
+     "mcnemar_5_p": 3.6923274592835773e-22,
+     "mcnemar_note": "unclustered; 6 answers per question are not independent. The cluster bootstrap CI above is the primary inference; this p-value is descriptive only.",
+     "n_discordant_bc": 84,
+     "tost": null
+    },
+    "citation_quality": {
+     "n": 366,
+     "mean_x": 2.9044,
+     "mean_y": 0.959,
+     "mean_diff": 1.9454,
+     "mean_diff_ci95": [
+      1.6939,
+      2.2214
+     ],
+     "exact_agreement": 0.2923,
+     "mean_abs_diff": 2.0383,
+     "share5_x": 0.2432,
+     "share5_y": 0.0628,
+     "share5_diff_pp": 18.03,
+     "share5_diff_ci95_pp": [
+      12.3,
+      24.04
+     ],
+     "wilcoxon_p": 8.999516216938972e-42,
+     "mcnemar_5_b": 73,
+     "mcnemar_5_c": 7,
+     "mcnemar_5_p": 5.79510097338583e-15,
+     "mcnemar_note": "unclustered; 6 answers per question are not independent. The cluster bootstrap CI above is the primary inference; this p-value is descriptive only.",
+     "n_discordant_bc": 80,
+     "tost": null
+    }
+   }
+  }
+ ],
+ "resolvable_noise_under_3pp": true,
+ "b_b2_identical_all_four_dims": {
+  "answers": 366,
+  "identical": 366
+ },
+ "s18e_v24": {
+  "share5_faithfulness": {
+   "A": {
+    "share5": 0.412568306010929,
+    "n": 366
+   },
+   "B": {
+    "share5": 0.412568306010929,
+    "n": 366
+   },
+   "C": {
+    "share5": 0.5491803278688525,
+    "n": 366
+   },
+   "D": {
+    "share5": 0.10655737704918032,
+    "n": 366
+   },
+   "B2": {
+    "share5": 0.412568306010929,
+    "n": 366
+   }
+  },
+  "contrasts": {
+   "B vs B2": {
+    "n": 366,
+    "share5_x": 0.4126,
+    "share5_y": 0.4126,
+    "share5_diff_pp": 0.0,
+    "share5_diff_ci95_pp": [
+     0.0,
+     0.0
+    ]
+   },
+   "A vs B": {
+    "n": 366,
+    "share5_x": 0.4126,
+    "share5_y": 0.4126,
+    "share5_diff_pp": 0.0,
+    "share5_diff_ci95_pp": [
+     0.0,
+     0.0
+    ]
+   },
+   "C vs B": {
+    "n": 366,
+    "share5_x": 0.5492,
+    "share5_y": 0.4126,
+    "share5_diff_pp": 13.66,
+    "share5_diff_ci95_pp": [
+     7.1,
+     19.67
+    ]
+   },
+   "D vs B": {
+    "n": 366,
+    "share5_x": 0.1066,
+    "share5_y": 0.4126,
+    "share5_diff_pp": -30.6,
+    "share5_diff_ci95_pp": [
+     -37.43,
+     -24.32
+    ]
+   },
+   "C vs D": {
+    "n": 366,
+    "share5_x": 0.5492,
+    "share5_y": 0.1066,
+    "share5_diff_pp": 44.26,
+    "share5_diff_ci95_pp": [
+     36.34,
+     52.46
+    ]
+   }
+  }
+ }
+}

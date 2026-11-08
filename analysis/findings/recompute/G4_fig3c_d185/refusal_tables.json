@@ -1,0 +1,6278 @@
+{
+ "awaiting_s6": {
+  "answers": 0,
+  "by_unit": {},
+  "what": "draw-1 answers this table reads from a key v2.4 row of one of the 132 questions key v2.5 changed (judge_rows_v25.choose's 'v2.4 awaiting S6'): their cells can move once S6 judges them on v2.5"
+ },
+ "main": [
+  {
+   "answers_by_status": {
+    "ok": 117
+   },
+   "core_papers": 5,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s5_n0",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s5_n1",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s5_n3",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      100.0,
+      100.0
+     ],
+     "full_one_sided_lower_bound_pct": 92.60624110733134,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 100.0,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      100.0,
+      100.0
+     ],
+     "full_one_sided_lower_bound_pct": 92.60624110733134,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 100.0,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "single_pass"
+  },
+  {
+   "answers_by_status": {
+    "ok": 117
+   },
+   "core_papers": 5,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       79.48717948717949,
+       97.43589743589743
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 89.74358974358975,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       79.48717948717949,
+       97.43589743589743
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 89.74358974358975,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s5_n0",
+     "not_judged": 0,
+     "refused": 35,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       69.23076923076923,
+       92.3076923076923
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 82.05128205128204,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       69.23076923076923,
+       92.3076923076923
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 82.05128205128204,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s5_n1",
+     "not_judged": 0,
+     "refused": 32,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       53.84615384615385,
+       82.05128205128204
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 69.23076923076923,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       53.84615384615385,
+       82.05128205128204
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 69.23076923076923,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s5_n3",
+     "not_judged": 0,
+     "refused": 27,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      71.7948717948718,
+      88.03418803418802
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 80.34188034188034,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      71.7948717948718,
+      88.03418803418802
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 80.34188034188034,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "multi_hop"
+  },
+  {
+   "answers_by_status": {
+    "ok": 117
+   },
+   "core_papers": 5,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s5_n0",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s5_n1",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s5_n3",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      100.0,
+      100.0
+     ],
+     "full_one_sided_lower_bound_pct": 92.60624110733134,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 100.0,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      100.0,
+      100.0
+     ],
+     "full_one_sided_lower_bound_pct": 92.60624110733134,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 100.0,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "verified_pass"
+  },
+  {
+   "answers_by_status": {
+    "failed": 3,
+    "ok": 114
+   },
+   "core_papers": 5,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       87.17948717948718,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 94.87179487179486,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       87.17948717948718,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 94.87179487179486,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s5_n0",
+     "not_judged": 0,
+     "refused": 37,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 2,
+     "failures_in": {
+      "ci95_pct": [
+       71.7948717948718,
+       94.87179487179486
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 84.61538461538461,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       78.37837837837837,
+       97.2972972972973
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 37,
+      "questions_without_value": 2,
+      "rate_pct": 89.1891891891892,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s5_n1",
+     "not_judged": 0,
+     "refused": 33,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 1,
+     "failures_in": {
+      "ci95_pct": [
+       58.97435897435898,
+       87.17948717948718
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 74.35897435897436,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       63.1578947368421,
+       89.47368421052632
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 38,
+      "questions_without_value": 1,
+      "rate_pct": 76.31578947368422,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s5_n3",
+     "not_judged": 0,
+     "refused": 29,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      76.92307692307693,
+      91.45299145299145
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 84.61538461538461,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      79.48717948717949,
+      92.3076923076923
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 86.32478632478634,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "rlm_5"
+  },
+  {
+   "answers_by_status": {
+    "ok": 117
+   },
+   "core_papers": 5,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s5_n0",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       92.3076923076923,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 97.43589743589743,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       92.3076923076923,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 97.43589743589743,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s5_n1",
+     "not_judged": 0,
+     "refused": 38,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       71.7948717948718,
+       94.87179487179486
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 84.61538461538461,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       71.7948717948718,
+       94.87179487179486
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 84.61538461538461,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s5_n3",
+     "not_judged": 0,
+     "refused": 33,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      88.88888888888889,
+      98.29059829059827
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 94.01709401709402,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      88.88888888888889,
+      98.29059829059827
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 94.01709401709402,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "rlm_10"
+  },
+  {
+   "answers_by_status": {
+    "ok": 117
+   },
+   "core_papers": 5,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s5_n0",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       87.17948717948718,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 94.87179487179486,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       87.17948717948718,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 94.87179487179486,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s5_n1",
+     "not_judged": 0,
+     "refused": 37,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       79.48717948717949,
+       97.43589743589743
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 89.74358974358975,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       79.48717948717949,
+       97.43589743589743
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 89.74358974358975,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s5_n3",
+     "not_judged": 0,
+     "refused": 35,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      89.74358974358975,
+      99.14529914529913
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 94.87179487179486,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      89.74358974358975,
+      99.14529914529913
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 94.87179487179486,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "rlm_20"
+  },
+  {
+   "answers_by_status": {
+    "ok": 117
+   },
+   "core_papers": 10,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s10_n0",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s10_n1",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s10_n3",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      100.0,
+      100.0
+     ],
+     "full_one_sided_lower_bound_pct": 92.60624110733134,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 100.0,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      100.0,
+      100.0
+     ],
+     "full_one_sided_lower_bound_pct": 92.60624110733134,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 100.0,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "single_pass"
+  },
+  {
+   "answers_by_status": {
+    "failed": 4,
+    "ok": 113
+   },
+   "core_papers": 10,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       82.05128205128204,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 92.3076923076923,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       82.05128205128204,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 92.3076923076923,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s10_n0",
+     "not_judged": 0,
+     "refused": 36,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 3,
+     "failures_in": {
+      "ci95_pct": [
+       46.15384615384615,
+       76.92307692307693
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 61.53846153846154,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       50.0,
+       80.55555555555556
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 36,
+      "questions_without_value": 3,
+      "rate_pct": 66.66666666666666,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s10_n1",
+     "not_judged": 0,
+     "refused": 24,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 1,
+     "failures_in": {
+      "ci95_pct": [
+       41.02564102564102,
+       71.7948717948718
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 56.41025641025641,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       42.10526315789473,
+       73.68421052631578
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 38,
+      "questions_without_value": 1,
+      "rate_pct": 57.89473684210527,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s10_n3",
+     "not_judged": 0,
+     "refused": 22,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      59.82905982905983,
+      79.48717948717949
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 70.08547008547008,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      63.24786324786324,
+      82.47863247863249
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 73.07692307692307,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "multi_hop"
+  },
+  {
+   "answers_by_status": {
+    "ok": 117
+   },
+   "core_papers": 10,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s10_n0",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s10_n1",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s10_n3",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      100.0,
+      100.0
+     ],
+     "full_one_sided_lower_bound_pct": 92.60624110733134,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 100.0,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      100.0,
+      100.0
+     ],
+     "full_one_sided_lower_bound_pct": 92.60624110733134,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 100.0,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "verified_pass"
+  },
+  {
+   "answers_by_status": {
+    "failed": 4,
+    "ok": 113
+   },
+   "core_papers": 10,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       82.05128205128204,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 92.3076923076923,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       82.05128205128204,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 92.3076923076923,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s10_n0",
+     "not_judged": 0,
+     "refused": 36,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 3,
+     "failures_in": {
+      "ci95_pct": [
+       58.97435897435898,
+       87.17948717948718
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 74.35897435897436,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       66.66666666666666,
+       91.66666666666666
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 36,
+      "questions_without_value": 3,
+      "rate_pct": 80.55555555555556,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s10_n1",
+     "not_judged": 0,
+     "refused": 29,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 1,
+     "failures_in": {
+      "ci95_pct": [
+       71.7948717948718,
+       94.87179487179486
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 84.61538461538461,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       76.31578947368422,
+       97.36842105263158
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 38,
+      "questions_without_value": 1,
+      "rate_pct": 86.8421052631579,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s10_n3",
+     "not_judged": 0,
+     "refused": 33,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      76.92307692307692,
+      90.59829059829059
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 83.76068376068378,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      79.91452991452991,
+      92.3076923076923
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 86.32478632478632,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "rlm_5"
+  },
+  {
+   "answers_by_status": {
+    "ok": 117
+   },
+   "core_papers": 10,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s10_n0",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       82.05128205128204,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 92.3076923076923,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       82.05128205128204,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 92.3076923076923,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s10_n1",
+     "not_judged": 0,
+     "refused": 36,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       79.48717948717949,
+       97.43589743589743
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 89.74358974358975,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       79.48717948717949,
+       97.43589743589743
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 89.74358974358975,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s10_n3",
+     "not_judged": 0,
+     "refused": 35,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      88.88888888888889,
+      98.29059829059827
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 94.01709401709402,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      88.88888888888889,
+      98.29059829059827
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 94.01709401709402,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "rlm_10"
+  },
+  {
+   "answers_by_status": {
+    "ok": 117
+   },
+   "core_papers": 10,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s10_n0",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       92.3076923076923,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 97.43589743589743,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       92.3076923076923,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 97.43589743589743,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s10_n1",
+     "not_judged": 0,
+     "refused": 38,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       71.7948717948718,
+       94.87179487179486
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 84.61538461538461,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       71.7948717948718,
+       94.87179487179486
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 84.61538461538461,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s10_n3",
+     "not_judged": 0,
+     "refused": 33,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      88.88888888888889,
+      98.29059829059827
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 94.01709401709401,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      88.88888888888889,
+      98.29059829059827
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 94.01709401709401,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "rlm_20"
+  },
+  {
+   "answers_by_status": {
+    "ok": 117
+   },
+   "core_papers": 20,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s20_n0",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s20_n1",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s20_n3",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      100.0,
+      100.0
+     ],
+     "full_one_sided_lower_bound_pct": 92.60624110733134,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 100.0,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      100.0,
+      100.0
+     ],
+     "full_one_sided_lower_bound_pct": 92.60624110733134,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 100.0,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "single_pass"
+  },
+  {
+   "answers_by_status": {
+    "failed": 2,
+    "ok": 115
+   },
+   "core_papers": 20,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 1,
+     "failures_in": {
+      "ci95_pct": [
+       79.48717948717949,
+       97.43589743589743
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 89.74358974358975,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       81.57894736842105,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 38,
+      "questions_without_value": 1,
+      "rate_pct": 92.10526315789474,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s20_n0",
+     "not_judged": 0,
+     "refused": 35,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 1,
+     "failures_in": {
+      "ci95_pct": [
+       51.28205128205128,
+       79.48717948717949
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 66.66666666666666,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       52.63157894736842,
+       81.57894736842105
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 38,
+      "questions_without_value": 1,
+      "rate_pct": 68.42105263157895,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s20_n1",
+     "not_judged": 0,
+     "refused": 26,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       48.717948717948715,
+       79.48717948717949
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 64.1025641025641,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       48.717948717948715,
+       79.48717948717949
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 64.1025641025641,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s20_n3",
+     "not_judged": 0,
+     "refused": 25,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      63.24786324786324,
+      82.9059829059829
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 73.5042735042735,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      64.95726495726495,
+      84.61538461538461
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 75.21367521367522,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "multi_hop"
+  },
+  {
+   "answers_by_status": {
+    "ok": 117
+   },
+   "core_papers": 20,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s20_n0",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s20_n1",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s20_n3",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      100.0,
+      100.0
+     ],
+     "full_one_sided_lower_bound_pct": 92.60624110733134,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 100.0,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      100.0,
+      100.0
+     ],
+     "full_one_sided_lower_bound_pct": 92.60624110733134,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 100.0,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "verified_pass"
+  },
+  {
+   "answers_by_status": {
+    "failed": 3,
+    "ok": 114
+   },
+   "core_papers": 20,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 1,
+     "failures_in": {
+      "ci95_pct": [
+       66.66666666666666,
+       92.3076923076923
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 79.48717948717949,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       68.42105263157895,
+       92.10526315789474
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 38,
+      "questions_without_value": 1,
+      "rate_pct": 81.57894736842105,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s20_n0",
+     "not_judged": 0,
+     "refused": 31,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 1,
+     "failures_in": {
+      "ci95_pct": [
+       53.84615384615385,
+       82.05128205128204
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 69.23076923076923,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       55.26315789473685,
+       84.21052631578947
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 38,
+      "questions_without_value": 1,
+      "rate_pct": 71.05263157894737,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s20_n1",
+     "not_judged": 0,
+     "refused": 27,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 1,
+     "failures_in": {
+      "ci95_pct": [
+       66.66666666666666,
+       92.3076923076923
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 79.48717948717949,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       68.42105263157895,
+       92.10526315789474
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 38,
+      "questions_without_value": 1,
+      "rate_pct": 81.57894736842105,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s20_n3",
+     "not_judged": 0,
+     "refused": 31,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      69.23076923076923,
+      82.05128205128204
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 76.06837606837608,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      71.7948717948718,
+      84.1880341880342
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 78.20512820512822,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "rlm_5"
+  },
+  {
+   "answers_by_status": {
+    "failed": 1,
+    "ok": 116
+   },
+   "core_papers": 20,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       87.17948717948718,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 94.87179487179486,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       87.17948717948718,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 94.87179487179486,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s20_n0",
+     "not_judged": 0,
+     "refused": 37,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 1,
+     "failures_in": {
+      "ci95_pct": [
+       82.05128205128204,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 92.3076923076923,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       86.8421052631579,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 38,
+      "questions_without_value": 1,
+      "rate_pct": 94.73684210526315,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s20_n1",
+     "not_judged": 0,
+     "refused": 36,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       82.05128205128204,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 92.3076923076923,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       82.05128205128204,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 92.3076923076923,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s20_n3",
+     "not_judged": 0,
+     "refused": 36,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      88.88888888888889,
+      97.43589743589743
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 93.16239316239316,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      89.74358974358975,
+      97.43589743589743
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 94.01709401709401,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "rlm_10"
+  },
+  {
+   "answers_by_status": {
+    "ok": 117
+   },
+   "core_papers": 20,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s20_n0",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       79.48717948717949,
+       97.43589743589743
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 89.74358974358975,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       79.48717948717949,
+       97.43589743589743
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 89.74358974358975,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s20_n1",
+     "not_judged": 0,
+     "refused": 35,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       76.92307692307693,
+       97.43589743589743
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 87.17948717948718,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       76.92307692307693,
+       97.43589743589743
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 87.17948717948718,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s20_n3",
+     "not_judged": 0,
+     "refused": 34,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      87.17948717948718,
+      96.5811965811966
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 92.30769230769229,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      87.17948717948718,
+      96.5811965811966
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 92.30769230769229,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "rlm_20"
+  },
+  {
+   "answers_by_status": {
+    "ok": 117
+   },
+   "core_papers": 50,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s50_n0",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s50_n1",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       92.3076923076923,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 97.43589743589743,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       92.3076923076923,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 97.43589743589743,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s50_n3",
+     "not_judged": 0,
+     "refused": 38,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      97.43589743589743,
+      100.0
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 99.14529914529913,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      97.43589743589743,
+      100.0
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 99.14529914529913,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "single_pass"
+  },
+  {
+   "answers_by_status": {
+    "ok": 117
+   },
+   "core_papers": 50,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       79.48717948717949,
+       97.43589743589743
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 89.74358974358975,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       79.48717948717949,
+       97.43589743589743
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 89.74358974358975,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s50_n0",
+     "not_judged": 0,
+     "refused": 35,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       53.84615384615385,
+       82.05128205128204
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 69.23076923076923,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       53.84615384615385,
+       82.05128205128204
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 69.23076923076923,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s50_n1",
+     "not_judged": 0,
+     "refused": 27,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       28.205128205128204,
+       58.97435897435898
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 43.58974358974359,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       28.205128205128204,
+       58.97435897435898
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 43.58974358974359,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s50_n3",
+     "not_judged": 0,
+     "refused": 17,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      58.11965811965811,
+      76.92307692307692
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 67.52136752136754,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      58.11965811965811,
+      76.92307692307692
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 67.52136752136754,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "multi_hop"
+  },
+  {
+   "answers_by_status": {
+    "ok": 117
+   },
+   "core_papers": 50,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s50_n0",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s50_n1",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       100.0,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": 92.60624110733134,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 100.0,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s50_n3",
+     "not_judged": 0,
+     "refused": 39,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      100.0,
+      100.0
+     ],
+     "full_one_sided_lower_bound_pct": 92.60624110733134,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 100.0,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      100.0,
+      100.0
+     ],
+     "full_one_sided_lower_bound_pct": 92.60624110733134,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 100.0,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "verified_pass"
+  },
+  {
+   "answers_by_status": {
+    "failed": 4,
+    "ok": 113
+   },
+   "core_papers": 50,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       76.92307692307693,
+       97.43589743589743
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 87.17948717948718,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       76.92307692307693,
+       97.43589743589743
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 87.17948717948718,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s50_n0",
+     "not_judged": 0,
+     "refused": 34,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 1,
+     "failures_in": {
+      "ci95_pct": [
+       56.41025641025641,
+       84.61538461538461
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 71.7948717948718,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       60.526315789473685,
+       86.8421052631579
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 38,
+      "questions_without_value": 1,
+      "rate_pct": 73.68421052631578,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s50_n1",
+     "not_judged": 0,
+     "refused": 28,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 3,
+     "failures_in": {
+      "ci95_pct": [
+       51.28205128205128,
+       82.05128205128204
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 66.66666666666666,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       55.55555555555556,
+       86.11111111111111
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 36,
+      "questions_without_value": 3,
+      "rate_pct": 72.22222222222221,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s50_n3",
+     "not_judged": 0,
+     "refused": 26,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      67.52136752136751,
+      82.05128205128204
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 75.21367521367523,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      70.94017094017093,
+      86.32478632478632
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 78.63247863247864,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "rlm_5"
+  },
+  {
+   "answers_by_status": {
+    "failed": 1,
+    "ok": 116
+   },
+   "core_papers": 50,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       87.17948717948718,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 94.87179487179486,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       87.17948717948718,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 94.87179487179486,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s50_n0",
+     "not_judged": 0,
+     "refused": 37,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       79.48717948717949,
+       97.43589743589743
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 89.74358974358975,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       79.48717948717949,
+       97.43589743589743
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 89.74358974358975,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s50_n1",
+     "not_judged": 0,
+     "refused": 35,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 1,
+     "failures_in": {
+      "ci95_pct": [
+       87.17948717948718,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 94.87179487179486,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       92.10526315789474,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 38,
+      "questions_without_value": 1,
+      "rate_pct": 97.36842105263158,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s50_n3",
+     "not_judged": 0,
+     "refused": 37,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      88.03418803418802,
+      97.43589743589743
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 93.16239316239316,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      88.88888888888889,
+      98.29059829059827
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 94.01709401709402,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "rlm_10"
+  },
+  {
+   "answers_by_status": {
+    "ok": 117
+   },
+   "core_papers": 50,
+   "per_index": [
+    {
+     "answers": 39,
+     "distractor_ratio": 0,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       92.3076923076923,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 97.43589743589743,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       92.3076923076923,
+       100.0
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 97.43589743589743,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s50_n0",
+     "not_judged": 0,
+     "refused": 38,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 1,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       76.92307692307693,
+       97.43589743589743
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 87.17948717948718,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       76.92307692307693,
+       97.43589743589743
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 87.17948717948718,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s50_n1",
+     "not_judged": 0,
+     "refused": 34,
+     "unscored": 0,
+     "with_value": 39
+    },
+    {
+     "answers": 39,
+     "distractor_ratio": 3,
+     "failed": 0,
+     "failures_in": {
+      "ci95_pct": [
+       76.92307692307693,
+       97.43589743589743
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 87.17948717948718,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "failures_left_out": {
+      "ci95_pct": [
+       76.92307692307693,
+       97.43589743589743
+      ],
+      "full_one_sided_lower_bound_pct": null,
+      "questions": 39,
+      "questions_without_value": 0,
+      "rate_pct": 87.17948717948718,
+      "zero_one_sided_upper_bound_pct": null
+     },
+     "index": "exp_v4_s50_n3",
+     "not_judged": 0,
+     "refused": 34,
+     "unscored": 0,
+     "with_value": 39
+    }
+   ],
+   "pooled_over_ratios": {
+    "failures_in": {
+     "ci95_pct": [
+      84.6153846153846,
+      95.72649572649573
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 90.59829059829059,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "failures_left_out": {
+     "ci95_pct": [
+      84.6153846153846,
+      95.72649572649573
+     ],
+     "full_one_sided_lower_bound_pct": null,
+     "questions": 39,
+     "questions_without_value": 0,
+     "rate_pct": 90.59829059829059,
+     "zero_one_sided_upper_bound_pct": null
+    },
+    "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+   },
+   "strategy": "rlm_20"
+  }
+ ],
+ "noise": {
+  "1": {
+   "awaiting_s6": {
+    "answers": 0,
+    "by_unit": {},
+    "what": "draw-1 answers this table reads from a key v2.4 row of one of the 132 questions key v2.5 changed (judge_rows_v25.choose's 'v2.4 awaiting S6'): their cells can move once S6 judges them on v2.5"
+   },
+   "rests_on": "draw 1, the subset's 13",
+   "tables": [
+    {
+     "answers_by_status": {
+      "ok": 39
+     },
+     "core_papers": 5,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s5_n0",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s5_n1",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s5_n3",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        100.0,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": 79.41833348134493,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 100.0,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        100.0,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": 79.41833348134493,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 100.0,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "single_pass"
+    },
+    {
+     "answers_by_status": {
+      "ok": 39
+     },
+     "core_papers": 5,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s5_n0",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s5_n1",
+       "not_judged": 0,
+       "refused": 12,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         53.84615384615385,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 76.92307692307693,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         53.84615384615385,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 76.92307692307693,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s5_n3",
+       "not_judged": 0,
+       "refused": 10,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        76.92307692307693,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 89.74358974358974,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        76.92307692307693,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 89.74358974358974,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "multi_hop"
+    },
+    {
+     "answers_by_status": {
+      "ok": 39
+     },
+     "core_papers": 5,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s5_n0",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s5_n1",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s5_n3",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        100.0,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": 79.41833348134493,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 100.0,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        100.0,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": 79.41833348134493,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 100.0,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "verified_pass"
+    },
+    {
+     "answers_by_status": {
+      "failed": 2,
+      "ok": 37
+     },
+     "core_papers": 5,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s5_n0",
+       "not_judged": 0,
+       "refused": 12,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 2,
+       "failures_in": {
+        "ci95_pct": [
+         53.84615384615385,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 76.92307692307693,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         72.72727272727273,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 11,
+        "questions_without_value": 2,
+        "rate_pct": 90.9090909090909,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s5_n1",
+       "not_judged": 0,
+       "refused": 10,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         53.84615384615385,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 76.92307692307693,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         53.84615384615385,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 76.92307692307693,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s5_n3",
+       "not_judged": 0,
+       "refused": 10,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        66.66666666666666,
+        94.87179487179488
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 82.05128205128204,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        70.51282051282051,
+        96.15384615384616
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 84.6153846153846,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "rlm_5"
+    },
+    {
+     "answers_by_status": {
+      "ok": 39
+     },
+     "core_papers": 5,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s5_n0",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s5_n1",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         61.53846153846154,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 84.61538461538461,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         61.53846153846154,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 84.61538461538461,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s5_n3",
+       "not_judged": 0,
+       "refused": 11,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        87.17948717948717,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 94.87179487179486,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        87.17948717948717,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 94.87179487179486,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "rlm_10"
+    },
+    {
+     "answers_by_status": {
+      "ok": 39
+     },
+     "core_papers": 5,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s5_n0",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s5_n1",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s5_n3",
+       "not_judged": 0,
+       "refused": 12,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        92.3076923076923,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 97.43589743589743,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        92.3076923076923,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 97.43589743589743,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "rlm_20"
+    },
+    {
+     "answers_by_status": {
+      "ok": 39
+     },
+     "core_papers": 10,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s10_n0",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s10_n1",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s10_n3",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        100.0,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": 79.41833348134493,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 100.0,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        100.0,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": 79.41833348134493,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 100.0,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "single_pass"
+    },
+    {
+     "answers_by_status": {
+      "failed": 1,
+      "ok": 38
+     },
+     "core_papers": 10,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         61.53846153846154,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 84.61538461538461,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         61.53846153846154,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 84.61538461538461,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s10_n0",
+       "not_judged": 0,
+       "refused": 11,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 1,
+       "failures_in": {
+        "ci95_pct": [
+         46.15384615384615,
+         92.3076923076923
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 69.23076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         50.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 12,
+        "questions_without_value": 1,
+        "rate_pct": 75.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s10_n1",
+       "not_judged": 0,
+       "refused": 9,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         30.76923076923077,
+         84.61538461538461
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 61.53846153846154,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         30.76923076923077,
+         84.61538461538461
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 61.53846153846154,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s10_n3",
+       "not_judged": 0,
+       "refused": 8,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        56.4102564102564,
+        87.17948717948718
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 71.79487179487178,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        57.692307692307686,
+        87.17948717948718
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 73.07692307692307,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "multi_hop"
+    },
+    {
+     "answers_by_status": {
+      "ok": 39
+     },
+     "core_papers": 10,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s10_n0",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s10_n1",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s10_n3",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        100.0,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": 79.41833348134493,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 100.0,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        100.0,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": 79.41833348134493,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 100.0,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "verified_pass"
+    },
+    {
+     "answers_by_status": {
+      "failed": 2,
+      "ok": 37
+     },
+     "core_papers": 10,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s10_n0",
+       "not_judged": 0,
+       "refused": 12,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 2,
+       "failures_in": {
+        "ci95_pct": [
+         53.84615384615385,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 76.92307692307693,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         72.72727272727273,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 11,
+        "questions_without_value": 2,
+        "rate_pct": 90.9090909090909,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s10_n1",
+       "not_judged": 0,
+       "refused": 10,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         53.84615384615385,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 76.92307692307693,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         53.84615384615385,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 76.92307692307693,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s10_n3",
+       "not_judged": 0,
+       "refused": 10,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        71.79487179487178,
+        92.3076923076923
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 82.05128205128204,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        75.64102564102562,
+        94.87179487179486
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 85.8974358974359,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "rlm_5"
+    },
+    {
+     "answers_by_status": {
+      "ok": 39
+     },
+     "core_papers": 10,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s10_n0",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s10_n1",
+       "not_judged": 0,
+       "refused": 12,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s10_n3",
+       "not_judged": 0,
+       "refused": 12,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        87.17948717948717,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 94.87179487179486,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        87.17948717948717,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 94.87179487179486,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "rlm_10"
+    },
+    {
+     "answers_by_status": {
+      "ok": 39
+     },
+     "core_papers": 10,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s10_n0",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s10_n1",
+       "not_judged": 0,
+       "refused": 12,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s10_n3",
+       "not_judged": 0,
+       "refused": 12,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        84.61538461538461,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 94.87179487179486,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        84.61538461538461,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 94.87179487179486,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "rlm_20"
+    },
+    {
+     "answers_by_status": {
+      "ok": 39
+     },
+     "core_papers": 20,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s20_n0",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s20_n1",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s20_n3",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        100.0,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": 79.41833348134493,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 100.0,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        100.0,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": 79.41833348134493,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 100.0,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "single_pass"
+    },
+    {
+     "answers_by_status": {
+      "failed": 1,
+      "ok": 38
+     },
+     "core_papers": 20,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 1,
+       "failures_in": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 77.90778080544442,
+        "questions": 12,
+        "questions_without_value": 1,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s20_n0",
+       "not_judged": 0,
+       "refused": 12,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         46.15384615384615,
+         92.3076923076923
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 69.23076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         46.15384615384615,
+         92.3076923076923
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 69.23076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s20_n1",
+       "not_judged": 0,
+       "refused": 9,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         30.76923076923077,
+         76.92307692307693
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 53.84615384615385,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         30.76923076923077,
+         76.92307692307693
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 53.84615384615385,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s20_n3",
+       "not_judged": 0,
+       "refused": 7,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        56.4102564102564,
+        87.17948717948717
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 71.7948717948718,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        56.41025641025641,
+        89.74358974358974
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 74.35897435897435,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "multi_hop"
+    },
+    {
+     "answers_by_status": {
+      "ok": 39
+     },
+     "core_papers": 20,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s20_n0",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s20_n1",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s20_n3",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        100.0,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": 79.41833348134493,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 100.0,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        100.0,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": 79.41833348134493,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 100.0,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "verified_pass"
+    },
+    {
+     "answers_by_status": {
+      "ok": 39
+     },
+     "core_papers": 20,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s20_n0",
+       "not_judged": 0,
+       "refused": 12,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         53.84615384615385,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 76.92307692307693,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         53.84615384615385,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 76.92307692307693,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s20_n1",
+       "not_judged": 0,
+       "refused": 10,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s20_n3",
+       "not_judged": 0,
+       "refused": 12,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        79.48717948717949,
+        94.87179487179486
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 87.17948717948717,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        79.48717948717949,
+        94.87179487179486
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 87.17948717948717,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "rlm_5"
+    },
+    {
+     "answers_by_status": {
+      "ok": 39
+     },
+     "core_papers": 20,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s20_n0",
+       "not_judged": 0,
+       "refused": 12,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s20_n1",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s20_n3",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        92.3076923076923,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 97.43589743589743,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        92.3076923076923,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 97.43589743589743,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "rlm_10"
+    },
+    {
+     "answers_by_status": {
+      "ok": 39
+     },
+     "core_papers": 20,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s20_n0",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s20_n1",
+       "not_judged": 0,
+       "refused": 12,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s20_n3",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        92.3076923076923,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 97.43589743589743,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        92.3076923076923,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 97.43589743589743,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "rlm_20"
+    },
+    {
+     "answers_by_status": {
+      "ok": 39
+     },
+     "core_papers": 50,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s50_n0",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s50_n1",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s50_n3",
+       "not_judged": 0,
+       "refused": 12,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        92.3076923076923,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 97.43589743589743,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        92.3076923076923,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 97.43589743589743,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "single_pass"
+    },
+    {
+     "answers_by_status": {
+      "ok": 39
+     },
+     "core_papers": 50,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         61.53846153846154,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 84.61538461538461,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         61.53846153846154,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 84.61538461538461,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s50_n0",
+       "not_judged": 0,
+       "refused": 11,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         53.84615384615385,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 76.92307692307693,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         53.84615384615385,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 76.92307692307693,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s50_n1",
+       "not_judged": 0,
+       "refused": 10,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         23.076923076923077,
+         69.23076923076923
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 46.15384615384615,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         23.076923076923077,
+         69.23076923076923
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 46.15384615384615,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s50_n3",
+       "not_judged": 0,
+       "refused": 6,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        51.28205128205128,
+        84.61538461538461
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 69.23076923076923,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        51.28205128205128,
+        84.61538461538461
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 69.23076923076923,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "multi_hop"
+    },
+    {
+     "answers_by_status": {
+      "ok": 39
+     },
+     "core_papers": 50,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s50_n0",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s50_n1",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s50_n3",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        100.0,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": 79.41833348134493,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 100.0,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        100.0,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": 79.41833348134493,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 100.0,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "verified_pass"
+    },
+    {
+     "answers_by_status": {
+      "failed": 1,
+      "ok": 38
+     },
+     "core_papers": 50,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         61.53846153846154,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 84.61538461538461,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         61.53846153846154,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 84.61538461538461,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s50_n0",
+       "not_judged": 0,
+       "refused": 11,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         53.84615384615385,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 76.92307692307693,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         53.84615384615385,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 76.92307692307693,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s50_n1",
+       "not_judged": 0,
+       "refused": 10,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 1,
+       "failures_in": {
+        "ci95_pct": [
+         38.46153846153847,
+         84.61538461538461
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 61.53846153846154,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         41.66666666666667,
+         91.66666666666666
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 12,
+        "questions_without_value": 1,
+        "rate_pct": 66.66666666666666,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s50_n3",
+       "not_judged": 0,
+       "refused": 8,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        64.1025641025641,
+        84.61538461538461
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 74.35897435897435,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        66.66666666666666,
+        87.17948717948718
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 76.92307692307693,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "rlm_5"
+    },
+    {
+     "answers_by_status": {
+      "ok": 39
+     },
+     "core_papers": 50,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s50_n0",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         61.53846153846154,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 84.61538461538461,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         61.53846153846154,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 84.61538461538461,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s50_n1",
+       "not_judged": 0,
+       "refused": 11,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s50_n3",
+       "not_judged": 0,
+       "refused": 12,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        84.6153846153846,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 92.30769230769229,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        84.6153846153846,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 92.30769230769229,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "rlm_10"
+    },
+    {
+     "answers_by_status": {
+      "ok": 39
+     },
+     "core_papers": 50,
+     "per_index": [
+      {
+       "answers": 13,
+       "distractor_ratio": 0,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         100.0,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": 79.41833348134493,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 100.0,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s50_n0",
+       "not_judged": 0,
+       "refused": 13,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 1,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         61.53846153846154,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 84.61538461538461,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         61.53846153846154,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 84.61538461538461,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s50_n1",
+       "not_judged": 0,
+       "refused": 11,
+       "unscored": 0,
+       "with_value": 13
+      },
+      {
+       "answers": 13,
+       "distractor_ratio": 3,
+       "failed": 0,
+       "failures_in": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "failures_left_out": {
+        "ci95_pct": [
+         76.92307692307693,
+         100.0
+        ],
+        "full_one_sided_lower_bound_pct": null,
+        "questions": 13,
+        "questions_without_value": 0,
+        "rate_pct": 92.3076923076923,
+        "zero_one_sided_upper_bound_pct": null
+       },
+       "index": "exp_v4_s50_n3",
+       "not_judged": 0,
+       "refused": 12,
+       "unscored": 0,
+       "with_value": 13
+      }
+     ],
+     "pooled_over_ratios": {
+      "failures_in": {
+       "ci95_pct": [
+        84.6153846153846,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 92.30769230769229,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "failures_left_out": {
+       "ci95_pct": [
+        84.6153846153846,
+        100.0
+       ],
+       "full_one_sided_lower_bound_pct": null,
+       "questions": 13,
+       "questions_without_value": 0,
+       "rate_pct": 92.30769230769229,
+       "zero_one_sided_upper_bound_pct": null
+      },
+      "status": "proposed, not a defined reading (Valerio's call): the mean over questions of each question's share over the size's three indexes (0, 1 and 3 times the distractors), so three set-ups are averaged as if they were draws; Rule 1 (LIST.md:236) defines the summary per question and set-up, and a set-up here is a strategy on one index (per_index is the reading)"
+     },
+     "strategy": "rlm_20"
+    }
+   ]
+  }
+ },
+ "provisional": true,
+ "rests_on": "draw 1, all 39 questions (D98's main estimate)",
+ "rule": "Rule 9: refused = refusal_accuracy 3 or more under the decline prompt; rate = the mean over the 39 of each question's refused share over the size's three indexes (draw 1); Rule 2 interval (S463.interval, 10,000 question resamples); D133's one-sided bounds at 0% and 100%; a failed answer is not refused (Rule 10), and the rate is also given with failures left out",
+ "run_to_run": "no run-to-run reading yet: only draw 1 read"
+}

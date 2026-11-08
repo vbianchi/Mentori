@@ -1,0 +1,821 @@
+{
+ "what": "Refused out-of-scope questions and answerable passes at 4 and 3, per set-up and draw (1 on all questions; 1, 2, 3 and 2+3 on D98's subset), and the routing fix minus the full pipeline",
+ "provenance": {
+  "script": "scripts/S591_routing_fix_by_draw.py",
+  "script_sha256": "c4a438430c76f6fd2d56d61d26e6a2a54758db5d99376ed825d5dd88af41940c",
+  "command": "uv run --frozen python scripts/S591_routing_fix_by_draw.py",
+  "imports": {
+   "scripts/S480_fig4_recount.py": "7c432aa0524944649573f60009acb38450eb9886459783d3c8bf7aa1504950ee",
+   "scripts/S463_fig2_ranking.py": "799642c3dbff3516c38735141d21ada5c29671c5cbaec581b93cee04fcb6bc84",
+   "scripts/judge_rows_v25.py": "aa90f42264e2ce21acfca52c2421d852607418981b6e9be8d8984a716b1ebddd"
+  },
+  "frozen_defaults": {
+   "records": "fig4_records_1023:fig4_records_1023",
+   "collect": "fig4_g9:g3_collect.jsonl",
+   "rlm_collect": "fig2:g1_collect.jsonl",
+   "rlm_answers": "fig2_g1r15_inputs:fig2_g1r15_inputs/runs",
+   "g9": "g9:.",
+   "s6_g1": "fig3_s6:."
+  },
+  "python": "3.13.11",
+  "model_calls": 0
+ },
+ "inputs": {
+  "answers_json:raw_gemini": {
+   "path": "findings/recompute/frozen_inputs/extracted/fig4_records_1023/fig4_records_1023/findings/runs/exp_03__raw_gemini__exp_v4_s20_n0/answers.json",
+   "sha256": "afa5aa7eca967a07d3098c3bb53159c6114948b185e06aab85274123bd6f87ee"
+  },
+  "answers_json:naive_rag": {
+   "path": "findings/recompute/frozen_inputs/extracted/fig4_records_1023/fig4_records_1023/findings/runs/exp_03__naive_rag__exp_v4_s20_n0/answers.json",
+   "sha256": "544d3cb4174ec1c9649d2bc436ddcfadc42e6c3d0da5a82612db9ad3d42d21b1"
+  },
+  "answers_json:full_orchestrator": {
+   "path": "findings/recompute/frozen_inputs/extracted/fig4_records_1023/fig4_records_1023/findings/runs/exp_03__full_orchestrator__exp_v4_s20_n0/answers.json",
+   "sha256": "3a91380cf2b620fdc573ec78a2f91b824a3ceac811d62e430fe48041729c812c"
+  },
+  "answers_json:orch_no_analyser": {
+   "path": "findings/recompute/frozen_inputs/extracted/fig4_records_1023/fig4_records_1023/findings/runs/exp_03__orch_no_analyser__exp_v4_s20_n0/answers.json",
+   "sha256": "6c54402ea3fec29f9f89bd0b5c3c6d892b2ddff5ca5e27fd034ee67b0e0f426c"
+  },
+  "answers_json:orch_no_planner": {
+   "path": "findings/recompute/frozen_inputs/extracted/fig4_records_1023/fig4_records_1023/findings/runs/exp_03__orch_no_planner__exp_v4_s20_n0/answers.json",
+   "sha256": "4ac955d8a012b7cd5fd103736d5868fc0bb2e1682937b8f780433de685067d1d"
+  },
+  "answers_json:orch_no_supervisor": {
+   "path": "findings/recompute/frozen_inputs/extracted/fig4_records_1023/fig4_records_1023/findings/runs/exp_03__orch_no_supervisor__exp_v4_s20_n0/answers.json",
+   "sha256": "0a7a955ffd36f332905366829a04621530271c093af9617127e51c4fd3d3ab04"
+  },
+  "answers_json:orch_no_synthesiser": {
+   "path": "findings/recompute/frozen_inputs/extracted/fig4_records_1023/fig4_records_1023/findings/runs/exp_03__orch_no_synthesiser__exp_v4_s20_n0/answers.json",
+   "sha256": "a5d82c4b338548759ea32aa26415b368f37da0e67960844c68d3f51c44cf7bdc"
+  },
+  "answers_json:orch_factual_to_documents": {
+   "path": "findings/recompute/frozen_inputs/extracted/fig4_records_1023/fig4_records_1023/findings/runs/exp_03__orch_factual_to_documents__exp_v4_s20_n0/answers.json",
+   "sha256": "126eeda5385dafc2414eb24ea7171d4633d0ab02a833ce0b9de10a540240e152"
+  },
+  "answers_json:orch_distil_every_step": {
+   "path": "findings/recompute/g9_inputs/runs/exp_03__orch_distil_every_step__exp_v4_s20_n0/answers.json",
+   "sha256": "d08585ab9a8f853eea7a6acaa8b19e5c83cccfbff03b619503fe14b6a30571f4"
+  },
+  "answers_json:orch_distil_every_step_f1": {
+   "path": "findings/recompute/g9_inputs/runs/exp_03__orch_distil_every_step_f1__exp_v4_s20_n0/answers.json",
+   "sha256": "0b12c674719289fbf8bac43b217c5751ba26535533979099ca8bb66a88bd1973"
+  },
+  "g3_collect": {
+   "path": "findings/recompute/fig4_g9_inputs/g3_collect.jsonl",
+   "sha256": "527fd71e53f30ca77f6ca050be58206a08e99b55b87e8d58887f5486bbdd4bae"
+  },
+  "g3_collect_sidecar": {
+   "path": "findings/recompute/fig4_g9_inputs/g3_collect.jsonl.json",
+   "sha256": "047a84919456d72557d581d83d6584ac8440158201a1ebec067be6b26d03b297"
+  },
+  "g1_collect": {
+   "path": "findings/recompute/fig2_inputs/g1_collect.jsonl",
+   "sha256": "f5ff75bc244cda492a48e7e11f54f2007ed7d586a8f49e78921edd7244b28965"
+  },
+  "g1_collect_sidecar": {
+   "path": "findings/recompute/fig2_inputs/g1_collect.jsonl.json",
+   "sha256": "04996e9dd9c3cca49177068f0143fbe0d1c7fa265a4eb6f617d24551f501f895"
+  },
+  "rlm_answers_jsonl": {
+   "path": "findings/recompute/frozen_inputs/extracted/fig2_g1r15_inputs/fig2_g1r15_inputs/runs/exp_01__rlm_10__exp_v4_s20_n0/answers.jsonl",
+   "sha256": "ecb6de5343d172894fd56d57997e3301d70ca3fb509ae2cd65f8e47eb8c268b7"
+  },
+  "s6_g1_sums": {
+   "path": "findings/recompute/fig3_s6_inputs/SHA256SUMS",
+   "sha256": "49fd1d0b39a4588abd4b13ece27efc4a8759710111de8fe475e785601ab361a4"
+  }
+ },
+ "known_inputs": {
+  "s480_recount": {
+   "path": "findings/recompute/S480_fig4_recount.json",
+   "sha256": "e78a7b3ac75edcee0f0aae9c8155e084c070ddee5824afa5492c6e7734a7d6dd"
+  },
+  "figure4_numbers": {
+   "path": "findings/figures_provisional/fig4/figure4_numbers.json",
+   "sha256": "44abc1d40a839022e184d64b650d8c4df69c1b03c0daa6eaa2f87e624dcc198b"
+  },
+  "rlm_manifest": {
+   "path": "findings/recompute/frozen_inputs/extracted/fig2_g1r15_inputs/fig2_g1r15_inputs/MANIFEST.sha256",
+   "sha256": "60c1f703d7b5853ec7bd5aebaecec9ac50ea3cb078b1f44741c5964427635b2e"
+  },
+  "d98_subset": {
+   "path": "findings/recompute/D98_subset/d98_subset.json",
+   "sha256": "957c79b6b0f3afb12b70be51d0802e7853b4d4ff12e2bdb519d44a10111046bc"
+  }
+ },
+ "rules": {
+  "refused_threshold": 3,
+  "pass_thresholds": [
+   4,
+   3
+  ],
+  "views": {
+   "1": "draw 1, all questions",
+   "1s": "draw 1, D98's subset",
+   "2": "draw 2, D98's subset",
+   "3": "draw 3, D98's subset",
+   "2+3": "draws 2 and 3, D98's subset"
+  },
+  "holm_family": [
+   "orch_no_analyser",
+   "orch_no_planner",
+   "orch_no_supervisor",
+   "orch_no_synthesiser",
+   "orch_factual_to_documents"
+  ],
+  "no_answer": "in n, a fail",
+  "unscored": "out of n"
+ },
+ "reproduced": "draw 1 equal to KNOWN (refused 2, 37, 38 of 39; passed at 4 65, 60 of 86), to S480.count and the committed S480 recount (inputs sha256 equal), its draw_counts on draws 1 to 3, and Figure 4's Source Data (Fig. 4a and 4b setup rows, comparison and Holm P included)",
+ "counts": {
+  "full_orchestrator": {
+   "1": {
+    "refused": 2,
+    "not_answerable_answers": 39,
+    "not_answerable_questions": 39,
+    "pass_4": 65,
+    "pass_3": 84,
+    "answerable_answers": 86,
+    "answerable_questions": 86
+   },
+   "1s": {
+    "refused": 1,
+    "not_answerable_answers": 13,
+    "not_answerable_questions": 13,
+    "pass_4": 23,
+    "pass_3": 28,
+    "answerable_answers": 29,
+    "answerable_questions": 29
+   },
+   "2": {
+    "refused": 0,
+    "not_answerable_answers": 13,
+    "not_answerable_questions": 13,
+    "pass_4": 20,
+    "pass_3": 26,
+    "answerable_answers": 29,
+    "answerable_questions": 29
+   },
+   "3": {
+    "refused": 1,
+    "not_answerable_answers": 13,
+    "not_answerable_questions": 13,
+    "pass_4": 26,
+    "pass_3": 28,
+    "answerable_answers": 29,
+    "answerable_questions": 29
+   },
+   "2+3": {
+    "refused": 1,
+    "not_answerable_answers": 26,
+    "not_answerable_questions": 13,
+    "pass_4": 46,
+    "pass_3": 54,
+    "answerable_answers": 58,
+    "answerable_questions": 29
+   }
+  },
+  "orch_no_analyser": {
+   "1": {
+    "refused": 37,
+    "not_answerable_answers": 39,
+    "not_answerable_questions": 39,
+    "pass_4": 67,
+    "pass_3": 82,
+    "answerable_answers": 86,
+    "answerable_questions": 86
+   },
+   "1s": {
+    "refused": 13,
+    "not_answerable_answers": 13,
+    "not_answerable_questions": 13,
+    "pass_4": 22,
+    "pass_3": 27,
+    "answerable_answers": 29,
+    "answerable_questions": 29
+   },
+   "2": {
+    "refused": 12,
+    "not_answerable_answers": 13,
+    "not_answerable_questions": 13,
+    "pass_4": 23,
+    "pass_3": 29,
+    "answerable_answers": 29,
+    "answerable_questions": 29
+   },
+   "3": {
+    "refused": 12,
+    "not_answerable_answers": 13,
+    "not_answerable_questions": 13,
+    "pass_4": 25,
+    "pass_3": 28,
+    "answerable_answers": 29,
+    "answerable_questions": 29
+   },
+   "2+3": {
+    "refused": 24,
+    "not_answerable_answers": 26,
+    "not_answerable_questions": 13,
+    "pass_4": 48,
+    "pass_3": 57,
+    "answerable_answers": 58,
+    "answerable_questions": 29
+   }
+  },
+  "orch_factual_to_documents": {
+   "1": {
+    "refused": 38,
+    "not_answerable_answers": 39,
+    "not_answerable_questions": 39,
+    "pass_4": 60,
+    "pass_3": 79,
+    "answerable_answers": 86,
+    "answerable_questions": 86
+   },
+   "1s": {
+    "refused": 12,
+    "not_answerable_answers": 13,
+    "not_answerable_questions": 13,
+    "pass_4": 24,
+    "pass_3": 28,
+    "answerable_answers": 29,
+    "answerable_questions": 29
+   },
+   "2": {
+    "refused": 13,
+    "not_answerable_answers": 13,
+    "not_answerable_questions": 13,
+    "pass_4": 24,
+    "pass_3": 29,
+    "answerable_answers": 29,
+    "answerable_questions": 29
+   },
+   "3": {
+    "refused": 12,
+    "not_answerable_answers": 13,
+    "not_answerable_questions": 13,
+    "pass_4": 24,
+    "pass_3": 27,
+    "answerable_answers": 29,
+    "answerable_questions": 29
+   },
+   "2+3": {
+    "refused": 25,
+    "not_answerable_answers": 26,
+    "not_answerable_questions": 13,
+    "pass_4": 48,
+    "pass_3": 56,
+    "answerable_answers": 58,
+    "answerable_questions": 29
+   }
+  }
+ },
+ "comparison": {
+  "1": {
+   "pass": {
+    "4": {
+     "rate": {
+      "full_orchestrator": {
+       "rate": 0.7558139534883721,
+       "lo": 0.6627906976744186,
+       "hi": 0.8488372093023255,
+       "questions_with_share": 86
+      },
+      "orch_no_analyser": {
+       "rate": 0.7790697674418605,
+       "lo": 0.686046511627907,
+       "hi": 0.8604651162790697,
+       "questions_with_share": 86
+      },
+      "orch_factual_to_documents": {
+       "rate": 0.6976744186046512,
+       "lo": 0.5930232558139535,
+       "hi": 0.7906976744186046,
+       "questions_with_share": 86
+      }
+     },
+     "fix_minus_full": {
+      "d": -0.05813953488372093,
+      "lo": -0.18604651162790697,
+      "hi": 0.05813953488372093,
+      "p_sign_flip": 0.45825831964612007,
+      "p_holm": 1.0,
+      "questions": 86,
+      "fix_higher": 12,
+      "full_higher": 17
+     },
+     "holm_family_p": {
+      "orch_no_analyser": 0.8318119049072266,
+      "orch_no_planner": 0.8238029479980469,
+      "orch_no_supervisor": 1.0,
+      "orch_no_synthesiser": 0.6636238098144531,
+      "orch_factual_to_documents": 0.45825831964612007
+     }
+    },
+    "3": {
+     "rate": {
+      "full_orchestrator": {
+       "rate": 0.9767441860465116,
+       "lo": 0.9418604651162791,
+       "hi": 1.0,
+       "questions_with_share": 86
+      },
+      "orch_no_analyser": {
+       "rate": 0.9534883720930233,
+       "lo": 0.9069767441860465,
+       "hi": 0.9883720930232558,
+       "questions_with_share": 86
+      },
+      "orch_factual_to_documents": {
+       "rate": 0.9186046511627907,
+       "lo": 0.8604651162790697,
+       "hi": 0.9651162790697675,
+       "questions_with_share": 86
+      }
+     },
+     "fix_minus_full": {
+      "d": -0.05813953488372093,
+      "lo": -0.12790697674418605,
+      "hi": 0.011627906976744186,
+      "p_sign_flip": 0.1796875,
+      "p_holm": 0.8984375,
+      "questions": 86,
+      "fix_higher": 2,
+      "full_higher": 7
+     },
+     "holm_family_p": {
+      "orch_no_analyser": 0.6875,
+      "orch_no_planner": 0.21875,
+      "orch_no_supervisor": 0.25,
+      "orch_no_synthesiser": 0.375,
+      "orch_factual_to_documents": 0.1796875
+     }
+    }
+   },
+   "refusal": {
+    "full_orchestrator": {
+     "rate": 0.05128205128205128,
+     "lo": 0.0,
+     "hi": 0.1282051282051282,
+     "questions_with_share": 39,
+     "zero_bound": null,
+     "full_bound": null
+    },
+    "orch_no_analyser": {
+     "rate": 0.9487179487179487,
+     "lo": 0.8717948717948718,
+     "hi": 1.0,
+     "questions_with_share": 39,
+     "zero_bound": null,
+     "full_bound": null
+    },
+    "orch_factual_to_documents": {
+     "rate": 0.9743589743589743,
+     "lo": 0.9230769230769231,
+     "hi": 1.0,
+     "questions_with_share": 39,
+     "zero_bound": null,
+     "full_bound": null
+    }
+   },
+   "refusal_paired_test": "none: S472 computes no paired test of refusal on draw 1 (statistics(): rate and interval only), so none is computed here"
+  },
+  "1s": {
+   "pass": {
+    "4": {
+     "rate": {
+      "full_orchestrator": {
+       "rate": 0.7931034482758621,
+       "lo": 0.6551724137931034,
+       "hi": 0.9310344827586207,
+       "questions_with_share": 29
+      },
+      "orch_no_analyser": {
+       "rate": 0.7586206896551724,
+       "lo": 0.5862068965517241,
+       "hi": 0.896551724137931,
+       "questions_with_share": 29
+      },
+      "orch_factual_to_documents": {
+       "rate": 0.8275862068965517,
+       "lo": 0.6896551724137931,
+       "hi": 0.9655172413793104,
+       "questions_with_share": 29
+      }
+     },
+     "fix_minus_full": {
+      "d": 0.034482758620689655,
+      "lo": -0.13793103448275862,
+      "hi": 0.20689655172413793,
+      "p_sign_flip": 1.0,
+      "p_holm": 1.0,
+      "questions": 29,
+      "fix_higher": 4,
+      "full_higher": 3
+     },
+     "holm_family_p": {
+      "orch_no_analyser": 1.0,
+      "orch_no_planner": 0.7265625,
+      "orch_no_supervisor": 1.0,
+      "orch_no_synthesiser": 0.21875,
+      "orch_factual_to_documents": 1.0
+     }
+    },
+    "3": {
+     "rate": {
+      "full_orchestrator": {
+       "rate": 0.9655172413793104,
+       "lo": 0.896551724137931,
+       "hi": 1.0,
+       "questions_with_share": 29
+      },
+      "orch_no_analyser": {
+       "rate": 0.9310344827586207,
+       "lo": 0.8275862068965517,
+       "hi": 1.0,
+       "questions_with_share": 29
+      },
+      "orch_factual_to_documents": {
+       "rate": 0.9655172413793104,
+       "lo": 0.896551724137931,
+       "hi": 1.0,
+       "questions_with_share": 29
+      }
+     },
+     "fix_minus_full": {
+      "d": -0.0,
+      "lo": -0.10344827586206896,
+      "hi": 0.10344827586206896,
+      "p_sign_flip": 1.0,
+      "p_holm": 1.0,
+      "questions": 29,
+      "fix_higher": 1,
+      "full_higher": 1
+     },
+     "holm_family_p": {
+      "orch_no_analyser": 1.0,
+      "orch_no_planner": 0.5,
+      "orch_no_supervisor": 1.0,
+      "orch_no_synthesiser": 1.0,
+      "orch_factual_to_documents": 1.0
+     }
+    }
+   },
+   "refusal": {
+    "full_orchestrator": {
+     "rate": 0.07692307692307693,
+     "lo": 0.0,
+     "hi": 0.23076923076923078,
+     "questions_with_share": 13,
+     "zero_bound": null,
+     "full_bound": null
+    },
+    "orch_no_analyser": {
+     "rate": 1.0,
+     "lo": 1.0,
+     "hi": 1.0,
+     "questions_with_share": 13,
+     "zero_bound": null,
+     "full_bound": 0.7941833348134493
+    },
+    "orch_factual_to_documents": {
+     "rate": 0.9230769230769231,
+     "lo": 0.7692307692307693,
+     "hi": 1.0,
+     "questions_with_share": 13,
+     "zero_bound": null,
+     "full_bound": null
+    }
+   },
+   "refusal_paired_test": "none: S472 computes no paired test of refusal on draw 1 (statistics(): rate and interval only), so none is computed here"
+  },
+  "2": {
+   "pass": {
+    "4": {
+     "rate": {
+      "full_orchestrator": {
+       "rate": 0.6896551724137931,
+       "lo": 0.5172413793103449,
+       "hi": 0.8620689655172413,
+       "questions_with_share": 29
+      },
+      "orch_no_analyser": {
+       "rate": 0.7931034482758621,
+       "lo": 0.6551724137931034,
+       "hi": 0.9310344827586207,
+       "questions_with_share": 29
+      },
+      "orch_factual_to_documents": {
+       "rate": 0.8275862068965517,
+       "lo": 0.6896551724137931,
+       "hi": 0.9655172413793104,
+       "questions_with_share": 29
+      }
+     },
+     "fix_minus_full": {
+      "d": 0.13793103448275862,
+      "lo": -0.06896551724137931,
+      "hi": 0.3448275862068966,
+      "p_sign_flip": 0.34375,
+      "p_holm": 1.0,
+      "questions": 29,
+      "fix_higher": 7,
+      "full_higher": 3
+     },
+     "holm_family_p": {
+      "orch_no_analyser": 0.5078125,
+      "orch_no_planner": 0.0703125,
+      "orch_no_supervisor": 0.5078125,
+      "orch_no_synthesiser": 1.0,
+      "orch_factual_to_documents": 0.34375
+     }
+    },
+    "3": {
+     "rate": {
+      "full_orchestrator": {
+       "rate": 0.896551724137931,
+       "lo": 0.7931034482758621,
+       "hi": 1.0,
+       "questions_with_share": 29
+      },
+      "orch_no_analyser": {
+       "rate": 1.0,
+       "lo": 1.0,
+       "hi": 1.0,
+       "questions_with_share": 29
+      },
+      "orch_factual_to_documents": {
+       "rate": 1.0,
+       "lo": 1.0,
+       "hi": 1.0,
+       "questions_with_share": 29
+      }
+     },
+     "fix_minus_full": {
+      "d": 0.10344827586206896,
+      "lo": -0.0,
+      "hi": 0.20689655172413793,
+      "p_sign_flip": 0.25,
+      "p_holm": 1.0,
+      "questions": 29,
+      "fix_higher": 3,
+      "full_higher": 0
+     },
+     "holm_family_p": {
+      "orch_no_analyser": 0.25,
+      "orch_no_planner": 0.5,
+      "orch_no_supervisor": 1.0,
+      "orch_no_synthesiser": 1.0,
+      "orch_factual_to_documents": 0.25
+     }
+    }
+   },
+   "refusal": {
+    "full_orchestrator": {
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.0,
+     "questions_with_share": 13,
+     "zero_bound": 0.20581666518655073,
+     "full_bound": null
+    },
+    "orch_no_analyser": {
+     "rate": 0.9230769230769231,
+     "lo": 0.7692307692307693,
+     "hi": 1.0,
+     "questions_with_share": 13,
+     "zero_bound": null,
+     "full_bound": null
+    },
+    "orch_factual_to_documents": {
+     "rate": 1.0,
+     "lo": 1.0,
+     "hi": 1.0,
+     "questions_with_share": 13,
+     "zero_bound": null,
+     "full_bound": 0.7941833348134493
+    }
+   },
+   "refusal_paired_test": "none: S472 computes no paired test of refusal on draw 1 (statistics(): rate and interval only), so none is computed here"
+  },
+  "3": {
+   "pass": {
+    "4": {
+     "rate": {
+      "full_orchestrator": {
+       "rate": 0.896551724137931,
+       "lo": 0.7586206896551724,
+       "hi": 1.0,
+       "questions_with_share": 29
+      },
+      "orch_no_analyser": {
+       "rate": 0.8620689655172413,
+       "lo": 0.7241379310344828,
+       "hi": 0.9655172413793104,
+       "questions_with_share": 29
+      },
+      "orch_factual_to_documents": {
+       "rate": 0.8275862068965517,
+       "lo": 0.6896551724137931,
+       "hi": 0.9655172413793104,
+       "questions_with_share": 29
+      }
+     },
+     "fix_minus_full": {
+      "d": -0.06896551724137931,
+      "lo": -0.2413793103448276,
+      "hi": 0.10344827586206896,
+      "p_sign_flip": 0.6875,
+      "p_holm": 1.0,
+      "questions": 29,
+      "fix_higher": 2,
+      "full_higher": 4
+     },
+     "holm_family_p": {
+      "orch_no_analyser": 1.0,
+      "orch_no_planner": 0.21875,
+      "orch_no_supervisor": 0.375,
+      "orch_no_synthesiser": 0.5,
+      "orch_factual_to_documents": 0.6875
+     }
+    },
+    "3": {
+     "rate": {
+      "full_orchestrator": {
+       "rate": 0.9655172413793104,
+       "lo": 0.896551724137931,
+       "hi": 1.0,
+       "questions_with_share": 29
+      },
+      "orch_no_analyser": {
+       "rate": 0.9655172413793104,
+       "lo": 0.896551724137931,
+       "hi": 1.0,
+       "questions_with_share": 29
+      },
+      "orch_factual_to_documents": {
+       "rate": 0.9310344827586207,
+       "lo": 0.8275862068965517,
+       "hi": 1.0,
+       "questions_with_share": 29
+      }
+     },
+     "fix_minus_full": {
+      "d": -0.034482758620689655,
+      "lo": -0.13793103448275862,
+      "hi": 0.06896551724137931,
+      "p_sign_flip": 1.0,
+      "p_holm": 1.0,
+      "questions": 29,
+      "fix_higher": 1,
+      "full_higher": 2
+     },
+     "holm_family_p": {
+      "orch_no_analyser": 1.0,
+      "orch_no_planner": 1.0,
+      "orch_no_supervisor": 0.5,
+      "orch_no_synthesiser": 0.5,
+      "orch_factual_to_documents": 1.0
+     }
+    }
+   },
+   "refusal": {
+    "full_orchestrator": {
+     "rate": 0.07692307692307693,
+     "lo": 0.0,
+     "hi": 0.23076923076923078,
+     "questions_with_share": 13,
+     "zero_bound": null,
+     "full_bound": null
+    },
+    "orch_no_analyser": {
+     "rate": 0.9230769230769231,
+     "lo": 0.7692307692307693,
+     "hi": 1.0,
+     "questions_with_share": 13,
+     "zero_bound": null,
+     "full_bound": null
+    },
+    "orch_factual_to_documents": {
+     "rate": 0.9230769230769231,
+     "lo": 0.7692307692307693,
+     "hi": 1.0,
+     "questions_with_share": 13,
+     "zero_bound": null,
+     "full_bound": null
+    }
+   },
+   "refusal_paired_test": "none: S472 computes no paired test of refusal on draw 1 (statistics(): rate and interval only), so none is computed here"
+  },
+  "2+3": {
+   "pass": {
+    "4": {
+     "rate": {
+      "full_orchestrator": {
+       "rate": 0.7931034482758621,
+       "lo": 0.6724137931034483,
+       "hi": 0.896551724137931,
+       "questions_with_share": 29
+      },
+      "orch_no_analyser": {
+       "rate": 0.8275862068965517,
+       "lo": 0.7068965517241379,
+       "hi": 0.9310344827586207,
+       "questions_with_share": 29
+      },
+      "orch_factual_to_documents": {
+       "rate": 0.8275862068965517,
+       "lo": 0.7068965517241379,
+       "hi": 0.9310344827586207,
+       "questions_with_share": 29
+      }
+     },
+     "fix_minus_full": {
+      "d": 0.034482758620689655,
+      "lo": -0.06896551724137931,
+      "hi": 0.15517241379310345,
+      "p_sign_flip": 0.78125,
+      "p_holm": 1.0,
+      "questions": 29,
+      "fix_higher": 5,
+      "full_higher": 4
+     },
+     "holm_family_p": {
+      "orch_no_analyser": 0.80859375,
+      "orch_no_planner": 0.6875,
+      "orch_no_supervisor": 1.0,
+      "orch_no_synthesiser": 1.0,
+      "orch_factual_to_documents": 0.78125
+     }
+    },
+    "3": {
+     "rate": {
+      "full_orchestrator": {
+       "rate": 0.9310344827586207,
+       "lo": 0.8448275862068966,
+       "hi": 1.0,
+       "questions_with_share": 29
+      },
+      "orch_no_analyser": {
+       "rate": 0.9827586206896551,
+       "lo": 0.9482758620689655,
+       "hi": 1.0,
+       "questions_with_share": 29
+      },
+      "orch_factual_to_documents": {
+       "rate": 0.9655172413793104,
+       "lo": 0.9137931034482759,
+       "hi": 1.0,
+       "questions_with_share": 29
+      }
+     },
+     "fix_minus_full": {
+      "d": 0.034482758620689655,
+      "lo": -0.034482758620689655,
+      "hi": 0.1206896551724138,
+      "p_sign_flip": 0.75,
+      "p_holm": 1.0,
+      "questions": 29,
+      "fix_higher": 2,
+      "full_higher": 1
+     },
+     "holm_family_p": {
+      "orch_no_analyser": 0.5,
+      "orch_no_planner": 0.5,
+      "orch_no_supervisor": 0.6875,
+      "orch_no_synthesiser": 0.625,
+      "orch_factual_to_documents": 0.75
+     }
+    }
+   },
+   "refusal": {
+    "full_orchestrator": {
+     "rate": 0.038461538461538464,
+     "lo": 0.0,
+     "hi": 0.11538461538461539,
+     "questions_with_share": 13,
+     "zero_bound": null,
+     "full_bound": null
+    },
+    "orch_no_analyser": {
+     "rate": 0.9230769230769231,
+     "lo": 0.8076923076923077,
+     "hi": 1.0,
+     "questions_with_share": 13,
+     "zero_bound": null,
+     "full_bound": null
+    },
+    "orch_factual_to_documents": {
+     "rate": 0.9615384615384616,
+     "lo": 0.8846153846153846,
+     "hi": 1.0,
+     "questions_with_share": 13,
+     "zero_bound": null,
+     "full_bound": null
+    }
+   },
+   "refusal_paired_test": "none: S472 computes no paired test of refusal on draw 1 (statistics(): rate and interval only), so none is computed here"
+  }
+ }
+}

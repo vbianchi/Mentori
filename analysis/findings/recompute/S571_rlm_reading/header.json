@@ -1,0 +1,36 @@
+{
+ "script": "scripts/S571_rlm_reading.py",
+ "script_sha256": "bf4bfe597be481fa8dfa1416f2467a64ac6d8d1bb2693d6060526566e1cd68ee",
+ "at": "2026-11-05T03:02:51Z",
+ "git_head": "e05879198ff207740e784e490ad99e9a0848cbef",
+ "worktree_dirty": true,
+ "tracked_files_changed": 9,
+ "dependencies_changed_from_head": [],
+ "code_sha256": {
+  "scripts/S571_rlm_reading.py": "bf4bfe597be481fa8dfa1416f2467a64ac6d8d1bb2693d6060526566e1cd68ee",
+  "scripts/S571_rlm_reading_test.py": "738138c10f59d76135a720fa962311f79cbce55dfeb821fc9ffcae18dabcffb5",
+  "scripts/S463_fig2_ranking.py": "906affaedad63a6bf3ffb96e5363467ddde580b339ef9cb58a287b2ab74f00f8",
+  "scripts/S511_g2_matched_budget.py": "2d416dbeb6ebe5b982b96e741f3cc9e188ee3ac221eee6484ab1e737d6cde5e0",
+  "scripts/fig_repro.py": "4bca103b599da4adc0bd473f5b8210dd48b6543caaf63e5589f2faaa7b37d18b",
+  "experiments/runner/gemini_client.py": "7dd19b1a0f4505db4745f8bfcb2052e0bcb1283629cac45b47c428f3b2757c92"
+ },
+ "command": "uv run --frozen python scripts/S571_rlm_reading.py",
+ "inputs_sha256": {
+  "findings/recompute/frozen_inputs/extracted/k1_inputs_runs/k1_inputs_runs/exp_01__rlm_10__exp_v4_s20_n0/answers.jsonl": "7d5d2651b0111d96cc863af5a5e9349d07466d6028be2407c1644ef31e7ab90b",
+  "findings/recompute/frozen_inputs/extracted/fig2_g1r15_inputs/fig2_g1r15_inputs/runs/exp_01__rlm_10__exp_v4_s20_n0/answers.jsonl": "ecb6de5343d172894fd56d57997e3301d70ca3fb509ae2cd65f8e47eb8c268b7",
+  "findings/recompute/fig2_inputs/g1_collect.jsonl": "f5ff75bc244cda492a48e7e11f54f2007ed7d586a8f49e78921edd7244b28965",
+  "findings/recompute/g6_d135_inputs/b4_rlm_ref__cap10__all135/answers.jsonl": "e5fa8d97d40859dd60f36c385b7d4e04a05a8f212d2857e9e462b82147b12637",
+  "findings/recompute/fig3_s6_inputs/g6_collect.jsonl": "76fc44664cbbff00a4fec43e88ff989f819b9f6cb85a377603d5781c333d38d7",
+  "findings/recompute/fig3_s6_inputs/g6_collect.jsonl.json": "5ffd2e826721dfeb11bc137f742f0950014dbeecaf346ed94b453fecb09d1596",
+  "findings/recompute/fig3_s6_inputs/s6_g6_collect.jsonl": "3f5d8ca13ec730ccba40b1ef34be6b6390554b2eedaea6ff8e7969f0c599d5eb",
+  "findings/recompute/fig3_s6_inputs/s6_g6_collect.jsonl.json": "923dd77365c38578d1fb58ec8919f8b405dd5528eb6eaed96ec93a1ea4594acf",
+  "findings/recompute/fig3_s6_inputs/s6_g1_collect.jsonl": "2a79dc76e87e362513b414776c39873c068466195c23ce979a439afad46462d3",
+  "findings/recompute/fig3_s6_inputs/s6_g1_collect.jsonl.json": "fd0a3ed92f25521a98eb8b38503db67d9f5ec6f7d14b3f7e2cb00df1226d5340",
+  "findings/recompute/frozen_inputs/extracted/g6_calls_after_d135/g6_calls_after_d135/b4_rlm_ref__cap10__all135/calls.jsonl": "e90df8b1a4c134a875ec2e0b0afc5006936a4a2ecedc7ac6626cf3856c615d9a",
+  "findings/recompute/B4_rlm_ref_context.json": "479e3dea3da73b581c66dceb99ae129c8befe9ad893ab1cd47fbf07ab1352728",
+  "findings/recompute/S511_g2_budget/results.json": "e225903ba4409374263dfe33626f6bca5c35ac957f1666a14553de937808b3f3",
+  "~/l1_inputs/store/chroma.sqlite3 (S511.STORE_SHA, pinned in S511; S511.paper_map checks it before reading)": "332a587a932d62af5af59497b29dd990d127191b6fe8318b16615cd874937d4b",
+  "findings/figures_provisional/fig3_strategies/Source Data Fig. 3 (provisional, 14860 of 21402).xlsx": "cff063eff8b353ac8012ba0c60ca6fdb1efa01198be4431c55676b10d5ecb2de"
+ },
+ "python": "3.13.11"
+}

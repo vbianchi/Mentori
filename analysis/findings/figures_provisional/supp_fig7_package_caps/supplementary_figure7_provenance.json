@@ -1,0 +1,546 @@
+{
+ "script": "scripts/S459_fig3_rlm_ref_caps.py",
+ "script_sha256": "7d68dc5043a856ff89a31c30c20ea1c6f6bf1532a7494d316224c9c4588b4489",
+ "command": "uv run --frozen python scripts/S459_fig3_rlm_ref_caps.py",
+ "python": "3.13.11",
+ "deterministic": "D155: no build time and no repository HEAD are recorded; the script's and every input's sha256 identify the build; the design documents are read at e44e636a",
+ "inputs_sha256": {
+  "frozen:L2/g6/b4_rlm_ref__cap1__depthsweep86/answers.jsonl": "9ff176b3b488e37e121dfd2c4f732628cf205414986acca83af1a3a6b0e58e9e",
+  "frozen:L2/g6/b4_rlm_ref__cap2__depthsweep86/answers.jsonl": "2430fdf9a0c83a3287841d5d6fe286b1687121b87fdb12db7b6371b10be7e308",
+  "frozen:L2/g6/b4_rlm_ref__cap3__depthsweep86/answers.jsonl": "4e6d063b1a773396db10d7bbfbd645bd256dec33c62407a012b62b591fdd8ef1",
+  "frozen:L2/g6/b4_rlm_ref__cap5__all135/answers.jsonl": "f7effb589f8a85aba1d9969d8a4696723e2a941e4c334697366ffad768feac4b",
+  "frozen:L2/g6/b4_rlm_ref__cap7__depthsweep86/answers.jsonl": "842ac920a0f9377f0dc538772f532dc901da61ffd74d7d2ff71b464d749c9d59",
+  "frozen:L2/g6/b4_rlm_ref__cap10__all135/answers.jsonl": "9ae10c34487d289179bebdcbefb2c7ff6bbb45c896ff57090dcd1d375c229f13",
+  "frozen:L2/g6/b4_rlm_ref__cap15__depthsweep86/answers.jsonl": "968638245804c9e124a9f2460d1491d42e14d5a2542c463377f096048cb2751a",
+  "frozen:L2/g6/b4_rlm_ref__cap20__all135/answers.jsonl": "8bad956400ff99a261126a514c579ce1fb4f3961ae9552aa64b8d7bd88f9f330",
+  "frozen:L2/g6/b4_rlm_ref__cap30__depthsweep86/answers.jsonl": "c901e8fdcf812223551ea32e159b586a741117c701ede720c6c2084a81438414",
+  "frozen:L2/g6/b4_rlm_ref__cap50__depthsweep86/answers.jsonl": "62ea5d47d9910cbc83c26700adf1e734606328379de6b150664edb9a5e040791",
+  "frozen:g6_d135/b4_rlm_ref__cap1__depthsweep86/answers.jsonl": "20272179e0bb7c42e108311e21456d550de4454e8afa52ab3d6a73aace047b78",
+  "frozen:g6_d135/b4_rlm_ref__cap2__depthsweep86/answers.jsonl": "8aae869cb7898fc36ce170fb3f1b30ed4a9e1ab26abab6acf34e301c97f0847b",
+  "frozen:g6_d135/b4_rlm_ref__cap3__depthsweep86/answers.jsonl": "1af3a2cd44b6c75647685db3dcf52d619eeb38011f31578f45be1bb30e9e3178",
+  "frozen:g6_d135/b4_rlm_ref__cap5__all135/answers.jsonl": "cb021bcd239289477f39df4f72b5205ea3f401dcf6b4da43fd837fff4cd26ac9",
+  "frozen:g6_d135/b4_rlm_ref__cap7__depthsweep86/answers.jsonl": "eab3be0907813ed1379ab9733d1368c069579afe397d06bdc5dfa484d48121f0",
+  "frozen:g6_d135/b4_rlm_ref__cap10__all135/answers.jsonl": "e5fa8d97d40859dd60f36c385b7d4e04a05a8f212d2857e9e462b82147b12637",
+  "frozen:g6_d135/b4_rlm_ref__cap15__depthsweep86/answers.jsonl": "50ac72bef9259c56b07ad0fc2cfc729dd3b70d3f25143994072eeee6e49aff99",
+  "frozen:g6_d135/b4_rlm_ref__cap20__all135/answers.jsonl": "fb8d2bb814ab76857aeee2c1e57722277086c97727482e5d2b44f982e2d59bcf",
+  "frozen:g6_d135/b4_rlm_ref__cap30__depthsweep86/answers.jsonl": "d7ed2f6368b01379b946325c239640850b7d7b123cc09bd4ea5b3210916002d4",
+  "frozen:g6_d135/b4_rlm_ref__cap50__depthsweep86/answers.jsonl": "5acf8b51dc31ebe4f7a735f0bed6abf604545e1f265c6e6afa8ab94834c3fde4",
+  "frozen:g6_d135/SOURCE_MTIMES.json": "dcc4b5dd8d46fd8c5ccf797696d0b918cb289efce3bed22563cb8098475a829f",
+  "experiments/rlm_ref/run_rlm_ref.py": "327d18987c9faa092ce525a4f6b3c7d6c88dcaafe42b9ff8e7de74676fcbba48",
+  "findings/recompute/Q145/S455_d92_affected.json": "c8fce3c6241ecdd1f3e2276f1ad3f532c7a199c8626bcd5c72b312b492ab97a3",
+  "experiments/LOCK.toml": "8730d401a5d7b6baa1780e656f844261eaead60e45b5199afa29d57f989ad495",
+  "experiments/FIGURE_LOCK.toml": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "manuscript/sections/29_references.md": "adc0d95f0360f9aca3c1db8f5156e90dfb094572a027f1e0076481995a0cba79",
+  "experiments/rlm_ref/.venv/lib/python3.13/site-packages/rlms-0.1.3.dist-info/METADATA": "a25f6bb8c4c3de41b07b212ca0316201c8785197c5546fe8fe7009d134be0398",
+  "findings/recompute/frozen_inputs/g6_before_d89_mtimes.json": "46fdc919b3d1705a78b681e262d0e2ece737c6473e3370175f87bda1fcc7ef3d",
+  "experiments/plan.csv@e44e636a": "efa050f9e50868c07bef32ab8333ee11c0a13b8971a1922e07177434150d7a60",
+  "experiments/LIST.md@e44e636a": "7766a32c5b54e82f2ad4d7a08ce5d967a7c804dd12242d954d9a1cb9b5145d4d",
+  "experiments/README.md@e44e636a": "c3ff0755072b145c370e3a5fd5793603e291e422d6a6810183ab6a397dc64ae8"
+ },
+ "model_calls": 0,
+ "stamp": "PROVISIONAL: 2,580 of 2,580 answers, Zhang RLM at 10 turn caps (G6, records of 2026-10-25 00:46 CEST), no judge; after the D89 and D90 reruns (D135), the gates on the records before them",
+ "page_mm": [
+  183.0,
+  82.41222222222223
+ ],
+ "figure_lock": {
+  "path": "experiments/FIGURE_LOCK.toml",
+  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "status": "agreed"
+ },
+ "run_lock_now": {
+  "path": "experiments/LOCK.toml",
+  "sha256": "8730d401a5d7b6baa1780e656f844261eaead60e45b5199afa29d57f989ad495"
+ },
+ "record_lock_sha256": {
+  "8fa06e43ceb5e614d3e3347581029983f288bf92b7efa0660d84ac9bebf3ff8f": 1359,
+  "668832dcd2cd50d522fad075f756b46ba15a1751b283d7b700b7c348b2ae6b33": 515,
+  "d66daa28596bf3b70ff90e0fb89b1353eab023eba699427cb05ebb3376105c12": 34,
+  "1b89d50cb23e175ded367360b2f851fea45f0301145723c1b9786517f970a9ca": 672
+ },
+ "record_versions": {
+  "adapter": {
+   "413f46c9": {
+    "commit": "fbbcfb3",
+    "records": 1187,
+    "commit_subject": "D78 Q114 and Q116: a cut root or closing reply of the authors' RLM passes what google-genai 2.30.1's response.text would ('' with a text part, None with none; a"
+   },
+   "7f4fa711": {
+    "commit": "1cc5909",
+    "records": 34,
+    "commit_subject": "D92 builds, Mentori/Gemini and operations lanes: Q184 str(content), Q185 None root reply, Q187 stored closing replies kept, Q188 other finish reasons, Q199 reco"
+   },
+   "b6c8a3f4": {
+    "commit": "a3f0cf1",
+    "records": 595,
+    "commit_subject": "D75 round 3, code: code generation (Q56-Q64: Python-tagged and top-of-reply fences open code, length replies run nothing, a single stated pick number counts, un"
+   },
+   "f8676d5f": {
+    "commit": "3d98613",
+    "records": 764,
+    "commit_subject": "B4: answer records flag a forced final that holds a repl block (forced_final_has_code, the package's own parser); kept as the package returned it (R2, Valerio 1"
+   }
+  },
+  "lock": {
+   "1b89d50c": {
+    "commit": "6457ae6",
+    "records": 672,
+    "commit_subject": "D81 Q136 in the lock: [generation] retry_seed = \"seed + 1000000 * retry\" (Ollama generator retries only); added between depth caps (cap 3 of draws 2-3 ended 23:"
+   },
+   "668832dc": {
+    "commit": "7f5769b",
+    "records": 515,
+    "commit_subject": "D7: olmo-3.1:32b-think in the lock (AllenAI card temperature 0.6, top_p 0.95; num_ctx 65536 as an exact exceptions key; digest 223d4ec84d91 on the Beelink); com"
+   },
+   "8fa06e43": {
+    "commit": "50af756",
+    "records": 1359,
+    "commit_subject": "README: D69 (round 2: Q27 cache off, Q35 code-fence rule, Q37 encoders on cpu, Q38 a refusal in a tool fails the question, Q39 a failed call in a tool keeps Men"
+   },
+   "d66daa28": {
+    "commit": "4fd5b72",
+    "records": 34,
+    "commit_subject": "D85: qwen3.8:27b GGUF (aaee06c39dcf, Beelink) as [judge] second_model; lock sha256 d66daa28 (was 1b89d50c). No [date] or [exceptions] row needed (Ollama v0.40.2"
+   }
+  },
+  "lock_tables_that_differ": [
+   "exceptions.olmo-3.1:32b-think.num_ctx",
+   "generation.retry_seed",
+   "judge.not_sent",
+   "judge.second_model",
+   "models.olmo-3.1:32b-think.digest",
+   "models.olmo-3.1:32b-think.machines",
+   "models.qwen3.8:27b.digest",
+   "models.qwen3.8:27b.machines",
+   "sampling.models.olmo-3.1:32b-think"
+  ],
+  "lock_gemini_tables_equal": true,
+  "answers_with_a_root_or_closing_call_cut_at_the_output_limit_by_adapter": {
+   "b6c8a3f4": 4,
+   "413f46c9": 5
+  },
+  "answers_stored_as_the_text_None": 0
+ },
+ "record_adapter_sha256_by_cap_and_draw": {
+  "cap 1 d1": {
+   "b6c8a3f4": 86
+  },
+  "cap 1 d2": {
+   "413f46c9": 86
+  },
+  "cap 1 d3": {
+   "413f46c9": 86
+  },
+  "cap 2 d1": {
+   "b6c8a3f4": 85,
+   "7f4fa711": 1
+  },
+  "cap 2 d2": {
+   "413f46c9": 86
+  },
+  "cap 2 d3": {
+   "413f46c9": 85,
+   "7f4fa711": 1
+  },
+  "cap 3 d1": {
+   "b6c8a3f4": 85,
+   "7f4fa711": 1
+  },
+  "cap 3 d2": {
+   "413f46c9": 86
+  },
+  "cap 3 d3": {
+   "413f46c9": 86
+  },
+  "cap 5 d1": {
+   "f8676d5f": 86
+  },
+  "cap 5 d2": {
+   "f8676d5f": 86
+  },
+  "cap 5 d3": {
+   "f8676d5f": 84,
+   "7f4fa711": 2
+  },
+  "cap 7 d1": {
+   "b6c8a3f4": 86
+  },
+  "cap 7 d2": {
+   "413f46c9": 86
+  },
+  "cap 7 d3": {
+   "413f46c9": 85,
+   "7f4fa711": 1
+  },
+  "cap 10 d1": {
+   "f8676d5f": 85,
+   "b6c8a3f4": 1
+  },
+  "cap 10 d2": {
+   "f8676d5f": 84,
+   "b6c8a3f4": 1,
+   "7f4fa711": 1
+  },
+  "cap 10 d3": {
+   "f8676d5f": 86
+  },
+  "cap 15 d1": {
+   "b6c8a3f4": 86
+  },
+  "cap 15 d2": {
+   "413f46c9": 84,
+   "7f4fa711": 2
+  },
+  "cap 15 d3": {
+   "413f46c9": 84,
+   "7f4fa711": 2
+  },
+  "cap 20 d1": {
+   "f8676d5f": 86
+  },
+  "cap 20 d2": {
+   "f8676d5f": 84,
+   "b6c8a3f4": 1,
+   "7f4fa711": 1
+  },
+  "cap 20 d3": {
+   "f8676d5f": 83,
+   "7f4fa711": 3
+  },
+  "cap 30 d1": {
+   "b6c8a3f4": 80,
+   "7f4fa711": 6
+  },
+  "cap 30 d2": {
+   "413f46c9": 83,
+   "7f4fa711": 3
+  },
+  "cap 30 d3": {
+   "413f46c9": 82,
+   "7f4fa711": 4
+  },
+  "cap 50 d1": {
+   "b6c8a3f4": 84,
+   "7f4fa711": 2
+  },
+  "cap 50 d2": {
+   "413f46c9": 82,
+   "7f4fa711": 4
+  },
+  "cap 50 d3": {
+   "413f46c9": 86
+  }
+ },
+ "adapter_cited": "line citations in S459 are to `git show fbbcfb3:experiments/rlm_ref/adapter.py`",
+ "design_lines": {
+  "d31": "experiments/LIST.md:45",
+  "fig3_q19": "experiments/LIST.md:98",
+  "list_q116": "experiments/LIST.md:462",
+  "readme_q116": "experiments/README.md:214",
+  "readme_q50": "experiments/README.md:179",
+  "fig2_caps": "experiments/rlm_ref/run_rlm_ref.py:78",
+  "d123": "experiments/README.md:712"
+ },
+ "package": {
+  "version": "0.1.3",
+  "author": "Alex Zhang",
+  "url": "https://arxiv.org/abs/2512.24601",
+  "reference": 21,
+  "reference_revised": 27,
+  "metadata": "experiments/rlm_ref/.venv/lib/python3.13/site-packages/rlms-0.1.3.dist-info/METADATA",
+  "reference_line": "manuscript/sections/29_references.md:74"
+ },
+ "figure": "Supplementary Figure 7",
+ "named": "Supplementary Figure 7: FIGURE_LOCK [files] supplementary_name (D92 Q194); D123 moved the plate from Figure 3",
+ "reproduced": {
+  "plan_csv_G6": {
+   "cap 1": {
+    "stated": [
+     16,
+     20,
+     26
+    ],
+    "records": [
+     16,
+     20,
+     26
+    ]
+   },
+   "cap 2": {
+    "stated": [
+     5,
+     3,
+     3
+    ],
+    "records": [
+     5,
+     3,
+     3
+    ]
+   },
+   "cap 3": {
+    "stated": [
+     1,
+     1,
+     1
+    ],
+    "records": [
+     1,
+     1,
+     1
+    ]
+   },
+   "cap 7": {
+    "stated": [
+     2,
+     0,
+     0
+    ],
+    "records": [
+     2,
+     0,
+     0
+    ]
+   },
+   "cap 15": {
+    "stated": [
+     1,
+     2,
+     3
+    ],
+    "records": [
+     1,
+     2,
+     3
+    ]
+   },
+   "cap 30": {
+    "stated": [
+     7,
+     4,
+     4
+    ],
+    "records": [
+     7,
+     4,
+     4
+    ]
+   },
+   "cap 50": {
+    "stated": [
+     4,
+     5,
+     1
+    ],
+    "records": [
+     4,
+     5,
+     1
+    ]
+   }
+  },
+  "plan_csv_G6_all135": {
+   "stated (answer_ready, turn_cap, failed)": [
+    1187,
+    10,
+    18
+   ],
+   "records": [
+    1187,
+    10,
+    18
+   ]
+  },
+  "S455_inputs": {
+   "findings/runs/b4_rlm_ref__cap1__depthsweep86/answers.jsonl": {
+    "S455": "9ff176b3b488e37e",
+    "now": "9ff176b3b488e37e"
+   },
+   "findings/runs/b4_rlm_ref__cap2__depthsweep86/answers.jsonl": {
+    "S455": "2430fdf9a0c83a32",
+    "now": "2430fdf9a0c83a32"
+   },
+   "findings/runs/b4_rlm_ref__cap3__depthsweep86/answers.jsonl": {
+    "S455": "4e6d063b1a773396",
+    "now": "4e6d063b1a773396"
+   },
+   "findings/runs/b4_rlm_ref__cap5__all135/answers.jsonl": {
+    "S455": "f7effb589f8a85ab",
+    "now": "f7effb589f8a85ab"
+   },
+   "findings/runs/b4_rlm_ref__cap7__depthsweep86/answers.jsonl": {
+    "S455": "842ac920a0f9377f",
+    "now": "842ac920a0f9377f"
+   },
+   "findings/runs/b4_rlm_ref__cap10__all135/answers.jsonl": {
+    "S455": "9ae10c34487d2891",
+    "now": "9ae10c34487d2891"
+   },
+   "findings/runs/b4_rlm_ref__cap15__depthsweep86/answers.jsonl": {
+    "S455": "968638245804c9e1",
+    "now": "968638245804c9e1"
+   },
+   "findings/runs/b4_rlm_ref__cap20__all135/answers.jsonl": {
+    "S455": "8bad956400ff99a2",
+    "now": "8bad956400ff99a2"
+   },
+   "findings/runs/b4_rlm_ref__cap30__depthsweep86/answers.jsonl": {
+    "S455": "c901e8fdcf812223",
+    "now": "c901e8fdcf812223"
+   },
+   "findings/runs/b4_rlm_ref__cap50__depthsweep86/answers.jsonl": {
+    "S455": "62ea5d47d9910cbc",
+    "now": "62ea5d47d9910cbc"
+   }
+  }
+ },
+ "planned_answers": {
+  "rule": "the authors' depth caps, three draws (D78 Q116; D98 keeps Figure 2's experiments' three full draws)",
+  "questions": 86,
+  "caps": 10,
+  "draws": 3,
+  "N": 2580,
+  "drawn": 2580
+ },
+ "d92_actions": {
+  "check_actions": "pass",
+  "rerun": 34,
+  "rebuild": 72,
+  "stays_failed": 15
+ },
+ "readings": {
+  "gated": "findings/recompute/L2_inputs/g6 (G6 before the D135 reruns): plan.csv G6's counts, S455's inputs, check_actions, the legend header's D92 paragraphs and sheet a's _before_reruns columns (D161 (2))",
+  "drawn": "findings/recompute/g6_d135_inputs (G6 after the D135 reruns, D160 Q23): every panel, sheet b and sheet a's _after_reruns columns",
+  "fail_status_by_cap_gated": {
+   "1": {
+    "malformed_response": 61,
+    "malformed_function_call": 1
+   },
+   "2": {
+    "malformed_response": 10,
+    "recitation": 1
+   },
+   "3": {
+    "malformed_function_call": 1,
+    "error, stream ended without a finishReason": 1,
+    "malformed_response": 1
+   },
+   "5": {
+    "error, stream ended without a finishReason": 1,
+    "malformed_function_call": 1
+   },
+   "7": {
+    "error, stream ended without a finishReason": 2
+   },
+   "10": {
+    "malformed_response": 1,
+    "error, stream ended without a finishReason": 2
+   },
+   "15": {
+    "error, other": 1,
+    "recitation": 1,
+    "error, stream ended without a finishReason": 2,
+    "malformed_response": 2
+   },
+   "20": {
+    "error, stream ended without a finishReason": 1,
+    "malformed_response": 2
+   },
+   "30": {
+    "malformed_response": 12,
+    "malformed_function_call": 1,
+    "error, stream ended without a finishReason": 2
+   },
+   "50": {
+    "error, stream ended without a finishReason": 4,
+    "malformed_response": 6
+   }
+  }
+ },
+ "drawn_check": "check_drawn(): 47 drawn values equal their data workbook",
+ "fail_status_by_cap": {
+  "1": {},
+  "2": {},
+  "3": {
+   "error, stream ended without a finishReason": 1
+  },
+  "5": {
+   "error, stream ended without a finishReason": 1
+  },
+  "7": {
+   "error, stream ended without a finishReason": 2
+  },
+  "10": {
+   "error, stream ended without a finishReason": 2
+  },
+  "15": {
+   "error, other": 1,
+   "error, stream ended without a finishReason": 2,
+   "the package's TypeError": 1
+  },
+  "20": {
+   "error, stream ended without a finishReason": 1,
+   "the package's TypeError": 1
+  },
+  "30": {
+   "error, stream ended without a finishReason": 2
+  },
+  "50": {
+   "error, stream ended without a finishReason": 4
+  }
+ },
+ "design": {
+  "questions": 86,
+  "caps": [
+   1,
+   2,
+   3,
+   5,
+   7,
+   10,
+   15,
+   20,
+   30,
+   50
+  ],
+  "caps from all135 runs": [
+   5,
+   10,
+   20
+  ],
+  "draws": [
+   1,
+   2,
+   3
+  ]
+ },
+ "panels": {
+  "a": "share of the answers at each cap by stop_reason (turn_cap split by forced_final_has_code; an answer of status ok with no text its own slice; the package's own TypeError, package_error(), its own slice, D161 (1)), n printed per row",
+  "b": "root turns used per answered answer (no-text answers included), box (quartiles, median, range), cap marked by a triangle above the box, n printed per row, log axis",
+  "dropped": "tokens per answer (D217), wall_s per answer (D224 Q5)"
+ },
+ "type_pt": {
+  "panel letters": 8.0,
+  "all other text": 8.0
+ },
+ "font": "Helvetica",
+ "colours_panel_a": {
+  "answer_ready": "#0072B2",
+  "turn_cap_answer": "#56B4E9",
+  "turn_cap_code": "#CC79A7",
+  "no_text": "#F0E442",
+  "forced_final_failed": "#E69F00",
+  "root_call_failed": "#D55E00",
+  "package_error": "#000000"
+ },
+ "box_fill": "#56B4E9",
+ "files": {
+  "Supplementary Figure 7 (provisional, 2580 of 2580).pdf": "c8bac3c5cdbba939b208df3a1412e53bddbd0d7a5482d8dc57a8e34e4b0c9371",
+  "Supplementary Figure 7 (provisional, 2580 of 2580).svg": "a8760a0cbdd365f5145836c9eed11045329794500e6a59b395497823938fe027",
+  "Supplementary Figure 7 (provisional, 2580 of 2580).png": "30dce9391afce3e5cd667649cada6b63f8cbb9b855ed1c2d563351d040695bce",
+  "Supplementary Figure 7 data (provisional, 2580 of 2580).xlsx": "96f9b9e3dbb927d967d6e1b853d41f24ec0de1e5f6b7ed31c1734aad810fada5",
+  "Supplementary Figure 7 data caption (provisional, 2580 of 2580).md": "9d08cd7df77f2d7aefc4affa7e0dc745674a0331c849cbe9959e5542e30f64de",
+  "supplementary_figure7_numbers.json": "2c6d46a4bf0cdaf2e907d4943869575bea6ab401a46bc660838314ee746e67fa",
+  "legend_draft.md": "1acab830a5ad2275af27607751e9caf604656122140fa84047632cd3e735c14a"
+ }
+}

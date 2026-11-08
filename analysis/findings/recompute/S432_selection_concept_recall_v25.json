@@ -1,0 +1,2820 @@
+{
+ "provenance": {
+  "script": "scripts/S432_selection_concept_recall_v24.py",
+  "script_sha256": "3e76906959d9c363c136b4d173c1fb1f8316b10956b30c31524aa8064a73c98d",
+  "command": "uv run python scripts/S432_selection_concept_recall_v24.py --v25",
+  "written_utc": "2026-11-06T09:47:14Z",
+  "python": "3.13.11",
+  "key": {
+   "file": "data/ground_truth_v2/all_v2_4.json",
+   "sha256": "5d8362ae931dc0fe0cc132be6b5e57187e3ae7d3131d86f63cdf1a44633fadd5",
+   "v1_format_file": "data/ground_truth_v2/ground_truth_v2_4_as_v1.json",
+   "v1_format_sha256": "e971de522df6fab54a070e44736b6cb28a5ebd26bab07ca9e1513230bb86f4ef"
+  },
+  "inputs_sha256": {
+   "data/ground_truth_v2/all_v2_4.json": "5d8362ae931dc0fe0cc132be6b5e57187e3ae7d3131d86f63cdf1a44633fadd5",
+   "data/ground_truth_v2/ground_truth_v2_4_as_v1.json": "e971de522df6fab54a070e44736b6cb28a5ebd26bab07ca9e1513230bb86f4ef",
+   "data/ground_truth_v2/ground_truth_v2_5_as_v1.json": "a42161841980792f5da521819c97b16dc54999b45838b8eb87cd4315f798270a",
+   "data/replication_inputs/ground_truth.json": "37d731f9f152901e954ff9d8663797dc9260f7f390cc4e1dbc4a9c484b2c3201",
+   "data/upstream/MANIFEST.sha256": "744d145b3ff9bdd6515f8804e696a94a74d347650674c0fac7acb59539cd7403",
+   "deposit/publication/results/exp00_objective_latest.json": "447c9328d35a9e7d669ed7bdf7e0a559a4d028d8bdbdc6bcadb4601786f56dd8",
+   "deposit/publication/results/exp00_phase2_latest.json": "d9642119da004af902327cc534bc25738aea562da10cb79bf62668d6eee64d77",
+   "deposit/publication/scripts/exp_00_objective_metrics.py": "832f90d004c2b793db47c9605a7fee036eec1e30342d719bd4d7e21d237561ac",
+   "deposit/publication/scripts/exp_06_depth_sweep.py": "081bdccfb776fb4dfbccf8d8df452908ce1f9410d2e1fb96f865d0099d78bbe8",
+   "findings/recompute/S323_docx_numbers.json": "0dc0bd04e29f8ede24129c44b02762ce76cdec6a63bc7093f47798eb904bd4d2",
+   "findings/recompute/S376_calibration_analysis.json": "2d9cf79219d874579e3f9c2c18f65dadfb3ac9861ff0c065f5cd2eaafda01837",
+   "recovered_harness/tests/experiments_v4/exp_v4_0_objective_metrics.py": "42d49ba4e819de846395ed666ca7773e72dbf0629bb202a8a141c1bc63277a0c"
+  },
+  "merged_ledgers": {
+   "listed_in": "findings/recompute/S388_rejudge_v22.json",
+   "sha256": {}
+  },
+  "imported_modules_sha256": {
+   "scripts/S141_campaign.py": "9a11d1f4868f6448056aef8bd8390f38eb167c6c3484aa8ce25cebad657053da",
+   "scripts/S141_runner/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "scripts/S141_runner/judge.py": "f89c2071764b5e10504ff969ede96228f6bd970a9e1557caaf9ee2715cf56ebe",
+   "scripts/S141_runner/providers.py": "bf554a6d968bad311ce1eae72b48e8116c5b8ca81cea3c05636f994ee01169cd",
+   "scripts/S141_runner/scorers.py": "1f9c1da9270c0271c5d7d3069a2f72466f49a808c5a274e09b1afac21f1d65ea",
+   "scripts/S141_runner/store.py": "44cef804d106cc9e5b4fd111a15931a7359b7180134ffdf035c98d70cb7c95cf",
+   "scripts/S21_full_answer_rejudge.py": "d496a10ffa3f96c3d9a838d7ebacaf91b516c1a9919951149080b16808ab0e48",
+   "scripts/S373_rejudge_v2.py": "0c74eebfedac5f42f079d6ee58e019f5c40ec6eac6471a0e38325adea5c4f677",
+   "scripts/S376b_calibration_analysis.py": "e3878dac59c69b899ae3d1f4415cc3070620b735a49938505c3204a772d768eb",
+   "scripts/S383_depth_concept_recall_v22.py": "cdc8c729f4efb7ec2f2797df2e52c7fb5994ef342cfa81de71a3cb6e63cd0752",
+   "scripts/S388_merge_rejudge_v22.py": "b12b2a2a133c2487dc26d7369a2e29b0ccb8e64baea78b6e37cb5923ba0023e9",
+   "scripts/S505_question_aware_matcher.py": "179a80fbde63790294f2a35e7b637c1601d7583a6873c4d33171c3493eb86d2f",
+   "scripts/bootstrap_upstream.py": "3e795b9d5dd8e84c8f960f238b522adcba3a115cee8d262bb276d133135da01d",
+   "scripts/concept_match_loose.py": "85bf57a09929dfb88c9bf221cd2a969b0cd78c22c97b77c129ce74a278934609",
+   "scripts/concept_match_stem.py": "121719a4fb5841af985a16d56990039cdc64a4dd29da9643a376f674d8e64bc6",
+   "scripts/d181_concept_recall.py": "f297bb619f9e125a587b8f834a97af293f437ec1545466147d491d6a1a0ac039",
+   "scripts/doc_paths.py": "2785b9740268267417d45a9dfb720085958fa7497857c1af8affcce223113e14",
+   "scripts/judged_ledger.py": "73b07688188ecb86e210d767e806e3e149cc17b5b4947eed517964ec557fa0f9",
+   "scripts/key_scope.py": "ba454a708b1b8952deda4203c76666fb4853423c66ea5128b55cb835a5954f6c",
+   "scripts/machine.py": "54cf5ed337e4162e255ebd8b923005fc5892c3f808c401086f12e843478bfe6c",
+   "scripts/phase3_common.py": "96d9b49dd05d1465e4c809efb7864e3281aea5ecdd3ff652f1ffdd72edf14d0d",
+   "scripts/s323/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "scripts/s323/r03a_methods.py": "2cb734fcd30336d485080ba0d566f8111f02c22001263f91879226710d8a4723",
+   "scripts/s323/registry.py": "9c292f9665108b50f28de5ff1357e72ea58ed0ed991173807d63d835ff137d9f",
+   "scripts/s374/rows.py": "8b62e098ebc5b765a892b3e9f2aa09efbc816c84f5731f96b94f3cef77cb9fbc",
+   "scripts/turn_limit_note.py": "34fcfb8a71b478b0fc61d66bdf34aa590e19d87f235c969f239be17ea429c3da"
+  },
+  "gates": [
+   {
+    "name": "G0a",
+    "ok": true,
+    "message": "the sha256 of 4 deposit files (exp00_phase2_latest.json, exp00_objective_latest.json, exp_00_objective_metrics.py, exp_06_depth_sweep.py) is the one data/upstream/MANIFEST.sha256 lists: 4 of 4"
+   },
+   {
+    "name": "G0b",
+    "ok": true,
+    "message": "the v1 key data/replication_inputs/ground_truth.json (sha256 37d731f9f152) is the source the v1-format key names: True; the two v2.4 key files (sha256 e971de522df6 and 5d8362ae931d) are the ones the loader's checked context holds: True and True"
+   },
+   {
+    "name": "G0c",
+    "ok": true,
+    "message": "the text of compute_concept_recall in recovered_harness/tests/experiments_v4/exp_v4_0_objective_metrics.py (sha256 66f2c6cbe94e) and in deposit/publication/scripts/exp_00_objective_metrics.py (sha256 66f2c6cbe94e) is the same: True"
+   },
+   {
+    "name": "G1",
+    "ok": true,
+    "message": "8 models by 15 questions, 120 rows, 107 completed answers and 13 failed generations; one row per model and question: True; the models are the header's model_ids: True; the questions are the header's question_ids: True; n_models and n_questions are their numbers: True; the counts are KNOWN_DESIGN: True; one model is gemini::gemini-3-flash-preview and the others start with ollama::: True; the objective file holds the same pairs in the same order: True; and the same completed flags: True; the completed answers are the keys of S376's reference_measures, each with its model as generator: True"
+   },
+   {
+    "name": "G2a",
+    "ok": true,
+    "message": "the registry's two derivations (scripts/s323/r03a_methods.py, called through its entries) give 0.6941266666666667 and 14.380666666666663; findings/recompute/S323_docx_numbers.json records 0.694127 and 14.380667 with the verdicts OK and OK; rounded half up the two derived values print as 0.69 and 14.4, and the Methods print 0.69 and 14.4"
+   },
+   {
+    "name": "G2b",
+    "ok": true,
+    "message": "this script's summary of the stored values against the registry's: the mean of every model: True; the mean of gemini-3-flash: True; the difference: True; the values typed in KNOWN_V1: True (gemini-3-flash 0.6941, largest local mean 0.5503 of ollama::qwen3-coder-next:q4_K_M, difference 14.38 points)"
+   },
+   {
+    "name": "G3",
+    "ok": true,
+    "message": "120 of 120 stored concept recalls of deposit/publication/results/exp00_objective_latest.json reproduced from the phase 2 answers with the deposited scorer on the v1 key at four decimals, a failed generation as 0.0"
+   },
+   {
+    "name": "G4a",
+    "ok": true,
+    "message": "of the 15 questions, 0 are among the 6 D7 questions of the key file and 15 are of the group answerable"
+   },
+   {
+    "name": "G4b",
+    "ok": true,
+    "message": "the expected_concepts of data/ground_truth_v2/ground_truth_v2_4_as_v1.json are the key_concepts phrases of data/ground_truth_v2/all_v2_4.json for 15 of the 15 questions"
+   },
+   {
+    "name": "G5a",
+    "ok": true,
+    "message": "concept_match_loose.spec_failures() returns 0 failures over its 25 rule cases and its stop-word checks"
+   },
+   {
+    "name": "G5b",
+    "ok": true,
+    "message": "on the 107 completed answers: the concepts the loose matcher marks found by its rule 1 give the depth sweep's function on 107; the single-concept decisions of the deposited scorer give its value on the whole list on 107; the detail of the loose matcher gives its value on 107; the loose value is not below the substring value on 107"
+   },
+   {
+    "name": "G6",
+    "ok": true,
+    "message": "the deposited scorer on the v1-format key's concepts equals the concept_recall of findings/recompute/S376_calibration_analysis.json on 107 of 107 completed answers (largest difference 0.0e+00)"
+   },
+   {
+    "name": "G7",
+    "ok": true,
+    "message": "d181_concept_recall.spec_failures() returns 0 failures"
+   },
+   {
+    "name": "G8",
+    "ok": true,
+    "message": "score() with an empty question on the v2.4 concepts gives this run's loose value on 107 of 107 completed answers"
+   },
+   {
+    "name": "G9",
+    "ok": true,
+    "message": "107 of 107 completed answers have at least one counted concept on v2.5"
+   }
+  ],
+  "scorers": {
+   "exact_deposited": {
+    "function": "compute_concept_recall",
+    "executed_from": "recovered_harness/tests/experiments_v4/exp_v4_0_objective_metrics.py",
+    "lifted_by": "S376b_calibration_analysis.lift",
+    "function_text_sha256": "66f2c6cbe94eccf2f7fb75c3226160de71afd1725d78d5046721c5062d6695f4",
+    "deposit_copy": "deposit/publication/scripts/exp_00_objective_metrics.py",
+    "deposit_copy_function_text_sha256": "66f2c6cbe94eccf2f7fb75c3226160de71afd1725d78d5046721c5062d6695f4"
+   },
+   "exact_substring": {
+    "function": "compute_concept_recall",
+    "executed_from": "deposit/publication/scripts/exp_06_depth_sweep.py",
+    "lifted_by": "S383_depth_concept_recall_v22.load_concept_recall",
+    "text_sha256_as_S383_returns_it": "0138ad98d991d4a46ec60c5eb450c492fd6be439ddd222696c89dd18952558da"
+   },
+   "loose": {
+    "function": "concept_recall_loose",
+    "module": "scripts/concept_match_loose.py"
+   }
+  },
+  "d181_code_sha256": {
+   "scripts/d181_concept_recall.py": "f297bb619f9e125a587b8f834a97af293f437ec1545466147d491d6a1a0ac039",
+   "scripts/S505_question_aware_matcher.py": "179a80fbde63790294f2a35e7b637c1601d7583a6873c4d33171c3493eb86d2f",
+   "scripts/concept_match_stem.py": "121719a4fb5841af985a16d56990039cdc64a4dd29da9643a376f674d8e64bc6",
+   "scripts/concept_match_loose.py": "85bf57a09929dfb88c9bf221cd2a969b0cd78c22c97b77c129ce74a278934609",
+   "scripts/turn_limit_note.py": "34fcfb8a71b478b0fc61d66bdf34aa590e19d87f235c969f239be17ea429c3da"
+  }
+ },
+ "ruling": "rulings page 6 Nov, GM2: O1 (run S432 on key v2.5)",
+ "reading": "D181: S505's loose matcher with the question rule, Q-need, reading (b) (scripts/S505_question_aware_matcher.py recall_q(text, concepts, question, 'loose', 'need', 'b')): content words of a concept that also occur in its question do not count, the loose need rule applies to the words left, a concept made only of question words leaves the denominator; key v2.5",
+ "headline": "d181",
+ "key": {
+  "path": "data/ground_truth_v2/ground_truth_v2_5_as_v1.json",
+  "sha256": "a42161841980792f5da521819c97b16dc54999b45838b8eb87cd4315f798270a",
+  "version": "2.5",
+  "v24_checked_against": "data/ground_truth_v2/ground_truth_v2_4_as_v1.json",
+  "v24_sha256": "e971de522df6fab54a070e44736b6cb28a5ebd26bab07ca9e1513230bb86f4ef"
+ },
+ "definitions": {
+  "value": "D181's concept_recall of a completed answer on its v2.5 concepts and question (found / counted, four decimals); 0 for a failed generation (D16)",
+  "loose_base": "concept_recall_loose on the v2.5 concepts, no question rule",
+  "exact_substring_base": "the substring test on the v2.5 concepts",
+  "summary": "as in the v2.4 file: means over each model's 15 questions, failed as 0; gemini_above_every_other_model compares exact fractions"
+ },
+ "counts": {
+  "rows": 120,
+  "completed": 107,
+  "failed": 13,
+  "concepts_v25": 88,
+  "concepts_per_question_v25_min": 1,
+  "concepts_per_question_v25_max": 9,
+  "questions_with_other_concepts_than_v24": 10,
+  "counted_per_answer_min": 1,
+  "counted_per_answer_max": 9
+ },
+ "v25": {
+  "d181": {
+   "per_model": {
+    "gemini::gemini-3-flash-preview": {
+     "n_questions": 15,
+     "n_completed": 15,
+     "mean_failed_as_0": 0.7875666666666666,
+     "mean_completed_only": 0.7875666666666666
+    },
+    "ollama::deepseek-r1:70b": {
+     "n_questions": 15,
+     "n_completed": 8,
+     "mean_failed_as_0": 0.225,
+     "mean_completed_only": 0.421875
+    },
+    "ollama::devstral-small-2:24b": {
+     "n_questions": 15,
+     "n_completed": 14,
+     "mean_failed_as_0": 0.44404666666666665,
+     "mean_completed_only": 0.4757642857142857
+    },
+    "ollama::gemma3:27b": {
+     "n_questions": 15,
+     "n_completed": 15,
+     "mean_failed_as_0": 0.60768,
+     "mean_completed_only": 0.60768
+    },
+    "ollama::gpt-oss:120b": {
+     "n_questions": 15,
+     "n_completed": 15,
+     "mean_failed_as_0": 0.4666666666666667,
+     "mean_completed_only": 0.4666666666666667
+    },
+    "ollama::nemotron-3-nano:30b": {
+     "n_questions": 15,
+     "n_completed": 12,
+     "mean_failed_as_0": 0.39153333333333334,
+     "mean_completed_only": 0.48941666666666667
+    },
+    "ollama::qwen3-coder-next:q4_K_M": {
+     "n_questions": 15,
+     "n_completed": 15,
+     "mean_failed_as_0": 0.4792266666666667,
+     "mean_completed_only": 0.4792266666666667
+    },
+    "ollama::qwen3-coder:latest": {
+     "n_questions": 15,
+     "n_completed": 13,
+     "mean_failed_as_0": 0.44378666666666666,
+     "mean_completed_only": 0.5120615384615385
+    }
+   },
+   "gemini_mean": 0.7875666666666666,
+   "local_max_mean": 0.60768,
+   "local_max_models": [
+    "ollama::gemma3:27b"
+   ],
+   "n_local_models": 7,
+   "difference_pp": 17.988666666666667,
+   "gemini_above_every_other_model": true
+  },
+  "loose_base": {
+   "per_model": {
+    "gemini::gemini-3-flash-preview": {
+     "n_questions": 15,
+     "n_completed": 15,
+     "mean_failed_as_0": 0.8209,
+     "mean_completed_only": 0.8209
+    },
+    "ollama::deepseek-r1:70b": {
+     "n_questions": 15,
+     "n_completed": 8,
+     "mean_failed_as_0": 0.225,
+     "mean_completed_only": 0.421875
+    },
+    "ollama::devstral-small-2:24b": {
+     "n_questions": 15,
+     "n_completed": 14,
+     "mean_failed_as_0": 0.55238,
+     "mean_completed_only": 0.5918357142857142
+    },
+    "ollama::gemma3:27b": {
+     "n_questions": 15,
+     "n_completed": 15,
+     "mean_failed_as_0": 0.62342,
+     "mean_completed_only": 0.62342
+    },
+    "ollama::gpt-oss:120b": {
+     "n_questions": 15,
+     "n_completed": 15,
+     "mean_failed_as_0": 0.475,
+     "mean_completed_only": 0.475
+    },
+    "ollama::nemotron-3-nano:30b": {
+     "n_questions": 15,
+     "n_completed": 12,
+     "mean_failed_as_0": 0.39986666666666665,
+     "mean_completed_only": 0.49983333333333335
+    },
+    "ollama::qwen3-coder-next:q4_K_M": {
+     "n_questions": 15,
+     "n_completed": 15,
+     "mean_failed_as_0": 0.5637533333333333,
+     "mean_completed_only": 0.5637533333333333
+    },
+    "ollama::qwen3-coder:latest": {
+     "n_questions": 15,
+     "n_completed": 13,
+     "mean_failed_as_0": 0.4687866666666667,
+     "mean_completed_only": 0.5409076923076923
+    }
+   },
+   "gemini_mean": 0.8209,
+   "local_max_mean": 0.62342,
+   "local_max_models": [
+    "ollama::gemma3:27b"
+   ],
+   "n_local_models": 7,
+   "difference_pp": 19.748,
+   "gemini_above_every_other_model": true
+  },
+  "exact_substring_base": {
+   "per_model": {
+    "gemini::gemini-3-flash-preview": {
+     "n_questions": 15,
+     "n_completed": 15,
+     "mean_failed_as_0": 0.37777333333333335,
+     "mean_completed_only": 0.37777333333333335
+    },
+    "ollama::deepseek-r1:70b": {
+     "n_questions": 15,
+     "n_completed": 8,
+     "mean_failed_as_0": 0.09444666666666666,
+     "mean_completed_only": 0.1770875
+    },
+    "ollama::devstral-small-2:24b": {
+     "n_questions": 15,
+     "n_completed": 14,
+     "mean_failed_as_0": 0.23611333333333334,
+     "mean_completed_only": 0.25297857142857144
+    },
+    "ollama::gemma3:27b": {
+     "n_questions": 15,
+     "n_completed": 15,
+     "mean_failed_as_0": 0.24378,
+     "mean_completed_only": 0.24378
+    },
+    "ollama::gpt-oss:120b": {
+     "n_questions": 15,
+     "n_completed": 15,
+     "mean_failed_as_0": 0.041666666666666664,
+     "mean_completed_only": 0.041666666666666664
+    },
+    "ollama::nemotron-3-nano:30b": {
+     "n_questions": 15,
+     "n_completed": 12,
+     "mean_failed_as_0": 0.2336,
+     "mean_completed_only": 0.292
+    },
+    "ollama::qwen3-coder-next:q4_K_M": {
+     "n_questions": 15,
+     "n_completed": 15,
+     "mean_failed_as_0": 0.21666666666666667,
+     "mean_completed_only": 0.21666666666666667
+    },
+    "ollama::qwen3-coder:latest": {
+     "n_questions": 15,
+     "n_completed": 13,
+     "mean_failed_as_0": 0.25304,
+     "mean_completed_only": 0.29196923076923076
+    }
+   },
+   "gemini_mean": 0.37777333333333335,
+   "local_max_mean": 0.25304,
+   "local_max_models": [
+    "ollama::qwen3-coder:latest"
+   ],
+   "n_local_models": 7,
+   "difference_pp": 12.473333333333333,
+   "gemini_above_every_other_model": true
+  }
+ },
+ "v24_loose_for_reference": {
+  "gemini_mean": 0.75,
+  "local_max_mean": 0.6,
+  "local_max_models": [
+   "ollama::gemma3:27b"
+  ],
+  "difference_pp": 15.0
+ },
+ "design": {
+  "model_ids": [
+   "gemini::gemini-3-flash-preview",
+   "ollama::deepseek-r1:70b",
+   "ollama::devstral-small-2:24b",
+   "ollama::gemma3:27b",
+   "ollama::gpt-oss:120b",
+   "ollama::nemotron-3-nano:30b",
+   "ollama::qwen3-coder-next:q4_K_M",
+   "ollama::qwen3-coder:latest"
+  ],
+  "question_ids": [
+   "01_sarek_CO2",
+   "01_sarek_FR1",
+   "01_sarek_TE3",
+   "02_snakemake_CO2",
+   "02_snakemake_FR1",
+   "02_snakemake_TE3",
+   "03_nfcore_framework_FR1",
+   "06_star_aligner_TE3",
+   "12_hpai_netherlands_CO2",
+   "CD_001",
+   "CD_002",
+   "CD_003",
+   "SY_001",
+   "SY_002",
+   "SY_003"
+  ],
+  "gemini": "gemini::gemini-3-flash-preview",
+  "local_prefix": "ollama::"
+ },
+ "answers": [
+  {
+   "model": "gemini::gemini-3-flash-preview",
+   "question_id": "01_sarek_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.625,
+    "loose_base": 0.625,
+    "exact_substring_base": 0.375
+   },
+   "n_counted": 8,
+   "found": 5,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "not_found",
+    "found",
+    "not_found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "gemini::gemini-3-flash-preview",
+   "question_id": "12_hpai_netherlands_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.5,
+    "loose_base": 0.75,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 8,
+   "found": 4,
+   "concept_status": [
+    "found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "gemini::gemini-3-flash-preview",
+   "question_id": "02_snakemake_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.75,
+    "loose_base": 0.875,
+    "exact_substring_base": 0.375
+   },
+   "n_counted": 8,
+   "found": 6,
+   "concept_status": [
+    "not_found",
+    "found",
+    "found",
+    "found",
+    "found",
+    "found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "gemini::gemini-3-flash-preview",
+   "question_id": "CD_002",
+   "completed": true,
+   "n_concepts_v25": 9,
+   "value": {
+    "d181": 0.7778,
+    "loose_base": 0.7778,
+    "exact_substring_base": 0.3333
+   },
+   "n_counted": 9,
+   "found": 7,
+   "concept_status": [
+    "found",
+    "not_found",
+    "found",
+    "found",
+    "found",
+    "found",
+    "found",
+    "not_found",
+    "found"
+   ]
+  },
+  {
+   "model": "gemini::gemini-3-flash-preview",
+   "question_id": "CD_001",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.625,
+    "loose_base": 0.625,
+    "exact_substring_base": 0.125
+   },
+   "n_counted": 8,
+   "found": 5,
+   "concept_status": [
+    "not_found",
+    "found",
+    "found",
+    "found",
+    "not_found",
+    "not_found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "gemini::gemini-3-flash-preview",
+   "question_id": "CD_003",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.875,
+    "loose_base": 0.875,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 8,
+   "found": 7,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "found",
+    "found",
+    "not_found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "gemini::gemini-3-flash-preview",
+   "question_id": "01_sarek_FR1",
+   "completed": true,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 1.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 0.5
+   },
+   "n_counted": 4,
+   "found": 4,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "gemini::gemini-3-flash-preview",
+   "question_id": "02_snakemake_FR1",
+   "completed": true,
+   "n_concepts_v25": 2,
+   "value": {
+    "d181": 1.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 1.0
+   },
+   "n_counted": 2,
+   "found": 2,
+   "concept_status": [
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "gemini::gemini-3-flash-preview",
+   "question_id": "03_nfcore_framework_FR1",
+   "completed": true,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 1.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 1.0
+   },
+   "n_counted": 4,
+   "found": 4,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "gemini::gemini-3-flash-preview",
+   "question_id": "SY_001",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.375,
+    "loose_base": 0.5,
+    "exact_substring_base": 0.125
+   },
+   "n_counted": 8,
+   "found": 3,
+   "concept_status": [
+    "found",
+    "not_found",
+    "found",
+    "not_found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "gemini::gemini-3-flash-preview",
+   "question_id": "SY_002",
+   "completed": true,
+   "n_concepts_v25": 7,
+   "value": {
+    "d181": 0.2857,
+    "loose_base": 0.2857,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 7,
+   "found": 2,
+   "concept_status": [
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "not_found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "gemini::gemini-3-flash-preview",
+   "question_id": "SY_003",
+   "completed": true,
+   "n_concepts_v25": 3,
+   "value": {
+    "d181": 1.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 0.3333
+   },
+   "n_counted": 3,
+   "found": 3,
+   "concept_status": [
+    "found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "gemini::gemini-3-flash-preview",
+   "question_id": "06_star_aligner_TE3",
+   "completed": true,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 1.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 1.0
+   },
+   "n_counted": 4,
+   "found": 4,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "gemini::gemini-3-flash-preview",
+   "question_id": "01_sarek_TE3",
+   "completed": true,
+   "n_concepts_v25": 1,
+   "value": {
+    "d181": 1.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 1,
+   "found": 1,
+   "concept_status": [
+    "found"
+   ]
+  },
+  {
+   "model": "gemini::gemini-3-flash-preview",
+   "question_id": "02_snakemake_TE3",
+   "completed": true,
+   "n_concepts_v25": 6,
+   "value": {
+    "d181": 1.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 0.5
+   },
+   "n_counted": 6,
+   "found": 6,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder:latest",
+   "question_id": "01_sarek_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.75,
+    "loose_base": 0.75,
+    "exact_substring_base": 0.375
+   },
+   "n_counted": 8,
+   "found": 6,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "found",
+    "not_found",
+    "found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder:latest",
+   "question_id": "12_hpai_netherlands_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.75,
+    "loose_base": 0.875,
+    "exact_substring_base": 0.25
+   },
+   "n_counted": 8,
+   "found": 6,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "not_found",
+    "not_found",
+    "found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder:latest",
+   "question_id": "02_snakemake_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.625,
+    "loose_base": 0.75,
+    "exact_substring_base": 0.375
+   },
+   "n_counted": 8,
+   "found": 5,
+   "concept_status": [
+    "not_found",
+    "found",
+    "not_found",
+    "found",
+    "found",
+    "found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder:latest",
+   "question_id": "CD_002",
+   "completed": true,
+   "n_concepts_v25": 9,
+   "value": {
+    "d181": 0.5556,
+    "loose_base": 0.5556,
+    "exact_substring_base": 0.1111
+   },
+   "n_counted": 9,
+   "found": 5,
+   "concept_status": [
+    "found",
+    "not_found",
+    "found",
+    "found",
+    "not_found",
+    "found",
+    "found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder:latest",
+   "question_id": "CD_001",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.125,
+    "loose_base": 0.125,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 8,
+   "found": 1,
+   "concept_status": [
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder:latest",
+   "question_id": "CD_003",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.625,
+    "loose_base": 0.625,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 8,
+   "found": 5,
+   "concept_status": [
+    "found",
+    "found",
+    "not_found",
+    "found",
+    "found",
+    "not_found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder:latest",
+   "question_id": "01_sarek_FR1",
+   "completed": true,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 0.75,
+    "loose_base": 0.75,
+    "exact_substring_base": 0.75
+   },
+   "n_counted": 4,
+   "found": 3,
+   "concept_status": [
+    "found",
+    "found",
+    "not_found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder:latest",
+   "question_id": "02_snakemake_FR1",
+   "completed": true,
+   "n_concepts_v25": 2,
+   "value": {
+    "d181": 1.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 1.0
+   },
+   "n_counted": 2,
+   "found": 2,
+   "concept_status": [
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder:latest",
+   "question_id": "03_nfcore_framework_FR1",
+   "completed": false,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 0.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": null,
+   "found": null
+  },
+  {
+   "model": "ollama::qwen3-coder:latest",
+   "question_id": "SY_001",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.25,
+    "loose_base": 0.375,
+    "exact_substring_base": 0.125
+   },
+   "n_counted": 8,
+   "found": 2,
+   "concept_status": [
+    "found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder:latest",
+   "question_id": "SY_002",
+   "completed": true,
+   "n_concepts_v25": 7,
+   "value": {
+    "d181": 0.1429,
+    "loose_base": 0.1429,
+    "exact_substring_base": 0.1429
+   },
+   "n_counted": 7,
+   "found": 1,
+   "concept_status": [
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder:latest",
+   "question_id": "SY_003",
+   "completed": true,
+   "n_concepts_v25": 3,
+   "value": {
+    "d181": 0.3333,
+    "loose_base": 0.3333,
+    "exact_substring_base": 0.3333
+   },
+   "n_counted": 3,
+   "found": 1,
+   "concept_status": [
+    "not_found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder:latest",
+   "question_id": "06_star_aligner_TE3",
+   "completed": true,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 0.25,
+    "loose_base": 0.25,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 4,
+   "found": 1,
+   "concept_status": [
+    "not_found",
+    "not_found",
+    "not_found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder:latest",
+   "question_id": "01_sarek_TE3",
+   "completed": false,
+   "n_concepts_v25": 1,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 0.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": null,
+   "found": null
+  },
+  {
+   "model": "ollama::qwen3-coder:latest",
+   "question_id": "02_snakemake_TE3",
+   "completed": true,
+   "n_concepts_v25": 6,
+   "value": {
+    "d181": 0.5,
+    "loose_base": 0.5,
+    "exact_substring_base": 0.3333
+   },
+   "n_counted": 6,
+   "found": 3,
+   "concept_status": [
+    "found",
+    "not_found",
+    "found",
+    "not_found",
+    "not_found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::devstral-small-2:24b",
+   "question_id": "01_sarek_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.375,
+    "loose_base": 0.5,
+    "exact_substring_base": 0.125
+   },
+   "n_counted": 8,
+   "found": 3,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::devstral-small-2:24b",
+   "question_id": "12_hpai_netherlands_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.5,
+    "loose_base": 0.75,
+    "exact_substring_base": 0.125
+   },
+   "n_counted": 8,
+   "found": 4,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::devstral-small-2:24b",
+   "question_id": "02_snakemake_CO2",
+   "completed": false,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 0.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": null,
+   "found": null
+  },
+  {
+   "model": "ollama::devstral-small-2:24b",
+   "question_id": "CD_002",
+   "completed": true,
+   "n_concepts_v25": 9,
+   "value": {
+    "d181": 0.3333,
+    "loose_base": 0.3333,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 9,
+   "found": 3,
+   "concept_status": [
+    "not_found",
+    "not_found",
+    "found",
+    "found",
+    "not_found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::devstral-small-2:24b",
+   "question_id": "CD_001",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.375,
+    "loose_base": 0.375,
+    "exact_substring_base": 0.125
+   },
+   "n_counted": 8,
+   "found": 3,
+   "concept_status": [
+    "not_found",
+    "found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::devstral-small-2:24b",
+   "question_id": "CD_003",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.375,
+    "loose_base": 0.375,
+    "exact_substring_base": 0.125
+   },
+   "n_counted": 8,
+   "found": 3,
+   "concept_status": [
+    "found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "not_found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::devstral-small-2:24b",
+   "question_id": "01_sarek_FR1",
+   "completed": true,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 0.5,
+    "loose_base": 0.5,
+    "exact_substring_base": 0.5
+   },
+   "n_counted": 4,
+   "found": 2,
+   "concept_status": [
+    "found",
+    "found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::devstral-small-2:24b",
+   "question_id": "02_snakemake_FR1",
+   "completed": true,
+   "n_concepts_v25": 2,
+   "value": {
+    "d181": 1.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 1.0
+   },
+   "n_counted": 2,
+   "found": 2,
+   "concept_status": [
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::devstral-small-2:24b",
+   "question_id": "03_nfcore_framework_FR1",
+   "completed": true,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 0.75,
+    "loose_base": 0.75,
+    "exact_substring_base": 0.75
+   },
+   "n_counted": 4,
+   "found": 3,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::devstral-small-2:24b",
+   "question_id": "SY_001",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.25,
+    "loose_base": 0.25,
+    "exact_substring_base": 0.125
+   },
+   "n_counted": 8,
+   "found": 2,
+   "concept_status": [
+    "found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::devstral-small-2:24b",
+   "question_id": "SY_002",
+   "completed": true,
+   "n_concepts_v25": 7,
+   "value": {
+    "d181": 0.2857,
+    "loose_base": 0.2857,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 7,
+   "found": 2,
+   "concept_status": [
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "not_found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::devstral-small-2:24b",
+   "question_id": "SY_003",
+   "completed": true,
+   "n_concepts_v25": 3,
+   "value": {
+    "d181": 0.6667,
+    "loose_base": 0.6667,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 3,
+   "found": 2,
+   "concept_status": [
+    "found",
+    "not_found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::devstral-small-2:24b",
+   "question_id": "06_star_aligner_TE3",
+   "completed": true,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 0.75,
+    "loose_base": 1.0,
+    "exact_substring_base": 0.5
+   },
+   "n_counted": 4,
+   "found": 3,
+   "concept_status": [
+    "found",
+    "found",
+    "not_found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::devstral-small-2:24b",
+   "question_id": "01_sarek_TE3",
+   "completed": true,
+   "n_concepts_v25": 1,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 1,
+   "found": 0,
+   "concept_status": [
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::devstral-small-2:24b",
+   "question_id": "02_snakemake_TE3",
+   "completed": true,
+   "n_concepts_v25": 6,
+   "value": {
+    "d181": 0.5,
+    "loose_base": 0.5,
+    "exact_substring_base": 0.1667
+   },
+   "n_counted": 6,
+   "found": 3,
+   "concept_status": [
+    "found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::nemotron-3-nano:30b",
+   "question_id": "01_sarek_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.75,
+    "loose_base": 0.875,
+    "exact_substring_base": 0.125
+   },
+   "n_counted": 8,
+   "found": 6,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "found",
+    "found",
+    "not_found",
+    "not_found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::nemotron-3-nano:30b",
+   "question_id": "12_hpai_netherlands_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 0.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 8,
+   "found": 0,
+   "concept_status": [
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::nemotron-3-nano:30b",
+   "question_id": "02_snakemake_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 1.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 1.0
+   },
+   "n_counted": 8,
+   "found": 8,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "found",
+    "found",
+    "found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::nemotron-3-nano:30b",
+   "question_id": "CD_002",
+   "completed": true,
+   "n_concepts_v25": 9,
+   "value": {
+    "d181": 0.4444,
+    "loose_base": 0.4444,
+    "exact_substring_base": 0.1111
+   },
+   "n_counted": 9,
+   "found": 4,
+   "concept_status": [
+    "not_found",
+    "not_found",
+    "found",
+    "found",
+    "not_found",
+    "found",
+    "found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::nemotron-3-nano:30b",
+   "question_id": "CD_001",
+   "completed": false,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 0.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": null,
+   "found": null
+  },
+  {
+   "model": "ollama::nemotron-3-nano:30b",
+   "question_id": "CD_003",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.625,
+    "loose_base": 0.625,
+    "exact_substring_base": 0.25
+   },
+   "n_counted": 8,
+   "found": 5,
+   "concept_status": [
+    "found",
+    "found",
+    "not_found",
+    "found",
+    "found",
+    "not_found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::nemotron-3-nano:30b",
+   "question_id": "01_sarek_FR1",
+   "completed": true,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 0.25,
+    "loose_base": 0.25,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 4,
+   "found": 1,
+   "concept_status": [
+    "found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::nemotron-3-nano:30b",
+   "question_id": "02_snakemake_FR1",
+   "completed": true,
+   "n_concepts_v25": 2,
+   "value": {
+    "d181": 1.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 1.0
+   },
+   "n_counted": 2,
+   "found": 2,
+   "concept_status": [
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::nemotron-3-nano:30b",
+   "question_id": "03_nfcore_framework_FR1",
+   "completed": false,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 0.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": null,
+   "found": null
+  },
+  {
+   "model": "ollama::nemotron-3-nano:30b",
+   "question_id": "SY_001",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.125,
+    "loose_base": 0.125,
+    "exact_substring_base": 0.125
+   },
+   "n_counted": 8,
+   "found": 1,
+   "concept_status": [
+    "found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::nemotron-3-nano:30b",
+   "question_id": "SY_002",
+   "completed": true,
+   "n_concepts_v25": 7,
+   "value": {
+    "d181": 0.4286,
+    "loose_base": 0.4286,
+    "exact_substring_base": 0.1429
+   },
+   "n_counted": 7,
+   "found": 3,
+   "concept_status": [
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "not_found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::nemotron-3-nano:30b",
+   "question_id": "SY_003",
+   "completed": true,
+   "n_concepts_v25": 3,
+   "value": {
+    "d181": 0.3333,
+    "loose_base": 0.3333,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 3,
+   "found": 1,
+   "concept_status": [
+    "found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::nemotron-3-nano:30b",
+   "question_id": "06_star_aligner_TE3",
+   "completed": true,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 0.75,
+    "loose_base": 0.75,
+    "exact_substring_base": 0.75
+   },
+   "n_counted": 4,
+   "found": 3,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::nemotron-3-nano:30b",
+   "question_id": "01_sarek_TE3",
+   "completed": false,
+   "n_concepts_v25": 1,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 0.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": null,
+   "found": null
+  },
+  {
+   "model": "ollama::nemotron-3-nano:30b",
+   "question_id": "02_snakemake_TE3",
+   "completed": true,
+   "n_concepts_v25": 6,
+   "value": {
+    "d181": 0.1667,
+    "loose_base": 0.1667,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 6,
+   "found": 1,
+   "concept_status": [
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::deepseek-r1:70b",
+   "question_id": "01_sarek_CO2",
+   "completed": false,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 0.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": null,
+   "found": null
+  },
+  {
+   "model": "ollama::deepseek-r1:70b",
+   "question_id": "12_hpai_netherlands_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.125,
+    "loose_base": 0.25,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 8,
+   "found": 1,
+   "concept_status": [
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::deepseek-r1:70b",
+   "question_id": "02_snakemake_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.5,
+    "loose_base": 0.625,
+    "exact_substring_base": 0.25
+   },
+   "n_counted": 8,
+   "found": 4,
+   "concept_status": [
+    "not_found",
+    "found",
+    "not_found",
+    "found",
+    "found",
+    "found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::deepseek-r1:70b",
+   "question_id": "CD_002",
+   "completed": false,
+   "n_concepts_v25": 9,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 0.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": null,
+   "found": null
+  },
+  {
+   "model": "ollama::deepseek-r1:70b",
+   "question_id": "CD_001",
+   "completed": false,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 0.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": null,
+   "found": null
+  },
+  {
+   "model": "ollama::deepseek-r1:70b",
+   "question_id": "CD_003",
+   "completed": false,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 0.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": null,
+   "found": null
+  },
+  {
+   "model": "ollama::deepseek-r1:70b",
+   "question_id": "01_sarek_FR1",
+   "completed": false,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 0.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": null,
+   "found": null
+  },
+  {
+   "model": "ollama::deepseek-r1:70b",
+   "question_id": "02_snakemake_FR1",
+   "completed": true,
+   "n_concepts_v25": 2,
+   "value": {
+    "d181": 1.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 1.0
+   },
+   "n_counted": 2,
+   "found": 2,
+   "concept_status": [
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::deepseek-r1:70b",
+   "question_id": "03_nfcore_framework_FR1",
+   "completed": true,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 0.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 4,
+   "found": 0,
+   "concept_status": [
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::deepseek-r1:70b",
+   "question_id": "SY_001",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 0.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 8,
+   "found": 0,
+   "concept_status": [
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::deepseek-r1:70b",
+   "question_id": "SY_002",
+   "completed": false,
+   "n_concepts_v25": 7,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 0.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": null,
+   "found": null
+  },
+  {
+   "model": "ollama::deepseek-r1:70b",
+   "question_id": "SY_003",
+   "completed": false,
+   "n_concepts_v25": 3,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 0.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": null,
+   "found": null
+  },
+  {
+   "model": "ollama::deepseek-r1:70b",
+   "question_id": "06_star_aligner_TE3",
+   "completed": true,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 0.25,
+    "loose_base": 0.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 4,
+   "found": 1,
+   "concept_status": [
+    "not_found",
+    "not_found",
+    "not_found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::deepseek-r1:70b",
+   "question_id": "01_sarek_TE3",
+   "completed": true,
+   "n_concepts_v25": 1,
+   "value": {
+    "d181": 1.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 1,
+   "found": 1,
+   "concept_status": [
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::deepseek-r1:70b",
+   "question_id": "02_snakemake_TE3",
+   "completed": true,
+   "n_concepts_v25": 6,
+   "value": {
+    "d181": 0.5,
+    "loose_base": 0.5,
+    "exact_substring_base": 0.1667
+   },
+   "n_counted": 6,
+   "found": 3,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::gemma3:27b",
+   "question_id": "01_sarek_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.375,
+    "loose_base": 0.375,
+    "exact_substring_base": 0.25
+   },
+   "n_counted": 8,
+   "found": 3,
+   "concept_status": [
+    "not_found",
+    "found",
+    "found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::gemma3:27b",
+   "question_id": "12_hpai_netherlands_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.875,
+    "loose_base": 0.875,
+    "exact_substring_base": 0.125
+   },
+   "n_counted": 8,
+   "found": 7,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "not_found",
+    "found",
+    "found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::gemma3:27b",
+   "question_id": "02_snakemake_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.75,
+    "loose_base": 0.75,
+    "exact_substring_base": 0.375
+   },
+   "n_counted": 8,
+   "found": 6,
+   "concept_status": [
+    "not_found",
+    "found",
+    "found",
+    "found",
+    "found",
+    "not_found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::gemma3:27b",
+   "question_id": "CD_002",
+   "completed": true,
+   "n_concepts_v25": 9,
+   "value": {
+    "d181": 0.5556,
+    "loose_base": 0.6667,
+    "exact_substring_base": 0.2222
+   },
+   "n_counted": 9,
+   "found": 5,
+   "concept_status": [
+    "found",
+    "not_found",
+    "found",
+    "found",
+    "found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::gemma3:27b",
+   "question_id": "CD_001",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.5,
+    "loose_base": 0.5,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 8,
+   "found": 4,
+   "concept_status": [
+    "not_found",
+    "found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::gemma3:27b",
+   "question_id": "CD_003",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.25,
+    "loose_base": 0.125,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 8,
+   "found": 2,
+   "concept_status": [
+    "found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::gemma3:27b",
+   "question_id": "01_sarek_FR1",
+   "completed": true,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 1.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 0.75
+   },
+   "n_counted": 4,
+   "found": 4,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::gemma3:27b",
+   "question_id": "02_snakemake_FR1",
+   "completed": true,
+   "n_concepts_v25": 2,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 0.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 2,
+   "found": 0,
+   "concept_status": [
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::gemma3:27b",
+   "question_id": "03_nfcore_framework_FR1",
+   "completed": true,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 1.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 0.75
+   },
+   "n_counted": 4,
+   "found": 4,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::gemma3:27b",
+   "question_id": "SY_001",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.25,
+    "loose_base": 0.25,
+    "exact_substring_base": 0.125
+   },
+   "n_counted": 8,
+   "found": 2,
+   "concept_status": [
+    "found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::gemma3:27b",
+   "question_id": "SY_002",
+   "completed": true,
+   "n_concepts_v25": 7,
+   "value": {
+    "d181": 0.1429,
+    "loose_base": 0.1429,
+    "exact_substring_base": 0.1429
+   },
+   "n_counted": 7,
+   "found": 1,
+   "concept_status": [
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::gemma3:27b",
+   "question_id": "SY_003",
+   "completed": true,
+   "n_concepts_v25": 3,
+   "value": {
+    "d181": 0.6667,
+    "loose_base": 0.6667,
+    "exact_substring_base": 0.3333
+   },
+   "n_counted": 3,
+   "found": 2,
+   "concept_status": [
+    "found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::gemma3:27b",
+   "question_id": "06_star_aligner_TE3",
+   "completed": true,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 0.75,
+    "loose_base": 1.0,
+    "exact_substring_base": 0.25
+   },
+   "n_counted": 4,
+   "found": 3,
+   "concept_status": [
+    "found",
+    "found",
+    "not_found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::gemma3:27b",
+   "question_id": "01_sarek_TE3",
+   "completed": true,
+   "n_concepts_v25": 1,
+   "value": {
+    "d181": 1.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 1,
+   "found": 1,
+   "concept_status": [
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::gemma3:27b",
+   "question_id": "02_snakemake_TE3",
+   "completed": true,
+   "n_concepts_v25": 6,
+   "value": {
+    "d181": 1.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 0.3333
+   },
+   "n_counted": 6,
+   "found": 6,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::gpt-oss:120b",
+   "question_id": "01_sarek_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.375,
+    "loose_base": 0.5,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 8,
+   "found": 3,
+   "concept_status": [
+    "not_found",
+    "found",
+    "found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::gpt-oss:120b",
+   "question_id": "12_hpai_netherlands_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.5,
+    "loose_base": 0.5,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 8,
+   "found": 4,
+   "concept_status": [
+    "found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::gpt-oss:120b",
+   "question_id": "02_snakemake_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.5,
+    "loose_base": 0.625,
+    "exact_substring_base": 0.125
+   },
+   "n_counted": 8,
+   "found": 4,
+   "concept_status": [
+    "not_found",
+    "found",
+    "found",
+    "found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::gpt-oss:120b",
+   "question_id": "CD_002",
+   "completed": true,
+   "n_concepts_v25": 9,
+   "value": {
+    "d181": 0.6667,
+    "loose_base": 0.6667,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 9,
+   "found": 6,
+   "concept_status": [
+    "found",
+    "not_found",
+    "found",
+    "found",
+    "found",
+    "found",
+    "not_found",
+    "not_found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::gpt-oss:120b",
+   "question_id": "CD_001",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.375,
+    "loose_base": 0.375,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 8,
+   "found": 3,
+   "concept_status": [
+    "not_found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::gpt-oss:120b",
+   "question_id": "CD_003",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.75,
+    "loose_base": 0.625,
+    "exact_substring_base": 0.25
+   },
+   "n_counted": 8,
+   "found": 6,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "found",
+    "not_found",
+    "not_found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::gpt-oss:120b",
+   "question_id": "01_sarek_FR1",
+   "completed": true,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 0.5,
+    "loose_base": 0.5,
+    "exact_substring_base": 0.25
+   },
+   "n_counted": 4,
+   "found": 2,
+   "concept_status": [
+    "found",
+    "found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::gpt-oss:120b",
+   "question_id": "02_snakemake_FR1",
+   "completed": true,
+   "n_concepts_v25": 2,
+   "value": {
+    "d181": 1.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 2,
+   "found": 2,
+   "concept_status": [
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::gpt-oss:120b",
+   "question_id": "03_nfcore_framework_FR1",
+   "completed": true,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 0.5,
+    "loose_base": 0.5,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 4,
+   "found": 2,
+   "concept_status": [
+    "not_found",
+    "found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::gpt-oss:120b",
+   "question_id": "SY_001",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 0.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 8,
+   "found": 0,
+   "concept_status": [
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::gpt-oss:120b",
+   "question_id": "SY_002",
+   "completed": true,
+   "n_concepts_v25": 7,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 0.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 7,
+   "found": 0,
+   "concept_status": [
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::gpt-oss:120b",
+   "question_id": "SY_003",
+   "completed": true,
+   "n_concepts_v25": 3,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 0.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 3,
+   "found": 0,
+   "concept_status": [
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::gpt-oss:120b",
+   "question_id": "06_star_aligner_TE3",
+   "completed": true,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 0.5,
+    "loose_base": 0.5,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 4,
+   "found": 2,
+   "concept_status": [
+    "not_found",
+    "found",
+    "not_found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::gpt-oss:120b",
+   "question_id": "01_sarek_TE3",
+   "completed": true,
+   "n_concepts_v25": 1,
+   "value": {
+    "d181": 1.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 1,
+   "found": 1,
+   "concept_status": [
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::gpt-oss:120b",
+   "question_id": "02_snakemake_TE3",
+   "completed": true,
+   "n_concepts_v25": 6,
+   "value": {
+    "d181": 0.3333,
+    "loose_base": 0.3333,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 6,
+   "found": 2,
+   "concept_status": [
+    "found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder-next:q4_K_M",
+   "question_id": "01_sarek_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.5,
+    "loose_base": 0.5,
+    "exact_substring_base": 0.25
+   },
+   "n_counted": 8,
+   "found": 4,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder-next:q4_K_M",
+   "question_id": "12_hpai_netherlands_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.875,
+    "loose_base": 0.875,
+    "exact_substring_base": 0.25
+   },
+   "n_counted": 8,
+   "found": 7,
+   "concept_status": [
+    "found",
+    "found",
+    "found",
+    "found",
+    "not_found",
+    "found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder-next:q4_K_M",
+   "question_id": "02_snakemake_CO2",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.625,
+    "loose_base": 0.75,
+    "exact_substring_base": 0.25
+   },
+   "n_counted": 8,
+   "found": 5,
+   "concept_status": [
+    "not_found",
+    "found",
+    "not_found",
+    "found",
+    "found",
+    "found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder-next:q4_K_M",
+   "question_id": "CD_002",
+   "completed": true,
+   "n_concepts_v25": 9,
+   "value": {
+    "d181": 0.4444,
+    "loose_base": 0.4444,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 9,
+   "found": 4,
+   "concept_status": [
+    "found",
+    "not_found",
+    "found",
+    "found",
+    "not_found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder-next:q4_K_M",
+   "question_id": "CD_001",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.375,
+    "loose_base": 0.375,
+    "exact_substring_base": 0.125
+   },
+   "n_counted": 8,
+   "found": 3,
+   "concept_status": [
+    "not_found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder-next:q4_K_M",
+   "question_id": "CD_003",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.5,
+    "loose_base": 0.5,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 8,
+   "found": 4,
+   "concept_status": [
+    "found",
+    "found",
+    "not_found",
+    "found",
+    "not_found",
+    "not_found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder-next:q4_K_M",
+   "question_id": "01_sarek_FR1",
+   "completed": true,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 0.5,
+    "loose_base": 0.5,
+    "exact_substring_base": 0.25
+   },
+   "n_counted": 4,
+   "found": 2,
+   "concept_status": [
+    "found",
+    "found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder-next:q4_K_M",
+   "question_id": "02_snakemake_FR1",
+   "completed": true,
+   "n_concepts_v25": 2,
+   "value": {
+    "d181": 1.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 1.0
+   },
+   "n_counted": 2,
+   "found": 2,
+   "concept_status": [
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder-next:q4_K_M",
+   "question_id": "03_nfcore_framework_FR1",
+   "completed": true,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 0.75,
+    "loose_base": 0.75,
+    "exact_substring_base": 0.5
+   },
+   "n_counted": 4,
+   "found": 3,
+   "concept_status": [
+    "not_found",
+    "found",
+    "found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder-next:q4_K_M",
+   "question_id": "SY_001",
+   "completed": true,
+   "n_concepts_v25": 8,
+   "value": {
+    "d181": 0.25,
+    "loose_base": 0.25,
+    "exact_substring_base": 0.125
+   },
+   "n_counted": 8,
+   "found": 2,
+   "concept_status": [
+    "found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder-next:q4_K_M",
+   "question_id": "SY_002",
+   "completed": true,
+   "n_concepts_v25": 7,
+   "value": {
+    "d181": 0.2857,
+    "loose_base": 0.4286,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 7,
+   "found": 2,
+   "concept_status": [
+    "not_found",
+    "not_found",
+    "not_found",
+    "found",
+    "not_found",
+    "found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder-next:q4_K_M",
+   "question_id": "SY_003",
+   "completed": true,
+   "n_concepts_v25": 3,
+   "value": {
+    "d181": 0.3333,
+    "loose_base": 0.3333,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 3,
+   "found": 1,
+   "concept_status": [
+    "found",
+    "not_found",
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder-next:q4_K_M",
+   "question_id": "06_star_aligner_TE3",
+   "completed": true,
+   "n_concepts_v25": 4,
+   "value": {
+    "d181": 0.25,
+    "loose_base": 0.25,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 4,
+   "found": 1,
+   "concept_status": [
+    "not_found",
+    "not_found",
+    "not_found",
+    "found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder-next:q4_K_M",
+   "question_id": "01_sarek_TE3",
+   "completed": true,
+   "n_concepts_v25": 1,
+   "value": {
+    "d181": 0.0,
+    "loose_base": 1.0,
+    "exact_substring_base": 0.0
+   },
+   "n_counted": 1,
+   "found": 0,
+   "concept_status": [
+    "not_found"
+   ]
+  },
+  {
+   "model": "ollama::qwen3-coder-next:q4_K_M",
+   "question_id": "02_snakemake_TE3",
+   "completed": true,
+   "n_concepts_v25": 6,
+   "value": {
+    "d181": 0.5,
+    "loose_base": 0.5,
+    "exact_substring_base": 0.5
+   },
+   "n_counted": 6,
+   "found": 3,
+   "concept_status": [
+    "found",
+    "found",
+    "not_found",
+    "not_found",
+    "not_found",
+    "found"
+   ]
+  }
+ ]
+}

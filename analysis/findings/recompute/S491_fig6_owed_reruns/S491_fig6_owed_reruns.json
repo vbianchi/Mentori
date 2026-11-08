@@ -1,0 +1,321 @@
+{
+ "provenance": {
+  "script": "scripts/S491_fig6_owed_reruns.py",
+  "script_sha256": "1d76b914820044f9723a38dbf6f1a31fc640980d54d7bb85c7f845b6d4b6b6d5",
+  "command": "uv run python scripts/S491_fig6_owed_reruns.py",
+  "frozen_set": {
+   "tar": "s2_after_s4_20261105.tar",
+   "sha256": "f879ea24f6398634f65d09d468e08210b9044a408822e45a52a0c1249182354d",
+   "manifest_files_checked": 363,
+   "read_through": "scripts/fig_repro.py frozen()"
+  },
+  "inputs": [
+   {
+    "path": "findings/recompute/frozen_inputs/members/s2_after_s4_20261105.sha256",
+    "sha256": "62163910fdcbf9059f3546c0480847c650d5b9545d12534a9a61f8278b02628a",
+    "role": "the tar's member list"
+   },
+   {
+    "path": "findings/figures_provisional/fig6/records_manifest.json",
+    "sha256": "2327a8032c352aa432cb54d5b9a634c3747482a890d0c31be356ece3beef06e0",
+    "role": "records manifest: the runs read and every file's sha256"
+   },
+   {
+    "path": "findings/recompute/S477_lung9_rescore.json",
+    "sha256": "27d38a043b7862d4112dd70f265c3ed107b42b3cd5fc3930e74dd60633a6807c",
+    "role": "S477's lung_9 re-score, applied by S447's loader"
+   },
+   {
+    "path": "experiments/mentori/tests/experiments_v2/datasets/coder_ground_truth.json",
+    "sha256": "afcef9ffea67b2ea1659dad7513948693027648f02f887e6db4e07f6ca3b9c35",
+    "role": "ground truth: operation tiers"
+   },
+   {
+    "path": "findings/recompute/S478_fig6_thinking_gap.json",
+    "sha256": "a15ec7131ade7a0d64fe409c49333303991225e89f88c5a6d97c3907826cc37d",
+    "role": "anchor: S478 (S481 Data's check; gpt-oss:20b high structured kinds)"
+   },
+   {
+    "path": "findings/recompute/S479_fig6_by_tier.json",
+    "sha256": "76bab1ad384b863b3da6d36dba4f1e7e51bfb68a62c36dbed7de4843119d372c",
+    "role": "anchor: S479 (S481 Data's check; the pooled gap)"
+   },
+   {
+    "path": "findings/figures_provisional/fig6/fig6_numbers.json",
+    "sha256": "14ea3bb30101edda9be40835c1f64e47fceb2c73b080190b9cc32c6b13ed9b6d",
+    "role": "anchor: claims_support.reruns_owed"
+   },
+   {
+    "path": "findings/figures_provisional/supp_fig16_fig6_models/supplementary_figure16_numbers.json",
+    "sha256": "edfdc53fac28d273517b630a52acbe8d1e9b50072c1e41a17fe476e85ffecd64",
+    "role": "anchor: Supplementary Fig. 16b"
+   }
+  ],
+  "code_imported": [
+   "scripts/S447_fig6_panels.py",
+   "scripts/S478_fig6_thinking_gap.py",
+   "scripts/S479_fig6_by_tier.py",
+   "scripts/S481_fig6_d138.py",
+   "scripts/S457_fig2_panels.py",
+   "scripts/fig_repro.py"
+  ],
+  "model_calls": 0,
+  "ported_from": [
+   "SCR/audit_1025/fig6_verify/verify.py",
+   "SCR/audit_1025/story_skeptic/fig6_check.py"
+  ]
+ },
+ "definitions": {
+  "owed": "a failed attempt with a D80 V1 event on any generator call (tool-call parse error, stall, or an Ollama HTTP 500 or dropped connection; never Gemini) or add_cell written as text (D81), as S447.rerun_tally() counts them",
+  "gap": "100 x (structured passes / attempts - free-form passes / attempts), pooled over the variants",
+  "bound": "the gap if every owed failed attempt passed on its rerun",
+  "tool_or_call_failure": "S481._X_MECH_OTHER: tool-call parse error, tool call written as text, stall, other call error, step produced no cell and no error"
+ },
+ "reproduced": {
+  "attempts": 2420,
+  "passes": 1692,
+  "S478_S479_equal": true,
+  "reruns_owed_totals": {
+   "attempts": 2420,
+   "failed_owing_d80v1_rerun": 18,
+   "failed_with_add_cell_as_text": 43,
+   "failed_with_add_cell_as_text_and_d80v1_event": 3,
+   "failed_with_add_cell_as_text_d81": 43,
+   "failed_with_d80v1_event": 18,
+   "failed_with_d80v1_event: parse": 18,
+   "passed_with_add_cell_as_text": 20,
+   "passed_with_d80v1_event": 14,
+   "passed_with_d80v1_event: parse": 14
+  },
+  "owed": 58,
+  "equal_to": "fig6_numbers.json claims_support.reruns_owed (totals and per variant)",
+  "pooled_gap_points": -18.75,
+  "pooled_gap_printed": -18.8,
+  "supp19b_gpt_oss_20b_high": {
+   "passed": 133,
+   "wrong values": 9,
+   "no result": 58,
+   "tool or call failure, other": 20
+  }
+ },
+ "owed": {
+  "count": 58,
+  "by_family": {
+   "structured": 58
+  },
+  "structured_share": 1.0,
+  "by_variant_and_family": {
+   "gpt-oss-20b+high | structured": 41,
+   "gpt-oss-20b+low | structured": 10,
+   "gpt-oss-20b+medium | structured": 5,
+   "qwen3-coder-next-q4_K_M+default | structured": 2
+  },
+  "by_fail_kind": {
+   "code raised or timed out": 24,
+   "result wrong or missing": 20,
+   "tool call written as text": 12,
+   "no code": 2
+  }
+ },
+ "gaps": [
+  {
+   "variants": "all 11 variants",
+   "left_out": [],
+   "gap_points": -18.75,
+   "gap_printed": -18.8,
+   "by_tier_points": {
+    "simple": -10.732323232323237,
+    "medium": -20.64393939393939,
+    "complex": -24.242424242424242
+   },
+   "by_tier_printed": {
+    "simple": -10.7,
+    "medium": -20.6,
+    "complex": -24.2
+   },
+   "bound_if_every_owed_failure_passed": -12.159090909090908,
+   "bound_printed": -12.2,
+   "bound_by_tier_printed": {
+    "simple": -6.9,
+    "medium": -14.4,
+    "complex": -14.4
+   }
+  },
+  {
+   "variants": "without gemma3:27b",
+   "left_out": [
+    "gemma3-27b+default"
+   ],
+   "gap_points": -14.291666666666657,
+   "gap_printed": -14.3,
+   "by_tier_points": {
+    "simple": -1.8055555555555602,
+    "medium": -17.29166666666667,
+    "complex": -22.77777777777778
+   },
+   "by_tier_printed": {
+    "simple": -1.8,
+    "medium": -17.3,
+    "complex": -22.8
+   },
+   "bound_if_every_owed_failure_passed": -7.041666666666657,
+   "bound_printed": -7.0,
+   "bound_by_tier_printed": {
+    "simple": 2.4,
+    "medium": -10.4,
+    "complex": -11.9
+   }
+  },
+  {
+   "variants": "without gemma3:27b and gpt-oss:20b (high)",
+   "left_out": [
+    "gemma3-27b+default",
+    "gpt-oss-20b+high"
+   ],
+   "gap_points": -12.5462962962963,
+   "gap_printed": -12.5,
+   "by_tier_points": {
+    "simple": 0.6172839506172756,
+    "medium": -15.509259259259256,
+    "complex": -21.759259259259256
+   },
+   "by_tier_printed": {
+    "simple": 0.6,
+    "medium": -15.5,
+    "complex": -21.8
+   },
+   "bound_if_every_owed_failure_passed": -10.185185185185187,
+   "bound_printed": -10.2,
+   "bound_by_tier_printed": {
+    "simple": 1.1,
+    "medium": -14.1,
+    "complex": -16.2
+   }
+  }
+ ],
+ "failure_split": {
+  "gpt_oss_20b_high_structured": {
+   "failed": 48,
+   "by_kind": {
+    "code raised or timed out": 21,
+    "tool call written as text": 12,
+    "result wrong or missing": 7,
+    "no code": 4,
+    "step produced no cell and no error": 3,
+    "harness error": 1
+   },
+   "tool_or_call_failure": 15,
+   "no_code": 4,
+   "tool_or_call_failure_or_no_code": 19,
+   "code_ran_raised_or_wrong": 28,
+   "equal_to_S478_structured_fail_kinds": true
+  },
+  "gpt_oss_20b_high_all_strategies": {
+   "failed": 87,
+   "by_kind": {
+    "code raised or timed out": 53,
+    "result wrong or missing": 14,
+    "tool call written as text": 12,
+    "no code": 4,
+    "step produced no cell and no error": 3,
+    "harness error": 1
+   },
+   "tool_or_call_failure": 15,
+   "no_code": 4,
+   "tool_or_call_failure_or_no_code": 19,
+   "code_ran_raised_or_wrong": 67
+  },
+  "supp19b_tool_or_call_failure_other": {
+   "count": 20,
+   "what": "S481.outcome5(): every failed attempt whose kind is not code raised or timed out, result wrong or missing, or length stop (Supplementary Fig. 16b's 'tool or call failure, other')",
+   "by_family": {
+    "structured": 20
+   },
+   "by_kind": {
+    "tool call written as text": 12,
+    "no code": 4,
+    "step produced no cell and no error": 3,
+    "harness error": 1
+   }
+  }
+ },
+ "against_inventory_F12": [
+  {
+   "number": "owed",
+   "inventory": 108,
+   "S491": 58,
+   "equal": false
+  },
+  {
+   "number": "owed_structured",
+   "inventory": 108,
+   "S491": 58,
+   "equal": false
+  },
+  {
+   "number": "gap_all",
+   "inventory": -22.4,
+   "S491": -18.8,
+   "equal": false
+  },
+  {
+   "number": "bound_all",
+   "inventory": -10.1,
+   "S491": -12.2,
+   "equal": false
+  },
+  {
+   "number": "gap_without_gemma3",
+   "inventory": -18.3,
+   "S491": -14.3,
+   "equal": false
+  },
+  {
+   "number": "gap_without_gemma3_and_gpt_oss_high",
+   "inventory": -14.1,
+   "S491": -12.5,
+   "equal": false
+  },
+  {
+   "number": "tier_gaps (simple, medium, complex)",
+   "inventory": [
+    -1.2,
+    -17.2,
+    -22.7
+   ],
+   "S491": {
+    "subset whose tier gaps equal": [],
+    "all subsets": {
+     "all 11 variants": [
+      -10.7,
+      -20.6,
+      -24.2
+     ],
+     "without gemma3:27b": [
+      -1.8,
+      -17.3,
+      -22.8
+     ],
+     "without gemma3:27b and gpt-oss:20b (high)": [
+      0.6,
+      -15.5,
+      -21.8
+     ]
+    }
+   },
+   "equal": null
+  },
+  {
+   "number": "gpt_oss_high_structured_mechanical",
+   "inventory": "66 of 69",
+   "S491": "15 of 48 tool or call failures; 19 of 48 with no code counted",
+   "equal": null
+  },
+  {
+   "number": "supp19b_tool_or_call_failure_other",
+   "inventory": 67,
+   "S491": 20,
+   "equal": false
+  }
+ ]
+}

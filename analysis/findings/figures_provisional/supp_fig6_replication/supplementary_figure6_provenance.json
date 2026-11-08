@@ -1,0 +1,242 @@
+{
+ "provenance": {
+  "script": "scripts/S523_supp_fig7_replication.py",
+  "script_sha256": "d94df6c418f4b2ef0042f60769b203fca6ef5c2a1e84d68f87e158acad324dfb",
+  "command": "uv run --frozen python scripts/S523_supp_fig7_replication.py",
+  "python": "3.13.11",
+  "deterministic": "no build time and no repository HEAD are recorded",
+  "inputs_sha256": {
+   "experiments/FIGURE_LOCK.toml": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+   "scripts/house_style.py": "647c8991f4dcd2cea08e0be46eaf758beb55fb029c54bb267e7fba1e0b8b17b6",
+   "scripts/S457_fig2_panels.py": "13d631dd56b4311cc732f7fc28b2656014c58e0f6b61b9d9b2caa1e94d5a6699",
+   "scripts/S463_fig2_ranking.py": "2f93a2b5df2bd68bdcf38a372d6c737ecdbce54a4e68406f0b261e03fbd9af31",
+   "scripts/S518_split_confirmation.py": "a2042e9a5ff3727f3e014a580dd2cbdf5ddd21b89414f0b144892571a1a1d94e",
+   "scripts/judge_rows_v25.py": "aa90f42264e2ce21acfca52c2421d852607418981b6e9be8d8984a716b1ebddd",
+   "findings/figures_provisional/fig3_strategies/figure3_numbers.json": "984e34e93d115a98f5e07253c99d62bc09dcaea98a17ff3de8bc92831ddbab69",
+   "findings/recompute/S518_split_confirmation/second_judge.json": "36ec03b05e7e23ba19d5b816bcf7e9190f267ffef09c3dbb25b64f8fa9787bfe",
+   "findings/recompute/S518_split_confirmation/gemma3.json": "ebc15e1c2724bc4c554260a29e4e7735ae5d831c875a3783e9bb2bc8d83636ce",
+   "findings/recompute/S518_split_confirmation/qwen3-coder.json": "5ef0b4716ddb200938b3fbcb2d66a189be95a12a7a96062242d9bb46d3094215",
+   "findings/recompute/S518_split_confirmation/claude-haiku-4-5.json": "6c6569362612c7724f6f6c12c0a9ce07d96658b5ca3f19c0f2d0625e630cc4eb",
+   "findings/recompute/S518_split_confirmation/gemini-2.5-pro.json": "33de43424f593c360a917ebcf0822381b345b7f9ec69a13b5db399513ba1496a",
+   "findings/recompute/S518_split_confirmation/gemini-3-flash-preview.json": "fbb5a6eeaa3db06ea5adcb0269660bde91c4b8452a3d21a69342992268461b6e",
+   "frozen:S518/claude-haiku-4-5/s6t2_collect.jsonl": "fae78e98fa12028509e2b66a52486ac1723ea9df20f8821e2ab353eb13bbe045",
+   "frozen:S518/claude-haiku-4-5/t2_v24_collect.jsonl": "1c4ba5c388ec0db38cd78683b290a8bf77b13bfc60ea7fc64ddc1846bd8ebc85",
+   "frozen:S518/gemini-2.5-pro/s6t2g_collect.jsonl": "8c0df67c84166ec5d8ef61ebf379784f68db0f1e0d9df7aa520bfbb3dbbc367d",
+   "frozen:S518/gemini-2.5-pro/t2g_collect.jsonl": "4fc0335b2f84a9c77ab486a9ddc5feede9196a304ea7edcad0ce529ff16f6162",
+   "frozen:S518/gemma3/collect.jsonl": "7fe93cde92d374b3e54c2d7db750152e9a4abe90f4a4e3b76b4ad383889a57e0",
+   "frozen:S518/qwen3-coder/collect.jsonl": "82f3415211dff2893a244b40e751a4a644a2f3f4a5ce5e3d398a60f6d4a58a38",
+   "frozen:fig2/g1_collect.jsonl": "f5ff75bc244cda492a48e7e11f54f2007ed7d586a8f49e78921edd7244b28965",
+   "frozen:fig3_s6/out_s6_g1/judge/exp_01__multi_hop__exp_v4_s20_n0/judge_passages.jsonl": "5c627d16e6a8249903396e92774b1cf4cae12f9160283e724059a4892986a601",
+   "frozen:fig3_s6/out_s6_g1/judge/exp_01__multi_hop__exp_v4_s20_n0/judge_passages_headers.jsonl": "ffb615658a8faaa6f32dfb4c78645c5582b10fef8c22f2a3a4339803ad5c0cce",
+   "frozen:fig3_s6/out_s6_g1/judge/exp_01__multi_hop__exp_v4_s20_n0/judge_passages_recheck.jsonl": "1268b7ee6ccba5e75754861a43cc5fa1f14d53f2b063e335c6c9f3930eac8aa7",
+   "frozen:fig3_s6/out_s6_g1/judge/exp_01__rlm_10__exp_v4_s20_n0/judge_passages.jsonl": "7eb72946a72e41752f48040ccdd68ec930a2622076b3f61af25405ec53bdb60f",
+   "frozen:fig3_s6/out_s6_g1/judge/exp_01__rlm_10__exp_v4_s20_n0/judge_passages_headers.jsonl": "b11a13abf0fbfdc974086ae887692f0b8dc94ce569962ca705ed0d3d156d0275",
+   "frozen:fig3_s6/out_s6_g1/judge/exp_01__rlm_10__exp_v4_s20_n0/judge_passages_recheck.jsonl": "02d6bc3012f435597d8e3131ccb16cc6c414b865a5865d12ad6c2c4a47ee6c3c",
+   "frozen:fig3_s6/out_s6_g1/judge/exp_01__rlm_20__exp_v4_s20_n0/judge_passages.jsonl": "a71c7560b6ec6c6e0440e6c028e957d963cb17dc92138fbb7ae55e2d51fe1ca3",
+   "frozen:fig3_s6/out_s6_g1/judge/exp_01__rlm_20__exp_v4_s20_n0/judge_passages_headers.jsonl": "5f1ee2787085c33162834020fb6ec4d97af2594d05f0fc5036347949d44e3bd3",
+   "frozen:fig3_s6/out_s6_g1/judge/exp_01__rlm_20__exp_v4_s20_n0/judge_passages_recheck.jsonl": "52576a4de0923f9dd85e3d8c2027d43ee16641f7d1d5df7cd6e0dd8313dbec90",
+   "frozen:fig3_s6/out_s6_g1/judge/exp_01__rlm_5__exp_v4_s20_n0/judge_passages.jsonl": "8b481cd0b4bd13cb01cfe29c297ba68aed2aec52123baa7ca9885fb26ac05488",
+   "frozen:fig3_s6/out_s6_g1/judge/exp_01__rlm_5__exp_v4_s20_n0/judge_passages_headers.jsonl": "7d863bd1cf0f9890b629487399a69ecf61b0a24407a78d7217d8cfad847d68b1",
+   "frozen:fig3_s6/out_s6_g1/judge/exp_01__rlm_5__exp_v4_s20_n0/judge_passages_recheck.jsonl": "8978d0f008fe8db4bcc9f3dea6d5ad0774a7dc84c8218d183933a9e1a2a91162",
+   "frozen:fig3_s6/out_s6_g1/judge/exp_01__single_pass__exp_v4_s20_n0/judge_passages.jsonl": "5aedc3d2ee388fd8942db0db4012e4bbfba51e3b2fbb5037e6dd7c0223ecc1cf",
+   "frozen:fig3_s6/out_s6_g1/judge/exp_01__single_pass__exp_v4_s20_n0/judge_passages_headers.jsonl": "89cebd7b9a8ebaf87b92541f388906cc09d23c1261d880ca0c2344fd3e15accd",
+   "frozen:fig3_s6/out_s6_g1/judge/exp_01__single_pass__exp_v4_s20_n0/judge_passages_recheck.jsonl": "dc49d56d0e1cf9173941e3c007e046cb16f939441d5392ba1e0a272b17eb51b2",
+   "frozen:fig3_s6/out_s6_g1/judge/exp_01__verified_pass__exp_v4_s20_n0/judge_passages.jsonl": "5e79f13df95a3f6e2d4d16971729a2278eb3efeb56d9db2a62b29e1a8c637564",
+   "frozen:fig3_s6/out_s6_g1/judge/exp_01__verified_pass__exp_v4_s20_n0/judge_passages_headers.jsonl": "3eed27d90d1a5bdb760ca25f9ebf1415a8d2ec4982d3b5ac4038fc3fcca2c12a",
+   "frozen:fig3_s6/out_s6_g1/judge/exp_01__verified_pass__exp_v4_s20_n0/judge_passages_recheck.jsonl": "eac00b642cbdf0a22e2a0bd00d393edbb0c73d564f0004557341022bd3f6500a",
+   "frozen:fig3_s6/out_s6_g1r15/judge/exp_01__rlm_10__exp_v4_s20_n0/judge_passages.jsonl": "0446a812bc5d030a24142158edb53adfd005f36628ec3086ecfb03fd2530d5af",
+   "frozen:fig3_s6/out_s6_g1r15/judge/exp_01__rlm_10__exp_v4_s20_n0/judge_passages_headers.jsonl": "ba24f0eec2620bce6c5347ef43afd2f1a05e00b26dd4bd5a9191a311ea099643",
+   "frozen:fig3_s6/out_s6_g1r15/judge/exp_01__rlm_10__exp_v4_s20_n0/judge_passages_recheck.jsonl": "82ea8559e5fbdef63d97a1db0cd700fa9b4dd6647605d9dba005b5976621438d",
+   "frozen:fig3_s6/out_s6_g1r15/judge/exp_01__rlm_20__exp_v4_s20_n0/judge_passages.jsonl": "0772d4465829a8d723b55fa54332ef005d551fefd2e406f35314dc6a8dafafb3",
+   "frozen:fig3_s6/out_s6_g1r15/judge/exp_01__rlm_20__exp_v4_s20_n0/judge_passages_headers.jsonl": "1fa043727dae54ac1d745ecc8c8367899f8277dd40f1b2a8a72487138f77f26d",
+   "frozen:fig3_s6/out_s6_g1r15/judge/exp_01__rlm_20__exp_v4_s20_n0/judge_passages_recheck.jsonl": "4475e63d3d27772d2bbd8b9d11adb4db17e4c8bd1e6efa6a6f26fd41cd1af141",
+   "frozen:fig3_s6/out_s6_g1r15/judge/exp_01__rlm_5__exp_v4_s20_n0/judge_passages.jsonl": "857be4c27e3f0e96b2d3812c702e17ea58c975f6bc591e7e39f117dd4e91fe37",
+   "frozen:fig3_s6/out_s6_g1r15/judge/exp_01__rlm_5__exp_v4_s20_n0/judge_passages_headers.jsonl": "1a1868c31bcef15a5051ae14c5435ade60f5cff676ab2ab3977fcf4442e22e27",
+   "frozen:fig3_s6/out_s6_g1r15/judge/exp_01__rlm_5__exp_v4_s20_n0/judge_passages_recheck.jsonl": "b8fdb016d7cb74fe3b5a6d3d10a26716fd3e4c37456fb7cdb54a4393d34851e2",
+   "frozen:fig3_s6/s6_g1_collect.jsonl": "2a79dc76e87e362513b414776c39873c068466195c23ce979a439afad46462d3",
+   "frozen:t2_local_v25/out_s6_w_t2lgemma_laptop/judge/exp_01__multi_hop__exp_v4_s20_n0+gemma3-27b/judge_passages.jsonl": "9b08c3f6d0b50f65d65fc367769862ae26645f8a47459a891b69c60fce074efe",
+   "frozen:t2_local_v25/out_s6_w_t2lgemma_laptop/judge/exp_01__multi_hop__exp_v4_s20_n0+gemma3-27b/judge_passages_headers.jsonl": "9fd2361475c68eb88aab6edbb7cf934658bda063003732062deceb1a63aa3976",
+   "frozen:t2_local_v25/out_s6_w_t2lgemma_laptop/judge/exp_01__multi_hop__exp_v4_s20_n0+gemma3-27b/judge_passages_recheck.jsonl": "ada6664714cddcd9fffa4ed08df3fa87d23eecaf423ca4bd7d79b993da71abcc",
+   "frozen:t2_local_v25/out_s6_w_t2lgemma_laptop/judge/exp_01__rlm_10__exp_v4_s20_n0+gemma3-27b/judge_passages.jsonl": "ee7fa7fc7b81ad6104c548815505fc45ccb642f62264a71402e63a9fa1c93354",
+   "frozen:t2_local_v25/out_s6_w_t2lgemma_laptop/judge/exp_01__rlm_10__exp_v4_s20_n0+gemma3-27b/judge_passages_headers.jsonl": "a6ddbdfd2b4bed4ea26f6df6eb9c8dd7cd4a81e73f7b48a41bb81e29d28d1b88",
+   "frozen:t2_local_v25/out_s6_w_t2lgemma_laptop/judge/exp_01__rlm_10__exp_v4_s20_n0+gemma3-27b/judge_passages_recheck.jsonl": "41034ae6b1deaea0f7413b3d48da7673f3bf7b39fccd56dbf4b7e499091fbef0",
+   "frozen:t2_local_v25/out_s6_w_t2lgemma_laptop/judge/exp_01__rlm_20__exp_v4_s20_n0+gemma3-27b/judge_passages.jsonl": "014dbfadf553e4811d89ac8626848a085100cdba615ae519bbaafe5f91cb0935",
+   "frozen:t2_local_v25/out_s6_w_t2lgemma_laptop/judge/exp_01__rlm_20__exp_v4_s20_n0+gemma3-27b/judge_passages_headers.jsonl": "467b841d9c59aa735a4cafb51c101fcbaf8762eb676d6c84bf89b2d3f6c69545",
+   "frozen:t2_local_v25/out_s6_w_t2lgemma_laptop/judge/exp_01__rlm_20__exp_v4_s20_n0+gemma3-27b/judge_passages_recheck.jsonl": "009b16929c80528bda9505bbb6fc88ddc12d767b9453d6075544fd904f5cff62",
+   "frozen:t2_local_v25/out_s6_w_t2lgemma_laptop/judge/exp_01__rlm_5__exp_v4_s20_n0+gemma3-27b/judge_passages.jsonl": "270d8e1ed25076795de7bf07ea72f1bec8949f480b93af611f3442e57dbd3be9",
+   "frozen:t2_local_v25/out_s6_w_t2lgemma_laptop/judge/exp_01__rlm_5__exp_v4_s20_n0+gemma3-27b/judge_passages_headers.jsonl": "1e6356ab4dffd3763ecfdf06310c337f7ca3009fe429bab8c43d6b8d657538f3",
+   "frozen:t2_local_v25/out_s6_w_t2lgemma_laptop/judge/exp_01__rlm_5__exp_v4_s20_n0+gemma3-27b/judge_passages_recheck.jsonl": "790106b8c93302ec642f58720d9ea5ecd4d47367d785301af1a610e42ad528ae",
+   "frozen:t2_local_v25/out_s6_w_t2lgemma_laptop/judge/exp_01__single_pass__exp_v4_s20_n0+gemma3-27b/judge_passages.jsonl": "9f99695df99d131698a7152f78a9ddbe6aa91e32bc48d8032409b1c7d9add994",
+   "frozen:t2_local_v25/out_s6_w_t2lgemma_laptop/judge/exp_01__single_pass__exp_v4_s20_n0+gemma3-27b/judge_passages_headers.jsonl": "219b4c0942572054f0f01eed7092f8f8bc6f6c1ac8332d9d4d7529956169cdc8",
+   "frozen:t2_local_v25/out_s6_w_t2lgemma_laptop/judge/exp_01__single_pass__exp_v4_s20_n0+gemma3-27b/judge_passages_recheck.jsonl": "f4c644a6092be3049d5a30b49c42123ff12042cf1b80334e4935f10a1e9aac97",
+   "frozen:t2_local_v25/out_s6_w_t2lgemma_laptop/judge/exp_01__verified_pass__exp_v4_s20_n0+gemma3-27b/judge_passages.jsonl": "e22dee1125236331df9d621ae9c8291557f8f04f7f0d86f90f0f93ae6a864fbb",
+   "frozen:t2_local_v25/out_s6_w_t2lgemma_laptop/judge/exp_01__verified_pass__exp_v4_s20_n0+gemma3-27b/judge_passages_headers.jsonl": "ace4767234907a6c690bb22d91acac9149f577ceb7218cc7e9e694997e51e7e0",
+   "frozen:t2_local_v25/out_s6_w_t2lgemma_laptop/judge/exp_01__verified_pass__exp_v4_s20_n0+gemma3-27b/judge_passages_recheck.jsonl": "607e95f4e6f0f2e408711fe21bcaf947ae83e1453f8aa95c0af396689123448c",
+   "frozen:t2_local_v25/out_s6_w_t2lgemma_studio/judge/exp_01__rlm_10__exp_v4_s20_n0+gemma3-27b/judge_passages.jsonl": "9fa56b605313619a4b8b7f23071a65f5661bc8873e232cb076d366d3a7ed896a",
+   "frozen:t2_local_v25/out_s6_w_t2lgemma_studio/judge/exp_01__rlm_10__exp_v4_s20_n0+gemma3-27b/judge_passages_headers.jsonl": "7ec7075c5418557f6c464e1b28fff582a6b8bc7865a87a26aac96081f7189bad",
+   "frozen:t2_local_v25/out_s6_w_t2lgemma_studio/judge/exp_01__rlm_10__exp_v4_s20_n0+gemma3-27b/judge_passages_recheck.jsonl": "bf5dc598cead3e35d17a8634e957a7feec2dbf507f844dfb3ea40f1d3723994f",
+   "frozen:t2_local_v25/out_s6_w_t2lqcoder/judge/exp_01__multi_hop__exp_v4_s20_n0+qwen3-coder-30b/judge_passages.jsonl": "90b23d7f4c8102b69b570e7059e94e4ba54e72df115f625aa77f25287d545a8b",
+   "frozen:t2_local_v25/out_s6_w_t2lqcoder/judge/exp_01__multi_hop__exp_v4_s20_n0+qwen3-coder-30b/judge_passages_headers.jsonl": "e7407bd4903c00b433923bfb3acf9a37749c3c176ca3bbf49c3aa546c372ac80",
+   "frozen:t2_local_v25/out_s6_w_t2lqcoder/judge/exp_01__multi_hop__exp_v4_s20_n0+qwen3-coder-30b/judge_passages_recheck.jsonl": "a27dbe8f973abc50bfcb1c89952abd5f8d8407e1331d06be505d86e777d0d5ac",
+   "frozen:t2_local_v25/out_s6_w_t2lqcoder/judge/exp_01__rlm_10__exp_v4_s20_n0+qwen3-coder-30b/judge_passages.jsonl": "edc8c1f0ac8edb024519d9f93847c5e7bb058f4cf7db25307260b73a804d8a09",
+   "frozen:t2_local_v25/out_s6_w_t2lqcoder/judge/exp_01__rlm_10__exp_v4_s20_n0+qwen3-coder-30b/judge_passages_headers.jsonl": "7e9107321263299f29a4feb516d59ff3af56dbb3099ed5df206cf8d46eab2e36",
+   "frozen:t2_local_v25/out_s6_w_t2lqcoder/judge/exp_01__rlm_10__exp_v4_s20_n0+qwen3-coder-30b/judge_passages_recheck.jsonl": "98f2f6c34f2ebbf2d8ad987d8f3365aa6dd82df895b1892518e9b8bba497507b",
+   "frozen:t2_local_v25/out_s6_w_t2lqcoder/judge/exp_01__rlm_20__exp_v4_s20_n0+qwen3-coder-30b/judge_passages.jsonl": "2f481c6be00601cd4ebfe019d6723cecb3da03d7358df3b739dc7afddc74083f",
+   "frozen:t2_local_v25/out_s6_w_t2lqcoder/judge/exp_01__rlm_20__exp_v4_s20_n0+qwen3-coder-30b/judge_passages_headers.jsonl": "59c753cb474b94d7269e306454ec4e0684a1bdf368ea17ef23ca1df12b9a2ec1",
+   "frozen:t2_local_v25/out_s6_w_t2lqcoder/judge/exp_01__rlm_20__exp_v4_s20_n0+qwen3-coder-30b/judge_passages_recheck.jsonl": "965c4e988f79265bc68a7c9366ccf77629caa41978b28834c387d50b7b073208",
+   "frozen:t2_local_v25/out_s6_w_t2lqcoder/judge/exp_01__rlm_5__exp_v4_s20_n0+qwen3-coder-30b/judge_passages.jsonl": "d8f17cd2d79e44b3e7a1f373a3c46ff17d628ede1f8f4078460da25cf837c424",
+   "frozen:t2_local_v25/out_s6_w_t2lqcoder/judge/exp_01__rlm_5__exp_v4_s20_n0+qwen3-coder-30b/judge_passages_headers.jsonl": "4df59458e47c0ddb729bbfd5294e346b96aa1770990070d9174937873eb83157",
+   "frozen:t2_local_v25/out_s6_w_t2lqcoder/judge/exp_01__rlm_5__exp_v4_s20_n0+qwen3-coder-30b/judge_passages_recheck.jsonl": "d373d8f8e15158d8f3a99d0af59a431c6cfe25982fa803252d51afe8d2a76049",
+   "frozen:t2_local_v25/out_s6_w_t2lqcoder/judge/exp_01__single_pass__exp_v4_s20_n0+qwen3-coder-30b/judge_passages.jsonl": "fb789343b0b8eced0328722bf821edfd44d29bffb9b685fdad0663f74700d87e",
+   "frozen:t2_local_v25/out_s6_w_t2lqcoder/judge/exp_01__single_pass__exp_v4_s20_n0+qwen3-coder-30b/judge_passages_headers.jsonl": "9a6a401088f62e623170ca42e7597d86b6e9bbe62c4d0faf9750361f027c43d6",
+   "frozen:t2_local_v25/out_s6_w_t2lqcoder/judge/exp_01__single_pass__exp_v4_s20_n0+qwen3-coder-30b/judge_passages_recheck.jsonl": "d18cf6bd5356a1ecdeb0a6ce4b575e56c4dfbeaf7903eb334a2c8eb350590d88",
+   "frozen:t2_local_v25/out_s6_w_t2lqcoder/judge/exp_01__verified_pass__exp_v4_s20_n0+qwen3-coder-30b/judge_passages.jsonl": "bd8401c491d973bcc37ce1f12fe7e25c17f9ad14f7746a1c0bf9fc2ad0bec1a6",
+   "frozen:t2_local_v25/out_s6_w_t2lqcoder/judge/exp_01__verified_pass__exp_v4_s20_n0+qwen3-coder-30b/judge_passages_headers.jsonl": "69d69ac31bb5be9a3582a3704aa53fa7a7877123f932aaa3fe6932f7f9838a87",
+   "frozen:t2_local_v25/out_s6_w_t2lqcoder/judge/exp_01__verified_pass__exp_v4_s20_n0+qwen3-coder-30b/judge_passages_recheck.jsonl": "fd7e88f8c2c3fafb5115db61007dfa1e031aaf5feca4f9ad50f5f9f7f36044a6",
+   "frozen:t2_local_v25/t2lgemma_collect.jsonl": "e355911470ffd8e09e23d752eb70e4dd22a8b9a62369ced82184e2a13fc5ce22",
+   "frozen:t2_local_v25/t2lqcoder_collect.jsonl": "2f0519844bd0a8373d7f1951bacf5d3c09b7afdfcc4a386f77da0e4caa6e4f1a"
+  },
+  "reproduced": {
+   "c": [
+    "panel e: S518's verdicts read, each reading S518.reading's for its interval: second_judge (test) I 33.3 points, agrees; gemma3 (test) I 13.8 points, not shown; qwen3-coder (test) I 28.2 points, agrees; claude-haiku-4-5 (beside) I 55.7 points, agrees; gemini-2.5-pro (beside) I 56.7 points, agrees; gemini-3-flash-preview (reference, key v2.5) I 56.9 points, agrees"
+   ],
+   "a and b": [
+    "gemini-3-flash-preview: S518's D_one and D_many with intervals",
+    "claude-haiku-4-5: S518's D_one and D_many with intervals",
+    "gemini-2.5-pro: S518's D_one and D_many with intervals",
+    "gemini-3-flash: Figure 3a's six pass rates at score 4 (figure3_numbers.json)",
+    "1359 of 1359 rows of findings/recompute/S518_inputs/gemma3/collect.jsonl give the same cell in findings/recompute/t2_local_v25_inputs/t2lgemma_collect.jsonl",
+    "945 of 945 rows of findings/recompute/S518_inputs/qwen3-coder/collect.jsonl give the same cell in findings/recompute/t2_local_v25_inputs/t2lqcoder_collect.jsonl"
+   ]
+  },
+  "judge_codes": {
+   "claude-haiku-4-5": {
+    "v2.4": {
+     "judge_codes": 2,
+     "run_sha256": [
+      "38ae79ab023b97562b69b2875b3c8001b02f887d5578121103b85d4a0b4729da",
+      "11e51fde82185384415ce4d0db1571ab7f442e0def3a6ea2cf81a98d44c1cd8c"
+     ],
+     "proof": "findings/recompute/S495_t2_judge_code_proof/verdict.json",
+     "verdict_sha256": "f6f37c89d2cc4e528aa7d5be013f7dfb6b73b7e9a9ebffae83bdba3424e64e65",
+     "offline_sha256": "71741ffe4d117b29e2567a1234ae5edbebeaccd225b686fce279951fc51db25b",
+     "rows_sha256": "2af63368515e4ff9a03a8fa833ba28d32bee6b66144045e9360f0883397fe19f",
+     "n": 120
+    },
+    "v2.5": {
+     "judge_codes": 1,
+     "run_sha256": [
+      "211568dbdfa09482e9c0abfb3b1da92d0bbd62d14a7646058663a990cbb54235"
+     ],
+     "key": "v2.5"
+    }
+   },
+   "gemini-2.5-pro": {
+    "v2.4": {
+     "judge_codes": 2,
+     "run_sha256": [
+      "38ae79ab023b97562b69b2875b3c8001b02f887d5578121103b85d4a0b4729da",
+      "11e51fde82185384415ce4d0db1571ab7f442e0def3a6ea2cf81a98d44c1cd8c"
+     ],
+     "proof": "findings/recompute/S495_t2_judge_code_proof/verdict.json",
+     "verdict_sha256": "f6f37c89d2cc4e528aa7d5be013f7dfb6b73b7e9a9ebffae83bdba3424e64e65",
+     "offline_sha256": "71741ffe4d117b29e2567a1234ae5edbebeaccd225b686fce279951fc51db25b",
+     "rows_sha256": "2af63368515e4ff9a03a8fa833ba28d32bee6b66144045e9360f0883397fe19f",
+     "n": 120
+    },
+    "v2.5": {
+     "judge_codes": 1,
+     "run_sha256": [
+      "211568dbdfa09482e9c0abfb3b1da92d0bbd62d14a7646058663a990cbb54235"
+     ],
+     "key": "v2.5"
+    }
+   },
+   "gemma3": {
+    "v2.5": {
+     "judge_codes": 2,
+     "run_sha256": [
+      "211568dbdfa09482e9c0abfb3b1da92d0bbd62d14a7646058663a990cbb54235",
+      "26705cceb6e1a6aa6e561958840cc8bd672b4448322d713dc7bc14331ef045e6"
+     ],
+     "key": "v2.5",
+     "rule": "D256 Q1",
+     "judge_passages_code_sha256": "f2fe242f21e1bfc8aa4706526ff815b3f14de137dd64b83365eb920fa1a93226",
+     "headers": {
+      "G1": 27,
+      "T2": 19
+     }
+    }
+   },
+   "qwen3-coder": {
+    "v2.5": {
+     "judge_codes": 2,
+     "run_sha256": [
+      "211568dbdfa09482e9c0abfb3b1da92d0bbd62d14a7646058663a990cbb54235",
+      "ca54067256df8d7445bcea8f8bc6ef35ee341ea2e98c411f149efa42063b4848"
+     ],
+     "key": "v2.5",
+     "rule": "D256 Q1",
+     "judge_passages_code_sha256": "f2fe242f21e1bfc8aa4706526ff815b3f14de137dd64b83365eb920fa1a93226",
+     "headers": {
+      "G1": 27,
+      "T2": 14
+     }
+    }
+   }
+  },
+  "rows": {
+   "gemini-3-flash-preview": {
+    "v24_rows": 2430,
+    "v25_rows": 1080,
+    "cells": 2430,
+    "v24_failed_awaiting_v25": 0
+   },
+   "gemma3": {
+    "v24_rows": 0,
+    "v25_rows": 1620,
+    "cells": 1620,
+    "v24_failed_awaiting_v25": 0
+   },
+   "qwen3-coder": {
+    "v24_rows": 0,
+    "v25_rows": 1620,
+    "cells": 1620,
+    "v24_failed_awaiting_v25": 0
+   },
+   "claude-haiku-4-5": {
+    "v24_rows": 2430,
+    "v25_rows": 1037,
+    "cells": 2430,
+    "v24_failed_awaiting_v25": 43
+   },
+   "gemini-2.5-pro": {
+    "v24_rows": 1349,
+    "v25_rows": 611,
+    "cells": 1349,
+    "v24_failed_awaiting_v25": 0
+   }
+  },
+  "decision": "D256 (Valerio, 5 Nov 18:46: 'Q1: ok, Q2: ok')",
+  "model_calls": 0
+ },
+ "stamp": "PROVISIONAL: panels a and b from the T2 judge rows on the final key (D256), 7,019 of 7,020 T2 answers read (claude-haiku-4-5 2,430, gemini-2.5-pro 1,349, gemma3:27b 1,620, qwen3-coder:30b 1,620); panel c from S518's committed verdicts (D195)",
+ "page_mm": [
+  183.0,
+  150.0
+ ],
+ "figure_lock": {
+  "path": "experiments/FIGURE_LOCK.toml",
+  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "status": "agreed"
+ },
+ "files": {
+  "Supplementary Figure 6 (provisional, 7019 of 7020).pdf": "9e9c40fff95fbade9c86b1831966adf76cd8c6d82d4bbfd6c5c5b18e493ca901",
+  "Supplementary Figure 6 (provisional, 7019 of 7020).svg": "1c579f19c5a0a92ff79e7cfc9d77cfa1551e3fc641de9c79d93e3ae5e4fc66df",
+  "Supplementary Figure 6 (provisional, 7019 of 7020).png": "5917e4e62ba035490cf00d06bdd3dfa12415b358eb0703797b7343927e6ff846",
+  "Supplementary Figure 6 data (provisional, 7019 of 7020).xlsx": "11a97f35647386561b255b4051aad0ccb83f012375fa0af605b705c25225bcdc",
+  "Supplementary Figure 6 data caption (provisional, 7019 of 7020).md": "925ffa9a5c99ffb6e54ef37bc8e09670cec13b5322383c7571b0116d0f9b395a",
+  "supplementary_figure6_numbers.json": "654a9013d6eefd4bf3fa63dca0f5960d95434c2427d734c685b51172726fcb48",
+  "legend_draft.md": "6afd1118ed58652de0f50a67f8f4237925a73ae6ea2ca0a4e98b704c3e9ec19d"
+ }
+}

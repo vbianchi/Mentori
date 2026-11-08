@@ -1,0 +1,481 @@
+{
+ "awaiting_s6": {
+  "answers": 0,
+  "by_unit": {},
+  "what": "draw-1 answers this table reads from a key v2.4 row of one of the 132 questions key v2.5 changed (judge_rows_v25.choose's 'v2.4 awaiting S6'): their cells can move once S6 judges them on v2.5"
+ },
+ "claim_text": {
+  "S1": {
+   "claim": "at 50 core papers single-pass beats RLM-10 at all three noise ratios (0x: 83.2% against 62.8%, 20.4 pp, Bonferroni P < 0.001 in each)",
+   "rule": "holds: single-pass ahead in all three, each Bonferroni P < 0.05; weakens: ahead in all three, not all significant; reverses: behind in any"
+  },
+  "S2": {
+   "claim": "no credible difference between RLM-10 and single-pass at 5, 10 or 20 core papers at any noise ratio (Bonferroni P = 1.00 in all nine cells)",
+   "rule": "a claim of no difference: reverses if any cell reaches Bonferroni P < 0.05; holds otherwise, but only at 80% coverage or more; minimum one cell with 10 pairs"
+  }
+ },
+ "claims": {
+  "S1": {
+   "failures_in": {
+    "holds_at_both_thresholds": false,
+    "score3": {
+     "cells": {
+      "50 core, 0x": {
+       "P": 0.7744140625,
+       "P_bonferroni": 1.0,
+       "n": 86,
+       "rlm_10": 0.9069767441860465,
+       "single_pass": 0.9302325581395349,
+       "sp_minus_rlm": 0.023255813953488344
+      },
+      "50 core, 1x": {
+       "P": 0.75390625,
+       "P_bonferroni": 1.0,
+       "n": 86,
+       "rlm_10": 0.9418604651162791,
+       "single_pass": 0.9186046511627908,
+       "sp_minus_rlm": -0.023255813953488344
+      },
+      "50 core, 3x": {
+       "P": 0.2890625,
+       "P_bonferroni": 1.0,
+       "n": 86,
+       "rlm_10": 0.9767441860465117,
+       "single_pass": 0.9302325581395349,
+       "sp_minus_rlm": -0.04651162790697683
+      }
+     },
+     "verdict": "reverses"
+    },
+    "score4": {
+     "cells": {
+      "50 core, 0x": {
+       "P": 0.005924612283706665,
+       "P_bonferroni": 0.07109534740447998,
+       "n": 86,
+       "rlm_10": 0.6395348837209303,
+       "single_pass": 0.813953488372093,
+       "sp_minus_rlm": 0.1744186046511627
+      },
+      "50 core, 1x": {
+       "P": 0.12144948495551944,
+       "P_bonferroni": 1.0,
+       "n": 86,
+       "rlm_10": 0.6976744186046511,
+       "single_pass": 0.813953488372093,
+       "sp_minus_rlm": 0.11627906976744186
+      },
+      "50 core, 3x": {
+       "P": 0.24778856337070465,
+       "P_bonferroni": 1.0,
+       "n": 86,
+       "rlm_10": 0.7093023255813954,
+       "single_pass": 0.7906976744186046,
+       "sp_minus_rlm": 0.08139534883720927
+      }
+     },
+     "verdict": "weakens"
+    }
+   },
+   "failures_left_out": {
+    "holds_at_both_thresholds": false,
+    "score3": {
+     "cells": {
+      "50 core, 0x": {
+       "P": 0.7744140625,
+       "P_bonferroni": 1.0,
+       "n": 86,
+       "rlm_10": 0.9069767441860465,
+       "single_pass": 0.9302325581395349,
+       "sp_minus_rlm": 0.023255813953488344
+      },
+      "50 core, 1x": {
+       "P": 0.75390625,
+       "P_bonferroni": 1.0,
+       "n": 86,
+       "rlm_10": 0.9418604651162791,
+       "single_pass": 0.9186046511627908,
+       "sp_minus_rlm": -0.023255813953488344
+      },
+      "50 core, 3x": {
+       "P": 0.2890625,
+       "P_bonferroni": 1.0,
+       "n": 86,
+       "rlm_10": 0.9767441860465117,
+       "single_pass": 0.9302325581395349,
+       "sp_minus_rlm": -0.04651162790697683
+      }
+     },
+     "verdict": "reverses"
+    },
+    "score4": {
+     "cells": {
+      "50 core, 0x": {
+       "P": 0.005924612283706665,
+       "P_bonferroni": 0.07109534740447998,
+       "n": 86,
+       "rlm_10": 0.6395348837209303,
+       "single_pass": 0.813953488372093,
+       "sp_minus_rlm": 0.1744186046511627
+      },
+      "50 core, 1x": {
+       "P": 0.12144948495551944,
+       "P_bonferroni": 1.0,
+       "n": 86,
+       "rlm_10": 0.6976744186046511,
+       "single_pass": 0.813953488372093,
+       "sp_minus_rlm": 0.11627906976744186
+      },
+      "50 core, 3x": {
+       "P": 0.24778856337070465,
+       "P_bonferroni": 1.0,
+       "n": 86,
+       "rlm_10": 0.7093023255813954,
+       "single_pass": 0.7906976744186046,
+       "sp_minus_rlm": 0.08139534883720927
+      }
+     },
+     "verdict": "weakens"
+    }
+   },
+   "verdict_differs_when_failures_left_out": false
+  },
+  "S2": {
+   "failures_in": {
+    "holds_at_both_thresholds": true,
+    "score3": {
+     "cells": {
+      "10 core, 0x": {
+       "P": 0.25,
+       "P_bonferroni": 1.0,
+       "n": 44,
+       "rlm_10": 1.0,
+       "single_pass": 0.9318181818181819,
+       "sp_minus_rlm": -0.06818181818181814
+      },
+      "10 core, 1x": {
+       "P": 1.0,
+       "P_bonferroni": 1.0,
+       "n": 44,
+       "rlm_10": 0.9318181818181819,
+       "single_pass": 0.9318181818181819,
+       "sp_minus_rlm": 0.0
+      },
+      "10 core, 3x": {
+       "P": 1.0,
+       "P_bonferroni": 1.0,
+       "n": 44,
+       "rlm_10": 0.9772727272727273,
+       "single_pass": 0.9545454545454546,
+       "sp_minus_rlm": -0.022727272727272804
+      },
+      "20 core, 0x": {
+       "P": 0.7744140625,
+       "P_bonferroni": 1.0,
+       "n": 86,
+       "rlm_10": 0.9418604651162791,
+       "single_pass": 0.9186046511627908,
+       "sp_minus_rlm": -0.023255813953488344
+      },
+      "20 core, 1x": {
+       "P": 0.75390625,
+       "P_bonferroni": 1.0,
+       "n": 86,
+       "rlm_10": 0.9534883720930233,
+       "single_pass": 0.9302325581395349,
+       "sp_minus_rlm": -0.023255813953488483
+      },
+      "20 core, 3x": {
+       "P": 0.75390625,
+       "P_bonferroni": 1.0,
+       "n": 86,
+       "rlm_10": 0.9534883720930233,
+       "single_pass": 0.9302325581395349,
+       "sp_minus_rlm": -0.023255813953488483
+      },
+      "5 core, 0x": {
+       "P": 1.0,
+       "P_bonferroni": 1.0,
+       "n": 22,
+       "rlm_10": 0.8636363636363636,
+       "single_pass": 0.9090909090909091,
+       "sp_minus_rlm": 0.04545454545454547
+      },
+      "5 core, 1x": {
+       "P": 1.0,
+       "P_bonferroni": 1.0,
+       "n": 22,
+       "rlm_10": 0.9545454545454546,
+       "single_pass": 0.9090909090909091,
+       "sp_minus_rlm": -0.04545454545454547
+      },
+      "5 core, 3x": {
+       "P": 1.0,
+       "P_bonferroni": 1.0,
+       "n": 22,
+       "rlm_10": 0.9090909090909091,
+       "single_pass": 0.9090909090909091,
+       "sp_minus_rlm": 0.0
+      }
+     },
+     "coverage": 1.0,
+     "min_P_bonferroni": 1.0,
+     "n_cells": 9,
+     "n_significant": 0,
+     "verdict": "holds"
+    },
+    "score4": {
+     "cells": {
+      "10 core, 0x": {
+       "P": 0.34375,
+       "P_bonferroni": 1.0,
+       "n": 44,
+       "rlm_10": 0.7727272727272727,
+       "single_pass": 0.8636363636363636,
+       "sp_minus_rlm": 0.09090909090909094
+      },
+      "10 core, 1x": {
+       "P": 0.210113525390625,
+       "P_bonferroni": 1.0,
+       "n": 44,
+       "rlm_10": 0.7045454545454546,
+       "single_pass": 0.8409090909090909,
+       "sp_minus_rlm": 0.1363636363636364
+      },
+      "10 core, 3x": {
+       "P": 0.4239501953125,
+       "P_bonferroni": 1.0,
+       "n": 44,
+       "rlm_10": 0.7727272727272727,
+       "single_pass": 0.8636363636363636,
+       "sp_minus_rlm": 0.09090909090909094
+      },
+      "20 core, 0x": {
+       "P": 0.0783538818359375,
+       "P_bonferroni": 0.94024658203125,
+       "n": 86,
+       "rlm_10": 0.7325581395348837,
+       "single_pass": 0.8372093023255814,
+       "sp_minus_rlm": 0.10465116279069775
+      },
+      "20 core, 1x": {
+       "P": 0.5234670639038086,
+       "P_bonferroni": 1.0,
+       "n": 86,
+       "rlm_10": 0.7906976744186046,
+       "single_pass": 0.8372093023255814,
+       "sp_minus_rlm": 0.04651162790697683
+      },
+      "20 core, 3x": {
+       "P": 0.16863754391670227,
+       "P_bonferroni": 1.0,
+       "n": 86,
+       "rlm_10": 0.7441860465116279,
+       "single_pass": 0.8372093023255814,
+       "sp_minus_rlm": 0.09302325581395351
+      },
+      "5 core, 0x": {
+       "P": 0.5078125,
+       "P_bonferroni": 1.0,
+       "n": 22,
+       "rlm_10": 0.6818181818181819,
+       "single_pass": 0.8181818181818181,
+       "sp_minus_rlm": 0.13636363636363627
+      },
+      "5 core, 1x": {
+       "P": 1.0,
+       "P_bonferroni": 1.0,
+       "n": 22,
+       "rlm_10": 0.8181818181818181,
+       "single_pass": 0.8181818181818181,
+       "sp_minus_rlm": 0.0
+      },
+      "5 core, 3x": {
+       "P": 1.0,
+       "P_bonferroni": 1.0,
+       "n": 22,
+       "rlm_10": 0.8636363636363636,
+       "single_pass": 0.8181818181818181,
+       "sp_minus_rlm": -0.04545454545454547
+      }
+     },
+     "coverage": 1.0,
+     "min_P_bonferroni": 0.94024658203125,
+     "n_cells": 9,
+     "n_significant": 0,
+     "verdict": "holds"
+    }
+   },
+   "failures_left_out": {
+    "holds_at_both_thresholds": true,
+    "score3": {
+     "cells": {
+      "10 core, 0x": {
+       "P": 0.25,
+       "P_bonferroni": 1.0,
+       "n": 44,
+       "rlm_10": 1.0,
+       "single_pass": 0.9318181818181819,
+       "sp_minus_rlm": -0.06818181818181814
+      },
+      "10 core, 1x": {
+       "P": 1.0,
+       "P_bonferroni": 1.0,
+       "n": 44,
+       "rlm_10": 0.9318181818181819,
+       "single_pass": 0.9318181818181819,
+       "sp_minus_rlm": 0.0
+      },
+      "10 core, 3x": {
+       "P": 1.0,
+       "P_bonferroni": 1.0,
+       "n": 44,
+       "rlm_10": 0.9772727272727273,
+       "single_pass": 0.9545454545454546,
+       "sp_minus_rlm": -0.022727272727272804
+      },
+      "20 core, 0x": {
+       "P": 0.7744140625,
+       "P_bonferroni": 1.0,
+       "n": 86,
+       "rlm_10": 0.9418604651162791,
+       "single_pass": 0.9186046511627908,
+       "sp_minus_rlm": -0.023255813953488344
+      },
+      "20 core, 1x": {
+       "P": 0.75390625,
+       "P_bonferroni": 1.0,
+       "n": 86,
+       "rlm_10": 0.9534883720930233,
+       "single_pass": 0.9302325581395349,
+       "sp_minus_rlm": -0.023255813953488483
+      },
+      "20 core, 3x": {
+       "P": 0.75390625,
+       "P_bonferroni": 1.0,
+       "n": 86,
+       "rlm_10": 0.9534883720930233,
+       "single_pass": 0.9302325581395349,
+       "sp_minus_rlm": -0.023255813953488483
+      },
+      "5 core, 0x": {
+       "P": 1.0,
+       "P_bonferroni": 1.0,
+       "n": 22,
+       "rlm_10": 0.8636363636363636,
+       "single_pass": 0.9090909090909091,
+       "sp_minus_rlm": 0.04545454545454547
+      },
+      "5 core, 1x": {
+       "P": 1.0,
+       "P_bonferroni": 1.0,
+       "n": 22,
+       "rlm_10": 0.9545454545454546,
+       "single_pass": 0.9090909090909091,
+       "sp_minus_rlm": -0.04545454545454547
+      },
+      "5 core, 3x": {
+       "P": 1.0,
+       "P_bonferroni": 1.0,
+       "n": 22,
+       "rlm_10": 0.9090909090909091,
+       "single_pass": 0.9090909090909091,
+       "sp_minus_rlm": 0.0
+      }
+     },
+     "coverage": 1.0,
+     "min_P_bonferroni": 1.0,
+     "n_cells": 9,
+     "n_significant": 0,
+     "verdict": "holds"
+    },
+    "score4": {
+     "cells": {
+      "10 core, 0x": {
+       "P": 0.34375,
+       "P_bonferroni": 1.0,
+       "n": 44,
+       "rlm_10": 0.7727272727272727,
+       "single_pass": 0.8636363636363636,
+       "sp_minus_rlm": 0.09090909090909094
+      },
+      "10 core, 1x": {
+       "P": 0.210113525390625,
+       "P_bonferroni": 1.0,
+       "n": 44,
+       "rlm_10": 0.7045454545454546,
+       "single_pass": 0.8409090909090909,
+       "sp_minus_rlm": 0.1363636363636364
+      },
+      "10 core, 3x": {
+       "P": 0.4239501953125,
+       "P_bonferroni": 1.0,
+       "n": 44,
+       "rlm_10": 0.7727272727272727,
+       "single_pass": 0.8636363636363636,
+       "sp_minus_rlm": 0.09090909090909094
+      },
+      "20 core, 0x": {
+       "P": 0.0783538818359375,
+       "P_bonferroni": 0.94024658203125,
+       "n": 86,
+       "rlm_10": 0.7325581395348837,
+       "single_pass": 0.8372093023255814,
+       "sp_minus_rlm": 0.10465116279069775
+      },
+      "20 core, 1x": {
+       "P": 0.5234670639038086,
+       "P_bonferroni": 1.0,
+       "n": 86,
+       "rlm_10": 0.7906976744186046,
+       "single_pass": 0.8372093023255814,
+       "sp_minus_rlm": 0.04651162790697683
+      },
+      "20 core, 3x": {
+       "P": 0.16863754391670227,
+       "P_bonferroni": 1.0,
+       "n": 86,
+       "rlm_10": 0.7441860465116279,
+       "single_pass": 0.8372093023255814,
+       "sp_minus_rlm": 0.09302325581395351
+      },
+      "5 core, 0x": {
+       "P": 0.5078125,
+       "P_bonferroni": 1.0,
+       "n": 22,
+       "rlm_10": 0.6818181818181819,
+       "single_pass": 0.8181818181818181,
+       "sp_minus_rlm": 0.13636363636363627
+      },
+      "5 core, 1x": {
+       "P": 1.0,
+       "P_bonferroni": 1.0,
+       "n": 22,
+       "rlm_10": 0.8181818181818181,
+       "single_pass": 0.8181818181818181,
+       "sp_minus_rlm": 0.0
+      },
+      "5 core, 3x": {
+       "P": 1.0,
+       "P_bonferroni": 1.0,
+       "n": 22,
+       "rlm_10": 0.8636363636363636,
+       "single_pass": 0.8181818181818181,
+       "sp_minus_rlm": -0.04545454545454547
+      }
+     },
+     "coverage": 1.0,
+     "min_P_bonferroni": 0.94024658203125,
+     "n_cells": 9,
+     "n_significant": 0,
+     "verdict": "holds"
+    }
+   },
+   "verdict_differs_when_failures_left_out": false
+  }
+ },
+ "pairing": "D126's covered questions with both cells present (S476.grid_point), not S393's 'both answered' on the April exp05 tables (design Q3)",
+ "provisional": true,
+ "rests_on": "draw 1, every covered question (D98's main estimate)",
+ "what": "P4 (e): S393's v_s1 (single pass ahead of RLM-10 at 50 core papers in all three ratios, each Bonferroni x12\nP < 0.05) and v_s2 (no cell at 5, 10 or 20 core papers with Bonferroni P < 0.05), on the draw-1 cells of RLM-10\nagainst single pass over D126's covered questions; the sign-flip P is Rule 3's (on one draw the exact McNemar).\nFailures in (the grid's cells, checked equal) and left out (Rule 10). S2 is a claim of no difference, so, as S393's\ndecide does for such a claim (S393_early_claims.py:70, :1879-1880), its \"holds\" stands only when at least 80% of\nits 9 cells are complete (S2_COVERAGE_MIN; 8 of 9), else \"not enough data\"; a \"reverses\" stands at any coverage.\nHolds at both thresholds only when both verdicts are holds (LIST.md Rule 5)."
+}

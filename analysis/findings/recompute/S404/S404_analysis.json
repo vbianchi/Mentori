@@ -1,0 +1,548 @@
+{
+ "script": "scripts/S404_calibration_extended.py",
+ "script_sha256": "042accc8dfb653430d94c4d48aebcfc2ee49f15c48941d76d0f4fc01a00673cd",
+ "written": "2026-10-13T07:33:33",
+ "machine": "Valerios-MacBook-Pro.local",
+ "plan": "<repo>/findings/recompute/S404/S404_plan.json",
+ "plan_sha256": "6ca17c0431ed59e1331a95bf99666fd47bcc481a80bc8231a0554f8a2ecdd157",
+ "plan_script_sha256": "042accc8dfb653430d94c4d48aebcfc2ee49f15c48941d76d0f4fc01a00673cd",
+ "key_sha256": "5d8362ae931dc0fe0cc132be6b5e57187e3ae7d3131d86f63cdf1a44633fadd5",
+ "citation_count": "text",
+ "ledgers": {
+  "<repo>/findings/recompute/S404/S404_calibration_extended.jsonl": "3cfce804be642e22c63055527be04b61ad77b2418116b770b40f625cb7a8e287"
+ },
+ "rule": "The judge with the highest composite in table A (the answers all four judges scored) is selected if the 95% interval of its difference from every other judge, over 2,000 paired bootstrap resamples of those answers (seed 20261012), excludes 0. Otherwise the result is a tie among it and every judge whose interval with it includes 0, and D8 is decided among the tied judges by the O50 repeatability results (S377).",
+ "rule_in_plan": "The judge with the highest composite in table A (the answers all four judges scored) is selected if the 95% interval of its difference from every other judge, over 2,000 paired bootstrap resamples of those answers (seed 20261012), excludes 0. Otherwise the result is a tie among it and every judge whose interval with it includes 0, and D8 is decided among the tied judges by the O50 repeatability results (S377).",
+ "rule_is_the_plans": true,
+ "full_plan": true,
+ "script_is_the_plans": true,
+ "rows_judged_with_any_machine": 0,
+ "gate_files": {
+  "<repo>/findings/recompute/S404/S404_gate.jsonl": "4192b21bbe94c4be73cf4ca92858ee99249fcf6ed0f3437bd97cc4765064f3bb"
+ },
+ "gate_R2": [
+  {
+   "judge": "devstral-small-2:24b",
+   "machine": "Bioinfos-Mac-Studio.local",
+   "port": 11451,
+   "ollama": "0.40.2",
+   "model_digest": "33af3142213a",
+   "start_passed_lines": 3,
+   "start_failed_lines": 0,
+   "start_failed_at": [],
+   "start_same_text": 3,
+   "start_same_scores": 3,
+   "text_may_differ": false,
+   "end_lines": 3,
+   "end_passed": 3,
+   "end_same_text": 3,
+   "end_same_scores": 3
+  },
+  {
+   "judge": "qwen3.8:27b-mlx",
+   "machine": "Bioinfos-Mac-Studio.local",
+   "port": 11462,
+   "ollama": "0.40.2",
+   "model_digest": "5642e97495e1",
+   "start_passed_lines": 3,
+   "start_failed_lines": 0,
+   "start_failed_at": [],
+   "start_same_text": 0,
+   "start_same_scores": 3,
+   "text_may_differ": true,
+   "end_lines": 3,
+   "end_passed": 3,
+   "end_same_text": 0,
+   "end_same_scores": 3
+  },
+  {
+   "judge": "ministral-3:14b",
+   "machine": "Bioinfos-Mac-Studio.local",
+   "port": 11453,
+   "ollama": "0.40.2",
+   "model_digest": "129e04c05b56",
+   "start_passed_lines": 3,
+   "start_failed_lines": 0,
+   "start_failed_at": [],
+   "start_same_text": 3,
+   "start_same_scores": 3,
+   "text_may_differ": false,
+   "end_lines": 3,
+   "end_passed": 3,
+   "end_same_text": 3,
+   "end_same_scores": 3
+  },
+  {
+   "judge": "qwen3-coder:latest",
+   "machine": "Bioinfos-Mac-Studio.local",
+   "port": 11452,
+   "ollama": "0.40.2",
+   "model_digest": "06c1097efce0",
+   "start_passed_lines": 3,
+   "start_failed_lines": 0,
+   "start_failed_at": [],
+   "start_same_text": 3,
+   "start_same_scores": 3,
+   "text_may_differ": false,
+   "end_lines": 3,
+   "end_passed": 3,
+   "end_same_text": 3,
+   "end_same_scores": 3
+  }
+ ],
+ "gate_R2_end_notes": [],
+ "partial": false,
+ "gate_A1": {
+  "max_abs_diff": 1.1102230246251565e-16,
+  "passed": true
+ },
+ "table_A": {
+  "devstral-small-2:24b": {
+   "n": 1500,
+   "composite": 0.575797207311717,
+   "correctness~semantic_similarity": 0.7149569316725204,
+   "completeness~concept_recall": 0.6314631638899338,
+   "citation_quality~cite_composite": 0.380971526372697,
+   "ci95": [
+    0.5533395555419919,
+    0.5978506319499446
+   ],
+   "ci95_question_bootstrap": [
+    0.5433119157268695,
+    0.6040119956123069
+   ]
+  },
+  "qwen3.8:27b-mlx": {
+   "n": 1500,
+   "composite": 0.6277773561386298,
+   "correctness~semantic_similarity": 0.6699802012038915,
+   "completeness~concept_recall": 0.7179961945570871,
+   "citation_quality~cite_composite": 0.4953556726549111,
+   "ci95": [
+    0.6061510441127007,
+    0.6486185193887056
+   ],
+   "ci95_question_bootstrap": [
+    0.5975970036944058,
+    0.6562053191744012
+   ]
+  },
+  "ministral-3:14b": {
+   "n": 1500,
+   "composite": 0.5441054893161145,
+   "correctness~semantic_similarity": 0.6879483289587064,
+   "completeness~concept_recall": 0.624068499711403,
+   "citation_quality~cite_composite": 0.32029963927823396,
+   "ci95": [
+    0.5181124005052002,
+    0.567593585461891
+   ],
+   "ci95_question_bootstrap": [
+    0.5120502375371134,
+    0.5739652764392329
+   ]
+  },
+  "qwen3-coder:latest": {
+   "n": 1500,
+   "composite": 0.5367181027596956,
+   "correctness~semantic_similarity": 0.71184074053285,
+   "completeness~concept_recall": 0.6085406932361134,
+   "citation_quality~cite_composite": 0.2897728745101237,
+   "ci95": [
+    0.5101684403405329,
+    0.561876076499253
+   ],
+   "ci95_question_bootstrap": [
+    0.5042301595134201,
+    0.5693028349727653
+   ]
+  }
+ },
+ "pairs_A": {
+  "devstral-small-2:24b - qwen3.8:27b-mlx": {
+   "diff": -0.05198014882691282,
+   "ci95": [
+    -0.06367624739606034,
+    -0.04002073893420269
+   ],
+   "share_first_ahead": 0.0,
+   "ci95_question_bootstrap": [
+    -0.06636276161289362,
+    -0.038326342425031586
+   ]
+  },
+  "devstral-small-2:24b - ministral-3:14b": {
+   "diff": 0.03169171799560255,
+   "ci95": [
+    0.014514612179951827,
+    0.0509524665669449
+   ],
+   "share_first_ahead": 1.0,
+   "ci95_question_bootstrap": [
+    0.012582148177393022,
+    0.05104895093166395
+   ]
+  },
+  "devstral-small-2:24b - qwen3-coder:latest": {
+   "diff": 0.03907910455202146,
+   "ci95": [
+    0.020135831684777502,
+    0.057715882018788266
+   ],
+   "share_first_ahead": 1.0,
+   "ci95_question_bootstrap": [
+    0.01909383168505002,
+    0.06126415401840592
+   ]
+  },
+  "qwen3.8:27b-mlx - devstral-small-2:24b": {
+   "diff": 0.05198014882691282,
+   "ci95": [
+    0.04002073893420268,
+    0.06367624739606033
+   ],
+   "share_first_ahead": 1.0,
+   "ci95_question_bootstrap": [
+    0.038326342425031586,
+    0.0663627616128936
+   ]
+  },
+  "qwen3.8:27b-mlx - ministral-3:14b": {
+   "diff": 0.08367186682251537,
+   "ci95": [
+    0.06562241954798041,
+    0.10320422260046905
+   ],
+   "share_first_ahead": 1.0,
+   "ci95_question_bootstrap": [
+    0.062383394415110614,
+    0.10455308116346886
+   ]
+  },
+  "qwen3.8:27b-mlx - qwen3-coder:latest": {
+   "diff": 0.09105925337893428,
+   "ci95": [
+    0.07254758845687058,
+    0.11118791653910466
+   ],
+   "share_first_ahead": 1.0,
+   "ci95_question_bootstrap": [
+    0.06886905036861155,
+    0.11439527652076098
+   ]
+  },
+  "ministral-3:14b - devstral-small-2:24b": {
+   "diff": -0.03169171799560255,
+   "ci95": [
+    -0.05095246656694491,
+    -0.014514612179951827
+   ],
+   "share_first_ahead": 0.0,
+   "ci95_question_bootstrap": [
+    -0.05104895093166396,
+    -0.012582148177393027
+   ]
+  },
+  "ministral-3:14b - qwen3.8:27b-mlx": {
+   "diff": -0.08367186682251537,
+   "ci95": [
+    -0.10320422260046905,
+    -0.06562241954798044
+   ],
+   "share_first_ahead": 0.0,
+   "ci95_question_bootstrap": [
+    -0.10455308116346887,
+    -0.062383394415110614
+   ]
+  },
+  "ministral-3:14b - qwen3-coder:latest": {
+   "diff": 0.007387386556418907,
+   "ci95": [
+    -0.014681328050669828,
+    0.027513740632777537
+   ],
+   "share_first_ahead": 0.7575,
+   "ci95_question_bootstrap": [
+    -0.0136845083215564,
+    0.02954856139423327
+   ]
+  },
+  "qwen3-coder:latest - devstral-small-2:24b": {
+   "diff": -0.03907910455202146,
+   "ci95": [
+    -0.05771588201878828,
+    -0.02013583168477756
+   ],
+   "share_first_ahead": 0.0,
+   "ci95_question_bootstrap": [
+    -0.06126415401840592,
+    -0.019093831685050053
+   ]
+  },
+  "qwen3-coder:latest - qwen3.8:27b-mlx": {
+   "diff": -0.09105925337893428,
+   "ci95": [
+    -0.11118791653910466,
+    -0.07254758845687061
+   ],
+   "share_first_ahead": 0.0,
+   "ci95_question_bootstrap": [
+    -0.11439527652076098,
+    -0.06886905036861156
+   ]
+  },
+  "qwen3-coder:latest - ministral-3:14b": {
+   "diff": -0.007387386556418907,
+   "ci95": [
+    -0.027513740632777547,
+    0.014681328050669823
+   ],
+   "share_first_ahead": 0.2425,
+   "ci95_question_bootstrap": [
+    -0.029548561394233282,
+    0.013684508321556378
+   ]
+  }
+ },
+ "decision": {
+  "top": "qwen3.8:27b-mlx",
+  "selected": "qwen3.8:27b-mlx",
+  "tie": [],
+  "text": "qwen3.8:27b-mlx is selected: its interval excludes 0 against every other judge"
+ },
+ "table_A_own_scored": {
+  "devstral-small-2:24b": {
+   "n_scored": 1500,
+   "n_calls": 1500,
+   "statuses": {
+    "ok": 1500
+   },
+   "n_dimension_missing": 0,
+   "composite": 0.575797207311717,
+   "ci95": [
+    0.5533395555419919,
+    0.5978506319499446
+   ]
+  },
+  "qwen3.8:27b-mlx": {
+   "n_scored": 1500,
+   "n_calls": 1500,
+   "statuses": {
+    "ok": 1500
+   },
+   "n_dimension_missing": 0,
+   "composite": 0.6277773561386298,
+   "ci95": [
+    0.6061510441127007,
+    0.6486185193887056
+   ]
+  },
+  "ministral-3:14b": {
+   "n_scored": 1500,
+   "n_calls": 1500,
+   "statuses": {
+    "ok": 1500
+   },
+   "n_dimension_missing": 0,
+   "composite": 0.5441054893161145,
+   "ci95": [
+    0.5181124005052002,
+    0.567593585461891
+   ]
+  },
+  "qwen3-coder:latest": {
+   "n_scored": 1500,
+   "n_calls": 1500,
+   "statuses": {
+    "ok": 1500
+   },
+   "n_dimension_missing": 0,
+   "composite": 0.5367181027596956,
+   "ci95": [
+    0.5101684403405329,
+    0.561876076499253
+   ]
+  }
+ },
+ "table_B": {
+  "devstral-small-2:24b": {
+   "n": 1487,
+   "composite": 0.5751405118771369,
+   "ci95": [
+    0.552688682333585,
+    0.5976285127963205
+   ]
+  },
+  "qwen3.8:27b-mlx": {
+   "n": 1399,
+   "composite": 0.6324371422202634,
+   "ci95": [
+    0.6102894104663688,
+    0.6540619290616438
+   ]
+  },
+  "ministral-3:14b": {
+   "n": 1487,
+   "composite": 0.544150690999526,
+   "ci95": [
+    0.5179907330906457,
+    0.5678202828064008
+   ]
+  },
+  "qwen3-coder:latest": {
+   "n": 1399,
+   "composite": 0.5402875116710785,
+   "ci95": [
+    0.5121040625820436,
+    0.5667363783703481
+   ]
+  }
+ },
+ "pairs_B": {
+  "devstral-small-2:24b - qwen3.8:27b-mlx": {
+   "n": 1386,
+   "ci95": [
+    -0.06677780758309117,
+    -0.04190411984282026
+   ]
+  },
+  "devstral-small-2:24b - ministral-3:14b": {
+   "n": 1487,
+   "ci95": [
+    0.01381547181109751,
+    0.05014037093466321
+   ]
+  },
+  "devstral-small-2:24b - qwen3-coder:latest": {
+   "n": 1386,
+   "ci95": [
+    0.017755119172360927,
+    0.05845732424876527
+   ]
+  },
+  "qwen3.8:27b-mlx - devstral-small-2:24b": {
+   "n": 1386,
+   "ci95": [
+    0.04190411984282026,
+    0.06677780758309115
+   ]
+  },
+  "qwen3.8:27b-mlx - ministral-3:14b": {
+   "n": 1386,
+   "ci95": [
+    0.06849317188185257,
+    0.10795012996683799
+   ]
+  },
+  "qwen3.8:27b-mlx - qwen3-coder:latest": {
+   "n": 1399,
+   "ci95": [
+    0.07205485882674563,
+    0.11263046329334854
+   ]
+  },
+  "ministral-3:14b - devstral-small-2:24b": {
+   "n": 1487,
+   "ci95": [
+    -0.050140370934663225,
+    -0.013815471811097517
+   ]
+  },
+  "ministral-3:14b - qwen3.8:27b-mlx": {
+   "n": 1386,
+   "ci95": [
+    -0.10795012996683803,
+    -0.06849317188185257
+   ]
+  },
+  "ministral-3:14b - qwen3-coder:latest": {
+   "n": 1386,
+   "ci95": [
+    -0.016036351295198634,
+    0.027165192445185546
+   ]
+  },
+  "qwen3-coder:latest - devstral-small-2:24b": {
+   "n": 1386,
+   "ci95": [
+    -0.05845732424876528,
+    -0.017755119172360938
+   ]
+  },
+  "qwen3-coder:latest - qwen3.8:27b-mlx": {
+   "n": 1399,
+   "ci95": [
+    -0.11263046329334855,
+    -0.07205485882674563
+   ]
+  },
+  "qwen3-coder:latest - ministral-3:14b": {
+   "n": 1386,
+   "ci95": [
+    -0.027165192445185556,
+    0.016036351295198634
+   ]
+  }
+ },
+ "table_A_final_citations": {
+  "n_rows_changed": 20,
+  "composite": {
+   "devstral-small-2:24b": 0.5755536008353399,
+   "qwen3.8:27b-mlx": 0.6273219809829217,
+   "ministral-3:14b": 0.5438630119803444,
+   "qwen3-coder:latest": 0.5373575421989535
+  },
+  "pairs": {
+   "devstral-small-2:24b - qwen3.8:27b-mlx": [
+    -0.06363266053718127,
+    -0.039562229695488144
+   ],
+   "devstral-small-2:24b - ministral-3:14b": [
+    0.014533196160369905,
+    0.050861914566728374
+   ],
+   "devstral-small-2:24b - qwen3-coder:latest": [
+    0.018706217673338597,
+    0.05698192833940304
+   ],
+   "qwen3.8:27b-mlx - devstral-small-2:24b": [
+    0.039562229695488144,
+    0.06363266053718125
+   ],
+   "qwen3.8:27b-mlx - ministral-3:14b": [
+    0.0653217804884265,
+    0.10286924873552197
+   ],
+   "qwen3.8:27b-mlx - qwen3-coder:latest": [
+    0.07126012274840947,
+    0.11024839573073363
+   ],
+   "ministral-3:14b - devstral-small-2:24b": [
+    -0.05086191456672838,
+    -0.014533196160369915
+   ],
+   "ministral-3:14b - qwen3.8:27b-mlx": [
+    -0.10286924873552199,
+    -0.0653217804884265
+   ],
+   "ministral-3:14b - qwen3-coder:latest": [
+    -0.015252975342419295,
+    0.026612610106908567
+   ],
+   "qwen3-coder:latest - devstral-small-2:24b": [
+    -0.05698192833940304,
+    -0.01870621767333861
+   ],
+   "qwen3-coder:latest - qwen3.8:27b-mlx": [
+    -0.11024839573073365,
+    -0.07126012274840948
+   ],
+   "qwen3-coder:latest - ministral-3:14b": [
+    -0.026612610106908574,
+    0.015252975342419295
+   ]
+  }
+ },
+ "n_planned": 1500,
+ "n_common": 1500
+}

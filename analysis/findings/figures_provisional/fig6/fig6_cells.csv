@@ -1,0 +1,183 @@
+# provenance: script scripts/S447_fig6_panels.py sha256 42ecc00c8494243a
+# command: uv run --frozen python scripts/S447_fig6_panels.py draw
+# written 2026-11-05T10:14:52Z, repository HEAD 6f112d9c (script uncommitted: M scripts/S447_fig6_panels.py)
+# inputs: 246 files hashed (sha256 in fig6_numbers.json), records manifest 2327a8032c352aa4
+# data stamp: PROVISIONAL: 2,420 of 2,420 attempts, 11 of 11 variants complete, records of 2026-11-04 08:35 CET; after the S4 reruns (D75, D80 V1, D81)
+# no model call
+variant,model,thinking,strategy,label,attempts,pass,fail,pass_rate_pct,wilson_lo,wilson_hi,complete,soft_pass_judge_PASS_WITH_RESERVE,kind: tool-call parse error,kind: tool call written as text,kind: stall,kind: tools refused by Ollama,kind: other call error,kind: length stop,kind: harness error,kind: step produced no cell and no error,kind: Gemini empty reply,kind: no code,kind: code raised or timed out,kind: result wrong or missing,kind: other
+qwen3-coder-30b+default,qwen3-coder:30b,default,free_form,free-form,20,19,1,95.0,76.38688045357189,99.11185512976645,True,0,0,0,0,0,0,0,0,0,0,0,1,0,0
+qwen3-coder-30b+default,qwen3-coder:30b,default,free_form_n3_best,free-form best of 3,20,18,2,90.0,69.89663528135878,97.21335190383085,True,0,0,0,0,0,0,0,0,0,0,0,1,1,0
+qwen3-coder-30b+default,qwen3-coder:30b,default,free_form_n3_combined,free-form combined,20,17,3,85.0,63.95811333571358,94.76312545132734,True,0,0,0,0,0,0,0,0,0,0,0,2,1,0
+qwen3-coder-30b+default,qwen3-coder:30b,default,error_recovery_introspect,error-recovery introspect,20,19,1,95.0,76.38688045357189,99.11185512976645,True,0,0,0,0,0,0,0,0,0,0,0,1,0,0
+qwen3-coder-30b+default,qwen3-coder:30b,default,introspect_then_code,introspect then code,20,16,4,80.0,58.398256590668296,91.93423379822393,True,0,0,0,0,0,0,0,0,0,0,0,3,1,0
+qwen3-coder-30b+default,qwen3-coder:30b,default,introspect_with_recovery,introspect with recovery,20,14,6,70.0,48.10271799475211,85.45227559784271,True,0,0,0,0,0,0,0,0,0,0,0,3,3,0
+qwen3-coder-30b+default,qwen3-coder:30b,default,thinker_coder_split,thinker-coder split,20,15,5,75.0,53.129912060741134,88.81382993000237,True,0,0,0,0,0,0,0,0,0,0,0,3,2,0
+qwen3-coder-30b+default,qwen3-coder:30b,default,coder_v2_n1,structured,20,10,10,50.0,29.92980068701797,70.07019931298203,True,1,0,0,0,0,0,0,0,0,0,0,0,10,0
+qwen3-coder-30b+default,qwen3-coder:30b,default,coder_v2_n1_cell3_best,structured best of 3,20,13,7,65.0,43.28542750684442,81.8808176876017,True,1,0,0,0,0,0,0,0,0,0,0,0,7,0
+qwen3-coder-30b+default,qwen3-coder:30b,default,coder_v2_n1_cell3_combined,structured combined,20,14,6,70.0,48.10271799475211,85.45227559784271,True,1,0,0,0,0,0,0,0,0,0,0,0,6,0
+qwen3-coder-30b+default,qwen3-coder:30b,default,coder_v2_n3,structured x3,20,13,7,65.0,43.28542750684442,81.8808176876017,True,1,0,0,0,0,0,0,0,0,0,0,1,6,0
+qwen3-coder-next-q4_K_M+default,qwen3-coder-next,default,free_form,free-form,20,15,5,75.0,53.129912060741134,88.81382993000237,True,0,0,0,0,0,0,0,0,0,0,0,1,4,0
+qwen3-coder-next-q4_K_M+default,qwen3-coder-next,default,free_form_n3_best,free-form best of 3,20,15,5,75.0,53.129912060741134,88.81382993000237,True,0,0,0,0,0,0,0,0,0,0,0,5,0,0
+qwen3-coder-next-q4_K_M+default,qwen3-coder-next,default,free_form_n3_combined,free-form combined,20,17,3,85.0,63.95811333571358,94.76312545132734,True,0,0,0,0,0,0,0,0,0,0,0,2,1,0
+qwen3-coder-next-q4_K_M+default,qwen3-coder-next,default,error_recovery_introspect,error-recovery introspect,20,15,5,75.0,53.129912060741134,88.81382993000237,True,0,0,0,0,0,0,0,0,0,0,0,1,4,0
+qwen3-coder-next-q4_K_M+default,qwen3-coder-next,default,introspect_then_code,introspect then code,20,17,3,85.0,63.95811333571358,94.76312545132734,True,0,0,0,0,0,0,0,0,0,0,0,3,0,0
+qwen3-coder-next-q4_K_M+default,qwen3-coder-next,default,introspect_with_recovery,introspect with recovery,20,13,7,65.0,43.28542750684442,81.8808176876017,True,0,0,0,0,0,0,0,0,0,0,0,5,2,0
+qwen3-coder-next-q4_K_M+default,qwen3-coder-next,default,thinker_coder_split,thinker-coder split,20,13,7,65.0,43.28542750684442,81.8808176876017,True,0,0,0,0,0,0,0,0,0,0,0,5,2,0
+qwen3-coder-next-q4_K_M+default,qwen3-coder-next,default,coder_v2_n1,structured,20,8,12,40.0,21.880653127178018,61.34185007652459,True,0,0,0,0,0,0,0,0,11,0,0,0,1,0
+qwen3-coder-next-q4_K_M+default,qwen3-coder-next,default,coder_v2_n1_cell3_best,structured best of 3,20,7,13,35.0,18.11918231239831,56.71457249315559,True,0,0,0,0,0,0,1,0,5,0,0,3,4,0
+qwen3-coder-next-q4_K_M+default,qwen3-coder-next,default,coder_v2_n1_cell3_combined,structured combined,20,9,11,45.0,25.819785703764037,65.79146589808727,True,1,0,0,0,0,0,0,0,3,0,0,3,5,0
+qwen3-coder-next-q4_K_M+default,qwen3-coder-next,default,coder_v2_n3,structured x3,20,7,13,35.0,18.11918231239831,56.71457249315559,True,0,0,0,0,0,0,0,0,8,0,0,1,4,0
+gpt-oss-20b+low,gpt-oss:20b,low,free_form,free-form,20,14,6,70.0,48.10271799475211,85.45227559784271,True,0,0,0,0,0,0,0,0,0,0,0,5,1,0
+gpt-oss-20b+low,gpt-oss:20b,low,free_form_n3_best,free-form best of 3,20,16,4,80.0,58.398256590668296,91.93423379822393,True,0,0,0,0,0,0,0,0,0,0,0,2,2,0
+gpt-oss-20b+low,gpt-oss:20b,low,free_form_n3_combined,free-form combined,20,14,6,70.0,48.10271799475211,85.45227559784271,True,0,0,0,0,0,0,0,0,0,0,0,4,2,0
+gpt-oss-20b+low,gpt-oss:20b,low,error_recovery_introspect,error-recovery introspect,20,14,6,70.0,48.10271799475211,85.45227559784271,True,0,0,0,0,0,0,0,0,0,0,0,5,1,0
+gpt-oss-20b+low,gpt-oss:20b,low,introspect_then_code,introspect then code,20,14,6,70.0,48.10271799475211,85.45227559784271,True,0,0,0,0,0,0,0,0,0,0,0,4,2,0
+gpt-oss-20b+low,gpt-oss:20b,low,introspect_with_recovery,introspect with recovery,20,12,8,60.0,38.65814992347542,78.11934687282198,True,0,0,0,0,0,0,0,0,0,0,0,3,5,0
+gpt-oss-20b+low,gpt-oss:20b,low,thinker_coder_split,thinker-coder split,20,15,5,75.0,53.129912060741134,88.81382993000237,True,0,0,0,0,0,0,0,0,0,0,0,3,2,0
+gpt-oss-20b+low,gpt-oss:20b,low,coder_v2_n1,structured,20,12,8,60.0,38.65814992347542,78.11934687282198,True,1,0,0,0,0,0,0,0,0,0,0,1,7,0
+gpt-oss-20b+low,gpt-oss:20b,low,coder_v2_n1_cell3_best,structured best of 3,20,13,7,65.0,43.28542750684442,81.8808176876017,True,0,0,0,0,0,0,0,0,0,0,2,1,4,0
+gpt-oss-20b+low,gpt-oss:20b,low,coder_v2_n1_cell3_combined,structured combined,20,12,8,60.0,38.65814992347542,78.11934687282198,True,1,0,0,0,0,0,0,0,0,0,2,0,6,0
+gpt-oss-20b+low,gpt-oss:20b,low,coder_v2_n3,structured x3,20,13,7,65.0,43.28542750684442,81.8808176876017,True,1,0,0,0,0,0,0,0,0,0,0,0,7,0
+gpt-oss-20b+medium,gpt-oss:20b,medium,free_form,free-form,20,15,5,75.0,53.129912060741134,88.81382993000237,True,0,0,0,0,0,0,0,0,0,0,0,4,1,0
+gpt-oss-20b+medium,gpt-oss:20b,medium,free_form_n3_best,free-form best of 3,20,16,4,80.0,58.398256590668296,91.93423379822393,True,0,0,0,0,0,0,0,0,0,0,0,2,2,0
+gpt-oss-20b+medium,gpt-oss:20b,medium,free_form_n3_combined,free-form combined,20,14,6,70.0,48.10271799475211,85.45227559784271,True,0,0,0,0,0,0,0,0,0,0,0,4,2,0
+gpt-oss-20b+medium,gpt-oss:20b,medium,error_recovery_introspect,error-recovery introspect,20,15,5,75.0,53.129912060741134,88.81382993000237,True,0,0,0,0,0,0,0,0,0,0,0,4,1,0
+gpt-oss-20b+medium,gpt-oss:20b,medium,introspect_then_code,introspect then code,20,14,6,70.0,48.10271799475211,85.45227559784271,True,0,0,0,0,0,0,0,0,0,0,0,5,1,0
+gpt-oss-20b+medium,gpt-oss:20b,medium,introspect_with_recovery,introspect with recovery,20,15,5,75.0,53.129912060741134,88.81382993000237,True,0,0,0,0,0,0,0,0,0,0,0,5,0,0
+gpt-oss-20b+medium,gpt-oss:20b,medium,thinker_coder_split,thinker-coder split,20,14,6,70.0,48.10271799475211,85.45227559784271,True,0,0,0,0,0,0,0,0,0,0,0,4,2,0
+gpt-oss-20b+medium,gpt-oss:20b,medium,coder_v2_n1,structured,20,11,9,55.0,34.20853410191274,74.18021429623597,True,0,0,0,0,0,0,0,0,0,0,1,1,7,0
+gpt-oss-20b+medium,gpt-oss:20b,medium,coder_v2_n1_cell3_best,structured best of 3,20,13,7,65.0,43.28542750684442,81.8808176876017,True,0,0,0,0,0,0,0,0,0,0,0,0,7,0
+gpt-oss-20b+medium,gpt-oss:20b,medium,coder_v2_n1_cell3_combined,structured combined,20,13,7,65.0,43.28542750684442,81.8808176876017,True,1,0,0,0,0,0,0,0,0,0,0,0,6,1
+gpt-oss-20b+medium,gpt-oss:20b,medium,coder_v2_n3,structured x3,20,14,6,70.0,48.10271799475211,85.45227559784271,True,1,0,0,0,0,0,0,1,0,0,0,1,4,0
+gpt-oss-20b+high,gpt-oss:20b,high,free_form,free-form,20,13,7,65.0,43.28542750684442,81.8808176876017,True,0,0,0,0,0,0,0,0,0,0,0,6,1,0
+gpt-oss-20b+high,gpt-oss:20b,high,free_form_n3_best,free-form best of 3,20,15,5,75.0,53.129912060741134,88.81382993000237,True,0,0,0,0,0,0,0,0,0,0,0,5,0,0
+gpt-oss-20b+high,gpt-oss:20b,high,free_form_n3_combined,free-form combined,20,14,6,70.0,48.10271799475211,85.45227559784271,True,0,0,0,0,0,0,0,0,0,0,0,5,1,0
+gpt-oss-20b+high,gpt-oss:20b,high,error_recovery_introspect,error-recovery introspect,20,13,7,65.0,43.28542750684442,81.8808176876017,True,0,0,0,0,0,0,0,0,0,0,0,6,1,0
+gpt-oss-20b+high,gpt-oss:20b,high,introspect_then_code,introspect then code,20,15,5,75.0,53.129912060741134,88.81382993000237,True,0,0,0,0,0,0,0,0,0,0,0,4,1,0
+gpt-oss-20b+high,gpt-oss:20b,high,introspect_with_recovery,introspect with recovery,20,15,5,75.0,53.129912060741134,88.81382993000237,True,0,0,0,0,0,0,0,0,0,0,0,4,1,0
+gpt-oss-20b+high,gpt-oss:20b,high,thinker_coder_split,thinker-coder split,20,16,4,80.0,58.398256590668296,91.93423379822393,True,0,0,0,0,0,0,0,0,0,0,0,2,2,0
+gpt-oss-20b+high,gpt-oss:20b,high,coder_v2_n1,structured,20,6,14,30.0,14.547724402157295,51.8972820052479,True,0,0,3,0,0,0,0,0,1,0,1,7,2,0
+gpt-oss-20b+high,gpt-oss:20b,high,coder_v2_n1_cell3_best,structured best of 3,20,10,10,50.0,29.92980068701797,70.07019931298203,True,1,0,3,0,0,0,0,0,2,0,1,2,2,0
+gpt-oss-20b+high,gpt-oss:20b,high,coder_v2_n1_cell3_combined,structured combined,20,9,11,45.0,25.819785703764037,65.79146589808727,True,1,0,3,0,0,0,0,0,0,0,2,4,2,0
+gpt-oss-20b+high,gpt-oss:20b,high,coder_v2_n3,structured x3,20,7,13,35.0,18.11918231239831,56.71457249315559,True,0,0,3,0,0,0,0,1,0,0,0,8,1,0
+glm-4.7-flash-bf16+default,glm-4.7-flash,default,free_form,free-form,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+glm-4.7-flash-bf16+default,glm-4.7-flash,default,free_form_n3_best,free-form best of 3,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+glm-4.7-flash-bf16+default,glm-4.7-flash,default,free_form_n3_combined,free-form combined,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+glm-4.7-flash-bf16+default,glm-4.7-flash,default,error_recovery_introspect,error-recovery introspect,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+glm-4.7-flash-bf16+default,glm-4.7-flash,default,introspect_then_code,introspect then code,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+glm-4.7-flash-bf16+default,glm-4.7-flash,default,introspect_with_recovery,introspect with recovery,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+glm-4.7-flash-bf16+default,glm-4.7-flash,default,thinker_coder_split,thinker-coder split,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+glm-4.7-flash-bf16+default,glm-4.7-flash,default,coder_v2_n1,structured,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+glm-4.7-flash-bf16+default,glm-4.7-flash,default,coder_v2_n1_cell3_best,structured best of 3,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+glm-4.7-flash-bf16+default,glm-4.7-flash,default,coder_v2_n1_cell3_combined,structured combined,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+glm-4.7-flash-bf16+default,glm-4.7-flash,default,coder_v2_n3,structured x3,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+glm-4.7-flash-bf16+off,glm-4.7-flash,off,free_form,free-form,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+glm-4.7-flash-bf16+off,glm-4.7-flash,off,free_form_n3_best,free-form best of 3,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+glm-4.7-flash-bf16+off,glm-4.7-flash,off,free_form_n3_combined,free-form combined,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+glm-4.7-flash-bf16+off,glm-4.7-flash,off,error_recovery_introspect,error-recovery introspect,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+glm-4.7-flash-bf16+off,glm-4.7-flash,off,introspect_then_code,introspect then code,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+glm-4.7-flash-bf16+off,glm-4.7-flash,off,introspect_with_recovery,introspect with recovery,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+glm-4.7-flash-bf16+off,glm-4.7-flash,off,thinker_coder_split,thinker-coder split,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+glm-4.7-flash-bf16+off,glm-4.7-flash,off,coder_v2_n1,structured,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+glm-4.7-flash-bf16+off,glm-4.7-flash,off,coder_v2_n1_cell3_best,structured best of 3,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+glm-4.7-flash-bf16+off,glm-4.7-flash,off,coder_v2_n1_cell3_combined,structured combined,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+glm-4.7-flash-bf16+off,glm-4.7-flash,off,coder_v2_n3,structured x3,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+default,nemotron-3-nano:30b,default,free_form,free-form,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+default,nemotron-3-nano:30b,default,free_form_n3_best,free-form best of 3,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+default,nemotron-3-nano:30b,default,free_form_n3_combined,free-form combined,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+default,nemotron-3-nano:30b,default,error_recovery_introspect,error-recovery introspect,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+default,nemotron-3-nano:30b,default,introspect_then_code,introspect then code,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+default,nemotron-3-nano:30b,default,introspect_with_recovery,introspect with recovery,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+default,nemotron-3-nano:30b,default,thinker_coder_split,thinker-coder split,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+default,nemotron-3-nano:30b,default,coder_v2_n1,structured,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+default,nemotron-3-nano:30b,default,coder_v2_n1_cell3_best,structured best of 3,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+default,nemotron-3-nano:30b,default,coder_v2_n1_cell3_combined,structured combined,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+default,nemotron-3-nano:30b,default,coder_v2_n3,structured x3,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+off,nemotron-3-nano:30b,off,free_form,free-form,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+off,nemotron-3-nano:30b,off,free_form_n3_best,free-form best of 3,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+off,nemotron-3-nano:30b,off,free_form_n3_combined,free-form combined,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+off,nemotron-3-nano:30b,off,error_recovery_introspect,error-recovery introspect,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+off,nemotron-3-nano:30b,off,introspect_then_code,introspect then code,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+off,nemotron-3-nano:30b,off,introspect_with_recovery,introspect with recovery,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+off,nemotron-3-nano:30b,off,thinker_coder_split,thinker-coder split,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+off,nemotron-3-nano:30b,off,coder_v2_n1,structured,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+off,nemotron-3-nano:30b,off,coder_v2_n1_cell3_best,structured best of 3,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+off,nemotron-3-nano:30b,off,coder_v2_n1_cell3_combined,structured combined,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+nemotron-3-nano-30b+off,nemotron-3-nano:30b,off,coder_v2_n3,structured x3,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+gemma3-27b+default,gemma3:27b,default,free_form,free-form,20,12,8,60.0,38.65814992347542,78.11934687282198,True,0,0,0,0,0,0,0,0,0,0,0,7,1,0
+gemma3-27b+default,gemma3:27b,default,free_form_n3_best,free-form best of 3,20,12,8,60.0,38.65814992347542,78.11934687282198,True,0,0,0,0,0,0,0,0,0,0,0,6,2,0
+gemma3-27b+default,gemma3:27b,default,free_form_n3_combined,free-form combined,20,14,6,70.0,48.10271799475211,85.45227559784271,True,0,0,0,0,0,0,0,0,0,0,0,5,1,0
+gemma3-27b+default,gemma3:27b,default,error_recovery_introspect,error-recovery introspect,20,12,8,60.0,38.65814992347542,78.11934687282198,True,0,0,0,0,0,0,0,0,0,0,0,7,1,0
+gemma3-27b+default,gemma3:27b,default,introspect_then_code,introspect then code,20,10,10,50.0,29.92980068701797,70.07019931298203,True,0,0,0,0,0,0,0,0,0,0,0,8,2,0
+gemma3-27b+default,gemma3:27b,default,introspect_with_recovery,introspect with recovery,20,11,9,55.0,34.20853410191274,74.18021429623597,True,0,0,0,0,0,0,0,0,0,0,0,7,2,0
+gemma3-27b+default,gemma3:27b,default,thinker_coder_split,thinker-coder split,20,12,8,60.0,38.65814992347542,78.11934687282198,True,0,0,0,0,0,0,0,0,0,0,0,7,1,0
+gemma3-27b+default,gemma3:27b,default,coder_v2_n1,structured,20,0,20,0.0,0.0,16.112516018512967,True,0,0,0,0,19,0,0,0,0,0,1,0,0,0
+gemma3-27b+default,gemma3:27b,default,coder_v2_n1_cell3_best,structured best of 3,20,0,20,0.0,0.0,16.112516018512967,True,0,0,0,0,20,0,0,0,0,0,0,0,0,0
+gemma3-27b+default,gemma3:27b,default,coder_v2_n1_cell3_combined,structured combined,20,0,20,0.0,0.0,16.112516018512967,True,0,0,0,0,19,0,0,0,0,0,1,0,0,0
+gemma3-27b+default,gemma3:27b,default,coder_v2_n3,structured x3,20,0,20,0.0,0.0,16.112516018512967,True,0,0,0,0,20,0,0,0,0,0,0,0,0,0
+devstral-small-2-24b+default,devstral-small-2:24b,default,free_form,free-form,20,14,6,70.0,48.10271799475211,85.45227559784271,True,0,0,0,0,0,0,0,0,0,0,0,5,1,0
+devstral-small-2-24b+default,devstral-small-2:24b,default,free_form_n3_best,free-form best of 3,20,14,6,70.0,48.10271799475211,85.45227559784271,True,0,0,0,0,0,0,0,0,0,0,0,4,2,0
+devstral-small-2-24b+default,devstral-small-2:24b,default,free_form_n3_combined,free-form combined,20,14,6,70.0,48.10271799475211,85.45227559784271,True,0,0,0,0,0,0,0,0,0,0,0,6,0,0
+devstral-small-2-24b+default,devstral-small-2:24b,default,error_recovery_introspect,error-recovery introspect,20,14,6,70.0,48.10271799475211,85.45227559784271,True,0,0,0,0,0,0,0,0,0,0,0,5,1,0
+devstral-small-2-24b+default,devstral-small-2:24b,default,introspect_then_code,introspect then code,20,16,4,80.0,58.398256590668296,91.93423379822393,True,0,0,0,0,0,0,0,0,0,0,0,1,3,0
+devstral-small-2-24b+default,devstral-small-2:24b,default,introspect_with_recovery,introspect with recovery,20,14,6,70.0,48.10271799475211,85.45227559784271,True,0,0,0,0,0,0,0,0,0,0,0,4,2,0
+devstral-small-2-24b+default,devstral-small-2:24b,default,thinker_coder_split,thinker-coder split,20,13,7,65.0,43.28542750684442,81.8808176876017,True,0,0,0,0,0,0,1,0,0,0,0,4,2,0
+devstral-small-2-24b+default,devstral-small-2:24b,default,coder_v2_n1,structured,20,9,11,45.0,25.819785703764037,65.79146589808727,True,1,0,0,0,0,0,3,0,0,0,0,1,7,0
+devstral-small-2-24b+default,devstral-small-2:24b,default,coder_v2_n1_cell3_best,structured best of 3,20,8,12,40.0,21.880653127178018,61.34185007652459,True,2,0,0,0,0,0,4,0,0,0,0,2,6,0
+devstral-small-2-24b+default,devstral-small-2:24b,default,coder_v2_n1_cell3_combined,structured combined,20,8,12,40.0,21.880653127178018,61.34185007652459,True,0,0,0,0,0,0,4,0,0,0,0,4,4,0
+devstral-small-2-24b+default,devstral-small-2:24b,default,coder_v2_n3,structured x3,20,10,10,50.0,29.92980068701797,70.07019931298203,True,0,0,0,0,0,0,6,0,0,0,0,0,4,0
+deepseek-r1-70b+default,deepseek-r1:70b,default,free_form,free-form,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+deepseek-r1-70b+default,deepseek-r1:70b,default,free_form_n3_best,free-form best of 3,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+deepseek-r1-70b+default,deepseek-r1:70b,default,free_form_n3_combined,free-form combined,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+deepseek-r1-70b+default,deepseek-r1:70b,default,error_recovery_introspect,error-recovery introspect,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+deepseek-r1-70b+default,deepseek-r1:70b,default,introspect_then_code,introspect then code,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+deepseek-r1-70b+default,deepseek-r1:70b,default,introspect_with_recovery,introspect with recovery,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+deepseek-r1-70b+default,deepseek-r1:70b,default,thinker_coder_split,thinker-coder split,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+deepseek-r1-70b+default,deepseek-r1:70b,default,coder_v2_n1,structured,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+deepseek-r1-70b+default,deepseek-r1:70b,default,coder_v2_n1_cell3_best,structured best of 3,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+deepseek-r1-70b+default,deepseek-r1:70b,default,coder_v2_n1_cell3_combined,structured combined,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+deepseek-r1-70b+default,deepseek-r1:70b,default,coder_v2_n3,structured x3,0,0,0,,,,False,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+gemini-2.5-pro+default,gemini-2.5-pro,default,free_form,free-form,20,15,5,75.0,53.129912060741134,88.81382993000237,True,0,0,0,0,0,0,0,0,0,0,0,1,4,0
+gemini-2.5-pro+default,gemini-2.5-pro,default,free_form_n3_best,free-form best of 3,20,18,2,90.0,69.89663528135878,97.21335190383085,True,0,0,0,0,0,0,0,0,0,0,0,1,1,0
+gemini-2.5-pro+default,gemini-2.5-pro,default,free_form_n3_combined,free-form combined,20,16,4,80.0,58.398256590668296,91.93423379822393,True,0,0,0,0,0,0,0,0,0,0,0,4,0,0
+gemini-2.5-pro+default,gemini-2.5-pro,default,error_recovery_introspect,error-recovery introspect,20,16,4,80.0,58.398256590668296,91.93423379822393,True,0,0,0,0,0,0,0,0,0,0,0,0,4,0
+gemini-2.5-pro+default,gemini-2.5-pro,default,introspect_then_code,introspect then code,20,18,2,90.0,69.89663528135878,97.21335190383085,True,0,0,0,0,0,0,0,0,0,0,0,0,2,0
+gemini-2.5-pro+default,gemini-2.5-pro,default,introspect_with_recovery,introspect with recovery,20,15,5,75.0,53.129912060741134,88.81382993000237,True,0,0,0,0,0,0,0,0,0,0,0,1,4,0
+gemini-2.5-pro+default,gemini-2.5-pro,default,thinker_coder_split,thinker-coder split,20,17,3,85.0,63.95811333571358,94.76312545132734,True,0,0,0,0,0,0,0,0,0,0,0,2,1,0
+gemini-2.5-pro+default,gemini-2.5-pro,default,coder_v2_n1,structured,20,17,3,85.0,63.95811333571358,94.76312545132734,True,0,0,0,0,0,0,0,0,0,0,0,2,1,0
+gemini-2.5-pro+default,gemini-2.5-pro,default,coder_v2_n1_cell3_best,structured best of 3,20,15,5,75.0,53.129912060741134,88.81382993000237,True,1,0,0,0,0,1,0,0,0,0,0,1,3,0
+gemini-2.5-pro+default,gemini-2.5-pro,default,coder_v2_n1_cell3_combined,structured combined,20,16,4,80.0,58.398256590668296,91.93423379822393,True,1,0,0,0,0,0,0,0,0,0,0,1,3,0
+gemini-2.5-pro+default,gemini-2.5-pro,default,coder_v2_n3,structured x3,20,20,0,100.0,83.88748398148705,100.00000000000003,True,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+gemini-2.5-pro+off,gemini-2.5-pro,off,free_form,free-form,20,15,5,75.0,53.129912060741134,88.81382993000237,True,0,0,0,0,0,0,0,0,0,0,0,1,4,0
+gemini-2.5-pro+off,gemini-2.5-pro,off,free_form_n3_best,free-form best of 3,20,14,6,70.0,48.10271799475211,85.45227559784271,True,1,0,0,0,0,0,0,0,0,0,0,1,5,0
+gemini-2.5-pro+off,gemini-2.5-pro,off,free_form_n3_combined,free-form combined,20,15,5,75.0,53.129912060741134,88.81382993000237,True,0,0,0,0,0,0,0,0,0,0,0,2,3,0
+gemini-2.5-pro+off,gemini-2.5-pro,off,error_recovery_introspect,error-recovery introspect,20,15,5,75.0,53.129912060741134,88.81382993000237,True,1,0,0,0,0,0,0,0,0,0,0,0,5,0
+gemini-2.5-pro+off,gemini-2.5-pro,off,introspect_then_code,introspect then code,20,14,6,70.0,48.10271799475211,85.45227559784271,True,0,0,0,0,0,0,0,0,0,0,0,1,5,0
+gemini-2.5-pro+off,gemini-2.5-pro,off,introspect_with_recovery,introspect with recovery,20,14,6,70.0,48.10271799475211,85.45227559784271,True,0,0,0,0,0,0,0,0,0,0,0,0,6,0
+gemini-2.5-pro+off,gemini-2.5-pro,off,thinker_coder_split,thinker-coder split,20,15,5,75.0,53.129912060741134,88.81382993000237,True,0,0,0,0,0,0,0,0,0,0,0,1,4,0
+gemini-2.5-pro+off,gemini-2.5-pro,off,coder_v2_n1,structured,20,10,10,50.0,29.92980068701797,70.07019931298203,True,0,0,0,0,0,1,0,0,0,0,0,2,7,0
+gemini-2.5-pro+off,gemini-2.5-pro,off,coder_v2_n1_cell3_best,structured best of 3,20,13,7,65.0,43.28542750684442,81.8808176876017,True,0,0,0,0,0,3,0,0,0,0,0,1,3,0
+gemini-2.5-pro+off,gemini-2.5-pro,off,coder_v2_n1_cell3_combined,structured combined,20,12,8,60.0,38.65814992347542,78.11934687282198,True,1,0,0,0,0,2,0,0,0,0,0,2,4,0
+gemini-2.5-pro+off,gemini-2.5-pro,off,coder_v2_n3,structured x3,20,16,4,80.0,58.398256590668296,91.93423379822393,True,0,0,0,0,0,0,0,0,0,0,0,0,4,0
+gemini-3-flash-preview+default,gemini-3-flash,default,free_form,free-form,20,19,1,95.0,76.38688045357189,99.11185512976645,True,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+gemini-3-flash-preview+default,gemini-3-flash,default,free_form_n3_best,free-form best of 3,20,19,1,95.0,76.38688045357189,99.11185512976645,True,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+gemini-3-flash-preview+default,gemini-3-flash,default,free_form_n3_combined,free-form combined,20,17,3,85.0,63.95811333571358,94.76312545132734,True,0,0,0,0,0,0,0,0,0,0,0,3,0,0
+gemini-3-flash-preview+default,gemini-3-flash,default,error_recovery_introspect,error-recovery introspect,20,19,1,95.0,76.38688045357189,99.11185512976645,True,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+gemini-3-flash-preview+default,gemini-3-flash,default,introspect_then_code,introspect then code,20,18,2,90.0,69.89663528135878,97.21335190383085,True,0,0,0,0,0,0,0,0,0,0,0,1,1,0
+gemini-3-flash-preview+default,gemini-3-flash,default,introspect_with_recovery,introspect with recovery,20,19,1,95.0,76.38688045357189,99.11185512976645,True,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+gemini-3-flash-preview+default,gemini-3-flash,default,thinker_coder_split,thinker-coder split,20,18,2,90.0,69.89663528135878,97.21335190383085,True,0,0,0,0,0,0,0,0,0,0,0,1,1,0
+gemini-3-flash-preview+default,gemini-3-flash,default,coder_v2_n1,structured,20,17,3,85.0,63.95811333571358,94.76312545132734,True,0,0,0,0,0,0,0,0,0,0,0,0,3,0
+gemini-3-flash-preview+default,gemini-3-flash,default,coder_v2_n1_cell3_best,structured best of 3,20,20,0,100.0,83.88748398148705,100.00000000000003,True,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+gemini-3-flash-preview+default,gemini-3-flash,default,coder_v2_n1_cell3_combined,structured combined,20,19,1,95.0,76.38688045357189,99.11185512976645,True,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+gemini-3-flash-preview+default,gemini-3-flash,default,coder_v2_n3,structured x3,20,18,2,90.0,69.89663528135878,97.21335190383085,True,0,0,0,0,0,0,0,0,0,0,0,0,2,0
+gemini-3-flash-preview+off,gemini-3-flash,off,free_form,free-form,20,18,2,90.0,69.89663528135878,97.21335190383085,True,0,0,0,0,0,0,0,0,0,0,0,1,1,0
+gemini-3-flash-preview+off,gemini-3-flash,off,free_form_n3_best,free-form best of 3,20,18,2,90.0,69.89663528135878,97.21335190383085,True,0,0,0,0,0,0,0,0,0,0,0,1,1,0
+gemini-3-flash-preview+off,gemini-3-flash,off,free_form_n3_combined,free-form combined,20,14,6,70.0,48.10271799475211,85.45227559784271,True,0,0,0,0,0,0,0,0,0,0,0,5,1,0
+gemini-3-flash-preview+off,gemini-3-flash,off,error_recovery_introspect,error-recovery introspect,20,18,2,90.0,69.89663528135878,97.21335190383085,True,0,0,0,0,0,0,0,0,0,0,0,2,0,0
+gemini-3-flash-preview+off,gemini-3-flash,off,introspect_then_code,introspect then code,20,18,2,90.0,69.89663528135878,97.21335190383085,True,0,0,0,0,0,0,0,0,0,0,0,1,1,0
+gemini-3-flash-preview+off,gemini-3-flash,off,introspect_with_recovery,introspect with recovery,20,19,1,95.0,76.38688045357189,99.11185512976645,True,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+gemini-3-flash-preview+off,gemini-3-flash,off,thinker_coder_split,thinker-coder split,20,18,2,90.0,69.89663528135878,97.21335190383085,True,0,0,0,0,0,0,0,0,0,0,0,1,1,0
+gemini-3-flash-preview+off,gemini-3-flash,off,coder_v2_n1,structured,20,16,4,80.0,58.398256590668296,91.93423379822393,True,0,0,0,0,0,0,0,0,0,0,0,0,4,0
+gemini-3-flash-preview+off,gemini-3-flash,off,coder_v2_n1_cell3_best,structured best of 3,20,20,0,100.0,83.88748398148705,100.00000000000003,True,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+gemini-3-flash-preview+off,gemini-3-flash,off,coder_v2_n1_cell3_combined,structured combined,20,19,1,95.0,76.38688045357189,99.11185512976645,True,1,0,0,0,0,0,0,0,0,0,0,0,1,0
+gemini-3-flash-preview+off,gemini-3-flash,off,coder_v2_n3,structured x3,20,18,2,90.0,69.89663528135878,97.21335190383085,True,0,0,0,0,0,0,0,0,0,0,0,0,2,0

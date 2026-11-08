@@ -1,0 +1,33 @@
+{
+ "script": "S565_corpus_interaction.py",
+ "script_sha256": "760cb075288751d3d6d93529a80edc75cc316713794bcd751400607d2f0482de",
+ "r_script_sha256": "fe8a1f066454fbead6f57273ef8b1bc75627c40bf9eb1db303575894ffe20ff0",
+ "command": "uv run --frozen python S565_corpus_interaction.py run --cores 8 --n-boot 10000",
+ "python": "3.13.11",
+ "r": "R version 4.5.2 (2025-10-31)",
+ "lme4": "2.0.1",
+ "inputs_sha256": {
+  "findings/recompute/G4_fig3c_d185/grid_pairs.jsonl": "82a5c4ddf3b61350fb63380d6fa33da0af7caa4a741b593d1ccd1bd3a517ba5f",
+  "findings/recompute/G4_fig3c_d185/header.json": "8f14ca14a810da291ab6a81662ac55decd3a64cd25b6e2a7b364580127e275a7",
+  "findings/recompute/G4_fig3c_d185/q66_tables.json": "e08237f293a4e9867307f01229f75dfe2cbfe60d0457a7a37942f6e6c2bf7579",
+  "findings/recompute/G4_fig3c/grid_pairs.jsonl": "0d8d8785aebc3b23dacc8eb0d74fb113d1ec33ba19d166733b5f0dc6cf283172",
+  "findings/recompute/G4_fig3c/header.json": "6e81ea21c70ab44d3e17effe06e4f545a2750f34ca65dcaba8b517e8baf1755d",
+  "findings/figures_provisional/supp_fig9_corpus/supplementary_figure9_numbers.json": "f1902f82706bfdb497b54355bf5a74390c607b9622abe4a8fa9f14aceb6174d8",
+  "findings/figures_provisional/supp_fig9_corpus/supplementary_figure9_provenance.json": "0a866de19e0e559723906d07369cda5770eef8306784dc23f3f4c487a88e930b",
+  "findings/figures_provisional/fig3_strategies/figure3_numbers.json": "13f9a1a8f5df1f768765531b49ed4044e8598591ed085e1a57364af1ea4bbc1b",
+  "scripts/S484_supp_fig4_corpus.py": "b095711ff9e1a466db9810db9852cec0186468a83eac503071ae71fec18289aa",
+  "scripts/S476_fig3_d123.py": "66c4de78dd0ede3dd0b1e7f3131c7341e61a3c25893db0f709eed3468ecab2ee",
+  "scripts/judge_rows_v25.py": "36fbde856e7cf7258cb8cd71954657fc23a6af41f73caa451fb721be3475f146",
+  "scripts/S11_corpus_mixed_model.R": "033a1ff5a0c3b00f1769f0aa4519eae01e6205a2f6846915d1b4be2a94465040"
+ },
+ "git_head": "dc8a67cdc218e5d7f0bf6e50239d4726e2ed61b3",
+ "outputs_sha256": {
+  "counts_all_in_scope.csv": "2f7971b6096de98120e6598bb421f2e25ee0f0ca31392700c00037fe9f3704d0",
+  "counts_same22.csv": "ffc3edb24e6d75ec5658d635f77322a9d3f73927230a703f1281d57913931ed8",
+  "model.json": "c6650c530a87fa9fb6bdb06230e8e2bb945e78b81d7cd46cf5d25c89190999bc",
+  "model.log": "571129c829e85799add7d248e9b6c08095229b92791e6dfa57bf392572b9d6b1",
+  "results.json": "73f2707de0932446bb354092d284fff1805b7ad1ffabcba0c9a21384f4b22fac",
+  "results.md": "cff9f035a52b033dc64cec11e4b2df8f76752daffe0d4ce103b2339ab025254b",
+  "tidy.csv": "d89ba907e17e4b6ff637be0a738d2ba86e3ad2d99e020be9c11fc50ac798dc95"
+ }
+}

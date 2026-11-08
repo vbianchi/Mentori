@@ -1,0 +1,275 @@
+{
+ "script": "scripts/S476_fig3_d123.py",
+ "script_sha256": "b50f91c05d5539fedc95dfec4601e0c718605d4800cb8dffb8ed776c24c72a42",
+ "command": "uv run --frozen python scripts/S476_fig3_d123.py plate",
+ "python": "3.13.11",
+ "inputs_sha256": {
+  "findings/recompute/L2/concept_recall.jsonl": "12f9a945c886b9fa2b38bb38e318a81923b7110359c3b2292c94c41b4a708781",
+  "findings/recompute/L2/cap_tables.json": "410bdad6a52b0a42154c596b42bfb86a9a8776801e02602caadc269c6f5e2785",
+  "findings/recompute/L2/header.json": "fde95a55d86ecf8423319373af80e2cbd55095ec14bcb44cfb86c621eb8a6152",
+  "findings/recompute/L2_d135/concept_recall.jsonl": "043d78a3d442de55ee76c4ebaca2bfb822363e34937ae5f185a933aa2b1d0dd6",
+  "findings/recompute/L2_d135/cap_tables.json": "da7c7ef80c25aa1d2cb1fd9e6caa10161d2211b2950069c4292488399edc2db1",
+  "findings/recompute/L2_d135/header.json": "892e194c91d865a2f1209e4a329f1e3b70d1fc630aa6e1f6ac38d7c5884e0d3f",
+  "findings/recompute/L2_d181/concept_recall.jsonl": "713773461aab4575e0ea0d746ae3dc8e42735db7509b8a474e19184cb1e1355d",
+  "findings/recompute/L2_d181/cap_tables.json": "982f658d268d3175b45a4a5ee8f5f4de5a6557e081541fafe70caf54cac6b2d6",
+  "findings/recompute/L2_d181/header.json": "078155046fdb8d89bcb149a150852187903ca994d84e8166d6ba51259870ffe6",
+  "findings/recompute/L2_d135_d181/concept_recall.jsonl": "43307c4b4a6c56adfdfd9297ef90be27e8ed577c64e66c2781ac9b933d85684f",
+  "findings/recompute/L2_d135_d181/cap_tables.json": "95cf480c1824404f5c383573cba974bc579e9299903b710f4488882b8a7406fe",
+  "findings/recompute/L2_d135_d181/header.json": "40ad807a471d70c486c91088a03656eb10410375b7f54b9dafcb9c1795719d06",
+  "findings/recompute/T1_L2/concept_recall.jsonl": "7b9c996460c9cb57062673c7b3fa6520c0d2099ef75c2f3a6b6eac7268d01b84",
+  "findings/recompute/T1_L2/cap_tables.json": "81a0730063767180c21dba223d1eabd17bdab00a1a31c24eaf34a495e5c3b162",
+  "findings/recompute/T1_L2/header.json": "8253d4d1f21d510b102c549d94b6b8d8ce7789df67939ad1c8fa5d71a5cddef4",
+  "findings/recompute/G4_fig3c/pairs.jsonl": "ff6e97483938bab2e0a1030ea8144b3629b8e68481bba69bec0775cea37bc8f1",
+  "findings/recompute/G4_fig3c/point_tables.json": "9b34ed146a48abccdabc1f27fe0e967d2a6fbabc3626b58d1919bfb9b31b3350",
+  "findings/recompute/G4_fig3c/header.json": "4caf4d9d14c86c74728315dac41fe5d5b9a48bafa0acb3c315bdba2d3bdd3069",
+  "findings/recompute/G4_fig3c/grid_pairs.jsonl": "0d8d8785aebc3b23dacc8eb0d74fb113d1ec33ba19d166733b5f0dc6cf283172",
+  "findings/recompute/G4_fig3c/grid_tables.json": "5e4bdb0048699526b152b43aa2d1c895dc984c43610760830b6b7e4dbf9e4f3a",
+  "findings/recompute/T1_L2_d181/concept_recall.jsonl": "0b8173f95644c29a9b7bc54367c5c6642dfb99c014022a713228fcb348d8ab68",
+  "findings/recompute/T1_L2_d181/cap_tables.json": "852d608833bfb2f73f47c66ca02663841e56cb1639b96a05f345276e431c4b96",
+  "findings/recompute/T1_L2_d181/header.json": "ea5eca8b5275f0326ddbc084e7deab7c95265235a89a776b3319d8d3e71918f5",
+  "findings/recompute/G4_fig3c_d185/grid_pairs.jsonl": "82a5c4ddf3b61350fb63380d6fa33da0af7caa4a741b593d1ccd1bd3a517ba5f",
+  "findings/recompute/G4_fig3c_d185/grid_tables.json": "5306a84df162c79b73ceb88c2ecbc225716bb977fc0abbd2b1759fc202dba3e8",
+  "findings/recompute/G4_fig3c_d185/header.json": "8f14ca14a810da291ab6a81662ac55decd3a64cd25b6e2a7b364580127e275a7",
+  "experiments/FIGURE_LOCK.toml": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "experiments/rlm_ref/run_rlm_ref.py": "327d18987c9faa092ce525a4f6b3c7d6c88dcaafe42b9ff8e7de74676fcbba48",
+  "findings/recompute/fig3_readmes_inputs/G4_runs/README.md": "e05ac9520fa70abe6142739cfe9abd0f75cc6af17d12698e783987b273797329",
+  "findings/recompute/fig3_readmes_inputs/G5_runs/README.md": "024b493b7b7bec0658b951b62972fba7092a92b35b7acf3cd8917a275ac227b1",
+  "findings/recompute/D98_subset/d98_subset.json": "957c79b6b0f3afb12b70be51d0802e7853b4d4ff12e2bdb519d44a10111046bc",
+  "findings/recompute/L2_d135_d181_g7/noise_tables.json": "3da5e4b86af8e68f79d5db2c6d7783c0b1bb77bcc7923c94616d8d8f4860cac0"
+ },
+ "model_calls": 0,
+ "stamp": "PROVISIONAL: 4284 of 4284 answers; G4 draw 1 of the six strategies judged by S3 (60 of 60 strategy and index cells with both units judged); c's judge rows on key v2.5 where S6 has judged an answer of the 132 questions v2.5 changed, key v2.4 for the 0 covered draw-1 answers awaiting it",
+ "page_mm": [
+  183.0,
+  70.8111111111111
+ ],
+ "figure_lock": {
+  "path": "experiments/FIGURE_LOCK.toml",
+  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "status": "agreed"
+ },
+ "l2_readings": {
+  "gated": "findings/recompute/L2 (G6 before the D135 reruns): S475.reproduce and its anchors",
+  "drawn": "findings/recompute/L2_d135 (G6 after the D135 reruns, D160 Q23): held to findings/recompute/L2 but for the answers the reruns acted on",
+  "held_check": {
+   "acted_on": "rerun_d89.sh's rerun and rebuild keys (D89, D90, D92; D135)",
+   "changed_by_outcome": {
+    "failed before, ok after": 101,
+    "ok before, failed after": 2,
+    "ok before, ok after": 3
+   },
+   "g6_failed_drawn": 18,
+   "g6_failed_gated": 117,
+   "g6_rows_changed": 106,
+   "rows": 3440
+  }
+ },
+ "concept_reading_a": "D186 (4): D181's reading, a draws findings/recompute/L2_d135_d181; the loose readings above are reproduced first and held to it",
+ "l2_d181": {
+  "gated": "findings/recompute/L2_d181",
+  "drawn": "findings/recompute/L2_d135_d181",
+  "matcher": "D181: S505's loose matcher with the question rule, Q-need, reading (b) (scripts/S505_question_aware_matcher.py recall_q(text, concepts, question, 'loose', 'need', 'b')): content words of a concept that also occur in its question do not count, the loose need rule applies to the words left, a concept made only of question words leaves the denominator; key v2.5",
+  "loose_base_held": {
+   "gated": 1280,
+   "drawn": 1280
+  },
+  "questions_concepts_unchanged": 32,
+  "held_check_d135": {
+   "rows": 3440,
+   "g6_rows_changed": 106,
+   "changed_by_outcome": {
+    "failed before, ok after": 101,
+    "ok before, failed after": 2,
+    "ok before, ok after": 3
+   },
+   "g6_failed_gated": 117,
+   "g6_failed_drawn": 18,
+   "acted_on": "rerun_d89.sh's rerun and rebuild keys (D89, D90, D92; D135)"
+  },
+  "anchors": {
+   "G5 cap 20": "71.9",
+   "G6 cap 50": "63.1"
+  }
+ },
+ "concept_reading_b": "D188: D181's reading, b draws findings/recompute/T1_L2_d181 and its gemini-3-flash-preview line a's D181 G5 rows; T1_L2 (the loose reading) is reproduced first and held to it",
+ "t1_d181": {
+  "dir": "findings/recompute/T1_L2_d181",
+  "rows": 360,
+  "loose_base_held": 120,
+  "questions_concepts_unchanged": 5,
+  "matcher": "D181: S505's loose matcher with the question rule, Q-need, reading (b) (scripts/S505_question_aware_matcher.py recall_q(text, concepts, question, 'loose', 'need', 'b')): content words of a concept that also occur in its question do not count, the loose need rule applies to the words left, a concept made only of question words leaves the denominator; key v2.5",
+  "key_sha256": "a42161841980792f5da521819c97b16dc54999b45838b8eb87cd4315f798270a",
+  "held_to": {
+   "concept_recall.jsonl": "7b9c9964",
+   "cap_tables.json": "81a07300"
+  }
+ },
+ "g4_d185": {
+  "dir": "findings/recompute/G4_fig3c_d185",
+  "rows": 1359,
+  "rows_moved_by_v25": 206,
+  "covered_answers_by_key": {
+   "not judged": 1,
+   "v2.4": 1673,
+   "v2.5": 2610
+  },
+  "awaiting_s6_covered": 0,
+  "units_complete": 72,
+  "choice_report": {
+   "answers": 11682,
+   "awaiting_s6": {
+    "count": 0
+   },
+   "by_draw": {
+    "1": {
+     "not judged": 62,
+     "v2.4": 6025,
+     "v2.5": 5595
+    }
+   },
+   "by_source": {
+    "G4": 6025,
+    "S6G4": 5574,
+    "S6G4R38": 21
+   },
+   "by_status": {
+    "not judged": 62,
+    "v2.4": 6025,
+    "v2.5": 5595
+   },
+   "g7_not_judged": {
+    "count": 0
+   },
+   "provisional": false,
+   "run_sha256": {
+    "G4": [
+     "38ae79ab023b97562b69b2875b3c8001b02f887d5578121103b85d4a0b4729da"
+    ],
+    "S6G4": [
+     "211568dbdfa09482e9c0abfb3b1da92d0bbd62d14a7646058663a990cbb54235"
+    ],
+    "S6G4R38": [
+     "211568dbdfa09482e9c0abfb3b1da92d0bbd62d14a7646058663a990cbb54235"
+    ]
+   }
+  }
+ },
+ "reproduced": {
+  "L2 (S475.reproduce)": {
+   "compared": 362,
+   "questions": 86,
+   "seed": 20261013,
+   "n_boot": 10000,
+   "what": "per system, mode (failed in, failed left out) and cap: answers, questions, mean, 95% interval, per-draw means, failed, cap_reached and stopped_by_cap shares, D92 action counts; and the anchors G5 cap 20 = 76.8%, G6 cap 50 = 65.9%"
+  },
+  "S463.reproduce": [
+   "S04a threshold_3: 15 against 4, P 0.0192108154296875",
+   "S04a threshold_4: 15 against 3, P 0.007537841796875",
+   "resample counts for n = 39 and 86 equal to S457.boot_matrix and S407.resample_counts (seed 20261013, 10000 resamples)",
+   "the letter's cost numbers from S77 (rlm_10 llm_calls 5.87, single_pass llm_calls 1.00, rlm_10 latency_s 82.4, single_pass latency_s 10.4; RLM-10 over single pass six times the calls, eight times the time)"
+  ],
+  "L2_d181 (S475.reproduce, ANCHORS_D181)": {
+   "compared": 362,
+   "questions": 86,
+   "seed": 20261013,
+   "n_boot": 10000,
+   "what": "per system, mode (failed in, failed left out) and cap: answers, questions, mean, 95% interval, per-draw means, failed, cap_reached and stopped_by_cap shares, D92 action counts; and the anchors G5 cap 20 = 71.9%, G6 cap 50 = 63.1%"
+  },
+  "T1_L2": "cap_tables.json recomputed from 360 rows, equal (k 15)",
+  "T1_L2_d181": "held to T1_L2: 360 answers tied one for one, cap_tables.json recomputed on concept_recall, equal",
+  "G4_fig3c_d185": "held to G4_fig3c: 1359 rows, 206 of the 132 changed questions' rows differ; grid_tables.json recomputed from its rows and draw-1 units, equal",
+  "G4_fig3c": "point_tables.json recomputed from 1359 rows, equal; grid_tables.json from 1359 rows, equal; RLM-10's cells equal to point_tables.json and, with the 38 judged G4R38 reruns held out (D156), to D149's anchor; the judged reading drawn",
+  "T1_L2 written by this script": true,
+  "G4_fig3c written by this script": true
+ },
+ "answers_drawn": {
+  "a": 5160,
+  "b": 360,
+  "c": 4284
+ },
+ "answers_planned": {
+  "G5": 2580,
+  "G6": 2580,
+  "T1": 360,
+  "G4c": 4284
+ },
+ "n": 9804,
+ "m": 9804,
+ "planned_how": {
+  "G5": {
+   "draw_1": 860,
+   "draws_2_and_3": 580,
+   "caps": 10,
+   "three_full_draws_before_D98": 2580
+  },
+  "G6": "three full draws (D98 keeps Figure 2's experiments)",
+  "T1": "4 models x 15 questions x 6 caps, draw 1 (D119 Q5)",
+  "G4c": "D160 S1: draw 1, 6 strategies x the covered questions of the 12 indexes (D126, {'10': 44, '20': 86, '5': 22, '50': 86} by core papers, three distractor ratios each); G4's whole plan, 6 x 12 x (86 common answerable + 2 x 29 of the D98 subset's answerable) = 10368, holds draws 2 and 3, which c does not use"
+ },
+ "drawn_check": "check_drawn(): 2688 drawn values equal their data workbook",
+ "dot_overlaps": {
+  "total": 212,
+  "by_strip": {
+   "G5 cap 1": 3,
+   "G5 cap 2": 9,
+   "G5 cap 3": 14,
+   "G5 cap 5": 12,
+   "G5 cap 7": 13,
+   "G5 cap 10": 10,
+   "G5 cap 15": 13,
+   "G5 cap 20": 10,
+   "G5 cap 30": 16,
+   "G5 cap 50": 17,
+   "G6 cap 1": 34,
+   "G6 cap 2": 0,
+   "G6 cap 3": 4,
+   "G6 cap 5": 5,
+   "G6 cap 7": 5,
+   "G6 cap 10": 11,
+   "G6 cap 15": 10,
+   "G6 cap 20": 9,
+   "G6 cap 30": 8,
+   "G6 cap 50": 9
+  }
+ },
+ "panels": {
+  "a": "A-1 (Valerio, 26 October): per cap two boxes, Mentori's RLM left, the package right, quartiles, median, full range, every question a dot, a thin line joining the medians, caps evenly spaced, no mean (L2 all mode; the mean and its interval in the data workbook, D128)",
+  "b": "B-2 (Valerio, 26 October), with his 15:00 follow-up (question lines one grey, #ABABAB, caps evenly spaced): one small panel per local model, a line per complete question, the median, and the median of the same questions with gemini-3-flash-preview (G5, draw 1) in #0072B2 dashed; the key is line samples with their meanings",
+  "c": "D150 (Valerio, 26 October 19:00, layout O-b1): every strategy minus single pass per index, judge score 4 (the pass rate) above score 3 (relaxed, D154), one cividis scale, the number in each cell, a frame where the two-sided 95% interval excludes 0, empty where a unit is not complete; on the questions the index can answer (D126, {'10': 44, '20': 86, '5': 22, '50': 86} by core papers)",
+  "strip": "D-3b (D149, Valerio 26 October 18:40): under a, per system and cap two bars side by side, reached the cap (plain) and cut off by the cap (hatched); no panel d",
+  "range strip": "FF30 a (supp.md section 7): under the first strip, per system and cap the range of the mean over the draws on D98's questions; an axis alone until G7 is read"
+ },
+ "legend_words": 98,
+ "font": "Helvetica",
+ "plates": {
+  "Figure 4 (D283)": {
+   "folder": "fig4_depth",
+   "panels": "a, b",
+   "stamp": "PROVISIONAL: 5520 of 5520 answers; a and the strip under it, RLM (three draws, 2580 of 2580) and Zhang RLM (three draws, 2580 of 2580) at 10 turn caps; b, T1's four local models, 360 of 360 (the 15 questions stored by every model at every cap); concept recall, no judge: a and b on D181's reading (the loose matcher with the question rule, key v2.5)",
+   "page_mm": [
+    183.0,
+    97.78888888888889
+   ],
+   "legend_words": 165
+  },
+  "Supplementary Figure 8 (D283)": {
+   "folder": "supp_fig8_depth",
+   "panels": "c, drawn with no letter",
+   "stamp": "PROVISIONAL: 4284 of 4284 answers; G4 draw 1 of the six strategies judged by S3 (60 of 60 strategy and index cells with both units judged); c's judge rows on key v2.5 where S6 has judged an answer of the 132 questions v2.5 changed, key v2.4 for the 0 covered draw-1 answers awaiting it",
+   "page_mm": [
+    183.0,
+    70.8111111111111
+   ],
+   "legend_words": 98
+  }
+ },
+ "files": {
+  "Supplementary Figure 8 (provisional, 4284 of 4284).pdf": "e40077181113e1480f374cc6918b05abca055cfb5132c1c16649f7ed58b2078c",
+  "Supplementary Figure 8 (provisional, 4284 of 4284).svg": "57ad47673012d31e06f0efccc0842ad4c25577d1527df7b4963df6d068ca85c8",
+  "Supplementary Figure 8 (provisional, 4284 of 4284).png": "9eaff554a1606fa6f641bb6b3c9d74dc9bab965a0482eea36f69fa4f0b565e4b",
+  "Supplementary Figure 8 data (provisional, 4284 of 4284).xlsx": "e1ad06d60c0244a1e02e32e52882aa529825e15fea5ea7bcf1e6e28e8cdf6b93",
+  "Supplementary Figure 8 data caption (provisional, 4284 of 4284).md": "ee360d9e81403d278532aba4689259c47498bda484dd0404c39d48193681a789",
+  "supplementary_figure8_numbers.json": "77d45af9b8dd52d01e1522954e72843d7e265cc921d898c0b20b39dd77bf14bb",
+  "legend_draft.md": "f306ab7f973928a4cf2591b8e026e356cf659a1f1cf766dac0020fe5fe34ac14"
+ }
+}

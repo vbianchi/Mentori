@@ -1,0 +1,840 @@
+{
+ "what": "Figure 4's judged counts per set-up on draw 1, counted apart from S472 and S463 (O1, 24 October); S472's reproduction gate (4) checks its counts against these",
+ "provenance": {
+  "script": "scripts/S480_fig4_recount.py",
+  "script_sha256": "7c432aa0524944649573f60009acb38450eb9886459783d3c8bf7aa1504950ee",
+  "command": "uv run --frozen python scripts/S480_fig4_recount.py",
+  "frozen_defaults": {
+   "records": "fig4_records_1023:fig4_records_1023",
+   "collect": "fig4_g9:g3_collect.jsonl",
+   "rlm_collect": "fig2:g1_collect.jsonl",
+   "rlm_answers": "fig2_g1r15_inputs:fig2_g1r15_inputs/runs",
+   "g9": "g9:.",
+   "s6_g1": "fig3_s6:."
+  },
+  "python": "3.13.11",
+  "model_calls": 0
+ },
+ "inputs": {
+  "answers_json:raw_gemini": {
+   "path": "findings/recompute/frozen_inputs/extracted/fig4_records_1023/fig4_records_1023/findings/runs/exp_03__raw_gemini__exp_v4_s20_n0/answers.json",
+   "sha256": "afa5aa7eca967a07d3098c3bb53159c6114948b185e06aab85274123bd6f87ee"
+  },
+  "answers_json:naive_rag": {
+   "path": "findings/recompute/frozen_inputs/extracted/fig4_records_1023/fig4_records_1023/findings/runs/exp_03__naive_rag__exp_v4_s20_n0/answers.json",
+   "sha256": "544d3cb4174ec1c9649d2bc436ddcfadc42e6c3d0da5a82612db9ad3d42d21b1"
+  },
+  "answers_json:full_orchestrator": {
+   "path": "findings/recompute/frozen_inputs/extracted/fig4_records_1023/fig4_records_1023/findings/runs/exp_03__full_orchestrator__exp_v4_s20_n0/answers.json",
+   "sha256": "3a91380cf2b620fdc573ec78a2f91b824a3ceac811d62e430fe48041729c812c"
+  },
+  "answers_json:orch_no_analyser": {
+   "path": "findings/recompute/frozen_inputs/extracted/fig4_records_1023/fig4_records_1023/findings/runs/exp_03__orch_no_analyser__exp_v4_s20_n0/answers.json",
+   "sha256": "6c54402ea3fec29f9f89bd0b5c3c6d892b2ddff5ca5e27fd034ee67b0e0f426c"
+  },
+  "answers_json:orch_no_planner": {
+   "path": "findings/recompute/frozen_inputs/extracted/fig4_records_1023/fig4_records_1023/findings/runs/exp_03__orch_no_planner__exp_v4_s20_n0/answers.json",
+   "sha256": "4ac955d8a012b7cd5fd103736d5868fc0bb2e1682937b8f780433de685067d1d"
+  },
+  "answers_json:orch_no_supervisor": {
+   "path": "findings/recompute/frozen_inputs/extracted/fig4_records_1023/fig4_records_1023/findings/runs/exp_03__orch_no_supervisor__exp_v4_s20_n0/answers.json",
+   "sha256": "0a7a955ffd36f332905366829a04621530271c093af9617127e51c4fd3d3ab04"
+  },
+  "answers_json:orch_no_synthesiser": {
+   "path": "findings/recompute/frozen_inputs/extracted/fig4_records_1023/fig4_records_1023/findings/runs/exp_03__orch_no_synthesiser__exp_v4_s20_n0/answers.json",
+   "sha256": "a5d82c4b338548759ea32aa26415b368f37da0e67960844c68d3f51c44cf7bdc"
+  },
+  "answers_json:orch_factual_to_documents": {
+   "path": "findings/recompute/frozen_inputs/extracted/fig4_records_1023/fig4_records_1023/findings/runs/exp_03__orch_factual_to_documents__exp_v4_s20_n0/answers.json",
+   "sha256": "126eeda5385dafc2414eb24ea7171d4633d0ab02a833ce0b9de10a540240e152"
+  },
+  "answers_json:orch_distil_every_step": {
+   "path": "findings/recompute/g9_inputs/runs/exp_03__orch_distil_every_step__exp_v4_s20_n0/answers.json",
+   "sha256": "d08585ab9a8f853eea7a6acaa8b19e5c83cccfbff03b619503fe14b6a30571f4"
+  },
+  "answers_json:orch_distil_every_step_f1": {
+   "path": "findings/recompute/g9_inputs/runs/exp_03__orch_distil_every_step_f1__exp_v4_s20_n0/answers.json",
+   "sha256": "0b12c674719289fbf8bac43b217c5751ba26535533979099ca8bb66a88bd1973"
+  },
+  "g3_collect": {
+   "path": "findings/recompute/fig4_g9_inputs/g3_collect.jsonl",
+   "sha256": "527fd71e53f30ca77f6ca050be58206a08e99b55b87e8d58887f5486bbdd4bae"
+  },
+  "g3_collect_sidecar": {
+   "path": "findings/recompute/fig4_g9_inputs/g3_collect.jsonl.json",
+   "sha256": "047a84919456d72557d581d83d6584ac8440158201a1ebec067be6b26d03b297"
+  },
+  "g1_collect": {
+   "path": "findings/recompute/fig2_inputs/g1_collect.jsonl",
+   "sha256": "f5ff75bc244cda492a48e7e11f54f2007ed7d586a8f49e78921edd7244b28965"
+  },
+  "g1_collect_sidecar": {
+   "path": "findings/recompute/fig2_inputs/g1_collect.jsonl.json",
+   "sha256": "04996e9dd9c3cca49177068f0143fbe0d1c7fa265a4eb6f617d24551f501f895"
+  },
+  "rlm_answers_jsonl": {
+   "path": "findings/recompute/frozen_inputs/extracted/fig2_g1r15_inputs/fig2_g1r15_inputs/runs/exp_01__rlm_10__exp_v4_s20_n0/answers.jsonl",
+   "sha256": "ecb6de5343d172894fd56d57997e3301d70ca3fb509ae2cd65f8e47eb8c268b7"
+  },
+  "s6_g1_sums": {
+   "path": "findings/recompute/fig3_s6_inputs/SHA256SUMS",
+   "sha256": "49fd1d0b39a4588abd4b13ece27efc4a8759710111de8fe475e785601ab361a4"
+  }
+ },
+ "known_inputs": {
+  "figure3_numbers": {
+   "path": "findings/figures_provisional/fig3_strategies/figure3_numbers.json",
+   "sha256": "984e34e93d115a98f5e07253c99d62bc09dcaea98a17ff3de8bc92831ddbab69"
+  },
+  "rerun_keys": {
+   "path": "findings/recompute/G1_runs/rerun_d89.sh",
+   "sha256": "8549210c7e829229ba83b0dd5afcc804454cda00aed665ce586ede5e24d98260"
+  },
+  "figure3_provenance": {
+   "path": "findings/figures_provisional/fig3_strategies/figure3_provenance.json",
+   "sha256": "1c451c7d914678dd3443e24511ffcb450040edf040df8d41a27d3b9c3a0c40c0"
+  },
+  "rlm_manifest": {
+   "path": "findings/recompute/frozen_inputs/extracted/fig2_g1r15_inputs/fig2_g1r15_inputs/MANIFEST.sha256",
+   "sha256": "60c1f703d7b5853ec7bd5aebaecec9ac50ea3cb078b1f44741c5964427635b2e"
+  }
+ },
+ "rules": {
+  "score_of_group": {
+   "answerable": "correctness",
+   "false_premise": "correctness",
+   "not_answerable": "refusal_accuracy"
+  },
+  "score_of_group_source": "S463.METRIC, scripts/S463_fig2_ranking.py (copied, not imported)",
+  "pass_thresholds": [
+   4,
+   3
+  ],
+  "refused_threshold": 3,
+  "false_premise_thresholds": [
+   4,
+   3
+  ],
+  "draw": 1,
+  "group_n": {
+   "answerable": 86,
+   "false_premise": 10,
+   "not_answerable": 39
+  }
+ },
+ "reproduced": {
+  "d5_key": {
+   "questions": 135,
+   "answerable": 86,
+   "false_premise": 10,
+   "not_answerable": 39
+  },
+  "rlm_10_draw_1_vs_figure_2": {
+   "answerable_pass_4": {
+    "here": 64,
+    "figure_2": 64,
+    "of": 86
+   },
+   "answerable_pass_3": {
+    "here": 80,
+    "figure_2": 80,
+    "of": 86
+   },
+   "not_answerable_refused_3": {
+    "here": 39,
+    "figure_2": 39,
+    "of": 39
+   },
+   "false_premise_pass_3": {
+    "here": 10,
+    "figure_2": 10,
+    "of": 10
+   }
+  },
+  "not_compared": {
+   "false_premise_pass_4": "Figure 3's Source Data holds no RLM-10 draw-1 value for it"
+  },
+  "v24_anchor": {
+   "compared": true,
+   "set_ups": 9,
+   "fields": [
+    "answerable_pass_4",
+    "answerable_pass_3",
+    "not_answerable_refused_3",
+    "false_premise_pass_4",
+    "false_premise_pass_3",
+    "answerable_judged",
+    "false_premise_judged",
+    "not_answerable_judged",
+    "judged_no_answer",
+    "unscored",
+    "not_answerable_direct_answer"
+   ],
+   "equal": true,
+   "inputs": "frozen defaults"
+  }
+ },
+ "judge_rows_v25": {
+  "what": "D188: counts is on the draw-1 rows scripts/judge_rows_v25.py chooses (an answer's key v2.5 row where S6 judged it, else its key v2.4 row); counts_v24 on the collects' key v2.4 rows",
+  "script_sha256": "aa90f42264e2ce21acfca52c2421d852607418981b6e9be8d8984a716b1ebddd",
+  "G3": {
+   "sources": {
+    "G3": {
+     "kind": "v2.4",
+     "run_sha256": "38ae79ab023b97562b69b2875b3c8001b02f887d5578121103b85d4a0b4729da",
+     "rows": 1924,
+     "set_aside": 574
+    },
+    "S6G3": {
+     "kind": "v2.5 changed",
+     "run_sha256": "211568dbdfa09482e9c0abfb3b1da92d0bbd62d14a7646058663a990cbb54235",
+     "rows": 854,
+     "set_aside": 254
+    }
+   },
+   "s6_absent": [],
+   "draw_1_answers": 1350,
+   "from_v25": 600,
+   "awaiting_s6": 0
+  },
+  "G1": {
+   "sources": {
+    "G1": {
+     "kind": "v2.4",
+     "run_sha256": "38ae79ab023b97562b69b2875b3c8001b02f887d5578121103b85d4a0b4729da",
+     "rows": 2430
+    },
+    "S6G1": {
+     "kind": "v2.5 changed",
+     "run_sha256": "211568dbdfa09482e9c0abfb3b1da92d0bbd62d14a7646058663a990cbb54235",
+     "rows": 1080
+    }
+   },
+   "s6_absent": [],
+   "draw_1_answers": 135,
+   "from_v25": 60,
+   "awaiting_s6": 0
+  },
+  "provisional": false
+ },
+ "counts": {
+  "raw_gemini": {
+   "answerable_pass_4": 32,
+   "answerable_pass_3": 62,
+   "not_answerable_refused_3": 0,
+   "false_premise_pass_4": 8,
+   "false_premise_pass_3": 9,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 0,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "none",
+   "not_answerable_direct_answer": null
+  },
+  "naive_rag": {
+   "answerable_pass_4": 72,
+   "answerable_pass_3": 82,
+   "not_answerable_refused_3": 39,
+   "false_premise_pass_4": 10,
+   "false_premise_pass_3": 10,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 0,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "none",
+   "not_answerable_direct_answer": null
+  },
+  "full_orchestrator": {
+   "answerable_pass_4": 65,
+   "answerable_pass_3": 84,
+   "not_answerable_refused_3": 2,
+   "false_premise_pass_4": 8,
+   "false_premise_pass_3": 8,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 0,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "on",
+   "not_answerable_direct_answer": 37
+  },
+  "orch_no_analyser": {
+   "answerable_pass_4": 67,
+   "answerable_pass_3": 82,
+   "not_answerable_refused_3": 37,
+   "false_premise_pass_4": 8,
+   "false_premise_pass_3": 8,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 0,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "switched off",
+   "not_answerable_direct_answer": null
+  },
+  "orch_no_planner": {
+   "answerable_pass_4": 63,
+   "answerable_pass_3": 80,
+   "not_answerable_refused_3": 1,
+   "false_premise_pass_4": 9,
+   "false_premise_pass_3": 9,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 0,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "on",
+   "not_answerable_direct_answer": 37
+  },
+  "orch_no_supervisor": {
+   "answerable_pass_4": 66,
+   "answerable_pass_3": 81,
+   "not_answerable_refused_3": 1,
+   "false_premise_pass_4": 9,
+   "false_premise_pass_3": 10,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 0,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "on",
+   "not_answerable_direct_answer": 38
+  },
+  "orch_no_synthesiser": {
+   "answerable_pass_4": 68,
+   "answerable_pass_3": 81,
+   "not_answerable_refused_3": 2,
+   "false_premise_pass_4": 10,
+   "false_premise_pass_3": 10,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 0,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "on",
+   "not_answerable_direct_answer": 37
+  },
+  "orch_factual_to_documents": {
+   "answerable_pass_4": 60,
+   "answerable_pass_3": 79,
+   "not_answerable_refused_3": 38,
+   "false_premise_pass_4": 9,
+   "false_premise_pass_3": 10,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 0,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "on",
+   "not_answerable_direct_answer": 0
+  },
+  "orch_distil_every_step": {
+   "answerable_pass_4": 54,
+   "answerable_pass_3": 79,
+   "not_answerable_refused_3": 2,
+   "false_premise_pass_4": 9,
+   "false_premise_pass_3": 10,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 0,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "on",
+   "not_answerable_direct_answer": 36
+  },
+  "orch_distil_every_step_f1": {
+   "answerable_pass_4": 60,
+   "answerable_pass_3": 79,
+   "not_answerable_refused_3": 2,
+   "false_premise_pass_4": 9,
+   "false_premise_pass_3": 10,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 0,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "on",
+   "not_answerable_direct_answer": 37
+  },
+  "rlm_10": {
+   "answerable_pass_4": 64,
+   "answerable_pass_3": 80,
+   "not_answerable_refused_3": 39,
+   "false_premise_pass_4": 9,
+   "false_premise_pass_3": 10,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 1,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "none",
+   "not_answerable_direct_answer": null
+  }
+ },
+ "counts_v24": {
+  "raw_gemini": {
+   "answerable_pass_4": 32,
+   "answerable_pass_3": 62,
+   "not_answerable_refused_3": 0,
+   "false_premise_pass_4": 8,
+   "false_premise_pass_3": 8,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 0,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "none",
+   "not_answerable_direct_answer": null
+  },
+  "naive_rag": {
+   "answerable_pass_4": 73,
+   "answerable_pass_3": 82,
+   "not_answerable_refused_3": 39,
+   "false_premise_pass_4": 10,
+   "false_premise_pass_3": 10,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 0,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "none",
+   "not_answerable_direct_answer": null
+  },
+  "full_orchestrator": {
+   "answerable_pass_4": 65,
+   "answerable_pass_3": 84,
+   "not_answerable_refused_3": 2,
+   "false_premise_pass_4": 8,
+   "false_premise_pass_3": 8,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 0,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "on",
+   "not_answerable_direct_answer": 37
+  },
+  "orch_no_analyser": {
+   "answerable_pass_4": 66,
+   "answerable_pass_3": 82,
+   "not_answerable_refused_3": 37,
+   "false_premise_pass_4": 8,
+   "false_premise_pass_3": 8,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 0,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "switched off",
+   "not_answerable_direct_answer": null
+  },
+  "orch_no_planner": {
+   "answerable_pass_4": 63,
+   "answerable_pass_3": 80,
+   "not_answerable_refused_3": 1,
+   "false_premise_pass_4": 9,
+   "false_premise_pass_3": 9,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 0,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "on",
+   "not_answerable_direct_answer": 37
+  },
+  "orch_no_supervisor": {
+   "answerable_pass_4": 65,
+   "answerable_pass_3": 81,
+   "not_answerable_refused_3": 1,
+   "false_premise_pass_4": 9,
+   "false_premise_pass_3": 10,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 0,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "on",
+   "not_answerable_direct_answer": 38
+  },
+  "orch_no_synthesiser": {
+   "answerable_pass_4": 68,
+   "answerable_pass_3": 81,
+   "not_answerable_refused_3": 2,
+   "false_premise_pass_4": 10,
+   "false_premise_pass_3": 10,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 0,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "on",
+   "not_answerable_direct_answer": 37
+  },
+  "orch_factual_to_documents": {
+   "answerable_pass_4": 60,
+   "answerable_pass_3": 79,
+   "not_answerable_refused_3": 38,
+   "false_premise_pass_4": 9,
+   "false_premise_pass_3": 10,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 0,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "on",
+   "not_answerable_direct_answer": 0
+  },
+  "orch_distil_every_step": {
+   "answerable_pass_4": 55,
+   "answerable_pass_3": 79,
+   "not_answerable_refused_3": 2,
+   "false_premise_pass_4": 9,
+   "false_premise_pass_3": 10,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 0,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "on",
+   "not_answerable_direct_answer": 36
+  },
+  "orch_distil_every_step_f1": {
+   "answerable_pass_4": 60,
+   "answerable_pass_3": 79,
+   "not_answerable_refused_3": 2,
+   "false_premise_pass_4": 9,
+   "false_premise_pass_3": 10,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 0,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "on",
+   "not_answerable_direct_answer": 37
+  },
+  "rlm_10": {
+   "answerable_pass_4": 66,
+   "answerable_pass_3": 80,
+   "not_answerable_refused_3": 39,
+   "false_premise_pass_4": 10,
+   "false_premise_pass_3": 10,
+   "answerable_judged": 86,
+   "false_premise_judged": 10,
+   "not_answerable_judged": 39,
+   "judged_no_answer": 1,
+   "unscored": 0,
+   "unscored_by_status": {},
+   "analyser": "none",
+   "not_answerable_direct_answer": null
+  }
+ },
+ "stress_records": {
+  "orch_distil_every_step": {
+   "answers": 135,
+   "no_text": 0,
+   "words": 40100,
+   "model_calls": 2460,
+   "failed_calls": 5,
+   "cut_calls": 16,
+   "not_answerable_direct_answer": 36
+  },
+  "orch_distil_every_step_f1": {
+   "answers": 135,
+   "no_text": 0,
+   "words": 42676,
+   "model_calls": 2060,
+   "failed_calls": 1,
+   "cut_calls": 3,
+   "not_answerable_direct_answer": 37
+  }
+ },
+ "draw_counts": {
+  "raw_gemini|1|4": [
+   14,
+   29
+  ],
+  "raw_gemini|1|3": [
+   22,
+   29
+  ],
+  "raw_gemini|2|4": [
+   12,
+   29
+  ],
+  "raw_gemini|2|3": [
+   22,
+   29
+  ],
+  "raw_gemini|3|4": [
+   14,
+   29
+  ],
+  "raw_gemini|3|3": [
+   23,
+   29
+  ],
+  "naive_rag|1|4": [
+   25,
+   29
+  ],
+  "naive_rag|1|3": [
+   28,
+   29
+  ],
+  "naive_rag|2|4": [
+   25,
+   29
+  ],
+  "naive_rag|2|3": [
+   27,
+   29
+  ],
+  "naive_rag|3|4": [
+   25,
+   29
+  ],
+  "naive_rag|3|3": [
+   27,
+   29
+  ],
+  "full_orchestrator|1|4": [
+   23,
+   29
+  ],
+  "full_orchestrator|1|3": [
+   28,
+   29
+  ],
+  "full_orchestrator|2|4": [
+   20,
+   29
+  ],
+  "full_orchestrator|2|3": [
+   26,
+   29
+  ],
+  "full_orchestrator|3|4": [
+   26,
+   29
+  ],
+  "full_orchestrator|3|3": [
+   28,
+   29
+  ],
+  "orch_no_analyser|1|4": [
+   22,
+   29
+  ],
+  "orch_no_analyser|1|3": [
+   27,
+   29
+  ],
+  "orch_no_analyser|2|4": [
+   23,
+   29
+  ],
+  "orch_no_analyser|2|3": [
+   29,
+   29
+  ],
+  "orch_no_analyser|3|4": [
+   25,
+   29
+  ],
+  "orch_no_analyser|3|3": [
+   28,
+   29
+  ],
+  "orch_no_planner|1|4": [
+   21,
+   29
+  ],
+  "orch_no_planner|1|3": [
+   26,
+   29
+  ],
+  "orch_no_planner|2|4": [
+   26,
+   29
+  ],
+  "orch_no_planner|2|3": [
+   28,
+   29
+  ],
+  "orch_no_planner|3|4": [
+   22,
+   29
+  ],
+  "orch_no_planner|3|3": [
+   28,
+   29
+  ],
+  "orch_no_supervisor|1|4": [
+   24,
+   29
+  ],
+  "orch_no_supervisor|1|3": [
+   28,
+   29
+  ],
+  "orch_no_supervisor|2|4": [
+   23,
+   29
+  ],
+  "orch_no_supervisor|2|3": [
+   26,
+   29
+  ],
+  "orch_no_supervisor|3|4": [
+   23,
+   29
+  ],
+  "orch_no_supervisor|3|3": [
+   26,
+   29
+  ],
+  "orch_no_synthesiser|1|4": [
+   27,
+   29
+  ],
+  "orch_no_synthesiser|1|3": [
+   28,
+   29
+  ],
+  "orch_no_synthesiser|2|4": [
+   21,
+   29
+  ],
+  "orch_no_synthesiser|2|3": [
+   26,
+   29
+  ],
+  "orch_no_synthesiser|3|4": [
+   24,
+   29
+  ],
+  "orch_no_synthesiser|3|3": [
+   26,
+   29
+  ],
+  "orch_factual_to_documents|1|4": [
+   24,
+   29
+  ],
+  "orch_factual_to_documents|1|3": [
+   28,
+   29
+  ],
+  "orch_factual_to_documents|2|4": [
+   24,
+   29
+  ],
+  "orch_factual_to_documents|2|3": [
+   29,
+   29
+  ],
+  "orch_factual_to_documents|3|4": [
+   24,
+   29
+  ],
+  "orch_factual_to_documents|3|3": [
+   27,
+   29
+  ],
+  "orch_distil_every_step|1|4": [
+   21,
+   29
+  ],
+  "orch_distil_every_step|1|3": [
+   27,
+   29
+  ],
+  "orch_distil_every_step|2|4": [
+   22,
+   29
+  ],
+  "orch_distil_every_step|2|3": [
+   29,
+   29
+  ],
+  "orch_distil_every_step|3|4": [
+   20,
+   29
+  ],
+  "orch_distil_every_step|3|3": [
+   28,
+   29
+  ],
+  "orch_distil_every_step_f1|1|4": [
+   25,
+   29
+  ],
+  "orch_distil_every_step_f1|1|3": [
+   28,
+   29
+  ],
+  "orch_distil_every_step_f1|2|4": [
+   20,
+   29
+  ],
+  "orch_distil_every_step_f1|2|3": [
+   26,
+   29
+  ],
+  "orch_distil_every_step_f1|3|4": [
+   20,
+   29
+  ],
+  "orch_distil_every_step_f1|3|3": [
+   26,
+   29
+  ],
+  "rlm_10|1|4": [
+   22,
+   29
+  ],
+  "rlm_10|1|3": [
+   27,
+   29
+  ],
+  "rlm_10|2|4": [
+   23,
+   29
+  ],
+  "rlm_10|2|3": [
+   28,
+   29
+  ],
+  "rlm_10|3|4": [
+   22,
+   29
+  ],
+  "rlm_10|3|3": [
+   29,
+   29
+  ]
+ }
+}

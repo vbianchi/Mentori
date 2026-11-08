@@ -1,0 +1,139 @@
+{
+ "provenance": {
+  "script": "scripts/S525_fig6_s4_check.py",
+  "script_sha256": "173f15fd9338577d655e05a7d66b7171793dfc4ff2622efcc90f265de434c533",
+  "command": "uv run --frozen python scripts/S525_fig6_s4_check.py",
+  "decision": "D201 Q2",
+  "old": {
+   "frozen_set": "s2_length_retries_20261021",
+   "manifest_sha256": "5a7587b04c961a564cefd904f40468f2d94fc904928087de947ebf4b8e4b4612",
+   "tar_sha256": "0085b2926f2ba8c442d1fa6c6ccceb54eb6fbc9d82fab581318b74662ace5ecf"
+  },
+  "new": {
+   "frozen_set": "s2_after_s4_20261105",
+   "manifest_sha256": "2327a8032c352aa432cb54d5b9a634c3747482a890d0c31be356ece3beef06e0",
+   "tar_sha256": "f879ea24f6398634f65d09d468e08210b9044a408822e45a52a0c1249182354d"
+  },
+  "list": {
+   "path": "findings/recompute/S502_fig6_s4_reruns/S502_rerun_list.json",
+   "sha256": "1c4b0ec2ae7130227fba15e2b323cbf523bc00b72a58277145368cb1113cb082"
+  },
+  "model_calls": 0
+ },
+ "fields_compared": [
+  "passed",
+  "fail_kind",
+  "exec_outcome",
+  "actual_results"
+ ],
+ "counts": {
+  "keys": 2420,
+  "outside_the_list_equal": 2255,
+  "listed": 165,
+  "listed_rerun": 165
+ },
+ "totals": {
+  "old": {
+   "attempts": 2420,
+   "passed": 1660
+  },
+  "new": {
+   "attempts": 2420,
+   "passed": 1692
+  }
+ },
+ "per_variant": {
+  "old": {
+   "devstral-small-2-24b+default": {
+    "attempts": 220,
+    "passed": 134
+   },
+   "gemini-2.5-pro+default": {
+    "attempts": 220,
+    "passed": 182
+   },
+   "gemini-2.5-pro+off": {
+    "attempts": 220,
+    "passed": 153
+   },
+   "gemini-3-flash-preview+default": {
+    "attempts": 220,
+    "passed": 203
+   },
+   "gemini-3-flash-preview+off": {
+    "attempts": 220,
+    "passed": 197
+   },
+   "gemma3-27b+default": {
+    "attempts": 220,
+    "passed": 83
+   },
+   "gpt-oss-20b+high": {
+    "attempts": 220,
+    "passed": 112
+   },
+   "gpt-oss-20b+low": {
+    "attempts": 220,
+    "passed": 142
+   },
+   "gpt-oss-20b+medium": {
+    "attempts": 220,
+    "passed": 149
+   },
+   "qwen3-coder-30b+default": {
+    "attempts": 220,
+    "passed": 171
+   },
+   "qwen3-coder-next-q4_K_M+default": {
+    "attempts": 220,
+    "passed": 134
+   }
+  },
+  "new": {
+   "devstral-small-2-24b+default": {
+    "attempts": 220,
+    "passed": 134
+   },
+   "gemini-2.5-pro+default": {
+    "attempts": 220,
+    "passed": 183
+   },
+   "gemini-2.5-pro+off": {
+    "attempts": 220,
+    "passed": 153
+   },
+   "gemini-3-flash-preview+default": {
+    "attempts": 220,
+    "passed": 203
+   },
+   "gemini-3-flash-preview+off": {
+    "attempts": 220,
+    "passed": 196
+   },
+   "gemma3-27b+default": {
+    "attempts": 220,
+    "passed": 83
+   },
+   "gpt-oss-20b+high": {
+    "attempts": 220,
+    "passed": 133
+   },
+   "gpt-oss-20b+low": {
+    "attempts": 220,
+    "passed": 149
+   },
+   "gpt-oss-20b+medium": {
+    "attempts": 220,
+    "passed": 154
+   },
+   "qwen3-coder-30b+default": {
+    "attempts": 220,
+    "passed": 168
+   },
+   "qwen3-coder-next-q4_K_M+default": {
+    "attempts": 220,
+    "passed": 136
+   }
+  }
+ }
+}

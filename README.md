@@ -339,3 +339,19 @@ The 200-paper evaluation corpus is **not** redistributed in this repository; thi
 Bug reports, reproducibility issues, and code questions: **open a GitHub issue** at <https://github.com/vbianchi/Mentori/issues>.
 
 For correspondence about the paper itself, contact the corresponding author at the email listed on the manuscript.
+
+<!-- S608 analysis begin -->
+## Reproducing the revised paper (analysis/)
+
+`analysis/` holds the scripts that make every figure, table and number of the revised paper, with the expected
+outputs, and `analysis/reproduce.py`, one command that rebuilds them from the data deposited on Zenodo and compares
+each file with the copy here:
+
+```
+cd analysis
+uv run --frozen python reproduce.py --data <empty folder> --download --zenodo-url https://zenodo.org/records/<id>
+```
+
+`analysis/README.md` says what it rebuilds, what it holds by sha256 and why, and what "100%" means for each kind of
+file. `publication/` is the submitted version's material; `analysis/` is the revision's.
+<!-- S608 analysis end -->

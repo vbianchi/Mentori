@@ -1,0 +1,112 @@
+{
+ "provenance": {
+  "script": "scripts/S461_supp_fig2_retrieval.py",
+  "script_sha256": "edad5bffbf8e0d3f7d799ce5019b20feb9f40e95d9e5270170286e5f79efb967",
+  "command": "uv run --frozen python scripts/S461_supp_fig2_retrieval.py",
+  "python": "3.13.11",
+  "deterministic": "D155: no build time and no repository HEAD are recorded; the script's and every input's sha256 identify the build",
+  "inputs_sha256": {
+   "frozen:upstream/publication/results/exp01_embedding_latest.json": "c0742536a88770487c3a3336468f49ac676a97a107d7518de394e541dfbef9db",
+   "frozen:upstream/publication/results/exp02_search_latest.json": "199227eae91cbb9f7bc9cb03fcf90fb975d380efc17885a615cb994aad84b2f4",
+   "frozen:upstream/publication/results/exp03a_chunking_latest.json": "4d772c4c1f8e2be1803b936c49f5ceea927110842e5394cf5a59401cf1484f0e",
+   "frozen:upstream/publication/results/exp03b_scalability_latest.json": "88f396487459a604e1106b78d49a0e56287d8ccb9ff361808920caeefd2035cf",
+   "frozen:upstream/publication/results/exp04_generation_latest.json": "9e4acbe88bae418890196147333e0ebe4ddc623c7c4e22b7409e11b230d5c4c7"
+  },
+  "lock_toml_sha256": "8730d401a5d7b6baa1780e656f844261eaead60e45b5199afa29d57f989ad495",
+  "model_calls": 0
+ },
+ "reproduced": [
+  "84 result rows: overall MRR equals the mean of the per-query MRRs, per-query count equals n_queries",
+  "rows equal each record's config grid once each (84 planned)",
+  "82 retrieval query ids, none among the 138 question ids of exp04_generation_latest.json; no per-query row carries answer, generation, response, judge_scores",
+  "S295's printed values regenerated: 8 chunking means and 5 scalability values, against manuscript/submission/supplementary/Supplementary_Figure_2.pdf sha256 922dd598ad200705"
+ ],
+ "stamp": "PROVISIONAL: 84 of 84 result rows, the deposit's four retrieval sweeps of February 2026 as they are (no run planned, experiments/LIST.md); legend a draft",
+ "figure": "Supplementary Figure 2",
+ "named": "Supplementary Figure 2: FIGURE_LOCK [files] supplementary_name (D92 Q194)",
+ "page_mm": [
+  183.0,
+  142.418
+ ],
+ "figure_lock": {
+  "path": "experiments/FIGURE_LOCK.toml",
+  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "status": "agreed"
+ },
+ "type_pt": {
+  "panel letters (bold)": 8.0,
+  "all other text": 8.0
+ },
+ "font": "Helvetica",
+ "drawn": {
+  "series_b": [
+   [
+    "RRF"
+   ],
+   [
+    "Hybrid (fixed \u03b1=0.5)",
+    "Hybrid (adaptive \u03b1)"
+   ],
+   [
+    "RRF + reranker"
+   ],
+   [
+    "BM25 only (scientific)"
+   ],
+   [
+    "BM25 only (standard)"
+   ],
+   [
+    "Dense only"
+   ]
+  ],
+  "colours_b": [
+   "#0072B2",
+   "#E69F00",
+   "#009E73",
+   "#CC79A7",
+   "#56B4E9",
+   "#D55E00"
+  ],
+  "shapes_b": [
+   "o",
+   "s",
+   "D",
+   "^",
+   "v",
+   "h"
+  ],
+  "shapes_a": {
+   "BAAI/bge-m3": "o",
+   "all-MiniLM-L6-v2": "s",
+   "all-mpnet-base-v2": "D",
+   "allenai/specter2_base": "^"
+  },
+  "colours_a": {
+   "BAAI/bge-m3": "#0072B2",
+   "all-MiniLM-L6-v2": "#E69F00",
+   "all-mpnet-base-v2": "#009E73",
+   "allenai/specter2_base": "#CC79A7"
+  },
+  "shapes_c": {
+   "A": "o",
+   "B": "^",
+   "C": "s"
+  }
+ },
+ "panels": {
+  "a": "MRR by corpus size per embedding model (exp01), a house colour and shape per model, direct labels",
+  "b": "MRR by corpus size per search strategy (exp02), Okabe-Ito colours; strategies with equal values at every size merged into one series",
+  "c": "MRR per chunking configuration (exp03a): tiles by run and mean, each value printed, cividis scale above",
+  "d": "MRR of RRF over the pre-built BGE-M3 indexes (the record's words) per corpus size (exp03b), each value printed"
+ },
+ "files": {
+  "Supplementary Figure 2 (provisional, 84 of 84).pdf": "eccad4d34ef3de22bcde01aca9249ebb61215ea88aedd342658a2f24f4e4ae44",
+  "Supplementary Figure 2 (provisional, 84 of 84).svg": "94a61f8afa5b541a0a48c6b15f0ac31e03b7b33b23f382331cd62ca382e47c3c",
+  "Supplementary Figure 2 (provisional, 84 of 84).png": "1fbb159633185c871dc694556eda776a2ecfba106ce6321be28a62079b6dd550",
+  "Supplementary Figure 2 data (provisional, 84 of 84).xlsx": "0310640487db19b579ed741faf7f4f887097cbbdf0480864bdb93714e0f090d9",
+  "Supplementary Figure 2 data caption (provisional, 84 of 84).md": "a2e78be054b341b35eefc3630c1b6dfe4972f5d22b3c41384f940262e9e7ab51",
+  "supplementary_figure2_numbers.json": "7fc88885646cf3450adfe974bdb14c94aa89fec3b9c12d3ebf880b3bc9d5ad39",
+  "legend_draft.md": "baa95ab2812cc473c516d4f4ebe1f40f6b96d66656d2b1d711db3d45fade1b18"
+ }
+}

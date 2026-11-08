@@ -1,0 +1,3643 @@
+{
+ "stamp": "PROVISIONAL: 1,548 of 1,548 gemini-3-flash-preview answers drawn under both judges, from the committed rows (S518_inputs/second_judge, fig2_inputs, fig3_s6_inputs); panel b from T2's rows of both judges (judge_rows_v25.t2_source; t2_second_inputs, S592), empty: gemini-2.5-pro RLM-20, gemini-2.5-pro RLM-5, gemini-2.5-pro multi-hop; reproduced first: six pass rates at 4 equal Figure 3a's committed strategy rows; S518 D_one, D_many and their intervals equal second_judge.json; the T2 reader gives gemini-3-flash-preview's ten b rows exactly as the G1 reader",
+ "what": "Supplementary Figure 4, data values and printed numbers (S448 R8 compares the workbook with this file)",
+ "sheets": {
+  "Supplementary Fig. 4a": {
+   "columns": [
+    "metric",
+    "judge_1_score",
+    "judge_2_score",
+    "share_of_answers_pct",
+    "answers"
+   ],
+   "rows": [
+    [
+     "Correctness",
+     0,
+     0,
+     2.1963824289405687,
+     34
+    ],
+    [
+     "Correctness",
+     1,
+     0,
+     0.06459948320413436,
+     1
+    ],
+    [
+     "Correctness",
+     2,
+     0,
+     0.5167958656330749,
+     8
+    ],
+    [
+     "Correctness",
+     3,
+     0,
+     0.12919896640826872,
+     2
+    ],
+    [
+     "Correctness",
+     4,
+     0,
+     0.0,
+     0
+    ],
+    [
+     "Correctness",
+     5,
+     0,
+     0.06459948320413436,
+     1
+    ],
+    [
+     "Correctness",
+     0,
+     1,
+     0.3875968992248062,
+     6
+    ],
+    [
+     "Correctness",
+     1,
+     1,
+     0.1937984496124031,
+     3
+    ],
+    [
+     "Correctness",
+     2,
+     1,
+     2.1963824289405687,
+     34
+    ],
+    [
+     "Correctness",
+     3,
+     1,
+     1.744186046511628,
+     27
+    ],
+    [
+     "Correctness",
+     4,
+     1,
+     0.0,
+     0
+    ],
+    [
+     "Correctness",
+     5,
+     1,
+     0.0,
+     0
+    ],
+    [
+     "Correctness",
+     0,
+     2,
+     0.06459948320413436,
+     1
+    ],
+    [
+     "Correctness",
+     1,
+     2,
+     0.0,
+     0
+    ],
+    [
+     "Correctness",
+     2,
+     2,
+     0.7751937984496124,
+     12
+    ],
+    [
+     "Correctness",
+     3,
+     2,
+     7.881136950904393,
+     122
+    ],
+    [
+     "Correctness",
+     4,
+     2,
+     3.4237726098191215,
+     53
+    ],
+    [
+     "Correctness",
+     5,
+     2,
+     0.0,
+     0
+    ],
+    [
+     "Correctness",
+     0,
+     3,
+     0.0,
+     0
+    ],
+    [
+     "Correctness",
+     1,
+     3,
+     0.0,
+     0
+    ],
+    [
+     "Correctness",
+     2,
+     3,
+     0.0,
+     0
+    ],
+    [
+     "Correctness",
+     3,
+     3,
+     2.648578811369509,
+     41
+    ],
+    [
+     "Correctness",
+     4,
+     3,
+     6.395348837209302,
+     99
+    ],
+    [
+     "Correctness",
+     5,
+     3,
+     0.06459948320413436,
+     1
+    ],
+    [
+     "Correctness",
+     0,
+     4,
+     0.0,
+     0
+    ],
+    [
+     "Correctness",
+     1,
+     4,
+     0.0,
+     0
+    ],
+    [
+     "Correctness",
+     2,
+     4,
+     0.0,
+     0
+    ],
+    [
+     "Correctness",
+     3,
+     4,
+     2.454780361757106,
+     38
+    ],
+    [
+     "Correctness",
+     4,
+     4,
+     16.989664082687337,
+     263
+    ],
+    [
+     "Correctness",
+     5,
+     4,
+     4.134366925064599,
+     64
+    ],
+    [
+     "Correctness",
+     0,
+     5,
+     0.0,
+     0
+    ],
+    [
+     "Correctness",
+     1,
+     5,
+     0.0,
+     0
+    ],
+    [
+     "Correctness",
+     2,
+     5,
+     0.0,
+     0
+    ],
+    [
+     "Correctness",
+     3,
+     5,
+     1.6149870801033592,
+     25
+    ],
+    [
+     "Correctness",
+     4,
+     5,
+     11.046511627906977,
+     171
+    ],
+    [
+     "Correctness",
+     5,
+     5,
+     35.012919896640824,
+     542
+    ],
+    [
+     "Completeness",
+     0,
+     0,
+     2.0671834625322996,
+     32
+    ],
+    [
+     "Completeness",
+     1,
+     0,
+     0.5167958656330749,
+     8
+    ],
+    [
+     "Completeness",
+     2,
+     0,
+     0.25839793281653745,
+     4
+    ],
+    [
+     "Completeness",
+     3,
+     0,
+     0.1937984496124031,
+     3
+    ],
+    [
+     "Completeness",
+     4,
+     0,
+     0.0,
+     0
+    ],
+    [
+     "Completeness",
+     5,
+     0,
+     0.06459948320413436,
+     1
+    ],
+    [
+     "Completeness",
+     0,
+     1,
+     0.45219638242894056,
+     7
+    ],
+    [
+     "Completeness",
+     1,
+     1,
+     1.0335917312661498,
+     16
+    ],
+    [
+     "Completeness",
+     2,
+     1,
+     4.58656330749354,
+     71
+    ],
+    [
+     "Completeness",
+     3,
+     1,
+     2.131782945736434,
+     33
+    ],
+    [
+     "Completeness",
+     4,
+     1,
+     0.45219638242894056,
+     7
+    ],
+    [
+     "Completeness",
+     5,
+     1,
+     0.06459948320413436,
+     1
+    ],
+    [
+     "Completeness",
+     0,
+     2,
+     0.0,
+     0
+    ],
+    [
+     "Completeness",
+     1,
+     2,
+     0.12919896640826872,
+     2
+    ],
+    [
+     "Completeness",
+     2,
+     2,
+     1.0981912144702843,
+     17
+    ],
+    [
+     "Completeness",
+     3,
+     2,
+     2.842377260981912,
+     44
+    ],
+    [
+     "Completeness",
+     4,
+     2,
+     5.62015503875969,
+     87
+    ],
+    [
+     "Completeness",
+     5,
+     2,
+     0.1937984496124031,
+     3
+    ],
+    [
+     "Completeness",
+     0,
+     3,
+     0.1937984496124031,
+     3
+    ],
+    [
+     "Completeness",
+     1,
+     3,
+     0.0,
+     0
+    ],
+    [
+     "Completeness",
+     2,
+     3,
+     0.06459948320413436,
+     1
+    ],
+    [
+     "Completeness",
+     3,
+     3,
+     2.5193798449612403,
+     39
+    ],
+    [
+     "Completeness",
+     4,
+     3,
+     9.30232558139535,
+     144
+    ],
+    [
+     "Completeness",
+     5,
+     3,
+     1.6795865633074936,
+     26
+    ],
+    [
+     "Completeness",
+     0,
+     4,
+     0.0,
+     0
+    ],
+    [
+     "Completeness",
+     1,
+     4,
+     0.0,
+     0
+    ],
+    [
+     "Completeness",
+     2,
+     4,
+     0.0,
+     0
+    ],
+    [
+     "Completeness",
+     3,
+     4,
+     1.1627906976744187,
+     18
+    ],
+    [
+     "Completeness",
+     4,
+     4,
+     11.950904392764858,
+     185
+    ],
+    [
+     "Completeness",
+     5,
+     4,
+     11.046511627906977,
+     171
+    ],
+    [
+     "Completeness",
+     0,
+     5,
+     0.0,
+     0
+    ],
+    [
+     "Completeness",
+     1,
+     5,
+     0.0,
+     0
+    ],
+    [
+     "Completeness",
+     2,
+     5,
+     0.0,
+     0
+    ],
+    [
+     "Completeness",
+     3,
+     5,
+     0.25839793281653745,
+     4
+    ],
+    [
+     "Completeness",
+     4,
+     5,
+     6.589147286821706,
+     102
+    ],
+    [
+     "Completeness",
+     5,
+     5,
+     33.52713178294574,
+     519
+    ],
+    [
+     "Faithfulness",
+     0,
+     0,
+     1.0981912144702843,
+     17
+    ],
+    [
+     "Faithfulness",
+     1,
+     0,
+     0.1937984496124031,
+     3
+    ],
+    [
+     "Faithfulness",
+     2,
+     0,
+     0.12919896640826872,
+     2
+    ],
+    [
+     "Faithfulness",
+     3,
+     0,
+     0.6459948320413437,
+     10
+    ],
+    [
+     "Faithfulness",
+     4,
+     0,
+     0.12919896640826872,
+     2
+    ],
+    [
+     "Faithfulness",
+     5,
+     0,
+     0.06459948320413436,
+     1
+    ],
+    [
+     "Faithfulness",
+     0,
+     1,
+     0.0,
+     0
+    ],
+    [
+     "Faithfulness",
+     1,
+     1,
+     0.25839793281653745,
+     4
+    ],
+    [
+     "Faithfulness",
+     2,
+     1,
+     0.12919896640826872,
+     2
+    ],
+    [
+     "Faithfulness",
+     3,
+     1,
+     0.9043927648578811,
+     14
+    ],
+    [
+     "Faithfulness",
+     4,
+     1,
+     0.45219638242894056,
+     7
+    ],
+    [
+     "Faithfulness",
+     5,
+     1,
+     0.1937984496124031,
+     3
+    ],
+    [
+     "Faithfulness",
+     0,
+     2,
+     0.12919896640826872,
+     2
+    ],
+    [
+     "Faithfulness",
+     1,
+     2,
+     0.0,
+     0
+    ],
+    [
+     "Faithfulness",
+     2,
+     2,
+     0.7751937984496124,
+     12
+    ],
+    [
+     "Faithfulness",
+     3,
+     2,
+     3.55297157622739,
+     55
+    ],
+    [
+     "Faithfulness",
+     4,
+     2,
+     3.488372093023256,
+     54
+    ],
+    [
+     "Faithfulness",
+     5,
+     2,
+     0.6459948320413437,
+     10
+    ],
+    [
+     "Faithfulness",
+     0,
+     3,
+     0.0,
+     0
+    ],
+    [
+     "Faithfulness",
+     1,
+     3,
+     0.0,
+     0
+    ],
+    [
+     "Faithfulness",
+     2,
+     3,
+     0.06459948320413436,
+     1
+    ],
+    [
+     "Faithfulness",
+     3,
+     3,
+     1.8087855297157622,
+     28
+    ],
+    [
+     "Faithfulness",
+     4,
+     3,
+     4.651162790697675,
+     72
+    ],
+    [
+     "Faithfulness",
+     5,
+     3,
+     0.9689922480620154,
+     15
+    ],
+    [
+     "Faithfulness",
+     0,
+     4,
+     0.0,
+     0
+    ],
+    [
+     "Faithfulness",
+     1,
+     4,
+     0.0,
+     0
+    ],
+    [
+     "Faithfulness",
+     2,
+     4,
+     0.06459948320413436,
+     1
+    ],
+    [
+     "Faithfulness",
+     3,
+     4,
+     2.0025839793281652,
+     31
+    ],
+    [
+     "Faithfulness",
+     4,
+     4,
+     6.007751937984496,
+     93
+    ],
+    [
+     "Faithfulness",
+     5,
+     4,
+     4.198966408268734,
+     65
+    ],
+    [
+     "Faithfulness",
+     0,
+     5,
+     0.9043927648578811,
+     14
+    ],
+    [
+     "Faithfulness",
+     1,
+     5,
+     0.0,
+     0
+    ],
+    [
+     "Faithfulness",
+     2,
+     5,
+     0.06459948320413436,
+     1
+    ],
+    [
+     "Faithfulness",
+     3,
+     5,
+     3.6175710594315245,
+     56
+    ],
+    [
+     "Faithfulness",
+     4,
+     5,
+     7.881136950904393,
+     122
+    ],
+    [
+     "Faithfulness",
+     5,
+     5,
+     54.974160206718345,
+     851
+    ],
+    [
+     "Faithfulness with passages",
+     0,
+     0,
+     1.9569471624266144,
+     30
+    ],
+    [
+     "Faithfulness with passages",
+     1,
+     0,
+     1.0437051532941943,
+     16
+    ],
+    [
+     "Faithfulness with passages",
+     2,
+     0,
+     0.2609262883235486,
+     4
+    ],
+    [
+     "Faithfulness with passages",
+     3,
+     0,
+     0.19569471624266144,
+     3
+    ],
+    [
+     "Faithfulness with passages",
+     4,
+     0,
+     0.0,
+     0
+    ],
+    [
+     "Faithfulness with passages",
+     5,
+     0,
+     0.06523157208088715,
+     1
+    ],
+    [
+     "Faithfulness with passages",
+     0,
+     1,
+     0.06523157208088715,
+     1
+    ],
+    [
+     "Faithfulness with passages",
+     1,
+     1,
+     0.45662100456621,
+     7
+    ],
+    [
+     "Faithfulness with passages",
+     2,
+     1,
+     1.0437051532941943,
+     16
+    ],
+    [
+     "Faithfulness with passages",
+     3,
+     1,
+     0.8480104370515329,
+     13
+    ],
+    [
+     "Faithfulness with passages",
+     4,
+     1,
+     1.0437051532941943,
+     16
+    ],
+    [
+     "Faithfulness with passages",
+     5,
+     1,
+     0.1304631441617743,
+     2
+    ],
+    [
+     "Faithfulness with passages",
+     0,
+     2,
+     0.06523157208088715,
+     1
+    ],
+    [
+     "Faithfulness with passages",
+     1,
+     2,
+     0.06523157208088715,
+     1
+    ],
+    [
+     "Faithfulness with passages",
+     2,
+     2,
+     0.91324200913242,
+     14
+    ],
+    [
+     "Faithfulness with passages",
+     3,
+     2,
+     1.36986301369863,
+     21
+    ],
+    [
+     "Faithfulness with passages",
+     4,
+     2,
+     2.152641878669276,
+     33
+    ],
+    [
+     "Faithfulness with passages",
+     5,
+     2,
+     0.91324200913242,
+     14
+    ],
+    [
+     "Faithfulness with passages",
+     0,
+     3,
+     0.0,
+     0
+    ],
+    [
+     "Faithfulness with passages",
+     1,
+     3,
+     0.0,
+     0
+    ],
+    [
+     "Faithfulness with passages",
+     2,
+     3,
+     0.19569471624266144,
+     3
+    ],
+    [
+     "Faithfulness with passages",
+     3,
+     3,
+     0.8480104370515329,
+     13
+    ],
+    [
+     "Faithfulness with passages",
+     4,
+     3,
+     1.1089367253750815,
+     17
+    ],
+    [
+     "Faithfulness with passages",
+     5,
+     3,
+     1.0437051532941943,
+     16
+    ],
+    [
+     "Faithfulness with passages",
+     0,
+     4,
+     0.0,
+     0
+    ],
+    [
+     "Faithfulness with passages",
+     1,
+     4,
+     0.0,
+     0
+    ],
+    [
+     "Faithfulness with passages",
+     2,
+     4,
+     0.2609262883235486,
+     4
+    ],
+    [
+     "Faithfulness with passages",
+     3,
+     4,
+     0.8480104370515329,
+     13
+    ],
+    [
+     "Faithfulness with passages",
+     4,
+     4,
+     5.609915198956295,
+     86
+    ],
+    [
+     "Faithfulness with passages",
+     5,
+     4,
+     6.784083496412263,
+     104
+    ],
+    [
+     "Faithfulness with passages",
+     0,
+     5,
+     0.45662100456621,
+     7
+    ],
+    [
+     "Faithfulness with passages",
+     1,
+     5,
+     0.0,
+     0
+    ],
+    [
+     "Faithfulness with passages",
+     2,
+     5,
+     0.2609262883235486,
+     4
+    ],
+    [
+     "Faithfulness with passages",
+     3,
+     5,
+     0.6523157208088715,
+     10
+    ],
+    [
+     "Faithfulness with passages",
+     4,
+     5,
+     4.827136333985649,
+     74
+    ],
+    [
+     "Faithfulness with passages",
+     5,
+     5,
+     64.51402478799739,
+     989
+    ],
+    [
+     "Citation quality",
+     0,
+     0,
+     1.937984496124031,
+     30
+    ],
+    [
+     "Citation quality",
+     1,
+     0,
+     0.0,
+     0
+    ],
+    [
+     "Citation quality",
+     2,
+     0,
+     0.25839793281653745,
+     4
+    ],
+    [
+     "Citation quality",
+     3,
+     0,
+     0.3875968992248062,
+     6
+    ],
+    [
+     "Citation quality",
+     4,
+     0,
+     0.1937984496124031,
+     3
+    ],
+    [
+     "Citation quality",
+     5,
+     0,
+     0.710594315245478,
+     11
+    ],
+    [
+     "Citation quality",
+     0,
+     1,
+     0.3875968992248062,
+     6
+    ],
+    [
+     "Citation quality",
+     1,
+     1,
+     0.06459948320413436,
+     1
+    ],
+    [
+     "Citation quality",
+     2,
+     1,
+     0.5167958656330749,
+     8
+    ],
+    [
+     "Citation quality",
+     3,
+     1,
+     1.0335917312661498,
+     16
+    ],
+    [
+     "Citation quality",
+     4,
+     1,
+     0.3875968992248062,
+     6
+    ],
+    [
+     "Citation quality",
+     5,
+     1,
+     0.3875968992248062,
+     6
+    ],
+    [
+     "Citation quality",
+     0,
+     2,
+     0.3875968992248062,
+     6
+    ],
+    [
+     "Citation quality",
+     1,
+     2,
+     0.3875968992248062,
+     6
+    ],
+    [
+     "Citation quality",
+     2,
+     2,
+     1.4857881136950903,
+     23
+    ],
+    [
+     "Citation quality",
+     3,
+     2,
+     5.103359173126615,
+     79
+    ],
+    [
+     "Citation quality",
+     4,
+     2,
+     1.3565891472868217,
+     21
+    ],
+    [
+     "Citation quality",
+     5,
+     2,
+     0.9043927648578811,
+     14
+    ],
+    [
+     "Citation quality",
+     0,
+     3,
+     1.0335917312661498,
+     16
+    ],
+    [
+     "Citation quality",
+     1,
+     3,
+     0.32299741602067183,
+     5
+    ],
+    [
+     "Citation quality",
+     2,
+     3,
+     1.8733850129198966,
+     29
+    ],
+    [
+     "Citation quality",
+     3,
+     3,
+     9.108527131782946,
+     141
+    ],
+    [
+     "Citation quality",
+     4,
+     3,
+     1.1627906976744187,
+     18
+    ],
+    [
+     "Citation quality",
+     5,
+     3,
+     4.134366925064599,
+     64
+    ],
+    [
+     "Citation quality",
+     0,
+     4,
+     0.0,
+     0
+    ],
+    [
+     "Citation quality",
+     1,
+     4,
+     0.06459948320413436,
+     1
+    ],
+    [
+     "Citation quality",
+     2,
+     4,
+     0.5813953488372093,
+     9
+    ],
+    [
+     "Citation quality",
+     3,
+     4,
+     13.113695090439277,
+     203
+    ],
+    [
+     "Citation quality",
+     4,
+     4,
+     2.5839793281653747,
+     40
+    ],
+    [
+     "Citation quality",
+     5,
+     4,
+     12.661498708010337,
+     196
+    ],
+    [
+     "Citation quality",
+     0,
+     5,
+     0.0,
+     0
+    ],
+    [
+     "Citation quality",
+     1,
+     5,
+     0.0,
+     0
+    ],
+    [
+     "Citation quality",
+     2,
+     5,
+     0.5813953488372093,
+     9
+    ],
+    [
+     "Citation quality",
+     3,
+     5,
+     5.167958656330749,
+     80
+    ],
+    [
+     "Citation quality",
+     4,
+     5,
+     0.8397932816537468,
+     13
+    ],
+    [
+     "Citation quality",
+     5,
+     5,
+     30.878552971576227,
+     478
+    ],
+    [
+     "Refusal",
+     0,
+     0,
+     7.6923076923076925,
+     54
+    ],
+    [
+     "Refusal",
+     1,
+     0,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     2,
+     0,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     3,
+     0,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     4,
+     0,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     5,
+     0,
+     0.42735042735042733,
+     3
+    ],
+    [
+     "Refusal",
+     0,
+     1,
+     0.14245014245014245,
+     1
+    ],
+    [
+     "Refusal",
+     1,
+     1,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     2,
+     1,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     3,
+     1,
+     0.7122507122507122,
+     5
+    ],
+    [
+     "Refusal",
+     4,
+     1,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     5,
+     1,
+     0.42735042735042733,
+     3
+    ],
+    [
+     "Refusal",
+     0,
+     2,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     1,
+     2,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     2,
+     2,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     3,
+     2,
+     1.1396011396011396,
+     8
+    ],
+    [
+     "Refusal",
+     4,
+     2,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     5,
+     2,
+     0.42735042735042733,
+     3
+    ],
+    [
+     "Refusal",
+     0,
+     3,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     1,
+     3,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     2,
+     3,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     3,
+     3,
+     1.566951566951567,
+     11
+    ],
+    [
+     "Refusal",
+     4,
+     3,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     5,
+     3,
+     0.7122507122507122,
+     5
+    ],
+    [
+     "Refusal",
+     0,
+     4,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     1,
+     4,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     2,
+     4,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     3,
+     4,
+     0.7122507122507122,
+     5
+    ],
+    [
+     "Refusal",
+     4,
+     4,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     5,
+     4,
+     0.5698005698005698,
+     4
+    ],
+    [
+     "Refusal",
+     0,
+     5,
+     0.14245014245014245,
+     1
+    ],
+    [
+     "Refusal",
+     1,
+     5,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     2,
+     5,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     3,
+     5,
+     1.4245014245014245,
+     10
+    ],
+    [
+     "Refusal",
+     4,
+     5,
+     0.0,
+     0
+    ],
+    [
+     "Refusal",
+     5,
+     5,
+     83.9031339031339,
+     589
+    ]
+   ]
+  },
+  "Supplementary Fig. 4b": {
+   "columns": [
+    "generator",
+    "strategy",
+    "judge",
+    "pass_rate_difference_pp",
+    "pass_rate_pct",
+    "single_pass_pass_rate_pct",
+    "answers",
+    "state"
+   ],
+   "rows": [
+    [
+     "gemini-3-flash-preview",
+     "multi-hop",
+     "Judge 1",
+     -4.263565891472865,
+     78.68217054263566,
+     82.94573643410853,
+     258,
+     "drawn"
+    ],
+    [
+     "gemini-3-flash-preview",
+     "multi-hop",
+     "Judge 2",
+     -7.751937984496124,
+     68.9922480620155,
+     76.74418604651163,
+     258,
+     "drawn"
+    ],
+    [
+     "gemini-3-flash-preview",
+     "verified pass",
+     "Judge 1",
+     0.38759689922480334,
+     83.33333333333333,
+     82.94573643410853,
+     258,
+     "drawn"
+    ],
+    [
+     "gemini-3-flash-preview",
+     "verified pass",
+     "Judge 2",
+     -3.875968992248062,
+     72.86821705426357,
+     76.74418604651163,
+     258,
+     "drawn"
+    ],
+    [
+     "gemini-3-flash-preview",
+     "RLM-5",
+     "Judge 1",
+     -9.689922480620154,
+     73.25581395348837,
+     82.94573643410853,
+     258,
+     "drawn"
+    ],
+    [
+     "gemini-3-flash-preview",
+     "RLM-5",
+     "Judge 2",
+     -5.426356589147289,
+     71.31782945736434,
+     76.74418604651163,
+     258,
+     "drawn"
+    ],
+    [
+     "gemini-3-flash-preview",
+     "RLM-10",
+     "Judge 1",
+     -8.914728682170548,
+     74.03100775193798,
+     82.94573643410853,
+     258,
+     "drawn"
+    ],
+    [
+     "gemini-3-flash-preview",
+     "RLM-10",
+     "Judge 2",
+     -6.589147286821714,
+     70.15503875968992,
+     76.74418604651163,
+     258,
+     "drawn"
+    ],
+    [
+     "gemini-3-flash-preview",
+     "RLM-20",
+     "Judge 1",
+     -12.403100775193792,
+     70.54263565891473,
+     82.94573643410853,
+     258,
+     "drawn"
+    ],
+    [
+     "gemini-3-flash-preview",
+     "RLM-20",
+     "Judge 2",
+     -9.302325581395351,
+     67.44186046511628,
+     76.74418604651163,
+     258,
+     "drawn"
+    ],
+    [
+     "gemini-2.5-pro",
+     "multi-hop",
+     "Judge 1",
+     null,
+     null,
+     null,
+     null,
+     "empty: no second-judge rows of this strategy"
+    ],
+    [
+     "gemini-2.5-pro",
+     "multi-hop",
+     "Judge 2",
+     null,
+     null,
+     null,
+     null,
+     "empty: no second-judge rows of this strategy"
+    ],
+    [
+     "gemini-2.5-pro",
+     "verified pass",
+     "Judge 1",
+     2.797202797202786,
+     86.7132867132867,
+     83.91608391608392,
+     143,
+     "drawn"
+    ],
+    [
+     "gemini-2.5-pro",
+     "verified pass",
+     "Judge 2",
+     -2.097902097902093,
+     79.02097902097903,
+     81.11888111888112,
+     143,
+     "drawn"
+    ],
+    [
+     "gemini-2.5-pro",
+     "RLM-5",
+     "Judge 1",
+     null,
+     null,
+     null,
+     null,
+     "empty: no second-judge rows of this strategy"
+    ],
+    [
+     "gemini-2.5-pro",
+     "RLM-5",
+     "Judge 2",
+     null,
+     null,
+     null,
+     null,
+     "empty: no second-judge rows of this strategy"
+    ],
+    [
+     "gemini-2.5-pro",
+     "RLM-10",
+     "Judge 1",
+     4.861111111111114,
+     88.88888888888889,
+     84.02777777777777,
+     144,
+     "drawn"
+    ],
+    [
+     "gemini-2.5-pro",
+     "RLM-10",
+     "Judge 2",
+     0.0,
+     81.25,
+     81.25,
+     144,
+     "drawn"
+    ],
+    [
+     "gemini-2.5-pro",
+     "RLM-20",
+     "Judge 1",
+     null,
+     null,
+     null,
+     null,
+     "empty: no second-judge rows of this strategy"
+    ],
+    [
+     "gemini-2.5-pro",
+     "RLM-20",
+     "Judge 2",
+     null,
+     null,
+     null,
+     null,
+     "empty: no second-judge rows of this strategy"
+    ],
+    [
+     "claude-haiku-4-5",
+     "multi-hop",
+     "Judge 1",
+     -0.7751937984496209,
+     77.13178294573643,
+     77.90697674418605,
+     258,
+     "drawn"
+    ],
+    [
+     "claude-haiku-4-5",
+     "multi-hop",
+     "Judge 2",
+     -3.100775193798441,
+     68.6046511627907,
+     71.70542635658914,
+     258,
+     "drawn"
+    ],
+    [
+     "claude-haiku-4-5",
+     "verified pass",
+     "Judge 1",
+     -0.7751937984496209,
+     77.13178294573643,
+     77.90697674418605,
+     258,
+     "drawn"
+    ],
+    [
+     "claude-haiku-4-5",
+     "verified pass",
+     "Judge 2",
+     -3.875968992248062,
+     67.82945736434108,
+     71.70542635658914,
+     258,
+     "drawn"
+    ],
+    [
+     "claude-haiku-4-5",
+     "RLM-5",
+     "Judge 1",
+     -5.038759689922486,
+     72.86821705426357,
+     77.90697674418605,
+     258,
+     "drawn"
+    ],
+    [
+     "claude-haiku-4-5",
+     "RLM-5",
+     "Judge 2",
+     -5.038759689922472,
+     66.66666666666667,
+     71.70542635658914,
+     258,
+     "drawn"
+    ],
+    [
+     "claude-haiku-4-5",
+     "RLM-10",
+     "Judge 1",
+     -0.38759689922481755,
+     77.51937984496124,
+     77.90697674418605,
+     258,
+     "drawn"
+    ],
+    [
+     "claude-haiku-4-5",
+     "RLM-10",
+     "Judge 2",
+     -2.7131782945736376,
+     68.9922480620155,
+     71.70542635658914,
+     258,
+     "drawn"
+    ],
+    [
+     "claude-haiku-4-5",
+     "RLM-20",
+     "Judge 1",
+     -2.713178294573652,
+     75.1937984496124,
+     77.90697674418605,
+     258,
+     "drawn"
+    ],
+    [
+     "claude-haiku-4-5",
+     "RLM-20",
+     "Judge 2",
+     -2.7131782945736376,
+     68.9922480620155,
+     71.70542635658914,
+     258,
+     "drawn"
+    ],
+    [
+     "gemma3:27b",
+     "multi-hop",
+     "Judge 1",
+     -20.930232558139537,
+     50.3875968992248,
+     71.31782945736434,
+     258,
+     "drawn"
+    ],
+    [
+     "gemma3:27b",
+     "multi-hop",
+     "Judge 2",
+     -13.178294573643413,
+     48.44961240310077,
+     61.627906976744185,
+     258,
+     "drawn"
+    ],
+    [
+     "gemma3:27b",
+     "verified pass",
+     "Judge 1",
+     1.5503875968992276,
+     72.86821705426357,
+     71.31782945736434,
+     258,
+     "drawn"
+    ],
+    [
+     "gemma3:27b",
+     "verified pass",
+     "Judge 2",
+     0.38759689922480334,
+     62.01550387596899,
+     61.627906976744185,
+     258,
+     "drawn"
+    ],
+    [
+     "gemma3:27b",
+     "RLM-5",
+     "Judge 1",
+     3.448275862068968,
+     80.45977011494253,
+     77.01149425287356,
+     87,
+     "drawn"
+    ],
+    [
+     "gemma3:27b",
+     "RLM-5",
+     "Judge 2",
+     8.045977011494244,
+     71.26436781609195,
+     63.2183908045977,
+     87,
+     "drawn"
+    ],
+    [
+     "gemma3:27b",
+     "RLM-10",
+     "Judge 1",
+     9.195402298850581,
+     86.20689655172414,
+     77.01149425287356,
+     87,
+     "drawn"
+    ],
+    [
+     "gemma3:27b",
+     "RLM-10",
+     "Judge 2",
+     13.793103448275858,
+     77.01149425287356,
+     63.2183908045977,
+     87,
+     "drawn"
+    ],
+    [
+     "gemma3:27b",
+     "RLM-20",
+     "Judge 1",
+     10.344827586206904,
+     87.35632183908046,
+     77.01149425287356,
+     87,
+     "drawn"
+    ],
+    [
+     "gemma3:27b",
+     "RLM-20",
+     "Judge 2",
+     17.241379310344826,
+     80.45977011494253,
+     63.2183908045977,
+     87,
+     "drawn"
+    ],
+    [
+     "qwen3-coder:30b, same family",
+     "multi-hop",
+     "Judge 1",
+     -5.038759689922486,
+     69.76744186046511,
+     74.8062015503876,
+     258,
+     "drawn"
+    ],
+    [
+     "qwen3-coder:30b, same family",
+     "multi-hop",
+     "Judge 2",
+     -7.751937984496124,
+     57.751937984496124,
+     65.50387596899225,
+     258,
+     "drawn"
+    ],
+    [
+     "qwen3-coder:30b, same family",
+     "verified pass",
+     "Judge 1",
+     -1.5564202334630437,
+     73.15175097276264,
+     74.70817120622569,
+     257,
+     "drawn"
+    ],
+    [
+     "qwen3-coder:30b, same family",
+     "verified pass",
+     "Judge 2",
+     -2.7237354085603016,
+     63.03501945525292,
+     65.75875486381322,
+     257,
+     "drawn"
+    ],
+    [
+     "qwen3-coder:30b, same family",
+     "RLM-5",
+     "Judge 1",
+     -18.39080459770115,
+     64.36781609195403,
+     82.75862068965517,
+     87,
+     "drawn"
+    ],
+    [
+     "qwen3-coder:30b, same family",
+     "RLM-5",
+     "Judge 2",
+     -9.195402298850581,
+     59.770114942528735,
+     68.96551724137932,
+     87,
+     "drawn"
+    ],
+    [
+     "qwen3-coder:30b, same family",
+     "RLM-10",
+     "Judge 1",
+     -9.195402298850581,
+     73.5632183908046,
+     82.75862068965517,
+     87,
+     "drawn"
+    ],
+    [
+     "qwen3-coder:30b, same family",
+     "RLM-10",
+     "Judge 2",
+     2.298850574712631,
+     71.26436781609195,
+     68.96551724137932,
+     87,
+     "drawn"
+    ],
+    [
+     "qwen3-coder:30b, same family",
+     "RLM-20",
+     "Judge 1",
+     -10.344827586206904,
+     72.41379310344827,
+     82.75862068965517,
+     87,
+     "drawn"
+    ],
+    [
+     "qwen3-coder:30b, same family",
+     "RLM-20",
+     "Judge 2",
+     -4.597701149425291,
+     64.36781609195403,
+     68.96551724137932,
+     87,
+     "drawn"
+    ]
+   ]
+  },
+  "Supplementary Fig. 4c": {
+   "columns": [
+    "metric",
+    "statistic",
+    "value",
+    "resample_q25",
+    "resample_median",
+    "resample_q75",
+    "interval_lo",
+    "interval_hi",
+    "answers",
+    "questions",
+    "resamples_undefined"
+   ],
+   "rows": [
+    [
+     "Correctness",
+     "Weighted kappa",
+     0.7830005599117754,
+     0.7675350233916529,
+     0.7825082106116472,
+     0.7968025666704398,
+     0.73721737933901,
+     0.8228343617407382,
+     1548,
+     86,
+     0
+    ],
+    [
+     "Correctness",
+     "Spearman's rho",
+     0.7688280722326973,
+     0.7508506696960174,
+     0.7680369515628602,
+     0.7843889456044162,
+     0.7145364512121092,
+     0.8132053535616184,
+     1548,
+     86,
+     0
+    ],
+    [
+     "Correctness",
+     "Kappa at 4",
+     0.6355837325557175,
+     0.6083277569027037,
+     0.6352207103301678,
+     0.6613307161056932,
+     0.5531561618776878,
+     0.7072364463819991,
+     1548,
+     86,
+     0
+    ],
+    [
+     "Correctness",
+     "Kappa at 3",
+     0.43699303825764835,
+     0.40111559629512605,
+     0.4375598674383526,
+     0.4763057129646765,
+     0.3317489113963497,
+     0.5518531868064449,
+     1548,
+     86,
+     0
+    ],
+    [
+     "Completeness",
+     "Weighted kappa",
+     0.758421128228044,
+     0.7429301794287153,
+     0.7582159427190394,
+     0.7726722289049271,
+     0.712219901959881,
+     0.799684418334373,
+     1548,
+     86,
+     0
+    ],
+    [
+     "Completeness",
+     "Spearman's rho",
+     0.7620015270591187,
+     0.7460953926703857,
+     0.7615336882431774,
+     0.7762576739485338,
+     0.7132993732790224,
+     0.8010530165591946,
+     1548,
+     86,
+     0
+    ],
+    [
+     "Completeness",
+     "Kappa at 4",
+     0.5430209626762107,
+     0.5161322636296561,
+     0.5427908653701978,
+     0.5695063250847499,
+     0.4634068198145096,
+     0.6211396127109534,
+     1548,
+     86,
+     0
+    ],
+    [
+     "Completeness",
+     "Kappa at 3",
+     0.5715374702796885,
+     0.5428518829235733,
+     0.5723362280688828,
+     0.6013040160055552,
+     0.4844112659690312,
+     0.6564984809846087,
+     1548,
+     86,
+     0
+    ],
+    [
+     "Faithfulness",
+     "Weighted kappa",
+     0.5930709354584627,
+     0.5646069655361183,
+     0.5931125525256528,
+     0.6192746377644482,
+     0.5101968690912869,
+     0.6681876173009463,
+     1548,
+     86,
+     0
+    ],
+    [
+     "Faithfulness",
+     "Spearman's rho",
+     0.6287671245164073,
+     0.6070049685334642,
+     0.628286687794255,
+     0.6488545055598136,
+     0.5638094012452558,
+     0.6828668940879985,
+     1548,
+     86,
+     0
+    ],
+    [
+     "Faithfulness",
+     "Kappa at 4",
+     0.42501725020588954,
+     0.39331629675772906,
+     0.4238632215042754,
+     0.45363264108635976,
+     0.33454008522412626,
+     0.511460857898888,
+     1548,
+     86,
+     0
+    ],
+    [
+     "Faithfulness",
+     "Kappa at 3",
+     0.28484906748702177,
+     0.25117516222844044,
+     0.28533085578610506,
+     0.3199376974628325,
+     0.1917122397994919,
+     0.390132481282346,
+     1548,
+     86,
+     0
+    ],
+    [
+     "Faithfulness with passages",
+     "Weighted kappa",
+     0.7478701358507944,
+     0.7232801049777013,
+     0.7480076554847133,
+     0.771358094371451,
+     0.6705858821064024,
+     0.8114410683459644,
+     1533,
+     86,
+     0
+    ],
+    [
+     "Faithfulness with passages",
+     "Spearman's rho",
+     0.6850850402670926,
+     0.6626907980153196,
+     0.6857735586853998,
+     0.7085973000929282,
+     0.6168828197769912,
+     0.7499914280732826,
+     1533,
+     86,
+     0
+    ],
+    [
+     "Faithfulness with passages",
+     "Kappa at 4",
+     0.6255342289896676,
+     0.595712416711691,
+     0.6262282416515458,
+     0.6552524057271782,
+     0.5372968191926515,
+     0.7055314290873731,
+     1533,
+     86,
+     0
+    ],
+    [
+     "Faithfulness with passages",
+     "Kappa at 3",
+     0.558081692456134,
+     0.5209107178161232,
+     0.5584568963933052,
+     0.5942532229768662,
+     0.4483678644048531,
+     0.6571302117891779,
+     1533,
+     86,
+     0
+    ],
+    [
+     "Citation quality",
+     "Weighted kappa",
+     0.5713543813733502,
+     0.547296312540026,
+     0.5718763225263969,
+     0.595114916846965,
+     0.49471291132637973,
+     0.6366557191069779,
+     1548,
+     86,
+     0
+    ],
+    [
+     "Citation quality",
+     "Spearman's rho",
+     0.5647151840467113,
+     0.5427209175514104,
+     0.5639594908628026,
+     0.58536894988174,
+     0.5005163310400305,
+     0.6241151277966357,
+     1548,
+     86,
+     0
+    ],
+    [
+     "Citation quality",
+     "Kappa at 4",
+     0.40057013971555666,
+     0.3729966868280157,
+     0.3984883729363048,
+     0.42477212804128894,
+     0.3253459453331291,
+     0.47250905388693465,
+     1548,
+     86,
+     0
+    ],
+    [
+     "Citation quality",
+     "Kappa at 3",
+     0.3407009159697332,
+     0.3070534358768323,
+     0.3389816238496979,
+     0.37081986709341486,
+     0.2499127745189198,
+     0.43387081359732393,
+     1548,
+     86,
+     0
+    ],
+    [
+     "Refusal",
+     "Kappa at 4",
+     0.8157577030077161,
+     0.7901322411742752,
+     0.8160709767748997,
+     0.8405833668408598,
+     0.7331161334811392,
+     0.8796405398998964,
+     702,
+     39,
+     0
+    ]
+   ]
+  }
+ },
+ "printed": {
+  "s448num_0": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 0,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_1": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 1,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_2": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 2,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_3": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 3,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_4": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 4,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_5": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 5,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_6": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 6,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_7": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 7,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_8": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 8,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_9": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 9,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_10": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 10,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_11": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 11,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_12": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 12,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_13": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 13,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_14": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 14,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_15": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 15,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_16": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 16,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_17": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 17,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_18": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 18,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_19": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 19,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_20": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 20,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_21": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 21,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_22": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 22,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_23": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 23,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_24": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 24,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_25": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 25,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_26": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 26,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_27": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 27,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_28": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 28,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_29": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 29,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_30": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 30,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_31": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 31,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_32": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 32,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_33": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 33,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_34": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 34,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_35": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 35,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_36": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 36,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_37": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 37,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_38": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 38,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_39": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 39,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_40": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 40,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_41": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 41,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_42": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 42,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_43": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 43,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_44": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 44,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_45": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 45,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_46": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 46,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_47": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 47,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_48": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 48,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_49": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 49,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_50": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 50,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_51": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 51,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_52": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 52,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_53": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 53,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_54": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 54,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_55": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 55,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_56": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 56,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_57": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 57,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_58": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 58,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_59": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 59,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_60": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 60,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_61": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 61,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_62": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 62,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_63": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 63,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_64": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 64,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_65": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 65,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_66": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 66,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_67": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 67,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_68": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 68,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_69": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 69,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_70": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 70,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_71": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 71,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_72": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 72,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_73": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 73,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_74": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 74,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_75": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 75,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_76": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 76,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_77": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 77,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_78": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 78,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_79": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 79,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_80": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 80,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_81": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 81,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_82": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 82,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_83": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 83,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_84": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 84,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_85": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 85,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_86": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 86,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_87": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 87,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_88": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 88,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_89": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 89,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_90": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 90,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_91": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 91,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_92": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 92,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_93": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 93,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_94": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 94,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_95": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 95,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_96": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 96,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_97": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 97,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_98": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 98,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_99": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 99,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_100": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 100,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_101": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 101,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_102": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 102,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_103": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 103,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_104": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 104,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_105": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 105,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_106": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 106,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_107": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 107,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_108": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 108,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_109": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 109,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_110": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 110,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_111": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 111,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_112": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 112,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_113": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 113,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_114": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 114,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_115": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 115,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_116": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 116,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_117": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 117,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_118": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 118,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_119": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 119,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_120": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 120,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_121": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 121,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_122": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 122,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_123": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 123,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_124": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 124,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_125": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 125,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_126": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 126,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_127": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 127,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_128": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 128,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_129": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 129,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_130": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 130,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_131": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 131,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_132": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 132,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_133": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 133,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_134": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 134,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_135": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 135,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_136": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 136,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_137": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 137,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_138": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 138,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_139": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 139,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_140": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 140,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_141": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 141,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_142": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 142,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_143": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 143,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_144": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 144,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_145": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 145,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_146": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 146,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_147": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 147,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_148": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 148,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_149": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 149,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_150": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 150,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_151": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 151,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_152": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 152,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_153": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 153,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_154": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 154,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_155": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 155,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_156": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 156,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_157": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 157,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_158": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 158,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_159": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 159,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_160": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 160,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_161": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 161,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_162": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 162,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_163": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 163,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_164": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 164,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_165": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 165,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_166": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 166,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_167": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 167,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_168": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 168,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_169": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 169,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_170": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 170,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_171": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 171,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_172": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 172,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_173": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 173,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_174": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 174,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_175": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 175,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_176": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 176,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_177": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 177,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_178": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 178,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_179": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 179,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_180": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 180,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_181": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 181,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_182": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 182,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_183": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 183,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_184": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 184,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_185": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 185,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_186": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 186,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_187": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 187,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_188": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 188,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_189": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 189,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_190": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 190,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_191": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 191,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_192": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 192,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_193": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 193,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_194": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 194,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_195": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 195,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_196": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 196,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_197": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 197,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_198": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 198,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_199": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 199,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_200": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 200,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_201": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 201,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_202": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 202,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_203": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 203,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_204": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 204,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_205": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 205,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_206": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 206,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_207": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 207,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_208": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 208,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_209": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 209,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_210": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 210,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_211": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 211,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_212": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 212,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_213": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 213,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_214": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 214,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_215": {
+   "sheet": "Supplementary Fig. 4a",
+   "row": 215,
+   "format": "{share_of_answers_pct:.0f}"
+  },
+  "s448num_216": {
+   "fixed": "0",
+   "why": "a score of judge 2"
+  },
+  "s448num_217": {
+   "fixed": "1",
+   "why": "a score of judge 2"
+  },
+  "s448num_218": {
+   "fixed": "2",
+   "why": "a score of judge 2"
+  },
+  "s448num_219": {
+   "fixed": "3",
+   "why": "a score of judge 2"
+  },
+  "s448num_220": {
+   "fixed": "4",
+   "why": "a score of judge 2"
+  },
+  "s448num_221": {
+   "fixed": "5",
+   "why": "a score of judge 2"
+  },
+  "s448num_222": {
+   "fixed": "0",
+   "why": "a score of judge 1"
+  },
+  "s448num_223": {
+   "fixed": "1",
+   "why": "a score of judge 1"
+  },
+  "s448num_224": {
+   "fixed": "2",
+   "why": "a score of judge 1"
+  },
+  "s448num_225": {
+   "fixed": "3",
+   "why": "a score of judge 1"
+  },
+  "s448num_226": {
+   "fixed": "4",
+   "why": "a score of judge 1"
+  },
+  "s448num_227": {
+   "fixed": "5",
+   "why": "a score of judge 1"
+  },
+  "s448num_228": {
+   "fixed": "0",
+   "why": "a score of judge 1"
+  },
+  "s448num_229": {
+   "fixed": "1",
+   "why": "a score of judge 1"
+  },
+  "s448num_230": {
+   "fixed": "2",
+   "why": "a score of judge 1"
+  },
+  "s448num_231": {
+   "fixed": "3",
+   "why": "a score of judge 1"
+  },
+  "s448num_232": {
+   "fixed": "4",
+   "why": "a score of judge 1"
+  },
+  "s448num_233": {
+   "fixed": "5",
+   "why": "a score of judge 1"
+  },
+  "s448num_234": {
+   "fixed": "0",
+   "why": "a score of judge 1"
+  },
+  "s448num_235": {
+   "fixed": "1",
+   "why": "a score of judge 1"
+  },
+  "s448num_236": {
+   "fixed": "2",
+   "why": "a score of judge 1"
+  },
+  "s448num_237": {
+   "fixed": "3",
+   "why": "a score of judge 1"
+  },
+  "s448num_238": {
+   "fixed": "4",
+   "why": "a score of judge 1"
+  },
+  "s448num_239": {
+   "fixed": "5",
+   "why": "a score of judge 1"
+  },
+  "s448num_240": {
+   "fixed": "0",
+   "why": "a score of judge 1"
+  },
+  "s448num_241": {
+   "fixed": "1",
+   "why": "a score of judge 1"
+  },
+  "s448num_242": {
+   "fixed": "2",
+   "why": "a score of judge 1"
+  },
+  "s448num_243": {
+   "fixed": "3",
+   "why": "a score of judge 1"
+  },
+  "s448num_244": {
+   "fixed": "4",
+   "why": "a score of judge 1"
+  },
+  "s448num_245": {
+   "fixed": "5",
+   "why": "a score of judge 1"
+  },
+  "s448num_246": {
+   "fixed": "0",
+   "why": "a score of judge 1"
+  },
+  "s448num_247": {
+   "fixed": "1",
+   "why": "a score of judge 1"
+  },
+  "s448num_248": {
+   "fixed": "2",
+   "why": "a score of judge 1"
+  },
+  "s448num_249": {
+   "fixed": "3",
+   "why": "a score of judge 1"
+  },
+  "s448num_250": {
+   "fixed": "4",
+   "why": "a score of judge 1"
+  },
+  "s448num_251": {
+   "fixed": "5",
+   "why": "a score of judge 1"
+  },
+  "s448num_252": {
+   "fixed": "0",
+   "why": "a score of judge 1"
+  },
+  "s448num_253": {
+   "fixed": "1",
+   "why": "a score of judge 1"
+  },
+  "s448num_254": {
+   "fixed": "2",
+   "why": "a score of judge 1"
+  },
+  "s448num_255": {
+   "fixed": "3",
+   "why": "a score of judge 1"
+  },
+  "s448num_256": {
+   "fixed": "4",
+   "why": "a score of judge 1"
+  },
+  "s448num_257": {
+   "fixed": "5",
+   "why": "a score of judge 1"
+  },
+  "s448num_258": {
+   "fixed": "Judge 2 score",
+   "why": "the second judge's name on the plate"
+  },
+  "s448num_259": {
+   "fixed": "Judge 1 score; each cell, share of answers (%)",
+   "why": "the main judge's name on the plate"
+  },
+  "s448num_260": {
+   "fixed": "Judge 1",
+   "why": "the judge's name in the key"
+  },
+  "s448num_261": {
+   "fixed": "Judge 2",
+   "why": "the judge's name in the key"
+  },
+  "s448num_262": {
+   "fixed": "RLM-5",
+   "why": "strategy name"
+  },
+  "s448num_263": {
+   "fixed": "RLM-10",
+   "why": "strategy name"
+  },
+  "s448num_264": {
+   "fixed": "RLM-20",
+   "why": "strategy name"
+  },
+  "s448num_265": {
+   "fixed": "gemini-3-flash",
+   "why": "generator's name"
+  },
+  "s448num_266": {
+   "fixed": "gemini-2.5-pro",
+   "why": "generator's name"
+  },
+  "s448num_267": {
+   "fixed": "claude-haiku-4-5",
+   "why": "generator's name"
+  },
+  "s448num_268": {
+   "fixed": "gemma3:27b",
+   "why": "generator's name"
+  },
+  "s448num_269": {
+   "fixed": "qwen3-coder:30b, same family",
+   "why": "generator's name"
+  },
+  "s448num_270": {
+   "fixed": "Kappa at 4",
+   "why": "the pass mark of the statistic"
+  },
+  "s448num_271": {
+   "fixed": "Kappa at 3",
+   "why": "the pass mark of the statistic"
+  },
+  "s448num_272": {
+   "fixed": "Agreement of judge 1 and judge 2",
+   "why": "the judges' names on the plate"
+  }
+ }
+}

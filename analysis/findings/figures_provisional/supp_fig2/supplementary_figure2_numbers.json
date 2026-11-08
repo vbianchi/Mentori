@@ -1,0 +1,929 @@
+{
+ "stamp": "PROVISIONAL: 84 of 84 result rows, the deposit's four retrieval sweeps of February 2026 as they are (no run planned, experiments/LIST.md); legend a draft",
+ "what": "every number Supplementary Figure 2 draws, sheet by sheet as the data workbook holds them (S448 --supplementary holds it to the workbook and the plate, R8 (2) to (6), D94 O-b)",
+ "sheets": {
+  "Supplementary Fig. 2a": {
+   "columns": [
+    "model",
+    "corpus_size_papers",
+    "n_queries",
+    "mrr"
+   ],
+   "rows": [
+    [
+     "all-MiniLM-L6-v2",
+     5,
+     28,
+     0.8702380952380953
+    ],
+    [
+     "all-MiniLM-L6-v2",
+     10,
+     28,
+     0.8642857142857142
+    ],
+    [
+     "all-MiniLM-L6-v2",
+     15,
+     28,
+     0.8642857142857142
+    ],
+    [
+     "all-MiniLM-L6-v2",
+     20,
+     28,
+     0.863095238095238
+    ],
+    [
+     "all-MiniLM-L6-v2",
+     30,
+     28,
+     0.863095238095238
+    ],
+    [
+     "all-mpnet-base-v2",
+     5,
+     28,
+     0.9
+    ],
+    [
+     "all-mpnet-base-v2",
+     10,
+     28,
+     0.8642857142857142
+    ],
+    [
+     "all-mpnet-base-v2",
+     15,
+     28,
+     0.8464285714285714
+    ],
+    [
+     "all-mpnet-base-v2",
+     20,
+     28,
+     0.8363095238095237
+    ],
+    [
+     "all-mpnet-base-v2",
+     30,
+     28,
+     0.8313492063492064
+    ],
+    [
+     "allenai/specter2_base",
+     5,
+     28,
+     0.7931547619047619
+    ],
+    [
+     "allenai/specter2_base",
+     10,
+     28,
+     0.6887591575091575
+    ],
+    [
+     "allenai/specter2_base",
+     15,
+     28,
+     0.6887591575091575
+    ],
+    [
+     "allenai/specter2_base",
+     20,
+     28,
+     0.6278584510727369
+    ],
+    [
+     "allenai/specter2_base",
+     30,
+     28,
+     0.4060741341991342
+    ],
+    [
+     "BAAI/bge-m3",
+     5,
+     28,
+     0.9714285714285714
+    ],
+    [
+     "BAAI/bge-m3",
+     10,
+     28,
+     0.9714285714285714
+    ],
+    [
+     "BAAI/bge-m3",
+     15,
+     28,
+     0.9714285714285714
+    ],
+    [
+     "BAAI/bge-m3",
+     20,
+     28,
+     0.9535714285714285
+    ],
+    [
+     "BAAI/bge-m3",
+     30,
+     28,
+     0.9178571428571428
+    ]
+   ]
+  },
+  "Supplementary Fig. 2b": {
+   "columns": [
+    "config",
+    "strategy",
+    "corpus_size_papers",
+    "n_queries",
+    "mrr"
+   ],
+   "rows": [
+    [
+     "dense",
+     "Dense only",
+     5,
+     28,
+     0.9714285714285714
+    ],
+    [
+     "dense",
+     "Dense only",
+     10,
+     28,
+     0.9714285714285714
+    ],
+    [
+     "dense",
+     "Dense only",
+     15,
+     28,
+     0.9714285714285714
+    ],
+    [
+     "dense",
+     "Dense only",
+     20,
+     28,
+     0.9535714285714285
+    ],
+    [
+     "dense",
+     "Dense only",
+     30,
+     28,
+     0.9178571428571428
+    ],
+    [
+     "bm25_standard",
+     "BM25 only (standard)",
+     5,
+     28,
+     1.0
+    ],
+    [
+     "bm25_standard",
+     "BM25 only (standard)",
+     10,
+     28,
+     0.9714285714285714
+    ],
+    [
+     "bm25_standard",
+     "BM25 only (standard)",
+     15,
+     28,
+     1.0
+    ],
+    [
+     "bm25_standard",
+     "BM25 only (standard)",
+     20,
+     28,
+     0.9821428571428571
+    ],
+    [
+     "bm25_standard",
+     "BM25 only (standard)",
+     30,
+     28,
+     0.9336734693877551
+    ],
+    [
+     "bm25_scientific",
+     "BM25 only (scientific)",
+     5,
+     28,
+     1.0
+    ],
+    [
+     "bm25_scientific",
+     "BM25 only (scientific)",
+     10,
+     28,
+     0.9642857142857143
+    ],
+    [
+     "bm25_scientific",
+     "BM25 only (scientific)",
+     15,
+     28,
+     0.9821428571428571
+    ],
+    [
+     "bm25_scientific",
+     "BM25 only (scientific)",
+     20,
+     28,
+     0.9821428571428571
+    ],
+    [
+     "bm25_scientific",
+     "BM25 only (scientific)",
+     30,
+     28,
+     0.9464285714285714
+    ],
+    [
+     "hybrid_fixed",
+     "Hybrid (fixed \u03b1=0.5)",
+     5,
+     28,
+     1.0
+    ],
+    [
+     "hybrid_fixed",
+     "Hybrid (fixed \u03b1=0.5)",
+     10,
+     28,
+     1.0
+    ],
+    [
+     "hybrid_fixed",
+     "Hybrid (fixed \u03b1=0.5)",
+     15,
+     28,
+     1.0
+    ],
+    [
+     "hybrid_fixed",
+     "Hybrid (fixed \u03b1=0.5)",
+     20,
+     28,
+     1.0
+    ],
+    [
+     "hybrid_fixed",
+     "Hybrid (fixed \u03b1=0.5)",
+     30,
+     28,
+     0.9642857142857143
+    ],
+    [
+     "hybrid_adaptive",
+     "Hybrid (adaptive \u03b1)",
+     5,
+     28,
+     1.0
+    ],
+    [
+     "hybrid_adaptive",
+     "Hybrid (adaptive \u03b1)",
+     10,
+     28,
+     1.0
+    ],
+    [
+     "hybrid_adaptive",
+     "Hybrid (adaptive \u03b1)",
+     15,
+     28,
+     1.0
+    ],
+    [
+     "hybrid_adaptive",
+     "Hybrid (adaptive \u03b1)",
+     20,
+     28,
+     1.0
+    ],
+    [
+     "hybrid_adaptive",
+     "Hybrid (adaptive \u03b1)",
+     30,
+     28,
+     0.9642857142857143
+    ],
+    [
+     "rrf",
+     "RRF",
+     5,
+     28,
+     1.0
+    ],
+    [
+     "rrf",
+     "RRF",
+     10,
+     28,
+     1.0
+    ],
+    [
+     "rrf",
+     "RRF",
+     15,
+     28,
+     1.0
+    ],
+    [
+     "rrf",
+     "RRF",
+     20,
+     28,
+     1.0
+    ],
+    [
+     "rrf",
+     "RRF",
+     30,
+     28,
+     0.9821428571428571
+    ],
+    [
+     "rrf_reranker",
+     "RRF + reranker",
+     5,
+     28,
+     1.0
+    ],
+    [
+     "rrf_reranker",
+     "RRF + reranker",
+     10,
+     28,
+     1.0
+    ],
+    [
+     "rrf_reranker",
+     "RRF + reranker",
+     15,
+     28,
+     1.0
+    ],
+    [
+     "rrf_reranker",
+     "RRF + reranker",
+     20,
+     28,
+     1.0
+    ],
+    [
+     "rrf_reranker",
+     "RRF + reranker",
+     30,
+     28,
+     0.9494047619047619
+    ]
+   ]
+  },
+  "Supplementary Fig. 2c": {
+   "columns": [
+    "config",
+    "configuration",
+    "run",
+    "n_queries",
+    "mrr",
+    "mean_mrr_over_runs",
+    "n_runs",
+    "run_number"
+   ],
+   "rows": [
+    [
+     "simple_128",
+     "Simple 128 tok",
+     "A",
+     28,
+     0.9247448979591837,
+     0.9219314268917443,
+     3,
+     1
+    ],
+    [
+     "simple_256",
+     "Simple 256 tok",
+     "A",
+     28,
+     0.9702380952380952,
+     0.9561287477954145,
+     3,
+     1
+    ],
+    [
+     "simple_512",
+     "Simple 512 tok (baseline)",
+     "A",
+     28,
+     0.9821428571428571,
+     0.9878747795414462,
+     3,
+     1
+    ],
+    [
+     "simple_1024",
+     "Simple 1024 tok",
+     "A",
+     28,
+     0.9404761904761905,
+     0.9739858906525574,
+     3,
+     1
+    ],
+    [
+     "semantic_500",
+     "Semantic 500 char",
+     "A",
+     28,
+     0.7595238095238095,
+     0.8075543797766019,
+     3,
+     1
+    ],
+    [
+     "semantic_1000",
+     "Semantic 1000 char",
+     "A",
+     28,
+     0.8061224489795917,
+     0.8273494583018391,
+     3,
+     1
+    ],
+    [
+     "semantic_2000",
+     "Semantic 2000 char",
+     "A",
+     28,
+     0.7585034013605443,
+     0.7988368186780885,
+     3,
+     1
+    ],
+    [
+     "semantic_4000",
+     "Semantic 4000 char",
+     "A",
+     28,
+     0.7573129251700681,
+     0.8004290193443633,
+     3,
+     1
+    ],
+    [
+     "simple_128",
+     "Simple 128 tok",
+     "B",
+     27,
+     0.9629629629629629,
+     0.9219314268917443,
+     3,
+     2
+    ],
+    [
+     "simple_256",
+     "Simple 256 tok",
+     "B",
+     27,
+     0.9351851851851852,
+     0.9561287477954145,
+     3,
+     2
+    ],
+    [
+     "simple_512",
+     "Simple 512 tok (baseline)",
+     "B",
+     27,
+     1.0,
+     0.9878747795414462,
+     3,
+     2
+    ],
+    [
+     "simple_1024",
+     "Simple 1024 tok",
+     "B",
+     27,
+     1.0,
+     0.9739858906525574,
+     3,
+     2
+    ],
+    [
+     "semantic_500",
+     "Semantic 500 char",
+     "B",
+     27,
+     0.8703703703703702,
+     0.8075543797766019,
+     3,
+     2
+    ],
+    [
+     "semantic_1000",
+     "Semantic 1000 char",
+     "B",
+     27,
+     0.8395061728395061,
+     0.8273494583018391,
+     3,
+     2
+    ],
+    [
+     "semantic_2000",
+     "Semantic 2000 char",
+     "B",
+     27,
+     0.8101851851851852,
+     0.7988368186780885,
+     3,
+     2
+    ],
+    [
+     "semantic_4000",
+     "Semantic 4000 char",
+     "B",
+     27,
+     0.8154320987654321,
+     0.8004290193443633,
+     3,
+     2
+    ],
+    [
+     "simple_128",
+     "Simple 128 tok",
+     "C",
+     27,
+     0.8780864197530863,
+     0.9219314268917443,
+     3,
+     3
+    ],
+    [
+     "simple_256",
+     "Simple 256 tok",
+     "C",
+     27,
+     0.9629629629629629,
+     0.9561287477954145,
+     3,
+     3
+    ],
+    [
+     "simple_512",
+     "Simple 512 tok (baseline)",
+     "C",
+     27,
+     0.9814814814814815,
+     0.9878747795414462,
+     3,
+     3
+    ],
+    [
+     "simple_1024",
+     "Simple 1024 tok",
+     "C",
+     27,
+     0.9814814814814815,
+     0.9739858906525574,
+     3,
+     3
+    ],
+    [
+     "semantic_500",
+     "Semantic 500 char",
+     "C",
+     27,
+     0.7927689594356261,
+     0.8075543797766019,
+     3,
+     3
+    ],
+    [
+     "semantic_1000",
+     "Semantic 1000 char",
+     "C",
+     27,
+     0.8364197530864197,
+     0.8273494583018391,
+     3,
+     3
+    ],
+    [
+     "semantic_2000",
+     "Semantic 2000 char",
+     "C",
+     27,
+     0.8278218694885361,
+     0.7988368186780885,
+     3,
+     3
+    ],
+    [
+     "semantic_4000",
+     "Semantic 4000 char",
+     "C",
+     27,
+     0.8285420340975895,
+     0.8004290193443633,
+     3,
+     3
+    ]
+   ]
+  },
+  "Supplementary Fig. 2d": {
+   "columns": [
+    "corpus_size_papers",
+    "index_name",
+    "n_queries",
+    "mrr"
+   ],
+   "rows": [
+    [
+     5,
+     "exp_s5",
+     28,
+     1.0
+    ],
+    [
+     10,
+     "exp_s10",
+     28,
+     1.0
+    ],
+    [
+     20,
+     "exp_s20",
+     28,
+     1.0
+    ],
+    [
+     50,
+     "exp_s50",
+     28,
+     0.9404761904761905
+    ],
+    [
+     100,
+     "exp_s100",
+     28,
+     0.8833333333333334
+    ]
+   ]
+  }
+ },
+ "printed": {
+  "s448num_0": {
+   "sheet": "Supplementary Fig. 2a",
+   "row": 19,
+   "format": "{model}"
+  },
+  "s448num_1": {
+   "sheet": "Supplementary Fig. 2a",
+   "row": 4,
+   "format": "{model}"
+  },
+  "s448num_2": {
+   "sheet": "Supplementary Fig. 2a",
+   "row": 9,
+   "format": "{model}"
+  },
+  "s448num_3": {
+   "sheet": "Supplementary Fig. 2a",
+   "row": 14,
+   "format": "{model}"
+  },
+  "s448num_4": {
+   "sheet": "Supplementary Fig. 2b",
+   "row": 25,
+   "format": "{strategy}"
+  },
+  "s448num_5": {
+   "sheet": "Supplementary Fig. 2b",
+   "row": 20,
+   "format": "{strategy} and"
+  },
+  "s448num_6": {
+   "sheet": "Supplementary Fig. 2b",
+   "row": 15,
+   "format": "{strategy}"
+  },
+  "s448num_7": {
+   "sheet": "Supplementary Fig. 2b",
+   "row": 30,
+   "format": "{strategy}"
+  },
+  "s448num_8": {
+   "sheet": "Supplementary Fig. 2b",
+   "row": 10,
+   "format": "{strategy}"
+  },
+  "s448num_9": {
+   "sheet": "Supplementary Fig. 2b",
+   "row": 5,
+   "format": "{strategy}"
+  },
+  "s448num_10": {
+   "sheet": "Supplementary Fig. 2b",
+   "row": 0,
+   "format": "{strategy}"
+  },
+  "s448num_11": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 2,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_12": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 10,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_13": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 18,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_14": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 2,
+   "format": "{mean_mrr_over_runs:.2f}"
+  },
+  "s448num_15": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 3,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_16": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 11,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_17": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 19,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_18": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 3,
+   "format": "{mean_mrr_over_runs:.2f}"
+  },
+  "s448num_19": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 1,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_20": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 9,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_21": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 17,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_22": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 1,
+   "format": "{mean_mrr_over_runs:.2f}"
+  },
+  "s448num_23": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 0,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_24": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 8,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_25": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 16,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_26": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 0,
+   "format": "{mean_mrr_over_runs:.2f}"
+  },
+  "s448num_27": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 5,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_28": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 13,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_29": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 21,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_30": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 5,
+   "format": "{mean_mrr_over_runs:.2f}"
+  },
+  "s448num_31": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 4,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_32": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 12,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_33": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 20,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_34": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 4,
+   "format": "{mean_mrr_over_runs:.2f}"
+  },
+  "s448num_35": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 7,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_36": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 15,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_37": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 23,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_38": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 7,
+   "format": "{mean_mrr_over_runs:.2f}"
+  },
+  "s448num_39": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 6,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_40": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 14,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_41": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 22,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_42": {
+   "sheet": "Supplementary Fig. 2c",
+   "row": 6,
+   "format": "{mean_mrr_over_runs:.2f}"
+  },
+  "s448num_43": {
+   "sheet": "Supplementary Fig. 2d",
+   "row": 0,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_44": {
+   "sheet": "Supplementary Fig. 2d",
+   "row": 1,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_45": {
+   "sheet": "Supplementary Fig. 2d",
+   "row": 2,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_46": {
+   "sheet": "Supplementary Fig. 2d",
+   "row": 3,
+   "format": "{mrr:.2f}"
+  },
+  "s448num_47": {
+   "sheet": "Supplementary Fig. 2d",
+   "row": 4,
+   "format": "{mrr:.2f}"
+  }
+ },
+ "printed_what": "every text on the plate written from a record (labels and printed values): the SVG group id of its text, the data workbook's sheet, 0-based data row and format it is written from"
+}

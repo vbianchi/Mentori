@@ -1,0 +1,750 @@
+{
+ "_provenance": {
+  "command": "uv run --frozen python scripts/S527_need_map.py",
+  "inputs_sha256": {
+   "findings/figures_provisional/fig3_strategies/ranking.json": "ae8c82f2f43dc423a9fa0dcbfdf7ed5c6dca81d7604fc5b5fded443952b753e5",
+   "findings/figures_provisional/fig4/figure5_numbers.json": "8429825c65ec3c17da2c135a1dcd996c7657cd2717e21b8eec5256fd18b8088b",
+   "findings/figures_provisional/fig6/fig6_numbers.json": "14ea3bb30101edda9be40835c1f64e47fceb2c73b080190b9cc32c6b13ed9b6d",
+   "findings/recompute/G4_fig3c_d185/verdicts.json": "06884d7121857e23dfbb4ffb18ad5019fa653ef2ae2e78eb266e428d0736b248",
+   "findings/recompute/S511_g2_budget/results.json": "e225903ba4409374263dfe33626f6bca5c35ac957f1666a14553de937808b3f3",
+   "findings/recompute/S511_g2_budget/results.md": "d259099abfaf3c20ce3ebee9f881020cd234bb1cfacf93d4fe33d08be463ff45",
+   "findings/recompute/S526_instrument_swaps/results.json": "3b0964900baa41d88be698066a10012235b68118cad5203cbf8b5c032805d6b4"
+  },
+  "script": "scripts/S527_need_map.py",
+  "script_sha256": "9a1b60ba35c4d6f19ef8dfd7dedc768d83cbe9b1869babd56397b9253e3ebf5b"
+ },
+ "cells": [
+  {
+   "attack_row": "attack.md row 1, WEAKEN",
+   "blank": null,
+   "depends_on": [],
+   "id": "N1",
+   "need": "Any question, with the budget to read widely",
+   "stands_on": "judge on key v2.4, draws 1 to 3, 86 questions",
+   "table": "needs",
+   "values": [
+    {
+     "key": "pass / 4 / all answerable / matched_budget / rate",
+     "label": "one call at RLM-10's budget",
+     "source": "findings/recompute/S511_g2_budget/results.json",
+     "unit": "%",
+     "value": 94.6
+    },
+    {
+     "key": "pass / 4 / all answerable / single_pass / rate",
+     "label": "single pass",
+     "source": "findings/recompute/S511_g2_budget/results.json",
+     "unit": "%",
+     "value": 83.3
+    },
+    {
+     "key": "pass / 4 / all answerable / rlm_10 / rate",
+     "label": "RLM-10",
+     "source": "findings/recompute/S511_g2_budget/results.json",
+     "unit": "%",
+     "value": 74.8
+    }
+   ],
+   "wording": "Given RLM-10's tokens per question, one call passed 94.6%.",
+   "wording_from": "attack.md's sentence"
+  },
+  {
+   "attack_row": "attack.md rows 2 and 3, WEAKEN",
+   "blank": null,
+   "depends_on": [],
+   "id": "N2",
+   "need": "One-paper questions",
+   "stands_on": "judge on key v2.4, draws 1 to 3, 60 questions; concept recall on key v2.5, draws 1 to 3, 60 questions",
+   "table": "needs",
+   "values": [
+    {
+     "key": "pass / 4 / one-paper / single_pass / rate",
+     "label": "single pass, judge at 4",
+     "source": "findings/recompute/S511_g2_budget/results.json",
+     "unit": "%",
+     "value": 97.2
+    },
+    {
+     "key": "pass / 4 / one-paper / rlm_10 / rate",
+     "label": "RLM-10, judge at 4",
+     "source": "findings/recompute/S511_g2_budget/results.json",
+     "unit": "%",
+     "value": 70.6
+    },
+    {
+     "key": "swaps / rlm_G1_vs_G6_cap10_d181 / one_paper / SP",
+     "label": "single pass, concept recall",
+     "source": "findings/recompute/S526_instrument_swaps/results.json",
+     "unit": "%",
+     "value": 78.4
+    },
+    {
+     "key": "swaps / rlm_G1_vs_G6_cap10_d181 / one_paper / G1",
+     "label": "RLM-10, concept recall",
+     "source": "findings/recompute/S526_instrument_swaps/results.json",
+     "unit": "%",
+     "value": 80.0
+    }
+   ],
+   "wording": "RLM-10 lost by the judge, not by concept recall.",
+   "wording_from": "attack.md's sentence"
+  },
+  {
+   "attack_row": "attack.md row 4, KEEP, exploratory",
+   "blank": null,
+   "depends_on": [],
+   "id": "N3",
+   "need": "Many-paper questions",
+   "stands_on": "judge on key v2.4, draws 1 to 3, 26 questions; concept recall on key v2.5, draws 1 to 3, 26 questions",
+   "table": "needs",
+   "values": [
+    {
+     "key": "pass / 4 / many-paper / single_pass / rate",
+     "label": "single pass, judge at 4",
+     "source": "findings/recompute/S511_g2_budget/results.json",
+     "unit": "%",
+     "value": 51.3
+    },
+    {
+     "key": "pass / 4 / many-paper / rlm_10 / rate",
+     "label": "RLM-10, judge at 4",
+     "source": "findings/recompute/S511_g2_budget/results.json",
+     "unit": "%",
+     "value": 84.6
+    },
+    {
+     "key": "pass / 4 / many-paper / matched_budget / rate",
+     "label": "one call at RLM-10's budget, judge at 4",
+     "source": "findings/recompute/S511_g2_budget/results.json",
+     "unit": "%",
+     "value": 85.9
+    },
+    {
+     "key": "swaps / rlm_G1_vs_G6_cap10_d181 / many_paper / SP",
+     "label": "single pass, concept recall",
+     "source": "findings/recompute/S526_instrument_swaps/results.json",
+     "unit": "%",
+     "value": 48.5
+    },
+    {
+     "key": "swaps / rlm_G1_vs_G6_cap10_d181 / many_paper / G1",
+     "label": "RLM-10, concept recall",
+     "source": "findings/recompute/S526_instrument_swaps/results.json",
+     "unit": "%",
+     "value": 67.5
+    }
+   ],
+   "wording": "On many-paper questions the judge and concept recall agree, and reading more text explains much of RLM-10's gain.",
+   "wording_from": "this script's, on attack.md's reason"
+  },
+  {
+   "attack_row": "attack.md row 5, WEAKEN",
+   "blank": null,
+   "depends_on": [],
+   "id": "N4",
+   "need": "Answers supported by the papers",
+   "stands_on": "draw 1, 81 questions with a value in every strategy",
+   "table": "needs",
+   "values": [
+    {
+     "key": "swaps / MiniCheck key to papers precision, as stored (draw 1) / B / verified_pass",
+     "label": "verified pass, Papers precision",
+     "source": "findings/recompute/S526_instrument_swaps/results.json",
+     "unit": "%",
+     "value": 83.7
+    },
+    {
+     "key": "swaps / MiniCheck key to papers precision, as stored (draw 1) / B / single_pass",
+     "label": "single pass, Papers precision",
+     "source": "findings/recompute/S526_instrument_swaps/results.json",
+     "unit": "%",
+     "value": 80.9
+    },
+    {
+     "key": "swaps / contrast set mc papers / vp-sp / 0",
+     "label": "verified pass minus single pass",
+     "source": "findings/recompute/S526_instrument_swaps/results.json",
+     "unit": "points",
+     "value": 2.8
+    },
+    {
+     "key": "swaps / contrast set mc papers / vp-sp / 1",
+     "label": "its 95% interval, lower end, two-sided",
+     "source": "findings/recompute/S526_instrument_swaps/results.json",
+     "unit": "points",
+     "value": -0.5
+    },
+    {
+     "key": "swaps / contrast set mc papers / vp-sp / 2",
+     "label": "its 95% interval, upper end, two-sided",
+     "source": "findings/recompute/S526_instrument_swaps/results.json",
+     "unit": "points",
+     "value": 6.2
+    }
+   ],
+   "wording": "No clear rise in support from verification.",
+   "wording_from": "this script's, picked by the values"
+  },
+  {
+   "attack_row": "attack.md row 6, WEAKEN",
+   "blank": null,
+   "depends_on": [],
+   "id": "N5",
+   "need": "Declining what the papers cannot answer",
+   "stands_on": "draws 1 to 3, 39 questions; each answer's key v2.5 row where one exists, else its key v2.4 row",
+   "table": "needs",
+   "values": [
+    {
+     "key": "keys / not_answerable|refusal_accuracy 3 or more|single_pass",
+     "label": "single pass, answers refusing, refusal score 3 or more",
+     "source": "findings/figures_provisional/fig3_strategies/ranking.json",
+     "unit": "of 117",
+     "value": 117
+    },
+    {
+     "key": "keys / not_answerable|refusal_accuracy 3 or more|verified_pass",
+     "label": "verified pass, answers refusing, refusal score 3 or more",
+     "source": "findings/figures_provisional/fig3_strategies/ranking.json",
+     "unit": "of 117",
+     "value": 117
+    },
+    {
+     "key": "keys / not_answerable|refusal_accuracy 3 or more|rlm_10",
+     "label": "RLM-10, answers refusing, refusal score 3 or more",
+     "source": "findings/figures_provisional/fig3_strategies/ranking.json",
+     "unit": "of 117",
+     "value": 114
+    },
+    {
+     "key": "rule6_refusal / highest / not_separated_from",
+     "label": "not told apart from single pass, the highest, tied with verified pass",
+     "source": "findings/figures_provisional/fig3_strategies/ranking.json",
+     "unit": "",
+     "value": [
+      "verified pass",
+      "RLM-10",
+      "RLM-20"
+     ]
+    }
+   ],
+   "wording": "Single pass and verified pass refused every out-of-scope answer, by judge score.",
+   "wording_from": "this script's, picked by the values"
+  },
+  {
+   "attack_row": "attack.md row 7, KEEP",
+   "blank": null,
+   "depends_on": [],
+   "id": "N6",
+   "need": "A large corpus",
+   "stands_on": "draw 1, every covered question (D98's main estimate), 86 questions; key v2.5 where S6 has judged, else key v2.4",
+   "table": "needs",
+   "values": [
+    {
+     "key": "claims / S1 / failures_in / score4 / cells / 50 core, 0x / single_pass",
+     "label": "single pass, judge at 4",
+     "source": "findings/recompute/G4_fig3c_d185/verdicts.json",
+     "unit": "%",
+     "value": 81.4
+    },
+    {
+     "key": "claims / S1 / failures_in / score4 / cells / 50 core, 0x / rlm_10",
+     "label": "RLM-10, judge at 4",
+     "source": "findings/recompute/G4_fig3c_d185/verdicts.json",
+     "unit": "%",
+     "value": 64.0
+    },
+    {
+     "key": "claims / S1 / failures_in / score4 / cells / 50 core, 0x / P_bonferroni",
+     "label": "P, Bonferroni over 12 cells, two-sided",
+     "source": "findings/recompute/G4_fig3c_d185/verdicts.json",
+     "unit": "",
+     "value": 0.071
+    },
+    {
+     "key": "awaiting_s6 / answers",
+     "label": "answers still read from key v2.4",
+     "source": "findings/recompute/G4_fig3c_d185/verdicts.json",
+     "unit": "answers",
+     "value": 0
+    }
+   ],
+   "wording": "50 core papers, the largest tested.",
+   "wording_from": "attack.md's sentence"
+  },
+  {
+   "attack_row": "attack.md row 8, KEEP, no best",
+   "blank": null,
+   "depends_on": [],
+   "id": "N7",
+   "need": "Time per answer",
+   "stands_on": "draws 1 to 3, 86 questions",
+   "table": "needs",
+   "values": [
+    {
+     "key": "cost / answerable / single_pass / clock_s / mean",
+     "label": "single pass, seconds",
+     "source": "findings/figures_provisional/fig3_strategies/ranking.json",
+     "unit": "s",
+     "value": 42.1
+    },
+    {
+     "key": "cost / answerable / verified_pass / clock_s / mean",
+     "label": "verified pass, seconds",
+     "source": "findings/figures_provisional/fig3_strategies/ranking.json",
+     "unit": "s",
+     "value": 372.4
+    },
+    {
+     "key": "cost / answerable / verified_pass / wait_s / mean",
+     "label": "of which waiting",
+     "source": "findings/figures_provisional/fig3_strategies/ranking.json",
+     "unit": "s",
+     "value": 275.3
+    },
+    {
+     "key": "cost / answerable / rlm_10 / clock_s / mean",
+     "label": "RLM-10, seconds",
+     "source": "findings/figures_provisional/fig3_strategies/ranking.json",
+     "unit": "s",
+     "value": 129.0
+    }
+   ],
+   "wording": "Time per answer, with verified pass's time mostly spent waiting.",
+   "wording_from": "this script's, on attack.md's reason"
+  },
+  {
+   "attack_row": "attack.md row 9, WEAKEN",
+   "blank": null,
+   "depends_on": [],
+   "id": "N8",
+   "need": "Code",
+   "stands_on": "2,420 of 2,420 attempts, 11 of 11 variants complete, records of 2026-11-04 08:35 CET; after the S4 reruns (D75, D80 V1, D81)",
+   "table": "needs",
+   "values": [
+    {
+     "key": "claims_support / mcnemar_best_of_3_vs_free_form / pairs",
+     "label": "pairs",
+     "source": "findings/figures_provisional/fig6/fig6_numbers.json",
+     "unit": "pairs",
+     "value": 220
+    },
+    {
+     "key": "claims_support / mcnemar_best_of_3_vs_free_form / a_only",
+     "label": "pass with best-of-3 only",
+     "source": "findings/figures_provisional/fig6/fig6_numbers.json",
+     "unit": "pairs",
+     "value": 19
+    },
+    {
+     "key": "claims_support / mcnemar_best_of_3_vs_free_form / b_only",
+     "label": "pass with free-form only",
+     "source": "findings/figures_provisional/fig6/fig6_numbers.json",
+     "unit": "pairs",
+     "value": 13
+    },
+    {
+     "key": "claims_support / mcnemar_best_of_3_vs_free_form / p_two_sided",
+     "label": "P, McNemar, two-sided",
+     "source": "findings/figures_provisional/fig6/fig6_numbers.json",
+     "unit": "",
+     "value": 0.38
+    }
+   ],
+   "wording": "Best-of-3 showed no clear gain.",
+   "wording_from": "attack.md's sentence"
+  },
+  {
+   "attack_row": "attack.md row 10, KEEP until T2",
+   "blank": "Needs T2's generators. D195: closed until S518 runs on Valerio's word.",
+   "depends_on": [
+    "T2's generators"
+   ],
+   "id": "N9",
+   "need": "The choice of generator",
+   "stands_on": null,
+   "table": "needs",
+   "values": [],
+   "wording": null,
+   "wording_from": null
+  },
+  {
+   "attack_row": "attack.md row 12, KEEP, no pick",
+   "blank": "Needs the second judge. D195: closed until S518 runs on Valerio's word.",
+   "depends_on": [
+    "the second judge"
+   ],
+   "id": "N10",
+   "need": "The choice of judge",
+   "stands_on": null,
+   "table": "needs",
+   "values": [],
+   "wording": null,
+   "wording_from": null
+  },
+  {
+   "attack_row": "attack.md row 13, WEAKEN",
+   "blank": null,
+   "depends_on": [],
+   "id": "N11",
+   "need": "More than one signal",
+   "stands_on": "the judge at 4: draws 1 to 3, 86 questions; concept recall: draws 1 to 3, 86 questions; Papers precision: draw 1, 81 questions",
+   "table": "needs",
+   "values": [
+    {
+     "key": "swaps / winner_gap judge 4",
+     "label": "highest by the judge at 4",
+     "source": "findings/recompute/S526_instrument_swaps/results.json",
+     "unit": "",
+     "value": "single pass, 0.4 points ahead of verified pass (95% interval -5.4 to +6.2, two-sided)"
+    },
+    {
+     "key": "swaps / winner_gap concept d181",
+     "label": "highest by concept recall",
+     "source": "findings/recompute/S526_instrument_swaps/results.json",
+     "unit": "",
+     "value": "RLM-10, 1.1 points ahead of RLM-20 (95% interval -2.4 to +4.5, two-sided)"
+    },
+    {
+     "key": "swaps / winner_gap mc papers",
+     "label": "highest by Papers precision",
+     "source": "findings/recompute/S526_instrument_swaps/results.json",
+     "unit": "",
+     "value": "verified pass, 2.8 points ahead of single pass (95% interval -0.5 to +6.2, two-sided)"
+    }
+   ],
+   "wording": "Signals differ on which strategy is highest, and no signal separates its highest from the next.",
+   "wording_from": "this script's, picked by the values"
+  },
+  {
+   "attack_row": "attack.md row 15, WEAKEN",
+   "blank": null,
+   "depends_on": [],
+   "id": "N12",
+   "need": "An orchestrated pipeline",
+   "stands_on": "draw 1, 86 questions; key v2.5 judge rows: RLM-10's 60 from S6G1 after phase 3 (frozen fig3_s6_inputs, S528), G3's 600",
+   "table": "needs",
+   "values": [
+    {
+     "key": "sheets / Fig. 5a / minus_full_low and minus_full_high, orchestrator set-ups, judge at 4",
+     "label": "lowest end of any interval, from routing fix",
+     "source": "findings/figures_provisional/fig4/figure5_numbers.json",
+     "unit": "points",
+     "value": -18.6
+    },
+    {
+     "key": "sheets / Fig. 5a / minus_full_low and minus_full_high, orchestrator set-ups, judge at 4",
+     "label": "highest end of any interval, from no synthesizer",
+     "source": "findings/figures_provisional/fig4/figure5_numbers.json",
+     "unit": "points",
+     "value": 14.0
+    },
+    {
+     "key": "sheets / Fig. 5a / minus_full_low and minus_full_high, orchestrator set-ups, judge at 4",
+     "label": "set-ups, each against the full pipeline",
+     "source": "findings/figures_provisional/fig4/figure5_numbers.json",
+     "unit": "set-ups",
+     "value": 5
+    }
+   ],
+   "wording": "No clear change in any orchestrator set-up; the intervals are wide.",
+   "wording_from": "this script's, on attack.md's reason"
+  },
+  {
+   "attack_row": "not a verdict row: attack.md's action A2",
+   "blank": "G10 is not judged yet (D196): no committed output holds its pass rates.",
+   "depends_on": [
+    "G10's judge rows"
+   ],
+   "id": "N13",
+   "need": "A flat wide call, fixed in advance",
+   "stands_on": null,
+   "table": "needs",
+   "values": [],
+   "wording": null,
+   "wording_from": null
+  },
+  {
+   "attack_row": "not in attack.md: D194 Q4",
+   "blank": "G11 is not judged yet (D196): no committed output holds its pass rates.",
+   "depends_on": [
+    "G11's judge rows"
+   ],
+   "id": "N14",
+   "need": "The old 800-character cut under the lock",
+   "stands_on": null,
+   "table": "needs",
+   "values": [],
+   "wording": null,
+   "wording_from": null
+  },
+  {
+   "attack_row": "attack.md second table, WEAKEN",
+   "blank": null,
+   "depends_on": [],
+   "id": "M1",
+   "need": "Judge correctness",
+   "stands_on": "judge on key v2.4, draws 1 to 3, 60 questions; judge on key v2.4, draws 1 to 3, 26 questions",
+   "table": "measures",
+   "values": [
+    {
+     "key": "pass / 4 / one-paper / rlm_10 / rate",
+     "label": "RLM-10, one-paper",
+     "source": "findings/recompute/S511_g2_budget/results.json",
+     "unit": "%",
+     "value": 70.6
+    },
+    {
+     "key": "pass / 4 / many-paper / rlm_10 / rate",
+     "label": "RLM-10, many-paper",
+     "source": "findings/recompute/S511_g2_budget/results.json",
+     "unit": "%",
+     "value": 84.6
+    }
+   ],
+   "wording": "Separates question types, which is not the same as being right.",
+   "wording_from": "this script's, on attack.md's reason"
+  },
+  {
+   "attack_row": "attack.md second table, KEEP",
+   "blank": null,
+   "depends_on": [],
+   "id": "M2",
+   "need": "Concepts",
+   "stands_on": "concept recall on key v2.5, draws 1 to 3, 86 questions",
+   "table": "measures",
+   "values": [
+    {
+     "key": "swaps / signal swap: judge pass at 4 to concept recall D181, all 86 / contrast_A / 0",
+     "label": "RLM-10 minus single pass, judge at 4",
+     "source": "findings/recompute/S526_instrument_swaps/results.json",
+     "unit": "points",
+     "value": -8.5
+    },
+    {
+     "key": "swaps / signal swap: judge pass at 4 to concept recall D181, all 86 / contrast_B / 0",
+     "label": "RLM-10 minus single pass, concept recall",
+     "source": "findings/recompute/S526_instrument_swaps/results.json",
+     "unit": "points",
+     "value": 6.8
+    }
+   ],
+   "wording": "Reads whether the key's concepts are stated. Descriptive.",
+   "wording_from": "this script's, on attack.md's reason"
+  },
+  {
+   "attack_row": "attack.md second table, WEAKEN",
+   "blank": null,
+   "depends_on": [],
+   "id": "M3",
+   "need": "Papers",
+   "stands_on": "draw 1, 81 questions, S526's approximate filter",
+   "table": "measures",
+   "values": [
+    {
+     "key": "swaps / MiniCheck papers precision, source lists kept to dropped / contrast_change_B_minus_A / 0",
+     "label": "change in RLM-10 minus single pass when S526 drops source-list lines",
+     "source": "findings/recompute/S526_instrument_swaps/results.json",
+     "unit": "points",
+     "value": 17.6
+    }
+   ],
+   "wording": "Provisional: the stored values count source-list lines as claims. D172's filter (minicheck_filter.py) is not applied here, and its heading rule is set.",
+   "wording_from": "this script's, on attack.md's reason"
+  },
+  {
+   "attack_row": "attack.md second table, WEAKEN",
+   "blank": "Its number stands only in a scratch output (ev_fast.py), and this script reads none.",
+   "depends_on": [
+    "a tracked output of the evaluator comparison"
+   ],
+   "id": "M4",
+   "need": "METEOR",
+   "stands_on": null,
+   "table": "measures",
+   "values": [],
+   "wording": null,
+   "wording_from": null
+  },
+  {
+   "attack_row": "attack.md second table, WEAKEN",
+   "blank": "Its number comes from S483's composite, closed here beside the second judge. D195: closed until S518 runs on Valerio's word.",
+   "depends_on": [
+    "the second judge"
+   ],
+   "id": "M5",
+   "need": "Citations",
+   "stands_on": null,
+   "table": "measures",
+   "values": [],
+   "wording": null,
+   "wording_from": null
+  },
+  {
+   "attack_row": "attack.md second table, KEEP",
+   "blank": "The only signal for this need, by design; its values are N5's.",
+   "depends_on": [
+    "the same values as N5"
+   ],
+   "id": "M6",
+   "need": "Refusal score",
+   "stands_on": null,
+   "table": "measures",
+   "values": [],
+   "wording": null,
+   "wording_from": null
+  },
+  {
+   "attack_row": "attack.md second table, WEAKEN",
+   "blank": "K1's rows are partial until the pull (build_order.md section 7).",
+   "depends_on": [
+    "K1's pull"
+   ],
+   "id": "M7",
+   "need": "RAGChecker",
+   "stands_on": null,
+   "table": "measures",
+   "values": [],
+   "wording": null,
+   "wording_from": null
+  }
+ ],
+ "claim_gates": [
+  {
+   "cell": "N2",
+   "got": "RLM-10 minus single pass, judge -26.7 (-34.4 to -19.4), concept recall +1.6 (-5.7 to +8.9)",
+   "test": "RLM-10 is below single pass by the judge, and not below it by concept recall"
+  },
+  {
+   "cell": "N3",
+   "got": "RLM-10 minus single pass, judge +33.3 (+16.7 to +50.0), concept recall +18.9 (+11.8 to +26.2); share of the gap one call closes 1.04",
+   "test": "both signals put RLM-10 above single pass, and one call at its budget closes at least half the judge's gap"
+  },
+  {
+   "cell": "N6",
+   "got": "largest core size 50 against 20; Bonferroni family 12",
+   "test": "the cell's core size is the largest in the grid, and its P is adjusted over the whole grid"
+  },
+  {
+   "cell": "N7",
+   "got": "waiting is 0.74 of verified pass's time",
+   "test": "at least half of verified pass's time is waiting"
+  },
+  {
+   "cell": "N8",
+   "got": "P 0.38",
+   "test": "best-of-3 against free-form has P at or above 0.05"
+  },
+  {
+   "cell": "N11",
+   "got": "single_pass, rlm_10, verified_pass",
+   "test": "the three signals do not all name one strategy"
+  },
+  {
+   "cell": "N12",
+   "got": "5 set-ups, largest lower end -7.0, smallest upper end +5.8, smallest Holm P 1.00",
+   "test": "every orchestrator set-up's interval holds zero and its Holm P is at or above 0.05"
+  }
+ ],
+ "gates": [
+  {
+   "cell": "N1",
+   "got": 94.6,
+   "label": "one call at RLM-10's budget",
+   "source": "findings/recompute/S511_g2_budget/results.json",
+   "source_moved": true,
+   "stated_at": "attack.md row 1",
+   "want": 94.6
+  },
+  {
+   "cell": "N2",
+   "got": 97.2,
+   "label": "single pass, judge at 4",
+   "source": "findings/recompute/S511_g2_budget/results.json",
+   "source_moved": true,
+   "stated_at": "framing.md R1",
+   "want": 97.2
+  },
+  {
+   "cell": "N2",
+   "got": 70.6,
+   "label": "RLM-10, judge at 4",
+   "source": "findings/recompute/S511_g2_budget/results.json",
+   "source_moved": true,
+   "stated_at": "framing.md R1",
+   "want": 70.6
+  },
+  {
+   "cell": "N3",
+   "got": 51.3,
+   "label": "single pass, judge at 4",
+   "source": "findings/recompute/S511_g2_budget/results.json",
+   "source_moved": true,
+   "stated_at": "framing.md R1",
+   "want": 51.3
+  },
+  {
+   "cell": "N3",
+   "got": 84.6,
+   "label": "RLM-10, judge at 4",
+   "source": "findings/recompute/S511_g2_budget/results.json",
+   "source_moved": true,
+   "stated_at": "framing.md R1",
+   "want": 84.6
+  },
+  {
+   "cell": "N3",
+   "got": 85.9,
+   "label": "one call at RLM-10's budget, judge at 4",
+   "source": "findings/recompute/S511_g2_budget/results.json",
+   "source_moved": true,
+   "stated_at": "framing.md R1",
+   "want": 85.9
+  },
+  {
+   "cell": "N7",
+   "got": 372.4,
+   "label": "verified pass, seconds",
+   "source": "findings/figures_provisional/fig3_strategies/ranking.json",
+   "source_moved": true,
+   "stated_at": "attack.md row 8",
+   "want": 372.4
+  },
+  {
+   "cell": "N7",
+   "got": 275.3,
+   "label": "of which waiting",
+   "source": "findings/figures_provisional/fig3_strategies/ranking.json",
+   "source_moved": true,
+   "stated_at": "attack.md row 8",
+   "want": 275.3
+  },
+  {
+   "cell": "N8",
+   "got": 0.38,
+   "label": "P, McNemar, two-sided",
+   "source": "findings/figures_provisional/fig6/fig6_numbers.json",
+   "source_moved": true,
+   "stated_at": "compare.md, code generation",
+   "want": 0.38
+  },
+  {
+   "cell": "N12",
+   "got": -18.6,
+   "label": "lowest end of any interval, from routing fix",
+   "source": "findings/figures_provisional/fig4/figure5_numbers.json",
+   "source_moved": true,
+   "stated_at": "attack.md row 15",
+   "want": -18.6
+  },
+  {
+   "cell": "N12",
+   "got": 14.0,
+   "label": "highest end of any interval, from no synthesizer",
+   "source": "findings/figures_provisional/fig4/figure5_numbers.json",
+   "source_moved": true,
+   "stated_at": "attack.md row 15",
+   "want": 14.0
+  }
+ ],
+ "gates_to_restate": []
+}

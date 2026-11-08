@@ -1,0 +1,797 @@
+{
+ "provenance": {
+  "script": "scripts/S487_kendall_grounded.py",
+  "script_sha256": "d327b6b74cd610d966f9e71da6eef83f7967de50faf68eedaa52608b9c1e2327",
+  "command": "uv run python scripts/S487_kendall_grounded.py",
+  "inputs_sha256": {
+   "data/ground_truth_v2/all_v2_4.json": "5d8362ae931dc0fe0cc132be6b5e57187e3ae7d3131d86f63cdf1a44633fadd5",
+   "data/ground_truth_v2/ground_truth_v2_4_as_v1.json": "e971de522df6fab54a070e44736b6cb28a5ebd26bab07ca9e1513230bb86f4ef",
+   "data/ground_truth_v2/ground_truth_v2_5_as_v1.json": "a42161841980792f5da521819c97b16dc54999b45838b8eb87cd4315f798270a",
+   "findings/recompute/S19_minicheck_source_k3.jsonl": "b223e99e5b3ca563030406605c7ab701df2994cb4faf0d8c154ae524b789f77a",
+   "findings/recompute/S26_signal_redundancy.json": "07dd836183ddedda293f203488058a1ab31101bafd821e4ba012a2e19f218951",
+   "findings/recompute/S318_statistics_ledger.json": "def90d4031c7b317410da180fce8630de0c707e91a046a5ec1f26f33b6d8447b",
+   "findings/recompute/S406_exp04_per_answer_v24.csv": "caa20af38156a8c2436b5d13a0128fed05c1ef7830084392a0f8df5f6c70e689",
+   "findings/recompute/S406_exp04_per_answer_v24.json": "ea6ec271d4d04ac43ed17ec1da55f45655a5633e8e23e04317df2f4845a348d9",
+   "findings/recompute/S516_exp04_per_answer_v25.csv": "f41c30a765374939cac5dc7a948409705e712ca178371609a633d6b9a01a6570",
+   "findings/recompute/S516_exp04_per_answer_v25.json": "fad3bd1ac00de8d282e8fbfb63b095e68d414c9ac4c8f5479d3cb7aad7efd6da"
+  },
+  "libraries": {
+   "numpy": "2.5.1",
+   "scipy": "1.18.0"
+  },
+  "seed": 20261013,
+  "resamples": 10000,
+  "no_time": "no time is written, so two runs give the same bytes"
+ },
+ "what": "Figure 5's agreement numbers (devstral, the 516 answerable exp04 answers): Kendall's W with MiniCheck against the key and against the papers (S19), split verdicts across judge, concept recall and grounding, and verified pass against RLM-10; numbers on key v2.4 (the inventory comparison), numbers_v25 on key v2.5 (D188; numbers_v25_status says what is still read from v2.4). Method in the script's docstring.",
+ "gates": [
+  {
+   "name": "G1",
+   "ok": true,
+   "message": "findings/recompute/S406_exp04_per_answer_v24.csv has sha256 caa20af38156, findings/recompute/S406_exp04_per_answer_v24.json records caa20af38156; its '# key' line names 2 key files, each with the sha256 it has"
+  },
+  {
+   "name": "G2",
+   "ok": true,
+   "message": "807 rows; 516 answerable on 86 questions x 6 configurations, one answer each, status ok, every signal a number in its range, answer types as the v2.4 key's (Rule 8), passed = correctness >= 3"
+  },
+  {
+   "name": "G3",
+   "ok": true,
+   "message": "516 of 516 answerable rows have exactly one S19 source top-3 row (findings/recompute/S19_minicheck_source_k3.jsonl, 528 rows) with the same precision and claim count"
+  },
+  {
+   "name": "G4",
+   "ok": true,
+   "message": "REPRODUCE: findings/recompute/S26_signal_redundancy.json's submitted means give W 0.926984126984127 and exact P 0.00018132716049382717; findings/recompute/S318_statistics_ledger.json (kendall_w_three_signals) holds W 0.926984126984127 and P_untied_null 0.00018132716049382717; typed 0.926984126984127 and 0.00018132716049382717"
+  },
+  {
+   "name": "G5",
+   "ok": true,
+   "message": "v2.5 table findings/recompute/S516_exp04_per_answer_v25.csv (sha256 f41c30a76537, as findings/recompute/S516_exp04_per_answer_v25.json records), key data/ground_truth_v2/ground_truth_v2_5_as_v1.json sha256 a42161841980: 516 rows, S406's answerable answers one for one, each in the group answerable, the carried columns equal to S406's, concept_recall_d181 = d181_found / d181_n_counted on every row; the 7 code files S516 records equal to the repository's"
+  }
+ ],
+ "anchor": {
+  "what": "the submitted Kendall's W (Figure 5d; legend 'Kendall's W over the three rankings is 0.927'), recomputed by this script's functions from the submitted per-configuration means",
+  "source_means": "findings/recompute/S26_signal_redundancy.json",
+  "source_value": "findings/recompute/S318_statistics_ledger.json, tests, id kendall_w_three_signals, full.W and full.P_untied_null",
+  "signals_in_order": [
+   "det",
+   "judge",
+   "mc"
+  ],
+  "configs": [
+   "single_pass",
+   "multi_hop",
+   "verified_pass",
+   "rlm_5",
+   "rlm_10",
+   "rlm_20"
+  ],
+  "ranks": [
+   [
+    3.0,
+    2.0,
+    1.0,
+    4.0,
+    6.0,
+    5.0
+   ],
+   [
+    2.0,
+    3.0,
+    1.0,
+    4.5,
+    6.0,
+    4.5
+   ],
+   [
+    3.0,
+    2.0,
+    1.0,
+    4.0,
+    5.0,
+    6.0
+   ]
+  ],
+  "W": 0.926984126984127,
+  "P_exact_untied_null": 0.00018132716049382717,
+  "W_expected": 0.926984126984127,
+  "P_expected": 0.00018132716049382717,
+  "equal": true
+ },
+ "numbers": {
+  "questions": 86,
+  "answers": 516,
+  "means": {
+   "judge_correctness": {
+    "single_pass": 2.8488372093023258,
+    "multi_hop": 2.6744186046511627,
+    "verified_pass": 2.4069767441860463,
+    "rlm_5": 3.546511627906977,
+    "rlm_10": 3.616279069767442,
+    "rlm_20": 3.4186046511627906
+   },
+   "det_score_correctness_simfull": {
+    "single_pass": 2.2209302325581395,
+    "multi_hop": 1.930232558139535,
+    "verified_pass": 1.9069767441860466,
+    "rlm_5": 3.104651162790698,
+    "rlm_10": 3.302325581395349,
+    "rlm_20": 3.186046511627907
+   },
+   "det_concept_recall_loose": {
+    "single_pass": 0.4112267441860465,
+    "multi_hop": 0.3816197674418606,
+    "verified_pass": 0.34914418604651165,
+    "rlm_5": 0.6708453488372093,
+    "rlm_10": 0.7339151162790698,
+    "rlm_20": 0.6915837209302326
+   },
+   "mc_key_f1": {
+    "single_pass": 0.1625209302325582,
+    "multi_hop": 0.1200593023255814,
+    "verified_pass": 0.1404383720930233,
+    "rlm_5": 0.23571511627906971,
+    "rlm_10": 0.25085581395348855,
+    "rlm_20": 0.24545000000000006
+   },
+   "mc_source_k3_precision": {
+    "single_pass": 0.6902848837209301,
+    "multi_hop": 0.3378767441860465,
+    "verified_pass": 0.7275581395348838,
+    "rlm_5": 0.47498255813953505,
+    "rlm_10": 0.5035976744186046,
+    "rlm_20": 0.48492209302325595
+   }
+  },
+  "kendall_w": {
+   "key": {
+    "signals": [
+     "det (det_score_correctness_simfull)",
+     "judge (judge_correctness)",
+     "key (mc_key_f1)"
+    ],
+    "ranks": {
+     "det_score_correctness_simfull": [
+      3.0,
+      2.0,
+      1.0,
+      4.0,
+      6.0,
+      5.0
+     ],
+     "judge_correctness": [
+      3.0,
+      2.0,
+      1.0,
+      5.0,
+      6.0,
+      4.0
+     ],
+     "mc_key_f1": [
+      3.0,
+      1.0,
+      2.0,
+      4.0,
+      6.0,
+      5.0
+     ]
+    },
+    "W": 0.9492063492063492,
+    "P_exact_untied_null": 0.00013503086419753085,
+    "W_interval95": [
+     0.834920634920635,
+     0.9746031746031746
+    ]
+   },
+   "papers": {
+    "signals": [
+     "det (det_score_correctness_simfull)",
+     "judge (judge_correctness)",
+     "papers (mc_source_k3_precision)"
+    ],
+    "ranks": {
+     "det_score_correctness_simfull": [
+      3.0,
+      2.0,
+      1.0,
+      4.0,
+      6.0,
+      5.0
+     ],
+     "judge_correctness": [
+      3.0,
+      2.0,
+      1.0,
+      5.0,
+      6.0,
+      4.0
+     ],
+     "mc_source_k3_precision": [
+      5.0,
+      1.0,
+      6.0,
+      2.0,
+      4.0,
+      3.0
+     ]
+    },
+    "W": 0.44126984126984126,
+    "P_exact_untied_null": 0.2755420524691358,
+    "W_interval95": [
+     0.326984126984127,
+     0.5682539682539682
+    ]
+   },
+   "key_loose_recall": {
+    "signals": [
+     "loose (det_concept_recall_loose)",
+     "judge (judge_correctness)",
+     "key (mc_key_f1)"
+    ],
+    "ranks": {
+     "det_concept_recall_loose": [
+      3.0,
+      2.0,
+      1.0,
+      4.0,
+      6.0,
+      5.0
+     ],
+     "judge_correctness": [
+      3.0,
+      2.0,
+      1.0,
+      5.0,
+      6.0,
+      4.0
+     ],
+     "mc_key_f1": [
+      3.0,
+      1.0,
+      2.0,
+      4.0,
+      6.0,
+      5.0
+     ]
+    },
+    "W": 0.9492063492063492,
+    "P_exact_untied_null": 0.00013503086419753085,
+    "W_interval95": [
+     0.834920634920635,
+     0.9746031746031746
+    ]
+   },
+   "papers_loose_recall": {
+    "signals": [
+     "loose (det_concept_recall_loose)",
+     "judge (judge_correctness)",
+     "papers (mc_source_k3_precision)"
+    ],
+    "ranks": {
+     "det_concept_recall_loose": [
+      3.0,
+      2.0,
+      1.0,
+      4.0,
+      6.0,
+      5.0
+     ],
+     "judge_correctness": [
+      3.0,
+      2.0,
+      1.0,
+      5.0,
+      6.0,
+      4.0
+     ],
+     "mc_source_k3_precision": [
+      5.0,
+      1.0,
+      6.0,
+      2.0,
+      4.0,
+      3.0
+     ]
+    },
+    "W": 0.44126984126984126,
+    "P_exact_untied_null": 0.2755420524691358,
+    "W_interval95": [
+     0.30158730158730157,
+     0.5396825396825397
+    ]
+   }
+  },
+  "verified_pass_rank_high_is_1": {
+   "judge_correctness": 6,
+   "det_score_correctness_simfull": 6,
+   "det_concept_recall_loose": 6,
+   "mc_key_f1": 5,
+   "mc_source_k3_precision": 1
+  },
+  "split_verdicts": {
+   "threshold_3": {
+    "judge_pass_at": 3,
+    "answers": 516,
+    "split": 269,
+    "split_share": 0.5213178294573644,
+    "cells": {
+     "all three fail": 62,
+     "all three pass": 185,
+     "concepts and grounding, not the judge": 8,
+     "concepts only": 11,
+     "grounding only": 47,
+     "judge and concepts pass, grounding fails": 97,
+     "judge and grounding pass, concepts fail": 67,
+     "judge only": 39
+    }
+   },
+   "threshold_4": {
+    "judge_pass_at": 4,
+    "answers": 516,
+    "split": 285,
+    "split_share": 0.5523255813953488,
+    "cells": {
+     "all three fail": 83,
+     "all three pass": 148,
+     "concepts and grounding, not the judge": 45,
+     "concepts only": 39,
+     "grounding only": 88,
+     "judge and concepts pass, grounding fails": 69,
+     "judge and grounding pass, concepts fail": 26,
+     "judge only": 18
+    }
+   }
+  },
+  "verified_pass_minus_rlm_10": {
+   "papers_precision": {
+    "verified_pass": 0.7275581395348837,
+    "rlm_10": 0.5035976744186046,
+    "difference": 0.22396046511627907,
+    "interval95": [
+     0.16901287790697678,
+     0.2777517441860465
+    ],
+    "questions": 86
+   },
+   "judge_pass_points_threshold_3": {
+    "verified_pass": 56.97674418604651,
+    "rlm_10": 88.37209302325581,
+    "difference": -31.3953488372093,
+    "interval95": [
+     -43.02325581395349,
+     -18.6046511627907
+    ],
+    "questions": 86
+   },
+   "judge_pass_points_threshold_4": {
+    "verified_pass": 25.581395348837212,
+    "rlm_10": 67.44186046511628,
+    "difference": -41.86046511627907,
+    "interval95": [
+     -53.48837209302326,
+     -29.069767441860463
+    ],
+    "questions": 86
+   }
+  }
+ },
+ "inventory_comparison": [
+  {
+   "number": "w_papers",
+   "inventory": 0.441,
+   "source": "E_signals.txt:221 (0.441); LIST.md:157 and INVENTORY F10 (0.44)",
+   "this_script": 0.44126984126984126,
+   "this_script_at_the_inventory_precision": 0.441,
+   "equal": true
+  },
+  {
+   "number": "w_papers_p",
+   "inventory": 0.28,
+   "source": "E_signals.txt:221 (P 0.28)",
+   "this_script": 0.2755420524691358,
+   "this_script_at_the_inventory_precision": 0.28,
+   "equal": true
+  },
+  {
+   "number": "w_key",
+   "inventory": 0.949,
+   "source": "E_signals.txt:220 (0.949); INVENTORY A11 anchor variant",
+   "this_script": 0.9492063492063492,
+   "this_script_at_the_inventory_precision": 0.949,
+   "equal": true
+  },
+  {
+   "number": "w_key_p",
+   "inventory": 0.0001,
+   "source": "E_signals.txt:220 (exact permutation P 0.0001)",
+   "this_script": 0.00013503086419753085,
+   "this_script_at_the_inventory_precision": 0.0001,
+   "equal": true
+  },
+  {
+   "number": "split_t3",
+   "inventory": 269,
+   "source": "E_signals.txt:64; LIST.md:159; INVENTORY F10 (269 of 516)",
+   "this_script": 269,
+   "this_script_at_the_inventory_precision": 269,
+   "equal": true
+  },
+  {
+   "number": "papers_diff",
+   "inventory": 0.224,
+   "source": "E_signals.txt:100 (+0.224); LIST.md:163 and INVENTORY F10 (+0.22)",
+   "this_script": 0.22396046511627907,
+   "this_script_at_the_inventory_precision": 0.224,
+   "equal": true
+  },
+  {
+   "number": "papers_diff_ci_lo",
+   "inventory": 0.174,
+   "source": "E_signals.txt:100 (2,000 resamples, seed 20261014)",
+   "this_script": 0.16901287790697678,
+   "this_script_at_the_inventory_precision": 0.169,
+   "equal": false
+  },
+  {
+   "number": "papers_diff_ci_hi",
+   "inventory": 0.278,
+   "source": "E_signals.txt:100 (2,000 resamples, seed 20261014)",
+   "this_script": 0.2777517441860465,
+   "this_script_at_the_inventory_precision": 0.278,
+   "equal": true
+  },
+  {
+   "number": "papers_mean_verified_pass",
+   "inventory": 0.728,
+   "source": "E_signals.txt:102 (answer mean 0.728)",
+   "this_script": 0.7275581395348837,
+   "this_script_at_the_inventory_precision": 0.728,
+   "equal": true
+  },
+  {
+   "number": "pass_diff_t3_points",
+   "inventory": -31.4,
+   "source": "E_signals.txt:97 (-31.4 points); LIST.md:163 (31 points below RLM-10)",
+   "this_script": -31.3953488372093,
+   "this_script_at_the_inventory_precision": -31.4,
+   "equal": true
+  },
+  {
+   "number": "split_t3_cells",
+   "inventory": {
+    "judge and concepts pass, grounding fails": 97,
+    "judge and grounding pass, concepts fail": 67,
+    "judge only": 39,
+    "grounding only": 47,
+    "concepts only": 11,
+    "concepts and grounding, not the judge": 8,
+    "all three pass": 185,
+    "all three fail": 62
+   },
+   "source": "E_signals.txt:63-70",
+   "this_script": {
+    "all three fail": 62,
+    "all three pass": 185,
+    "concepts and grounding, not the judge": 8,
+    "concepts only": 11,
+    "grounding only": 47,
+    "judge and concepts pass, grounding fails": 97,
+    "judge and grounding pass, concepts fail": 67,
+    "judge only": 39
+   },
+   "this_script_at_the_inventory_precision": {
+    "all three fail": 62,
+    "all three pass": 185,
+    "concepts and grounding, not the judge": 8,
+    "concepts only": 11,
+    "grounding only": 47,
+    "judge and concepts pass, grounding fails": 97,
+    "judge and grounding pass, concepts fail": 67,
+    "judge only": 39
+   },
+   "equal": true
+  }
+ ],
+ "numbers_v25_status": {
+  "provisional": true,
+  "concept_recall": "D181's reading on key v2.5 on every answer (concept_recall_d181)",
+  "judge_correctness_on_v24": {
+   "answers": 324,
+   "questions": 54,
+   "why": "the questions whose judge fields v2.5 changed (S512.changed_ids); no run has judged exp04 on key v2.5"
+  },
+  "answer_key_signals_on_v24": {
+   "answers": 6,
+   "questions": [
+    "CD_006"
+   ],
+   "columns": [
+    "mc_key_f1",
+    "det_score_correctness_simfull"
+   ],
+   "why": "the question whose expected_answer v2.5 changed: MiniCheck against the key and the bge-m3 similarity in the deterministic correctness read it"
+  },
+  "unchanged_by_v25": [
+   "mc_source_k3_precision"
+  ]
+ },
+ "numbers_v25": {
+  "questions": 86,
+  "answers": 516,
+  "means": {
+   "judge_correctness": {
+    "single_pass": 2.8488372093023258,
+    "multi_hop": 2.6744186046511627,
+    "verified_pass": 2.4069767441860463,
+    "rlm_5": 3.546511627906977,
+    "rlm_10": 3.616279069767442,
+    "rlm_20": 3.4186046511627906
+   },
+   "det_score_correctness_simfull": {
+    "single_pass": 2.2209302325581395,
+    "multi_hop": 1.930232558139535,
+    "verified_pass": 1.9069767441860466,
+    "rlm_5": 3.104651162790698,
+    "rlm_10": 3.302325581395349,
+    "rlm_20": 3.186046511627907
+   },
+   "concept_recall_d181": {
+    "single_pass": 0.3423313953488372,
+    "multi_hop": 0.33089883720930224,
+    "verified_pass": 0.264506976744186,
+    "rlm_5": 0.6544220930232558,
+    "rlm_10": 0.7097558139534885,
+    "rlm_20": 0.6746941860465118
+   },
+   "mc_key_f1": {
+    "single_pass": 0.1625209302325582,
+    "multi_hop": 0.1200593023255814,
+    "verified_pass": 0.1404383720930233,
+    "rlm_5": 0.23571511627906971,
+    "rlm_10": 0.25085581395348855,
+    "rlm_20": 0.24545000000000006
+   },
+   "mc_source_k3_precision": {
+    "single_pass": 0.6902848837209301,
+    "multi_hop": 0.3378767441860465,
+    "verified_pass": 0.7275581395348838,
+    "rlm_5": 0.47498255813953505,
+    "rlm_10": 0.5035976744186046,
+    "rlm_20": 0.48492209302325595
+   }
+  },
+  "kendall_w": {
+   "key": {
+    "signals": [
+     "det (det_score_correctness_simfull)",
+     "judge (judge_correctness)",
+     "key (mc_key_f1)"
+    ],
+    "ranks": {
+     "det_score_correctness_simfull": [
+      3.0,
+      2.0,
+      1.0,
+      4.0,
+      6.0,
+      5.0
+     ],
+     "judge_correctness": [
+      3.0,
+      2.0,
+      1.0,
+      5.0,
+      6.0,
+      4.0
+     ],
+     "mc_key_f1": [
+      3.0,
+      1.0,
+      2.0,
+      4.0,
+      6.0,
+      5.0
+     ]
+    },
+    "W": 0.9492063492063492,
+    "P_exact_untied_null": 0.00013503086419753085,
+    "W_interval95": [
+     0.834920634920635,
+     0.9746031746031746
+    ]
+   },
+   "papers": {
+    "signals": [
+     "det (det_score_correctness_simfull)",
+     "judge (judge_correctness)",
+     "papers (mc_source_k3_precision)"
+    ],
+    "ranks": {
+     "det_score_correctness_simfull": [
+      3.0,
+      2.0,
+      1.0,
+      4.0,
+      6.0,
+      5.0
+     ],
+     "judge_correctness": [
+      3.0,
+      2.0,
+      1.0,
+      5.0,
+      6.0,
+      4.0
+     ],
+     "mc_source_k3_precision": [
+      5.0,
+      1.0,
+      6.0,
+      2.0,
+      4.0,
+      3.0
+     ]
+    },
+    "W": 0.44126984126984126,
+    "P_exact_untied_null": 0.2755420524691358,
+    "W_interval95": [
+     0.326984126984127,
+     0.5682539682539682
+    ]
+   },
+   "key_d181_recall": {
+    "signals": [
+     "loose (concept_recall_d181)",
+     "judge (judge_correctness)",
+     "key (mc_key_f1)"
+    ],
+    "ranks": {
+     "concept_recall_d181": [
+      3.0,
+      2.0,
+      1.0,
+      4.0,
+      6.0,
+      5.0
+     ],
+     "judge_correctness": [
+      3.0,
+      2.0,
+      1.0,
+      5.0,
+      6.0,
+      4.0
+     ],
+     "mc_key_f1": [
+      3.0,
+      1.0,
+      2.0,
+      4.0,
+      6.0,
+      5.0
+     ]
+    },
+    "W": 0.9492063492063492,
+    "P_exact_untied_null": 0.00013503086419753085,
+    "W_interval95": [
+     0.8222222222222222,
+     0.9746031746031746
+    ]
+   },
+   "papers_d181_recall": {
+    "signals": [
+     "loose (concept_recall_d181)",
+     "judge (judge_correctness)",
+     "papers (mc_source_k3_precision)"
+    ],
+    "ranks": {
+     "concept_recall_d181": [
+      3.0,
+      2.0,
+      1.0,
+      4.0,
+      6.0,
+      5.0
+     ],
+     "judge_correctness": [
+      3.0,
+      2.0,
+      1.0,
+      5.0,
+      6.0,
+      4.0
+     ],
+     "mc_source_k3_precision": [
+      5.0,
+      1.0,
+      6.0,
+      2.0,
+      4.0,
+      3.0
+     ]
+    },
+    "W": 0.44126984126984126,
+    "P_exact_untied_null": 0.2755420524691358,
+    "W_interval95": [
+     0.28888888888888886,
+     0.5047619047619047
+    ]
+   }
+  },
+  "verified_pass_rank_high_is_1": {
+   "judge_correctness": 6,
+   "det_score_correctness_simfull": 6,
+   "concept_recall_d181": 6,
+   "mc_key_f1": 5,
+   "mc_source_k3_precision": 1
+  },
+  "split_verdicts": {
+   "threshold_3": {
+    "judge_pass_at": 3,
+    "answers": 516,
+    "split": 276,
+    "split_share": 0.5348837209302325,
+    "cells": {
+     "all three fail": 71,
+     "all three pass": 169,
+     "concepts and grounding, not the judge": 7,
+     "concepts only": 2,
+     "grounding only": 48,
+     "judge and concepts pass, grounding fails": 93,
+     "judge and grounding pass, concepts fail": 83,
+     "judge only": 43
+    }
+   },
+   "threshold_4": {
+    "judge_pass_at": 4,
+    "answers": 516,
+    "split": 283,
+    "split_share": 0.5484496124031008,
+    "cells": {
+     "all three fail": 94,
+     "all three pass": 139,
+     "concepts and grounding, not the judge": 37,
+     "concepts only": 28,
+     "grounding only": 96,
+     "judge and concepts pass, grounding fails": 67,
+     "judge and grounding pass, concepts fail": 35,
+     "judge only": 20
+    }
+   }
+  },
+  "verified_pass_minus_rlm_10": {
+   "papers_precision": {
+    "verified_pass": 0.7275581395348837,
+    "rlm_10": 0.5035976744186046,
+    "difference": 0.22396046511627907,
+    "interval95": [
+     0.16901287790697678,
+     0.2777517441860465
+    ],
+    "questions": 86
+   },
+   "judge_pass_points_threshold_3": {
+    "verified_pass": 56.97674418604651,
+    "rlm_10": 88.37209302325581,
+    "difference": -31.3953488372093,
+    "interval95": [
+     -43.02325581395349,
+     -18.6046511627907
+    ],
+    "questions": 86
+   },
+   "judge_pass_points_threshold_4": {
+    "verified_pass": 25.581395348837212,
+    "rlm_10": 67.44186046511628,
+    "difference": -41.86046511627907,
+    "interval95": [
+     -53.48837209302326,
+     -29.069767441860463
+    ],
+    "questions": 86
+   }
+  }
+ }
+}

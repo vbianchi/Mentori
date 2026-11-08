@@ -1,0 +1,74 @@
+{
+ "proposal": "Proposed, not run (design Q1, Valerio's call): scripts/S513_absent_decline.py, built as S512 is (judge_passages imported, the lock's [judge] call), with two things changed: the prompt (the decline prompt, answerable=False) and the selection (G4's draw-1 answers to answerable and false-premise questions of the common set whose source or refuting paper is not among the index's core papers: 69 questions x 18 runs at 5 core papers and 45 x 18 at 10, 2,052 answers, those with text judged). Set S7G4A, out out_s7_absent_g4, its run_sha256 hashing the selection. Gate first: re-judge the 39's decline-prompt answers of one index and require the scores S3 stored. Optional: the D98 subset's draws 2 and 3 (subset_answers_planned_draws_2_3). Scored as Rule 9's refusal (refused = refusal_accuracy 3 or more), reported per size as a third group, never pooled (D76 Q131).",
+ "scored": false,
+ "sizes": {
+  "10": {
+   "answered_draw1": 784,
+   "answers_draw1": 810,
+   "by_group": {
+    "answerable": 756,
+    "false_premise": 54
+   },
+   "failed_draw1": 26,
+   "g4r38_reruns_judged_draw1": 3,
+   "questions": 45,
+   "questions_in_subset": 16,
+   "rows_answerable_prompt": 787,
+   "rows_decline_prompt": 0,
+   "subset_answers_planned_draws_2_3": 576,
+   "to_judge_draw1": 787
+  },
+  "20": {
+   "answered_draw1": 0,
+   "answers_draw1": 0,
+   "by_group": {},
+   "failed_draw1": 0,
+   "g4r38_reruns_judged_draw1": 0,
+   "questions": 0,
+   "questions_in_subset": 0,
+   "rows_answerable_prompt": 0,
+   "rows_decline_prompt": 0,
+   "subset_answers_planned_draws_2_3": 0,
+   "to_judge_draw1": 0
+  },
+  "5": {
+   "answered_draw1": 1223,
+   "answers_draw1": 1242,
+   "by_group": {
+    "answerable": 1152,
+    "false_premise": 90
+   },
+   "failed_draw1": 19,
+   "g4r38_reruns_judged_draw1": 6,
+   "questions": 69,
+   "questions_in_subset": 24,
+   "rows_answerable_prompt": 1229,
+   "rows_decline_prompt": 0,
+   "subset_answers_planned_draws_2_3": 864,
+   "to_judge_draw1": 1229
+  },
+  "50": {
+   "answered_draw1": 0,
+   "answers_draw1": 0,
+   "by_group": {},
+   "failed_draw1": 0,
+   "g4r38_reruns_judged_draw1": 0,
+   "questions": 0,
+   "questions_in_subset": 0,
+   "rows_answerable_prompt": 0,
+   "rows_decline_prompt": 0,
+   "subset_answers_planned_draws_2_3": 0,
+   "to_judge_draw1": 0
+  }
+ },
+ "to_judge_how": "the answers with text, and the G4R38 keys whose rerun text S3 judged (their input line is the failed call; the text is in findings/recompute/fig3_g4r38_inputs)",
+ "total": {
+  "answered_draw1": 2007,
+  "answers_draw1": 2052,
+  "g4r38_reruns_judged_draw1": 9,
+  "rows_decline_prompt": 0,
+  "subset_answers_planned_draws_2_3": 1440,
+  "to_judge_draw1": 2016
+ },
+ "why_not_scored": "no decline-prompt judge row exists for these answers: S3 judged them on the answerable prompt (Rule 8 by the question's group), and the decline prompt (scripts/S141_runner/judge.py:86-87) carries only the question and the answer"
+}

@@ -1,0 +1,352 @@
+{
+ "provenance": {
+  "script": "scripts/S486_faithfulness_paired.py",
+  "script_sha256": "200dc6afb0a5143747b972663371e9d59264326e666a0583f6ef21652f9d14a1",
+  "command": "uv run python scripts/S486_faithfulness_paired.py",
+  "inputs": [
+   {
+    "path": "findings/recompute/fig2_inputs/g1_collect.jsonl",
+    "sha256": "f5ff75bc244cda492a48e7e11f54f2007ed7d586a8f49e78921edd7244b28965",
+    "role": "S3's G1 collect of 23 Oct, frozen set fig2 (fig_repro.frozen)"
+   },
+   {
+    "path": "data/ground_truth_v2/all_v2_4.json",
+    "sha256": "5d8362ae931dc0fe0cc132be6b5e57187e3ae7d3131d86f63cdf1a44633fadd5",
+    "role": "answer key v2.4 (question types)"
+   },
+   {
+    "path": "data/ground_truth_v2/ground_truth_v2_4_as_v1.json",
+    "sha256": "e971de522df6fab54a070e44736b6cb28a5ebd26bab07ca9e1513230bb86f4ef",
+    "role": "the D5 key (answerable or not)"
+   },
+   {
+    "path": "findings/figures_provisional/fig5/fig5_data_state.json",
+    "sha256": "27cfd169ce8db4ed6d90af4c09a6de0ede7fff4c4b90cf0c2e34481f040b0857",
+    "role": "anchor: Figure 6's d_all (S473 compute(), written by S497)"
+   },
+   {
+    "path": "findings/figures_provisional/fig5/figure6_numbers.json",
+    "sha256": "97c5b09905d441a972df2bf87cb4f5c55991784da17791da08bc19913154d3a3",
+    "role": "anchor: S497 sheet Fig. 6d (judge pass and fail rows summed)"
+   },
+   {
+    "path": "findings/figures_provisional/fig5/figure6_provenance.json",
+    "sha256": "d90c10bc85474d46d44ba5cdec494e1f66835f74b96bc3843edbcfde40d59822",
+    "role": "anchor: the collect sha256 Figure 6 read"
+   },
+   {
+    "path": "data/ground_truth_v2/ground_truth_v2_5_as_v1.json",
+    "sha256": "a42161841980792f5da521819c97b16dc54999b45838b8eb87cd4315f798270a",
+    "role": "answer key v2.5: the key of the S6 rows chosen (judge_rows_v25)"
+   },
+   {
+    "path": "findings/recompute/fig3_s6_inputs/SHA256SUMS",
+    "sha256": "49fd1d0b39a4588abd4b13ece27efc4a8759710111de8fe475e785601ab361a4",
+    "role": "the frozen fig3_s6 set's list of files (S528)"
+   }
+  ],
+  "ported_from": "scratch audit_1025/synthesis/faith86.py (INVENTORY.md F9, A10)",
+  "reproduced": [
+   "with passages 5/5 on the frozen v2.4 collect: 1,130 of 1,539, the known value",
+   "with passages 5/5 on key v2.5, the frozen fig3_s6 set: 1,133 of 1,539, the known value",
+   "collect sha256 f5ff75bc244c equals the one findings/figures_provisional/fig5/figure6_provenance.json records",
+   "with passages 5/5 1,133 of 1,539 and the counts at scores 0 to 5 equal findings/figures_provisional/fig5/fig5_data_state.json d_all",
+   "per strategy, the with-passages counts at scores 0 to 5 equal findings/figures_provisional/fig5/figure6_numbers.json sheet Fig. 6d (judge pass and fail rows summed; 6 of 6 strategies)",
+   "judge rows (D188, judge_rows_v25 through S463.judge_rows): key v2.5 for every answer of the 132 changed questions read (1,080)"
+  ],
+  "s6_folder": "findings/recompute/fig3_s6_inputs",
+  "plate_held_on": "key v2.5",
+  "code_sha256": {
+   "scripts/S463_fig2_ranking.py": "2f93a2b5df2bd68bdcf38a372d6c737ecdbce54a4e68406f0b261e03fbd9af31",
+   "scripts/judge_rows_v25.py": "aa90f42264e2ce21acfca52c2421d852607418981b6e9be8d8984a716b1ebddd"
+  }
+ },
+ "judge_rows": {
+  "reader": "scripts/judge_rows_v25.py (D186 (3)): an answer's key v2.5 row (S512, out_s6_g1 with out_s6_g1r15 as --replace) where one exists, else its key v2.4 row (out/ with out_g1r15/)",
+  "status": "key v2.5 for every answer of the 132 changed questions read (1,080)",
+  "provisional": false,
+  "answers_read": 2430,
+  "cells_from_v25": 1080,
+  "awaiting_s6_read": 0,
+  "sources": {
+   "G1": {
+    "kind": "v2.4",
+    "present": true,
+    "run_sha256": "38ae79ab023b97562b69b2875b3c8001b02f887d5578121103b85d4a0b4729da",
+    "rows": 2430,
+    "replace": {
+     "keys": 15,
+     "rows_from_replace": 15
+    }
+   },
+   "S6G1": {
+    "kind": "v2.5 changed",
+    "present": true,
+    "missing": [],
+    "run_sha256": "211568dbdfa09482e9c0abfb3b1da92d0bbd62d14a7646058663a990cbb54235",
+    "rows": 1080,
+    "replace": {
+     "keys": 15,
+     "rows_from_replace": 5
+    }
+   }
+  }
+ },
+ "definitions": {
+  "questions": "the 86 answerable questions of the D5 key (S463.key_groups), all three draws",
+  "rows": "per answer the key v2.5 judge row where S6 has judged one, else the frozen v2.4 collect's row (judge_rows_v25 through S463.judge_rows; both calls a and b come from the row chosen); counts_v24 is the v2.4 collect alone, the anchor",
+  "plain": "call a, the judge without passages; a score counts when the call's status is ok",
+  "passages": "call b, the judge with the retrieved passages; a score counts when the call's status is ok",
+  "paired_up_to5": "both scored; 5 with passages, below 5 plain",
+  "paired_down_from5": "both scored; 5 plain, below 5 with passages",
+  "c0": "the plain call's correctness score is 0; each call's n is the c0 answers that call scored",
+  "not_ok_by_status": "answerable answers whose call (plain or passages) has a status other than ok, by that status ('absent' when the row holds no such call); they are left out of that call's n, so each call's n plus its not-ok answers is the answerable answers"
+ },
+ "summary": {
+  "plain_5of5": "945 of 1545",
+  "passages_5of5": "1133 of 1539",
+  "paired_up_to5": 226,
+  "paired_down_from5": 37,
+  "paired_n": 1539,
+  "c0_plain_5of5": "1 of 38",
+  "c0_passages_5of5": "6 of 38",
+  "plain_not_ok": "3 (no_answer 3)",
+  "passages_not_ok": "9 (error 6, no_answer 3)"
+ },
+ "counts": {
+  "all": {
+   "plain_n": 1545,
+   "plain_at5": 945,
+   "passages_n": 1539,
+   "passages_at5": 1133,
+   "paired_n": 1539,
+   "paired_both5": 907,
+   "paired_up_to5": 226,
+   "paired_down_from5": 37,
+   "c0_plain_n": 38,
+   "c0_plain_at5": 1,
+   "c0_passages_n": 38,
+   "c0_passages_at5": 6,
+   "plain_share_at5_pct": 61.165049,
+   "passages_share_at5_pct": 73.619233,
+   "passages_score_counts": {
+    "0": 36,
+    "1": 24,
+    "2": 45,
+    "3": 75,
+    "4": 226,
+    "5": 1133
+   },
+   "plain_not_ok_by_status": {
+    "no_answer": 3
+   },
+   "passages_not_ok_by_status": {
+    "error": 6,
+    "no_answer": 3
+   }
+  },
+  "single_pass": {
+   "plain_n": 258,
+   "plain_at5": 195,
+   "passages_n": 258,
+   "passages_at5": 229,
+   "paired_n": 258,
+   "paired_both5": 191,
+   "paired_up_to5": 38,
+   "paired_down_from5": 4,
+   "c0_plain_n": 2,
+   "c0_plain_at5": 1,
+   "c0_passages_n": 2,
+   "c0_passages_at5": 1,
+   "plain_share_at5_pct": 75.581395,
+   "passages_share_at5_pct": 88.75969,
+   "passages_score_counts": {
+    "0": 1,
+    "1": 0,
+    "2": 0,
+    "3": 2,
+    "4": 26,
+    "5": 229
+   },
+   "plain_not_ok_by_status": {},
+   "passages_not_ok_by_status": {}
+  },
+  "multi_hop": {
+   "plain_n": 258,
+   "plain_at5": 177,
+   "passages_n": 258,
+   "passages_at5": 203,
+   "paired_n": 258,
+   "paired_both5": 177,
+   "paired_up_to5": 26,
+   "paired_down_from5": 0,
+   "c0_plain_n": 2,
+   "c0_plain_at5": 0,
+   "c0_passages_n": 2,
+   "c0_passages_at5": 0,
+   "plain_share_at5_pct": 68.604651,
+   "passages_share_at5_pct": 78.682171,
+   "passages_score_counts": {
+    "0": 1,
+    "1": 2,
+    "2": 2,
+    "3": 12,
+    "4": 38,
+    "5": 203
+   },
+   "plain_not_ok_by_status": {},
+   "passages_not_ok_by_status": {}
+  },
+  "verified_pass": {
+   "plain_n": 257,
+   "plain_at5": 199,
+   "passages_n": 257,
+   "passages_at5": 240,
+   "paired_n": 257,
+   "paired_both5": 197,
+   "paired_up_to5": 43,
+   "paired_down_from5": 2,
+   "c0_plain_n": 9,
+   "c0_plain_at5": 0,
+   "c0_passages_n": 9,
+   "c0_passages_at5": 5,
+   "plain_share_at5_pct": 77.431907,
+   "passages_share_at5_pct": 93.385214,
+   "passages_score_counts": {
+    "0": 0,
+    "1": 0,
+    "2": 1,
+    "3": 7,
+    "4": 9,
+    "5": 240
+   },
+   "plain_not_ok_by_status": {
+    "no_answer": 1
+   },
+   "passages_not_ok_by_status": {
+    "no_answer": 1
+   }
+  },
+  "rlm_5": {
+   "plain_n": 257,
+   "plain_at5": 131,
+   "passages_n": 255,
+   "passages_at5": 155,
+   "paired_n": 255,
+   "paired_both5": 116,
+   "paired_up_to5": 39,
+   "paired_down_from5": 14,
+   "c0_plain_n": 9,
+   "c0_plain_at5": 0,
+   "c0_passages_n": 9,
+   "c0_passages_at5": 0,
+   "plain_share_at5_pct": 50.972763,
+   "passages_share_at5_pct": 60.784314,
+   "passages_score_counts": {
+    "0": 8,
+    "1": 9,
+    "2": 10,
+    "3": 19,
+    "4": 54,
+    "5": 155
+   },
+   "plain_not_ok_by_status": {
+    "no_answer": 1
+   },
+   "passages_not_ok_by_status": {
+    "error": 2,
+    "no_answer": 1
+   }
+  },
+  "rlm_10": {
+   "plain_n": 257,
+   "plain_at5": 125,
+   "passages_n": 254,
+   "passages_at5": 154,
+   "paired_n": 254,
+   "paired_both5": 117,
+   "paired_up_to5": 37,
+   "paired_down_from5": 8,
+   "c0_plain_n": 10,
+   "c0_plain_at5": 0,
+   "c0_passages_n": 10,
+   "c0_passages_at5": 0,
+   "plain_share_at5_pct": 48.638132,
+   "passages_share_at5_pct": 60.629921,
+   "passages_score_counts": {
+    "0": 13,
+    "1": 5,
+    "2": 14,
+    "3": 18,
+    "4": 50,
+    "5": 154
+   },
+   "plain_not_ok_by_status": {
+    "no_answer": 1
+   },
+   "passages_not_ok_by_status": {
+    "error": 3,
+    "no_answer": 1
+   }
+  },
+  "rlm_20": {
+   "plain_n": 258,
+   "plain_at5": 118,
+   "passages_n": 257,
+   "passages_at5": 152,
+   "paired_n": 257,
+   "paired_both5": 109,
+   "paired_up_to5": 43,
+   "paired_down_from5": 9,
+   "c0_plain_n": 6,
+   "c0_plain_at5": 0,
+   "c0_passages_n": 6,
+   "c0_passages_at5": 0,
+   "plain_share_at5_pct": 45.736434,
+   "passages_share_at5_pct": 59.143969,
+   "passages_score_counts": {
+    "0": 13,
+    "1": 8,
+    "2": 18,
+    "3": 17,
+    "4": 49,
+    "5": 152
+   },
+   "plain_not_ok_by_status": {},
+   "passages_not_ok_by_status": {
+    "error": 1
+   }
+  }
+ },
+ "counts_v24": {
+  "plain_n": 1545,
+  "plain_at5": 941,
+  "passages_n": 1539,
+  "passages_at5": 1130,
+  "paired_n": 1539,
+  "paired_both5": 907,
+  "paired_up_to5": 223,
+  "paired_down_from5": 33,
+  "c0_plain_n": 41,
+  "c0_plain_at5": 2,
+  "c0_passages_n": 41,
+  "c0_passages_at5": 7,
+  "plain_share_at5_pct": 60.906149,
+  "passages_share_at5_pct": 73.424301,
+  "passages_score_counts": {
+   "0": 37,
+   "1": 23,
+   "2": 40,
+   "3": 75,
+   "4": 234,
+   "5": 1130
+  },
+  "plain_not_ok_by_status": {
+   "no_answer": 3
+  },
+  "passages_not_ok_by_status": {
+   "error": 6,
+   "no_answer": 3
+  }
+ }
+}

@@ -1,0 +1,80 @@
+{
+ "provenance": {
+  "script": "scripts/distiller_count_g3_d1.py",
+  "script_sha256": "1d3e8ff45944fe934eab7f698879b4a3afe114373513aafeb7efe840d31d5643",
+  "command": "uv run python scripts/distiller_count_g3_d1.py",
+  "inputs": [
+   {
+    "path": "fig4_records_1023.tar",
+    "sha256": "7283205a989ba66179c78bb36b7add786a45f224f38fdf7a45af52a351fa5e72",
+    "role": "frozen tar (findings/recompute/frozen_inputs/SHA256SUMS)"
+   },
+   {
+    "path": "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__full_orchestrator__exp_v4_s20_n0/answers.json",
+    "sha256": "3a91380cf2b620fdc573ec78a2f91b824a3ceac811d62e430fe48041729c812c",
+    "role": "G3 full_orchestrator answers"
+   },
+   {
+    "path": "experiments/mentori/orchestrator/distiller_firing.py",
+    "sha256": "0a62f360852bd64162d43da9f75b128a33145f620533c52417095509eb83feb7",
+    "role": "the counting function"
+   },
+   {
+    "path": "experiments/LOCK.toml",
+    "sha256": "8730d401a5d7b6baa1780e656f844261eaead60e45b5199afa29d57f989ad495",
+    "role": "num_ctx for the threshold"
+   },
+   {
+    "path": "findings/figures_provisional/fig4/figure5_provenance.json",
+    "sha256": "b7dd973a1910f2d4ac23e0ed46963127697369cf8953869212ac9ba2c9a03983",
+    "role": "anchor: the answers file's recorded sha256"
+   }
+  ],
+  "reproduced": [
+   "answers.json sha256 3a91380cf2b6 equals figure5_provenance.json's record",
+   "threshold 209,712 characters (LOCK num_ctx) and 135 draw-1 answers, as RUNNING.md 26 Oct 21:20"
+  ]
+ },
+ "result": {
+  "answers_path": "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__full_orchestrator__exp_v4_s20_n0/answers.json",
+  "threshold_chars": 209712,
+  "answers": 135,
+  "step_attempts": 146,
+  "steps_over_threshold": 0,
+  "distill_status": {
+   "not_asked": 146
+  },
+  "largest_step_output": {
+   "chars": 62712,
+   "answer_key": "exp_v4_s20_n0|full_orchestrator|OOD_048|d1",
+   "step_id": "step_1",
+   "attempt_no": 1
+  },
+  "distiller_fired_in_mentori_as_built": false
+ },
+ "against_running_md_26oct_2120": {
+  "running_md": {
+   "answers": 135,
+   "step_attempts": 146,
+   "steps_over_threshold": 0,
+   "distill_status": {
+    "not_asked": 146
+   },
+   "largest_chars": 62712,
+   "largest_answer_key": "exp_v4_s20_n0|full_orchestrator|OOD_048|d1",
+   "largest_step_id": "step_1"
+  },
+  "this_run": {
+   "answers": 135,
+   "step_attempts": 146,
+   "steps_over_threshold": 0,
+   "distill_status": {
+    "not_asked": 146
+   },
+   "largest_chars": 62712,
+   "largest_answer_key": "exp_v4_s20_n0|full_orchestrator|OOD_048|d1",
+   "largest_step_id": "step_1"
+  },
+  "equal": true
+ }
+}

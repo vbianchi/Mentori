@@ -1,0 +1,1485 @@
+{
+ "script": "scripts/S472_fig4_panels.py",
+ "script_sha256": "3e455cc6e435d4bc6ed99ccb0311bae72049776b330a4b43945a6be545a9f4aa",
+ "command": "uv run --frozen python scripts/S472_fig4_panels.py figure",
+ "python": "3.13.11",
+ "frozen_inputs": {
+  "sums": {
+   "path": "findings/recompute/frozen_inputs/SHA256SUMS",
+   "sha256": "3e29c46426981fd1cfa45b51241b0f4a71899e1c011c60388c8bfb7e44bba423"
+  },
+  "read_by_default": {
+   "records": "fig4_records_1023:fig4_records_1023",
+   "collect": "fig4_g9:g3_collect.jsonl",
+   "g9_retrievals": "fig4_g9:g9_retrievals/findings/runs",
+   "rlm_collect": "fig2:g1_collect.jsonl",
+   "rlm_answers": "fig2_g1r15_inputs:fig2_g1r15_inputs/runs",
+   "g9": "g9:.",
+   "s6_g1": "fig3_s6:."
+  },
+  "pinned": {
+   "fig4_records_1023:fig4_records_1023/PULL.json": "23b1360f37aad4e0b2450d9234aa7ffbce180e6a1124b866fb0c311b5c4efe7e",
+   "fig4_g9:g3_collect.jsonl": "527fd71e53f30ca77f6ca050be58206a08e99b55b87e8d58887f5486bbdd4bae",
+   "fig4_g9:g3_collect.jsonl.json": "047a84919456d72557d581d83d6584ac8440158201a1ebec067be6b26d03b297",
+   "fig4_g9:g9_retrievals/PULL.json": "034a9c5a2ed4352e829f216508d912e3b01693c819dada576127ee4ba2d3b252",
+   "fig2:g1_collect.jsonl": "f5ff75bc244cda492a48e7e11f54f2007ed7d586a8f49e78921edd7244b28965",
+   "fig2:g1_collect.jsonl.json": "04996e9dd9c3cca49177068f0143fbe0d1c7fa265a4eb6f617d24551f501f895",
+   "fig2_g1r15_inputs:fig2_g1r15_inputs/MANIFEST.sha256": "60c1f703d7b5853ec7bd5aebaecec9ac50ea3cb078b1f44741c5964427635b2e",
+   "fig2_g1r15_inputs:fig2_g1r15_inputs/runs/exp_01__verified_pass__exp_v4_s20_n0/answers.jsonl": "1ce4b1052912d8592b912da29ed987df9c2a4baca575cf80cc2b9d33334f8148",
+   "fig2_g1r15_inputs:fig2_g1r15_inputs/runs/exp_01__rlm_5__exp_v4_s20_n0/answers.jsonl": "cc10c9eb881fa9618ff2fb8ec7a3f1bb9cf58662827cd67b326e47f67b51d42c",
+   "fig2_g1r15_inputs:fig2_g1r15_inputs/runs/exp_01__rlm_10__exp_v4_s20_n0/answers.jsonl": "ecb6de5343d172894fd56d57997e3301d70ca3fb509ae2cd65f8e47eb8c268b7",
+   "fig2_g1r15_inputs:fig2_g1r15_inputs/runs/exp_01__rlm_20__exp_v4_s20_n0/answers.jsonl": "1e5b124d8bbd98640c87051916305ed0c04d668447967c60a08d6945fca32c62",
+   "g9:PULL.json": "e7f9abed14cee406c3c1934af3ea0257bfc06da9d1401213ce5fd913384f61f9"
+  },
+  "files": {
+   "fig4_records_1023.tar:fig4_records_1023/PULL.json": "23b1360f37aad4e0b2450d9234aa7ffbce180e6a1124b866fb0c311b5c4efe7e",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/g3_draw1_stop.log": "cddd863631fc95fe9cde0e76889c25de794ea51be8910a33314a23c961c2841c",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/g3_full_orchestrator.end.json": "d19407b567f47cd90a82cf6d2ff903576ce9effe6fe103f42052e9769f258406",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/g3_full_orchestrator.start.json": "d2ed625f54d8b8ca1728cc98159ab5f5ea3c181d95cede3418afa59260ac30e6",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/g3_naive_rag.end.json": "9dba5b253958206a0699cb82d375b6252cdf057fdfd0330b72aad2374a9e1e77",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/g3_naive_rag.start.json": "0a10446b1be5ca139d40c0849e191278405a6269648ca60d04bc0cd1d8677222",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/g3_orch_factual_to_documents.end.json": "1b5ebfc81ac041f919da1809f09c9c0dfc6dff5eb792d01c9ebab36bc12c5cf3",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/g3_orch_factual_to_documents.start.json": "bec618b7212b7785d0c289db050949a9266922856c628b83d9ad62264b33bc56",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/g3_orch_factual_to_documents_attempt_20261018T122155Z/g3_orch_factual_to_documents.end.json": "522cf897322fd117181826c4b1ab979c037342c7c364c527b9de9d5d58945cde",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/g3_orch_factual_to_documents_attempt_20261018T122155Z/g3_orch_factual_to_documents.start.json": "8650e4a212381b35c4b3a46c3e207896338c5ffe1f5ff45652820f56ca1245cd",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/g3_orch_no_analyser.end.json": "a0e0cc61ce8236bc309d85c1fe6d8cc2e358e2d74700f0492184b3223066c13b",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/g3_orch_no_analyser.start.json": "76b5262291199ab95dbd0a5902a1771abddb87c9de77f8fcc3ea29a52f408747",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/g3_orch_no_planner.end.json": "ba65ce46725cea93604a136d9ce8472f7df3e3ce88d297fe7276da36b437a854",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/g3_orch_no_planner.start.json": "c237527df6c0641893d50364e93096730677ae9ecc9e0e11169073118c730577",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/g3_orch_no_supervisor.end.json": "7636582c81092b8f90a601add46d414035e664ab220b0f1a46ec9fcf1541df84",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/g3_orch_no_supervisor.start.json": "e84ad8dfd8c74f999845a6831da75b660ec6fae6ea5da264c2460152a25e307e",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/g3_orch_no_synthesiser.end.json": "554fce28f81eacafca90f20b7191ec2dd0e578444b7f9559ae96c51f332d8e01",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/g3_orch_no_synthesiser.start.json": "53fe9d9417d9e5b0daebdd0710c03c87ce9a9d1910f6a9e4c61726fa9c66d307",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/g3_orch_no_synthesiser_attempt_20261018T122016Z/g3_orch_no_synthesiser.end.json": "a50175bc588fd6c8215ef660c6bbf4d0103a6a6c977d674913adfd5a8c35b934",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/g3_orch_no_synthesiser_attempt_20261018T122016Z/g3_orch_no_synthesiser.start.json": "16a47da4d493508ff49a2b1966138c879ba1f5e7673f9f3321a9bc8beb2bab8f",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/g3_raw_gemini.end.json": "3b1b3b60814fde851db68a789a12d02229ca9513ece65d7a03a1d97e2e122c41",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/g3_raw_gemini.start.json": "73987fff64256a2e009bb6bef2eb8567ca26b50d4aef57959492620d5b83ce38",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/launch_relaunch_factual_20261018T122155Z.json": "32e37fa91d3e8aead5c857287c97d2f36c4bc9eb2f679a2753c8e6c2baf7eac7",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/launch_relaunch_no_synthesiser_20261018T122016Z.json": "e2b96d11492f41ba1cf0e11bb381f04580e2c3ddfa280e2df08f6b51bef0a56c",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/launch_wave1.json": "028a10600095fabcfb7e19f977c0b887b2f9e80ddc13f2cc0e890f2eb56b5ec4",
+   "fig4_records_1023.tar:fig4_records_1023/findings/recompute/G3_runs/smoke_check.json": "5969baff0b00f29d18c1c2356a6d5b5a512d1c7426b77f71f9c2e6e950b64acb",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__full_orchestrator__exp_v4_s20_n0/answers.json": "3a91380cf2b620fdc573ec78a2f91b824a3ceac811d62e430fe48041729c812c",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__full_orchestrator__exp_v4_s20_n0/index_identity.jsonl": "3de760a240086cd3a6e70c028c35be0020c97a54d0834031bd1cf26550fe4a5e",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__full_orchestrator__exp_v4_s20_n0/retrievals.jsonl": "ac74dcc83e7dbe6b792d01716537af44e9600e4f3749568dde37867145ffb9f6",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__full_orchestrator__exp_v4_s20_n0/run_identity.json": "80ff591e5e3f9a99ca9b0a4561a05dbe3638f2e9cbe28dd1db43e52f482d66af",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__naive_rag__exp_v4_s20_n0/answers.json": "544d3cb4174ec1c9649d2bc436ddcfadc42e6c3d0da5a82612db9ad3d42d21b1",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__naive_rag__exp_v4_s20_n0/index_identity.jsonl": "0bdc0ba7eeeb81e1241747272ec9d0953784968437424f8bd7c7afc9e0cb57ed",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__naive_rag__exp_v4_s20_n0/retrievals.jsonl": "cf0fda0e18764c0648ef6dd513275a0863dbe8c6ba6bb7a3eb9b21b772ba7149",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__naive_rag__exp_v4_s20_n0/run_identity.json": "5c5531ab884c53d81957b33602f4b3d885950c31cd2181d8539d4e8d8d711c5d",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_factual_to_documents__exp_v4_s20_n0/answers.json": "126eeda5385dafc2414eb24ea7171d4633d0ab02a833ce0b9de10a540240e152",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_factual_to_documents__exp_v4_s20_n0/index_identity.jsonl": "81d5e3733f4e5ed07e3d764a96d3ec2829e3ca9fcc1de24c337e6827dfaa6bdb",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_factual_to_documents__exp_v4_s20_n0/retrievals.jsonl": "0f634a4a6f0ddbb59c481daa895c51f654aead3578467175c518e33d9fee6cad",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_factual_to_documents__exp_v4_s20_n0/run_identity.json": "51708836577ded2b049eb15f7426a1d212d19d5910fc3e0507f3289e999be18f",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_no_analyser__exp_v4_s20_n0/answers.json": "6c54402ea3fec29f9f89bd0b5c3c6d892b2ddff5ca5e27fd034ee67b0e0f426c",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_no_analyser__exp_v4_s20_n0/index_identity.jsonl": "3ef7c6bb152cc2ee7c62d91aea2ddaac60665d70d4670a7ef88617c8836a0a5e",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_no_analyser__exp_v4_s20_n0/retrievals.jsonl": "d7c92094fe0d1831adc1099f060a5676f841ee69ee55b18ddf0ab83b6c7f8e62",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_no_analyser__exp_v4_s20_n0/run_identity.json": "13fdfb9ec9d792042146c95f5a162ca6c6fdd1e4c0af82b5b63f68e9a829154f",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_no_planner__exp_v4_s20_n0/answers.json": "4ac955d8a012b7cd5fd103736d5868fc0bb2e1682937b8f780433de685067d1d",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_no_planner__exp_v4_s20_n0/index_identity.jsonl": "01cb4cfa0d18522fd1f0d61f929e6690d7b867d1ccb23343bf05a979d7e6e65e",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_no_planner__exp_v4_s20_n0/retrievals.jsonl": "19f3f8a42de1bf32010b20bb5ecbe8c93d3b9e7df7cb941658922137d087d617",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_no_planner__exp_v4_s20_n0/run_identity.json": "b89d362072668d6e4e118b36fe6858a5323367ca784230f65749517b5ef4973c",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_no_supervisor__exp_v4_s20_n0/answers.json": "0a7a955ffd36f332905366829a04621530271c093af9617127e51c4fd3d3ab04",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_no_supervisor__exp_v4_s20_n0/index_identity.jsonl": "26461b99ae0e5a7a746da597c442c4d7bf8fb1553e714d3b91c41e26e51a4929",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_no_supervisor__exp_v4_s20_n0/retrievals.jsonl": "73c9129c7ec0bf24ba7f4cd504af3ab74c802bbfe8537b022f2d6b9f2aa58d1b",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_no_supervisor__exp_v4_s20_n0/run_identity.json": "0a070653e7fdbb4c5e9897754587ad7fe069bde068c12697ba07f0210e317f80",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_no_synthesiser__exp_v4_s20_n0/answers.json": "a5d82c4b338548759ea32aa26415b368f37da0e67960844c68d3f51c44cf7bdc",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_no_synthesiser__exp_v4_s20_n0/index_identity.jsonl": "c246b6b09e6a9f7413ead705efb7a060f3dc2ac16b7b35956e8008f7dec7f18d",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_no_synthesiser__exp_v4_s20_n0/retrievals.jsonl": "a071894a6a43cd67844abc11dc39b78b84505e3bb2533139dde3c618997f8f98",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_no_synthesiser__exp_v4_s20_n0/run_identity.json": "c520477a52c401df634c2038b473adc6d7cd6c03bb26b7d51f19e70b8c8303e6",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__raw_gemini__exp_v4_s20_n0/answers.json": "afa5aa7eca967a07d3098c3bb53159c6114948b185e06aab85274123bd6f87ee",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__raw_gemini__exp_v4_s20_n0/index_identity.jsonl": "12c5153ea83f66e2fe8587f8774ef5da6cc426ea6eaabc441966d41226ca1715",
+   "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__raw_gemini__exp_v4_s20_n0/run_identity.json": "ee7150a4c9f16ba05a8145a6c368b80f54321b19f1cda4a72985b7eef884c56a",
+   "fig4_g9:SHA256SUMS": "d1b1c2c456191457770cf4235886c03523dfe59f86907ab00d9d10e41d93ebce",
+   "findings/recompute/fig2_inputs/PULL.json": "4548df922e8af14b3e5ec26dd378c2016bb5170d894286684022578c858da35c",
+   "findings/recompute/fig2_inputs/g1_collect.jsonl": "f5ff75bc244cda492a48e7e11f54f2007ed7d586a8f49e78921edd7244b28965",
+   "findings/recompute/fig2_inputs/g1_collect.jsonl.json": "04996e9dd9c3cca49177068f0143fbe0d1c7fa265a4eb6f617d24551f501f895",
+   "findings/recompute/fig2_inputs/out/judge/exp_01__multi_hop__exp_v4_s20_n0/judge_passages.jsonl": "26d6f9763894f7681748ba36edf8db1f66e8e0dbbf6c16459815c4a5a01bff02",
+   "findings/recompute/fig2_inputs/out/judge/exp_01__multi_hop__exp_v4_s20_n0/judge_passages_headers.jsonl": "07fc15236e5acd765f3b02cd13d7886678fa96d13a3c11e268453e6cbda1d53e",
+   "findings/recompute/fig2_inputs/out/judge/exp_01__multi_hop__exp_v4_s20_n0/judge_passages_recheck.jsonl": "4df3fbd809f9397d9e3a9364b737696a9fa42ac42d6526859f512c6e9c57adf4",
+   "findings/recompute/fig2_inputs/out/judge/exp_01__rlm_10__exp_v4_s20_n0/judge_passages.jsonl": "7f72e416ae15f93bc68704710ae1f8832d3c47c5fa6d1375911063ae8faa6903",
+   "findings/recompute/fig2_inputs/out/judge/exp_01__rlm_10__exp_v4_s20_n0/judge_passages_headers.jsonl": "5fbc1e2c694ec542ae03f5f43ced98be8c2b2b507219407d980d5c411ce89fa3",
+   "findings/recompute/fig2_inputs/out/judge/exp_01__rlm_10__exp_v4_s20_n0/judge_passages_recheck.jsonl": "57586f90f6f3834edc1749883c1f2c7c4aa1f2c64febc4c3e069e4fa1d49ed1c",
+   "findings/recompute/fig2_inputs/out/judge/exp_01__rlm_20__exp_v4_s20_n0/judge_passages.jsonl": "98b097115b456b546b42ab7ec65d4c22cc0291ce85871caae7cc41df8d697de4",
+   "findings/recompute/fig2_inputs/out/judge/exp_01__rlm_20__exp_v4_s20_n0/judge_passages_headers.jsonl": "df3950357a14d650ecce6dd0fcf04631133b82598502593e722e39cb00d031e1",
+   "findings/recompute/fig2_inputs/out/judge/exp_01__rlm_20__exp_v4_s20_n0/judge_passages_recheck.jsonl": "28c3ced011c59b2be79383998e12575c758e87d5f7f7747e79345ef677b0d561",
+   "findings/recompute/fig2_inputs/out/judge/exp_01__rlm_5__exp_v4_s20_n0/judge_passages.jsonl": "6025d3d2b72de28f5c4dcdf15399dc4c09f3b8ddbf10dc9dfa032b46f4eb4ee4",
+   "findings/recompute/fig2_inputs/out/judge/exp_01__rlm_5__exp_v4_s20_n0/judge_passages_headers.jsonl": "bf4d3864c82fe7527d98dfec1104524346db81e60665e34752257916a22162d6",
+   "findings/recompute/fig2_inputs/out/judge/exp_01__rlm_5__exp_v4_s20_n0/judge_passages_recheck.jsonl": "7b85db45a29598004357f5f782a0865a882b994ca39497831a5b7cb494c28c3c",
+   "findings/recompute/fig2_inputs/out/judge/exp_01__single_pass__exp_v4_s20_n0/judge_passages.jsonl": "71d15cc7f2837f508bb5d6e7b8fe6da0c09dc270f527e90fa0dfd9a22606754c",
+   "findings/recompute/fig2_inputs/out/judge/exp_01__single_pass__exp_v4_s20_n0/judge_passages_headers.jsonl": "c440945a8f4a7935a723bfee2696311c929af25b77a3f9c168c10be8708bf5a7",
+   "findings/recompute/fig2_inputs/out/judge/exp_01__single_pass__exp_v4_s20_n0/judge_passages_recheck.jsonl": "6e87f813328dc148ca75d5a6edcfa3c0f5c8d91d09c9dbb22e11849fdba282c1",
+   "findings/recompute/fig2_inputs/out/judge/exp_01__verified_pass__exp_v4_s20_n0/judge_passages.jsonl": "500ddd46b2f7f09fe10e9358f06df56a762908ab63f74bba9db5af0ce43602cf",
+   "findings/recompute/fig2_inputs/out/judge/exp_01__verified_pass__exp_v4_s20_n0/judge_passages_headers.jsonl": "e54367e51670704bf004ff801c92186d4917d828cc06343499d060dc0515f3af",
+   "findings/recompute/fig2_inputs/out/judge/exp_01__verified_pass__exp_v4_s20_n0/judge_passages_recheck.jsonl": "1d47d790fa987efac2e6130e64b0a0e6319c2006f51af614646ae542bbc0781c",
+   "findings/recompute/fig2_inputs/out/start_11455_20261018T120423.json": "8a68e8be636cd95627ff3cedc6e90463b24bbcb537f13a8335c4b6638fc9852a",
+   "findings/recompute/fig2_inputs/out_g1r15/judge/exp_01__rlm_10__exp_v4_s20_n0/judge_passages.jsonl": "110c1e9c09248afb037eb45a50de5c5007e246ecee15225e55d1d51354d5211b",
+   "findings/recompute/fig2_inputs/out_g1r15/judge/exp_01__rlm_10__exp_v4_s20_n0/judge_passages_headers.jsonl": "ab538fd7b0c60f5602e03d1048a1249ad866048b852ae372d2e3d2e592665f02",
+   "findings/recompute/fig2_inputs/out_g1r15/judge/exp_01__rlm_10__exp_v4_s20_n0/judge_passages_recheck.jsonl": "bd0fdd77cfdf1784f626e1fa38e7ca4e03315e26a08559a0671b5f4792f652ff",
+   "findings/recompute/fig2_inputs/out_g1r15/judge/exp_01__rlm_20__exp_v4_s20_n0/judge_passages.jsonl": "5cb96e389c9d40027b252ac841d3eabcd839dda0000a14944eaafe33db0afcb8",
+   "findings/recompute/fig2_inputs/out_g1r15/judge/exp_01__rlm_20__exp_v4_s20_n0/judge_passages_headers.jsonl": "a0475ebc7d8b2fa225e0292de706d676649870848f25dcbc90976f5f1a44f4c2",
+   "findings/recompute/fig2_inputs/out_g1r15/judge/exp_01__rlm_20__exp_v4_s20_n0/judge_passages_recheck.jsonl": "98e26491c4be27808286fcbd877bf5655fa702e8e5872a5eadfdc0b55487e7d2",
+   "findings/recompute/fig2_inputs/out_g1r15/judge/exp_01__rlm_5__exp_v4_s20_n0/judge_passages.jsonl": "acd6e982d4e0ee95f5ec4291376065bfb250f3535c110be0dfaabd9a1cadf64b",
+   "findings/recompute/fig2_inputs/out_g1r15/judge/exp_01__rlm_5__exp_v4_s20_n0/judge_passages_headers.jsonl": "86eaa691b55ff49b58650de018ba4fac6181cb9fd36da6041d17723b23e38df8",
+   "findings/recompute/fig2_inputs/out_g1r15/judge/exp_01__rlm_5__exp_v4_s20_n0/judge_passages_recheck.jsonl": "ae7447bbd85bc4091b8cd003429443e36926babc530bb27d44a7edf11dca00b8",
+   "findings/recompute/fig2_inputs/out_g1r15/judge/exp_01__verified_pass__exp_v4_s20_n0/judge_passages.jsonl": "7cf78a8fe562b49b4c4181e7ed496528ecdb56f4ed697e71eeec64ef9f0bd3b3",
+   "findings/recompute/fig2_inputs/out_g1r15/judge/exp_01__verified_pass__exp_v4_s20_n0/judge_passages_headers.jsonl": "810ad439b7a1fd3b3bf2a571001b7701c4c768746fde77a07e1af5ec8530e423",
+   "findings/recompute/fig2_inputs/out_g1r15/start_11455_20261018T120423.json": "8a68e8be636cd95627ff3cedc6e90463b24bbcb537f13a8335c4b6638fc9852a",
+   "fig2_g1r15_inputs.tar:fig2_g1r15_inputs/MANIFEST.sha256": "60c1f703d7b5853ec7bd5aebaecec9ac50ea3cb078b1f44741c5964427635b2e",
+   "fig2_g1r15_inputs.tar:fig2_g1r15_inputs/keys.txt": "fc2abb9e6be404a9c75e0a66e56e40cb8e581d83e2e5cabcc155e4db40c6ece3",
+   "fig2_g1r15_inputs.tar:fig2_g1r15_inputs/runs/exp_01__rlm_10__exp_v4_s20_n0/answers.jsonl": "ecb6de5343d172894fd56d57997e3301d70ca3fb509ae2cd65f8e47eb8c268b7",
+   "fig2_g1r15_inputs.tar:fig2_g1r15_inputs/runs/exp_01__rlm_20__exp_v4_s20_n0/answers.jsonl": "1e5b124d8bbd98640c87051916305ed0c04d668447967c60a08d6945fca32c62",
+   "fig2_g1r15_inputs.tar:fig2_g1r15_inputs/runs/exp_01__rlm_5__exp_v4_s20_n0/answers.jsonl": "cc10c9eb881fa9618ff2fb8ec7a3f1bb9cf58662827cd67b326e47f67b51d42c",
+   "fig2_g1r15_inputs.tar:fig2_g1r15_inputs/runs/exp_01__verified_pass__exp_v4_s20_n0/answers.jsonl": "1ce4b1052912d8592b912da29ed987df9c2a4baca575cf80cc2b9d33334f8148",
+   "findings/recompute/g9_inputs/PULL.json": "e7f9abed14cee406c3c1934af3ea0257bfc06da9d1401213ce5fd913384f61f9",
+   "findings/recompute/g9_inputs/runs/exp_03__orch_distil_every_step__exp_v4_s20_n0/answers.json": "d08585ab9a8f853eea7a6acaa8b19e5c83cccfbff03b619503fe14b6a30571f4",
+   "findings/recompute/g9_inputs/runs/exp_03__orch_distil_every_step_f1__exp_v4_s20_n0/answers.json": "0b12c674719289fbf8bac43b217c5751ba26535533979099ca8bb66a88bd1973",
+   "fig3_s6:SHA256SUMS": "49fd1d0b39a4588abd4b13ece27efc4a8759710111de8fe475e785601ab361a4"
+  }
+ },
+ "records": {
+  "from": "10.15.212.253:~/projects/mentori-runs-g3",
+  "clone_head": "fd20b16c9bdbd475368d7b18ba5061e965129564",
+  "listed_utc": "2026-10-23T07:41:05Z",
+  "sha256": {
+   "findings/runs/exp_03__raw_gemini__exp_v4_s20_n0/answers.json": "afa5aa7eca967a07d3098c3bb53159c6114948b185e06aab85274123bd6f87ee",
+   "findings/runs/exp_03__raw_gemini__exp_v4_s20_n0/run_identity.json": "ee7150a4c9f16ba05a8145a6c368b80f54321b19f1cda4a72985b7eef884c56a",
+   "findings/runs/exp_03__raw_gemini__exp_v4_s20_n0/index_identity.jsonl": "12c5153ea83f66e2fe8587f8774ef5da6cc426ea6eaabc441966d41226ca1715",
+   "findings/runs/exp_03__naive_rag__exp_v4_s20_n0/answers.json": "544d3cb4174ec1c9649d2bc436ddcfadc42e6c3d0da5a82612db9ad3d42d21b1",
+   "findings/runs/exp_03__naive_rag__exp_v4_s20_n0/run_identity.json": "5c5531ab884c53d81957b33602f4b3d885950c31cd2181d8539d4e8d8d711c5d",
+   "findings/runs/exp_03__naive_rag__exp_v4_s20_n0/index_identity.jsonl": "0bdc0ba7eeeb81e1241747272ec9d0953784968437424f8bd7c7afc9e0cb57ed",
+   "findings/runs/exp_03__naive_rag__exp_v4_s20_n0/retrievals.jsonl": "cf0fda0e18764c0648ef6dd513275a0863dbe8c6ba6bb7a3eb9b21b772ba7149",
+   "findings/runs/exp_03__full_orchestrator__exp_v4_s20_n0/answers.json": "3a91380cf2b620fdc573ec78a2f91b824a3ceac811d62e430fe48041729c812c",
+   "findings/runs/exp_03__full_orchestrator__exp_v4_s20_n0/run_identity.json": "80ff591e5e3f9a99ca9b0a4561a05dbe3638f2e9cbe28dd1db43e52f482d66af",
+   "findings/runs/exp_03__full_orchestrator__exp_v4_s20_n0/index_identity.jsonl": "3de760a240086cd3a6e70c028c35be0020c97a54d0834031bd1cf26550fe4a5e",
+   "findings/runs/exp_03__full_orchestrator__exp_v4_s20_n0/retrievals.jsonl": "ac74dcc83e7dbe6b792d01716537af44e9600e4f3749568dde37867145ffb9f6",
+   "findings/runs/exp_03__orch_no_analyser__exp_v4_s20_n0/answers.json": "6c54402ea3fec29f9f89bd0b5c3c6d892b2ddff5ca5e27fd034ee67b0e0f426c",
+   "findings/runs/exp_03__orch_no_analyser__exp_v4_s20_n0/run_identity.json": "13fdfb9ec9d792042146c95f5a162ca6c6fdd1e4c0af82b5b63f68e9a829154f",
+   "findings/runs/exp_03__orch_no_analyser__exp_v4_s20_n0/index_identity.jsonl": "3ef7c6bb152cc2ee7c62d91aea2ddaac60665d70d4670a7ef88617c8836a0a5e",
+   "findings/runs/exp_03__orch_no_analyser__exp_v4_s20_n0/retrievals.jsonl": "d7c92094fe0d1831adc1099f060a5676f841ee69ee55b18ddf0ab83b6c7f8e62",
+   "findings/runs/exp_03__orch_no_planner__exp_v4_s20_n0/answers.json": "4ac955d8a012b7cd5fd103736d5868fc0bb2e1682937b8f780433de685067d1d",
+   "findings/runs/exp_03__orch_no_planner__exp_v4_s20_n0/run_identity.json": "b89d362072668d6e4e118b36fe6858a5323367ca784230f65749517b5ef4973c",
+   "findings/runs/exp_03__orch_no_planner__exp_v4_s20_n0/index_identity.jsonl": "01cb4cfa0d18522fd1f0d61f929e6690d7b867d1ccb23343bf05a979d7e6e65e",
+   "findings/runs/exp_03__orch_no_planner__exp_v4_s20_n0/retrievals.jsonl": "19f3f8a42de1bf32010b20bb5ecbe8c93d3b9e7df7cb941658922137d087d617",
+   "findings/runs/exp_03__orch_no_supervisor__exp_v4_s20_n0/answers.json": "0a7a955ffd36f332905366829a04621530271c093af9617127e51c4fd3d3ab04",
+   "findings/runs/exp_03__orch_no_supervisor__exp_v4_s20_n0/run_identity.json": "0a070653e7fdbb4c5e9897754587ad7fe069bde068c12697ba07f0210e317f80",
+   "findings/runs/exp_03__orch_no_supervisor__exp_v4_s20_n0/index_identity.jsonl": "26461b99ae0e5a7a746da597c442c4d7bf8fb1553e714d3b91c41e26e51a4929",
+   "findings/runs/exp_03__orch_no_supervisor__exp_v4_s20_n0/retrievals.jsonl": "73c9129c7ec0bf24ba7f4cd504af3ab74c802bbfe8537b022f2d6b9f2aa58d1b",
+   "findings/runs/exp_03__orch_no_synthesiser__exp_v4_s20_n0/answers.json": "a5d82c4b338548759ea32aa26415b368f37da0e67960844c68d3f51c44cf7bdc",
+   "findings/runs/exp_03__orch_no_synthesiser__exp_v4_s20_n0/run_identity.json": "c520477a52c401df634c2038b473adc6d7cd6c03bb26b7d51f19e70b8c8303e6",
+   "findings/runs/exp_03__orch_no_synthesiser__exp_v4_s20_n0/index_identity.jsonl": "c246b6b09e6a9f7413ead705efb7a060f3dc2ac16b7b35956e8008f7dec7f18d",
+   "findings/runs/exp_03__orch_no_synthesiser__exp_v4_s20_n0/retrievals.jsonl": "a071894a6a43cd67844abc11dc39b78b84505e3bb2533139dde3c618997f8f98",
+   "findings/runs/exp_03__orch_factual_to_documents__exp_v4_s20_n0/answers.json": "126eeda5385dafc2414eb24ea7171d4633d0ab02a833ce0b9de10a540240e152",
+   "findings/runs/exp_03__orch_factual_to_documents__exp_v4_s20_n0/run_identity.json": "51708836577ded2b049eb15f7426a1d212d19d5910fc3e0507f3289e999be18f",
+   "findings/runs/exp_03__orch_factual_to_documents__exp_v4_s20_n0/index_identity.jsonl": "81d5e3733f4e5ed07e3d764a96d3ec2829e3ca9fcc1de24c337e6827dfaa6bdb",
+   "findings/runs/exp_03__orch_factual_to_documents__exp_v4_s20_n0/retrievals.jsonl": "0f634a4a6f0ddbb59c481daa895c51f654aead3578467175c518e33d9fee6cad",
+   "findings/recompute/G3_runs/g3_full_orchestrator.start.json": "d2ed625f54d8b8ca1728cc98159ab5f5ea3c181d95cede3418afa59260ac30e6",
+   "findings/recompute/G3_runs/g3_naive_rag.start.json": "0a10446b1be5ca139d40c0849e191278405a6269648ca60d04bc0cd1d8677222",
+   "findings/recompute/G3_runs/g3_orch_factual_to_documents.start.json": "bec618b7212b7785d0c289db050949a9266922856c628b83d9ad62264b33bc56",
+   "findings/recompute/G3_runs/g3_orch_no_analyser.start.json": "76b5262291199ab95dbd0a5902a1771abddb87c9de77f8fcc3ea29a52f408747",
+   "findings/recompute/G3_runs/g3_orch_no_planner.start.json": "c237527df6c0641893d50364e93096730677ae9ecc9e0e11169073118c730577",
+   "findings/recompute/G3_runs/g3_orch_no_supervisor.start.json": "e84ad8dfd8c74f999845a6831da75b660ec6fae6ea5da264c2460152a25e307e",
+   "findings/recompute/G3_runs/g3_orch_no_synthesiser.start.json": "53fe9d9417d9e5b0daebdd0710c03c87ce9a9d1910f6a9e4c61726fa9c66d307",
+   "findings/recompute/G3_runs/g3_raw_gemini.start.json": "73987fff64256a2e009bb6bef2eb8567ca26b50d4aef57959492620d5b83ce38",
+   "findings/recompute/G3_runs/g3_full_orchestrator.end.json": "d19407b567f47cd90a82cf6d2ff903576ce9effe6fe103f42052e9769f258406",
+   "findings/recompute/G3_runs/g3_naive_rag.end.json": "9dba5b253958206a0699cb82d375b6252cdf057fdfd0330b72aad2374a9e1e77",
+   "findings/recompute/G3_runs/g3_orch_factual_to_documents.end.json": "1b5ebfc81ac041f919da1809f09c9c0dfc6dff5eb792d01c9ebab36bc12c5cf3",
+   "findings/recompute/G3_runs/g3_orch_no_analyser.end.json": "a0e0cc61ce8236bc309d85c1fe6d8cc2e358e2d74700f0492184b3223066c13b",
+   "findings/recompute/G3_runs/g3_orch_no_planner.end.json": "ba65ce46725cea93604a136d9ce8472f7df3e3ce88d297fe7276da36b437a854",
+   "findings/recompute/G3_runs/g3_orch_no_supervisor.end.json": "7636582c81092b8f90a601add46d414035e664ab220b0f1a46ec9fcf1541df84",
+   "findings/recompute/G3_runs/g3_orch_no_synthesiser.end.json": "554fce28f81eacafca90f20b7191ec2dd0e578444b7f9559ae96c51f332d8e01",
+   "findings/recompute/G3_runs/g3_raw_gemini.end.json": "3b1b3b60814fde851db68a789a12d02229ca9513ece65d7a03a1d97e2e122c41",
+   "findings/recompute/G3_runs/launch_wave1.json": "028a10600095fabcfb7e19f977c0b887b2f9e80ddc13f2cc0e890f2eb56b5ec4",
+   "findings/recompute/G3_runs/launch_relaunch_factual_20261018T122155Z.json": "32e37fa91d3e8aead5c857287c97d2f36c4bc9eb2f679a2753c8e6c2baf7eac7",
+   "findings/recompute/G3_runs/launch_relaunch_no_synthesiser_20261018T122016Z.json": "e2b96d11492f41ba1cf0e11bb381f04580e2c3ddfa280e2df08f6b51bef0a56c",
+   "findings/recompute/G3_runs/g3_orch_factual_to_documents_attempt_20261018T122155Z/g3_orch_factual_to_documents.end.json": "522cf897322fd117181826c4b1ab979c037342c7c364c527b9de9d5d58945cde",
+   "findings/recompute/G3_runs/g3_orch_factual_to_documents_attempt_20261018T122155Z/g3_orch_factual_to_documents.start.json": "8650e4a212381b35c4b3a46c3e207896338c5ffe1f5ff45652820f56ca1245cd",
+   "findings/recompute/G3_runs/g3_orch_no_synthesiser_attempt_20261018T122016Z/g3_orch_no_synthesiser.end.json": "a50175bc588fd6c8215ef660c6bbf4d0103a6a6c977d674913adfd5a8c35b934",
+   "findings/recompute/G3_runs/g3_orch_no_synthesiser_attempt_20261018T122016Z/g3_orch_no_synthesiser.start.json": "16a47da4d493508ff49a2b1966138c879ba1f5e7673f9f3321a9bc8beb2bab8f",
+   "findings/recompute/G3_runs/g3_draw1_stop.log": "cddd863631fc95fe9cde0e76889c25de794ea51be8910a33314a23c961c2841c",
+   "findings/recompute/G3_runs/smoke_check.json": "5969baff0b00f29d18c1c2356a6d5b5a512d1c7426b77f71f9c2e6e950b64acb"
+  }
+ },
+ "judge": {
+  "g3_collect": {
+   "path": "findings/recompute/fig4_g9_inputs/g3_collect.jsonl",
+   "sha256": "527fd71e53f30ca77f6ca050be58206a08e99b55b87e8d58887f5486bbdd4bae",
+   "sidecar_sha256": "047a84919456d72557d581d83d6584ac8440158201a1ebec067be6b26d03b297",
+   "rows": 1924,
+   "rows_other_draws": {
+    "2": 304,
+    "3": 270
+   },
+   "units": {
+    "folders": {
+     "findings/recompute/fig4_g9_inputs/out_g3/judge/exp_03__full_orchestrator__exp_v4_s20_n0": {
+      "rows": 135,
+      "recheck": {
+       "phase 1": "10 of 10 equal"
+      },
+      "judge": "devstral-small-2:24b 33af3142213a"
+     },
+     "findings/recompute/fig4_g9_inputs/out_g3/judge/exp_03__naive_rag__exp_v4_s20_n0": {
+      "rows": 135,
+      "recheck": {
+       "phase 1": "10 of 10 equal"
+      },
+      "judge": "devstral-small-2:24b 33af3142213a"
+     },
+     "findings/recompute/fig4_g9_inputs/out_g3/judge/exp_03__orch_distil_every_step__exp_v4_s20_n0": {
+      "rows": 135,
+      "recheck": {
+       "phase 1": "10 of 10 equal"
+      },
+      "judge": "devstral-small-2:24b 33af3142213a"
+     },
+     "findings/recompute/fig4_g9_inputs/out_g3/judge/exp_03__orch_distil_every_step_f1__exp_v4_s20_n0": {
+      "rows": 135,
+      "recheck": {
+       "phase 1": "10 of 10 equal"
+      },
+      "judge": "devstral-small-2:24b 33af3142213a"
+     },
+     "findings/recompute/fig4_g9_inputs/out_g3/judge/exp_03__orch_factual_to_documents__exp_v4_s20_n0": {
+      "rows": 135,
+      "recheck": {
+       "phase 1": "10 of 10 equal"
+      },
+      "judge": "devstral-small-2:24b 33af3142213a"
+     },
+     "findings/recompute/fig4_g9_inputs/out_g3/judge/exp_03__orch_no_analyser__exp_v4_s20_n0": {
+      "rows": 135,
+      "recheck": {
+       "phase 1": "10 of 10 equal"
+      },
+      "judge": "devstral-small-2:24b 33af3142213a"
+     },
+     "findings/recompute/fig4_g9_inputs/out_g3/judge/exp_03__orch_no_planner__exp_v4_s20_n0": {
+      "rows": 135,
+      "recheck": {
+       "phase 1": "10 of 10 equal"
+      },
+      "judge": "devstral-small-2:24b 33af3142213a"
+     },
+     "findings/recompute/fig4_g9_inputs/out_g3/judge/exp_03__orch_no_supervisor__exp_v4_s20_n0": {
+      "rows": 135,
+      "recheck": {
+       "phase 1": "10 of 10 equal"
+      },
+      "judge": "devstral-small-2:24b 33af3142213a"
+     },
+     "findings/recompute/fig4_g9_inputs/out_g3/judge/exp_03__orch_no_synthesiser__exp_v4_s20_n0": {
+      "rows": 135,
+      "recheck": {
+       "phase 1": "10 of 10 equal"
+      },
+      "judge": "devstral-small-2:24b 33af3142213a"
+     },
+     "findings/recompute/fig4_g9_inputs/out_g3/judge/exp_03__raw_gemini__exp_v4_s20_n0": {
+      "rows": 135,
+      "recheck": {
+       "phase 1": "10 of 10 equal"
+      },
+      "judge": "devstral-small-2:24b 33af3142213a"
+     }
+    },
+    "starts": {
+     "findings/recompute/fig4_g9_inputs/out_g3/start_11455_20261023T083722.json": "d66daa28",
+     "findings/recompute/fig4_g9_inputs/out_g3/start_11455_20261027T014037.json": "d66daa28"
+    }
+   }
+  },
+  "g1_collect": {
+   "path": "findings/recompute/fig2_inputs/g1_collect.jsonl",
+   "sha256": "f5ff75bc244cda492a48e7e11f54f2007ed7d586a8f49e78921edd7244b28965",
+   "sidecar_sha256": "04996e9dd9c3cca49177068f0143fbe0d1c7fa265a4eb6f617d24551f501f895",
+   "rows": 2430,
+   "units": {
+    "folders": {
+     "findings/recompute/fig2_inputs/out/judge/exp_01__multi_hop__exp_v4_s20_n0": {
+      "rows": 135,
+      "recheck": {
+       "phase 1": "10 of 10 equal"
+      },
+      "judge": "devstral-small-2:24b 33af3142213a"
+     },
+     "findings/recompute/fig2_inputs/out/judge/exp_01__rlm_10__exp_v4_s20_n0": {
+      "rows": 135,
+      "recheck": {
+       "phase 1": "10 of 10 equal"
+      },
+      "judge": "devstral-small-2:24b 33af3142213a"
+     },
+     "findings/recompute/fig2_inputs/out/judge/exp_01__rlm_20__exp_v4_s20_n0": {
+      "rows": 135,
+      "recheck": {
+       "phase 1": "10 of 10 equal"
+      },
+      "judge": "devstral-small-2:24b 33af3142213a"
+     },
+     "findings/recompute/fig2_inputs/out/judge/exp_01__rlm_5__exp_v4_s20_n0": {
+      "rows": 135,
+      "recheck": {
+       "phase 1": "10 of 10 equal"
+      },
+      "judge": "devstral-small-2:24b 33af3142213a"
+     },
+     "findings/recompute/fig2_inputs/out/judge/exp_01__single_pass__exp_v4_s20_n0": {
+      "rows": 135,
+      "recheck": {
+       "phase 1": "10 of 10 equal"
+      },
+      "judge": "devstral-small-2:24b 33af3142213a"
+     },
+     "findings/recompute/fig2_inputs/out/judge/exp_01__verified_pass__exp_v4_s20_n0": {
+      "rows": 135,
+      "recheck": {
+       "phase 1": "10 of 10 equal"
+      },
+      "judge": "devstral-small-2:24b 33af3142213a"
+     },
+     "findings/recompute/fig2_inputs/out_g1r15/judge/exp_01__rlm_20__exp_v4_s20_n0": {
+      "rows": 4,
+      "recheck": {
+       "phase 1": "4 of 4 equal"
+      },
+      "judge": "devstral-small-2:24b 33af3142213a"
+     },
+     "findings/recompute/fig2_inputs/out_g1r15/judge/exp_01__rlm_5__exp_v4_s20_n0": {
+      "rows": 1,
+      "recheck": {
+       "phase 1": "1 of 1 equal"
+      },
+      "judge": "devstral-small-2:24b 33af3142213a"
+     }
+    },
+    "starts": {
+     "findings/recompute/fig2_inputs/out/start_11455_20261018T120423.json": "d66daa28",
+     "findings/recompute/fig2_inputs/out_g1r15/start_11455_20261018T120423.json": "d66daa28"
+    }
+   }
+  },
+  "rlm_answers": {
+   "findings/recompute/frozen_inputs/extracted/fig2_g1r15_inputs/fig2_g1r15_inputs/runs/exp_01__verified_pass__exp_v4_s20_n0/answers.jsonl": "1ce4b1052912d8592b912da29ed987df9c2a4baca575cf80cc2b9d33334f8148",
+   "findings/recompute/frozen_inputs/extracted/fig2_g1r15_inputs/fig2_g1r15_inputs/runs/exp_01__rlm_5__exp_v4_s20_n0/answers.jsonl": "cc10c9eb881fa9618ff2fb8ec7a3f1bb9cf58662827cd67b326e47f67b51d42c",
+   "findings/recompute/frozen_inputs/extracted/fig2_g1r15_inputs/fig2_g1r15_inputs/runs/exp_01__rlm_10__exp_v4_s20_n0/answers.jsonl": "ecb6de5343d172894fd56d57997e3301d70ca3fb509ae2cd65f8e47eb8c268b7",
+   "findings/recompute/frozen_inputs/extracted/fig2_g1r15_inputs/fig2_g1r15_inputs/runs/exp_01__rlm_20__exp_v4_s20_n0/answers.jsonl": "1e5b124d8bbd98640c87051916305ed0c04d668447967c60a08d6945fca32c62"
+  },
+  "run_sha256": "38ae79ab023b97562b69b2875b3c8001b02f887d5578121103b85d4a0b4729da",
+  "unscored": {
+   "raw_gemini": 0,
+   "naive_rag": 0,
+   "full_orchestrator": 0,
+   "orch_no_analyser": 0,
+   "orch_no_planner": 0,
+   "orch_no_supervisor": 0,
+   "orch_no_synthesiser": 0,
+   "orch_factual_to_documents": 0,
+   "orch_distil_every_step": 0,
+   "orch_distil_every_step_f1": 0,
+   "rlm_10": 0
+  },
+  "failed": {
+   "raw_gemini": 0,
+   "naive_rag": 0,
+   "full_orchestrator": 0,
+   "orch_no_analyser": 0,
+   "orch_no_planner": 0,
+   "orch_no_supervisor": 0,
+   "orch_no_synthesiser": 0,
+   "orch_factual_to_documents": 0,
+   "orch_distil_every_step": 0,
+   "orch_distil_every_step_f1": 0,
+   "rlm_10": 1
+  },
+  "judge_rows_v25": {
+   "g3": {
+    "reader": "scripts/judge_rows_v25.py (D188): an answer's key v2.5 row (S512, out_s6_g3) where one exists, else its key v2.4 row (out_g3); draw 1 of the G3 and G9 set-ups read, every other row set aside",
+    "sources": {
+     "G3": {
+      "kind": "v2.4",
+      "present": true,
+      "run_sha256": "38ae79ab023b97562b69b2875b3c8001b02f887d5578121103b85d4a0b4729da",
+      "rows": 1924,
+      "rows_set_aside": 574
+     },
+     "S6G3": {
+      "kind": "v2.5 changed",
+      "present": true,
+      "missing": [],
+      "run_sha256": "211568dbdfa09482e9c0abfb3b1da92d0bbd62d14a7646058663a990cbb54235",
+      "rows": 854,
+      "rows_set_aside": 254
+     },
+     "S6G7G3": {
+      "kind": "v2.5 all",
+      "present": null,
+      "read": false,
+      "why": "draws 2 and 3 (G7) are not drawn in this plate (D98)"
+     }
+    },
+    "status": "key v2.5 for every G3 answer of the 132 changed questions (600)",
+    "provisional": false,
+    "answers_read": 1350,
+    "cells_from_v25": 600,
+    "awaiting_s6_read": 0,
+    "by_status": {
+     "v2.4": 750,
+     "v2.5": 600
+    },
+    "units_v25": {
+     "folders": {
+      "findings/recompute/fig3_s6_inputs/out_s6_g3/judge/exp_03__full_orchestrator__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig3_s6_inputs/out_s6_g3/judge/exp_03__naive_rag__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig3_s6_inputs/out_s6_g3/judge/exp_03__orch_distil_every_step__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig3_s6_inputs/out_s6_g3/judge/exp_03__orch_distil_every_step_f1__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig3_s6_inputs/out_s6_g3/judge/exp_03__orch_factual_to_documents__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig3_s6_inputs/out_s6_g3/judge/exp_03__orch_no_analyser__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig3_s6_inputs/out_s6_g3/judge/exp_03__orch_no_planner__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig3_s6_inputs/out_s6_g3/judge/exp_03__orch_no_supervisor__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig3_s6_inputs/out_s6_g3/judge/exp_03__orch_no_synthesiser__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig3_s6_inputs/out_s6_g3/judge/exp_03__raw_gemini__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      }
+     },
+     "starts": {
+      "findings/recompute/fig3_s6_inputs/out_s6_g3/start_11455_20261031T094846.json": "d66daa28",
+      "findings/recompute/fig3_s6_inputs/out_s6_g3/start_11455_20261031T171107.json": "d66daa28"
+     }
+    }
+   },
+   "rlm_10": {
+    "reader": "scripts/judge_rows_v25.py (D186 (3)): an answer's key v2.5 row (S512, out_s6_g1 with out_s6_g1r15 as --replace) where one exists, else its key v2.4 row (out/ with out_g1r15/)",
+    "sources": {
+     "G1": {
+      "kind": "v2.4",
+      "present": true,
+      "run_sha256": "38ae79ab023b97562b69b2875b3c8001b02f887d5578121103b85d4a0b4729da",
+      "rows": 2430,
+      "replace": {
+       "keys": 15,
+       "rows_from_replace": 15
+      }
+     },
+     "S6G1": {
+      "kind": "v2.5 changed",
+      "present": true,
+      "missing": [],
+      "run_sha256": "211568dbdfa09482e9c0abfb3b1da92d0bbd62d14a7646058663a990cbb54235",
+      "rows": 1080,
+      "replace": {
+       "keys": 15,
+       "rows_from_replace": 5
+      }
+     }
+    },
+    "status": "key v2.5 for every answer of the 132 changed questions read (360)",
+    "provisional": false,
+    "answers_read": 810,
+    "cells_from_v25": 360,
+    "awaiting_s6_read": 0,
+    "awaiting_s6_all_draws": 0,
+    "by_status": {
+     "v2.4": 1350,
+     "v2.5": 1080
+    },
+    "by_draw": {
+     "1": {
+      "v2.4": 450,
+      "v2.5": 360
+     },
+     "2": {
+      "v2.4": 450,
+      "v2.5": 360
+     },
+     "3": {
+      "v2.4": 450,
+      "v2.5": 360
+     }
+    },
+    "units_v25": {
+     "folders": {
+      "findings/recompute/fig3_s6_inputs/out_s6_g1/judge/exp_01__multi_hop__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig3_s6_inputs/out_s6_g1/judge/exp_01__rlm_10__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig3_s6_inputs/out_s6_g1/judge/exp_01__rlm_20__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig3_s6_inputs/out_s6_g1/judge/exp_01__rlm_5__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig3_s6_inputs/out_s6_g1/judge/exp_01__single_pass__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig3_s6_inputs/out_s6_g1/judge/exp_01__verified_pass__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig3_s6_inputs/out_s6_g1r15/judge/exp_01__rlm_20__exp_v4_s20_n0": {
+       "rows": 2,
+       "recheck": {
+        "phase 1": "2 of 2 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig3_s6_inputs/out_s6_g1r15/judge/exp_01__rlm_5__exp_v4_s20_n0": {
+       "rows": 1,
+       "recheck": {
+        "phase 1": "1 of 1 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      }
+     },
+     "starts": {
+      "findings/recompute/fig3_s6_inputs/out_s6_g1/start_11434_20261031T015532.json": "d66daa28",
+      "findings/recompute/fig3_s6_inputs/out_s6_g1/start_11434_20261031T080315.json": "d66daa28",
+      "findings/recompute/fig3_s6_inputs/out_s6_g1/start_11434_20261031T081045.json": "d66daa28",
+      "findings/recompute/fig3_s6_inputs/out_s6_g1/start_11434_20261031T084549.json": "d66daa28",
+      "findings/recompute/fig3_s6_inputs/out_s6_g1/start_11434_20261101T093806.json": "d66daa28",
+      "findings/recompute/fig3_s6_inputs/out_s6_g1r15/start_11434_20261031T015532.json": "d66daa28",
+      "findings/recompute/fig3_s6_inputs/out_s6_g1r15/start_11434_20261031T080315.json": "d66daa28",
+      "findings/recompute/fig3_s6_inputs/out_s6_g1r15/start_11434_20261031T081045.json": "d66daa28",
+      "findings/recompute/fig3_s6_inputs/out_s6_g1r15/start_11434_20261031T084549.json": "d66daa28",
+      "findings/recompute/fig3_s6_inputs/out_s6_g1r15/start_11434_20261101T093806.json": "d66daa28"
+     }
+    },
+    "rlm_10_draw_1": {
+     "cells_from_v25": 60,
+     "changed_questions": 60,
+     "awaiting_s6": 0,
+     "frozen_set": "findings/recompute/fig3_s6_inputs"
+    }
+   },
+   "provisional": false,
+   "cells_differ_from_v24": 37
+  },
+  "s6_g1": {
+   "path": "findings/recompute/fig3_s6_inputs",
+   "sums_sha256": "49fd1d0b39a4588abd4b13ece27efc4a8759710111de8fe475e785601ab361a4"
+  },
+  "draw_rows": {
+   "units": {
+    "S6G3": {
+     "folders": {
+      "findings/recompute/fig4_g9_inputs/out_s6_g3/judge/exp_03__full_orchestrator__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal",
+        "phase 2": "0 of 0 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig4_g9_inputs/out_s6_g3/judge/exp_03__naive_rag__exp_v4_s20_n0": {
+       "rows": 180,
+       "recheck": {
+        "phase 1": "10 of 10 equal",
+        "phase 2": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig4_g9_inputs/out_s6_g3/judge/exp_03__orch_distil_every_step__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal",
+        "phase 2": "0 of 0 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig4_g9_inputs/out_s6_g3/judge/exp_03__orch_distil_every_step_f1__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal",
+        "phase 2": "0 of 0 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig4_g9_inputs/out_s6_g3/judge/exp_03__orch_factual_to_documents__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal",
+        "phase 2": "0 of 0 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig4_g9_inputs/out_s6_g3/judge/exp_03__orch_no_analyser__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal",
+        "phase 2": "0 of 0 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig4_g9_inputs/out_s6_g3/judge/exp_03__orch_no_planner__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal",
+        "phase 2": "0 of 0 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig4_g9_inputs/out_s6_g3/judge/exp_03__orch_no_supervisor__exp_v4_s20_n0": {
+       "rows": 74,
+       "recheck": {
+        "phase 1": "10 of 10 equal",
+        "phase 2": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig4_g9_inputs/out_s6_g3/judge/exp_03__orch_no_synthesiser__exp_v4_s20_n0": {
+       "rows": 60,
+       "recheck": {
+        "phase 1": "10 of 10 equal",
+        "phase 2": "0 of 0 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig4_g9_inputs/out_s6_g3/judge/exp_03__raw_gemini__exp_v4_s20_n0": {
+       "rows": 180,
+       "recheck": {
+        "phase 1": "10 of 10 equal",
+        "phase 2": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      }
+     },
+     "starts": {
+      "findings/recompute/fig4_g9_inputs/out_s6_g3/start_11455_20261031T094846.json": "d66daa28",
+      "findings/recompute/fig4_g9_inputs/out_s6_g3/start_11455_20261031T171107.json": "d66daa28"
+     }
+    },
+    "S6G7G3": {
+     "folders": {
+      "findings/recompute/fig4_g9_inputs/out_s6_g7_g3/judge/exp_03__full_orchestrator__exp_v4_s20_n0": {
+       "rows": 90,
+       "recheck": {
+        "phase 2": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig4_g9_inputs/out_s6_g7_g3/judge/exp_03__orch_distil_every_step__exp_v4_s20_n0": {
+       "rows": 90,
+       "recheck": {
+        "phase 2": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig4_g9_inputs/out_s6_g7_g3/judge/exp_03__orch_distil_every_step_f1__exp_v4_s20_n0": {
+       "rows": 90,
+       "recheck": {
+        "phase 2": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig4_g9_inputs/out_s6_g7_g3/judge/exp_03__orch_factual_to_documents__exp_v4_s20_n0": {
+       "rows": 90,
+       "recheck": {
+        "phase 2": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig4_g9_inputs/out_s6_g7_g3/judge/exp_03__orch_no_analyser__exp_v4_s20_n0": {
+       "rows": 90,
+       "recheck": {
+        "phase 2": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig4_g9_inputs/out_s6_g7_g3/judge/exp_03__orch_no_planner__exp_v4_s20_n0": {
+       "rows": 90,
+       "recheck": {
+        "phase 2": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig4_g9_inputs/out_s6_g7_g3/judge/exp_03__orch_no_supervisor__exp_v4_s20_n0": {
+       "rows": 90,
+       "recheck": {
+        "phase 2": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      },
+      "findings/recompute/fig4_g9_inputs/out_s6_g7_g3/judge/exp_03__orch_no_synthesiser__exp_v4_s20_n0": {
+       "rows": 90,
+       "recheck": {
+        "phase 2": "10 of 10 equal"
+       },
+       "judge": "devstral-small-2:24b 33af3142213a"
+      }
+     },
+     "starts": {
+      "findings/recompute/fig4_g9_inputs/out_s6_g7_g3/start_11434_20261101T203703.json": "d66daa28",
+      "findings/recompute/fig4_g9_inputs/out_s6_g7_g3/start_11434_20261101T223410.json": "d66daa28",
+      "findings/recompute/fig4_g9_inputs/out_s6_g7_g3/start_11441_20261101T095445.json": "d66daa28",
+      "findings/recompute/fig4_g9_inputs/out_s6_g7_g3/start_11441_20261101T192833.json": "d66daa28",
+      "findings/recompute/fig4_g9_inputs/out_s6_g7_g3/start_11451_20261101T095704.json": "d66daa28",
+      "findings/recompute/fig4_g9_inputs/out_s6_g7_g3/start_11451_20261102T095537.json": "d66daa28",
+      "findings/recompute/fig4_g9_inputs/out_s6_g7_g3/start_11456_20261101T095555.json": "d66daa28",
+      "findings/recompute/fig4_g9_inputs/out_s6_g7_g3/start_11456_20261101T203813.json": "d66daa28"
+     }
+    }
+   },
+   "sources": {
+    "G3": {
+     "kind": "v2.4",
+     "run_sha256": "38ae79ab023b97562b69b2875b3c8001b02f887d5578121103b85d4a0b4729da",
+     "set_aside": 1294
+    },
+    "S6G3": {
+     "kind": "v2.5 changed",
+     "run_sha256": "211568dbdfa09482e9c0abfb3b1da92d0bbd62d14a7646058663a990cbb54235",
+     "set_aside": 560
+    },
+    "S6G7G3": {
+     "kind": "v2.5 all",
+     "run_sha256": "4fd04162d5d12dcb91d62af506b9ac6b65675dc16cf3fc8423d258ff7041af9a",
+     "set_aside": 0
+    }
+   }
+  }
+ },
+ "g17": {
+  "decision": "D250 (layout), D240 (G17)",
+  "reading": "findings/recompute/S571_rlm_reading/g17_d123/g17_reading.json",
+  "reading_sha256": "e824e35e084ab7ff7788a38248ce399d6f8188f564a3b3088d3ecb052f4a6880",
+  "s576": "findings/recompute/S576_d249/s576_d249.json",
+  "s576_sha256": "3c819abbdbf982216e4d3552951c7fe132eac20a7d3d5d4879eb2e507dfd70b8",
+  "s576_code_sha256": {
+   "scripts/S576_d249_hypotheses.py": "65c2fec33e12db6f89b1008d591e4ee96efff3053b1ec458b741c7c7211730c5",
+   "scripts/S463_fig2_ranking.py": "906affaedad63a6bf3ffb96e5363467ddde580b339ef9cb58a287b2ab74f00f8",
+   "scripts/S575_g17_contrasts.py": "c5b6ee839516c3305e152e3fb999d6e9634d1b86633db7dd4287be92c254e440"
+  },
+  "s575_contrasts": "findings/recompute/S575_g17_contrasts/contrasts.json",
+  "s575_contrasts_sha256": "7670e44cae5f998eeb7d26157d865d6cae387d328a8f4a586fdfda6da624b2c8",
+  "resamples": 10000,
+  "seed": 20261013,
+  "unscored_cells": {
+   "ctrl": 0,
+   "search_off": 0,
+   "gate_off": 0,
+   "package": 0
+  },
+  "drawn": "d: concept recall per question, mean of draws [1, 2, 3]; e: sub-calls that returned paper text and distinct papers read per draw-1 answer; four arms, one-paper and many-paper questions, house boxes",
+  "source_data_only": "S576's paired differences on the mean of draws 1 to 3 (the legend quotes each arm minus the control on concept recall)"
+ },
+ "g9": {
+  "path": "findings/recompute/g9_inputs",
+  "answers_sha256": {
+   "orch_distil_every_step": "d08585ab9a8f853eea7a6acaa8b19e5c83cccfbff03b619503fe14b6a30571f4",
+   "orch_distil_every_step_f1": "0b12c674719289fbf8bac43b217c5751ba26535533979099ca8bb66a88bd1973"
+  },
+  "judged": true,
+  "retrievals": [
+   "orch_distil_every_step",
+   "orch_distil_every_step_f1"
+  ],
+  "stress_steps": {
+   "orch_distil_every_step": {
+    "distilled": 181
+   },
+   "orch_distil_every_step_f1": {
+    "distilled": 146
+   }
+  }
+ },
+ "recount": {
+  "path": "findings/recompute/S480_fig4_recount.json",
+  "sha256": "6305958ce9e25d2f146b7ea6db5959414c1ac98906bb7fb35c098c64c5a23e8b",
+  "script": "scripts/S480_fig4_recount.py",
+  "script_sha256": "7c432aa0524944649573f60009acb38450eb9886459783d3c8bf7aa1504950ee",
+  "inputs_checked": [
+   "answers_json:full_orchestrator",
+   "answers_json:naive_rag",
+   "answers_json:orch_distil_every_step",
+   "answers_json:orch_distil_every_step_f1",
+   "answers_json:orch_factual_to_documents",
+   "answers_json:orch_no_analyser",
+   "answers_json:orch_no_planner",
+   "answers_json:orch_no_supervisor",
+   "answers_json:orch_no_synthesiser",
+   "answers_json:raw_gemini",
+   "g1_collect",
+   "g1_collect_sidecar",
+   "g3_collect",
+   "g3_collect_sidecar",
+   "rlm_answers_jsonl",
+   "s6_g1_sums"
+  ]
+ },
+ "inputs_sha256": {
+  "experiments/plan.csv@96936742": "f5fd5e87b08c4121f345e0db7b11293d6fbe107145aec08f2477ff912564e38b",
+  "findings/recompute/fig4_repo_inputs/G3_runs/preflight.sh": "01b8a87a2bd08c7fca12a3948f47931033089904b7bf7dd85668ecb84c4f14a5",
+  "findings/recompute/D98_subset/d98_subset.json": "957c79b6b0f3afb12b70be51d0802e7853b4d4ff12e2bdb519d44a10111046bc",
+  "experiments/mentori/orchestrator/distiller_firing.py@96936742": "65766687222d78b8af6e872345047cbad778a94c0a5c53b9bdbe1b52e49be50b",
+  "experiments/mentori/publication/scripts/exp_03_orchestration_ablation.py@96936742": "6783d3f6a5868807b87580a5e3f12a4ee6b38a3d509334636aa17aa2c208c0f0",
+  "experiments/LOCK.toml": "8730d401a5d7b6baa1780e656f844261eaead60e45b5199afa29d57f989ad495",
+  "experiments/FIGURE_LOCK.toml": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "experiments/LIST.md@96936742": "d2fce3fff97d06f2d35eb4295518f6ce30c9319e0b31be16080ef4d1d8cc070b",
+  "experiments/README.md@96936742": "6a1fac64adc05f2be648aac3fcf8ed15f6078a1e5388ce6025ec2ab9b75169eb",
+  "scripts/S457_fig2_panels.py": "13d631dd56b4311cc732f7fc28b2656014c58e0f6b61b9d9b2caa1e94d5a6699",
+  "scripts/S463_fig2_ranking.py": "2f93a2b5df2bd68bdcf38a372d6c737ecdbce54a4e68406f0b261e03fbd9af31",
+  "scripts/judge_rows_v25.py": "aa90f42264e2ce21acfca52c2421d852607418981b6e9be8d8984a716b1ebddd",
+  "scripts/house_style.py": "647c8991f4dcd2cea08e0be46eaf758beb55fb029c54bb267e7fba1e0b8b17b6",
+  "scripts/figure_names.py": "a3c65ae0a1e8aa05e99a99610ea857f63b0d8fff60a99404bcb5bf6ff9a82e65",
+  "scripts/S575_g17_contrasts.py": "c5b6ee839516c3305e152e3fb999d6e9634d1b86633db7dd4287be92c254e440",
+  "scripts/S576_d249_hypotheses.py": "65c2fec33e12db6f89b1008d591e4ee96efff3053b1ec458b741c7c7211730c5",
+  "findings/recompute/S571_rlm_reading/g17_d123/g17_reading.json": "e824e35e084ab7ff7788a38248ce399d6f8188f564a3b3088d3ecb052f4a6880",
+  "findings/recompute/S576_d249/s576_d249.json": "3c819abbdbf982216e4d3552951c7fe132eac20a7d3d5d4879eb2e507dfd70b8",
+  "findings/recompute/S575_g17_contrasts/contrasts.json": "7670e44cae5f998eeb7d26157d865d6cae387d328a8f4a586fdfda6da624b2c8",
+  "resubmission/04_manuscript/02_Main_Text.docx@96936742": "fcb60d13eeba61a55167b3615ca6e1b5b12a9e8b0438b42b4bede999d5332fb2",
+  "resubmission/02_response_to_reviewers/Point_by_point_response_all_reviewers.docx@96936742": "dbfcc49bc340cc14e2818f027ce7a9e3bc1568510b0827029e2cd363f3369463"
+ },
+ "inputs_read": "every input as it stands in the working tree, every check and the claims list on those; inputs_sha256 records the design documents (DESIGN_DOCS) as they stood at DESIGN_AT 96936742 (git show), under names carrying @96936742; exp_03's STRESS_CONFIG_NAMES and distiller_firing.py's code (less its docstring) required the same as at DESIGN_AT",
+ "model_calls": 0,
+ "stamp": "PROVISIONAL: 1,485 of 3,015 answers, draw 1 of eight G3 set-ups (records of 2026-10-19 01:54 CEST, copied 2026-10-23T07:41:05Z, judged by S3, G3 collect of 2026-11-03T15:22:54), of RLM-10 (G1, G1 collect of 2026-10-23T09:41:17) and of G9's two set-ups (judged, retrievals read); key v2.5 judge rows: RLM-10's 60 from S6G1 after phase 3 (frozen fig3_s6_inputs, S528), G3's 600; 0 G3 answers of changed questions still on key v2.4 (D188, awaiting S6G3); 'draw' rows in; T3 not drawn; d, e: G17 (D250), concept recall the mean of draws 1 to 3, reading paper text draw 1, S571's reading e824e35e, S576's differences 3c819abb",
+ "page_mm": [
+  183.0,
+  162.90166666666667
+ ],
+ "figure_lock": {
+  "path": "experiments/FIGURE_LOCK.toml",
+  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "status": "agreed"
+ },
+ "run_lock_now": {
+  "path": "experiments/LOCK.toml",
+  "sha256": "8730d401a5d7b6baa1780e656f844261eaead60e45b5199afa29d57f989ad495"
+ },
+ "g3_start_records": {
+  "commits": [
+   "fd20b16"
+  ],
+  "lock_sha256": [
+   "d66daa28596bf3b70ff90e0fb89b1353eab023eba699427cb05ebb3376105c12"
+  ],
+  "n": 10
+ },
+ "reproduced": {
+  "full_orchestrator": {
+   "stop_log": [
+    135,
+    0
+   ],
+   "records": [
+    135,
+    0
+   ]
+  },
+  "orch_no_analyser": {
+   "stop_log": [
+    135,
+    0
+   ],
+   "records": [
+    135,
+    0
+   ]
+  },
+  "orch_no_planner": {
+   "stop_log": [
+    135,
+    0
+   ],
+   "records": [
+    135,
+    0
+   ]
+  },
+  "orch_no_supervisor": {
+   "stop_log": [
+    135,
+    34
+   ],
+   "records": [
+    135,
+    34
+   ]
+  },
+  "orch_no_synthesiser": {
+   "stop_log": [
+    135,
+    0
+   ],
+   "records": [
+    135,
+    0
+   ]
+  },
+  "orch_factual_to_documents": {
+   "stop_log": [
+    135,
+    0
+   ],
+   "records": [
+    135,
+    0
+   ]
+  },
+  "raw_gemini": {
+   "plan_csv": "all three draws",
+   "records": {
+    "1": 135,
+    "2": 135,
+    "3": 135
+   }
+  },
+  "naive_rag": {
+   "plan_csv": "all three draws",
+   "records": {
+    "1": 135,
+    "2": 135,
+    "3": 135
+   }
+  },
+  "q82_distiller_firing_count": {
+   "answers": 135,
+   "step_attempts": 146,
+   "steps_over_threshold": 0,
+   "threshold_chars": 209712,
+   "distill_status": {
+    "not_asked": 146
+   },
+   "largest_step_output": {
+    "chars": 62712,
+    "answer_key": "exp_v4_s20_n0|full_orchestrator|OOD_048|d1",
+    "step_id": "step_1",
+    "attempt_no": 1
+   }
+  },
+  "s480_at_head": {
+   "script_sha256": "7c432aa0524944649573f60009acb38450eb9886459783d3c8bf7aa1504950ee",
+   "equal_to": "HEAD"
+  },
+  "s480_recount_v24": {
+   "raw_gemini": {
+    "answerable_pass_4": 32,
+    "answerable_pass_3": 62,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 0,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 8,
+    "false_premise_pass_3": 8,
+    "false_premise_judged": 10,
+    "judged_no_answer": 0,
+    "unscored": 0,
+    "not_answerable_direct_answer": null
+   },
+   "naive_rag": {
+    "answerable_pass_4": 73,
+    "answerable_pass_3": 82,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 39,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 10,
+    "false_premise_pass_3": 10,
+    "false_premise_judged": 10,
+    "judged_no_answer": 0,
+    "unscored": 0,
+    "not_answerable_direct_answer": null
+   },
+   "full_orchestrator": {
+    "answerable_pass_4": 65,
+    "answerable_pass_3": 84,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 2,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 8,
+    "false_premise_pass_3": 8,
+    "false_premise_judged": 10,
+    "judged_no_answer": 0,
+    "unscored": 0,
+    "not_answerable_direct_answer": 37
+   },
+   "orch_no_analyser": {
+    "answerable_pass_4": 66,
+    "answerable_pass_3": 82,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 37,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 8,
+    "false_premise_pass_3": 8,
+    "false_premise_judged": 10,
+    "judged_no_answer": 0,
+    "unscored": 0,
+    "not_answerable_direct_answer": null
+   },
+   "orch_no_planner": {
+    "answerable_pass_4": 63,
+    "answerable_pass_3": 80,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 1,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 9,
+    "false_premise_pass_3": 9,
+    "false_premise_judged": 10,
+    "judged_no_answer": 0,
+    "unscored": 0,
+    "not_answerable_direct_answer": 37
+   },
+   "orch_no_supervisor": {
+    "answerable_pass_4": 65,
+    "answerable_pass_3": 81,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 1,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 9,
+    "false_premise_pass_3": 10,
+    "false_premise_judged": 10,
+    "judged_no_answer": 0,
+    "unscored": 0,
+    "not_answerable_direct_answer": 38
+   },
+   "orch_no_synthesiser": {
+    "answerable_pass_4": 68,
+    "answerable_pass_3": 81,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 2,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 10,
+    "false_premise_pass_3": 10,
+    "false_premise_judged": 10,
+    "judged_no_answer": 0,
+    "unscored": 0,
+    "not_answerable_direct_answer": 37
+   },
+   "orch_factual_to_documents": {
+    "answerable_pass_4": 60,
+    "answerable_pass_3": 79,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 38,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 9,
+    "false_premise_pass_3": 10,
+    "false_premise_judged": 10,
+    "judged_no_answer": 0,
+    "unscored": 0,
+    "not_answerable_direct_answer": 0
+   },
+   "orch_distil_every_step": {
+    "answerable_pass_4": 55,
+    "answerable_pass_3": 79,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 2,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 9,
+    "false_premise_pass_3": 10,
+    "false_premise_judged": 10,
+    "judged_no_answer": 0,
+    "unscored": 0,
+    "not_answerable_direct_answer": 36
+   },
+   "orch_distil_every_step_f1": {
+    "answerable_pass_4": 60,
+    "answerable_pass_3": 79,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 2,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 9,
+    "false_premise_pass_3": 10,
+    "false_premise_judged": 10,
+    "judged_no_answer": 0,
+    "unscored": 0,
+    "not_answerable_direct_answer": 37
+   },
+   "rlm_10": {
+    "answerable_pass_4": 66,
+    "answerable_pass_3": 80,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 39,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 10,
+    "false_premise_pass_3": 10,
+    "false_premise_judged": 10,
+    "judged_no_answer": 1,
+    "unscored": 0,
+    "not_answerable_direct_answer": null
+   }
+  },
+  "s480_recount": {
+   "raw_gemini": {
+    "answerable_pass_4": 32,
+    "answerable_pass_3": 62,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 0,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 8,
+    "false_premise_pass_3": 9,
+    "false_premise_judged": 10,
+    "judged_no_answer": 0,
+    "unscored": 0,
+    "not_answerable_direct_answer": null
+   },
+   "naive_rag": {
+    "answerable_pass_4": 72,
+    "answerable_pass_3": 82,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 39,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 10,
+    "false_premise_pass_3": 10,
+    "false_premise_judged": 10,
+    "judged_no_answer": 0,
+    "unscored": 0,
+    "not_answerable_direct_answer": null
+   },
+   "full_orchestrator": {
+    "answerable_pass_4": 65,
+    "answerable_pass_3": 84,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 2,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 8,
+    "false_premise_pass_3": 8,
+    "false_premise_judged": 10,
+    "judged_no_answer": 0,
+    "unscored": 0,
+    "not_answerable_direct_answer": 37
+   },
+   "orch_no_analyser": {
+    "answerable_pass_4": 67,
+    "answerable_pass_3": 82,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 37,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 8,
+    "false_premise_pass_3": 8,
+    "false_premise_judged": 10,
+    "judged_no_answer": 0,
+    "unscored": 0,
+    "not_answerable_direct_answer": null
+   },
+   "orch_no_planner": {
+    "answerable_pass_4": 63,
+    "answerable_pass_3": 80,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 1,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 9,
+    "false_premise_pass_3": 9,
+    "false_premise_judged": 10,
+    "judged_no_answer": 0,
+    "unscored": 0,
+    "not_answerable_direct_answer": 37
+   },
+   "orch_no_supervisor": {
+    "answerable_pass_4": 66,
+    "answerable_pass_3": 81,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 1,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 9,
+    "false_premise_pass_3": 10,
+    "false_premise_judged": 10,
+    "judged_no_answer": 0,
+    "unscored": 0,
+    "not_answerable_direct_answer": 38
+   },
+   "orch_no_synthesiser": {
+    "answerable_pass_4": 68,
+    "answerable_pass_3": 81,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 2,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 10,
+    "false_premise_pass_3": 10,
+    "false_premise_judged": 10,
+    "judged_no_answer": 0,
+    "unscored": 0,
+    "not_answerable_direct_answer": 37
+   },
+   "orch_factual_to_documents": {
+    "answerable_pass_4": 60,
+    "answerable_pass_3": 79,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 38,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 9,
+    "false_premise_pass_3": 10,
+    "false_premise_judged": 10,
+    "judged_no_answer": 0,
+    "unscored": 0,
+    "not_answerable_direct_answer": 0
+   },
+   "orch_distil_every_step": {
+    "answerable_pass_4": 54,
+    "answerable_pass_3": 79,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 2,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 9,
+    "false_premise_pass_3": 10,
+    "false_premise_judged": 10,
+    "judged_no_answer": 0,
+    "unscored": 0,
+    "not_answerable_direct_answer": 36
+   },
+   "orch_distil_every_step_f1": {
+    "answerable_pass_4": 60,
+    "answerable_pass_3": 79,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 2,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 9,
+    "false_premise_pass_3": 10,
+    "false_premise_judged": 10,
+    "judged_no_answer": 0,
+    "unscored": 0,
+    "not_answerable_direct_answer": 37
+   },
+   "rlm_10": {
+    "answerable_pass_4": 64,
+    "answerable_pass_3": 80,
+    "answerable_judged": 86,
+    "not_answerable_refused_3": 39,
+    "not_answerable_judged": 39,
+    "false_premise_pass_4": 9,
+    "false_premise_pass_3": 10,
+    "false_premise_judged": 10,
+    "judged_no_answer": 1,
+    "unscored": 0,
+    "not_answerable_direct_answer": null
+   }
+  },
+  "s480_draw_counts": {
+   "rows": 66,
+   "equal_to": "the recount's draw_counts"
+  },
+  "new_rows": {
+   "frozen_collect_rows_equal": 1654,
+   "collect_rows": 1924,
+   "nine_with_and_without_stress": "equal"
+  },
+  "g17_s576": "S576's descriptive contrasts and arm means on draws 1 to 3 (findings/recompute/S576_d249/s576_d249.json) equal S576.evaluate() and arm_means() run again on findings/recompute/S571_rlm_reading/g17_d123/g17_reading.json; S576 names the reading and findings/recompute/S575_g17_contrasts/contrasts.json by the sha256 read here"
+ },
+ "planned_answers": {
+  "parts": {
+   "baselines (3 draws each, D79 Q134)": 810,
+   "six wave-1 set-ups (draw 1 + D98 subset draws 2 and 3)": 1350,
+   "distiller set-ups (WAVE2)": 0,
+   "G9 stress set-ups (draw 1 + D98 subset draws 2 and 3)": 450,
+   "RLM-10 (G1, Figure 3's answers, D83 Q148)": 405
+  },
+  "N": 3015,
+  "subset_n": 45,
+  "wave2": [
+   "orch_no_distiller",
+   "orch_distiller_f1"
+  ],
+  "stress": [
+   "orch_distil_every_step",
+   "orch_distil_every_step_f1"
+  ],
+  "zero_branch": true
+ },
+ "q82": {
+  "full_orchestrator": {
+   "answers": 135,
+   "step_attempts": 146,
+   "over_threshold": 0,
+   "threshold_chars": 209712,
+   "largest_chars": 62712
+  },
+  "orch_no_analyser": {
+   "answers": 135,
+   "step_attempts": 206,
+   "over_threshold": 0,
+   "threshold_chars": 209712,
+   "largest_chars": 67570
+  },
+  "orch_no_planner": {
+   "answers": 135,
+   "step_attempts": 117,
+   "over_threshold": 0,
+   "threshold_chars": 209712,
+   "largest_chars": 65914
+  },
+  "orch_no_supervisor": {
+   "answers": 135,
+   "step_attempts": 91,
+   "over_threshold": 0,
+   "threshold_chars": 209712,
+   "largest_chars": 63191
+  },
+  "orch_no_synthesiser": {
+   "answers": 135,
+   "step_attempts": 139,
+   "over_threshold": 0,
+   "threshold_chars": 209712,
+   "largest_chars": 62032
+  },
+  "orch_factual_to_documents": {
+   "answers": 135,
+   "step_attempts": 185,
+   "over_threshold": 0,
+   "threshold_chars": 209712,
+   "largest_chars": 63344
+  }
+ },
+ "drawn_check": "check_drawn(): 1567 drawn marks equal their Source Data",
+ "dots_overlapping": {
+  "model calls no retrieval": 132,
+  "model calls naive RAG": 132,
+  "model calls full pipeline": 108,
+  "model calls no analyser": 112,
+  "model calls no planner": 104,
+  "model calls no supervisor": 112,
+  "model calls no synthesizer": 100,
+  "model calls routing fix": 109,
+  "model calls always distil": 109,
+  "model calls always distil F1": 107,
+  "model calls RLM-10": 111,
+  "own time (s) no retrieval": 112,
+  "own time (s) naive RAG": 129,
+  "own time (s) full pipeline": 106,
+  "own time (s) no analyser": 120,
+  "own time (s) no planner": 111,
+  "own time (s) no supervisor": 111,
+  "own time (s) no synthesizer": 105,
+  "own time (s) routing fix": 124,
+  "own time (s) always distil": 106,
+  "own time (s) always distil F1": 110,
+  "d cr one RLM-10": 12,
+  "d cr one Zhang RLM-10": 5,
+  "d cr one search tools off": 1,
+  "d cr many RLM-10": 3,
+  "d cr many Zhang RLM-10": 5,
+  "d cr many search tools off": 5,
+  "d cr many quality gate off": 4,
+  "e sub_calls_with_paper_text one RLM-10": 32,
+  "e sub_calls_with_paper_text one Zhang RLM-10": 21,
+  "e sub_calls_with_paper_text one search tools off": 38,
+  "e sub_calls_with_paper_text one quality gate off": 37,
+  "e sub_calls_with_paper_text many RLM-10": 19,
+  "e sub_calls_with_paper_text many Zhang RLM-10": 18,
+  "e sub_calls_with_paper_text many search tools off": 20,
+  "e sub_calls_with_paper_text many quality gate off": 19,
+  "e n_papers one RLM-10": 43,
+  "e n_papers one Zhang RLM-10": 36,
+  "e n_papers one search tools off": 46,
+  "e n_papers one quality gate off": 44,
+  "e n_papers many RLM-10": 19,
+  "e n_papers many Zhang RLM-10": 20,
+  "e n_papers many search tools off": 21,
+  "e n_papers many quality gate off": 18
+ },
+ "held_not_drawn": {
+  "baselines draws 2 and 3": {
+   "raw_gemini": 270,
+   "naive_rag": 270
+  },
+  "orch_no_supervisor draw 2": 34,
+  "of which on D98 subset questions": 11
+ },
+ "panels": {
+  "a": "P-1 (D132), full width (D250): the 86 answerable questions by set-up, tiles in three cividis levels (4 or 5, 3, 2 or less or no answer) in one shared order; pass rate at 4 with the Rule 2 interval. Difference from the full pipeline and P: Source Data only (Valerio, 2 November)",
+  "b": "R-1 (D132) as D250 set it: the 39 out-of-scope questions by set-up, tiles refused or not, a dot where the analyser sent the question to a direct answer; the 10 false-premise questions as tiles of their own, a pass at 4 outlined in vermillion; no refusal rate margin (Source Data only) and no false-premise column (sheet b)",
+  "c": "C-2 and A-3 (D132), moved up beside b (D250): per set-up, on b's rows, model calls per answer (log axis by doubling) and own time per answer (calls' wall_s + search_s, log axis) as two box columns, each box over one grey dot per answer; RLM-10's time row prints that no search time was recorded; each column's answers above it; failed and cut calls in sheet c only (sheet d inside this script)",
+  "d": "G17 (D250, option 2b): concept recall per answerable question, each question's mean over draws 1 to 3, one house box per arm and question type, dots one question each",
+  "e": "G17 (D250, option 2b): per draw-1 answer, sub-calls that returned paper text and distinct papers read, house boxes on an axis linear to 2 and logarithmic above",
+  "moved": "old b (F-2, the plan step attempts against the distiller threshold) is Supplementary Figure 10a (S524), from findings/recompute/S472_supp12a_steps.json"
+ },
+ "colours": {
+  "a, b": "cividis",
+  "dots": "#8C8C8C",
+  "b false-premise pass": "#D55E00",
+  "d, e arms": {
+   "RLM-10": "#0072B2",
+   "Zhang RLM-10": "#D55E00",
+   "search tools off": "#56B4E9",
+   "quality gate off": "#CC79A7"
+  }
+ },
+ "files": {
+  "Figure 5 (provisional, 1485 of 3015).pdf": "0da186644f44f36a54f47d8f208b28961fc222fc4bb1a263838772048b97e05a",
+  "Figure 5 (provisional, 1485 of 3015).svg": "cb4ee79e6c53241e4248015912ae7a96d0167e549d6f0979b9678f7694b8f782",
+  "Figure 5 (provisional, 1485 of 3015).png": "73c1cccd846a8c04b67e4386cedd3c13cdbe7f1882657d7a2556be3bd175a4d0",
+  "Source Data Fig. 5 (provisional, 1485 of 3015).xlsx": "aa90b86ddfda998826864c8f6cf42f17a881c71044b83ddfb6a1a6d008b31d20",
+  "Source Data Fig. 5 caption (provisional, 1485 of 3015).md": "124b50d1b30d3ce071850cc828b335962f33a102ae9fbeb7df2a978c88987e67",
+  "figure5_numbers.json": "8429825c65ec3c17da2c135a1dcd996c7657cd2717e21b8eec5256fd18b8088b",
+  "legend_draft.md": "de13d9c3f3b004e27308421edd58eb9500f07dd7ea7fcfb67bbef2642a89385c",
+  "claims.md": "377abe7ee022b641035c58c51ac2b2801d72551c39930a8aa01bbdddea09ebe4",
+  "records_manifest.json": "4cb9dee23516ce041f169d7527190c41e99b2efebf4509ba9e3c9908bf4b1131"
+ }
+}

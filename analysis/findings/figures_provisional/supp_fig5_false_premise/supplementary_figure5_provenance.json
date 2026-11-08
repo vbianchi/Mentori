@@ -1,0 +1,193 @@
+{
+ "script": "scripts/S532_supp4_false_premise.py",
+ "script_sha256": "49adb101e3e6f258a21966d63e8a9b9e01edb71856583708b35f2084c19dec76",
+ "command": "uv run --frozen python scripts/S532_supp4_false_premise.py plate",
+ "python": "3.13.11",
+ "model_calls": 0,
+ "inputs_sha256": {
+  "findings/recompute/fig2_inputs/g1_collect.jsonl": "f5ff75bc244cda492a48e7e11f54f2007ed7d586a8f49e78921edd7244b28965",
+  "findings/recompute/G4_fig3c_d185/q66_tables.json": "e08237f293a4e9867307f01229f75dfe2cbfe60d0457a7a37942f6e6c2bf7579"
+ },
+ "stamp": "PROVISIONAL: 540 of 540 answers on their final key: a and b, all 180 (G1, three draws, 108 on changed questions read from S6G1, the others unchanged by key v2.5); c, 360 of 360 (G4 draw 1, 0 awaiting S6G4, read on key v2.4 until it ends)",
+ "figure": "Supplementary Figure 5",
+ "page_mm": [
+  183.0,
+  127.6
+ ],
+ "judge_rows": {
+  "reader": "scripts/judge_rows_v25.py (D186 (3)): an answer's key v2.5 row (S512, out_s6_g1 with out_s6_g1r15 as --replace) where one exists, else its key v2.4 row (out/ with out_g1r15/)",
+  "sources": {
+   "G1": {
+    "kind": "v2.4",
+    "present": true,
+    "run_sha256": "38ae79ab023b97562b69b2875b3c8001b02f887d5578121103b85d4a0b4729da",
+    "rows": 2430,
+    "replace": {
+     "keys": 15,
+     "rows_from_replace": 15
+    }
+   },
+   "S6G1": {
+    "kind": "v2.5 changed",
+    "present": true,
+    "missing": [],
+    "run_sha256": "211568dbdfa09482e9c0abfb3b1da92d0bbd62d14a7646058663a990cbb54235",
+    "rows": 1080,
+    "replace": {
+     "keys": 15,
+     "rows_from_replace": 5
+    }
+   }
+  },
+  "status": "key v2.5 for every answer of the 132 changed questions read (1,080)",
+  "provisional": false,
+  "answers_read": 2430,
+  "cells_from_v25": 1080,
+  "awaiting_s6_read": 0,
+  "awaiting_s6_all_draws": 0,
+  "by_status": {
+   "v2.4": 1350,
+   "v2.5": 1080
+  },
+  "by_draw": {
+   "1": {
+    "v2.4": 450,
+    "v2.5": 360
+   },
+   "2": {
+    "v2.4": 450,
+    "v2.5": 360
+   },
+   "3": {
+    "v2.4": 450,
+    "v2.5": 360
+   }
+  },
+  "units_v25": {
+   "folders": {
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/judge/exp_01__multi_hop__exp_v4_s20_n0": {
+     "rows": 180,
+     "recheck": {
+      "phase 1": "10 of 10 equal",
+      "phase 2": "10 of 10 equal"
+     },
+     "judge": "devstral-small-2:24b 33af3142213a"
+    },
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/judge/exp_01__rlm_10__exp_v4_s20_n0": {
+     "rows": 180,
+     "recheck": {
+      "phase 1": "10 of 10 equal",
+      "phase 2": "10 of 10 equal"
+     },
+     "judge": "devstral-small-2:24b 33af3142213a"
+    },
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/judge/exp_01__rlm_20__exp_v4_s20_n0": {
+     "rows": 180,
+     "recheck": {
+      "phase 1": "10 of 10 equal",
+      "phase 2": "10 of 10 equal"
+     },
+     "judge": "devstral-small-2:24b 33af3142213a"
+    },
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/judge/exp_01__rlm_5__exp_v4_s20_n0": {
+     "rows": 180,
+     "recheck": {
+      "phase 1": "10 of 10 equal",
+      "phase 2": "10 of 10 equal"
+     },
+     "judge": "devstral-small-2:24b 33af3142213a"
+    },
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/judge/exp_01__single_pass__exp_v4_s20_n0": {
+     "rows": 180,
+     "recheck": {
+      "phase 1": "10 of 10 equal",
+      "phase 2": "10 of 10 equal"
+     },
+     "judge": "devstral-small-2:24b 33af3142213a"
+    },
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/judge/exp_01__verified_pass__exp_v4_s20_n0": {
+     "rows": 180,
+     "recheck": {
+      "phase 1": "10 of 10 equal",
+      "phase 2": "10 of 10 equal"
+     },
+     "judge": "devstral-small-2:24b 33af3142213a"
+    },
+    "findings/recompute/fig3_s6_inputs/out_s6_g1r15/judge/exp_01__rlm_10__exp_v4_s20_n0": {
+     "rows": 1,
+     "recheck": {
+      "phase 1": "0 of 0 equal",
+      "phase 2": "1 of 1 equal"
+     },
+     "judge": "devstral-small-2:24b 33af3142213a"
+    },
+    "findings/recompute/fig3_s6_inputs/out_s6_g1r15/judge/exp_01__rlm_20__exp_v4_s20_n0": {
+     "rows": 2,
+     "recheck": {
+      "phase 1": "2 of 2 equal",
+      "phase 2": "0 of 0 equal"
+     },
+     "judge": "devstral-small-2:24b 33af3142213a"
+    },
+    "findings/recompute/fig3_s6_inputs/out_s6_g1r15/judge/exp_01__rlm_5__exp_v4_s20_n0": {
+     "rows": 2,
+     "recheck": {
+      "phase 1": "1 of 1 equal",
+      "phase 2": "1 of 1 equal"
+     },
+     "judge": "devstral-small-2:24b 33af3142213a"
+    }
+   },
+   "starts": {
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/start_11434_20261031T015532.json": "d66daa28",
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/start_11434_20261031T080315.json": "d66daa28",
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/start_11434_20261031T081045.json": "d66daa28",
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/start_11434_20261031T084549.json": "d66daa28",
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/start_11434_20261101T093806.json": "d66daa28",
+    "findings/recompute/fig3_s6_inputs/out_s6_g1r15/start_11434_20261031T015532.json": "d66daa28",
+    "findings/recompute/fig3_s6_inputs/out_s6_g1r15/start_11434_20261031T080315.json": "d66daa28",
+    "findings/recompute/fig3_s6_inputs/out_s6_g1r15/start_11434_20261031T081045.json": "d66daa28",
+    "findings/recompute/fig3_s6_inputs/out_s6_g1r15/start_11434_20261031T084549.json": "d66daa28",
+    "findings/recompute/fig3_s6_inputs/out_s6_g1r15/start_11434_20261101T093806.json": "d66daa28"
+   }
+  }
+ },
+ "reproduced": {
+  "v2.4 answer keys equal ranking.json": 360,
+  "ranking_at": "94262a0e",
+  "v2.5": {
+   "answers": 180,
+   "changed": 108,
+   "passed_4": 163,
+   "per_strategy": {
+    "single_pass": 30,
+    "multi_hop": 28,
+    "verified_pass": 28,
+    "rlm_5": 26,
+    "rlm_10": 25,
+    "rlm_20": 26
+   }
+  },
+  "q66_ids": [
+   "OOD_041",
+   "OOD_042",
+   "OOD_044",
+   "OOD_045",
+   "OOD_049"
+  ]
+ },
+ "rule": "Rule 9: passed = correctness 4 or more against the refutation (3 relaxed); k of n, no interval, no test, no ranking",
+ "figure_lock": {
+  "path": "experiments/FIGURE_LOCK.toml",
+  "status": "agreed"
+ },
+ "files": {
+  "Supplementary Figure 5 (provisional, 540 of 540).pdf": "67510d3b3222270a6eea10d41e11b355f688d30f8b1e7977044819efe480a391",
+  "Supplementary Figure 5 (provisional, 540 of 540).svg": "31068e1dd615dfc95a739cf17a3b641101f393405872e392e5e94909efbbb60a",
+  "Supplementary Figure 5 (provisional, 540 of 540).png": "94ac5a6dfa3fe4d2303249f2e2035fdcd440f5ad65aeedc42e420740864a014a",
+  "Supplementary Figure 5 data (provisional, 540 of 540).xlsx": "051c5b69e44b1cb7fded09e95c1d093869d01ae787df30ad0f23c2650919e66b",
+  "Supplementary Figure 5 data caption (provisional, 540 of 540).md": "f7c310bd193eeecb30e2f5e2595aaecf4e3f5a3ed94e8e27ace6175d85ea7df2",
+  "supplementary_figure5_numbers.json": "65190897134c743e0c1b8faeffaadb416805e04cbf9eaa52a9f932640e821990",
+  "legend_draft.md": "4cdb50b6b95dda9a00c09d3f07226123a7ea6bb7c3a26acb0f9ba1222c91f5c5"
+ }
+}

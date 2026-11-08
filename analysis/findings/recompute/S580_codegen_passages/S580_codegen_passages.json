@@ -1,0 +1,492 @@
+{
+ "provenance": {
+  "script": "scripts/S580_codegen_passages.py",
+  "script_sha256": "6ae922e638efca39fdf7e93a8c7f0baae0ec30f4eca996c46833170f0aefe08e",
+  "command": "uv run python scripts/S580_codegen_passages.py",
+  "repo_head": "8b542fae",
+  "inputs_sha256": {
+   "findings/figures_provisional/fig6/figure7_numbers.json": "d334db3de14c3990333cc6ae778c1700727e428714731199aa3e73b666e01049",
+   "findings/figures_provisional/supp_fig23_fig6_pairs/supplementary_figure23_numbers.json": "4f73ceed9715be369ed0ed3579bb27f61d2777d155b48a07505358523b4ff9d2",
+   "findings/figures_provisional/fig6/fig6_numbers.json": "14ea3bb30101edda9be40835c1f64e47fceb2c73b080190b9cc32c6b13ed9b6d",
+   "findings/figures_provisional/supp_fig13_fig6_models/supplementary_figure13_numbers.json": "e520c6135e85375e578d3cda43aa8c884e347e362abb6ad171e0a0235b958615",
+   "findings/figures_provisional/supp_fig12_fig6_failures/supplementary_figure12_numbers.json": "329e10c883fecd6a0b0d179a87258c0c00b6f3ff04d24d8924bb2f36f00db8c3",
+   "findings/recompute/S488_fig6_heterogeneity/S488_fig6_heterogeneity.json": "edf9656b6d56bb3d3dd9932d3766ef9dcb67b9baaa663adc5b8604186629ba63",
+   "scripts/S488_fig6_heterogeneity.py": "5ed25daad1815e7683d02f8f279ee3fb7e90d361bb8deeb2652b7e281c5b2d58"
+  },
+  "records": "PROVISIONAL: 2,420 of 2,420 attempts, 11 of 11 variants complete, records of 2026-11-04 08:35 CET; after the S4 reruns (D75, D80 V1, D81)",
+  "reproduced": [
+   "S488 committed Q 55.9 / 6.0 by its own cochran_q",
+   "WANT 2,420 / 1,692",
+   "families 515/880, 510/660, 667/880",
+   "gpt-oss:20b (high) 133/220",
+   "Supp 12 failures = attempts - passes per variant and family",
+   "S447 cells = sheet 6a"
+  ]
+ },
+ "P1": {
+  "free_form": {
+   "passes": 510,
+   "attempts": 660,
+   "pct": 77.3
+  },
+  "introspection": {
+   "passes": 667,
+   "attempts": 880,
+   "pct": 75.8
+  },
+  "structured": {
+   "passes": 515,
+   "attempts": 880,
+   "pct": 58.5
+  },
+  "structured_minus_free_form_points": -18.8,
+  "structured_minus_free_form_exact": "-18.75",
+  "best_of_3_vs_free_form": {
+   "change_points": 2.7,
+   "low": -2.3,
+   "high": 7.7,
+   "rescued": 19,
+   "lost": 13,
+   "pairs": 220
+  },
+  "combined_vs_free_form": {
+   "change_points": -1.4,
+   "low": -7.7,
+   "high": 5.0,
+   "rescued": 25,
+   "lost": 28,
+   "pairs": 220
+  },
+  "structured_best_of_3_vs_structured": {
+   "change_points": 7.3,
+   "low": 0.5,
+   "high": 14.1,
+   "rescued": 35,
+   "lost": 19,
+   "pairs": 220
+  },
+  "structured_x3_vs_structured": {
+   "change_points": 9.1,
+   "low": 2.7,
+   "high": 15.5,
+   "rescued": 36,
+   "lost": 16,
+   "pairs": 220
+  },
+  "structured_combined_vs_structured": {
+   "change_points": 6.8,
+   "low": 1.4,
+   "high": 12.7,
+   "rescued": 32,
+   "lost": 17,
+   "pairs": 220
+  },
+  "structured_best_of_3_vs_free_form": {
+   "change_points": -16.8,
+   "low": -25.0,
+   "high": -8.6,
+   "rescued": 20,
+   "lost": 57,
+   "pairs": 220
+  },
+  "structured_x3_vs_free_form": {
+   "change_points": -15.0,
+   "low": -25.0,
+   "high": -4.1,
+   "rescued": 22,
+   "lost": 55,
+   "pairs": 220
+  },
+  "structured_vs_free_form_single": {
+   "change_points": -24.1,
+   "low": -34.1,
+   "high": -14.5,
+   "rescued": 17,
+   "lost": 70,
+   "pairs": 220
+  }
+ },
+ "P2": {
+  "gap_by_block": {
+   "Gemini": {
+    "variants": 4,
+    "most_negative": {
+     "variant": "gemini-2.5-pro (low)",
+     "points": -9.6
+    },
+    "least_negative_or_most_positive": {
+     "variant": "gemini-3-flash (low)",
+     "points": 7.9
+    },
+    "pooled": {
+     "structured": [
+      266,
+      320
+     ],
+     "free_form": [
+      198,
+      240
+     ],
+     "gap_points": 0.6
+    },
+    "per_variant_points": {
+     "gemini-2.5-pro (low)": -9.6,
+     "gemini-3-flash (default)": 0.8,
+     "gemini-2.5-pro (default)": 3.3,
+     "gemini-3-flash (low)": 7.9
+    }
+   },
+   "open-weight": {
+    "variants": 7,
+    "most_negative": {
+     "variant": "gemma3:27b",
+     "points": -63.3
+    },
+    "least_negative_or_most_positive": {
+     "variant": "gpt-oss:20b (low)",
+     "points": -10.8
+    },
+    "pooled": {
+     "structured": [
+      249,
+      560
+     ],
+     "free_form": [
+      312,
+      420
+     ],
+     "gap_points": -29.8
+    },
+    "per_variant_points": {
+     "gemma3:27b": -63.3,
+     "qwen3-coder-next": -39.6,
+     "gpt-oss:20b (high)": -30.0,
+     "qwen3-coder:30b": -27.5,
+     "devstral-small-2:24b": -26.3,
+     "gpt-oss:20b (medium)": -11.3,
+     "gpt-oss:20b (low)": -10.8
+    }
+   }
+  },
+  "heterogeneity_S488_method": {
+   "structured vs free-form": {
+    "Q": 40.4,
+    "df": 10,
+    "P": 1.4e-05,
+    "I2_pct": 75
+   },
+   "introspection vs free-form": {
+    "Q": 6.0,
+    "df": 10,
+    "P": 0.82,
+    "I2_pct": 0
+   },
+   "structured vs free-form, without gemma3:27b": {
+    "Q": 29.0,
+    "df": 9,
+    "P": 0.00065,
+    "I2_pct": 69
+   }
+  },
+  "median_operation_pass_pct": {
+   "structured": {
+    "simple": 77.3,
+    "medium": 67.0,
+    "complex": 33.0
+   },
+   "free-form": {
+    "simple": 90.9,
+    "medium": 86.4,
+    "complex": 71.2
+   },
+   "introspection": {
+    "simple": 90.9,
+    "medium": 83.0,
+    "complex": 63.6
+   }
+  },
+  "n_operations": {
+   "simple": 6,
+   "medium": 8,
+   "complex": 6
+  }
+ },
+ "P3": {
+  "open_weight_structured_failed": 311,
+  "tool_failures (tools refused + other tool or call failure)": 120,
+  "supp20_groups_open_weight_structured": {
+   "tools refused by Ollama": {
+    "total": 78,
+    "by_variant": {
+     "gemma3:27b": 78
+    }
+   },
+   "other tool or call failure": {
+    "total": 42,
+    "by_variant": {
+     "qwen3-coder-next": 27,
+     "gpt-oss:20b (high)": 15
+    }
+   },
+   "length stop": {
+    "total": 18,
+    "by_variant": {
+     "qwen3-coder-next": 1,
+     "devstral-small-2:24b": 17
+    }
+   },
+   "no result": {
+    "total": 53,
+    "by_variant": {
+     "qwen3-coder:30b": 3,
+     "qwen3-coder-next": 9,
+     "gpt-oss:20b (low)": 6,
+     "gpt-oss:20b (medium)": 5,
+     "gpt-oss:20b (high)": 21,
+     "devstral-small-2:24b": 9
+    }
+   },
+   "wrong values": {
+    "total": 106,
+    "by_variant": {
+     "qwen3-coder:30b": 27,
+     "qwen3-coder-next": 12,
+     "gpt-oss:20b (low)": 20,
+     "gpt-oss:20b (medium)": 21,
+     "gpt-oss:20b (high)": 7,
+     "devstral-small-2:24b": 19
+    }
+   },
+   "other (harness, no code)": {
+    "total": 14,
+    "by_variant": {
+     "gpt-oss:20b (low)": 4,
+     "gpt-oss:20b (medium)": 3,
+     "gpt-oss:20b (high)": 5,
+     "gemma3:27b": 2
+    }
+   }
+  },
+  "S447_fail_kinds_open_weight_structured": {
+   "result wrong or missing": {
+    "total": 119,
+    "by_variant": {
+     "qwen3-coder:30b": 29,
+     "qwen3-coder-next": 14,
+     "gpt-oss:20b (low)": 24,
+     "gpt-oss:20b (medium)": 24,
+     "gpt-oss:20b (high)": 7,
+     "devstral-small-2:24b": 21
+    }
+   },
+   "code raised or timed out": {
+    "total": 40,
+    "by_variant": {
+     "qwen3-coder:30b": 1,
+     "qwen3-coder-next": 7,
+     "gpt-oss:20b (low)": 2,
+     "gpt-oss:20b (medium)": 2,
+     "gpt-oss:20b (high)": 21,
+     "devstral-small-2:24b": 7
+    }
+   },
+   "step produced no cell and no error": {
+    "total": 30,
+    "by_variant": {
+     "qwen3-coder-next": 27,
+     "gpt-oss:20b (high)": 3
+    }
+   },
+   "length stop": {
+    "total": 18,
+    "by_variant": {
+     "qwen3-coder-next": 1,
+     "devstral-small-2:24b": 17
+    }
+   },
+   "no code": {
+    "total": 11,
+    "by_variant": {
+     "gpt-oss:20b (low)": 4,
+     "gpt-oss:20b (medium)": 1,
+     "gpt-oss:20b (high)": 4,
+     "gemma3:27b": 2
+    }
+   },
+   "other": {
+    "total": 1,
+    "by_variant": {
+     "gpt-oss:20b (medium)": 1
+    }
+   },
+   "harness error": {
+    "total": 2,
+    "by_variant": {
+     "gpt-oss:20b (medium)": 1,
+     "gpt-oss:20b (high)": 1
+    }
+   },
+   "tool call written as text": {
+    "total": 12,
+    "by_variant": {
+     "gpt-oss:20b (high)": 12
+    }
+   },
+   "tools refused by Ollama": {
+    "total": 78,
+    "by_variant": {
+     "gemma3:27b": 78
+    }
+   }
+  },
+  "S447_fail_kinds_open_weight_free_form": {
+   "code raised or timed out": {
+    "total": 82,
+    "by_variant": {
+     "qwen3-coder:30b": 4,
+     "qwen3-coder-next": 8,
+     "gpt-oss:20b (low)": 11,
+     "gpt-oss:20b (medium)": 10,
+     "gpt-oss:20b (high)": 16,
+     "gemma3:27b": 18,
+     "devstral-small-2:24b": 15
+    }
+   },
+   "result wrong or missing": {
+    "total": 26,
+    "by_variant": {
+     "qwen3-coder:30b": 2,
+     "qwen3-coder-next": 5,
+     "gpt-oss:20b (low)": 5,
+     "gpt-oss:20b (medium)": 5,
+     "gpt-oss:20b (high)": 2,
+     "gemma3:27b": 4,
+     "devstral-small-2:24b": 3
+    }
+   }
+  },
+  "open_weight_free_form_tool_kind_failures": 0,
+  "open_weight_introspection_tool_group_failures": 0
+ },
+ "P4": {
+  "low": {
+   "passes": 149,
+   "attempts": 220,
+   "median_wall_time_s": 48,
+   "median_output_tokens": 1795,
+   "tool_or_call_failure_other_19b": 4,
+   "tool_or_call_failure_other_by_family_supp20": {
+    "free-form": 0,
+    "introspection": 0,
+    "structured": 4
+   },
+   "passes_by_family": {
+    "structured": [
+     50,
+     80
+    ],
+    "free-form": [
+     44,
+     60
+    ],
+    "introspection": [
+     55,
+     80
+    ]
+   },
+   "passes_without_tools (free-form + introspection)": [
+    99,
+    140
+   ]
+  },
+  "medium": {
+   "passes": 154,
+   "attempts": 220,
+   "median_wall_time_s": 93,
+   "median_output_tokens": 3896,
+   "tool_or_call_failure_other_19b": 3,
+   "tool_or_call_failure_other_by_family_supp20": {
+    "free-form": 0,
+    "introspection": 0,
+    "structured": 3
+   },
+   "passes_by_family": {
+    "structured": [
+     51,
+     80
+    ],
+    "free-form": [
+     45,
+     60
+    ],
+    "introspection": [
+     58,
+     80
+    ]
+   },
+   "passes_without_tools (free-form + introspection)": [
+    103,
+    140
+   ]
+  },
+  "high": {
+   "passes": 133,
+   "attempts": 220,
+   "median_wall_time_s": 786,
+   "median_output_tokens": 12008,
+   "tool_or_call_failure_other_19b": 20,
+   "tool_or_call_failure_other_by_family_supp20": {
+    "free-form": 0,
+    "introspection": 0,
+    "structured": 20
+   },
+   "passes_by_family": {
+    "structured": [
+     32,
+     80
+    ],
+    "free-form": [
+     42,
+     60
+    ],
+    "introspection": [
+     59,
+     80
+    ]
+   },
+   "passes_without_tools (free-form + introspection)": [
+    101,
+    140
+   ]
+  },
+  "high_minus_medium_passes": {
+   "structured": -19,
+   "free-form": -3,
+   "introspection": 1,
+   "all": -21
+  },
+  "high_minus_low_passes_all": -16
+ },
+ "legend_gemma3": {
+  "structured_passes": 0,
+  "structured_attempts": 80,
+  "tools_refused_by_Ollama": 78,
+  "other_groups": {
+   "other (harness, no code)": 2
+  }
+ },
+ "ties": [
+  {
+   "what": "structured minus free-form",
+   "exact": "-18.75"
+  },
+  {
+   "what": "devstral-small-2:24b gap",
+   "exact": "-26.25"
+  },
+  {
+   "what": "gpt-oss:20b (medium) gap",
+   "exact": "-11.25"
+  }
+ ]
+}

@@ -1,0 +1,136 @@
+{
+ "_provenance": {
+  "script": "scripts/S596_windowed_bertscore.py",
+  "script_sha256": "b25cb9fdc4ca30bdaf9e87314aa108048c65a85bc00dc3240374e26f8b9bf62e",
+  "git_head": "f3ccbde8ac0b267ec2e672b715f6c2bbc64ebb37",
+  "at": "2026-11-06T09:55:45Z",
+  "command": "uv run --frozen python scripts/S596_windowed_bertscore.py run",
+  "ruling": "rulings page 6 Nov, RUN-BERTSCORE: O1",
+  "imports_sha256": {
+   "scripts/S497_fig5_d166.py": "191495f5b8a88ed2d2ec10f18e1296a7e8c33aed8deb47c297bdb9ee2bbc42c0",
+   "scripts/S540_fig5_evaluators.py": "f794d4e6e40179894d22905220e79daa42693710c3f6ba4c10ee09c5b7297c77",
+   "scripts/S470_l1_signals.py": "e301c6a6d7c4f50bcc3ab8ba679be2d8caf1211d95c67241b9031c1aacaa5b37"
+  },
+  "inputs": {
+   "key": {
+    "path": "<repo>/data/ground_truth_v2/ground_truth_v2_4_as_v1.json",
+    "sha256": "e971de522df6fab54a070e44736b6cb28a5ebd26bab07ca9e1513230bb86f4ef"
+   },
+   "answers_sha256": {
+    "exp_01__single_pass__exp_v4_s20_n0": "bc43f45f211b64ad625db677110d6346dfd6d5bdda9387a6647d0d957cc5dccd",
+    "exp_01__multi_hop__exp_v4_s20_n0": "518b0efefd170ec4e172b8ba1d8218aa25612a4eaf27ebab98a824343864ad42",
+    "exp_01__verified_pass__exp_v4_s20_n0": "1ce4b1052912d8592b912da29ed987df9c2a4baca575cf80cc2b9d33334f8148",
+    "exp_01__rlm_5__exp_v4_s20_n0": "cc10c9eb881fa9618ff2fb8ec7a3f1bb9cf58662827cd67b326e47f67b51d42c",
+    "exp_01__rlm_10__exp_v4_s20_n0": "ecb6de5343d172894fd56d57997e3301d70ca3fb509ae2cd65f8e47eb8c268b7",
+    "exp_01__rlm_20__exp_v4_s20_n0": "1e5b124d8bbd98640c87051916305ed0c04d668447967c60a08d6945fca32c62"
+   },
+   "reader": "S497.d200_data table, S540.evaluator_rows",
+   "fig5_numbers_at_head": "findings/figures_provisional/fig5/figure5_numbers.json"
+  },
+  "encoder": {
+   "repo": "roberta-large",
+   "snapshot": "722cf37b1afa9454edce342e7895e588b6ff1d59",
+   "weights": "model.safetensors",
+   "weights_blob": "047c85f0b96269cd62e6f732644f067004eebd95af5b5d35965ae2528f13bf38",
+   "layer": 17,
+   "idf": false,
+   "rescale_with_baseline": false,
+   "window_pieces": 510,
+   "stride": 255,
+   "limit": 512,
+   "batch": 32,
+   "device": "cpu",
+   "threads": 12
+  },
+  "lock_sha256": "8730d401a5d7b6baa1780e656f844261eaead60e45b5199afa29d57f989ad495",
+  "versions": {
+   "bert_score": "0.3.12",
+   "transformers": "5.14.1",
+   "torch": "2.13.0",
+   "python": "3.13.11"
+  },
+  "gates": [
+   "G1: S540.evaluator_rows on S497's table equals all 20 drawn Fig. 5e records of findings/figures_provisional/fig5/figure5_numbers.json at HEAD (2 held there, D195, not compared)",
+   "G2: all 516 answers' sha256 equal L1's overlap rows; every word-piece count equals L1's",
+   "G3: on the 164 answers L1 scored (answer and key within 512), the windowed F1 equals L1's BERTScore F1, largest difference 8.9e-07 (tolerance 0.0001)"
+  ],
+  "wall_s": 220.7
+ },
+ "counts": {
+  "answers": 516,
+  "scored": 514,
+  "no_answer": 2,
+  "l1_over_limit": 350,
+  "l1_no_answer": 2,
+  "l1_scored": 164,
+  "answers_over_one_window": 324,
+  "keys_over_one_window": 26,
+  "keys": 86,
+  "longest_answer_pieces": 6953,
+  "most_windows": 27
+ },
+ "fig5e_form": [
+  {
+   "row": "BERTScore (windowed)",
+   "family": "simple",
+   "judge_signal": "Judge correctness",
+   "rho": 0.580210566070268,
+   "resample_q25": 0.5496371646680657,
+   "resample_median": 0.5802732800109928,
+   "resample_q75": 0.6097432372493153,
+   "interval_lo": 0.4847039074980754,
+   "interval_hi": 0.6601135479936595,
+   "within_question_rho": 0.3851201898767,
+   "answers": 514,
+   "questions": 86,
+   "source": "bs:windowed_f1"
+  },
+  {
+   "row": "BERTScore (windowed)",
+   "family": "simple",
+   "judge_signal": "Judge faithfulness",
+   "rho": 0.3704453944596886,
+   "resample_q25": 0.33096875867484976,
+   "resample_median": 0.3729869489292324,
+   "resample_q75": 0.41124001634160806,
+   "interval_lo": 0.2494999745023466,
+   "interval_hi": 0.4787703669757781,
+   "within_question_rho": 0.3539497972900701,
+   "answers": 511,
+   "questions": 86,
+   "source": "bs:windowed_f1"
+  }
+ ],
+ "fits_512_only": [
+  {
+   "row": "BERTScore, answers that fit 512 only",
+   "family": "simple",
+   "judge_signal": "Judge correctness",
+   "rho": 0.47322372550736796,
+   "resample_q25": 0.42389906443061176,
+   "resample_median": 0.4759425299998971,
+   "resample_q75": 0.5234888117826011,
+   "interval_lo": 0.3171413171736187,
+   "interval_hi": 0.6129164763444584,
+   "within_question_rho": 0.36565299758499425,
+   "answers": 164,
+   "questions": 58,
+   "source": "bs:windowed_f1"
+  },
+  {
+   "row": "BERTScore, answers that fit 512 only",
+   "family": "simple",
+   "judge_signal": "Judge faithfulness",
+   "rho": 0.22892974879816924,
+   "resample_q25": 0.18050854858697635,
+   "resample_median": 0.23897996326545884,
+   "resample_q75": 0.29254466350506836,
+   "interval_lo": 0.0710133410095085,
+   "interval_hi": 0.3782417569811733,
+   "within_question_rho": 0.2873918551094943,
+   "answers": 164,
+   "questions": 58,
+   "source": "bs:windowed_f1"
+  }
+ ]
+}

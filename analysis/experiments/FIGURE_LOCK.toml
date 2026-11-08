@@ -1,0 +1,161 @@
+# FIGURE_LOCK: the one set of rules for every figure of the revised paper, provisional or final. The editor's rules
+# and the journal's are both mandatory (D84, Q158); nothing departs from this file (D87). scripts/S448_figure_rules_check.py
+# reads its thresholds from here, refuses to run when this file is missing or its status is not "agreed", and prints
+# this file's sha256. experiments/FIGURE_RULES.md explains each rule and how the figure scripts meet it; it carries no
+# second copy of a value. A sibling of LOCK.toml, so the lock_sha256 every run record carries does not change (D87).
+#
+# Which source governs. One rule, applied to every key below:
+#   1. The editor's checklist binds in every case (D84): the Editorial Requests Table and the editor's letter.
+#   2. Beside it, the journal's own pages govern (journal_format, journal_stats, journal_policy, journal_types below).
+#   3. The Nature research figure guide (guide_spec, guide_build) applies only where the journal's pages are silent.
+#      Where the journal speaks, the guide's value is not used, stricter or not.
+#   No other source sets a value. notes/FIGURE_SPEC.md (Nature Machine Intelligence, April) is history, not a source.
+# Every key's comment quotes its source and, where the journal is silent, says so.
+#
+# Tags. A key whose comment carries "S448 R<n>" is read by S448 and used by rule R<n>; `S448 --mutants` proves each
+# such key by changing it in a copy of this file and requiring that rule's verdict to change, and fails when a key
+# S448 reads is untagged or a tagged key is not read. A key marked MANUAL is for a person to check. Every key in the
+# value sections ([page] to [display_items]) carries one of the two.
+
+status = "agreed"              # Valerio, 17 October (D84: the editor's and the journal's figure rules are mandatory; D87: written here, with the lock's status)
+
+[sources]
+editor_table   = "resubmission/03_response_to_editor/Editorial_Requests_Table_original.docx"   # word/document.xml read with zipfile, 17 October; 47 w:tr rows, counted from 1 in document order
+editor_letter  = "Reviewers_Nature_AIC/editor_review.txt"
+journal_format = "https://www.nature.com/commsaicomp/submit/formatting-guidelines"     # fetched 17 October 2026, HTTP 200 ("Formatting Guidelines | Communications AI & Computing")
+journal_stats  = "https://www.nature.com/commsaicomp/submit/statistical-guidelines"    # fetched 17 October 2026, HTTP 200
+journal_policy = "https://www.nature.com/commsaicomp/submit/policy"                    # fetched 17 October 2026, HTTP 200
+journal_types  = "https://www.nature.com/commsaicomp/submit/content-types"             # fetched 17 October 2026, HTTP 200
+guide_spec     = "https://research-figure-guide.nature.com/figures/preparing-figures-our-specifications/"   # fetched 17 October 2026, HTTP 200
+guide_build    = "https://research-figure-guide.nature.com/figures/building-and-exporting-figure-panels/"   # fetched 17 October 2026, HTTP 200
+# Not a page: https://www.nature.com/commsaicomp/submission-guidelines answers 404 (17 October; WebFetch sees a login
+# redirect first). The journal's figure rules are under /commsaicomp/submit/.
+
+# ---------------------------------------------------------------------------------------------------------------
+# The editor's rules, E1 to E8 (FIGURE_RULES.md), each with the table's words.
+# ---------------------------------------------------------------------------------------------------------------
+[editor]
+E1 = "larger type and figures; no colour scheme that impairs reading, especially red and green"
+# row 17, "Display items": "Please increase the size and font of all the figures for improved reading clarity. [...]
+# For Figures 2-6 and Exteded figures, to ensure that the figures are widely accessible, please make sure that the
+# colour schemes used do not impair their readability, especially for green/red colours." Checked: S448 R2, R3, R4, R6, R11.
+E2 = "a point value with error bars shows its individual points, or is a box or dot plot"
+# row 18, "Display items": "For all graphs depicting a single point value (e.g., mean) with error bars, you must add
+# individual data points or convert the graph to a boxplot or dot-plot. This applies to bar graphs and line graphs."
+# Checked: MANUAL (S447 check_drawn for Figure 6).
+E3 = "no rainbow colour maps; perceptually uniform ones"
+# row 19, "Display items": "Using rainbow colour plots can be visually misleading (see links below). Please change the
+# colour schemes used in your plots to perceptually uniform ones." Row 17: "For Figures 3,5,6 and Extended Figures 4
+# and 5, please use a visually perceptible colour scheme." Checked: S448 R5.
+E4 = "Source Data for every main figure, with a caption and a Data Availability sentence"
+# row 20, "Source Data": "All source data, i.e. the numerical results underlying the graphs and charts presented in the
+# main figures,are mandatory and must be made available as Supplementary Data (in Excel or text format) or via a
+# generalist repository (e.g., Figshare or Dryad)." Row 21: "Please include a caption for the source data file and add
+# a sentence to the Data Availability statement to describe how source data can be accessed using text similar to
+# "The source data for Figure X is in Supplementary Data Y"." Checked: S448 R8; the sentence MANUAL.
+E5 = "one file per figure, named Figure X, one page, an accepted format, nothing in it but the figure"
+# row 9, "Figure File": "All Figures must be provided as individual files with all panels and elements included in a
+# single file (not uploaded as separate elements) All associated components of a Figure should fit on one page, and
+# each page should be presented in a separate file titled "Figure XX."" Rows 29 and 30, "Figures", the same for
+# Figures 1-6. Row 31, "Figure Captions": "Embedding captions within figure files is not permitted at this stage."
+# Row 32, "Figures": "Your Figure files must not include any additional text or labels that do not form part of the
+# Figure itself." Checked: S448 R1, R7, R10.
+E6 = "a brief title for the whole figure, no panel reference; every panel defined in the legend"
+# row 34, "Titles and Captions": "The titles must describe the figure as a whole and must not contain reference to
+# specific figure panels. The titles should be brief. All figure panels must be defined in the legend. Figure legends
+# should be informative, clear, not unnecessarily long." Checked: S448 R9 (heuristic); clarity MANUAL.
+E7 = "n as a precise value with its unit; one- or two-sided stated; error bars defined"
+# row 45, "Statistics": "the legend needs to provide and define the n number. The n number must be provided as a
+# precise value (not a range), using the wording "n=X biologically independent samples/animals/independent
+# experiments" etc. as applicable." Row 46: "the information on whether the statistical test used was one-sided or
+# two-sided, where appropriate, is missing". Row 47: "the error bars/error bands need to be defined in the legends".
+# Checked: S448 R9 (heuristic); the rest MANUAL.
+E8 = "figures, captions, counts and text consistent"
+# editor_review.txt:9: "Finally, the manuscript requires a careful consistency check. Several discrepancies appear
+# across figures, captions, evaluation counts, and textual claims." Checked: S448 R8, R10 in part; claims list MANUAL.
+
+# ---------------------------------------------------------------------------------------------------------------
+# Values. Every key carries "S448 R<n>" (S448 reads it; --mutants proves it) or MANUAL (a person checks it).
+# ---------------------------------------------------------------------------------------------------------------
+[page]
+width_double_mm   = 183.0     # guide_build: "The widths of printed figures are: 89 mm (single column) 183 mm (double column)". The journal's pages give no width, so the guide applies (notes/FIGURE_SPEC.md:22's 180 mm was Nature Machine Intelligence's). S448 R2
+width_single_mm   = 89.0      # guide_build, as above; a plate is one width or the other. S448 R2
+width_tol_mm      = 0.5       # R2's measuring tolerance on the width (17 October). S448 R2
+height_max_mm     = 170.0     # guide_build: "The maximum height for a Nature figure is 170 mm, to allow space for the figure legend to fit underneath." The journal's pages give no height, so the guide applies. S448 R2
+one_page          = true      # editor rows 9 and 29; journal_format 2.1: "All associated components of a Figure should fit on one page". S448 R1
+
+[type]
+font_families      = ["Helvetica", "Arial"]   # journal_format 2.1: "To add lettering, use Helvetica or Arial 8-12pt (sans serif fonts)". S448 R4 (the PDF's font names)
+font_min_pt        = 8.0       # journal_format 2.1, as above: "8-12pt". The journal speaks, so the guide's "Minimum text size: 5 pt" and "Maximum text size: 7 pt" do not apply; editor row 17 "increase the size and font" points the same way. S448 R3
+font_max_pt        = 12.0      # journal_format 2.1 "8-12pt", as above. S448 R3
+size_variance      = "minimal" # journal_format 2.1: "Variance of type size within an illustration should be minimal". MANUAL
+panel_letter_pt    = 8.0       # guide_spec: "labelled with 8-pt bold, upright (not italic) and lowercase a, b, c". The journal gives no size for panel letters, so the guide applies; 8 pt is inside the journal's 8-12 pt. S448 R3
+panel_letter_weight = "bold"   # guide_spec, as above; the journal gives no weight. "bold" or "normal". S448 R3
+panel_letter_case  = "lowercase"   # journal_format 2.1: "Figure parts or panels should be denoted by lowercase letters (a, b, c, etc.)". "lowercase" or "uppercase". S448 R3
+panel_letter_style = "upright" # guide_spec "upright (not italic)"; the journal is silent. "upright" or "italic", read from the PDF's italic flag. S448 R3
+fonts_embedded     = true      # guide_spec: "Embed fonts (True Type 2 or 42)". The journal speaks of embedding linked images, not fonts. S448 R4
+font_types_refused = ["Type3"] # guide_spec: "Embed fonts (True Type 2 or 42, do not select TrueType 3)" (matplotlib pdf.fonttype 42, not 3); the journal is silent. S448 R4
+text_as_text       = true      # guide_spec: "all text needs to be legible and editable", "Do not outline text"; the journal is silent. An SVG or a PDF with no text fails. S448 R3
+text_effects       = "none"    # journal_format 2.1: "Avoid effects such as shading, outline letters etc." MANUAL
+contrast_min_ratio = 4.5       # journal_format 2.1: "Figure lettering should have a contrast ratio of at least 4.5:1": 4.5 passes, under 4.5 fails (WCAG 2.1 ratio, text against what is painted under it). The journal speaks, so the guide's ">4.5" does not apply. S448 R11
+coloured_text      = "avoid"   # guide_spec: "Avoid coloured text"; guide_build: "where colour is not necessary for clarity or scientific meaning, we will recolour text to black or white". The journal is silent. "avoid" warns, "none" fails, "allowed" does not check. S448 R11
+
+[lines]
+line_min_pt   = 0.3            # journal_format 2.1, under "For black and white line art graphics with no shading": "All lines should be at least 0.1 mm (0.3 pt) wide." For other figures the journal and the guide give no line width; the lock holds every line to this one, the only line width either source gives (a choice beyond the precedence rule, confirmed by Valerio: every line in every figure, D92 Q196, 18 October). S448 R12
+faint_lines   = "none"         # journal_format 2.1, same section: "Do not use faint lines and/or lettering". MANUAL
+gridlines     = "none"         # guide_spec, "We avoid": "Background gridlines"; the journal is silent (notes/FIGURE_SPEC.md drew faint ones in R; departs). MANUAL
+axes          = "axis lines and tick marks; every axis labelled, units in parentheses"   # guide_spec, "We require"; the journal is silent. MANUAL
+
+[colour]
+categorical   = ["#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"]   # guide_spec "We require": "An accessible colour palette to be used (for example Wong, B. Points of view: Colour blindness. Nature Methods 8, 441 (2011).)"; guide_build's colour-blind palette table, the same eight (Okabe and Ito). The journal names no palette; editor row 17 "especially for green/red colours". S448 R5, R6
+continuous    = "cividis"      # editor row 19 "perceptually uniform"; guide_build "Avoiding red/green combinations and rainbow scales". A matplotlib colour map name; cividis meets both. S448 R5
+continuous_tol = 2             # R5: a colour belongs to the continuous map when within 2 levels of one of its 256 entries (17 October). S448 R5
+grey_tol      = 3              # R5 and R11: a colour is grey when its channels differ by at most 3 levels (17 October); R11 warns on text that is not grey. S448 R5, R11
+vector_only   = true           # guide_spec: "please export figure panels as vector artwork"; guide_build "For main figures we require vector files". The journal speaks of linked images only ("avoid using linked images"). No raster image inside the SVG or the PDF. S448 R5
+red_hue_deg   = [345.0, 15.0]  # R6's reading of editor row 17 "especially for green/red colours" and guide_build "Avoiding red/green combinations": a saturated red is a hue from 345 through 0 to 15 degrees. S448 R6
+green_hue_deg = [80.0, 150.0]  # R6, as above: a saturated green is a hue from 80 to 150 degrees. S448 R6
+saturated_min = 0.5            # R6: HSV saturation at least 0.5. S448 R6
+value_min     = 0.35           # R6: HSV value at least 0.35. S448 R6
+patterns      = "journal: patterns instead of or in addition to colours"   # journal_format 2.1: "For accessibility, use patterns instead of or in addition to colours for conveying information (colour-blind users would then be able to distinguish the visual elements)". The journal speaks, so the guide's "We avoid: Patterns" does not apply. Its aim is the colour-blind reader, and the plates' palettes (categorical, continuous) are colour-blind safe; whether a figure also needs patterns is for a person. MANUAL
+colour_space  = "RGB"          # guide_spec: "RGB colour space"; the journal is silent. MANUAL
+colour_keys   = "in the figure" # guide_build: "Keys or keylines should be used in the figure wherever possible, rather than having colour descriptions in the figure caption"; the journal is silent. MANUAL
+
+[files]
+name             = "Figure {n}"   # editor rows 9 and 29: "titled "Figure XX.""; journal_format 2.1 "presented in a separate file titled "Figure XX"" (its example "Fig1.eps" aside). {n} is the figure number; a " (provisional, ...)" suffix is accepted with a WARN. A main figure's name; a Supplementary figure takes supplementary_name. S448 R1
+supplementary_name = "Supplementary Figure {n}"   # D92 Q194 (18 October): a Supplementary figure's own name, so it never shares a file name with main Figure {n} (audit of 17 October F50). Editor rows 23 and 24: Supplementary items go "as part of the combined Supplementary Information PDF" (notes/EDITORIAL_REQUESTS_TABLE.md:24-28). Checked for the drawing rules (S448 --supplementary: R1 to R7 and R9 to R12, R1 finding its files by this name and still holding one_page and file_max_mb, whose journal sources name no figure kind or are written for Supplementary files) and for R8's consistency parts (2) to (6) on its data workbook "Supplementary Figure {n} data" (D94 O-b); the main-figure rules are not applied: the "Figure XX" upload name (editor row 9) and the Source Data paperwork (R8's part (1), editor row 20 "the main figures"). The " (provisional, ...)" suffix as for name. S448 R1, R8
+plate_files      = ["pdf", "svg", "png|tif|tiff"]   # what a figure folder holds, one file of each entry ("|" separates alternatives; FIGURE_RULES.md E5): the PDF that is uploaded, the SVG R10 compares with it, a raster R7 holds equal to it. S448 R1
+upload_format    = "pdf"          # editor rows 9 and 30 list PDF; journal_format 2.1 "Preferred figure formats are: PDF, EPS, AI, or PS". The file submitted. A raster format here would hold the raster to raster_dpi_min. S448 R2
+raster_dpi_min   = 1200           # journal_format 2.1: "line drawings in bitmap format should have a minimum resolution of 1200 DPI" (600 for "a combination of halftone and line art"). It applies to a submitted bitmap. The submission is the vector PDF (upload_format), which the journal, the editor and the guide all allow, so the raster is a preview R7 holds equal to the PDF and its dpi is reported (INFO), not failed. S448 R2
+raster_delta     = 0              # R7: the raster equals the PDF rasterised again at its dpi, 0 levels in every channel (Figure 6, 17 October). S448 R7
+file_max_mb      = 50.0           # guide_build: "Please limit file sizes to 50 MB where possible". The journal's "maximum size of 50 MB" (3.2) is for Supplementary files; for figures it is silent, so the guide applies. S448 R1
+forbidden_text   = 'provisional|preliminary|\bdraft\b|stamp|watermark|confidential|not for (?:citation|distribution)|do not cite|records of|provenance'   # editor row 32 "must not include any additional text or labels"; row 31 no captions in figure files; journal_format 2.1 "Do not include titles or captions within your illustrations". Any case. S448 R7
+titles_in_figure = "none"         # journal_format 2.1, as above; panel titles too (Valerio, 17 October, Q2: removed from every plate; the legend describes each panel). MANUAL
+generative_ai    = "none"         # journal_policy 11: "Springer Nature journals are unable to permit its use for publication" (AI-generated images). MANUAL
+
+[legend]
+words_under      = 350            # journal_format 2.3: "Legends should be under 350 words each.": a legend of 350 words or more is too long. A WARN on a provisional plate (D84 Q158: legends shrunk later), a FAIL on a final one. S448 R9
+title_panel_re   = '\bpanels?\b|\([a-h]\)|\b[a-h]\s*[,)]|\b[a-h]-[a-h]\b'   # editor row 34 "must not contain reference to specific figure panels"; R9's heuristic. S448 R9
+panels_defined   = true           # editor row 34; journal_format 2.3 "individual panels should be identified by corresponding lower case letters and described in the caption". S448 R9
+location         = "end of the manuscript, after references"   # editor row 31; journal_format 2.3. MANUAL
+depicts_not_results = true        # journal_format 2.3: "a short caption of what is accurately depicted in the figure, not the results (or data) of the experiment or the methods used". MANUAL
+errors_defined   = true           # editor row 47; journal_format 2.3 "authors must specify what the errors represent"; journal_stats "Graphs should include clearly labelled error bars". MANUAL
+
+[statistics]
+n_exact          = true           # editor row 45 "the legend needs to provide and define the n number [...] as a precise value (not a range)"; journal_stats "the n value for each statistical analysis". An "n = <number>" present, no count given as a range. S448 R9
+n_range_dashes   = "\u2010\u2011\u2012\u2013\u2014\u2212-"   # R9: two numbers joined by one of these (hyphen, non-breaking hyphen, figure dash, en dash, em dash, minus sign, hyphen-minus) is a range. S448 R9
+n_count_words    = ["per", "attempts?", "operations?", "samples?", "replicates?", "runs?", "questions?", "variants?", "models?", "records?", "cells?", "units?", "strategies", "strategy", "draws?", "answers?", "items?", "each"]   # R9: a range followed within three words by one of these is a count given as a range. S448 R9
+sidedness_phrase = "two-sided"    # editor row 46 "one-sided or two-sided"; journal_stats "whether the tests were one-tailed or two-tailed". Asked for only where sidedness_when matches; the same phrase with "two" read as "one" ("one-sided") also meets it (D122, Valerio, 23 Oct, Q3). S448 R9
+sidedness_when   = '\bintervals?\b|\bCIs?\b|\berror (?:bars?|bands?)\b|\bconfidence\b|\bcredible\b|(?<!\bno )\b(?:hypothesis|statistical|significance|permutation|sign|signed-rank|rank-sum|exact|t|z|chi-squared?|binomial|wilcoxon|mann-whitney|mcnemar|fisher|friedman|kruskal-wallis)[- ]tests?\b|\bP[- ]values?\b|\bP\s*[<=>\u2264\u2265]'   # D122 (Valerio, 23 Oct, Q3): sidedness_phrase is required only when the legend describes an interval, an error bar or band, a test or a P value (a regex, case ignored; "no hypothesis test" does not count). Editor row 46: "the information on whether the statistical test used was one-sided or two-sided, where appropriate, is missing"; journal_stats: "whether the tests were one-tailed or two-tailed". A legend that draws only medians, quartiles or ranges states no sidedness. S448 R9
+points_shown     = true           # editor row 18; journal_stats "If using a bar chart, please note that individual data points must be overlaid on the bars". MANUAL
+centre_and_spread_labelled = true # journal_stats: "a clearly labelled measure of centre (such as the mean or the median), and a clearly labelled measure of variability". MANUAL
+test_reporting   = "test named, n, alpha, sidedness, exact P unless p < 0.001"   # journal_stats: "the name of the statistical test, the n value [...] the alpha level for all tests, whether the tests were one-tailed or two-tailed, and the actual P value for each test (unless p< 0.001)". MANUAL
+
+[source_data]
+per_main_figure  = true           # editor row 20 "mandatory". S448 R8
+formats          = ["xlsx", "csv"]   # editor row 20 "in Excel or text format": a workbook, or a folder of one CSV per panel. S448 R8
+workbook_name    = "Source Data Fig. {n}.xlsx"   # FIGURE_RULES.md E4 (S447 convention): its stem also names the CSV folder and, with " caption", the caption file; one sheet per panel, "Fig. {n}a" and so on. S448 R8
+caption          = true           # editor row 21. S448 R8
+availability_sentence = "The source data for Figure X is in Supplementary Data Y"   # editor row 21 ("text similar to"); journal_policy 4 requires a Data Availability statement. MANUAL
+
+[display_items]
+max_per_article  = 10             # journal_types: "Articles can include up to 10 display items (figures, tables)." MANUAL

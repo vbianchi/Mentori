@@ -1,0 +1,149 @@
+{
+ "provenance": {
+  "script": "scripts/S601_retrieval_sweep_provenance.py",
+  "script_sha256": "fbf065f679d817d4545e0a304c4439ff1270833ced582182e6874fdd88680e22",
+  "command": "uv run --frozen python scripts/S601_retrieval_sweep_provenance.py",
+  "backup_repo": "../Mentori-backup",
+  "backup_head": "39bc3f4af796eddce697aed4701ea5c2f83492b6",
+  "inputs_sha256": {
+   "findings/recompute/S222_corpus_papers_corrected.csv": "1020bccbb72b1f4c71551d4cf2eda93a037b16536478314d348ae4520035ccbd",
+   "findings/recompute/D75_Q51_corpus/corpus_core_deposit.csv": "bde0b3b3aa2ca6e311702cf216ed2a2f9a05966788361a6a3a448023859cbe7d"
+  },
+  "rulings": "rulings page 6 Nov, M7: O2; R12: O2"
+ },
+ "reproduced": [
+  "(1) n_queries 28 and 28 equal the queries with a source file in the ground truth each script read at its commit",
+  "(2) exp01's models (4) equal the script's MODEL_ALIASES and its corpus sizes [5, 10, 15, 20, 30] the commit message's"
+ ],
+ "sweeps": [
+  {
+   "file": "findings/recompute/upstream_inputs/publication/results/exp01_embedding_latest.json",
+   "sha256": "c0742536a88770487c3a3336468f49ac676a97a107d7518de394e541dfbef9db",
+   "git_blob": "d210bc00a9ff8062a11901cc030ea528a5da081f",
+   "experiment": "exp2_embedding_comparison",
+   "timestamp": "20260211_174232",
+   "backup_commit": "fad8cfdc94028b984e3250f936adc201fae1a95c",
+   "backup_commit_date": "2026-02-11 17:44:23 +0100",
+   "backup_results_path": "tests/experiments/results/exp2_results_20260211_174232.json",
+   "script": "tests/experiments/exp2_embedding_comparison.py",
+   "script_sha256": "66146034c61093011a96179f0a1e692153dfefb4dd5f01080ae271e9a2a977b6",
+   "is_relevant": "def is_relevant(result: Dict, query_gt: Dict) -> bool:\n    \"\"\"Check if a result is relevant to the ground truth query.\n\n    Relevant = comes from expected source file AND contains at least one\n    expected keyword (case-insensitive).\n    \"\"\"\n    source_files = query_gt.get(\"source_files\", [])\n    expected_keywords = query_gt.get(\"expected_in_chunk\", [])\n\n    if not source_files:\n        return False  # Unanswerable queries have no relevant results\n\n    result_source = result.get(\"source_file\", \"\")\n    if result_source not in source_files:\n        return False\n\n    if not expected_keywords:\n        # No keywords specified \u2014 any chunk from the right source is relevant\n        return True\n\n    text_lower = result.get(\"text\", \"\").lower()\n    for kw in expected_keywords:\n        if kw.lower() in text_lower:\n            return True\n\n    return False",
+   "rule_cases_passed": "6 of 6",
+   "ground_truth": {
+    "path": "tests/experiments/ground_truth_retrieval.json",
+    "sha256": "e00b34bf7a05117ff0cb1be2407f227fe2eb899f49849f7f531727eaf733fae1",
+    "queries": 30,
+    "with_source_files": 28,
+    "with_source_and_keywords": 28
+   },
+   "n_queries": 28
+  },
+  {
+   "file": "findings/recompute/upstream_inputs/publication/results/exp02_search_latest.json",
+   "sha256": "199227eae91cbb9f7bc9cb03fcf90fb975d380efc17885a615cb994aad84b2f4",
+   "git_blob": "d317fd0ee4dd71f551a424137d735c53cf80195c",
+   "experiment": "exp3_hybrid_search_ablation",
+   "timestamp": "20260211_180248",
+   "backup_commit": "116ab13b63c9fe99eccad56b334fc71256e08423",
+   "backup_commit_date": "2026-02-11 19:50:47 +0100",
+   "backup_results_path": "tests/experiments/results/exp3_results_20260211_180248.json",
+   "script": "tests/experiments/exp3_hybrid_search_ablation.py",
+   "script_sha256": "c1e1beb7085ab6030b54d355513e7f245c943d177b44f8271ab4e7a3d01df230",
+   "is_relevant": "def is_relevant(result: Dict, query_gt: Dict) -> bool:\n    \"\"\"Check if a result is relevant (source file match + keyword match).\"\"\"\n    source_files = query_gt.get(\"source_files\", [])\n    expected_keywords = query_gt.get(\"expected_in_chunk\", [])\n\n    if not source_files:\n        return False\n\n    result_source = result.get(\"source_file\", \"\")\n    if result_source not in source_files:\n        return False\n\n    if not expected_keywords:\n        return True\n\n    text_lower = result.get(\"text\", \"\").lower()\n    return any(kw.lower() in text_lower for kw in expected_keywords)",
+   "rule_cases_passed": "6 of 6",
+   "ground_truth": {
+    "path": "tests/experiments/ground_truth_retrieval.json",
+    "sha256": "e00b34bf7a05117ff0cb1be2407f227fe2eb899f49849f7f531727eaf733fae1",
+    "queries": 30,
+    "with_source_files": 28,
+    "with_source_and_keywords": 28
+   },
+   "n_queries": 28
+  },
+  {
+   "file": "findings/recompute/upstream_inputs/publication/results/exp03a_chunking_latest.json",
+   "sha256": "4d772c4c1f8e2be1803b936c49f5ceea927110842e5394cf5a59401cf1484f0e",
+   "git_blob": "79ed27092c16447dccb1d4ef22a6d97a686f649a",
+   "experiment": "exp4_chunking_comparison",
+   "timestamp": "20260213_142928",
+   "backup_commit": "bd3185ca6d00b8a92387d4858f451e2c9c22c090",
+   "backup_commit_date": "2026-02-13 14:59:40 +0100",
+   "backup_results_path": "tests/experiments/results/exp4_chunking_20260213_142928.json",
+   "script": "tests/experiments/exp4_chunking_comparison.py",
+   "script_sha256": "b7337a490644b5fc2ef3f769f5a714acaf1576e755b284626786c54bb07cbc00",
+   "is_relevant": "def is_relevant(result: Dict, query_gt: Dict) -> bool:\n    source_files = query_gt.get(\"source_files\", [])\n    expected_keywords = query_gt.get(\"expected_in_chunk\", [])\n    if not source_files:\n        return False\n    result_source = result.get(\"source_file\", \"\")\n    if result_source not in source_files:\n        return False\n    if not expected_keywords:\n        return True\n    text_lower = result.get(\"text\", \"\").lower()\n    return any(kw.lower() in text_lower for kw in expected_keywords)",
+   "rule_cases_passed": "6 of 6",
+   "ground_truth": null,
+   "n_queries": null
+  },
+  {
+   "file": "findings/recompute/upstream_inputs/publication/results/exp03b_scalability_latest.json",
+   "sha256": "88f396487459a604e1106b78d49a0e56287d8ccb9ff361808920caeefd2035cf",
+   "git_blob": "42813c1434949ff5ab0bbfc137b7fd464110620e",
+   "experiment": "exp3c_scalability",
+   "timestamp": "20260216_090601",
+   "backup_commit": "7a21e28738d9fc0adba18b340d5750827ffc1604",
+   "backup_commit_date": "2026-02-16 13:28:58 +0100",
+   "backup_results_path": "tests/experiments/results/exp3c_results_20260216_090601.json",
+   "script": "tests/experiments/exp3c_scalability.py",
+   "script_sha256": "29166355c01cfbed7a7bfb47ee44422267249be105cac626278fc41093fff66f",
+   "is_relevant": "def is_relevant(result: Dict, query_gt: Dict) -> bool:\n    source_files = query_gt.get(\"source_files\", [])\n    expected_keywords = query_gt.get(\"expected_in_chunk\", [])\n    if not source_files:\n        return False\n    result_source = result.get(\"metadata\", {}).get(\"file_name\", result.get(\"metadata\", {}).get(\"source_file\", \"\"))\n    if result_source not in source_files:\n        return False\n    if not expected_keywords:\n        return True\n    text_lower = result.get(\"text\", \"\").lower()\n    return any(kw.lower() in text_lower for kw in expected_keywords)",
+   "rule_cases_passed": "6 of 6",
+   "ground_truth": null,
+   "n_queries": null
+  }
+ ],
+ "papers": [
+  {
+   "file": "fgene-07-00075.pdf",
+   "sha256": "7efa93a8de67290abb612dc2724aa3b87e5c8fb2c3286990f0afc899ce0a417a",
+   "doi_printed": "10.3389/fgene.2016.00075",
+   "doi_found_on": "first two pages",
+   "corpus_paper_id": "47",
+   "bucket": "core",
+   "corpus_filename": "47_htsflow.pdf",
+   "same_bytes_as_indexed": true
+  },
+  {
+   "file": "1-s2.0-S1046202318304742-main.pdf",
+   "sha256": "9d81ce48025125551c8b709b2b717f781dba174a3c6237a42db92d9e4e22d17a",
+   "doi_printed": "10.1016/j.ymeth.2019.07.014",
+   "doi_found_on": "first two pages",
+   "corpus_paper_id": "50",
+   "bucket": "core",
+   "corpus_filename": "50_4cseq_protocol.pdf",
+   "same_bytes_as_indexed": true
+  },
+  {
+   "file": "1471-2105-13-S4-S17.pdf",
+   "sha256": "eb5b53640dbad31c655c53fce501fb98cda12a045c5721ccf7669f9643cb7e3d",
+   "doi_printed": "10.1186/1471-2105-13-S4-S17",
+   "doi_found_on": "later page, holds the file name",
+   "corpus_paper_id": "49",
+   "bucket": "core",
+   "corpus_filename": "49_pdbinder.pdf",
+   "same_bytes_as_indexed": true
+  },
+  {
+   "file": "3463.pdf",
+   "sha256": "33349d860fc6a03a254d495ecc011059455cd6a6fced661d654cb0a3322f96e5",
+   "doi_printed": "10.1158/0008-5472.CAN-16-0316",
+   "doi_found_on": "first two pages",
+   "corpus_paper_id": "48",
+   "bucket": "core",
+   "corpus_filename": "48_myc_oncogene.pdf",
+   "same_bytes_as_indexed": null
+  },
+  {
+   "file": "s12859-015-0742-6.pdf",
+   "sha256": "bb3c60d7b34510a278c845e43efb3ce68ca75c7a48bdaeedf8a50dabe9978018",
+   "doi_printed": "10.1186/s12859-015-0742-6",
+   "doi_found_on": "first two pages",
+   "corpus_paper_id": "46",
+   "bucket": "core",
+   "corpus_filename": "46_methylpipe.pdf",
+   "same_bytes_as_indexed": true
+  }
+ ],
+ "papers_folder_note": "read by file name from ../Mentori-backup/data/workspace/c87ca97f-d5b8-41c5-a670-e91fb618d7ba/papers; the sweep's own folder tests/test_files_rag/papers/ is in neither that repository's history nor on this machine"
+}

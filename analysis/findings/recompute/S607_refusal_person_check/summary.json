@@ -1,0 +1,117 @@
+{
+  "_provenance": {
+    "script": "scripts/S607_refusal_person_check.py",
+    "script_sha256": "feaf879914cd1734657217b61ca5da3b0538e500d2e4a8ccb9e8fa93658fab37",
+    "commit": "5a6fdeaaaf529dd1ace94624717fb94547cb0481",
+    "written": "2026-11-08T15:06:31+00:00",
+    "command": "uv run python scripts/S607_refusal_person_check.py",
+    "inputs": {
+      "~/Mentori_scratch_keep/refusal_check_2026-11/refusal_check_done_20261103.xlsx": "67656c4e527b4da3b68614783d1e560874ebaff3bdbdfa3ee5189d1f07e4df45",
+      "~/Mentori_scratch_keep/refusal_check_2026-11/refusal_check_KEY.csv": "fcf0b8688f35bfdeaeb7fb2f76a5f4ea09dd82828adfa3fba3a5016488bb3a47",
+      "~/Mentori_scratch_keep/refusal_check_2026-11/comparison_20261103.md": "664204a47c38e4180b0cc5a82adbaa5709c9db1f3e40a85e4b091bcd27992e19"
+    },
+    "decisions": [
+      "D223",
+      "D227",
+      "D227 note",
+      "D231",
+      "D306"
+    ],
+    "reproduced": "REPRODUCED comparison_20261103.md: the 3 breakdown rows of each strategy, the D227 and re-reading tables, agreement 77 of 78"
+  },
+  "what": "Valerio's blind reading (D223) of the 78 answers of single pass and Mentori RLM-10 to the 39 out-of-scope questions, draw 1 of Figure 3's run, against the judge's refusal (score 3 or more). Counts of answers.",
+  "readings": {
+    "final": "D227: 'partly' counts as refused (ruled after a first comparison with the judge was shown); D227 note: R24 and R48 re-read as refused, R65 answered",
+    "before_d227": "the sheet as filled, 'partly' counted as answered (not refused), before D227"
+  },
+  "results": {
+    "final": {
+      "Single pass": {
+        "n": 39,
+        "person_refused": 39,
+        "judge_refused": 39,
+        "agreement": 39,
+        "table_2x2": {
+          "both_refused": 39,
+          "person_refused_judge_not": 0,
+          "person_not_judge_refused": 0,
+          "both_not": 0
+        },
+        "kappa": null,
+        "kappa_note": "not defined: the judge gave one category to all 39 answers, so chance agreement equals observed agreement"
+      },
+      "RLM-10": {
+        "n": 39,
+        "person_refused": 38,
+        "judge_refused": 39,
+        "agreement": 38,
+        "table_2x2": {
+          "both_refused": 38,
+          "person_refused_judge_not": 0,
+          "person_not_judge_refused": 1,
+          "both_not": 0
+        },
+        "kappa": null,
+        "kappa_note": "not defined: the judge gave one category to all 39 answers, so chance agreement equals observed agreement"
+      },
+      "Total": {
+        "n": 78,
+        "person_refused": 77,
+        "judge_refused": 78,
+        "agreement": 77,
+        "table_2x2": {
+          "both_refused": 77,
+          "person_refused_judge_not": 0,
+          "person_not_judge_refused": 1,
+          "both_not": 0
+        },
+        "kappa": null,
+        "kappa_note": "not defined: the judge gave one category to all 78 answers, so chance agreement equals observed agreement"
+      }
+    },
+    "before_d227": {
+      "Single pass": {
+        "n": 39,
+        "person_refused": 39,
+        "judge_refused": 39,
+        "agreement": 39,
+        "table_2x2": {
+          "both_refused": 39,
+          "person_refused_judge_not": 0,
+          "person_not_judge_refused": 0,
+          "both_not": 0
+        },
+        "kappa": null,
+        "kappa_note": "not defined: the judge gave one category to all 39 answers, so chance agreement equals observed agreement"
+      },
+      "RLM-10": {
+        "n": 39,
+        "person_refused": 29,
+        "judge_refused": 39,
+        "agreement": 29,
+        "table_2x2": {
+          "both_refused": 29,
+          "person_refused_judge_not": 0,
+          "person_not_judge_refused": 10,
+          "both_not": 0
+        },
+        "kappa": null,
+        "kappa_note": "not defined: the judge gave one category to all 39 answers, so chance agreement equals observed agreement"
+      },
+      "Total": {
+        "n": 78,
+        "person_refused": 68,
+        "judge_refused": 78,
+        "agreement": 68,
+        "table_2x2": {
+          "both_refused": 68,
+          "person_refused_judge_not": 0,
+          "person_not_judge_refused": 10,
+          "both_not": 0
+        },
+        "kappa": null,
+        "kappa_note": "not defined: the judge gave one category to all 78 answers, so chance agreement equals observed agreement"
+      }
+    }
+  }
+}

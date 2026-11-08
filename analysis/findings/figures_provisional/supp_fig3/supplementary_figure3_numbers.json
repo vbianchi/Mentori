@@ -1,0 +1,2647 @@
+{
+"stamp": "PROVISIONAL two raters, 49 of 49 answers drawn",
+"sheets": {
+"Supplementary Fig. 3a": {
+"columns": [
+"statistic",
+"point",
+"ci95_low",
+"q25",
+"median",
+"q75",
+"ci95_high"
+],
+"rows": [
+[
+"Krippendorff's alpha",
+0.29590750995456905,
+0.03294899748335137,
+0.20973147288522964,
+0.2903842484380791,
+0.36933983318840213,
+0.5141091424852443
+],
+[
+"ICC(2,1)",
+0.25506072874493924,
+0.020974803628719955,
+0.17016999644471714,
+0.2571011087780396,
+0.3391300706759726,
+0.5070724461884383
+],
+[
+"Gwet's AC2",
+0.47427345244203967,
+0.24986117571116467,
+0.41747478209420175,
+0.4943089827546795,
+0.5724970913579628,
+0.6944182261234964
+],
+[
+"Mean weighted kappa",
+0.25116279069767433,
+0.020555545602144547,
+0.16727807223780453,
+0.2531825868822205,
+0.3345242990238362,
+0.5019180867277545
+],
+[
+"Exact agreement",
+0.24489795918367346,
+0.12244897959183673,
+0.20408163265306123,
+0.24489795918367346,
+0.2857142857142857,
+0.3673469387755102
+],
+[
+"Adjacent agreement",
+0.7551020408163265,
+0.6326530612244898,
+0.7142857142857143,
+0.7551020408163265,
+0.7959183673469387,
+0.8775510204081632
+]
+]
+},
+"Supplementary Fig. 3b": {
+"columns": [
+"signal",
+"dimension",
+"rater",
+"n",
+"point",
+"ci95_low",
+"q25",
+"median",
+"q75",
+"ci95_high"
+],
+"rows": [
+[
+"Judge",
+"correctness",
+1,
+49,
+0.8309325948253352,
+0.7124642304127786,
+0.7967536591606666,
+0.8299883309115488,
+0.8614530921976339,
+0.9064499073799621
+],
+[
+"Judge",
+"correctness",
+2,
+49,
+0.8039038381681249,
+0.6784228201109339,
+0.7656480732255255,
+0.8028951017190633,
+0.8374030296294004,
+0.887957076671367
+],
+[
+"Judge",
+"faithfulness",
+1,
+49,
+0.3759712913401654,
+0.0714060947068802,
+0.286240595987554,
+0.38450268953374384,
+0.48182115208139253,
+0.6273721758510564
+],
+[
+"Judge",
+"faithfulness",
+2,
+49,
+0.44094827505301687,
+0.15010258318027392,
+0.34801445409588483,
+0.44212328017977814,
+0.5279226253429047,
+0.6846582689248938
+],
+[
+"Second judge",
+"correctness",
+1,
+49,
+0.8995374836917491,
+0.813455977239303,
+0.8732627310794289,
+0.898176077284299,
+0.9196931766463834,
+0.9533011698837806
+],
+[
+"Second judge",
+"correctness",
+2,
+49,
+0.8439500009997022,
+0.7264371562233141,
+0.8068599688259255,
+0.8444064957956041,
+0.8740910592908211,
+0.9206661084311923
+],
+[
+"Second judge",
+"faithfulness",
+1,
+49,
+0.5460586351983353,
+0.24883185524384005,
+0.46580960065146787,
+0.5564829506652547,
+0.6446456652977203,
+0.7757413658569409
+],
+[
+"Second judge",
+"faithfulness",
+2,
+49,
+0.400984452477362,
+0.14405346867055685,
+0.31517914262240865,
+0.40038639800941433,
+0.48305089289798175,
+0.6304912866068454
+],
+[
+"Concepts",
+"correctness",
+1,
+49,
+0.7448098711712331,
+0.5535170217332612,
+0.6888878207559963,
+0.7449638546804956,
+0.7930917403535455,
+0.8669871759107464
+],
+[
+"Concepts",
+"correctness",
+2,
+49,
+0.7159350485602133,
+0.5294063460714387,
+0.6573477757569011,
+0.7160433185842165,
+0.7679288271789692,
+0.8496437333679192
+],
+[
+"Concepts",
+"faithfulness",
+1,
+49,
+0.36705733775246935,
+0.06356214159410283,
+0.27360852426128573,
+0.3712969539609786,
+0.4666043006105945,
+0.6230517244016914
+],
+[
+"Concepts",
+"faithfulness",
+2,
+49,
+0.6806676566988884,
+0.49051819113249906,
+0.6203959295998092,
+0.6800539172384064,
+0.7369127201981455,
+0.8173348198409113
+],
+[
+"Concepts, old matcher",
+"correctness",
+1,
+49,
+0.47569222694042623,
+0.22555042065934805,
+0.39916878262153843,
+0.4840277086513006,
+0.5556061214271049,
+0.6830623237380666
+],
+[
+"Concepts, old matcher",
+"correctness",
+2,
+49,
+0.5585675944467485,
+0.3150403803348638,
+0.48887365529551075,
+0.5702973675081298,
+0.6372001625710733,
+0.7537062238369333
+],
+[
+"Concepts, old matcher",
+"faithfulness",
+1,
+49,
+0.38538404154982053,
+0.11563265241643805,
+0.2994494034604554,
+0.3862442875135538,
+0.4669048609734152,
+0.6038294954454569
+],
+[
+"Concepts, old matcher",
+"faithfulness",
+2,
+49,
+0.5389714908609504,
+0.31160742563304616,
+0.4722456660780332,
+0.5499389012866438,
+0.6151988575208015,
+0.7176750942925817
+],
+[
+"MiniCheck against the key",
+"correctness",
+1,
+49,
+0.45595982490135745,
+0.1545412613933381,
+0.36291481557634403,
+0.455258011704987,
+0.5370149061418987,
+0.6682477655012976
+],
+[
+"MiniCheck against the key",
+"correctness",
+2,
+49,
+0.39615681663174657,
+0.09715386663336223,
+0.3077074556694973,
+0.39393300302480905,
+0.4772582456794462,
+0.6100169431588105
+],
+[
+"MiniCheck against the key",
+"faithfulness",
+1,
+49,
+0.20441897004466913,
+-0.12459423233513661,
+0.09987430701211746,
+0.2117727228611532,
+0.3168631661644572,
+0.5139095572268874
+],
+[
+"MiniCheck against the key",
+"faithfulness",
+2,
+49,
+0.33727013865791533,
+0.042933017863598995,
+0.2441845330874669,
+0.33254476022897417,
+0.42242795578036213,
+0.5649609766565493
+],
+[
+"Papers",
+"correctness",
+1,
+48,
+0.29429655696529683,
+-0.02274711427880979,
+0.19421444205256055,
+0.2957679974033737,
+0.3852106043003152,
+0.5505085899925464
+],
+[
+"Papers",
+"correctness",
+2,
+48,
+0.18044976410776725,
+-0.10247286742778422,
+0.08719746291734472,
+0.1810233493996679,
+0.27077273038929944,
+0.4275555330199272
+],
+[
+"Papers",
+"faithfulness",
+1,
+48,
+0.1609933670030688,
+-0.18923434709970735,
+0.04465551065451962,
+0.16108384842551265,
+0.2749979915598421,
+0.45526131746276705
+],
+[
+"Papers",
+"faithfulness",
+2,
+48,
+0.08327935450255859,
+-0.20863153877368573,
+-0.012604149536849598,
+0.08460276182451193,
+0.17339583266103553,
+0.3549367829117281
+],
+[
+"Papers, no source-list filter",
+"correctness",
+1,
+48,
+0.22380950399078367,
+-0.08844475271725401,
+0.12175738716825389,
+0.21858983104836002,
+0.3196615773623463,
+0.4794760640992951
+],
+[
+"Papers, no source-list filter",
+"correctness",
+2,
+48,
+0.07984169062339863,
+-0.21352542609002065,
+-0.01701872959718663,
+0.07737819579515084,
+0.17495107243076868,
+0.3312456159677551
+],
+[
+"Papers, no source-list filter",
+"faithfulness",
+1,
+48,
+0.15255531986472437,
+-0.20823318806505778,
+0.035352801368096404,
+0.15607352686517006,
+0.2644816050010052,
+0.4495913100833563
+],
+[
+"Papers, no source-list filter",
+"faithfulness",
+2,
+48,
+-0.007412774001225242,
+-0.2925093092417377,
+-0.09973468502700804,
+-0.007042848955976796,
+0.08840262386908815,
+0.2573241117712432
+]
+]
+},
+"Supplementary Fig. 3c": {
+"columns": [
+"row_kind",
+"judge_band",
+"rater_band",
+"answers",
+"rho",
+"ci95_low",
+"ci95_high",
+"eval_id",
+"r1_completeness",
+"r2_completeness",
+"judge_completeness"
+],
+"rows": [
+[
+"cell",
+"0-2",
+"<3",
+11,
+null,
+null,
+null,
+null,
+null,
+null,
+null
+],
+[
+"cell",
+"0-2",
+"3 to <4",
+7,
+null,
+null,
+null,
+null,
+null,
+null,
+null
+],
+[
+"cell",
+"0-2",
+"≥4",
+0,
+null,
+null,
+null,
+null,
+null,
+null,
+null
+],
+[
+"cell",
+"3",
+"<3",
+3,
+null,
+null,
+null,
+null,
+null,
+null,
+null
+],
+[
+"cell",
+"3",
+"3 to <4",
+3,
+null,
+null,
+null,
+null,
+null,
+null,
+null
+],
+[
+"cell",
+"3",
+"≥4",
+1,
+null,
+null,
+null,
+null,
+null,
+null,
+null
+],
+[
+"cell",
+"4-5",
+"<3",
+1,
+null,
+null,
+null,
+null,
+null,
+null,
+null
+],
+[
+"cell",
+"4-5",
+"3 to <4",
+1,
+null,
+null,
+null,
+null,
+null,
+null,
+null
+],
+[
+"cell",
+"4-5",
+"≥4",
+22,
+null,
+null,
+null,
+null,
+null,
+null,
+null
+],
+[
+"rho",
+null,
+null,
+null,
+0.8443377788090729,
+0.7181658562859993,
+0.9237674233764143,
+null,
+null,
+null,
+null
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E001",
+4,
+4,
+4
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E002",
+5,
+5,
+5
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E003",
+3,
+3,
+2
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E004",
+5,
+4,
+5
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E005",
+4,
+4,
+4
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E006",
+4,
+4,
+4
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E007",
+3,
+2,
+1
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E008",
+5,
+5,
+4
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E009",
+5,
+5,
+3
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E010",
+5,
+4,
+5
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E011",
+3,
+3,
+3
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E012",
+3,
+3,
+5
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E013",
+4,
+4,
+4
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E014",
+3,
+4,
+3
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E015",
+4,
+5,
+4
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E016",
+5,
+5,
+5
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E017",
+2,
+1,
+1
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E018",
+2,
+2,
+3
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E019",
+5,
+5,
+5
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E020",
+2,
+2,
+3
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E021",
+2,
+2,
+3
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E022",
+1,
+1,
+0
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E023",
+1,
+1,
+0
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E024",
+4,
+4,
+4
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E025",
+3,
+3,
+2
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E026",
+3,
+3,
+1
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E027",
+2,
+2,
+2
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E028",
+5,
+5,
+5
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E029",
+1,
+1,
+0
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E030",
+3,
+4,
+2
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E031",
+1,
+2,
+0
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E032",
+1,
+1,
+0
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E033",
+4,
+4,
+5
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E034",
+5,
+5,
+5
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E035",
+1,
+1,
+0
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E036",
+3,
+3,
+2
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E037",
+5,
+5,
+4
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E039",
+4,
+4,
+4
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E040",
+2,
+2,
+2
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E041",
+5,
+5,
+5
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E042",
+5,
+4,
+5
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E043",
+5,
+5,
+5
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E044",
+3,
+3,
+3
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E045",
+2,
+3,
+2
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E046",
+3,
+3,
+2
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E047",
+3,
+2,
+4
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E048",
+3,
+3,
+2
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E049",
+4,
+4,
+4
+],
+[
+"answer",
+null,
+null,
+null,
+null,
+null,
+null,
+"E050",
+5,
+5,
+5
+]
+]
+},
+"Supplementary Fig. 3d": {
+"columns": [
+"judge_bar",
+"rater_bar",
+"concepts_cut",
+"papers_cut",
+"accuracy",
+"primary",
+"n"
+],
+"rows": [
+[
+4,
+4,
+0.33,
+0.5,
+75.0,
+null,
+48
+],
+[
+4,
+4,
+0.33,
+0.67,
+77.08333333333334,
+null,
+48
+],
+[
+4,
+4,
+0.33,
+0.8,
+77.08333333333334,
+null,
+48
+],
+[
+4,
+4,
+0.33,
+1.0,
+83.33333333333334,
+null,
+48
+],
+[
+4,
+4,
+0.5,
+0.5,
+77.08333333333334,
+"primary",
+48
+],
+[
+4,
+4,
+0.5,
+0.67,
+77.08333333333334,
+null,
+48
+],
+[
+4,
+4,
+0.5,
+0.8,
+77.08333333333334,
+null,
+48
+],
+[
+4,
+4,
+0.5,
+1.0,
+83.33333333333334,
+null,
+48
+],
+[
+4,
+4,
+0.67,
+0.5,
+77.08333333333334,
+null,
+48
+],
+[
+4,
+4,
+0.67,
+0.67,
+77.08333333333334,
+null,
+48
+],
+[
+4,
+4,
+0.67,
+0.8,
+77.08333333333334,
+null,
+48
+],
+[
+4,
+4,
+0.67,
+1.0,
+79.16666666666666,
+null,
+48
+],
+[
+4,
+4,
+1.0,
+0.5,
+85.41666666666666,
+null,
+48
+],
+[
+4,
+4,
+1.0,
+0.67,
+83.33333333333334,
+null,
+48
+],
+[
+4,
+4,
+1.0,
+0.8,
+81.25,
+null,
+48
+],
+[
+4,
+4,
+1.0,
+1.0,
+72.91666666666666,
+null,
+48
+],
+[
+4,
+3,
+0.33,
+0.5,
+89.58333333333334,
+null,
+48
+],
+[
+4,
+3,
+0.33,
+0.67,
+87.5,
+null,
+48
+],
+[
+4,
+3,
+0.33,
+0.8,
+75.0,
+null,
+48
+],
+[
+4,
+3,
+0.33,
+1.0,
+77.08333333333334,
+null,
+48
+],
+[
+4,
+3,
+0.5,
+0.5,
+79.16666666666666,
+null,
+48
+],
+[
+4,
+3,
+0.5,
+0.67,
+79.16666666666666,
+null,
+48
+],
+[
+4,
+3,
+0.5,
+0.8,
+70.83333333333334,
+null,
+48
+],
+[
+4,
+3,
+0.5,
+1.0,
+72.91666666666666,
+null,
+48
+],
+[
+4,
+3,
+0.67,
+0.5,
+75.0,
+null,
+48
+],
+[
+4,
+3,
+0.67,
+0.67,
+75.0,
+null,
+48
+],
+[
+4,
+3,
+0.67,
+0.8,
+70.83333333333334,
+null,
+48
+],
+[
+4,
+3,
+0.67,
+1.0,
+68.75,
+null,
+48
+],
+[
+4,
+3,
+1.0,
+0.5,
+75.0,
+null,
+48
+],
+[
+4,
+3,
+1.0,
+0.67,
+72.91666666666666,
+null,
+48
+],
+[
+4,
+3,
+1.0,
+0.8,
+66.66666666666666,
+null,
+48
+],
+[
+4,
+3,
+1.0,
+1.0,
+50.0,
+null,
+48
+],
+[
+3,
+4,
+0.33,
+0.5,
+66.66666666666666,
+null,
+48
+],
+[
+3,
+4,
+0.33,
+0.67,
+66.66666666666666,
+null,
+48
+],
+[
+3,
+4,
+0.33,
+0.8,
+70.83333333333334,
+null,
+48
+],
+[
+3,
+4,
+0.33,
+1.0,
+83.33333333333334,
+null,
+48
+],
+[
+3,
+4,
+0.5,
+0.5,
+64.58333333333334,
+null,
+48
+],
+[
+3,
+4,
+0.5,
+0.67,
+66.66666666666666,
+null,
+48
+],
+[
+3,
+4,
+0.5,
+0.8,
+70.83333333333334,
+null,
+48
+],
+[
+3,
+4,
+0.5,
+1.0,
+83.33333333333334,
+null,
+48
+],
+[
+3,
+4,
+0.67,
+0.5,
+66.66666666666666,
+null,
+48
+],
+[
+3,
+4,
+0.67,
+0.67,
+68.75,
+null,
+48
+],
+[
+3,
+4,
+0.67,
+0.8,
+68.75,
+null,
+48
+],
+[
+3,
+4,
+0.67,
+1.0,
+77.08333333333334,
+null,
+48
+],
+[
+3,
+4,
+1.0,
+0.5,
+70.83333333333334,
+null,
+48
+],
+[
+3,
+4,
+1.0,
+0.67,
+70.83333333333334,
+null,
+48
+],
+[
+3,
+4,
+1.0,
+0.8,
+68.75,
+null,
+48
+],
+[
+3,
+4,
+1.0,
+1.0,
+66.66666666666666,
+null,
+48
+],
+[
+3,
+3,
+0.33,
+0.5,
+85.41666666666666,
+null,
+48
+],
+[
+3,
+3,
+0.33,
+0.67,
+85.41666666666666,
+null,
+48
+],
+[
+3,
+3,
+0.33,
+0.8,
+81.25,
+null,
+48
+],
+[
+3,
+3,
+0.33,
+1.0,
+85.41666666666666,
+null,
+48
+],
+[
+3,
+3,
+0.5,
+0.5,
+83.33333333333334,
+null,
+48
+],
+[
+3,
+3,
+0.5,
+0.67,
+81.25,
+null,
+48
+],
+[
+3,
+3,
+0.5,
+0.8,
+72.91666666666666,
+null,
+48
+],
+[
+3,
+3,
+0.5,
+1.0,
+77.08333333333334,
+null,
+48
+],
+[
+3,
+3,
+0.67,
+0.5,
+81.25,
+null,
+48
+],
+[
+3,
+3,
+0.67,
+0.67,
+79.16666666666666,
+null,
+48
+],
+[
+3,
+3,
+0.67,
+0.8,
+70.83333333333334,
+null,
+48
+],
+[
+3,
+3,
+0.67,
+1.0,
+70.83333333333334,
+null,
+48
+],
+[
+3,
+3,
+1.0,
+0.5,
+81.25,
+null,
+48
+],
+[
+3,
+3,
+1.0,
+0.67,
+77.08333333333334,
+null,
+48
+],
+[
+3,
+3,
+1.0,
+0.8,
+66.66666666666666,
+null,
+48
+],
+[
+3,
+3,
+1.0,
+1.0,
+52.083333333333336,
+null,
+48
+]
+]
+},
+"Supplementary Fig. 3e": {
+"columns": [
+"evaluator",
+"dimension",
+"n",
+"point",
+"ci95_low",
+"q25",
+"median",
+"q75",
+"ci95_high"
+],
+"rows": [
+[
+"ROUGE-L",
+"correctness",
+49,
+0.2306638456241709,
+-0.10213089639417024,
+0.12591621362401828,
+0.23588893242409165,
+0.33485557663644694,
+0.5170524063395775
+],
+[
+"ROUGE-L",
+"faithfulness",
+49,
+0.30363323617013954,
+-0.013626317257643033,
+0.21020536315921987,
+0.30959635823857284,
+0.40450403443653815,
+0.5753935539623
+],
+[
+"METEOR",
+"correctness",
+49,
+0.4640773952110231,
+0.18760839556995448,
+0.3741980385324105,
+0.4646022182111319,
+0.5548164355238892,
+0.7090254768062066
+],
+[
+"METEOR",
+"faithfulness",
+49,
+0.44839103030321975,
+0.181287018332799,
+0.36413461949154874,
+0.4488842137489918,
+0.5356295932802781,
+0.6905073477020308
+],
+[
+"Number overlap",
+"correctness",
+49,
+0.6535290918790659,
+0.4342058200887646,
+0.5815741101534617,
+0.6523057231015954,
+0.7176019940890432,
+0.8186341171210171
+],
+[
+"Number overlap",
+"faithfulness",
+49,
+0.5456080611481946,
+0.3048780805850209,
+0.46490901357927633,
+0.5428268018144099,
+0.6172349922047008,
+0.7457175010715253
+],
+[
+"bge-m3 similarity",
+"correctness",
+48,
+0.389864708869196,
+0.07369839258673862,
+0.2905190935876445,
+0.3966181758103149,
+0.4913570661224109,
+0.6482518860764772
+],
+[
+"bge-m3 similarity",
+"faithfulness",
+48,
+0.4118259956074431,
+0.12512401994998817,
+0.3209865625222304,
+0.41693141078066187,
+0.5015709674352253,
+0.6555910289777463
+],
+[
+"Judge",
+"correctness",
+49,
+0.8661164909978744,
+0.7656815204201967,
+0.8358774562476332,
+0.8667037852408865,
+0.892786643017123,
+0.9303871179108798
+],
+[
+"Judge",
+"faithfulness",
+49,
+0.5285916722523745,
+0.27745117305615963,
+0.45454390177514353,
+0.533222512423482,
+0.603212231751604,
+0.7315649538545859
+]
+]
+},
+"Supplementary Fig. 3f": {
+"columns": [
+"dimension",
+"n",
+"point",
+"ci95_low",
+"q25",
+"median",
+"q75",
+"ci95_high"
+],
+"rows": [
+[
+"correctness",
+49,
+-0.30612244897959184,
+-0.5306122448979592,
+-0.37755102040816324,
+-0.30612244897959184,
+-0.23469387755102042,
+-0.08163265306122448
+],
+[
+"faithfulness",
+49,
+0.29591836734693877,
+-0.030612244897959183,
+0.19387755102040816,
+0.29591836734693877,
+0.41836734693877553,
+0.6224489795918368
+]
+]
+}
+},
+"printed": {
+"c_n_0_0": {
+"sheet": "Supplementary Fig. 3c",
+"row": 0,
+"format": "{answers}",
+"inside": {
+"gid": "c_cell_0_0",
+"path": 0
+}
+},
+"c_n_0_1": {
+"sheet": "Supplementary Fig. 3c",
+"row": 1,
+"format": "{answers}",
+"inside": {
+"gid": "c_cell_0_1",
+"path": 0
+}
+},
+"c_n_0_2": {
+"sheet": "Supplementary Fig. 3c",
+"row": 2,
+"format": "{answers}",
+"inside": {
+"gid": "c_cell_0_2",
+"path": 0
+}
+},
+"c_n_1_0": {
+"sheet": "Supplementary Fig. 3c",
+"row": 3,
+"format": "{answers}",
+"inside": {
+"gid": "c_cell_1_0",
+"path": 0
+}
+},
+"c_n_1_1": {
+"sheet": "Supplementary Fig. 3c",
+"row": 4,
+"format": "{answers}",
+"inside": {
+"gid": "c_cell_1_1",
+"path": 0
+}
+},
+"c_n_1_2": {
+"sheet": "Supplementary Fig. 3c",
+"row": 5,
+"format": "{answers}",
+"inside": {
+"gid": "c_cell_1_2",
+"path": 0
+}
+},
+"c_n_2_0": {
+"sheet": "Supplementary Fig. 3c",
+"row": 6,
+"format": "{answers}",
+"inside": {
+"gid": "c_cell_2_0",
+"path": 0
+}
+},
+"c_n_2_1": {
+"sheet": "Supplementary Fig. 3c",
+"row": 7,
+"format": "{answers}",
+"inside": {
+"gid": "c_cell_2_1",
+"path": 0
+}
+},
+"c_n_2_2": {
+"sheet": "Supplementary Fig. 3c",
+"row": 8,
+"format": "{answers}",
+"inside": {
+"gid": "c_cell_2_2",
+"path": 0
+}
+},
+"d_acc_0_0_0": {
+"sheet": "Supplementary Fig. 3d",
+"row": 0,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_0_0_0",
+"path": 0
+}
+},
+"d_acc_0_0_1": {
+"sheet": "Supplementary Fig. 3d",
+"row": 1,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_0_0_1",
+"path": 0
+}
+},
+"d_acc_0_0_2": {
+"sheet": "Supplementary Fig. 3d",
+"row": 2,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_0_0_2",
+"path": 0
+}
+},
+"d_acc_0_0_3": {
+"sheet": "Supplementary Fig. 3d",
+"row": 3,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_0_0_3",
+"path": 0
+}
+},
+"d_acc_0_1_0": {
+"sheet": "Supplementary Fig. 3d",
+"row": 4,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_0_1_0",
+"path": 0
+}
+},
+"d_acc_0_1_1": {
+"sheet": "Supplementary Fig. 3d",
+"row": 5,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_0_1_1",
+"path": 0
+}
+},
+"d_acc_0_1_2": {
+"sheet": "Supplementary Fig. 3d",
+"row": 6,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_0_1_2",
+"path": 0
+}
+},
+"d_acc_0_1_3": {
+"sheet": "Supplementary Fig. 3d",
+"row": 7,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_0_1_3",
+"path": 0
+}
+},
+"d_acc_0_2_0": {
+"sheet": "Supplementary Fig. 3d",
+"row": 8,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_0_2_0",
+"path": 0
+}
+},
+"d_acc_0_2_1": {
+"sheet": "Supplementary Fig. 3d",
+"row": 9,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_0_2_1",
+"path": 0
+}
+},
+"d_acc_0_2_2": {
+"sheet": "Supplementary Fig. 3d",
+"row": 10,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_0_2_2",
+"path": 0
+}
+},
+"d_acc_0_2_3": {
+"sheet": "Supplementary Fig. 3d",
+"row": 11,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_0_2_3",
+"path": 0
+}
+},
+"d_acc_0_3_0": {
+"sheet": "Supplementary Fig. 3d",
+"row": 12,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_0_3_0",
+"path": 0
+}
+},
+"d_acc_0_3_1": {
+"sheet": "Supplementary Fig. 3d",
+"row": 13,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_0_3_1",
+"path": 0
+}
+},
+"d_acc_0_3_2": {
+"sheet": "Supplementary Fig. 3d",
+"row": 14,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_0_3_2",
+"path": 0
+}
+},
+"d_acc_0_3_3": {
+"sheet": "Supplementary Fig. 3d",
+"row": 15,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_0_3_3",
+"path": 0
+}
+},
+"d_acc_1_0_0": {
+"sheet": "Supplementary Fig. 3d",
+"row": 16,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_1_0_0",
+"path": 0
+}
+},
+"d_acc_1_0_1": {
+"sheet": "Supplementary Fig. 3d",
+"row": 17,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_1_0_1",
+"path": 0
+}
+},
+"d_acc_1_0_2": {
+"sheet": "Supplementary Fig. 3d",
+"row": 18,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_1_0_2",
+"path": 0
+}
+},
+"d_acc_1_0_3": {
+"sheet": "Supplementary Fig. 3d",
+"row": 19,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_1_0_3",
+"path": 0
+}
+},
+"d_acc_1_1_0": {
+"sheet": "Supplementary Fig. 3d",
+"row": 20,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_1_1_0",
+"path": 0
+}
+},
+"d_acc_1_1_1": {
+"sheet": "Supplementary Fig. 3d",
+"row": 21,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_1_1_1",
+"path": 0
+}
+},
+"d_acc_1_1_2": {
+"sheet": "Supplementary Fig. 3d",
+"row": 22,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_1_1_2",
+"path": 0
+}
+},
+"d_acc_1_1_3": {
+"sheet": "Supplementary Fig. 3d",
+"row": 23,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_1_1_3",
+"path": 0
+}
+},
+"d_acc_1_2_0": {
+"sheet": "Supplementary Fig. 3d",
+"row": 24,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_1_2_0",
+"path": 0
+}
+},
+"d_acc_1_2_1": {
+"sheet": "Supplementary Fig. 3d",
+"row": 25,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_1_2_1",
+"path": 0
+}
+},
+"d_acc_1_2_2": {
+"sheet": "Supplementary Fig. 3d",
+"row": 26,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_1_2_2",
+"path": 0
+}
+},
+"d_acc_1_2_3": {
+"sheet": "Supplementary Fig. 3d",
+"row": 27,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_1_2_3",
+"path": 0
+}
+},
+"d_acc_1_3_0": {
+"sheet": "Supplementary Fig. 3d",
+"row": 28,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_1_3_0",
+"path": 0
+}
+},
+"d_acc_1_3_1": {
+"sheet": "Supplementary Fig. 3d",
+"row": 29,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_1_3_1",
+"path": 0
+}
+},
+"d_acc_1_3_2": {
+"sheet": "Supplementary Fig. 3d",
+"row": 30,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_1_3_2",
+"path": 0
+}
+},
+"d_acc_1_3_3": {
+"sheet": "Supplementary Fig. 3d",
+"row": 31,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_1_3_3",
+"path": 0
+}
+},
+"d_acc_2_0_0": {
+"sheet": "Supplementary Fig. 3d",
+"row": 32,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_2_0_0",
+"path": 0
+}
+},
+"d_acc_2_0_1": {
+"sheet": "Supplementary Fig. 3d",
+"row": 33,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_2_0_1",
+"path": 0
+}
+},
+"d_acc_2_0_2": {
+"sheet": "Supplementary Fig. 3d",
+"row": 34,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_2_0_2",
+"path": 0
+}
+},
+"d_acc_2_0_3": {
+"sheet": "Supplementary Fig. 3d",
+"row": 35,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_2_0_3",
+"path": 0
+}
+},
+"d_acc_2_1_0": {
+"sheet": "Supplementary Fig. 3d",
+"row": 36,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_2_1_0",
+"path": 0
+}
+},
+"d_acc_2_1_1": {
+"sheet": "Supplementary Fig. 3d",
+"row": 37,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_2_1_1",
+"path": 0
+}
+},
+"d_acc_2_1_2": {
+"sheet": "Supplementary Fig. 3d",
+"row": 38,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_2_1_2",
+"path": 0
+}
+},
+"d_acc_2_1_3": {
+"sheet": "Supplementary Fig. 3d",
+"row": 39,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_2_1_3",
+"path": 0
+}
+},
+"d_acc_2_2_0": {
+"sheet": "Supplementary Fig. 3d",
+"row": 40,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_2_2_0",
+"path": 0
+}
+},
+"d_acc_2_2_1": {
+"sheet": "Supplementary Fig. 3d",
+"row": 41,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_2_2_1",
+"path": 0
+}
+},
+"d_acc_2_2_2": {
+"sheet": "Supplementary Fig. 3d",
+"row": 42,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_2_2_2",
+"path": 0
+}
+},
+"d_acc_2_2_3": {
+"sheet": "Supplementary Fig. 3d",
+"row": 43,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_2_2_3",
+"path": 0
+}
+},
+"d_acc_2_3_0": {
+"sheet": "Supplementary Fig. 3d",
+"row": 44,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_2_3_0",
+"path": 0
+}
+},
+"d_acc_2_3_1": {
+"sheet": "Supplementary Fig. 3d",
+"row": 45,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_2_3_1",
+"path": 0
+}
+},
+"d_acc_2_3_2": {
+"sheet": "Supplementary Fig. 3d",
+"row": 46,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_2_3_2",
+"path": 0
+}
+},
+"d_acc_2_3_3": {
+"sheet": "Supplementary Fig. 3d",
+"row": 47,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_2_3_3",
+"path": 0
+}
+},
+"d_acc_3_0_0": {
+"sheet": "Supplementary Fig. 3d",
+"row": 48,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_3_0_0",
+"path": 0
+}
+},
+"d_acc_3_0_1": {
+"sheet": "Supplementary Fig. 3d",
+"row": 49,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_3_0_1",
+"path": 0
+}
+},
+"d_acc_3_0_2": {
+"sheet": "Supplementary Fig. 3d",
+"row": 50,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_3_0_2",
+"path": 0
+}
+},
+"d_acc_3_0_3": {
+"sheet": "Supplementary Fig. 3d",
+"row": 51,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_3_0_3",
+"path": 0
+}
+},
+"d_acc_3_1_0": {
+"sheet": "Supplementary Fig. 3d",
+"row": 52,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_3_1_0",
+"path": 0
+}
+},
+"d_acc_3_1_1": {
+"sheet": "Supplementary Fig. 3d",
+"row": 53,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_3_1_1",
+"path": 0
+}
+},
+"d_acc_3_1_2": {
+"sheet": "Supplementary Fig. 3d",
+"row": 54,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_3_1_2",
+"path": 0
+}
+},
+"d_acc_3_1_3": {
+"sheet": "Supplementary Fig. 3d",
+"row": 55,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_3_1_3",
+"path": 0
+}
+},
+"d_acc_3_2_0": {
+"sheet": "Supplementary Fig. 3d",
+"row": 56,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_3_2_0",
+"path": 0
+}
+},
+"d_acc_3_2_1": {
+"sheet": "Supplementary Fig. 3d",
+"row": 57,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_3_2_1",
+"path": 0
+}
+},
+"d_acc_3_2_2": {
+"sheet": "Supplementary Fig. 3d",
+"row": 58,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_3_2_2",
+"path": 0
+}
+},
+"d_acc_3_2_3": {
+"sheet": "Supplementary Fig. 3d",
+"row": 59,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_3_2_3",
+"path": 0
+}
+},
+"d_acc_3_3_0": {
+"sheet": "Supplementary Fig. 3d",
+"row": 60,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_3_3_0",
+"path": 0
+}
+},
+"d_acc_3_3_1": {
+"sheet": "Supplementary Fig. 3d",
+"row": 61,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_3_3_1",
+"path": 0
+}
+},
+"d_acc_3_3_2": {
+"sheet": "Supplementary Fig. 3d",
+"row": 62,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_3_3_2",
+"path": 0
+}
+},
+"d_acc_3_3_3": {
+"sheet": "Supplementary Fig. 3d",
+"row": 63,
+"format": "{accuracy:.0f}",
+"inside": {
+"gid": "d_cell_3_3_3",
+"path": 0
+}
+},
+"fx1": {
+"fixed": "Alpha gate, 0.667",
+"why": "a label of the design, no data"
+},
+"fx2": {
+"fixed": "Rater 1",
+"why": "a label of the design, no data"
+},
+"fx3": {
+"fixed": "Rater 2",
+"why": "a label of the design, no data"
+},
+"fx4": {
+"fixed": "Judge 4, raters 4",
+"why": "a label of the design, no data"
+},
+"fx5": {
+"fixed": "Judge 4, raters 3",
+"why": "a label of the design, no data"
+},
+"fx6": {
+"fixed": "Judge 3, raters 4",
+"why": "a label of the design, no data"
+},
+"fx7": {
+"fixed": "Judge 3, raters 3",
+"why": "a label of the design, no data"
+},
+"fx8": {
+"fixed": "Papers cut-off (columns), Concepts cut-off (rows); 2 of 3 rule, accuracy (%)",
+"why": "a label of the design, no data"
+}
+}
+}

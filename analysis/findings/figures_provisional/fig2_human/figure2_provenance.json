@@ -1,0 +1,20 @@
+{
+ "stamp": "PROVISIONAL two raters, 49 of 49 answers drawn",
+ "script": "scripts/S531_fig2_s3_plates.py",
+ "script_sha256": "50ec719568f060b9db444d8b3238808a9991861ea54547f4b6f9bf2eab7fc03f",
+ "command": "uv run --frozen python scripts/S531_fig2_s3_plates.py --raters 2",
+ "raters": 2,
+ "inputs": {
+  "results.json": "c809d46729f4038c2d38b6cd84cffc408c3dcea7279bdb696b58b711b11f918d",
+  "resamples.npz": "95b450e930277d7d22cdab5bcb4221b400d396282910d7cb83e25101f0ffb0dc"
+ },
+ "files": {
+  "Figure 2 (provisional, 49 of 49).pdf": "bffa4a70730e75a2ef01280ef5810c95861b7271fec45cdbc595c3a6cd7a68bf",
+  "Figure 2 (provisional, 49 of 49).png": "e6501a0306102188bca9dfb3f7eaf122babee4c3a6ee022b457bc02d998e98cb",
+  "Figure 2 (provisional, 49 of 49).svg": "8fc621e20802f1f47c2965dc60d36d9d376b38085bb27ba9531cf1d666ead9eb",
+  "Source Data Fig. 2 (provisional, 49 of 49).xlsx": "c9dc7f641bdb9624d0c6d3c3d1a3775d7383b7bc3ad3b6df08108525a231d6c3",
+  "Source Data Fig. 2 caption (provisional, 49 of 49).md": "204b82414b249e0d2de74625af9cb19b8c082485a195e9fc28a6f36e809b9818",
+  "figure2_numbers.json": "a1969bec6049b5f620b5d0ff249b2def87fcfe6a4706864a5b51f04a2b648545",
+  "legend_draft.md": "6a5843d54ff44ba0ef8e46a875f8aa32ba95680c22cd27e08b8aefc6536027ca"
+ }
+}

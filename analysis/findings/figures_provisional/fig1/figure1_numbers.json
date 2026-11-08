@@ -1,0 +1,579 @@
+{
+ "stamp": "PROVISIONAL: 2 of 2 panels (panel a, the signals; panel b, the design), 11 settings read from the design files (inputs sha256 8e7dd85af144)",
+ "what": "every value Figure 1 prints, as Source Data Fig. 1 holds it (S448 R8)",
+ "sheets": {
+  "Fig. 1a": {
+   "columns": [
+    "name",
+    "signal",
+    "reference",
+    "tool",
+    "clause",
+    "readout",
+    "rated",
+    "figure",
+    "figure_printed",
+    "text",
+    "source"
+   ],
+   "rows": [
+    [
+     "Judge correctness",
+     "Judge",
+     "against key and passages",
+     "devstral-small-2:24b, qwen3.8:27b",
+     "pass 4+, relaxed 3+",
+     "Correctness (pass 4+)",
+     "yes",
+     "2, 3, 5, 6",
+     "Fig. 2, 3, 5, 6",
+     "each answer scored against the expert answer key; pass at score 4 or more; relaxed, 3 or more",
+     "S456 MEASURES and READOUT; legend drafts of Figure 2, 3, 5, 6"
+    ],
+    [
+     "Judge refusal",
+     "Judge",
+     "against key and passages",
+     "devstral-small-2:24b, qwen3.8:27b",
+     "refused 3+",
+     "Refusal",
+     "no",
+     "3, 5",
+     "Fig. 3, 5",
+     "each answer to an out-of-scope question scored for refusal; refused at 3 or more",
+     "S456 MEASURES and READOUT; legend drafts of Figure 3, 5"
+    ],
+    [
+     "Judge faithfulness",
+     "Judge",
+     "against key and passages",
+     "devstral-small-2:24b, qwen3.8:27b",
+     "with or without passages",
+     "Faithfulness",
+     "part",
+     "2, 6",
+     "Fig. 2, 6",
+     "each answer scored by the plain call, without passages, or the call with passages; the raters check the plain call only",
+     "S456 MEASURES and READOUT; legend drafts of Figure 2, 6"
+    ],
+    [
+     "Concept recall",
+     "Concepts",
+     "against the key",
+     "word matching",
+     "concepts found",
+     "Concept recall",
+     "yes",
+     "2, 4, 5, 6",
+     "Fig. 2, 4, 5, 6",
+     "share of the key's expected concepts that a concept matcher finds in the answer; a concept's content words that also occur in the question are not counted",
+     "S456 MEASURES and READOUT; legend drafts of Figure 2, 4, 5, 6"
+    ],
+    [
+     "Papers precision",
+     "Papers",
+     "against sources",
+     "MiniCheck",
+     "claims supported",
+     "Claims supported",
+     "part",
+     "2, 6",
+     "Fig. 2, 6",
+     "share of the answer's claims that MiniCheck finds supported by the key's source papers; Figure 2 uses the same tool against the key",
+     "S456 MEASURES and READOUT; legend drafts of Figure 2, 6"
+    ]
+   ]
+  },
+  "Fig. 1b": {
+   "columns": [
+    "stage",
+    "axis",
+    "levels",
+    "levels_as",
+    "factors",
+    "line",
+    "text",
+    "n",
+    "figure",
+    "plan_row",
+    "source"
+   ],
+   "rows": [
+    [
+     "INDEX",
+     "Corpus scale",
+     12,
+     "4 \u00d7 3",
+     "size \u00d7 distractor",
+     1,
+     "5 / 10 / 20 / 50 core papers \u00d7 distractor ratio 0 / 1 / 3",
+     "n = 135 questions asked at every index and the questions in scope at each size (n = 66, 90, 135 and 244 at 5, 10, 20 and 50 core papers)",
+     "Figure 3",
+     "G4",
+     "exp_02 CORE_SIZES, NOISE_RATIOS; g4_lib.sh ORDER"
+    ],
+    [
+     "INDEX",
+     "Embedding model",
+     20,
+     "4 \u00d7 5",
+     "model \u00d7 size",
+     1,
+     "4 models \u00d7 5 corpus sizes (5 / 10 / 15 / 20 / 30 papers)",
+     "n = 28 retrieval queries",
+     "Supplementary Figure 2",
+     "",
+     "exp01_embedding_latest.json config.models, config.corpus_sizes, results"
+    ],
+    [
+     "INDEX",
+     "Embedding model",
+     20,
+     "4 \u00d7 5",
+     "",
+     2,
+     "all-MiniLM-L6-v2 / all-mpnet-base-v2 / specter2_base / bge-m3",
+     "",
+     "Supplementary Figure 2",
+     "",
+     "exp01_embedding_latest.json config.models, config.corpus_sizes, results"
+    ],
+    [
+     "INDEX",
+     "Chunking",
+     24,
+     "8 \u00d7 3",
+     "chunking \u00d7 queries",
+     1,
+     "8 chunkings \u00d7 3 query sets",
+     "n = 28 retrieval queries (3 query sets of n = 28, 27 and 27)",
+     "Supplementary Figure 2",
+     "",
+     "exp03a_chunking_latest.json config.configs_tested, config.runs, results"
+    ],
+    [
+     "INDEX",
+     "Chunking",
+     24,
+     "8 \u00d7 3",
+     "",
+     2,
+     "simple 128 / 256 / 512 / 1024 tokens",
+     "",
+     "Supplementary Figure 2",
+     "",
+     "exp03a_chunking_latest.json config.configs_tested, config.runs, results"
+    ],
+    [
+     "INDEX",
+     "Chunking",
+     24,
+     "8 \u00d7 3",
+     "",
+     3,
+     "semantic 500 / 1000 / 2000 / 4000 characters",
+     "",
+     "Supplementary Figure 2",
+     "",
+     "exp03a_chunking_latest.json config.configs_tested, config.runs, results"
+    ],
+    [
+     "RETRIEVE",
+     "Search strategy",
+     35,
+     "7 \u00d7 5",
+     "strategy \u00d7 size",
+     1,
+     "7 strategies \u00d7 the same 5 corpus sizes",
+     "n = 28 retrieval queries",
+     "Supplementary Figure 2",
+     "",
+     "exp02_search_latest.json config.configs_tested, config.corpus_sizes, results"
+    ],
+    [
+     "RETRIEVE",
+     "Search strategy",
+     35,
+     "7 \u00d7 5",
+     "",
+     2,
+     "dense / BM25 standard / BM25 scientific / hybrid fixed / hybrid adaptive / RRF / RRF + reranker",
+     "",
+     "Supplementary Figure 2",
+     "",
+     "exp02_search_latest.json config.configs_tested, config.corpus_sizes, results"
+    ],
+    [
+     "RETRIEVE",
+     "Retrieval depth",
+     44,
+     "10 \u00d7 2 + 6 \u00d7 4",
+     "cap \u00d7 RLM + cap \u00d7 model",
+     1,
+     "10 turn caps \u00d7 2 RLMs (RLM, Zhang RLM), gemini-3-flash-preview",
+     "n = 86 questions at each turn cap with the main generation model and n = 15 with each local model",
+     "Figure 4",
+     "G5, G6, T1",
+     "exp_06 DEFAULT_DEPTHS; g5_lib.sh SMOKE_OPTS; run_rlm_ref.py FIGURE2_CAPS, DEPTH_SWEEP_CAPS; T1 assignment.toml models, depths, less check_t1.py HELD"
+    ],
+    [
+     "RETRIEVE",
+     "Retrieval depth",
+     44,
+     "10 \u00d7 2 + 6 \u00d7 4",
+     "",
+     2,
+     "1 / 2 / 3 / 5 / 7 / 10 / 15 / 20 / 30 / 50 turns",
+     "",
+     "Figure 4",
+     "G5, G6, T1",
+     "exp_06 DEFAULT_DEPTHS; g5_lib.sh SMOKE_OPTS; run_rlm_ref.py FIGURE2_CAPS, DEPTH_SWEEP_CAPS; T1 assignment.toml models, depths, less check_t1.py HELD"
+    ],
+    [
+     "RETRIEVE",
+     "Retrieval depth",
+     44,
+     "10 \u00d7 2 + 6 \u00d7 4",
+     "",
+     3,
+     "+ 6 turn caps (1 / 3 / 5 / 7 / 20 / 50) \u00d7 4 local models, RLM",
+     "",
+     "Figure 4",
+     "G5, G6, T1",
+     "exp_06 DEFAULT_DEPTHS; g5_lib.sh SMOKE_OPTS; run_rlm_ref.py FIGURE2_CAPS, DEPTH_SWEEP_CAPS; T1 assignment.toml models, depths, less check_t1.py HELD"
+    ],
+    [
+     "RETRIEVE",
+     "Retrieval depth",
+     44,
+     "10 \u00d7 2 + 6 \u00d7 4",
+     "",
+     4,
+     "devstral-small-2:24b / gemma3:27b / qwen3-coder:30b / qwen3-coder-next:q4_K_M",
+     "",
+     "Figure 4",
+     "G5, G6, T1",
+     "exp_06 DEFAULT_DEPTHS; g5_lib.sh SMOKE_OPTS; run_rlm_ref.py FIGURE2_CAPS, DEPTH_SWEEP_CAPS; T1 assignment.toml models, depths, less check_t1.py HELD"
+    ],
+    [
+     "GENERATE",
+     "Generation model",
+     5,
+     "1 + 4",
+     "main + replication",
+     1,
+     "gemini-3-flash-preview + 4 replication models",
+     "n = 135 questions with the main generation model, and with each of the 4 other generation models on the 6 generation strategies (2 of them: n = 45 with the 3 RLM strategies)",
+     "Figure 3",
+     "G1, T2",
+     "experiments_v4/exp_common.py GEN_MODEL (G1); T2_runs/check_t2.py GENERATORS (= t2_lib.sh's case), CONFIGS"
+    ],
+    [
+     "GENERATE",
+     "Generation model",
+     5,
+     "1 + 4",
+     "",
+     2,
+     "claude-haiku-4-5 / gemini-2.5-pro / gemma3:27b / qwen3-coder:30b",
+     "",
+     "Figure 3",
+     "G1, T2",
+     "experiments_v4/exp_common.py GEN_MODEL (G1); T2_runs/check_t2.py GENERATORS (= t2_lib.sh's case), CONFIGS"
+    ],
+    [
+     "GENERATE",
+     "Generation strategy",
+     10,
+     "6 + 4",
+     "strategy + reference",
+     1,
+     "6 strategies + 4 reference arms",
+     "n = 135 questions with the main generation model, and with each of the 4 other generation models on the 6 generation strategies (2 of them: n = 45 with the 3 RLM strategies)",
+     "Figure 3",
+     "G1, G2, G6",
+     "exp_01 CONFIG_NAMES, MATCHED_BUDGET; run_rlm_ref.py FIGURE2_CAPS"
+    ],
+    [
+     "GENERATE",
+     "Generation strategy",
+     10,
+     "6 + 4",
+     "",
+     2,
+     "single pass / multi-hop / RLM-5 / RLM-10 / RLM-20 / verified pass",
+     "",
+     "Figure 3",
+     "G1, G2, G6",
+     "exp_01 CONFIG_NAMES, MATCHED_BUDGET; run_rlm_ref.py FIGURE2_CAPS"
+    ],
+    [
+     "GENERATE",
+     "Generation strategy",
+     10,
+     "6 + 4",
+     "",
+     3,
+     "reference arms: single pass at matched budget / Zhang RLM at caps 5 10 20",
+     "",
+     "Figure 3",
+     "G1, G2, G6",
+     "exp_01 CONFIG_NAMES, MATCHED_BUDGET; run_rlm_ref.py FIGURE2_CAPS"
+    ],
+    [
+     "GENERATE",
+     "System configuration",
+     4,
+     "4",
+     "system",
+     1,
+     "no retrieval (model alone) / naive RAG / RLM-10 / full orchestrator",
+     "n = 135 questions with the main generation model, and with each of the 4 other generation models on the 6 generation strategies (2 of them: n = 45 with the 3 RLM strategies)",
+     "Figure 5",
+     "G3",
+     "exp_03 CONFIG_NAMES (those not in ORCHESTRATOR_CONFIGS, and full_orchestrator); G3 preflight.sh WAVE1"
+    ],
+    [
+     "GENERATE",
+     "Orchestrator set-up",
+     8,
+     "6 + 2",
+     "set-up + stress",
+     1,
+     "6 set-ups + 2 stress set-ups (not Mentor::i's default)",
+     "n = 135 questions with the main generation model, and with each of the 4 other generation models on the 6 generation strategies (2 of them: n = 45 with the 3 RLM strategies)",
+     "Figure 5",
+     "G3, G9",
+     "exp_03 ORCHESTRATOR_CONFIGS in G3 preflight.sh WAVE1, and STRESS_CONFIG_NAMES (G9)"
+    ],
+    [
+     "GENERATE",
+     "Orchestrator set-up",
+     8,
+     "6 + 2",
+     "",
+     2,
+     "as built / no analyser / no planner / no supervisor / no synthesizer / factual questions to documents",
+     "",
+     "Figure 5",
+     "G3, G9",
+     "exp_03 ORCHESTRATOR_CONFIGS in G3 preflight.sh WAVE1, and STRESS_CONFIG_NAMES (G9)"
+    ],
+    [
+     "GENERATE",
+     "Orchestrator set-up",
+     8,
+     "6 + 2",
+     "",
+     3,
+     "stress: distiller on every step / distiller prompt F1 on every step",
+     "",
+     "Figure 5",
+     "G3, G9",
+     "exp_03 ORCHESTRATOR_CONFIGS in G3 preflight.sh WAVE1, and STRESS_CONFIG_NAMES (G9)"
+    ],
+    [
+     "GENERATE",
+     "Code-generation strategy",
+     121,
+     "11 \u00d7 11",
+     "strategy \u00d7 variant",
+     1,
+     "11 strategies \u00d7 11 model variants (7 models at their thinking settings)",
+     "n = 20 operations per strategy and model variant (a model at one thinking setting)",
+     "Figure 7",
+     "S2",
+     "exp_v2_8_coder_benchmark.py CONFIG_NAMES (labels: S447 STRATEGIES); exp_05 FIG6_MODELS, variants() on LOCK.toml"
+    ],
+    [
+     "GENERATE",
+     "Code-generation strategy",
+     121,
+     "11 \u00d7 11",
+     "",
+     2,
+     "free-form / free-form best of 3 / free-form combined / error-recovery introspect / introspect then code / introspect with recovery / thinker-coder split / structured / structured best of 3 / structured combined / structured x3",
+     "",
+     "Figure 7",
+     "S2",
+     "exp_v2_8_coder_benchmark.py CONFIG_NAMES (labels: S447 STRATEGIES); exp_05 FIG6_MODELS, variants() on LOCK.toml"
+    ],
+    [
+     "GENERATE",
+     "Code-generation strategy",
+     121,
+     "11 \u00d7 11",
+     "",
+     3,
+     "qwen3-coder:30b / qwen3-coder-next:q4_K_M / gpt-oss:20b / gemma3:27b / devstral-small-2:24b / gemini-2.5-pro / gemini-3-flash-preview",
+     "",
+     "Figure 7",
+     "S2",
+     "exp_v2_8_coder_benchmark.py CONFIG_NAMES (labels: S447 STRATEGIES); exp_05 FIG6_MODELS, variants() on LOCK.toml"
+    ],
+    [
+     "JUDGE",
+     "Judge model",
+     2,
+     "2",
+     "judge",
+     1,
+     "devstral-small-2:24b (main) / qwen3.8:27b (second, on the generation strategies)",
+     "",
+     "Figures 2, 3, 5 and 6",
+     "S3",
+     "LOCK.toml [judge] model, second_model (lock.judges()); S483_d85_check/repro_check.json; S483 S3_SET G1"
+    ],
+    [
+     "ALL",
+     "Answers, whole study",
+     null,
+     "",
+     "",
+     1,
+     "51,441",
+     "",
+     "Figure 1",
+     "",
+     "S492 findings/recompute/S492_answer_registry/registry.json today.total_counted"
+    ],
+    [
+     "ALL",
+     "Model calls, whole study",
+     null,
+     "",
+     "",
+     1,
+     "\u2265 1,158,418",
+     "",
+     "Figure 1",
+     "",
+     "S520 figure1_legend_total"
+    ]
+   ]
+  }
+ },
+ "printed": {
+  "s448num_0": {
+   "sheet": "Fig. 1a",
+   "row": 0,
+   "format": "{reference}"
+  },
+  "s448num_1": {
+   "sheet": "Fig. 1a",
+   "row": 0,
+   "format": "{tool}"
+  },
+  "s448num_2": {
+   "sheet": "Fig. 1a",
+   "row": 0,
+   "format": "{readout}"
+  },
+  "s448num_3": {
+   "sheet": "Fig. 1a",
+   "row": 1,
+   "format": "{readout}"
+  },
+  "s448num_4": {
+   "sheet": "Fig. 1a",
+   "row": 2,
+   "format": "{readout}"
+  },
+  "s448num_5": {
+   "sheet": "Fig. 1a",
+   "row": 3,
+   "format": "{reference}"
+  },
+  "s448num_6": {
+   "sheet": "Fig. 1a",
+   "row": 3,
+   "format": "{tool}"
+  },
+  "s448num_7": {
+   "sheet": "Fig. 1a",
+   "row": 3,
+   "format": "{readout}"
+  },
+  "s448num_8": {
+   "sheet": "Fig. 1a",
+   "row": 4,
+   "format": "{reference}"
+  },
+  "s448num_9": {
+   "sheet": "Fig. 1a",
+   "row": 4,
+   "format": "{tool}"
+  },
+  "s448num_10": {
+   "sheet": "Fig. 1a",
+   "row": 4,
+   "format": "{readout}"
+  },
+  "s448num_11": {
+   "sheet": "Fig. 1b",
+   "row": 0,
+   "format": "{levels}"
+  },
+  "s448num_12": {
+   "sheet": "Fig. 1b",
+   "row": 1,
+   "format": "{levels}"
+  },
+  "s448num_13": {
+   "sheet": "Fig. 1b",
+   "row": 3,
+   "format": "{levels}"
+  },
+  "s448num_14": {
+   "sheet": "Fig. 1b",
+   "row": 6,
+   "format": "{levels}"
+  },
+  "s448num_15": {
+   "sheet": "Fig. 1b",
+   "row": 8,
+   "format": "{levels}"
+  },
+  "s448num_16": {
+   "sheet": "Fig. 1b",
+   "row": 12,
+   "format": "{levels}"
+  },
+  "s448num_17": {
+   "sheet": "Fig. 1b",
+   "row": 14,
+   "format": "{levels}"
+  },
+  "s448num_18": {
+   "sheet": "Fig. 1b",
+   "row": 17,
+   "format": "{levels}"
+  },
+  "s448num_19": {
+   "sheet": "Fig. 1b",
+   "row": 18,
+   "format": "{levels}"
+  },
+  "s448num_20": {
+   "sheet": "Fig. 1b",
+   "row": 21,
+   "format": "{levels}"
+  },
+  "s448num_21": {
+   "sheet": "Fig. 1b",
+   "row": 24,
+   "format": "{levels}"
+  },
+  "s448num_22": {
+   "sheet": "Fig. 1b",
+   "row": 25,
+   "format": "{text} answers"
+  },
+  "s448num_23": {
+   "sheet": "Fig. 1b",
+   "row": 26,
+   "format": "{text} model calls"
+  }
+ },
+ "printed_what": "every numeral and level line printed on the plate: the SVG group id of its text and the Source Data row and format it is written from (S448 R8 (6))"
+}

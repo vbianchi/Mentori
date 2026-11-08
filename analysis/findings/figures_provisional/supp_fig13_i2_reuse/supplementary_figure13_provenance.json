@@ -1,0 +1,58 @@
+{
+ "provenance": {
+  "script": "scripts/S570_supp_i2_reuse.py",
+  "script_sha256": "1b8125dfeeac62bd48c94eec64de18de7e2a76076896c65259709900ac9bc360",
+  "imports_sha256": {
+   "S497_fig5_d166.py": "e01ceea19cdea8dc5ddf0417859206598512e3245a38753322c2f28d2c988028",
+   "S540_fig5_evaluators.py": "f794d4e6e40179894d22905220e79daa42693710c3f6ba4c10ee09c5b7297c77",
+   "house_style.py": "647c8991f4dcd2cea08e0be46eaf758beb55fb029c54bb267e7fba1e0b8b17b6",
+   "figure_names.py": "a3c65ae0a1e8aa05e99a99610ea857f63b0d8fff60a99404bcb5bf6ff9a82e65",
+   "S457_fig2_panels.py": "acf59ee8e25f8907378a70b677cd77e5a959999ab4c3b9f3e711e0f9570c9cbe",
+   "fig_repro.py": "4bca103b599da4adc0bd473f5b8210dd48b6543caaf63e5589f2faaa7b37d18b",
+   "d181_concept_recall.py": "f297bb619f9e125a587b8f834a97af293f437ec1545466147d491d6a1a0ac039",
+   "S505_question_aware_matcher.py": "179a80fbde63790294f2a35e7b637c1601d7583a6873c4d33171c3493eb86d2f",
+   "concept_match_loose.py": "85bf57a09929dfb88c9bf221cd2a969b0cd78c22c97b77c129ce74a278934609",
+   "turn_limit_note.py": "34fcfb8a71b478b0fc61d66bdf34aa590e19d87f235c969f239be17ea429c3da"
+  },
+  "command": "uv run --frozen python scripts/S570_supp_i2_reuse.py figure"
+ },
+ "stamp": "PROVISIONAL: 90 of 90 answers drawn (I2, draws 1, 2, 3 of 3), frozen set i2 (S569, ecf1e368); judge devstral-small-2:24b plain call, run_sha256 11e51fde8218; key PB v1.1 sha256 eb58a724f103; concept recall D181 (loose matcher, question rule; D285)",
+ "page_mm": [
+  183.0,
+  98.5
+ ],
+ "inputs_sha256": {
+  "experiments/reuse_demo/i2_report.py": "8a76081ecae1cb68943a8618a4b9a940afcb7e073b52f9e4561981a35a7ca439",
+  "experiments/reuse_demo/key_v1_1.json": "eb58a724f10382f478a25c68ec3b52260c398ce912e071ff8ba5a7647d9e5487",
+  "experiments/reuse_demo/plant_key.py": "d1c0b9de8641663fc5ed1e5a20ea0732fd0baaaf4845df1489469fb4e03b8070",
+  "frozen:i2/judge/judge_passages.jsonl": "24c4799da344bc4efe16e6b41a5e30bbf5413ebb6cb306b5668f439049830109",
+  "frozen:i2/signals/concepts.jsonl": "71cf6343b1d8e616ae3024886b52350bd1ee8e0fdd16f610183fafba3d251250",
+  "frozen:i2/signals/concepts_header.json": "78f7227e76966851957f42db7bd5bd3a6bbd09a81a21b8a52ab441db00273ef9",
+  "frozen:i2/signals/key.jsonl": "4d85a167cdc310e4a57109c274a136b9d977f95b6f09eb5be7b31c5cbe5e957e",
+  "frozen:i2/signals/numbers.jsonl": "3345ecfd8c7895b4555d963f4145384a75d4d5a91682e3bac5d816a595e185b0",
+  "frozen:i2/signals/papers.jsonl": "e62d93077892c0ec9d7c41dbf28d4ddeca2708396a1d20d99052938e90a55e75",
+  "frozen:i2/signals/papers_header.json": "980a4de031b9ca961cf3f9679697c9c138a6f15de51e45f6468fd7ccf1617cfc",
+  "frozen:i2/sinks/exp_01__multi_hop__i2_plant5/answers.jsonl": "b399db61eac1320f8342693188a286a8eef8b89d701b6859443f7d2399633b8d",
+  "frozen:i2/sinks/exp_01__rlm_10__i2_plant5/answers.jsonl": "f7657550f2754dd250093e99b3b50128009a9a4e01dbdc7831132f2b84706475",
+  "frozen:i2/sinks/exp_01__rlm_20__i2_plant5/answers.jsonl": "be4c7c80000d92fe23edefef53bf03802dfa883b984f4e5178698fd8f5d8a426",
+  "frozen:i2/sinks/exp_01__rlm_5__i2_plant5/answers.jsonl": "e3afc8106a91d2c4723891aaa808380f30fca92c36ec9907171c99bd386f1b43",
+  "frozen:i2/sinks/exp_01__single_pass__i2_plant5/answers.jsonl": "c0edfb2d784b1a33e262337bcba6f73831a1b6c294d76e4d1a7cb4f60aab791c",
+  "frozen:i2/sinks/exp_01__verified_pass__i2_plant5/answers.jsonl": "cf3fbef0d739c0e5de26de326e608955fac4fa726d35ba7b446641ba3e73c047",
+  "scripts/S463_fig2_ranking.py at HEAD (METRIC, THRESHOLDS, PRIMARY, REFUSAL_T, JUDGE_FAILED)": "git blob 33e1c05190a58f719c02b85c9ecceb11985928c2"
+ },
+ "figure_lock": {
+  "path": "experiments/FIGURE_LOCK.toml",
+  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "status": "agreed"
+ },
+ "files": {
+  "Supplementary Figure 13 (provisional, 90 of 90).pdf": "d298d5465de8ef300653adda824b6f528ff147c0e72d2177c7c5df562a2bf7a9",
+  "Supplementary Figure 13 (provisional, 90 of 90).png": "48539a343fe2b05c2256213e3377eaff10bd10bcc07d54a89b22d94bdf79c571",
+  "Supplementary Figure 13 (provisional, 90 of 90).svg": "058f09e13d49cd1dd9fdbdb9d79c64879e46d8240ea0c9c295461ae0a4133f1e",
+  "Supplementary Figure 13 data (provisional, 90 of 90).xlsx": "7f88ac347a452047b4cdbe0d270ad555e1d756aa535d84ae63fae4f5777cee4e",
+  "Supplementary Figure 13 data caption (provisional, 90 of 90).md": "702b964891103c715be80b2dcf446efefe71ce975017ff2590b4b5337a32823c",
+  "legend_draft.md": "74943383e74e7640bfba79de8c87fb3a5eb4a528b325b5afa1a77b3fc59e69f8",
+  "methods_notes.md": "ec836211f7a232202d29f0002d730f70836d466e6dbee3883d29ab391c6a0513",
+  "supplementary_figure13_numbers.json": "e5523d2dcbaceb79b073e11f5db8b47c23f3e85c0c7186570850fb935ae14232"
+ }
+}

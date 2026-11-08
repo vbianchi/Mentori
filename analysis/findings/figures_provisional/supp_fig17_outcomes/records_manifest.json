@@ -1,0 +1,353 @@
+{
+ "what": "the G1 and G2 records the plate reads, copied read-only from the Studio by S457 mirror",
+ "written_utc": "2026-10-22T14:47:27Z",
+ "copied_to": "outside the repository (mirror --to)",
+ "exp01": {
+  "single_pass": {
+   "group": "G1",
+   "run": "exp_01__single_pass__exp_v4_s20_n0",
+   "host": "10.15.212.253",
+   "clone": "projects/mentori-runs",
+   "clone_head_when_copied": "b6173fb",
+   "processes": [
+    {
+     "pid": 55404,
+     "commit": "11137f9",
+     "start_utc": "2026-10-16T23:31:07Z",
+     "start_record": "findings/recompute/G1_runs/g1_single_pass.start.json",
+     "cmd": "uv run --project experiments/mentori --frozen python experiments/mentori/publication/scripts/exp_01_generation.py --ollama-url http://127.0.0.1:11453 --configs single_pass --draws 1 2 3",
+     "first_call_local": "2026-10-17T01:31:24",
+     "last_call_local": "2026-10-17T02:41:31",
+     "calls": 405,
+     "studio_utc_offset": "+0200"
+    }
+   ],
+   "path": "projects/mentori-runs/findings/runs/exp_01__single_pass__exp_v4_s20_n0/answers.jsonl",
+   "calls_lock_sha256": {
+    "1b89d50cb23e175ded367360b2f851fea45f0301145723c1b9786517f970a9ca": 405
+   },
+   "calls_sha256": "61957616a968b47ebaebfd43ef31598c2abdd45e3045f7594cdd121553a3c8c0",
+   "calls_lines": 405,
+   "sha256": "bc43f45f211b64ad625db677110d6346dfd6d5bdda9387a6647d0d957cc5dccd",
+   "size": 1773288,
+   "mtime": 1792197699,
+   "mtime_local": "2026-10-17 02:41 CEST",
+   "lines": 405
+  },
+  "multi_hop": {
+   "group": "G1",
+   "run": "exp_01__multi_hop__exp_v4_s20_n0",
+   "host": "10.15.212.253",
+   "clone": "projects/mentori-runs",
+   "clone_head_when_copied": "b6173fb",
+   "processes": [
+    {
+     "pid": 55399,
+     "commit": "11137f9",
+     "start_utc": "2026-10-16T23:31:07Z",
+     "start_record": "findings/recompute/G1_runs/q151_before_rerun_20261017T124813Z/g1_multi_hop.start.json",
+     "cmd": "uv run --project experiments/mentori --frozen python experiments/mentori/publication/scripts/exp_01_generation.py --ollama-url http://127.0.0.1:11453 --configs multi_hop --draws 1 2 3",
+     "first_call_local": "2026-10-17T01:31:24",
+     "last_call_local": "2026-10-17T04:23:42",
+     "calls": 1103,
+     "studio_utc_offset": "+0200"
+    },
+    {
+     "pid": 68173,
+     "commit": "6248b1d",
+     "start_utc": "2026-10-17T12:48:20Z",
+     "start_record": "findings/recompute/G1_runs/g1_multi_hop.start.json",
+     "cmd": "uv run --project experiments/mentori --frozen python experiments/mentori/publication/scripts/exp_01_generation.py --ollama-url http://127.0.0.1:11453 --configs multi_hop --draws 1 2 3 --resume --skip-failed",
+     "first_call_local": "2026-10-17T14:48:29",
+     "last_call_local": "2026-10-17T15:24:55",
+     "calls": 66,
+     "studio_utc_offset": "+0200"
+    }
+   ],
+   "path": "projects/mentori-runs/findings/runs/exp_01__multi_hop__exp_v4_s20_n0/answers.jsonl",
+   "calls_lock_sha256": {
+    "1b89d50cb23e175ded367360b2f851fea45f0301145723c1b9786517f970a9ca": 1169
+   },
+   "calls_sha256": "3574118b858e2e676f4b7a1e215cf29324b44d6067a377ee8ba914a28581e6c1",
+   "calls_lines": 1169,
+   "sha256": "518b0efefd170ec4e172b8ba1d8218aa25612a4eaf27ebab98a824343864ad42",
+   "size": 5444589,
+   "mtime": 1792243523,
+   "mtime_local": "2026-10-17 15:25 CEST",
+   "lines": 405
+  },
+  "verified_pass": {
+   "group": "G1",
+   "run": "exp_01__verified_pass__exp_v4_s20_n0",
+   "host": "10.15.212.253",
+   "clone": "projects/mentori-runs",
+   "clone_head_when_copied": "b6173fb",
+   "processes": [
+    {
+     "pid": 55401,
+     "commit": "11137f9",
+     "start_utc": "2026-10-16T23:31:07Z",
+     "start_record": "findings/recompute/G1_runs/d89_before_rerun_20261018T060109Z/g1_verified_pass.start.json",
+     "cmd": "uv run --project experiments/mentori --frozen python experiments/mentori/publication/scripts/exp_01_generation.py --ollama-url http://127.0.0.1:11453 --configs verified_pass --draws 1 2 3",
+     "first_call_local": "2026-10-17T01:31:45",
+     "last_call_local": "2026-10-17T07:54:42",
+     "calls": 810,
+     "studio_utc_offset": "+0200"
+    },
+    {
+     "pid": 58714,
+     "commit": "b6173fb",
+     "start_utc": "2026-10-18T06:01:38Z",
+     "start_record": "findings/recompute/G1_runs/g1_verified_pass.start.json",
+     "cmd": "uv run --project experiments/mentori --frozen python experiments/mentori/publication/scripts/exp_01_generation.py --ollama-url http://127.0.0.1:11453 --configs verified_pass --draws 1 2 3 --resume --skip-failed",
+     "first_call_local": "2026-10-18T08:02:03",
+     "last_call_local": "2026-10-18T08:02:50",
+     "calls": 2,
+     "studio_utc_offset": "+0200"
+    }
+   ],
+   "path": "projects/mentori-runs/findings/runs/exp_01__verified_pass__exp_v4_s20_n0/answers.jsonl",
+   "calls_lock_sha256": {
+    "1b89d50cb23e175ded367360b2f851fea45f0301145723c1b9786517f970a9ca": 810,
+    "d66daa28596bf3b70ff90e0fb89b1353eab023eba699427cb05ebb3376105c12": 2
+   },
+   "calls_sha256": "d44ddc8e4684267bfc02b9478f97853d1517613a8ba5f1036c4f7dc316e57f96",
+   "calls_lines": 812,
+   "sha256": "1ce4b1052912d8592b912da29ed987df9c2a4baca575cf80cc2b9d33334f8148",
+   "size": 4412643,
+   "mtime": 1792303371,
+   "mtime_local": "2026-10-18 08:02 CEST",
+   "lines": 405
+  },
+  "rlm_5": {
+   "group": "G1",
+   "run": "exp_01__rlm_5__exp_v4_s20_n0",
+   "host": "10.15.212.253",
+   "clone": "projects/mentori-runs",
+   "clone_head_when_copied": "b6173fb",
+   "processes": [
+    {
+     "pid": 55400,
+     "commit": "11137f9",
+     "start_utc": "2026-10-16T23:31:07Z",
+     "start_record": "findings/recompute/G1_runs/q141_before_restart_20261017T095126Z/g1_rlm_5.start.json",
+     "cmd": "uv run --project experiments/mentori --frozen python experiments/mentori/publication/scripts/exp_01_generation.py --ollama-url http://127.0.0.1:11453 --configs rlm_5 --draws 1 2 3",
+     "first_call_local": "2026-10-17T01:31:13",
+     "last_call_local": "2026-10-17T07:09:29",
+     "calls": 1937,
+     "studio_utc_offset": "+0200"
+    },
+    {
+     "pid": 63692,
+     "commit": "87ad4a0",
+     "start_utc": "2026-10-17T09:51:35Z",
+     "start_record": "findings/recompute/G1_runs/d89_before_rerun_20261018T060109Z/g1_rlm_5.start.json",
+     "cmd": "uv run --project experiments/mentori --frozen python experiments/mentori/publication/scripts/exp_01_generation.py --ollama-url http://127.0.0.1:11453 --configs rlm_5 --draws 1 2 3 --resume --skip-failed",
+     "first_call_local": "2026-10-17T11:51:40",
+     "last_call_local": "2026-10-17T13:18:37",
+     "calls": 557,
+     "studio_utc_offset": "+0200"
+    },
+    {
+     "pid": 58713,
+     "commit": "b6173fb",
+     "start_utc": "2026-10-18T06:01:38Z",
+     "start_record": "findings/recompute/G1_runs/g1_rlm_5.start.json",
+     "cmd": "uv run --project experiments/mentori --frozen python experiments/mentori/publication/scripts/exp_01_generation.py --ollama-url http://127.0.0.1:11453 --configs rlm_5 --draws 1 2 3 --resume --skip-failed",
+     "first_call_local": "2026-10-18T08:01:44",
+     "last_call_local": "2026-10-18T08:05:28",
+     "calls": 26,
+     "studio_utc_offset": "+0200"
+    }
+   ],
+   "path": "projects/mentori-runs/findings/runs/exp_01__rlm_5__exp_v4_s20_n0/answers.jsonl",
+   "calls_lock_sha256": {
+    "1b89d50cb23e175ded367360b2f851fea45f0301145723c1b9786517f970a9ca": 2494,
+    "d66daa28596bf3b70ff90e0fb89b1353eab023eba699427cb05ebb3376105c12": 26
+   },
+   "calls_sha256": "bf258c0b0e38b70732da9d32fb783385aa7da66598c212e54aabafb1389d99ac",
+   "calls_lines": 2520,
+   "sha256": "cc10c9eb881fa9618ff2fb8ec7a3f1bb9cf58662827cd67b326e47f67b51d42c",
+   "size": 21493057,
+   "mtime": 1792303531,
+   "mtime_local": "2026-10-18 08:05 CEST",
+   "lines": 405
+  },
+  "rlm_10": {
+   "group": "G1",
+   "run": "exp_01__rlm_10__exp_v4_s20_n0",
+   "host": "10.15.212.253",
+   "clone": "projects/mentori-runs",
+   "clone_head_when_copied": "b6173fb",
+   "processes": [
+    {
+     "pid": 55402,
+     "commit": "11137f9",
+     "start_utc": "2026-10-16T23:31:07Z",
+     "start_record": "findings/recompute/G1_runs/q141_before_restart_20261017T095126Z/g1_rlm_10.start.json",
+     "cmd": "uv run --project experiments/mentori --frozen python experiments/mentori/publication/scripts/exp_01_generation.py --ollama-url http://127.0.0.1:11453 --configs rlm_10 --draws 1 2 3",
+     "first_call_local": "2026-10-17T01:31:13",
+     "last_call_local": "2026-10-17T08:24:25",
+     "calls": 2279,
+     "studio_utc_offset": "+0200"
+    },
+    {
+     "pid": 63693,
+     "commit": "87ad4a0",
+     "start_utc": "2026-10-17T09:51:35Z",
+     "start_record": "findings/recompute/G1_runs/q141b_before_restart_20261017T113042Z/g1_rlm_10.start.json",
+     "cmd": "uv run --project experiments/mentori --frozen python experiments/mentori/publication/scripts/exp_01_generation.py --ollama-url http://127.0.0.1:11453 --configs rlm_10 --draws 1 2 3 --resume --skip-failed",
+     "first_call_local": "2026-10-17T11:51:40",
+     "last_call_local": "2026-10-17T12:20:52",
+     "calls": 156,
+     "studio_utc_offset": "+0200"
+    },
+    {
+     "pid": 67157,
+     "commit": "4cd0c96",
+     "start_utc": "2026-10-17T11:30:50Z",
+     "start_record": "findings/recompute/G1_runs/d89_before_rerun_20261018T060109Z/g1_rlm_10.start.json",
+     "cmd": "uv run --project experiments/mentori --frozen python experiments/mentori/publication/scripts/exp_01_generation.py --ollama-url http://127.0.0.1:11453 --configs rlm_10 --draws 1 2 3 --resume --skip-failed",
+     "first_call_local": "2026-10-17T13:30:55",
+     "last_call_local": "2026-10-17T14:44:39",
+     "calls": 535,
+     "studio_utc_offset": "+0200"
+    },
+    {
+     "pid": 58711,
+     "commit": "b6173fb",
+     "start_utc": "2026-10-18T06:01:38Z",
+     "start_record": "findings/recompute/G1_runs/g1_rlm_10.start.json",
+     "cmd": "uv run --project experiments/mentori --frozen python experiments/mentori/publication/scripts/exp_01_generation.py --ollama-url http://127.0.0.1:11453 --configs rlm_10 --draws 1 2 3 --resume --skip-failed",
+     "first_call_local": "2026-10-18T08:01:44",
+     "last_call_local": "2026-10-18T08:06:23",
+     "calls": 43,
+     "studio_utc_offset": "+0200"
+    }
+   ],
+   "path": "projects/mentori-runs/findings/runs/exp_01__rlm_10__exp_v4_s20_n0/answers.jsonl",
+   "calls_lock_sha256": {
+    "1b89d50cb23e175ded367360b2f851fea45f0301145723c1b9786517f970a9ca": 2970,
+    "d66daa28596bf3b70ff90e0fb89b1353eab023eba699427cb05ebb3376105c12": 43
+   },
+   "calls_sha256": "074c08b9e4e1011247b4729b524252c598158ec760c8cae38b3ae92daa3d6254",
+   "calls_lines": 3013,
+   "sha256": "ecb6de5343d172894fd56d57997e3301d70ca3fb509ae2cd65f8e47eb8c268b7",
+   "size": 23350749,
+   "mtime": 1792303588,
+   "mtime_local": "2026-10-18 08:06 CEST",
+   "lines": 405
+  },
+  "rlm_20": {
+   "group": "G1",
+   "run": "exp_01__rlm_20__exp_v4_s20_n0",
+   "host": "10.15.212.253",
+   "clone": "projects/mentori-runs",
+   "clone_head_when_copied": "b6173fb",
+   "processes": [
+    {
+     "pid": 55403,
+     "commit": "11137f9",
+     "start_utc": "2026-10-16T23:31:07Z",
+     "start_record": "findings/recompute/G1_runs/d89_before_rerun_20261018T060109Z/g1_rlm_20.start.json",
+     "cmd": "uv run --project experiments/mentori --frozen python experiments/mentori/publication/scripts/exp_01_generation.py --ollama-url http://127.0.0.1:11453 --configs rlm_20 --draws 1 2 3",
+     "first_call_local": "2026-10-17T01:31:13",
+     "last_call_local": "2026-10-17T09:25:56",
+     "calls": 2950,
+     "studio_utc_offset": "+0200"
+    },
+    {
+     "pid": 58712,
+     "commit": "b6173fb",
+     "start_utc": "2026-10-18T06:01:38Z",
+     "start_record": "findings/recompute/G1_runs/g1_rlm_20.start.json",
+     "cmd": "uv run --project experiments/mentori --frozen python experiments/mentori/publication/scripts/exp_01_generation.py --ollama-url http://127.0.0.1:11453 --configs rlm_20 --draws 1 2 3 --resume --skip-failed",
+     "first_call_local": "2026-10-18T08:01:44",
+     "last_call_local": "2026-10-18T08:17:21",
+     "calls": 56,
+     "studio_utc_offset": "+0200"
+    }
+   ],
+   "path": "projects/mentori-runs/findings/runs/exp_01__rlm_20__exp_v4_s20_n0/answers.jsonl",
+   "calls_lock_sha256": {
+    "1b89d50cb23e175ded367360b2f851fea45f0301145723c1b9786517f970a9ca": 2950,
+    "d66daa28596bf3b70ff90e0fb89b1353eab023eba699427cb05ebb3376105c12": 56
+   },
+   "calls_sha256": "4338a275076950f786f0211c1990bb635b9bde5254821db7f6169b986208118d",
+   "calls_lines": 3006,
+   "sha256": "1e5b124d8bbd98640c87051916305ed0c04d668447967c60a08d6945fca32c62",
+   "size": 23173708,
+   "mtime": 1792304248,
+   "mtime_local": "2026-10-18 08:17 CEST",
+   "lines": 405
+  },
+  "matched_budget": {
+   "group": "G2",
+   "run": "exp_01__matched_budget__exp_v4_s20_n0",
+   "host": "10.15.212.253",
+   "clone": "projects/mentori-runs",
+   "clone_head_when_copied": "b6173fb",
+   "processes": [
+    {
+     "pid": 29508,
+     "commit": "dd3fc37",
+     "start_utc": "2026-10-18T01:17:03Z",
+     "start_record": "findings/recompute/G2_runs/g2_arm.start.json",
+     "cmd": "uv run --project experiments/mentori --frozen python experiments/mentori/publication/scripts/exp_01_generation.py --ollama-url http://127.0.0.1:11453 --configs matched_budget --matched-budget-plan findings/recompute/G2_runs/g2_matched_budget_plan.json --draws 1 2 3",
+     "first_call_local": "2026-10-18T03:17:55",
+     "last_call_local": "2026-10-18T07:20:59",
+     "calls": 405,
+     "studio_utc_offset": "+0200"
+    }
+   ],
+   "path": "projects/mentori-runs/findings/runs/exp_01__matched_budget__exp_v4_s20_n0/answers.jsonl",
+   "calls_lock_sha256": {
+    "1b89d50cb23e175ded367360b2f851fea45f0301145723c1b9786517f970a9ca": 405
+   },
+   "calls_sha256": "497b59b21772b449f4f9a893245583261d077bc3abd07a049e76cb4490ae109b",
+   "calls_lines": 405,
+   "sha256": "6b4c46531eca233b1bd73a5cb56819874e1807e9ee6c80152e9ce904a2d32728",
+   "size": 4255241,
+   "mtime": 1792300869,
+   "mtime_local": "2026-10-18 07:21 CEST",
+   "lines": 405,
+   "g2_runs": {
+    "g2_matched_budget_plan.json": {
+     "path": "projects/mentori-runs/findings/recompute/G2_runs/g2_matched_budget_plan.json",
+     "sha256": "3dc2d9f506dc9376cca4be9bbfaad9380e36181e82d93b858cc9fa79dca9a331",
+     "size": 117664,
+     "mtime": 1792286213,
+     "mtime_local": "2026-10-18 03:16 CEST"
+    },
+    "g2_matched_budget_reached.json": {
+     "path": "projects/mentori-runs/findings/recompute/G2_runs/g2_matched_budget_reached.json",
+     "sha256": "9672e6beb2490e4bf18f4ff8df618f1849ff4e78d8edba712ed3af7bf2808cb8",
+     "size": 113126,
+     "mtime": 1792300870,
+     "mtime_local": "2026-10-18 07:21 CEST"
+    },
+    "g2_plan_check.txt": {
+     "path": "projects/mentori-runs/findings/recompute/G2_runs/g2_plan_check.txt",
+     "sha256": "6eba42aee612a00d0f630936126e7d37a3cb93de86495703a8b160617f47983f",
+     "size": 538,
+     "mtime": 1792286216,
+     "mtime_local": "2026-10-18 03:16 CEST"
+    },
+    "g2_arm_check.txt": {
+     "path": "projects/mentori-runs/findings/recompute/G2_runs/g2_arm_check.txt",
+     "sha256": "ca048a72bb20081e444fbe30a36ca344efd12ad6c9af540956939e2a12e7cfda",
+     "size": 231,
+     "mtime": 1792300870,
+     "mtime_local": "2026-10-18 07:21 CEST"
+    },
+    "g2_reached_check.txt": {
+     "path": "projects/mentori-runs/findings/recompute/G2_runs/g2_reached_check.txt",
+     "sha256": "9d544e18851cd28016cb0946de9f51ea7cf207db2915c3415f2d50c65e01b263",
+     "size": 230,
+     "mtime": 1792300871,
+     "mtime_local": "2026-10-18 07:21 CEST"
+    }
+   }
+  }
+ }
+}

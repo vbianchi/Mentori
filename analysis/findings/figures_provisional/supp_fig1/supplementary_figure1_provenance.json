@@ -1,0 +1,516 @@
+{
+ "provenance": {
+  "script": "scripts/S496_supp_fig1_experiment_graph.py",
+  "script_sha256": "ec088071f12697538b7ee4cd9e177c109f996c292e3b81b3cd0140ec4122c306",
+  "command": "uv run --frozen python scripts/S496_supp_fig1_experiment_graph.py",
+  "python": "3.13.11",
+  "deterministic": "D155: no build time and no repository HEAD are recorded; draws.csv is recorded by the sha256 of the fields drawn, not of the file",
+  "inputs_sha256": {
+   "findings/recompute/S492_answer_registry/registry.json": "50ec28658dfedaef28fe4489c50e5ef5289393960613e69e13c23c762b6b9dcb",
+   "findings/figures_provisional/fig1/figure1_provenance.json": "9910c6233f0b4440239f5292d8548eff4e50f0770678e83a988fcc366bcd4c78",
+   "experiments/draws.csv (fields experiment, plan_row, design, draws, status)": "d8a4adaa93474cbf9a0a31f7b25dfe5b75254bd26a9b3d40d21c35b67c4cb1ef",
+   "experiments/rlm_ref/pyproject.toml": "7b8b26c479d8fe9ef349ed5e283902fe8bab1b4725633909c532fb72fe22b2cb"
+  },
+  "model_calls": 0
+ },
+ "reproduced": [
+  "answers stored and counted (registry stored_new_counted): 48697 = registry",
+  "answers kept from April (registry kept_from_april): 2744 = registry",
+  "total counted (registry total_counted): 51441 = registry",
+  "not counted (registry not_counted): 0 = registry"
+ ],
+ "box_sum_check": null,
+ "stamp": "PROVISIONAL: 22 of 22 experiments with answers counted (51,441 answers, scripts/S492_answer_registry.py)",
+ "figure": "Supplementary Figure 1",
+ "named": "Supplementary Figure 1: FIGURE_LOCK [files] supplementary_name (D92 Q194)",
+ "page_mm": [
+  183.0,
+  161.402
+ ],
+ "geometry_mm": {
+  "box_mm": 30.6,
+  "channel_mm": 7.0,
+  "lead_mm": 3.33,
+  "top_mm": 5.999,
+  "key_top_mm": 140.788,
+  "arrow_crossings": 4
+ },
+ "figure_lock": {
+  "path": "experiments/FIGURE_LOCK.toml",
+  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "status": "agreed"
+ },
+ "type_pt": {
+  "all text": 8.0
+ },
+ "font": "Helvetica",
+ "line_pt": 0.6,
+ "colours": {
+  "text, boxes, arrows": "#000000",
+  "column labels": "#5A5A5A",
+  "corpus box": "#EEEEEE"
+ },
+ "boxes": [
+  {
+   "id": "RO",
+   "plan_row": "",
+   "experiment": "Retrieval optimisation",
+   "column": 0,
+   "design": [
+    "4 embedding models, 8 chunkings, 7 search strategies"
+   ],
+   "draws": "1 run",
+   "answers": 2336,
+   "calls": null,
+   "count_kind": "answers, kept from April",
+   "dashed": false
+  },
+  {
+   "id": "CORPUS",
+   "plan_row": "",
+   "experiment": "Evaluation corpus",
+   "column": 0,
+   "design": [
+    "244 questions on 50 core papers",
+    "150 distractor papers"
+   ],
+   "draws": null,
+   "answers": null,
+   "calls": null,
+   "count_kind": "corpus",
+   "dashed": false
+  },
+  {
+   "id": "MS",
+   "plan_row": "",
+   "experiment": "Model selection",
+   "column": 0,
+   "design": [
+    "9 language models from 5 makers"
+   ],
+   "draws": null,
+   "answers": 408,
+   "calls": null,
+   "count_kind": "answers, kept from April",
+   "dashed": false
+  },
+  {
+   "id": "G1",
+   "plan_row": "G1",
+   "experiment": "Generation strategies",
+   "column": 1,
+   "design": [
+    "6 strategies × 135 questions",
+    "gemini-3-flash-preview"
+   ],
+   "draws": "3 draws",
+   "answers": 2430,
+   "calls": null,
+   "count_kind": "answers",
+   "dashed": false
+  },
+  {
+   "id": "G3B",
+   "plan_row": "G3",
+   "experiment": "No retrieval and naive RAG",
+   "column": 1,
+   "design": [
+    "2 baselines × 135 questions"
+   ],
+   "draws": "3 draws",
+   "answers": 810,
+   "calls": null,
+   "count_kind": "answers",
+   "dashed": false
+  },
+  {
+   "id": "G5",
+   "plan_row": "G5",
+   "experiment": "Retrieval depth",
+   "column": 1,
+   "design": [
+    "RLM at 10 turn caps × 86 questions"
+   ],
+   "draws": "3 draws",
+   "answers": 2580,
+   "calls": null,
+   "count_kind": "answers",
+   "dashed": false
+  },
+  {
+   "id": "T1",
+   "plan_row": "T1",
+   "experiment": "Retrieval depth, local models",
+   "column": 1,
+   "design": [
+    "RLM at 6 turn caps × 4 local models × 15 questions"
+   ],
+   "draws": "1 draw",
+   "answers": 360,
+   "calls": null,
+   "count_kind": "answers",
+   "dashed": false
+  },
+  {
+   "id": "S2",
+   "plan_row": "S2",
+   "experiment": "Code generation",
+   "column": 1,
+   "design": [
+    "11 strategies × 11 model variants × 20 operations"
+   ],
+   "draws": "1 draw",
+   "answers": 2420,
+   "calls": null,
+   "count_kind": "answers",
+   "dashed": false
+  },
+  {
+   "id": "G2",
+   "plan_row": "G2",
+   "experiment": "Matched-budget arm",
+   "column": 2,
+   "design": [
+    "single pass at matched budget × 135 questions"
+   ],
+   "draws": "3 draws",
+   "answers": 405,
+   "calls": null,
+   "count_kind": "answers",
+   "dashed": false
+  },
+  {
+   "id": "G4",
+   "plan_row": "G4",
+   "experiment": "Corpus scaling",
+   "column": 2,
+   "design": [
+    "12 indexes × 6 strategies × the questions in scope"
+   ],
+   "draws": "1 + 2 draws",
+   "answers": 18162,
+   "calls": null,
+   "count_kind": "answers",
+   "dashed": false
+  },
+  {
+   "id": "G6C",
+   "plan_row": "G6",
+   "experiment": "Package RLM at caps 5 10 20",
+   "column": 2,
+   "design": [
+    "Zhang RLM at 3 turn caps × 135 questions"
+   ],
+   "draws": "3 draws",
+   "answers": 1215,
+   "calls": null,
+   "count_kind": "answers",
+   "dashed": false
+  },
+  {
+   "id": "G6D",
+   "plan_row": "G6",
+   "experiment": "Package RLM depth caps",
+   "column": 2,
+   "design": [
+    "Zhang RLM at 7 more turn caps × 86 questions"
+   ],
+   "draws": "3 draws",
+   "answers": 1806,
+   "calls": null,
+   "count_kind": "answers",
+   "dashed": false
+  },
+  {
+   "id": "G9",
+   "plan_row": "G9",
+   "experiment": "Distiller on every step (stress)",
+   "column": 3,
+   "design": [
+    "2 stress set-ups × 135 questions"
+   ],
+   "draws": "1 draw",
+   "answers": 450,
+   "calls": null,
+   "count_kind": "answers",
+   "dashed": false
+  },
+  {
+   "id": "G3A",
+   "plan_row": "G3",
+   "experiment": "Pipeline ablation",
+   "column": 3,
+   "design": [
+    "6 orchestrator set-ups × 135 questions"
+   ],
+   "draws": "1 + 2 draws",
+   "answers": 1373,
+   "calls": null,
+   "count_kind": "answers",
+   "dashed": false
+  },
+  {
+   "id": "T3C",
+   "plan_row": "T3",
+   "experiment": "Component benchmarks",
+   "column": 3,
+   "design": [
+    "orchestrator components × models × 832 items"
+   ],
+   "draws": "1 draw",
+   "answers": 6656,
+   "calls": null,
+   "count_kind": "answers",
+   "dashed": false
+  },
+  {
+   "id": "T3D",
+   "plan_row": "T3",
+   "experiment": "Distiller intervention",
+   "column": 3,
+   "design": [
+    "7 prompt variants × models × 97 items"
+   ],
+   "draws": "1 draw",
+   "answers": 1164,
+   "calls": null,
+   "count_kind": "answers",
+   "dashed": false
+  },
+  {
+   "id": "T2",
+   "plan_row": "T2",
+   "experiment": "Strategy replication",
+   "column": 4,
+   "design": [
+    "4 generation models × 6 strategies × 135 questions"
+   ],
+   "draws": "3 draws, RLM on a third",
+   "answers": 7054,
+   "calls": null,
+   "count_kind": "answers",
+   "dashed": false
+  },
+  {
+   "id": "I2",
+   "plan_row": "I2",
+   "experiment": "Plant-science reuse demonstration",
+   "column": 4,
+   "design": [
+    "6 strategies × 5 questions on 5 papers"
+   ],
+   "draws": "3 draws",
+   "answers": 90,
+   "calls": null,
+   "count_kind": "answers",
+   "dashed": false
+  },
+  {
+   "id": "G11",
+   "plan_row": "G11",
+   "experiment": "Short-passage single pass",
+   "column": 4,
+   "design": [
+    "single pass with each passage cut to its first 800 characters"
+   ],
+   "draws": "1 + 2 draws",
+   "answers": 225,
+   "calls": null,
+   "count_kind": "answers",
+   "dashed": false
+  },
+  {
+   "id": "G10",
+   "plan_row": "G10",
+   "experiment": "Flat wide call",
+   "column": 4,
+   "design": [
+    "3 indexes × 1 call at a fixed passage count",
+    "third index: draw 1 only"
+   ],
+   "draws": "1 + 2 draws",
+   "answers": 585,
+   "calls": null,
+   "count_kind": "answers",
+   "dashed": false
+  },
+  {
+   "id": "S18F",
+   "plan_row": "S12",
+   "experiment": "Judge with evidence",
+   "column": 2,
+   "design": [
+    "4 arms (no source, own papers, unrelated papers, repeat) × 366 answers"
+   ],
+   "draws": "1 draw",
+   "answers": 0,
+   "calls": null,
+   "count_kind": "answers",
+   "dashed": false
+  },
+  {
+   "id": "G17",
+   "plan_row": "G17",
+   "experiment": "RLM ablation",
+   "column": 3,
+   "design": [
+    "3 arms (control, search off, gate off) × 86 questions"
+   ],
+   "draws": "3 draws",
+   "answers": 774,
+   "calls": null,
+   "count_kind": "answers",
+   "dashed": false
+  },
+  {
+   "id": "G19",
+   "plan_row": "G19",
+   "experiment": "RLM ablation, gemma3:27b",
+   "column": 4,
+   "design": [
+    "3 arms (Zhang RLM, search off, gate off) × 46 questions"
+   ],
+   "draws": "1 draw",
+   "answers": 138,
+   "calls": null,
+   "count_kind": "answers",
+   "dashed": false
+  }
+ ],
+ "arrows": [
+  {
+   "from": "CORPUS",
+   "to": "RO",
+   "basis": "the retrieval settings were chosen on the corpus (submitted Supplementary Figure 1)"
+  },
+  {
+   "from": "CORPUS",
+   "to": "MS",
+   "basis": "the models were chosen on the corpus's questions (submitted Supplementary Figure 1)"
+  },
+  {
+   "from": "RO",
+   "to": "G1",
+   "basis": "the index every strategy searches is built with the retrieval settings kept from April (submitted Supplementary Figure 1)"
+  },
+  {
+   "from": "RO",
+   "to": "G3B",
+   "basis": "naive RAG searches with the same retrieval settings (submitted Supplementary Figure 1)"
+  },
+  {
+   "from": "MS",
+   "to": "G1",
+   "basis": "the generation model, gemini-3-flash-preview (submitted Supplementary Figure 1)"
+  },
+  {
+   "from": "MS",
+   "to": "T1",
+   "basis": "the local models (submitted Supplementary Figure 1: model selection to retrieval depth)"
+  },
+  {
+   "from": "MS",
+   "to": "S2",
+   "basis": "the code-generation models (submitted Supplementary Figure 1)"
+  },
+  {
+   "from": "G1",
+   "to": "G2",
+   "basis": "single pass given each question's passage count from G1's RLM-10 call records (exp_01 matched_budget; experiments/runner/matched_budget.py)"
+  },
+  {
+   "from": "G1",
+   "to": "G4",
+   "basis": "corpus scaling runs the same six strategies (S456: exp_02 CONFIG_NAMES equal exp_01's)"
+  },
+  {
+   "from": "G1",
+   "to": "G6C",
+   "basis": "package RLM is run at the caps of G1's RLM-5, RLM-10 and RLM-20 (run_rlm_ref.py FIGURE2_CAPS)"
+  },
+  {
+   "from": "G1",
+   "to": "G3A",
+   "basis": "Figure 5 sets the pipeline beside G1's RLM-10 answers, which G3 does not run again (G3_runs/README.md: rlm_10 not run, Figure 4 uses G1's RLM-10 answers)"
+  },
+  {
+   "from": "G1",
+   "to": "T2",
+   "basis": "T2 runs G1's six strategies on G1's index with other generation models (check_t2.py CONFIGS, t2_lib.sh)"
+  },
+  {
+   "from": "G1",
+   "to": "I2",
+   "basis": "the reuse demonstration runs G1's six strategies (D160 (14), Q-I2b O-b)"
+  },
+  {
+   "from": "G5",
+   "to": "T1",
+   "basis": "T1's turn caps are a subset of G5's (S456 check on T1_runs/assignment.toml)"
+  },
+  {
+   "from": "G5",
+   "to": "G6D",
+   "basis": "package RLM's depth caps with caps 5, 10 and 20 are G5's ten caps (S456: FIGURE2_CAPS + DEPTH_SWEEP_CAPS = exp_06 DEFAULT_DEPTHS)"
+  },
+  {
+   "from": "G6C",
+   "to": "G6D",
+   "basis": "the depth curve of package RLM takes its caps 5, 10 and 20 from these runs, the 86 questions kept (S459: b4_rlm_ref__cap<c>__all135 for caps 5, 10, 20)"
+  },
+  {
+   "from": "G3A",
+   "to": "G9",
+   "basis": "the distiller never ran in the full pipeline's draw 1, so the stress set-ups run it on every step (D154 as amended; draws.csv G9 basis, Q82)"
+  },
+  {
+   "from": "G3A",
+   "to": "T3C",
+   "basis": "the components benchmarked are the orchestrator's (submitted Supplementary Figure 1)"
+  },
+  {
+   "from": "T3C",
+   "to": "T3D",
+   "basis": "the distiller prompts are varied on the distiller's benchmark items (submitted Supplementary Figure 1)"
+  },
+  {
+   "from": "G1",
+   "to": "G11",
+   "basis": "paired with G1 by question, on G1's index (D196)"
+  },
+  {
+   "from": "G4",
+   "to": "G10",
+   "basis": "its top_k comes from G4's token counts and it pairs with G4 by question (D196; S519)"
+  },
+  {
+   "from": "G1",
+   "to": "G17",
+   "basis": "the control is G1's RLM-10 on today's code, and G1's RLM-10 draw 1 checks what the code changed (D240)"
+  },
+  {
+   "from": "G6C",
+   "to": "G17",
+   "basis": "the package arm is G6's cap-10 answers, stored and judged (D240, D249 O1)"
+  },
+  {
+   "from": "G17",
+   "to": "G19",
+   "basis": "the same three switches on gemma3:27b (D249 O2)"
+  },
+  {
+   "from": "G1",
+   "to": "S18F",
+   "basis": "judges G1's draw-1 answers with no source, their own papers or unrelated papers (D107; S18f)"
+  }
+ ],
+ "files": {
+  "Supplementary Figure 1 (provisional, 22 of 22).pdf": "a1e9251608a0e6f92df11fe9188cdbcb951f1f1ca4145a61a8c4ac5e4af801df",
+  "Supplementary Figure 1 (provisional, 22 of 22).svg": "90b87a18b5458ccefb3bdac3f83cadaebbcb3401db7ec31e0cd0ad918fd7fc9b",
+  "Supplementary Figure 1 (provisional, 22 of 22).png": "773c3d09878bc2ce646613cf69a433ed33d749d56ed9fc4992fdf744a2be8034",
+  "Supplementary Figure 1 data (provisional, 22 of 22).xlsx": "a2b48922853c408a946f51396fd8d41d15ba37f2c11ba871a61f1960ebecf382",
+  "Supplementary Figure 1 data caption (provisional, 22 of 22).md": "799eb2b7347d3a99d024bb093ef3e3a3f24f1c571d4674d2cdc89ab22f926740",
+  "supplementary_figure1_numbers.json": "10a78c3712e4e37b02e649b3cc57ce75cbf77f64aec3a6d2f46fca3e815df062",
+  "legend_draft.md": "6185b08b1c76d0f420be49da47d773b4a7a26dffe5d7d00983e4a4b5af95b68c"
+ }
+}

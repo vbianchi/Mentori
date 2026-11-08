@@ -1,0 +1,5349 @@
+{
+ "_provenance": {
+  "command": "uv run --frozen python scripts/S526_instrument_swaps.py",
+  "inputs_sha256": {
+   "data/ground_truth_v2/all_v2_4.json": "5d8362ae931dc0fe0cc132be6b5e57187e3ae7d3131d86f63cdf1a44633fadd5",
+   "data/ground_truth_v2/ground_truth_v2_4_as_v1.json": "e971de522df6fab54a070e44736b6cb28a5ebd26bab07ca9e1513230bb86f4ef",
+   "findings/recompute/L2_d135/concept_recall.jsonl": "043d78a3d442de55ee76c4ebaca2bfb822363e34937ae5f185a933aa2b1d0dd6",
+   "findings/recompute/L2_d135_d181/concept_recall.jsonl": "43307c4b4a6c56adfdfd9297ef90be27e8ed577c64e66c2781ac9b933d85684f",
+   "findings/recompute/L2_d135_d181_g7/concept_recall_g7.jsonl": "b0c7b14d654ca7fe8a4947820ca04c940d42124edc4b626865116d682f2a5ea2",
+   "findings/recompute/L3/concept_recall.jsonl": "56f0f23b3415169a2ec5a79f6fb9cbf427939054279b9ebc32b21cf07c6e2f36",
+   "findings/recompute/L3_d181/concept_recall.jsonl": "2ce0985ee014cf33f84417410282271b518c06a220138d2d6f67145c539e6371",
+   "findings/recompute/S281_exp04_per_answer.csv": "8e63b6eaff80b75b28324d9b854d85598af1e0d27b982c7fe3bdb81df9193834",
+   "findings/recompute/S406_exp04_per_answer_v24.csv": "caa20af38156a8c2436b5d13a0128fed05c1ef7830084392a0f8df5f6c70e689",
+   "findings/recompute/S526_instrument_swaps/inputs/W_questions_d166.json": "71878f8f95d7a9a89f836dd751c904c00660ac1f243f8be33e0c9e7644689140",
+   "frozen:fig2/g1_collect.jsonl": "f5ff75bc244cda492a48e7e11f54f2007ed7d586a8f49e78921edd7244b28965",
+   "frozen:fig3/g4_collect.jsonl": "8f10e30af2f33f8899198762e85298646f86ebe920b9e2ac86d9bc2f1cc65bd0",
+   "frozen:fig3_s6/s6_g1_collect.jsonl": "2a79dc76e87e362513b414776c39873c068466195c23ce979a439afad46462d3",
+   "frozen:fig5_1028/l1/key/key.shard0of1.jsonl": "5157ce1f2e11b9e90970c79af17dbc3138579f03d7fde9ea0611e416278b74ce",
+   "frozen:fig5_1028/l1/papers/papers.shard0of25.jsonl": "a72473858e2b0cbe5fbb651afd30fa20c135cccc506313339185cfb8f579469e",
+   "frozen:fig5_1028/l1/papers/papers.shard0of3.jsonl": "497119e9aacccf795455cd0666a88fed141750f74805e28dd4ebe4eca27a776d",
+   "frozen:fig5_1028/l1/papers/papers.shard0of6.jsonl": "02a128b0c628f1fe2dc5d6e2488c8bf6aeeb46f470e6a8047e97b71c5191705e",
+   "frozen:fig5_1028/l1/papers/papers.shard0of8.jsonl": "3bc371e114a18ae860ffcdfd46bb571d4ac9cb406a609adbae13d05c9e763d94",
+   "frozen:fig5_1028/l1/papers/papers.shard11of25.jsonl": "24124256d4eeb63160a3de3822cb23cf5db52a2303945a384b439e23255d8b7c",
+   "frozen:fig5_1028/l1/papers/papers.shard17of25.jsonl": "c183ec0074924e3ac79866525cbca5a64de3dfb5ce5459813d6e5296e1f98fda",
+   "frozen:fig5_1028/l1/papers/papers.shard1of3.jsonl": "20cb43f9b64ed071e4b1d9dd93669289bb7c908922cb963d1c0113943057d915",
+   "frozen:fig5_1028/l1/papers/papers.shard1of6.jsonl": "a340682c9ea14b08de5934c22879afba9a836d7a80dfd8ec62cf88f23c9e5af5",
+   "frozen:fig5_1028/l1/papers/papers.shard1of8.jsonl": "893cce2612d5417494f074c38cc1ed5153eefa162f02b8947e425dca7bcb92ab",
+   "frozen:fig5_1028/l1/papers/papers.shard21of25.jsonl": "a0b9b54c1e2c9e173bda8ee55fda11444e29b897501372deb35348715286ba95",
+   "frozen:fig5_1028/l1/papers/papers.shard23of25.jsonl": "44bc7352c7cdcfefeaa924981f78fcf0be6f32ba3a12494c528159814ce39b66",
+   "frozen:fig5_1028/l1/papers/papers.shard24of25.jsonl": "3cc090aaed37913d2a6518557ca48ab0a09dd3ff02bbfea594246eb71d0ecb1d",
+   "frozen:fig5_1028/l1/papers/papers.shard2of3.jsonl": "fd6ced90b95846cf0cb7004a8b9edc805c6791202b75c499912ab5e76dc1f9b2",
+   "frozen:fig5_1028/l1/papers/papers.shard2of6.jsonl": "7e2c5259192e0344ca3f4a9f8badd2bf895422acf470bdb506365ab46e485186",
+   "frozen:fig5_1028/l1/papers/papers.shard2of8.jsonl": "a1838a9662038cef7e16f510081c40e2476e5347caba34af7bab0aa02a0ea97c",
+   "frozen:fig5_1028/l1/papers/papers.shard3of25.jsonl": "1801f791b1ae7c0bd2fc0a581d339bcc954616b41621a7c72df9b22e0f1e4f8f",
+   "frozen:fig5_1028/l1/papers/papers.shard3of6.jsonl": "e9d3026b2aaac173fbc9120ea0548ec71c3750555e6e79ce7b2e9ad1c571e79f",
+   "frozen:fig5_1028/l1/papers/papers.shard4of25.jsonl": "1d1a91cd52264524d7b2171c427495ad734e15741877e38507e2e0ff3777eb1e",
+   "frozen:fig5_1028/l1/papers/papers.shard4of6.jsonl": "0cf00913ee8f25d6447785b67ac98e280aa7ccaeabc02ac51fad51e6fcbcf598",
+   "frozen:fig5_1028/l1/papers/papers.shard4of8.jsonl": "64df74e6a50527d223906cfb9fb5bd393871de91a2c11816f5953ac44d24d15e",
+   "frozen:fig5_1028/l1/papers/papers.shard5of6.jsonl": "0ab765f577e1ce718f31eb923632b032ac5b23b7c28fc68f3fecf965878672c4",
+   "frozen:fig5_1028/l1/papers/papers.shard6of8.jsonl": "3cd4eb94c8ba1af3756e65e535bc83c425d6b6c8ad9595c8ead15f5ab59384b8",
+   "frozen:fig5_1028/l1/papers/papers.shard9of25.jsonl": "4c07787970aa66c359f4ea0768b874c7ceb9c5585c9ef7b6760ab8c59872bf7c"
+  },
+  "ported_from": [
+   "findings/audits/rerun_story_2026-11-01/scripts/instr.py",
+   "findings/audits/rerun_story_2026-11-01/scripts/recount3.py"
+  ],
+  "script": "scripts/S526_instrument_swaps.py",
+  "script_sha256": "d000347e37f5794dedaff303810d78773ed41db87f4f181c3230fe87941ae93e"
+ },
+ "gates": [
+  {
+   "gate": "G1 pass rate single_pass at 4",
+   "got": 83.3,
+   "pass": true,
+   "source": "ranking_report.md (instr.py's gate)",
+   "want": 83.3
+  },
+  {
+   "gate": "G1 pass rate verified_pass at 4",
+   "got": 82.9,
+   "pass": true,
+   "source": "ranking_report.md (instr.py's gate)",
+   "want": 82.9
+  },
+  {
+   "gate": "G1 pass rate multi_hop at 4",
+   "got": 79.5,
+   "pass": true,
+   "source": "ranking_report.md (instr.py's gate)",
+   "want": 79.5
+  },
+  {
+   "gate": "G1 pass rate rlm_10 at 4",
+   "got": 74.8,
+   "pass": true,
+   "source": "ranking_report.md (instr.py's gate)",
+   "want": 74.8
+  },
+  {
+   "gate": "G1 pass rate rlm_5 at 4",
+   "got": 71.7,
+   "pass": true,
+   "source": "ranking_report.md (instr.py's gate)",
+   "want": 71.7
+  },
+  {
+   "gate": "G1 pass rate rlm_20 at 4",
+   "got": 71.3,
+   "pass": true,
+   "source": "ranking_report.md (instr.py's gate)",
+   "want": 71.3
+  },
+  {
+   "gate": "G1 pass rate single_pass at 3",
+   "got": 93.4,
+   "pass": true,
+   "source": "ranking_report.md (instr.py's gate)",
+   "want": 93.4
+  },
+  {
+   "gate": "G1 pass rate verified_pass at 3",
+   "got": 93.0,
+   "pass": true,
+   "source": "ranking_report.md (instr.py's gate)",
+   "want": 93.0
+  },
+  {
+   "gate": "G1 pass rate multi_hop at 3",
+   "got": 95.0,
+   "pass": true,
+   "source": "ranking_report.md (instr.py's gate)",
+   "want": 95.0
+  },
+  {
+   "gate": "G1 pass rate rlm_10 at 3",
+   "got": 92.2,
+   "pass": true,
+   "source": "ranking_report.md (instr.py's gate)",
+   "want": 92.2
+  },
+  {
+   "gate": "G1 pass rate rlm_5 at 3",
+   "got": 93.4,
+   "pass": true,
+   "source": "ranking_report.md (instr.py's gate)",
+   "want": 93.4
+  },
+  {
+   "gate": "G1 pass rate rlm_20 at 3",
+   "got": 93.8,
+   "pass": true,
+   "source": "ranking_report.md (instr.py's gate)",
+   "want": 93.8
+  },
+  {
+   "gate": "papers median, answers",
+   "got": 495,
+   "pass": true,
+   "source": "instruments.md:30",
+   "want": 495
+  },
+  {
+   "gate": "papers median",
+   "got": 0.6562,
+   "pass": true,
+   "source": "instruments.md:30",
+   "want": 0.6562
+  },
+  {
+   "gate": "judge to concepts, change in the gap",
+   "got": 15.37,
+   "pass": true,
+   "source": "instruments.md:7",
+   "want": 15.4
+  },
+  {
+   "gate": "judge to concepts, change in the gap, lower",
+   "got": 6.76,
+   "pass": true,
+   "source": "instruments.md:7",
+   "want": 6.8
+  },
+  {
+   "gate": "judge to concepts, change in the gap, upper",
+   "got": 24.32,
+   "pass": true,
+   "source": "instruments.md:7",
+   "want": 24.3
+  },
+  {
+   "gate": "judge to concepts, noise",
+   "got": 3.5,
+   "pass": true,
+   "source": "instruments.md:7",
+   "want": 3.5
+  },
+  {
+   "gate": "judge to concepts, one-paper",
+   "got": 28.28,
+   "pass": true,
+   "source": "instruments.md:7",
+   "want": 28.3
+  },
+  {
+   "gate": "judge to concepts, one-paper, lower",
+   "got": 18.66,
+   "pass": true,
+   "source": "instruments.md:7",
+   "want": 18.7
+  },
+  {
+   "gate": "judge to concepts, one-paper, upper",
+   "got": 38.02,
+   "pass": true,
+   "source": "instruments.md:7",
+   "want": 38.0
+  },
+  {
+   "gate": "Mentori minus package, cap 10",
+   "got": 10.9,
+   "pass": true,
+   "source": "instruments.md:8",
+   "want": 10.9
+  },
+  {
+   "gate": "Mentori minus package, cap 10, lower",
+   "got": 4.78,
+   "pass": true,
+   "source": "instruments.md:8",
+   "want": 4.8
+  },
+  {
+   "gate": "Mentori minus package, cap 10, upper",
+   "got": 16.73,
+   "pass": true,
+   "source": "instruments.md:8",
+   "want": 16.7
+  },
+  {
+   "gate": "source lists, change in the gap",
+   "got": 17.6,
+   "pass": true,
+   "source": "instruments.md:11",
+   "want": 17.6
+  },
+  {
+   "gate": "source lists, change in the gap, lower",
+   "got": 15.0,
+   "pass": true,
+   "source": "instruments.md:11",
+   "want": 15.0
+  },
+  {
+   "gate": "source lists, change in the gap, upper",
+   "got": 20.33,
+   "pass": true,
+   "source": "instruments.md:11",
+   "want": 20.3
+  },
+  {
+   "gate": "single pass, April answers, devstral, at 4",
+   "got": 33.7,
+   "pass": true,
+   "source": "compare.md:29",
+   "want": 33.7
+  },
+  {
+   "gate": "single pass, re-run, at 4",
+   "got": 83.3,
+   "pass": true,
+   "source": "compare.md:29",
+   "want": 83.3
+  }
+ ],
+ "ladder": {
+  "april_answers_april_judge": {
+   "all86": {
+    "3": {
+     "multi_hop": [
+      74.4,
+      86
+     ],
+     "rlm_10": [
+      90.7,
+      86
+     ],
+     "rlm_20": [
+      84.9,
+      86
+     ],
+     "rlm_5": [
+      88.4,
+      86
+     ],
+     "single_pass": [
+      80.2,
+      86
+     ],
+     "verified_pass": [
+      67.4,
+      86
+     ]
+    },
+    "4": {
+     "multi_hop": [
+      58.1,
+      86
+     ],
+     "rlm_10": [
+      75.6,
+      86
+     ],
+     "rlm_20": [
+      73.3,
+      86
+     ],
+     "rlm_5": [
+      70.9,
+      86
+     ],
+     "single_pass": [
+      54.7,
+      86
+     ],
+     "verified_pass": [
+      40.7,
+      86
+     ]
+    }
+   },
+   "many26": {
+    "3": {
+     "multi_hop": [
+      76.9,
+      26
+     ],
+     "rlm_10": [
+      80.8,
+      26
+     ],
+     "rlm_20": [
+      73.1,
+      26
+     ],
+     "rlm_5": [
+      84.6,
+      26
+     ],
+     "single_pass": [
+      80.8,
+      26
+     ],
+     "verified_pass": [
+      65.4,
+      26
+     ]
+    },
+    "4": {
+     "multi_hop": [
+      61.5,
+      26
+     ],
+     "rlm_10": [
+      53.8,
+      26
+     ],
+     "rlm_20": [
+      57.7,
+      26
+     ],
+     "rlm_5": [
+      50.0,
+      26
+     ],
+     "single_pass": [
+      53.8,
+      26
+     ],
+     "verified_pass": [
+      30.8,
+      26
+     ]
+    }
+   },
+   "one60": {
+    "3": {
+     "multi_hop": [
+      73.3,
+      60
+     ],
+     "rlm_10": [
+      95.0,
+      60
+     ],
+     "rlm_20": [
+      90.0,
+      60
+     ],
+     "rlm_5": [
+      90.0,
+      60
+     ],
+     "single_pass": [
+      80.0,
+      60
+     ],
+     "verified_pass": [
+      68.3,
+      60
+     ]
+    },
+    "4": {
+     "multi_hop": [
+      56.7,
+      60
+     ],
+     "rlm_10": [
+      85.0,
+      60
+     ],
+     "rlm_20": [
+      80.0,
+      60
+     ],
+     "rlm_5": [
+      80.0,
+      60
+     ],
+     "single_pass": [
+      55.0,
+      60
+     ],
+     "verified_pass": [
+      45.0,
+      60
+     ]
+    }
+   }
+  },
+  "april_answers_devstral_v24": {
+   "all86": {
+    "3": {
+     "multi_hop": [
+      66.3,
+      86
+     ],
+     "rlm_10": [
+      88.4,
+      86
+     ],
+     "rlm_20": [
+      79.1,
+      86
+     ],
+     "rlm_5": [
+      83.7,
+      86
+     ],
+     "single_pass": [
+      76.7,
+      86
+     ],
+     "verified_pass": [
+      57.0,
+      86
+     ]
+    },
+    "4": {
+     "multi_hop": [
+      47.7,
+      86
+     ],
+     "rlm_10": [
+      67.4,
+      86
+     ],
+     "rlm_20": [
+      65.1,
+      86
+     ],
+     "rlm_5": [
+      64.0,
+      86
+     ],
+     "single_pass": [
+      33.7,
+      86
+     ],
+     "verified_pass": [
+      25.6,
+      86
+     ]
+    }
+   },
+   "many26": {
+    "3": {
+     "multi_hop": [
+      69.2,
+      26
+     ],
+     "rlm_10": [
+      80.8,
+      26
+     ],
+     "rlm_20": [
+      65.4,
+      26
+     ],
+     "rlm_5": [
+      76.9,
+      26
+     ],
+     "single_pass": [
+      73.1,
+      26
+     ],
+     "verified_pass": [
+      42.3,
+      26
+     ]
+    },
+    "4": {
+     "multi_hop": [
+      30.8,
+      26
+     ],
+     "rlm_10": [
+      38.5,
+      26
+     ],
+     "rlm_20": [
+      38.5,
+      26
+     ],
+     "rlm_5": [
+      30.8,
+      26
+     ],
+     "single_pass": [
+      15.4,
+      26
+     ],
+     "verified_pass": [
+      7.7,
+      26
+     ]
+    }
+   },
+   "one60": {
+    "3": {
+     "multi_hop": [
+      65.0,
+      60
+     ],
+     "rlm_10": [
+      91.7,
+      60
+     ],
+     "rlm_20": [
+      85.0,
+      60
+     ],
+     "rlm_5": [
+      86.7,
+      60
+     ],
+     "single_pass": [
+      78.3,
+      60
+     ],
+     "verified_pass": [
+      63.3,
+      60
+     ]
+    },
+    "4": {
+     "multi_hop": [
+      55.0,
+      60
+     ],
+     "rlm_10": [
+      80.0,
+      60
+     ],
+     "rlm_20": [
+      76.7,
+      60
+     ],
+     "rlm_5": [
+      78.3,
+      60
+     ],
+     "single_pass": [
+      41.7,
+      60
+     ],
+     "verified_pass": [
+      33.3,
+      60
+     ]
+    }
+   }
+  },
+  "april_concept_recall_v24": {
+   "det_concept_recall": {
+    "multi_hop": 21.1,
+    "rlm_10": 57.7,
+    "rlm_20": 56.4,
+    "rlm_5": 52.5,
+    "single_pass": 25.7,
+    "verified_pass": 21.8
+   },
+   "det_concept_recall_loose": {
+    "multi_hop": 38.2,
+    "rlm_10": 73.4,
+    "rlm_20": 69.2,
+    "rlm_5": 67.1,
+    "single_pass": 41.1,
+    "verified_pass": 34.9
+   }
+  },
+  "april_judge_column": "correctness_published",
+  "april_minicheck": {
+   "mc_key_precision": {
+    "multi_hop": 25.8,
+    "rlm_10": 22.8,
+    "rlm_20": 22.8,
+    "rlm_5": 24.7,
+    "single_pass": 38.0,
+    "verified_pass": 40.9
+   },
+   "mc_key_s19_precision": {
+    "multi_hop": 31.8,
+    "rlm_10": 19.6,
+    "rlm_20": 19.8,
+    "rlm_5": 23.5,
+    "single_pass": 38.7,
+    "verified_pass": 44.6
+   },
+   "mc_source_fulldoc_precision": {
+    "multi_hop": 54.3,
+    "rlm_10": 55.7,
+    "rlm_20": 68.7,
+    "rlm_5": 56.9,
+    "single_pass": 88.5,
+    "verified_pass": 91.7
+   },
+   "mc_source_k3_precision": {
+    "multi_hop": 33.8,
+    "rlm_10": 50.4,
+    "rlm_20": 48.5,
+    "rlm_5": 47.5,
+    "single_pass": 69.0,
+    "verified_pass": 72.8
+   }
+  },
+  "g4_in_scope_answerable": {
+   "exp_v4_s10_n0 at 3": {
+    "one_paper": 30,
+    "pass": {
+     "rlm_10": [
+      100.0,
+      44
+     ],
+     "single_pass": [
+      93.2,
+      44
+     ],
+     "verified_pass": [
+      90.9,
+      44
+     ]
+    },
+    "questions": 44
+   },
+   "exp_v4_s10_n0 at 4": {
+    "one_paper": 30,
+    "pass": {
+     "rlm_10": [
+      77.3,
+      44
+     ],
+     "single_pass": [
+      86.4,
+      44
+     ],
+     "verified_pass": [
+      81.8,
+      44
+     ]
+    },
+    "questions": 44
+   },
+   "exp_v4_s10_n1 at 3": {
+    "one_paper": 30,
+    "pass": {
+     "rlm_10": [
+      93.2,
+      44
+     ],
+     "single_pass": [
+      93.2,
+      44
+     ],
+     "verified_pass": [
+      88.6,
+      44
+     ]
+    },
+    "questions": 44
+   },
+   "exp_v4_s10_n1 at 4": {
+    "one_paper": 30,
+    "pass": {
+     "rlm_10": [
+      70.5,
+      44
+     ],
+     "single_pass": [
+      88.6,
+      44
+     ],
+     "verified_pass": [
+      81.8,
+      44
+     ]
+    },
+    "questions": 44
+   },
+   "exp_v4_s10_n3 at 3": {
+    "one_paper": 30,
+    "pass": {
+     "rlm_10": [
+      97.7,
+      44
+     ],
+     "single_pass": [
+      93.2,
+      44
+     ],
+     "verified_pass": [
+      93.2,
+      44
+     ]
+    },
+    "questions": 44
+   },
+   "exp_v4_s10_n3 at 4": {
+    "one_paper": 30,
+    "pass": {
+     "rlm_10": [
+      77.3,
+      44
+     ],
+     "single_pass": [
+      86.4,
+      44
+     ],
+     "verified_pass": [
+      84.1,
+      44
+     ]
+    },
+    "questions": 44
+   },
+   "exp_v4_s20_n0 at 3": {
+    "one_paper": 60,
+    "pass": {
+     "rlm_10": [
+      94.2,
+      86
+     ],
+     "single_pass": [
+      91.9,
+      86
+     ],
+     "verified_pass": [
+      93.0,
+      86
+     ]
+    },
+    "questions": 86
+   },
+   "exp_v4_s20_n0 at 4": {
+    "one_paper": 60,
+    "pass": {
+     "rlm_10": [
+      76.7,
+      86
+     ],
+     "single_pass": [
+      83.7,
+      86
+     ],
+     "verified_pass": [
+      86.0,
+      86
+     ]
+    },
+    "questions": 86
+   },
+   "exp_v4_s20_n1 at 3": {
+    "one_paper": 60,
+    "pass": {
+     "rlm_10": [
+      96.5,
+      86
+     ],
+     "single_pass": [
+      93.0,
+      86
+     ],
+     "verified_pass": [
+      93.0,
+      86
+     ]
+    },
+    "questions": 86
+   },
+   "exp_v4_s20_n1 at 4": {
+    "one_paper": 60,
+    "pass": {
+     "rlm_10": [
+      77.9,
+      86
+     ],
+     "single_pass": [
+      82.6,
+      86
+     ],
+     "verified_pass": [
+      87.2,
+      86
+     ]
+    },
+    "questions": 86
+   },
+   "exp_v4_s20_n3 at 3": {
+    "one_paper": 60,
+    "pass": {
+     "rlm_10": [
+      95.3,
+      86
+     ],
+     "single_pass": [
+      93.0,
+      86
+     ],
+     "verified_pass": [
+      90.7,
+      86
+     ]
+    },
+    "questions": 86
+   },
+   "exp_v4_s20_n3 at 4": {
+    "one_paper": 60,
+    "pass": {
+     "rlm_10": [
+      75.6,
+      86
+     ],
+     "single_pass": [
+      82.6,
+      86
+     ],
+     "verified_pass": [
+      88.4,
+      86
+     ]
+    },
+    "questions": 86
+   },
+   "exp_v4_s50_n0 at 3": {
+    "one_paper": 147,
+    "pass": {
+     "rlm_10": [
+      89.2,
+      195
+     ],
+     "single_pass": [
+      95.4,
+      195
+     ],
+     "verified_pass": [
+      93.8,
+      195
+     ]
+    },
+    "questions": 195
+   },
+   "exp_v4_s50_n0 at 4": {
+    "one_paper": 147,
+    "pass": {
+     "rlm_10": [
+      62.6,
+      195
+     ],
+     "single_pass": [
+      84.6,
+      195
+     ],
+     "verified_pass": [
+      84.1,
+      195
+     ]
+    },
+    "questions": 195
+   },
+   "exp_v4_s50_n1 at 3": {
+    "one_paper": 147,
+    "pass": {
+     "rlm_10": [
+      89.7,
+      195
+     ],
+     "single_pass": [
+      94.9,
+      195
+     ],
+     "verified_pass": [
+      94.4,
+      195
+     ]
+    },
+    "questions": 195
+   },
+   "exp_v4_s50_n1 at 4": {
+    "one_paper": 147,
+    "pass": {
+     "rlm_10": [
+      65.1,
+      195
+     ],
+     "single_pass": [
+      83.1,
+      195
+     ],
+     "verified_pass": [
+      83.6,
+      195
+     ]
+    },
+    "questions": 195
+   },
+   "exp_v4_s50_n3 at 3": {
+    "one_paper": 147,
+    "pass": {
+     "rlm_10": [
+      94.4,
+      195
+     ],
+     "single_pass": [
+      94.9,
+      195
+     ],
+     "verified_pass": [
+      93.3,
+      195
+     ]
+    },
+    "questions": 195
+   },
+   "exp_v4_s50_n3 at 4": {
+    "one_paper": 147,
+    "pass": {
+     "rlm_10": [
+      67.2,
+      195
+     ],
+     "single_pass": [
+      82.6,
+      195
+     ],
+     "verified_pass": [
+      83.1,
+      195
+     ]
+    },
+    "questions": 195
+   },
+   "exp_v4_s5_n0 at 3": {
+    "one_paper": 15,
+    "pass": {
+     "rlm_10": [
+      86.4,
+      22
+     ],
+     "single_pass": [
+      90.9,
+      22
+     ],
+     "verified_pass": [
+      86.4,
+      22
+     ]
+    },
+    "questions": 22
+   },
+   "exp_v4_s5_n0 at 4": {
+    "one_paper": 15,
+    "pass": {
+     "rlm_10": [
+      68.2,
+      22
+     ],
+     "single_pass": [
+      81.8,
+      22
+     ],
+     "verified_pass": [
+      86.4,
+      22
+     ]
+    },
+    "questions": 22
+   },
+   "exp_v4_s5_n1 at 3": {
+    "one_paper": 15,
+    "pass": {
+     "rlm_10": [
+      95.5,
+      22
+     ],
+     "single_pass": [
+      90.9,
+      22
+     ],
+     "verified_pass": [
+      90.9,
+      22
+     ]
+    },
+    "questions": 22
+   },
+   "exp_v4_s5_n1 at 4": {
+    "one_paper": 15,
+    "pass": {
+     "rlm_10": [
+      81.8,
+      22
+     ],
+     "single_pass": [
+      81.8,
+      22
+     ],
+     "verified_pass": [
+      86.4,
+      22
+     ]
+    },
+    "questions": 22
+   },
+   "exp_v4_s5_n3 at 3": {
+    "one_paper": 15,
+    "pass": {
+     "rlm_10": [
+      90.9,
+      22
+     ],
+     "single_pass": [
+      90.9,
+      22
+     ],
+     "verified_pass": [
+      86.4,
+      22
+     ]
+    },
+    "questions": 22
+   },
+   "exp_v4_s5_n3 at 4": {
+    "one_paper": 15,
+    "pass": {
+     "rlm_10": [
+      81.8,
+      22
+     ],
+     "single_pass": [
+      81.8,
+      22
+     ],
+     "verified_pass": [
+      86.4,
+      22
+     ]
+    },
+    "questions": 22
+   }
+  }
+ },
+ "swaps": {
+  "MiniCheck key F1 to papers precision, as stored (draw 1)": {
+   "A": {
+    "multi_hop": 18.8,
+    "rlm_10": 25.9,
+    "rlm_20": 22.6,
+    "rlm_5": 21.2,
+    "single_pass": 37.9,
+    "verified_pass": 36.5
+   },
+   "B": {
+    "multi_hop": 58.2,
+    "rlm_10": 55.9,
+    "rlm_20": 52.3,
+    "rlm_5": 54.1,
+    "single_pass": 80.7,
+    "verified_pass": 83.6
+   },
+   "abs_mean_shift": 37.0,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -11.96,
+    -17.04,
+    -7.16
+   ],
+   "contrast_B": [
+    -24.81,
+    -29.48,
+    -19.78
+   ],
+   "contrast_change_B_minus_A": [
+    -12.85,
+    -19.01,
+    -6.24
+   ],
+   "n_q": 80,
+   "name": "MiniCheck key F1 to papers precision, as stored (draw 1)",
+   "rank_A": {
+    "multi_hop": 6.0,
+    "rlm_10": 3.0,
+    "rlm_20": 4.0,
+    "rlm_5": 5.0,
+    "single_pass": 1.0,
+    "verified_pass": 2.0
+   },
+   "rank_B": {
+    "multi_hop": 3.0,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_moves_sum": 8.0,
+   "shift_per_strategy": {
+    "multi_hop": 39.4,
+    "rlm_10": 30.0,
+    "rlm_20": 29.7,
+    "rlm_5": 32.9,
+    "single_pass": 42.8,
+    "verified_pass": 47.1
+   },
+   "spearman_rank_A_B": 0.543,
+   "winner_A": "single_pass",
+   "winner_B": "verified_pass"
+  },
+  "MiniCheck key to papers precision, as stored (draw 1)": {
+   "A": {
+    "multi_hop": 35.1,
+    "rlm_10": 21.8,
+    "rlm_20": 19.1,
+    "rlm_5": 19.5,
+    "single_pass": 50.0,
+    "verified_pass": 54.2
+   },
+   "B": {
+    "multi_hop": 58.4,
+    "rlm_10": 55.4,
+    "rlm_20": 51.8,
+    "rlm_5": 54.1,
+    "single_pass": 80.9,
+    "verified_pass": 83.7
+   },
+   "abs_mean_shift": 30.8,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -28.16,
+    -33.65,
+    -22.77
+   ],
+   "contrast_B": [
+    -25.49,
+    -30.48,
+    -20.35
+   ],
+   "contrast_change_B_minus_A": [
+    2.66,
+    -3.61,
+    9.38
+   ],
+   "n_q": 81,
+   "name": "MiniCheck key to papers precision, as stored (draw 1)",
+   "noise": {
+    "per_draw": {
+     "1": -28.4,
+     "2": -28.6,
+     "3": -28.4
+    },
+    "range": 0.2
+   },
+   "rank_A": {
+    "multi_hop": 3.0,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_B": {
+    "multi_hop": 3.0,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_moves_sum": 0.0,
+   "shift_per_strategy": {
+    "multi_hop": 23.3,
+    "rlm_10": 33.6,
+    "rlm_20": 32.8,
+    "rlm_5": 34.6,
+    "single_pass": 30.9,
+    "verified_pass": 29.5
+   },
+   "spearman_rank_A_B": 1.0,
+   "winner_A": "verified_pass",
+   "winner_B": "verified_pass"
+  },
+  "MiniCheck key to papers precision, source lists dropped (draw 1)": {
+   "A": {
+    "multi_hop": 35.1,
+    "rlm_10": 31.8,
+    "rlm_20": 28.9,
+    "rlm_5": 28.9,
+    "single_pass": 50.0,
+    "verified_pass": 54.2
+   },
+   "B": {
+    "multi_hop": 58.4,
+    "rlm_10": 73.0,
+    "rlm_20": 70.3,
+    "rlm_5": 70.6,
+    "single_pass": 80.9,
+    "verified_pass": 83.7
+   },
+   "abs_mean_shift": 34.7,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -18.18,
+    -23.92,
+    -12.53
+   ],
+   "contrast_B": [
+    -7.89,
+    -12.28,
+    -3.3
+   ],
+   "contrast_change_B_minus_A": [
+    10.29,
+    4.09,
+    17.02
+   ],
+   "n_q": 81,
+   "name": "MiniCheck key to papers precision, source lists dropped (draw 1)",
+   "noise": {
+    "per_draw": {
+     "1": -28.4,
+     "2": -28.6,
+     "3": -28.4
+    },
+    "range": 0.2
+   },
+   "rank_A": {
+    "multi_hop": 3.0,
+    "rlm_10": 4.0,
+    "rlm_20": 5.0,
+    "rlm_5": 6.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_B": {
+    "multi_hop": 6.0,
+    "rlm_10": 3.0,
+    "rlm_20": 5.0,
+    "rlm_5": 4.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_moves_sum": 6.0,
+   "shift_per_strategy": {
+    "multi_hop": 23.4,
+    "rlm_10": 41.2,
+    "rlm_20": 41.4,
+    "rlm_5": 41.7,
+    "single_pass": 30.9,
+    "verified_pass": 29.5
+   },
+   "spearman_rank_A_B": 0.6,
+   "winner_A": "verified_pass",
+   "winner_B": "verified_pass"
+  },
+  "MiniCheck key to papers, as stored, verified_pass minus rlm_10": {
+   "A": {
+    "multi_hop": 35.1,
+    "rlm_10": 21.8,
+    "rlm_20": 19.1,
+    "rlm_5": 19.5,
+    "single_pass": 50.0,
+    "verified_pass": 54.2
+   },
+   "B": {
+    "multi_hop": 58.4,
+    "rlm_10": 55.4,
+    "rlm_20": 51.8,
+    "rlm_5": 54.1,
+    "single_pass": 80.9,
+    "verified_pass": 83.7
+   },
+   "abs_mean_shift": 30.8,
+   "contrast": "verified_pass minus rlm_10",
+   "contrast_A": [
+    32.39,
+    27.19,
+    37.91
+   ],
+   "contrast_B": [
+    28.33,
+    23.41,
+    33.13
+   ],
+   "contrast_change_B_minus_A": [
+    -4.06,
+    -10.39,
+    2.05
+   ],
+   "n_q": 81,
+   "name": "MiniCheck key to papers, as stored, verified_pass minus rlm_10",
+   "rank_A": {
+    "multi_hop": 3.0,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_B": {
+    "multi_hop": 3.0,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_moves_sum": 0.0,
+   "shift_per_strategy": {
+    "multi_hop": 23.3,
+    "rlm_10": 33.6,
+    "rlm_20": 32.8,
+    "rlm_5": 34.6,
+    "single_pass": 30.9,
+    "verified_pass": 29.5
+   },
+   "spearman_rank_A_B": 1.0,
+   "winner_A": "verified_pass",
+   "winner_B": "verified_pass"
+  },
+  "MiniCheck key to papers, source dropped, many-paper": {
+   "A": {
+    "multi_hop": 16.9,
+    "rlm_10": 27.4,
+    "rlm_20": 25.0,
+    "rlm_5": 23.4,
+    "single_pass": 35.7,
+    "verified_pass": 41.5
+   },
+   "B": {
+    "multi_hop": 34.3,
+    "rlm_10": 62.0,
+    "rlm_20": 58.5,
+    "rlm_5": 61.0,
+    "single_pass": 68.8,
+    "verified_pass": 75.7
+   },
+   "abs_mean_shift": 31.7,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -8.23,
+    -13.33,
+    -3.25
+   ],
+   "contrast_B": [
+    -6.77,
+    -13.44,
+    -0.16
+   ],
+   "contrast_change_B_minus_A": [
+    1.46,
+    -6.6,
+    9.11
+   ],
+   "n_q": 23,
+   "name": "MiniCheck key to papers, source dropped, many-paper",
+   "rank_A": {
+    "multi_hop": 6.0,
+    "rlm_10": 3.0,
+    "rlm_20": 4.0,
+    "rlm_5": 5.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_B": {
+    "multi_hop": 6.0,
+    "rlm_10": 3.0,
+    "rlm_20": 5.0,
+    "rlm_5": 4.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_moves_sum": 2.0,
+   "shift_per_strategy": {
+    "multi_hop": 17.4,
+    "rlm_10": 34.5,
+    "rlm_20": 33.6,
+    "rlm_5": 37.7,
+    "single_pass": 33.1,
+    "verified_pass": 34.1
+   },
+   "spearman_rank_A_B": 0.943,
+   "winner_A": "verified_pass",
+   "winner_B": "verified_pass"
+  },
+  "MiniCheck key to papers, source dropped, one-paper": {
+   "A": {
+    "multi_hop": 42.3,
+    "rlm_10": 33.5,
+    "rlm_20": 30.4,
+    "rlm_5": 31.1,
+    "single_pass": 55.6,
+    "verified_pass": 59.2
+   },
+   "B": {
+    "multi_hop": 68.0,
+    "rlm_10": 77.3,
+    "rlm_20": 75.0,
+    "rlm_5": 74.3,
+    "single_pass": 85.7,
+    "verified_pass": 86.9
+   },
+   "abs_mean_shift": 35.8,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -22.13,
+    -29.49,
+    -14.77
+   ],
+   "contrast_B": [
+    -8.34,
+    -13.79,
+    -2.5
+   ],
+   "contrast_change_B_minus_A": [
+    13.79,
+    5.8,
+    22.34
+   ],
+   "n_q": 58,
+   "name": "MiniCheck key to papers, source dropped, one-paper",
+   "rank_A": {
+    "multi_hop": 3.0,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_B": {
+    "multi_hop": 6.0,
+    "rlm_10": 3.0,
+    "rlm_20": 4.0,
+    "rlm_5": 5.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_moves_sum": 6.0,
+   "shift_per_strategy": {
+    "multi_hop": 25.7,
+    "rlm_10": 43.8,
+    "rlm_20": 44.5,
+    "rlm_5": 43.3,
+    "single_pass": 30.0,
+    "verified_pass": 27.7
+   },
+   "spearman_rank_A_B": 0.6,
+   "winner_A": "verified_pass",
+   "winner_B": "verified_pass"
+  },
+  "MiniCheck papers precision, source lists kept to dropped": {
+   "A": {
+    "multi_hop": 58.4,
+    "rlm_10": 55.4,
+    "rlm_20": 51.8,
+    "rlm_5": 54.1,
+    "single_pass": 80.9,
+    "verified_pass": 83.7
+   },
+   "B": {
+    "multi_hop": 58.4,
+    "rlm_10": 73.0,
+    "rlm_20": 70.3,
+    "rlm_5": 70.6,
+    "single_pass": 80.9,
+    "verified_pass": 83.7
+   },
+   "abs_mean_shift": 8.8,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -25.49,
+    -30.48,
+    -20.35
+   ],
+   "contrast_B": [
+    -7.89,
+    -12.28,
+    -3.3
+   ],
+   "contrast_change_B_minus_A": [
+    17.6,
+    15.0,
+    20.33
+   ],
+   "n_q": 81,
+   "name": "MiniCheck papers precision, source lists kept to dropped",
+   "rank_A": {
+    "multi_hop": 3.0,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_B": {
+    "multi_hop": 6.0,
+    "rlm_10": 3.0,
+    "rlm_20": 5.0,
+    "rlm_5": 4.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_moves_sum": 6.0,
+   "shift_per_strategy": {
+    "multi_hop": 0.0,
+    "rlm_10": 17.6,
+    "rlm_20": 18.5,
+    "rlm_5": 16.4,
+    "single_pass": 0.0,
+    "verified_pass": -0.0
+   },
+   "spearman_rank_A_B": 0.657,
+   "winner_A": "verified_pass",
+   "winner_B": "verified_pass"
+  },
+  "W_fig_n": 83,
+  "cap10_G6_group_draws": {
+   "many": [
+    55.6,
+    48.1,
+    45.8
+   ],
+   "one": [
+    69.7,
+    73.9,
+    72.5
+   ]
+  },
+  "concept v2.4 loose to v2.5 D181, all 86": {
+   "A": {
+    "multi_hop": 52.4,
+    "rlm_10": 79.7,
+    "rlm_20": 78.2,
+    "rlm_5": 78.8,
+    "single_pass": 71.2,
+    "verified_pass": 71.0
+   },
+   "B": {
+    "multi_hop": 54.0,
+    "rlm_10": 76.2,
+    "rlm_20": 75.1,
+    "rlm_5": 74.0,
+    "single_pass": 69.3,
+    "verified_pass": 69.7
+   },
+   "abs_mean_shift": 2.7,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    8.45,
+    3.34,
+    13.34
+   ],
+   "contrast_B": [
+    6.85,
+    0.9,
+    12.57
+   ],
+   "contrast_change_B_minus_A": [
+    -1.6,
+    -5.19,
+    1.89
+   ],
+   "n_q": 86,
+   "name": "concept v2.4 loose to v2.5 D181, all 86",
+   "noise": {
+    "per_draw": {
+     "1": 5.3,
+     "2": 7.2,
+     "3": 8.0
+    },
+    "range": 2.7
+   },
+   "rank_A": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 3.0,
+    "rlm_5": 2.0,
+    "single_pass": 4.0,
+    "verified_pass": 5.0
+   },
+   "rank_B": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 2.0,
+    "rlm_5": 3.0,
+    "single_pass": 5.0,
+    "verified_pass": 4.0
+   },
+   "rank_moves_sum": 4.0,
+   "shift_per_strategy": {
+    "multi_hop": 1.6,
+    "rlm_10": -3.5,
+    "rlm_20": -3.1,
+    "rlm_5": -4.8,
+    "single_pass": -1.9,
+    "verified_pass": -1.3
+   },
+   "spearman_rank_A_B": 0.886,
+   "winner_A": "rlm_10",
+   "winner_B": "rlm_10"
+  },
+  "concept v2.4 loose to v2.5 D181, changed judge questions": {
+   "A": {
+    "multi_hop": 47.2,
+    "rlm_10": 78.0,
+    "rlm_20": 75.8,
+    "rlm_5": 77.1,
+    "single_pass": 67.1,
+    "verified_pass": 66.7
+   },
+   "B": {
+    "multi_hop": 53.5,
+    "rlm_10": 73.9,
+    "rlm_20": 73.0,
+    "rlm_5": 71.3,
+    "single_pass": 67.6,
+    "verified_pass": 67.3
+   },
+   "abs_mean_shift": 3.3,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    10.86,
+    4.3,
+    17.47
+   ],
+   "contrast_B": [
+    6.28,
+    -1.3,
+    13.45
+   ],
+   "contrast_change_B_minus_A": [
+    -4.58,
+    -9.56,
+    0.43
+   ],
+   "n_q": 54,
+   "name": "concept v2.4 loose to v2.5 D181, changed judge questions",
+   "noise": {
+    "per_draw": {
+     "1": 5.3,
+     "2": 7.2,
+     "3": 8.0
+    },
+    "range": 2.7
+   },
+   "rank_A": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 3.0,
+    "rlm_5": 2.0,
+    "single_pass": 4.0,
+    "verified_pass": 5.0
+   },
+   "rank_B": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 2.0,
+    "rlm_5": 3.0,
+    "single_pass": 4.0,
+    "verified_pass": 5.0
+   },
+   "rank_moves_sum": 2.0,
+   "shift_per_strategy": {
+    "multi_hop": 6.3,
+    "rlm_10": -4.1,
+    "rlm_20": -2.8,
+    "rlm_5": -5.8,
+    "single_pass": 0.5,
+    "verified_pass": 0.6
+   },
+   "spearman_rank_A_B": 0.943,
+   "winner_A": "rlm_10",
+   "winner_B": "rlm_10"
+  },
+  "concept v2.4 loose to v2.5 D181, many-paper": {
+   "A": {
+    "multi_hop": 27.4,
+    "rlm_10": 70.2,
+    "rlm_20": 68.2,
+    "rlm_5": 68.8,
+    "single_pass": 45.7,
+    "verified_pass": 46.9
+   },
+   "B": {
+    "multi_hop": 30.9,
+    "rlm_10": 67.5,
+    "rlm_20": 65.0,
+    "rlm_5": 65.5,
+    "single_pass": 48.5,
+    "verified_pass": 48.0
+   },
+   "abs_mean_shift": 2.8,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    24.59,
+    15.77,
+    33.33
+   ],
+   "contrast_B": [
+    18.92,
+    11.81,
+    26.16
+   ],
+   "contrast_change_B_minus_A": [
+    -5.67,
+    -11.71,
+    0.05
+   ],
+   "n_q": 26,
+   "name": "concept v2.4 loose to v2.5 D181, many-paper",
+   "rank_A": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 3.0,
+    "rlm_5": 2.0,
+    "single_pass": 5.0,
+    "verified_pass": 4.0
+   },
+   "rank_B": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 3.0,
+    "rlm_5": 2.0,
+    "single_pass": 4.0,
+    "verified_pass": 5.0
+   },
+   "rank_moves_sum": 2.0,
+   "shift_per_strategy": {
+    "multi_hop": 3.5,
+    "rlm_10": -2.8,
+    "rlm_20": -3.3,
+    "rlm_5": -3.3,
+    "single_pass": 2.9,
+    "verified_pass": 1.1
+   },
+   "spearman_rank_A_B": 0.943,
+   "winner_A": "rlm_10",
+   "winner_B": "rlm_10"
+  },
+  "concept v2.4 loose to v2.5 D181, one-paper": {
+   "A": {
+    "multi_hop": 63.3,
+    "rlm_10": 83.8,
+    "rlm_20": 82.6,
+    "rlm_5": 83.1,
+    "single_pass": 82.3,
+    "verified_pass": 81.5
+   },
+   "B": {
+    "multi_hop": 64.0,
+    "rlm_10": 80.0,
+    "rlm_20": 79.5,
+    "rlm_5": 77.7,
+    "single_pass": 78.4,
+    "verified_pass": 79.1
+   },
+   "abs_mean_shift": 3.2,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    1.46,
+    -3.64,
+    6.34
+   ],
+   "contrast_B": [
+    1.62,
+    -5.72,
+    8.92
+   ],
+   "contrast_change_B_minus_A": [
+    0.16,
+    -4.16,
+    4.39
+   ],
+   "n_q": 60,
+   "name": "concept v2.4 loose to v2.5 D181, one-paper",
+   "rank_A": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 3.0,
+    "rlm_5": 2.0,
+    "single_pass": 4.0,
+    "verified_pass": 5.0
+   },
+   "rank_B": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 2.0,
+    "rlm_5": 5.0,
+    "single_pass": 4.0,
+    "verified_pass": 3.0
+   },
+   "rank_moves_sum": 6.0,
+   "shift_per_strategy": {
+    "multi_hop": 0.8,
+    "rlm_10": -3.8,
+    "rlm_20": -3.0,
+    "rlm_5": -5.4,
+    "single_pass": -4.0,
+    "verified_pass": -2.3
+   },
+   "spearman_rank_A_B": 0.6,
+   "winner_A": "rlm_10",
+   "winner_B": "rlm_10"
+  },
+  "concept v2.4 loose to v2.5 loose base (key only), all 86": {
+   "A": {
+    "multi_hop": 52.4,
+    "rlm_10": 79.7,
+    "rlm_20": 78.2,
+    "rlm_5": 78.8,
+    "single_pass": 71.2,
+    "verified_pass": 71.0
+   },
+   "B": {
+    "multi_hop": 56.3,
+    "rlm_10": 79.1,
+    "rlm_20": 78.0,
+    "rlm_5": 77.7,
+    "single_pass": 73.8,
+    "verified_pass": 73.6
+   },
+   "abs_mean_shift": 1.8,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    8.45,
+    3.34,
+    13.34
+   ],
+   "contrast_B": [
+    5.3,
+    -0.16,
+    10.5
+   ],
+   "contrast_change_B_minus_A": [
+    -3.15,
+    -5.92,
+    -0.6
+   ],
+   "n_q": 86,
+   "name": "concept v2.4 loose to v2.5 loose base (key only), all 86",
+   "noise": {
+    "per_draw": {
+     "1": 5.3,
+     "2": 7.2,
+     "3": 8.0
+    },
+    "range": 2.7
+   },
+   "rank_A": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 3.0,
+    "rlm_5": 2.0,
+    "single_pass": 4.0,
+    "verified_pass": 5.0
+   },
+   "rank_B": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 2.0,
+    "rlm_5": 3.0,
+    "single_pass": 4.0,
+    "verified_pass": 5.0
+   },
+   "rank_moves_sum": 2.0,
+   "shift_per_strategy": {
+    "multi_hop": 3.9,
+    "rlm_10": -0.6,
+    "rlm_20": -0.2,
+    "rlm_5": -1.1,
+    "single_pass": 2.6,
+    "verified_pass": 2.5
+   },
+   "spearman_rank_A_B": 0.943,
+   "winner_A": "rlm_10",
+   "winner_B": "rlm_10"
+  },
+  "concept v2.5 loose base to v2.5 D181 (question rule only), all 86": {
+   "A": {
+    "multi_hop": 56.3,
+    "rlm_10": 79.1,
+    "rlm_20": 78.0,
+    "rlm_5": 77.7,
+    "single_pass": 73.8,
+    "verified_pass": 73.6
+   },
+   "B": {
+    "multi_hop": 54.0,
+    "rlm_10": 76.2,
+    "rlm_20": 75.1,
+    "rlm_5": 74.0,
+    "single_pass": 69.3,
+    "verified_pass": 69.7
+   },
+   "abs_mean_shift": 3.3,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    5.3,
+    -0.16,
+    10.5
+   ],
+   "contrast_B": [
+    6.85,
+    0.9,
+    12.57
+   ],
+   "contrast_change_B_minus_A": [
+    1.55,
+    -0.36,
+    3.61
+   ],
+   "n_q": 86,
+   "name": "concept v2.5 loose base to v2.5 D181 (question rule only), all 86",
+   "noise": {
+    "per_draw": {
+     "1": 5.3,
+     "2": 7.2,
+     "3": 8.0
+    },
+    "range": 2.7
+   },
+   "rank_A": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 2.0,
+    "rlm_5": 3.0,
+    "single_pass": 4.0,
+    "verified_pass": 5.0
+   },
+   "rank_B": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 2.0,
+    "rlm_5": 3.0,
+    "single_pass": 5.0,
+    "verified_pass": 4.0
+   },
+   "rank_moves_sum": 2.0,
+   "shift_per_strategy": {
+    "multi_hop": -2.3,
+    "rlm_10": -2.9,
+    "rlm_20": -2.9,
+    "rlm_5": -3.7,
+    "single_pass": -4.5,
+    "verified_pass": -3.8
+   },
+   "spearman_rank_A_B": 0.943,
+   "winner_A": "rlm_10",
+   "winner_B": "rlm_10"
+  },
+  "concept_d181_means": {
+   "multi_hop": 54.0,
+   "rlm_10": 76.2,
+   "rlm_20": 75.1,
+   "rlm_5": 74.0,
+   "single_pass": 69.3,
+   "verified_pass": 69.7
+  },
+  "contrast set concept d181": {
+   "mh-sp": [
+    -15.31,
+    -19.13,
+    -11.52
+   ],
+   "n": 86,
+   "rlm10-sp": [
+    6.85,
+    0.9,
+    12.57
+   ],
+   "vp-rlm10": [
+    -6.47,
+    -12.22,
+    -0.59
+   ],
+   "vp-sp": [
+    0.38,
+    -2.17,
+    2.9
+   ]
+  },
+  "contrast set judge 4": {
+   "mh-sp": [
+    -3.88,
+    -9.69,
+    1.55
+   ],
+   "n": 86,
+   "rlm10-sp": [
+    -8.53,
+    -17.83,
+    0.78
+   ],
+   "vp-rlm10": [
+    8.14,
+    -1.16,
+    17.44
+   ],
+   "vp-sp": [
+    -0.39,
+    -6.2,
+    5.43
+   ]
+  },
+  "contrast set mc papers": {
+   "mh-sp": [
+    -22.43,
+    -28.77,
+    -16.29
+   ],
+   "n": 81,
+   "rlm10-sp": [
+    -25.49,
+    -30.48,
+    -20.35
+   ],
+   "vp-rlm10": [
+    28.33,
+    23.41,
+    33.13
+   ],
+   "vp-sp": [
+    2.84,
+    -0.51,
+    6.15
+   ]
+  },
+  "contrast set mc papers nosrc": {
+   "mh-sp": [
+    -22.41,
+    -28.73,
+    -16.29
+   ],
+   "n": 81,
+   "rlm10-sp": [
+    -7.89,
+    -12.28,
+    -3.3
+   ],
+   "vp-rlm10": [
+    10.73,
+    5.99,
+    15.35
+   ],
+   "vp-sp": [
+    2.84,
+    -0.51,
+    6.15
+   ]
+  },
+  "exp04 MiniCheck key F1 to source k3 precision": {
+   "A": {
+    "multi_hop": 12.0,
+    "rlm_10": 25.1,
+    "rlm_20": 24.5,
+    "rlm_5": 23.6,
+    "single_pass": 16.3,
+    "verified_pass": 14.0
+   },
+   "B": {
+    "multi_hop": 33.8,
+    "rlm_10": 50.4,
+    "rlm_20": 48.5,
+    "rlm_5": 47.5,
+    "single_pass": 69.0,
+    "verified_pass": 72.8
+   },
+   "abs_mean_shift": 34.4,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    8.83,
+    3.96,
+    13.64
+   ],
+   "contrast_B": [
+    -18.67,
+    -23.94,
+    -13.05
+   ],
+   "contrast_change_B_minus_A": [
+    -27.5,
+    -33.67,
+    -21.19
+   ],
+   "n_q": 86,
+   "name": "exp04 MiniCheck key F1 to source k3 precision",
+   "rank_A": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 2.0,
+    "rlm_5": 3.0,
+    "single_pass": 4.0,
+    "verified_pass": 5.0
+   },
+   "rank_B": {
+    "multi_hop": 6.0,
+    "rlm_10": 3.0,
+    "rlm_20": 4.0,
+    "rlm_5": 5.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_moves_sum": 12.0,
+   "shift_per_strategy": {
+    "multi_hop": 21.8,
+    "rlm_10": 25.3,
+    "rlm_20": 23.9,
+    "rlm_5": 23.9,
+    "single_pass": 52.8,
+    "verified_pass": 58.7
+   },
+   "spearman_rank_A_B": 0.086,
+   "winner_A": "rlm_10",
+   "winner_B": "verified_pass"
+  },
+  "exp04 MiniCheck key F1 to source k3, verified_pass minus rlm_10": {
+   "A": {
+    "multi_hop": 12.0,
+    "rlm_10": 25.1,
+    "rlm_20": 24.5,
+    "rlm_5": 23.6,
+    "single_pass": 16.3,
+    "verified_pass": 14.0
+   },
+   "B": {
+    "multi_hop": 33.8,
+    "rlm_10": 50.4,
+    "rlm_20": 48.5,
+    "rlm_5": 47.5,
+    "single_pass": 69.0,
+    "verified_pass": 72.8
+   },
+   "abs_mean_shift": 34.4,
+   "contrast": "verified_pass minus rlm_10",
+   "contrast_A": [
+    -11.04,
+    -15.83,
+    -5.97
+   ],
+   "contrast_B": [
+    22.4,
+    16.9,
+    27.78
+   ],
+   "contrast_change_B_minus_A": [
+    33.44,
+    26.86,
+    39.89
+   ],
+   "n_q": 86,
+   "name": "exp04 MiniCheck key F1 to source k3, verified_pass minus rlm_10",
+   "rank_A": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 2.0,
+    "rlm_5": 3.0,
+    "single_pass": 4.0,
+    "verified_pass": 5.0
+   },
+   "rank_B": {
+    "multi_hop": 6.0,
+    "rlm_10": 3.0,
+    "rlm_20": 4.0,
+    "rlm_5": 5.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_moves_sum": 12.0,
+   "shift_per_strategy": {
+    "multi_hop": 21.8,
+    "rlm_10": 25.3,
+    "rlm_20": 23.9,
+    "rlm_5": 23.9,
+    "single_pass": 52.8,
+    "verified_pass": 58.7
+   },
+   "spearman_rank_A_B": 0.086,
+   "winner_A": "rlm_10",
+   "winner_B": "verified_pass"
+  },
+  "exp04 MiniCheck key precision to source k3 precision": {
+   "A": {
+    "multi_hop": 25.8,
+    "rlm_10": 22.8,
+    "rlm_20": 22.8,
+    "rlm_5": 24.7,
+    "single_pass": 38.0,
+    "verified_pass": 40.9
+   },
+   "B": {
+    "multi_hop": 33.8,
+    "rlm_10": 50.4,
+    "rlm_20": 48.5,
+    "rlm_5": 47.5,
+    "single_pass": 69.0,
+    "verified_pass": 72.8
+   },
+   "abs_mean_shift": 24.5,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -15.26,
+    -20.14,
+    -10.57
+   ],
+   "contrast_B": [
+    -18.67,
+    -23.94,
+    -13.05
+   ],
+   "contrast_change_B_minus_A": [
+    -3.41,
+    -8.98,
+    2.37
+   ],
+   "n_q": 86,
+   "name": "exp04 MiniCheck key precision to source k3 precision",
+   "rank_A": {
+    "multi_hop": 3.0,
+    "rlm_10": 6.0,
+    "rlm_20": 5.0,
+    "rlm_5": 4.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_B": {
+    "multi_hop": 6.0,
+    "rlm_10": 3.0,
+    "rlm_20": 4.0,
+    "rlm_5": 5.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_moves_sum": 8.0,
+   "shift_per_strategy": {
+    "multi_hop": 8.0,
+    "rlm_10": 27.6,
+    "rlm_20": 25.7,
+    "rlm_5": 22.8,
+    "single_pass": 31.0,
+    "verified_pass": 31.8
+   },
+   "spearman_rank_A_B": 0.429,
+   "winner_A": "verified_pass",
+   "winner_B": "verified_pass"
+  },
+  "g7_rows": 580,
+  "gate_papers_median_on_W": [
+   495,
+   0.6562
+  ],
+  "judge plain to passages, many-paper, pass at 4": {
+   "A": {
+    "multi_hop": 38.5,
+    "rlm_10": 84.6,
+    "rlm_20": 78.2,
+    "rlm_5": 78.2,
+    "single_pass": 51.3,
+    "verified_pass": 52.6
+   },
+   "B": {
+    "multi_hop": 56.4,
+    "rlm_10": 86.5,
+    "rlm_20": 81.4,
+    "rlm_5": 87.2,
+    "single_pass": 70.5,
+    "verified_pass": 67.9
+   },
+   "abs_mean_shift": 11.1,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    33.33,
+    16.67,
+    50.0
+   ],
+   "contrast_B": [
+    16.03,
+    1.92,
+    32.05
+   ],
+   "contrast_change_B_minus_A": [
+    -17.31,
+    -30.77,
+    -5.13
+   ],
+   "n_q": 26,
+   "name": "judge plain to passages, many-paper, pass at 4",
+   "rank_A": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 2.5,
+    "rlm_5": 2.5,
+    "single_pass": 5.0,
+    "verified_pass": 4.0
+   },
+   "rank_B": {
+    "multi_hop": 6.0,
+    "rlm_10": 2.0,
+    "rlm_20": 3.0,
+    "rlm_5": 1.0,
+    "single_pass": 4.0,
+    "verified_pass": 5.0
+   },
+   "rank_moves_sum": 5.0,
+   "shift_per_strategy": {
+    "multi_hop": 17.9,
+    "rlm_10": 1.9,
+    "rlm_20": 3.2,
+    "rlm_5": 9.0,
+    "single_pass": 19.2,
+    "verified_pass": 15.4
+   },
+   "spearman_rank_A_B": 0.841,
+   "winner_A": "rlm_10",
+   "winner_B": "rlm_5"
+  },
+  "judge plain to passages, mean citation_quality (0-100 scale, score x 20)": {
+   "A": {
+    "multi_hop": 72.7,
+    "rlm_10": 76.7,
+    "rlm_20": 78.0,
+    "rlm_5": 78.2,
+    "single_pass": 80.6,
+    "verified_pass": 79.6
+   },
+   "B": {
+    "multi_hop": 81.6,
+    "rlm_10": 74.0,
+    "rlm_20": 72.8,
+    "rlm_5": 74.2,
+    "single_pass": 93.0,
+    "verified_pass": 92.9
+   },
+   "abs_mean_shift": 7.7,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -3.95,
+    -8.68,
+    0.62
+   ],
+   "contrast_B": [
+    -19.07,
+    -23.72,
+    -14.38
+   ],
+   "contrast_change_B_minus_A": [
+    -15.12,
+    -19.11,
+    -11.12
+   ],
+   "n_q": 86,
+   "name": "judge plain to passages, mean citation_quality (0-100 scale, score x 20)",
+   "rank_A": {
+    "multi_hop": 6.0,
+    "rlm_10": 5.0,
+    "rlm_20": 4.0,
+    "rlm_5": 3.0,
+    "single_pass": 1.0,
+    "verified_pass": 2.0
+   },
+   "rank_B": {
+    "multi_hop": 3.0,
+    "rlm_10": 5.0,
+    "rlm_20": 6.0,
+    "rlm_5": 4.0,
+    "single_pass": 1.0,
+    "verified_pass": 2.0
+   },
+   "rank_moves_sum": 6.0,
+   "shift_per_strategy": {
+    "multi_hop": 8.8,
+    "rlm_10": -2.7,
+    "rlm_20": -5.2,
+    "rlm_5": -4.0,
+    "single_pass": 12.4,
+    "verified_pass": 13.3
+   },
+   "spearman_rank_A_B": 0.6,
+   "winner_A": "single_pass",
+   "winner_B": "single_pass"
+  },
+  "judge plain to passages, mean completeness (0-100 scale, score x 20)": {
+   "A": {
+    "multi_hop": 75.7,
+    "rlm_10": 82.2,
+    "rlm_20": 81.5,
+    "rlm_5": 81.0,
+    "single_pass": 83.6,
+    "verified_pass": 82.3
+   },
+   "B": {
+    "multi_hop": 80.4,
+    "rlm_10": 79.9,
+    "rlm_20": 78.2,
+    "rlm_5": 80.0,
+    "single_pass": 89.1,
+    "verified_pass": 86.1
+   },
+   "abs_mean_shift": 3.4,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -1.32,
+    -6.12,
+    3.64
+   ],
+   "contrast_B": [
+    -9.22,
+    -13.95,
+    -4.34
+   ],
+   "contrast_change_B_minus_A": [
+    -7.91,
+    -10.04,
+    -5.74
+   ],
+   "n_q": 86,
+   "name": "judge plain to passages, mean completeness (0-100 scale, score x 20)",
+   "rank_A": {
+    "multi_hop": 6.0,
+    "rlm_10": 3.0,
+    "rlm_20": 4.0,
+    "rlm_5": 5.0,
+    "single_pass": 1.0,
+    "verified_pass": 2.0
+   },
+   "rank_B": {
+    "multi_hop": 3.0,
+    "rlm_10": 5.0,
+    "rlm_20": 6.0,
+    "rlm_5": 4.0,
+    "single_pass": 1.0,
+    "verified_pass": 2.0
+   },
+   "rank_moves_sum": 8.0,
+   "shift_per_strategy": {
+    "multi_hop": 4.7,
+    "rlm_10": -2.3,
+    "rlm_20": -3.3,
+    "rlm_5": -0.9,
+    "single_pass": 5.6,
+    "verified_pass": 3.8
+   },
+   "spearman_rank_A_B": 0.486,
+   "winner_A": "single_pass",
+   "winner_B": "single_pass"
+  },
+  "judge plain to passages, mean correctness (0-100 scale, score x 20)": {
+   "A": {
+    "multi_hop": 82.9,
+    "rlm_10": 77.5,
+    "rlm_20": 76.9,
+    "rlm_5": 77.0,
+    "single_pass": 85.7,
+    "verified_pass": 84.8
+   },
+   "B": {
+    "multi_hop": 87.5,
+    "rlm_10": 80.3,
+    "rlm_20": 80.0,
+    "rlm_5": 81.2,
+    "single_pass": 91.8,
+    "verified_pass": 90.2
+   },
+   "abs_mean_shift": 4.4,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -8.18,
+    -12.87,
+    -3.45
+   ],
+   "contrast_B": [
+    -11.47,
+    -15.81,
+    -7.02
+   ],
+   "contrast_change_B_minus_A": [
+    -3.29,
+    -5.27,
+    -1.32
+   ],
+   "n_q": 86,
+   "name": "judge plain to passages, mean correctness (0-100 scale, score x 20)",
+   "rank_A": {
+    "multi_hop": 3.0,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 1.0,
+    "verified_pass": 2.0
+   },
+   "rank_B": {
+    "multi_hop": 3.0,
+    "rlm_10": 5.0,
+    "rlm_20": 6.0,
+    "rlm_5": 4.0,
+    "single_pass": 1.0,
+    "verified_pass": 2.0
+   },
+   "rank_moves_sum": 2.0,
+   "shift_per_strategy": {
+    "multi_hop": 4.6,
+    "rlm_10": 2.8,
+    "rlm_20": 3.1,
+    "rlm_5": 4.2,
+    "single_pass": 6.1,
+    "verified_pass": 5.4
+   },
+   "spearman_rank_A_B": 0.943,
+   "winner_A": "single_pass",
+   "winner_B": "single_pass"
+  },
+  "judge plain to passages, mean faithfulness (0-100 scale, score x 20)": {
+   "A": {
+    "multi_hop": 90.8,
+    "rlm_10": 82.1,
+    "rlm_20": 83.2,
+    "rlm_5": 83.6,
+    "single_pass": 93.5,
+    "verified_pass": 91.7
+   },
+   "B": {
+    "multi_hop": 94.1,
+    "rlm_10": 82.6,
+    "rlm_20": 81.8,
+    "rlm_5": 84.7,
+    "single_pass": 97.6,
+    "verified_pass": 97.6
+   },
+   "abs_mean_shift": 2.7,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -11.43,
+    -15.35,
+    -7.64
+   ],
+   "contrast_B": [
+    -14.96,
+    -18.88,
+    -11.16
+   ],
+   "contrast_change_B_minus_A": [
+    -3.53,
+    -6.2,
+    -0.85
+   ],
+   "n_q": 86,
+   "name": "judge plain to passages, mean faithfulness (0-100 scale, score x 20)",
+   "rank_A": {
+    "multi_hop": 3.0,
+    "rlm_10": 6.0,
+    "rlm_20": 5.0,
+    "rlm_5": 4.0,
+    "single_pass": 1.0,
+    "verified_pass": 2.0
+   },
+   "rank_B": {
+    "multi_hop": 3.0,
+    "rlm_10": 5.0,
+    "rlm_20": 6.0,
+    "rlm_5": 4.0,
+    "single_pass": 1.0,
+    "verified_pass": 2.0
+   },
+   "rank_moves_sum": 2.0,
+   "shift_per_strategy": {
+    "multi_hop": 3.3,
+    "rlm_10": 0.6,
+    "rlm_20": -1.4,
+    "rlm_5": 1.0,
+    "single_pass": 4.1,
+    "verified_pass": 5.9
+   },
+   "spearman_rank_A_B": 0.943,
+   "winner_A": "single_pass",
+   "winner_B": "single_pass"
+  },
+  "judge plain to passages, one-paper, pass at 4": {
+   "A": {
+    "multi_hop": 97.2,
+    "rlm_10": 70.6,
+    "rlm_20": 68.3,
+    "rlm_5": 68.9,
+    "single_pass": 97.2,
+    "verified_pass": 96.1
+   },
+   "B": {
+    "multi_hop": 96.1,
+    "rlm_10": 71.7,
+    "rlm_20": 70.6,
+    "rlm_5": 73.1,
+    "single_pass": 99.4,
+    "verified_pass": 98.3
+   },
+   "abs_mean_shift": 2.2,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -26.67,
+    -34.44,
+    -19.44
+   ],
+   "contrast_B": [
+    -27.78,
+    -35.83,
+    -20.0
+   ],
+   "contrast_change_B_minus_A": [
+    -1.11,
+    -6.11,
+    3.06
+   ],
+   "n_q": 60,
+   "name": "judge plain to passages, one-paper, pass at 4",
+   "rank_A": {
+    "multi_hop": 1.5,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 1.5,
+    "verified_pass": 3.0
+   },
+   "rank_B": {
+    "multi_hop": 3.0,
+    "rlm_10": 5.0,
+    "rlm_20": 6.0,
+    "rlm_5": 4.0,
+    "single_pass": 1.0,
+    "verified_pass": 2.0
+   },
+   "rank_moves_sum": 5.0,
+   "shift_per_strategy": {
+    "multi_hop": -1.1,
+    "rlm_10": 1.1,
+    "rlm_20": 2.2,
+    "rlm_5": 4.2,
+    "single_pass": 2.2,
+    "verified_pass": 2.2
+   },
+   "spearman_rank_A_B": 0.841,
+   "winner_A": "single_pass",
+   "winner_B": "single_pass"
+  },
+  "judge plain to passages, pass at 3": {
+   "A": {
+    "multi_hop": 95.0,
+    "rlm_10": 92.2,
+    "rlm_20": 93.8,
+    "rlm_5": 93.4,
+    "single_pass": 93.4,
+    "verified_pass": 93.0
+   },
+   "B": {
+    "multi_hop": 97.7,
+    "rlm_10": 92.6,
+    "rlm_20": 91.9,
+    "rlm_5": 93.0,
+    "single_pass": 97.7,
+    "verified_pass": 95.3
+   },
+   "abs_mean_shift": 2.0,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -1.16,
+    -7.75,
+    5.81
+   ],
+   "contrast_B": [
+    -5.04,
+    -9.69,
+    -0.39
+   ],
+   "contrast_change_B_minus_A": [
+    -3.88,
+    -8.53,
+    0.0
+   ],
+   "n_q": 86,
+   "name": "judge plain to passages, pass at 3",
+   "noise": {
+    "per_draw": {
+     "1": 0.0,
+     "2": -2.3,
+     "3": -1.2
+    },
+    "range": 2.3
+   },
+   "rank_A": {
+    "multi_hop": 1.0,
+    "rlm_10": 6.0,
+    "rlm_20": 2.0,
+    "rlm_5": 3.5,
+    "single_pass": 3.5,
+    "verified_pass": 5.0
+   },
+   "rank_B": {
+    "multi_hop": 1.5,
+    "rlm_10": 5.0,
+    "rlm_20": 6.0,
+    "rlm_5": 4.0,
+    "single_pass": 1.5,
+    "verified_pass": 3.0
+   },
+   "rank_moves_sum": 10.0,
+   "shift_per_strategy": {
+    "multi_hop": 2.7,
+    "rlm_10": 0.4,
+    "rlm_20": -1.9,
+    "rlm_5": -0.4,
+    "single_pass": 4.3,
+    "verified_pass": 2.3
+   },
+   "spearman_rank_A_B": 0.25,
+   "winner_A": "multi_hop",
+   "winner_B": "single_pass"
+  },
+  "judge plain to passages, pass at 4": {
+   "A": {
+    "multi_hop": 79.5,
+    "rlm_10": 74.8,
+    "rlm_20": 71.3,
+    "rlm_5": 71.7,
+    "single_pass": 83.3,
+    "verified_pass": 82.9
+   },
+   "B": {
+    "multi_hop": 84.1,
+    "rlm_10": 76.2,
+    "rlm_20": 73.8,
+    "rlm_5": 77.3,
+    "single_pass": 90.7,
+    "verified_pass": 89.1
+   },
+   "abs_mean_shift": 4.6,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -8.53,
+    -17.83,
+    0.78
+   ],
+   "contrast_B": [
+    -14.53,
+    -22.48,
+    -6.01
+   ],
+   "contrast_change_B_minus_A": [
+    -6.01,
+    -11.63,
+    -0.97
+   ],
+   "n_q": 86,
+   "name": "judge plain to passages, pass at 4",
+   "noise": {
+    "per_draw": {
+     "1": -7.0,
+     "2": -10.5,
+     "3": -8.1
+    },
+    "range": 3.5
+   },
+   "rank_A": {
+    "multi_hop": 3.0,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 1.0,
+    "verified_pass": 2.0
+   },
+   "rank_B": {
+    "multi_hop": 3.0,
+    "rlm_10": 5.0,
+    "rlm_20": 6.0,
+    "rlm_5": 4.0,
+    "single_pass": 1.0,
+    "verified_pass": 2.0
+   },
+   "rank_moves_sum": 2.0,
+   "shift_per_strategy": {
+    "multi_hop": 4.7,
+    "rlm_10": 1.4,
+    "rlm_20": 2.5,
+    "rlm_5": 5.6,
+    "single_pass": 7.4,
+    "verified_pass": 6.2
+   },
+   "spearman_rank_A_B": 0.943,
+   "winner_A": "single_pass",
+   "winner_B": "single_pass"
+  },
+  "key v2.4 to v2.5, judge plain, all 86, pass at 3": {
+   "A": {
+    "multi_hop": 95.0,
+    "rlm_10": 92.2,
+    "rlm_20": 93.8,
+    "rlm_5": 93.4,
+    "single_pass": 93.4,
+    "verified_pass": 93.0
+   },
+   "B": {
+    "multi_hop": 95.7,
+    "rlm_10": 92.2,
+    "rlm_20": 93.8,
+    "rlm_5": 93.4,
+    "single_pass": 93.4,
+    "verified_pass": 93.0
+   },
+   "abs_mean_shift": 0.1,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -1.16,
+    -7.75,
+    5.81
+   ],
+   "contrast_B": [
+    -1.16,
+    -7.75,
+    5.81
+   ],
+   "contrast_change_B_minus_A": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "n_q": 86,
+   "name": "key v2.4 to v2.5, judge plain, all 86, pass at 3",
+   "noise": {
+    "per_draw": {
+     "1": 0.0,
+     "2": -2.3,
+     "3": -1.2
+    },
+    "range": 2.3
+   },
+   "rank_A": {
+    "multi_hop": 1.0,
+    "rlm_10": 6.0,
+    "rlm_20": 2.0,
+    "rlm_5": 3.5,
+    "single_pass": 3.5,
+    "verified_pass": 5.0
+   },
+   "rank_B": {
+    "multi_hop": 1.0,
+    "rlm_10": 6.0,
+    "rlm_20": 2.0,
+    "rlm_5": 3.5,
+    "single_pass": 3.5,
+    "verified_pass": 5.0
+   },
+   "rank_moves_sum": 0.0,
+   "shift_per_strategy": {
+    "multi_hop": 0.8,
+    "rlm_10": 0.0,
+    "rlm_20": 0.0,
+    "rlm_5": 0.0,
+    "single_pass": 0.0,
+    "verified_pass": 0.0
+   },
+   "spearman_rank_A_B": 1.0,
+   "winner_A": "multi_hop",
+   "winner_B": "multi_hop"
+  },
+  "key v2.4 to v2.5, judge plain, all 86, pass at 4": {
+   "A": {
+    "multi_hop": 79.5,
+    "rlm_10": 74.8,
+    "rlm_20": 71.3,
+    "rlm_5": 71.7,
+    "single_pass": 83.3,
+    "verified_pass": 82.9
+   },
+   "B": {
+    "multi_hop": 78.7,
+    "rlm_10": 74.0,
+    "rlm_20": 70.5,
+    "rlm_5": 73.3,
+    "single_pass": 82.9,
+    "verified_pass": 83.3
+   },
+   "abs_mean_shift": 0.8,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -8.53,
+    -17.83,
+    0.78
+   ],
+   "contrast_B": [
+    -8.91,
+    -17.83,
+    0.0
+   ],
+   "contrast_change_B_minus_A": [
+    -0.39,
+    -2.33,
+    1.55
+   ],
+   "n_q": 86,
+   "name": "key v2.4 to v2.5, judge plain, all 86, pass at 4",
+   "noise": {
+    "per_draw": {
+     "1": -7.0,
+     "2": -10.5,
+     "3": -8.1
+    },
+    "range": 3.5
+   },
+   "rank_A": {
+    "multi_hop": 3.0,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 1.0,
+    "verified_pass": 2.0
+   },
+   "rank_B": {
+    "multi_hop": 3.0,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_moves_sum": 2.0,
+   "shift_per_strategy": {
+    "multi_hop": -0.8,
+    "rlm_10": -0.8,
+    "rlm_20": -0.8,
+    "rlm_5": 1.6,
+    "single_pass": -0.4,
+    "verified_pass": 0.4
+   },
+   "spearman_rank_A_B": 0.943,
+   "winner_A": "single_pass",
+   "winner_B": "verified_pass"
+  },
+  "key v2.4 to v2.5, judge plain, changed answerable, pass at 3": {
+   "A": {
+    "multi_hop": 92.6,
+    "rlm_10": 92.6,
+    "rlm_20": 94.4,
+    "rlm_5": 93.8,
+    "single_pass": 92.6,
+    "verified_pass": 91.4
+   },
+   "B": {
+    "multi_hop": 93.8,
+    "rlm_10": 92.6,
+    "rlm_20": 94.4,
+    "rlm_5": 93.8,
+    "single_pass": 92.6,
+    "verified_pass": 91.4
+   },
+   "abs_mean_shift": 0.2,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    0.0,
+    -8.64,
+    9.26
+   ],
+   "contrast_B": [
+    0.0,
+    -8.64,
+    9.26
+   ],
+   "contrast_change_B_minus_A": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "n_q": 54,
+   "name": "key v2.4 to v2.5, judge plain, changed answerable, pass at 3",
+   "noise": {
+    "per_draw": {
+     "1": 3.7,
+     "2": -1.9,
+     "3": -1.9
+    },
+    "range": 5.6
+   },
+   "rank_A": {
+    "multi_hop": 4.0,
+    "rlm_10": 4.0,
+    "rlm_20": 1.0,
+    "rlm_5": 2.0,
+    "single_pass": 4.0,
+    "verified_pass": 6.0
+   },
+   "rank_B": {
+    "multi_hop": 2.5,
+    "rlm_10": 4.5,
+    "rlm_20": 1.0,
+    "rlm_5": 2.5,
+    "single_pass": 4.5,
+    "verified_pass": 6.0
+   },
+   "rank_moves_sum": 3.0,
+   "shift_per_strategy": {
+    "multi_hop": 1.2,
+    "rlm_10": 0.0,
+    "rlm_20": 0.0,
+    "rlm_5": 0.0,
+    "single_pass": 0.0,
+    "verified_pass": 0.0
+   },
+   "spearman_rank_A_B": 0.907,
+   "winner_A": "rlm_20",
+   "winner_B": "rlm_20"
+  },
+  "key v2.4 to v2.5, judge plain, changed answerable, pass at 4": {
+   "A": {
+    "multi_hop": 72.2,
+    "rlm_10": 72.2,
+    "rlm_20": 69.8,
+    "rlm_5": 71.0,
+    "single_pass": 79.0,
+    "verified_pass": 78.4
+   },
+   "B": {
+    "multi_hop": 71.0,
+    "rlm_10": 71.0,
+    "rlm_20": 68.5,
+    "rlm_5": 73.5,
+    "single_pass": 78.4,
+    "verified_pass": 79.0
+   },
+   "abs_mean_shift": 1.2,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -6.79,
+    -18.52,
+    5.56
+   ],
+   "contrast_B": [
+    -7.41,
+    -18.52,
+    4.32
+   ],
+   "contrast_change_B_minus_A": [
+    -0.62,
+    -3.7,
+    2.47
+   ],
+   "n_q": 54,
+   "name": "key v2.4 to v2.5, judge plain, changed answerable, pass at 4",
+   "noise": {
+    "per_draw": {
+     "1": -1.9,
+     "2": -11.1,
+     "3": -7.4
+    },
+    "range": 9.2
+   },
+   "rank_A": {
+    "multi_hop": 4.0,
+    "rlm_10": 3.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 1.0,
+    "verified_pass": 2.0
+   },
+   "rank_B": {
+    "multi_hop": 5.0,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 3.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_moves_sum": 6.0,
+   "shift_per_strategy": {
+    "multi_hop": -1.2,
+    "rlm_10": -1.2,
+    "rlm_20": -1.2,
+    "rlm_5": 2.5,
+    "single_pass": -0.6,
+    "verified_pass": 0.6
+   },
+   "spearman_rank_A_B": 0.771,
+   "winner_A": "single_pass",
+   "winner_B": "verified_pass"
+  },
+  "key v2.4 to v2.5, judge plain, many-paper, pass at 3": {
+   "A": {
+    "multi_hop": 84.6,
+    "rlm_10": 98.7,
+    "rlm_20": 98.7,
+    "rlm_5": 96.2,
+    "single_pass": 78.2,
+    "verified_pass": 78.2
+   },
+   "B": {
+    "multi_hop": 87.2,
+    "rlm_10": 98.7,
+    "rlm_20": 98.7,
+    "rlm_5": 96.2,
+    "single_pass": 78.2,
+    "verified_pass": 78.2
+   },
+   "abs_mean_shift": 0.4,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    20.51,
+    5.13,
+    37.18
+   ],
+   "contrast_B": [
+    20.51,
+    5.13,
+    37.18
+   ],
+   "contrast_change_B_minus_A": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "n_q": 26,
+   "name": "key v2.4 to v2.5, judge plain, many-paper, pass at 3",
+   "rank_A": {
+    "multi_hop": 4.0,
+    "rlm_10": 1.5,
+    "rlm_20": 1.5,
+    "rlm_5": 3.0,
+    "single_pass": 5.5,
+    "verified_pass": 5.5
+   },
+   "rank_B": {
+    "multi_hop": 4.0,
+    "rlm_10": 1.5,
+    "rlm_20": 1.5,
+    "rlm_5": 3.0,
+    "single_pass": 5.5,
+    "verified_pass": 5.5
+   },
+   "rank_moves_sum": 0.0,
+   "shift_per_strategy": {
+    "multi_hop": 2.6,
+    "rlm_10": 0.0,
+    "rlm_20": 0.0,
+    "rlm_5": 0.0,
+    "single_pass": 0.0,
+    "verified_pass": 0.0
+   },
+   "spearman_rank_A_B": 1.0,
+   "winner_A": "rlm_10",
+   "winner_B": "rlm_10"
+  },
+  "key v2.4 to v2.5, judge plain, many-paper, pass at 4": {
+   "A": {
+    "multi_hop": 38.5,
+    "rlm_10": 84.6,
+    "rlm_20": 78.2,
+    "rlm_5": 78.2,
+    "single_pass": 51.3,
+    "verified_pass": 52.6
+   },
+   "B": {
+    "multi_hop": 38.5,
+    "rlm_10": 82.1,
+    "rlm_20": 78.2,
+    "rlm_5": 78.2,
+    "single_pass": 51.3,
+    "verified_pass": 55.1
+   },
+   "abs_mean_shift": 0.9,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    33.33,
+    16.67,
+    50.0
+   ],
+   "contrast_B": [
+    30.77,
+    14.1,
+    47.44
+   ],
+   "contrast_change_B_minus_A": [
+    -2.56,
+    -7.69,
+    2.56
+   ],
+   "n_q": 26,
+   "name": "key v2.4 to v2.5, judge plain, many-paper, pass at 4",
+   "rank_A": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 2.5,
+    "rlm_5": 2.5,
+    "single_pass": 5.0,
+    "verified_pass": 4.0
+   },
+   "rank_B": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 2.0,
+    "rlm_5": 3.0,
+    "single_pass": 5.0,
+    "verified_pass": 4.0
+   },
+   "rank_moves_sum": 1.0,
+   "shift_per_strategy": {
+    "multi_hop": -0.0,
+    "rlm_10": -2.6,
+    "rlm_20": 0.0,
+    "rlm_5": 0.0,
+    "single_pass": 0.0,
+    "verified_pass": 2.6
+   },
+   "spearman_rank_A_B": 0.986,
+   "winner_A": "rlm_10",
+   "winner_B": "rlm_10"
+  },
+  "key v2.4 to v2.5, judge plain, one-paper, pass at 3": {
+   "A": {
+    "multi_hop": 99.4,
+    "rlm_10": 89.4,
+    "rlm_20": 91.7,
+    "rlm_5": 92.2,
+    "single_pass": 100.0,
+    "verified_pass": 99.4
+   },
+   "B": {
+    "multi_hop": 99.4,
+    "rlm_10": 89.4,
+    "rlm_20": 91.7,
+    "rlm_5": 92.2,
+    "single_pass": 100.0,
+    "verified_pass": 99.4
+   },
+   "abs_mean_shift": 0.0,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -10.56,
+    -16.11,
+    -5.56
+   ],
+   "contrast_B": [
+    -10.56,
+    -16.11,
+    -5.56
+   ],
+   "contrast_change_B_minus_A": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "n_q": 60,
+   "name": "key v2.4 to v2.5, judge plain, one-paper, pass at 3",
+   "rank_A": {
+    "multi_hop": 3.0,
+    "rlm_10": 6.0,
+    "rlm_20": 5.0,
+    "rlm_5": 4.0,
+    "single_pass": 1.0,
+    "verified_pass": 2.0
+   },
+   "rank_B": {
+    "multi_hop": 3.0,
+    "rlm_10": 6.0,
+    "rlm_20": 5.0,
+    "rlm_5": 4.0,
+    "single_pass": 1.0,
+    "verified_pass": 2.0
+   },
+   "rank_moves_sum": 0.0,
+   "shift_per_strategy": {
+    "multi_hop": 0.0,
+    "rlm_10": 0.0,
+    "rlm_20": 0.0,
+    "rlm_5": 0.0,
+    "single_pass": 0.0,
+    "verified_pass": 0.0
+   },
+   "spearman_rank_A_B": 1.0,
+   "winner_A": "single_pass",
+   "winner_B": "single_pass"
+  },
+  "key v2.4 to v2.5, judge plain, one-paper, pass at 4": {
+   "A": {
+    "multi_hop": 97.2,
+    "rlm_10": 70.6,
+    "rlm_20": 68.3,
+    "rlm_5": 68.9,
+    "single_pass": 97.2,
+    "verified_pass": 96.1
+   },
+   "B": {
+    "multi_hop": 96.1,
+    "rlm_10": 70.6,
+    "rlm_20": 67.2,
+    "rlm_5": 71.1,
+    "single_pass": 96.7,
+    "verified_pass": 95.6
+   },
+   "abs_mean_shift": 0.9,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -26.67,
+    -34.44,
+    -19.44
+   ],
+   "contrast_B": [
+    -26.11,
+    -33.33,
+    -19.44
+   ],
+   "contrast_change_B_minus_A": [
+    0.56,
+    -1.11,
+    2.22
+   ],
+   "n_q": 60,
+   "name": "key v2.4 to v2.5, judge plain, one-paper, pass at 4",
+   "rank_A": {
+    "multi_hop": 1.5,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 1.5,
+    "verified_pass": 3.0
+   },
+   "rank_B": {
+    "multi_hop": 2.0,
+    "rlm_10": 5.0,
+    "rlm_20": 6.0,
+    "rlm_5": 4.0,
+    "single_pass": 1.0,
+    "verified_pass": 3.0
+   },
+   "rank_moves_sum": 3.0,
+   "shift_per_strategy": {
+    "multi_hop": -1.1,
+    "rlm_10": 0.0,
+    "rlm_20": -1.1,
+    "rlm_5": 2.2,
+    "single_pass": -0.6,
+    "verified_pass": -0.6
+   },
+   "spearman_rank_A_B": 0.928,
+   "winner_A": "single_pass",
+   "winner_B": "single_pass"
+  },
+  "l2_loose_fields": [
+   "concept_recall_exact",
+   "concept_recall_loose",
+   "n_concepts"
+  ],
+  "minicheck_answer_pearson": 0.585,
+  "minicheck_paired_questions": 81,
+  "minicheck_paired_questions_nosrc": 81,
+  "minicheck_source_lines_dropped_share_of_claims": {
+   "multi_hop": 0.002,
+   "rlm_10": 0.358,
+   "rlm_20": 0.372,
+   "rlm_5": 0.354,
+   "single_pass": 0.0,
+   "verified_pass": 0.0
+  },
+  "noise_concept_d181_contrast": {
+   "per_draw": {
+    "1": 5.3,
+    "2": 7.2,
+    "3": 8.0
+   },
+   "range": 2.7
+  },
+  "noise_judge3_contrast": {
+   "per_draw": {
+    "1": 0.0,
+    "2": -2.3,
+    "3": -1.2
+   },
+   "range": 2.3
+  },
+  "noise_judge3_draw_pairs": {
+   "d1-d2": [
+    2.33,
+    -4.65,
+    9.3
+   ],
+   "d1-d3": [
+    1.16,
+    -5.81,
+    9.3
+   ],
+   "d2-d3": [
+    -1.16,
+    -8.14,
+    6.98
+   ]
+  },
+  "noise_judge4_contrast": {
+   "per_draw": {
+    "1": -7.0,
+    "2": -10.5,
+    "3": -8.1
+   },
+   "range": 3.5
+  },
+  "noise_judge4_draw_pairs": {
+   "d1-d2": [
+    3.49,
+    -9.3,
+    16.28
+   ],
+   "d1-d3": [
+    1.16,
+    -10.47,
+    12.79
+   ],
+   "d2-d3": [
+    -2.33,
+    -15.12,
+    11.63
+   ]
+  },
+  "noise_judge4_strategy_per_draw": {
+   "multi_hop": [
+    80.2,
+    77.9,
+    80.2
+   ],
+   "rlm_10": [
+    76.7,
+    73.3,
+    74.4
+   ],
+   "rlm_20": [
+    68.6,
+    72.1,
+    73.3
+   ],
+   "rlm_5": [
+    68.6,
+    67.4,
+    79.1
+   ],
+   "single_pass": [
+    83.7,
+    83.7,
+    82.6
+   ],
+   "verified_pass": [
+    83.7,
+    84.9,
+    80.2
+   ]
+  },
+  "noise_mc_key_precision_contrast": {
+   "per_draw": {
+    "1": -28.4,
+    "2": -28.6,
+    "3": -28.4
+   },
+   "range": 0.2
+  },
+  "noise_mc_key_precision_strategy_means": {
+   "1": {
+    "multi_hop": 34.7,
+    "rlm_10": 21.1,
+    "rlm_20": 19.0,
+    "rlm_5": 19.1,
+    "single_pass": 49.9,
+    "verified_pass": 54.2
+   },
+   "2": {
+    "multi_hop": 38.4,
+    "rlm_10": 19.6,
+    "rlm_20": 19.4,
+    "rlm_5": 19.0,
+    "single_pass": 48.3,
+    "verified_pass": 51.0
+   },
+   "3": {
+    "multi_hop": 33.3,
+    "rlm_10": 20.3,
+    "rlm_20": 18.6,
+    "rlm_5": 19.8,
+    "single_pass": 48.7,
+    "verified_pass": 51.2
+   }
+  },
+  "noise_v25_contrast_at_3": {
+   "per_draw": {
+    "1": 0.0,
+    "2": -2.3,
+    "3": -1.2
+   },
+   "range": 2.3
+  },
+  "noise_v25_contrast_at_4": {
+   "per_draw": {
+    "1": -8.1,
+    "2": -9.3,
+    "3": -9.3
+   },
+   "range": 1.2
+  },
+  "old judge (corrected state, key v1) to devstral (key v2.4), exp04, pass at 3": {
+   "A": {
+    "multi_hop": 76.7,
+    "rlm_10": 91.9,
+    "rlm_20": 86.0,
+    "rlm_5": 88.4,
+    "single_pass": 80.2,
+    "verified_pass": 67.4
+   },
+   "B": {
+    "multi_hop": 66.3,
+    "rlm_10": 88.4,
+    "rlm_20": 79.1,
+    "rlm_5": 83.7,
+    "single_pass": 76.7,
+    "verified_pass": 57.0
+   },
+   "abs_mean_shift": 6.6,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    11.63,
+    2.33,
+    20.93
+   ],
+   "contrast_B": [
+    11.63,
+    1.16,
+    22.09
+   ],
+   "contrast_change_B_minus_A": [
+    0.0,
+    -6.98,
+    6.98
+   ],
+   "n_q": 86,
+   "name": "old judge (corrected state, key v1) to devstral (key v2.4), exp04, pass at 3",
+   "rank_A": {
+    "multi_hop": 5.0,
+    "rlm_10": 1.0,
+    "rlm_20": 3.0,
+    "rlm_5": 2.0,
+    "single_pass": 4.0,
+    "verified_pass": 6.0
+   },
+   "rank_B": {
+    "multi_hop": 5.0,
+    "rlm_10": 1.0,
+    "rlm_20": 3.0,
+    "rlm_5": 2.0,
+    "single_pass": 4.0,
+    "verified_pass": 6.0
+   },
+   "rank_moves_sum": 0.0,
+   "shift_per_strategy": {
+    "multi_hop": -10.5,
+    "rlm_10": -3.5,
+    "rlm_20": -7.0,
+    "rlm_5": -4.7,
+    "single_pass": -3.5,
+    "verified_pass": -10.5
+   },
+   "spearman_rank_A_B": 1.0,
+   "winner_A": "rlm_10",
+   "winner_B": "rlm_10"
+  },
+  "old judge (corrected state, key v1) to devstral (key v2.4), exp04, pass at 4": {
+   "A": {
+    "multi_hop": 58.1,
+    "rlm_10": 79.1,
+    "rlm_20": 74.4,
+    "rlm_5": 75.6,
+    "single_pass": 54.7,
+    "verified_pass": 40.7
+   },
+   "B": {
+    "multi_hop": 47.7,
+    "rlm_10": 67.4,
+    "rlm_20": 65.1,
+    "rlm_5": 64.0,
+    "single_pass": 33.7,
+    "verified_pass": 25.6
+   },
+   "abs_mean_shift": 13.2,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    24.42,
+    12.79,
+    36.05
+   ],
+   "contrast_B": [
+    33.72,
+    19.77,
+    47.67
+   ],
+   "contrast_change_B_minus_A": [
+    9.3,
+    -3.49,
+    22.09
+   ],
+   "n_q": 86,
+   "name": "old judge (corrected state, key v1) to devstral (key v2.4), exp04, pass at 4",
+   "rank_A": {
+    "multi_hop": 4.0,
+    "rlm_10": 1.0,
+    "rlm_20": 3.0,
+    "rlm_5": 2.0,
+    "single_pass": 5.0,
+    "verified_pass": 6.0
+   },
+   "rank_B": {
+    "multi_hop": 4.0,
+    "rlm_10": 1.0,
+    "rlm_20": 2.0,
+    "rlm_5": 3.0,
+    "single_pass": 5.0,
+    "verified_pass": 6.0
+   },
+   "rank_moves_sum": 2.0,
+   "shift_per_strategy": {
+    "multi_hop": -10.5,
+    "rlm_10": -11.6,
+    "rlm_20": -9.3,
+    "rlm_5": -11.6,
+    "single_pass": -20.9,
+    "verified_pass": -15.1
+   },
+   "spearman_rank_A_B": 0.943,
+   "winner_A": "rlm_10",
+   "winner_B": "rlm_10"
+  },
+  "old judge (published, key v1) to devstral (key v2.4), exp04, pass at 3": {
+   "A": {
+    "multi_hop": 74.4,
+    "rlm_10": 90.7,
+    "rlm_20": 84.9,
+    "rlm_5": 88.4,
+    "single_pass": 80.2,
+    "verified_pass": 67.4
+   },
+   "B": {
+    "multi_hop": 66.3,
+    "rlm_10": 88.4,
+    "rlm_20": 79.1,
+    "rlm_5": 83.7,
+    "single_pass": 76.7,
+    "verified_pass": 57.0
+   },
+   "abs_mean_shift": 5.8,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    10.47,
+    1.16,
+    19.77
+   ],
+   "contrast_B": [
+    11.63,
+    1.16,
+    22.09
+   ],
+   "contrast_change_B_minus_A": [
+    1.16,
+    -5.81,
+    8.14
+   ],
+   "n_q": 86,
+   "name": "old judge (published, key v1) to devstral (key v2.4), exp04, pass at 3",
+   "rank_A": {
+    "multi_hop": 5.0,
+    "rlm_10": 1.0,
+    "rlm_20": 3.0,
+    "rlm_5": 2.0,
+    "single_pass": 4.0,
+    "verified_pass": 6.0
+   },
+   "rank_B": {
+    "multi_hop": 5.0,
+    "rlm_10": 1.0,
+    "rlm_20": 3.0,
+    "rlm_5": 2.0,
+    "single_pass": 4.0,
+    "verified_pass": 6.0
+   },
+   "rank_moves_sum": 0.0,
+   "shift_per_strategy": {
+    "multi_hop": -8.1,
+    "rlm_10": -2.3,
+    "rlm_20": -5.8,
+    "rlm_5": -4.7,
+    "single_pass": -3.5,
+    "verified_pass": -10.5
+   },
+   "spearman_rank_A_B": 1.0,
+   "winner_A": "rlm_10",
+   "winner_B": "rlm_10"
+  },
+  "old judge (published, key v1) to devstral (key v2.4), exp04, pass at 4": {
+   "A": {
+    "multi_hop": 58.1,
+    "rlm_10": 75.6,
+    "rlm_20": 73.3,
+    "rlm_5": 70.9,
+    "single_pass": 54.7,
+    "verified_pass": 40.7
+   },
+   "B": {
+    "multi_hop": 47.7,
+    "rlm_10": 67.4,
+    "rlm_20": 65.1,
+    "rlm_5": 64.0,
+    "single_pass": 33.7,
+    "verified_pass": 25.6
+   },
+   "abs_mean_shift": 11.6,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    20.93,
+    9.27,
+    32.56
+   ],
+   "contrast_B": [
+    33.72,
+    19.77,
+    47.67
+   ],
+   "contrast_change_B_minus_A": [
+    12.79,
+    0.0,
+    25.58
+   ],
+   "n_q": 86,
+   "name": "old judge (published, key v1) to devstral (key v2.4), exp04, pass at 4",
+   "rank_A": {
+    "multi_hop": 4.0,
+    "rlm_10": 1.0,
+    "rlm_20": 2.0,
+    "rlm_5": 3.0,
+    "single_pass": 5.0,
+    "verified_pass": 6.0
+   },
+   "rank_B": {
+    "multi_hop": 4.0,
+    "rlm_10": 1.0,
+    "rlm_20": 2.0,
+    "rlm_5": 3.0,
+    "single_pass": 5.0,
+    "verified_pass": 6.0
+   },
+   "rank_moves_sum": 0.0,
+   "shift_per_strategy": {
+    "multi_hop": -10.5,
+    "rlm_10": -8.1,
+    "rlm_20": -8.1,
+    "rlm_5": -7.0,
+    "single_pass": -20.9,
+    "verified_pass": -15.1
+   },
+   "spearman_rank_A_B": 1.0,
+   "winner_A": "rlm_10",
+   "winner_B": "rlm_10"
+  },
+  "old judge to devstral, exp04, verified_pass minus rlm_10, at 3": {
+   "A": {
+    "multi_hop": 76.7,
+    "rlm_10": 91.9,
+    "rlm_20": 86.0,
+    "rlm_5": 88.4,
+    "single_pass": 80.2,
+    "verified_pass": 67.4
+   },
+   "B": {
+    "multi_hop": 66.3,
+    "rlm_10": 88.4,
+    "rlm_20": 79.1,
+    "rlm_5": 83.7,
+    "single_pass": 76.7,
+    "verified_pass": 57.0
+   },
+   "abs_mean_shift": 6.6,
+   "contrast": "verified_pass minus rlm_10",
+   "contrast_A": [
+    -24.42,
+    -36.05,
+    -12.79
+   ],
+   "contrast_B": [
+    -31.4,
+    -43.02,
+    -18.6
+   ],
+   "contrast_change_B_minus_A": [
+    -6.98,
+    -16.28,
+    2.33
+   ],
+   "n_q": 86,
+   "name": "old judge to devstral, exp04, verified_pass minus rlm_10, at 3",
+   "rank_A": {
+    "multi_hop": 5.0,
+    "rlm_10": 1.0,
+    "rlm_20": 3.0,
+    "rlm_5": 2.0,
+    "single_pass": 4.0,
+    "verified_pass": 6.0
+   },
+   "rank_B": {
+    "multi_hop": 5.0,
+    "rlm_10": 1.0,
+    "rlm_20": 3.0,
+    "rlm_5": 2.0,
+    "single_pass": 4.0,
+    "verified_pass": 6.0
+   },
+   "rank_moves_sum": 0.0,
+   "shift_per_strategy": {
+    "multi_hop": -10.5,
+    "rlm_10": -3.5,
+    "rlm_20": -7.0,
+    "rlm_5": -4.7,
+    "single_pass": -3.5,
+    "verified_pass": -10.5
+   },
+   "spearman_rank_A_B": 1.0,
+   "winner_A": "rlm_10",
+   "winner_B": "rlm_10"
+  },
+  "old judge to devstral, exp04, verified_pass minus rlm_10, at 4": {
+   "A": {
+    "multi_hop": 58.1,
+    "rlm_10": 79.1,
+    "rlm_20": 74.4,
+    "rlm_5": 75.6,
+    "single_pass": 54.7,
+    "verified_pass": 40.7
+   },
+   "B": {
+    "multi_hop": 47.7,
+    "rlm_10": 67.4,
+    "rlm_20": 65.1,
+    "rlm_5": 64.0,
+    "single_pass": 33.7,
+    "verified_pass": 25.6
+   },
+   "abs_mean_shift": 13.2,
+   "contrast": "verified_pass minus rlm_10",
+   "contrast_A": [
+    -38.37,
+    -48.84,
+    -26.74
+   ],
+   "contrast_B": [
+    -41.86,
+    -53.49,
+    -29.07
+   ],
+   "contrast_change_B_minus_A": [
+    -3.49,
+    -16.28,
+    9.3
+   ],
+   "n_q": 86,
+   "name": "old judge to devstral, exp04, verified_pass minus rlm_10, at 4",
+   "rank_A": {
+    "multi_hop": 4.0,
+    "rlm_10": 1.0,
+    "rlm_20": 3.0,
+    "rlm_5": 2.0,
+    "single_pass": 5.0,
+    "verified_pass": 6.0
+   },
+   "rank_B": {
+    "multi_hop": 4.0,
+    "rlm_10": 1.0,
+    "rlm_20": 2.0,
+    "rlm_5": 3.0,
+    "single_pass": 5.0,
+    "verified_pass": 6.0
+   },
+   "rank_moves_sum": 2.0,
+   "shift_per_strategy": {
+    "multi_hop": -10.5,
+    "rlm_10": -11.6,
+    "rlm_20": -9.3,
+    "rlm_5": -11.6,
+    "single_pass": -20.9,
+    "verified_pass": -15.1
+   },
+   "spearman_rank_A_B": 0.943,
+   "winner_A": "rlm_10",
+   "winner_B": "rlm_10"
+  },
+  "old_judge_common_questions": 86,
+  "pass mark 4 to 3, all 86": {
+   "A": {
+    "multi_hop": 79.5,
+    "rlm_10": 74.8,
+    "rlm_20": 71.3,
+    "rlm_5": 71.7,
+    "single_pass": 83.3,
+    "verified_pass": 82.9
+   },
+   "B": {
+    "multi_hop": 95.0,
+    "rlm_10": 92.2,
+    "rlm_20": 93.8,
+    "rlm_5": 93.4,
+    "single_pass": 93.4,
+    "verified_pass": 93.0
+   },
+   "abs_mean_shift": 16.2,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -8.53,
+    -17.83,
+    0.78
+   ],
+   "contrast_B": [
+    -1.16,
+    -7.75,
+    5.81
+   ],
+   "contrast_change_B_minus_A": [
+    7.36,
+    -0.0,
+    14.73
+   ],
+   "n_q": 86,
+   "name": "pass mark 4 to 3, all 86",
+   "noise": {
+    "per_draw": {
+     "1": -7.0,
+     "2": -10.5,
+     "3": -8.1
+    },
+    "range": 3.5
+   },
+   "rank_A": {
+    "multi_hop": 3.0,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 1.0,
+    "verified_pass": 2.0
+   },
+   "rank_B": {
+    "multi_hop": 1.0,
+    "rlm_10": 6.0,
+    "rlm_20": 2.0,
+    "rlm_5": 3.5,
+    "single_pass": 3.5,
+    "verified_pass": 5.0
+   },
+   "rank_moves_sum": 15.0,
+   "shift_per_strategy": {
+    "multi_hop": 15.5,
+    "rlm_10": 17.4,
+    "rlm_20": 22.5,
+    "rlm_5": 21.7,
+    "single_pass": 10.1,
+    "verified_pass": 10.1
+   },
+   "spearman_rank_A_B": -0.203,
+   "winner_A": "single_pass",
+   "winner_B": "multi_hop"
+  },
+  "pass mark 4 to 3, many-paper 26": {
+   "A": {
+    "multi_hop": 38.5,
+    "rlm_10": 84.6,
+    "rlm_20": 78.2,
+    "rlm_5": 78.2,
+    "single_pass": 51.3,
+    "verified_pass": 52.6
+   },
+   "B": {
+    "multi_hop": 84.6,
+    "rlm_10": 98.7,
+    "rlm_20": 98.7,
+    "rlm_5": 96.2,
+    "single_pass": 78.2,
+    "verified_pass": 78.2
+   },
+   "abs_mean_shift": 25.2,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    33.33,
+    16.67,
+    50.0
+   ],
+   "contrast_B": [
+    20.51,
+    5.13,
+    37.18
+   ],
+   "contrast_change_B_minus_A": [
+    -12.82,
+    -28.21,
+    2.56
+   ],
+   "n_q": 26,
+   "name": "pass mark 4 to 3, many-paper 26",
+   "rank_A": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 2.5,
+    "rlm_5": 2.5,
+    "single_pass": 5.0,
+    "verified_pass": 4.0
+   },
+   "rank_B": {
+    "multi_hop": 4.0,
+    "rlm_10": 1.5,
+    "rlm_20": 1.5,
+    "rlm_5": 3.0,
+    "single_pass": 5.5,
+    "verified_pass": 5.5
+   },
+   "rank_moves_sum": 6.0,
+   "shift_per_strategy": {
+    "multi_hop": 46.2,
+    "rlm_10": 14.1,
+    "rlm_20": 20.5,
+    "rlm_5": 17.9,
+    "single_pass": 26.9,
+    "verified_pass": 25.6
+   },
+   "spearman_rank_A_B": 0.761,
+   "winner_A": "rlm_10",
+   "winner_B": "rlm_10"
+  },
+  "pass mark 4 to 3, one-paper 60": {
+   "A": {
+    "multi_hop": 97.2,
+    "rlm_10": 70.6,
+    "rlm_20": 68.3,
+    "rlm_5": 68.9,
+    "single_pass": 97.2,
+    "verified_pass": 96.1
+   },
+   "B": {
+    "multi_hop": 99.4,
+    "rlm_10": 89.4,
+    "rlm_20": 91.7,
+    "rlm_5": 92.2,
+    "single_pass": 100.0,
+    "verified_pass": 99.4
+   },
+   "abs_mean_shift": 12.3,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -26.67,
+    -34.44,
+    -19.44
+   ],
+   "contrast_B": [
+    -10.56,
+    -16.11,
+    -5.56
+   ],
+   "contrast_change_B_minus_A": [
+    16.11,
+    8.89,
+    23.33
+   ],
+   "n_q": 60,
+   "name": "pass mark 4 to 3, one-paper 60",
+   "rank_A": {
+    "multi_hop": 1.5,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 1.5,
+    "verified_pass": 3.0
+   },
+   "rank_B": {
+    "multi_hop": 3.0,
+    "rlm_10": 6.0,
+    "rlm_20": 5.0,
+    "rlm_5": 4.0,
+    "single_pass": 1.0,
+    "verified_pass": 2.0
+   },
+   "rank_moves_sum": 7.0,
+   "shift_per_strategy": {
+    "multi_hop": 2.2,
+    "rlm_10": 18.9,
+    "rlm_20": 23.3,
+    "rlm_5": 23.3,
+    "single_pass": 2.8,
+    "verified_pass": 3.3
+   },
+   "spearman_rank_A_B": 0.725,
+   "winner_A": "single_pass",
+   "winner_B": "single_pass"
+  },
+  "pass mark 4 to 5, all 86": {
+   "A": {
+    "multi_hop": 79.5,
+    "rlm_10": 74.8,
+    "rlm_20": 71.3,
+    "rlm_5": 71.7,
+    "single_pass": 83.3,
+    "verified_pass": 82.9
+   },
+   "B": {
+    "multi_hop": 41.9,
+    "rlm_10": 27.5,
+    "rlm_20": 24.0,
+    "rlm_5": 26.7,
+    "single_pass": 53.5,
+    "verified_pass": 56.6
+   },
+   "abs_mean_shift": 38.9,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -8.53,
+    -17.83,
+    0.78
+   ],
+   "contrast_B": [
+    -25.97,
+    -35.27,
+    -16.67
+   ],
+   "contrast_change_B_minus_A": [
+    -17.44,
+    -26.74,
+    -8.14
+   ],
+   "n_q": 86,
+   "name": "pass mark 4 to 5, all 86",
+   "rank_A": {
+    "multi_hop": 3.0,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 1.0,
+    "verified_pass": 2.0
+   },
+   "rank_B": {
+    "multi_hop": 3.0,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_moves_sum": 2.0,
+   "shift_per_strategy": {
+    "multi_hop": -37.6,
+    "rlm_10": -47.3,
+    "rlm_20": -47.3,
+    "rlm_5": -45.0,
+    "single_pass": -29.8,
+    "verified_pass": -26.4
+   },
+   "spearman_rank_A_B": 0.943,
+   "winner_A": "single_pass",
+   "winner_B": "verified_pass"
+  },
+  "pass_table_at_3": {
+   "multi_hop": 95.0,
+   "rlm_10": 92.2,
+   "rlm_20": 93.8,
+   "rlm_5": 93.4,
+   "single_pass": 93.4,
+   "verified_pass": 93.0
+  },
+  "pass_table_at_4": {
+   "multi_hop": 79.5,
+   "rlm_10": 74.8,
+   "rlm_20": 71.3,
+   "rlm_5": 71.7,
+   "single_pass": 83.3,
+   "verified_pass": 82.9
+  },
+  "per_draw_rlm10_minus_sp_citation_quality_a": {
+   "1": -5.6,
+   "2": -4.2,
+   "3": -1.9
+  },
+  "per_draw_rlm10_minus_sp_citation_quality_b": {
+   "1": -19.0,
+   "2": -17.6,
+   "3": -19.5
+  },
+  "per_draw_rlm10_minus_sp_completeness_a": {
+   "1": 0.5,
+   "2": -1.9,
+   "3": -2.3
+  },
+  "per_draw_rlm10_minus_sp_completeness_b": {
+   "1": -8.3,
+   "2": -8.5,
+   "3": -10.6
+  },
+  "per_draw_rlm10_minus_sp_correctness_a": {
+   "1": -7.3,
+   "2": -9.3,
+   "3": -7.9
+  },
+  "per_draw_rlm10_minus_sp_correctness_b": {
+   "1": -10.2,
+   "2": -11.3,
+   "3": -12.5
+  },
+  "per_draw_rlm10_minus_sp_faithfulness_a": {
+   "1": -12.2,
+   "2": -12.1,
+   "3": -10.0
+  },
+  "per_draw_rlm10_minus_sp_faithfulness_b": {
+   "1": -13.3,
+   "2": -14.1,
+   "3": -16.7
+  },
+  "plateau_G5_d1_minus_G6_caps10to50_d181": {
+   "G5": 73.2,
+   "G6": 65.2,
+   "diff": [
+    8.03,
+    3.03,
+    12.77
+   ],
+   "many": [
+    11.36,
+    3.36,
+    19.18
+   ],
+   "one": [
+    6.59,
+    0.62,
+    12.33
+   ]
+  },
+  "rank_noise": {
+   "concept_d181": [
+    0.943,
+    0.943,
+    0.886
+   ],
+   "judge_3": [
+    0.539,
+    -0.612,
+    0.0
+   ],
+   "judge_4": [
+    0.971,
+    0.851,
+    0.725
+   ],
+   "mc_key_precision": [
+    0.943,
+    1.0,
+    0.943
+   ],
+   "spread_judge3": 2.713178294573652,
+   "spread_judge4": 12.015503875969017,
+   "top2_gap_judge4": 0.38759689922480334,
+   "winner_by_draw_concept": {
+    "1": "rlm_10",
+    "2": "rlm_10",
+    "3": "rlm_20"
+   },
+   "winner_by_draw_judge4": {
+    "1": "single_pass",
+    "2": "verified_pass",
+    "3": "single_pass"
+   }
+  },
+  "rlm_G1_vs_G6_cap10_d181": {
+   "G1_draws": [
+    75.3,
+    76.8,
+    76.5
+   ],
+   "G1_mentori_3d": 76.2,
+   "G1_minus_G6": [
+    10.9,
+    4.78,
+    16.73
+   ],
+   "G1_minus_SP": [
+    6.85,
+    0.9,
+    12.57
+   ],
+   "G6_draws": [
+    65.4,
+    66.1,
+    64.4
+   ],
+   "G6_minus_SP": [
+    -4.06,
+    -8.22,
+    0.04
+   ],
+   "G6_package_3d": 65.3,
+   "SP": 69.3,
+   "gap_by_draw": [
+    9.9,
+    10.8,
+    12.1
+   ],
+   "interaction": [
+    10.9,
+    4.78,
+    16.73
+   ],
+   "many_paper": {
+    "G1": 67.5,
+    "G1_minus_G6": [
+     17.64,
+     10.34,
+     24.81
+    ],
+    "G6": 49.8,
+    "G6_minus_SP": [
+     1.28,
+     -5.43,
+     8.12
+    ],
+    "SP": 48.5
+   },
+   "one_paper": {
+    "G1": 80.0,
+    "G1_minus_G6": [
+     7.99,
+     0.01,
+     15.73
+    ],
+    "G6": 72.0,
+    "G6_minus_SP": [
+     -6.37,
+     -11.25,
+     -1.3
+    ],
+    "SP": 78.4
+   },
+   "same_software_G1_d1_minus_G5_d1": [
+    5.27,
+    -0.73,
+    11.42
+   ]
+  },
+  "rlm_G1_vs_G6_cap20_d181": {
+   "G1_draws": [
+    72.3,
+    75.9,
+    77.2
+   ],
+   "G1_mentori_3d": 75.1,
+   "G1_minus_G6": [
+    10.28,
+    5.21,
+    15.24
+   ],
+   "G1_minus_SP": [
+    5.78,
+    0.86,
+    10.6
+   ],
+   "G6_draws": [
+    64.4,
+    63.4,
+    66.8
+   ],
+   "G6_minus_SP": [
+    -4.49,
+    -8.7,
+    -0.3
+   ],
+   "G6_package_3d": 64.8,
+   "SP": 69.3,
+   "gap_by_draw": [
+    7.9,
+    12.5,
+    10.5
+   ],
+   "interaction": [
+    10.28,
+    5.21,
+    15.24
+   ],
+   "many_paper": {
+    "G1": 65.0,
+    "G1_minus_G6": [
+     13.59,
+     5.31,
+     22.06
+    ],
+    "G6": 51.4,
+    "G6_minus_SP": [
+     2.83,
+     -4.96,
+     10.49
+    ],
+    "SP": 48.5
+   },
+   "one_paper": {
+    "G1": 79.5,
+    "G1_minus_G6": [
+     8.85,
+     2.67,
+     15.25
+    ],
+    "G6": 70.7,
+    "G6_minus_SP": [
+     -7.67,
+     -12.51,
+     -2.71
+    ],
+    "SP": 78.4
+   },
+   "same_software_G1_d1_minus_G5_d1": [
+    0.33,
+    -5.37,
+    5.95
+   ]
+  },
+  "rlm_G1_vs_G6_cap5_d181": {
+   "G1_draws": [
+    71.5,
+    74.3,
+    76.2
+   ],
+   "G1_mentori_3d": 74.0,
+   "G1_minus_G6": [
+    11.84,
+    6.8,
+    16.93
+   ],
+   "G1_minus_SP": [
+    4.65,
+    -0.86,
+    9.96
+   ],
+   "G6_draws": [
+    67.1,
+    61.9,
+    57.5
+   ],
+   "G6_minus_SP": [
+    -7.19,
+    -12.02,
+    -2.44
+   ],
+   "G6_package_3d": 62.2,
+   "SP": 69.3,
+   "gap_by_draw": [
+    4.4,
+    12.4,
+    18.7
+   ],
+   "interaction": [
+    11.84,
+    6.8,
+    16.93
+   ],
+   "many_paper": {
+    "G1": 65.5,
+    "G1_minus_G6": [
+     14.64,
+     8.53,
+     20.79
+    ],
+    "G6": 50.9,
+    "G6_minus_SP": [
+     2.32,
+     -4.45,
+     9.16
+    ],
+    "SP": 48.5
+   },
+   "one_paper": {
+    "G1": 77.7,
+    "G1_minus_G6": [
+     10.62,
+     3.84,
+     17.57
+    ],
+    "G6": 67.0,
+    "G6_minus_SP": [
+     -11.31,
+     -17.18,
+     -5.47
+    ],
+    "SP": 78.4
+   },
+   "same_software_G1_d1_minus_G5_d1": [
+    -0.56,
+    -7.06,
+    5.97
+   ]
+  },
+  "rlm_by_cap_d181": {
+   "1": {
+    "G5_d1": 42.6,
+    "G5_d1_minus_G6_d1": 27.2,
+    "G5_minus_G6": [
+     32.77,
+     24.88,
+     40.58
+    ],
+    "G5_minus_G6_many": [
+     32.01,
+     19.79,
+     43.92
+    ],
+    "G5_minus_G6_one": [
+     33.1,
+     22.9,
+     43.04
+    ],
+    "G6_3d": 9.9,
+    "G6_by_draw": [
+     15.4,
+     9.7,
+     4.5
+    ]
+   },
+   "10": {
+    "G5_d1": 70.0,
+    "G5_d1_minus_G6_d1": 4.6,
+    "G5_minus_G6": [
+     4.72,
+     -2.07,
+     11.09
+    ],
+    "G5_minus_G6_many": [
+     13.2,
+     3.86,
+     21.95
+    ],
+    "G5_minus_G6_one": [
+     1.04,
+     -7.55,
+     9.07
+    ],
+    "G6_3d": 65.3,
+    "G6_by_draw": [
+     65.4,
+     66.1,
+     64.4
+    ]
+   },
+   "15": {
+    "G5_d1": 75.8,
+    "G5_d1_minus_G6_d1": 7.5,
+    "G5_minus_G6": [
+     11.27,
+     5.14,
+     17.25
+    ],
+    "G5_minus_G6_many": [
+     15.16,
+     4.13,
+     25.87
+    ],
+    "G5_minus_G6_one": [
+     9.59,
+     2.51,
+     16.33
+    ],
+    "G6_3d": 64.5,
+    "G6_by_draw": [
+     68.3,
+     62.1,
+     63.1
+    ]
+   },
+   "2": {
+    "G5_d1": 69.9,
+    "G5_d1_minus_G6_d1": 21.6,
+    "G5_minus_G6": [
+     17.01,
+     9.3,
+     24.81
+    ],
+    "G5_minus_G6_many": [
+     5.56,
+     -5.88,
+     16.66
+    ],
+    "G5_minus_G6_one": [
+     21.97,
+     12.0,
+     32.14
+    ],
+    "G6_3d": 52.9,
+    "G6_by_draw": [
+     48.3,
+     54.8,
+     55.7
+    ]
+   },
+   "20": {
+    "G5_d1": 71.9,
+    "G5_d1_minus_G6_d1": 7.6,
+    "G5_minus_G6": [
+     7.1,
+     1.15,
+     12.6
+    ],
+    "G5_minus_G6_many": [
+     3.49,
+     -6.03,
+     12.43
+    ],
+    "G5_minus_G6_one": [
+     8.66,
+     1.35,
+     15.52
+    ],
+    "G6_3d": 64.8,
+    "G6_by_draw": [
+     64.4,
+     63.4,
+     66.8
+    ]
+   },
+   "3": {
+    "G5_d1": 73.0,
+    "G5_d1_minus_G6_d1": 15.2,
+    "G5_minus_G6": [
+     13.43,
+     7.35,
+     19.2
+    ],
+    "G5_minus_G6_many": [
+     9.92,
+     1.84,
+     18.17
+    ],
+    "G5_minus_G6_one": [
+     14.95,
+     7.07,
+     22.44
+    ],
+    "G6_3d": 59.6,
+    "G6_by_draw": [
+     57.8,
+     59.5,
+     61.5
+    ]
+   },
+   "30": {
+    "G5_d1": 70.7,
+    "G5_d1_minus_G6_d1": 5.7,
+    "G5_minus_G6": [
+     3.95,
+     -2.89,
+     10.26
+    ],
+    "G5_minus_G6_many": [
+     12.27,
+     0.71,
+     22.7
+    ],
+    "G5_minus_G6_one": [
+     0.35,
+     -7.68,
+     8.1
+    ],
+    "G6_3d": 66.8,
+    "G6_by_draw": [
+     65.0,
+     66.5,
+     68.8
+    ]
+   },
+   "5": {
+    "G5_d1": 72.1,
+    "G5_d1_minus_G6_d1": 5.0,
+    "G5_minus_G6": [
+     9.91,
+     2.78,
+     16.7
+    ],
+    "G5_minus_G6_many": [
+     9.3,
+     0.06,
+     17.98
+    ],
+    "G5_minus_G6_one": [
+     10.17,
+     1.04,
+     19.04
+    ],
+    "G6_3d": 62.2,
+    "G6_by_draw": [
+     67.1,
+     61.9,
+     57.5
+    ]
+   },
+   "50": {
+    "G5_d1": 77.7,
+    "G5_d1_minus_G6_d1": 14.3,
+    "G5_minus_G6": [
+     13.12,
+     7.26,
+     19.03
+    ],
+    "G5_minus_G6_many": [
+     12.67,
+     0.6,
+     24.18
+    ],
+    "G5_minus_G6_one": [
+     13.32,
+     6.85,
+     20.04
+    ],
+    "G6_3d": 64.6,
+    "G6_by_draw": [
+     63.4,
+     65.8,
+     64.6
+    ]
+   },
+   "7": {
+    "G5_d1": 73.6,
+    "G5_d1_minus_G6_d1": 10.5,
+    "G5_minus_G6": [
+     11.24,
+     3.94,
+     17.91
+    ],
+    "G5_minus_G6_many": [
+     16.32,
+     7.35,
+     24.38
+    ],
+    "G5_minus_G6_one": [
+     9.03,
+     -0.47,
+     18.02
+    ],
+    "G6_3d": 62.4,
+    "G6_by_draw": [
+     63.1,
+     62.7,
+     61.3
+    ]
+   }
+  },
+  "s406_answerable": 516,
+  "s6_a_status": {
+   "ok": 1080
+  },
+  "s6_answer_key_mismatch": 0,
+  "s6_changed_all_questions": 60,
+  "s6_changed_answerable_complete": 54,
+  "s6_latest_at": "2026-11-01T20:15:56",
+  "s6_rows_answers": 1080,
+  "s6_unchanged_answerable": 32,
+  "signal swap: judge pass at 4 to MiniCheck papers source dropped, draw 1": {
+   "A": {
+    "multi_hop": 80.2,
+    "rlm_10": 77.8,
+    "rlm_20": 69.1,
+    "rlm_5": 70.4,
+    "single_pass": 84.0,
+    "verified_pass": 86.4
+   },
+   "B": {
+    "multi_hop": 58.4,
+    "rlm_10": 73.0,
+    "rlm_20": 70.3,
+    "rlm_5": 70.6,
+    "single_pass": 80.9,
+    "verified_pass": 83.7
+   },
+   "abs_mean_shift": 5.6,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -6.17,
+    -18.52,
+    4.94
+   ],
+   "contrast_B": [
+    -7.89,
+    -12.28,
+    -3.3
+   ],
+   "contrast_change_B_minus_A": [
+    -1.72,
+    -13.13,
+    10.28
+   ],
+   "n_q": 81,
+   "name": "signal swap: judge pass at 4 to MiniCheck papers source dropped, draw 1",
+   "rank_A": {
+    "multi_hop": 3.0,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_B": {
+    "multi_hop": 6.0,
+    "rlm_10": 3.0,
+    "rlm_20": 5.0,
+    "rlm_5": 4.0,
+    "single_pass": 2.0,
+    "verified_pass": 1.0
+   },
+   "rank_moves_sum": 6.0,
+   "shift_per_strategy": {
+    "multi_hop": -21.8,
+    "rlm_10": -4.8,
+    "rlm_20": 1.2,
+    "rlm_5": 0.2,
+    "single_pass": -3.1,
+    "verified_pass": -2.7
+   },
+   "spearman_rank_A_B": 0.657,
+   "winner_A": "verified_pass",
+   "winner_B": "verified_pass"
+  },
+  "signal swap: judge pass at 4 to concept recall D181, all 86": {
+   "A": {
+    "multi_hop": 79.5,
+    "rlm_10": 74.8,
+    "rlm_20": 71.3,
+    "rlm_5": 71.7,
+    "single_pass": 83.3,
+    "verified_pass": 82.9
+   },
+   "B": {
+    "multi_hop": 54.0,
+    "rlm_10": 76.2,
+    "rlm_20": 75.1,
+    "rlm_5": 74.0,
+    "single_pass": 69.3,
+    "verified_pass": 69.7
+   },
+   "abs_mean_shift": 10.0,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -8.53,
+    -17.83,
+    0.78
+   ],
+   "contrast_B": [
+    6.85,
+    0.9,
+    12.57
+   ],
+   "contrast_change_B_minus_A": [
+    15.37,
+    6.76,
+    24.32
+   ],
+   "n_q": 86,
+   "name": "signal swap: judge pass at 4 to concept recall D181, all 86",
+   "noise": {
+    "per_draw": {
+     "1": -7.0,
+     "2": -10.5,
+     "3": -8.1
+    },
+    "range": 3.5
+   },
+   "rank_A": {
+    "multi_hop": 3.0,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 1.0,
+    "verified_pass": 2.0
+   },
+   "rank_B": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 2.0,
+    "rlm_5": 3.0,
+    "single_pass": 5.0,
+    "verified_pass": 4.0
+   },
+   "rank_moves_sum": 18.0,
+   "shift_per_strategy": {
+    "multi_hop": -25.4,
+    "rlm_10": 1.4,
+    "rlm_20": 3.8,
+    "rlm_5": 2.3,
+    "single_pass": -14.0,
+    "verified_pass": -13.2
+   },
+   "spearman_rank_A_B": -0.657,
+   "winner_A": "single_pass",
+   "winner_B": "rlm_10"
+  },
+  "signal swap: judge pass at 4 to concept recall D181, many-paper": {
+   "A": {
+    "multi_hop": 38.5,
+    "rlm_10": 84.6,
+    "rlm_20": 78.2,
+    "rlm_5": 78.2,
+    "single_pass": 51.3,
+    "verified_pass": 52.6
+   },
+   "B": {
+    "multi_hop": 30.9,
+    "rlm_10": 67.5,
+    "rlm_20": 65.0,
+    "rlm_5": 65.5,
+    "single_pass": 48.5,
+    "verified_pass": 48.0
+   },
+   "abs_mean_shift": 9.7,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    33.33,
+    16.67,
+    50.0
+   ],
+   "contrast_B": [
+    18.92,
+    11.81,
+    26.16
+   ],
+   "contrast_change_B_minus_A": [
+    -14.42,
+    -26.83,
+    -1.72
+   ],
+   "n_q": 26,
+   "name": "signal swap: judge pass at 4 to concept recall D181, many-paper",
+   "rank_A": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 2.5,
+    "rlm_5": 2.5,
+    "single_pass": 5.0,
+    "verified_pass": 4.0
+   },
+   "rank_B": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 3.0,
+    "rlm_5": 2.0,
+    "single_pass": 4.0,
+    "verified_pass": 5.0
+   },
+   "rank_moves_sum": 3.0,
+   "shift_per_strategy": {
+    "multi_hop": -7.5,
+    "rlm_10": -17.2,
+    "rlm_20": -13.3,
+    "rlm_5": -12.7,
+    "single_pass": -2.7,
+    "verified_pass": -4.6
+   },
+   "spearman_rank_A_B": 0.928,
+   "winner_A": "rlm_10",
+   "winner_B": "rlm_10"
+  },
+  "signal swap: judge pass at 4 to concept recall D181, one-paper": {
+   "A": {
+    "multi_hop": 97.2,
+    "rlm_10": 70.6,
+    "rlm_20": 68.3,
+    "rlm_5": 68.9,
+    "single_pass": 97.2,
+    "verified_pass": 96.1
+   },
+   "B": {
+    "multi_hop": 64.0,
+    "rlm_10": 80.0,
+    "rlm_20": 79.5,
+    "rlm_5": 77.7,
+    "single_pass": 78.4,
+    "verified_pass": 79.1
+   },
+   "abs_mean_shift": 16.4,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    -26.67,
+    -34.44,
+    -19.44
+   ],
+   "contrast_B": [
+    1.62,
+    -5.72,
+    8.92
+   ],
+   "contrast_change_B_minus_A": [
+    28.28,
+    18.66,
+    38.02
+   ],
+   "n_q": 60,
+   "name": "signal swap: judge pass at 4 to concept recall D181, one-paper",
+   "rank_A": {
+    "multi_hop": 1.5,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 1.5,
+    "verified_pass": 3.0
+   },
+   "rank_B": {
+    "multi_hop": 6.0,
+    "rlm_10": 1.0,
+    "rlm_20": 2.0,
+    "rlm_5": 5.0,
+    "single_pass": 4.0,
+    "verified_pass": 3.0
+   },
+   "rank_moves_sum": 14.0,
+   "shift_per_strategy": {
+    "multi_hop": -33.2,
+    "rlm_10": 9.4,
+    "rlm_20": 11.2,
+    "rlm_5": 8.8,
+    "single_pass": -18.9,
+    "verified_pass": -17.0
+   },
+   "spearman_rank_A_B": -0.493,
+   "winner_A": "single_pass",
+   "winner_B": "rlm_10"
+  },
+  "submitted answers (exp04) to re-run (G1 3 draws), devstral v2.4, pass at 3": {
+   "A": {
+    "multi_hop": 66.3,
+    "rlm_10": 88.4,
+    "rlm_20": 79.1,
+    "rlm_5": 83.7,
+    "single_pass": 76.7,
+    "verified_pass": 57.0
+   },
+   "B": {
+    "multi_hop": 95.0,
+    "rlm_10": 92.2,
+    "rlm_20": 93.8,
+    "rlm_5": 93.4,
+    "single_pass": 93.4,
+    "verified_pass": 93.0
+   },
+   "abs_mean_shift": 18.3,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    11.63,
+    1.16,
+    22.09
+   ],
+   "contrast_B": [
+    -1.16,
+    -7.75,
+    5.81
+   ],
+   "contrast_change_B_minus_A": [
+    -12.79,
+    -24.42,
+    -1.16
+   ],
+   "n_q": 86,
+   "name": "submitted answers (exp04) to re-run (G1 3 draws), devstral v2.4, pass at 3",
+   "noise": {
+    "per_draw": {
+     "1": 0.0,
+     "2": -2.3,
+     "3": -1.2
+    },
+    "range": 2.3
+   },
+   "rank_A": {
+    "multi_hop": 5.0,
+    "rlm_10": 1.0,
+    "rlm_20": 3.0,
+    "rlm_5": 2.0,
+    "single_pass": 4.0,
+    "verified_pass": 6.0
+   },
+   "rank_B": {
+    "multi_hop": 1.0,
+    "rlm_10": 6.0,
+    "rlm_20": 2.0,
+    "rlm_5": 3.5,
+    "single_pass": 3.5,
+    "verified_pass": 5.0
+   },
+   "rank_moves_sum": 13.0,
+   "shift_per_strategy": {
+    "multi_hop": 28.7,
+    "rlm_10": 3.9,
+    "rlm_20": 14.7,
+    "rlm_5": 9.7,
+    "single_pass": 16.7,
+    "verified_pass": 36.0
+   },
+   "spearman_rank_A_B": -0.319,
+   "winner_A": "rlm_10",
+   "winner_B": "multi_hop"
+  },
+  "submitted answers (exp04) to re-run (G1 3 draws), devstral v2.4, pass at 4": {
+   "A": {
+    "multi_hop": 47.7,
+    "rlm_10": 67.4,
+    "rlm_20": 65.1,
+    "rlm_5": 64.0,
+    "single_pass": 33.7,
+    "verified_pass": 25.6
+   },
+   "B": {
+    "multi_hop": 79.5,
+    "rlm_10": 74.8,
+    "rlm_20": 71.3,
+    "rlm_5": 71.7,
+    "single_pass": 83.3,
+    "verified_pass": 82.9
+   },
+   "abs_mean_shift": 26.7,
+   "contrast": "rlm_10 minus single_pass",
+   "contrast_A": [
+    33.72,
+    19.77,
+    47.67
+   ],
+   "contrast_B": [
+    -8.53,
+    -17.83,
+    0.78
+   ],
+   "contrast_change_B_minus_A": [
+    -42.25,
+    -60.85,
+    -24.02
+   ],
+   "n_q": 86,
+   "name": "submitted answers (exp04) to re-run (G1 3 draws), devstral v2.4, pass at 4",
+   "noise": {
+    "per_draw": {
+     "1": -7.0,
+     "2": -10.5,
+     "3": -8.1
+    },
+    "range": 3.5
+   },
+   "rank_A": {
+    "multi_hop": 4.0,
+    "rlm_10": 1.0,
+    "rlm_20": 2.0,
+    "rlm_5": 3.0,
+    "single_pass": 5.0,
+    "verified_pass": 6.0
+   },
+   "rank_B": {
+    "multi_hop": 3.0,
+    "rlm_10": 4.0,
+    "rlm_20": 6.0,
+    "rlm_5": 5.0,
+    "single_pass": 1.0,
+    "verified_pass": 2.0
+   },
+   "rank_moves_sum": 18.0,
+   "shift_per_strategy": {
+    "multi_hop": 31.8,
+    "rlm_10": 7.4,
+    "rlm_20": 6.2,
+    "rlm_5": 7.8,
+    "single_pass": 49.6,
+    "verified_pass": 57.4
+   },
+   "spearman_rank_A_B": -0.771,
+   "winner_A": "rlm_10",
+   "winner_B": "single_pass"
+  },
+  "v25_pass_table_at_3": {
+   "multi_hop": 95.7,
+   "rlm_10": 92.2,
+   "rlm_20": 93.8,
+   "rlm_5": 93.4,
+   "single_pass": 93.4,
+   "verified_pass": 93.0
+  },
+  "v25_pass_table_at_4": {
+   "multi_hop": 78.7,
+   "rlm_10": 74.0,
+   "rlm_20": 70.5,
+   "rlm_5": 73.3,
+   "single_pass": 82.9,
+   "verified_pass": 83.3
+  },
+  "winner_gap concept d181": {
+   "gap": [
+    1.06,
+    -2.41,
+    4.54
+   ],
+   "n": 86,
+   "runner_up": "rlm_20",
+   "winner": "rlm_10"
+  },
+  "winner_gap judge 3": {
+   "gap": [
+    1.16,
+    -3.49,
+    5.81
+   ],
+   "n": 86,
+   "runner_up": "rlm_20",
+   "winner": "multi_hop"
+  },
+  "winner_gap judge 4": {
+   "gap": [
+    0.39,
+    -5.43,
+    6.2
+   ],
+   "n": 86,
+   "runner_up": "verified_pass",
+   "winner": "single_pass"
+  },
+  "winner_gap judge 5": {
+   "gap": [
+    3.1,
+    -1.94,
+    8.14
+   ],
+   "n": 86,
+   "runner_up": "single_pass",
+   "winner": "verified_pass"
+  },
+  "winner_gap judge passages 4": {
+   "gap": [
+    1.55,
+    -3.88,
+    6.59
+   ],
+   "n": 86,
+   "runner_up": "verified_pass",
+   "winner": "single_pass"
+  },
+  "winner_gap mc key f1": {
+   "gap": [
+    1.39,
+    -2.89,
+    6.0
+   ],
+   "n": 80,
+   "runner_up": "verified_pass",
+   "winner": "single_pass"
+  },
+  "winner_gap mc key prec": {
+   "gap": [
+    4.24,
+    -0.1,
+    8.71
+   ],
+   "n": 81,
+   "runner_up": "single_pass",
+   "winner": "verified_pass"
+  },
+  "winner_gap mc papers": {
+   "gap": [
+    2.84,
+    -0.51,
+    6.15
+   ],
+   "n": 81,
+   "runner_up": "single_pass",
+   "winner": "verified_pass"
+  },
+  "winner_gap mc papers nosrc": {
+   "gap": [
+    2.84,
+    -0.51,
+    6.15
+   ],
+   "n": 81,
+   "runner_up": "single_pass",
+   "winner": "verified_pass"
+  }
+ },
+ "thesis": {
+  "Mentori minus package, cap 10": {
+   "first_stated_at": "instruments.md:8",
+   "interval_95": [
+    4.78,
+    16.73
+   ],
+   "value": 10.9
+  },
+  "judge to concepts, change in the gap": {
+   "first_stated_at": "instruments.md:7",
+   "interval_95": [
+    6.76,
+    24.32
+   ],
+   "value": 15.37
+  },
+  "judge to concepts, noise": {
+   "first_stated_at": "instruments.md:7",
+   "interval_95": null,
+   "value": 3.5
+  },
+  "judge to concepts, one-paper": {
+   "first_stated_at": "instruments.md:7",
+   "interval_95": [
+    18.66,
+    38.02
+   ],
+   "value": 28.28
+  },
+  "single pass, April answers, devstral, at 4": {
+   "first_stated_at": "compare.md:29",
+   "interval_95": null,
+   "value": 33.7
+  },
+  "single pass, re-run, at 4": {
+   "first_stated_at": "compare.md:29",
+   "interval_95": null,
+   "value": 83.3
+  },
+  "source lists, change in the gap": {
+   "first_stated_at": "instruments.md:11",
+   "interval_95": [
+    15.0,
+    20.33
+   ],
+   "value": 17.6
+  }
+ }
+}

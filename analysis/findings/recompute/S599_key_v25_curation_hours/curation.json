@@ -1,0 +1,320 @@
+{
+ "provenance": {
+  "script": "scripts/S599_key_v25_curation_hours.py",
+  "script_sha256": "2f501a09bd8ea6cd6784d39fc125d2d8238b276d5fc8cd0b48da685aed3a85ae",
+  "command": "uv run --frozen python scripts/S599_key_v25_curation_hours.py",
+  "inputs_sha256": {
+   "data/ground_truth_v2/agent_review_r2_r3_workflow_result.json": "24f912e11f3407d76940453bd79f76e8611dc51c0c9572a5a5b531096fc5ec0b",
+   "data/ground_truth_v2/agent_review_workflow_result.json": "2ca82ded02689bfe2afb5bb705b8bb3eebe62125b615d6ac06d5784f0848ad1b",
+   "data/ground_truth_v2/all_v2_1_workflow_result.json": "4c3eeb138f9c8eca38fcef8f59cec9fa757878ff8711bca18f8f9f7e59672abe",
+   "data/ground_truth_v2/all_workflow_result.json": "0513b1f8a8634e30c216dc1da0910af260965af07608dc29d9f2e861616d9d86",
+   "data/ground_truth_v2/concepts_conceptual_workflow_result.json": "cdc2b116b280e688019fe56bf131ac01f8322ea3d1be9711dc1319a6b9970d76",
+   "data/ground_truth_v2/extractors_cde_workflow_result.json": "5055790f43962d02b87ce91eb59418dda57e99890475dca96861bd5d2589e1e4",
+   "data/ground_truth_v2/pilot_workflow_result.json": "7b32a6eb563ee86ab436d46ec921ce7803470e29cca2528b73f3202a2c7e7e8b",
+   "data/ground_truth_v2/replacements_workflow_result.json": "05ccc1c8918d728bab3da60f7895cde1154bfd9dd44a8a2dadd9b6535f1e48a1",
+   "data/ground_truth_v2/rest_workflow_result.json": "d8ec2846d1dacf8cb5ca1e6b4aa817a370eb0656b5e2293a6d057ba6169b81ae",
+   "data/ground_truth_v2/signoff_v2_2_workflow_result.json": "aec3f3b9bded225cfdc0834837dad6f526bcc910dcf652f67d5cf303c62ff281",
+   "data/ground_truth_v2/sy018_v2_2_workflow_result.json": "27334e7b3f9a4d0f2c665b22a7265c3925d9314c0dd81f10fe544dcfa3323cbd",
+   "response/ground_truth_v2/pilot_signoff.xlsx#docProps/core.xml": "205ab6ca55da1c5f6b400871232ad4d1b66db05a31810ecc1cf61a8a914f52f4",
+   "response/ground_truth_v2/all_signoff.xlsx#docProps/core.xml": "3696058b7c470691d522d0fb5405f39f50c6767272c01affa2b7ae2a6ab7828b",
+   "response/ground_truth_v2/replacements_signoff.xlsx#docProps/core.xml": "3159166aeca61f731c9d07108791703e8934d820082b55ec83385ac0deac8c5a",
+   "response/ground_truth_v2/v2_2_review.xlsx#docProps/core.xml": "f4c56cf291dc222fe8c2114ef6951ec7dcd537cef4f39492c4e9f217a534c746",
+   "response/ground_truth_v2/concept_premise_check_v1.xlsx#docProps/core.xml": "9416757f8d64f93784bef22c7512df4d76a1ab0409b820f1a21a2a61770c9e18",
+   "response/ground_truth_v2/concept_premise_check_v2.xlsx#docProps/core.xml": "7a1da33c95d1cbc0cd0b5128db11e021e6ee2fc620b3ae9433390ddce2d0af76",
+   "response/ground_truth_v2/concept_premise_check_v3.xlsx#docProps/core.xml": "1936b8522b9ba80337ff48e29c583f4249163fee4d2bc5d42591be41dac0113c",
+   "response/ground_truth_v2/key_v2_5_review.xlsx#docProps/core.xml": "f85da496eee9139d21827ecf4b10559de9f70a43d1fb259f1663b6fd0e63b080",
+   "data/ground_truth_v2/ground_truth_v2_5_as_v1.json": "a42161841980792f5da521819c97b16dc54999b45838b8eb87cd4315f798270a"
+  },
+  "model_calls": 0
+ },
+ "reproduced": [
+  "(1) key v2.5: sha256 a4216184, 244 questions, 1,157 expected concepts (commit c1c13184)",
+  "(2) rest workflow: '213 of 213 reconciled', 639 agents; pilot: '37 of 37 reconciled' (commit d4b8ec1d)"
+ ],
+ "workflows": [
+  {
+   "file": "data/ground_truth_v2/agent_review_r2_r3_workflow_result.json",
+   "agents": 500,
+   "timed": 500,
+   "states": [
+    "done"
+   ],
+   "agent_h": 2.3601047222222222,
+   "span_h": 0.170935,
+   "first_start_utc": "2026-10-08T17:00:10Z",
+   "last_end_utc": "2026-10-08T17:10:26Z",
+   "tokens": 21655580,
+   "log": "500 of 500 reviewed; missing: none",
+   "summary": "Two more independent reviewer agents (R2, R3) per ground-truth v2.1 question, same prompt as R1: checks the question, the verbatim evidence against the paper text, the answer and the key concepts, and decides accept, edit or reject, as Valerio does in the sign-off sheet"
+  },
+  {
+   "file": "data/ground_truth_v2/agent_review_workflow_result.json",
+   "agents": 250,
+   "timed": 250,
+   "states": [
+    "done"
+   ],
+   "agent_h": 1.3220847222222223,
+   "span_h": 0.09688694444444444,
+   "first_start_utc": "2026-10-08T16:47:40Z",
+   "last_end_utc": "2026-10-08T16:53:29Z",
+   "tokens": 10965223,
+   "log": "250 of 250 reviewed; missing: none",
+   "summary": "One reviewer agent per ground-truth v2.1 question: checks the question, the verbatim evidence against the paper text, the answer and the key concepts, and decides accept, edit or reject, as Valerio does in the sign-off sheet"
+  },
+  {
+   "file": "data/ground_truth_v2/all_v2_1_workflow_result.json",
+   "timing": "no timing: records only"
+  },
+  {
+   "file": "data/ground_truth_v2/all_workflow_result.json",
+   "timing": "no timing: records only"
+  },
+  {
+   "file": "data/ground_truth_v2/concepts_conceptual_workflow_result.json",
+   "agents": 150,
+   "timed": 150,
+   "states": [
+    "done"
+   ],
+   "agent_h": 0.9824836111111112,
+   "span_h": 0.07540694444444444,
+   "first_start_utc": "2026-10-08T19:47:58Z",
+   "last_end_utc": "2026-10-08T19:52:29Z",
+   "tokens": 6173295,
+   "log": "50 of 50 reconciled",
+   "summary": "Key concepts re-derived for the 50 conceptual (CO) questions under the revised rule (ideas a correct answer must state; numbers only when asked): two independent proposers and a reconciler per question"
+  },
+  {
+   "file": "data/ground_truth_v2/extractors_cde_workflow_result.json",
+   "agents": 750,
+   "timed": 750,
+   "states": [
+    "done"
+   ],
+   "agent_h": 9.075968333333334,
+   "span_h": 0.6523083333333334,
+   "first_start_utc": "2026-10-08T14:54:34Z",
+   "last_end_utc": "2026-10-08T15:33:42Z",
+   "tokens": 39842783,
+   "log": "750 of 750 extractions returned",
+   "summary": "Ground truth v2.1: three more independent extractors (C, D, E) on all 250 questions, same rules and inputs as A and B, no reconciler; the votes are tallied afterwards by script"
+  },
+  {
+   "file": "data/ground_truth_v2/pilot_workflow_result.json",
+   "agents": 111,
+   "timed": 111,
+   "states": [
+    "done"
+   ],
+   "agent_h": 1.4679411111111111,
+   "span_h": 0.12538027777777777,
+   "first_start_utc": "2026-10-08T08:06:56Z",
+   "last_end_utc": "2026-10-08T08:14:27Z",
+   "tokens": 5935960,
+   "log": "37 of 37 reconciled; missing: none",
+   "summary": "Ground truth v2 pilot: for each of 37 questions, two independent agents extract verbatim evidence from the full paper text and draft an evidence-only answer; a third reconciles"
+  },
+  {
+   "file": "data/ground_truth_v2/replacements_workflow_result.json",
+   "agents": 9,
+   "timed": 9,
+   "states": [
+    "done"
+   ],
+   "agent_h": 0.13932083333333334,
+   "span_h": 0.04174138888888889,
+   "first_start_utc": "2026-10-08T14:22:34Z",
+   "last_end_utc": "2026-10-08T14:25:04Z",
+   "tokens": 474454,
+   "log": "3 of 3 reconciled; missing: none",
+   "summary": "Ground truth v2 for the three replacement questions (OOD_011, CD_015, SY_010): two independent agents and a reconciler each, same rules as the full run"
+  },
+  {
+   "file": "data/ground_truth_v2/rest_workflow_result.json",
+   "agents": 639,
+   "timed": 639,
+   "states": [
+    "done"
+   ],
+   "agent_h": 8.425424444444445,
+   "span_h": 0.6103152777777778,
+   "first_start_utc": "2026-10-08T08:37:02Z",
+   "last_end_utc": "2026-10-08T09:13:40Z",
+   "tokens": 32243060,
+   "log": "213 of 213 reconciled; missing: none",
+   "summary": "Ground truth v2 for the remaining 213 questions: evidence-only answers from the full paper text (answerable and false-premise), and a corpus-wide search for the 40 off-topic questions; two independent agents and a reconciler each"
+  },
+  {
+   "file": "data/ground_truth_v2/signoff_v2_2_workflow_result.json",
+   "timing": "no timing: records only"
+  },
+  {
+   "file": "data/ground_truth_v2/sy018_v2_2_workflow_result.json",
+   "timing": "no timing: records only"
+  }
+ ],
+ "workbooks": [
+  {
+   "file": "response/ground_truth_v2/pilot_signoff.xlsx",
+   "step": "v2 pilot sign-off sheet (37 questions)",
+   "creator": "openpyxl",
+   "last_modified_by": null,
+   "created": "2026-10-08T09:15:36Z",
+   "modified": "2026-10-08T09:15:36Z",
+   "person": null,
+   "window_h": null,
+   "reading": "last written by a tool: no time of a person's work"
+  },
+  {
+   "file": "response/ground_truth_v2/all_signoff.xlsx",
+   "step": "v2 sign-off sheet (250 questions)",
+   "creator": "openpyxl",
+   "last_modified_by": null,
+   "created": "2026-10-08T09:15:55Z",
+   "modified": "2026-10-08T09:15:55Z",
+   "person": null,
+   "window_h": null,
+   "reading": "last written by a tool: no time of a person's work"
+  },
+  {
+   "file": "response/ground_truth_v2/replacements_signoff.xlsx",
+   "step": "v2.1 replacement questions sign-off sheet",
+   "creator": "openpyxl",
+   "last_modified_by": null,
+   "created": "2026-10-08T14:27:06Z",
+   "modified": "2026-10-08T14:27:06Z",
+   "person": null,
+   "window_h": null,
+   "reading": "last written by a tool: no time of a person's work"
+  },
+  {
+   "file": "response/ground_truth_v2/all_v2_1_signoff.xlsx",
+   "step": "v2.1 sign-off sheet (Valerio's 54 edits, applied in v2.2)",
+   "reading": "not opened (D168 forbidden list): no time read"
+  },
+  {
+   "file": "response/ground_truth_v2/v2_2_review.xlsx",
+   "step": "v2.2 review sheet",
+   "creator": "openpyxl",
+   "last_modified_by": null,
+   "created": "2026-10-09T17:06:53Z",
+   "modified": "2026-10-09T17:06:53Z",
+   "person": null,
+   "window_h": null,
+   "reading": "last written by a tool: no time of a person's work"
+  },
+  {
+   "file": "response/ground_truth_v2/concept_premise_check_v1.xlsx",
+   "step": "concept premise check, v1 layout",
+   "creator": "openpyxl",
+   "last_modified_by": null,
+   "created": "2026-10-29T16:49:13Z",
+   "modified": "2026-10-29T16:49:14Z",
+   "person": null,
+   "window_h": null,
+   "reading": "last written by a tool: no time of a person's work"
+  },
+  {
+   "file": "response/ground_truth_v2/concept_premise_check_v2.xlsx",
+   "step": "concept premise check, v2 layout",
+   "creator": "openpyxl",
+   "last_modified_by": null,
+   "created": "2026-10-29T17:01:26Z",
+   "modified": "2026-10-29T17:01:27Z",
+   "person": null,
+   "window_h": null,
+   "reading": "last written by a tool: no time of a person's work"
+  },
+  {
+   "file": "response/ground_truth_v2/concept_premise_check_v3.xlsx",
+   "step": "concept premise check, v3 (Valerio's calls, the input of key v2.5)",
+   "creator": "openpyxl",
+   "last_modified_by": "Bianchi, Valerio",
+   "created": "2026-10-29T17:29:48Z",
+   "modified": "2026-10-30T11:40:58Z",
+   "person": "Bianchi, Valerio",
+   "window_h": 18.18611111111111,
+   "reading": "created to last save spans more than 8 h (a night or more): it bounds nothing useful"
+  },
+  {
+   "file": "response/ground_truth_v2/key_v2_5_review.xlsx",
+   "step": "key v2.5 draft review (Valerio's calls, D180)",
+   "creator": "openpyxl",
+   "last_modified_by": "Bianchi, Valerio",
+   "created": "2026-10-30T13:15:06Z",
+   "modified": "2026-10-30T13:44:02Z",
+   "person": "Bianchi, Valerio",
+   "window_h": 0.4822222222222222,
+   "reading": "an upper bound on the person's time in the sheet (created to last save)"
+  }
+ ],
+ "timeline": [
+  {
+   "commit": "c1c13184",
+   "author_time": "2026-10-30T15:54:24+01:00",
+   "subject": "Key v2.5 final (data/ground_truth_v2/ground_truth_v2_5_as_v1.json, sha256 a4216184; 1,157 concepts; S504 --final, test 69/69); amendment 9 DRAFT for Valerio (completeness re-rated on the 36 items whos"
+  },
+  {
+   "commit": "53dda7e2",
+   "author_time": "2026-10-11T09:38:27+02:00",
+   "subject": "O36 (Valerio, 11 October): CD_007 gets the five paper sentences its new short answer rests on (t-tests of log2(TPM + 1), the GEUVADIS sequencing-centre comparison, Polyester), evidence 26 to 30 from t"
+  },
+  {
+   "commit": "dc754e42",
+   "author_time": "2026-10-11T09:22:45+02:00",
+   "subject": "Ground truth v2.4 (Q50, Valerio, 11 October 09:00): v2.3 with the 25 corrections verified in Q49, with Q52-Q54 as recommended (S398, gates K1-K7; an independent review matched all 25 records to the no"
+  },
+  {
+   "commit": "a32c6cf4",
+   "author_time": "2026-10-11T00:28:01+02:00",
+   "subject": "Q48 (Valerio, 11 October 00:35): the Sarek key point (F1, 01_sarek_CO2) is \"Docker and Singularity containers\", shortened from \"... as well as Conda environments\" so answers naming the containers with"
+  },
+  {
+   "commit": "1e0705a3",
+   "author_time": "2026-10-11T00:20:08+02:00",
+   "subject": "Q45 (Valerio, 11 October 00:00, \"Fix the keys, add the fixes in the raters file\"): ground truth v2.3 = v2.2 with the five errors found by the check of the 36 rated questions corrected (S396, gates K1-"
+  },
+  {
+   "commit": "03440b4c",
+   "author_time": "2026-10-09T19:19:18+02:00",
+   "subject": "Ground truth v2.2 frozen (Valerio, 9 October evening: review accepted as drafted; the ten choices resolve to the drafted versions): data/ground_truth_v2/all_v2_2.json, 250 records"
+  },
+  {
+   "commit": "75c64533",
+   "author_time": "2026-10-08T21:53:16+02:00",
+   "subject": "Q4 (Valerio, 8 October): key concepts re-derived for the 50 conceptual questions (ideas a correct answer must state; numbers only when asked), two proposers and a reconciler each; all 322 proposed con"
+  },
+  {
+   "commit": "d3adb45e",
+   "author_time": "2026-10-08T16:27:39+02:00",
+   "subject": "Ground truth v2.1: OOD_011, CD_015 and SY_010 get new questions (D1, D2, 8 October), built by the same two-extractor-and-reconciler workflow and S364 checks (3 of 3 pass, 43 of 44 evidence sentences e"
+  },
+  {
+   "commit": "d4b8ec1d",
+   "author_time": "2026-10-08T11:16:10+02:00",
+   "subject": "Ground truth v2 for all 250 questions (separate set; v1 untouched): 213 more by workflow wf_b056c5ad-db7 (two blind extractors and a reconciler each; the 40 off-topic questions by a search of all 200 "
+  }
+ ],
+ "totals": {
+  "agent_h": 23.77332777777778,
+  "agent_span_h": 1.7729741666666667,
+  "workflows_timed": 7,
+  "agents_timed": 2409,
+  "person_windows": [
+   {
+    "file": "response/ground_truth_v2/concept_premise_check_v3.xlsx",
+    "person": "Bianchi, Valerio",
+    "window_h": 18.18611111111111,
+    "reading": "created to last save spans more than 8 h (a night or more): it bounds nothing useful"
+   },
+   {
+    "file": "response/ground_truth_v2/key_v2_5_review.xlsx",
+    "person": "Bianchi, Valerio",
+    "window_h": 0.4822222222222222,
+    "reading": "an upper bound on the person's time in the sheet (created to last save)"
+   }
+  ],
+  "person_hours": "not in the records: for Valerio to confirm (CURATION O1)"
+ }
+}

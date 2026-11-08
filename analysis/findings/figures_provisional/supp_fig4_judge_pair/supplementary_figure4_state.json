@@ -1,0 +1,247 @@
+{
+ "answers_per_metric": {
+  "Correctness": {
+   "answers": 1548,
+   "questions": 86,
+   "left_out": {}
+  },
+  "Completeness": {
+   "answers": 1548,
+   "questions": 86,
+   "left_out": {}
+  },
+  "Faithfulness": {
+   "answers": 1548,
+   "questions": 86,
+   "left_out": {}
+  },
+  "Faithfulness with passages": {
+   "answers": 1533,
+   "questions": 86,
+   "left_out": {
+    "judge 1 error": 6,
+    "judge 2 deferred": 9
+   }
+  },
+  "Citation quality": {
+   "answers": 1548,
+   "questions": 86,
+   "left_out": {}
+  },
+  "Refusal": {
+   "answers": 702,
+   "questions": 39,
+   "left_out": {}
+  }
+ },
+ "v25_rows_per_judge": 1080,
+ "reproduced": {
+  "judge_1": "six pass rates at 4 equal Figure 3a's committed strategy rows",
+  "judge_2": "S518 D_one, D_many and their intervals equal second_judge.json",
+  "panel_b": "the T2 reader gives gemini-3-flash-preview's ten b rows exactly as the G1 reader"
+ },
+ "panel_b": {
+  "gemini-3-flash-preview": {
+   "strategies": {
+    "multi_hop": {
+     "pairs": 258,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 0,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    },
+    "verified_pass": {
+     "pairs": 258,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 0,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    },
+    "rlm_5": {
+     "pairs": 258,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 0,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    },
+    "rlm_10": {
+     "pairs": 258,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 0,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    },
+    "rlm_20": {
+     "pairs": 258,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 0,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    }
+   },
+   "judge2_rows_without_judge1_row": 0
+  },
+  "gemini-2.5-pro": {
+   "strategies": {
+    "multi_hop": {
+     "pairs": 0,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 0,
+     "pairs_without_judge2_row": 144,
+     "strategy_answers_without_single_pass": 0
+    },
+    "verified_pass": {
+     "pairs": 143,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 0,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    },
+    "rlm_5": {
+     "pairs": 0,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 0,
+     "pairs_without_judge2_row": 144,
+     "strategy_answers_without_single_pass": 0
+    },
+    "rlm_10": {
+     "pairs": 144,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 0,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    },
+    "rlm_20": {
+     "pairs": 0,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 0,
+     "pairs_without_judge2_row": 144,
+     "strategy_answers_without_single_pass": 0
+    }
+   },
+   "judge2_rows_without_judge1_row": 1
+  },
+  "claude-haiku-4-5": {
+   "strategies": {
+    "multi_hop": {
+     "pairs": 258,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 0,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    },
+    "verified_pass": {
+     "pairs": 258,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 0,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    },
+    "rlm_5": {
+     "pairs": 258,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 22,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    },
+    "rlm_10": {
+     "pairs": 258,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 18,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    },
+    "rlm_20": {
+     "pairs": 258,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 28,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    }
+   },
+   "judge2_rows_without_judge1_row": 0
+  },
+  "gemma3:27b": {
+   "strategies": {
+    "multi_hop": {
+     "pairs": 258,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 0,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    },
+    "verified_pass": {
+     "pairs": 258,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 0,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    },
+    "rlm_5": {
+     "pairs": 87,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 0,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    },
+    "rlm_10": {
+     "pairs": 87,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 0,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    },
+    "rlm_20": {
+     "pairs": 87,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 0,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    }
+   },
+   "judge2_rows_without_judge1_row": 0
+  },
+  "qwen3-coder:30b, same family": {
+   "strategies": {
+    "multi_hop": {
+     "pairs": 258,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 3,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    },
+    "verified_pass": {
+     "pairs": 257,
+     "left_out": {
+      "judge 1 error": 1
+     },
+     "failed_cells_no_judge2_call": 0,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    },
+    "rlm_5": {
+     "pairs": 87,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 0,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    },
+    "rlm_10": {
+     "pairs": 87,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 0,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    },
+    "rlm_20": {
+     "pairs": 87,
+     "left_out": {},
+     "failed_cells_no_judge2_call": 0,
+     "pairs_without_judge2_row": 0,
+     "strategy_answers_without_single_pass": 0
+    }
+   },
+   "judge2_rows_without_judge1_row": 0
+  }
+ }
+}

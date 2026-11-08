@@ -1,0 +1,783 @@
+{
+ "stamp": "PROVISIONAL: 516 of 516 draw-1 answerable answers have a final row from all four scorers; judge plain call 1,548 of 1,548, concept recall 1,548 of 1,548 (D181's reading, L3_d181), MiniCheck against the papers 516 of 516 (draw 1, S564's selection D208 and the claim filter D172), judge with passages 1,548 of 1,548; RAGAS 576 and RAGChecker 576 rows (K1); the Second judge row of panel e from S518's qwen3.8:27b rows (D267); S3 collect 2026-10-28T10:19:31Z, run_sha256 38ae79ab023b",
+ "planned": {
+  "judge": 1548,
+  "concept": 1548,
+  "papers": 516,
+  "faith": 1548
+ },
+ "have": {
+  "judge": 1548,
+  "judge_failed": 3,
+  "judge_unscored": 0,
+  "concept": 1548,
+  "papers": 516,
+  "papers_null": 11,
+  "faith": 1548,
+  "faith_ok": 1539,
+  "faith_status": {
+   "ok": 1539,
+   "no_answer": 3,
+   "error": 6
+  },
+  "faith_error_over_context": 6,
+  "papers_null_reasons": {
+   "no S564 selection: the answer is not among the L1 answers S564 judged (D208's 506 of 28 October)": 7,
+   "no claim sentence": 1,
+   "no answer": 2,
+   "no sentence left after S564's selection and the source-list filter": 1
+  },
+  "judge_failed_why": {
+   "RLMRunError: Maximum turns (10) reached without completion. No meaningful analysis was produced (0 citations, 0 report sections).": 1,
+   "RLMRunError: Maximum turns (5) reached without completion. No meaningful analysis was produced (0 citations, 0 report sections).": 1,
+   "no answer stored": 1
+  }
+ },
+ "answers_with_all_four": 516,
+ "judge_key": "v2.5",
+ "W_questions": [
+  "01_sarek_CO2",
+  "01_sarek_FR1",
+  "01_sarek_TE3",
+  "02_snakemake_CO2",
+  "02_snakemake_FR1",
+  "02_snakemake_TE3",
+  "03_nfcore_framework_CO2",
+  "03_nfcore_framework_FR1",
+  "03_nfcore_framework_TE3",
+  "04_fastp_CO2",
+  "04_fastp_FR1",
+  "04_fastp_TE3",
+  "05_multiqc_CO2",
+  "05_multiqc_FR1",
+  "05_multiqc_TE3",
+  "06_star_aligner_CO2",
+  "06_star_aligner_FR1",
+  "06_star_aligner_TE3",
+  "07_salmon_CO2",
+  "07_salmon_FR1",
+  "07_salmon_TE3",
+  "08_deseq2_CO2",
+  "08_deseq2_FR1",
+  "08_deseq2_TE3",
+  "09_seqkit_CO2",
+  "09_seqkit_FR1",
+  "09_seqkit_TE3",
+  "10_cutadapt_CO2",
+  "10_cutadapt_FR1",
+  "10_cutadapt_TE3",
+  "11_asf_burkina_faso_CO2",
+  "11_asf_burkina_faso_FR1",
+  "11_asf_burkina_faso_TE3",
+  "12_hpai_netherlands_CO2",
+  "12_hpai_netherlands_FR1",
+  "12_hpai_netherlands_TE3",
+  "13_lsd_nepal_CO2",
+  "13_lsd_nepal_FR1",
+  "13_lsd_nepal_TE3",
+  "14_bovine_tb_cameroon_CO2",
+  "14_bovine_tb_cameroon_FR1",
+  "14_bovine_tb_cameroon_TE3",
+  "15_rabies_tanzania_CO2",
+  "15_rabies_tanzania_FR1",
+  "15_rabies_tanzania_TE3",
+  "16_ppr_ethiopia_CO2",
+  "16_ppr_ethiopia_FR1",
+  "16_ppr_ethiopia_TE3",
+  "17_brucellosis_ethiopia_CO2",
+  "17_brucellosis_ethiopia_FR1",
+  "17_brucellosis_ethiopia_TE3",
+  "18_fmd_review_CO2",
+  "18_fmd_review_FR1",
+  "18_fmd_review_TE3",
+  "19_hpai_canada_CO2",
+  "19_hpai_canada_FR1",
+  "19_hpai_canada_TE3",
+  "20_lsd_review_CO2",
+  "20_lsd_review_FR1",
+  "20_lsd_review_TE3",
+  "CD_001",
+  "CD_002",
+  "CD_003",
+  "CD_004",
+  "CD_005",
+  "CD_006",
+  "CD_007",
+  "CD_008",
+  "CD_009",
+  "CD_010",
+  "CD_011",
+  "CD_012",
+  "CD_013",
+  "CD_014",
+  "CD_016",
+  "CD_017",
+  "CD_018",
+  "SY_001",
+  "SY_002",
+  "SY_003",
+  "SY_004",
+  "SY_005",
+  "SY_006",
+  "SY_007",
+  "SY_008",
+  "SY_009"
+ ],
+ "W_partial_blocks_left_out": [],
+ "c": {
+  "partial_blocks_left_out": [],
+  "means": {
+   "judge": {
+    "single_pass": 4.282945736434107,
+    "multi_hop": 4.158914728682169,
+    "verified_pass": 4.248062015503876,
+    "rlm_5": 3.872093023255814,
+    "rlm_10": 3.8565891472868215,
+    "rlm_20": 3.848837209302326
+   },
+   "concept": {
+    "single_pass": 0.6934310077519381,
+    "multi_hop": 0.5403158914728683,
+    "verified_pass": 0.6972158914728683,
+    "rlm_5": 0.7399213178294574,
+    "rlm_10": 0.7619000000000001,
+    "rlm_20": 0.7512693798449612
+   },
+   "papers": {
+    "single_pass": 0.7919811764705881,
+    "multi_hop": 0.5599364705882353,
+    "verified_pass": 0.8288104651162792,
+    "rlm_5": 0.6904785714285714,
+    "rlm_10": 0.7111999999999999,
+    "rlm_20": 0.6763626506024097
+   }
+  },
+  "ranks_low1": {
+   "judge": {
+    "single_pass": 6.0,
+    "multi_hop": 4.0,
+    "verified_pass": 5.0,
+    "rlm_5": 3.0,
+    "rlm_10": 2.0,
+    "rlm_20": 1.0
+   },
+   "concept": {
+    "single_pass": 2.0,
+    "multi_hop": 1.0,
+    "verified_pass": 3.0,
+    "rlm_5": 4.0,
+    "rlm_10": 6.0,
+    "rlm_20": 5.0
+   },
+   "papers": {
+    "single_pass": 5.0,
+    "multi_hop": 1.0,
+    "verified_pass": 6.0,
+    "rlm_5": 3.0,
+    "rlm_10": 4.0,
+    "rlm_20": 2.0
+   }
+  },
+  "W": 0.30158730158730157,
+  "P": 0.5339564043209877,
+  "W_ci": [
+   0.1746031746031746,
+   0.5047619047619047
+  ],
+  "rho": -0.047619047619047596,
+  "rho_ci": [
+   -0.2380952380952381,
+   0.2571428571428572
+  ],
+  "pc1": 0.6347660659755564,
+  "pc1_ci": [
+   0.5159239070090604,
+   0.6637540236764757
+  ],
+  "pr": 1.8772348033373059,
+  "pr_ci": [
+   1.8323084593651318,
+   2.383783783783784
+  ],
+  "corr": {
+   "judge_concept": -0.7714285714285715,
+   "judge_papers": 0.5428571428571429,
+   "concept_papers": 0.08571428571428573
+  },
+  "resamples_undefined": 0,
+  "answers": {
+   "judge": 516,
+   "concept": 516,
+   "papers": 505
+  }
+ },
+ "e": {
+  "rho_all": {
+   "rho": 0.3712870199691479,
+   "lo": 0.26147344202646283,
+   "hi": 0.4750835807650571,
+   "answers": 502,
+   "questions": 86,
+   "resamples_undefined": 0
+  },
+  "rho_3to5": {
+   "rho": 0.32083398216281556,
+   "lo": 0.20930170980453117,
+   "hi": 0.424823806985695,
+   "answers": 472,
+   "questions": 86,
+   "resamples_undefined": 0
+  },
+  "e9": {
+   "rated_5": 369,
+   "below_half": 32,
+   "median": 0.8235,
+   "mean": 0.7733365853658537
+  }
+ },
+ "d_all": {
+  "n": 1539,
+  "at5": 1133,
+  "counts": {
+   "0": 36,
+   "1": 24,
+   "2": 45,
+   "3": 75,
+   "4": 226,
+   "5": 1133
+  }
+ },
+ "papers_waits": null,
+ "ablation": {
+  "ranks": {
+   "Judge": {
+    "single_pass": 1.0,
+    "multi_hop": 3.0,
+    "verified_pass": 2.0,
+    "rlm_5": 4.0,
+    "rlm_10": 5.0,
+    "rlm_20": 6.0
+   },
+   "Concepts": {
+    "single_pass": 5.0,
+    "multi_hop": 6.0,
+    "verified_pass": 4.0,
+    "rlm_5": 3.0,
+    "rlm_10": 1.0,
+    "rlm_20": 2.0
+   },
+   "Papers": {
+    "single_pass": 2.0,
+    "multi_hop": 6.0,
+    "verified_pass": 1.0,
+    "rlm_5": 4.0,
+    "rlm_10": 3.0,
+    "rlm_20": 5.0
+   },
+   "Judge + Concepts": {
+    "single_pass": 2.0,
+    "multi_hop": 6.0,
+    "verified_pass": 2.0,
+    "rlm_5": 4.0,
+    "rlm_10": 2.0,
+    "rlm_20": 5.0
+   },
+   "Judge + Papers": {
+    "single_pass": 1.5,
+    "multi_hop": 5.0,
+    "verified_pass": 1.5,
+    "rlm_5": 3.5,
+    "rlm_10": 3.5,
+    "rlm_20": 6.0
+   },
+   "Concepts + Papers": {
+    "single_pass": 4.0,
+    "multi_hop": 6.0,
+    "verified_pass": 2.0,
+    "rlm_5": 4.0,
+    "rlm_10": 1.0,
+    "rlm_20": 4.0
+   },
+   "All three": {
+    "single_pass": 2.0,
+    "multi_hop": 6.0,
+    "verified_pass": 1.0,
+    "rlm_5": 4.0,
+    "rlm_10": 3.0,
+    "rlm_20": 5.0
+   }
+  }
+ },
+ "k1_length_done": [
+  [
+   "rlm_10",
+   "13_lsd_nepal_FR1",
+   1
+  ],
+  [
+   "rlm_10",
+   "OOD_046",
+   1
+  ],
+  [
+   "rlm_20",
+   "15_rabies_tanzania_CO2",
+   1
+  ],
+  [
+   "rlm_5",
+   "13_lsd_nepal_FR1",
+   1
+  ],
+  [
+   "rlm_5",
+   "19_hpai_canada_CO2",
+   1
+  ]
+ ],
+ "d_status": {
+  "single_pass": {
+   "ok": 258
+  },
+  "multi_hop": {
+   "ok": 258
+  },
+  "verified_pass": {
+   "ok": 257,
+   "no_answer": 1
+  },
+  "rlm_5": {
+   "ok": 255,
+   "no_answer": 1,
+   "error": 2
+  },
+  "rlm_10": {
+   "ok": 254,
+   "no_answer": 1,
+   "error": 3
+  },
+  "rlm_20": {
+   "ok": 257,
+   "error": 1
+  }
+ },
+ "plate_mm": [
+  183.0,
+  168.8
+ ],
+ "layout": {
+  "LINE": 3.7,
+  "LABW": 16.242,
+  "P1": 6.0,
+  "P2": 6.4,
+  "SP": 3.1,
+  "GG": 0.9,
+  "PAD": 8.4,
+  "GAP": 12.0,
+  "Y1": 0.0,
+  "R1": 7.0,
+  "R1B": 43.0,
+  "F_W": 34.0,
+  "D_END": 176.892,
+  "B_CW": 4.4,
+  "B_HEAD": 19.4,
+  "B_X1": 150.492,
+  "B_X": 125.6,
+  "B_TH": 4.5,
+  "A_X": 18.042,
+  "A_G": 3.6,
+  "A_W": 31.453,
+  "Y2": 55.6,
+  "R2": 64.0,
+  "R2B": 96.0,
+  "DR": 60.0,
+  "DRB": 101.7,
+  "Y3": 114.3,
+  "R3": 118.7,
+  "R3B": 160.4,
+  "H": 168.8,
+  "E_LET": 0.0,
+  "E_GAP": 6.0,
+  "E_LABR": 34.649,
+  "E_X": 36.249,
+  "E_CW": 70.275,
+  "F_LET": 108.4,
+  "D_X": 18.042,
+  "D_G": 4.2,
+  "D_W": 25.439
+ },
+ "legend_words": 205,
+ "c_unprinted": [
+  [
+   "RLM-10",
+   "Papers",
+   "tie",
+   4
+  ],
+  [
+   "RLM-20",
+   "Papers",
+   "tie",
+   3
+  ]
+ ],
+ "d_left_out": {
+  "single_pass": {
+   "no_answer": 0,
+   "error": 0
+  },
+  "multi_hop": {
+   "no_answer": 0,
+   "error": 0
+  },
+  "verified_pass": {
+   "no_answer": 1,
+   "error": 0
+  },
+  "rlm_5": {
+   "no_answer": 1,
+   "error": 2
+  },
+  "rlm_10": {
+   "no_answer": 1,
+   "error": 3
+  },
+  "rlm_20": {
+   "no_answer": 0,
+   "error": 1
+  }
+ },
+ "claim_filter": {
+  "rows_read": 810,
+  "rows_with_a_value": 573,
+  "values_changed": 441,
+  "values_now_null": 68,
+  "selection": {
+   "s564_run_sha256": "6934ed46ccabd396a32f2cab73774f7ac06e6d6689ff9fb57bcf1f4941b6904c",
+   "dir": "findings/recompute/S564_claimify_selection/full",
+   "no_verdict_reading": "kept as selected",
+   "rows_sha256": {
+    "0": "625c826c7d9754fdf4138706a473be0c1db2a27cfac6b81e24119d6ed24957e2",
+    "1": "9d16d8ef2e3728cf4a1ee7496533137b52b81ba378b49879a6261a9fc97a51c8",
+    "2": "c468afe65bf3ec2e8f1d3378f6c4c25e76bf0c843c1f4abb5457541e56ea8a1e",
+    "3": "285557e2076d4929b9884d357c77d06a837f12ff4ad04ab899697f202fab346c",
+    "4": "02836c18e7beb0e153cadd155e426e300a6ff64616084cd6539c6d2bfd18d8a2",
+    "5": "98aa0c9a01228b529822db4afb417ff2d089e0a57ad5858723aa329d1d381143",
+    "6": "c2207de96ab259dfe75f845250f4854fe1f8c76a1f20ce7c93e0a3c9fe96bd9d",
+    "7": "d79480616e40d3ffa7c7043eb7ab62ab88fbea9ce4ecb63061e7137af8b66eb0"
+   },
+   "s564_status": {
+    "ok": 14797,
+    "unparseable": 8,
+    "length": 4
+   },
+   "sentences_read": 13740,
+   "sentences_selected": 10578,
+   "answers_not_judged_by_group": {
+    "false_premise": 60,
+    "answerable": 7
+   },
+   "answers_none_selected_by_group": {
+    "answerable": 1
+   },
+   "no_verdict_sentences_by_status": {
+    "unparseable": 8,
+    "length": 4
+   },
+   "no_verdict_answers": 12,
+   "no_verdict_answers_value_this_reading_and_other": [
+    [
+     "exp_v4_s20_n0|rlm_10|11_asf_burkina_faso_FR1|d1",
+     0.75,
+     0.75
+    ],
+    [
+     "exp_v4_s20_n0|rlm_10|15_rabies_tanzania_FR1|d1",
+     0.7857,
+     0.7857
+    ],
+    [
+     "exp_v4_s20_n0|rlm_10|CD_008|d1",
+     0.8857,
+     0.8857
+    ],
+    [
+     "exp_v4_s20_n0|rlm_20|19_hpai_canada_CO2|d1",
+     1.0,
+     1.0
+    ],
+    [
+     "exp_v4_s20_n0|rlm_20|CD_003|d1",
+     0.7018,
+     0.6964
+    ],
+    [
+     "exp_v4_s20_n0|rlm_20|SY_002|d1",
+     0.814,
+     0.814
+    ],
+    [
+     "exp_v4_s20_n0|rlm_5|11_asf_burkina_faso_FR1|d1",
+     0.75,
+     0.75
+    ],
+    [
+     "exp_v4_s20_n0|rlm_5|11_asf_burkina_faso_TE3|d1",
+     0.7692,
+     0.7895
+    ],
+    [
+     "exp_v4_s20_n0|rlm_5|CD_003|d1",
+     0.7091,
+     0.7037
+    ],
+    [
+     "exp_v4_s20_n0|rlm_5|CD_012|d1",
+     0.5111,
+     0.5227
+    ],
+    [
+     "exp_v4_s20_n0|single_pass|01_sarek_CO2|d1",
+     0.6364,
+     0.6
+    ],
+    [
+     "exp_v4_s20_n0|single_pass|06_star_aligner_CO2|d1",
+     0.75,
+     0.8571
+    ]
+   ]
+  }
+ },
+ "k1_status": {
+  "ragchecker": {
+   "answerable failed": 4,
+   "answerable no_answer": 2,
+   "answerable ok": 510,
+   "false_premise failed": 1,
+   "false_premise ok": 59
+  },
+  "ragas": {
+   "answerable no_answer": 2,
+   "answerable ok": 510,
+   "answerable ok_with_nulls": 4,
+   "false_premise ok": 60
+  }
+ },
+ "k1_replaced": {
+  "ragchecker": [
+   {
+    "answer": [
+     "rlm_5",
+     "06_star_aligner_FR1",
+     1
+    ],
+    "was": "no_answer",
+    "now": "ok"
+   },
+   {
+    "answer": [
+     "rlm_20",
+     "06_star_aligner_FR1",
+     1
+    ],
+    "was": "no_answer",
+    "now": "ok"
+   },
+   {
+    "answer": [
+     "rlm_20",
+     "OOD_041",
+     1
+    ],
+    "was": "no_answer",
+    "now": "ok"
+   },
+   {
+    "answer": [
+     "rlm_20",
+     "OOD_043",
+     1
+    ],
+    "was": "no_answer",
+    "now": "ok"
+   }
+  ],
+  "ragas": [
+   {
+    "answer": [
+     "rlm_5",
+     "06_star_aligner_FR1",
+     1
+    ],
+    "was": "no_answer",
+    "now": "ok"
+   },
+   {
+    "answer": [
+     "rlm_20",
+     "06_star_aligner_FR1",
+     1
+    ],
+    "was": "no_answer",
+    "now": "ok"
+   },
+   {
+    "answer": [
+     "rlm_20",
+     "OOD_041",
+     1
+    ],
+    "was": "no_answer",
+    "now": "ok"
+   },
+   {
+    "answer": [
+     "rlm_20",
+     "OOD_043",
+     1
+    ],
+    "was": "no_answer",
+    "now": "ok"
+   }
+  ]
+ },
+ "judge_rows": {
+  "reader": "scripts/judge_rows_v25.py (D186 (3)): an answer's key v2.5 row (S512, out_s6_g1 with out_s6_g1r15 as --replace) where one exists, else its key v2.4 row (out/ with out_g1r15/)",
+  "sources": {
+   "G1": {
+    "kind": "v2.4",
+    "present": true,
+    "run_sha256": "38ae79ab023b97562b69b2875b3c8001b02f887d5578121103b85d4a0b4729da",
+    "rows": 2430,
+    "replace": {
+     "keys": 15,
+     "rows_from_replace": 15
+    }
+   },
+   "S6G1": {
+    "kind": "v2.5 changed",
+    "present": true,
+    "missing": [],
+    "run_sha256": "211568dbdfa09482e9c0abfb3b1da92d0bbd62d14a7646058663a990cbb54235",
+    "rows": 1080,
+    "replace": {
+     "keys": 15,
+     "rows_from_replace": 5
+    }
+   }
+  },
+  "status": "key v2.5 for every answer of the 132 changed questions read (1,080)",
+  "provisional": false,
+  "answers_read": 2430,
+  "cells_from_v25": 1080,
+  "awaiting_s6_read": 0,
+  "awaiting_s6_all_draws": 0,
+  "by_status": {
+   "v2.4": 1350,
+   "v2.5": 1080
+  },
+  "by_draw": {
+   "1": {
+    "v2.4": 450,
+    "v2.5": 360
+   },
+   "2": {
+    "v2.4": 450,
+    "v2.5": 360
+   },
+   "3": {
+    "v2.4": 450,
+    "v2.5": 360
+   }
+  },
+  "units_v25": {
+   "folders": {
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/judge/exp_01__multi_hop__exp_v4_s20_n0": {
+     "rows": 180,
+     "recheck": {
+      "phase 1": "10 of 10 equal",
+      "phase 2": "10 of 10 equal"
+     },
+     "judge": "devstral-small-2:24b 33af3142213a"
+    },
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/judge/exp_01__rlm_10__exp_v4_s20_n0": {
+     "rows": 180,
+     "recheck": {
+      "phase 1": "10 of 10 equal",
+      "phase 2": "10 of 10 equal"
+     },
+     "judge": "devstral-small-2:24b 33af3142213a"
+    },
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/judge/exp_01__rlm_20__exp_v4_s20_n0": {
+     "rows": 180,
+     "recheck": {
+      "phase 1": "10 of 10 equal",
+      "phase 2": "10 of 10 equal"
+     },
+     "judge": "devstral-small-2:24b 33af3142213a"
+    },
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/judge/exp_01__rlm_5__exp_v4_s20_n0": {
+     "rows": 180,
+     "recheck": {
+      "phase 1": "10 of 10 equal",
+      "phase 2": "10 of 10 equal"
+     },
+     "judge": "devstral-small-2:24b 33af3142213a"
+    },
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/judge/exp_01__single_pass__exp_v4_s20_n0": {
+     "rows": 180,
+     "recheck": {
+      "phase 1": "10 of 10 equal",
+      "phase 2": "10 of 10 equal"
+     },
+     "judge": "devstral-small-2:24b 33af3142213a"
+    },
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/judge/exp_01__verified_pass__exp_v4_s20_n0": {
+     "rows": 180,
+     "recheck": {
+      "phase 1": "10 of 10 equal",
+      "phase 2": "10 of 10 equal"
+     },
+     "judge": "devstral-small-2:24b 33af3142213a"
+    },
+    "findings/recompute/fig3_s6_inputs/out_s6_g1r15/judge/exp_01__rlm_10__exp_v4_s20_n0": {
+     "rows": 1,
+     "recheck": {
+      "phase 1": "0 of 0 equal",
+      "phase 2": "1 of 1 equal"
+     },
+     "judge": "devstral-small-2:24b 33af3142213a"
+    },
+    "findings/recompute/fig3_s6_inputs/out_s6_g1r15/judge/exp_01__rlm_20__exp_v4_s20_n0": {
+     "rows": 2,
+     "recheck": {
+      "phase 1": "2 of 2 equal",
+      "phase 2": "0 of 0 equal"
+     },
+     "judge": "devstral-small-2:24b 33af3142213a"
+    },
+    "findings/recompute/fig3_s6_inputs/out_s6_g1r15/judge/exp_01__rlm_5__exp_v4_s20_n0": {
+     "rows": 2,
+     "recheck": {
+      "phase 1": "1 of 1 equal",
+      "phase 2": "1 of 1 equal"
+     },
+     "judge": "devstral-small-2:24b 33af3142213a"
+    }
+   },
+   "starts": {
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/start_11434_20261031T015532.json": "d66daa28",
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/start_11434_20261031T080315.json": "d66daa28",
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/start_11434_20261031T081045.json": "d66daa28",
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/start_11434_20261031T084549.json": "d66daa28",
+    "findings/recompute/fig3_s6_inputs/out_s6_g1/start_11434_20261101T093806.json": "d66daa28",
+    "findings/recompute/fig3_s6_inputs/out_s6_g1r15/start_11434_20261031T015532.json": "d66daa28",
+    "findings/recompute/fig3_s6_inputs/out_s6_g1r15/start_11434_20261031T080315.json": "d66daa28",
+    "findings/recompute/fig3_s6_inputs/out_s6_g1r15/start_11434_20261031T081045.json": "d66daa28",
+    "findings/recompute/fig3_s6_inputs/out_s6_g1r15/start_11434_20261031T084549.json": "d66daa28",
+    "findings/recompute/fig3_s6_inputs/out_s6_g1r15/start_11434_20261101T093806.json": "d66daa28"
+   }
+  }
+ }
+}

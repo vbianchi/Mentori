@@ -1,0 +1,1526 @@
+{
+ "all_answers": {
+  "gemma3:27b-it-qat": {
+   "n_scored": 107,
+   "n_calls": 107,
+   "composite": 0.4132501289958567,
+   "correctness~similarity": 0.5359136003199102,
+   "completeness~concept_recall": 0.637509453573198,
+   "citation~citation_composite": 0.06632733309446175,
+   "group": "selection",
+   "ci95": [
+    0.29943193493866394,
+    0.5183161517106092
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.15949047999542515,
+    0.04669878450509803
+   ]
+  },
+  "qwen3.5:122b": {
+   "n_scored": 107,
+   "n_calls": 107,
+   "composite": 0.4642808028311256,
+   "correctness~similarity": 0.385401357152225,
+   "completeness~concept_recall": 0.7019645167815176,
+   "citation~citation_composite": 0.30547653455963425,
+   "group": "selection",
+   "ci95": [
+    0.38515403223796985,
+    0.5420761258030831
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.07784725004903426,
+    0.09917087118403328
+   ]
+  },
+  "llama3.2:latest": {
+   "n_scored": 106,
+   "n_calls": 107,
+   "composite": 0.18859411983635976,
+   "correctness~similarity": 0.12695468301103507,
+   "completeness~concept_recall": 0.2261105902101364,
+   "citation~citation_composite": 0.2127170862879078,
+   "group": "selection",
+   "ci95": [
+    0.044633931499693455,
+    0.3263237681142909
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.4280865337220915,
+    -0.13092037909251794
+   ]
+  },
+  "ministral-3:3b": {
+   "n_scored": 107,
+   "n_calls": 107,
+   "composite": 0.42963085925274935,
+   "correctness~similarity": 0.44743715349357366,
+   "completeness~concept_recall": 0.5099035732314391,
+   "citation~citation_composite": 0.3315518510332353,
+   "group": "selection",
+   "ci95": [
+    0.3352543998171777,
+    0.510332837946551
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.1233230419484627,
+    0.06614383953400998
+   ]
+  },
+  "gemma3:latest": {
+   "n_scored": 107,
+   "n_calls": 107,
+   "composite": 0.26967884605144493,
+   "correctness~similarity": 0.20509461477419244,
+   "completeness~concept_recall": 0.3705705562912672,
+   "citation~citation_composite": 0.23337136708887513,
+   "group": "selection",
+   "ci95": [
+    0.12278792733518869,
+    0.40633813634631455
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.3553175782229102,
+    -0.03746328586703075
+   ]
+  },
+  "gpt-oss:120b": {
+   "n_scored": 107,
+   "n_calls": 107,
+   "composite": 0.4720412309000716,
+   "correctness~similarity": 0.40568405081676107,
+   "completeness~concept_recall": 0.6936129213802626,
+   "citation~citation_composite": 0.3168267205031912,
+   "group": "selection",
+   "ci95": [
+    0.3919675892246181,
+    0.5475628110259875
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.05726854765820056,
+    0.08696658276924919
+   ]
+  },
+  "mistral:latest": {
+   "n_scored": 107,
+   "n_calls": 107,
+   "composite": 0.24154991835755113,
+   "correctness~similarity": 0.3636252617392345,
+   "completeness~concept_recall": 0.19775025346692163,
+   "citation~citation_composite": 0.16327423986649722,
+   "group": "selection",
+   "ci95": [
+    0.1013496435021177,
+    0.37311441238728227
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.3546876366327835,
+    -0.09435244324877898
+   ]
+  },
+  "ministral-3:8b": {
+   "n_scored": 107,
+   "n_calls": 107,
+   "composite": 0.4964470009309001,
+   "correctness~similarity": 0.5748153452037036,
+   "completeness~concept_recall": 0.6500740484152006,
+   "citation~citation_composite": 0.26445160917379607,
+   "group": "selection",
+   "ci95": [
+    0.4122487277713654,
+    0.5654752629520761
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.04843608967297585,
+    0.120414172315295
+   ]
+  },
+  "qwen3:235b": {
+   "n_scored": 107,
+   "n_calls": 107,
+   "composite": 0.3933487843735696,
+   "correctness~similarity": 0.39019447046863137,
+   "completeness~concept_recall": 0.7359662884414915,
+   "citation~citation_composite": 0.05388559421058601,
+   "group": "selection",
+   "ci95": [
+    0.28668647601275776,
+    0.5004826748072357
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.1525536173198288,
+    0.03426734356554561
+   ]
+  },
+  "olmo-3:latest": {
+   "n_scored": 103,
+   "n_calls": 107,
+   "composite": 0.3753528688657175,
+   "correctness~similarity": 0.39558082582447546,
+   "completeness~concept_recall": 0.64230481724113,
+   "citation~citation_composite": 0.08817296353154719,
+   "group": "selection",
+   "ci95": [
+    0.27997434767819984,
+    0.44690273918116036
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.1859973723278775,
+    0.001442401973158467
+   ]
+  },
+  "qwen3-coder-next:q4_K_M": {
+   "n_scored": 107,
+   "n_calls": 107,
+   "composite": 0.4050038083717467,
+   "correctness~similarity": 0.46983950220224524,
+   "completeness~concept_recall": 0.6046646935886647,
+   "citation~citation_composite": 0.1405072293243304,
+   "group": "selection",
+   "ci95": [
+    0.313430707281393,
+    0.4909087835470111
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.15307328717406216,
+    0.04212079094382356
+   ]
+  },
+  "gemma3n:latest": {
+   "n_scored": 106,
+   "n_calls": 107,
+   "composite": 0.3519011189100243,
+   "correctness~similarity": 0.25227368189972416,
+   "completeness~concept_recall": 0.5153891789328038,
+   "citation~citation_composite": 0.28804049589754493,
+   "group": "selection",
+   "ci95": [
+    0.21959992645997276,
+    0.466083572818862
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.2460920951177285,
+    0.014159894717422997
+   ]
+  },
+  "ministral-3:14b": {
+   "n_scored": 107,
+   "n_calls": 107,
+   "composite": 0.5290188995786529,
+   "correctness~similarity": 0.5143413576885871,
+   "completeness~concept_recall": 0.7000362078352874,
+   "citation~citation_composite": 0.37267913321208396,
+   "group": "selection",
+   "ci95": [
+    0.45634875560770594,
+    0.5986152231591625
+   ],
+   "diff_vs_incumbent_ci95": [
+    0.00875935514176012,
+    0.13991852928822537
+   ]
+  },
+  "deepseek-r1:70b": {
+   "n_scored": 107,
+   "n_calls": 107,
+   "composite": 0.40168885350314354,
+   "correctness~similarity": 0.546663016581318,
+   "completeness~concept_recall": 0.6344179323947123,
+   "citation~citation_composite": 0.023985611533400255,
+   "group": "selection",
+   "ci95": [
+    0.2969881560477642,
+    0.4953586777410304
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.1710441809084682,
+    0.03874714395337606
+   ]
+  },
+  "gpt-oss:20b": {
+   "n_scored": 107,
+   "n_calls": 107,
+   "composite": 0.47416776223539037,
+   "correctness~similarity": 0.41570725557347943,
+   "completeness~concept_recall": 0.7042084867610151,
+   "citation~citation_composite": 0.3025875443716765,
+   "group": "selection",
+   "ci95": [
+    0.3834917766289524,
+    0.5732329984409307
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.06274375239377915,
+    0.10668911307902841
+   ]
+  },
+  "devstral-small-2:24b": {
+   "n_scored": 107,
+   "n_calls": 107,
+   "composite": 0.502621935695506,
+   "correctness~similarity": 0.5492333172717048,
+   "completeness~concept_recall": 0.6674631988075512,
+   "citation~citation_composite": 0.2911692910072619,
+   "group": "selection",
+   "ci95": [
+    0.4102616067862561,
+    0.5825692006527396
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.03284485386352528,
+    0.12348288474536853
+   ]
+  },
+  "gemma3:27b": {
+   "n_scored": 107,
+   "n_calls": 107,
+   "composite": 0.43240819511963907,
+   "correctness~similarity": 0.5588967381283652,
+   "completeness~concept_recall": 0.633153705016785,
+   "citation~citation_composite": 0.10517414221376699,
+   "group": "selection",
+   "ci95": [
+    0.30941845241169885,
+    0.5494641516942181
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.14394106771451315,
+    0.06589662705356066
+   ]
+  },
+  "qwen3-coder:latest": {
+   "n_scored": 107,
+   "n_calls": 107,
+   "composite": 0.46276229518253315,
+   "correctness~similarity": 0.5589429165818887,
+   "completeness~concept_recall": 0.7098647991746717,
+   "citation~citation_composite": 0.11947916979103892,
+   "group": "selection",
+   "ci95": [
+    0.36732029312096964,
+    0.5432591308608923
+   ],
+   "diff_vs_incumbent_ci95": [
+    0.0,
+    0.0
+   ]
+  },
+  "glm-4.7-flash:latest": {
+   "n_scored": 107,
+   "n_calls": 107,
+   "composite": 0.45042774216823506,
+   "correctness~similarity": 0.3609511609849527,
+   "completeness~concept_recall": 0.6899543892224997,
+   "citation~citation_composite": 0.3003776762972527,
+   "group": "selection",
+   "ci95": [
+    0.3727476154863681,
+    0.5379487005235815
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.08370606254646337,
+    0.08823798037231752
+   ]
+  },
+  "gemma4:26b": {
+   "n_scored": 107,
+   "n_calls": 107,
+   "composite": 0.46036651220624986,
+   "correctness~similarity": 0.49578246688880806,
+   "completeness~concept_recall": 0.6457893825063021,
+   "citation~citation_composite": 0.2395276872236393,
+   "group": "later_check",
+   "ci95": [
+    0.3564775921893543,
+    0.5639486897633936
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.08990756516284204,
+    0.09676489420634525
+   ]
+  },
+  "gemma4:31b": {
+   "n_scored": 107,
+   "n_calls": 107,
+   "composite": 0.4702553327191155,
+   "correctness~similarity": 0.47592704949222764,
+   "completeness~concept_recall": 0.6657562196223655,
+   "citation~citation_composite": 0.26908272904275343,
+   "group": "later_check",
+   "ci95": [
+    0.36461324862954797,
+    0.5791472245899325
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.07363018489457632,
+    0.10798059188256895
+   ]
+  },
+  "qwen3.8:27b-mlx": {
+   "n_scored": 107,
+   "n_calls": 107,
+   "composite": 0.5299265880215362,
+   "correctness~similarity": 0.47042200650175775,
+   "completeness~concept_recall": 0.7623117716512047,
+   "citation~citation_composite": 0.35704598591164644,
+   "group": "later_check",
+   "ci95": [
+    0.4512919281374042,
+    0.6076788966825775
+   ],
+   "diff_vs_incumbent_ci95": [
+    0.00014951732750576643,
+    0.15073685960849453
+   ]
+  }
+ },
+ "without_own_answers": {
+  "gemma3:27b-it-qat": {
+   "n_scored": 77,
+   "n_calls": 107,
+   "composite": 0.42380936720000717,
+   "correctness~similarity": 0.5252462266979246,
+   "completeness~concept_recall": 0.6706281736314186,
+   "citation~citation_composite": 0.0755537012706781,
+   "group": "selection",
+   "ci95": [
+    0.30185320277398,
+    0.5422714162415686
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.17242515882420134,
+    0.06422735077089589
+   ]
+  },
+  "qwen3.5:122b": {
+   "n_scored": 79,
+   "n_calls": 107,
+   "composite": 0.4465272163167136,
+   "correctness~similarity": 0.33764014205376397,
+   "completeness~concept_recall": 0.6948873443717395,
+   "citation~citation_composite": 0.30705416252463746,
+   "group": "selection",
+   "ci95": [
+    0.35141886799052247,
+    0.5433139237908465
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.11665117358932396,
+    0.09351192520981487
+   ]
+  },
+  "llama3.2:latest": {
+   "n_scored": 106,
+   "n_calls": 107,
+   "composite": 0.18859411983635976,
+   "correctness~similarity": 0.12695468301103507,
+   "completeness~concept_recall": 0.2261105902101364,
+   "citation~citation_composite": 0.2127170862879078,
+   "group": "selection",
+   "ci95": [
+    0.044633931499693455,
+    0.3263237681142909
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.441333829618887,
+    -0.13036000294887418
+   ]
+  },
+  "ministral-3:3b": {
+   "n_scored": 93,
+   "n_calls": 107,
+   "composite": 0.4350506255905866,
+   "correctness~similarity": 0.49195525910090226,
+   "completeness~concept_recall": 0.5300601966841233,
+   "citation~citation_composite": 0.28313642098673414,
+   "group": "selection",
+   "ci95": [
+    0.3264832874261054,
+    0.5264141119298025
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.1371962541799877,
+    0.07369464572042465
+   ]
+  },
+  "gemma3:latest": {
+   "n_scored": 77,
+   "n_calls": 107,
+   "composite": 0.2774326543385753,
+   "correctness~similarity": 0.2899871421164198,
+   "completeness~concept_recall": 0.33199308497881497,
+   "citation~citation_composite": 0.21031773592049102,
+   "group": "selection",
+   "ci95": [
+    0.11403632511870572,
+    0.4249047481749234
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.3731489900430721,
+    -0.011455067522502964
+   ]
+  },
+  "gpt-oss:120b": {
+   "n_scored": 92,
+   "n_calls": 107,
+   "composite": 0.4884686685647008,
+   "correctness~similarity": 0.3900118880174418,
+   "completeness~concept_recall": 0.7247725422199396,
+   "citation~citation_composite": 0.3506215754567209,
+   "group": "selection",
+   "ci95": [
+    0.3988743147989225,
+    0.5727659000397328
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.07372491446721316,
+    0.11883339114106152
+   ]
+  },
+  "mistral:latest": {
+   "n_scored": 93,
+   "n_calls": 107,
+   "composite": 0.21261411639502373,
+   "correctness~similarity": 0.3973126659396026,
+   "completeness~concept_recall": 0.25975915446270165,
+   "citation~citation_composite": -0.019229471217233098,
+   "group": "selection",
+   "ci95": [
+    0.08576676612455007,
+    0.3344755541285077
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.3984901374618429,
+    -0.102461262585021
+   ]
+  },
+  "ministral-3:8b": {
+   "n_scored": 93,
+   "n_calls": 107,
+   "composite": 0.5042705549367933,
+   "correctness~similarity": 0.6184436278925923,
+   "completeness~concept_recall": 0.6474775386772593,
+   "citation~citation_composite": 0.2468904982405282,
+   "group": "selection",
+   "ci95": [
+    0.41445645100211526,
+    0.582827870428985
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.06766300673383244,
+    0.1430863988785372
+   ]
+  },
+  "qwen3:235b": {
+   "n_scored": 79,
+   "n_calls": 107,
+   "composite": 0.3717076063783095,
+   "correctness~similarity": 0.35565196947910144,
+   "completeness~concept_recall": 0.7144548379876493,
+   "citation~citation_composite": 0.045016011668177675,
+   "group": "selection",
+   "ci95": [
+    0.24247519964253877,
+    0.5035184190469172
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.19474127935913407,
+    0.027962692888502706
+   ]
+  },
+  "olmo-3:latest": {
+   "n_scored": 103,
+   "n_calls": 107,
+   "composite": 0.3753528688657175,
+   "correctness~similarity": 0.39558082582447546,
+   "completeness~concept_recall": 0.64230481724113,
+   "citation~citation_composite": 0.08817296353154719,
+   "group": "selection",
+   "ci95": [
+    0.27997434767819984,
+    0.44690273918116036
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.20589225301021497,
+    0.006261187778513695
+   ]
+  },
+  "qwen3-coder-next:q4_K_M": {
+   "n_scored": 79,
+   "n_calls": 107,
+   "composite": 0.3998450050021179,
+   "correctness~similarity": 0.43691472998280256,
+   "completeness~concept_recall": 0.5944267340796388,
+   "citation~citation_composite": 0.16819355094391258,
+   "group": "selection",
+   "ci95": [
+    0.28918596249822887,
+    0.5043842245555268
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.18990956500035774,
+    0.05910793978940294
+   ]
+  },
+  "gemma3n:latest": {
+   "n_scored": 77,
+   "n_calls": 107,
+   "composite": 0.3354894038100502,
+   "correctness~similarity": 0.29926779935735565,
+   "completeness~concept_recall": 0.45633869552192347,
+   "citation~citation_composite": 0.2508617165508714,
+   "group": "selection",
+   "ci95": [
+    0.1865640951098648,
+    0.4600579188553907
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.2902499418847156,
+    0.005927369019621404
+   ]
+  },
+  "ministral-3:14b": {
+   "n_scored": 93,
+   "n_calls": 107,
+   "composite": 0.5259283633925683,
+   "correctness~similarity": 0.5580611056040772,
+   "completeness~concept_recall": 0.6994220219663916,
+   "citation~citation_composite": 0.32030196260723637,
+   "group": "selection",
+   "ci95": [
+    0.4442172463759233,
+    0.6089768884763582
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.013778300956207069,
+    0.14976610247076375
+   ]
+  },
+  "deepseek-r1:70b": {
+   "n_scored": 99,
+   "n_calls": 107,
+   "composite": 0.3869148086817813,
+   "correctness~similarity": 0.47647801393932004,
+   "completeness~concept_recall": 0.6355157190511292,
+   "citation~citation_composite": 0.04875069305489459,
+   "group": "selection",
+   "ci95": [
+    0.2718343836570131,
+    0.4877826777519027
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.21063842323807122,
+    0.03446589774438602
+   ]
+  },
+  "gpt-oss:20b": {
+   "n_scored": 92,
+   "n_calls": 107,
+   "composite": 0.48940763653764735,
+   "correctness~similarity": 0.37997162551873226,
+   "completeness~concept_recall": 0.736418333614314,
+   "citation~citation_composite": 0.35183295047989577,
+   "group": "selection",
+   "ci95": [
+    0.3829281347521507,
+    0.5942835435196685
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.08976889325482725,
+    0.14631420157192612
+   ]
+  },
+  "devstral-small-2:24b": {
+   "n_scored": 93,
+   "n_calls": 107,
+   "composite": 0.4930331118854248,
+   "correctness~similarity": 0.5864493149455299,
+   "completeness~concept_recall": 0.6669464114941197,
+   "citation~citation_composite": 0.22570360921662483,
+   "group": "selection",
+   "ci95": [
+    0.3879928969617452,
+    0.5873597336103865
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.055838617219223764,
+    0.12781969483458946
+   ]
+  },
+  "gemma3:27b": {
+   "n_scored": 77,
+   "n_calls": 107,
+   "composite": 0.42931971854419143,
+   "correctness~similarity": 0.5713974034782855,
+   "completeness~concept_recall": 0.5961150067009416,
+   "citation~citation_composite": 0.12044674545334713,
+   "group": "selection",
+   "ci95": [
+    0.29854955272282746,
+    0.5610890731899988
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.1732806469841654,
+    0.07741478634496055
+   ]
+  },
+  "qwen3-coder:latest": {
+   "n_scored": 79,
+   "n_calls": 107,
+   "composite": 0.4733202072817942,
+   "correctness~similarity": 0.55790840759422,
+   "completeness~concept_recall": 0.7019258309420224,
+   "citation~citation_composite": 0.1601263833091401,
+   "group": "selection",
+   "ci95": [
+    0.35610524773579505,
+    0.5608139844456033
+   ],
+   "diff_vs_incumbent_ci95": [
+    0.0,
+    0.0
+   ]
+  },
+  "glm-4.7-flash:latest": {
+   "n_scored": 107,
+   "n_calls": 107,
+   "composite": 0.45042774216823506,
+   "correctness~similarity": 0.3609511609849527,
+   "completeness~concept_recall": 0.6899543892224997,
+   "citation~citation_composite": 0.3003776762972527,
+   "group": "selection",
+   "ci95": [
+    0.3727476154863681,
+    0.5379487005235815
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.10187186755810147,
+    0.09456729621321391
+   ]
+  },
+  "gemma4:26b": {
+   "n_scored": 77,
+   "n_calls": 107,
+   "composite": 0.44483234721963655,
+   "correctness~similarity": 0.5035615578918705,
+   "completeness~concept_recall": 0.5912675475737855,
+   "citation~citation_composite": 0.23966793619325372,
+   "group": "later_check",
+   "ci95": [
+    0.32043965120666684,
+    0.5638761979749211
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.14424489779659044,
+    0.10738060852112032
+   ]
+  },
+  "gemma4:31b": {
+   "n_scored": 77,
+   "n_calls": 107,
+   "composite": 0.44164243164016725,
+   "correctness~similarity": 0.47851428654822437,
+   "completeness~concept_recall": 0.6117082867381002,
+   "citation~citation_composite": 0.23470472163417735,
+   "group": "later_check",
+   "ci95": [
+    0.31534365112384344,
+    0.5699339986472485
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.1385331251659612,
+    0.09739783197632736
+   ]
+  },
+  "qwen3.8:27b-mlx": {
+   "n_scored": 79,
+   "n_calls": 107,
+   "composite": 0.5297478440480057,
+   "correctness~similarity": 0.4402938842030877,
+   "completeness~concept_recall": 0.7534138030740458,
+   "citation~citation_composite": 0.3955358448668836,
+   "group": "later_check",
+   "ci95": [
+    0.43522717650123177,
+    0.6207784665071244
+   ],
+   "diff_vs_incumbent_ci95": [
+    -0.022128637636723746,
+    0.1612596407043342
+   ]
+  }
+ },
+ "original_composite": {
+  "qwen3:235b": 0.4059,
+  "gemma3:27b-it-qat": 0.5017,
+  "qwen3.5:122b": 0.5312,
+  "llama3.2:latest": 0.2963,
+  "ministral-3:3b": 0.4699,
+  "gemma3:latest": 0.3949,
+  "gpt-oss:120b": 0.5541,
+  "mistral:latest": 0.2145,
+  "olmo-3:latest": 0.2846,
+  "ministral-3:8b": 0.4644,
+  "qwen3-coder-next:q4_K_M": 0.4993,
+  "gemma3n:latest": 0.5112,
+  "ministral-3:14b": 0.512,
+  "deepseek-r1:70b": 0.4683,
+  "gpt-oss:20b": 0.5117,
+  "devstral-small-2:24b": 0.5447,
+  "gemma3:27b": 0.5021,
+  "qwen3-coder:latest": 0.5672,
+  "glm-4.7-flash:latest": 0.3493
+ },
+ "reference_measures": {
+  "gemini::gemini-3-flash-preview|01_sarek_CO2": {
+   "generator": "gemini::gemini-3-flash-preview",
+   "concept_recall": 0.5,
+   "semantic_similarity": 0.8444432020187378,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "gemini::gemini-3-flash-preview|12_hpai_netherlands_CO2": {
+   "generator": "gemini::gemini-3-flash-preview",
+   "concept_recall": 0.375,
+   "semantic_similarity": 0.7958230376243591,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "gemini::gemini-3-flash-preview|02_snakemake_CO2": {
+   "generator": "gemini::gemini-3-flash-preview",
+   "concept_recall": 0.625,
+   "semantic_similarity": 0.8970514535903931,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "gemini::gemini-3-flash-preview|CD_002": {
+   "generator": "gemini::gemini-3-flash-preview",
+   "concept_recall": 0.75,
+   "semantic_similarity": 0.8038922548294067,
+   "encoder_truncated": false,
+   "cite_composite": 0.808071472581639
+  },
+  "gemini::gemini-3-flash-preview|CD_001": {
+   "generator": "gemini::gemini-3-flash-preview",
+   "concept_recall": 0.125,
+   "semantic_similarity": 0.7707722783088684,
+   "encoder_truncated": false,
+   "cite_composite": 0.8333333333333334
+  },
+  "gemini::gemini-3-flash-preview|CD_003": {
+   "generator": "gemini::gemini-3-flash-preview",
+   "concept_recall": 0.5,
+   "semantic_similarity": 0.8351369500160217,
+   "encoder_truncated": false,
+   "cite_composite": 0.8888888888888888
+  },
+  "gemini::gemini-3-flash-preview|01_sarek_FR1": {
+   "generator": "gemini::gemini-3-flash-preview",
+   "concept_recall": 0.8,
+   "semantic_similarity": 0.6932772397994995,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "gemini::gemini-3-flash-preview|02_snakemake_FR1": {
+   "generator": "gemini::gemini-3-flash-preview",
+   "concept_recall": 1.0,
+   "semantic_similarity": 0.790928065776825,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "gemini::gemini-3-flash-preview|03_nfcore_framework_FR1": {
+   "generator": "gemini::gemini-3-flash-preview",
+   "concept_recall": 1.0,
+   "semantic_similarity": 0.8072131872177124,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "gemini::gemini-3-flash-preview|SY_001": {
+   "generator": "gemini::gemini-3-flash-preview",
+   "concept_recall": 0.25,
+   "semantic_similarity": 0.7986176013946533,
+   "encoder_truncated": false,
+   "cite_composite": 0.75
+  },
+  "gemini::gemini-3-flash-preview|SY_002": {
+   "generator": "gemini::gemini-3-flash-preview",
+   "concept_recall": 0.25,
+   "semantic_similarity": 0.7806842923164368,
+   "encoder_truncated": false,
+   "cite_composite": 0.9166666666666666
+  },
+  "gemini::gemini-3-flash-preview|SY_003": {
+   "generator": "gemini::gemini-3-flash-preview",
+   "concept_recall": 0.25,
+   "semantic_similarity": 0.7863828539848328,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "gemini::gemini-3-flash-preview|06_star_aligner_TE3": {
+   "generator": "gemini::gemini-3-flash-preview",
+   "concept_recall": 1.0,
+   "semantic_similarity": 0.7307080030441284,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "gemini::gemini-3-flash-preview|01_sarek_TE3": {
+   "generator": "gemini::gemini-3-flash-preview",
+   "concept_recall": 1.0,
+   "semantic_similarity": 0.7791421413421631,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "gemini::gemini-3-flash-preview|02_snakemake_TE3": {
+   "generator": "gemini::gemini-3-flash-preview",
+   "concept_recall": 1.0,
+   "semantic_similarity": 0.8752673268318176,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::qwen3-coder:latest|01_sarek_CO2": {
+   "generator": "ollama::qwen3-coder:latest",
+   "concept_recall": 0.625,
+   "semantic_similarity": 0.8344179391860962,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::qwen3-coder:latest|12_hpai_netherlands_CO2": {
+   "generator": "ollama::qwen3-coder:latest",
+   "concept_recall": 0.625,
+   "semantic_similarity": 0.7909364104270935,
+   "encoder_truncated": false,
+   "cite_composite": 0.0
+  },
+  "ollama::qwen3-coder:latest|02_snakemake_CO2": {
+   "generator": "ollama::qwen3-coder:latest",
+   "concept_recall": 0.625,
+   "semantic_similarity": 0.8996576070785522,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::qwen3-coder:latest|CD_002": {
+   "generator": "ollama::qwen3-coder:latest",
+   "concept_recall": 0.25,
+   "semantic_similarity": 0.8225041031837463,
+   "encoder_truncated": false,
+   "cite_composite": 0.8333333333333334
+  },
+  "ollama::qwen3-coder:latest|CD_001": {
+   "generator": "ollama::qwen3-coder:latest",
+   "concept_recall": 0.0,
+   "semantic_similarity": 0.7734862565994263,
+   "encoder_truncated": false,
+   "cite_composite": 0.8333333333333334
+  },
+  "ollama::qwen3-coder:latest|CD_003": {
+   "generator": "ollama::qwen3-coder:latest",
+   "concept_recall": 0.25,
+   "semantic_similarity": 0.7037472724914551,
+   "encoder_truncated": false,
+   "cite_composite": 0.7777777777777777
+  },
+  "ollama::qwen3-coder:latest|01_sarek_FR1": {
+   "generator": "ollama::qwen3-coder:latest",
+   "concept_recall": 0.8,
+   "semantic_similarity": 0.6944156885147095,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::qwen3-coder:latest|02_snakemake_FR1": {
+   "generator": "ollama::qwen3-coder:latest",
+   "concept_recall": 1.0,
+   "semantic_similarity": 0.751368522644043,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::qwen3-coder:latest|SY_001": {
+   "generator": "ollama::qwen3-coder:latest",
+   "concept_recall": 0.125,
+   "semantic_similarity": 0.7433950304985046,
+   "encoder_truncated": false,
+   "cite_composite": 0.8333333333333334
+  },
+  "ollama::qwen3-coder:latest|SY_002": {
+   "generator": "ollama::qwen3-coder:latest",
+   "concept_recall": 0.125,
+   "semantic_similarity": 0.7415239214897156,
+   "encoder_truncated": false,
+   "cite_composite": 0.8333333333333334
+  },
+  "ollama::qwen3-coder:latest|SY_003": {
+   "generator": "ollama::qwen3-coder:latest",
+   "concept_recall": 0.25,
+   "semantic_similarity": 0.7523410320281982,
+   "encoder_truncated": false,
+   "cite_composite": 0.9166666666666666
+  },
+  "ollama::qwen3-coder:latest|06_star_aligner_TE3": {
+   "generator": "ollama::qwen3-coder:latest",
+   "concept_recall": 0.25,
+   "semantic_similarity": 0.6343896389007568,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::qwen3-coder:latest|02_snakemake_TE3": {
+   "generator": "ollama::qwen3-coder:latest",
+   "concept_recall": 0.375,
+   "semantic_similarity": 0.9295493364334106,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::devstral-small-2:24b|01_sarek_CO2": {
+   "generator": "ollama::devstral-small-2:24b",
+   "concept_recall": 0.375,
+   "semantic_similarity": 0.8730677366256714,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::devstral-small-2:24b|12_hpai_netherlands_CO2": {
+   "generator": "ollama::devstral-small-2:24b",
+   "concept_recall": 0.25,
+   "semantic_similarity": 0.7849633693695068,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::devstral-small-2:24b|CD_002": {
+   "generator": "ollama::devstral-small-2:24b",
+   "concept_recall": 0.125,
+   "semantic_similarity": 0.7954370975494385,
+   "encoder_truncated": false,
+   "cite_composite": 0.8333333333333334
+  },
+  "ollama::devstral-small-2:24b|CD_001": {
+   "generator": "ollama::devstral-small-2:24b",
+   "concept_recall": 0.125,
+   "semantic_similarity": 0.7966839075088501,
+   "encoder_truncated": false,
+   "cite_composite": 0.8333333333333334
+  },
+  "ollama::devstral-small-2:24b|CD_003": {
+   "generator": "ollama::devstral-small-2:24b",
+   "concept_recall": 0.25,
+   "semantic_similarity": 0.8338623642921448,
+   "encoder_truncated": false,
+   "cite_composite": 0.8888888888888888
+  },
+  "ollama::devstral-small-2:24b|01_sarek_FR1": {
+   "generator": "ollama::devstral-small-2:24b",
+   "concept_recall": 0.6,
+   "semantic_similarity": 0.6614581346511841,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::devstral-small-2:24b|02_snakemake_FR1": {
+   "generator": "ollama::devstral-small-2:24b",
+   "concept_recall": 1.0,
+   "semantic_similarity": 0.7554644346237183,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::devstral-small-2:24b|03_nfcore_framework_FR1": {
+   "generator": "ollama::devstral-small-2:24b",
+   "concept_recall": 0.5,
+   "semantic_similarity": 0.8262391686439514,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::devstral-small-2:24b|SY_001": {
+   "generator": "ollama::devstral-small-2:24b",
+   "concept_recall": 0.125,
+   "semantic_similarity": 0.7839559316635132,
+   "encoder_truncated": false,
+   "cite_composite": 0.75
+  },
+  "ollama::devstral-small-2:24b|SY_002": {
+   "generator": "ollama::devstral-small-2:24b",
+   "concept_recall": 0.125,
+   "semantic_similarity": 0.8057063221931458,
+   "encoder_truncated": false,
+   "cite_composite": 0.8333333333333334
+  },
+  "ollama::devstral-small-2:24b|SY_003": {
+   "generator": "ollama::devstral-small-2:24b",
+   "concept_recall": 0.125,
+   "semantic_similarity": 0.6973889470100403,
+   "encoder_truncated": false,
+   "cite_composite": 0.75
+  },
+  "ollama::devstral-small-2:24b|06_star_aligner_TE3": {
+   "generator": "ollama::devstral-small-2:24b",
+   "concept_recall": 0.75,
+   "semantic_similarity": 0.7466873526573181,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::devstral-small-2:24b|01_sarek_TE3": {
+   "generator": "ollama::devstral-small-2:24b",
+   "concept_recall": 0.4,
+   "semantic_similarity": 0.7977069616317749,
+   "encoder_truncated": false,
+   "cite_composite": 0.0
+  },
+  "ollama::devstral-small-2:24b|02_snakemake_TE3": {
+   "generator": "ollama::devstral-small-2:24b",
+   "concept_recall": 0.375,
+   "semantic_similarity": 0.8424826860427856,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::nemotron-3-nano:30b|01_sarek_CO2": {
+   "generator": "ollama::nemotron-3-nano:30b",
+   "concept_recall": 0.5,
+   "semantic_similarity": 0.792167603969574,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::nemotron-3-nano:30b|12_hpai_netherlands_CO2": {
+   "generator": "ollama::nemotron-3-nano:30b",
+   "concept_recall": 0.0,
+   "semantic_similarity": 0.48470059037208557,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::nemotron-3-nano:30b|02_snakemake_CO2": {
+   "generator": "ollama::nemotron-3-nano:30b",
+   "concept_recall": 1.0,
+   "semantic_similarity": 0.7717061042785645,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::nemotron-3-nano:30b|CD_002": {
+   "generator": "ollama::nemotron-3-nano:30b",
+   "concept_recall": 0.375,
+   "semantic_similarity": 0.7400450706481934,
+   "encoder_truncated": false,
+   "cite_composite": 0.16666666666666666
+  },
+  "ollama::nemotron-3-nano:30b|CD_003": {
+   "generator": "ollama::nemotron-3-nano:30b",
+   "concept_recall": 0.375,
+   "semantic_similarity": 0.7536531686782837,
+   "encoder_truncated": false,
+   "cite_composite": 0.7777777777777777
+  },
+  "ollama::nemotron-3-nano:30b|01_sarek_FR1": {
+   "generator": "ollama::nemotron-3-nano:30b",
+   "concept_recall": 0.0,
+   "semantic_similarity": 0.7265318036079407,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::nemotron-3-nano:30b|02_snakemake_FR1": {
+   "generator": "ollama::nemotron-3-nano:30b",
+   "concept_recall": 1.0,
+   "semantic_similarity": 0.6641932129859924,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::nemotron-3-nano:30b|SY_001": {
+   "generator": "ollama::nemotron-3-nano:30b",
+   "concept_recall": 0.125,
+   "semantic_similarity": 0.7847563028335571,
+   "encoder_truncated": false,
+   "cite_composite": 0.5097505352322442
+  },
+  "ollama::nemotron-3-nano:30b|SY_002": {
+   "generator": "ollama::nemotron-3-nano:30b",
+   "concept_recall": 0.125,
+   "semantic_similarity": 0.8073402643203735,
+   "encoder_truncated": false,
+   "cite_composite": 0.8333333333333334
+  },
+  "ollama::nemotron-3-nano:30b|SY_003": {
+   "generator": "ollama::nemotron-3-nano:30b",
+   "concept_recall": 0.125,
+   "semantic_similarity": 0.7147258520126343,
+   "encoder_truncated": false,
+   "cite_composite": 0.75
+  },
+  "ollama::nemotron-3-nano:30b|06_star_aligner_TE3": {
+   "generator": "ollama::nemotron-3-nano:30b",
+   "concept_recall": 0.75,
+   "semantic_similarity": 0.7717804312705994,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::nemotron-3-nano:30b|02_snakemake_TE3": {
+   "generator": "ollama::nemotron-3-nano:30b",
+   "concept_recall": 0.25,
+   "semantic_similarity": 0.8081098794937134,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::deepseek-r1:70b|12_hpai_netherlands_CO2": {
+   "generator": "ollama::deepseek-r1:70b",
+   "concept_recall": 0.125,
+   "semantic_similarity": 0.7891136407852173,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::deepseek-r1:70b|02_snakemake_CO2": {
+   "generator": "ollama::deepseek-r1:70b",
+   "concept_recall": 0.375,
+   "semantic_similarity": 0.9072598218917847,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::deepseek-r1:70b|02_snakemake_FR1": {
+   "generator": "ollama::deepseek-r1:70b",
+   "concept_recall": 1.0,
+   "semantic_similarity": 0.6649936437606812,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::deepseek-r1:70b|03_nfcore_framework_FR1": {
+   "generator": "ollama::deepseek-r1:70b",
+   "concept_recall": 0.0,
+   "semantic_similarity": 0.4927886426448822,
+   "encoder_truncated": false,
+   "cite_composite": 0.6666666666666666
+  },
+  "ollama::deepseek-r1:70b|SY_001": {
+   "generator": "ollama::deepseek-r1:70b",
+   "concept_recall": 0.0,
+   "semantic_similarity": 0.6387014389038086,
+   "encoder_truncated": false,
+   "cite_composite": 0.75
+  },
+  "ollama::deepseek-r1:70b|06_star_aligner_TE3": {
+   "generator": "ollama::deepseek-r1:70b",
+   "concept_recall": 0.25,
+   "semantic_similarity": 0.61872398853302,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::deepseek-r1:70b|01_sarek_TE3": {
+   "generator": "ollama::deepseek-r1:70b",
+   "concept_recall": 0.6,
+   "semantic_similarity": 0.8040685653686523,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::deepseek-r1:70b|02_snakemake_TE3": {
+   "generator": "ollama::deepseek-r1:70b",
+   "concept_recall": 0.375,
+   "semantic_similarity": 0.7626070976257324,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::gemma3:27b|01_sarek_CO2": {
+   "generator": "ollama::gemma3:27b",
+   "concept_recall": 0.375,
+   "semantic_similarity": 0.8544578552246094,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::gemma3:27b|12_hpai_netherlands_CO2": {
+   "generator": "ollama::gemma3:27b",
+   "concept_recall": 0.875,
+   "semantic_similarity": 0.8377963304519653,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::gemma3:27b|02_snakemake_CO2": {
+   "generator": "ollama::gemma3:27b",
+   "concept_recall": 0.625,
+   "semantic_similarity": 0.9131197929382324,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::gemma3:27b|CD_002": {
+   "generator": "ollama::gemma3:27b",
+   "concept_recall": 0.5,
+   "semantic_similarity": 0.8639061450958252,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::gemma3:27b|CD_001": {
+   "generator": "ollama::gemma3:27b",
+   "concept_recall": 0.25,
+   "semantic_similarity": 0.7799842357635498,
+   "encoder_truncated": false,
+   "cite_composite": 0.8333333333333334
+  },
+  "ollama::gemma3:27b|CD_003": {
+   "generator": "ollama::gemma3:27b",
+   "concept_recall": 0.0,
+   "semantic_similarity": 0.8005151748657227,
+   "encoder_truncated": false,
+   "cite_composite": 0.7777777777777777
+  },
+  "ollama::gemma3:27b|01_sarek_FR1": {
+   "generator": "ollama::gemma3:27b",
+   "concept_recall": 0.8,
+   "semantic_similarity": 0.7154459953308105,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::gemma3:27b|02_snakemake_FR1": {
+   "generator": "ollama::gemma3:27b",
+   "concept_recall": 0.0,
+   "semantic_similarity": 0.47957611083984375,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::gemma3:27b|03_nfcore_framework_FR1": {
+   "generator": "ollama::gemma3:27b",
+   "concept_recall": 1.0,
+   "semantic_similarity": 0.781400740146637,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::gemma3:27b|SY_001": {
+   "generator": "ollama::gemma3:27b",
+   "concept_recall": 0.25,
+   "semantic_similarity": 0.7406355738639832,
+   "encoder_truncated": false,
+   "cite_composite": 0.75
+  },
+  "ollama::gemma3:27b|SY_002": {
+   "generator": "ollama::gemma3:27b",
+   "concept_recall": 0.125,
+   "semantic_similarity": 0.7622021436691284,
+   "encoder_truncated": false,
+   "cite_composite": 0.8333333333333334
+  },
+  "ollama::gemma3:27b|SY_003": {
+   "generator": "ollama::gemma3:27b",
+   "concept_recall": 0.125,
+   "semantic_similarity": 0.7457028031349182,
+   "encoder_truncated": false,
+   "cite_composite": 0.75
+  },
+  "ollama::gemma3:27b|06_star_aligner_TE3": {
+   "generator": "ollama::gemma3:27b",
+   "concept_recall": 0.75,
+   "semantic_similarity": 0.7242255210876465,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::gemma3:27b|01_sarek_TE3": {
+   "generator": "ollama::gemma3:27b",
+   "concept_recall": 0.8,
+   "semantic_similarity": 0.8462571501731873,
+   "encoder_truncated": false,
+   "cite_composite": 0.988106718097075
+  },
+  "ollama::gemma3:27b|02_snakemake_TE3": {
+   "generator": "ollama::gemma3:27b",
+   "concept_recall": 0.75,
+   "semantic_similarity": 0.8786417245864868,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::gpt-oss:120b|01_sarek_CO2": {
+   "generator": "ollama::gpt-oss:120b",
+   "concept_recall": 0.125,
+   "semantic_similarity": 0.8696960210800171,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::gpt-oss:120b|12_hpai_netherlands_CO2": {
+   "generator": "ollama::gpt-oss:120b",
+   "concept_recall": 0.25,
+   "semantic_similarity": 0.8310717940330505,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::gpt-oss:120b|02_snakemake_CO2": {
+   "generator": "ollama::gpt-oss:120b",
+   "concept_recall": 0.25,
+   "semantic_similarity": 0.8903204202651978,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::gpt-oss:120b|CD_002": {
+   "generator": "ollama::gpt-oss:120b",
+   "concept_recall": 0.375,
+   "semantic_similarity": 0.8615545034408569,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::gpt-oss:120b|CD_001": {
+   "generator": "ollama::gpt-oss:120b",
+   "concept_recall": 0.0,
+   "semantic_similarity": 0.8022912740707397,
+   "encoder_truncated": false,
+   "cite_composite": 0.8333333333333334
+  },
+  "ollama::gpt-oss:120b|CD_003": {
+   "generator": "ollama::gpt-oss:120b",
+   "concept_recall": 0.375,
+   "semantic_similarity": 0.8523502349853516,
+   "encoder_truncated": false,
+   "cite_composite": 0.8888888888888888
+  },
+  "ollama::gpt-oss:120b|01_sarek_FR1": {
+   "generator": "ollama::gpt-oss:120b",
+   "concept_recall": 0.4,
+   "semantic_similarity": 0.7465412020683289,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::gpt-oss:120b|02_snakemake_FR1": {
+   "generator": "ollama::gpt-oss:120b",
+   "concept_recall": 0.5,
+   "semantic_similarity": 0.7663432359695435,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::gpt-oss:120b|03_nfcore_framework_FR1": {
+   "generator": "ollama::gpt-oss:120b",
+   "concept_recall": 0.5,
+   "semantic_similarity": 0.8594233989715576,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::gpt-oss:120b|SY_001": {
+   "generator": "ollama::gpt-oss:120b",
+   "concept_recall": 0.0,
+   "semantic_similarity": 0.6669548749923706,
+   "encoder_truncated": false,
+   "cite_composite": 0.75
+  },
+  "ollama::gpt-oss:120b|SY_002": {
+   "generator": "ollama::gpt-oss:120b",
+   "concept_recall": 0.0,
+   "semantic_similarity": 0.6849198341369629,
+   "encoder_truncated": false,
+   "cite_composite": 0.75
+  },
+  "ollama::gpt-oss:120b|SY_003": {
+   "generator": "ollama::gpt-oss:120b",
+   "concept_recall": 0.125,
+   "semantic_similarity": 0.7273366451263428,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::gpt-oss:120b|06_star_aligner_TE3": {
+   "generator": "ollama::gpt-oss:120b",
+   "concept_recall": 0.5,
+   "semantic_similarity": 0.6600020527839661,
+   "encoder_truncated": false,
+   "cite_composite": 0.0
+  },
+  "ollama::gpt-oss:120b|01_sarek_TE3": {
+   "generator": "ollama::gpt-oss:120b",
+   "concept_recall": 0.8,
+   "semantic_similarity": 0.8263189196586609,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::gpt-oss:120b|02_snakemake_TE3": {
+   "generator": "ollama::gpt-oss:120b",
+   "concept_recall": 0.25,
+   "semantic_similarity": 0.8352600336074829,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::qwen3-coder-next:q4_K_M|01_sarek_CO2": {
+   "generator": "ollama::qwen3-coder-next:q4_K_M",
+   "concept_recall": 0.375,
+   "semantic_similarity": 0.8834381699562073,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::qwen3-coder-next:q4_K_M|12_hpai_netherlands_CO2": {
+   "generator": "ollama::qwen3-coder-next:q4_K_M",
+   "concept_recall": 0.75,
+   "semantic_similarity": 0.8701817989349365,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::qwen3-coder-next:q4_K_M|02_snakemake_CO2": {
+   "generator": "ollama::qwen3-coder-next:q4_K_M",
+   "concept_recall": 0.375,
+   "semantic_similarity": 0.9145742654800415,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::qwen3-coder-next:q4_K_M|CD_002": {
+   "generator": "ollama::qwen3-coder-next:q4_K_M",
+   "concept_recall": 0.375,
+   "semantic_similarity": 0.8273991346359253,
+   "encoder_truncated": false,
+   "cite_composite": 0.8333333333333334
+  },
+  "ollama::qwen3-coder-next:q4_K_M|CD_001": {
+   "generator": "ollama::qwen3-coder-next:q4_K_M",
+   "concept_recall": 0.25,
+   "semantic_similarity": 0.824682354927063,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::qwen3-coder-next:q4_K_M|CD_003": {
+   "generator": "ollama::qwen3-coder-next:q4_K_M",
+   "concept_recall": 0.375,
+   "semantic_similarity": 0.7972670793533325,
+   "encoder_truncated": false,
+   "cite_composite": 0.7777777777777777
+  },
+  "ollama::qwen3-coder-next:q4_K_M|01_sarek_FR1": {
+   "generator": "ollama::qwen3-coder-next:q4_K_M",
+   "concept_recall": 0.6,
+   "semantic_similarity": 0.7432496547698975,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::qwen3-coder-next:q4_K_M|02_snakemake_FR1": {
+   "generator": "ollama::qwen3-coder-next:q4_K_M",
+   "concept_recall": 1.0,
+   "semantic_similarity": 0.7326276302337646,
+   "encoder_truncated": false,
+   "cite_composite": 0.9044222539229673
+  },
+  "ollama::qwen3-coder-next:q4_K_M|03_nfcore_framework_FR1": {
+   "generator": "ollama::qwen3-coder-next:q4_K_M",
+   "concept_recall": 0.75,
+   "semantic_similarity": 0.8730500936508179,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::qwen3-coder-next:q4_K_M|SY_001": {
+   "generator": "ollama::qwen3-coder-next:q4_K_M",
+   "concept_recall": 0.25,
+   "semantic_similarity": 0.7346044182777405,
+   "encoder_truncated": false,
+   "cite_composite": 0.75
+  },
+  "ollama::qwen3-coder-next:q4_K_M|SY_002": {
+   "generator": "ollama::qwen3-coder-next:q4_K_M",
+   "concept_recall": 0.25,
+   "semantic_similarity": 0.8331642150878906,
+   "encoder_truncated": false,
+   "cite_composite": 0.8333333333333334
+  },
+  "ollama::qwen3-coder-next:q4_K_M|SY_003": {
+   "generator": "ollama::qwen3-coder-next:q4_K_M",
+   "concept_recall": 0.375,
+   "semantic_similarity": 0.7386198043823242,
+   "encoder_truncated": false,
+   "cite_composite": 0.8333333333333334
+  },
+  "ollama::qwen3-coder-next:q4_K_M|06_star_aligner_TE3": {
+   "generator": "ollama::qwen3-coder-next:q4_K_M",
+   "concept_recall": 0.25,
+   "semantic_similarity": 0.6292436718940735,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  },
+  "ollama::qwen3-coder-next:q4_K_M|01_sarek_TE3": {
+   "generator": "ollama::qwen3-coder-next:q4_K_M",
+   "concept_recall": 0.4,
+   "semantic_similarity": 0.7010018229484558,
+   "encoder_truncated": false,
+   "cite_composite": 0.6666666666666666
+  },
+  "ollama::qwen3-coder-next:q4_K_M|02_snakemake_TE3": {
+   "generator": "ollama::qwen3-coder-next:q4_K_M",
+   "concept_recall": 0.625,
+   "semantic_similarity": 0.9368392825126648,
+   "encoder_truncated": false,
+   "cite_composite": 1.0
+  }
+ }
+}

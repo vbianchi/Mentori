@@ -1,0 +1,160 @@
+"""S582 - Supplementary Data 1 (7 before D302): the answer key's 244 questions as one workbook, one row per question.
+
+Reads the answer key the analyses score against (data/ground_truth_v2/ground_truth_v2_5_as_v1.json) and the corpus
+manifest (findings/recompute/D75_Q51_corpus/corpus_papers.csv, for each source paper's area), and writes
+findings/figures_provisional/supp_data1_answer_key/Supplementary Data 1.xlsx: sheet "Questions" (id, question,
+category, subcategory, difficulty as labelled when the question was written, answerable, source papers, their areas,
+expected answer, expected concepts) and sheet "Counts" (questions per category and per area, and the answerable
+questions with the ten false-premise ones left out, rulings page 6 Nov, R3: O1). The counts it prints are the ones the
+Results paragraph on the answer key cites. Then, beside it, 'Supplementary Data 1 caption.md' (D304), in the style of the
+Source Data captions: what the workbook holds, sheet by sheet, with every count read back from the saved workbook.
+
+Reproduces before writing: the key's own header counts (total_questions, by_category, answerable_questions) must equal
+the counts recounted from its rows, or the script stops.
+
+    uv run python scripts/S582_answer_key_table.py              # the workbook, then its caption
+    uv run python scripts/S582_answer_key_table.py --caption    # the caption only, from the committed workbook
+"""
+
+import collections
+import csv
+import hashlib
+import json
+import sys
+from pathlib import Path
+
+import openpyxl
+
+ROOT = Path(__file__).resolve().parent.parent
+KEY = ROOT / "data/ground_truth_v2/ground_truth_v2_5_as_v1.json"
+CORPUS = ROOT / "findings/recompute/D75_Q51_corpus/corpus_papers.csv"
+OUT = ROOT / "findings/figures_provisional/supp_data1_answer_key/Supplementary Data 1.xlsx"
+CAPTION = OUT.with_name("Supplementary Data 1 caption.md")
+
+AREA = {
+    "amr_one_health": "antimicrobial resistance and One Health",
+    "bioinformatics_ngs": "bioinformatics and sequencing",
+    "veterinary_epidemiology": "veterinary epidemiology",
+    "microbiome": "microbiome",
+    "computational_biology_methods": "computational biology methods",
+}
+
+
+# The key's subcategory "contradictory" marks the ten false-premise questions (out_of_domain, answerable); the
+# workbook prints the paper's name for them. The key itself is not changed.
+SUBCATEGORY = {"contradictory": "false_premise"}
+
+
+def sha(p):
+    return hashlib.sha256(p.read_bytes()).hexdigest()
+
+
+def _words(xs):
+    return ", ".join(xs[:-1]) + " and " + xs[-1] if len(xs) > 1 else xs[0]
+
+
+def caption(book=OUT):
+    """The caption, every count read from the saved workbook; refused when the two sheets disagree."""
+    wb = openpyxl.load_workbook(book, read_only=True)
+    head, *rows = list(wb["Questions"].iter_rows(values_only=True))
+    counts = [r for r in wb["Counts"].iter_rows(min_row=2, values_only=True)]
+    by = collections.defaultdict(list)
+    for kind, group, n in counts:
+        by[kind].append((group, n))
+    cat = by["questions per category"]
+    if sum(n for _, n in cat) != len(rows) or dict(cat) != dict(collections.Counter(r[2] for r in rows)):
+        sys.exit(f"S582 caption: sheet Counts' categories {cat} are not sheet Questions' {len(rows)} rows")
+    ans = sum(1 for r in rows if r[5] == "yes")
+    ood = by["out_of_domain questions per subcategory"]
+    fp = dict(ood).get("false_premise")
+    if sum(1 for r in rows if r[3] == "false_premise" and r[5] == "yes") != fp:
+        sys.exit(f"S582 caption: the {fp} false-premise questions of sheet Counts are not all answerable in Questions")
+    papers = by["core papers per area"]
+    nq = len(rows)
+    text = (
+        "# Supplementary Data 1, caption\n\n"
+        "**Supplementary Data 1 | The answer key.** The answer key is Supplementary Data 1. One workbook, two sheets. "
+        f"Sheet Questions: one row per question, {nq} questions ("
+        + _words([f"{n} {g.replace('_', ' ')}" for g, n in cat]) + "), with "
+        + _words([h for h in head]) + f"; {ans} are marked answerable, the {fp} false-premise questions among them "
+        "(subcategory false_premise), and difficulty is as labelled when the question was written. Sheet Counts: the "
+        "questions per category; the " + str(dict(by["answerable, false premise excluded"])["all"])
+        + " answerable questions with the false-premise ones left out; the out-of-domain questions per subcategory ("
+        + _words([f"{n} {g.replace('_', ' ')}" for g, n in ood]) + "); the core papers per area ("
+        + str(sum(n for _, n in papers)) + f": {_words([f'{n} {g}' for g, n in papers])}); the one-paper questions "
+        "per area; the "
+        + str(dict(by["questions with two or more source papers"])["all"]) + " questions with two or more source "
+        "papers, " + str(dict(by["of those, papers from two areas"])["all"]) + " of them with papers from two areas; "
+        "and the sha256 of the two files it is read from. Generated by `uv run python scripts/S582_answer_key_table.py` "
+        f"from {KEY.relative_to(ROOT)} and {CORPUS.relative_to(ROOT)}.\n\n"
+        "Proposed Data Availability sentence: \"The answer key is Supplementary Data 1.\"\n")
+    CAPTION.write_text(text)
+    print(f"wrote {CAPTION.relative_to(ROOT)}")
+
+
+def main():
+    if sys.argv[1:] == ["--caption"]:
+        return caption()
+    if sys.argv[1:]:
+        sys.exit("usage: S582_answer_key_table.py [--caption]")
+    key = json.loads(KEY.read_text())
+    qs = key["questions"]
+    area = {r["filename"]: r["domain"] for r in csv.DictReader(CORPUS.open())}
+    cats = collections.Counter(q["category"] for q in qs)
+    if len(qs) != key["total_questions"] or dict(cats) != key["by_category"]:
+        sys.exit(f"S582: key header {key['total_questions']}, {key['by_category']} != rows {len(qs)}, {dict(cats)}")
+    contra = {q["id"] for q in qs if q["subcategory"] == "contradictory"}
+    premise = {q["id"] for q in qs if q["category"] == "out_of_domain" and q["answerable"]}
+    if contra != premise or len(contra) != 10:
+        sys.exit(f"S582: 'contradictory' ({len(contra)}) is not the set of false-premise questions ({len(premise)})")
+    answerable = [q for q in qs if q["answerable"]]
+    if len(answerable) != key["answerable_questions"]:
+        sys.exit(f"S582: key header answerable_questions {key['answerable_questions']} != rows {len(answerable)}")
+    # rulings page 6 Nov, R3: O1. The key's answerable flag is true for the ten false-premise questions (205); the
+    # text's "195 can be answered from the papers" leaves them out.
+    answerable_no_premise = [q for q in answerable if q["id"] not in premise]
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Questions"
+    ws.append(["id", "question", "category", "subcategory", "difficulty", "answerable", "source papers",
+               "source areas", "expected answer", "expected concepts"])
+    for q in qs:
+        src = q["source_files"] or []
+        ws.append([q["id"], q["question"], q["category"], SUBCATEGORY.get(q["subcategory"], q["subcategory"] or ""), q["difficulty"] or "",
+                   "yes" if q["answerable"] else "no", "; ".join(src),
+                   "; ".join(sorted({AREA[area[f]] for f in src})), q["expected_answer"] or "",
+                   "; ".join(q["expected_concepts"] or [])])
+
+    papers = collections.Counter(AREA[r["domain"]] for r in csv.DictReader(CORPUS.open()) if r["bucket"] == "core")
+    one_area = collections.Counter(AREA[area[q["source_files"][0]]] for q in qs if len(q["source_files"] or []) == 1)
+    multi = [q for q in qs if len(q["source_files"] or []) > 1]
+    sub = collections.Counter(SUBCATEGORY.get(q["subcategory"], q["subcategory"]) for q in qs
+                              if q["category"] == "out_of_domain")
+    wc = wb.create_sheet("Counts")
+    wc.append(["count", "group", "n"])
+    for k, v in sorted(cats.items()):
+        wc.append(["questions per category", k, v])
+    wc.append(["answerable, false premise excluded", "all", len(answerable_no_premise)])
+    for k, v in sorted(sub.items(), key=lambda kv: str(kv[0])):
+        wc.append(["out_of_domain questions per subcategory", str(k), v])
+    for k, v in papers.most_common():
+        wc.append(["core papers per area", k, v])
+    for k, v in one_area.most_common():
+        wc.append(["one-paper questions per area", k, v])
+    wc.append(["questions with two or more source papers", "all", len(multi)])
+    wc.append(["of those, papers from two areas", "all",
+               sum(len({area[f] for f in q["source_files"]}) > 1 for q in multi)])
+    wc.append(["provenance", f"{KEY.relative_to(ROOT)} sha256", sha(KEY)])
+    wc.append(["provenance", f"{CORPUS.relative_to(ROOT)} sha256", sha(CORPUS)])
+
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    wb.save(OUT)
+    for row in wc.iter_rows(min_row=2, values_only=True):
+        print(*row, sep="\t")
+    print(f"wrote {OUT.relative_to(ROOT)}")
+    caption(OUT)
+
+
+if __name__ == "__main__":
+    main()

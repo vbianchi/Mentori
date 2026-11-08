@@ -1,0 +1,113 @@
+{
+ "provenance": {
+  "script": "scripts/S524_t3_s12_s13.py",
+  "script_sha256": "e388ff60e30c347663c45de82bf9081127209e0ce0e8008e8f2ed67040566f79",
+  "command": "uv run --frozen python scripts/S524_t3_s12_s13.py figure --t3 findings/recompute/frozen_inputs/extracted/count_records_20261106/count_records_20261106/t3/T3_frozen_20261104T131439Z --s12b findings/recompute/s12b_inputs --results findings/recompute/exp07_bench_20261107/exp07_bench_20261107.tar",
+  "python": "3.13.11",
+  "deterministic": "no build time and no repository HEAD are recorded",
+  "inputs_sha256": {
+   "experiments/LOCK.toml": "8730d401a5d7b6baa1780e656f844261eaead60e45b5199afa29d57f989ad495",
+   "findings/recompute/T3_runs/inputs/MANIFEST.json": "222a3898c1bb930d6ede15ae87b38113f74e5a2c80fbedab7d237caa8e3861bd",
+   "findings/recompute/S285_component_bench.csv": "f8dea1a7400f5cf30f0d88fd07232c9795bc790abd0d1100c288579b7977b022",
+   "findings/recompute/frozen_inputs/extracted/count_records_20261106/count_records_20261106/t3/T3_frozen_20261104T131439Z/SHA256SUMS": "0d1312adf1bf17a8c5768a7a9ca96a7e71ba176af79fbac4451a3bbe1d474044",
+   "findings/recompute/exp07_bench_20261107/exp07_bench_20261107.tar": "c2a8c0398bb63d32110e44f9fe7984c70d035af8fd4cb51760f51ea52e5e3d66",
+   "findings/recompute/s12b_inputs/SHA256SUMS": "2ce95c580962154b00480aade3cf2de8daa837b4eb7720b5a91662c6e246e9c3",
+   "findings/recompute/T3_runs/inputs/s12b_item_map.json": "d1d4cf3c8ef52184b2dcfe7a83e478be14ed01cfa2f55643d87fcc9bf86d2d84"
+  },
+  "frozen_set": "findings/recompute/frozen_inputs/extracted/count_records_20261106/count_records_20261106/t3/T3_frozen_20261104T131439Z",
+  "frozen_set_sha256sums": "0d1312adf1bf17a8c5768a7a9ca96a7e71ba176af79fbac4451a3bbe1d474044",
+  "reproduced": [
+   {
+    "component": "Analyser",
+    "model_key": "devstral-small-2-24b",
+    "recomputed": 85.2174,
+    "S285": 85.2174,
+    "equal": true
+   },
+   {
+    "component": "Analyser",
+    "model_key": "gemini-3-flash-preview",
+    "recomputed": 80.8696,
+    "S285": 80.8696,
+    "equal": true
+   },
+   {
+    "component": "Planner",
+    "model_key": "devstral-small-2-24b",
+    "recomputed": 96.6667,
+    "S285": 96.6667,
+    "equal": true
+   },
+   {
+    "component": "Planner",
+    "model_key": "gemini-3-flash-preview",
+    "recomputed": 82.2222,
+    "S285": 82.2222,
+    "equal": true
+   },
+   {
+    "component": "Distiller",
+    "model_key": "devstral-small-2-24b",
+    "recomputed": 46.7619,
+    "S285": 46.7619,
+    "equal": true
+   },
+   {
+    "component": "Distiller",
+    "model_key": "gemini-3-flash-preview",
+    "recomputed": 18.7278,
+    "S285": 18.7278,
+    "equal": true
+   },
+   {
+    "component": "Supervisor rho",
+    "model_key": "devstral-small-2-24b",
+    "recomputed": 0.1956,
+    "S285": 0.1956,
+    "equal": true
+   },
+   {
+    "component": "Supervisor rho",
+    "model_key": "gemini-3-flash-preview",
+    "recomputed": 0.1943,
+    "S285": 0.1943,
+    "equal": true
+   }
+  ],
+  "refusals_checked": [
+   "S518_split_confirmation exists (D195)",
+   "frozen set: every file as SHA256SUMS lists it, none unlisted",
+   "frozen items: five files as T3_runs/inputs/MANIFEST.json",
+   "LOCK.toml equivalent to d66daa28 (lock_equiv)",
+   "every sink planned; run_identity and every record of its run and model",
+   "no answer key twice; every item in the frozen dataset; every draw in the plan",
+   "one or more calls per answer, no call without an answer",
+   "every call's lock sha256 equivalent; local digests as LOCK.toml [models]; Gemini calls of Gemini",
+   "stored analyser, planner and distiller scores recomputed from the item and the stored text",
+   "D213: the items on D9's six questions counted as LEFT_OUT and left out (left_out_ids)",
+   "S12b copy: every file as SHA256SUMS lists it, none unlisted; COPY.json of T3's supervisor file",
+   "S12b answers: the map's 194 in-key rows once each, every text's sha256 the T3 supervisor item's",
+   "S12b judge rows: once each, run, scope and key v2.5 (key_hash, answerable prompt, S512); run_sha256 the summary's (its recheck passed) and the headers'; lock equivalent; judge model and digest LOCK.toml's; status ok; score 0 to 5"
+  ],
+  "model_calls": 0
+ },
+ "stamp": "PROVISIONAL: 1,128 of 1,128 planned T3 answers, from frozen set findings/recompute/frozen_inputs/extracted/count_records_20261106/count_records_20261106/t3/T3_frozen_20261104T131439Z (SHA256SUMS 0d1312adf1bf); models in: gpt-oss:20b, devstral-small-2:24b, gemma3:27b, qwen3-coder:30b, gemini-3-flash-preview, llama3:8b; D213: the 3 items on D9's six questions left out",
+ "figure": "Supplementary Figure 11",
+ "page_mm": [
+  183.0,
+  100.4
+ ],
+ "figure_lock": {
+  "path": "experiments/FIGURE_LOCK.toml",
+  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b"
+ },
+ "files": {
+  "Supplementary Figure 11 (provisional, 1128 of 1128).pdf": "a37d1e570253deb8d94bdd6ceaa6918c4ac916a8e14e6cef0b88995d89945f8a",
+  "Supplementary Figure 11 (provisional, 1128 of 1128).svg": "8d52b98e8ef1a6873e5b47f80e36b15792e8ba4dd831a2fd67eb29353d6332f2",
+  "Supplementary Figure 11 (provisional, 1128 of 1128).png": "34fd69a7a3da6b94d2aaab8631b5ff89f658f882a3d08647d44f5f7cbe8e2530",
+  "Supplementary Figure 11 data (provisional, 1128 of 1128).xlsx": "3bcff8ea25407b073e5ec91b3bd4a01ccd9510c0f39bc231241a94d64bf1a953",
+  "Supplementary Figure 11 data caption (provisional, 1128 of 1128).md": "afe6bcdb06c9fe36bdb1b42c94cdb138b093b43b60e66158109c4c372c7c8dbb",
+  "supplementary_figure11_numbers.json": "00692b4c0590f1d4a2a4cf59f5e6020be22bb32939b8d030ef1e98e4feac393f",
+  "legend_draft.md": "239a26e77c7ce7b12f93c35253fdf728e26d91c3422e14f8a51186595c3c5cfe"
+ }
+}

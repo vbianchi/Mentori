@@ -1,0 +1,710 @@
+{
+ "stamp": "drawn from the code at experiments/mentori/, no data: the 7 orchestration ablation set-ups of Figure 5 and at most 10 plan steps",
+ "what": "every text Supplementary Figure 9 prints and every element it draws, as the data workbook holds them",
+ "sheets": {
+  "Supp. Fig. 9 lines": {
+   "columns": [
+    "element",
+    "kind",
+    "line",
+    "text"
+   ],
+   "rows": [
+    [
+     "Question -> Analyser",
+     "label",
+     1,
+     "Question"
+    ],
+    [
+     "Question -> Analyser",
+     "box",
+     2,
+     "Analyser"
+    ],
+    [
+     "Question -> Analyser",
+     "box",
+     3,
+     "answer directly"
+    ],
+    [
+     "Question -> Analyser",
+     "box",
+     4,
+     "or plan"
+    ],
+    [
+     "Analyser -> Planner (\"needs_plan\")",
+     "box",
+     1,
+     "Planner"
+    ],
+    [
+     "Analyser -> Planner (\"needs_plan\")",
+     "box",
+     2,
+     "writes the steps,"
+    ],
+    [
+     "Analyser -> Planner (\"needs_plan\")",
+     "box",
+     3,
+     "one tool each"
+    ],
+    [
+     "Analyser -> Direct answer",
+     "box",
+     1,
+     "Direct answer"
+    ],
+    [
+     "Analyser -> Direct answer",
+     "box",
+     2,
+     "one model call,"
+    ],
+    [
+     "Analyser -> Direct answer",
+     "box",
+     3,
+     "no tools"
+    ],
+    [
+     "\"at most 10 steps\"",
+     "label",
+     1,
+     "at most 10 steps"
+    ],
+    [
+     "Tool call: smart query router, no model call",
+     "box",
+     1,
+     "Tool call"
+    ],
+    [
+     "Tool call: smart query router, no model call",
+     "box",
+     2,
+     "smart query router picks"
+    ],
+    [
+     "Tool call: smart query router, no model call",
+     "box",
+     3,
+     "the retrieval strategy"
+    ],
+    [
+     "Tool call: smart query router, no model call",
+     "box",
+     4,
+     "(no model call)"
+    ],
+    [
+     "Tool -> Distiller",
+     "box",
+     1,
+     "Distiller"
+    ],
+    [
+     "Tool -> Distiller",
+     "box",
+     2,
+     "condenses a very long"
+    ],
+    [
+     "Tool -> Distiller",
+     "box",
+     3,
+     "step output"
+    ],
+    [
+     "Distiller -> Supervisor",
+     "box",
+     1,
+     "Supervisor"
+    ],
+    [
+     "Distiller -> Supervisor",
+     "box",
+     2,
+     "scores each step;"
+    ],
+    [
+     "Distiller -> Supervisor",
+     "box",
+     3,
+     "below 70, reruns it"
+    ],
+    [
+     "Distiller -> Supervisor",
+     "box",
+     4,
+     "(up to 3 times)"
+    ],
+    [
+     "Retry loop (\"retry\"; < 70, < 3 retries)",
+     "label",
+     1,
+     "retry"
+    ],
+    [
+     "Execution -> Synthesizer",
+     "box",
+     1,
+     "Synthesizer"
+    ],
+    [
+     "Execution -> Synthesizer",
+     "box",
+     2,
+     "writes the answer"
+    ],
+    [
+     "Execution -> Synthesizer",
+     "box",
+     3,
+     "from the steps"
+    ],
+    [
+     "Synthesizer -> Answer",
+     "box",
+     1,
+     "Answer"
+    ],
+    [
+     "no analyser",
+     "ablation set-up",
+     1,
+     "no analyser:"
+    ],
+    [
+     "no analyser",
+     "ablation set-up",
+     2,
+     "every question"
+    ],
+    [
+     "no analyser",
+     "ablation set-up",
+     3,
+     "planned"
+    ],
+    [
+     "routing fix",
+     "ablation set-up",
+     1,
+     "routing fix:"
+    ],
+    [
+     "routing fix",
+     "ablation set-up",
+     2,
+     "factual"
+    ],
+    [
+     "routing fix",
+     "ablation set-up",
+     3,
+     "questions planned"
+    ],
+    [
+     "no planner",
+     "ablation set-up",
+     1,
+     "no planner:"
+    ],
+    [
+     "no planner",
+     "ablation set-up",
+     2,
+     "one fixed step"
+    ],
+    [
+     "no planner",
+     "ablation set-up",
+     3,
+     "to the router"
+    ],
+    [
+     "no synthesizer",
+     "ablation set-up",
+     1,
+     "no synthesizer:"
+    ],
+    [
+     "no synthesizer",
+     "ablation set-up",
+     2,
+     "the steps' text"
+    ],
+    [
+     "no synthesizer",
+     "ablation set-up",
+     3,
+     "is the answer"
+    ],
+    [
+     "every step distilled, with either prompt",
+     "ablation set-up",
+     1,
+     "every step"
+    ],
+    [
+     "every step distilled, with either prompt",
+     "ablation set-up",
+     2,
+     "distilled, with"
+    ],
+    [
+     "every step distilled, with either prompt",
+     "ablation set-up",
+     3,
+     "either prompt"
+    ],
+    [
+     "no supervisor",
+     "ablation set-up",
+     1,
+     "no supervisor:"
+    ],
+    [
+     "no supervisor",
+     "ablation set-up",
+     2,
+     "each step once,"
+    ],
+    [
+     "no supervisor",
+     "ablation set-up",
+     3,
+     "no retry"
+    ],
+    [
+     "key",
+     "key",
+     1,
+     "model call"
+    ],
+    [
+     "key",
+     "key",
+     2,
+     "no model call"
+    ],
+    [
+     "key",
+     "key",
+     3,
+     "ablation set-up"
+    ]
+   ]
+  },
+  "Supp. Fig. 9 elements": {
+   "columns": [
+    "element",
+    "what_the_code_does",
+    "source"
+   ],
+   "rows": [
+    [
+     "Question -> Analyser",
+     "One model call returns `decision` \"direct_answer\" or \"needs_plan\" (with reasoning, complexity)",
+     "prompts.py:46-52; schemas.py:229-238; engine.py:433-452"
+    ],
+    [
+     "Analyser -> Direct answer",
+     "`decision == \"direct_answer\"`: one call, `tools=None`",
+     "engine.py:483-545; synthesizer.py:165-222 (tools=None at :220)"
+    ],
+    [
+     "Direct answer -> Answer",
+     "the streamed text is the answer",
+     "engine.py:520-531"
+    ],
+    [
+     "Analyser -> Planner (\"needs_plan\")",
+     "one model call writes goal, reasoning and steps, each with one `tool_name` and its args",
+     "engine.py:550-567; prompts.py:168-182"
+    ],
+    [
+     "\"at most 10 steps\"",
+     "the engine cuts a longer plan to `max_steps` (10)",
+     "engine.py:235, 619-621; publication/scripts/exp_03_orchestration_ablation.py:163"
+    ],
+    [
+     "Each step in plan order",
+     "`while not plan.is_complete()`, `plan.current_step()`, `plan.advance()`",
+     "engine.py:681-689, 1130"
+    ],
+    [
+     "Tool call, one per step",
+     "one `mcp_session.call_tool` per attempt",
+     "executor.py:371-374; engine.py:854-861"
+    ],
+    [
+     "Tool call: smart query router, no model call",
+     "keyword rules in order: metadata words -> `inspect_document_index`; triage -> `paper_triage`; corpus analysis -> `analyze_corpus`; cross-document -> `cross_document_analysis`; verify words -> RLM with `verify`; complex or deep words -> RLM; index > 500 passages -> RLM; else `query_documents`, 5 passages",
+     "context_engine.py:1-14, 157-225; rag_tools.py:1105-1193"
+    ],
+    [
+     "Tool -> Distiller",
+     "only when the output is longer than 0.40 x num_ctx 131,072 x 4 = 209,712 characters (`should_distill`)",
+     "executor.py:410-437; observation_distiller.py:42-54, 267-269"
+    ],
+    [
+     "\"asked for at most 600 words\"",
+     "the prompt asks for at most 600 words; no output cap is set",
+     "observation_distiller.py:46-47, 67"
+    ],
+    [
+     "Distiller -> Supervisor",
+     "text pre-check (empty or failed result, no model call), else one call scoring relevance, completeness, accuracy, progress, 0 to 100",
+     "supervisor.py:156-186, 263-285, 367-372"
+    ],
+    [
+     "\">= 70: next step\"",
+     "`is_good_quality()` at 70 resets the failure count; the plan advances",
+     "schemas.py:526-532; engine.py:1126-1130"
+    ],
+    [
+     "Retry loop (\"retry\"; < 70, < 3 retries)",
+     "one micro-adjustment call rewrites `tool_args`, `retry_count += 1`, the same step reruns; no replanning",
+     "supervisor.py:383-385, 410; engine.py:1030-1072; schemas.py:21"
+    ],
+    [
+     "\"< 70 after 3 retries: an escalation\"; \"3 escalations in a row end the steps\"",
+     "`should_escalate` -> `consecutive_failures += 1`; at `max_failures` (3) the plan is marked failed and the loop breaks; synthesis still runs",
+     "supervisor.py:386-388; engine.py:1074-1123; schemas.py:17-22, 445"
+    ],
+    [
+     "Execution -> Synthesizer",
+     "one call reads question, goal and `format_steps_with_results` (each step's last attempt)",
+     "synthesizer.py:73-88; engine.py:1164-1180"
+    ],
+    [
+     "Synthesizer -> Answer",
+     "the synthesis text; thinking used only when content is empty and no error",
+     "engine.py:1182-1197"
+    ],
+    [
+     "no analyser",
+     "`{\"analyser\": \"off\"}`: no call, every question to the planner",
+     "exp_03:151; engine.py:433-436"
+    ],
+    [
+     "routing fix",
+     "`{\"analyser\": \"factual_to_documents\"}`: the analyser prompt's direct-answer list keeps only greetings, meta questions and the like, so factual questions are planned",
+     "exp_03:155; prompts.py:85-114; engine.py:447"
+    ],
+    [
+     "no planner",
+     "`{\"planner\": \"off\"}`: one fixed step, `smart_query` (the smart query router) with the question, mode auto",
+     "exp_03:152; engine.py:188-209, 555-556"
+    ],
+    [
+     "every step distilled, with either prompt",
+     "`{\"distiller_trigger\": \"every_step\"}`, alone or with `{\"distiller\": \"F1\"}` (the worked-example prompt, exp_04b's F1; D290)",
+     "exp_03:149-150, 156-157; executor.py:412-430"
+    ],
+    [
+     "no supervisor",
+     "`{\"supervisor\": \"off\"}`: each step once, no evaluation, no retry",
+     "exp_03:153; engine.py:946-962"
+    ],
+    [
+     "no synthesizer",
+     "`{\"synthesiser\": \"off\"}`: the answer is the steps' text as synthesis would read it",
+     "exp_03:154; engine.py:1151-1162"
+    ]
+   ]
+  },
+  "Supp. Fig. 9 set-ups": {
+   "columns": [
+    "exp_03_config",
+    "label"
+   ],
+   "rows": [
+    [
+     "orch_no_analyser",
+     "no analyser"
+    ],
+    [
+     "orch_factual_to_documents",
+     "routing fix"
+    ],
+    [
+     "orch_no_planner",
+     "no planner"
+    ],
+    [
+     "orch_no_synthesiser",
+     "no synthesizer"
+    ],
+    [
+     "orch_no_distiller",
+     "not drawn: not one of Figure 5's set-ups"
+    ],
+    [
+     "orch_distiller_f1",
+     "not drawn: not one of Figure 5's set-ups"
+    ],
+    [
+     "orch_distil_every_step",
+     "every step distilled, with either prompt"
+    ],
+    [
+     "orch_distil_every_step_f1",
+     "every step distilled, with either prompt"
+    ],
+    [
+     "orch_no_supervisor",
+     "no supervisor"
+    ]
+   ]
+  }
+ },
+ "printed": {
+  "s448num_0": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 0,
+   "format": "{text}"
+  },
+  "s448num_1": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 1,
+   "format": "{text}"
+  },
+  "s448num_2": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 2,
+   "format": "{text}"
+  },
+  "s448num_3": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 3,
+   "format": "{text}"
+  },
+  "s448num_4": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 4,
+   "format": "{text}"
+  },
+  "s448num_5": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 5,
+   "format": "{text}"
+  },
+  "s448num_6": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 6,
+   "format": "{text}"
+  },
+  "s448num_7": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 7,
+   "format": "{text}"
+  },
+  "s448num_8": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 8,
+   "format": "{text}"
+  },
+  "s448num_9": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 9,
+   "format": "{text}"
+  },
+  "s448num_10": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 10,
+   "format": "{text}"
+  },
+  "s448num_11": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 11,
+   "format": "{text}"
+  },
+  "s448num_12": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 12,
+   "format": "{text}"
+  },
+  "s448num_13": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 13,
+   "format": "{text}"
+  },
+  "s448num_14": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 14,
+   "format": "{text}"
+  },
+  "s448num_15": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 15,
+   "format": "{text}"
+  },
+  "s448num_16": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 16,
+   "format": "{text}"
+  },
+  "s448num_17": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 17,
+   "format": "{text}"
+  },
+  "s448num_18": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 18,
+   "format": "{text}"
+  },
+  "s448num_19": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 19,
+   "format": "{text}"
+  },
+  "s448num_20": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 20,
+   "format": "{text}"
+  },
+  "s448num_21": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 21,
+   "format": "{text}"
+  },
+  "s448num_22": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 22,
+   "format": "{text}"
+  },
+  "s448num_23": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 23,
+   "format": "{text}"
+  },
+  "s448num_24": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 24,
+   "format": "{text}"
+  },
+  "s448num_25": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 25,
+   "format": "{text}"
+  },
+  "s448num_26": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 26,
+   "format": "{text}"
+  },
+  "s448num_27": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 27,
+   "format": "{text}"
+  },
+  "s448num_28": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 28,
+   "format": "{text}"
+  },
+  "s448num_29": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 29,
+   "format": "{text}"
+  },
+  "s448num_30": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 30,
+   "format": "{text}"
+  },
+  "s448num_31": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 31,
+   "format": "{text}"
+  },
+  "s448num_32": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 32,
+   "format": "{text}"
+  },
+  "s448num_33": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 33,
+   "format": "{text}"
+  },
+  "s448num_34": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 34,
+   "format": "{text}"
+  },
+  "s448num_35": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 35,
+   "format": "{text}"
+  },
+  "s448num_36": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 36,
+   "format": "{text}"
+  },
+  "s448num_37": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 37,
+   "format": "{text}"
+  },
+  "s448num_38": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 38,
+   "format": "{text}"
+  },
+  "s448num_39": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 39,
+   "format": "{text}"
+  },
+  "s448num_40": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 40,
+   "format": "{text}"
+  },
+  "s448num_41": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 41,
+   "format": "{text}"
+  },
+  "s448num_42": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 42,
+   "format": "{text}"
+  },
+  "s448num_43": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 43,
+   "format": "{text}"
+  },
+  "s448num_44": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 44,
+   "format": "{text}"
+  },
+  "s448num_45": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 45,
+   "format": "{text}"
+  },
+  "s448num_46": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 46,
+   "format": "{text}"
+  },
+  "s448num_47": {
+   "sheet": "Supp. Fig. 9 lines",
+   "row": 47,
+   "format": "{text}"
+  }
+ },
+ "printed_what": "every text on the plate: the SVG group id of its text, the lines sheet's 0-based data row and format it is written from (S448 R8 (6))"
+}

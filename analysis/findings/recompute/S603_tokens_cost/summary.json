@@ -1,0 +1,1150 @@
+{
+ "all_tiers": {
+  "by_model": {
+   "Anthropic|claude-haiku-4-5": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 13696,
+    "no_count": 119,
+    "not_in_collects": 0,
+    "output": 17359060,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 178726140,
+    "split": 13577,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 265.52143999999817
+   },
+   "Google|gemini-2.5-pro": {
+    "above_200k_calls": 5,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 14017,
+    "no_count": 2,
+    "not_in_collects": 0,
+    "output": 2834911,
+    "output_from_total": 969,
+    "output_from_total_tokens": 0,
+    "prompt": 44194155,
+    "split": 14015,
+    "thinking": 9926696,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 184.44012999999964
+   },
+   "Google|gemini-3-flash-preview": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 205200,
+    "no_count": 43,
+    "not_in_collects": 0,
+    "output": 183413555,
+    "output_from_total": 177,
+    "output_from_total_tokens": 0,
+    "prompt": 1770445317,
+    "split": 205157,
+    "thinking": 197797041,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 2028.8544464999652
+   },
+   "local (Ollama)|deepseek-r1:70b": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 834,
+    "no_count": 0,
+    "not_in_collects": 0,
+    "output": 1454102,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 860571,
+    "split": 834,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "local (Ollama)|devstral-small-2:24b": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 988314,
+    "no_count": 258,
+    "not_in_collects": 0,
+    "output": 21124416,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 1658937727,
+    "split": 988056,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "local (Ollama)|gemma3:27b": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 8316,
+    "no_count": 380,
+    "not_in_collects": 0,
+    "output": 1472940,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 33385309,
+    "split": 7936,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "local (Ollama)|glm-4.7-flash:bf16": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 567,
+    "no_count": 0,
+    "not_in_collects": 0,
+    "output": 1341315,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 609331,
+    "split": 567,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "local (Ollama)|gpt-oss:20b": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 30,
+    "no_count": 0,
+    "not_in_collects": 0,
+    "output": 60596,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 72104,
+    "split": 30,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "local (Ollama)|gpt-oss:20b-date20261010": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 16062,
+    "no_count": 103,
+    "not_in_collects": 0,
+    "output": 20282825,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 54048552,
+    "split": 15959,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "local (Ollama)|nemotron-3-nano:30b": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 945,
+    "no_count": 13,
+    "not_in_collects": 0,
+    "output": 4134617,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 1008007,
+    "split": 932,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "local (Ollama)|qwen3-coder-next:q4_K_M": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 5498,
+    "no_count": 3,
+    "not_in_collects": 0,
+    "output": 911442,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 12071305,
+    "split": 5495,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "local (Ollama)|qwen3-coder:30b": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 10087,
+    "no_count": 0,
+    "not_in_collects": 0,
+    "output": 2901202,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 38763922,
+    "split": 10087,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "local (Ollama)|qwen3-coder:latest": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 181,
+    "no_count": 0,
+    "not_in_collects": 0,
+    "output": 28578,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 152683,
+    "split": 181,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "local (Ollama)|qwen3.8:27b": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 13116,
+    "no_count": 52,
+    "not_in_collects": 0,
+    "output": 2419436,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 97476457,
+    "split": 13064,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "unknown|?": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 2,
+    "no_count": 2,
+    "not_in_collects": 0,
+    "output": 0,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 0,
+    "split": 0,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   }
+  },
+  "by_provider": {
+   "Anthropic": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 13696,
+    "no_count": 119,
+    "not_in_collects": 0,
+    "output": 17359060,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 178726140,
+    "split": 13577,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 265.52143999999817
+   },
+   "Google": {
+    "above_200k_calls": 5,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 219217,
+    "no_count": 45,
+    "not_in_collects": 0,
+    "output": 186248466,
+    "output_from_total": 1146,
+    "output_from_total_tokens": 0,
+    "prompt": 1814639472,
+    "split": 219172,
+    "thinking": 207723737,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 2213.294576499965
+   },
+   "local (Ollama)": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 1043950,
+    "no_count": 809,
+    "not_in_collects": 0,
+    "output": 56131469,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 1897385968,
+    "split": 1043141,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "unknown": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 2,
+    "no_count": 2,
+    "not_in_collects": 0,
+    "output": 0,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 0,
+    "split": 0,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   }
+  },
+  "by_tier": {
+   "check": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 111816,
+    "no_count": 0,
+    "not_in_collects": 0,
+    "output": 1431053,
+    "output_from_total": 2,
+    "output_from_total_tokens": 0,
+    "prompt": 156055702,
+    "split": 111816,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.012897
+   },
+   "dropped": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 2533,
+    "no_count": 15,
+    "not_in_collects": 0,
+    "output": 6939411,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 2673171,
+    "split": 2518,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "run": {
+    "above_200k_calls": 5,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 1158418,
+    "no_count": 954,
+    "not_in_collects": 0,
+    "output": 246690809,
+    "output_from_total": 1142,
+    "output_from_total_tokens": 0,
+    "prompt": 3697953272,
+    "split": 1157464,
+    "thinking": 204128349,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 2437.894239249963
+   },
+   "smoke": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 4098,
+    "no_count": 6,
+    "not_in_collects": 0,
+    "output": 4677722,
+    "output_from_total": 2,
+    "output_from_total_tokens": 0,
+    "prompt": 34069435,
+    "split": 4092,
+    "thinking": 3595388,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 40.908880250000166
+   }
+  }
+ },
+ "eur": "not converted: the repository records no USD to EUR rate (Valerio's, from the invoices)",
+ "gates": [
+  {
+   "gate": "R3 line reader equals S520's",
+   "got": true,
+   "pass": true,
+   "source": "scripts/S520_llm_calls.py top_fields, value_at",
+   "want": true
+  },
+  {
+   "gate": "R1 S520 total over its frozen inputs",
+   "got": 1158418,
+   "pass": true,
+   "source": "findings/recompute/S520_inputs/laptop_gates.json total_calls",
+   "want": 1158418
+  },
+  {
+   "gate": "R1 S520 calls per model",
+   "got": {
+    "?": 2,
+    "claude-haiku-4-5": 13668,
+    "devstral-small-2:24b": 877399,
+    "gemini-2.5-pro": 13991,
+    "gemini-3-flash-preview": 201491,
+    "gemma3:27b": 8225,
+    "gpt-oss:20b-date20261010": 15939,
+    "qwen3-coder-next:q4_K_M": 5444,
+    "qwen3-coder:30b": 10025,
+    "qwen3.8:27b": 12234
+   },
+   "pass": true,
+   "source": "findings/recompute/S520_llm_calls/summary.json by_model",
+   "want": {
+    "?": 2,
+    "claude-haiku-4-5": 13668,
+    "devstral-small-2:24b": 877399,
+    "gemini-2.5-pro": 13991,
+    "gemini-3-flash-preview": 201491,
+    "gemma3:27b": 8225,
+    "gpt-oss:20b-date20261010": 15939,
+    "qwen3-coder-next:q4_K_M": 5444,
+    "qwen3-coder:30b": 10025,
+    "qwen3.8:27b": 12234
+   }
+  },
+  {
+   "gate": "R2 hashes per S520 row equal its calls",
+   "got": true,
+   "pass": true,
+   "source": "S520.Book rows",
+   "want": true
+  },
+  {
+   "gate": "R2 run-tier hashes equal the total",
+   "got": 1158418,
+   "pass": true,
+   "source": "laptop_gates.json total_calls",
+   "want": 1158418
+  }
+ ],
+ "prices_usd_per_million": {
+  "claude-haiku-4-5": {
+   "cache_read": 0.1,
+   "cache_write": 1.25,
+   "input": 1.0,
+   "output": 5.0,
+   "provider": "Anthropic",
+   "source": "platform.claude.com/docs/en/about-claude/pricing, fetched 7 Nov 2026"
+  },
+  "gemini-2.5-pro": {
+   "input": 1.25,
+   "input_above": 2.5,
+   "output": 10.0,
+   "output_above": 15.0,
+   "provider": "Google",
+   "source": "aistudio.google.com/docs/pricing, fetched 7 Nov 2026",
+   "tier_above": 200000
+  },
+  "gemini-3-flash-preview": {
+   "input": 0.5,
+   "output": 3.0,
+   "provider": "Google",
+   "source": "D234 (experiments/README.md:1562); aistudio.google.com/docs/pricing, 7 Nov 2026"
+  }
+ },
+ "provenance": {
+  "collects": {
+   "beelink": {
+    "ended_utc": "2026-11-07T08:29:31Z",
+    "files_missing": [],
+    "host": "DESKTOP-QJFE6FS",
+    "started_utc": "2026-11-07T08:29:07Z",
+    "zone": "CET +0100"
+   },
+   "laptop": {
+    "ended_utc": "2026-11-07T08:28:52Z",
+    "files_missing": [],
+    "host": "Valerios-MacBook-Pro.local",
+    "started_utc": "2026-11-07T08:28:15Z",
+    "zone": "CET +0100"
+   },
+   "studio": {
+    "ended_utc": "2026-11-07T08:32:01Z",
+    "files_missing": [],
+    "host": "Bioinfos-Mac-Studio.local",
+    "started_utc": "2026-11-07T08:29:10Z",
+    "zone": "CET +0100"
+   }
+  },
+  "command": "uv run --frozen python scripts/S603_tokens_cost.py report",
+  "s520_inputs_sha256": {
+   "laptop_gates.json": "76dd4c325869b57e4fe73b090a0975e3fe33e626212a4a9fa4e3a8e4bb46de98",
+   "s520_beelink.json": "83745c3e0a0e7032a87c43e43debbd5e85508ee61645df7886e8248c5a329809",
+   "s520_laptop.json": "18c4d4483523f2bd85fd5015ca670eea1907bc4ecc73ce78ac558209ec3b7700",
+   "s520_studio.json": "25488c4ce4d39d7d7eb8b2de60558c83df365718f0274dcf2bb81c18a2dfa253"
+  },
+  "s603_inputs_sha256": {
+   "s603_beelink.json.gz": "53e7700bfc245a54215c7ecd50557fb49e78ca6866b1e7055f7530214282d6bb",
+   "s603_laptop.json.gz": "066e13f0fb059527a26c1eec33c08ec70ac1caf4187f1f54e7fb40a500cce913",
+   "s603_studio.json.gz": "8db44273c487f49d2bc1421d6f2d830349b31f511a7e7bd8ac3f115b6aaca871"
+  },
+  "script": "scripts/S603_tokens_cost.py",
+  "script_sha256": "3752aa49d05e8d9f2598f8cf32cb3bf781458b3368a4425790d44b0ac45f36c8"
+ },
+ "run": {
+  "by_model": {
+   "Anthropic|claude-haiku-4-5": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 13668,
+    "no_count": 119,
+    "not_in_collects": 0,
+    "output": 17318335,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 178518117,
+    "split": 13549,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 265.10979199999815
+   },
+   "Google|gemini-2.5-pro": {
+    "above_200k_calls": 5,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 13991,
+    "no_count": 2,
+    "not_in_collects": 0,
+    "output": 2826040,
+    "output_from_total": 968,
+    "output_from_total_tokens": 0,
+    "prompt": 44046906,
+    "split": 13989,
+    "thinking": 9901207,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 183.91246874999965
+   },
+   "Google|gemini-3-flash-preview": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 201491,
+    "no_count": 41,
+    "not_in_collects": 0,
+    "output": 178940351,
+    "output_from_total": 174,
+    "output_from_total_tokens": 0,
+    "prompt": 1738738999,
+    "split": 201450,
+    "thinking": 194227142,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 1988.871978499965
+   },
+   "local (Ollama)|devstral-small-2:24b": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 877399,
+    "no_count": 256,
+    "not_in_collects": 0,
+    "output": 19977410,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 1505993294,
+    "split": 877143,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "local (Ollama)|gemma3:27b": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 8225,
+    "no_count": 380,
+    "not_in_collects": 0,
+    "output": 1459196,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 33032647,
+    "split": 7845,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "local (Ollama)|gpt-oss:20b-date20261010": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 15939,
+    "no_count": 99,
+    "not_in_collects": 0,
+    "output": 20155727,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 53137984,
+    "split": 15840,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "local (Ollama)|qwen3-coder-next:q4_K_M": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 5444,
+    "no_count": 3,
+    "not_in_collects": 0,
+    "output": 900048,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 11740871,
+    "split": 5441,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "local (Ollama)|qwen3-coder:30b": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 10025,
+    "no_count": 0,
+    "not_in_collects": 0,
+    "output": 2868203,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 38222278,
+    "split": 10025,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "local (Ollama)|qwen3.8:27b": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 12234,
+    "no_count": 52,
+    "not_in_collects": 0,
+    "output": 2245499,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 94522176,
+    "split": 12182,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "unknown|?": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 2,
+    "no_count": 2,
+    "not_in_collects": 0,
+    "output": 0,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 0,
+    "split": 0,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   }
+  },
+  "by_provider": {
+   "Anthropic": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 13668,
+    "no_count": 119,
+    "not_in_collects": 0,
+    "output": 17318335,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 178518117,
+    "split": 13549,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 265.10979199999815
+   },
+   "Google": {
+    "above_200k_calls": 5,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 215482,
+    "no_count": 43,
+    "not_in_collects": 0,
+    "output": 181766391,
+    "output_from_total": 1142,
+    "output_from_total_tokens": 0,
+    "prompt": 1782785905,
+    "split": 215439,
+    "thinking": 204128349,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 2172.7844472499646
+   },
+   "local (Ollama)": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 929266,
+    "no_count": 790,
+    "not_in_collects": 0,
+    "output": 47606083,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 1736649250,
+    "split": 928476,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "unknown": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 2,
+    "no_count": 2,
+    "not_in_collects": 0,
+    "output": 0,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 0,
+    "split": 0,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   }
+  }
+ },
+ "s520_calls_per_provider": {
+  "Anthropic": 13668,
+  "Google": 215482,
+  "local (Ollama)": 929266,
+  "unknown": 2
+ },
+ "times_all_tiers": {
+  "all": {
+   "busy_hours": 484.3,
+   "calls_with_time": 1276865,
+   "first_start": {
+    "amsterdam": "2026-10-03 00:27 CEST",
+    "utc": "2026-10-02T22:27:42Z"
+   },
+   "last_end": {
+    "amsterdam": "2026-11-07 01:50 CET",
+    "utc": "2026-11-07T00:50:56Z"
+   },
+   "span_days": 35.1,
+   "wall_s_sum_hours": 4135.3
+  },
+  "by_machine": {
+   "beelink": {
+    "busy_hours": 391.3,
+    "calls_with_time": 426975,
+    "first_start": {
+     "amsterdam": "2026-10-15 19:04 CEST",
+     "utc": "2026-10-15T17:04:11Z"
+    },
+    "last_end": {
+     "amsterdam": "2026-11-02 16:38 CET",
+     "utc": "2026-11-02T15:38:22Z"
+    },
+    "span_days": 17.94,
+    "wall_s_sum_hours": 579.8
+   },
+   "laptop": {
+    "busy_hours": 359.5,
+    "calls_with_time": 286327,
+    "first_start": {
+     "amsterdam": "2026-10-15 23:48 CEST",
+     "utc": "2026-10-15T21:48:03Z"
+    },
+    "last_end": {
+     "amsterdam": "2026-11-01 20:34 CET",
+     "utc": "2026-11-01T19:34:38Z"
+    },
+    "span_days": 16.91,
+    "wall_s_sum_hours": 444.4
+   },
+   "studio": {
+    "busy_hours": 483.2,
+    "calls_with_time": 563563,
+    "first_start": {
+     "amsterdam": "2026-10-03 00:27 CEST",
+     "utc": "2026-10-02T22:27:42Z"
+    },
+    "last_end": {
+     "amsterdam": "2026-11-07 01:50 CET",
+     "utc": "2026-11-07T00:50:56Z"
+    },
+    "span_days": 35.1,
+    "wall_s_sum_hours": 3111.1
+   }
+  },
+  "by_provider": {
+   "Anthropic": {
+    "busy_hours": 22.8,
+    "calls_with_time": 13696,
+    "first_start": {
+     "amsterdam": "2026-10-26 07:31 CET",
+     "utc": "2026-10-26T06:31:08Z"
+    },
+    "last_end": {
+     "amsterdam": "2026-10-28 01:28 CET",
+     "utc": "2026-10-28T00:28:45Z"
+    },
+    "span_days": 1.75,
+    "wall_s_sum_hours": 48.4
+   },
+   "Google": {
+    "busy_hours": 141.5,
+    "calls_with_time": 219217,
+    "first_start": {
+     "amsterdam": "2026-10-15 23:00 CEST",
+     "utc": "2026-10-15T21:00:33Z"
+    },
+    "last_end": {
+     "amsterdam": "2026-11-07 01:50 CET",
+     "utc": "2026-11-07T00:50:56Z"
+    },
+    "span_days": 22.16,
+    "wall_s_sum_hours": 613.7
+   },
+   "local (Ollama)": {
+    "busy_hours": 480.4,
+    "calls_with_time": 1043950,
+    "first_start": {
+     "amsterdam": "2026-10-03 00:27 CEST",
+     "utc": "2026-10-02T22:27:42Z"
+    },
+    "last_end": {
+     "amsterdam": "2026-11-05 03:22 CET",
+     "utc": "2026-11-05T02:22:55Z"
+    },
+    "span_days": 33.16,
+    "wall_s_sum_hours": 3473.2
+   },
+   "unknown": {
+    "busy_hours": 0.0,
+    "calls_with_time": 2,
+    "first_start": {
+     "amsterdam": "2026-10-21 21:24 CEST",
+     "utc": "2026-10-21T19:24:52Z"
+    },
+    "last_end": {
+     "amsterdam": "2026-10-24 10:01 CEST",
+     "utc": "2026-10-24T08:01:16Z"
+    },
+    "span_days": 2.53,
+    "wall_s_sum_hours": 0.0
+   }
+  },
+  "cloud": {
+   "busy_hours": 162.3,
+   "calls_with_time": 232913,
+   "first_start": {
+    "amsterdam": "2026-10-15 23:00 CEST",
+    "utc": "2026-10-15T21:00:33Z"
+   },
+   "last_end": {
+    "amsterdam": "2026-11-07 01:50 CET",
+    "utc": "2026-11-07T00:50:56Z"
+   },
+   "span_days": 22.16,
+   "wall_s_sum_hours": 662.1
+  }
+ },
+ "times_run": {
+  "all": {
+   "busy_hours": 477.2,
+   "calls_with_time": 1158418,
+   "first_start": {
+    "amsterdam": "2026-10-15 23:00 CEST",
+    "utc": "2026-10-15T21:00:33Z"
+   },
+   "last_end": {
+    "amsterdam": "2026-11-07 01:50 CET",
+    "utc": "2026-11-07T00:50:56Z"
+   },
+   "span_days": 22.16,
+   "wall_s_sum_hours": 3746.7
+  },
+  "by_machine": {
+   "beelink": {
+    "busy_hours": 345.8,
+    "calls_with_time": 332546,
+    "first_start": {
+     "amsterdam": "2026-10-17 17:09 CEST",
+     "utc": "2026-10-17T15:09:19Z"
+    },
+    "last_end": {
+     "amsterdam": "2026-11-02 16:38 CET",
+     "utc": "2026-11-02T15:38:22Z"
+    },
+    "span_days": 16.02,
+    "wall_s_sum_hours": 530.0
+   },
+   "laptop": {
+    "busy_hours": 357.3,
+    "calls_with_time": 285781,
+    "first_start": {
+     "amsterdam": "2026-10-16 00:27 CEST",
+     "utc": "2026-10-15T22:27:23Z"
+    },
+    "last_end": {
+     "amsterdam": "2026-11-01 20:34 CET",
+     "utc": "2026-11-01T19:34:38Z"
+    },
+    "span_days": 16.88,
+    "wall_s_sum_hours": 442.2
+   },
+   "studio": {
+    "busy_hours": 476.7,
+    "calls_with_time": 540091,
+    "first_start": {
+     "amsterdam": "2026-10-15 23:00 CEST",
+     "utc": "2026-10-15T21:00:33Z"
+    },
+    "last_end": {
+     "amsterdam": "2026-11-07 01:50 CET",
+     "utc": "2026-11-07T00:50:56Z"
+    },
+    "span_days": 22.16,
+    "wall_s_sum_hours": 2774.5
+   }
+  },
+  "by_provider": {
+   "Anthropic": {
+    "busy_hours": 22.7,
+    "calls_with_time": 13668,
+    "first_start": {
+     "amsterdam": "2026-10-26 07:45 CET",
+     "utc": "2026-10-26T06:45:52Z"
+    },
+    "last_end": {
+     "amsterdam": "2026-10-28 01:28 CET",
+     "utc": "2026-10-28T00:28:45Z"
+    },
+    "span_days": 1.74,
+    "wall_s_sum_hours": 48.3
+   },
+   "Google": {
+    "busy_hours": 139.0,
+    "calls_with_time": 215482,
+    "first_start": {
+     "amsterdam": "2026-10-15 23:00 CEST",
+     "utc": "2026-10-15T21:00:33Z"
+    },
+    "last_end": {
+     "amsterdam": "2026-11-07 01:50 CET",
+     "utc": "2026-11-07T00:50:56Z"
+    },
+    "span_days": 22.16,
+    "wall_s_sum_hours": 600.3
+   },
+   "local (Ollama)": {
+    "busy_hours": 473.8,
+    "calls_with_time": 929266,
+    "first_start": {
+     "amsterdam": "2026-10-15 23:00 CEST",
+     "utc": "2026-10-15T21:00:34Z"
+    },
+    "last_end": {
+     "amsterdam": "2026-11-05 03:22 CET",
+     "utc": "2026-11-05T02:22:55Z"
+    },
+    "span_days": 20.22,
+    "wall_s_sum_hours": 3098.1
+   },
+   "unknown": {
+    "busy_hours": 0.0,
+    "calls_with_time": 2,
+    "first_start": {
+     "amsterdam": "2026-10-21 21:24 CEST",
+     "utc": "2026-10-21T19:24:52Z"
+    },
+    "last_end": {
+     "amsterdam": "2026-10-24 10:01 CEST",
+     "utc": "2026-10-24T08:01:16Z"
+    },
+    "span_days": 2.53,
+    "wall_s_sum_hours": 0.0
+   }
+  },
+  "cloud": {
+   "busy_hours": 159.7,
+   "calls_with_time": 229150,
+   "first_start": {
+    "amsterdam": "2026-10-15 23:00 CEST",
+    "utc": "2026-10-15T21:00:33Z"
+   },
+   "last_end": {
+    "amsterdam": "2026-11-07 01:50 CET",
+    "utc": "2026-11-07T00:50:56Z"
+   },
+   "span_days": 22.16,
+   "wall_s_sum_hours": 648.6
+  }
+ }
+}

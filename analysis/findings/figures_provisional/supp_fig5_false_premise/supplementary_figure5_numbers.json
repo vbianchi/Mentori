@@ -1,0 +1,4413 @@
+{
+ "stamp": "PROVISIONAL: 540 of 540 answers on their final key: a and b, all 180 (G1, three draws, 108 on changed questions read from S6G1, the others unchanged by key v2.5); c, 360 of 360 (G4 draw 1, 0 awaiting S6G4, read on key v2.4 until it ends)",
+ "what": "every number Supplementary Figure 5 draws, sheet by sheet as the data workbook holds them (S448 --supplementary R8 (2) to (6))",
+ "sheets": {
+  "Supplementary Fig. 5a": {
+   "columns": [
+    "row",
+    "threshold",
+    "strategy",
+    "strategy_label",
+    "question_id",
+    "short_claim",
+    "draws_passed",
+    "of_draws",
+    "passed",
+    "of_answers",
+    "pass_keys",
+    "fail_keys",
+    "key_versions"
+   ],
+   "rows": [
+    [
+     "cell",
+     4,
+     "single_pass",
+     "single pass",
+     "OOD_041",
+     "Sarek: Illumina short reads only",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "single_pass",
+     "single pass",
+     "OOD_042",
+     "fastp: separate tools, several passes",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "single_pass",
+     "single pass",
+     "OOD_043",
+     "DESeq2: raw counts, no normalization",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "single_pass",
+     "single pass",
+     "OOD_044",
+     "Snakemake: first-come job queue",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "single_pass",
+     "single pass",
+     "OOD_045",
+     "nf-core: CRAM raised storage by 65%",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "single_pass",
+     "single pass",
+     "OOD_046",
+     "Salmon: full alignment to the genome",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "single_pass",
+     "single pass",
+     "OOD_047",
+     "LSD Nepal: pregnant cows at lower risk",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "single_pass",
+     "single pass",
+     "OOD_048",
+     "HPAI: same signs in every species",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "single_pass",
+     "single pass",
+     "OOD_049",
+     "MultiQC: one tool at a time",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "single_pass",
+     "single pass",
+     "OOD_050",
+     "Rabies: uniform vaccination coverage",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "multi_hop",
+     "multi-hop",
+     "OOD_041",
+     "Sarek: Illumina short reads only",
+     1,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "multi_hop",
+     "multi-hop",
+     "OOD_042",
+     "fastp: separate tools, several passes",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "multi_hop",
+     "multi-hop",
+     "OOD_043",
+     "DESeq2: raw counts, no normalization",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "multi_hop",
+     "multi-hop",
+     "OOD_044",
+     "Snakemake: first-come job queue",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "multi_hop",
+     "multi-hop",
+     "OOD_045",
+     "nf-core: CRAM raised storage by 65%",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "multi_hop",
+     "multi-hop",
+     "OOD_046",
+     "Salmon: full alignment to the genome",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "multi_hop",
+     "multi-hop",
+     "OOD_047",
+     "LSD Nepal: pregnant cows at lower risk",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "multi_hop",
+     "multi-hop",
+     "OOD_048",
+     "HPAI: same signs in every species",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "multi_hop",
+     "multi-hop",
+     "OOD_049",
+     "MultiQC: one tool at a time",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "multi_hop",
+     "multi-hop",
+     "OOD_050",
+     "Rabies: uniform vaccination coverage",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "verified_pass",
+     "verified pass",
+     "OOD_041",
+     "Sarek: Illumina short reads only",
+     2,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "verified_pass",
+     "verified pass",
+     "OOD_042",
+     "fastp: separate tools, several passes",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "verified_pass",
+     "verified pass",
+     "OOD_043",
+     "DESeq2: raw counts, no normalization",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "verified_pass",
+     "verified pass",
+     "OOD_044",
+     "Snakemake: first-come job queue",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "verified_pass",
+     "verified pass",
+     "OOD_045",
+     "nf-core: CRAM raised storage by 65%",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "verified_pass",
+     "verified pass",
+     "OOD_046",
+     "Salmon: full alignment to the genome",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "verified_pass",
+     "verified pass",
+     "OOD_047",
+     "LSD Nepal: pregnant cows at lower risk",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "verified_pass",
+     "verified pass",
+     "OOD_048",
+     "HPAI: same signs in every species",
+     2,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "verified_pass",
+     "verified pass",
+     "OOD_049",
+     "MultiQC: one tool at a time",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "verified_pass",
+     "verified pass",
+     "OOD_050",
+     "Rabies: uniform vaccination coverage",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_5",
+     "RLM-5",
+     "OOD_041",
+     "Sarek: Illumina short reads only",
+     1,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_5",
+     "RLM-5",
+     "OOD_042",
+     "fastp: separate tools, several passes",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_5",
+     "RLM-5",
+     "OOD_043",
+     "DESeq2: raw counts, no normalization",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_5",
+     "RLM-5",
+     "OOD_044",
+     "Snakemake: first-come job queue",
+     2,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_5",
+     "RLM-5",
+     "OOD_045",
+     "nf-core: CRAM raised storage by 65%",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_5",
+     "RLM-5",
+     "OOD_046",
+     "Salmon: full alignment to the genome",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_5",
+     "RLM-5",
+     "OOD_047",
+     "LSD Nepal: pregnant cows at lower risk",
+     2,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_5",
+     "RLM-5",
+     "OOD_048",
+     "HPAI: same signs in every species",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_5",
+     "RLM-5",
+     "OOD_049",
+     "MultiQC: one tool at a time",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_5",
+     "RLM-5",
+     "OOD_050",
+     "Rabies: uniform vaccination coverage",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_10",
+     "RLM-10",
+     "OOD_041",
+     "Sarek: Illumina short reads only",
+     1,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_10",
+     "RLM-10",
+     "OOD_042",
+     "fastp: separate tools, several passes",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_10",
+     "RLM-10",
+     "OOD_043",
+     "DESeq2: raw counts, no normalization",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_10",
+     "RLM-10",
+     "OOD_044",
+     "Snakemake: first-come job queue",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_10",
+     "RLM-10",
+     "OOD_045",
+     "nf-core: CRAM raised storage by 65%",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_10",
+     "RLM-10",
+     "OOD_046",
+     "Salmon: full alignment to the genome",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_10",
+     "RLM-10",
+     "OOD_047",
+     "LSD Nepal: pregnant cows at lower risk",
+     1,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_10",
+     "RLM-10",
+     "OOD_048",
+     "HPAI: same signs in every species",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_10",
+     "RLM-10",
+     "OOD_049",
+     "MultiQC: one tool at a time",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_10",
+     "RLM-10",
+     "OOD_050",
+     "Rabies: uniform vaccination coverage",
+     2,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_20",
+     "RLM-20",
+     "OOD_041",
+     "Sarek: Illumina short reads only",
+     1,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_20",
+     "RLM-20",
+     "OOD_042",
+     "fastp: separate tools, several passes",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_20",
+     "RLM-20",
+     "OOD_043",
+     "DESeq2: raw counts, no normalization",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_20",
+     "RLM-20",
+     "OOD_044",
+     "Snakemake: first-come job queue",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_20",
+     "RLM-20",
+     "OOD_045",
+     "nf-core: CRAM raised storage by 65%",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_20",
+     "RLM-20",
+     "OOD_046",
+     "Salmon: full alignment to the genome",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_20",
+     "RLM-20",
+     "OOD_047",
+     "LSD Nepal: pregnant cows at lower risk",
+     2,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_20",
+     "RLM-20",
+     "OOD_048",
+     "HPAI: same signs in every species",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_20",
+     "RLM-20",
+     "OOD_049",
+     "MultiQC: one tool at a time",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     4,
+     "rlm_20",
+     "RLM-20",
+     "OOD_050",
+     "Rabies: uniform vaccination coverage",
+     2,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "single_pass",
+     "single pass",
+     "OOD_041",
+     "Sarek: Illumina short reads only",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "single_pass",
+     "single pass",
+     "OOD_042",
+     "fastp: separate tools, several passes",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "single_pass",
+     "single pass",
+     "OOD_043",
+     "DESeq2: raw counts, no normalization",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "single_pass",
+     "single pass",
+     "OOD_044",
+     "Snakemake: first-come job queue",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "single_pass",
+     "single pass",
+     "OOD_045",
+     "nf-core: CRAM raised storage by 65%",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "single_pass",
+     "single pass",
+     "OOD_046",
+     "Salmon: full alignment to the genome",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "single_pass",
+     "single pass",
+     "OOD_047",
+     "LSD Nepal: pregnant cows at lower risk",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "single_pass",
+     "single pass",
+     "OOD_048",
+     "HPAI: same signs in every species",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "single_pass",
+     "single pass",
+     "OOD_049",
+     "MultiQC: one tool at a time",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "single_pass",
+     "single pass",
+     "OOD_050",
+     "Rabies: uniform vaccination coverage",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "multi_hop",
+     "multi-hop",
+     "OOD_041",
+     "Sarek: Illumina short reads only",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "multi_hop",
+     "multi-hop",
+     "OOD_042",
+     "fastp: separate tools, several passes",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "multi_hop",
+     "multi-hop",
+     "OOD_043",
+     "DESeq2: raw counts, no normalization",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "multi_hop",
+     "multi-hop",
+     "OOD_044",
+     "Snakemake: first-come job queue",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "multi_hop",
+     "multi-hop",
+     "OOD_045",
+     "nf-core: CRAM raised storage by 65%",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "multi_hop",
+     "multi-hop",
+     "OOD_046",
+     "Salmon: full alignment to the genome",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "multi_hop",
+     "multi-hop",
+     "OOD_047",
+     "LSD Nepal: pregnant cows at lower risk",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "multi_hop",
+     "multi-hop",
+     "OOD_048",
+     "HPAI: same signs in every species",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "multi_hop",
+     "multi-hop",
+     "OOD_049",
+     "MultiQC: one tool at a time",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "multi_hop",
+     "multi-hop",
+     "OOD_050",
+     "Rabies: uniform vaccination coverage",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "verified_pass",
+     "verified pass",
+     "OOD_041",
+     "Sarek: Illumina short reads only",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "verified_pass",
+     "verified pass",
+     "OOD_042",
+     "fastp: separate tools, several passes",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "verified_pass",
+     "verified pass",
+     "OOD_043",
+     "DESeq2: raw counts, no normalization",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "verified_pass",
+     "verified pass",
+     "OOD_044",
+     "Snakemake: first-come job queue",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "verified_pass",
+     "verified pass",
+     "OOD_045",
+     "nf-core: CRAM raised storage by 65%",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "verified_pass",
+     "verified pass",
+     "OOD_046",
+     "Salmon: full alignment to the genome",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "verified_pass",
+     "verified pass",
+     "OOD_047",
+     "LSD Nepal: pregnant cows at lower risk",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "verified_pass",
+     "verified pass",
+     "OOD_048",
+     "HPAI: same signs in every species",
+     2,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "verified_pass",
+     "verified pass",
+     "OOD_049",
+     "MultiQC: one tool at a time",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "verified_pass",
+     "verified pass",
+     "OOD_050",
+     "Rabies: uniform vaccination coverage",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_5",
+     "RLM-5",
+     "OOD_041",
+     "Sarek: Illumina short reads only",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_5",
+     "RLM-5",
+     "OOD_042",
+     "fastp: separate tools, several passes",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_5",
+     "RLM-5",
+     "OOD_043",
+     "DESeq2: raw counts, no normalization",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_5",
+     "RLM-5",
+     "OOD_044",
+     "Snakemake: first-come job queue",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_5",
+     "RLM-5",
+     "OOD_045",
+     "nf-core: CRAM raised storage by 65%",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_5",
+     "RLM-5",
+     "OOD_046",
+     "Salmon: full alignment to the genome",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_5",
+     "RLM-5",
+     "OOD_047",
+     "LSD Nepal: pregnant cows at lower risk",
+     2,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_5",
+     "RLM-5",
+     "OOD_048",
+     "HPAI: same signs in every species",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_5",
+     "RLM-5",
+     "OOD_049",
+     "MultiQC: one tool at a time",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_5",
+     "RLM-5",
+     "OOD_050",
+     "Rabies: uniform vaccination coverage",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_10",
+     "RLM-10",
+     "OOD_041",
+     "Sarek: Illumina short reads only",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_10",
+     "RLM-10",
+     "OOD_042",
+     "fastp: separate tools, several passes",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_10",
+     "RLM-10",
+     "OOD_043",
+     "DESeq2: raw counts, no normalization",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_10",
+     "RLM-10",
+     "OOD_044",
+     "Snakemake: first-come job queue",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_10",
+     "RLM-10",
+     "OOD_045",
+     "nf-core: CRAM raised storage by 65%",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_10",
+     "RLM-10",
+     "OOD_046",
+     "Salmon: full alignment to the genome",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_10",
+     "RLM-10",
+     "OOD_047",
+     "LSD Nepal: pregnant cows at lower risk",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_10",
+     "RLM-10",
+     "OOD_048",
+     "HPAI: same signs in every species",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_10",
+     "RLM-10",
+     "OOD_049",
+     "MultiQC: one tool at a time",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_10",
+     "RLM-10",
+     "OOD_050",
+     "Rabies: uniform vaccination coverage",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_20",
+     "RLM-20",
+     "OOD_041",
+     "Sarek: Illumina short reads only",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_20",
+     "RLM-20",
+     "OOD_042",
+     "fastp: separate tools, several passes",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_20",
+     "RLM-20",
+     "OOD_043",
+     "DESeq2: raw counts, no normalization",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_20",
+     "RLM-20",
+     "OOD_044",
+     "Snakemake: first-come job queue",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_20",
+     "RLM-20",
+     "OOD_045",
+     "nf-core: CRAM raised storage by 65%",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_20",
+     "RLM-20",
+     "OOD_046",
+     "Salmon: full alignment to the genome",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_20",
+     "RLM-20",
+     "OOD_047",
+     "LSD Nepal: pregnant cows at lower risk",
+     2,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_20",
+     "RLM-20",
+     "OOD_048",
+     "HPAI: same signs in every species",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_20",
+     "RLM-20",
+     "OOD_049",
+     "MultiQC: one tool at a time",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "cell",
+     3,
+     "rlm_20",
+     "RLM-20",
+     "OOD_050",
+     "Rabies: uniform vaccination coverage",
+     3,
+     3,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    [
+     "total",
+     4,
+     "single_pass",
+     "single pass",
+     null,
+     null,
+     null,
+     null,
+     30,
+     30,
+     "exp_v4_s20_n0|single_pass|OOD_041|d1 exp_v4_s20_n0|single_pass|OOD_041|d2 exp_v4_s20_n0|single_pass|OOD_041|d3 exp_v4_s20_n0|single_pass|OOD_042|d1 exp_v4_s20_n0|single_pass|OOD_042|d2 exp_v4_s20_n0|single_pass|OOD_042|d3 exp_v4_s20_n0|single_pass|OOD_043|d1 exp_v4_s20_n0|single_pass|OOD_043|d2 exp_v4_s20_n0|single_pass|OOD_043|d3 exp_v4_s20_n0|single_pass|OOD_044|d1 exp_v4_s20_n0|single_pass|OOD_044|d2 exp_v4_s20_n0|single_pass|OOD_044|d3 exp_v4_s20_n0|single_pass|OOD_045|d1 exp_v4_s20_n0|single_pass|OOD_045|d2 exp_v4_s20_n0|single_pass|OOD_045|d3 exp_v4_s20_n0|single_pass|OOD_046|d1 exp_v4_s20_n0|single_pass|OOD_046|d2 exp_v4_s20_n0|single_pass|OOD_046|d3 exp_v4_s20_n0|single_pass|OOD_047|d1 exp_v4_s20_n0|single_pass|OOD_047|d2 exp_v4_s20_n0|single_pass|OOD_047|d3 exp_v4_s20_n0|single_pass|OOD_048|d1 exp_v4_s20_n0|single_pass|OOD_048|d2 exp_v4_s20_n0|single_pass|OOD_048|d3 exp_v4_s20_n0|single_pass|OOD_049|d1 exp_v4_s20_n0|single_pass|OOD_049|d2 exp_v4_s20_n0|single_pass|OOD_049|d3 exp_v4_s20_n0|single_pass|OOD_050|d1 exp_v4_s20_n0|single_pass|OOD_050|d2 exp_v4_s20_n0|single_pass|OOD_050|d3",
+     "",
+     "{\"v2.4\": 12, \"v2.5\": 18}"
+    ],
+    [
+     "total",
+     4,
+     "multi_hop",
+     "multi-hop",
+     null,
+     null,
+     null,
+     null,
+     28,
+     30,
+     "exp_v4_s20_n0|multi_hop|OOD_041|d1 exp_v4_s20_n0|multi_hop|OOD_042|d1 exp_v4_s20_n0|multi_hop|OOD_042|d2 exp_v4_s20_n0|multi_hop|OOD_042|d3 exp_v4_s20_n0|multi_hop|OOD_043|d1 exp_v4_s20_n0|multi_hop|OOD_043|d2 exp_v4_s20_n0|multi_hop|OOD_043|d3 exp_v4_s20_n0|multi_hop|OOD_044|d1 exp_v4_s20_n0|multi_hop|OOD_044|d2 exp_v4_s20_n0|multi_hop|OOD_044|d3 exp_v4_s20_n0|multi_hop|OOD_045|d1 exp_v4_s20_n0|multi_hop|OOD_045|d2 exp_v4_s20_n0|multi_hop|OOD_045|d3 exp_v4_s20_n0|multi_hop|OOD_046|d1 exp_v4_s20_n0|multi_hop|OOD_046|d2 exp_v4_s20_n0|multi_hop|OOD_046|d3 exp_v4_s20_n0|multi_hop|OOD_047|d1 exp_v4_s20_n0|multi_hop|OOD_047|d2 exp_v4_s20_n0|multi_hop|OOD_047|d3 exp_v4_s20_n0|multi_hop|OOD_048|d1 exp_v4_s20_n0|multi_hop|OOD_048|d2 exp_v4_s20_n0|multi_hop|OOD_048|d3 exp_v4_s20_n0|multi_hop|OOD_049|d1 exp_v4_s20_n0|multi_hop|OOD_049|d2 exp_v4_s20_n0|multi_hop|OOD_049|d3 exp_v4_s20_n0|multi_hop|OOD_050|d1 exp_v4_s20_n0|multi_hop|OOD_050|d2 exp_v4_s20_n0|multi_hop|OOD_050|d3",
+     "exp_v4_s20_n0|multi_hop|OOD_041|d2 exp_v4_s20_n0|multi_hop|OOD_041|d3",
+     "{\"v2.4\": 12, \"v2.5\": 18}"
+    ],
+    [
+     "total",
+     4,
+     "verified_pass",
+     "verified pass",
+     null,
+     null,
+     null,
+     null,
+     28,
+     30,
+     "exp_v4_s20_n0|verified_pass|OOD_041|d2 exp_v4_s20_n0|verified_pass|OOD_041|d3 exp_v4_s20_n0|verified_pass|OOD_042|d1 exp_v4_s20_n0|verified_pass|OOD_042|d2 exp_v4_s20_n0|verified_pass|OOD_042|d3 exp_v4_s20_n0|verified_pass|OOD_043|d1 exp_v4_s20_n0|verified_pass|OOD_043|d2 exp_v4_s20_n0|verified_pass|OOD_043|d3 exp_v4_s20_n0|verified_pass|OOD_044|d1 exp_v4_s20_n0|verified_pass|OOD_044|d2 exp_v4_s20_n0|verified_pass|OOD_044|d3 exp_v4_s20_n0|verified_pass|OOD_045|d1 exp_v4_s20_n0|verified_pass|OOD_045|d2 exp_v4_s20_n0|verified_pass|OOD_045|d3 exp_v4_s20_n0|verified_pass|OOD_046|d1 exp_v4_s20_n0|verified_pass|OOD_046|d2 exp_v4_s20_n0|verified_pass|OOD_046|d3 exp_v4_s20_n0|verified_pass|OOD_047|d1 exp_v4_s20_n0|verified_pass|OOD_047|d2 exp_v4_s20_n0|verified_pass|OOD_047|d3 exp_v4_s20_n0|verified_pass|OOD_048|d1 exp_v4_s20_n0|verified_pass|OOD_048|d2 exp_v4_s20_n0|verified_pass|OOD_049|d1 exp_v4_s20_n0|verified_pass|OOD_049|d2 exp_v4_s20_n0|verified_pass|OOD_049|d3 exp_v4_s20_n0|verified_pass|OOD_050|d1 exp_v4_s20_n0|verified_pass|OOD_050|d2 exp_v4_s20_n0|verified_pass|OOD_050|d3",
+     "exp_v4_s20_n0|verified_pass|OOD_041|d1 exp_v4_s20_n0|verified_pass|OOD_048|d3",
+     "{\"v2.4\": 12, \"v2.5\": 18}"
+    ],
+    [
+     "total",
+     4,
+     "rlm_5",
+     "RLM-5",
+     null,
+     null,
+     null,
+     null,
+     26,
+     30,
+     "exp_v4_s20_n0|rlm_5|OOD_041|d3 exp_v4_s20_n0|rlm_5|OOD_042|d1 exp_v4_s20_n0|rlm_5|OOD_042|d2 exp_v4_s20_n0|rlm_5|OOD_042|d3 exp_v4_s20_n0|rlm_5|OOD_043|d1 exp_v4_s20_n0|rlm_5|OOD_043|d2 exp_v4_s20_n0|rlm_5|OOD_043|d3 exp_v4_s20_n0|rlm_5|OOD_044|d1 exp_v4_s20_n0|rlm_5|OOD_044|d3 exp_v4_s20_n0|rlm_5|OOD_045|d1 exp_v4_s20_n0|rlm_5|OOD_045|d2 exp_v4_s20_n0|rlm_5|OOD_045|d3 exp_v4_s20_n0|rlm_5|OOD_046|d1 exp_v4_s20_n0|rlm_5|OOD_046|d2 exp_v4_s20_n0|rlm_5|OOD_046|d3 exp_v4_s20_n0|rlm_5|OOD_047|d1 exp_v4_s20_n0|rlm_5|OOD_047|d3 exp_v4_s20_n0|rlm_5|OOD_048|d1 exp_v4_s20_n0|rlm_5|OOD_048|d2 exp_v4_s20_n0|rlm_5|OOD_048|d3 exp_v4_s20_n0|rlm_5|OOD_049|d1 exp_v4_s20_n0|rlm_5|OOD_049|d2 exp_v4_s20_n0|rlm_5|OOD_049|d3 exp_v4_s20_n0|rlm_5|OOD_050|d1 exp_v4_s20_n0|rlm_5|OOD_050|d2 exp_v4_s20_n0|rlm_5|OOD_050|d3",
+     "exp_v4_s20_n0|rlm_5|OOD_041|d1 exp_v4_s20_n0|rlm_5|OOD_041|d2 exp_v4_s20_n0|rlm_5|OOD_044|d2 exp_v4_s20_n0|rlm_5|OOD_047|d2",
+     "{\"v2.4\": 12, \"v2.5\": 18}"
+    ],
+    [
+     "total",
+     4,
+     "rlm_10",
+     "RLM-10",
+     null,
+     null,
+     null,
+     null,
+     25,
+     30,
+     "exp_v4_s20_n0|rlm_10|OOD_041|d3 exp_v4_s20_n0|rlm_10|OOD_042|d1 exp_v4_s20_n0|rlm_10|OOD_042|d2 exp_v4_s20_n0|rlm_10|OOD_042|d3 exp_v4_s20_n0|rlm_10|OOD_043|d1 exp_v4_s20_n0|rlm_10|OOD_043|d2 exp_v4_s20_n0|rlm_10|OOD_043|d3 exp_v4_s20_n0|rlm_10|OOD_044|d1 exp_v4_s20_n0|rlm_10|OOD_044|d2 exp_v4_s20_n0|rlm_10|OOD_044|d3 exp_v4_s20_n0|rlm_10|OOD_045|d1 exp_v4_s20_n0|rlm_10|OOD_045|d2 exp_v4_s20_n0|rlm_10|OOD_045|d3 exp_v4_s20_n0|rlm_10|OOD_046|d1 exp_v4_s20_n0|rlm_10|OOD_046|d2 exp_v4_s20_n0|rlm_10|OOD_046|d3 exp_v4_s20_n0|rlm_10|OOD_047|d1 exp_v4_s20_n0|rlm_10|OOD_048|d1 exp_v4_s20_n0|rlm_10|OOD_048|d2 exp_v4_s20_n0|rlm_10|OOD_048|d3 exp_v4_s20_n0|rlm_10|OOD_049|d1 exp_v4_s20_n0|rlm_10|OOD_049|d2 exp_v4_s20_n0|rlm_10|OOD_049|d3 exp_v4_s20_n0|rlm_10|OOD_050|d1 exp_v4_s20_n0|rlm_10|OOD_050|d2",
+     "exp_v4_s20_n0|rlm_10|OOD_041|d1 exp_v4_s20_n0|rlm_10|OOD_041|d2 exp_v4_s20_n0|rlm_10|OOD_047|d2 exp_v4_s20_n0|rlm_10|OOD_047|d3 exp_v4_s20_n0|rlm_10|OOD_050|d3",
+     "{\"v2.4\": 12, \"v2.5\": 18}"
+    ],
+    [
+     "total",
+     4,
+     "rlm_20",
+     "RLM-20",
+     null,
+     null,
+     null,
+     null,
+     26,
+     30,
+     "exp_v4_s20_n0|rlm_20|OOD_041|d1 exp_v4_s20_n0|rlm_20|OOD_042|d1 exp_v4_s20_n0|rlm_20|OOD_042|d2 exp_v4_s20_n0|rlm_20|OOD_042|d3 exp_v4_s20_n0|rlm_20|OOD_043|d1 exp_v4_s20_n0|rlm_20|OOD_043|d2 exp_v4_s20_n0|rlm_20|OOD_043|d3 exp_v4_s20_n0|rlm_20|OOD_044|d1 exp_v4_s20_n0|rlm_20|OOD_044|d2 exp_v4_s20_n0|rlm_20|OOD_044|d3 exp_v4_s20_n0|rlm_20|OOD_045|d1 exp_v4_s20_n0|rlm_20|OOD_045|d2 exp_v4_s20_n0|rlm_20|OOD_045|d3 exp_v4_s20_n0|rlm_20|OOD_046|d1 exp_v4_s20_n0|rlm_20|OOD_046|d2 exp_v4_s20_n0|rlm_20|OOD_046|d3 exp_v4_s20_n0|rlm_20|OOD_047|d1 exp_v4_s20_n0|rlm_20|OOD_047|d2 exp_v4_s20_n0|rlm_20|OOD_048|d1 exp_v4_s20_n0|rlm_20|OOD_048|d2 exp_v4_s20_n0|rlm_20|OOD_048|d3 exp_v4_s20_n0|rlm_20|OOD_049|d1 exp_v4_s20_n0|rlm_20|OOD_049|d2 exp_v4_s20_n0|rlm_20|OOD_049|d3 exp_v4_s20_n0|rlm_20|OOD_050|d1 exp_v4_s20_n0|rlm_20|OOD_050|d2",
+     "exp_v4_s20_n0|rlm_20|OOD_041|d2 exp_v4_s20_n0|rlm_20|OOD_041|d3 exp_v4_s20_n0|rlm_20|OOD_047|d3 exp_v4_s20_n0|rlm_20|OOD_050|d3",
+     "{\"v2.4\": 12, \"v2.5\": 18}"
+    ],
+    [
+     "total",
+     3,
+     "single_pass",
+     "single pass",
+     null,
+     null,
+     null,
+     null,
+     30,
+     30,
+     "exp_v4_s20_n0|single_pass|OOD_041|d1 exp_v4_s20_n0|single_pass|OOD_041|d2 exp_v4_s20_n0|single_pass|OOD_041|d3 exp_v4_s20_n0|single_pass|OOD_042|d1 exp_v4_s20_n0|single_pass|OOD_042|d2 exp_v4_s20_n0|single_pass|OOD_042|d3 exp_v4_s20_n0|single_pass|OOD_043|d1 exp_v4_s20_n0|single_pass|OOD_043|d2 exp_v4_s20_n0|single_pass|OOD_043|d3 exp_v4_s20_n0|single_pass|OOD_044|d1 exp_v4_s20_n0|single_pass|OOD_044|d2 exp_v4_s20_n0|single_pass|OOD_044|d3 exp_v4_s20_n0|single_pass|OOD_045|d1 exp_v4_s20_n0|single_pass|OOD_045|d2 exp_v4_s20_n0|single_pass|OOD_045|d3 exp_v4_s20_n0|single_pass|OOD_046|d1 exp_v4_s20_n0|single_pass|OOD_046|d2 exp_v4_s20_n0|single_pass|OOD_046|d3 exp_v4_s20_n0|single_pass|OOD_047|d1 exp_v4_s20_n0|single_pass|OOD_047|d2 exp_v4_s20_n0|single_pass|OOD_047|d3 exp_v4_s20_n0|single_pass|OOD_048|d1 exp_v4_s20_n0|single_pass|OOD_048|d2 exp_v4_s20_n0|single_pass|OOD_048|d3 exp_v4_s20_n0|single_pass|OOD_049|d1 exp_v4_s20_n0|single_pass|OOD_049|d2 exp_v4_s20_n0|single_pass|OOD_049|d3 exp_v4_s20_n0|single_pass|OOD_050|d1 exp_v4_s20_n0|single_pass|OOD_050|d2 exp_v4_s20_n0|single_pass|OOD_050|d3",
+     "",
+     "{\"v2.4\": 12, \"v2.5\": 18}"
+    ],
+    [
+     "total",
+     3,
+     "multi_hop",
+     "multi-hop",
+     null,
+     null,
+     null,
+     null,
+     30,
+     30,
+     "exp_v4_s20_n0|multi_hop|OOD_041|d1 exp_v4_s20_n0|multi_hop|OOD_041|d2 exp_v4_s20_n0|multi_hop|OOD_041|d3 exp_v4_s20_n0|multi_hop|OOD_042|d1 exp_v4_s20_n0|multi_hop|OOD_042|d2 exp_v4_s20_n0|multi_hop|OOD_042|d3 exp_v4_s20_n0|multi_hop|OOD_043|d1 exp_v4_s20_n0|multi_hop|OOD_043|d2 exp_v4_s20_n0|multi_hop|OOD_043|d3 exp_v4_s20_n0|multi_hop|OOD_044|d1 exp_v4_s20_n0|multi_hop|OOD_044|d2 exp_v4_s20_n0|multi_hop|OOD_044|d3 exp_v4_s20_n0|multi_hop|OOD_045|d1 exp_v4_s20_n0|multi_hop|OOD_045|d2 exp_v4_s20_n0|multi_hop|OOD_045|d3 exp_v4_s20_n0|multi_hop|OOD_046|d1 exp_v4_s20_n0|multi_hop|OOD_046|d2 exp_v4_s20_n0|multi_hop|OOD_046|d3 exp_v4_s20_n0|multi_hop|OOD_047|d1 exp_v4_s20_n0|multi_hop|OOD_047|d2 exp_v4_s20_n0|multi_hop|OOD_047|d3 exp_v4_s20_n0|multi_hop|OOD_048|d1 exp_v4_s20_n0|multi_hop|OOD_048|d2 exp_v4_s20_n0|multi_hop|OOD_048|d3 exp_v4_s20_n0|multi_hop|OOD_049|d1 exp_v4_s20_n0|multi_hop|OOD_049|d2 exp_v4_s20_n0|multi_hop|OOD_049|d3 exp_v4_s20_n0|multi_hop|OOD_050|d1 exp_v4_s20_n0|multi_hop|OOD_050|d2 exp_v4_s20_n0|multi_hop|OOD_050|d3",
+     "",
+     "{\"v2.4\": 12, \"v2.5\": 18}"
+    ],
+    [
+     "total",
+     3,
+     "verified_pass",
+     "verified pass",
+     null,
+     null,
+     null,
+     null,
+     29,
+     30,
+     "exp_v4_s20_n0|verified_pass|OOD_041|d1 exp_v4_s20_n0|verified_pass|OOD_041|d2 exp_v4_s20_n0|verified_pass|OOD_041|d3 exp_v4_s20_n0|verified_pass|OOD_042|d1 exp_v4_s20_n0|verified_pass|OOD_042|d2 exp_v4_s20_n0|verified_pass|OOD_042|d3 exp_v4_s20_n0|verified_pass|OOD_043|d1 exp_v4_s20_n0|verified_pass|OOD_043|d2 exp_v4_s20_n0|verified_pass|OOD_043|d3 exp_v4_s20_n0|verified_pass|OOD_044|d1 exp_v4_s20_n0|verified_pass|OOD_044|d2 exp_v4_s20_n0|verified_pass|OOD_044|d3 exp_v4_s20_n0|verified_pass|OOD_045|d1 exp_v4_s20_n0|verified_pass|OOD_045|d2 exp_v4_s20_n0|verified_pass|OOD_045|d3 exp_v4_s20_n0|verified_pass|OOD_046|d1 exp_v4_s20_n0|verified_pass|OOD_046|d2 exp_v4_s20_n0|verified_pass|OOD_046|d3 exp_v4_s20_n0|verified_pass|OOD_047|d1 exp_v4_s20_n0|verified_pass|OOD_047|d2 exp_v4_s20_n0|verified_pass|OOD_047|d3 exp_v4_s20_n0|verified_pass|OOD_048|d1 exp_v4_s20_n0|verified_pass|OOD_048|d2 exp_v4_s20_n0|verified_pass|OOD_049|d1 exp_v4_s20_n0|verified_pass|OOD_049|d2 exp_v4_s20_n0|verified_pass|OOD_049|d3 exp_v4_s20_n0|verified_pass|OOD_050|d1 exp_v4_s20_n0|verified_pass|OOD_050|d2 exp_v4_s20_n0|verified_pass|OOD_050|d3",
+     "exp_v4_s20_n0|verified_pass|OOD_048|d3",
+     "{\"v2.4\": 12, \"v2.5\": 18}"
+    ],
+    [
+     "total",
+     3,
+     "rlm_5",
+     "RLM-5",
+     null,
+     null,
+     null,
+     null,
+     29,
+     30,
+     "exp_v4_s20_n0|rlm_5|OOD_041|d1 exp_v4_s20_n0|rlm_5|OOD_041|d2 exp_v4_s20_n0|rlm_5|OOD_041|d3 exp_v4_s20_n0|rlm_5|OOD_042|d1 exp_v4_s20_n0|rlm_5|OOD_042|d2 exp_v4_s20_n0|rlm_5|OOD_042|d3 exp_v4_s20_n0|rlm_5|OOD_043|d1 exp_v4_s20_n0|rlm_5|OOD_043|d2 exp_v4_s20_n0|rlm_5|OOD_043|d3 exp_v4_s20_n0|rlm_5|OOD_044|d1 exp_v4_s20_n0|rlm_5|OOD_044|d2 exp_v4_s20_n0|rlm_5|OOD_044|d3 exp_v4_s20_n0|rlm_5|OOD_045|d1 exp_v4_s20_n0|rlm_5|OOD_045|d2 exp_v4_s20_n0|rlm_5|OOD_045|d3 exp_v4_s20_n0|rlm_5|OOD_046|d1 exp_v4_s20_n0|rlm_5|OOD_046|d2 exp_v4_s20_n0|rlm_5|OOD_046|d3 exp_v4_s20_n0|rlm_5|OOD_047|d1 exp_v4_s20_n0|rlm_5|OOD_047|d3 exp_v4_s20_n0|rlm_5|OOD_048|d1 exp_v4_s20_n0|rlm_5|OOD_048|d2 exp_v4_s20_n0|rlm_5|OOD_048|d3 exp_v4_s20_n0|rlm_5|OOD_049|d1 exp_v4_s20_n0|rlm_5|OOD_049|d2 exp_v4_s20_n0|rlm_5|OOD_049|d3 exp_v4_s20_n0|rlm_5|OOD_050|d1 exp_v4_s20_n0|rlm_5|OOD_050|d2 exp_v4_s20_n0|rlm_5|OOD_050|d3",
+     "exp_v4_s20_n0|rlm_5|OOD_047|d2",
+     "{\"v2.4\": 12, \"v2.5\": 18}"
+    ],
+    [
+     "total",
+     3,
+     "rlm_10",
+     "RLM-10",
+     null,
+     null,
+     null,
+     null,
+     30,
+     30,
+     "exp_v4_s20_n0|rlm_10|OOD_041|d1 exp_v4_s20_n0|rlm_10|OOD_041|d2 exp_v4_s20_n0|rlm_10|OOD_041|d3 exp_v4_s20_n0|rlm_10|OOD_042|d1 exp_v4_s20_n0|rlm_10|OOD_042|d2 exp_v4_s20_n0|rlm_10|OOD_042|d3 exp_v4_s20_n0|rlm_10|OOD_043|d1 exp_v4_s20_n0|rlm_10|OOD_043|d2 exp_v4_s20_n0|rlm_10|OOD_043|d3 exp_v4_s20_n0|rlm_10|OOD_044|d1 exp_v4_s20_n0|rlm_10|OOD_044|d2 exp_v4_s20_n0|rlm_10|OOD_044|d3 exp_v4_s20_n0|rlm_10|OOD_045|d1 exp_v4_s20_n0|rlm_10|OOD_045|d2 exp_v4_s20_n0|rlm_10|OOD_045|d3 exp_v4_s20_n0|rlm_10|OOD_046|d1 exp_v4_s20_n0|rlm_10|OOD_046|d2 exp_v4_s20_n0|rlm_10|OOD_046|d3 exp_v4_s20_n0|rlm_10|OOD_047|d1 exp_v4_s20_n0|rlm_10|OOD_047|d2 exp_v4_s20_n0|rlm_10|OOD_047|d3 exp_v4_s20_n0|rlm_10|OOD_048|d1 exp_v4_s20_n0|rlm_10|OOD_048|d2 exp_v4_s20_n0|rlm_10|OOD_048|d3 exp_v4_s20_n0|rlm_10|OOD_049|d1 exp_v4_s20_n0|rlm_10|OOD_049|d2 exp_v4_s20_n0|rlm_10|OOD_049|d3 exp_v4_s20_n0|rlm_10|OOD_050|d1 exp_v4_s20_n0|rlm_10|OOD_050|d2 exp_v4_s20_n0|rlm_10|OOD_050|d3",
+     "",
+     "{\"v2.4\": 12, \"v2.5\": 18}"
+    ],
+    [
+     "total",
+     3,
+     "rlm_20",
+     "RLM-20",
+     null,
+     null,
+     null,
+     null,
+     29,
+     30,
+     "exp_v4_s20_n0|rlm_20|OOD_041|d1 exp_v4_s20_n0|rlm_20|OOD_041|d2 exp_v4_s20_n0|rlm_20|OOD_041|d3 exp_v4_s20_n0|rlm_20|OOD_042|d1 exp_v4_s20_n0|rlm_20|OOD_042|d2 exp_v4_s20_n0|rlm_20|OOD_042|d3 exp_v4_s20_n0|rlm_20|OOD_043|d1 exp_v4_s20_n0|rlm_20|OOD_043|d2 exp_v4_s20_n0|rlm_20|OOD_043|d3 exp_v4_s20_n0|rlm_20|OOD_044|d1 exp_v4_s20_n0|rlm_20|OOD_044|d2 exp_v4_s20_n0|rlm_20|OOD_044|d3 exp_v4_s20_n0|rlm_20|OOD_045|d1 exp_v4_s20_n0|rlm_20|OOD_045|d2 exp_v4_s20_n0|rlm_20|OOD_045|d3 exp_v4_s20_n0|rlm_20|OOD_046|d1 exp_v4_s20_n0|rlm_20|OOD_046|d2 exp_v4_s20_n0|rlm_20|OOD_046|d3 exp_v4_s20_n0|rlm_20|OOD_047|d1 exp_v4_s20_n0|rlm_20|OOD_047|d2 exp_v4_s20_n0|rlm_20|OOD_048|d1 exp_v4_s20_n0|rlm_20|OOD_048|d2 exp_v4_s20_n0|rlm_20|OOD_048|d3 exp_v4_s20_n0|rlm_20|OOD_049|d1 exp_v4_s20_n0|rlm_20|OOD_049|d2 exp_v4_s20_n0|rlm_20|OOD_049|d3 exp_v4_s20_n0|rlm_20|OOD_050|d1 exp_v4_s20_n0|rlm_20|OOD_050|d2 exp_v4_s20_n0|rlm_20|OOD_050|d3",
+     "exp_v4_s20_n0|rlm_20|OOD_047|d3",
+     "{\"v2.4\": 12, \"v2.5\": 18}"
+    ]
+   ]
+  },
+  "Supplementary Fig. 5b": {
+   "columns": [
+    "row",
+    "strategy",
+    "strategy_label",
+    "draw",
+    "questions_passed",
+    "of_questions",
+    "mean_of_draws"
+   ],
+   "rows": [
+    [
+     "draw",
+     "single_pass",
+     "single pass",
+     1,
+     10,
+     10,
+     null
+    ],
+    [
+     "draw",
+     "single_pass",
+     "single pass",
+     2,
+     10,
+     10,
+     null
+    ],
+    [
+     "draw",
+     "single_pass",
+     "single pass",
+     3,
+     10,
+     10,
+     null
+    ],
+    [
+     "mean",
+     "single_pass",
+     "single pass",
+     null,
+     null,
+     10,
+     10.0
+    ],
+    [
+     "draw",
+     "multi_hop",
+     "multi-hop",
+     1,
+     10,
+     10,
+     null
+    ],
+    [
+     "draw",
+     "multi_hop",
+     "multi-hop",
+     2,
+     9,
+     10,
+     null
+    ],
+    [
+     "draw",
+     "multi_hop",
+     "multi-hop",
+     3,
+     9,
+     10,
+     null
+    ],
+    [
+     "mean",
+     "multi_hop",
+     "multi-hop",
+     null,
+     null,
+     10,
+     9.333333333333334
+    ],
+    [
+     "draw",
+     "verified_pass",
+     "verified pass",
+     1,
+     9,
+     10,
+     null
+    ],
+    [
+     "draw",
+     "verified_pass",
+     "verified pass",
+     2,
+     10,
+     10,
+     null
+    ],
+    [
+     "draw",
+     "verified_pass",
+     "verified pass",
+     3,
+     9,
+     10,
+     null
+    ],
+    [
+     "mean",
+     "verified_pass",
+     "verified pass",
+     null,
+     null,
+     10,
+     9.333333333333334
+    ],
+    [
+     "draw",
+     "rlm_5",
+     "RLM-5",
+     1,
+     9,
+     10,
+     null
+    ],
+    [
+     "draw",
+     "rlm_5",
+     "RLM-5",
+     2,
+     7,
+     10,
+     null
+    ],
+    [
+     "draw",
+     "rlm_5",
+     "RLM-5",
+     3,
+     10,
+     10,
+     null
+    ],
+    [
+     "mean",
+     "rlm_5",
+     "RLM-5",
+     null,
+     null,
+     10,
+     8.666666666666666
+    ],
+    [
+     "draw",
+     "rlm_10",
+     "RLM-10",
+     1,
+     9,
+     10,
+     null
+    ],
+    [
+     "draw",
+     "rlm_10",
+     "RLM-10",
+     2,
+     8,
+     10,
+     null
+    ],
+    [
+     "draw",
+     "rlm_10",
+     "RLM-10",
+     3,
+     8,
+     10,
+     null
+    ],
+    [
+     "mean",
+     "rlm_10",
+     "RLM-10",
+     null,
+     null,
+     10,
+     8.333333333333334
+    ],
+    [
+     "draw",
+     "rlm_20",
+     "RLM-20",
+     1,
+     10,
+     10,
+     null
+    ],
+    [
+     "draw",
+     "rlm_20",
+     "RLM-20",
+     2,
+     9,
+     10,
+     null
+    ],
+    [
+     "draw",
+     "rlm_20",
+     "RLM-20",
+     3,
+     7,
+     10,
+     null
+    ],
+    [
+     "mean",
+     "rlm_20",
+     "RLM-20",
+     null,
+     null,
+     10,
+     8.666666666666666
+    ]
+   ]
+  },
+  "Supplementary Fig. 5c": {
+   "columns": [
+    "row",
+    "core_papers",
+    "index",
+    "strategy",
+    "strategy_label",
+    "passed_4",
+    "passed_3",
+    "n",
+    "answers_by_status",
+    "awaiting_s6_n"
+   ],
+   "rows": [
+    [
+     "size",
+     5,
+     null,
+     "single_pass",
+     "single pass",
+     15,
+     15,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     5,
+     null,
+     "multi_hop",
+     "multi-hop",
+     13,
+     15,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     5,
+     null,
+     "verified_pass",
+     "verified pass",
+     14,
+     15,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     5,
+     null,
+     "rlm_5",
+     "RLM-5",
+     12,
+     15,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     5,
+     null,
+     "rlm_10",
+     "RLM-10",
+     13,
+     15,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     5,
+     null,
+     "rlm_20",
+     "RLM-20",
+     12,
+     15,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     10,
+     null,
+     "single_pass",
+     "single pass",
+     15,
+     15,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     10,
+     null,
+     "multi_hop",
+     "multi-hop",
+     13,
+     15,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     10,
+     null,
+     "verified_pass",
+     "verified pass",
+     12,
+     15,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     10,
+     null,
+     "rlm_5",
+     "RLM-5",
+     12,
+     14,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     10,
+     null,
+     "rlm_10",
+     "RLM-10",
+     11,
+     13,
+     15,
+     "{\"failed\": 1, \"ok\": 14}",
+     0
+    ],
+    [
+     "size",
+     10,
+     null,
+     "rlm_20",
+     "RLM-20",
+     14,
+     15,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     20,
+     null,
+     "single_pass",
+     "single pass",
+     15,
+     15,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     20,
+     null,
+     "multi_hop",
+     "multi-hop",
+     13,
+     15,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     20,
+     null,
+     "verified_pass",
+     "verified pass",
+     13,
+     15,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     20,
+     null,
+     "rlm_5",
+     "RLM-5",
+     13,
+     14,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     20,
+     null,
+     "rlm_10",
+     "RLM-10",
+     13,
+     15,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     20,
+     null,
+     "rlm_20",
+     "RLM-20",
+     13,
+     15,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     50,
+     null,
+     "single_pass",
+     "single pass",
+     15,
+     15,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     50,
+     null,
+     "multi_hop",
+     "multi-hop",
+     13,
+     15,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     50,
+     null,
+     "verified_pass",
+     "verified pass",
+     14,
+     15,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     50,
+     null,
+     "rlm_5",
+     "RLM-5",
+     13,
+     14,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     50,
+     null,
+     "rlm_10",
+     "RLM-10",
+     11,
+     14,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "size",
+     50,
+     null,
+     "rlm_20",
+     "RLM-20",
+     12,
+     14,
+     15,
+     "{\"ok\": 15}",
+     0
+    ],
+    [
+     "per_index",
+     5,
+     "exp_v4_s5_n0",
+     "single_pass",
+     "single pass",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     5,
+     "exp_v4_s5_n1",
+     "single_pass",
+     "single pass",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     5,
+     "exp_v4_s5_n3",
+     "single_pass",
+     "single pass",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     5,
+     "exp_v4_s5_n0",
+     "multi_hop",
+     "multi-hop",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     5,
+     "exp_v4_s5_n1",
+     "multi_hop",
+     "multi-hop",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     5,
+     "exp_v4_s5_n3",
+     "multi_hop",
+     "multi-hop",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     5,
+     "exp_v4_s5_n0",
+     "verified_pass",
+     "verified pass",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     5,
+     "exp_v4_s5_n1",
+     "verified_pass",
+     "verified pass",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     5,
+     "exp_v4_s5_n3",
+     "verified_pass",
+     "verified pass",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     5,
+     "exp_v4_s5_n0",
+     "rlm_5",
+     "RLM-5",
+     3,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     5,
+     "exp_v4_s5_n1",
+     "rlm_5",
+     "RLM-5",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     5,
+     "exp_v4_s5_n3",
+     "rlm_5",
+     "RLM-5",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     5,
+     "exp_v4_s5_n0",
+     "rlm_10",
+     "RLM-10",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     5,
+     "exp_v4_s5_n1",
+     "rlm_10",
+     "RLM-10",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     5,
+     "exp_v4_s5_n3",
+     "rlm_10",
+     "RLM-10",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     5,
+     "exp_v4_s5_n0",
+     "rlm_20",
+     "RLM-20",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     5,
+     "exp_v4_s5_n1",
+     "rlm_20",
+     "RLM-20",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     5,
+     "exp_v4_s5_n3",
+     "rlm_20",
+     "RLM-20",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     10,
+     "exp_v4_s10_n0",
+     "single_pass",
+     "single pass",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     10,
+     "exp_v4_s10_n1",
+     "single_pass",
+     "single pass",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     10,
+     "exp_v4_s10_n3",
+     "single_pass",
+     "single pass",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     10,
+     "exp_v4_s10_n0",
+     "multi_hop",
+     "multi-hop",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     10,
+     "exp_v4_s10_n1",
+     "multi_hop",
+     "multi-hop",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     10,
+     "exp_v4_s10_n3",
+     "multi_hop",
+     "multi-hop",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     10,
+     "exp_v4_s10_n0",
+     "verified_pass",
+     "verified pass",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     10,
+     "exp_v4_s10_n1",
+     "verified_pass",
+     "verified pass",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     10,
+     "exp_v4_s10_n3",
+     "verified_pass",
+     "verified pass",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     10,
+     "exp_v4_s10_n0",
+     "rlm_5",
+     "RLM-5",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     10,
+     "exp_v4_s10_n1",
+     "rlm_5",
+     "RLM-5",
+     3,
+     4,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     10,
+     "exp_v4_s10_n3",
+     "rlm_5",
+     "RLM-5",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     10,
+     "exp_v4_s10_n0",
+     "rlm_10",
+     "RLM-10",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     10,
+     "exp_v4_s10_n1",
+     "rlm_10",
+     "RLM-10",
+     3,
+     4,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     10,
+     "exp_v4_s10_n3",
+     "rlm_10",
+     "RLM-10",
+     3,
+     4,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     10,
+     "exp_v4_s10_n0",
+     "rlm_20",
+     "RLM-20",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     10,
+     "exp_v4_s10_n1",
+     "rlm_20",
+     "RLM-20",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     10,
+     "exp_v4_s10_n3",
+     "rlm_20",
+     "RLM-20",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     20,
+     "exp_v4_s20_n0",
+     "single_pass",
+     "single pass",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     20,
+     "exp_v4_s20_n1",
+     "single_pass",
+     "single pass",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     20,
+     "exp_v4_s20_n3",
+     "single_pass",
+     "single pass",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     20,
+     "exp_v4_s20_n0",
+     "multi_hop",
+     "multi-hop",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     20,
+     "exp_v4_s20_n1",
+     "multi_hop",
+     "multi-hop",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     20,
+     "exp_v4_s20_n3",
+     "multi_hop",
+     "multi-hop",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     20,
+     "exp_v4_s20_n0",
+     "verified_pass",
+     "verified pass",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     20,
+     "exp_v4_s20_n1",
+     "verified_pass",
+     "verified pass",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     20,
+     "exp_v4_s20_n3",
+     "verified_pass",
+     "verified pass",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     20,
+     "exp_v4_s20_n0",
+     "rlm_5",
+     "RLM-5",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     20,
+     "exp_v4_s20_n1",
+     "rlm_5",
+     "RLM-5",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     20,
+     "exp_v4_s20_n3",
+     "rlm_5",
+     "RLM-5",
+     4,
+     4,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     20,
+     "exp_v4_s20_n0",
+     "rlm_10",
+     "RLM-10",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     20,
+     "exp_v4_s20_n1",
+     "rlm_10",
+     "RLM-10",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     20,
+     "exp_v4_s20_n3",
+     "rlm_10",
+     "RLM-10",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     20,
+     "exp_v4_s20_n0",
+     "rlm_20",
+     "RLM-20",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     20,
+     "exp_v4_s20_n1",
+     "rlm_20",
+     "RLM-20",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     20,
+     "exp_v4_s20_n3",
+     "rlm_20",
+     "RLM-20",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     50,
+     "exp_v4_s50_n0",
+     "single_pass",
+     "single pass",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     50,
+     "exp_v4_s50_n1",
+     "single_pass",
+     "single pass",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     50,
+     "exp_v4_s50_n3",
+     "single_pass",
+     "single pass",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     50,
+     "exp_v4_s50_n0",
+     "multi_hop",
+     "multi-hop",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     50,
+     "exp_v4_s50_n1",
+     "multi_hop",
+     "multi-hop",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     50,
+     "exp_v4_s50_n3",
+     "multi_hop",
+     "multi-hop",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     50,
+     "exp_v4_s50_n0",
+     "verified_pass",
+     "verified pass",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     50,
+     "exp_v4_s50_n1",
+     "verified_pass",
+     "verified pass",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     50,
+     "exp_v4_s50_n3",
+     "verified_pass",
+     "verified pass",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     50,
+     "exp_v4_s50_n0",
+     "rlm_5",
+     "RLM-5",
+     5,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     50,
+     "exp_v4_s50_n1",
+     "rlm_5",
+     "RLM-5",
+     4,
+     4,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     50,
+     "exp_v4_s50_n3",
+     "rlm_5",
+     "RLM-5",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     50,
+     "exp_v4_s50_n0",
+     "rlm_10",
+     "RLM-10",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     50,
+     "exp_v4_s50_n1",
+     "rlm_10",
+     "RLM-10",
+     3,
+     4,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     50,
+     "exp_v4_s50_n3",
+     "rlm_10",
+     "RLM-10",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     50,
+     "exp_v4_s50_n0",
+     "rlm_20",
+     "RLM-20",
+     4,
+     5,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     50,
+     "exp_v4_s50_n1",
+     "rlm_20",
+     "RLM-20",
+     4,
+     4,
+     5,
+     null,
+     0
+    ],
+    [
+     "per_index",
+     50,
+     "exp_v4_s50_n3",
+     "rlm_20",
+     "RLM-20",
+     4,
+     5,
+     5,
+     null,
+     0
+    ]
+   ]
+  }
+ },
+ "printed": {
+  "s448num_0": {
+   "fixed": "Judge score 4 or more",
+   "why": "the threshold of the block (Rule 9)"
+  },
+  "s448num_1": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 0,
+   "format": "{draws_passed}"
+  },
+  "s448num_2": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 1,
+   "format": "{draws_passed}"
+  },
+  "s448num_3": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 2,
+   "format": "{draws_passed}"
+  },
+  "s448num_4": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 3,
+   "format": "{draws_passed}"
+  },
+  "s448num_5": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 4,
+   "format": "{draws_passed}"
+  },
+  "s448num_6": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 5,
+   "format": "{draws_passed}"
+  },
+  "s448num_7": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 6,
+   "format": "{draws_passed}"
+  },
+  "s448num_8": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 7,
+   "format": "{draws_passed}"
+  },
+  "s448num_9": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 8,
+   "format": "{draws_passed}"
+  },
+  "s448num_10": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 9,
+   "format": "{draws_passed}"
+  },
+  "s448num_11": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 10,
+   "format": "{draws_passed}"
+  },
+  "s448num_12": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 11,
+   "format": "{draws_passed}"
+  },
+  "s448num_13": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 12,
+   "format": "{draws_passed}"
+  },
+  "s448num_14": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 13,
+   "format": "{draws_passed}"
+  },
+  "s448num_15": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 14,
+   "format": "{draws_passed}"
+  },
+  "s448num_16": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 15,
+   "format": "{draws_passed}"
+  },
+  "s448num_17": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 16,
+   "format": "{draws_passed}"
+  },
+  "s448num_18": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 17,
+   "format": "{draws_passed}"
+  },
+  "s448num_19": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 18,
+   "format": "{draws_passed}"
+  },
+  "s448num_20": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 19,
+   "format": "{draws_passed}"
+  },
+  "s448num_21": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 20,
+   "format": "{draws_passed}"
+  },
+  "s448num_22": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 21,
+   "format": "{draws_passed}"
+  },
+  "s448num_23": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 22,
+   "format": "{draws_passed}"
+  },
+  "s448num_24": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 23,
+   "format": "{draws_passed}"
+  },
+  "s448num_25": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 24,
+   "format": "{draws_passed}"
+  },
+  "s448num_26": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 25,
+   "format": "{draws_passed}"
+  },
+  "s448num_27": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 26,
+   "format": "{draws_passed}"
+  },
+  "s448num_28": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 27,
+   "format": "{draws_passed}"
+  },
+  "s448num_29": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 28,
+   "format": "{draws_passed}"
+  },
+  "s448num_30": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 29,
+   "format": "{draws_passed}"
+  },
+  "s448num_31": {
+   "fixed": "RLM-5",
+   "why": "a strategy's name"
+  },
+  "s448num_32": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 30,
+   "format": "{draws_passed}"
+  },
+  "s448num_33": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 31,
+   "format": "{draws_passed}"
+  },
+  "s448num_34": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 32,
+   "format": "{draws_passed}"
+  },
+  "s448num_35": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 33,
+   "format": "{draws_passed}"
+  },
+  "s448num_36": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 34,
+   "format": "{draws_passed}"
+  },
+  "s448num_37": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 35,
+   "format": "{draws_passed}"
+  },
+  "s448num_38": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 36,
+   "format": "{draws_passed}"
+  },
+  "s448num_39": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 37,
+   "format": "{draws_passed}"
+  },
+  "s448num_40": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 38,
+   "format": "{draws_passed}"
+  },
+  "s448num_41": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 39,
+   "format": "{draws_passed}"
+  },
+  "s448num_42": {
+   "fixed": "RLM-10",
+   "why": "a strategy's name"
+  },
+  "s448num_43": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 40,
+   "format": "{draws_passed}"
+  },
+  "s448num_44": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 41,
+   "format": "{draws_passed}"
+  },
+  "s448num_45": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 42,
+   "format": "{draws_passed}"
+  },
+  "s448num_46": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 43,
+   "format": "{draws_passed}"
+  },
+  "s448num_47": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 44,
+   "format": "{draws_passed}"
+  },
+  "s448num_48": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 45,
+   "format": "{draws_passed}"
+  },
+  "s448num_49": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 46,
+   "format": "{draws_passed}"
+  },
+  "s448num_50": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 47,
+   "format": "{draws_passed}"
+  },
+  "s448num_51": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 48,
+   "format": "{draws_passed}"
+  },
+  "s448num_52": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 49,
+   "format": "{draws_passed}"
+  },
+  "s448num_53": {
+   "fixed": "RLM-20",
+   "why": "a strategy's name"
+  },
+  "s448num_54": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 50,
+   "format": "{draws_passed}"
+  },
+  "s448num_55": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 51,
+   "format": "{draws_passed}"
+  },
+  "s448num_56": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 52,
+   "format": "{draws_passed}"
+  },
+  "s448num_57": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 53,
+   "format": "{draws_passed}"
+  },
+  "s448num_58": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 54,
+   "format": "{draws_passed}"
+  },
+  "s448num_59": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 55,
+   "format": "{draws_passed}"
+  },
+  "s448num_60": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 56,
+   "format": "{draws_passed}"
+  },
+  "s448num_61": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 57,
+   "format": "{draws_passed}"
+  },
+  "s448num_62": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 58,
+   "format": "{draws_passed}"
+  },
+  "s448num_63": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 59,
+   "format": "{draws_passed}"
+  },
+  "s448num_64": {
+   "fixed": "Judge score 3 or more",
+   "why": "the threshold of the block (Rule 9)"
+  },
+  "s448num_65": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 60,
+   "format": "{draws_passed}"
+  },
+  "s448num_66": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 61,
+   "format": "{draws_passed}"
+  },
+  "s448num_67": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 62,
+   "format": "{draws_passed}"
+  },
+  "s448num_68": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 63,
+   "format": "{draws_passed}"
+  },
+  "s448num_69": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 64,
+   "format": "{draws_passed}"
+  },
+  "s448num_70": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 65,
+   "format": "{draws_passed}"
+  },
+  "s448num_71": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 66,
+   "format": "{draws_passed}"
+  },
+  "s448num_72": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 67,
+   "format": "{draws_passed}"
+  },
+  "s448num_73": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 68,
+   "format": "{draws_passed}"
+  },
+  "s448num_74": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 69,
+   "format": "{draws_passed}"
+  },
+  "s448num_75": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 70,
+   "format": "{draws_passed}"
+  },
+  "s448num_76": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 71,
+   "format": "{draws_passed}"
+  },
+  "s448num_77": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 72,
+   "format": "{draws_passed}"
+  },
+  "s448num_78": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 73,
+   "format": "{draws_passed}"
+  },
+  "s448num_79": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 74,
+   "format": "{draws_passed}"
+  },
+  "s448num_80": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 75,
+   "format": "{draws_passed}"
+  },
+  "s448num_81": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 76,
+   "format": "{draws_passed}"
+  },
+  "s448num_82": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 77,
+   "format": "{draws_passed}"
+  },
+  "s448num_83": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 78,
+   "format": "{draws_passed}"
+  },
+  "s448num_84": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 79,
+   "format": "{draws_passed}"
+  },
+  "s448num_85": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 80,
+   "format": "{draws_passed}"
+  },
+  "s448num_86": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 81,
+   "format": "{draws_passed}"
+  },
+  "s448num_87": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 82,
+   "format": "{draws_passed}"
+  },
+  "s448num_88": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 83,
+   "format": "{draws_passed}"
+  },
+  "s448num_89": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 84,
+   "format": "{draws_passed}"
+  },
+  "s448num_90": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 85,
+   "format": "{draws_passed}"
+  },
+  "s448num_91": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 86,
+   "format": "{draws_passed}"
+  },
+  "s448num_92": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 87,
+   "format": "{draws_passed}"
+  },
+  "s448num_93": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 88,
+   "format": "{draws_passed}"
+  },
+  "s448num_94": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 89,
+   "format": "{draws_passed}"
+  },
+  "s448num_95": {
+   "fixed": "RLM-5",
+   "why": "a strategy's name"
+  },
+  "s448num_96": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 90,
+   "format": "{draws_passed}"
+  },
+  "s448num_97": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 91,
+   "format": "{draws_passed}"
+  },
+  "s448num_98": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 92,
+   "format": "{draws_passed}"
+  },
+  "s448num_99": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 93,
+   "format": "{draws_passed}"
+  },
+  "s448num_100": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 94,
+   "format": "{draws_passed}"
+  },
+  "s448num_101": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 95,
+   "format": "{draws_passed}"
+  },
+  "s448num_102": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 96,
+   "format": "{draws_passed}"
+  },
+  "s448num_103": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 97,
+   "format": "{draws_passed}"
+  },
+  "s448num_104": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 98,
+   "format": "{draws_passed}"
+  },
+  "s448num_105": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 99,
+   "format": "{draws_passed}"
+  },
+  "s448num_106": {
+   "fixed": "RLM-10",
+   "why": "a strategy's name"
+  },
+  "s448num_107": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 100,
+   "format": "{draws_passed}"
+  },
+  "s448num_108": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 101,
+   "format": "{draws_passed}"
+  },
+  "s448num_109": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 102,
+   "format": "{draws_passed}"
+  },
+  "s448num_110": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 103,
+   "format": "{draws_passed}"
+  },
+  "s448num_111": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 104,
+   "format": "{draws_passed}"
+  },
+  "s448num_112": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 105,
+   "format": "{draws_passed}"
+  },
+  "s448num_113": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 106,
+   "format": "{draws_passed}"
+  },
+  "s448num_114": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 107,
+   "format": "{draws_passed}"
+  },
+  "s448num_115": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 108,
+   "format": "{draws_passed}"
+  },
+  "s448num_116": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 109,
+   "format": "{draws_passed}"
+  },
+  "s448num_117": {
+   "fixed": "RLM-20",
+   "why": "a strategy's name"
+  },
+  "s448num_118": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 110,
+   "format": "{draws_passed}"
+  },
+  "s448num_119": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 111,
+   "format": "{draws_passed}"
+  },
+  "s448num_120": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 112,
+   "format": "{draws_passed}"
+  },
+  "s448num_121": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 113,
+   "format": "{draws_passed}"
+  },
+  "s448num_122": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 114,
+   "format": "{draws_passed}"
+  },
+  "s448num_123": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 115,
+   "format": "{draws_passed}"
+  },
+  "s448num_124": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 116,
+   "format": "{draws_passed}"
+  },
+  "s448num_125": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 117,
+   "format": "{draws_passed}"
+  },
+  "s448num_126": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 118,
+   "format": "{draws_passed}"
+  },
+  "s448num_127": {
+   "sheet": "Supplementary Fig. 5a",
+   "row": 119,
+   "format": "{draws_passed}"
+  },
+  "s448num_128": {
+   "fixed": "Sarek: Illumina short reads only (041)",
+   "why": "our short wording of the false claim, with the question's number"
+  },
+  "s448num_129": {
+   "fixed": "fastp: separate tools, several passes (042)",
+   "why": "our short wording of the false claim, with the question's number"
+  },
+  "s448num_130": {
+   "fixed": "DESeq2: raw counts, no normalization (043)",
+   "why": "our short wording of the false claim, with the question's number"
+  },
+  "s448num_131": {
+   "fixed": "Snakemake: first-come job queue (044)",
+   "why": "our short wording of the false claim, with the question's number"
+  },
+  "s448num_132": {
+   "fixed": "nf-core: CRAM raised storage by 65% (045)",
+   "why": "our short wording of the false claim, with the question's number"
+  },
+  "s448num_133": {
+   "fixed": "Salmon: full alignment to the genome (046)",
+   "why": "our short wording of the false claim, with the question's number"
+  },
+  "s448num_134": {
+   "fixed": "LSD Nepal: pregnant cows at lower risk (047)",
+   "why": "our short wording of the false claim, with the question's number"
+  },
+  "s448num_135": {
+   "fixed": "HPAI: same signs in every species (048)",
+   "why": "our short wording of the false claim, with the question's number"
+  },
+  "s448num_136": {
+   "fixed": "MultiQC: one tool at a time (049)",
+   "why": "our short wording of the false claim, with the question's number"
+  },
+  "s448num_137": {
+   "fixed": "Rabies: uniform vaccination coverage (050)",
+   "why": "our short wording of the false claim, with the question's number"
+  },
+  "s448num_138": {
+   "fixed": "3",
+   "why": "a step of the key"
+  },
+  "s448num_139": {
+   "fixed": "2",
+   "why": "a step of the key"
+  },
+  "s448num_140": {
+   "fixed": "1",
+   "why": "a step of the key"
+  },
+  "s448num_141": {
+   "fixed": "0 of 3",
+   "why": "a step of the key"
+  },
+  "s532_b_ylab": {
+   "fixed": "in a draw (of 10)",
+   "why": "the axis label"
+  },
+  "s448num_143": {
+   "fixed": "5",
+   "why": "a strategy's name, on two lines"
+  },
+  "s448num_144": {
+   "fixed": "10",
+   "why": "a strategy's name, on two lines"
+  },
+  "s448num_145": {
+   "fixed": "20",
+   "why": "a strategy's name, on two lines"
+  },
+  "s448num_146": {
+   "fixed": "5",
+   "why": "a strategy's name, on two lines"
+  },
+  "s448num_147": {
+   "fixed": "10",
+   "why": "a strategy's name, on two lines"
+  },
+  "s448num_148": {
+   "fixed": "20",
+   "why": "a strategy's name, on two lines"
+  },
+  "s448num_149": {
+   "fixed": "5",
+   "why": "core papers in the index"
+  },
+  "s448num_150": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 0,
+   "format": "{passed_4}"
+  },
+  "s448num_151": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 1,
+   "format": "{passed_4}"
+  },
+  "s448num_152": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 2,
+   "format": "{passed_4}"
+  },
+  "s448num_153": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 3,
+   "format": "{passed_4}"
+  },
+  "s448num_154": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 4,
+   "format": "{passed_4}"
+  },
+  "s448num_155": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 5,
+   "format": "{passed_4}"
+  },
+  "s448num_156": {
+   "fixed": "10",
+   "why": "core papers in the index"
+  },
+  "s448num_157": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 6,
+   "format": "{passed_4}"
+  },
+  "s448num_158": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 7,
+   "format": "{passed_4}"
+  },
+  "s448num_159": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 8,
+   "format": "{passed_4}"
+  },
+  "s448num_160": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 9,
+   "format": "{passed_4}"
+  },
+  "s448num_161": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 10,
+   "format": "{passed_4}"
+  },
+  "s448num_162": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 11,
+   "format": "{passed_4}"
+  },
+  "s448num_163": {
+   "fixed": "20",
+   "why": "core papers in the index"
+  },
+  "s448num_164": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 12,
+   "format": "{passed_4}"
+  },
+  "s448num_165": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 13,
+   "format": "{passed_4}"
+  },
+  "s448num_166": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 14,
+   "format": "{passed_4}"
+  },
+  "s448num_167": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 15,
+   "format": "{passed_4}"
+  },
+  "s448num_168": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 16,
+   "format": "{passed_4}"
+  },
+  "s448num_169": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 17,
+   "format": "{passed_4}"
+  },
+  "s448num_170": {
+   "fixed": "50",
+   "why": "core papers in the index"
+  },
+  "s448num_171": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 18,
+   "format": "{passed_4}"
+  },
+  "s448num_172": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 19,
+   "format": "{passed_4}"
+  },
+  "s448num_173": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 20,
+   "format": "{passed_4}"
+  },
+  "s448num_174": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 21,
+   "format": "{passed_4}"
+  },
+  "s448num_175": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 22,
+   "format": "{passed_4}"
+  },
+  "s448num_176": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 23,
+   "format": "{passed_4}"
+  },
+  "s448num_177": {
+   "fixed": "Score 4+",
+   "why": "the threshold (Rule 9)"
+  },
+  "s448num_178": {
+   "fixed": "5",
+   "why": "core papers in the index"
+  },
+  "s448num_179": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 0,
+   "format": "{passed_3}"
+  },
+  "s448num_180": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 1,
+   "format": "{passed_3}"
+  },
+  "s448num_181": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 2,
+   "format": "{passed_3}"
+  },
+  "s448num_182": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 3,
+   "format": "{passed_3}"
+  },
+  "s448num_183": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 4,
+   "format": "{passed_3}"
+  },
+  "s448num_184": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 5,
+   "format": "{passed_3}"
+  },
+  "s448num_185": {
+   "fixed": "10",
+   "why": "core papers in the index"
+  },
+  "s448num_186": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 6,
+   "format": "{passed_3}"
+  },
+  "s448num_187": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 7,
+   "format": "{passed_3}"
+  },
+  "s448num_188": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 8,
+   "format": "{passed_3}"
+  },
+  "s448num_189": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 9,
+   "format": "{passed_3}"
+  },
+  "s448num_190": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 10,
+   "format": "{passed_3}"
+  },
+  "s448num_191": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 11,
+   "format": "{passed_3}"
+  },
+  "s448num_192": {
+   "fixed": "20",
+   "why": "core papers in the index"
+  },
+  "s448num_193": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 12,
+   "format": "{passed_3}"
+  },
+  "s448num_194": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 13,
+   "format": "{passed_3}"
+  },
+  "s448num_195": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 14,
+   "format": "{passed_3}"
+  },
+  "s448num_196": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 15,
+   "format": "{passed_3}"
+  },
+  "s448num_197": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 16,
+   "format": "{passed_3}"
+  },
+  "s448num_198": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 17,
+   "format": "{passed_3}"
+  },
+  "s448num_199": {
+   "fixed": "50",
+   "why": "core papers in the index"
+  },
+  "s448num_200": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 18,
+   "format": "{passed_3}"
+  },
+  "s448num_201": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 19,
+   "format": "{passed_3}"
+  },
+  "s448num_202": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 20,
+   "format": "{passed_3}"
+  },
+  "s448num_203": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 21,
+   "format": "{passed_3}"
+  },
+  "s448num_204": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 22,
+   "format": "{passed_3}"
+  },
+  "s448num_205": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 23,
+   "format": "{passed_3}"
+  },
+  "s448num_206": {
+   "fixed": "Score 3+",
+   "why": "the threshold (Rule 9)"
+  }
+ },
+ "printed_what": "every text holding a digit: the SVG group id, and the sheet, row and format it is written from, or the fixed text",
+ "questions": [
+  "OOD_041",
+  "OOD_042",
+  "OOD_043",
+  "OOD_044",
+  "OOD_045",
+  "OOD_046",
+  "OOD_047",
+  "OOD_048",
+  "OOD_049",
+  "OOD_050"
+ ]
+}

@@ -1,0 +1,35 @@
+# T1 (D97, D118): where the local models run, their order and the caps. check_t1.py reads this file and refuses it
+# when a model of T1's seven is missing or twice, a machine is not one the lock lists for the model's tag ([models]
+# machines), the lock does not run the model as a generator, the Studio's port is a reserved one, the caps or the smoke's
+# caps are not exp_06's (a subset, in order), or the question order is not the 15 once each with every prefix balanced
+# over the five categories. launch_t1.sh admits a model only on its machine and port here. A change here is a commit.
+#
+# D118 (Valerio, 22 October evening, on T1's Q1: "go ahead. Can we actually have all the models then running in
+# parallel, so whatever we reach as set of questions will stop for every model at the same (more or less)"): every
+# model on the Studio, port 11454 (D112 Q10 O-b, D116), one model loaded at a time, interleaved: question by question
+# in question_order, within a question cap by cap (ascending), within a cap model by model in the models' order below
+# (interleave_t1.py; check_t1.py order and interleaved). Wherever T1 stops, every model has the same questions at the
+# same caps. devstral's 6-answer smoke first, for a measured rate. The laptop and the Beelink (D97's spread) have
+# decided work to 9 Nov (K1, L1 papers, T3), so T1 is on the Studio only.
+# status: smoke and the walk refuse until "agreed"; written "agreed" on D118's "go ahead" (the commit that brings
+# D118's build). depths_status: the walk refuses until "agreed"; the smoke does not depend on it.
+status = "agreed"
+set = "per_category"            # exp_06 --question-set: the submitted local sweep's 15 questions (D75 Q50)
+depths = [1, 3, 5, 7, 20, 50]   # D118 names these caps; confirmed D119 (README Q-D1; April's local caps: 1, 3, 7, 15, 30)
+depths_status = "agreed"        # D119 (Valerio, 22 October 21:30, "I agree with all": README Q-D1 to Q-D5, Q3, Q5 as advised)
+smoke_depths = [1, 10, 50]      # the smoke: 2 questions x these caps x draw 1 = 6 answers per model (reviewed kit of 22 Oct)
+# D118: the question order, fixed before any answer. Three rounds of the five categories (factual recall, conceptual,
+# technical, cross-document, synthesis), so every prefix holds each category within one of the others; inside a round the
+# three single-paper questions come from three different papers (sarek, snakemake, nf-core), rotating, so a round of five
+# reads each of the three papers once.
+question_order = ["01_sarek_FR1", "02_snakemake_CO2", "03_nfcore_framework_TE3", "CD_001", "SY_001",
+                  "02_snakemake_FR1", "03_nfcore_framework_CO2", "01_sarek_TE3", "CD_002", "SY_002",
+                  "03_nfcore_framework_FR1", "01_sarek_CO2", "02_snakemake_TE3", "CD_003", "SY_003"]
+
+[machine.studio]
+# The models' order inside a cap is D118's list. glm-4.7-flash (D83 Q181: its general-task row, at the lock edit of D115
+# PQ6) and llama3:8b (D83 Q167: one test call first) are held (check_t1.py HELD): the walk skips their cells and records
+# each skip, the others go on; once a hold is lifted by a commit, that model catches up in the same order.
+models = ["devstral-small-2:24b", "gemma3:27b", "glm-4.7-flash:bf16", "qwen3-coder:30b", "qwen3-coder-next:q4_K_M",
+          "gpt-oss:20b", "llama3:8b"]
+port = 11454

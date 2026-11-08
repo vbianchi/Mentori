@@ -1,0 +1,49 @@
+{
+ "provenance": {
+  "script": "scripts/S590_supp_fig9_pipeline.py",
+  "script_sha256": "5ea4aa746587b3293629a2819211dedb1aef06ecdd8c5fc02d1792534e770e56",
+  "command": "uv run --frozen python scripts/S590_supp_fig9_pipeline.py",
+  "python": "3.13.11",
+  "deterministic": "D155: no build time and no repository HEAD are recorded",
+  "inputs_sha256": {
+   "experiments/mentori/publication/scripts/exp_03_orchestration_ablation.py": "55f2562d68a8ffea4e68a7069b62cf9c58859a9fbfb7f6cbf0bb696fcc99efd7"
+  },
+  "model_calls": 0
+ },
+ "reproduced": [
+  "exp_03 ORCHESTRATOR_CONFIGS: full_orchestrator and 9 set-ups = the 9 the dashed labels draw",
+  "exp_03 MAX_STEPS 10 = the plate's 'at most 10'"
+ ],
+ "stamp": "drawn from the code at experiments/mentori/, no data: the 7 orchestration ablation set-ups of Figure 5 and at most 10 plan steps",
+ "figure": "Supplementary Figure 9",
+ "named": "Supplementary Figure 9: FIGURE_LOCK [files] supplementary_name (D92 Q194); D257",
+ "page_mm": [
+  183.0,
+  100.0
+ ],
+ "figure_lock": {
+  "path": "experiments/FIGURE_LOCK.toml",
+  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "status": "agreed"
+ },
+ "type_pt": {
+  "all text": 8.0
+ },
+ "font": "Helvetica",
+ "line_pt": 0.8,
+ "colours": {
+  "model call": "#0072B2",
+  "no model call, text": "#000000",
+  "ablation set-up": "#D55E00",
+  "execution frame": "#595959"
+ },
+ "files": {
+  "Supplementary Figure 9.pdf": "75ed83b54fdfbe587ad0bff93d85758f49ad13488e1240d7a730f2283c577038",
+  "Supplementary Figure 9.svg": "4721502041cc93815a2cdcceea87b65666add12703da614570e6eba7029fa71d",
+  "Supplementary Figure 9.png": "5db215b8dbda69ffe9e48c56ca9b5aebca0e637c4be0607d99f7ac9af7b30b18",
+  "Supplementary Figure 9 data.xlsx": "668f0bd6f33c4cce386355f758567d048569071c46352183fcce6b4c69180c17",
+  "Supplementary Figure 9 data caption.md": "ddeb1c3e3457c8a4244b3e7eb263dd4bcca194b4f04376b37442531d5c0bbe03",
+  "supplementary_figure9_numbers.json": "70eddb152656182497dd511ae3de87de30d7f26a79965724fa490b800710d583",
+  "legend_draft.md": "85ba892b42e38ff676b41ec55bc2aeaa02787d3d5f7029c6f98a1be67d66c311"
+ }
+}

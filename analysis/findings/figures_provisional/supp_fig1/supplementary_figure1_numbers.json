@@ -1,0 +1,2365 @@
+{
+ "stamp": "PROVISIONAL: 22 of 22 experiments with answers counted (51,441 answers, scripts/S492_answer_registry.py)",
+ "what": "every value Supplementary Figure 1 draws, sheet by sheet as the data workbook holds them",
+ "sheets": {
+  "Supp. Fig. 1 lines": {
+   "columns": [
+    "box",
+    "plan_row",
+    "experiment",
+    "kind",
+    "line",
+    "text"
+   ],
+   "rows": [
+    [
+     "column 1",
+     "",
+     "Corpus and choices",
+     "column label",
+     1,
+     "Corpus and choices"
+    ],
+    [
+     "column 2",
+     "",
+     "Core experiments",
+     "column label",
+     1,
+     "Core experiments"
+    ],
+    [
+     "column 3",
+     "",
+     "Built on the core",
+     "column label",
+     1,
+     "Built on the core"
+    ],
+    [
+     "column 4",
+     "",
+     "Ablation",
+     "column label",
+     1,
+     "Ablation"
+    ],
+    [
+     "column 5",
+     "",
+     "Replication and reuse",
+     "column label",
+     1,
+     "Replication and reuse"
+    ],
+    [
+     "RO",
+     "",
+     "Retrieval optimisation",
+     "name",
+     1,
+     "Retrieval"
+    ],
+    [
+     "RO",
+     "",
+     "Retrieval optimisation",
+     "name",
+     2,
+     "optimization"
+    ],
+    [
+     "RO",
+     "",
+     "Retrieval optimisation",
+     "design",
+     3,
+     "4 embedding models,"
+    ],
+    [
+     "RO",
+     "",
+     "Retrieval optimisation",
+     "design",
+     4,
+     "8 chunkings, 7 search"
+    ],
+    [
+     "RO",
+     "",
+     "Retrieval optimisation",
+     "design",
+     5,
+     "strategies"
+    ],
+    [
+     "RO",
+     "",
+     "Retrieval optimisation",
+     "draws",
+     6,
+     "1 run"
+    ],
+    [
+     "CORPUS",
+     "",
+     "Evaluation corpus",
+     "name",
+     1,
+     "Evaluation corpus"
+    ],
+    [
+     "CORPUS",
+     "",
+     "Evaluation corpus",
+     "design",
+     2,
+     "244 questions on 50"
+    ],
+    [
+     "CORPUS",
+     "",
+     "Evaluation corpus",
+     "design",
+     3,
+     "core papers"
+    ],
+    [
+     "CORPUS",
+     "",
+     "Evaluation corpus",
+     "design",
+     4,
+     "150 distractor papers"
+    ],
+    [
+     "MS",
+     "",
+     "Model selection",
+     "name",
+     1,
+     "Model selection"
+    ],
+    [
+     "MS",
+     "",
+     "Model selection",
+     "design",
+     2,
+     "9 language models"
+    ],
+    [
+     "MS",
+     "",
+     "Model selection",
+     "design",
+     3,
+     "from 5 makers"
+    ],
+    [
+     "G1",
+     "G1",
+     "Generation strategies",
+     "name",
+     1,
+     "Generation"
+    ],
+    [
+     "G1",
+     "G1",
+     "Generation strategies",
+     "name",
+     2,
+     "strategies"
+    ],
+    [
+     "G1",
+     "G1",
+     "Generation strategies",
+     "design",
+     3,
+     "6 strategies × 135"
+    ],
+    [
+     "G1",
+     "G1",
+     "Generation strategies",
+     "design",
+     4,
+     "questions"
+    ],
+    [
+     "G1",
+     "G1",
+     "Generation strategies",
+     "design",
+     5,
+     "gemini-3-flash"
+    ],
+    [
+     "G1",
+     "G1",
+     "Generation strategies",
+     "draws",
+     6,
+     "3 draws"
+    ],
+    [
+     "G3B",
+     "G3",
+     "No retrieval and naive RAG",
+     "name",
+     1,
+     "No retrieval and"
+    ],
+    [
+     "G3B",
+     "G3",
+     "No retrieval and naive RAG",
+     "name",
+     2,
+     "naive RAG"
+    ],
+    [
+     "G3B",
+     "G3",
+     "No retrieval and naive RAG",
+     "design",
+     3,
+     "2 baselines × 135"
+    ],
+    [
+     "G3B",
+     "G3",
+     "No retrieval and naive RAG",
+     "design",
+     4,
+     "questions"
+    ],
+    [
+     "G3B",
+     "G3",
+     "No retrieval and naive RAG",
+     "draws",
+     5,
+     "3 draws"
+    ],
+    [
+     "G5",
+     "G5",
+     "Retrieval depth",
+     "name",
+     1,
+     "Retrieval depth"
+    ],
+    [
+     "G5",
+     "G5",
+     "Retrieval depth",
+     "design",
+     2,
+     "RLM at 10 turn caps ×"
+    ],
+    [
+     "G5",
+     "G5",
+     "Retrieval depth",
+     "design",
+     3,
+     "86 questions"
+    ],
+    [
+     "G5",
+     "G5",
+     "Retrieval depth",
+     "draws",
+     4,
+     "3 draws"
+    ],
+    [
+     "T1",
+     "T1",
+     "Retrieval depth, local models",
+     "name",
+     1,
+     "Retrieval depth, local"
+    ],
+    [
+     "T1",
+     "T1",
+     "Retrieval depth, local models",
+     "name",
+     2,
+     "models"
+    ],
+    [
+     "T1",
+     "T1",
+     "Retrieval depth, local models",
+     "design",
+     3,
+     "RLM at 6 turn caps ×"
+    ],
+    [
+     "T1",
+     "T1",
+     "Retrieval depth, local models",
+     "design",
+     4,
+     "4 local models × 15"
+    ],
+    [
+     "T1",
+     "T1",
+     "Retrieval depth, local models",
+     "design",
+     5,
+     "questions"
+    ],
+    [
+     "T1",
+     "T1",
+     "Retrieval depth, local models",
+     "draws",
+     6,
+     "1 draw"
+    ],
+    [
+     "S2",
+     "S2",
+     "Code generation",
+     "name",
+     1,
+     "Code generation"
+    ],
+    [
+     "S2",
+     "S2",
+     "Code generation",
+     "design",
+     2,
+     "11 strategies × 11"
+    ],
+    [
+     "S2",
+     "S2",
+     "Code generation",
+     "design",
+     3,
+     "model variants × 20"
+    ],
+    [
+     "S2",
+     "S2",
+     "Code generation",
+     "design",
+     4,
+     "operations"
+    ],
+    [
+     "S2",
+     "S2",
+     "Code generation",
+     "draws",
+     5,
+     "1 draw"
+    ],
+    [
+     "G2",
+     "G2",
+     "Matched-budget arm",
+     "name",
+     1,
+     "Matched-budget arm"
+    ],
+    [
+     "G2",
+     "G2",
+     "Matched-budget arm",
+     "design",
+     2,
+     "single pass at"
+    ],
+    [
+     "G2",
+     "G2",
+     "Matched-budget arm",
+     "design",
+     3,
+     "matched budget × 135"
+    ],
+    [
+     "G2",
+     "G2",
+     "Matched-budget arm",
+     "design",
+     4,
+     "questions"
+    ],
+    [
+     "G2",
+     "G2",
+     "Matched-budget arm",
+     "draws",
+     5,
+     "3 draws"
+    ],
+    [
+     "G4",
+     "G4",
+     "Corpus scaling",
+     "name",
+     1,
+     "Corpus scaling"
+    ],
+    [
+     "G4",
+     "G4",
+     "Corpus scaling",
+     "design",
+     2,
+     "12 indexes × 6"
+    ],
+    [
+     "G4",
+     "G4",
+     "Corpus scaling",
+     "design",
+     3,
+     "strategies × the"
+    ],
+    [
+     "G4",
+     "G4",
+     "Corpus scaling",
+     "design",
+     4,
+     "questions in scope"
+    ],
+    [
+     "G4",
+     "G4",
+     "Corpus scaling",
+     "draws",
+     5,
+     "1 + 2 draws"
+    ],
+    [
+     "G6C",
+     "G6",
+     "Package RLM at caps 5 10 20",
+     "name",
+     1,
+     "Zhang RLM at caps"
+    ],
+    [
+     "G6C",
+     "G6",
+     "Package RLM at caps 5 10 20",
+     "name",
+     2,
+     "5, 10 and 20"
+    ],
+    [
+     "G6C",
+     "G6",
+     "Package RLM at caps 5 10 20",
+     "design",
+     3,
+     "Zhang RLM at 3 turn"
+    ],
+    [
+     "G6C",
+     "G6",
+     "Package RLM at caps 5 10 20",
+     "design",
+     4,
+     "caps × 135 questions"
+    ],
+    [
+     "G6C",
+     "G6",
+     "Package RLM at caps 5 10 20",
+     "draws",
+     5,
+     "3 draws"
+    ],
+    [
+     "G6D",
+     "G6",
+     "Package RLM depth caps",
+     "name",
+     1,
+     "Zhang RLM at the"
+    ],
+    [
+     "G6D",
+     "G6",
+     "Package RLM depth caps",
+     "name",
+     2,
+     "depth caps"
+    ],
+    [
+     "G6D",
+     "G6",
+     "Package RLM depth caps",
+     "design",
+     3,
+     "Zhang RLM at 7 more"
+    ],
+    [
+     "G6D",
+     "G6",
+     "Package RLM depth caps",
+     "design",
+     4,
+     "turn caps × 86"
+    ],
+    [
+     "G6D",
+     "G6",
+     "Package RLM depth caps",
+     "design",
+     5,
+     "questions"
+    ],
+    [
+     "G6D",
+     "G6",
+     "Package RLM depth caps",
+     "draws",
+     6,
+     "3 draws"
+    ],
+    [
+     "G9",
+     "G9",
+     "Distiller on every step (stress)",
+     "name",
+     1,
+     "Always distil (stress)"
+    ],
+    [
+     "G9",
+     "G9",
+     "Distiller on every step (stress)",
+     "design",
+     2,
+     "2 stress set-ups × 135"
+    ],
+    [
+     "G9",
+     "G9",
+     "Distiller on every step (stress)",
+     "design",
+     3,
+     "questions"
+    ],
+    [
+     "G9",
+     "G9",
+     "Distiller on every step (stress)",
+     "draws",
+     4,
+     "1 draw"
+    ],
+    [
+     "G3A",
+     "G3",
+     "Pipeline ablation",
+     "name",
+     1,
+     "Pipeline ablation"
+    ],
+    [
+     "G3A",
+     "G3",
+     "Pipeline ablation",
+     "design",
+     2,
+     "6 orchestrator set-ups"
+    ],
+    [
+     "G3A",
+     "G3",
+     "Pipeline ablation",
+     "design",
+     3,
+     "× 135 questions"
+    ],
+    [
+     "G3A",
+     "G3",
+     "Pipeline ablation",
+     "draws",
+     4,
+     "1 + 2 draws"
+    ],
+    [
+     "T3C",
+     "T3",
+     "Component benchmarks",
+     "name",
+     1,
+     "Component"
+    ],
+    [
+     "T3C",
+     "T3",
+     "Component benchmarks",
+     "name",
+     2,
+     "benchmarks"
+    ],
+    [
+     "T3C",
+     "T3",
+     "Component benchmarks",
+     "design",
+     3,
+     "orchestrator"
+    ],
+    [
+     "T3C",
+     "T3",
+     "Component benchmarks",
+     "design",
+     4,
+     "components × models"
+    ],
+    [
+     "T3C",
+     "T3",
+     "Component benchmarks",
+     "design",
+     5,
+     "× 832 items"
+    ],
+    [
+     "T3C",
+     "T3",
+     "Component benchmarks",
+     "draws",
+     6,
+     "1 draw"
+    ],
+    [
+     "T3D",
+     "T3",
+     "Distiller intervention",
+     "name",
+     1,
+     "Distiller intervention"
+    ],
+    [
+     "T3D",
+     "T3",
+     "Distiller intervention",
+     "design",
+     2,
+     "7 prompt variants ×"
+    ],
+    [
+     "T3D",
+     "T3",
+     "Distiller intervention",
+     "design",
+     3,
+     "models × 97 items"
+    ],
+    [
+     "T3D",
+     "T3",
+     "Distiller intervention",
+     "draws",
+     4,
+     "1 draw"
+    ],
+    [
+     "T2",
+     "T2",
+     "Strategy replication",
+     "name",
+     1,
+     "Strategy replication"
+    ],
+    [
+     "T2",
+     "T2",
+     "Strategy replication",
+     "design",
+     2,
+     "4 generation models ×"
+    ],
+    [
+     "T2",
+     "T2",
+     "Strategy replication",
+     "design",
+     3,
+     "6 strategies × 135"
+    ],
+    [
+     "T2",
+     "T2",
+     "Strategy replication",
+     "design",
+     4,
+     "questions"
+    ],
+    [
+     "T2",
+     "T2",
+     "Strategy replication",
+     "draws",
+     5,
+     "3 draws, RLM on a"
+    ],
+    [
+     "T2",
+     "T2",
+     "Strategy replication",
+     "draws",
+     6,
+     "third"
+    ],
+    [
+     "I2",
+     "I2",
+     "Plant-science reuse demonstration",
+     "name",
+     1,
+     "Plant-science reuse"
+    ],
+    [
+     "I2",
+     "I2",
+     "Plant-science reuse demonstration",
+     "name",
+     2,
+     "demonstration"
+    ],
+    [
+     "I2",
+     "I2",
+     "Plant-science reuse demonstration",
+     "design",
+     3,
+     "6 strategies × 5"
+    ],
+    [
+     "I2",
+     "I2",
+     "Plant-science reuse demonstration",
+     "design",
+     4,
+     "questions on 5 papers"
+    ],
+    [
+     "I2",
+     "I2",
+     "Plant-science reuse demonstration",
+     "draws",
+     5,
+     "3 draws"
+    ],
+    [
+     "G11",
+     "G11",
+     "Short-passage single pass",
+     "name",
+     1,
+     "Short-passage"
+    ],
+    [
+     "G11",
+     "G11",
+     "Short-passage single pass",
+     "name",
+     2,
+     "single pass"
+    ],
+    [
+     "G11",
+     "G11",
+     "Short-passage single pass",
+     "design",
+     3,
+     "single pass with each"
+    ],
+    [
+     "G11",
+     "G11",
+     "Short-passage single pass",
+     "design",
+     4,
+     "passage cut to its first"
+    ],
+    [
+     "G11",
+     "G11",
+     "Short-passage single pass",
+     "design",
+     5,
+     "800 characters"
+    ],
+    [
+     "G11",
+     "G11",
+     "Short-passage single pass",
+     "draws",
+     6,
+     "1 + 2 draws"
+    ],
+    [
+     "G10",
+     "G10",
+     "Flat wide call",
+     "name",
+     1,
+     "Flat wide call"
+    ],
+    [
+     "G10",
+     "G10",
+     "Flat wide call",
+     "design",
+     2,
+     "3 indexes × 1 call at a"
+    ],
+    [
+     "G10",
+     "G10",
+     "Flat wide call",
+     "design",
+     3,
+     "fixed passage count"
+    ],
+    [
+     "G10",
+     "G10",
+     "Flat wide call",
+     "design",
+     4,
+     "third index: draw 1"
+    ],
+    [
+     "G10",
+     "G10",
+     "Flat wide call",
+     "design",
+     5,
+     "only"
+    ],
+    [
+     "G10",
+     "G10",
+     "Flat wide call",
+     "draws",
+     6,
+     "1 + 2 draws"
+    ],
+    [
+     "S18F",
+     "S12",
+     "Judge with evidence",
+     "name",
+     1,
+     "Judge with evidence"
+    ],
+    [
+     "S18F",
+     "S12",
+     "Judge with evidence",
+     "design",
+     2,
+     "4 arms (no source,"
+    ],
+    [
+     "S18F",
+     "S12",
+     "Judge with evidence",
+     "design",
+     3,
+     "own papers, unrelated"
+    ],
+    [
+     "S18F",
+     "S12",
+     "Judge with evidence",
+     "design",
+     4,
+     "papers, repeat) × 366"
+    ],
+    [
+     "S18F",
+     "S12",
+     "Judge with evidence",
+     "design",
+     5,
+     "answers"
+    ],
+    [
+     "S18F",
+     "S12",
+     "Judge with evidence",
+     "draws",
+     6,
+     "1 draw"
+    ],
+    [
+     "G17",
+     "G17",
+     "RLM ablation",
+     "name",
+     1,
+     "RLM ablation"
+    ],
+    [
+     "G17",
+     "G17",
+     "RLM ablation",
+     "design",
+     2,
+     "3 arms (control,"
+    ],
+    [
+     "G17",
+     "G17",
+     "RLM ablation",
+     "design",
+     3,
+     "search off, gate off) ×"
+    ],
+    [
+     "G17",
+     "G17",
+     "RLM ablation",
+     "design",
+     4,
+     "86 questions"
+    ],
+    [
+     "G17",
+     "G17",
+     "RLM ablation",
+     "draws",
+     5,
+     "3 draws"
+    ],
+    [
+     "G19",
+     "G19",
+     "RLM ablation, gemma3:27b",
+     "name",
+     1,
+     "RLM ablation,"
+    ],
+    [
+     "G19",
+     "G19",
+     "RLM ablation, gemma3:27b",
+     "name",
+     2,
+     "gemma3:27b"
+    ],
+    [
+     "G19",
+     "G19",
+     "RLM ablation, gemma3:27b",
+     "design",
+     3,
+     "3 arms (Zhang RLM,"
+    ],
+    [
+     "G19",
+     "G19",
+     "RLM ablation, gemma3:27b",
+     "design",
+     4,
+     "search off, gate off) ×"
+    ],
+    [
+     "G19",
+     "G19",
+     "RLM ablation, gemma3:27b",
+     "design",
+     5,
+     "46 questions"
+    ],
+    [
+     "G19",
+     "G19",
+     "RLM ablation, gemma3:27b",
+     "draws",
+     6,
+     "1 draw"
+    ],
+    [
+     "draws key",
+     "",
+     "",
+     "key label",
+     1,
+     "Draws"
+    ],
+    [
+     "draws key",
+     "",
+     "",
+     "key name",
+     1,
+     "3 draws"
+    ],
+    [
+     "draws key",
+     "",
+     "",
+     "key text",
+     1,
+     "every question answered three times"
+    ],
+    [
+     "draws key",
+     "",
+     "",
+     "key name",
+     2,
+     "1 + 2 draws"
+    ],
+    [
+     "draws key",
+     "",
+     "",
+     "key text",
+     2,
+     "every question answered once, and a fixed third of them twice more"
+    ],
+    [
+     "draws key",
+     "",
+     "",
+     "key name",
+     3,
+     "3 draws, RLM on a third"
+    ],
+    [
+     "draws key",
+     "",
+     "",
+     "key text",
+     3,
+     "every question answered three times, except by the RLM set-ups, which answer a fixed third of them three times"
+    ],
+    [
+     "draws key",
+     "",
+     "",
+     "key name",
+     4,
+     "1 draw"
+    ],
+    [
+     "draws key",
+     "",
+     "",
+     "key text",
+     4,
+     "every question answered once"
+    ],
+    [
+     "draws key",
+     "",
+     "",
+     "key name",
+     5,
+     "1 run"
+    ],
+    [
+     "draws key",
+     "",
+     "",
+     "key text",
+     5,
+     "each retrieval query scored once"
+    ]
+   ]
+  },
+  "Supp. Fig. 1 boxes": {
+   "columns": [
+    "box",
+    "plan_row",
+    "experiment",
+    "column",
+    "design",
+    "draws",
+    "answers",
+    "calls",
+    "count_kind",
+    "draws_csv_design",
+    "draws_csv_draws",
+    "draws_csv_status",
+    "registry_basis"
+   ],
+   "rows": [
+    [
+     "RO",
+     "",
+     "Retrieval optimisation",
+     "Corpus and choices",
+     "4 embedding models, 8 chunkings, 7 search strategies",
+     "1 run",
+     2336,
+     null,
+     "answers, kept from April",
+     "not re-run",
+     "0",
+     "not",
+     "registry today.kept_from_april (S13's count)"
+    ],
+    [
+     "CORPUS",
+     "",
+     "Evaluation corpus",
+     "Corpus and choices",
+     "244 questions on 50 core papers | 150 distractor papers",
+     "",
+     null,
+     null,
+     "corpus",
+     "",
+     "",
+     "",
+     ""
+    ],
+    [
+     "MS",
+     "",
+     "Model selection",
+     "Corpus and choices",
+     "9 language models from 5 makers",
+     "",
+     408,
+     null,
+     "answers, kept from April",
+     "not re-run",
+     "0",
+     "not",
+     "registry today.kept_from_april (S13's count)"
+    ],
+    [
+     "G1",
+     "G1",
+     "Generation strategies",
+     "Core experiments",
+     "6 strategies × 135 questions | gemini-3-flash-preview",
+     "3 draws",
+     2430,
+     null,
+     "answers",
+     "6 strategies x 135 questions",
+     "3",
+     "done",
+     "s457_mirror_20261022.tar (sha256 b8d4b175eb42), distinct answer keys"
+    ],
+    [
+     "G3B",
+     "G3",
+     "No retrieval and naive RAG",
+     "Core experiments",
+     "2 baselines × 135 questions",
+     "3 draws",
+     810,
+     null,
+     "answers",
+     "2 baselines x 135 questions",
+     "3",
+     "done",
+     "count_records_20261108.tar (sha256 a43a504f0a6f): g3/runs, distinct answer keys over every draw; the 810 keys of the earlier source (fig4_records_1023.tar) reproduced, each holding the same row"
+    ],
+    [
+     "G5",
+     "G5",
+     "Retrieval depth",
+     "Core experiments",
+     "RLM at 10 turn caps × 86 questions",
+     "3 draws",
+     2580,
+     null,
+     "answers",
+     "10 depths x 86 questions (gemini)",
+     "3",
+     "done",
+     "committed L2_d284_inputs (PULL.json, 13 files; the draw-1 file equal to L2_inputs' frozen one), distinct answer keys over every draw"
+    ],
+    [
+     "T1",
+     "T1",
+     "Retrieval depth, local models",
+     "Core experiments",
+     "RLM at 6 turn caps × 4 local models × 15 questions",
+     "1 draw",
+     360,
+     null,
+     "answers",
+     "4 local models (devstral, gemma3, qwen3-coder, qwen3-coder-next) x 6 caps (1, 3, 5, 7, 20, 50) x 15 questions",
+     "1 (draws 2 and 3 only if 11454 has nothing else to run, D119 Q5)",
+     "done",
+     "fig3_t1.tar (sha256 0b0326de1814): the union of 364 results files, distinct (model, answer key)"
+    ],
+    [
+     "S2",
+     "S2",
+     "Code generation",
+     "Core experiments",
+     "11 strategies × 11 model variants × 20 operations",
+     "1 draw",
+     2420,
+     null,
+     "answers",
+     "16 model variants x 11 strategies x 20 operations",
+     "1",
+     "done",
+     "s2_after_s4_20261105.tar (sha256 f879ea24f639): the 121 runs findings/figures_provisional/fig6/records_manifest.json names, distinct answer keys"
+    ],
+    [
+     "G2",
+     "G2",
+     "Matched-budget arm",
+     "Built on the core",
+     "single pass at matched budget × 135 questions",
+     "3 draws",
+     405,
+     null,
+     "answers",
+     "1 arm (single pass given more passages) x 135",
+     "3",
+     "done",
+     "s457_mirror_20261022.tar (sha256 b8d4b175eb42), distinct answer keys"
+    ],
+    [
+     "G4",
+     "G4",
+     "Corpus scaling",
+     "Built on the core",
+     "12 indexes × 6 strategies × the questions in scope",
+     "1 + 2 draws",
+     18162,
+     null,
+     "answers",
+     "12 indexes x 6 strategies x questions per size (Q105: 11682 answers per draw)",
+     "1, and 2 and 3 on a fixed third (D98)",
+     "done",
+     "g4_draws_20261101.tar (sha256 c02cef9c0487), distinct answer keys over every draw; each run's draw-1 file of fig3_g4_inputs.tar (sha256 7f8481440b0c) a byte prefix"
+    ],
+    [
+     "G6C",
+     "G6",
+     "Package RLM at caps 5 10 20",
+     "Built on the core",
+     "Zhang RLM at 3 turn caps × 135 questions",
+     "3 draws",
+     1215,
+     null,
+     "answers",
+     "3 caps x 135 questions",
+     "3",
+     "done",
+     "answer_lengths_20261020.tar (sha256 adb177a69245), distinct answer keys"
+    ],
+    [
+     "G6D",
+     "G6",
+     "Package RLM depth caps",
+     "Built on the core",
+     "Zhang RLM at 7 more turn caps × 86 questions",
+     "3 draws",
+     1806,
+     null,
+     "answers",
+     "7 caps (1 2 3 7 15 30 50) x 86 questions",
+     "3",
+     "done",
+     "committed L2_inputs/g6 (frozen, listed in SHA256SUMS), distinct answer keys"
+    ],
+    [
+     "G9",
+     "G9",
+     "Distiller on every step (stress)",
+     "Ablation",
+     "2 stress set-ups × 135 questions",
+     "1 draw",
+     450,
+     null,
+     "answers",
+     "2 set-ups (Q82: Mentori's prompt, F1) x 135 questions",
+     "1 (D98)",
+     "done",
+     "count_records_20261108.tar (sha256 a43a504f0a6f): g3/runs, distinct answer keys over every draw; the 270 keys of the earlier source (committed g9_inputs) reproduced, each holding the same row"
+    ],
+    [
+     "G3A",
+     "G3",
+     "Pipeline ablation",
+     "Ablation",
+     "6 orchestrator set-ups × 135 questions",
+     "1 + 2 draws",
+     1373,
+     null,
+     "answers",
+     "8 set-ups (D52) x 135 questions",
+     "1, and 2 and 3 on a fixed third (D98)",
+     "done",
+     "count_records_20261108.tar (sha256 a43a504f0a6f): g3/runs, distinct answer keys over every draw; the 844 keys of the earlier source (fig4_records_1023.tar) reproduced, each holding the same row"
+    ],
+    [
+     "T3C",
+     "T3",
+     "Component benchmarks",
+     "Ablation",
+     "orchestrator components × models × 832 items",
+     "1 draw",
+     6656,
+     null,
+     "answers",
+     "orchestrator components x models x 832 items",
+     "1 (Gemini 3)",
+     "running",
+     "count_records_20261106.tar (sha256 b6f334760dfc): t3/T3_frozen_20261104T131439Z, each sink's rows equal to its MANIFEST.json answers_per_sink, distinct answer keys"
+    ],
+    [
+     "T3D",
+     "T3",
+     "Distiller intervention",
+     "Ablation",
+     "7 prompt variants × models × 97 items",
+     "1 draw",
+     1164,
+     null,
+     "answers",
+     "7 prompt variants x models x 97 items",
+     "1",
+     "running",
+     "count_records_20261106.tar (sha256 b6f334760dfc): t3/T3_frozen_20261104T131439Z, each sink's rows equal to its MANIFEST.json answers_per_sink, distinct answer keys"
+    ],
+    [
+     "T2",
+     "T2",
+     "Strategy replication",
+     "Replication and reuse",
+     "4 generation models × 6 strategies × 135 questions",
+     "3 draws, RLM on a third",
+     7054,
+     null,
+     "answers",
+     "4 generators x 6 strategies x 135 questions (D160 (2): claude-haiku-4-5, gemini-2.5-pro, gemma3:27b, qwen3-coder:30b; glm-4.7-flash and qwen3.5:122b out)",
+     "3; gemini-2.5-pro 1, and 2 and 3 on a fixed third (D98); gemma3:27b and qwen3-coder:30b: rlm_5, rlm_10, rlm_20 on that third at every draw (D175 Q3, D176)",
+     "running",
+     "count_records_20261106.tar (sha256 b6f334760dfc): t2/<generator>/runs, distinct answer keys, equal to the judge's committed collects but for answers with no text; with T2X (D241), RLM-10 of gemma3:27b and qwen3-coder:30b on the 17 many-paper questions outside D98's subset, from count_records_20261108.tar (sha256 a43a504f0a6f): t2x/<generator>/runs, equal to the judge's committed T2X collects"
+    ],
+    [
+     "I2",
+     "I2",
+     "Plant-science reuse demonstration",
+     "Replication and reuse",
+     "6 strategies × 5 questions on 5 papers",
+     "3 draws",
+     90,
+     null,
+     "answers",
+     "Figure 2's six strategies x 5 questions on 5 papers, key PB v1.1",
+     "3",
+     "done",
+     "committed i2_inputs (frozen by S569, ecf1e368, listed in SHA256SUMS), distinct answer keys, checked against I2's own key PB v1.1"
+    ],
+    [
+     "G11",
+     "G11",
+     "Short-passage single pass",
+     "Replication and reuse",
+     "single pass with each passage cut to its first 800 characters",
+     "1 + 2 draws",
+     225,
+     null,
+     "answers",
+     "single pass with each passage cut to its first 800 characters (D196)",
+     "1 on 135 questions, 2 and 3 on a fixed third (D98)",
+     "done",
+     "count_records_20261106.tar (sha256 b6f334760dfc): g11/runs, distinct answer keys, equal to the judge's committed collect (S600)"
+    ],
+    [
+     "G10",
+     "G10",
+     "Flat wide call",
+     "Replication and reuse",
+     "3 indexes × 1 call at a fixed passage count | third index: draw 1 only",
+     "1 + 2 draws",
+     585,
+     null,
+     "answers",
+     "3 indexes x 1 call at a fixed passage count (D196)",
+     "1 on 135 questions, 2 and 3 on a fixed third (D98) on two indexes",
+     "running",
+     "count_records_20261106.tar (sha256 b6f334760dfc): g10/runs, distinct answer keys, equal to the judge's committed collect (S600)"
+    ],
+    [
+     "S18F",
+     "S12",
+     "Judge with evidence",
+     "Built on the core",
+     "4 arms (no source, own papers, unrelated papers, repeat) × 366 answers",
+     "1 draw",
+     0,
+     null,
+     "answers",
+     "4 arms (no source, own papers, unrelated papers, repeat) x 366 answers (S18f, key v2.5)",
+     "1",
+     "done",
+     "no answer of its own: judge calls on 366 of G1's draw-1 answers (findings/recompute/S18f_v25_results.json analysis_set), counted in G1"
+    ],
+    [
+     "G17",
+     "G17",
+     "RLM ablation",
+     "Ablation",
+     "3 arms (control, search off, gate off) × 86 questions",
+     "3 draws",
+     774,
+     null,
+     "answers",
+     "3 arms (control, search off, gate off) x 86 questions (D240)",
+     "3",
+     "done",
+     "committed G17_runs/inputs (draw 1) and inputs_d23 (draws 2 and 3), each equal to its MANIFEST.sha256, distinct answer keys, equal to S573's concept-recall rows"
+    ],
+    [
+     "G19",
+     "G19",
+     "RLM ablation, gemma3:27b",
+     "Replication and reuse",
+     "3 arms (Zhang RLM, search off, gate off) × 46 questions",
+     "1 draw",
+     138,
+     null,
+     "answers",
+     "3 arms (Zhang RLM, search off, gate off) x 46 questions (D249 O2)",
+     "1",
+     "running",
+     "count_records_20261106.tar (sha256 b6f334760dfc): g19/runs, arms A (package RLM), B and C, distinct answer keys, equal to S573's concept-recall rows"
+    ]
+   ]
+  },
+  "Supp. Fig. 1 arrows": {
+   "columns": [
+    "from",
+    "to",
+    "from_experiment",
+    "to_experiment",
+    "meaning",
+    "basis",
+    "path_mm"
+   ],
+   "rows": [
+    [
+     "CORPUS",
+     "RO",
+     "Evaluation corpus",
+     "Retrieval optimisation",
+     "uses the output or the choice of",
+     "the retrieval settings were chosen on the corpus (submitted Supplementary Figure 1)",
+     "16.30,59.69 16.30,51.29"
+    ],
+    [
+     "CORPUS",
+     "MS",
+     "Evaluation corpus",
+     "Model selection",
+     "uses the output or the choice of",
+     "the models were chosen on the corpus's questions (submitted Supplementary Figure 1)",
+     "16.30,74.85 16.30,83.25"
+    ],
+    [
+     "RO",
+     "G1",
+     "Retrieval optimisation",
+     "Generation strategies",
+     "uses the output or the choice of",
+     "the index every strategy searches is built with the retrieval settings kept from April (submitted Supplementary Figure 1)",
+     "31.60,40.39 33.93,40.39 33.93,13.27 38.60,13.27"
+    ],
+    [
+     "RO",
+     "G3B",
+     "Retrieval optimisation",
+     "No retrieval and naive RAG",
+     "uses the output or the choice of",
+     "naive RAG searches with the same retrieval settings (submitted Supplementary Figure 1)",
+     "31.60,40.39 38.60,40.39"
+    ],
+    [
+     "MS",
+     "G1",
+     "Model selection",
+     "Generation strategies",
+     "uses the output or the choice of",
+     "the generation model, gemini-3-flash-preview (submitted Supplementary Figure 1)",
+     "31.60,89.16 36.27,89.16 36.27,20.54 38.60,20.54"
+    ],
+    [
+     "MS",
+     "T1",
+     "Model selection",
+     "Retrieval depth, local models",
+     "uses the output or the choice of",
+     "the local models (submitted Supplementary Figure 1: model selection to retrieval depth)",
+     "31.60,89.16 38.60,89.16"
+    ],
+    [
+     "MS",
+     "S2",
+     "Model selection",
+     "Code generation",
+     "uses the output or the choice of",
+     "the code-generation models (submitted Supplementary Figure 1)",
+     "31.60,89.16 36.27,89.16 36.27,109.31 38.60,109.31"
+    ],
+    [
+     "G1",
+     "G2",
+     "Generation strategies",
+     "Matched-budget arm",
+     "uses the output or the choice of",
+     "single pass given each question's passage count from G1's RLM-10 call records (exp_01 matched_budget; experiments/runner/matched_budget.py)",
+     "69.20,16.91 73.87,16.91 73.87,29.15 76.20,29.15"
+    ],
+    [
+     "G1",
+     "G4",
+     "Generation strategies",
+     "Corpus scaling",
+     "uses the output or the choice of",
+     "corpus scaling runs the same six strategies (S456: exp_02 CONFIG_NAMES equal exp_01's)",
+     "69.20,16.91 73.87,16.91 73.87,51.83 76.20,51.83"
+    ],
+    [
+     "G1",
+     "G6C",
+     "Generation strategies",
+     "Package RLM at caps 5 10 20",
+     "uses the output or the choice of",
+     "package RLM is run at the caps of G1's RLM-5, RLM-10 and RLM-20 (run_rlm_ref.py FIGURE2_CAPS)",
+     "69.20,16.91 73.87,16.91 73.87,74.52 76.20,74.52"
+    ],
+    [
+     "G1",
+     "G3A",
+     "Generation strategies",
+     "Pipeline ablation",
+     "uses the output or the choice of",
+     "Figure 5 sets the pipeline beside G1's RLM-10 answers, which G3 does not run again (G3_runs/README.md: rlm_10 not run, Figure 4 uses G1's RLM-10 answers)",
+     "69.20,16.91 110.30,16.91 110.30,46.84 113.80,46.84"
+    ],
+    [
+     "G1",
+     "T2",
+     "Generation strategies",
+     "Strategy replication",
+     "uses the output or the choice of",
+     "T2 runs G1's six strategies on G1's index with other generation models (check_t2.py CONFIGS, t2_lib.sh)",
+     "69.20,16.91 151.40,16.91"
+    ],
+    [
+     "G1",
+     "I2",
+     "Generation strategies",
+     "Plant-science reuse demonstration",
+     "uses the output or the choice of",
+     "the reuse demonstration runs G1's six strategies (D160 (14), Q-I2b O-b)",
+     "69.20,16.91 146.15,16.91 146.15,41.26 151.40,41.26"
+    ],
+    [
+     "G5",
+     "T1",
+     "Retrieval depth",
+     "Retrieval depth, local models",
+     "uses the output or the choice of",
+     "T1's turn caps are a subset of G5's (S456 check on T1_runs/assignment.toml)",
+     "53.90,69.85 53.90,74.05"
+    ],
+    [
+     "G5",
+     "G6D",
+     "Retrieval depth",
+     "Package RLM depth caps",
+     "uses the output or the choice of",
+     "package RLM's depth caps with caps 5, 10 and 20 are G5's ten caps (S456: FIGURE2_CAPS + DEPTH_SWEEP_CAPS = exp_06 DEFAULT_DEPTHS)",
+     "69.20,62.27 71.53,62.27 71.53,98.87 76.20,98.87"
+    ],
+    [
+     "G6C",
+     "G6D",
+     "Package RLM at caps 5 10 20",
+     "Package RLM depth caps",
+     "uses the output or the choice of",
+     "the depth curve of package RLM takes its caps 5, 10 and 20 from these runs, the 86 questions kept (S459: b4_rlm_ref__cap<c>__all135 for caps 5, 10, 20)",
+     "91.50,83.76 91.50,87.96"
+    ],
+    [
+     "G3A",
+     "G9",
+     "Pipeline ablation",
+     "Distiller on every step (stress)",
+     "uses the output or the choice of",
+     "the distiller never ran in the full pipeline's draw 1, so the stress set-ups run it on every step (D154 as amended; draws.csv G9 basis, Q82)",
+     "129.10,39.26 129.10,35.06"
+    ],
+    [
+     "G3A",
+     "T3C",
+     "Pipeline ablation",
+     "Component benchmarks",
+     "uses the output or the choice of",
+     "the components benchmarked are the orchestrator's (submitted Supplementary Figure 1)",
+     "129.10,54.41 129.10,58.61"
+    ],
+    [
+     "T3C",
+     "T3D",
+     "Component benchmarks",
+     "Distiller intervention",
+     "uses the output or the choice of",
+     "the distiller prompts are varied on the distiller's benchmark items (submitted Supplementary Figure 1)",
+     "129.10,80.43 129.10,84.63"
+    ],
+    [
+     "G1",
+     "G11",
+     "Generation strategies",
+     "Short-passage single pass",
+     "uses the output or the choice of",
+     "paired with G1 by question, on G1's index (D196)",
+     "69.20,16.91 146.15,16.91 146.15,65.60 151.40,65.60"
+    ],
+    [
+     "G4",
+     "G10",
+     "Corpus scaling",
+     "Flat wide call",
+     "uses the output or the choice of",
+     "its top_k comes from G4's token counts and it pairs with G4 by question (D196; S519)",
+     "106.80,51.83 112.05,51.83 112.05,82.53 151.40,82.53"
+    ],
+    [
+     "G1",
+     "G17",
+     "Generation strategies",
+     "RLM ablation",
+     "uses the output or the choice of",
+     "the control is G1's RLM-10 on today's code, and G1's RLM-10 draw 1 checks what the code changed (D240)",
+     "69.20,16.91 110.30,16.91 110.30,110.14 113.80,110.14"
+    ],
+    [
+     "G6C",
+     "G17",
+     "Package RLM at caps 5 10 20",
+     "RLM ablation",
+     "uses the output or the choice of",
+     "the package arm is G6's cap-10 answers, stored and judged (D240, D249 O1)",
+     "106.80,74.52 108.55,74.52 108.55,116.31 113.80,116.31"
+    ],
+    [
+     "G17",
+     "G19",
+     "RLM ablation",
+     "RLM ablation, gemma3:27b",
+     "uses the output or the choice of",
+     "the same three switches on gemma3:27b (D249 O2)",
+     "144.40,113.22 151.40,113.22"
+    ],
+    [
+     "G1",
+     "S18F",
+     "Generation strategies",
+     "Judge with evidence",
+     "uses the output or the choice of",
+     "judges G1's draw-1 answers with no source, their own papers or unrelated papers (D107; S18f)",
+     "69.20,16.91 73.87,16.91 73.87,124.88 76.20,124.88"
+    ]
+   ]
+  }
+ },
+ "printed": {
+  "s448num_0": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 0,
+   "format": "{text}"
+  },
+  "s448num_1": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 1,
+   "format": "{text}"
+  },
+  "s448num_2": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 2,
+   "format": "{text}"
+  },
+  "s448num_3": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 3,
+   "format": "{text}"
+  },
+  "s448num_4": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 4,
+   "format": "{text}"
+  },
+  "s448num_5": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 5,
+   "format": "{text}"
+  },
+  "s448num_6": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 6,
+   "format": "{text}"
+  },
+  "s448num_7": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 7,
+   "format": "{text}"
+  },
+  "s448num_8": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 8,
+   "format": "{text}"
+  },
+  "s448num_9": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 9,
+   "format": "{text}"
+  },
+  "s448num_10": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 10,
+   "format": "{text}"
+  },
+  "s448num_11": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 11,
+   "format": "{text}"
+  },
+  "s448num_12": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 12,
+   "format": "{text}"
+  },
+  "s448num_13": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 13,
+   "format": "{text}"
+  },
+  "s448num_14": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 14,
+   "format": "{text}"
+  },
+  "s448num_15": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 15,
+   "format": "{text}"
+  },
+  "s448num_16": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 16,
+   "format": "{text}"
+  },
+  "s448num_17": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 17,
+   "format": "{text}"
+  },
+  "s448num_18": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 18,
+   "format": "{text}"
+  },
+  "s448num_19": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 19,
+   "format": "{text}"
+  },
+  "s448num_20": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 20,
+   "format": "{text}"
+  },
+  "s448num_21": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 21,
+   "format": "{text}"
+  },
+  "s448num_22": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 22,
+   "format": "{text}"
+  },
+  "s448num_23": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 23,
+   "format": "{text}"
+  },
+  "s448num_24": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 24,
+   "format": "{text}"
+  },
+  "s448num_25": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 25,
+   "format": "{text}"
+  },
+  "s448num_26": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 26,
+   "format": "{text}"
+  },
+  "s448num_27": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 27,
+   "format": "{text}"
+  },
+  "s448num_28": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 28,
+   "format": "{text}"
+  },
+  "s448num_29": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 29,
+   "format": "{text}"
+  },
+  "s448num_30": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 30,
+   "format": "{text}"
+  },
+  "s448num_31": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 31,
+   "format": "{text}"
+  },
+  "s448num_32": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 32,
+   "format": "{text}"
+  },
+  "s448num_33": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 33,
+   "format": "{text}"
+  },
+  "s448num_34": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 34,
+   "format": "{text}"
+  },
+  "s448num_35": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 35,
+   "format": "{text}"
+  },
+  "s448num_36": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 36,
+   "format": "{text}"
+  },
+  "s448num_37": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 37,
+   "format": "{text}"
+  },
+  "s448num_38": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 38,
+   "format": "{text}"
+  },
+  "s448num_39": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 39,
+   "format": "{text}"
+  },
+  "s448num_40": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 40,
+   "format": "{text}"
+  },
+  "s448num_41": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 41,
+   "format": "{text}"
+  },
+  "s448num_42": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 42,
+   "format": "{text}"
+  },
+  "s448num_43": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 43,
+   "format": "{text}"
+  },
+  "s448num_44": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 44,
+   "format": "{text}"
+  },
+  "s448num_45": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 45,
+   "format": "{text}"
+  },
+  "s448num_46": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 46,
+   "format": "{text}"
+  },
+  "s448num_47": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 47,
+   "format": "{text}"
+  },
+  "s448num_48": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 48,
+   "format": "{text}"
+  },
+  "s448num_49": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 49,
+   "format": "{text}"
+  },
+  "s448num_50": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 50,
+   "format": "{text}"
+  },
+  "s448num_51": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 51,
+   "format": "{text}"
+  },
+  "s448num_52": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 52,
+   "format": "{text}"
+  },
+  "s448num_53": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 53,
+   "format": "{text}"
+  },
+  "s448num_54": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 54,
+   "format": "{text}"
+  },
+  "s448num_55": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 55,
+   "format": "{text}"
+  },
+  "s448num_56": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 56,
+   "format": "{text}"
+  },
+  "s448num_57": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 57,
+   "format": "{text}"
+  },
+  "s448num_58": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 58,
+   "format": "{text}"
+  },
+  "s448num_59": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 59,
+   "format": "{text}"
+  },
+  "s448num_60": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 60,
+   "format": "{text}"
+  },
+  "s448num_61": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 61,
+   "format": "{text}"
+  },
+  "s448num_62": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 62,
+   "format": "{text}"
+  },
+  "s448num_63": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 63,
+   "format": "{text}"
+  },
+  "s448num_64": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 64,
+   "format": "{text}"
+  },
+  "s448num_65": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 65,
+   "format": "{text}"
+  },
+  "s448num_66": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 66,
+   "format": "{text}"
+  },
+  "s448num_67": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 67,
+   "format": "{text}"
+  },
+  "s448num_68": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 68,
+   "format": "{text}"
+  },
+  "s448num_69": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 69,
+   "format": "{text}"
+  },
+  "s448num_70": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 70,
+   "format": "{text}"
+  },
+  "s448num_71": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 71,
+   "format": "{text}"
+  },
+  "s448num_72": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 72,
+   "format": "{text}"
+  },
+  "s448num_73": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 73,
+   "format": "{text}"
+  },
+  "s448num_74": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 74,
+   "format": "{text}"
+  },
+  "s448num_75": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 75,
+   "format": "{text}"
+  },
+  "s448num_76": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 76,
+   "format": "{text}"
+  },
+  "s448num_77": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 77,
+   "format": "{text}"
+  },
+  "s448num_78": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 78,
+   "format": "{text}"
+  },
+  "s448num_79": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 79,
+   "format": "{text}"
+  },
+  "s448num_80": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 80,
+   "format": "{text}"
+  },
+  "s448num_81": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 81,
+   "format": "{text}"
+  },
+  "s448num_82": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 82,
+   "format": "{text}"
+  },
+  "s448num_83": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 83,
+   "format": "{text}"
+  },
+  "s448num_84": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 84,
+   "format": "{text}"
+  },
+  "s448num_85": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 85,
+   "format": "{text}"
+  },
+  "s448num_86": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 86,
+   "format": "{text}"
+  },
+  "s448num_87": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 87,
+   "format": "{text}"
+  },
+  "s448num_88": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 88,
+   "format": "{text}"
+  },
+  "s448num_89": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 89,
+   "format": "{text}"
+  },
+  "s448num_90": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 90,
+   "format": "{text}"
+  },
+  "s448num_91": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 91,
+   "format": "{text}"
+  },
+  "s448num_92": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 92,
+   "format": "{text}"
+  },
+  "s448num_93": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 93,
+   "format": "{text}"
+  },
+  "s448num_94": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 94,
+   "format": "{text}"
+  },
+  "s448num_95": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 95,
+   "format": "{text}"
+  },
+  "s448num_96": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 96,
+   "format": "{text}"
+  },
+  "s448num_97": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 97,
+   "format": "{text}"
+  },
+  "s448num_98": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 98,
+   "format": "{text}"
+  },
+  "s448num_99": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 99,
+   "format": "{text}"
+  },
+  "s448num_100": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 100,
+   "format": "{text}"
+  },
+  "s448num_101": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 101,
+   "format": "{text}"
+  },
+  "s448num_102": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 102,
+   "format": "{text}"
+  },
+  "s448num_103": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 103,
+   "format": "{text}"
+  },
+  "s448num_104": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 104,
+   "format": "{text}"
+  },
+  "s448num_105": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 105,
+   "format": "{text}"
+  },
+  "s448num_106": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 106,
+   "format": "{text}"
+  },
+  "s448num_107": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 107,
+   "format": "{text}"
+  },
+  "s448num_108": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 108,
+   "format": "{text}"
+  },
+  "s448num_109": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 109,
+   "format": "{text}"
+  },
+  "s448num_110": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 110,
+   "format": "{text}"
+  },
+  "s448num_111": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 111,
+   "format": "{text}"
+  },
+  "s448num_112": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 112,
+   "format": "{text}"
+  },
+  "s448num_113": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 113,
+   "format": "{text}"
+  },
+  "s448num_114": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 114,
+   "format": "{text}"
+  },
+  "s448num_115": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 115,
+   "format": "{text}"
+  },
+  "s448num_116": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 116,
+   "format": "{text}"
+  },
+  "s448num_117": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 117,
+   "format": "{text}"
+  },
+  "s448num_118": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 118,
+   "format": "{text}"
+  },
+  "s448num_119": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 119,
+   "format": "{text}"
+  },
+  "s448num_120": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 120,
+   "format": "{text}"
+  },
+  "s448num_121": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 121,
+   "format": "{text}"
+  },
+  "s448num_122": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 122,
+   "format": "{text}"
+  },
+  "s448num_123": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 123,
+   "format": "{text}"
+  },
+  "s448num_124": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 124,
+   "format": "{text}"
+  },
+  "s448num_125": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 125,
+   "format": "{text}"
+  },
+  "s448num_126": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 126,
+   "format": "{text}"
+  },
+  "s448num_127": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 127,
+   "format": "{text}"
+  },
+  "s448num_128": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 128,
+   "format": "{text}"
+  },
+  "s448num_129": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 129,
+   "format": "{text}"
+  },
+  "s448num_130": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 130,
+   "format": "{text}"
+  },
+  "s448num_131": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 131,
+   "format": "{text}"
+  },
+  "s448num_132": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 132,
+   "format": "{text}"
+  },
+  "s448num_133": {
+   "sheet": "Supp. Fig. 1 lines",
+   "row": 133,
+   "format": "{text}"
+  }
+ },
+ "printed_what": "every text on the plate: the SVG group id of its text, the lines sheet's 0-based data row and format it is written from (S448 R8 (6))"
+}

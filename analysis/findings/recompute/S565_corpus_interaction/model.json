@@ -1,0 +1,1491 @@
+{
+  "script": "S565_corpus_interaction.R",
+  "r_version": "R version 4.5.2 (2025-10-31)",
+  "lme4": "2.0.1",
+  "formula": "pass ~ strategy * log2c + ratio + (1 | cluster)",
+  "cores": 8,
+  "n_boot": 10000,
+  "complete": true,
+  "fits": [
+    {
+      "question_set": "same22",
+      "threshold": 4,
+      "strategy": "rlm_10",
+      "term": "strategyrlm_10:log2c",
+      "n_rows": 528,
+      "n_questions": 22,
+      "estimate_log_odds_per_doubling": -0.0696372722584117,
+      "wald_se": 0.185357031146139,
+      "wald_ci95": [-0.432930377586114, 0.293655833069291],
+      "wald_p_two_sided": 0.70714541062766,
+      "odds_ratio_per_doubling": 0.932732086356117,
+      "boot_ci95_percentile": [-0.454206440466852, 0.383860064100593],
+      "boot_odds_ratio_ci95": [0.634951640001928, 1.46794000980313],
+      "boot_resamples": 10000,
+      "boot_ok": 10000,
+      "boot_errors": 0,
+      "boot_singular": 0,
+      "boot_median": -0.0696663465422416,
+      "boot_seconds": 424.069154024124,
+      "fit_warnings": [],
+      "fit_singular": false,
+      "random_intercept_sd": 1.33025721512107,
+      "fixed_effects": {
+        "(Intercept)": 1.74064786363337,
+        "strategyrlm_10": -0.423780510282314,
+        "log2c": -0.0461550438820527,
+        "ratio1": 0.0786730802925257,
+        "ratio3": 0.200916689544758,
+        "strategyrlm_10:log2c": -0.0696372722584117
+      },
+      "pass_rate_by_size": {
+        "1": {
+          "strategy": "single_pass",
+          "core_papers": 5,
+          "pass": 0.818181818181818
+        },
+        "2": {
+          "strategy": "rlm_10",
+          "core_papers": 5,
+          "pass": 0.787878787878788
+        },
+        "3": {
+          "strategy": "single_pass",
+          "core_papers": 10,
+          "pass": 0.803030303030303
+        },
+        "4": {
+          "strategy": "rlm_10",
+          "core_papers": 10,
+          "pass": 0.712121212121212
+        },
+        "5": {
+          "strategy": "single_pass",
+          "core_papers": 20,
+          "pass": 0.772727272727273
+        },
+        "6": {
+          "strategy": "rlm_10",
+          "core_papers": 20,
+          "pass": 0.742424242424242
+        },
+        "7": {
+          "strategy": "single_pass",
+          "core_papers": 50,
+          "pass": 0.803030303030303
+        },
+        "8": {
+          "strategy": "rlm_10",
+          "core_papers": 50,
+          "pass": 0.712121212121212
+        }
+      }
+    },
+    {
+      "question_set": "same22",
+      "threshold": 4,
+      "strategy": "multi_hop",
+      "term": "strategymulti_hop:log2c",
+      "n_rows": 528,
+      "n_questions": 22,
+      "estimate_log_odds_per_doubling": 0.175827316068716,
+      "wald_se": 0.279567337162494,
+      "wald_ci95": [-0.372114596023538, 0.723769228160969],
+      "wald_p_two_sided": 0.529397154626278,
+      "odds_ratio_per_doubling": 1.19223216153696,
+      "boot_ci95_percentile": [-0.485300398097535, 0.798796653295481],
+      "boot_odds_ratio_ci95": [0.615512270274893, 2.22286444184406],
+      "boot_resamples": 10000,
+      "boot_ok": 9999,
+      "boot_errors": 1,
+      "boot_singular": 0,
+      "boot_median": 0.186526225011649,
+      "boot_seconds": 2609.949655056,
+      "fit_warnings": [],
+      "fit_singular": false,
+      "random_intercept_sd": 7.8778183708285,
+      "fixed_effects": {
+        "(Intercept)": 8.77324343755406,
+        "strategymulti_hop": -0.117505808755939,
+        "log2c": -0.0937000810675043,
+        "ratio1": -0.263402374927077,
+        "ratio3": -0.263402534457745,
+        "strategymulti_hop:log2c": 0.175827316068716
+      },
+      "pass_rate_by_size": {
+        "1": {
+          "strategy": "single_pass",
+          "core_papers": 5,
+          "pass": 0.818181818181818
+        },
+        "2": {
+          "strategy": "multi_hop",
+          "core_papers": 5,
+          "pass": 0.787878787878788
+        },
+        "3": {
+          "strategy": "single_pass",
+          "core_papers": 10,
+          "pass": 0.803030303030303
+        },
+        "4": {
+          "strategy": "multi_hop",
+          "core_papers": 10,
+          "pass": 0.742424242424242
+        },
+        "5": {
+          "strategy": "single_pass",
+          "core_papers": 20,
+          "pass": 0.772727272727273
+        },
+        "6": {
+          "strategy": "multi_hop",
+          "core_papers": 20,
+          "pass": 0.863636363636364
+        },
+        "7": {
+          "strategy": "single_pass",
+          "core_papers": 50,
+          "pass": 0.803030303030303
+        },
+        "8": {
+          "strategy": "multi_hop",
+          "core_papers": 50,
+          "pass": 0.772727272727273
+        }
+      }
+    },
+    {
+      "question_set": "same22",
+      "threshold": 4,
+      "strategy": "verified_pass",
+      "term": "strategyverified_pass:log2c",
+      "n_rows": 528,
+      "n_questions": 22,
+      "estimate_log_odds_per_doubling": 0.283466635616222,
+      "wald_se": 0.335719986630183,
+      "wald_ci95": [-0.374532447069205, 0.941465718301649],
+      "wald_p_two_sided": 0.398471416057568,
+      "odds_ratio_per_doubling": 1.32772458086239,
+      "boot_ci95_percentile": [-0.713664735851536, 2.27735748528397],
+      "boot_odds_ratio_ci95": [0.489845748776822, 9.75087949233822],
+      "boot_resamples": 10000,
+      "boot_ok": 9999,
+      "boot_errors": 1,
+      "boot_singular": 0,
+      "boot_median": 0.301015643151515,
+      "boot_seconds": 2292.0479528904,
+      "fit_warnings": [],
+      "fit_singular": false,
+      "random_intercept_sd": 11.5154430026445,
+      "fixed_effects": {
+        "(Intercept)": 9.67818208804588,
+        "strategyverified_pass": 1.06061148651996,
+        "log2c": -0.11736037076338,
+        "ratio1": -0.355480383079831,
+        "ratio3": 0.386599359229208,
+        "strategyverified_pass:log2c": 0.283466635616222
+      },
+      "pass_rate_by_size": {
+        "1": {
+          "strategy": "single_pass",
+          "core_papers": 5,
+          "pass": 0.818181818181818
+        },
+        "2": {
+          "strategy": "verified_pass",
+          "core_papers": 5,
+          "pass": 0.863636363636364
+        },
+        "3": {
+          "strategy": "single_pass",
+          "core_papers": 10,
+          "pass": 0.803030303030303
+        },
+        "4": {
+          "strategy": "verified_pass",
+          "core_papers": 10,
+          "pass": 0.818181818181818
+        },
+        "5": {
+          "strategy": "single_pass",
+          "core_papers": 20,
+          "pass": 0.772727272727273
+        },
+        "6": {
+          "strategy": "verified_pass",
+          "core_papers": 20,
+          "pass": 0.833333333333333
+        },
+        "7": {
+          "strategy": "single_pass",
+          "core_papers": 50,
+          "pass": 0.803030303030303
+        },
+        "8": {
+          "strategy": "verified_pass",
+          "core_papers": 50,
+          "pass": 0.878787878787879
+        }
+      }
+    },
+    {
+      "question_set": "same22",
+      "threshold": 4,
+      "strategy": "rlm_5",
+      "term": "strategyrlm_5:log2c",
+      "n_rows": 528,
+      "n_questions": 22,
+      "estimate_log_odds_per_doubling": 0.176282306723548,
+      "wald_se": 0.184969349500316,
+      "wald_ci95": [-0.186250956540872, 0.538815569987968],
+      "wald_p_two_sided": 0.340572220534831,
+      "odds_ratio_per_doubling": 1.19277473945343,
+      "boot_ci95_percentile": [-0.187560119513158, 0.648305804766871],
+      "boot_odds_ratio_ci95": [0.828979278851595, 1.91229827640669],
+      "boot_resamples": 10000,
+      "boot_ok": 10000,
+      "boot_errors": 0,
+      "boot_singular": 0,
+      "boot_median": 0.174423207960774,
+      "boot_seconds": 542.503654003143,
+      "fit_warnings": [],
+      "fit_singular": false,
+      "random_intercept_sd": 1.37641240291032,
+      "fixed_effects": {
+        "(Intercept)": 2.08161467994344,
+        "strategyrlm_5": -0.546102347570872,
+        "log2c": -0.046081109201127,
+        "ratio1": -0.432603408311618,
+        "ratio3": -0.204172661962546,
+        "strategyrlm_5:log2c": 0.176282306723548
+      },
+      "pass_rate_by_size": {
+        "1": {
+          "strategy": "single_pass",
+          "core_papers": 5,
+          "pass": 0.818181818181818
+        },
+        "2": {
+          "strategy": "rlm_5",
+          "core_papers": 5,
+          "pass": 0.681818181818182
+        },
+        "3": {
+          "strategy": "single_pass",
+          "core_papers": 10,
+          "pass": 0.803030303030303
+        },
+        "4": {
+          "strategy": "rlm_5",
+          "core_papers": 10,
+          "pass": 0.742424242424242
+        },
+        "5": {
+          "strategy": "single_pass",
+          "core_papers": 20,
+          "pass": 0.772727272727273
+        },
+        "6": {
+          "strategy": "rlm_5",
+          "core_papers": 20,
+          "pass": 0.681818181818182
+        },
+        "7": {
+          "strategy": "single_pass",
+          "core_papers": 50,
+          "pass": 0.803030303030303
+        },
+        "8": {
+          "strategy": "rlm_5",
+          "core_papers": 50,
+          "pass": 0.772727272727273
+        }
+      }
+    },
+    {
+      "question_set": "same22",
+      "threshold": 4,
+      "strategy": "rlm_20",
+      "term": "strategyrlm_20:log2c",
+      "n_rows": 528,
+      "n_questions": 22,
+      "estimate_log_odds_per_doubling": 0.0709808496982916,
+      "wald_se": 0.189340537928335,
+      "wald_ci95": [-0.300119785454685, 0.442081484851269],
+      "wald_p_two_sided": 0.707746301021119,
+      "odds_ratio_per_doubling": 1.07356066666083,
+      "boot_ci95_percentile": [-0.25535137607083, 0.446799982719782],
+      "boot_odds_ratio_ci95": [0.774644258678792, 1.56330158068257],
+      "boot_resamples": 10000,
+      "boot_ok": 10000,
+      "boot_errors": 0,
+      "boot_singular": 0,
+      "boot_median": 0.0710419032540886,
+      "boot_seconds": 530.208359003067,
+      "fit_warnings": [],
+      "fit_singular": false,
+      "random_intercept_sd": 1.49744792559998,
+      "fixed_effects": {
+        "(Intercept)": 1.98615650825277,
+        "strategyrlm_20": -0.419320741565393,
+        "log2c": -0.0481166595125458,
+        "ratio1": -0.166234749510453,
+        "ratio3": 4.40760585266254e-08,
+        "strategyrlm_20:log2c": 0.0709808496982916
+      },
+      "pass_rate_by_size": {
+        "1": {
+          "strategy": "single_pass",
+          "core_papers": 5,
+          "pass": 0.818181818181818
+        },
+        "2": {
+          "strategy": "rlm_20",
+          "core_papers": 5,
+          "pass": 0.742424242424242
+        },
+        "3": {
+          "strategy": "single_pass",
+          "core_papers": 10,
+          "pass": 0.803030303030303
+        },
+        "4": {
+          "strategy": "rlm_20",
+          "core_papers": 10,
+          "pass": 0.742424242424242
+        },
+        "5": {
+          "strategy": "single_pass",
+          "core_papers": 20,
+          "pass": 0.772727272727273
+        },
+        "6": {
+          "strategy": "rlm_20",
+          "core_papers": 20,
+          "pass": 0.727272727272727
+        },
+        "7": {
+          "strategy": "single_pass",
+          "core_papers": 50,
+          "pass": 0.803030303030303
+        },
+        "8": {
+          "strategy": "rlm_20",
+          "core_papers": 50,
+          "pass": 0.757575757575758
+        }
+      }
+    },
+    {
+      "question_set": "same22",
+      "threshold": 3,
+      "strategy": "rlm_10",
+      "term": "strategyrlm_10:log2c",
+      "n_rows": 528,
+      "n_questions": 22,
+      "estimate_log_odds_per_doubling": 0.561975286604031,
+      "wald_se": 0.371938156322823,
+      "wald_ci95": [-0.16701010426493, 1.29096067747299],
+      "wald_p_two_sided": 0.130804390127242,
+      "odds_ratio_per_doubling": 1.75413399783335,
+      "boot_ci95_percentile": [-0.0473580240929319, 20.1943031106547],
+      "boot_odds_ratio_ci95": [0.953745872456032, 589215830.898315],
+      "boot_resamples": 10000,
+      "boot_ok": 10000,
+      "boot_errors": 0,
+      "boot_singular": 7,
+      "boot_median": 0.545891170667716,
+      "boot_seconds": 915.025672912598,
+      "fit_warnings": [],
+      "fit_singular": false,
+      "random_intercept_sd": 2.83898832089619,
+      "fixed_effects": {
+        "(Intercept)": 4.56619527743316,
+        "strategyrlm_10": 1.0761759126415,
+        "log2c": 5.28374476489918e-08,
+        "ratio1": 2.38333015755645e-07,
+        "ratio3": 0.269359384698988,
+        "strategyrlm_10:log2c": 0.561975286604031
+      },
+      "pass_rate_by_size": {
+        "1": {
+          "strategy": "single_pass",
+          "core_papers": 5,
+          "pass": 0.909090909090909
+        },
+        "2": {
+          "strategy": "rlm_10",
+          "core_papers": 5,
+          "pass": 0.909090909090909
+        },
+        "3": {
+          "strategy": "single_pass",
+          "core_papers": 10,
+          "pass": 0.909090909090909
+        },
+        "4": {
+          "strategy": "rlm_10",
+          "core_papers": 10,
+          "pass": 0.96969696969697
+        },
+        "5": {
+          "strategy": "single_pass",
+          "core_papers": 20,
+          "pass": 0.909090909090909
+        },
+        "6": {
+          "strategy": "rlm_10",
+          "core_papers": 20,
+          "pass": 0.939393939393939
+        },
+        "7": {
+          "strategy": "single_pass",
+          "core_papers": 50,
+          "pass": 0.909090909090909
+        },
+        "8": {
+          "strategy": "rlm_10",
+          "core_papers": 50,
+          "pass": 0.984848484848485
+        }
+      }
+    },
+    {
+      "question_set": "same22",
+      "threshold": 3,
+      "strategy": "multi_hop",
+      "term": "strategymulti_hop:log2c",
+      "n_rows": 528,
+      "n_questions": 22,
+      "estimate_log_odds_per_doubling": 0.517872142645631,
+      "wald_se": 0.550857638459579,
+      "wald_ci95": [-0.561788989343929, 1.59753327463519],
+      "wald_p_two_sided": 0.347156141781262,
+      "odds_ratio_per_doubling": 1.67845234001774,
+      "boot_ci95_percentile": [-4.02435318392164, 7.46389457155928],
+      "boot_odds_ratio_ci95": [0.0178749822408464, 1743.92669614618],
+      "boot_resamples": 10000,
+      "boot_ok": 9602,
+      "boot_errors": 398,
+      "boot_singular": 0,
+      "boot_median": 0.575037077136813,
+      "boot_seconds": 3065.47522187233,
+      "fit_warnings": [],
+      "fit_singular": false,
+      "random_intercept_sd": 10.5156260807543,
+      "fixed_effects": {
+        "(Intercept)": 10.5804427146585,
+        "strategymulti_hop": 3.11728745443396,
+        "log2c": 4.72423263170208e-07,
+        "ratio1": 3.06075542281858e-07,
+        "ratio3": 1.51550899277127e-06,
+        "strategymulti_hop:log2c": 0.517872142645631
+      },
+      "pass_rate_by_size": {
+        "1": {
+          "strategy": "single_pass",
+          "core_papers": 5,
+          "pass": 0.909090909090909
+        },
+        "2": {
+          "strategy": "multi_hop",
+          "core_papers": 5,
+          "pass": 0.96969696969697
+        },
+        "3": {
+          "strategy": "single_pass",
+          "core_papers": 10,
+          "pass": 0.909090909090909
+        },
+        "4": {
+          "strategy": "multi_hop",
+          "core_papers": 10,
+          "pass": 0.954545454545455
+        },
+        "5": {
+          "strategy": "single_pass",
+          "core_papers": 20,
+          "pass": 0.909090909090909
+        },
+        "6": {
+          "strategy": "multi_hop",
+          "core_papers": 20,
+          "pass": 1
+        },
+        "7": {
+          "strategy": "single_pass",
+          "core_papers": 50,
+          "pass": 0.909090909090909
+        },
+        "8": {
+          "strategy": "multi_hop",
+          "core_papers": 50,
+          "pass": 0.984848484848485
+        }
+      }
+    },
+    {
+      "question_set": "same22",
+      "threshold": 3,
+      "strategy": "verified_pass",
+      "term": "strategyverified_pass:log2c",
+      "n_rows": 528,
+      "n_questions": 22,
+      "estimate_log_odds_per_doubling": 1.19889808919817,
+      "wald_se": 2.37430957750821,
+      "wald_ci95": [-3.45466317086643, 5.85245934926276],
+      "wald_p_two_sided": 0.613596774410068,
+      "odds_ratio_per_doubling": 3.31646046495117,
+      "boot_ci95_percentile": [-0.181539098021164, 2.0212868822696],
+      "boot_odds_ratio_ci95": [0.833985637477929, 7.54803211502167],
+      "boot_resamples": 10000,
+      "boot_ok": 9613,
+      "boot_errors": 387,
+      "boot_singular": 0,
+      "boot_median": 1.19385669470403,
+      "boot_seconds": 5846.58006286621,
+      "fit_warnings": [],
+      "fit_singular": false,
+      "random_intercept_sd": 40.1323968155012,
+      "fixed_effects": {
+        "(Intercept)": 20.6328225689407,
+        "strategyverified_pass": -5.98913702152193,
+        "log2c": -6.55221024210619e-06,
+        "ratio1": 1.48767844646669,
+        "ratio3": 3.01716061155678,
+        "strategyverified_pass:log2c": 1.19889808919817
+      },
+      "pass_rate_by_size": {
+        "1": {
+          "strategy": "single_pass",
+          "core_papers": 5,
+          "pass": 0.909090909090909
+        },
+        "2": {
+          "strategy": "verified_pass",
+          "core_papers": 5,
+          "pass": 0.878787878787879
+        },
+        "3": {
+          "strategy": "single_pass",
+          "core_papers": 10,
+          "pass": 0.909090909090909
+        },
+        "4": {
+          "strategy": "verified_pass",
+          "core_papers": 10,
+          "pass": 0.878787878787879
+        },
+        "5": {
+          "strategy": "single_pass",
+          "core_papers": 20,
+          "pass": 0.909090909090909
+        },
+        "6": {
+          "strategy": "verified_pass",
+          "core_papers": 20,
+          "pass": 0.878787878787879
+        },
+        "7": {
+          "strategy": "single_pass",
+          "core_papers": 50,
+          "pass": 0.909090909090909
+        },
+        "8": {
+          "strategy": "verified_pass",
+          "core_papers": 50,
+          "pass": 0.909090909090909
+        }
+      }
+    },
+    {
+      "question_set": "same22",
+      "threshold": 3,
+      "strategy": "rlm_5",
+      "term": "strategyrlm_5:log2c",
+      "n_rows": 528,
+      "n_questions": 22,
+      "estimate_log_odds_per_doubling": -0.144838532199613,
+      "wald_se": 0.27880376144192,
+      "wald_ci95": [-0.691283863380072, 0.401606798980847],
+      "wald_p_two_sided": 0.603412167586081,
+      "odds_ratio_per_doubling": 0.865161977634669,
+      "boot_ci95_percentile": [-0.567237362016983, 0.387518636085058],
+      "boot_odds_ratio_ci95": [0.567089940838322, 1.47332041028766],
+      "boot_resamples": 10000,
+      "boot_ok": 10000,
+      "boot_errors": 0,
+      "boot_singular": 0,
+      "boot_median": -0.153229828324432,
+      "boot_seconds": 981.846737861633,
+      "fit_warnings": [],
+      "fit_singular": false,
+      "random_intercept_sd": 2.28288717600283,
+      "fixed_effects": {
+        "(Intercept)": 3.81334550607935,
+        "strategyrlm_5": -0.110317990117247,
+        "log2c": -1.23913330259099e-07,
+        "ratio1": 0.174225398468532,
+        "ratio3": 0.174225297349297,
+        "strategyrlm_5:log2c": -0.144838532199613
+      },
+      "pass_rate_by_size": {
+        "1": {
+          "strategy": "single_pass",
+          "core_papers": 5,
+          "pass": 0.909090909090909
+        },
+        "2": {
+          "strategy": "rlm_5",
+          "core_papers": 5,
+          "pass": 0.924242424242424
+        },
+        "3": {
+          "strategy": "single_pass",
+          "core_papers": 10,
+          "pass": 0.909090909090909
+        },
+        "4": {
+          "strategy": "rlm_5",
+          "core_papers": 10,
+          "pass": 0.924242424242424
+        },
+        "5": {
+          "strategy": "single_pass",
+          "core_papers": 20,
+          "pass": 0.909090909090909
+        },
+        "6": {
+          "strategy": "rlm_5",
+          "core_papers": 20,
+          "pass": 0.848484848484849
+        },
+        "7": {
+          "strategy": "single_pass",
+          "core_papers": 50,
+          "pass": 0.909090909090909
+        },
+        "8": {
+          "strategy": "rlm_5",
+          "core_papers": 50,
+          "pass": 0.909090909090909
+        }
+      }
+    },
+    {
+      "question_set": "same22",
+      "threshold": 3,
+      "strategy": "rlm_20",
+      "term": "strategyrlm_20:log2c",
+      "n_rows": 528,
+      "n_questions": 22,
+      "estimate_log_odds_per_doubling": -0.335553580195647,
+      "wald_se": 0.332581573407986,
+      "wald_ci95": [-0.987401485996964, 0.316294325605669],
+      "wald_p_two_sided": 0.313005245264797,
+      "odds_ratio_per_doubling": 0.714942198942588,
+      "boot_ci95_percentile": [-0.992711622697817, 0.27757317492327],
+      "boot_odds_ratio_ci95": [0.37057048008145, 1.31992270085239],
+      "boot_resamples": 10000,
+      "boot_ok": 10000,
+      "boot_errors": 0,
+      "boot_singular": 73,
+      "boot_median": -0.320133479726827,
+      "boot_seconds": 1033.78693318367,
+      "fit_warnings": [],
+      "fit_singular": false,
+      "random_intercept_sd": 2.03204278452694,
+      "fixed_effects": {
+        "(Intercept)": 3.91594240455564,
+        "strategyrlm_20": 0.843171238974197,
+        "log2c": -8.55221259063371e-08,
+        "ratio1": -0.248412312851728,
+        "ratio3": -0.362096788703068,
+        "strategyrlm_20:log2c": -0.335553580195647
+      },
+      "pass_rate_by_size": {
+        "1": {
+          "strategy": "single_pass",
+          "core_papers": 5,
+          "pass": 0.909090909090909
+        },
+        "2": {
+          "strategy": "rlm_20",
+          "core_papers": 5,
+          "pass": 0.96969696969697
+        },
+        "3": {
+          "strategy": "single_pass",
+          "core_papers": 10,
+          "pass": 0.909090909090909
+        },
+        "4": {
+          "strategy": "rlm_20",
+          "core_papers": 10,
+          "pass": 0.96969696969697
+        },
+        "5": {
+          "strategy": "single_pass",
+          "core_papers": 20,
+          "pass": 0.909090909090909
+        },
+        "6": {
+          "strategy": "rlm_20",
+          "core_papers": 20,
+          "pass": 0.909090909090909
+        },
+        "7": {
+          "strategy": "single_pass",
+          "core_papers": 50,
+          "pass": 0.909090909090909
+        },
+        "8": {
+          "strategy": "rlm_20",
+          "core_papers": 50,
+          "pass": 0.939393939393939
+        }
+      }
+    },
+    {
+      "question_set": "all_in_scope",
+      "threshold": 4,
+      "strategy": "rlm_10",
+      "term": "strategyrlm_10:log2c",
+      "n_rows": 1428,
+      "n_questions": 86,
+      "estimate_log_odds_per_doubling": -0.135184747251121,
+      "wald_se": 0.138240297176091,
+      "wald_ci95": [-0.406130750928374, 0.135761256426132],
+      "wald_p_two_sided": 0.328125357204222,
+      "odds_ratio_per_doubling": 0.873554509984809,
+      "boot_ci95_percentile": [-0.547005316132047, 0.383073814515707],
+      "boot_odds_ratio_ci95": [0.578680182335558, 1.46678629619264],
+      "boot_resamples": 10000,
+      "boot_ok": 10000,
+      "boot_errors": 0,
+      "boot_singular": 0,
+      "boot_median": -0.125413955675187,
+      "boot_seconds": 3462.43022489548,
+      "fit_warnings": [],
+      "fit_singular": false,
+      "random_intercept_sd": 1.74037935149361,
+      "fixed_effects": {
+        "(Intercept)": 2.19339907428148,
+        "strategyrlm_10": -0.800581106841408,
+        "log2c": -0.0848176333624172,
+        "ratio1": 0.157137484452227,
+        "ratio3": 0.157137757891844,
+        "strategyrlm_10:log2c": -0.135184747251121
+      },
+      "pass_rate_by_size": {
+        "1": {
+          "strategy": "single_pass",
+          "core_papers": 5,
+          "pass": 0.818181818181818
+        },
+        "2": {
+          "strategy": "rlm_10",
+          "core_papers": 5,
+          "pass": 0.787878787878788
+        },
+        "3": {
+          "strategy": "single_pass",
+          "core_papers": 10,
+          "pass": 0.856060606060606
+        },
+        "4": {
+          "strategy": "rlm_10",
+          "core_papers": 10,
+          "pass": 0.75
+        },
+        "5": {
+          "strategy": "single_pass",
+          "core_papers": 20,
+          "pass": 0.837209302325581
+        },
+        "6": {
+          "strategy": "rlm_10",
+          "core_papers": 20,
+          "pass": 0.755813953488372
+        },
+        "7": {
+          "strategy": "single_pass",
+          "core_papers": 50,
+          "pass": 0.806201550387597
+        },
+        "8": {
+          "strategy": "rlm_10",
+          "core_papers": 50,
+          "pass": 0.682170542635659
+        }
+      }
+    },
+    {
+      "question_set": "all_in_scope",
+      "threshold": 4,
+      "strategy": "multi_hop",
+      "term": "strategymulti_hop:log2c",
+      "n_rows": 1428,
+      "n_questions": 86,
+      "estimate_log_odds_per_doubling": 0.054962976424772,
+      "wald_se": 0.20300479788695,
+      "wald_ci95": [-0.342919116122482, 0.452845068972026],
+      "wald_p_two_sided": 0.78658548763211,
+      "odds_ratio_per_doubling": 1.05650149848868,
+      "boot_ci95_percentile": [-0.493102907014843, 0.83708584627441],
+      "boot_odds_ratio_ci95": [0.610728417593677, 2.30962655341095],
+      "boot_resamples": 10000,
+      "boot_ok": 10000,
+      "boot_errors": 0,
+      "boot_singular": 0,
+      "boot_median": 0.058475630100878,
+      "boot_seconds": 6051.65237593651,
+      "fit_warnings": [],
+      "fit_singular": false,
+      "random_intercept_sd": 8.62678740720419,
+      "fixed_effects": {
+        "(Intercept)": 9.18187762410455,
+        "strategymulti_hop": -1.10805834856718,
+        "log2c": -0.108814568429802,
+        "ratio1": -0.07329763653371,
+        "ratio3": -0.183083163399005,
+        "strategymulti_hop:log2c": 0.054962976424772
+      },
+      "pass_rate_by_size": {
+        "1": {
+          "strategy": "single_pass",
+          "core_papers": 5,
+          "pass": 0.818181818181818
+        },
+        "2": {
+          "strategy": "multi_hop",
+          "core_papers": 5,
+          "pass": 0.787878787878788
+        },
+        "3": {
+          "strategy": "single_pass",
+          "core_papers": 10,
+          "pass": 0.856060606060606
+        },
+        "4": {
+          "strategy": "multi_hop",
+          "core_papers": 10,
+          "pass": 0.75
+        },
+        "5": {
+          "strategy": "single_pass",
+          "core_papers": 20,
+          "pass": 0.837209302325581
+        },
+        "6": {
+          "strategy": "multi_hop",
+          "core_papers": 20,
+          "pass": 0.779069767441861
+        },
+        "7": {
+          "strategy": "single_pass",
+          "core_papers": 50,
+          "pass": 0.806201550387597
+        },
+        "8": {
+          "strategy": "multi_hop",
+          "core_papers": 50,
+          "pass": 0.748062015503876
+        }
+      }
+    },
+    {
+      "question_set": "all_in_scope",
+      "threshold": 4,
+      "strategy": "verified_pass",
+      "term": "strategyverified_pass:log2c",
+      "n_rows": 1428,
+      "n_questions": 86,
+      "estimate_log_odds_per_doubling": 0.094997150118793,
+      "wald_se": 0.234667687245946,
+      "wald_ci95": [-0.364943065218571, 0.554937365456157],
+      "wald_p_two_sided": 0.685613031197543,
+      "odds_ratio_per_doubling": 1.09965572123346,
+      "boot_ci95_percentile": [-0.832762497191509, 1.20319758765248],
+      "boot_odds_ratio_ci95": [0.434846363692902, 3.33075027909785],
+      "boot_resamples": 10000,
+      "boot_ok": 10000,
+      "boot_errors": 0,
+      "boot_singular": 0,
+      "boot_median": 0.111549945084972,
+      "boot_seconds": 3631.68850493431,
+      "fit_warnings": [],
+      "fit_singular": false,
+      "random_intercept_sd": 9.2233313090062,
+      "fixed_effects": {
+        "(Intercept)": 8.8251285523175,
+        "strategyverified_pass": 0.560696134749764,
+        "log2c": -0.284366030430523,
+        "ratio1": 0.0477389454743192,
+        "ratio3": -0.0473667198591783,
+        "strategyverified_pass:log2c": 0.094997150118793
+      },
+      "pass_rate_by_size": {
+        "1": {
+          "strategy": "single_pass",
+          "core_papers": 5,
+          "pass": 0.818181818181818
+        },
+        "2": {
+          "strategy": "verified_pass",
+          "core_papers": 5,
+          "pass": 0.863636363636364
+        },
+        "3": {
+          "strategy": "single_pass",
+          "core_papers": 10,
+          "pass": 0.856060606060606
+        },
+        "4": {
+          "strategy": "verified_pass",
+          "core_papers": 10,
+          "pass": 0.848484848484849
+        },
+        "5": {
+          "strategy": "single_pass",
+          "core_papers": 20,
+          "pass": 0.837209302325581
+        },
+        "6": {
+          "strategy": "verified_pass",
+          "core_papers": 20,
+          "pass": 0.864341085271318
+        },
+        "7": {
+          "strategy": "single_pass",
+          "core_papers": 50,
+          "pass": 0.806201550387597
+        },
+        "8": {
+          "strategy": "verified_pass",
+          "core_papers": 50,
+          "pass": 0.84108527131783
+        }
+      }
+    },
+    {
+      "question_set": "all_in_scope",
+      "threshold": 4,
+      "strategy": "rlm_5",
+      "term": "strategyrlm_5:log2c",
+      "n_rows": 1428,
+      "n_questions": 86,
+      "estimate_log_odds_per_doubling": -0.0476100859784358,
+      "wald_se": 0.13512883648822,
+      "wald_ci95": [-0.312457738768149, 0.217237566811277],
+      "wald_p_two_sided": 0.724589998370502,
+      "odds_ratio_per_doubling": 0.953505499768799,
+      "boot_ci95_percentile": [-0.478288635419357, 0.481796316029673],
+      "boot_odds_ratio_ci95": [0.619843262439823, 1.61897999144367],
+      "boot_resamples": 10000,
+      "boot_ok": 10000,
+      "boot_errors": 0,
+      "boot_singular": 0,
+      "boot_median": -0.0403561006440566,
+      "boot_seconds": 845.896120071411,
+      "fit_warnings": [],
+      "fit_singular": false,
+      "random_intercept_sd": 1.58577065025011,
+      "fixed_effects": {
+        "(Intercept)": 2.25493008369119,
+        "strategyrlm_5": -1.01001495380269,
+        "log2c": -0.0592655903010908,
+        "ratio1": -0.243403285674715,
+        "ratio3": -3.30201016180236e-07,
+        "strategyrlm_5:log2c": -0.0476100859784358
+      },
+      "pass_rate_by_size": {
+        "1": {
+          "strategy": "single_pass",
+          "core_papers": 5,
+          "pass": 0.818181818181818
+        },
+        "2": {
+          "strategy": "rlm_5",
+          "core_papers": 5,
+          "pass": 0.681818181818182
+        },
+        "3": {
+          "strategy": "single_pass",
+          "core_papers": 10,
+          "pass": 0.856060606060606
+        },
+        "4": {
+          "strategy": "rlm_5",
+          "core_papers": 10,
+          "pass": 0.757575757575758
+        },
+        "5": {
+          "strategy": "single_pass",
+          "core_papers": 20,
+          "pass": 0.837209302325581
+        },
+        "6": {
+          "strategy": "rlm_5",
+          "core_papers": 20,
+          "pass": 0.705426356589147
+        },
+        "7": {
+          "strategy": "single_pass",
+          "core_papers": 50,
+          "pass": 0.806201550387597
+        },
+        "8": {
+          "strategy": "rlm_5",
+          "core_papers": 50,
+          "pass": 0.662790697674419
+        }
+      }
+    },
+    {
+      "question_set": "all_in_scope",
+      "threshold": 4,
+      "strategy": "rlm_20",
+      "term": "strategyrlm_20:log2c",
+      "n_rows": 1428,
+      "n_questions": 86,
+      "estimate_log_odds_per_doubling": -0.0455106659725565,
+      "wald_se": 0.138192187446935,
+      "wald_ci95": [-0.316362376313357, 0.225341044368244],
+      "wald_p_two_sided": 0.741907184927798,
+      "odds_ratio_per_doubling": 0.955509411080447,
+      "boot_ci95_percentile": [-0.444125511383291, 0.443224658828258],
+      "boot_odds_ratio_ci95": [0.641384914667344, 1.55772225109004],
+      "boot_resamples": 10000,
+      "boot_ok": 10000,
+      "boot_errors": 0,
+      "boot_singular": 0,
+      "boot_median": -0.0399849198714872,
+      "boot_seconds": 1274.51824188232,
+      "fit_warnings": [],
+      "fit_singular": false,
+      "random_intercept_sd": 1.64358415806624,
+      "fixed_effects": {
+        "(Intercept)": 2.18361825407302,
+        "strategyrlm_20": -0.773068634669269,
+        "log2c": -0.0852680273112571,
+        "ratio1": -0.0170905231942158,
+        "ratio3": 0.158426841627731,
+        "strategyrlm_20:log2c": -0.0455106659725565
+      },
+      "pass_rate_by_size": {
+        "1": {
+          "strategy": "single_pass",
+          "core_papers": 5,
+          "pass": 0.818181818181818
+        },
+        "2": {
+          "strategy": "rlm_20",
+          "core_papers": 5,
+          "pass": 0.742424242424242
+        },
+        "3": {
+          "strategy": "single_pass",
+          "core_papers": 10,
+          "pass": 0.856060606060606
+        },
+        "4": {
+          "strategy": "rlm_20",
+          "core_papers": 10,
+          "pass": 0.757575757575758
+        },
+        "5": {
+          "strategy": "single_pass",
+          "core_papers": 20,
+          "pass": 0.837209302325581
+        },
+        "6": {
+          "strategy": "rlm_20",
+          "core_papers": 20,
+          "pass": 0.75968992248062
+        },
+        "7": {
+          "strategy": "single_pass",
+          "core_papers": 50,
+          "pass": 0.806201550387597
+        },
+        "8": {
+          "strategy": "rlm_20",
+          "core_papers": 50,
+          "pass": 0.693798449612403
+        }
+      }
+    },
+    {
+      "question_set": "all_in_scope",
+      "threshold": 3,
+      "strategy": "rlm_10",
+      "term": "strategyrlm_10:log2c",
+      "n_rows": 1428,
+      "n_questions": 86,
+      "estimate_log_odds_per_doubling": -0.00383087833794419,
+      "wald_se": 0.240132949479435,
+      "wald_ci95": [-0.474482810819013, 0.466821054143124],
+      "wald_p_two_sided": 0.987271763248696,
+      "odds_ratio_per_doubling": 0.996176450115351,
+      "boot_ci95_percentile": [-0.753885622647044, 0.954443753780763],
+      "boot_odds_ratio_ci95": [0.470534675861938, 2.59722548418534],
+      "boot_resamples": 10000,
+      "boot_ok": 10000,
+      "boot_errors": 0,
+      "boot_singular": 0,
+      "boot_median": 0.0232061947876377,
+      "boot_seconds": 3402.078373909,
+      "fit_warnings": [],
+      "fit_singular": false,
+      "random_intercept_sd": 2.95936634310907,
+      "fixed_effects": {
+        "(Intercept)": 4.87211433313245,
+        "strategyrlm_10": 0.478414111563277,
+        "log2c": 0.0218505907099733,
+        "ratio1": 0.144856169830845,
+        "ratio3": 0.467401088344229,
+        "strategyrlm_10:log2c": -0.00383087833794419
+      },
+      "pass_rate_by_size": {
+        "1": {
+          "strategy": "single_pass",
+          "core_papers": 5,
+          "pass": 0.909090909090909
+        },
+        "2": {
+          "strategy": "rlm_10",
+          "core_papers": 5,
+          "pass": 0.909090909090909
+        },
+        "3": {
+          "strategy": "single_pass",
+          "core_papers": 10,
+          "pass": 0.939393939393939
+        },
+        "4": {
+          "strategy": "rlm_10",
+          "core_papers": 10,
+          "pass": 0.96969696969697
+        },
+        "5": {
+          "strategy": "single_pass",
+          "core_papers": 20,
+          "pass": 0.926356589147287
+        },
+        "6": {
+          "strategy": "rlm_10",
+          "core_papers": 20,
+          "pass": 0.949612403100775
+        },
+        "7": {
+          "strategy": "single_pass",
+          "core_papers": 50,
+          "pass": 0.926356589147287
+        },
+        "8": {
+          "strategy": "rlm_10",
+          "core_papers": 50,
+          "pass": 0.941860465116279
+        }
+      }
+    },
+    {
+      "question_set": "all_in_scope",
+      "threshold": 3,
+      "strategy": "multi_hop",
+      "term": "strategymulti_hop:log2c",
+      "n_rows": 1428,
+      "n_questions": 86,
+      "estimate_log_odds_per_doubling": 0.0191265763362854,
+      "wald_se": 0.307428013010782,
+      "wald_ci95": [-0.583421257003559, 0.62167440967613],
+      "wald_p_two_sided": 0.950391766284719,
+      "odds_ratio_per_doubling": 1.01931066106129,
+      "boot_ci95_percentile": [-1.01268652675002, 1.6704613824056],
+      "boot_odds_ratio_ci95": [0.363241808725568, 5.3146193034358],
+      "boot_resamples": 10000,
+      "boot_ok": 10000,
+      "boot_errors": 0,
+      "boot_singular": 0,
+      "boot_median": 0.0810105614899003,
+      "boot_seconds": 2864.35326814651,
+      "fit_warnings": [],
+      "fit_singular": false,
+      "random_intercept_sd": 9.27210046376879,
+      "fixed_effects": {
+        "(Intercept)": 10.0286328380464,
+        "strategymulti_hop": 0.988071723765803,
+        "log2c": 0.133889401617818,
+        "ratio1": -0.0830927964115014,
+        "ratio3": 0.16818111266563,
+        "strategymulti_hop:log2c": 0.0191265763362854
+      },
+      "pass_rate_by_size": {
+        "1": {
+          "strategy": "single_pass",
+          "core_papers": 5,
+          "pass": 0.909090909090909
+        },
+        "2": {
+          "strategy": "multi_hop",
+          "core_papers": 5,
+          "pass": 0.96969696969697
+        },
+        "3": {
+          "strategy": "single_pass",
+          "core_papers": 10,
+          "pass": 0.939393939393939
+        },
+        "4": {
+          "strategy": "multi_hop",
+          "core_papers": 10,
+          "pass": 0.939393939393939
+        },
+        "5": {
+          "strategy": "single_pass",
+          "core_papers": 20,
+          "pass": 0.926356589147287
+        },
+        "6": {
+          "strategy": "multi_hop",
+          "core_papers": 20,
+          "pass": 0.949612403100775
+        },
+        "7": {
+          "strategy": "single_pass",
+          "core_papers": 50,
+          "pass": 0.926356589147287
+        },
+        "8": {
+          "strategy": "multi_hop",
+          "core_papers": 50,
+          "pass": 0.957364341085271
+        }
+      }
+    },
+    {
+      "question_set": "all_in_scope",
+      "threshold": 3,
+      "strategy": "verified_pass",
+      "term": "strategyverified_pass:log2c",
+      "n_rows": 1428,
+      "n_questions": 86,
+      "estimate_log_odds_per_doubling": 1.0146939324127,
+      "wald_se": 0.444965244259797,
+      "wald_ci95": [0.142578079291433, 1.88680978553397],
+      "wald_p_two_sided": 0.0225846162497419,
+      "odds_ratio_per_doubling": 2.75851897491053,
+      "boot_ci95_percentile": [-0.570502856646923, 2.22211845146945],
+      "boot_odds_ratio_ci95": [0.56524113196244, 9.22685682458033],
+      "boot_resamples": 10000,
+      "boot_ok": 10000,
+      "boot_errors": 0,
+      "boot_singular": 0,
+      "boot_median": 0.969751757583428,
+      "boot_seconds": 3191.0928030014,
+      "fit_warnings": [],
+      "fit_singular": false,
+      "random_intercept_sd": 12.9222122440725,
+      "fixed_effects": {
+        "(Intercept)": 11.7417703008623,
+        "strategyverified_pass": -0.453103923478646,
+        "log2c": -0.337148342526217,
+        "ratio1": 0.270089151827386,
+        "ratio3": 0.132731500583643,
+        "strategyverified_pass:log2c": 1.0146939324127
+      },
+      "pass_rate_by_size": {
+        "1": {
+          "strategy": "single_pass",
+          "core_papers": 5,
+          "pass": 0.909090909090909
+        },
+        "2": {
+          "strategy": "verified_pass",
+          "core_papers": 5,
+          "pass": 0.878787878787879
+        },
+        "3": {
+          "strategy": "single_pass",
+          "core_papers": 10,
+          "pass": 0.939393939393939
+        },
+        "4": {
+          "strategy": "verified_pass",
+          "core_papers": 10,
+          "pass": 0.909090909090909
+        },
+        "5": {
+          "strategy": "single_pass",
+          "core_papers": 20,
+          "pass": 0.926356589147287
+        },
+        "6": {
+          "strategy": "verified_pass",
+          "core_papers": 20,
+          "pass": 0.926356589147287
+        },
+        "7": {
+          "strategy": "single_pass",
+          "core_papers": 50,
+          "pass": 0.926356589147287
+        },
+        "8": {
+          "strategy": "verified_pass",
+          "core_papers": 50,
+          "pass": 0.934108527131783
+        }
+      }
+    },
+    {
+      "question_set": "all_in_scope",
+      "threshold": 3,
+      "strategy": "rlm_5",
+      "term": "strategyrlm_5:log2c",
+      "n_rows": 1428,
+      "n_questions": 86,
+      "estimate_log_odds_per_doubling": -0.119254779639999,
+      "wald_se": 0.209236117760503,
+      "wald_ci95": [-0.529350034715565, 0.290840475435568],
+      "wald_p_two_sided": 0.568709489932102,
+      "odds_ratio_per_doubling": 0.887581634222622,
+      "boot_ci95_percentile": [-0.697588236839077, 0.607212018523291],
+      "boot_odds_ratio_ci95": [0.497784395314511, 1.83530745618018],
+      "boot_resamples": 10000,
+      "boot_ok": 10000,
+      "boot_errors": 0,
+      "boot_singular": 0,
+      "boot_median": -0.107009435004873,
+      "boot_seconds": 1373.13668012619,
+      "fit_warnings": [],
+      "fit_singular": false,
+      "random_intercept_sd": 2.22213826459916,
+      "fixed_effects": {
+        "(Intercept)": 4.3227856980361,
+        "strategyrlm_5": -0.104272112580273,
+        "log2c": -0.0415680959502087,
+        "ratio1": -0.12144132162429,
+        "ratio3": -0.121441644198754,
+        "strategyrlm_5:log2c": -0.119254779639999
+      },
+      "pass_rate_by_size": {
+        "1": {
+          "strategy": "single_pass",
+          "core_papers": 5,
+          "pass": 0.909090909090909
+        },
+        "2": {
+          "strategy": "rlm_5",
+          "core_papers": 5,
+          "pass": 0.924242424242424
+        },
+        "3": {
+          "strategy": "single_pass",
+          "core_papers": 10,
+          "pass": 0.939393939393939
+        },
+        "4": {
+          "strategy": "rlm_5",
+          "core_papers": 10,
+          "pass": 0.939393939393939
+        },
+        "5": {
+          "strategy": "single_pass",
+          "core_papers": 20,
+          "pass": 0.926356589147287
+        },
+        "6": {
+          "strategy": "rlm_5",
+          "core_papers": 20,
+          "pass": 0.918604651162791
+        },
+        "7": {
+          "strategy": "single_pass",
+          "core_papers": 50,
+          "pass": 0.926356589147287
+        },
+        "8": {
+          "strategy": "rlm_5",
+          "core_papers": 50,
+          "pass": 0.914728682170543
+        }
+      }
+    },
+    {
+      "question_set": "all_in_scope",
+      "threshold": 3,
+      "strategy": "rlm_20",
+      "term": "strategyrlm_20:log2c",
+      "n_rows": 1428,
+      "n_questions": 86,
+      "estimate_log_odds_per_doubling": -0.373419026573034,
+      "wald_se": 0.226966123451685,
+      "wald_ci95": [-0.818264454249008, 0.0714264011029395],
+      "wald_p_two_sided": 0.0999155307547221,
+      "odds_ratio_per_doubling": 0.688376724262072,
+      "boot_ci95_percentile": [-0.916200631538433, 0.400080460515904],
+      "boot_odds_ratio_ci95": [0.400036041757952, 1.49194473545517],
+      "boot_resamples": 10000,
+      "boot_ok": 10000,
+      "boot_errors": 0,
+      "boot_singular": 0,
+      "boot_median": -0.35584163799888,
+      "boot_seconds": 1249.12834787369,
+      "fit_warnings": [],
+      "fit_singular": false,
+      "random_intercept_sd": 1.87912557169786,
+      "fixed_effects": {
+        "(Intercept)": 3.64856220863006,
+        "strategyrlm_20": 0.189561501411673,
+        "log2c": 0.0234976377580578,
+        "ratio1": 0.20496898277599,
+        "ratio3": 0.293960238946623,
+        "strategyrlm_20:log2c": -0.373419026573034
+      },
+      "pass_rate_by_size": {
+        "1": {
+          "strategy": "single_pass",
+          "core_papers": 5,
+          "pass": 0.909090909090909
+        },
+        "2": {
+          "strategy": "rlm_20",
+          "core_papers": 5,
+          "pass": 0.96969696969697
+        },
+        "3": {
+          "strategy": "single_pass",
+          "core_papers": 10,
+          "pass": 0.939393939393939
+        },
+        "4": {
+          "strategy": "rlm_20",
+          "core_papers": 10,
+          "pass": 0.962121212121212
+        },
+        "5": {
+          "strategy": "single_pass",
+          "core_papers": 20,
+          "pass": 0.926356589147287
+        },
+        "6": {
+          "strategy": "rlm_20",
+          "core_papers": 20,
+          "pass": 0.926356589147287
+        },
+        "7": {
+          "strategy": "single_pass",
+          "core_papers": 50,
+          "pass": 0.926356589147287
+        },
+        "8": {
+          "strategy": "rlm_20",
+          "core_papers": 50,
+          "pass": 0.918604651162791
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+ "source": "gemini-3-flash-preview",
+ "role": "reference",
+ "key": "v2.5",
+ "judge": "devstral-small-2:24b",
+ "label": "Gemini 3 Flash (reference), key v2.5",
+ "script_commit": "db34af67",
+ "decision": "D235",
+ "method": "D195",
+ "threshold": 4,
+ "inputs": [
+  {
+   "role": "gate: G1 collect",
+   "path": "findings/recompute/fig2_inputs/g1_collect.jsonl",
+   "sha256": "f5ff75bc244cda492a48e7e11f54f2007ed7d586a8f49e78921edd7244b28965"
+  },
+  {
+   "role": "gate: S511 results",
+   "path": "findings/recompute/S511_g2_budget/results.json",
+   "sha256": "f8197b6853da40cd8570025bf22d0ede7106de11fe0f8f5384e300a0ad4e2cb1"
+  },
+  {
+   "role": "questions: D5 key",
+   "path": "data/ground_truth_v2/ground_truth_v2_4_as_v1.json",
+   "sha256": "e971de522df6fab54a070e44736b6cb28a5ebd26bab07ca9e1513230bb86f4ef"
+  },
+  {
+   "role": "import: S511",
+   "path": "scripts/S511_g2_matched_budget.py",
+   "sha256": "4568ba70a8b30ef6477d5b526bdd84c9c18d5d2859f4e9f05376ef50f5c214da"
+  },
+  {
+   "role": "reference base (key v2.4)",
+   "path": "findings/recompute/fig2_inputs/g1_collect.jsonl",
+   "sha256": "f5ff75bc244cda492a48e7e11f54f2007ed7d586a8f49e78921edd7244b28965"
+  },
+  {
+   "role": "reference collect (key v2.5)",
+   "path": "findings/recompute/fig3_s6_inputs/s6_g1_collect.jsonl",
+   "sha256": "2a79dc76e87e362513b414776c39873c068466195c23ce979a439afad46462d3"
+  },
+  {
+   "role": "reference collect: SHA256SUMS",
+   "path": "findings/recompute/fig3_s6_inputs/SHA256SUMS",
+   "sha256": "49fd1d0b39a4588abd4b13ece27efc4a8759710111de8fe475e785601ab361a4"
+  }
+ ],
+ "rows": {
+  "base_rows": 516,
+  "v25_rows": 324,
+  "rows_used": 516
+ },
+ "reproduced": "S511 results.json v25.pairs['4'] rlm_10 against single_pass: one-paper -0.261111 [-0.333333, -0.194444], n 60, P 2.33e-10; many-paper +0.307692 [+0.141026, +0.474359], n 26, P 0.00292",
+ "result": {
+  "one_paper": {
+   "questions": 60,
+   "d": -0.2611111111111111,
+   "lo": -0.3333333333333333,
+   "hi": -0.19444444444444445,
+   "p_signflip_exact_two_sided": 2.3283064365386963e-10
+  },
+  "many_paper": {
+   "questions": 26,
+   "d": 0.3076923076923077,
+   "lo": 0.14102564102564102,
+   "hi": 0.47435897435897434,
+   "p_signflip_exact_two_sided": 0.00292205810546875
+  },
+  "interaction": {
+   "I": 0.5688034188034188,
+   "lo": 0.3854700854700855,
+   "hi": 0.7517094017094017,
+   "reading": "agrees"
+  }
+ },
+ "reference_flash_v24": {
+  "one_paper": {
+   "questions": 60,
+   "d": -0.26666666666666666,
+   "lo": -0.3444444444444444,
+   "hi": -0.19444444444444445,
+   "p_signflip_exact_two_sided": 4.656612873077393e-10
+  },
+  "many_paper": {
+   "questions": 26,
+   "d": 0.3333333333333333,
+   "lo": 0.16666666666666666,
+   "hi": 0.5,
+   "p_signflip_exact_two_sided": 0.0014495849609375
+  },
+  "interaction": {
+   "I": 0.6,
+   "lo": 0.4145299145299145,
+   "hi": 0.7837606837606838,
+   "reading": "agrees"
+  }
+ }
+}

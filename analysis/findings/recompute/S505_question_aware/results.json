@@ -1,0 +1,5993 @@
+{
+ "provenance": {
+  "script": "scripts/S505_question_aware_matcher.py",
+  "script_sha256": "179a80fbde63790294f2a35e7b637c1601d7583a6873c4d33171c3493eb86d2f",
+  "command": "uv run python scripts/S505_question_aware_matcher.py",
+  "written_utc": "2026-10-30T14:08:32Z",
+  "python": "3.13.11",
+  "key": {
+   "file": "data/ground_truth_v2/all_v2_4.json",
+   "sha256": "5d8362ae931dc0fe0cc132be6b5e57187e3ae7d3131d86f63cdf1a44633fadd5",
+   "v1_format_file": "data/ground_truth_v2/ground_truth_v2_4_as_v1.json",
+   "v1_format_sha256": "e971de522df6fab54a070e44736b6cb28a5ebd26bab07ca9e1513230bb86f4ef"
+  },
+  "inputs_sha256": {
+   "data/upstream/MANIFEST.sha256": "744d145b3ff9bdd6515f8804e696a94a74d347650674c0fac7acb59539cd7403",
+   "deposit/publication/results/exp04_generation_latest.json": "9e4acbe88bae418890196147333e0ebe4ddc623c7c4e22b7409e11b230d5c4c7",
+   "deposit/publication/scripts/analysis_deterministic_scorer.py": "56b09bbc39cf58444a6c389b38d9237a1f82c713c2abd91f3c5ae97f7080689d",
+   "findings/recompute/S382_exp04_objective_v22.csv": "7a0ae8542ccfb66cb428648fb7da3f094c3b370db39f3491d8bd3aa144550604",
+   "findings/recompute/S439_concept_label_analysis.json": "d8384f1535cf5eb7f58ae500c1894adc67b7170506d5eee17f74ed5a66c93ecc",
+   "findings/recompute/S439_concept_label_key.json": "283ebcc196d510ff5838330b6195467b1fa142da6f6de342123f0cfdefc6065b",
+   "findings/recompute/S504_key_v2_5/ground_truth_v2_5_as_v1.draft_reviewed.json": "d7fc4268f52cd4f80a06d8ba4f64b1d35d3d4925fe61ee16c475c81d4672f257",
+   "recovered_harness/tests/experiments_v4/exp_common.py": "9ed9fb531789f788d24b616603e603a2d47dd0debe9abfb88658213451bb5c83",
+   "response/concept_match_labels/concept_labels_v1_ai_panel.xlsx": "6e3f94bfad2e6c4e848bdd29f90dfa9a4d7accb6cf6064a637ad8f9eea96f5a5"
+  },
+  "merged_ledgers": {
+   "listed_in": "findings/recompute/S388_rejudge_v22.json",
+   "sha256": {
+    "findings/recompute/S388_rejudge_v22/03_generation_strategies/devstral.jsonl": "7d3ac7f9fef4a4e9aa240e18eced2a0660d671dfbeba5df805ab264bf7e52e2c"
+   }
+  },
+  "imported_modules_sha256": {
+   "scripts/S141_campaign.py": "9a11d1f4868f6448056aef8bd8390f38eb167c6c3484aa8ce25cebad657053da",
+   "scripts/S141_runner/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "scripts/S141_runner/judge.py": "f89c2071764b5e10504ff969ede96228f6bd970a9e1557caaf9ee2715cf56ebe",
+   "scripts/S141_runner/providers.py": "bf554a6d968bad311ce1eae72b48e8116c5b8ca81cea3c05636f994ee01169cd",
+   "scripts/S141_runner/store.py": "44cef804d106cc9e5b4fd111a15931a7359b7180134ffdf035c98d70cb7c95cf",
+   "scripts/S21_full_answer_rejudge.py": "d496a10ffa3f96c3d9a838d7ebacaf91b516c1a9919951149080b16808ab0e48",
+   "scripts/S373_rejudge_v2.py": "0c74eebfedac5f42f079d6ee58e019f5c40ec6eac6471a0e38325adea5c4f677",
+   "scripts/S382_exp04_objective_v22.py": "560f20e5ceb914653fb09c258e2d9974bcbfb1111fbd97fb6518669a8418d4a8",
+   "scripts/S388_merge_rejudge_v22.py": "b12b2a2a133c2487dc26d7369a2e29b0ccb8e64baea78b6e37cb5923ba0023e9",
+   "scripts/S439_concept_label_sheet.py": "e38a89d893554f32f30a134700bc8339fdf51e8443af0615d0235378a2bb242f",
+   "scripts/bootstrap_upstream.py": "3e795b9d5dd8e84c8f960f238b522adcba3a115cee8d262bb276d133135da01d",
+   "scripts/concept_match_loose.py": "85bf57a09929dfb88c9bf221cd2a969b0cd78c22c97b77c129ce74a278934609",
+   "scripts/concept_match_stem.py": "121719a4fb5841af985a16d56990039cdc64a4dd29da9643a376f674d8e64bc6",
+   "scripts/judged_ledger.py": "73b07688188ecb86e210d767e806e3e149cc17b5b4947eed517964ec557fa0f9",
+   "scripts/key_scope.py": "ba454a708b1b8952deda4203c76666fb4853423c66ea5128b55cb835a5954f6c",
+   "scripts/machine.py": "54cf5ed337e4162e255ebd8b923005fc5892c3f808c401086f12e843478bfe6c",
+   "scripts/phase3_common.py": "224759a0393e219333be22ff7feeb3d5ea22895af324bac2da2eafe965896221",
+   "scripts/s374/files.py": "19cf06a67985d627633c0cef5d1d90a3d28c722167561cb681212a5e24a7c990",
+   "scripts/s374/rows.py": "8b62e098ebc5b765a892b3e9f2aa09efbc816c84f5731f96b94f3cef77cb9fbc"
+  },
+  "gates": [
+   {
+    "name": "G1",
+    "ok": true,
+    "message": "base matchers' own cases and 19 hand cases hold"
+   },
+   {
+    "name": "G2",
+    "ok": true,
+    "message": "S439 population: 516 answers, 3426 pairs, loose finds 1774 (known 516, 3426, 1774)"
+   },
+   {
+    "name": "G3",
+    "ok": true,
+    "message": "with an empty question Q-need equals the base loose and stem verdicts on 4617 of 4617 pairs (3,426 exp04 pairs and the v2.5 key's concepts scored on their questions)"
+   },
+   {
+    "name": "G4a",
+    "ok": true,
+    "message": "the labelled sheet is the one S439 --analyze scored (response/concept_match_labels/concept_labels_v1_ai_panel.xlsx, sha256 6e3f94bfad2e)"
+   },
+   {
+    "name": "G4",
+    "ok": true,
+    "message": "the base verdicts of the 249 sampled pairs are S439's key file's"
+   },
+   {
+    "name": "G5",
+    "ok": true,
+    "message": "the base loose and stem rates reproduce S439_concept_label_analysis.json on 16 of 16 cells (share, counts, interval)"
+   },
+   {
+    "name": "G6",
+    "ok": true,
+    "message": "loose_o30 per answer equals S382 csv concept_recall_loose_v22 on 516 of 516 answers; csv records the present key and answers file: True"
+   }
+  ],
+  "libraries": {
+   "nltk": "3.10.0"
+  }
+ },
+ "rule": "One concept under the question-aware rule (module docstring, THE RULE). matcher \"loose\" or \"stem\", rule \"all\"\n(Q-all) or \"need\" (Q-need). Returns {concept, status, found, content_words, removed, remaining, matched, need,\nexact}: status is \"found\", \"not_found\", \"no_remaining\" (every content word is in the question; found is False,\nwhich is reading (a); a caller using (b) drops the concept) or \"no_content\" (no content word: the exact rule\nalone decides, as in the base matchers); matched lists the remaining words found in the answer; need is the\nnumber of remaining words required (all of them under \"all\").",
+ "measures": {
+  "M1": "M1. For each base matcher and each Q variant, on the 249 pairs of S439's sample, the two rates of S439\n--analyze: \"found among stated\" = (pairs the matcher finds and Valerio labelled stated) / (pairs labelled stated),\nthe sensitivity; \"not stated among found\" = (pairs the matcher finds and he labelled not stated) / (pairs the\nmatcher finds), the false finds. Two readings of \"stated\": yes or partly (partly_as_stated), yes only\n(partly_as_not_stated). Unweighted, and weighted by 1 / inclusion probability as S439 weights. The 95% interval is\nthe 2.5th to 97.5th percentile over S439's 10,000 bootstrap replicates, rebuilt here with S439's code and seed\n(S439.rate()). The question of a pair is the question of its key entry (the record S439's population holds).\nUnder (b) a pair whose concept has no remaining word (for that matcher's removal) is left out of both rates; the\nbase matcher is then also reported on the same reduced set (name ending \"_base_b\") so the two compare on equal\npairs. Returns the table rows and the per-pair verdicts M2 reads.",
+  "M2": "M2. The pairs on which a Q variant and its base matcher disagree, on the 249 labelled pairs; \"stated\" is a\nlabel of yes or partly, \"not stated\" a label of no.\n  lost_stated     every stated pair the base matcher finds and the Q variant does not: the pairs O3 would take\n                  credit from. One row per pair, with the variants that lose it, whether the concept has no\n                  remaining word (lost under (a), left out under (b)), whether anything was removed (a Q-all loss\n                  with nothing removed comes from the stricter all-words rule, not from the question), the\n                  question, the concept, the removed words, the remaining words and those the answer holds, his\n                  comment, and the answer passage around the concept's content words.\n  dropped_not_stated  every not-stated pair the base matcher finds and the Q variant does not: the false finds\n                  O3 removes, with the same fields.\n  added           every pair the Q variant finds and the base matcher does not, with its label.\n  summary         per Q variant, the counts of the three lists under (a) and under (b), each loss split by cause:\n                  no_remaining (all content words in the question), removal (some removed, too few left in the\n                  answer) and rule_only (nothing removed: the all-words rule alone).",
+  "M3": "M3. On every answerable question of the reviewed v2.5 key, the question's own text is scored as the answer\nagainst each of its concepts. Reports, per matcher (exact, loose, stem and each Q variant), how many concepts are\ncredited (found) out of all the concepts, and lists every concept a Q variant still credits. Also lists every\nconcept with no remaining word (all its content words in the question) under each matcher's removal, and the\nconcepts with no content word. Under (b) the no-remaining concepts leave the denominator; the credited count is\nthe same under (a) and (b), since such a concept is never found.",
+  "M4": "M4. On S439's population (516 answerable exp04 answers, 86 questions x 6 strategies; the concepts of the\nv1-format key judged_ledger's checked context holds), concept recall per answer = found concepts / concepts\ncounted, and its mean over the answers of each strategy (and over all 516), for: loose and stem (base, each\nconcept's verdict from the base module), loose_o30 (S382's concept_recall_loose_v22, reproduced by gate G6), and\neach Q variant. Under (b) an answer whose every concept has no remaining word has no recall and is left out of the\nmean; the number of answers averaged is given. Also counts, over the population's distinct (question, concept)\nentries, the concepts with no remaining word and the concepts with at least one removed word."
+ },
+ "M1_p2": {
+  "tables": [
+   {
+    "reading": "partly_as_stated",
+    "matcher": "loose",
+    "weighting": "unweighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.762589928057554,
+     "numerator": 106,
+     "denominator": 139,
+     "weighted_numerator": 106.0,
+     "weighted_denominator": 139.0,
+     "interval_95": [
+      0.684931506849315,
+      0.822429906542056
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.1092436974789916,
+     "numerator": 13,
+     "denominator": 119,
+     "weighted_numerator": 13.0,
+     "weighted_denominator": 119.0,
+     "interval_95": [
+      0.047619047619047616,
+      0.19047619047619047
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "loose",
+    "weighting": "weighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.8499267115035803,
+     "numerator": 106,
+     "denominator": 139,
+     "weighted_numerator": 1600.240459269648,
+     "weighted_denominator": 1882.7981726079765,
+     "interval_95": [
+      0.7625814292000116,
+      0.9102405880611016
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.10771895262253862,
+     "numerator": 13,
+     "denominator": 119,
+     "weighted_numerator": 193.18602218815974,
+     "weighted_denominator": 1793.4264814578078,
+     "interval_95": [
+      0.03647710179562468,
+      0.210745614243039
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "loose_Qall_a",
+    "weighting": "unweighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.5899280575539568,
+     "numerator": 82,
+     "denominator": 139,
+     "weighted_numerator": 82.0,
+     "weighted_denominator": 139.0,
+     "interval_95": [
+      0.4935064935064935,
+      0.6637168141592921
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.023809523809523808,
+     "numerator": 2,
+     "denominator": 84,
+     "weighted_numerator": 2.0,
+     "weighted_denominator": 84.0,
+     "interval_95": [
+      0.0,
+      0.06521739130434782
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "loose_Qall_a",
+    "weighting": "weighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.6506738569699738,
+     "numerator": 82,
+     "denominator": 139,
+     "weighted_numerator": 1225.0875488668505,
+     "weighted_denominator": 1882.7981726079765,
+     "interval_95": [
+      0.5498204568127371,
+      0.7277111449604442
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.02208282515694772,
+     "numerator": 2,
+     "denominator": 84,
+     "weighted_numerator": 27.66430004455352,
+     "weighted_denominator": 1252.751848911404,
+     "interval_95": [
+      0.0,
+      0.07147174112212597
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "loose_Qneed_a",
+    "weighting": "unweighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.7122302158273381,
+     "numerator": 99,
+     "denominator": 139,
+     "weighted_numerator": 99.0,
+     "weighted_denominator": 139.0,
+     "interval_95": [
+      0.6351351351351351,
+      0.7735849056603774
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.08333333333333333,
+     "numerator": 9,
+     "denominator": 108,
+     "weighted_numerator": 9.0,
+     "weighted_denominator": 108.0,
+     "interval_95": [
+      0.02857142857142857,
+      0.15517241379310345
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "loose_Qneed_a",
+    "weighting": "weighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.7741176725917515,
+     "numerator": 99,
+     "denominator": 139,
+     "weighted_numerator": 1457.5073393392895,
+     "weighted_denominator": 1882.7981726079765,
+     "interval_95": [
+      0.6867435943405998,
+      0.8418628494887521
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.07588545480813724,
+     "numerator": 9,
+     "denominator": 108,
+     "weighted_numerator": 119.68603665793043,
+     "weighted_denominator": 1577.1933759972198,
+     "interval_95": [
+      0.02119700497444881,
+      0.15794308824969855
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "loose_base_b",
+    "weighting": "unweighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.753731343283582,
+     "numerator": 101,
+     "denominator": 134,
+     "weighted_numerator": 101.0,
+     "weighted_denominator": 134.0,
+     "interval_95": [
+      0.6764705882352942,
+      0.8117676179382644
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.11403508771929824,
+     "numerator": 13,
+     "denominator": 114,
+     "weighted_numerator": 13.0,
+     "weighted_denominator": 114.0,
+     "interval_95": [
+      0.04938271604938271,
+      0.1969750320102432
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "loose_base_b",
+    "weighting": "weighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.8403211829729341,
+     "numerator": 101,
+     "denominator": 134,
+     "weighted_numerator": 1486.9801539821347,
+     "weighted_denominator": 1769.5378673204632,
+     "interval_95": [
+      0.7563438869918799,
+      0.8996222709966821
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.11498030666734435,
+     "numerator": 13,
+     "denominator": 114,
+     "weighted_numerator": 193.18602218815974,
+     "weighted_denominator": 1680.1661761702942,
+     "interval_95": [
+      0.039410011866885974,
+      0.22178630636165375
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "loose_Qall_b",
+    "weighting": "unweighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.6119402985074627,
+     "numerator": 82,
+     "denominator": 134,
+     "weighted_numerator": 82.0,
+     "weighted_denominator": 134.0,
+     "interval_95": [
+      0.5131578947368421,
+      0.6904761904761905
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.023809523809523808,
+     "numerator": 2,
+     "denominator": 84,
+     "weighted_numerator": 2.0,
+     "weighted_denominator": 84.0,
+     "interval_95": [
+      0.0,
+      0.06521739130434782
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "loose_Qall_b",
+    "weighting": "weighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.6923206174287466,
+     "numerator": 82,
+     "denominator": 134,
+     "weighted_numerator": 1225.0875488668505,
+     "weighted_denominator": 1769.5378673204632,
+     "interval_95": [
+      0.5807017657924414,
+      0.7780766524302718
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.02208282515694772,
+     "numerator": 2,
+     "denominator": 84,
+     "weighted_numerator": 27.66430004455352,
+     "weighted_denominator": 1252.751848911404,
+     "interval_95": [
+      0.0,
+      0.07147174112212597
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "loose_Qneed_b",
+    "weighting": "unweighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.7388059701492538,
+     "numerator": 99,
+     "denominator": 134,
+     "weighted_numerator": 99.0,
+     "weighted_denominator": 134.0,
+     "interval_95": [
+      0.6623376623376623,
+      0.7978723404255319
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.08333333333333333,
+     "numerator": 9,
+     "denominator": 108,
+     "weighted_numerator": 9.0,
+     "weighted_denominator": 108.0,
+     "interval_95": [
+      0.02857142857142857,
+      0.15517241379310345
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "loose_Qneed_b",
+    "weighting": "weighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.8236655266079904,
+     "numerator": 99,
+     "denominator": 134,
+     "weighted_numerator": 1457.5073393392895,
+     "weighted_denominator": 1769.5378673204632,
+     "interval_95": [
+      0.7413698326616232,
+      0.883671829721808
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.07588545480813724,
+     "numerator": 9,
+     "denominator": 108,
+     "weighted_numerator": 119.68603665793043,
+     "weighted_denominator": 1577.1933759972198,
+     "interval_95": [
+      0.02119700497444881,
+      0.15794308824969855
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "stem",
+    "weighting": "unweighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.8561151079136691,
+     "numerator": 119,
+     "denominator": 139,
+     "weighted_numerator": 119.0,
+     "weighted_denominator": 139.0,
+     "interval_95": [
+      0.7894736842105263,
+      0.9072164948453608
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.15602836879432624,
+     "numerator": 22,
+     "denominator": 141,
+     "weighted_numerator": 22.0,
+     "weighted_denominator": 141.0,
+     "interval_95": [
+      0.08653846153846154,
+      0.25
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "stem",
+    "weighting": "weighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.8921482609542698,
+     "numerator": 119,
+     "denominator": 139,
+     "weighted_numerator": 1679.7351154200833,
+     "weighted_denominator": 1882.7981726079765,
+     "interval_95": [
+      0.8150954503997926,
+      0.9488288383292538
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.1288790103465476,
+     "numerator": 22,
+     "denominator": 141,
+     "weighted_numerator": 248.51036984633438,
+     "weighted_denominator": 1928.2454852664177,
+     "interval_95": [
+      0.05788514391224245,
+      0.23318813149219206
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "stem_Qall_a",
+    "weighting": "unweighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.6618705035971223,
+     "numerator": 92,
+     "denominator": 139,
+     "weighted_numerator": 92.0,
+     "weighted_denominator": 139.0,
+     "interval_95": [
+      0.5647058823529412,
+      0.7372902756377333
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.02127659574468085,
+     "numerator": 2,
+     "denominator": 94,
+     "weighted_numerator": 2.0,
+     "weighted_denominator": 94.0,
+     "interval_95": [
+      0.0,
+      0.058823529411764705
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "stem_Qall_a",
+    "weighting": "weighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.7187199177417987,
+     "numerator": 92,
+     "denominator": 139,
+     "weighted_numerator": 1353.2045477412137,
+     "weighted_denominator": 1882.7981726079765,
+     "interval_95": [
+      0.6367008872911029,
+      0.7811000606361838
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.020033980843954455,
+     "numerator": 2,
+     "denominator": 94,
+     "weighted_numerator": 27.66430004455352,
+     "weighted_denominator": 1380.8688477857672,
+     "interval_95": [
+      0.0,
+      0.06608570490759871
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "stem_Qneed_a",
+    "weighting": "unweighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.7841726618705036,
+     "numerator": 109,
+     "denominator": 139,
+     "weighted_numerator": 109.0,
+     "weighted_denominator": 139.0,
+     "interval_95": [
+      0.7,
+      0.8526315789473684
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.1349206349206349,
+     "numerator": 17,
+     "denominator": 126,
+     "weighted_numerator": 17.0,
+     "weighted_denominator": 126.0,
+     "interval_95": [
+      0.06729166666666668,
+      0.22973361292326805
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "stem_Qneed_a",
+    "weighting": "weighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.8064313618576654,
+     "numerator": 109,
+     "denominator": 139,
+     "weighted_numerator": 1518.3474944393743,
+     "weighted_denominator": 1882.7981726079765,
+     "interval_95": [
+      0.722695729548355,
+      0.8758946676610616
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.09998907235579424,
+     "numerator": 17,
+     "denominator": 126,
+     "weighted_numerator": 168.68479350592344,
+     "weighted_denominator": 1687.0322879452974,
+     "interval_95": [
+      0.04134887884825838,
+      0.18858695843955683
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "stem_base_b",
+    "weighting": "unweighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.8507462686567164,
+     "numerator": 114,
+     "denominator": 134,
+     "weighted_numerator": 114.0,
+     "weighted_denominator": 134.0,
+     "interval_95": [
+      0.7831325301204819,
+      0.9024444204619037
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.16176470588235295,
+     "numerator": 22,
+     "denominator": 136,
+     "weighted_numerator": 22.0,
+     "weighted_denominator": 136.0,
+     "interval_95": [
+      0.09,
+      0.25925925925925924
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "stem_base_b",
+    "weighting": "weighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.885245147369814,
+     "numerator": 114,
+     "denominator": 134,
+     "weighted_numerator": 1566.4748101325697,
+     "weighted_denominator": 1769.5378673204632,
+     "interval_95": [
+      0.8102128693706488,
+      0.9429446942469755
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.1369214319696114,
+     "numerator": 22,
+     "denominator": 136,
+     "weighted_numerator": 248.51036984633438,
+     "weighted_denominator": 1814.985179978904,
+     "interval_95": [
+      0.06211955337906943,
+      0.24298082114173972
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "stem_Qall_b",
+    "weighting": "unweighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.6865671641791045,
+     "numerator": 92,
+     "denominator": 134,
+     "weighted_numerator": 92.0,
+     "weighted_denominator": 134.0,
+     "interval_95": [
+      0.5853658536585366,
+      0.7659574468085106
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.02127659574468085,
+     "numerator": 2,
+     "denominator": 94,
+     "weighted_numerator": 2.0,
+     "weighted_denominator": 94.0,
+     "interval_95": [
+      0.0,
+      0.058823529411764705
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "stem_Qall_b",
+    "weighting": "weighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.7647220060853032,
+     "numerator": 92,
+     "denominator": 134,
+     "weighted_numerator": 1353.2045477412137,
+     "weighted_denominator": 1769.5378673204632,
+     "interval_95": [
+      0.6757871964297606,
+      0.8375797705222422
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.020033980843954455,
+     "numerator": 2,
+     "denominator": 94,
+     "weighted_numerator": 27.66430004455352,
+     "weighted_denominator": 1380.8688477857672,
+     "interval_95": [
+      0.0,
+      0.06608570490759871
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "stem_Qneed_b",
+    "weighting": "unweighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.8134328358208955,
+     "numerator": 109,
+     "denominator": 134,
+     "weighted_numerator": 109.0,
+     "weighted_denominator": 134.0,
+     "interval_95": [
+      0.7333333333333333,
+      0.8787962037962037
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.1349206349206349,
+     "numerator": 17,
+     "denominator": 126,
+     "weighted_numerator": 17.0,
+     "weighted_denominator": 126.0,
+     "interval_95": [
+      0.06729166666666668,
+      0.22973361292326805
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_stated",
+    "matcher": "stem_Qneed_b",
+    "weighting": "weighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.8580474724389731,
+     "numerator": 109,
+     "denominator": 134,
+     "weighted_numerator": 1518.3474944393743,
+     "weighted_denominator": 1769.5378673204632,
+     "interval_95": [
+      0.781699685997911,
+      0.9193335492518431
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.09998907235579424,
+     "numerator": 17,
+     "denominator": 126,
+     "weighted_numerator": 168.68479350592344,
+     "weighted_denominator": 1687.0322879452974,
+     "interval_95": [
+      0.04134887884825838,
+      0.18858695843955683
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "loose",
+    "weighting": "unweighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.7846153846153846,
+     "numerator": 102,
+     "denominator": 130,
+     "weighted_numerator": 102.0,
+     "weighted_denominator": 130.0,
+     "interval_95": [
+      0.7111111111111111,
+      0.8452380952380952
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.14285714285714285,
+     "numerator": 17,
+     "denominator": 119,
+     "weighted_numerator": 17.0,
+     "weighted_denominator": 119.0,
+     "interval_95": [
+      0.07953050239234451,
+      0.22972972972972974
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "loose",
+    "weighting": "weighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.8763952759715253,
+     "numerator": 102,
+     "denominator": 130,
+     "weighted_numerator": 1561.1819398117252,
+     "weighted_denominator": 1781.3673608419233,
+     "interval_95": [
+      0.8095335515345894,
+      0.9279452061277678
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.1294976649710781,
+     "numerator": 17,
+     "denominator": 119,
+     "weighted_numerator": 232.2445416460826,
+     "weighted_denominator": 1793.4264814578078,
+     "interval_95": [
+      0.054745282304929345,
+      0.24043121629005737
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "loose_Qall_a",
+    "weighting": "unweighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.6230769230769231,
+     "numerator": 81,
+     "denominator": 130,
+     "weighted_numerator": 81.0,
+     "weighted_denominator": 130.0,
+     "interval_95": [
+      0.5268817204301075,
+      0.7083333333333334
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.03571428571428571,
+     "numerator": 3,
+     "denominator": 84,
+     "weighted_numerator": 3.0,
+     "weighted_denominator": 84.0,
+     "interval_95": [
+      0.0,
+      0.07692307692307693
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "loose_Qall_a",
+    "weighting": "weighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.6846733918352318,
+     "numerator": 81,
+     "denominator": 130,
+     "weighted_numerator": 1219.6548330522148,
+     "weighted_denominator": 1781.3673608419233,
+     "interval_95": [
+      0.590028444333743,
+      0.7688583028442513
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.02641945081777318,
+     "numerator": 3,
+     "denominator": 84,
+     "weighted_numerator": 33.097015859189256,
+     "weighted_denominator": 1252.751848911404,
+     "interval_95": [
+      0.0,
+      0.07582691790460719
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "loose_Qneed_a",
+    "weighting": "unweighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.7307692307692307,
+     "numerator": 95,
+     "denominator": 130,
+     "weighted_numerator": 95.0,
+     "weighted_denominator": 130.0,
+     "interval_95": [
+      0.6515151515151515,
+      0.797979797979798
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.12037037037037036,
+     "numerator": 13,
+     "denominator": 108,
+     "weighted_numerator": 13.0,
+     "weighted_denominator": 108.0,
+     "interval_95": [
+      0.06578947368421052,
+      0.2
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "loose_Qneed_a",
+    "weighting": "weighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.7962696808427928,
+     "numerator": 95,
+     "denominator": 130,
+     "weighted_numerator": 1418.4488198813665,
+     "weighted_denominator": 1781.3673608419233,
+     "interval_95": [
+      0.707349599584297,
+      0.8723670588107115
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.10065002715059153,
+     "numerator": 13,
+     "denominator": 108,
+     "weighted_numerator": 158.7445561158533,
+     "weighted_denominator": 1577.1933759972198,
+     "interval_95": [
+      0.04173674439915468,
+      0.19273763403358032
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "loose_base_b",
+    "weighting": "unweighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.776,
+     "numerator": 97,
+     "denominator": 125,
+     "weighted_numerator": 97.0,
+     "weighted_denominator": 125.0,
+     "interval_95": [
+      0.703125,
+      0.8369628412537917
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.14912280701754385,
+     "numerator": 17,
+     "denominator": 114,
+     "weighted_numerator": 17.0,
+     "weighted_denominator": 114.0,
+     "interval_95": [
+      0.08247422680412371,
+      0.23728813559322035
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "loose_base_b",
+    "weighting": "weighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.8680028237414188,
+     "numerator": 97,
+     "denominator": 125,
+     "weighted_numerator": 1447.9216345242116,
+     "weighted_denominator": 1668.10705555441,
+     "interval_95": [
+      0.8000528291332158,
+      0.9205367239573775
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.1382271259474178,
+     "numerator": 17,
+     "denominator": 114,
+     "weighted_numerator": 232.2445416460826,
+     "weighted_denominator": 1680.1661761702942,
+     "interval_95": [
+      0.058863112933822084,
+      0.2533072664188539
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "loose_Qall_b",
+    "weighting": "unweighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.648,
+     "numerator": 81,
+     "denominator": 125,
+     "weighted_numerator": 81.0,
+     "weighted_denominator": 125.0,
+     "interval_95": [
+      0.5490136298421808,
+      0.735632183908046
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.03571428571428571,
+     "numerator": 3,
+     "denominator": 84,
+     "weighted_numerator": 3.0,
+     "weighted_denominator": 84.0,
+     "interval_95": [
+      0.0,
+      0.07692307692307693
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "loose_Qall_b",
+    "weighting": "weighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.7311610061183105,
+     "numerator": 81,
+     "denominator": 125,
+     "weighted_numerator": 1219.6548330522148,
+     "weighted_denominator": 1668.10705555441,
+     "interval_95": [
+      0.6339307701808745,
+      0.8139330877729997
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.02641945081777318,
+     "numerator": 3,
+     "denominator": 84,
+     "weighted_numerator": 33.097015859189256,
+     "weighted_denominator": 1252.751848911404,
+     "interval_95": [
+      0.0,
+      0.07582691790460719
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "loose_Qneed_b",
+    "weighting": "unweighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.76,
+     "numerator": 95,
+     "denominator": 125,
+     "weighted_numerator": 95.0,
+     "weighted_denominator": 125.0,
+     "interval_95": [
+      0.6865671641791045,
+      0.8207547169811321
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.12037037037037036,
+     "numerator": 13,
+     "denominator": 108,
+     "weighted_numerator": 13.0,
+     "weighted_denominator": 108.0,
+     "interval_95": [
+      0.06578947368421052,
+      0.2
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "loose_Qneed_b",
+    "weighting": "weighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.8503344045924754,
+     "numerator": 95,
+     "denominator": 125,
+     "weighted_numerator": 1418.4488198813665,
+     "weighted_denominator": 1668.10705555441,
+     "interval_95": [
+      0.7847662443757389,
+      0.903538277092364
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.10065002715059153,
+     "numerator": 13,
+     "denominator": 108,
+     "weighted_numerator": 158.7445561158533,
+     "weighted_denominator": 1577.1933759972198,
+     "interval_95": [
+      0.04173674439915468,
+      0.19273763403358032
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "stem",
+    "weighting": "unweighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.8846153846153846,
+     "numerator": 115,
+     "denominator": 130,
+     "weighted_numerator": 115.0,
+     "weighted_denominator": 130.0,
+     "interval_95": [
+      0.8172043010752689,
+      0.9390243902439024
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.18439716312056736,
+     "numerator": 26,
+     "denominator": 141,
+     "weighted_numerator": 26.0,
+     "weighted_denominator": 141.0,
+     "interval_95": [
+      0.1111111111111111,
+      0.2839506172839506
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "stem",
+    "weighting": "weighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.9210209146229845,
+     "numerator": 115,
+     "denominator": 130,
+     "weighted_numerator": 1640.6765959621603,
+     "weighted_denominator": 1781.3673608419233,
+     "interval_95": [
+      0.8596244143314666,
+      0.9707710088516338
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.14913499940829636,
+     "numerator": 26,
+     "denominator": 141,
+     "weighted_numerator": 287.5688893042573,
+     "weighted_denominator": 1928.2454852664177,
+     "interval_95": [
+      0.07423821113824547,
+      0.2600700504634548
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "stem_Qall_a",
+    "weighting": "unweighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.6923076923076923,
+     "numerator": 90,
+     "denominator": 130,
+     "weighted_numerator": 90.0,
+     "weighted_denominator": 130.0,
+     "interval_95": [
+      0.6,
+      0.7721518987341772
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.0425531914893617,
+     "numerator": 4,
+     "denominator": 94,
+     "weighted_numerator": 4.0,
+     "weighted_denominator": 94.0,
+     "interval_95": [
+      0.0125,
+      0.08695652173913043
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "stem_Qall_a",
+    "weighting": "weighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.7528302396347912,
+     "numerator": 90,
+     "denominator": 130,
+     "weighted_numerator": 1341.0672171402207,
+     "weighted_denominator": 1781.3673608419233,
+     "interval_95": [
+      0.6763300116012578,
+      0.8247004664051825
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.02882361399445639,
+     "numerator": 4,
+     "denominator": 94,
+     "weighted_numerator": 39.80163064554671,
+     "weighted_denominator": 1380.8688477857672,
+     "interval_95": [
+      0.004541235549719156,
+      0.07827666894783966
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "stem_Qneed_a",
+    "weighting": "unweighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.8076923076923077,
+     "numerator": 105,
+     "denominator": 130,
+     "weighted_numerator": 105.0,
+     "weighted_denominator": 130.0,
+     "interval_95": [
+      0.7215137995434737,
+      0.8837293562521064
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.16666666666666666,
+     "numerator": 21,
+     "denominator": 126,
+     "weighted_numerator": 21.0,
+     "weighted_denominator": 126.0,
+     "interval_95": [
+      0.09615384615384616,
+      0.2676056338028169
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "stem_Qneed_a",
+    "weighting": "weighted",
+    "pairs": 249,
+    "found_among_stated": {
+     "share": 0.8304233071174598,
+     "numerator": 105,
+     "denominator": 130,
+     "weighted_numerator": 1479.2889749814512,
+     "weighted_denominator": 1781.3673608419233,
+     "interval_95": [
+      0.7426329908475,
+      0.9124396755325734
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.12314127859216319,
+     "numerator": 21,
+     "denominator": 126,
+     "weighted_numerator": 207.74331296384634,
+     "weighted_denominator": 1687.0322879452974,
+     "interval_95": [
+      0.06012129764978662,
+      0.2219687074216426
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "stem_base_b",
+    "weighting": "unweighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.88,
+     "numerator": 110,
+     "denominator": 125,
+     "weighted_numerator": 110.0,
+     "weighted_denominator": 125.0,
+     "interval_95": [
+      0.8108108108108109,
+      0.9358974358974359
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.19117647058823528,
+     "numerator": 26,
+     "denominator": 136,
+     "weighted_numerator": 26.0,
+     "weighted_denominator": 136.0,
+     "interval_95": [
+      0.11578947368421053,
+      0.29411764705882354
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "stem_base_b",
+    "weighting": "weighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.9156584318666506,
+     "numerator": 110,
+     "denominator": 125,
+     "weighted_numerator": 1527.416290674647,
+     "weighted_denominator": 1668.10705555441,
+     "interval_95": [
+      0.8534202438908238,
+      0.9679232272964571
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.1584414531184215,
+     "numerator": 26,
+     "denominator": 136,
+     "weighted_numerator": 287.5688893042573,
+     "weighted_denominator": 1814.985179978904,
+     "interval_95": [
+      0.07960517460073277,
+      0.2721516983416438
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "stem_Qall_b",
+    "weighting": "unweighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.72,
+     "numerator": 90,
+     "denominator": 125,
+     "weighted_numerator": 90.0,
+     "weighted_denominator": 125.0,
+     "interval_95": [
+      0.6271186440677966,
+      0.801980198019802
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.0425531914893617,
+     "numerator": 4,
+     "denominator": 94,
+     "weighted_numerator": 4.0,
+     "weighted_denominator": 94.0,
+     "interval_95": [
+      0.0125,
+      0.08695652173913043
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "stem_Qall_b",
+    "weighting": "weighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.8039455337562285,
+     "numerator": 90,
+     "denominator": 125,
+     "weighted_numerator": 1341.0672171402207,
+     "weighted_denominator": 1668.10705555441,
+     "interval_95": [
+      0.7343685150494178,
+      0.8698608805630448
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.02882361399445639,
+     "numerator": 4,
+     "denominator": 94,
+     "weighted_numerator": 39.80163064554671,
+     "weighted_denominator": 1380.8688477857672,
+     "interval_95": [
+      0.004541235549719156,
+      0.07827666894783966
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "stem_Qneed_b",
+    "weighting": "unweighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.84,
+     "numerator": 105,
+     "denominator": 125,
+     "weighted_numerator": 105.0,
+     "weighted_denominator": 125.0,
+     "interval_95": [
+      0.7611940298507462,
+      0.90804890921886
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.16666666666666666,
+     "numerator": 21,
+     "denominator": 126,
+     "weighted_numerator": 21.0,
+     "weighted_denominator": 126.0,
+     "interval_95": [
+      0.09615384615384616,
+      0.2676056338028169
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   },
+   {
+    "reading": "partly_as_not_stated",
+    "matcher": "stem_Qneed_b",
+    "weighting": "weighted",
+    "pairs": 243,
+    "found_among_stated": {
+     "share": 0.8868069768398628,
+     "numerator": 105,
+     "denominator": 125,
+     "weighted_numerator": 1479.2889749814512,
+     "weighted_denominator": 1668.10705555441,
+     "interval_95": [
+      0.823197105351674,
+      0.9441698039882359
+     ],
+     "replicates_with_a_denominator": 10000
+    },
+    "not_stated_among_found": {
+     "share": 0.12314127859216319,
+     "numerator": 21,
+     "denominator": 126,
+     "weighted_numerator": 207.74331296384634,
+     "weighted_denominator": 1687.0322879452974,
+     "interval_95": [
+      0.06012129764978662,
+      0.2219687074216426
+     ],
+     "replicates_with_a_denominator": 10000
+    }
+   }
+  ],
+  "pairs": 249,
+  "labels": {
+   "yes": 130,
+   "no": 110,
+   "partly": 9
+  }
+ },
+ "M2_penalty": {
+  "lost_stated": [
+   {
+    "row_id": "R002",
+    "label": "yes",
+    "question_id": "11_asf_burkina_faso_CO2",
+    "strategy": "single_pass",
+    "question": "How did the researchers use multi-gene analysis to establish the genetic identity and classification of the ASFV strains responsible for the outbreaks?",
+    "concept": "partial CD2v, and partial B602L",
+    "variants": [
+     "loose_Qall",
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "b602l",
+      "cd2v",
+      "partial"
+     ],
+     "stem": [
+      "b602l",
+      "cd2v",
+      "partial"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "b602l",
+      "cd2v"
+     ],
+     "stem": [
+      "b602l",
+      "cd2v"
+     ]
+    },
+    "comment": "",
+    "passage": "Researchers used multi-gene analysis targeting the **p72**, **p54**, **CD2v**, and **B602L** genes to characterize and classify the African swine fever virus (ASFV) strains responsible for the 2018 ou"
+   },
+   {
+    "row_id": "R011",
+    "label": "yes",
+    "question_id": "04_fastp_TE3",
+    "strategy": "verified_pass",
+    "question": "How does fastp's methodology for adapter detection differ between single-end and paired-end sequencing data?",
+    "concept": "finding the overlap of each pair",
+    "variants": [
+     "loose_Qall",
+     "stem_Qall",
+     "stem_Qneed"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": [
+      "pair"
+     ]
+    },
+    "remaining": {
+     "loose": [
+      "finding",
+      "overlap",
+      "pair"
+     ],
+     "stem": [
+      "finding",
+      "overlap"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "overlap",
+      "pair"
+     ],
+     "stem": [
+      "overlap"
+     ]
+    },
+    "comment": "",
+    "passage": "lid, a backward extension is then performed to identify the complete adapter sequence [04_fastp.pdf:0]. *   **Paired-end data:** The tool employs an overlap-analysis-based method derived from AfterQC [04_fastp.pdf:0]. It identifies the overlap between each pair of r"
+   },
+   {
+    "row_id": "R012",
+    "label": "yes",
+    "question_id": "04_fastp_TE3",
+    "strategy": "verified_pass",
+    "question": "How does fastp's methodology for adapter detection differ between single-end and paired-end sequencing data?",
+    "concept": "considered as adapter seeds",
+    "variants": [
+     "loose_Qall",
+     "loose_Qneed",
+     "stem_Qall",
+     "stem_Qneed"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [
+      "adapter"
+     ],
+     "stem": [
+      "adapter"
+     ]
+    },
+    "remaining": {
+     "loose": [
+      "considered",
+      "seeds"
+     ],
+     "stem": [
+      "considered",
+      "seeds"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "seeds"
+     ],
+     "stem": [
+      "seeds"
+     ]
+    },
+    "comment": "",
+    "passage": "Based on the provided passage, fastp uses different algorithms for adapter detection depending on the sequencing data type:  *   **Single-end data:** The algorithm utilizes an \"adapter seed\" approach. It attempts to extend a seed in the forward direction to verify its validity, as valid adapters sh"
+   },
+   {
+    "row_id": "R014",
+    "label": "yes",
+    "question_id": "04_fastp_TE3",
+    "strategy": "verified_pass",
+    "question": "How does fastp's methodology for adapter detection differ between single-end and paired-end sequencing data?",
+    "concept": "fall out of the overlapped regions",
+    "variants": [
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "fall",
+      "out",
+      "overlapped",
+      "regions"
+     ],
+     "stem": [
+      "fall",
+      "out",
+      "overlapped",
+      "regions"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "overlapped",
+      "regions"
+     ],
+     "stem": [
+      "fall",
+      "overlapped",
+      "regions"
+     ]
+    },
+    "comment": "",
+    "passage": "rmed to identify the complete adapter sequence [04_fastp.pdf:0]. *   **Paired-end data:** The tool employs an overlap-analysis-based method derived from AfterQC [04_fastp.pdf:0]. It identifies the overlap between each pair of reads and designates any bases falling outside of these overlapped regions as adapter content [04_fastp.pdf:0].  This overlap-analysis method for paired-end data is noted as an advanta"
+   },
+   {
+    "row_id": "R017",
+    "label": "yes",
+    "question_id": "10_cutadapt_CO2",
+    "strategy": "rlm_5",
+    "question": "How does the implementation of Cutadapt balance the trade-off between user accessibility and computational efficiency?",
+    "concept": "mainly written in Python",
+    "variants": [
+     "loose_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "mainly",
+      "python",
+      "written"
+     ],
+     "stem": [
+      "mainly",
+      "python",
+      "written"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "python",
+      "written"
+     ],
+     "stem": [
+      "mainly",
+      "python",
+      "written"
+     ]
+    },
+    "comment": "",
+    "passage": "## Cutadapt Implementation: Accessibility vs Efficiency  Cutadapt is primarily written in Python to ensure it remains a user-friendly and maintainable tool [2]. It is designed as a standalone, easy-to-use c"
+   },
+   {
+    "row_id": "R039",
+    "label": "yes",
+    "question_id": "05_multiqc_CO2",
+    "strategy": "multi_hop",
+    "question": "How does MultiQC's approach to data presentation assist researchers in identifying quality issues across large-scale projects?",
+    "concept": "single summary report",
+    "variants": [
+     "loose_Qall",
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "report",
+      "single",
+      "summary"
+     ],
+     "stem": [
+      "report",
+      "single",
+      "summary"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "report",
+      "single"
+     ],
+     "stem": [
+      "report",
+      "single"
+     ]
+    },
+    "comment": "",
+    "passage": "sues across large-scale projects by aggregating results from multiple samples and bioinformatics tools into a single, interactive HTML report [05_multiqc.pdf:0]. This centralized approach allows for the direct comparison of datasets, making it easier"
+   },
+   {
+    "row_id": "R040",
+    "label": "yes",
+    "question_id": "05_multiqc_CO2",
+    "strategy": "multi_hop",
+    "question": "How does MultiQC's approach to data presentation assist researchers in identifying quality issues across large-scale projects?",
+    "concept": "output from multiple tools",
+    "variants": [
+     "loose_Qall",
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "multiple",
+      "output",
+      "tools"
+     ],
+     "stem": [
+      "multiple",
+      "output",
+      "tools"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "multiple",
+      "tools"
+     ],
+     "stem": [
+      "multiple",
+      "tools"
+     ]
+    },
+    "comment": "",
+    "passage": "iQC assists researchers in identifying quality issues across large-scale projects by aggregating results from multiple samples and bioinformatics tools into a single, interactive HTML report [05_multiqc.pdf:0]. This centralized approach allows for the direct co"
+   },
+   {
+    "row_id": "R043",
+    "label": "yes",
+    "question_id": "05_multiqc_CO2",
+    "strategy": "multi_hop",
+    "question": "How does MultiQC's approach to data presentation assist researchers in identifying quality issues across large-scale projects?",
+    "concept": "aids batch effect detection",
+    "variants": [
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "aids",
+      "batch",
+      "detection",
+      "effect"
+     ],
+     "stem": [
+      "aids",
+      "batch",
+      "detection",
+      "effect"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "batch",
+      "effect"
+     ],
+     "stem": [
+      "batch",
+      "detection",
+      "effect"
+     ]
+    },
+    "comment": "",
+    "passage": "This centralized approach allows for the direct comparison of datasets, making it easier to spot outliers and batch effects that would be difficult to detect in individual per-sample reports [05_multiqc.pdf:0]. The reports feature interactive elements such as dynamic"
+   },
+   {
+    "row_id": "R044",
+    "label": "yes",
+    "question_id": "05_multiqc_CO2",
+    "strategy": "multi_hop",
+    "question": "How does MultiQC's approach to data presentation assist researchers in identifying quality issues across large-scale projects?",
+    "concept": "identify abnormal samples",
+    "variants": [
+     "stem_Qall",
+     "stem_Qneed"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": [
+      "identify"
+     ]
+    },
+    "remaining": {
+     "loose": [
+      "abnormal",
+      "identify",
+      "samples"
+     ],
+     "stem": [
+      "abnormal",
+      "samples"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "samples"
+     ],
+     "stem": [
+      "samples"
+     ]
+    },
+    "comment": "",
+    "passage": "MultiQC assists researchers in identifying quality issues across large-scale projects by aggregating results from multiple samples and bioinformatics tools into a single, interactive HTML report [05_multiqc.pdf:0]. This centralized approach"
+   },
+   {
+    "row_id": "R072",
+    "label": "partly",
+    "question_id": "02_snakemake_TE3",
+    "strategy": "multi_hop",
+    "question": "Explain the technical approach Snakemake uses to optimize job scheduling and how it handles job submission overhead in cluster or cloud environments.",
+    "concept": "maximize the number of used cores",
+    "variants": [
+     "loose_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": [
+      "used"
+     ]
+    },
+    "remaining": {
+     "loose": [
+      "cores",
+      "maximize",
+      "number",
+      "used"
+     ],
+     "stem": [
+      "cores",
+      "maximize",
+      "number"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "cores",
+      "maximize",
+      "number"
+     ],
+     "stem": [
+      "cores",
+      "maximize",
+      "number"
+     ]
+    },
+    "comment": "in the constraints it mentioned that selected jobs do not exceed resource limits, such as CPU cores and memory",
+    "passage": "ailable resources and workflow priorities [02_snakemake.pdf:0].  *   **Objective Function:** The MILP aims to maximize the \"value\" of the jobs scheduled in each step. This value is typically a combination of job priority and the [...] lver ensures that the selected subset of jobs does not exceed defined resource limits, such as:     *   **CPU Cores and Memory:** Standard hardware constraints [02_snakemake.pdf:0].     *   **Temporary Storage:** Snakemake tr [...] dividually, the entire group is submitted as a single unit to the cluster or cloud provider. This reduces the number of interactions with the external scheduler and ensures that the grouped jobs run sequentially on the same al"
+   },
+   {
+    "row_id": "R073",
+    "label": "yes",
+    "question_id": "02_snakemake_TE3",
+    "strategy": "multi_hop",
+    "question": "Explain the technical approach Snakemake uses to optimize job scheduling and how it handles job submission overhead in cluster or cloud environments.",
+    "concept": "delete existing temporary files",
+    "variants": [
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "delete",
+      "existing",
+      "files",
+      "temporary"
+     ],
+     "stem": [
+      "delete",
+      "existing",
+      "files",
+      "temporary"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "files",
+      "temporary"
+     ],
+     "stem": [
+      "delete",
+      "files",
+      "temporary"
+     ]
+    },
+    "comment": "",
+    "passage": "y a combination of job priority and the potential to free up disk space by completing jobs that allow for the deletion of temporary files [02_snakemake.pdf:0]. *   **Constraints:** The solver ensures that the selected subset of jobs does not excee"
+   },
+   {
+    "row_id": "R079",
+    "label": "yes",
+    "question_id": "17_brucellosis_ethiopia_CO2",
+    "strategy": "single_pass",
+    "question": "Based on the study's findings, how does the clinical history of livestock relate to the likelihood of brucellosis seropositivity in both small ruminants and camels?",
+    "concept": "RFM had a significant association",
+    "variants": [
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "association",
+      "had",
+      "rfm",
+      "significant"
+     ],
+     "stem": [
+      "association",
+      "had",
+      "rfm",
+      "significant"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "had"
+     ],
+     "stem": [
+      "association",
+      "had",
+      "significant"
+     ]
+    },
+    "comment": "",
+    "passage": "Based on the study's findings, the clinical and physiological history of livestock is significantly associated with brucellosis seropositivity in both small ruminants and camels:  **Small Ruminants (Sheep and Goats)** * [...] ) [17_brucellosis_ethiopia.pdf:0].  **Camels** *   **History of Abortion:** Camels with a history of abortion had a significantly higher likelihood of seropositivity, with odds 3.9 times higher than those without such a his"
+   },
+   {
+    "row_id": "R084",
+    "label": "yes",
+    "question_id": "04_fastp_CO2",
+    "strategy": "rlm_20",
+    "question": "What design choices and implementation strategies allow fastp to achieve higher performance and lower I/O overhead than traditional FASTQ tools?",
+    "concept": "read and load data multiple times",
+    "variants": [
+     "loose_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "data",
+      "load",
+      "multiple",
+      "read",
+      "times"
+     ],
+     "stem": [
+      "data",
+      "load",
+      "multiple",
+      "read",
+      "times"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "data",
+      "multiple",
+      "read",
+      "times"
+     ],
+     "stem": [
+      "data",
+      "load",
+      "multiple",
+      "read",
+      "times"
+     ]
+    },
+    "comment": "",
+    "passage": "tp` is designed as an ultra-fast, all-in-one FASTQ preprocessor that achieves high performance by integrating multiple functions—including quality profiling, adapter trimming, read filtering, and base correction—into a single tool [7][10][14][16]. To maximize execution speed, the tool is d [...] O overhead is the \"all-in-one\" processing flow, which performs all operations with a single scan of the FASTQ data [2][7][10][14][20]. This approach avoids the inefficiency of traditional workflows where multiple tools (such [...] as FASTQC, Cutadapt, and Trimmomatic) are used in sequence, requiring the data to be read and loaded multiple times [7][8][14][15][18].  The multi-threading architecture of `fastp` utilizes a thread pool where reads are packe"
+   },
+   {
+    "row_id": "R085",
+    "label": "yes",
+    "question_id": "04_fastp_CO2",
+    "strategy": "rlm_20",
+    "question": "What design choices and implementation strategies allow fastp to achieve higher performance and lower I/O overhead than traditional FASTQ tools?",
+    "concept": "developed in C/Cþþ",
+    "variants": [
+     "loose_Qall",
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "c",
+      "cþþ",
+      "developed"
+     ],
+     "stem": [
+      "c",
+      "cþþ",
+      "developed"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "c",
+      "developed"
+     ],
+     "stem": [
+      "c",
+      "developed"
+     ]
+    },
+    "comment": "",
+    "passage": "d filtering, and base correction—into a single tool [7][10][14][16]. To maximize execution speed, the tool is developed in C/C++ and features a solid multi-threading implementation [10][16][19]. This contrasts with older tools develop"
+   },
+   {
+    "row_id": "R094",
+    "label": "yes",
+    "question_id": "13_lsd_nepal_FR1",
+    "strategy": "single_pass",
+    "question": "What were the overall morbidity, mortality, and case fatality rates recorded during the LSD outbreak in the study area?",
+    "concept": "overall morbidity rate",
+    "variants": [
+     "loose_Qall",
+     "loose_Qneed",
+     "stem_Qall",
+     "stem_Qneed"
+    ],
+    "no_remaining": {
+     "loose": true,
+     "stem": true
+    },
+    "removed": {
+     "loose": [
+      "morbidity",
+      "overall",
+      "rate"
+     ],
+     "stem": [
+      "morbidity",
+      "overall",
+      "rate"
+     ]
+    },
+    "remaining": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining_in_answer": {
+     "loose": [],
+     "stem": []
+    },
+    "comment": "",
+    "passage": "During the Lumpy Skin Disease (LSD) outbreak in the study area of Nawalpur, the following overall rates were recorded:  *   **Morbidity rate:** 28.02% (n = 431/1,538) [13_lsd_nepal.pdf:0]. *   **Mortality rate:** 3.06% (n = 47/1,538) [13_lsd_nep"
+   },
+   {
+    "row_id": "R095",
+    "label": "yes",
+    "question_id": "13_lsd_nepal_FR1",
+    "strategy": "single_pass",
+    "question": "What were the overall morbidity, mortality, and case fatality rates recorded during the LSD outbreak in the study area?",
+    "concept": "mortality rate",
+    "variants": [
+     "loose_Qall",
+     "loose_Qneed",
+     "stem_Qall",
+     "stem_Qneed"
+    ],
+    "no_remaining": {
+     "loose": true,
+     "stem": true
+    },
+    "removed": {
+     "loose": [
+      "mortality",
+      "rate"
+     ],
+     "stem": [
+      "mortality",
+      "rate"
+     ]
+    },
+    "remaining": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining_in_answer": {
+     "loose": [],
+     "stem": []
+    },
+    "comment": "",
+    "passage": "During the Lumpy Skin Disease (LSD) outbreak in the study area of Nawalpur, the following overall rates were recorded:  *   **Morbidity rate:** 28.02% (n = 431/1,538) [13_lsd_nepal.pdf:0]. *   **Mortality rate:** 3.06% (n = 47/1,538) [13_lsd_nepal.pdf:0]. *   **Case fatality rate:** 10.90% (n = 47/431) [13_lsd_ne"
+   },
+   {
+    "row_id": "R096",
+    "label": "yes",
+    "question_id": "13_lsd_nepal_FR1",
+    "strategy": "single_pass",
+    "question": "What were the overall morbidity, mortality, and case fatality rates recorded during the LSD outbreak in the study area?",
+    "concept": "case fatality rate",
+    "variants": [
+     "loose_Qall",
+     "loose_Qneed",
+     "stem_Qall",
+     "stem_Qneed"
+    ],
+    "no_remaining": {
+     "loose": true,
+     "stem": true
+    },
+    "removed": {
+     "loose": [
+      "case",
+      "fatality",
+      "rate"
+     ],
+     "stem": [
+      "case",
+      "fatality",
+      "rate"
+     ]
+    },
+    "remaining": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining_in_answer": {
+     "loose": [],
+     "stem": []
+    },
+    "comment": "",
+    "passage": "During the Lumpy Skin Disease (LSD) outbreak in the study area of Nawalpur, the following overall rates were recorded:  *   **Morbidity rate:** 28.02% (n = 431/1,538) [13_lsd_nepal.pdf:0]. *   **Mortality rate:** 3.06% (n = 47/1,538) [13_lsd_nepal.pdf:0]. *   **Case fatality rate:** 10.90% (n = 47/431) [13_lsd_nepal.pdf:0]."
+   },
+   {
+    "row_id": "R106",
+    "label": "partly",
+    "question_id": "SY_001",
+    "strategy": "rlm_10",
+    "question": "Based on the development of Sarek, Snakemake, nf-core, and fastp, what is the emerging meta-strategy for balancing high-performance computational efficiency with scientific reproducibility in large-scale genomics?",
+    "concept": "exact release version",
+    "variants": [
+     "loose_Qall",
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "exact",
+      "release",
+      "version"
+     ],
+     "stem": [
+      "exact",
+      "release",
+      "version"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "exact",
+      "version"
+     ],
+     "stem": [
+      "exact",
+      "version"
+     ]
+    },
+    "comment": "",
+    "passage": "and Relaunching:** Sarek is designed to be highly resilient; incomplete runs can be easily restarted from the exact point of failure (\"any stage in the workflow process\") without re-processing successful upstream steps [Chunk [...] *Singularity** containers [Chunk 4, 18]. *   **Environment Agnosticism:** This ensures that the same software versions are used whether the user is on a local POSIX-compatible computer, an HPC cluster, or a cloud environment. Sa"
+   },
+   {
+    "row_id": "R118",
+    "label": "yes",
+    "question_id": "10_cutadapt_TE3",
+    "strategy": "rlm_5",
+    "question": "What are the specific performance metrics for Cutadapt when processing 35 bp colour-space reads with an 18 bp adapter on a 2.66 GHz Intel Core 2 processor?",
+    "concept": "2.66 GHz Intel Core 2 processor",
+    "variants": [
+     "loose_Qall",
+     "loose_Qneed",
+     "stem_Qall",
+     "stem_Qneed"
+    ],
+    "no_remaining": {
+     "loose": true,
+     "stem": true
+    },
+    "removed": {
+     "loose": [
+      "2",
+      "2.66",
+      "core",
+      "ghz",
+      "intel",
+      "processor"
+     ],
+     "stem": [
+      "2",
+      "2.66",
+      "core",
+      "ghz",
+      "intel",
+      "processor"
+     ]
+    },
+    "remaining": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining_in_answer": {
+     "loose": [],
+     "stem": []
+    },
+    "comment": "",
+    "passage": "## Performance Metrics  When using a single core of a 2.66 GHz Intel Core 2 processor to process 35 bp colour-space reads with an 18 bp adapter, Cutadapt trims approximately 1 million reads per m"
+   },
+   {
+    "row_id": "R119",
+    "label": "yes",
+    "question_id": "10_cutadapt_TE3",
+    "strategy": "rlm_5",
+    "question": "What are the specific performance metrics for Cutadapt when processing 35 bp colour-space reads with an 18 bp adapter on a 2.66 GHz Intel Core 2 processor?",
+    "concept": "35 bp colour-space reads",
+    "variants": [
+     "loose_Qall",
+     "loose_Qneed",
+     "stem_Qall",
+     "stem_Qneed"
+    ],
+    "no_remaining": {
+     "loose": true,
+     "stem": true
+    },
+    "removed": {
+     "loose": [
+      "35",
+      "bp",
+      "colour",
+      "reads",
+      "space"
+     ],
+     "stem": [
+      "35",
+      "bp",
+      "colour",
+      "reads",
+      "space"
+     ]
+    },
+    "remaining": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining_in_answer": {
+     "loose": [],
+     "stem": []
+    },
+    "comment": "",
+    "passage": "## Performance Metrics  When using a single core of a 2.66 GHz Intel Core 2 processor to process 35 bp colour-space reads with an 18 bp adapter, Cutadapt trims approximately 1 million reads per minute [1]. This processing speed equ"
+   },
+   {
+    "row_id": "R126",
+    "label": "partly",
+    "question_id": "16_ppr_ethiopia_CO2",
+    "strategy": "rlm_20",
+    "question": "Why does the study conclude that the current PPR herd immunity in the Borena Zone is insufficient according to international standards?",
+    "concept": "128 small ruminants",
+    "variants": [
+     "loose_Qall",
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "128",
+      "ruminants",
+      "small"
+     ],
+     "stem": [
+      "128",
+      "ruminants",
+      "small"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "ruminants",
+      "small"
+     ],
+     "stem": [
+      "ruminants",
+      "small"
+     ]
+    },
+    "comment": "it get the proper information attached to the small ruminants data, but failed to mention the size of the herd.",
+    "passage": "## PPR Herd Immunity Analysis  The study concludes that herd immunity against Peste des Petits Ruminants (PPR) in the Borena Zone is insufficient because the protection level in vaccinated small ruminants was found to be 68.8% [1][2][8]. This figure is significantly lower than the 80% herd immunity thre"
+   },
+   {
+    "row_id": "R132",
+    "label": "yes",
+    "question_id": "09_seqkit_FR1",
+    "strategy": "multi_hop",
+    "question": "Which operating systems are supported by SeqKit and what are the requirements for their installation and configuration?",
+    "concept": "without any dependencies or pre-configurations",
+    "variants": [
+     "loose_Qall",
+     "loose_Qneed",
+     "stem_Qall",
+     "stem_Qneed"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [
+      "configurations"
+     ],
+     "stem": [
+      "configurations"
+     ]
+    },
+    "remaining": {
+     "loose": [
+      "dependencies",
+      "pre"
+     ],
+     "stem": [
+      "dependencies",
+      "pre"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "dependencies"
+     ],
+     "stem": [
+      "dependencies"
+     ]
+    },
+    "comment": "",
+    "passage": "fically **Windows, Linux, Mac OS X, and FreeBSD** [source_file:09_seqkit.pdf:0].   Regarding installation and configuration requirements, SeqKit is designed to be lightweight and used \"**out-of-the-box**\" without any external dependencies or complex configurations [source_file:09_seqkit.pdf:0]. Because it is implemented in the Go programming lang"
+   },
+   {
+    "row_id": "R136",
+    "label": "yes",
+    "question_id": "02_snakemake_CO2",
+    "strategy": "multi_hop",
+    "question": "How does Snakemake's implementation of a blockchain-style hashing scheme facilitate cross-workflow result caching?",
+    "concept": "created before in a different workflow",
+    "variants": [
+     "loose_Qall",
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [
+      "workflow"
+     ],
+     "stem": [
+      "workflow"
+     ]
+    },
+    "remaining": {
+     "loose": [
+      "before",
+      "created",
+      "different"
+     ],
+     "stem": [
+      "before",
+      "created",
+      "different"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "before",
+      "created"
+     ],
+     "stem": [
+      "before",
+      "created"
+     ]
+    },
+    "comment": "",
+    "passage": "Snakemake facilitates cross-workflow result caching through a **blockchain-style hashing scheme** that generates a unique identifier for each job [...] le:02_snakemake.pdf:0]. This hash allows Snakemake to unambiguously identify the provenance of an output file before it is created. If a rule is marked for caching, Snakemake checks a **central cache** (local or remote) for the calculated h"
+   },
+   {
+    "row_id": "R147",
+    "label": "yes",
+    "question_id": "09_seqkit_CO2",
+    "strategy": "verified_pass",
+    "question": "How does SeqKit achieve stable memory usage and efficiency when processing datasets that are significantly larger than the human genome?",
+    "concept": "parallelized by multiple Goroutines",
+    "variants": [
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "goroutines",
+      "multiple",
+      "parallelized"
+     ],
+     "stem": [
+      "goroutines",
+      "multiple",
+      "parallelized"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "goroutines"
+     ],
+     "stem": [
+      "goroutines",
+      "parallelized"
+     ]
+    },
+    "comment": "",
+    "passage": "greatly reduces the memory footprint [09_seqkit.pdf:0].  ### 2. Efficiency and Performance Optimization *   **Parallelization:** SeqKit utilizes the multi-CPU environment of modern computers by parallelizing CPU-intensive tasks using \"Goroutines\" (lightweight processes in the Go language). These tasks include sequence letter validation, reverse compleme"
+   },
+   {
+    "row_id": "R157",
+    "label": "yes",
+    "question_id": "06_star_aligner_CO2",
+    "strategy": "rlm_10",
+    "question": "How does the Maximum Mappable Prefix (MMP) search mechanism facilitate the identification of diverse sequence features beyond simple genomic mapping?",
+    "concept": "repeated for the unmapped portion",
+    "variants": [
+     "loose_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "portion",
+      "repeated",
+      "unmapped"
+     ],
+     "stem": [
+      "portion",
+      "repeated",
+      "unmapped"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "portion",
+      "unmapped"
+     ],
+     "stem": [
+      "portion",
+      "repeated",
+      "unmapped"
+     ]
+    },
+    "comment": "",
+    "passage": "nds the MMP for the first part of the read (e.g., a donor site) and then repeats the search for the remaining unmapped portion (e.g., an acceptor site) [3]. This allows for the detection of splice junctions in a single pass without prio"
+   },
+   {
+    "row_id": "R161",
+    "label": "yes",
+    "question_id": "06_star_aligner_CO2",
+    "strategy": "rlm_10",
+    "question": "How does the Maximum Mappable Prefix (MMP) search mechanism facilitate the identification of diverse sequence features beyond simple genomic mapping?",
+    "concept": "MMPs will serve as anchors",
+    "variants": [
+     "loose_Qall",
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [
+      "mmps"
+     ],
+     "stem": [
+      "mmps"
+     ]
+    },
+    "remaining": {
+     "loose": [
+      "anchors",
+      "serve",
+      "will"
+     ],
+     "stem": [
+      "anchors",
+      "serve",
+      "will"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "anchors",
+      "serve"
+     ],
+     "stem": [
+      "anchors",
+      "serve"
+     ]
+    },
+    "comment": "",
+    "passage": "## MMP Search Mechanism  The Maximum Mappable Prefix (MMP) is defined as the longest substring of a read sequence th [...] locations or properties [2]. *   **Mismatches and Indels:** If a search is terminated by a mismatch, the MMPs serve as genomic anchors that can be extended to allow for alignments with mismatches [2]. A subsequent \"frugal\" dynamic programming a"
+   },
+   {
+    "row_id": "R167",
+    "label": "yes",
+    "question_id": "03_nfcore_framework_TE3",
+    "strategy": "rlm_20",
+    "question": "Based on the benchmarking of mapping processes, what was the numerical impact of input sharding on median runtime, and at what point was the maximum efficiency plateau reached?",
+    "concept": "mapping processes decreases",
+    "variants": [
+     "stem_Qall",
+     "stem_Qneed"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [
+      "mapping",
+      "processes"
+     ],
+     "stem": [
+      "mapping",
+      "processes"
+     ]
+    },
+    "remaining": {
+     "loose": [
+      "decreases"
+     ],
+     "stem": [
+      "decreases"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [],
+     "stem": []
+    },
+    "comment": "",
+    "passage": "## Impact of Input Sharding on Mapping Runtime  Benchmarking of the mapping process in the nf-core/sarek framework showed that input sharding significantly reduces runtime. Specifically, the me"
+   },
+   {
+    "row_id": "R174",
+    "label": "yes",
+    "question_id": "CD_005",
+    "strategy": "verified_pass",
+    "question": "In the context of scaling large-scale genomic analyses, how do the parallelization strategies of the nf-core framework differ from the job scheduling approach of Snakemake?",
+    "concept": "mixed integer linear program (MILP)",
+    "variants": [
+     "loose_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "integer",
+      "linear",
+      "milp",
+      "mixed",
+      "program"
+     ],
+     "stem": [
+      "integer",
+      "linear",
+      "milp",
+      "mixed",
+      "program"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "integer",
+      "linear",
+      "milp",
+      "mixed"
+     ],
+     "stem": [
+      "integer",
+      "linear",
+      "milp",
+      "mixed",
+      "program"
+     ]
+    },
+    "comment": "",
+    "passage": ", the passages provide the following details regarding Snakemake’s job scheduling and parallelization:  *   **MILP Scheduling:** Snakemake solves a scheduling problem using Mixed Integer Linear Programming (MILP) to select a subset of pending jobs for efficient execution [02_snakemake.pdf:0]. *   **Opt"
+   },
+   {
+    "row_id": "R175",
+    "label": "yes",
+    "question_id": "CD_005",
+    "strategy": "verified_pass",
+    "question": "In the context of scaling large-scale genomic analyses, how do the parallelization strategies of the nf-core framework differ from the job scheduling approach of Snakemake?",
+    "concept": "maximize the number of used cores",
+    "variants": [
+     "loose_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [
+      "cores"
+     ],
+     "stem": [
+      "cores"
+     ]
+    },
+    "remaining": {
+     "loose": [
+      "maximize",
+      "number",
+      "used"
+     ],
+     "stem": [
+      "maximize",
+      "number",
+      "used"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "number",
+      "used"
+     ],
+     "stem": [
+      "maximize",
+      "number",
+      "used"
+     ]
+    },
+    "comment": "",
+    "passage": "Based on the provided passages, there is no information regarding the **nf-core framework**. Therefore, it is not possible to compare its parallelization strategies with Snakemake’s job sch [...] specific criteria:     1.  Prioritizing jobs with high priority [02_snakemake.pdf:0].     2.  Maximizing the number of cores used to increase parallelization [02_snakemake.pdf:0].     3.  Deleting temporary files as quickly as possible [02"
+   },
+   {
+    "row_id": "R194",
+    "label": "yes",
+    "question_id": "CD_016",
+    "strategy": "rlm_5",
+    "question": "Contrast the epidemiological findings of the 2022 Lumpy Skin Disease (LSD) outbreak in Nawalpur, Nepal, with the general disease characteristics and prevention strategies outlined in global systematic reviews.",
+    "concept": "neighboring farms having sick animals",
+    "variants": [
+     "loose_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "animals",
+      "farms",
+      "having",
+      "neighboring",
+      "sick"
+     ],
+     "stem": [
+      "animals",
+      "farms",
+      "having",
+      "neighboring",
+      "sick"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "animals",
+      "farms",
+      "neighboring",
+      "sick"
+     ],
+     "stem": [
+      "animals",
+      "farms",
+      "having",
+      "neighboring",
+      "sick"
+     ]
+    },
+    "comment": "",
+    "passage": "mortality) compared to Gaidakot municipality (11.53% morbidity, 0.72% mortality) [12][15]. The most affected animals were dry cattle, which had the highest morbidity at 47.62%, while cattle heifers and milking cattle recorded the highest mortality and case fatality rates [12][14][18]. Predominant clinical symptoms observed in case farms included skin nodules (97%), decreased milk production (87%), and lameness (55%) [2][13][16]. Risk factors id [...] d included importing animals from disease-prevalent regions, sharing feed and water troughs, and proximity to neighboring farms with sick animals [2][10][13].  Prior to the outbreak, the Nepalese government attempted to strengthen border quarantin"
+   },
+   {
+    "row_id": "R198",
+    "label": "yes",
+    "question_id": "CD_016",
+    "strategy": "rlm_5",
+    "question": "Contrast the epidemiological findings of the 2022 Lumpy Skin Disease (LSD) outbreak in Nawalpur, Nepal, with the general disease characteristics and prevention strategies outlined in global systematic reviews.",
+    "concept": "not yet vaccinated against LSD",
+    "variants": [
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [
+      "lsd"
+     ],
+     "stem": [
+      "lsd"
+     ]
+    },
+    "remaining": {
+     "loose": [
+      "against",
+      "vaccinated",
+      "yet"
+     ],
+     "stem": [
+      "against",
+      "vaccinated",
+      "yet"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "yet"
+     ],
+     "stem": [
+      "vaccinated",
+      "yet"
+     ]
+    },
+    "comment": "",
+    "passage": "## Epidemiological Findings and Global Contrast  The 2022 lumpy skin disease (LSD) outbreak in Nawalpur, Nepal, which occurred between August and December, resulted in an overall morbidity ra [...] treated with topical medications like potassium permanganate, antipyretics, and antibiotics [6]. Although LSD vaccination was approved by the government, it had not been implemented in the study area during the investigation [6]. R [...] orbidity and Mortality Rates *   **Contrast with India:** The Nawalpur study recorded a \"low mortality rate,\" yet Figure 4 shows that 16% of case farms reported animal deaths. This contrasts with findings from **Odisha, Ind"
+   },
+   {
+    "row_id": "R212",
+    "label": "yes",
+    "question_id": "CD_002",
+    "strategy": "rlm_10",
+    "question": "How does the 'all-in-one' preprocessing approach of fastp complement the visualization and quality control capabilities of MultiQC in a bioinformatics pipeline?",
+    "concept": "produced on a per-sample basis",
+    "variants": [
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "basis",
+      "produced",
+      "sample"
+     ],
+     "stem": [
+      "basis",
+      "produced",
+      "sample"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "sample"
+     ],
+     "stem": [
+      "produced",
+      "sample"
+     ]
+    },
+    "comment": "The caveat here is that there is no mention of fastp in the answer provided, but given it was a mix of comparing and putting together fastp and multiqc, these concept are real and exist in the answer because they belong to multiqc.",
+    "passage": "sing Integration  MultiQC complements bioinformatics preprocessing tools by addressing the limitations of per-sample log files, which are often time-consuming and error-prone to compile manually [1][2]. While the specific tool [...] ned in the provided text [Not found in source material], the document notes that most bioinformatics programs produce logs detailing their results [1][2]. MultiQC automates the quality control (QC) process by recursively search"
+   },
+   {
+    "row_id": "R226",
+    "label": "yes",
+    "question_id": "17_brucellosis_ethiopia_TE3",
+    "strategy": "rlm_20",
+    "question": "Describe the laboratory diagnostic sequence and the statistical methods used to identify significant risk factors for brucellosis in this study.",
+    "concept": "Two tests were used serially",
+    "variants": [
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [
+      "used"
+     ],
+     "stem": [
+      "used"
+     ]
+    },
+    "remaining": {
+     "loose": [
+      "serially",
+      "tests",
+      "two"
+     ],
+     "stem": [
+      "serially",
+      "tests",
+      "two"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "tests"
+     ],
+     "stem": [
+      "serially",
+      "tests"
+     ]
+    },
+    "comment": "",
+    "passage": "# Laboratory Diagnostic Sequence  The laboratory diagnostic sequence for brucellosis in this study followed a serial testing approach to maximize specificity and rule out false-positive results [7][11].   1.  **Sample Collection and P [...] 0°C for processing [2][8]. 2.  **Screening Step**: All animal and human serum samples were initially screened using the Rose Bengal Plate Test (RBPT) [2][3][6][8][9][10][12].      *   For camels, 30 μL of RBPT was used [3][6]"
+   },
+   {
+    "row_id": "R242",
+    "label": "yes",
+    "question_id": "SY_004",
+    "strategy": "rlm_10",
+    "question": "Based on the various stages of data processing described, what meta-conclusion can be drawn regarding the relationship between technical artifact removal and statistical reliability in high-throughput sequencing analysis?",
+    "concept": "avoids type-I errors",
+    "variants": [
+     "loose_Qall",
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "avoids",
+      "errors",
+      "i",
+      "type"
+     ],
+     "stem": [
+      "avoids",
+      "errors",
+      "i",
+      "type"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "avoids",
+      "errors",
+      "type"
+     ],
+     "stem": [
+      "avoids",
+      "errors",
+      "type"
+     ]
+    },
+    "comment": "",
+    "passage": "equencing data is inherently noisy, suffering from adapter contamination, base content biases, and sequencing errors [2]. Pre-processing tools like fastp are essential for \"clean data\" generation by performing quality control, [...] i (MAP) estimates [1][6]. This procedure shrinks noisy gene-wise estimates toward the trend line, which helps avoid false positives that can result from underestimating dispersion [2][6][7]. Unlike other methods like edgeR, w [...] raudulent.   --- ## Sources (from your corpus)  [1] 04_fastp.pdf, page 0: \"Document: OP-CBIO180574 884..890 | Type: paper  particu- larly for noninvasive prenatal testing (Bia...\" [2] 07_salmon.pdf, page 0: \"Document: Salmon"
+   }
+  ],
+  "dropped_not_stated": [
+   {
+    "row_id": "R013",
+    "label": "no",
+    "question_id": "04_fastp_TE3",
+    "strategy": "verified_pass",
+    "question": "How does fastp's methodology for adapter detection differ between single-end and paired-end sequencing data?",
+    "concept": "tree-based algorithm",
+    "variants": [
+     "loose_Qall",
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "algorithm",
+      "based",
+      "tree"
+     ],
+     "stem": [
+      "algorithm",
+      "based",
+      "tree"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "algorithm",
+      "based"
+     ],
+     "stem": [
+      "algorithm",
+      "based"
+     ]
+    },
+    "comment": "",
+    "passage": "Based on the provided passage, fastp uses different algorithms for adapter detection depending on the sequencing data type:  *   **Single-end data:** The algorithm utilizes"
+   },
+   {
+    "row_id": "R023",
+    "label": "no",
+    "question_id": "SY_006",
+    "strategy": "rlm_20",
+    "question": "Analyze how the choice of diagnostic methodology and specific assay thresholds influences the reported prevalence and epidemiological understanding of transboundary diseases.",
+    "concept": "threshold values 3 mm and 4 mm",
+    "variants": [
+     "loose_Qall",
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [
+      "threshold"
+     ],
+     "stem": [
+      "threshold"
+     ]
+    },
+    "remaining": {
+     "loose": [
+      "3",
+      "4",
+      "mm",
+      "values"
+     ],
+     "stem": [
+      "3",
+      "4",
+      "mm",
+      "values"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "3",
+      "4",
+      "values"
+     ],
+     "stem": [
+      "3",
+      "4",
+      "values"
+     ]
+    },
+    "comment": "",
+    "passage": "## Diagnostic Methodology: Serial Testing  Not found in source material.  ## Assay Thresholds: Interpretation Criteria  The provided documents describe the methodology for performing the Single Intraderm [...] s 'severe' interpretation thresholds influence reported prevalence is not found in the source material [1][2][3]. While the text includes references to studies that appraise interpretation criteria and evaluate the compar [...] ot found in source material. No content or chunks were provided to summarize regarding the analysis of PCR Ct values, viral shedding, or transmission potential across species.   --- ## Sources (from your corpus)  [1] 17_brucel [...] d between different poultry types and virus strains to evaluate the level of viral shedding...\" (unverified) [4] 14_bovine_tb_cameroon.pdf, page 0: \"Document: Veterinary World, EISSN: 2231-0916\b | Authors: Veterinary Worl"
+   },
+   {
+    "row_id": "R028",
+    "label": "no",
+    "question_id": "SY_006",
+    "strategy": "rlm_20",
+    "question": "Analyze how the choice of diagnostic methodology and specific assay thresholds influences the reported prevalence and epidemiological understanding of transboundary diseases.",
+    "concept": "Two tests were used serially",
+    "variants": [
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "serially",
+      "tests",
+      "two",
+      "used"
+     ],
+     "stem": [
+      "serially",
+      "tests",
+      "two",
+      "used"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "tests"
+     ],
+     "stem": [
+      "serially",
+      "tests",
+      "used"
+     ]
+    },
+    "comment": "",
+    "passage": "## Diagnostic Methodology: Serial Testing  Not found in source material.  ## Assay Thresholds: Interpretation Criteria  The provided documents describe [...] # Sources (from your corpus)  [1] 17_brucellosis_ethiopia.pdf, page 0: \"serum samples were initially screened using the Rose Bengal Plate Test (RBPT)... confirmed using a competitive enzyme-li...\" (unverified) [2] 14_bovine_t"
+   },
+   {
+    "row_id": "R029",
+    "label": "no",
+    "question_id": "SY_006",
+    "strategy": "rlm_20",
+    "question": "Analyze how the choice of diagnostic methodology and specific assay thresholds influences the reported prevalence and epidemiological understanding of transboundary diseases.",
+    "concept": "sensitivity and specificity tests used",
+    "variants": [
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": [
+      "specificity"
+     ]
+    },
+    "remaining": {
+     "loose": [
+      "sensitivity",
+      "specificity",
+      "tests",
+      "used"
+     ],
+     "stem": [
+      "sensitivity",
+      "tests",
+      "used"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "tests"
+     ],
+     "stem": [
+      "tests",
+      "used"
+     ]
+    },
+    "comment": "",
+    "passage": "## Diagnostic Methodology: Serial Testing  Not found in source material.  ## Assay Thresholds: Interpretation Criteria  The provided documents describe [...] ater based on an interpretation grid from the World Organization for Animal Health (WOAH) [1].   However, the specific information regarding how 'standard' versus 'severe' interpretation thresholds influence reported prevalence [...] # Sources (from your corpus)  [1] 17_brucellosis_ethiopia.pdf, page 0: \"serum samples were initially screened using the Rose Bengal Plate Test (RBPT)... confirmed using a competitive enzyme-li...\" (unverified) [2] 14_bovine_t"
+   },
+   {
+    "row_id": "R031",
+    "label": "no",
+    "question_id": "12_hpai_netherlands_TE3",
+    "strategy": "rlm_5",
+    "question": "How did the researchers define and calculate the Mortality Ratio (MR) metric used to assess early warning signals on the infected farms?",
+    "concept": "percentage of daily mortality",
+    "variants": [
+     "loose_Qall",
+     "loose_Qneed",
+     "stem_Qall",
+     "stem_Qneed"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [
+      "mortality"
+     ],
+     "stem": [
+      "mortality"
+     ]
+    },
+    "remaining": {
+     "loose": [
+      "daily",
+      "percentage"
+     ],
+     "stem": [
+      "daily",
+      "percentage"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "daily"
+     ],
+     "stem": [
+      "daily"
+     ]
+    },
+    "comment": "",
+    "passage": "## Mortality Ratio (MR) Definition and Calculation  The provided text mentions that researchers used a Mortality Ratio (MR [...] )  [1] 12_hpai_netherlands.pdf, page 0: \"The mortality ratio (MR) was calculated as the ratio of the observed daily mortality and the expected daily mortality (t...\" (unverified) [2] 12_hpai_netherlands.pdf, page 0: \"The thre"
+   },
+   {
+    "row_id": "R037",
+    "label": "no",
+    "question_id": "12_hpai_netherlands_TE3",
+    "strategy": "rlm_5",
+    "question": "How did the researchers define and calculate the Mortality Ratio (MR) metric used to assess early warning signals on the infected farms?",
+    "concept": "average mortality of the previous week",
+    "variants": [
+     "loose_Qall",
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [
+      "mortality"
+     ],
+     "stem": [
+      "mortality"
+     ]
+    },
+    "remaining": {
+     "loose": [
+      "average",
+      "previous",
+      "week"
+     ],
+     "stem": [
+      "average",
+      "previous",
+      "week"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "average",
+      "previous"
+     ],
+     "stem": [
+      "average",
+      "previous"
+     ]
+    },
+    "comment": "The answer provided mentione MR>3, but not the fact that dutch leglislation requires notification when dailyu mortality is 3 times higher the average mortaility of the previous week for two consecutive days.",
+    "passage": "## Mortality Ratio (MR) Definition and Calculation  The provided text mentions that researchers used a Mortality Ratio (MR [...] daily mortality (t...\" (unverified) [2] 12_hpai_netherlands.pdf, page 0: \"The threshold was calculated as the average daily mortality of the previous 7 days plus 3 times the standard deviation (...\" (unverified) [3] 12_hpai_netherlands.pdf, page 0: \"An EWS wa"
+   },
+   {
+    "row_id": "R053",
+    "label": "no",
+    "question_id": "CD_014",
+    "strategy": "verified_pass",
+    "question": "How do the risk factors identified for brucellosis in Ethiopian camels and small ruminants compare to the risk factors for Peste des petits ruminants (PPR) in the same region?",
+    "concept": "8.3 times higher in gifted small ruminants",
+    "variants": [
+     "loose_Qall",
+     "loose_Qneed",
+     "stem_Qall",
+     "stem_Qneed"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [
+      "ruminants",
+      "small"
+     ],
+     "stem": [
+      "ruminants",
+      "small"
+     ]
+    },
+    "remaining": {
+     "loose": [
+      "8.3",
+      "gifted",
+      "higher",
+      "times"
+     ],
+     "stem": [
+      "8.3",
+      "gifted",
+      "higher",
+      "times"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "higher",
+      "times"
+     ],
+     "stem": [
+      "higher",
+      "times"
+     ]
+    },
+    "comment": "",
+    "passage": "Based on the provided passages, the risk factors for brucellosis and Peste des petits ruminants (PPR) in Ethiopian livestock share similarities regarding animal movement and flock size, but differ in their [...] brucellosis [17_brucellosis_ethiopia.pdf:0]. For PPR, goats and sheep raised in medium-sized flocks exhibited higher seropositivity rates [16_ppr_ethiopia.pdf:0].  ### Distinct Risk Factors *   **Reproductive Status (Brucellos [...] actor for brucellosis in the provided text, it is a significant risk factor for PPR. Older animals have a 7.3 times higher likelihood of being seropositive for PPRV compared to adult small ruminants [16_ppr_ethiopia.pdf:0]. *   **Species Sensitivity (PPR):** For PPR, some research indicates higher"
+   },
+   {
+    "row_id": "R058",
+    "label": "no",
+    "question_id": "SY_002",
+    "strategy": "verified_pass",
+    "question": "How do the collective methodologies across Sarek, Snakemake, nf-core, and MultiQC redefine the concept of 'quality control' from a single-sample metric to a system-wide diagnostic process?",
+    "concept": "quality control (QC) reporting",
+    "variants": [
+     "stem_Qall",
+     "stem_Qneed"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [
+      "control",
+      "quality"
+     ],
+     "stem": [
+      "control",
+      "quality"
+     ]
+    },
+    "remaining": {
+     "loose": [
+      "qc",
+      "reporting"
+     ],
+     "stem": [
+      "qc",
+      "reporting"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [],
+     "stem": [
+      "reporting"
+     ]
+    },
+    "comment": "",
+    "passage": "gh information to explain how the collective methodologies of Sarek, Snakemake, nf-core, and MultiQC redefine quality control. The retrieved text only contains information regarding **MultiQC**.  According to the available documentatio [...] **MultiQC** is designed to summarize analysis results from multiple tools and multiple samples into a single report [05_multiqc.pdf:0].  The provided text does not mention Sarek, Snakemake, or nf-core, nor does it discuss the"
+   },
+   {
+    "row_id": "R090",
+    "label": "no",
+    "question_id": "04_fastp_CO2",
+    "strategy": "rlm_20",
+    "question": "What design choices and implementation strategies allow fastp to achieve higher performance and lower I/O overhead than traditional FASTQ tools?",
+    "concept": "2–5 times faster",
+    "variants": [
+     "loose_Qall",
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "2",
+      "5",
+      "faster",
+      "times"
+     ],
+     "stem": [
+      "2",
+      "5",
+      "faster",
+      "times"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "2",
+      "faster",
+      "times"
+     ],
+     "stem": [
+      "2",
+      "faster",
+      "times"
+     ]
+    },
+    "comment": "",
+    "passage": "head is the \"all-in-one\" processing flow, which performs all operations with a single scan of the FASTQ data [2][7][10][14][20]. This approach avoids the inefficiency of traditional workflows where multiple tools (such as FASTQC, Cutadapt, and Trimmomatic) are used in sequence, requiring the data to be read and loaded multiple times [7][8][14][15][18].  The multi-threading architecture of `fastp` utilizes a thread pool where reads are packe [...] [1] 04_fastp.pdf, page 0: \"Document: OP-CBIO180574 884..890 | Type: paper  fastp is approximately 2.7 times faster than umis and about 6.1 times fa...\" [2] 04_fastp.pdf, page 0: \"Document: OP-CBIO180574 884..890 | Type: pape"
+   },
+   {
+    "row_id": "R102",
+    "label": "no",
+    "question_id": "SY_001",
+    "strategy": "rlm_10",
+    "question": "Based on the development of Sarek, Snakemake, nf-core, and fastp, what is the emerging meta-strategy for balancing high-performance computational efficiency with scientific reproducibility in large-scale genomics?",
+    "concept": "reduces the needed CPU hours by 66%",
+    "variants": [
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "66",
+      "cpu",
+      "hours",
+      "needed",
+      "reduces"
+     ],
+     "stem": [
+      "66",
+      "cpu",
+      "hours",
+      "needed",
+      "reduces"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "cpu",
+      "hours",
+      "reduces"
+     ],
+     "stem": [
+      "cpu",
+      "hours",
+      "needed",
+      "reduces"
+     ]
+    },
+    "comment": "",
+    "passage": "scatter-gather approach, which divides the genome into smaller chunks for parallel processing across multiple CPU cores, significantly reducing wall-clock runtime [13]. The workflow also includes robust error reporting and the ability to restart incompl [...] rated strategy allows Sarek to provide fast, reproducible results—processing 90X WGS data in approximately 48 hours—while remaining flexible for user modifications [8][24].  ## Synthesis of Genomics Meta-Strategy  Based on th [...] ws users to choose between various state-of-the-art tools (like Manta, Mutect2, and FreeBayes) to balance the need for sensitivity versus precision in different research contexts [Chunk 1, 3, 17].  In summary, Sarek’s meta-s"
+   },
+   {
+    "row_id": "R105",
+    "label": "no",
+    "question_id": "SY_001",
+    "strategy": "rlm_10",
+    "question": "Based on the development of Sarek, Snakemake, nf-core, and fastp, what is the emerging meta-strategy for balancing high-performance computational efficiency with scientific reproducibility in large-scale genomics?",
+    "concept": "2–5 times faster",
+    "variants": [
+     "loose_Qall",
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "2",
+      "5",
+      "faster",
+      "times"
+     ],
+     "stem": [
+      "2",
+      "5",
+      "faster",
+      "times"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "2",
+      "5",
+      "times"
+     ],
+     "stem": [
+      "2",
+      "5",
+      "times"
+     ]
+    },
+    "comment": "",
+    "passage": "eproducibility is maintained by managing all software dependencies through Conda, Docker, and Singularity [1][2][13]. Tools are initially installed in Conda and then pushed to DockerHub, ensuring they are accessible acros [...] files are stored centrally, allowing for \"robust portability\" across different compute environments [Chunk 4, 5]. *   **Quality Control:** Being part of nf-core means the pipeline is community-tested and well-documented, [...] d portability as first-class citizens**, using Nextflow and containerization to ensure that \"human management time\" is minimized while scientific output remains strictly reproducible.  ## Technical Implementation of the Meta"
+   },
+   {
+    "row_id": "R110",
+    "label": "no",
+    "question_id": "CD_012",
+    "strategy": "rlm_5",
+    "question": "How do the challenges of disease control identified in the Serengeti rabies vaccination campaigns relate to the vaccine efficacy findings for Lumpy Skin Disease (LSD)?",
+    "concept": "reaching 50% in 2022",
+    "variants": [
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "2022",
+      "50",
+      "reaching"
+     ],
+     "stem": [
+      "2022",
+      "50",
+      "reaching"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "2022"
+     ],
+     "stem": [
+      "2022",
+      "reaching"
+     ]
+    },
+    "comment": "",
+    "passage": "ocument states that vaccination is an imperative control measure to mitigate economic impacts (Dhakal et al., 2022). It emphasizes that a vaccine coverage level exceeding 80% in susceptible populations is necessary to preven [...] stics of the Lumpy Skin Disease Outbreak in Nawalpur, Nepal, 2022 | Authors: Epidemi...\"  --- *Note: Analysis reached turn limit. Results may be incomplete.*"
+   },
+   {
+    "row_id": "R156",
+    "label": "no",
+    "question_id": "SY_009",
+    "strategy": "single_pass",
+    "question": "Identify the gaps in translating standardized, large-scale genomic workflows into the context of rapid, localized veterinary outbreak characterization based on current literature.",
+    "concept": "limited scope of surveillance",
+    "variants": [
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "limited",
+      "scope",
+      "surveillance"
+     ],
+     "stem": [
+      "limited",
+      "scope",
+      "surveillance"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "surveillance"
+     ],
+     "stem": [
+      "limited",
+      "surveillance"
+     ]
+    },
+    "comment": "",
+    "passage": "y, though it does not specifically mention genomic workflow translation [18_fmd_review.pdf:0]. *   **Data and surveillance gaps:** In the context of rabies control, researchers note that the impact of vaccination heterogeneity on disease incidence is rarely quantified in real systems, likely due to a \"lack of fine-scale data\" and the limitations of \"coarsely aggregated data\" [15_rabies_tanzania.pdf:0]. *   **Genetic analysis in outbreaks:** While geneti"
+   },
+   {
+    "row_id": "R165",
+    "label": "no",
+    "question_id": "03_nfcore_framework_TE3",
+    "strategy": "rlm_20",
+    "question": "Based on the benchmarking of mapping processes, what was the numerical impact of input sharding on median runtime, and at what point was the maximum efficiency plateau reached?",
+    "concept": "median runtime to 37%",
+    "variants": [
+     "loose_Qall",
+     "loose_Qneed",
+     "stem_Qall",
+     "stem_Qneed"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [
+      "median",
+      "runtime"
+     ],
+     "stem": [
+      "median",
+      "runtime"
+     ]
+    },
+    "remaining": {
+     "loose": [
+      "37"
+     ],
+     "stem": [
+      "37"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [],
+     "stem": []
+    },
+    "comment": "",
+    "passage": "## Impact of Input Sharding on Mapping Runtime  Benchmarking of the mapping process in the nf-core/sarek framework showed that input sharding significantly reduces runtime. Specifically, the median runtime for the mapping process was reduced from 104.5 minutes to 11.5 minutes, representing a 9.1-fold reduc"
+   },
+   {
+    "row_id": "R182",
+    "label": "no",
+    "question_id": "07_salmon_FR1",
+    "strategy": "verified_pass",
+    "question": "By what percentage range was Salmon's sensitivity higher in differential expression testing compared to other tools at the same False Discovery Rates (FDRs)?",
+    "concept": "kallisto’s estimates",
+    "variants": [
+     "loose_Qall",
+     "loose_Qneed",
+     "stem_Qall",
+     "stem_Qneed"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [
+      "s"
+     ],
+     "stem": [
+      "s"
+     ]
+    },
+    "remaining": {
+     "loose": [
+      "estimates",
+      "kallisto"
+     ],
+     "stem": [
+      "estimates",
+      "kallisto"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "kallisto"
+     ],
+     "stem": [
+      "kallisto"
+     ]
+    },
+    "comment": "",
+    "passage": "provided passages, there is not enough information to determine the specific percentage range by which Salmon's sensitivity was higher in differential expression testing compared to other tools.  While the documents state that Salmon \"typically outperforms both kallisto and eXpress in terms of accuracy\" [07_salmon.pdf:0] and yields \"improved inter-replicate concordance\" when us"
+   },
+   {
+    "row_id": "R186",
+    "label": "no",
+    "question_id": "10_cutadapt_FR1",
+    "strategy": "single_pass",
+    "question": "What unique capability does Cutadapt offer compared to other standalone tools in the context of read trimming?",
+    "concept": "correctly trim colour-space reads",
+    "variants": [
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [
+      "reads"
+     ],
+     "stem": [
+      "reads",
+      "trim"
+     ]
+    },
+    "remaining": {
+     "loose": [
+      "colour",
+      "correctly",
+      "space",
+      "trim"
+     ],
+     "stem": [
+      "colour",
+      "correctly",
+      "space"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "colour",
+      "space"
+     ],
+     "stem": [
+      "colour",
+      "space"
+     ]
+    },
+    "comment": "The answer talk about using colour space reads, but no mention that it can correctly trim reads based on that feature",
+    "passage": "Based on the provided passages, Cutadapt offers several specific capabilities compared to other standalone trimming tools like Vectorstrip:  *   **Colour-space support:** Cutadapt supports colour-space data (SOLiD), a feature that was notably absent from previous solut [...] ed repeatedly [10_cutadapt.pdf:0]. *   **Specific algorithm modifications:** To prevent the removal of entire reads due to short random matches at the beginning, Cutadapt utilizes a modified alignment approach that penalizes"
+   },
+   {
+    "row_id": "R207",
+    "label": "no",
+    "question_id": "CD_002",
+    "strategy": "rlm_10",
+    "question": "How does the 'all-in-one' preprocessing approach of fastp complement the visualization and quality control capabilities of MultiQC in a bioinformatics pipeline?",
+    "concept": "single scan of the FASTQ data",
+    "variants": [
+     "loose_Qall",
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "data",
+      "fastq",
+      "scan",
+      "single"
+     ],
+     "stem": [
+      "data",
+      "fastq",
+      "scan",
+      "single"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "data",
+      "scan",
+      "single"
+     ],
+     "stem": [
+      "data",
+      "scan",
+      "single"
+     ]
+    },
+    "comment": "",
+    "passage": "(QC) process by recursively searching directories for these recognized log files and reports, aggregating the data into a single, centralized summary [2][3]. This allows researchers to identify global trends, batch effects, and outlier sa [...] for multiple tools and samples into a single report, Visualizes global trends and biases across project data, Scans directories recursively for log files and QC reports, Interactive and resizeable plots using HighCharts, Supp"
+   },
+   {
+    "row_id": "R209",
+    "label": "no",
+    "question_id": "CD_002",
+    "strategy": "rlm_10",
+    "question": "How does the 'all-in-one' preprocessing approach of fastp complement the visualization and quality control capabilities of MultiQC in a bioinformatics pipeline?",
+    "concept": "pre- and post-filtered data",
+    "variants": [
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "data",
+      "filtered",
+      "post",
+      "pre"
+     ],
+     "stem": [
+      "data",
+      "filtered",
+      "post",
+      "pre"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "data",
+      "post"
+     ],
+     "stem": [
+      "data",
+      "filtered",
+      "post"
+     ]
+    },
+    "comment": "",
+    "passage": "(QC) process by recursively searching directories for these recognized log files and reports, aggregating the data into a single, centralized summary [2][3]. This allows researchers to identify global trends, batch effects, [...] ML report, parsed data can be exported as tab-delimited text, YAML, or JSON files for downstream analysis and post-processing [3][4]. *   **Customization:** Reports can be branded using templates, and plots can be exported i [...] such as **tab-delimited text, YAML, or JSON**. This allows the output to be used for post-processing, dataset filtering, or integration into databases and LIMS (Laboratory Information Management Systems).  By acting as a \"central"
+   },
+   {
+    "row_id": "R222",
+    "label": "no",
+    "question_id": "SY_003",
+    "strategy": "multi_hop",
+    "question": "How does the corpus demonstrate an evolution from localized tool optimization to systemic computational efficiency across different layers of the bioinformatics stack?",
+    "concept": "70% cost reduction",
+    "variants": [
+     "loose_Qall",
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "70",
+      "cost",
+      "reduction"
+     ],
+     "stem": [
+      "70",
+      "cost",
+      "reduction"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [
+      "cost",
+      "reduction"
+     ],
+     "stem": [
+      "cost",
+      "reduction"
+     ]
+    },
+    "comment": "The value reported in there is either hallucinated or completely misunderstood from the blocks of text evaluated by the LLM.",
+    "passage": "rated, containerized workflows (like nf-core/sarek) managed by Nextflow. This shift is characterized by a 69% reduction in compute costs (down to $20 per sample for WGS), the ability to perform population-scale recomputing on commercial clouds, a"
+   },
+   {
+    "row_id": "R239",
+    "label": "no",
+    "question_id": "SY_004",
+    "strategy": "rlm_10",
+    "question": "Based on the various stages of data processing described, what meta-conclusion can be drawn regarding the relationship between technical artifact removal and statistical reliability in high-throughput sequencing analysis?",
+    "concept": "batch effect detection",
+    "variants": [
+     "stem_Qall"
+    ],
+    "no_remaining": {
+     "loose": false,
+     "stem": false
+    },
+    "removed": {
+     "loose": [],
+     "stem": []
+    },
+    "remaining": {
+     "loose": [
+      "batch",
+      "detection",
+      "effect"
+     ],
+     "stem": [
+      "batch",
+      "detection",
+      "effect"
+     ]
+    },
+    "remaining_in_answer": {
+     "loose": [],
+     "stem": [
+      "detection",
+      "effect"
+     ]
+    },
+    "comment": "",
+    "passage": "in a single scan [2]. This stage is critical for eliminating false positives and negatives, particularly when detecting ultra-low mutation allele frequencies (MAF) in liquid biopsies, where technical noise can easily obscure real [...] Salmon addresses these by learning sample-specific parameters during its online phase and re-estimating the \"effective length\" of transcripts [4][5]. This bias-aware quantification is a prerequisite for accurate expression estim"
+   }
+  ],
+  "added": [],
+  "summary": {
+   "loose_Qall": {
+    "lost_stated_a": 24,
+    "lost_stated_b": 19,
+    "lost_stated_rule_only": 14,
+    "lost_stated_removal": 5,
+    "dropped_not_stated_a": 11,
+    "dropped_not_stated_b": 11,
+    "dropped_not_stated_rule_only": 5,
+    "dropped_not_stated_removal": 6,
+    "lost_stated_no_remaining": 5
+   },
+   "loose_Qneed": {
+    "lost_stated_a": 7,
+    "lost_stated_b": 2,
+    "lost_stated_removal": 2,
+    "dropped_not_stated_a": 4,
+    "dropped_not_stated_b": 4,
+    "dropped_not_stated_removal": 4,
+    "lost_stated_no_remaining": 5
+   },
+   "stem_Qall": {
+    "lost_stated_a": 27,
+    "lost_stated_b": 22,
+    "lost_stated_rule_only": 13,
+    "lost_stated_removal": 9,
+    "dropped_not_stated_a": 20,
+    "dropped_not_stated_b": 20,
+    "dropped_not_stated_rule_only": 11,
+    "dropped_not_stated_removal": 9,
+    "lost_stated_no_remaining": 5
+   },
+   "stem_Qneed": {
+    "lost_stated_a": 10,
+    "lost_stated_b": 5,
+    "lost_stated_removal": 5,
+    "dropped_not_stated_a": 5,
+    "dropped_not_stated_b": 5,
+    "dropped_not_stated_removal": 5,
+    "lost_stated_no_remaining": 5
+   }
+  }
+ },
+ "M3_free_credit": {
+  "counts": {
+   "concepts": 1191,
+   "questions": 205,
+   "exact": 18,
+   "loose": 77,
+   "stem": 85,
+   "loose_Qall": 0,
+   "loose_Qneed": 0,
+   "stem_Qall": 0,
+   "stem_Qneed": 0
+  },
+  "no_remaining": {
+   "loose": [
+    {
+     "question_id": "01_sarek_FR1",
+     "concept": "BAM files, annotated VCF files and CNV files",
+     "content_words": [
+      "annotated",
+      "bam",
+      "cnv",
+      "files",
+      "vcf"
+     ],
+     "question": "What is the total storage capacity required for the resulting BAM, annotated VCF, and CNV files for a 90x/90x tumor/normal WGS dataset processed by Sarek?"
+    },
+    {
+     "question_id": "06_star_aligner_FR1",
+     "concept": "12-core server",
+     "content_words": [
+      "12",
+      "core",
+      "server"
+     ],
+     "question": "What is the reported mapping speed of STAR when using a 12-core server for 2 x 76 bp paired-end reads, and how does this compare to other aligners?"
+    },
+    {
+     "question_id": "10_cutadapt_TE3",
+     "concept": "2.66 GHz Intel Core 2 processor",
+     "content_words": [
+      "2",
+      "2.66",
+      "core",
+      "ghz",
+      "intel",
+      "processor"
+     ],
+     "question": "What are the specific performance metrics for Cutadapt when processing 35 bp colour-space reads with an 18 bp adapter on a 2.66 GHz Intel Core 2 processor?"
+    },
+    {
+     "question_id": "10_cutadapt_TE3",
+     "concept": "35 bp colour-space reads",
+     "content_words": [
+      "35",
+      "bp",
+      "colour",
+      "reads",
+      "space"
+     ],
+     "question": "What are the specific performance metrics for Cutadapt when processing 35 bp colour-space reads with an 18 bp adapter on a 2.66 GHz Intel Core 2 processor?"
+    },
+    {
+     "question_id": "13_lsd_nepal_FR1",
+     "concept": "overall morbidity rate",
+     "content_words": [
+      "morbidity",
+      "overall",
+      "rate"
+     ],
+     "question": "What were the overall morbidity, mortality, and case fatality rates recorded during the LSD outbreak in the study area?"
+    },
+    {
+     "question_id": "13_lsd_nepal_FR1",
+     "concept": "mortality rate",
+     "content_words": [
+      "mortality",
+      "rate"
+     ],
+     "question": "What were the overall morbidity, mortality, and case fatality rates recorded during the LSD outbreak in the study area?"
+    },
+    {
+     "question_id": "13_lsd_nepal_FR1",
+     "concept": "case fatality rate",
+     "content_words": [
+      "case",
+      "fatality",
+      "rate"
+     ],
+     "question": "What were the overall morbidity, mortality, and case fatality rates recorded during the LSD outbreak in the study area?"
+    },
+    {
+     "question_id": "13_lsd_nepal_TE3",
+     "concept": "Multivariable logistic regression analysis",
+     "content_words": [
+      "analysis",
+      "logistic",
+      "multivariable",
+      "regression"
+     ],
+     "question": "According to the multivariable logistic regression analysis, what was identified as the most significant risk factor for LSD transmission and what were its associated statistical metrics?"
+    },
+    {
+     "question_id": "16_ppr_ethiopia_TE3",
+     "concept": "purchased animals",
+     "content_words": [
+      "animals",
+      "purchased"
+     ],
+     "question": "Using the multivariable logistic regression results, how do animal age and origin (gifted or purchased) quantify the risk of PPR seropositivity in nonvaccinated animals?"
+    },
+    {
+     "question_id": "18_fmd_review_CO2",
+     "concept": "no FMDV carrier state in pigs",
+     "content_words": [
+      "carrier",
+      "fmdv",
+      "pigs",
+      "state"
+     ],
+     "question": "How does the FMDV 'carrier state' differ between pigs and ruminants, and what biological evidence challenges the historical 28-day threshold for this state?"
+    },
+    {
+     "question_id": "19_hpai_canada_FR1",
+     "concept": "culled in Canada",
+     "content_words": [
+      "canada",
+      "culled"
+     ],
+     "question": "According to the epidemiological review of the 2022 H5N1 outbreak, how many birds were culled in Canada?"
+    },
+    {
+     "question_id": "20_lsd_review_TE3",
+     "concept": "cross-protection rate",
+     "content_words": [
+      "cross",
+      "protection",
+      "rate"
+     ],
+     "question": "According to the comparative analysis of vaccinations, what is the specific cross-protection rate between LSDV and related poxviruses, and which viruses are involved?"
+    },
+    {
+     "question_id": "21_livestock_gut_microbiome_review_FR1",
+     "concept": "most abundant phyla",
+     "content_words": [
+      "abundant",
+      "most",
+      "phyla"
+     ],
+     "question": "In cattle, which two bacterial phyla are the most abundant and what percentage of the gastrointestinal tract bacterial community can they represent?"
+    },
+    {
+     "question_id": "26_gut_meat_quality_TE3",
+     "concept": "finishing weight",
+     "content_words": [
+      "finishing",
+      "weight"
+     ],
+     "question": "What metric is used to quantify the impact of the gut microbiome on rabbit finishing weight, and which specific host genes are highlighted as part of the microbial-influenced pathway for intramuscular fat accumulation?"
+    },
+    {
+     "question_id": "29_16s_best_practices_FR1",
+     "concept": "raw read number target",
+     "content_words": [
+      "number",
+      "raw",
+      "read",
+      "target"
+     ],
+     "question": "What is the recommended target for raw read numbers per sample when starting a 16S rRNA gene sequencing study without prior pilot data?"
+    },
+    {
+     "question_id": "31_amr_one_health_FR1",
+     "concept": "classified as innovative",
+     "content_words": [
+      "classified",
+      "innovative"
+     ],
+     "question": "According to the World Health Organization's 2019 data, how many of the 32 antimicrobials in hospital development were classified as innovative?"
+    },
+    {
+     "question_id": "31_amr_one_health_FR1",
+     "concept": "32 antimicrobials in hospital development",
+     "content_words": [
+      "32",
+      "antimicrobials",
+      "development",
+      "hospital"
+     ],
+     "question": "According to the World Health Organization's 2019 data, how many of the 32 antimicrobials in hospital development were classified as innovative?"
+    },
+    {
+     "question_id": "31_amr_one_health_FR1",
+     "concept": "In 2019",
+     "content_words": [
+      "2019"
+     ],
+     "question": "According to the World Health Organization's 2019 data, how many of the 32 antimicrobials in hospital development were classified as innovative?"
+    },
+    {
+     "question_id": "31_amr_one_health_TE3",
+     "concept": "third- and fourth generation cephalosporins",
+     "content_words": [
+      "cephalosporins",
+      "fourth",
+      "generation",
+      "third"
+     ],
+     "question": "Compare the recorded usage in tons of fluoroquinolones and third- and fourth-generation cephalosporins in animals between Europe (2017) and the USA (2018)."
+    },
+    {
+     "question_id": "32_amr_livestock_environment_FR1",
+     "concept": "if current trends continue",
+     "content_words": [
+      "continue",
+      "current",
+      "if",
+      "trends"
+     ],
+     "question": "What is the projected annual human mortality rate associated with antimicrobial resistance by the year 2050 if current trends continue?"
+    },
+    {
+     "question_id": "32_amr_livestock_environment_FR1",
+     "concept": "by 2050",
+     "content_words": [
+      "2050"
+     ],
+     "question": "What is the projected annual human mortality rate associated with antimicrobial resistance by the year 2050 if current trends continue?"
+    },
+    {
+     "question_id": "32_amr_livestock_environment_TE3",
+     "concept": "2020 to 2030",
+     "content_words": [
+      "2020",
+      "2030"
+     ],
+     "question": "Based on statistical modeling estimates, what was the estimated global antimicrobial usage in livestock for 2020 and what is the projected usage for 2030?"
+    },
+    {
+     "question_id": "33_amr_food_animals_FR1",
+     "concept": "not absorbed by the animals",
+     "content_words": [
+      "absorbed",
+      "animals"
+     ],
+     "question": "What percentage of antibiotics administered to food animals is estimated to be excreted without being absorbed, and through what primary mediums does this occur?"
+    },
+    {
+     "question_id": "35_isse_framework_amr_FR1",
+     "concept": "five evaluation levels",
+     "content_words": [
+      "evaluation",
+      "five",
+      "levels"
+     ],
+     "question": "What are the five distinct levels of evaluation defined in the Integrated Surveillance System Evaluation (ISSE) framework?"
+    },
+    {
+     "question_id": "37_data_driven_one_health_TE3",
+     "concept": "Mollentze et al.",
+     "content_words": [
+      "al",
+      "et",
+      "mollentze"
+     ],
+     "question": "Regarding the machine learning modeling referenced from Mollentze et al., what features were used for zoonotic risk prediction and what was the reported accuracy for high-potential viruses?"
+    },
+    {
+     "question_id": "38_one_health_africa_TE3",
+     "concept": "low- and middle-income countries",
+     "content_words": [
+      "countries",
+      "income",
+      "low",
+      "middle"
+     ],
+     "question": "According to the disease burden metrics provided, what percentages of existing and emerging infectious diseases in humans are zoonotic, and what is the resulting impact in low- and middle-income countries?"
+    },
+    {
+     "question_id": "40_animal_agriculture_one_health_FR1",
+     "concept": "zoonotic",
+     "content_words": [
+      "zoonotic"
+     ],
+     "question": "What percentage of all human pathogens and emerging diseases affecting humans are estimated to be zoonotic in origin?"
+    },
+    {
+     "question_id": "40_animal_agriculture_one_health_TE3",
+     "concept": "by 2050",
+     "content_words": [
+      "2050"
+     ],
+     "question": "Based on the paper's findings, what are the specific projected global health and economic impacts of antimicrobial resistance (AMR) by the year 2050?"
+    },
+    {
+     "question_id": "45_kenya_amr_digital_TE3",
+     "concept": "Of the 17 surveillance sites",
+     "content_words": [
+      "17",
+      "sites",
+      "surveillance"
+     ],
+     "question": "What are the three specific methods used by the 17 human health surveillance sites to submit data to the system, and what is the percentage breakdown for each method?"
+    },
+    {
+     "question_id": "48_myc_oncogene_FR1",
+     "concept": "MYC-induced and repressed genes",
+     "content_words": [
+      "genes",
+      "induced",
+      "myc",
+      "repressed"
+     ],
+     "question": "How many primary MYC-induced and repressed genes were identified via RNA-seq following a 16-hour inactivation of MYC?"
+    },
+    {
+     "question_id": "48_myc_oncogene_FR1",
+     "concept": "16 hours",
+     "content_words": [
+      "16",
+      "hours"
+     ],
+     "question": "How many primary MYC-induced and repressed genes were identified via RNA-seq following a 16-hour inactivation of MYC?"
+    },
+    {
+     "question_id": "50_4cseq_protocol_FR1",
+     "concept": "reproducible 4C profiles",
+     "content_words": [
+      "4c",
+      "profiles",
+      "reproducible"
+     ],
+     "question": "According to the paper's subsampling analysis, what is the minimum number of cis-mapped reads required to generate reproducible 4C profiles?"
+    },
+    {
+     "question_id": "50_4cseq_protocol_FR1",
+     "concept": "Subsampling analysis",
+     "content_words": [
+      "analysis",
+      "subsampling"
+     ],
+     "question": "According to the paper's subsampling analysis, what is the minimum number of cis-mapped reads required to generate reproducible 4C profiles?"
+    },
+    {
+     "question_id": "50_4cseq_protocol_TE3",
+     "concept": "motifPosperc",
+     "content_words": [
+      "motifposperc"
+     ],
+     "question": "What is the function of the 'motifPosperc' metric within the pipe4C data processing pipeline, and what value indicates high specificity?"
+    }
+   ],
+   "stem": [
+    {
+     "question_id": "01_sarek_FR1",
+     "concept": "BAM files, annotated VCF files and CNV files",
+     "content_words": [
+      "annotated",
+      "bam",
+      "cnv",
+      "files",
+      "vcf"
+     ],
+     "question": "What is the total storage capacity required for the resulting BAM, annotated VCF, and CNV files for a 90x/90x tumor/normal WGS dataset processed by Sarek?"
+    },
+    {
+     "question_id": "06_star_aligner_FR1",
+     "concept": "12-core server",
+     "content_words": [
+      "12",
+      "core",
+      "server"
+     ],
+     "question": "What is the reported mapping speed of STAR when using a 12-core server for 2 x 76 bp paired-end reads, and how does this compare to other aligners?"
+    },
+    {
+     "question_id": "10_cutadapt_TE3",
+     "concept": "2.66 GHz Intel Core 2 processor",
+     "content_words": [
+      "2",
+      "2.66",
+      "core",
+      "ghz",
+      "intel",
+      "processor"
+     ],
+     "question": "What are the specific performance metrics for Cutadapt when processing 35 bp colour-space reads with an 18 bp adapter on a 2.66 GHz Intel Core 2 processor?"
+    },
+    {
+     "question_id": "10_cutadapt_TE3",
+     "concept": "35 bp colour-space reads",
+     "content_words": [
+      "35",
+      "bp",
+      "colour",
+      "reads",
+      "space"
+     ],
+     "question": "What are the specific performance metrics for Cutadapt when processing 35 bp colour-space reads with an 18 bp adapter on a 2.66 GHz Intel Core 2 processor?"
+    },
+    {
+     "question_id": "13_lsd_nepal_FR1",
+     "concept": "overall morbidity rate",
+     "content_words": [
+      "morbidity",
+      "overall",
+      "rate"
+     ],
+     "question": "What were the overall morbidity, mortality, and case fatality rates recorded during the LSD outbreak in the study area?"
+    },
+    {
+     "question_id": "13_lsd_nepal_FR1",
+     "concept": "mortality rate",
+     "content_words": [
+      "mortality",
+      "rate"
+     ],
+     "question": "What were the overall morbidity, mortality, and case fatality rates recorded during the LSD outbreak in the study area?"
+    },
+    {
+     "question_id": "13_lsd_nepal_FR1",
+     "concept": "case fatality rate",
+     "content_words": [
+      "case",
+      "fatality",
+      "rate"
+     ],
+     "question": "What were the overall morbidity, mortality, and case fatality rates recorded during the LSD outbreak in the study area?"
+    },
+    {
+     "question_id": "13_lsd_nepal_TE3",
+     "concept": "Multivariable logistic regression analysis",
+     "content_words": [
+      "analysis",
+      "logistic",
+      "multivariable",
+      "regression"
+     ],
+     "question": "According to the multivariable logistic regression analysis, what was identified as the most significant risk factor for LSD transmission and what were its associated statistical metrics?"
+    },
+    {
+     "question_id": "16_ppr_ethiopia_TE3",
+     "concept": "purchased animals",
+     "content_words": [
+      "animals",
+      "purchased"
+     ],
+     "question": "Using the multivariable logistic regression results, how do animal age and origin (gifted or purchased) quantify the risk of PPR seropositivity in nonvaccinated animals?"
+    },
+    {
+     "question_id": "18_fmd_review_CO2",
+     "concept": "no FMDV carrier state in pigs",
+     "content_words": [
+      "carrier",
+      "fmdv",
+      "pigs",
+      "state"
+     ],
+     "question": "How does the FMDV 'carrier state' differ between pigs and ruminants, and what biological evidence challenges the historical 28-day threshold for this state?"
+    },
+    {
+     "question_id": "19_hpai_canada_FR1",
+     "concept": "culled in Canada",
+     "content_words": [
+      "canada",
+      "culled"
+     ],
+     "question": "According to the epidemiological review of the 2022 H5N1 outbreak, how many birds were culled in Canada?"
+    },
+    {
+     "question_id": "20_lsd_review_TE3",
+     "concept": "cross-protection rate",
+     "content_words": [
+      "cross",
+      "protection",
+      "rate"
+     ],
+     "question": "According to the comparative analysis of vaccinations, what is the specific cross-protection rate between LSDV and related poxviruses, and which viruses are involved?"
+    },
+    {
+     "question_id": "21_livestock_gut_microbiome_review_FR1",
+     "concept": "most abundant phyla",
+     "content_words": [
+      "abundant",
+      "most",
+      "phyla"
+     ],
+     "question": "In cattle, which two bacterial phyla are the most abundant and what percentage of the gastrointestinal tract bacterial community can they represent?"
+    },
+    {
+     "question_id": "26_gut_meat_quality_TE3",
+     "concept": "finishing weight",
+     "content_words": [
+      "finishing",
+      "weight"
+     ],
+     "question": "What metric is used to quantify the impact of the gut microbiome on rabbit finishing weight, and which specific host genes are highlighted as part of the microbial-influenced pathway for intramuscular fat accumulation?"
+    },
+    {
+     "question_id": "29_16s_best_practices_FR1",
+     "concept": "raw read number target",
+     "content_words": [
+      "number",
+      "raw",
+      "read",
+      "target"
+     ],
+     "question": "What is the recommended target for raw read numbers per sample when starting a 16S rRNA gene sequencing study without prior pilot data?"
+    },
+    {
+     "question_id": "31_amr_one_health_FR1",
+     "concept": "classified as innovative",
+     "content_words": [
+      "classified",
+      "innovative"
+     ],
+     "question": "According to the World Health Organization's 2019 data, how many of the 32 antimicrobials in hospital development were classified as innovative?"
+    },
+    {
+     "question_id": "31_amr_one_health_FR1",
+     "concept": "32 antimicrobials in hospital development",
+     "content_words": [
+      "32",
+      "antimicrobials",
+      "development",
+      "hospital"
+     ],
+     "question": "According to the World Health Organization's 2019 data, how many of the 32 antimicrobials in hospital development were classified as innovative?"
+    },
+    {
+     "question_id": "31_amr_one_health_FR1",
+     "concept": "In 2019",
+     "content_words": [
+      "2019"
+     ],
+     "question": "According to the World Health Organization's 2019 data, how many of the 32 antimicrobials in hospital development were classified as innovative?"
+    },
+    {
+     "question_id": "31_amr_one_health_TE3",
+     "concept": "third- and fourth generation cephalosporins",
+     "content_words": [
+      "cephalosporins",
+      "fourth",
+      "generation",
+      "third"
+     ],
+     "question": "Compare the recorded usage in tons of fluoroquinolones and third- and fourth-generation cephalosporins in animals between Europe (2017) and the USA (2018)."
+    },
+    {
+     "question_id": "32_amr_livestock_environment_FR1",
+     "concept": "if current trends continue",
+     "content_words": [
+      "continue",
+      "current",
+      "if",
+      "trends"
+     ],
+     "question": "What is the projected annual human mortality rate associated with antimicrobial resistance by the year 2050 if current trends continue?"
+    },
+    {
+     "question_id": "32_amr_livestock_environment_FR1",
+     "concept": "by 2050",
+     "content_words": [
+      "2050"
+     ],
+     "question": "What is the projected annual human mortality rate associated with antimicrobial resistance by the year 2050 if current trends continue?"
+    },
+    {
+     "question_id": "32_amr_livestock_environment_TE3",
+     "concept": "statistical models",
+     "content_words": [
+      "models",
+      "statistical"
+     ],
+     "question": "Based on statistical modeling estimates, what was the estimated global antimicrobial usage in livestock for 2020 and what is the projected usage for 2030?"
+    },
+    {
+     "question_id": "32_amr_livestock_environment_TE3",
+     "concept": "2020 to 2030",
+     "content_words": [
+      "2020",
+      "2030"
+     ],
+     "question": "Based on statistical modeling estimates, what was the estimated global antimicrobial usage in livestock for 2020 and what is the projected usage for 2030?"
+    },
+    {
+     "question_id": "33_amr_food_animals_FR1",
+     "concept": "not absorbed by the animals",
+     "content_words": [
+      "absorbed",
+      "animals"
+     ],
+     "question": "What percentage of antibiotics administered to food animals is estimated to be excreted without being absorbed, and through what primary mediums does this occur?"
+    },
+    {
+     "question_id": "35_isse_framework_amr_FR1",
+     "concept": "five evaluation levels",
+     "content_words": [
+      "evaluation",
+      "five",
+      "levels"
+     ],
+     "question": "What are the five distinct levels of evaluation defined in the Integrated Surveillance System Evaluation (ISSE) framework?"
+    },
+    {
+     "question_id": "37_data_driven_one_health_TE3",
+     "concept": "Mollentze et al.",
+     "content_words": [
+      "al",
+      "et",
+      "mollentze"
+     ],
+     "question": "Regarding the machine learning modeling referenced from Mollentze et al., what features were used for zoonotic risk prediction and what was the reported accuracy for high-potential viruses?"
+    },
+    {
+     "question_id": "38_one_health_africa_TE3",
+     "concept": "low- and middle-income countries",
+     "content_words": [
+      "countries",
+      "income",
+      "low",
+      "middle"
+     ],
+     "question": "According to the disease burden metrics provided, what percentages of existing and emerging infectious diseases in humans are zoonotic, and what is the resulting impact in low- and middle-income countries?"
+    },
+    {
+     "question_id": "39_zoonotic_southeast_asia_TE3",
+     "concept": "95 publications were included",
+     "content_words": [
+      "95",
+      "included",
+      "publications"
+     ],
+     "question": "Describe the systematic methodology used to select the final 95 publications from the initial search results, including the databases and criteria involved."
+    },
+    {
+     "question_id": "40_animal_agriculture_one_health_FR1",
+     "concept": "zoonotic",
+     "content_words": [
+      "zoonotic"
+     ],
+     "question": "What percentage of all human pathogens and emerging diseases affecting humans are estimated to be zoonotic in origin?"
+    },
+    {
+     "question_id": "40_animal_agriculture_one_health_TE3",
+     "concept": "by 2050",
+     "content_words": [
+      "2050"
+     ],
+     "question": "Based on the paper's findings, what are the specific projected global health and economic impacts of antimicrobial resistance (AMR) by the year 2050?"
+    },
+    {
+     "question_id": "45_kenya_amr_digital_TE3",
+     "concept": "Of the 17 surveillance sites",
+     "content_words": [
+      "17",
+      "sites",
+      "surveillance"
+     ],
+     "question": "What are the three specific methods used by the 17 human health surveillance sites to submit data to the system, and what is the percentage breakdown for each method?"
+    },
+    {
+     "question_id": "48_myc_oncogene_FR1",
+     "concept": "MYC-induced and repressed genes",
+     "content_words": [
+      "genes",
+      "induced",
+      "myc",
+      "repressed"
+     ],
+     "question": "How many primary MYC-induced and repressed genes were identified via RNA-seq following a 16-hour inactivation of MYC?"
+    },
+    {
+     "question_id": "48_myc_oncogene_FR1",
+     "concept": "16 hours",
+     "content_words": [
+      "16",
+      "hours"
+     ],
+     "question": "How many primary MYC-induced and repressed genes were identified via RNA-seq following a 16-hour inactivation of MYC?"
+    },
+    {
+     "question_id": "50_4cseq_protocol_FR1",
+     "concept": "reproducible 4C profiles",
+     "content_words": [
+      "4c",
+      "profiles",
+      "reproducible"
+     ],
+     "question": "According to the paper's subsampling analysis, what is the minimum number of cis-mapped reads required to generate reproducible 4C profiles?"
+    },
+    {
+     "question_id": "50_4cseq_protocol_FR1",
+     "concept": "Subsampling analysis",
+     "content_words": [
+      "analysis",
+      "subsampling"
+     ],
+     "question": "According to the paper's subsampling analysis, what is the minimum number of cis-mapped reads required to generate reproducible 4C profiles?"
+    },
+    {
+     "question_id": "50_4cseq_protocol_TE3",
+     "concept": "motifPosperc",
+     "content_words": [
+      "motifposperc"
+     ],
+     "question": "What is the function of the 'motifPosperc' metric within the pipe4C data processing pipeline, and what value indicates high specificity?"
+    },
+    {
+     "question_id": "CD_019",
+     "concept": "Sarek is implemented in Nextflow",
+     "content_words": [
+      "implemented",
+      "nextflow",
+      "sarek"
+     ],
+     "question": "How do the implementation strategies for NGS workflow management and reproducibility differ between Nextflow-based systems like Sarek, the Snakemake system, and the HTS-flow platform?"
+    }
+   ]
+  },
+  "no_content": [],
+  "still_credited": [],
+  "base_credited": {
+   "loose": [
+    {
+     "question_id": "01_sarek_FR1",
+     "concept": "BAM files, annotated VCF files and CNV files"
+    },
+    {
+     "question_id": "01_sarek_TE3",
+     "concept": "F1 score = 0.80"
+    },
+    {
+     "question_id": "03_nfcore_framework_TE3",
+     "concept": "median runtime to 37%"
+    },
+    {
+     "question_id": "03_nfcore_framework_TE3",
+     "concept": "mapping processes decreases"
+    },
+    {
+     "question_id": "05_multiqc_FR1",
+     "concept": "22 common bioinformatics tools"
+    },
+    {
+     "question_id": "06_star_aligner_FR1",
+     "concept": "using 12 threads"
+    },
+    {
+     "question_id": "06_star_aligner_FR1",
+     "concept": "12-core server"
+    },
+    {
+     "question_id": "10_cutadapt_TE3",
+     "concept": "2.66 GHz Intel Core 2 processor"
+    },
+    {
+     "question_id": "10_cutadapt_TE3",
+     "concept": "35 bp colour-space reads"
+    },
+    {
+     "question_id": "11_asf_burkina_faso_FR1",
+     "concept": "confirmed ASFV DNA in twenty samples"
+    },
+    {
+     "question_id": "13_lsd_nepal_FR1",
+     "concept": "overall morbidity rate"
+    },
+    {
+     "question_id": "13_lsd_nepal_FR1",
+     "concept": "mortality rate"
+    },
+    {
+     "question_id": "13_lsd_nepal_FR1",
+     "concept": "case fatality rate"
+    },
+    {
+     "question_id": "13_lsd_nepal_TE3",
+     "concept": "Multivariable logistic regression analysis"
+    },
+    {
+     "question_id": "15_rabies_tanzania_FR1",
+     "concept": "48 human rabies deaths"
+    },
+    {
+     "question_id": "16_ppr_ethiopia_FR1",
+     "concept": "53 PPR outbreaks"
+    },
+    {
+     "question_id": "16_ppr_ethiopia_TE3",
+     "concept": "purchased animals"
+    },
+    {
+     "question_id": "18_fmd_review_FR1",
+     "concept": "primary infection in the oropharynx"
+    },
+    {
+     "question_id": "18_fmd_review_CO2",
+     "concept": "no FMDV carrier state in pigs"
+    },
+    {
+     "question_id": "19_hpai_canada_FR1",
+     "concept": "culled in Canada"
+    },
+    {
+     "question_id": "19_hpai_canada_TE3",
+     "concept": "various carnivores in Europe and Canada"
+    },
+    {
+     "question_id": "20_lsd_review_FR1",
+     "concept": "Lumpi-ProVacInd is 100%"
+    },
+    {
+     "question_id": "20_lsd_review_TE3",
+     "concept": "cross-protection rate"
+    },
+    {
+     "question_id": "21_livestock_gut_microbiome_review_FR1",
+     "concept": "most abundant phyla"
+    },
+    {
+     "question_id": "22_pig_mags_TE3",
+     "concept": "1,150 non-redundant MAGs"
+    },
+    {
+     "question_id": "23_swine_cultivation_FR1",
+     "concept": "a total of 1,299 colonies"
+    },
+    {
+     "question_id": "23_swine_cultivation_FR1",
+     "concept": "13 sub-ASVs"
+    },
+    {
+     "question_id": "26_gut_meat_quality_FR1",
+     "concept": "highly, positively correlated with IMF"
+    },
+    {
+     "question_id": "26_gut_meat_quality_CO2",
+     "concept": "fatty acid oxidation"
+    },
+    {
+     "question_id": "26_gut_meat_quality_CO2",
+     "concept": "fatty acid synthase"
+    },
+    {
+     "question_id": "26_gut_meat_quality_TE3",
+     "concept": "finishing weight"
+    },
+    {
+     "question_id": "29_16s_best_practices_FR1",
+     "concept": "10,000 reads per sample"
+    },
+    {
+     "question_id": "29_16s_best_practices_FR1",
+     "concept": "raw read number target"
+    },
+    {
+     "question_id": "29_16s_best_practices_TE3",
+     "concept": "equalizes sample variance"
+    },
+    {
+     "question_id": "31_amr_one_health_FR1",
+     "concept": "classified as innovative"
+    },
+    {
+     "question_id": "31_amr_one_health_FR1",
+     "concept": "32 antimicrobials in hospital development"
+    },
+    {
+     "question_id": "31_amr_one_health_FR1",
+     "concept": "In 2019"
+    },
+    {
+     "question_id": "31_amr_one_health_TE3",
+     "concept": "approximately 216 tons of fluoroquinolones"
+    },
+    {
+     "question_id": "31_amr_one_health_TE3",
+     "concept": "approximately 23.3 tons in 2018"
+    },
+    {
+     "question_id": "31_amr_one_health_TE3",
+     "concept": "third- and fourth generation cephalosporins"
+    },
+    {
+     "question_id": "31_amr_one_health_TE3",
+     "concept": "approximately 31.44 tons in 2018"
+    },
+    {
+     "question_id": "32_amr_livestock_environment_FR1",
+     "concept": "if current trends continue"
+    },
+    {
+     "question_id": "32_amr_livestock_environment_FR1",
+     "concept": "by 2050"
+    },
+    {
+     "question_id": "32_amr_livestock_environment_CO2",
+     "concept": "changes in one domain"
+    },
+    {
+     "question_id": "32_amr_livestock_environment_TE3",
+     "concept": "2020 to 2030"
+    },
+    {
+     "question_id": "33_amr_food_animals_FR1",
+     "concept": "not absorbed by the animals"
+    },
+    {
+     "question_id": "35_isse_framework_amr_FR1",
+     "concept": "five evaluation levels"
+    },
+    {
+     "question_id": "36_integrated_amr_surveillance_FR1",
+     "concept": "14 integrated surveillance systems"
+    },
+    {
+     "question_id": "37_data_driven_one_health_TE3",
+     "concept": "Mollentze et al."
+    },
+    {
+     "question_id": "37_data_driven_one_health_TE3",
+     "concept": "high or very high zoonotic potential"
+    },
+    {
+     "question_id": "38_one_health_africa_FR1",
+     "concept": "61% case fatality rate"
+    },
+    {
+     "question_id": "38_one_health_africa_TE3",
+     "concept": "low- and middle-income countries"
+    },
+    {
+     "question_id": "39_zoonotic_southeast_asia_TE3",
+     "concept": "95 publications were included"
+    },
+    {
+     "question_id": "40_animal_agriculture_one_health_FR1",
+     "concept": "60% of all human pathogens"
+    },
+    {
+     "question_id": "40_animal_agriculture_one_health_FR1",
+     "concept": "75% of emerging diseases"
+    },
+    {
+     "question_id": "40_animal_agriculture_one_health_FR1",
+     "concept": "zoonotic"
+    },
+    {
+     "question_id": "40_animal_agriculture_one_health_TE3",
+     "concept": "by 2050"
+    },
+    {
+     "question_id": "42_campylobacter_wgs_thailand_TE3",
+     "concept": "Virulence Factor Database"
+    },
+    {
+     "question_id": "45_kenya_amr_digital_TE3",
+     "concept": "Of the 17 surveillance sites"
+    },
+    {
+     "question_id": "46_methylpipe_FR1",
+     "concept": "100 human promoters"
+    },
+    {
+     "question_id": "46_methylpipe_TE3",
+     "concept": "genome-wide analysis"
+    },
+    {
+     "question_id": "48_myc_oncogene_FR1",
+     "concept": "MYC-induced and repressed genes"
+    },
+    {
+     "question_id": "48_myc_oncogene_FR1",
+     "concept": "16 hours"
+    },
+    {
+     "question_id": "48_myc_oncogene_TE3",
+     "concept": "MYC influences RNA Pol II loading"
+    },
+    {
+     "question_id": "50_4cseq_protocol_FR1",
+     "concept": "50,000–100,000 cis-mapped 4C reads"
+    },
+    {
+     "question_id": "50_4cseq_protocol_FR1",
+     "concept": "reproducible 4C profiles"
+    },
+    {
+     "question_id": "50_4cseq_protocol_FR1",
+     "concept": "Subsampling analysis"
+    },
+    {
+     "question_id": "50_4cseq_protocol_TE3",
+     "concept": "motifPosperc"
+    },
+    {
+     "question_id": "CD_019",
+     "concept": "Sarek is implemented in Nextflow"
+    },
+    {
+     "question_id": "CD_026",
+     "concept": "cow genome directly affects"
+    },
+    {
+     "question_id": "CD_026",
+     "concept": "gut microbiome and genetics"
+    },
+    {
+     "question_id": "SY_002",
+     "concept": "aggregated quality control review across samples"
+    },
+    {
+     "question_id": "SY_013",
+     "concept": "cross-study tractability"
+    },
+    {
+     "question_id": "OOD_046",
+     "concept": "faster than traditional alignment"
+    },
+    {
+     "question_id": "OOD_047",
+     "concept": "including pregnant cows"
+    },
+    {
+     "question_id": "OOD_049",
+     "concept": "output from multiple tools"
+    },
+    {
+     "question_id": "OOD_050",
+     "concept": "heterogeneity in coverage was reduced"
+    }
+   ],
+   "stem": [
+    {
+     "question_id": "01_sarek_FR1",
+     "concept": "BAM files, annotated VCF files and CNV files"
+    },
+    {
+     "question_id": "01_sarek_TE3",
+     "concept": "F1 score = 0.80"
+    },
+    {
+     "question_id": "03_nfcore_framework_TE3",
+     "concept": "median runtime to 37%"
+    },
+    {
+     "question_id": "03_nfcore_framework_TE3",
+     "concept": "plateau at 12 shards"
+    },
+    {
+     "question_id": "03_nfcore_framework_TE3",
+     "concept": "mapping processes decreases"
+    },
+    {
+     "question_id": "05_multiqc_FR1",
+     "concept": "22 common bioinformatics tools"
+    },
+    {
+     "question_id": "06_star_aligner_FR1",
+     "concept": "using 12 threads"
+    },
+    {
+     "question_id": "06_star_aligner_FR1",
+     "concept": "12-core server"
+    },
+    {
+     "question_id": "06_star_aligner_TE3",
+     "concept": "aligned the largest percentage of reads"
+    },
+    {
+     "question_id": "08_deseq2_FR1",
+     "concept": "overlap improves to 81 of 100 genes"
+    },
+    {
+     "question_id": "10_cutadapt_TE3",
+     "concept": "2.66 GHz Intel Core 2 processor"
+    },
+    {
+     "question_id": "10_cutadapt_TE3",
+     "concept": "35 bp colour-space reads"
+    },
+    {
+     "question_id": "11_asf_burkina_faso_FR1",
+     "concept": "confirmed ASFV DNA in twenty samples"
+    },
+    {
+     "question_id": "13_lsd_nepal_FR1",
+     "concept": "overall morbidity rate"
+    },
+    {
+     "question_id": "13_lsd_nepal_FR1",
+     "concept": "mortality rate"
+    },
+    {
+     "question_id": "13_lsd_nepal_FR1",
+     "concept": "case fatality rate"
+    },
+    {
+     "question_id": "13_lsd_nepal_TE3",
+     "concept": "Multivariable logistic regression analysis"
+    },
+    {
+     "question_id": "15_rabies_tanzania_FR1",
+     "concept": "48 human rabies deaths"
+    },
+    {
+     "question_id": "16_ppr_ethiopia_FR1",
+     "concept": "53 PPR outbreaks"
+    },
+    {
+     "question_id": "16_ppr_ethiopia_TE3",
+     "concept": "purchased animals"
+    },
+    {
+     "question_id": "18_fmd_review_FR1",
+     "concept": "primary infection in the oropharynx"
+    },
+    {
+     "question_id": "18_fmd_review_CO2",
+     "concept": "no FMDV carrier state in pigs"
+    },
+    {
+     "question_id": "19_hpai_canada_FR1",
+     "concept": "culled in Canada"
+    },
+    {
+     "question_id": "19_hpai_canada_TE3",
+     "concept": "various carnivores in Europe and Canada"
+    },
+    {
+     "question_id": "20_lsd_review_FR1",
+     "concept": "Lumpi-ProVacInd is 100%"
+    },
+    {
+     "question_id": "20_lsd_review_TE3",
+     "concept": "cross-protection rate"
+    },
+    {
+     "question_id": "21_livestock_gut_microbiome_review_FR1",
+     "concept": "most abundant phyla"
+    },
+    {
+     "question_id": "22_pig_mags_TE3",
+     "concept": "1,150 non-redundant MAGs"
+    },
+    {
+     "question_id": "23_swine_cultivation_FR1",
+     "concept": "a total of 1,299 colonies"
+    },
+    {
+     "question_id": "23_swine_cultivation_FR1",
+     "concept": "13 sub-ASVs"
+    },
+    {
+     "question_id": "23_swine_cultivation_CO2",
+     "concept": "Increasing microbial diversities"
+    },
+    {
+     "question_id": "26_gut_meat_quality_FR1",
+     "concept": "highly, positively correlated with IMF"
+    },
+    {
+     "question_id": "26_gut_meat_quality_CO2",
+     "concept": "fatty acid oxidation"
+    },
+    {
+     "question_id": "26_gut_meat_quality_CO2",
+     "concept": "fatty acid synthase"
+    },
+    {
+     "question_id": "26_gut_meat_quality_TE3",
+     "concept": "finishing weight"
+    },
+    {
+     "question_id": "29_16s_best_practices_FR1",
+     "concept": "10,000 reads per sample"
+    },
+    {
+     "question_id": "29_16s_best_practices_FR1",
+     "concept": "raw read number target"
+    },
+    {
+     "question_id": "29_16s_best_practices_TE3",
+     "concept": "equalizes sample variance"
+    },
+    {
+     "question_id": "29_16s_best_practices_TE3",
+     "concept": "robust to differences between samples"
+    },
+    {
+     "question_id": "31_amr_one_health_FR1",
+     "concept": "classified as innovative"
+    },
+    {
+     "question_id": "31_amr_one_health_FR1",
+     "concept": "32 antimicrobials in hospital development"
+    },
+    {
+     "question_id": "31_amr_one_health_FR1",
+     "concept": "In 2019"
+    },
+    {
+     "question_id": "31_amr_one_health_TE3",
+     "concept": "approximately 216 tons of fluoroquinolones"
+    },
+    {
+     "question_id": "31_amr_one_health_TE3",
+     "concept": "approximately 23.3 tons in 2018"
+    },
+    {
+     "question_id": "31_amr_one_health_TE3",
+     "concept": "third- and fourth generation cephalosporins"
+    },
+    {
+     "question_id": "31_amr_one_health_TE3",
+     "concept": "approximately 31.44 tons in 2018"
+    },
+    {
+     "question_id": "32_amr_livestock_environment_FR1",
+     "concept": "if current trends continue"
+    },
+    {
+     "question_id": "32_amr_livestock_environment_FR1",
+     "concept": "by 2050"
+    },
+    {
+     "question_id": "32_amr_livestock_environment_CO2",
+     "concept": "changes in one domain"
+    },
+    {
+     "question_id": "32_amr_livestock_environment_TE3",
+     "concept": "statistical models"
+    },
+    {
+     "question_id": "32_amr_livestock_environment_TE3",
+     "concept": "2020 to 2030"
+    },
+    {
+     "question_id": "33_amr_food_animals_FR1",
+     "concept": "not absorbed by the animals"
+    },
+    {
+     "question_id": "35_isse_framework_amr_FR1",
+     "concept": "five evaluation levels"
+    },
+    {
+     "question_id": "36_integrated_amr_surveillance_FR1",
+     "concept": "14 integrated surveillance systems"
+    },
+    {
+     "question_id": "37_data_driven_one_health_TE3",
+     "concept": "Mollentze et al."
+    },
+    {
+     "question_id": "37_data_driven_one_health_TE3",
+     "concept": "high or very high zoonotic potential"
+    },
+    {
+     "question_id": "38_one_health_africa_FR1",
+     "concept": "61% case fatality rate"
+    },
+    {
+     "question_id": "38_one_health_africa_TE3",
+     "concept": "low- and middle-income countries"
+    },
+    {
+     "question_id": "39_zoonotic_southeast_asia_TE3",
+     "concept": "95 publications were included"
+    },
+    {
+     "question_id": "40_animal_agriculture_one_health_FR1",
+     "concept": "60% of all human pathogens"
+    },
+    {
+     "question_id": "40_animal_agriculture_one_health_FR1",
+     "concept": "75% of emerging diseases"
+    },
+    {
+     "question_id": "40_animal_agriculture_one_health_FR1",
+     "concept": "zoonotic"
+    },
+    {
+     "question_id": "40_animal_agriculture_one_health_TE3",
+     "concept": "by 2050"
+    },
+    {
+     "question_id": "42_campylobacter_wgs_thailand_TE3",
+     "concept": "de novo assembled using SPAdes"
+    },
+    {
+     "question_id": "42_campylobacter_wgs_thailand_TE3",
+     "concept": "Virulence Factor Database"
+    },
+    {
+     "question_id": "45_kenya_amr_digital_TE3",
+     "concept": "Of the 17 surveillance sites"
+    },
+    {
+     "question_id": "46_methylpipe_FR1",
+     "concept": "100 human promoters"
+    },
+    {
+     "question_id": "46_methylpipe_TE3",
+     "concept": "genome-wide analysis"
+    },
+    {
+     "question_id": "48_myc_oncogene_FR1",
+     "concept": "MYC-induced and repressed genes"
+    },
+    {
+     "question_id": "48_myc_oncogene_FR1",
+     "concept": "16 hours"
+    },
+    {
+     "question_id": "48_myc_oncogene_TE3",
+     "concept": "MYC influences RNA Pol II loading"
+    },
+    {
+     "question_id": "50_4cseq_protocol_FR1",
+     "concept": "50,000–100,000 cis-mapped 4C reads"
+    },
+    {
+     "question_id": "50_4cseq_protocol_FR1",
+     "concept": "reproducible 4C profiles"
+    },
+    {
+     "question_id": "50_4cseq_protocol_FR1",
+     "concept": "Subsampling analysis"
+    },
+    {
+     "question_id": "50_4cseq_protocol_TE3",
+     "concept": "motifPosperc"
+    },
+    {
+     "question_id": "CD_019",
+     "concept": "Sarek is implemented in Nextflow"
+    },
+    {
+     "question_id": "CD_026",
+     "concept": "cow genome directly affects"
+    },
+    {
+     "question_id": "CD_026",
+     "concept": "gut microbiome and genetics"
+    },
+    {
+     "question_id": "SY_002",
+     "concept": "aggregated quality control review across samples"
+    },
+    {
+     "question_id": "SY_013",
+     "concept": "cross-study tractability"
+    },
+    {
+     "question_id": "OOD_044",
+     "concept": "first releases of Snakemake used a greedy scheduler"
+    },
+    {
+     "question_id": "OOD_046",
+     "concept": "faster than traditional alignment"
+    },
+    {
+     "question_id": "OOD_047",
+     "concept": "including pregnant cows"
+    },
+    {
+     "question_id": "OOD_049",
+     "concept": "output from multiple tools"
+    },
+    {
+     "question_id": "OOD_050",
+     "concept": "heterogeneity in coverage was reduced"
+    }
+   ]
+  },
+  "concepts_with_a_removed_word": {
+   "loose": 392,
+   "stem": 461
+  }
+ },
+ "M4_recall": {
+  "columns": [
+   "loose_o30",
+   "loose",
+   "stem",
+   "loose_Qall_a",
+   "loose_Qall_b",
+   "loose_Qneed_a",
+   "loose_Qneed_b",
+   "stem_Qall_a",
+   "stem_Qall_b",
+   "stem_Qneed_a",
+   "stem_Qneed_b"
+  ],
+  "table": [
+   {
+    "strategy": "single_pass",
+    "answers": 86,
+    "loose_o30": 0.41122646733111845,
+    "loose_o30_n": 86,
+    "loose": 0.4026024363233666,
+    "loose_n": 86,
+    "stem": 0.4398394241417497,
+    "stem_n": 86,
+    "loose_Qall_a": 0.2063279069767442,
+    "loose_Qall_a_n": 86,
+    "loose_Qall_b": 0.22593023255813954,
+    "loose_Qall_b_n": 86,
+    "loose_Qneed_a": 0.3015651162790698,
+    "loose_Qneed_a_n": 86,
+    "loose_Qneed_b": 0.3221767441860465,
+    "loose_Qneed_b_n": 86,
+    "stem_Qall_a": 0.22923837209302328,
+    "stem_Qall_a_n": 86,
+    "stem_Qall_b": 0.24884069767441863,
+    "stem_Qall_b_n": 86,
+    "stem_Qneed_a": 0.3257906976744186,
+    "stem_Qneed_a_n": 86,
+    "stem_Qneed_b": 0.3464023255813954,
+    "stem_Qneed_b_n": 86
+   },
+   {
+    "strategy": "multi_hop",
+    "answers": 86,
+    "loose_o30": 0.38161683277962344,
+    "loose_o30_n": 86,
+    "loose": 0.3743493909191583,
+    "loose_n": 86,
+    "stem": 0.40708748615725354,
+    "stem_n": 86,
+    "loose_Qall_a": 0.17500232558139536,
+    "loose_Qall_a_n": 86,
+    "loose_Qall_b": 0.1854686046511628,
+    "loose_Qall_b_n": 86,
+    "loose_Qneed_a": 0.28318372093023253,
+    "loose_Qneed_a_n": 86,
+    "loose_Qneed_b": 0.3012488372093023,
+    "loose_Qneed_b_n": 86,
+    "stem_Qall_a": 0.2039058139534884,
+    "stem_Qall_a_n": 86,
+    "stem_Qall_b": 0.2174732558139535,
+    "stem_Qall_b_n": 86,
+    "stem_Qneed_a": 0.3086244186046512,
+    "stem_Qneed_a_n": 86,
+    "stem_Qneed_b": 0.3286279069767442,
+    "stem_Qneed_b_n": 86
+   },
+   {
+    "strategy": "rlm_5",
+    "answers": 86,
+    "loose_o30": 0.6708471760797342,
+    "loose_o30_n": 86,
+    "loose": 0.6645487264673311,
+    "loose_n": 86,
+    "stem": 0.6974944629014396,
+    "stem_n": 86,
+    "loose_Qall_a": 0.4733790697674419,
+    "loose_Qall_a_n": 86,
+    "loose_Qall_b": 0.5039988372093023,
+    "loose_Qall_b_n": 86,
+    "loose_Qneed_a": 0.5890058139534884,
+    "loose_Qneed_a_n": 86,
+    "loose_Qneed_b": 0.6256476744186047,
+    "loose_Qneed_b_n": 86,
+    "stem_Qall_a": 0.5235313953488372,
+    "stem_Qall_a_n": 86,
+    "stem_Qall_b": 0.5560895348837209,
+    "stem_Qall_b_n": 86,
+    "stem_Qneed_a": 0.6233372093023256,
+    "stem_Qneed_a_n": 86,
+    "stem_Qneed_b": 0.6623046511627907,
+    "stem_Qneed_b_n": 86
+   },
+   {
+    "strategy": "rlm_10",
+    "answers": 86,
+    "loose_o30": 0.7339147286821706,
+    "loose_o30_n": 86,
+    "loose": 0.7310077519379845,
+    "loose_n": 86,
+    "stem": 0.7636766334440752,
+    "stem_n": 86,
+    "loose_Qall_a": 0.5394674418604651,
+    "loose_Qall_a_n": 86,
+    "loose_Qall_b": 0.5679825581395349,
+    "loose_Qall_b_n": 86,
+    "loose_Qneed_a": 0.661836046511628,
+    "loose_Qneed_a_n": 86,
+    "loose_Qneed_b": 0.6963720930232558,
+    "loose_Qneed_b_n": 86,
+    "stem_Qall_a": 0.5745988372093024,
+    "stem_Qall_a_n": 86,
+    "stem_Qall_b": 0.6077651162790698,
+    "stem_Qall_b_n": 86,
+    "stem_Qneed_a": 0.6972453488372092,
+    "stem_Qneed_a_n": 86,
+    "stem_Qneed_b": 0.7368197674418605,
+    "stem_Qneed_b_n": 86
+   },
+   {
+    "strategy": "rlm_20",
+    "answers": 86,
+    "loose_o30": 0.6915836101882613,
+    "loose_o30_n": 86,
+    "loose": 0.6901301218161683,
+    "loose_n": 86,
+    "stem": 0.7453626799557033,
+    "stem_n": 86,
+    "loose_Qall_a": 0.5249186046511628,
+    "loose_Qall_a_n": 86,
+    "loose_Qall_b": 0.5513860465116279,
+    "loose_Qall_b_n": 86,
+    "loose_Qneed_a": 0.622993023255814,
+    "loose_Qneed_a_n": 86,
+    "loose_Qneed_b": 0.6496686046511627,
+    "loose_Qneed_b_n": 86,
+    "stem_Qall_a": 0.5528523255813953,
+    "stem_Qall_a_n": 86,
+    "stem_Qall_b": 0.5830023255813953,
+    "stem_Qall_b_n": 86,
+    "stem_Qneed_a": 0.6671918604651164,
+    "stem_Qneed_a_n": 86,
+    "stem_Qneed_b": 0.69755,
+    "stem_Qneed_b_n": 86
+   },
+   {
+    "strategy": "verified_pass",
+    "answers": 86,
+    "loose_o30": 0.34914174972314505,
+    "loose_o30_n": 86,
+    "loose": 0.3380952380952381,
+    "loose_n": 86,
+    "stem": 0.3759551495016611,
+    "stem_n": 86,
+    "loose_Qall_a": 0.16322209302325583,
+    "loose_Qall_a_n": 86,
+    "loose_Qall_b": 0.1713767441860465,
+    "loose_Qall_b_n": 86,
+    "loose_Qneed_a": 0.2456546511627907,
+    "loose_Qneed_a_n": 86,
+    "loose_Qneed_b": 0.2544046511627907,
+    "loose_Qneed_b_n": 86,
+    "stem_Qall_a": 0.17941744186046513,
+    "stem_Qall_a_n": 86,
+    "stem_Qall_b": 0.1875720930232558,
+    "stem_Qall_b_n": 86,
+    "stem_Qneed_a": 0.27001627906976744,
+    "stem_Qneed_a_n": 86,
+    "stem_Qneed_b": 0.2787662790697674,
+    "stem_Qneed_b_n": 86
+   },
+   {
+    "strategy": "all",
+    "answers": 516,
+    "loose_o30": 0.5397217607973421,
+    "loose_o30_n": 516,
+    "loose": 0.5334556109265411,
+    "loose_n": 516,
+    "stem": 0.5715693060169804,
+    "stem_n": 516,
+    "loose_Qall_a": 0.3470529069767442,
+    "loose_Qall_a_n": 516,
+    "loose_Qall_b": 0.36769050387596897,
+    "loose_Qall_b_n": 516,
+    "loose_Qneed_a": 0.4507063953488372,
+    "loose_Qneed_a_n": 516,
+    "loose_Qneed_b": 0.4749197674418605,
+    "loose_Qneed_b_n": 516,
+    "stem_Qall_a": 0.3772573643410853,
+    "stem_Qall_a_n": 516,
+    "stem_Qall_b": 0.40012383720930234,
+    "stem_Qall_b_n": 516,
+    "stem_Qneed_a": 0.4820343023255814,
+    "stem_Qneed_a_n": 516,
+    "stem_Qneed_b": 0.5084118217054264,
+    "stem_Qneed_b_n": 516
+   }
+  ],
+  "population_concepts": {
+   "loose": {
+    "distinct_concepts": 571,
+    "with_a_removed_word": 160,
+    "no_remaining": 18,
+    "no_remaining_list": [
+     {
+      "question_id": "01_sarek_FR1",
+      "concept": "BAM files, annotated VCF files and CNV files",
+      "content_words": [
+       "annotated",
+       "bam",
+       "cnv",
+       "files",
+       "vcf"
+      ]
+     },
+     {
+      "question_id": "01_sarek_TE3",
+      "concept": "GATK4 Mutect2 and Strelka2",
+      "content_words": [
+       "gatk4",
+       "mutect2",
+       "strelka2"
+      ]
+     },
+     {
+      "question_id": "01_sarek_TE3",
+      "concept": "SSMs",
+      "content_words": [
+       "ssms"
+      ]
+     },
+     {
+      "question_id": "01_sarek_TE3",
+      "concept": "intersection",
+      "content_words": [
+       "intersection"
+      ]
+     },
+     {
+      "question_id": "05_multiqc_FR1",
+      "concept": "At the time of writing",
+      "content_words": [
+       "time",
+       "writing"
+      ]
+     },
+     {
+      "question_id": "06_star_aligner_FR1",
+      "concept": "12-core server",
+      "content_words": [
+       "12",
+       "core",
+       "server"
+      ]
+     },
+     {
+      "question_id": "07_salmon_FR1",
+      "concept": "at the same FDRs",
+      "content_words": [
+       "fdrs",
+       "same"
+      ]
+     },
+     {
+      "question_id": "10_cutadapt_TE3",
+      "concept": "2.66 GHz Intel Core 2 processor",
+      "content_words": [
+       "2",
+       "2.66",
+       "core",
+       "ghz",
+       "intel",
+       "processor"
+      ]
+     },
+     {
+      "question_id": "10_cutadapt_TE3",
+      "concept": "35 bp colour-space reads",
+      "content_words": [
+       "35",
+       "bp",
+       "colour",
+       "reads",
+       "space"
+      ]
+     },
+     {
+      "question_id": "13_lsd_nepal_FR1",
+      "concept": "case fatality rate",
+      "content_words": [
+       "case",
+       "fatality",
+       "rate"
+      ]
+     },
+     {
+      "question_id": "13_lsd_nepal_FR1",
+      "concept": "mortality rate",
+      "content_words": [
+       "mortality",
+       "rate"
+      ]
+     },
+     {
+      "question_id": "13_lsd_nepal_FR1",
+      "concept": "overall morbidity rate",
+      "content_words": [
+       "morbidity",
+       "overall",
+       "rate"
+      ]
+     },
+     {
+      "question_id": "13_lsd_nepal_TE3",
+      "concept": "Multivariable logistic regression analysis",
+      "content_words": [
+       "analysis",
+       "logistic",
+       "multivariable",
+       "regression"
+      ]
+     },
+     {
+      "question_id": "16_ppr_ethiopia_FR1",
+      "concept": "between 2018 and 2022",
+      "content_words": [
+       "2018",
+       "2022"
+      ]
+     },
+     {
+      "question_id": "16_ppr_ethiopia_TE3",
+      "concept": "purchased animals",
+      "content_words": [
+       "animals",
+       "purchased"
+      ]
+     },
+     {
+      "question_id": "18_fmd_review_CO2",
+      "concept": "no FMDV carrier state in pigs",
+      "content_words": [
+       "carrier",
+       "fmdv",
+       "pigs",
+       "state"
+      ]
+     },
+     {
+      "question_id": "19_hpai_canada_FR1",
+      "concept": "culled in Canada",
+      "content_words": [
+       "canada",
+       "culled"
+      ]
+     },
+     {
+      "question_id": "20_lsd_review_TE3",
+      "concept": "cross-protection rate",
+      "content_words": [
+       "cross",
+       "protection",
+       "rate"
+      ]
+     }
+    ]
+   },
+   "stem": {
+    "distinct_concepts": 571,
+    "with_a_removed_word": 193,
+    "no_remaining": 20,
+    "no_remaining_list": [
+     {
+      "question_id": "01_sarek_FR1",
+      "concept": "BAM files, annotated VCF files and CNV files",
+      "content_words": [
+       "annotated",
+       "bam",
+       "cnv",
+       "files",
+       "vcf"
+      ]
+     },
+     {
+      "question_id": "01_sarek_TE3",
+      "concept": "GATK4 Mutect2 and Strelka2",
+      "content_words": [
+       "gatk4",
+       "mutect2",
+       "strelka2"
+      ]
+     },
+     {
+      "question_id": "01_sarek_TE3",
+      "concept": "SSMs",
+      "content_words": [
+       "ssms"
+      ]
+     },
+     {
+      "question_id": "01_sarek_TE3",
+      "concept": "intersection",
+      "content_words": [
+       "intersection"
+      ]
+     },
+     {
+      "question_id": "05_multiqc_FR1",
+      "concept": "At the time of writing",
+      "content_words": [
+       "time",
+       "writing"
+      ]
+     },
+     {
+      "question_id": "06_star_aligner_FR1",
+      "concept": "12-core server",
+      "content_words": [
+       "12",
+       "core",
+       "server"
+      ]
+     },
+     {
+      "question_id": "07_salmon_FR1",
+      "concept": "at the same FDRs",
+      "content_words": [
+       "fdrs",
+       "same"
+      ]
+     },
+     {
+      "question_id": "10_cutadapt_TE3",
+      "concept": "2.66 GHz Intel Core 2 processor",
+      "content_words": [
+       "2",
+       "2.66",
+       "core",
+       "ghz",
+       "intel",
+       "processor"
+      ]
+     },
+     {
+      "question_id": "10_cutadapt_TE3",
+      "concept": "35 bp colour-space reads",
+      "content_words": [
+       "35",
+       "bp",
+       "colour",
+       "reads",
+       "space"
+      ]
+     },
+     {
+      "question_id": "12_hpai_netherlands_FR1",
+      "concept": "increased for meat-type poultry",
+      "content_words": [
+       "increased",
+       "meat",
+       "poultry",
+       "type"
+      ]
+     },
+     {
+      "question_id": "13_lsd_nepal_FR1",
+      "concept": "case fatality rate",
+      "content_words": [
+       "case",
+       "fatality",
+       "rate"
+      ]
+     },
+     {
+      "question_id": "13_lsd_nepal_FR1",
+      "concept": "mortality rate",
+      "content_words": [
+       "mortality",
+       "rate"
+      ]
+     },
+     {
+      "question_id": "13_lsd_nepal_FR1",
+      "concept": "overall morbidity rate",
+      "content_words": [
+       "morbidity",
+       "overall",
+       "rate"
+      ]
+     },
+     {
+      "question_id": "13_lsd_nepal_TE3",
+      "concept": "Multivariable logistic regression analysis",
+      "content_words": [
+       "analysis",
+       "logistic",
+       "multivariable",
+       "regression"
+      ]
+     },
+     {
+      "question_id": "16_ppr_ethiopia_FR1",
+      "concept": "between 2018 and 2022",
+      "content_words": [
+       "2018",
+       "2022"
+      ]
+     },
+     {
+      "question_id": "16_ppr_ethiopia_TE3",
+      "concept": "purchased animals",
+      "content_words": [
+       "animals",
+       "purchased"
+      ]
+     },
+     {
+      "question_id": "18_fmd_review_CO2",
+      "concept": "no FMDV carrier state in pigs",
+      "content_words": [
+       "carrier",
+       "fmdv",
+       "pigs",
+       "state"
+      ]
+     },
+     {
+      "question_id": "19_hpai_canada_FR1",
+      "concept": "culled in Canada",
+      "content_words": [
+       "canada",
+       "culled"
+      ]
+     },
+     {
+      "question_id": "20_lsd_review_FR1",
+      "concept": "homologous vaccination",
+      "content_words": [
+       "homologous",
+       "vaccination"
+      ]
+     },
+     {
+      "question_id": "20_lsd_review_TE3",
+      "concept": "cross-protection rate",
+      "content_words": [
+       "cross",
+       "protection",
+       "rate"
+      ]
+     }
+    ]
+   }
+  },
+  "key_file": "data/ground_truth_v2/ground_truth_v2_4_as_v1.json"
+ }
+}

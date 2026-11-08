@@ -1,0 +1,204 @@
+{
+ "rests_on": "the key (source_files) and experiment.py's per-size sets; answer counts draw 1",
+ "sizes": {
+  "10": {
+   "answerable": {
+    "in": 44,
+    "left_out": 42,
+    "left_out_answers_draw1": 756,
+    "left_out_ids": [
+     "11_asf_burkina_faso_CO2",
+     "11_asf_burkina_faso_FR1",
+     "11_asf_burkina_faso_TE3",
+     "12_hpai_netherlands_CO2",
+     "12_hpai_netherlands_FR1",
+     "12_hpai_netherlands_TE3",
+     "13_lsd_nepal_CO2",
+     "13_lsd_nepal_FR1",
+     "13_lsd_nepal_TE3",
+     "14_bovine_tb_cameroon_CO2",
+     "14_bovine_tb_cameroon_FR1",
+     "14_bovine_tb_cameroon_TE3",
+     "15_rabies_tanzania_CO2",
+     "15_rabies_tanzania_FR1",
+     "15_rabies_tanzania_TE3",
+     "16_ppr_ethiopia_CO2",
+     "16_ppr_ethiopia_FR1",
+     "16_ppr_ethiopia_TE3",
+     "17_brucellosis_ethiopia_CO2",
+     "17_brucellosis_ethiopia_FR1",
+     "17_brucellosis_ethiopia_TE3",
+     "18_fmd_review_CO2",
+     "18_fmd_review_FR1",
+     "18_fmd_review_TE3",
+     "19_hpai_canada_CO2",
+     "19_hpai_canada_FR1",
+     "19_hpai_canada_TE3",
+     "20_lsd_review_CO2",
+     "20_lsd_review_FR1",
+     "20_lsd_review_TE3",
+     "CD_011",
+     "CD_012",
+     "CD_013",
+     "CD_014",
+     "CD_016",
+     "CD_017",
+     "CD_018",
+     "SY_005",
+     "SY_006",
+     "SY_007",
+     "SY_008",
+     "SY_009"
+    ]
+   },
+   "false_premise": {
+    "in": 7,
+    "left_out": 3,
+    "left_out_answers_draw1": 54,
+    "left_out_ids": [
+     "OOD_047",
+     "OOD_048",
+     "OOD_050"
+    ]
+   },
+   "not_answerable": {
+    "in": 39,
+    "left_out": 0,
+    "left_out_answers_draw1": 0,
+    "left_out_ids": []
+   }
+  },
+  "20": {
+   "answerable": {
+    "in": 86,
+    "left_out": 0,
+    "left_out_answers_draw1": 0,
+    "left_out_ids": []
+   },
+   "false_premise": {
+    "in": 10,
+    "left_out": 0,
+    "left_out_answers_draw1": 0,
+    "left_out_ids": []
+   },
+   "not_answerable": {
+    "in": 39,
+    "left_out": 0,
+    "left_out_answers_draw1": 0,
+    "left_out_ids": []
+   }
+  },
+  "5": {
+   "answerable": {
+    "in": 22,
+    "left_out": 64,
+    "left_out_answers_draw1": 1152,
+    "left_out_ids": [
+     "06_star_aligner_CO2",
+     "06_star_aligner_FR1",
+     "06_star_aligner_TE3",
+     "07_salmon_CO2",
+     "07_salmon_FR1",
+     "07_salmon_TE3",
+     "08_deseq2_CO2",
+     "08_deseq2_FR1",
+     "08_deseq2_TE3",
+     "09_seqkit_CO2",
+     "09_seqkit_FR1",
+     "09_seqkit_TE3",
+     "10_cutadapt_CO2",
+     "10_cutadapt_FR1",
+     "10_cutadapt_TE3",
+     "11_asf_burkina_faso_CO2",
+     "11_asf_burkina_faso_FR1",
+     "11_asf_burkina_faso_TE3",
+     "12_hpai_netherlands_CO2",
+     "12_hpai_netherlands_FR1",
+     "12_hpai_netherlands_TE3",
+     "13_lsd_nepal_CO2",
+     "13_lsd_nepal_FR1",
+     "13_lsd_nepal_TE3",
+     "14_bovine_tb_cameroon_CO2",
+     "14_bovine_tb_cameroon_FR1",
+     "14_bovine_tb_cameroon_TE3",
+     "15_rabies_tanzania_CO2",
+     "15_rabies_tanzania_FR1",
+     "15_rabies_tanzania_TE3",
+     "16_ppr_ethiopia_CO2",
+     "16_ppr_ethiopia_FR1",
+     "16_ppr_ethiopia_TE3",
+     "17_brucellosis_ethiopia_CO2",
+     "17_brucellosis_ethiopia_FR1",
+     "17_brucellosis_ethiopia_TE3",
+     "18_fmd_review_CO2",
+     "18_fmd_review_FR1",
+     "18_fmd_review_TE3",
+     "19_hpai_canada_CO2",
+     "19_hpai_canada_FR1",
+     "19_hpai_canada_TE3",
+     "20_lsd_review_CO2",
+     "20_lsd_review_FR1",
+     "20_lsd_review_TE3",
+     "CD_006",
+     "CD_007",
+     "CD_008",
+     "CD_009",
+     "CD_010",
+     "CD_011",
+     "CD_012",
+     "CD_013",
+     "CD_014",
+     "CD_016",
+     "CD_017",
+     "CD_018",
+     "SY_003",
+     "SY_004",
+     "SY_005",
+     "SY_006",
+     "SY_007",
+     "SY_008",
+     "SY_009"
+    ]
+   },
+   "false_premise": {
+    "in": 5,
+    "left_out": 5,
+    "left_out_answers_draw1": 90,
+    "left_out_ids": [
+     "OOD_043",
+     "OOD_046",
+     "OOD_047",
+     "OOD_048",
+     "OOD_050"
+    ]
+   },
+   "not_answerable": {
+    "in": 39,
+    "left_out": 0,
+    "left_out_answers_draw1": 0,
+    "left_out_ids": []
+   }
+  },
+  "50": {
+   "answerable": {
+    "in": 86,
+    "left_out": 0,
+    "left_out_answers_draw1": 0,
+    "left_out_ids": []
+   },
+   "false_premise": {
+    "in": 10,
+    "left_out": 0,
+    "left_out_answers_draw1": 0,
+    "left_out_ids": []
+   },
+   "not_answerable": {
+    "in": 39,
+    "left_out": 0,
+    "left_out_answers_draw1": 0,
+    "left_out_ids": []
+   }
+  }
+ },
+ "what": "questions of the common set left out at each size; answers: the draw-1 answers of the six strategies on the three indexes of the size"
+}

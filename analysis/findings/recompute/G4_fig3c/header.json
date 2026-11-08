@@ -1,0 +1,2016 @@
+{
+ "command": "uv run --frozen python scripts/S476_fig3_d123.py rebuild",
+ "copy": "frozen (D155, S3 part refrozen 27 October, D156): findings/recompute/fig3_inputs (g4_collect.jsonl, its sidecar, s3/, PULL_SUMMARY.json), fig3_t1.tar (t1/), fig3_g4_inputs.tar (g4_inputs/)",
+ "drawn_indexes": [
+  "exp_v4_s5_n0",
+  "exp_v4_s5_n1",
+  "exp_v4_s5_n3",
+  "exp_v4_s10_n0",
+  "exp_v4_s10_n1",
+  "exp_v4_s10_n3",
+  "exp_v4_s20_n0",
+  "exp_v4_s20_n1",
+  "exp_v4_s20_n3",
+  "exp_v4_s50_n0",
+  "exp_v4_s50_n1",
+  "exp_v4_s50_n3"
+ ],
+ "frozen_inputs_sha256": {
+  "fig3_g4_inputs.tar": "7f8481440b0ce74123dd0f5f037b21190070ae932614c20dc8af86d180bbf601",
+  "findings/recompute/fig3_inputs/g4_collect.jsonl": "8f10e30af2f33f8899198762e85298646f86ebe920b9e2ac86d9bc2f1cc65bd0",
+  "findings/recompute/fig3_inputs/g4_collect.jsonl.json": "45be4ec5949a454a75c96dd85e06cfd3dcfd446fd6ff71376a1d87f9e52eedc5",
+  "findings/recompute/fig3_inputs/s3/HEAD.txt": "414ba289c692951048073d29dfa11651c856460705d3849e85b2b96575064338",
+  "findings/recompute/fig3_inputs/s3/out_g4/claims.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s10_n0/judge_passages.jsonl": "22962848465b96625af7b052397fd247a1012a5e5f5124627aeab6b26aee64ef",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s10_n0/judge_passages_headers.jsonl": "b94a84a343598a0a0a1aec3ac40897dce2c616283417bbbc3ea6f0668e382b34",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s10_n0/judge_passages_recheck.jsonl": "9dc621ec19e92c93d63df5413029c73020247851e50fcbf53b301dcf44133cfe",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s10_n0/judge_passages_summary.json": "057d0a660751f3ed7a0a5407c31fa323ad7a7208157a73311c14e2a09758e53b",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s10_n1/judge_passages.jsonl": "ebd1ab2570d729906a3bf90a70f7d4750608c9e3bcde96790c7096fddf8da756",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s10_n1/judge_passages_headers.jsonl": "dc474c413653dac1ecf864fdc561f09bcd5277adff9add63f01a35866384e9fe",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s10_n1/judge_passages_recheck.jsonl": "d76bea7aa032e2cbddaa283b7e8f48aae0d29c4001b400a02200cfff5f35a901",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s10_n1/judge_passages_summary.json": "7c684682e32ab4bda1b08efaef8329307c2a1c1c4d9f0c460f7b60d643270b4e",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s10_n3/judge_passages.jsonl": "0f8efba843d8f269a161201a786c33e8160b0de4963957ad59ca033bcca431f0",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s10_n3/judge_passages_headers.jsonl": "c0f11f4a4a0c680fcb8c8191a63520b9786dd167da7e713c44fc75883aa56f03",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s10_n3/judge_passages_recheck.jsonl": "d6fc24518e367a9f6f83f41317f6add09ab0377297b22616b1b55d5d6a8ee75d",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s10_n3/judge_passages_summary.json": "63edb23719c71ab4910fdcd7858d97f47e3713104083cb8bff2cb6bf4bb1d30e",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s20_n0/judge_passages.jsonl": "5de2a62406368c48dea8a799c441c1907d5104c3365298d032fb214857f72d22",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s20_n0/judge_passages_headers.jsonl": "b6145301fd48514b0afc985b5d7854f34ec9aab9c4fa0e6e409bcb7aee212690",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s20_n0/judge_passages_recheck.jsonl": "342cc665df50a09c0a2c7e99281c59c6f7f560175e6f5410f19bb2ec15fbb239",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s20_n0/judge_passages_summary.json": "cfbfcf5ae01e6c6e3a35df2628e6b46523149d6a697b9e36ab04134ed1db0a03",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s20_n1/judge_passages.jsonl": "567dcf6651a1b74784a02cb7962c214bc9a78f3d65ecfaf59f57b230bd26ac3f",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s20_n1/judge_passages_headers.jsonl": "1fcdbc219772774b77e71e6b8462a9dbc6634d2224e7b959a32dc98e4057b6a7",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s20_n1/judge_passages_recheck.jsonl": "1ff9e06ab833d85b2671800b30ca22512d4d152edcf8f47772c12da05dfc0e7a",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s20_n1/judge_passages_summary.json": "a04484754d1818779b3cef0fac9efc687c37c6b7af64da58969a757850cfd163",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s20_n3/judge_passages.jsonl": "eb9c24858736fd9beb2443eafbc512e46c95f42b37e4442c4baa69c1d892010c",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s20_n3/judge_passages_headers.jsonl": "0a1b3ed3d2dd5aec6932759e50d9a3b32e7a64255a9bd43e7b14bdd127a0dd06",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s20_n3/judge_passages_recheck.jsonl": "f935ecfd559305b46383657e2d9653ee7cbbb9ce46c1f61c78c204b8e5570682",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s20_n3/judge_passages_summary.json": "ef8d427904b5852127653a2befb8b88bb86e0a7b450bdd3e8f6ef18ed71e15bf",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s50_n0/judge_passages.jsonl": "f1cfff0cfa7b35a1b2959875dda49de5c240941e68371c69bc9a41f81990dbf6",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s50_n0/judge_passages_headers.jsonl": "5ccc39339bc600e8c5043478d55fd79ea98bf6ae7354b80da0892e626a099ac8",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s50_n0/judge_passages_recheck.jsonl": "437ca2b6459a2aa7c19b83d0e6c2cba814bea7c099e28e1d1cd04f773f7e8c12",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s50_n0/judge_passages_summary.json": "4ca8c1d65e1d403e94ed42522da48523d6a4f237e83c8c0005123ccb15cb5b7f",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s50_n1/judge_passages.jsonl": "25c1374affcdd094985d8db9cef09acfeaa46753e5c2e738fa747d139dd1994f",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s50_n1/judge_passages_headers.jsonl": "f288a0e78e7cac39cec2340bc07dff73f3faaaaa04c8f46e4b064c0dedf5f35d",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s50_n1/judge_passages_recheck.jsonl": "24e38dcbaaf373774b4d7a09e7d7b1e43aafdf7a9c9d6a1b228a9f7a90c17f42",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s50_n1/judge_passages_summary.json": "735933c310bf8512a407e55df4dda200954f41908e876df068423e199d681819",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s50_n3/judge_passages.jsonl": "5f19cc67046ebef0303d75460f3a2e08a4093ecf9c32c105449432660b084811",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s50_n3/judge_passages_headers.jsonl": "56acf249ee887ff2caf74be10f6e15e035bbcdca550b47c35d5182771d1fac99",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s50_n3/judge_passages_recheck.jsonl": "2f4b4e5104bfaa8cb978db28286ec702db537cae4cd3b193c49fcd8098ef41dc",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s50_n3/judge_passages_summary.json": "ccb7c5cc21b3bc924dd065664ef30f9d5f183fa9e6f58904ec5f5e7163f460b2",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s5_n0/judge_passages.jsonl": "cd0be1d3d44ba3378154547926e03c6b681c8f58ca062b49a1aeee4a025a87a4",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s5_n0/judge_passages_headers.jsonl": "43a62cc5a6b1454aaea3d7f7f592e37f26537fba085039c95567229c0c0931de",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s5_n0/judge_passages_recheck.jsonl": "277e013071f3fc668f4d2475333fe1329b754714198c796d28143b4cb46c8b48",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s5_n0/judge_passages_summary.json": "1080ded677e2a1739433312551ecd407da1cf50ad5f6b6d5d5c101da865651c3",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s5_n1/judge_passages.jsonl": "352e50108867c0b91f48bc2d3981c98d10e1053cf2c62e3c03e5e0c56d63ec2d",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s5_n1/judge_passages_headers.jsonl": "451e5019c519d603b21ee5b77ff395e74a9260b4ddc38930114b0ec41f5d48db",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s5_n1/judge_passages_recheck.jsonl": "a8e2055fc376a7affeecbc18185abbcf36da2eec45669eb66f4abd3544c4c770",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s5_n1/judge_passages_summary.json": "ed5f85838ecba997f5f1107995ee25e3a31ec8f6c181ed58a7adb5080462c308",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s5_n3/judge_passages.jsonl": "5e6efd97bc2b19c87807832908967039de98db218114bccf5855fe8899b292af",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s5_n3/judge_passages_headers.jsonl": "439e272ae6c9f216d4ea66773258c2d25ff6dc5daf6d129cc6fda5a5d27f9320",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s5_n3/judge_passages_recheck.jsonl": "d0fd9aded22b5ac0ce29b11b79f009129b95397ce80b45f2eca5665bc327ab0b",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__multi_hop__exp_v4_s5_n3/judge_passages_summary.json": "9e04a774b26dbed3f46fd1a7f07715210a212c00f1bb25c0b907b8716ce6dbdc",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n0/judge_passages.jsonl": "5c57ad0c077f8abee0f0514fc964d895ac57bf6d0a698f6affeee6fa181eb2d4",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n0/judge_passages_headers.jsonl": "054c546c79ffdabc5f967a904963ce786dd299573e906256e4139fb887f36519",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n0/judge_passages_recheck.jsonl": "29772dbf767eeb95006774db628f34c1a5de014b1203dad91e81d8d29c3a4400",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n0/judge_passages_summary.json": "a24d8a4502d3e4fd81234e3a5b2690fcd2ef6b662469e475b7fbc6d1595f4e77",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n1/judge_passages.jsonl": "0432b5c1774dce84986b7b05765094dd570828b72c89097cce1b3b3c60b7ce02",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n1/judge_passages_headers.jsonl": "fe13ef8457a77507b3821ba2f146c6ebb7c9e14d3f7e90db1ed5ddc95eeed4c8",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n1/judge_passages_recheck.jsonl": "d953aa48fd577b650ec52592b6468610a54f02791d62e266002e8b539bbe7e4e",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n1/judge_passages_summary.json": "e91ebaa7294084e5775f456ce969c455e72c70f9b344b26bcab04c2fe609eaed",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n3/judge_passages.jsonl": "14fe899bd691ece55b0b760059669983ba1edf8be65a78866297414abbed2dbe",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n3/judge_passages_headers.jsonl": "7b905316b99d7a7da9f43be7c5ff87f87ead6d0082885d3125cac527d895e574",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n3/judge_passages_recheck.jsonl": "e4dddb8dd7de8ad7693e69c2eeebd8bff6927a187293a66394b0b8c45e17c8c5",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n3/judge_passages_summary.json": "8580df84f6f8912a233744a88b225a2f3b2cc875222109e3b1e64666df931f5c",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s20_n0/judge_passages.jsonl": "78b1c957df0ea352c35fe7c09d4d2ee52b8446333298d301106ab3cde81fa080",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s20_n0/judge_passages_headers.jsonl": "873d0d0b8091e99c906aa76ac2b45f11010fb9bfa371915d417aa29f00e38cd8",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s20_n0/judge_passages_recheck.jsonl": "b9da392990eceade08fa1f258ca99d2e498f16b8f74a500799963c8b86dd6469",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s20_n0/judge_passages_summary.json": "5c039086992d7d6f9057d2664c45c8d54879091273a4ead1f086e29118354905",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s20_n1/judge_passages.jsonl": "3eb89eda1ee27095643b47c60aa4ff7a02bd097e91494d3f3d1d5d9488ec6897",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s20_n1/judge_passages_headers.jsonl": "9b7147165b225ed09d19799ff587d2a2fd6da6041a2c3f8d38022c1285e3d755",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s20_n1/judge_passages_recheck.jsonl": "17c5c4f7e4d6e857a97aa456e100043fb2ee34bc665dde31df6e3f659a9757e5",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s20_n1/judge_passages_summary.json": "da35007de5ff9664e4585e1cb06d51b490321146e92aa6e9643a66eb61bc190d",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s20_n3/judge_passages.jsonl": "ad3d9e2599b8a8cc93aa9d0f210262c6972dcdc500457fe36dac03cf81609533",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s20_n3/judge_passages_headers.jsonl": "710964b4cb2d60235da572c073a765bfbf45980030fea38f3694d8d35f63b4e7",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s20_n3/judge_passages_recheck.jsonl": "96c7730822f0af7b7cde3b9315209cfaa06bc6d2c8f5fbc585e3ad681bd80ad5",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s20_n3/judge_passages_summary.json": "4bdf8f98369b3e36faa8187ce77ed56d8ed1c3812cc5aae5cf98032492bc0eff",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n0/judge_passages.jsonl": "6b1558edb1482ae36cfa347c92ec46dbe28ec00c21780af03f9bad15513b6c2b",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n0/judge_passages_headers.jsonl": "17072c150f512759f9b0141254f99a68c10b9a80626ea491cfee0920e1c95b05",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n0/judge_passages_recheck.jsonl": "4a3a9fb40acb82de0280f96e60150c1f8d9591966b278a8a978f3add57facd5d",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n0/judge_passages_summary.json": "ea9085b204a8a090769863b8c0a52bf8b1abd93d791199c8a813babb4825e0b4",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n1/judge_passages.jsonl": "e29df4bb3489a542f39e13c98046fe93b24def54a2664268cfb4ab30c2da93e2",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n1/judge_passages_headers.jsonl": "80594031f81540ca843c7d6baf77f504d082d201dff25c1df3559bddbeb6e142",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n1/judge_passages_recheck.jsonl": "b6bd0754de4dd1858014b40263c60433908ed5bddb39bd56d45a6b8ebe3f49dc",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n1/judge_passages_summary.json": "e0e03add353920b73bfb18875f4893002be567d150e0e2bee4c72934d80b7341",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n3/judge_passages.jsonl": "dd1da8ee84689b2486c3e1370789b2b9c35a8d44906e5261bdea34648cdb3e77",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n3/judge_passages_headers.jsonl": "3fe91ad43ade407fff7940d73e05f0edd732d9377e7ee2dbd3d1cab2fce1a16e",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n3/judge_passages_recheck.jsonl": "e893fa6762b7c7e6c30ef62b957152c0cd35c6f4aee58f1feb9f056cc7a7b594",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n3/judge_passages_summary.json": "99ca120cc64ff291fa761ee69253395990342019db161df622f2c0eb4ae70862",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n0/judge_passages.jsonl": "5122484601f1c2e163838a3e6e53dba185b981c729b11a38e81053d6157e7919",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n0/judge_passages_headers.jsonl": "823901144ede5e065bee52083e36b4765efe7c3667c239decab46eeaaefa52de",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n0/judge_passages_recheck.jsonl": "0e9a441009a71bc32718b9959f539f878be53f5940a449fd089ad8c55fb1dc22",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n0/judge_passages_summary.json": "2d825bb8ff6f56b8752afbb7e2a94f0a994f5bb0b2aaaeb6cae6159d41724686",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n1/judge_passages.jsonl": "c0a632964dc1540bd41a603d49e75d946eb910678e2aaae3b89d7665f4a0f82a",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n1/judge_passages_headers.jsonl": "3820203515eb8e7be0cf9022c722f6dae22e44e63f2a7fe036fd562a0f5a16e2",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n1/judge_passages_recheck.jsonl": "e5955373eea507f2fc4d558efe7375bc2a256431b1858491ee4adc54fba875f6",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n1/judge_passages_summary.json": "168f0c8f1bc27cbebaf7ad98ac60114e7c485abdf390ac3e7c58e8d3da4b38be",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n3/judge_passages.jsonl": "4130fa35a07bc8affb8950ab56a75ff35db52f0e21ba3b86f90bbf5e7c1ae9b6",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n3/judge_passages_headers.jsonl": "a3874890cad56c0da015019c64bee9c0c4c854e54d90afdacf4095f9ce96b4b6",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n3/judge_passages_recheck.jsonl": "b8755dddf9f2dd445fb7a5ca163dc5c4a575c1cca23386817d0b3b1a6e18ba9b",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n3/judge_passages_summary.json": "ebbee81b27d41d62a10a5e103681f6da89d81bab044a8906436cd3424280bc7a",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n0/judge_passages.jsonl": "4f50395ffd41c1fa9735a6c74ff4c547eec87855546eee43c5bc11297ee986dc",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n0/judge_passages_headers.jsonl": "dfa9d56fb38f58b37e8f720a77b49868d75a0f6ef215ef77c1f8636f5dcc3f69",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n0/judge_passages_recheck.jsonl": "fea6521dd176d95edaafb444a9f0c9fd6ccd3fc296ac76ada343b1286c62f058",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n0/judge_passages_summary.json": "372ac4ca08f52701571d3f0fe7e7b7f306418973e90052abb49ca8aeabccfdf4",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n1/judge_passages.jsonl": "d926cfb8bd4cbc187923e27126743dc44e197e95208e97cf1b69ce0a3a727d85",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n1/judge_passages_headers.jsonl": "e2701c3d6b1deb5bcb50b537820e55a240b6c2df35f81fcbb38ffd9a7a6fac29",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n1/judge_passages_recheck.jsonl": "8b5ceb05a4e0cc46805ff4c452d9b607285043538d6470da0564f2154fb51556",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n1/judge_passages_summary.json": "618deb2b2200ac80a0e426dccce6efeec3714f227ca609b8681235ab4a60b1e0",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n3/judge_passages.jsonl": "9a2853518c91f003b417c6c1da2cd0fe5d688313ec509622574cb7dbd54ae5a3",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n3/judge_passages_headers.jsonl": "629c4acf3cb78f2288c4086a9c52e8c3b4ba551583e98d4c85bb144fe26fcf8a",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n3/judge_passages_recheck.jsonl": "92800926c2970b4fa2401b8621f6bcc9828918d5c916764cf2f7e45eb4403dfc",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n3/judge_passages_summary.json": "9b107db78be0d5f17ad81844fb111b3048a32e3819750019dd348cfb8bcd42c1",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s20_n0/judge_passages.jsonl": "d98d92060bfbf802f15f757042120761c61b98b3ea492b17dbfc4b1b1b759679",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s20_n0/judge_passages_headers.jsonl": "9d4957170e7e7615ec637686de049f6b069e1a7fece05b1e820acd1d39d0990d",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s20_n0/judge_passages_recheck.jsonl": "27cf2df6a12290ad3b32b09d53cf3328e9ef968b37f9a74532ef67a7b2466d33",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s20_n0/judge_passages_summary.json": "c54b4f22cc92a3b889b499217ce90d8ba30dd2967e72f9481d17f159b3ac4136",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s20_n1/judge_passages.jsonl": "4fe44d5229b26041ff9557cd1667bcbaa3eaf16ac4e1bf4173dd162fb2bead8a",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s20_n1/judge_passages_headers.jsonl": "0d0de41ccf198b2f2b56165ef51e80f9daf5a4eef6ed72fe2398f067e2970da5",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s20_n1/judge_passages_recheck.jsonl": "506f3ba256ea7242b348d58c124186595d35a1b77cf7880c8174ad299b52ffc4",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s20_n1/judge_passages_summary.json": "38ea96a2cd3547cf113a52fad70ce4f90e2563fbb7a8860656958c473aec0e34",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s20_n3/judge_passages.jsonl": "e705c1af6f0143c32ef94280c00520513dc2b7c6b4fecabc5808f977becea994",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s20_n3/judge_passages_headers.jsonl": "5c2a08775ff6c8ceaa923a8530c53327d7d929441345ee2ff219a81c4cb45309",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s20_n3/judge_passages_recheck.jsonl": "fda7e94363d671f68d2f12c3a9b24d784b5302386b4f845ed9e8107da5af95fc",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s20_n3/judge_passages_summary.json": "d53eb6151c2d9a8e49f1e6f2763bdf888e00a511a02993e143dbcaf167f83fbd",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s50_n0/judge_passages.jsonl": "7d0e185bf6fbaafe80b0806c469174e2cb9a54f83994becd022c4507698551ca",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s50_n0/judge_passages_headers.jsonl": "81ad49709852f5c4af4827bd4864d3d3453fdc131b61c601de67544381eaf69e",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s50_n0/judge_passages_recheck.jsonl": "0922c3e3af586f28370653ec9b3561623b043a06c0610abb4377409dd747dfce",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s50_n0/judge_passages_summary.json": "8ad85348bcf94151b7828aae7b59530d58c88b6e0ec8d289289817e04050664c",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s50_n1/judge_passages.jsonl": "c210eb53257fdda818e0e41985d3fb9649c54cf47d2a07e5cbdc2449ce6e6ef7",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s50_n1/judge_passages_headers.jsonl": "41f631a5db87941d6a18b63f2cd2c451c7fc7fca9d7098b59794799079f9bf84",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s50_n1/judge_passages_recheck.jsonl": "f535051eda9d083a9cbb9e1fccb6dc80feb9038b122139bcb43ae571c1c8c086",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s50_n1/judge_passages_summary.json": "63471ea912ce4780f6b1ad494ee6c0fc91a2ced0868f2705507932ba0d035f49",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s50_n3/judge_passages.jsonl": "b745141b6410640330b556e4fdf087d0a2b8948f5e4b09e59a9cf4f2e7909362",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s50_n3/judge_passages_headers.jsonl": "c5bfaa0d448a6a48c66ae9d2c08f0344944d24babbe900ef00c0a800edc3c67b",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s50_n3/judge_passages_recheck.jsonl": "3161949040f80061084f243a1bbd81a750079fd730713da9ae1a59759bb35ee4",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s50_n3/judge_passages_summary.json": "4fcaf607a27ade1c2722c1c47fbc594245e9ac7b4f4f0d9700e2700871e7b19c",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s5_n0/judge_passages.jsonl": "863d188b99dfc1bff6af45c9060550f4edd88212d2423d0ebebbee9e50989d21",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s5_n0/judge_passages_headers.jsonl": "ea6f492b16147688393b0facced670f6414407c14698b4242f0c5e551ba83efe",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s5_n0/judge_passages_recheck.jsonl": "d92dac2e58a9e5d243447f6d9855b2fde4dbdfec853e5ee98db086c1a8b5e047",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s5_n0/judge_passages_summary.json": "9655dd00108ad4d7af22b2202f491980079e59521e0fe35e95c8cdb191d91520",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s5_n1/judge_passages.jsonl": "d7a819ce2fcc955cd6bea9a0d6000844c38e57bd45d593cb30ef26358056d373",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s5_n1/judge_passages_headers.jsonl": "b531a19d90ccd6db92929321f307c4d3e24501e1172d0847767cd2d6630d5ef6",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s5_n1/judge_passages_recheck.jsonl": "4de6ec0639303d61ab94330028ecc42d5dc1fe9a8119e2e0b2d82fb7926ab3a3",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s5_n1/judge_passages_summary.json": "54e9eda930672affd710dc687693fe8219f971de785de9bc23e3c95f4eb6267e",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s5_n3/judge_passages.jsonl": "051fadd4bc88d0b369b5b2f9d5a48732cbbfe23cd4a944cc85c885d773d8aee2",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s5_n3/judge_passages_headers.jsonl": "ad45673c23769676624ef1584deb76b2423e471915d96ce18ee294bedc6040a1",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s5_n3/judge_passages_recheck.jsonl": "cd9c1bb1d9f606991b56eda73d0c30cd6203e61149a991625db268d9af354773",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s5_n3/judge_passages_summary.json": "cf84455c808815cc789d5e699cf75aa6a3d0237d90a68f7d9a1c301dc68d3f7b",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s10_n0/judge_passages.jsonl": "5a05730ee4c0f32800142031348df1fe3888a27cdc663874c9defe2662ab339f",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s10_n0/judge_passages_headers.jsonl": "072678da7116adce6e199b5268b2021666568712f9af4b4c973b8f64fcada7bb",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s10_n0/judge_passages_recheck.jsonl": "9909d508955ef244aac9b6f021a4ed2dda61ab1f52f23700b3f3bacdd5350065",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s10_n0/judge_passages_summary.json": "302293a0e280f9c9076a76a94bb27e48808147a964ee812c5fa7bc29c38d5703",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s10_n1/judge_passages.jsonl": "ac14cdd5212d982f199a878d435bfa8575bbe310a9dea01fbec93c8191f9f380",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s10_n1/judge_passages_headers.jsonl": "ba8024812cb7a3f377badb57267390c04a0d2965243c1f8c63244a76d0a506d5",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s10_n1/judge_passages_recheck.jsonl": "e761dd183c54037f7947bc4c0adcf3885cf0fc326e60dba5d5eda53a26ee954a",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s10_n1/judge_passages_summary.json": "ccbe71493bda4b26bad6f86653f88e64a475b3c573cb177ff2daf2b6bd955d67",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s10_n3/judge_passages.jsonl": "71b6af9ebb9e77fa2af7ccfd7d89cda6e9b6bf59afc2e8add408dfc6c29fdd1d",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s10_n3/judge_passages_headers.jsonl": "d1685a377d9add78788863293e09c9566aa5d59dc7a14dfdfd6c7aad85b166bb",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s10_n3/judge_passages_recheck.jsonl": "c6608f17722d48e7a35ff8771e14d0123a4fb585b4c152dc661c58e154d77179",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s10_n3/judge_passages_summary.json": "e7652d0549a0a55147891c2fc72d7e93517a275a6fb2a7a99415e6335f5fb23f",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s20_n0/judge_passages.jsonl": "5d232d73c169acd697f55ab238d5953bb74a82e6e047fecab9ab157de909e40c",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s20_n0/judge_passages_headers.jsonl": "842e28e6370aa44384e7daad0e9e0a9fec202b0065342add4afa3503b0193577",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s20_n0/judge_passages_recheck.jsonl": "b702e99b9e77e7588b3ee86669cef8fa55883cec16edad7a1abbc6d7fde86237",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s20_n0/judge_passages_summary.json": "5aa73f1db5b517940a202f36dd812c8c99d3701d62c9e554080bfac9092217d3",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s20_n1/judge_passages.jsonl": "c98feab52bda47c309c752c8d9f1661c4619b24bdb7c13b4e1fe53cd04ad20ab",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s20_n1/judge_passages_headers.jsonl": "801bcd2f8b2090fc231354eb4778de868c34561bda161261f8454c4485db5e48",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s20_n1/judge_passages_recheck.jsonl": "34529ac2dd85bea76b24745da8f75bc7c0d855ffd1b836e7a896522ae3fdf5b5",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s20_n1/judge_passages_summary.json": "e299e4a530ff4411338d3debca5d92207b0153d694b52875193072907a258d3a",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s20_n3/judge_passages.jsonl": "6d391d88149572b6e53c131e11b0379636af961db680dfb87b7145f438029590",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s20_n3/judge_passages_headers.jsonl": "26fbee1353bad632b6accfd16216b8802eb999c740a62c78e3cd46a6ee7c7a3d",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s20_n3/judge_passages_recheck.jsonl": "97f134514da02e28d8e3d0444d86972caefda6afc73bb99c930907679d1b5ba6",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s20_n3/judge_passages_summary.json": "6c4784073cc7fce594f39970304f97c6e566469155471e27c0dee54576cc3da2",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s50_n0/judge_passages.jsonl": "aa3bcc8ece2ba5e526dc20ab088880bbca4bda5471a5134a0eac045c13e9c33e",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s50_n0/judge_passages_headers.jsonl": "ccb19c743616e5089319e51007c08cda98fea95d0368c7551ed37b4cd7fca88d",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s50_n0/judge_passages_recheck.jsonl": "57a48b88d0af55040a4b38f3038f5d9a09cf689687a872c0bdfeec2afc4e3b92",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s50_n0/judge_passages_summary.json": "56977de23cc68931ab3ea62eb7ea71e18707895f161c3473f19b0f345b3fb003",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s50_n1/judge_passages.jsonl": "b4b1ad8b2045672f8796afd9a089908ad79829b788f047ec3bf1bb9f650870a5",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s50_n1/judge_passages_headers.jsonl": "ce348537034eda7269ed765bc9834af1fc490d48574d3cdd992032ad4118eb66",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s50_n1/judge_passages_recheck.jsonl": "437329546fe953ecebda8896ded667e010873a857a3a47d354d313c057cb10e1",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s50_n1/judge_passages_summary.json": "8d626696ef8d7fc8b396e53497ec0083cec6bedb93d64730c594fb15ef9296cc",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s50_n3/judge_passages.jsonl": "4fb7bfa64de8575b76d82542e5bab94a5d1ed4a7747bdc8e7c064beaf66da72a",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s50_n3/judge_passages_headers.jsonl": "89f7761f5668f231ea13be0aab3c618c94a5d13c3d1afb8155de4c4933efd311",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s50_n3/judge_passages_recheck.jsonl": "4e8ec861b6c136a86c6670e4567a9bd49441645f5c5675c3dc0c87b4482d0af2",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s50_n3/judge_passages_summary.json": "164b3e450c81f504d154494cfffce3b93c4ad739486da9240ddf75948bda0520",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s5_n0/judge_passages.jsonl": "aae4b31ee56e46e6cb52dfd715e4a83d9cd5a0fcbf8184ce4bd781843eeed62b",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s5_n0/judge_passages_headers.jsonl": "dfdaeb5496fd11ff91d1de326735b6433869d639b4a155691ce83ebeeeeb22ca",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s5_n0/judge_passages_recheck.jsonl": "c6f86edc899252a5e0cf5fd9538b2768501579137d22b58ac1f1f19d4e2882b7",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s5_n0/judge_passages_summary.json": "d42d616757d8cb1d037bfa711d8685ecdd5efb3996ac3d24fe062823a944d5de",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s5_n1/judge_passages.jsonl": "7418bed2de8a8e6aa8a607764ca97d93914cc9d8c72c58c9e10f1584e8aa9da9",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s5_n1/judge_passages_headers.jsonl": "5271656025656e44cb1ca8bbf9017173aff40fbe2322dc4fc9367a8a4d71c199",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s5_n1/judge_passages_recheck.jsonl": "8819d6455147fe70b6e8992ed23dc342b84b0bd8684154600a767914104e5ea5",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s5_n1/judge_passages_summary.json": "f65a146fdfba8b371352a2020d91b913a61d29422d59c754f15981f6b7df5903",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s5_n3/judge_passages.jsonl": "eba35daabe90531bdba55be448945be8502aa225d6f1aa61f249b7034bd6aece",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s5_n3/judge_passages_headers.jsonl": "ffcc39dc1bba38f7309329a847a033f83fc3f7d25a5d9a391e9415937102f854",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s5_n3/judge_passages_recheck.jsonl": "bcb6540bcca3da1b02d94abe3c1805e39b8d47e89f902074c21ebbe4aaa0eda5",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s5_n3/judge_passages_summary.json": "fc6d9d8cb8f6eb59841322ba416d0ccd2e8f6d067d04acf8a66ea9847f34ed57",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s10_n0/judge_passages.jsonl": "573d476fa609d252e9c7c4c4897bfbcb2d4256a1b65a0ce651de642a9189b061",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s10_n0/judge_passages_headers.jsonl": "0fae4cd858672f250ed8b90919a607ea08d0a7a97b3e1bd42e2be7f3ea217e81",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s10_n0/judge_passages_recheck.jsonl": "f5cbee59ee9a256252cf1f8b2687d8ae76cb57f7986e1158a8afa4fed33391ae",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s10_n0/judge_passages_summary.json": "1b6e2bd58ce884c5706ddb00bf53c8a2855aa9f53c7f08f59bab09278afad127",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s10_n1/judge_passages.jsonl": "eac1c7c976409a45840cb37054e8326f7db841238286d400e8309d0de9973474",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s10_n1/judge_passages_headers.jsonl": "f1fdb05fa224d316555fa18db7324963434e4d62038b31b91dceb1e2fc130d27",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s10_n1/judge_passages_recheck.jsonl": "ca16383cb1fd0515cf831500fafa0720c1f52dbee43560660dd8febed091f2d4",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s10_n1/judge_passages_summary.json": "a106102ec9de4a4d62bc04bad97994086ca667aee5a74c12af80250ec632bee8",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s10_n3/judge_passages.jsonl": "dedeca3d1296b365c49657e619cbd0eabe86f6245957e0a59bd347069c52c12a",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s10_n3/judge_passages_headers.jsonl": "74e71882c637bf50f4efe428f3013ced18418d9811d522b89eff9cb2f3061c46",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s10_n3/judge_passages_recheck.jsonl": "3568ca5e19461be19bdef48f3063685f71924d18026523808de38c91f6b050ad",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s10_n3/judge_passages_summary.json": "aea2d98a7d891b32f66b282a6c23b75c5f708d2f7a02018e768eeb2516c80ad9",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s20_n0/judge_passages.jsonl": "d568a4832d7a9e1a303b92c98315df62bb1bd646cce5739d633e9bdf6e755275",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s20_n0/judge_passages_headers.jsonl": "9dfbcd590f6a344591717a65a746c91021bfccd503e44791565c115b44c6b3b6",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s20_n0/judge_passages_recheck.jsonl": "ef374dcc5f5333c2f522ff64a79f062a32f86aba4de9a2addc07df20d8903817",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s20_n0/judge_passages_summary.json": "9be614ab63e81efd3c311abb67799f11102b2b14bee89bd74d52eb2ffd4ccb4b",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s20_n1/judge_passages.jsonl": "5a987ba256e9c35d923bc92d6f83eef91f7a66bff9711a810d6513f5c38b9929",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s20_n1/judge_passages_headers.jsonl": "969b7b57f17a5e75ca7bb724583a0adf575fdcd9adebad61f06e91c5f276321f",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s20_n1/judge_passages_recheck.jsonl": "dde0da8016093285ea57550d1c67f184509b448c4110d2da59d94b5017299439",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s20_n1/judge_passages_summary.json": "f9dbab2da3cdeb601c050325ccb329503bd9175871bfba57283df1fb1aa18da0",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s20_n3/judge_passages.jsonl": "73310f7bdaf831659dc9aa01bd3927367da2b36b4bc8865325f9c99c9f3ae9cd",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s20_n3/judge_passages_headers.jsonl": "bfd5f9fd31e0ddb68520e842865c6a2924c1cda531ad49edab23b79199453c62",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s20_n3/judge_passages_recheck.jsonl": "fea73bf41d01d4e834879fe2fd4a63f4cefc5c2bcf0ad703c11e6be7afea9a39",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s20_n3/judge_passages_summary.json": "6af1548f9f446330925e264530eb23f05fe795a32ce8abeeb60f39f272c831bb",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s50_n0/judge_passages.jsonl": "33a4200e222417898b6c46622ed184c6505f3e265c9e5dcf192bd96a3e626a97",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s50_n0/judge_passages_headers.jsonl": "160c349f2a930abe63144d3f2861dbd42827d1cb3a23981beb53dd7718bc0df7",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s50_n0/judge_passages_recheck.jsonl": "cca3d1a2c3eb5a8d341548100254e02fa56d9f37d880fde24bf52d76d5459d7e",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s50_n0/judge_passages_summary.json": "e7eecb950a12666be399b2f794318692163aaff33cbf9fbcd0ac7bf12693d192",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s50_n1/judge_passages.jsonl": "6be26451cb5465ca083a99d36e3ea8443d7d284c8c88c77b0aa687bec04dd6d4",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s50_n1/judge_passages_headers.jsonl": "c0b952c8eb9499047a3db1f43b6f7234de4cec54df3d743e4f415967c61f2219",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s50_n1/judge_passages_recheck.jsonl": "27c22c7d98b19b592fe11b98de78a56e8f1f52938b8adb8ccf27182820088f62",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s50_n1/judge_passages_summary.json": "d7d76ea060987c630d434af638b56d2e255460cc5f9065bef36f79ef18aba092",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s50_n3/judge_passages.jsonl": "11722a4e76ccfbdf095452ef1a48ffcaa8152710dd44ad691c35e93d0f9989fa",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s50_n3/judge_passages_headers.jsonl": "74fa5f03d3882159e9179db00eb437d01363c94c00deb275e3e0529e6aeb2497",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s50_n3/judge_passages_recheck.jsonl": "9bdb7b70e8cf56bb45b701475533ae05000b9aa1beb8bdb4a14498a2647781ee",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s50_n3/judge_passages_summary.json": "596b641853d690e60370184efa35935d3636f85fedef03110c91d1cec71fe906",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s5_n0/judge_passages.jsonl": "e9286d30fcaa1a7e4fc528ceb5cee144463e76dce81afca9456f566d6ee6bcee",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s5_n0/judge_passages_headers.jsonl": "956da8c92cd14ce453b8d4a881d47a27e63c3c3396b816fdaa1f9d196c38393b",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s5_n0/judge_passages_recheck.jsonl": "028a28caf680a1528d45e7bb903645d12f2e747a9b87b73c8d56123d6b5a02d0",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s5_n0/judge_passages_summary.json": "e773a2e86902568c0eeebba5d1bcc29bc04b7a21c12263385dc8dbbfcce93a72",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s5_n1/judge_passages.jsonl": "68ce1d6340753d30cdd082b46eab0478b01dbbc2900442547d2cbba7a7facd69",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s5_n1/judge_passages_headers.jsonl": "242ab7ca8221abfa91073577ae46e0cd08e91e16da97c367097873be13a8616f",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s5_n1/judge_passages_recheck.jsonl": "c1d4c85472e2800500fd4b9fa63996144ae0255205cce804329a0c7a3f93b96f",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s5_n1/judge_passages_summary.json": "e46da4ed06a389a10ee88a5d0dfcd95f9fcb90020ea5ac564300c78d46ab4ff7",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s5_n3/judge_passages.jsonl": "068ee66b44a1f4716aefd1ab53f98ca40859b242e436246c99f731d17b4454a5",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s5_n3/judge_passages_headers.jsonl": "994919c3f5002a26ed23834d7d73a90e64d4397cded01c0772be8528f20d6b64",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s5_n3/judge_passages_recheck.jsonl": "dbfeccef6b7ad6095a14d0194848040d4d1986ccfd1b2accb5d97fb91d211a4c",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__single_pass__exp_v4_s5_n3/judge_passages_summary.json": "c96553144166d0d3bd6ef7374822a91f2307dced2a652d5651a8be1ca9d71819",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s10_n0/judge_passages.jsonl": "2f581af7ef65c80cdebcada5e8c75b66990d2a07f159b83b5e8e45798d5a8785",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s10_n0/judge_passages_headers.jsonl": "d33e202c2c2c6a9e5132294d39c9b07ec149ab8602fbcf91ca4cbd16709dcab2",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s10_n0/judge_passages_recheck.jsonl": "624b427153c5051462b6be37cdc8e31a84fcc64e998fb60c4c9edff67f8ede83",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s10_n0/judge_passages_summary.json": "a13b55e12f0ad488c817c857b2b30d9df9ffc074644160f991731989c63c4cf4",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s10_n1/judge_passages.jsonl": "c86f04754d45fb1f43588ab25a97407831a7155129a1ae8a56461206ad95202c",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s10_n1/judge_passages_headers.jsonl": "8558714897fdd0e07965ba15781ce1d78c1bfdffaccdf92486188a81c3c078a5",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s10_n1/judge_passages_recheck.jsonl": "c5a111e86fa1aa8a6de705ba8846afeb6d9932db76d27a71722f95f7687620a8",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s10_n1/judge_passages_summary.json": "d1302ba5c83427f9a67dd96add0093cba82b9603c76cde03cde769a63ff5551d",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s10_n3/judge_passages.jsonl": "fd5cc9b0461377b5402d4e5116b1ccf8afb341ea81c7af287ae45e4da8ea3ad5",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s10_n3/judge_passages_headers.jsonl": "df0c681f7d830496d95bca04544afc952ab9964676518d9b1a1dd0ab5677c96b",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s10_n3/judge_passages_recheck.jsonl": "0d5b736ac482b7aa5a76d73b9bc2bab5554cde6b93065ee2a2e41683445343cb",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s10_n3/judge_passages_summary.json": "bb6a50587e5bd4bc685674cdb04cad6f5e67a75a1ff06017bf6d54f38d81ee59",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s20_n0/judge_passages.jsonl": "9ed4c12ee18731c1fe72ad8a4d5246eb51cae3ecb3cde205c0cafa079cc4f255",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s20_n0/judge_passages_headers.jsonl": "eaa6eab79eb6eaab06f7db486636dd85431ac227b93bbcace1bfb013f7dbaa17",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s20_n0/judge_passages_recheck.jsonl": "829689e86cd7144a14218ec32c2ad29f7320042b8928d87228ba3cb8b8830604",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s20_n0/judge_passages_summary.json": "9f94e7b697bb0f170500a8871330d533d54d20114d89504570ecdaf21dc72011",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s20_n1/judge_passages.jsonl": "6bd2b043b34a0a5a1624582172930f8e12192be36e30c7d334378645f5f6e4f1",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s20_n1/judge_passages_headers.jsonl": "760353a64848124496d9b28559638b0efe74847d29f712c336d578343d2bc3cd",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s20_n1/judge_passages_recheck.jsonl": "bfcc5f5e6e1e5f4e8306a215e60b4b6ec2deacab13bd498f3a7fbd5a1c49243d",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s20_n1/judge_passages_summary.json": "cf011f2708e1ba0d45a44a70ab2dd15c83f062c866d0fa6eb58fa155640bd76b",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s20_n3/judge_passages.jsonl": "75c39e05b016a01558eadd73609299689c8313e044343c6ed3eafb433ce7a375",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s20_n3/judge_passages_headers.jsonl": "244aea84ae8a6e0633be0b0d8ab054f2224c73446851dbb6d9710340af613c70",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s20_n3/judge_passages_recheck.jsonl": "af7e9603f2e85ff0123a8fc4b6a60b04d68f38451b4276b06bfc0212a29ad4e3",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s20_n3/judge_passages_summary.json": "269d1df00a5e5d4bb722783cdcf0193620161ee8dd01ae0af61fe16ea1c1e23c",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s50_n0/judge_passages.jsonl": "bd0ebd3fc5e219fc24ca083fdaec247b161ac21b4f49c664d2872e7274d64596",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s50_n0/judge_passages_headers.jsonl": "6435bcee824238cac423b5a067cc6e4553bbfb90e598ea27eac1358a112d6eb0",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s50_n0/judge_passages_recheck.jsonl": "ba7258b78d5d75de546df3f70140435cec92af75cdeb5d1a0f7dc056be8f7aaa",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s50_n0/judge_passages_summary.json": "f5815032d37cde8dba52f9d50a6a5c5f016615f71450d6c3617eb4a478023329",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s50_n1/judge_passages.jsonl": "672b1da9c06f258855c023f9e3fbc5ee32dadaf9a59dacf5b91f2642134a7a0c",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s50_n1/judge_passages_headers.jsonl": "bf843c014ef39fbf16758e3fdae82d7a99999e0a49016a7c10e2831d2095a886",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s50_n1/judge_passages_recheck.jsonl": "1bfd85caed6305577a51ab5f9a873b658a14711e11ebf1a58046b1e23b2e41c7",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s50_n1/judge_passages_summary.json": "65f422d94ce7774bb237be6fb9752f02db5c4571ca4d7e3091964ad1fa5f8b99",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s50_n3/judge_passages.jsonl": "0bb106ae262fefdcb46999e56b4d32437e0d19cb28baca1870f64c72ed55f285",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s50_n3/judge_passages_headers.jsonl": "3f3fbad0e80444316070aac11369ca2ad59337dcb16b4efeb9ccdb99001dd9c4",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s50_n3/judge_passages_recheck.jsonl": "3e49ea2d79bb94d286fa7e8f34a417fc9571d34a2b7f2838da398893935ed66a",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s50_n3/judge_passages_summary.json": "9a672c94f41de8ffa6319ea50cb5464d699e0cd51ae34da671e5cfc185e991cb",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s5_n0/judge_passages.jsonl": "f3e0378f9d7498b3b192bb35afbcf9e7d4a762f1565f1d8d2bdf4795218b5205",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s5_n0/judge_passages_headers.jsonl": "d2e479d5cb994eb0b884fa4d3da71ec11170c1be4bd51939faf82d13976888f7",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s5_n0/judge_passages_recheck.jsonl": "4f335c81b66f7cf6b587a057659131e143ce1b1fc28ea19958b47c2a162048ac",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s5_n0/judge_passages_summary.json": "2360f46774ef3525769d36780b7e7bfadc13eca6761a3cb5b2bf2ce4e72eb83e",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s5_n1/judge_passages.jsonl": "3c26505c018236295585ccf4f10eb3294f393e624f5df66fe2c3007ebb1e7992",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s5_n1/judge_passages_headers.jsonl": "9159cf30302e8964bad5e6c9a6ce20b1aa49148ec6090be2b90f16a1f3dbecfc",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s5_n1/judge_passages_recheck.jsonl": "1aed4bf2f5c2eb62a60c14455cc58f58ffacee2be829b07df00e70e9337bea97",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s5_n1/judge_passages_summary.json": "a5327bd3c396ce7ec77a18d1fd51f8a7300ebe265a1a94f96a1ffaf642532ea6",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s5_n3/judge_passages.jsonl": "8c05195482c302a58ea163e42e7d67f7ef5bf5e6203d3bb2c97304bc6e8da5d4",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s5_n3/judge_passages_headers.jsonl": "3d9c816227a1670a2e858647e5035759f81d7e89045d11482eb29204ee50fa20",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s5_n3/judge_passages_recheck.jsonl": "cfc816aa4eb378e6547dab6dad75115f8804bf39b846b4c44aa29ce8b6480da1",
+  "findings/recompute/fig3_inputs/s3/out_g4/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s5_n3/judge_passages_summary.json": "b46e837d38812ee79dc2f50bcad0295bf07ba083db62ab694112cc5cce8484e8",
+  "findings/recompute/fig3_inputs/s3/out_g4/start_11453_20261021T151042.json": "4f4dad4c8fea789b8533cf4b1f60ea499d341c8b70d3eebbd6104a6203feb0cf",
+  "findings/recompute/fig3_inputs/s3/out_g4/start_11453_20261021T195809.json": "ebfaaaba3fb18b5abbc6ceef97dcb767c65b2ad49b63fddd4a6db824656fbae6",
+  "findings/recompute/fig3_inputs/s3/out_g4/start_11453_20261023T184323.json": "85c312d50f245b7ef1034c8dc7870b2b9dfd9e92923ea88dddecd36ff80c42a1",
+  "findings/recompute/fig3_inputs/s3/out_g4/start_11453_20261024T185020.json": "1a59de44b33a56eef6039203f44c33be2aae58260e18d9ee33769e447da8a631",
+  "findings/recompute/fig3_inputs/s3/out_g4/start_11455_20261024T231846.json": "b0f8f006171f38e756a66ef57cb3af63b0dadb311b235b303dfea1d74615f99c",
+  "findings/recompute/fig3_inputs/s3/out_g4/units_11453.tsv": "906ddbed44fd01a265e1764d2b09a5df91ae72979d2be26c966054ecf0cc9886",
+  "findings/recompute/fig3_inputs/s3/out_g4/units_11455.tsv": "906ddbed44fd01a265e1764d2b09a5df91ae72979d2be26c966054ecf0cc9886",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/claims.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n0/judge_passages.jsonl": "15265a5ce9c7145c935d82f1d56283a774a9eb168d9b008629dde38edd862d6f",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n0/judge_passages_headers.jsonl": "0e18947df544a532293a8228b62448e6d452811e5eb4b08f6b361a82a7c1fa86",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n0/judge_passages_recheck.jsonl": "da1cd2d3f2608172fdb5d01bfb553349d7c1efcb3de62cfc31e13da8fcab7770",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n0/judge_passages_summary.json": "0074cd5fea658a6891bbb16f6819afde855ef3df25baca1f122574f5f9d63456",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n3/judge_passages.jsonl": "12024fea0110a8fd451fe66d5c14986732509dc4fc46e4e293cfd2940b5a0850",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n3/judge_passages_headers.jsonl": "b49b28e0293328315a98781496edb6cd63f2a24c2d52afaf71215932a2df084c",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n3/judge_passages_recheck.jsonl": "b29d983d02af2c6fd42a4e1861cb099b54333fb8566ce3c0c20646044df6cc44",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n3/judge_passages_summary.json": "c3a717da4666e6ba6f63e48e35105f0511e5b55a3a57747496af07ce9c0e82b4",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n1/judge_passages.jsonl": "9e0653d6f2f7bc6ebe4ebc919bd52828cb918ba96166ee2d3ba3ff76a63d39bb",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n1/judge_passages_headers.jsonl": "47a7cde15772133ef5224529c22c79ad9d9a487eace5cb298b5116890f9f6fc4",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n1/judge_passages_recheck.jsonl": "06eff1784cbb787bbd5d32042033c0821ea6e8833b4b0e67a1ee9f31ba015dad",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n1/judge_passages_summary.json": "cd25d773c319ddd3b9d82e39e3a7b9e9f132405ca7c039a0b99f2e1e1e43e101",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n3/judge_passages.jsonl": "20d7f1c2cc0c880c3f2bc48808a65ac35cd33669a199146099b1de92479e9aee",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n3/judge_passages_headers.jsonl": "90478ce4336141443c7323fcb9557baeb3d6a0dece0a37441d1ec3d80b47ce6a",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n3/judge_passages_recheck.jsonl": "7dc4a90bd562959bb5c4d59345f6c5e35bab1bcb58adc7969477449ad4bab41e",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n3/judge_passages_summary.json": "005cbfff8dbd192299e299271e7f1aa45e1a04df1b86a1ba6e69c20b411b28c0",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n0/judge_passages.jsonl": "98fe4b7884fb87efab0cc9fb43ef5fc445a432568b72e3fdfc1721e5686b0dc0",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n0/judge_passages_headers.jsonl": "6281c3bda35fcced2485afef4c280d8d83719b5eae4b6b27dce3d148fc404a09",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n0/judge_passages_recheck.jsonl": "4a7c0fda7fcb8174b8a85e0d134b37b18cc38509c71f350f408d4ab3fa9e63a1",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n0/judge_passages_summary.json": "108606e3588bedd2d1bd2ce9166c4404fe7c764f70cf207b4acb4662e2a32ac2",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n1/judge_passages.jsonl": "b595569e100c05361203cc7f819bd4f8b9c481b0143e7d1cdf256652fca589e5",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n1/judge_passages_headers.jsonl": "7804aa561904d8e453a34cb115687889832d76ce181025a7eb75cdb37c1d4b72",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n1/judge_passages_recheck.jsonl": "9e4409da0248441b400e7f4057d1f0bffaf2861cd078543dc4c1f09412947a3e",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n1/judge_passages_summary.json": "dbffbef58050220d6a9b7a4e9368428bc380446382afce492e37a6b0e6b16688",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n3/judge_passages.jsonl": "825f18b17e489bb15350d6a84b06dcd6442830837d55dade54f7cc834c0962b0",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n3/judge_passages_headers.jsonl": "12fc741df15f626012e4c116a613d3c0c7cc0f8447c97db041c80e95dfc173ec",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n3/judge_passages_recheck.jsonl": "eddae1e0ed85a7eb2d2acdc7ce65c044a3f7f730073b5309197be513b0f66f96",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n3/judge_passages_summary.json": "087cabfbdeae2ce8bc04feb6ff7d9c700b41225c7dac04443c28b228bcefbba5",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n0/judge_passages.jsonl": "0c3e4223c44d4007fb7b77470f80f20545943e77c91e8eed37a6cfb0d26894e6",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n0/judge_passages_headers.jsonl": "61e8ca5164c29d180163d52f79e6022935f6fc5a6bd0390dcfcb6cbdb71920d6",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n0/judge_passages_recheck.jsonl": "09eb9e63b24fa72e9c0addbb3575b97734468443d5478be8f8c70c2ea8f68013",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n0/judge_passages_summary.json": "17268456816f525061b1c116a348126bc347e84200b465b6753017ea5c2b6608",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n3/judge_passages.jsonl": "6d4b33a46f74a9e9c80109fe97fc1e8ec0121d163849c2dc347c8ed369b56a32",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n3/judge_passages_headers.jsonl": "6afc5b8eb05d21d3de68a80765c3f41d496d4b5ec0ae64fa22e2a173a463a104",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n3/judge_passages_recheck.jsonl": "ba2a40ed51be6a63461034bf383c3a6b4156f3da7544f1632d71cc1615c32c91",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n3/judge_passages_summary.json": "b40d1bb77fa13850ef0b4346f1d91db122191883c607e5bb8d705c8232766724",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s50_n1/judge_passages.jsonl": "6843a6b08a28764d400537b3bd7f4e6a2bbae72ed8347bd80e7e7f2e48eefb61",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s50_n1/judge_passages_headers.jsonl": "417dd44e8dafefe1141081ac45b4643bbda04044fc3f4da3c77664fb7ba0b883",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s50_n1/judge_passages_recheck.jsonl": "5263a2a3f65e15e0053ddf96c51b6d47ba2572826684fc0c6ce55045d2def0f0",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s50_n1/judge_passages_summary.json": "196315de1871b342d6dfa704cf0b63f0f0589d7a60b19422b8b185df5be7f232",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s5_n3/judge_passages.jsonl": "857fabb405caf451b3db72adbeeff0419f33198673e582459c6751224f8cac1c",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s5_n3/judge_passages_headers.jsonl": "d1e55e6b8f92fae2a66b59bfd9e296fe3fbbb7c68438267227d9f6e3463c3cfd",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s5_n3/judge_passages_recheck.jsonl": "20bb4a56efd75acdf7b98bef2aaa0e02116a2f89acd710f8670ad469060d6996",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__rlm_5__exp_v4_s5_n3/judge_passages_summary.json": "e3cde135d601664629a4adb36045e7271f78a909cde8179374013eef61533732",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s20_n0/judge_passages.jsonl": "dc007520a42be62e2baae11f1ed49bf3b81a5b478bdea2db4c8ab13f5bae73f4",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s20_n0/judge_passages_headers.jsonl": "f80bfa35da5d6596d5da40ed0d1c956fc44c31e08cc8b5d19fa52c39d977f8c2",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s20_n0/judge_passages_recheck.jsonl": "d8fcb427cd8c159eda526c031d3e028bdfc51434f247bbff0377294f6aca73c1",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/judge/exp_02_scaling_factorial__verified_pass__exp_v4_s20_n0/judge_passages_summary.json": "ec9612636335287b931b8c9e3c6589fde59b1b354fb3984ed363086407a74f82",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/start_11453_20261027T014102.json": "bd7b17d67b39d5ab1fb3b21968e9065d7d76470e7ad7dd2839dae35486b1f4db",
+  "findings/recompute/fig3_inputs/s3/out_g4r38/units_11453.tsv": "0fc2e953e840c6f0670d3b2508b57797ea1543d7a8027699f5a355b66b9ca748"
+ },
+ "g4r38_keys_file": {
+  "path": "findings/recompute/G4_runs/g4r38_keys.txt",
+  "sha256": "f27e02041710e0f106e77ff9c18d96a359c38d450678513ce1f38ca487318bd0"
+ },
+ "grid": {
+  "anchor_sha256": "b9fe21836d6ed583e98b82832ef7b071c0a82dfa5ff49fb7d4023c6913106d97",
+  "cells_complete": 60,
+  "checks_d160": {
+   "g4r38_texts": {
+    "answer_text_sha256": {
+     "exp_v4_s10_n0|rlm_10|SY_008|d1": "8e2040212359088a3738b745622ab9508a6ae012c74b7024f55bda6c1fd7a7ac",
+     "exp_v4_s10_n0|rlm_10|SY_009|d1": "a3f153ae14849a51df81f6d1f05b0ef153e5e947aacb7694b8cd9ee63b682b8b",
+     "exp_v4_s10_n0|rlm_20|01_sarek_CO2|d1": "e82e6fee43dbd68e0fae05a31134dd6624907f5fed5a2e82124a2722eecba00d",
+     "exp_v4_s10_n0|rlm_20|01_sarek_FR1|d1": "4a2663a65140e40c22a73a7644e29f1a27a7858b60288c61854afff8a5bee43a",
+     "exp_v4_s10_n0|rlm_20|01_sarek_TE3|d1": "c0a248269f8122498ec3f669308521d1d627d86156a8a14ba97f2b053ad90a26",
+     "exp_v4_s10_n0|rlm_20|02_snakemake_CO2|d1": "080108fe0a93892026e472e04e15a0cd02b453bd608144f7035194825de3802c",
+     "exp_v4_s10_n0|rlm_20|02_snakemake_FR1|d1": "5c2d420dc75ba2b0289431bdcbd28587ce78c5742fdd0be70aff6b8b2821e531",
+     "exp_v4_s10_n0|rlm_20|02_snakemake_TE3|d1": "ada816559aef9e10248c0f43fe1c0ba070971d39580eb517090ac799f92d51e1",
+     "exp_v4_s10_n0|rlm_20|03_nfcore_framework_CO2|d1": "d899199fd9b6d5a4187ba43f40f4d8594ebd86479ecaf4244c132008668d2eea",
+     "exp_v4_s10_n0|rlm_20|03_nfcore_framework_FR1|d1": "70b13394f22996bbb684af08992199d2c67bea457591300bfebe7b79d70f8543",
+     "exp_v4_s10_n0|rlm_20|03_nfcore_framework_TE3|d1": "b20a828099b5e6bdd460d9e72b59166c3b1581a1da097eb1c568a160a3216f67",
+     "exp_v4_s10_n0|rlm_20|04_fastp_CO2|d1": "57faa261b6140ab67ee6ca0811d58aa45a2e4392c40476301f164d1bfd39b925",
+     "exp_v4_s10_n0|rlm_20|04_fastp_TE3|d1": "9c023b28e106b13c331f5047f814c2f3ae6954ef856e31b68393547fd8cd0cbf",
+     "exp_v4_s10_n0|rlm_20|05_multiqc_CO2|d1": "55a2398cb87f59c60f2354d0d531068eb3249c09a17665aed00acc34b3e5517c",
+     "exp_v4_s10_n0|rlm_20|05_multiqc_FR1|d1": "79ffd02e773ac66d3a241c32ac12c77a475834d693025851bc6486d1cb3e2300",
+     "exp_v4_s10_n0|rlm_20|05_multiqc_TE3|d1": "8e96a80273193125e751d772473fca442d9844e51e392cc66c648d9a758b955e",
+     "exp_v4_s10_n0|rlm_20|06_star_aligner_CO2|d1": "afdb81c14ad299f214d2717cc1dcc8ef63def6b4c745d3dfef2ecb156d4dc0d5",
+     "exp_v4_s10_n0|rlm_20|06_star_aligner_TE3|d1": "1e4c5a742e585bdf41fbcac5883c8d19c5b649a3eff1af4baf5c69fff4e1274c",
+     "exp_v4_s10_n0|rlm_20|07_salmon_CO2|d1": "97929e54e7abb14cb97a865fe0e9ab2bdc7bcb275ddbaec6f2bc8bbc6e95b587",
+     "exp_v4_s10_n3|rlm_10|SY_008|d1": "a6ee4a1763e72da0314c3c18ec4ef179fe9e67bcdcc9370a16ce06056808f53d",
+     "exp_v4_s10_n3|rlm_20|01_sarek_CO2|d1": "d60e7393f0f3852f82c08e2975338b4fd018aa498c1e50c1ef692d7ac2e79d65",
+     "exp_v4_s10_n3|rlm_20|01_sarek_FR1|d1": "484770fabfd663f9350fdc3464796c5c0f466195d752f7e8e2bea4b96b7c60ad",
+     "exp_v4_s10_n3|rlm_20|01_sarek_TE3|d1": "273836fb6e1b6e237612e3428fea57ed5e038aa2d32b137d7d3610e84a69eb01",
+     "exp_v4_s10_n3|rlm_20|02_snakemake_TE3|d1": "f5be5a0da4c287fe0bec2d0951ad7ee8a213dced922048c154e48385ca5600cd",
+     "exp_v4_s10_n3|rlm_20|03_nfcore_framework_CO2|d1": "f7b910b1c0b1509d49eda886c7e5c0cba77f8e05b6f211b3c76c40d65330a832",
+     "exp_v4_s20_n0|verified_pass|CD_010|d1": "ebed69adaf1afb02a1b6ace672eb037f1e83b65ac0637e5171503292b74c1bbf",
+     "exp_v4_s50_n1|rlm_10|OOD_014|d1": "49bc1230860f80b2d2079fb60ae968b58eac4a8f5deadbe45573f007ba6269ca",
+     "exp_v4_s50_n1|rlm_5|22_pig_mags_FR1|d1": "9549de8080ebe1b04546318e346182836b7977cb1db429bbcfef468688fdfcb2",
+     "exp_v4_s50_n1|rlm_5|22_pig_mags_TE3|d1": "1c11741879fc0eb64c95e7ed9abd945d9029974ecdaf5152a036a2d0df44755a",
+     "exp_v4_s50_n3|rlm_10|OOD_014|d1": "9f61e2ebaf3d9a8318f34d7be33b8ea3f762c18f284bac5d46a631bc9f64aff6",
+     "exp_v4_s5_n0|rlm_10|19_hpai_canada_FR1|d1": "221700a5563dbd3add58c45f4eb9a6764c6ec9a2b393b253d1092d04d4e6269d",
+     "exp_v4_s5_n1|rlm_10|OOD_050|d1": "27f9c052fab6e98dd7d6e0b47bfef6f3f2b85ac307d549d6e9577d1f0e1a129d",
+     "exp_v4_s5_n1|rlm_10|SY_001|d1": "eba55d75a366ca20394ff97f4f37044f05bd6c8535adcab22ec2fecd866c414e",
+     "exp_v4_s5_n1|rlm_10|SY_002|d1": "814994fdaabccfd93d955ab58da248bfa6d300d4447ed6cb855a857f3a7e88f9",
+     "exp_v4_s5_n1|rlm_10|SY_003|d1": "ba7cc35851a2afccf8a1dea1dfc24c5a50fc5bd86d710fb0bcd707c66078d502",
+     "exp_v4_s5_n3|rlm_10|18_fmd_review_TE3|d1": "4611f99fc1cfceebb9e961f5f3597e3e8e44a6eca07424a8ca2587ffb002a6bc",
+     "exp_v4_s5_n3|rlm_5|07_salmon_TE3|d1": "55910cec009909cd861d9f54d87f86b8a25c699833d37b9e11dd6cb0cb765f98",
+     "exp_v4_s5_n3|rlm_5|10_cutadapt_CO2|d1": "74a33d8865a1135e9b705e563b123184ea50cc30aee65ab7988546842d171d94"
+    },
+    "answers": 38,
+    "files_sha256": {
+     "findings/recompute/fig3_g4r38_inputs/COPY.json": "f5d0037bc6d1505c3af0d29f995697fafa22f2260b3a26456ccd62e396c63447",
+     "findings/recompute/fig3_g4r38_inputs/MANIFEST.sha256": "cf7b360215cd42fbafa338ad721e8fb62cf0e5fbffa37cf806257613278c65fc",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n0/answers.jsonl": "f2374fd67a21051a7addd37e8c55063e29ee4992ed8ed66f5f381f45d0d9e9a6",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n0/index_identity.jsonl": "67d8f4df71c520854ede09d24b02a72b752b673dc729a608d5000b7860cb240f",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n0/run_identity.json": "43d6f46bf1276236cfb9d29d59a442d10ed242975c15dfda8e822b161e3a1993",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n3/answers.jsonl": "b6a426168dba4baf7ce8e5385ba20689121f2dd248c2025a341e8d318366d571",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n3/index_identity.jsonl": "0b4959b8574befe936bcdbe082dfa006067bef29d49cadd8ca925c8fe1173396",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_10__exp_v4_s10_n3/run_identity.json": "fcf7b04aa74c8a65dc64cd99eeb1ea66220ced2d030c9413bea82148bd8032ad",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n1/answers.jsonl": "e189ca9e30320fce5a15599efbfba2024e06a490dc7c63b14c499b6921240f68",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n1/index_identity.jsonl": "484880a43ac84e61133a7f210478b61577248fe5547914dc88fbc8f3cd965a9c",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n1/run_identity.json": "31bf9134fc739e3f1c3b3fa3ca41ca15b1f6fa303e87b102b2cbe0000138eb4c",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n3/answers.jsonl": "02a2ef419a4e30b952c44385012544ee3f28305ce6ace10e4585900ea0f70bed",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n3/index_identity.jsonl": "4c25043d58eade3497874e796ddb40e153222054c901cf9fcf7f27b2911d3217",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_10__exp_v4_s50_n3/run_identity.json": "cc1135a58ae7250e355b96662c147901c386d632dd06d4a26df46a0070542b38",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n0/answers.jsonl": "34a745f8ed77eeaaad415e768fa3eb5e38f4ce5b18d63b391acc962fd7e947eb",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n0/index_identity.jsonl": "9552f3ee0ffe4904c6a3125b251ced68dd4d5c7b2059ae412abeb3aec513f1d0",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n0/run_identity.json": "6b142dcd1432c6ac61f46bf2df102cac112f865ce0cda032e6b76f92eecdd6f0",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n1/answers.jsonl": "92000a57f1d716370aab8cada7eafe211808c68e83bf7feba2a35c1274d6f3f6",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n1/index_identity.jsonl": "ff2da7f90fb7cf78d425ca446e3c8d9c146ce44964999c71ef24c653e1973e71",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n1/run_identity.json": "1d5ca8c8e0905e150961e784582ce99c9a111d0844afb7844b383f19bd40fa1c",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n3/answers.jsonl": "bf46852118237fa55730ca4532fe19353929b5557da535ed7c88dab8b6f61d35",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n3/index_identity.jsonl": "1ab32d5d34bffb2cb48750d2a80e951b9d0c24bd36e7343a00154213195ef81b",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n3/run_identity.json": "a1608e61401da366be8e619f29b7904007f14881d33dbc61f026436831e91f8c",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n0/answers.jsonl": "8611f4d8680f7aa9089b11cf3f98f95ea8287a947e91d6b5a29b0876f1fa0ac9",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n0/index_identity.jsonl": "4118b8b9943b8bc30e6bc2663580bfd7c391717a773edc4fe7a4e9dfa31f1cd9",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n0/run_identity.json": "e3c0ab3131eb616670ebaa03d9ff3d47b0a2f612a1b39b7451add8fd12f835a4",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n3/answers.jsonl": "4bd8f0d1c0f53be9670db8de6c36252a252eb87c2b773753e0996a5a6a814a1f",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n3/index_identity.jsonl": "af8a86b5c76a08df2bad53f1b2f19d2a6cd96d4765af6e943a00b77ed3af8964",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_20__exp_v4_s10_n3/run_identity.json": "d81707722dd93d777fdc3703ba8c0ddc50452f2638fba59e59929fcf6a283d1c",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_5__exp_v4_s50_n1/answers.jsonl": "054bed51422ccc290eab217f8206e21459705982b5c0c20bc5013288fa483a5f",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_5__exp_v4_s50_n1/index_identity.jsonl": "ace0bec0bd1ec9c428c2b10c6241fbad9dede48a92a5893eff0ae9141344d18a",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_5__exp_v4_s50_n1/run_identity.json": "befbe2422f22fa89a3df534471592f143dcde57cdc95274d0acb87ef89f74ee2",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_5__exp_v4_s5_n3/answers.jsonl": "5a4c373ce39a3b95ebdf8caab2a34a8bc90082e5cc70b6eda8a7f2d67bce3521",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_5__exp_v4_s5_n3/index_identity.jsonl": "b12eef4502e18e17cc76c4d4b07253a91ef4f2da89111dd3dd7b1a900978a92a",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__rlm_5__exp_v4_s5_n3/run_identity.json": "a261660ee75710310ec68984222d0bce988715023a33daf5f89b4ccd65bd3ae4",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__verified_pass__exp_v4_s20_n0/answers.jsonl": "cdedbcd0aae55bdc885f61ef84b5e40c3392939726db5043a9958732496bf1f8",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__verified_pass__exp_v4_s20_n0/index_identity.jsonl": "a29d3b1243b2245a0c80bc73947947a258089031a0079178b86cfb36612a4d19",
+     "findings/recompute/fig3_g4r38_inputs/runs/exp_02_scaling_factorial__verified_pass__exp_v4_s20_n0/run_identity.json": "a7e03b50ae5d5b872d68d2970d59a468d40e8cf0292529a79c6f4cd32486538e"
+    },
+    "frozen": true,
+    "set": "findings/recompute/fig3_g4r38_inputs"
+   },
+   "judge_rows": {
+    "by_status": {
+     "failed": 36,
+     "ok": 8118
+    },
+    "cells": 8154,
+    "g4r38_from_out_g4r38": 35,
+    "judge_rows_matched": 8118
+   },
+   "pre_d156": {
+    "anchor": "findings/recompute/G4_fig3c/anchor_pre_d156_grid.json",
+    "anchor_from": "8ab8614a:findings/recompute/G4_fig3c/grid_tables.json",
+    "anchor_sha256": "5ed7d4aa5410fdef60a9e5978aca943c97d51a1d30c5361c49f4ff718a1897ac",
+    "cells": 120,
+    "complete_before_d156": 108,
+    "complete_since_d156": [
+     "score 3 verified_pass exp_v4_s50_n0",
+     "score 3 verified_pass exp_v4_s50_n1",
+     "score 3 verified_pass exp_v4_s50_n3",
+     "score 3 verified_pass exp_v4_s5_n0",
+     "score 3 verified_pass exp_v4_s5_n1",
+     "score 3 verified_pass exp_v4_s5_n3",
+     "score 4 verified_pass exp_v4_s50_n0",
+     "score 4 verified_pass exp_v4_s50_n1",
+     "score 4 verified_pass exp_v4_s50_n3",
+     "score 4 verified_pass exp_v4_s5_n0",
+     "score 4 verified_pass exp_v4_s5_n1",
+     "score 4 verified_pass exp_v4_s5_n3"
+    ],
+    "drawn_changed": [
+     {
+      "drawn": {
+       "ci95_pp": [
+        -9.090909090909092,
+        18.181818181818183
+       ],
+       "d_pp": 4.545454545454546,
+       "n_paired": 22,
+       "p_signflip": 1.0,
+       "pass_single_pass_pct": 90.9090909090909,
+       "pass_strategy_pct": 95.45454545454545
+      },
+      "index": "exp_v4_s5_n1",
+      "pre_d156": {
+       "ci95_pp": [
+        -10.0,
+        20.0
+       ],
+       "d_pp": 5.0,
+       "n_paired": 20,
+       "p_signflip": 1.0,
+       "pass_single_pass_pct": 90.0,
+       "pass_strategy_pct": 95.0
+      },
+      "score": 3,
+      "strategy": "rlm_10",
+      "why": "a judged G4R38 rerun enters it"
+     },
+     {
+      "drawn": {
+       "ci95_pp": [
+        0.0,
+        15.909090909090908
+       ],
+       "d_pp": 6.8181818181818175,
+       "n_paired": 44,
+       "p_signflip": 0.25,
+       "pass_single_pass_pct": 93.18181818181819,
+       "pass_strategy_pct": 100.0
+      },
+      "index": "exp_v4_s10_n0",
+      "pre_d156": {
+       "ci95_pp": [
+        0.0,
+        22.22222222222222
+       ],
+       "d_pp": 11.11111111111111,
+       "n_paired": 27,
+       "p_signflip": 0.25,
+       "pass_single_pass_pct": 88.88888888888889,
+       "pass_strategy_pct": 100.0
+      },
+      "score": 3,
+      "strategy": "rlm_20",
+      "why": "a judged G4R38 rerun enters it"
+     },
+     {
+      "drawn": {
+       "ci95_pp": [
+        -6.8181818181818175,
+        11.363636363636363
+       ],
+       "d_pp": 2.272727272727273,
+       "n_paired": 44,
+       "p_signflip": 1.0,
+       "pass_single_pass_pct": 93.18181818181819,
+       "pass_strategy_pct": 95.45454545454545
+      },
+      "index": "exp_v4_s10_n3",
+      "pre_d156": {
+       "ci95_pp": [
+        -7.6923076923076925,
+        12.82051282051282
+       ],
+       "d_pp": 2.564102564102564,
+       "n_paired": 39,
+       "p_signflip": 1.0,
+       "pass_single_pass_pct": 92.3076923076923,
+       "pass_strategy_pct": 94.87179487179488
+      },
+      "score": 3,
+      "strategy": "rlm_20",
+      "why": "a judged G4R38 rerun enters it"
+     },
+     {
+      "drawn": {
+       "ci95_pp": [
+        -3.488372093023256,
+        5.813953488372093
+       ],
+       "d_pp": 1.1627906976744187,
+       "n_paired": 86,
+       "p_signflip": 1.0,
+       "pass_single_pass_pct": 91.86046511627907,
+       "pass_strategy_pct": 93.02325581395348
+      },
+      "index": "exp_v4_s20_n0",
+      "pre_d156": {
+       "ci95_pp": [
+        -3.5294117647058822,
+        5.88235294117647
+       ],
+       "d_pp": 1.1764705882352942,
+       "n_paired": 85,
+       "p_signflip": 1.0,
+       "pass_single_pass_pct": 91.76470588235294,
+       "pass_strategy_pct": 92.94117647058823
+      },
+      "score": 3,
+      "strategy": "verified_pass",
+      "why": "a judged G4R38 rerun enters it"
+     },
+     {
+      "drawn": {
+       "ci95_pp": [
+        -3.488372093023256,
+        5.813953488372093
+       ],
+       "d_pp": 1.1627906976744187,
+       "n_paired": 86,
+       "p_signflip": 1.0,
+       "pass_single_pass_pct": 91.86046511627907,
+       "pass_strategy_pct": 93.02325581395348
+      },
+      "index": "exp_v4_s50_n0",
+      "pre_d156": null,
+      "score": 3,
+      "strategy": "verified_pass",
+      "why": "complete since D156"
+     },
+     {
+      "drawn": {
+       "ci95_pp": [
+        0.0,
+        5.813953488372093
+       ],
+       "d_pp": 2.3255813953488373,
+       "n_paired": 86,
+       "p_signflip": 0.5,
+       "pass_single_pass_pct": 91.86046511627907,
+       "pass_strategy_pct": 94.18604651162791
+      },
+      "index": "exp_v4_s50_n1",
+      "pre_d156": null,
+      "score": 3,
+      "strategy": "verified_pass",
+      "why": "complete since D156"
+     },
+     {
+      "drawn": {
+       "ci95_pp": [
+        -5.813953488372093,
+        3.488372093023256
+       ],
+       "d_pp": -1.1627906976744187,
+       "n_paired": 86,
+       "p_signflip": 1.0,
+       "pass_single_pass_pct": 93.02325581395348,
+       "pass_strategy_pct": 91.86046511627907
+      },
+      "index": "exp_v4_s50_n3",
+      "pre_d156": null,
+      "score": 3,
+      "strategy": "verified_pass",
+      "why": "complete since D156"
+     },
+     {
+      "drawn": {
+       "ci95_pp": [
+        -13.636363636363635,
+        0.0
+       ],
+       "d_pp": -4.545454545454546,
+       "n_paired": 22,
+       "p_signflip": 1.0,
+       "pass_single_pass_pct": 90.9090909090909,
+       "pass_strategy_pct": 86.36363636363636
+      },
+      "index": "exp_v4_s5_n0",
+      "pre_d156": null,
+      "score": 3,
+      "strategy": "verified_pass",
+      "why": "complete since D156"
+     },
+     {
+      "drawn": {
+       "ci95_pp": [
+        0.0,
+        0.0
+       ],
+       "d_pp": 0.0,
+       "n_paired": 22,
+       "p_signflip": 1.0,
+       "pass_single_pass_pct": 90.9090909090909,
+       "pass_strategy_pct": 90.9090909090909
+      },
+      "index": "exp_v4_s5_n1",
+      "pre_d156": null,
+      "score": 3,
+      "strategy": "verified_pass",
+      "why": "complete since D156"
+     },
+     {
+      "drawn": {
+       "ci95_pp": [
+        -13.636363636363635,
+        0.0
+       ],
+       "d_pp": -4.545454545454546,
+       "n_paired": 22,
+       "p_signflip": 1.0,
+       "pass_single_pass_pct": 90.9090909090909,
+       "pass_strategy_pct": 86.36363636363636
+      },
+      "index": "exp_v4_s5_n3",
+      "pre_d156": null,
+      "score": 3,
+      "strategy": "verified_pass",
+      "why": "complete since D156"
+     },
+     {
+      "drawn": {
+       "ci95_pp": [
+        -27.27272727272727,
+        22.727272727272727
+       ],
+       "d_pp": 0.0,
+       "n_paired": 22,
+       "p_signflip": 1.0,
+       "pass_single_pass_pct": 81.81818181818181,
+       "pass_strategy_pct": 81.81818181818181
+      },
+      "index": "exp_v4_s5_n1",
+      "pre_d156": {
+       "ci95_pp": [
+        -25.0,
+        30.0
+       ],
+       "d_pp": 0.0,
+       "n_paired": 20,
+       "p_signflip": 1.0,
+       "pass_single_pass_pct": 80.0,
+       "pass_strategy_pct": 80.0
+      },
+      "score": 4,
+      "strategy": "rlm_10",
+      "why": "a judged G4R38 rerun enters it"
+     },
+     {
+      "drawn": {
+       "ci95_pp": [
+        -25.0,
+        2.272727272727273
+       ],
+       "d_pp": -11.363636363636363,
+       "n_paired": 44,
+       "p_signflip": 0.2265625,
+       "pass_single_pass_pct": 86.36363636363636,
+       "pass_strategy_pct": 75.0
+      },
+      "index": "exp_v4_s10_n0",
+      "pre_d156": {
+       "ci95_pp": [
+        -18.51851851851852,
+        18.51851851851852
+       ],
+       "d_pp": 0.0,
+       "n_paired": 27,
+       "p_signflip": 1.0,
+       "pass_single_pass_pct": 77.77777777777777,
+       "pass_strategy_pct": 77.77777777777777
+      },
+      "score": 4,
+      "strategy": "rlm_20",
+      "why": "a judged G4R38 rerun enters it"
+     },
+     {
+      "drawn": {
+       "ci95_pp": [
+        -15.909090909090908,
+        11.363636363636363
+       ],
+       "d_pp": -2.272727272727273,
+       "n_paired": 44,
+       "p_signflip": 1.0,
+       "pass_single_pass_pct": 86.36363636363636,
+       "pass_strategy_pct": 84.0909090909091
+      },
+      "index": "exp_v4_s10_n3",
+      "pre_d156": {
+       "ci95_pp": [
+        -12.82051282051282,
+        17.94871794871795
+       ],
+       "d_pp": 2.564102564102564,
+       "n_paired": 39,
+       "p_signflip": 1.0,
+       "pass_single_pass_pct": 84.61538461538461,
+       "pass_strategy_pct": 87.17948717948718
+      },
+      "score": 4,
+      "strategy": "rlm_20",
+      "why": "a judged G4R38 rerun enters it"
+     },
+     {
+      "drawn": {
+       "ci95_pp": [
+        -5.813953488372093,
+        10.465116279069768
+       ],
+       "d_pp": 2.3255813953488373,
+       "n_paired": 86,
+       "p_signflip": 0.7744140625,
+       "pass_single_pass_pct": 83.72093023255815,
+       "pass_strategy_pct": 86.04651162790698
+      },
+      "index": "exp_v4_s20_n0",
+      "pre_d156": {
+       "ci95_pp": [
+        -5.88235294117647,
+        10.588235294117647
+       ],
+       "d_pp": 2.3529411764705883,
+       "n_paired": 85,
+       "p_signflip": 0.7744140625,
+       "pass_single_pass_pct": 83.52941176470588,
+       "pass_strategy_pct": 85.88235294117646
+      },
+      "score": 4,
+      "strategy": "verified_pass",
+      "why": "a judged G4R38 rerun enters it"
+     },
+     {
+      "drawn": {
+       "ci95_pp": [
+        -2.3255813953488373,
+        9.30232558139535
+       ],
+       "d_pp": 3.488372093023256,
+       "n_paired": 86,
+       "p_signflip": 0.453125,
+       "pass_single_pass_pct": 82.55813953488372,
+       "pass_strategy_pct": 86.04651162790698
+      },
+      "index": "exp_v4_s50_n0",
+      "pre_d156": null,
+      "score": 4,
+      "strategy": "verified_pass",
+      "why": "complete since D156"
+     },
+     {
+      "drawn": {
+       "ci95_pp": [
+        -3.488372093023256,
+        10.465116279069768
+       ],
+       "d_pp": 3.488372093023256,
+       "n_paired": 86,
+       "p_signflip": 0.5078125,
+       "pass_single_pass_pct": 81.3953488372093,
+       "pass_strategy_pct": 84.88372093023256
+      },
+      "index": "exp_v4_s50_n1",
+      "pre_d156": null,
+      "score": 4,
+      "strategy": "verified_pass",
+      "why": "complete since D156"
+     },
+     {
+      "drawn": {
+       "ci95_pp": [
+        -4.651162790697675,
+        11.627906976744185
+       ],
+       "d_pp": 3.488372093023256,
+       "n_paired": 86,
+       "p_signflip": 0.5810546875,
+       "pass_single_pass_pct": 80.23255813953489,
+       "pass_strategy_pct": 83.72093023255815
+      },
+      "index": "exp_v4_s50_n3",
+      "pre_d156": null,
+      "score": 4,
+      "strategy": "verified_pass",
+      "why": "complete since D156"
+     },
+     {
+      "drawn": {
+       "ci95_pp": [
+        -9.090909090909092,
+        18.181818181818183
+       ],
+       "d_pp": 4.545454545454546,
+       "n_paired": 22,
+       "p_signflip": 1.0,
+       "pass_single_pass_pct": 81.81818181818181,
+       "pass_strategy_pct": 86.36363636363636
+      },
+      "index": "exp_v4_s5_n0",
+      "pre_d156": null,
+      "score": 4,
+      "strategy": "verified_pass",
+      "why": "complete since D156"
+     },
+     {
+      "drawn": {
+       "ci95_pp": [
+        -9.090909090909092,
+        18.181818181818183
+       ],
+       "d_pp": 4.545454545454546,
+       "n_paired": 22,
+       "p_signflip": 1.0,
+       "pass_single_pass_pct": 81.81818181818181,
+       "pass_strategy_pct": 86.36363636363636
+      },
+      "index": "exp_v4_s5_n1",
+      "pre_d156": null,
+      "score": 4,
+      "strategy": "verified_pass",
+      "why": "complete since D156"
+     },
+     {
+      "drawn": {
+       "ci95_pp": [
+        -9.090909090909092,
+        18.181818181818183
+       ],
+       "d_pp": 4.545454545454546,
+       "n_paired": 22,
+       "p_signflip": 1.0,
+       "pass_single_pass_pct": 81.81818181818181,
+       "pass_strategy_pct": 86.36363636363636
+      },
+      "index": "exp_v4_s5_n3",
+      "pre_d156": null,
+      "score": 4,
+      "strategy": "verified_pass",
+      "why": "complete since D156"
+     }
+    ],
+    "equal_on_held_reading": 108
+   }
+  },
+  "gate": {
+   "anchor": "findings/recompute/G4_fig3c/anchor_d149_rlm10.json",
+   "anchor_reading": "G4R38 reruns held out (as g4_cells holds a key whose rerun is not judged): D149's anchor is checked on this reading, which is not drawn (D156)",
+   "anchor_reading_compared": 1599,
+   "compared": 3078,
+   "drawn_reading": "G4R38 reruns judged: drawn (pairs.jsonl, point_tables.json, grid_pairs.jsonl, grid_tables.json); checked for (1) and (2) of grid_gate, not against the anchor (D156)",
+   "drawn_reading_compared": 1479,
+   "g4r38_held_for_anchor": [
+    "exp_v4_s10_n0|rlm_10|SY_008|d1",
+    "exp_v4_s10_n0|rlm_10|SY_009|d1",
+    "exp_v4_s10_n0|rlm_20|01_sarek_CO2|d1",
+    "exp_v4_s10_n0|rlm_20|01_sarek_FR1|d1",
+    "exp_v4_s10_n0|rlm_20|01_sarek_TE3|d1",
+    "exp_v4_s10_n0|rlm_20|02_snakemake_CO2|d1",
+    "exp_v4_s10_n0|rlm_20|02_snakemake_FR1|d1",
+    "exp_v4_s10_n0|rlm_20|02_snakemake_TE3|d1",
+    "exp_v4_s10_n0|rlm_20|03_nfcore_framework_CO2|d1",
+    "exp_v4_s10_n0|rlm_20|03_nfcore_framework_FR1|d1",
+    "exp_v4_s10_n0|rlm_20|03_nfcore_framework_TE3|d1",
+    "exp_v4_s10_n0|rlm_20|04_fastp_CO2|d1",
+    "exp_v4_s10_n0|rlm_20|04_fastp_TE3|d1",
+    "exp_v4_s10_n0|rlm_20|05_multiqc_CO2|d1",
+    "exp_v4_s10_n0|rlm_20|05_multiqc_FR1|d1",
+    "exp_v4_s10_n0|rlm_20|05_multiqc_TE3|d1",
+    "exp_v4_s10_n0|rlm_20|06_star_aligner_CO2|d1",
+    "exp_v4_s10_n0|rlm_20|06_star_aligner_TE3|d1",
+    "exp_v4_s10_n0|rlm_20|07_salmon_CO2|d1",
+    "exp_v4_s10_n3|rlm_10|SY_008|d1",
+    "exp_v4_s10_n3|rlm_20|01_sarek_CO2|d1",
+    "exp_v4_s10_n3|rlm_20|01_sarek_FR1|d1",
+    "exp_v4_s10_n3|rlm_20|01_sarek_TE3|d1",
+    "exp_v4_s10_n3|rlm_20|02_snakemake_TE3|d1",
+    "exp_v4_s10_n3|rlm_20|03_nfcore_framework_CO2|d1",
+    "exp_v4_s20_n0|verified_pass|CD_010|d1",
+    "exp_v4_s50_n1|rlm_10|OOD_014|d1",
+    "exp_v4_s50_n1|rlm_5|22_pig_mags_FR1|d1",
+    "exp_v4_s50_n1|rlm_5|22_pig_mags_TE3|d1",
+    "exp_v4_s50_n3|rlm_10|OOD_014|d1",
+    "exp_v4_s5_n0|rlm_10|19_hpai_canada_FR1|d1",
+    "exp_v4_s5_n1|rlm_10|OOD_050|d1",
+    "exp_v4_s5_n1|rlm_10|SY_001|d1",
+    "exp_v4_s5_n1|rlm_10|SY_002|d1",
+    "exp_v4_s5_n1|rlm_10|SY_003|d1",
+    "exp_v4_s5_n3|rlm_10|18_fmd_review_TE3|d1",
+    "exp_v4_s5_n3|rlm_5|07_salmon_TE3|d1",
+    "exp_v4_s5_n3|rlm_5|10_cutadapt_CO2|d1"
+   ]
+  },
+  "held_cells_complete": 60,
+  "inputs": {
+   "answer_lines": {
+    "exp_02_scaling_factorial__multi_hop__exp_v4_s10_n0": 135,
+    "exp_02_scaling_factorial__multi_hop__exp_v4_s10_n1": 135,
+    "exp_02_scaling_factorial__multi_hop__exp_v4_s10_n3": 135,
+    "exp_02_scaling_factorial__multi_hop__exp_v4_s20_n0": 135,
+    "exp_02_scaling_factorial__multi_hop__exp_v4_s20_n1": 135,
+    "exp_02_scaling_factorial__multi_hop__exp_v4_s20_n3": 135,
+    "exp_02_scaling_factorial__multi_hop__exp_v4_s50_n0": 244,
+    "exp_02_scaling_factorial__multi_hop__exp_v4_s50_n1": 244,
+    "exp_02_scaling_factorial__multi_hop__exp_v4_s50_n3": 244,
+    "exp_02_scaling_factorial__multi_hop__exp_v4_s5_n0": 135,
+    "exp_02_scaling_factorial__multi_hop__exp_v4_s5_n1": 135,
+    "exp_02_scaling_factorial__multi_hop__exp_v4_s5_n3": 135,
+    "exp_02_scaling_factorial__rlm_10__exp_v4_s10_n0": 135,
+    "exp_02_scaling_factorial__rlm_10__exp_v4_s10_n1": 135,
+    "exp_02_scaling_factorial__rlm_10__exp_v4_s10_n3": 135,
+    "exp_02_scaling_factorial__rlm_10__exp_v4_s20_n0": 135,
+    "exp_02_scaling_factorial__rlm_10__exp_v4_s20_n1": 135,
+    "exp_02_scaling_factorial__rlm_10__exp_v4_s20_n3": 135,
+    "exp_02_scaling_factorial__rlm_10__exp_v4_s50_n0": 244,
+    "exp_02_scaling_factorial__rlm_10__exp_v4_s50_n1": 244,
+    "exp_02_scaling_factorial__rlm_10__exp_v4_s50_n3": 244,
+    "exp_02_scaling_factorial__rlm_10__exp_v4_s5_n0": 135,
+    "exp_02_scaling_factorial__rlm_10__exp_v4_s5_n1": 135,
+    "exp_02_scaling_factorial__rlm_10__exp_v4_s5_n3": 135,
+    "exp_02_scaling_factorial__rlm_20__exp_v4_s10_n0": 135,
+    "exp_02_scaling_factorial__rlm_20__exp_v4_s10_n1": 135,
+    "exp_02_scaling_factorial__rlm_20__exp_v4_s10_n3": 135,
+    "exp_02_scaling_factorial__rlm_20__exp_v4_s20_n0": 135,
+    "exp_02_scaling_factorial__rlm_20__exp_v4_s20_n1": 135,
+    "exp_02_scaling_factorial__rlm_20__exp_v4_s20_n3": 135,
+    "exp_02_scaling_factorial__rlm_20__exp_v4_s50_n0": 244,
+    "exp_02_scaling_factorial__rlm_20__exp_v4_s50_n1": 244,
+    "exp_02_scaling_factorial__rlm_20__exp_v4_s50_n3": 244,
+    "exp_02_scaling_factorial__rlm_20__exp_v4_s5_n0": 135,
+    "exp_02_scaling_factorial__rlm_20__exp_v4_s5_n1": 135,
+    "exp_02_scaling_factorial__rlm_20__exp_v4_s5_n3": 135,
+    "exp_02_scaling_factorial__rlm_5__exp_v4_s10_n0": 135,
+    "exp_02_scaling_factorial__rlm_5__exp_v4_s10_n1": 135,
+    "exp_02_scaling_factorial__rlm_5__exp_v4_s10_n3": 135,
+    "exp_02_scaling_factorial__rlm_5__exp_v4_s20_n0": 135,
+    "exp_02_scaling_factorial__rlm_5__exp_v4_s20_n1": 135,
+    "exp_02_scaling_factorial__rlm_5__exp_v4_s20_n3": 135,
+    "exp_02_scaling_factorial__rlm_5__exp_v4_s50_n0": 244,
+    "exp_02_scaling_factorial__rlm_5__exp_v4_s50_n1": 244,
+    "exp_02_scaling_factorial__rlm_5__exp_v4_s50_n3": 244,
+    "exp_02_scaling_factorial__rlm_5__exp_v4_s5_n0": 135,
+    "exp_02_scaling_factorial__rlm_5__exp_v4_s5_n1": 135,
+    "exp_02_scaling_factorial__rlm_5__exp_v4_s5_n3": 135,
+    "exp_02_scaling_factorial__single_pass__exp_v4_s10_n0": 135,
+    "exp_02_scaling_factorial__single_pass__exp_v4_s10_n1": 135,
+    "exp_02_scaling_factorial__single_pass__exp_v4_s10_n3": 135,
+    "exp_02_scaling_factorial__single_pass__exp_v4_s20_n0": 135,
+    "exp_02_scaling_factorial__single_pass__exp_v4_s20_n1": 135,
+    "exp_02_scaling_factorial__single_pass__exp_v4_s20_n3": 135,
+    "exp_02_scaling_factorial__single_pass__exp_v4_s50_n0": 244,
+    "exp_02_scaling_factorial__single_pass__exp_v4_s50_n1": 244,
+    "exp_02_scaling_factorial__single_pass__exp_v4_s50_n3": 244,
+    "exp_02_scaling_factorial__single_pass__exp_v4_s5_n0": 135,
+    "exp_02_scaling_factorial__single_pass__exp_v4_s5_n1": 135,
+    "exp_02_scaling_factorial__single_pass__exp_v4_s5_n3": 135,
+    "exp_02_scaling_factorial__verified_pass__exp_v4_s10_n0": 135,
+    "exp_02_scaling_factorial__verified_pass__exp_v4_s10_n1": 135,
+    "exp_02_scaling_factorial__verified_pass__exp_v4_s10_n3": 135,
+    "exp_02_scaling_factorial__verified_pass__exp_v4_s20_n0": 135,
+    "exp_02_scaling_factorial__verified_pass__exp_v4_s20_n1": 135,
+    "exp_02_scaling_factorial__verified_pass__exp_v4_s20_n3": 135,
+    "exp_02_scaling_factorial__verified_pass__exp_v4_s50_n0": 244,
+    "exp_02_scaling_factorial__verified_pass__exp_v4_s50_n1": 244,
+    "exp_02_scaling_factorial__verified_pass__exp_v4_s50_n3": 244,
+    "exp_02_scaling_factorial__verified_pass__exp_v4_s5_n0": 135,
+    "exp_02_scaling_factorial__verified_pass__exp_v4_s5_n1": 135,
+    "exp_02_scaling_factorial__verified_pass__exp_v4_s5_n3": 135
+   },
+   "claims": [],
+   "collect_rows_rlm10_sp": 11620,
+   "collect_sidecar": {
+    "added_by_replace": 38,
+    "replaced": 0,
+    "rows": 11620,
+    "run_sha256": "38ae79ab023b97562b69b2875b3c8001b02f887d5578121103b85d4a0b4729da",
+    "status_a": {
+     "ok": 11620
+    }
+   },
+   "common_answerable": 86,
+   "copy": "2026-10-21T14:54:23+0200",
+   "copy_from": "Bioinfos-Mac-Studio.local:/Users/bioinfo-001/projects/mentori-runs-g4/findings/runs",
+   "covered": {
+    "10": 44,
+    "20": 86,
+    "5": 22,
+    "50": 86
+   },
+   "covered_how": "D126: of the common set's answerable questions, those whose source papers (the D5 key's source_files) are all among the index's core papers 01 to N; equal to the per-size answerable questions restricted to the common set (coverage_check)",
+   "g4r38_judged": 38,
+   "g4r38_judged_keys": [
+    "exp_v4_s10_n0|rlm_10|SY_008|d1",
+    "exp_v4_s10_n0|rlm_10|SY_009|d1",
+    "exp_v4_s10_n0|rlm_20|01_sarek_CO2|d1",
+    "exp_v4_s10_n0|rlm_20|01_sarek_FR1|d1",
+    "exp_v4_s10_n0|rlm_20|01_sarek_TE3|d1",
+    "exp_v4_s10_n0|rlm_20|02_snakemake_CO2|d1",
+    "exp_v4_s10_n0|rlm_20|02_snakemake_FR1|d1",
+    "exp_v4_s10_n0|rlm_20|02_snakemake_TE3|d1",
+    "exp_v4_s10_n0|rlm_20|03_nfcore_framework_CO2|d1",
+    "exp_v4_s10_n0|rlm_20|03_nfcore_framework_FR1|d1",
+    "exp_v4_s10_n0|rlm_20|03_nfcore_framework_TE3|d1",
+    "exp_v4_s10_n0|rlm_20|04_fastp_CO2|d1",
+    "exp_v4_s10_n0|rlm_20|04_fastp_TE3|d1",
+    "exp_v4_s10_n0|rlm_20|05_multiqc_CO2|d1",
+    "exp_v4_s10_n0|rlm_20|05_multiqc_FR1|d1",
+    "exp_v4_s10_n0|rlm_20|05_multiqc_TE3|d1",
+    "exp_v4_s10_n0|rlm_20|06_star_aligner_CO2|d1",
+    "exp_v4_s10_n0|rlm_20|06_star_aligner_TE3|d1",
+    "exp_v4_s10_n0|rlm_20|07_salmon_CO2|d1",
+    "exp_v4_s10_n3|rlm_10|SY_008|d1",
+    "exp_v4_s10_n3|rlm_20|01_sarek_CO2|d1",
+    "exp_v4_s10_n3|rlm_20|01_sarek_FR1|d1",
+    "exp_v4_s10_n3|rlm_20|01_sarek_TE3|d1",
+    "exp_v4_s10_n3|rlm_20|02_snakemake_TE3|d1",
+    "exp_v4_s10_n3|rlm_20|03_nfcore_framework_CO2|d1",
+    "exp_v4_s20_n0|verified_pass|CD_010|d1",
+    "exp_v4_s50_n1|rlm_10|OOD_014|d1",
+    "exp_v4_s50_n1|rlm_5|22_pig_mags_FR1|d1",
+    "exp_v4_s50_n1|rlm_5|22_pig_mags_TE3|d1",
+    "exp_v4_s50_n3|rlm_10|OOD_014|d1",
+    "exp_v4_s5_n0|rlm_10|19_hpai_canada_FR1|d1",
+    "exp_v4_s5_n1|rlm_10|OOD_050|d1",
+    "exp_v4_s5_n1|rlm_10|SY_001|d1",
+    "exp_v4_s5_n1|rlm_10|SY_002|d1",
+    "exp_v4_s5_n1|rlm_10|SY_003|d1",
+    "exp_v4_s5_n3|rlm_10|18_fmd_review_TE3|d1",
+    "exp_v4_s5_n3|rlm_5|07_salmon_TE3|d1",
+    "exp_v4_s5_n3|rlm_5|10_cutadapt_CO2|d1"
+   ],
+   "g4r38_keys": {
+    "multi_hop": 0,
+    "rlm_10": 11,
+    "rlm_20": 22,
+    "rlm_5": 4,
+    "single_pass": 0,
+    "verified_pass": 1
+   },
+   "indexes": [
+    "exp_v4_s5_n0",
+    "exp_v4_s5_n1",
+    "exp_v4_s5_n3",
+    "exp_v4_s10_n0",
+    "exp_v4_s10_n1",
+    "exp_v4_s10_n3",
+    "exp_v4_s20_n0",
+    "exp_v4_s20_n1",
+    "exp_v4_s20_n3",
+    "exp_v4_s50_n0",
+    "exp_v4_s50_n1",
+    "exp_v4_s50_n3"
+   ],
+   "out_g4r38": true,
+   "reading": "G4R38 reruns judged (D156: the reading drawn)",
+   "run_sha256": "38ae79ab023b97562b69b2875b3c8001b02f887d5578121103b85d4a0b4729da",
+   "units": {
+    "multi_hop exp_v4_s10_n0": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "multi_hop exp_v4_s10_n1": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 8,
+     "judged_rows_d1": 127,
+     "summary": true
+    },
+    "multi_hop exp_v4_s10_n3": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 3,
+     "judged_rows_d1": 132,
+     "summary": true
+    },
+    "multi_hop exp_v4_s20_n0": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 1,
+     "judged_rows_d1": 134,
+     "summary": true
+    },
+    "multi_hop exp_v4_s20_n1": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 1,
+     "judged_rows_d1": 134,
+     "summary": true
+    },
+    "multi_hop exp_v4_s20_n3": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "multi_hop exp_v4_s50_n0": {
+     "answer_lines": 244,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 244,
+     "summary": true
+    },
+    "multi_hop exp_v4_s50_n1": {
+     "answer_lines": 244,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 244,
+     "summary": true
+    },
+    "multi_hop exp_v4_s50_n3": {
+     "answer_lines": 244,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 244,
+     "summary": true
+    },
+    "multi_hop exp_v4_s5_n0": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "multi_hop exp_v4_s5_n1": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "multi_hop exp_v4_s5_n3": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 1,
+     "judged_rows_d1": 134,
+     "summary": true
+    },
+    "rlm_10 exp_v4_s10_n0": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 4,
+     "judged_rows_d1": 131,
+     "summary": true
+    },
+    "rlm_10 exp_v4_s10_n1": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 2,
+     "judged_rows_d1": 133,
+     "summary": true
+    },
+    "rlm_10 exp_v4_s10_n3": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 4,
+     "judged_rows_d1": 131,
+     "summary": true
+    },
+    "rlm_10 exp_v4_s20_n0": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "rlm_10 exp_v4_s20_n1": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 1,
+     "judged_rows_d1": 134,
+     "summary": true
+    },
+    "rlm_10 exp_v4_s20_n3": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "rlm_10 exp_v4_s50_n0": {
+     "answer_lines": 244,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 244,
+     "summary": true
+    },
+    "rlm_10 exp_v4_s50_n1": {
+     "answer_lines": 244,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 1,
+     "judged_rows_d1": 243,
+     "summary": true
+    },
+    "rlm_10 exp_v4_s50_n3": {
+     "answer_lines": 244,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 2,
+     "judged_rows_d1": 242,
+     "summary": true
+    },
+    "rlm_10 exp_v4_s5_n0": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 1,
+     "judged_rows_d1": 134,
+     "summary": true
+    },
+    "rlm_10 exp_v4_s5_n1": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 4,
+     "judged_rows_d1": 131,
+     "summary": true
+    },
+    "rlm_10 exp_v4_s5_n3": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 3,
+     "judged_rows_d1": 132,
+     "summary": true
+    },
+    "rlm_20 exp_v4_s10_n0": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 17,
+     "judged_rows_d1": 118,
+     "summary": true
+    },
+    "rlm_20 exp_v4_s10_n1": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "rlm_20 exp_v4_s10_n3": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 5,
+     "judged_rows_d1": 130,
+     "summary": true
+    },
+    "rlm_20 exp_v4_s20_n0": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "rlm_20 exp_v4_s20_n1": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "rlm_20 exp_v4_s20_n3": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "rlm_20 exp_v4_s50_n0": {
+     "answer_lines": 244,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 244,
+     "summary": true
+    },
+    "rlm_20 exp_v4_s50_n1": {
+     "answer_lines": 244,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 244,
+     "summary": true
+    },
+    "rlm_20 exp_v4_s50_n3": {
+     "answer_lines": 244,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 244,
+     "summary": true
+    },
+    "rlm_20 exp_v4_s5_n0": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "rlm_20 exp_v4_s5_n1": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "rlm_20 exp_v4_s5_n3": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 2,
+     "judged_rows_d1": 133,
+     "summary": true
+    },
+    "rlm_5 exp_v4_s10_n0": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 6,
+     "judged_rows_d1": 129,
+     "summary": true
+    },
+    "rlm_5 exp_v4_s10_n1": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 6,
+     "judged_rows_d1": 129,
+     "summary": true
+    },
+    "rlm_5 exp_v4_s10_n3": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 2,
+     "judged_rows_d1": 133,
+     "summary": true
+    },
+    "rlm_5 exp_v4_s20_n0": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 1,
+     "judged_rows_d1": 134,
+     "summary": true
+    },
+    "rlm_5 exp_v4_s20_n1": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 1,
+     "judged_rows_d1": 134,
+     "summary": true
+    },
+    "rlm_5 exp_v4_s20_n3": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 1,
+     "judged_rows_d1": 134,
+     "summary": true
+    },
+    "rlm_5 exp_v4_s50_n0": {
+     "answer_lines": 244,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 244,
+     "summary": true
+    },
+    "rlm_5 exp_v4_s50_n1": {
+     "answer_lines": 244,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 5,
+     "judged_rows_d1": 239,
+     "summary": true
+    },
+    "rlm_5 exp_v4_s50_n3": {
+     "answer_lines": 244,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 4,
+     "judged_rows_d1": 240,
+     "summary": true
+    },
+    "rlm_5 exp_v4_s5_n0": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 1,
+     "judged_rows_d1": 134,
+     "summary": true
+    },
+    "rlm_5 exp_v4_s5_n1": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 4,
+     "judged_rows_d1": 131,
+     "summary": true
+    },
+    "rlm_5 exp_v4_s5_n3": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 7,
+     "judged_rows_d1": 128,
+     "summary": true
+    },
+    "single_pass exp_v4_s10_n0": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "single_pass exp_v4_s10_n1": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "single_pass exp_v4_s10_n3": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "single_pass exp_v4_s20_n0": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "single_pass exp_v4_s20_n1": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "single_pass exp_v4_s20_n3": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "single_pass exp_v4_s50_n0": {
+     "answer_lines": 244,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 244,
+     "summary": true
+    },
+    "single_pass exp_v4_s50_n1": {
+     "answer_lines": 244,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 244,
+     "summary": true
+    },
+    "single_pass exp_v4_s50_n3": {
+     "answer_lines": 244,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 244,
+     "summary": true
+    },
+    "single_pass exp_v4_s5_n0": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 1,
+     "judged_rows_d1": 134,
+     "summary": true
+    },
+    "single_pass exp_v4_s5_n1": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "single_pass exp_v4_s5_n3": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "verified_pass exp_v4_s10_n0": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "verified_pass exp_v4_s10_n1": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "verified_pass exp_v4_s10_n3": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "verified_pass exp_v4_s20_n0": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 1,
+     "judged_rows_d1": 134,
+     "summary": true
+    },
+    "verified_pass exp_v4_s20_n1": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "verified_pass exp_v4_s20_n3": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "verified_pass exp_v4_s50_n0": {
+     "answer_lines": 244,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 244,
+     "summary": true
+    },
+    "verified_pass exp_v4_s50_n1": {
+     "answer_lines": 244,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 244,
+     "summary": true
+    },
+    "verified_pass exp_v4_s50_n3": {
+     "answer_lines": 244,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 244,
+     "summary": true
+    },
+    "verified_pass exp_v4_s5_n0": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "verified_pass exp_v4_s5_n1": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    },
+    "verified_pass exp_v4_s5_n3": {
+     "answer_lines": 135,
+     "claimed": false,
+     "complete": true,
+     "failed_not_judged": 0,
+     "judged_rows_d1": 135,
+     "summary": true
+    }
+   }
+  },
+  "rows": 1359,
+  "what": "D150: all six strategies (grid_pairs.jsonl, g4_cells on G4_ALL) and every strategy against single pass at score 3 and 4 (grid_tables.json)"
+ },
+ "inputs": {
+  "answer_lines": {
+   "exp_02_scaling_factorial__rlm_10__exp_v4_s10_n0": 135,
+   "exp_02_scaling_factorial__rlm_10__exp_v4_s10_n1": 135,
+   "exp_02_scaling_factorial__rlm_10__exp_v4_s10_n3": 135,
+   "exp_02_scaling_factorial__rlm_10__exp_v4_s20_n0": 135,
+   "exp_02_scaling_factorial__rlm_10__exp_v4_s20_n1": 135,
+   "exp_02_scaling_factorial__rlm_10__exp_v4_s20_n3": 135,
+   "exp_02_scaling_factorial__rlm_10__exp_v4_s50_n0": 244,
+   "exp_02_scaling_factorial__rlm_10__exp_v4_s50_n1": 244,
+   "exp_02_scaling_factorial__rlm_10__exp_v4_s50_n3": 244,
+   "exp_02_scaling_factorial__rlm_10__exp_v4_s5_n0": 135,
+   "exp_02_scaling_factorial__rlm_10__exp_v4_s5_n1": 135,
+   "exp_02_scaling_factorial__rlm_10__exp_v4_s5_n3": 135,
+   "exp_02_scaling_factorial__single_pass__exp_v4_s10_n0": 135,
+   "exp_02_scaling_factorial__single_pass__exp_v4_s10_n1": 135,
+   "exp_02_scaling_factorial__single_pass__exp_v4_s10_n3": 135,
+   "exp_02_scaling_factorial__single_pass__exp_v4_s20_n0": 135,
+   "exp_02_scaling_factorial__single_pass__exp_v4_s20_n1": 135,
+   "exp_02_scaling_factorial__single_pass__exp_v4_s20_n3": 135,
+   "exp_02_scaling_factorial__single_pass__exp_v4_s50_n0": 244,
+   "exp_02_scaling_factorial__single_pass__exp_v4_s50_n1": 244,
+   "exp_02_scaling_factorial__single_pass__exp_v4_s50_n3": 244,
+   "exp_02_scaling_factorial__single_pass__exp_v4_s5_n0": 135,
+   "exp_02_scaling_factorial__single_pass__exp_v4_s5_n1": 135,
+   "exp_02_scaling_factorial__single_pass__exp_v4_s5_n3": 135
+  },
+  "claims": [],
+  "collect_rows_rlm10_sp": 3882,
+  "collect_sidecar": {
+   "added_by_replace": 38,
+   "replaced": 0,
+   "rows": 11620,
+   "run_sha256": "38ae79ab023b97562b69b2875b3c8001b02f887d5578121103b85d4a0b4729da",
+   "status_a": {
+    "ok": 11620
+   }
+  },
+  "common_answerable": 86,
+  "copy": "2026-10-21T14:54:23+0200",
+  "copy_from": "Bioinfos-Mac-Studio.local:/Users/bioinfo-001/projects/mentori-runs-g4/findings/runs",
+  "covered": {
+   "10": 44,
+   "20": 86,
+   "5": 22,
+   "50": 86
+  },
+  "covered_how": "D126: of the common set's answerable questions, those whose source papers (the D5 key's source_files) are all among the index's core papers 01 to N; equal to the per-size answerable questions restricted to the common set (coverage_check)",
+  "g4r38_judged": 11,
+  "g4r38_judged_keys": [
+   "exp_v4_s10_n0|rlm_10|SY_008|d1",
+   "exp_v4_s10_n0|rlm_10|SY_009|d1",
+   "exp_v4_s10_n3|rlm_10|SY_008|d1",
+   "exp_v4_s50_n1|rlm_10|OOD_014|d1",
+   "exp_v4_s50_n3|rlm_10|OOD_014|d1",
+   "exp_v4_s5_n0|rlm_10|19_hpai_canada_FR1|d1",
+   "exp_v4_s5_n1|rlm_10|OOD_050|d1",
+   "exp_v4_s5_n1|rlm_10|SY_001|d1",
+   "exp_v4_s5_n1|rlm_10|SY_002|d1",
+   "exp_v4_s5_n1|rlm_10|SY_003|d1",
+   "exp_v4_s5_n3|rlm_10|18_fmd_review_TE3|d1"
+  ],
+  "g4r38_keys": {
+   "rlm_10": 11,
+   "single_pass": 0
+  },
+  "indexes": [
+   "exp_v4_s5_n0",
+   "exp_v4_s5_n1",
+   "exp_v4_s5_n3",
+   "exp_v4_s10_n0",
+   "exp_v4_s10_n1",
+   "exp_v4_s10_n3",
+   "exp_v4_s20_n0",
+   "exp_v4_s20_n1",
+   "exp_v4_s20_n3",
+   "exp_v4_s50_n0",
+   "exp_v4_s50_n1",
+   "exp_v4_s50_n3"
+  ],
+  "out_g4r38": true,
+  "reading": "G4R38 reruns judged (D156: the reading drawn)",
+  "run_sha256": "38ae79ab023b97562b69b2875b3c8001b02f887d5578121103b85d4a0b4729da",
+  "units": {
+   "rlm_10 exp_v4_s10_n0": {
+    "answer_lines": 135,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 4,
+    "judged_rows_d1": 131,
+    "summary": true
+   },
+   "rlm_10 exp_v4_s10_n1": {
+    "answer_lines": 135,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 2,
+    "judged_rows_d1": 133,
+    "summary": true
+   },
+   "rlm_10 exp_v4_s10_n3": {
+    "answer_lines": 135,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 4,
+    "judged_rows_d1": 131,
+    "summary": true
+   },
+   "rlm_10 exp_v4_s20_n0": {
+    "answer_lines": 135,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 0,
+    "judged_rows_d1": 135,
+    "summary": true
+   },
+   "rlm_10 exp_v4_s20_n1": {
+    "answer_lines": 135,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 1,
+    "judged_rows_d1": 134,
+    "summary": true
+   },
+   "rlm_10 exp_v4_s20_n3": {
+    "answer_lines": 135,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 0,
+    "judged_rows_d1": 135,
+    "summary": true
+   },
+   "rlm_10 exp_v4_s50_n0": {
+    "answer_lines": 244,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 0,
+    "judged_rows_d1": 244,
+    "summary": true
+   },
+   "rlm_10 exp_v4_s50_n1": {
+    "answer_lines": 244,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 1,
+    "judged_rows_d1": 243,
+    "summary": true
+   },
+   "rlm_10 exp_v4_s50_n3": {
+    "answer_lines": 244,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 2,
+    "judged_rows_d1": 242,
+    "summary": true
+   },
+   "rlm_10 exp_v4_s5_n0": {
+    "answer_lines": 135,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 1,
+    "judged_rows_d1": 134,
+    "summary": true
+   },
+   "rlm_10 exp_v4_s5_n1": {
+    "answer_lines": 135,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 4,
+    "judged_rows_d1": 131,
+    "summary": true
+   },
+   "rlm_10 exp_v4_s5_n3": {
+    "answer_lines": 135,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 3,
+    "judged_rows_d1": 132,
+    "summary": true
+   },
+   "single_pass exp_v4_s10_n0": {
+    "answer_lines": 135,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 0,
+    "judged_rows_d1": 135,
+    "summary": true
+   },
+   "single_pass exp_v4_s10_n1": {
+    "answer_lines": 135,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 0,
+    "judged_rows_d1": 135,
+    "summary": true
+   },
+   "single_pass exp_v4_s10_n3": {
+    "answer_lines": 135,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 0,
+    "judged_rows_d1": 135,
+    "summary": true
+   },
+   "single_pass exp_v4_s20_n0": {
+    "answer_lines": 135,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 0,
+    "judged_rows_d1": 135,
+    "summary": true
+   },
+   "single_pass exp_v4_s20_n1": {
+    "answer_lines": 135,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 0,
+    "judged_rows_d1": 135,
+    "summary": true
+   },
+   "single_pass exp_v4_s20_n3": {
+    "answer_lines": 135,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 0,
+    "judged_rows_d1": 135,
+    "summary": true
+   },
+   "single_pass exp_v4_s50_n0": {
+    "answer_lines": 244,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 0,
+    "judged_rows_d1": 244,
+    "summary": true
+   },
+   "single_pass exp_v4_s50_n1": {
+    "answer_lines": 244,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 0,
+    "judged_rows_d1": 244,
+    "summary": true
+   },
+   "single_pass exp_v4_s50_n3": {
+    "answer_lines": 244,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 0,
+    "judged_rows_d1": 244,
+    "summary": true
+   },
+   "single_pass exp_v4_s5_n0": {
+    "answer_lines": 135,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 1,
+    "judged_rows_d1": 134,
+    "summary": true
+   },
+   "single_pass exp_v4_s5_n1": {
+    "answer_lines": 135,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 0,
+    "judged_rows_d1": 135,
+    "summary": true
+   },
+   "single_pass exp_v4_s5_n3": {
+    "answer_lines": 135,
+    "claimed": false,
+    "complete": true,
+    "failed_not_judged": 0,
+    "judged_rows_d1": 135,
+    "summary": true
+   }
+  }
+ },
+ "n_boot": 10000,
+ "provisional": true,
+ "rows": 1359,
+ "script": "scripts/S476_fig3_d123.py",
+ "script_sha256": "b50f91c05d5539fedc95dfec4601e0c718605d4800cb8dffb8ed776c24c72a42",
+ "seed": 20261013,
+ "what": "G4 draw 1, rlm_10 and single_pass, judged by S3 (plain call (a)); a cell passes at correctness 4 or more (Rule 5, D154), and at 3 or more on the relaxed threshold; an input answer with an error or no text fails (Rule 10); a G4R38 key not judged again is held out (setup error, Rule 10); a failed judge call is unscored; an index is drawn when both units are complete; d over the questions the index can answer (D126: of the common set's answerable questions, those whose source papers are all in the index); the common-86 reading (Q105) kept beside it"
+}

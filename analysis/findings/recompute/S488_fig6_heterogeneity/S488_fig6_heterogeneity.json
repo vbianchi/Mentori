@@ -1,0 +1,1026 @@
+{
+ "provenance": {
+  "script": "scripts/S488_fig6_heterogeneity.py",
+  "script_sha256": "5ed25daad1815e7683d02f8f279ee3fb7e90d361bb8deeb2652b7e281c5b2d58",
+  "command": "uv run python scripts/S488_fig6_heterogeneity.py",
+  "inputs": [
+   {
+    "path": "findings/figures_provisional/fig6/figure7_numbers.json",
+    "sha256": "d334db3de14c3990333cc6ae778c1700727e428714731199aa3e73b666e01049",
+    "role": "Figure 7 plate numbers (S481, after S4), sheet Fig. 7a: the cells tested"
+   },
+   {
+    "path": "findings/figures_provisional/fig6/fig6_cells.csv",
+    "sha256": "281679dabeb8d412fed6489ea0df5e2904a8127b1a44dfa8cbcf29ebc824bd16",
+    "role": "anchor: S447's cells after S4, compared cell by cell"
+   },
+   {
+    "path": "findings/figures_provisional/fig6/fig6_numbers.json",
+    "sha256": "14ea3bb30101edda9be40835c1f64e47fceb2c73b080190b9cc32c6b13ed9b6d",
+    "role": "anchor: S447 pooled_structured_vs_free_form"
+   },
+   {
+    "path": "findings/recompute/S479_fig6_by_tier.json",
+    "sha256": "76bab1ad384b863b3da6d36dba4f1e7e51bfb68a62c36dbed7de4843119d372c",
+    "role": "anchor: S479 by_group"
+   },
+   {
+    "path": "findings/recompute/S580_codegen_passages/S580_codegen_passages.json",
+    "part": "P2.heterogeneity_S488_method",
+    "sha256_of_part": "6f2c153ba14a7ffa13faa6e9d5f9987a452fd1f6dad85b3d5edccf0ca13c15aa",
+    "role": "D253 check: S580's Q, df, P and I2 (the part read; canonical JSON, sorted keys)"
+   }
+  ],
+  "data_stamp": "PROVISIONAL: 2,420 of 2,420 attempts, 11 of 11 variants complete, records of 2026-11-04 08:35 CET; after the S4 reruns (D75, D80 V1, D81)",
+  "model_calls": 0,
+  "method": "(one, for every contrast). Cochran's Q on log odds ratios (Woolf's inverse-variance test): - per variant v, the 2x2 table of passes and failures, family B (structured or introspection) against family A (free-form), pooled over the family's strategies and the 20 operations (B: 4 strategies, 80 attempts; A: 3 strategies, 60 attempts); - 0.5 added to all four cells of every variant's table (Haldane-Anscombe), so a cell at 0% or 100% (gemma3:27b passes 0 of 80 structured attempts) keeps a finite log odds ratio and variance; - log OR_v = ln((a d) / (b c)), var_v = 1/a + 1/b + 1/c + 1/d, w_v = 1 / var_v; - pooled log OR = sum(w_v log OR_v) / sum(w_v) (fixed effect); Q = sum(w_v (log OR_v - pooled)^2), referred to chi-square with k - 1 degrees of freedom (k variants); I^2 = max(0, (Q - df) / Q). Woolf's variance treats each variant's 80 and 60 attempts as independent, though they are 20 operations repeated over the strategies, the same operations in both families; with each variant's variance from a bootstrap over the 20 operations instead (paired across families, 4,000 resamples; computed by the audit's verifier, scratch code, as findings/audits/audit_2026-10-27_scripts/fig4_6_verified.md F4 records it, not by this script), no conclusion changes: introspection Q 5.98, P 0.817 becomes 5.90, P 0.824; structured 55.86, P 2.2e-08 becomes 146.6, P 1.8e-26 (gemma3:27b's 0 of 80 gives a near-zero bootstrap variance); structured without gemma3:27b 45.31, P 8.1e-07 becomes 42.72, P 2.4e-06. Why not risk differences (het.py): the variance of a difference of two proportions is near zero when both sit at 0% or 100%, so such a variant gets a near-infinite weight and dominates Q. het.py patched that with + 0.5 / n inside the variance, a choice no reference states. Why not the committed interaction_chi2 (S447, fig6_numbers.json): a Pearson chi-square on the 11 x 11 table of pass counts alone (chi2 88.38, df 100, P 0.79), which asks whether the variants' passes spread alike over all 11 strategies, not whether one family's effect depends on the model; its P 0.79 matching the introspection P is a coincidence.",
+  "ported_from": [
+   "SCR/audit_1025/synthesis/het.py",
+   "SCR/audit_1025/story_skeptic/fig6_check.py"
+  ]
+ },
+ "reproduced": {
+  "passes_of_attempts": {
+   "all": [
+    1692,
+    2420
+   ],
+   "free-form": [
+    510,
+    660
+   ],
+   "introspection": [
+    667,
+    880
+   ],
+   "structured": [
+    515,
+    880
+   ]
+  },
+  "equal_to": [
+   "fig6_numbers.json pooled_structured_vs_free_form",
+   "S479_fig6_by_tier.json by_group all"
+  ],
+  "cells_equal_to_fig6_cells_csv": 121,
+  "family_rows_equal_sum_of_strategy_rows": 33
+ },
+ "contrasts": [
+  {
+   "contrast": "introspection vs free-form",
+   "family_b": "introspection",
+   "family_a": "free-form",
+   "variants": 11,
+   "left_out": [],
+   "Q": 5.977521559651624,
+   "df": 10,
+   "P": 0.8171482350641561,
+   "I2": 0.0,
+   "pooled_log_odds_ratio": -0.0735296202059992,
+   "pooled_odds_ratio": 0.9291086249950675,
+   "pooled_se": 0.12342633786781816,
+   "printed": {
+    "Q": 6.0,
+    "df": 10,
+    "P": 0.82,
+    "I2_pct": 0,
+    "pooled_odds_ratio": 0.93
+   },
+   "per_variant": [
+    {
+     "variant": "qwen3-coder:30b",
+     "introspection_passes": 64,
+     "introspection_attempts": 80,
+     "free-form_passes": 54,
+     "free-form_attempts": 60,
+     "log_odds_ratio": -0.763093681872415,
+     "variance": 0.24830471427441772,
+     "rate_difference_points": -9.999999999999998
+    },
+    {
+     "variant": "qwen3-coder-next",
+     "introspection_passes": 58,
+     "introspection_attempts": 80,
+     "free-form_passes": 47,
+     "free-form_attempts": 60,
+     "log_odds_ratio": -0.30252858056877535,
+     "variance": 0.156665167191483,
+     "rate_difference_points": -5.833333333333335
+    },
+    {
+     "variant": "gpt-oss:20b (low)",
+     "introspection_passes": 55,
+     "introspection_attempts": 80,
+     "free-form_passes": 44,
+     "free-form_attempts": 60,
+     "log_odds_ratio": -0.21442423967765128,
+     "variance": 0.140311675010948,
+     "rate_difference_points": -4.583333333333329
+    },
+    {
+     "variant": "gpt-oss:20b (medium)",
+     "introspection_passes": 58,
+     "introspection_attempts": 80,
+     "free-form_passes": 45,
+     "free-form_attempts": 60,
+     "log_odds_ratio": -0.12136085700426748,
+     "variance": 0.1480326125487416,
+     "rate_difference_points": -2.500000000000002
+    },
+    {
+     "variant": "gpt-oss:20b (high)",
+     "introspection_passes": 59,
+     "introspection_attempts": 80,
+     "free-form_passes": 42,
+     "free-form_attempts": 60,
+     "log_odds_ratio": 0.186190033571875,
+     "variance": 0.1409018164148123,
+     "rate_difference_points": 3.750000000000009
+    },
+    {
+     "variant": "gemma3:27b",
+     "introspection_passes": 45,
+     "introspection_attempts": 80,
+     "free-form_passes": 38,
+     "free-form_attempts": 60,
+     "log_odds_ratio": -0.28896330260782954,
+     "variance": 0.12056550648099945,
+     "rate_difference_points": -7.08333333333333
+    },
+    {
+     "variant": "devstral-small-2:24b",
+     "introspection_passes": 57,
+     "introspection_attempts": 80,
+     "free-form_passes": 42,
+     "free-form_attempts": 60,
+     "log_odds_ratio": 0.0630511828070995,
+     "variance": 0.13752796165594772,
+     "rate_difference_points": 1.2500000000000067
+    },
+    {
+     "variant": "gemini-2.5-pro (default)",
+     "introspection_passes": 66,
+     "introspection_attempts": 80,
+     "free-form_passes": 49,
+     "free-form_attempts": 60,
+     "log_odds_ratio": 0.06342766402983946,
+     "variance": 0.19116165316749234,
+     "rate_difference_points": 0.8333333333333304
+    },
+    {
+     "variant": "gemini-2.5-pro (low)",
+     "introspection_passes": 58,
+     "introspection_attempts": 80,
+     "free-form_passes": 44,
+     "free-form_attempts": 60,
+     "log_odds_ratio": -0.03661736323822319,
+     "variance": 0.1446164322568817,
+     "rate_difference_points": -0.8333333333333304
+    },
+    {
+     "variant": "gemini-3-flash (default)",
+     "introspection_passes": 74,
+     "introspection_attempts": 80,
+     "free-form_passes": 55,
+     "free-form_attempts": 60,
+     "log_odds_ratio": 0.12736201996995888,
+     "variance": 0.3671051724743,
+     "rate_difference_points": 0.8333333333333415
+    },
+    {
+     "variant": "gemini-3-flash (low)",
+     "introspection_passes": 73,
+     "introspection_attempts": 80,
+     "free-form_passes": 50,
+     "free-form_attempts": 60,
+     "log_odds_ratio": 0.7117843065586898,
+     "variance": 0.2619788509463191,
+     "rate_difference_points": 7.916666666666661
+    }
+   ]
+  },
+  {
+   "contrast": "structured vs free-form",
+   "family_b": "structured",
+   "family_a": "free-form",
+   "variants": 11,
+   "left_out": [],
+   "Q": 40.4222324279992,
+   "df": 10,
+   "P": 1.4275726836468973e-05,
+   "I2": 0.752611387364313,
+   "pooled_log_odds_ratio": -0.7548155400261504,
+   "pooled_odds_ratio": 0.47009732087290074,
+   "pooled_se": 0.12839139179651768,
+   "printed": {
+    "Q": 40.4,
+    "df": 10,
+    "P": 1.4e-05,
+    "I2_pct": 75,
+    "pooled_odds_ratio": 0.47
+   },
+   "per_variant": [
+    {
+     "variant": "qwen3-coder:30b",
+     "structured_passes": 50,
+     "structured_attempts": 80,
+     "free-form_passes": 54,
+     "free-form_attempts": 60,
+     "log_odds_ratio": -1.6221518720996586,
+     "variance": 0.2247836431432863,
+     "rate_difference_points": -27.500000000000004
+    },
+    {
+     "variant": "qwen3-coder-next",
+     "structured_passes": 31,
+     "structured_attempts": 80,
+     "free-form_passes": 47,
+     "free-form_attempts": 60,
+     "log_odds_ratio": -1.710025149339269,
+     "variance": 0.14707475760107339,
+     "rate_difference_points": -39.58333333333333
+    },
+    {
+     "variant": "gpt-oss:20b (low)",
+     "structured_passes": 50,
+     "structured_attempts": 80,
+     "free-form_passes": 44,
+     "free-form_attempts": 60,
+     "log_odds_ratio": -0.4878821555977113,
+     "variance": 0.1356668361623416,
+     "rate_difference_points": -10.833333333333329
+    },
+    {
+     "variant": "gpt-oss:20b (medium)",
+     "structured_passes": 51,
+     "structured_attempts": 80,
+     "free-form_passes": 45,
+     "free-form_attempts": 60,
+     "log_odds_ratio": -0.5196807577077875,
+     "variance": 0.13980993182318113,
+     "rate_difference_points": -11.250000000000004
+    },
+    {
+     "variant": "gpt-oss:20b (high)",
+     "structured_passes": 32,
+     "structured_attempts": 80,
+     "free-form_passes": 42,
+     "free-form_attempts": 60,
+     "log_odds_ratio": -1.2320570524538377,
+     "variance": 0.12897125328902165,
+     "rate_difference_points": -29.999999999999993
+    },
+    {
+     "variant": "gemma3:27b",
+     "structured_passes": 0,
+     "structured_attempts": 80,
+     "free-form_passes": 38,
+     "free-form_attempts": 60,
+     "log_odds_ratio": -5.618547297067827,
+     "variance": 2.082840830666917,
+     "rate_difference_points": -63.33333333333333
+    },
+    {
+     "variant": "devstral-small-2:24b",
+     "structured_passes": 35,
+     "structured_attempts": 80,
+     "free-form_passes": 42,
+     "free-form_attempts": 60,
+     "log_odds_ratio": -1.0799129733216266,
+     "variance": 0.12773050188128895,
+     "rate_difference_points": -26.249999999999996
+    },
+    {
+     "variant": "gemini-2.5-pro (default)",
+     "structured_passes": 68,
+     "structured_attempts": 80,
+     "free-form_passes": 49,
+     "free-form_attempts": 60,
+     "log_odds_ratio": 0.24147946675448392,
+     "variance": 0.20175708208713605,
+     "rate_difference_points": 3.3333333333333326
+    },
+    {
+     "variant": "gemini-2.5-pro (low)",
+     "structured_passes": 51,
+     "structured_attempts": 80,
+     "free-form_passes": 44,
+     "free-form_attempts": 60,
+     "log_odds_ratio": -0.43493726394174326,
+     "variance": 0.13639375153132127,
+     "rate_difference_points": -9.583333333333332
+    },
+    {
+     "variant": "gemini-3-flash (default)",
+     "structured_passes": 74,
+     "structured_attempts": 80,
+     "free-form_passes": 55,
+     "free-form_attempts": 60,
+     "log_odds_ratio": 0.12736201996995888,
+     "variance": 0.3671051724743,
+     "rate_difference_points": 0.8333333333333415
+    },
+    {
+     "variant": "gemini-3-flash (low)",
+     "structured_passes": 73,
+     "structured_attempts": 80,
+     "free-form_passes": 50,
+     "free-form_attempts": 60,
+     "log_odds_ratio": 0.7117843065586898,
+     "variance": 0.2619788509463191,
+     "rate_difference_points": 7.916666666666661
+    }
+   ]
+  },
+  {
+   "contrast": "structured vs free-form, without gemma3:27b",
+   "family_b": "structured",
+   "family_a": "free-form",
+   "variants": 10,
+   "left_out": [
+    "gemma3:27b"
+   ],
+   "Q": 28.974117439169678,
+   "df": 9,
+   "P": 0.0006545873039064038,
+   "I2": 0.6893779415750889,
+   "pooled_log_odds_ratio": -0.7160151419213153,
+   "pooled_odds_ratio": 0.4886957643502447,
+   "pooled_se": 0.12890249536360393,
+   "printed": {
+    "Q": 29.0,
+    "df": 9,
+    "P": 0.00065,
+    "I2_pct": 69,
+    "pooled_odds_ratio": 0.49
+   },
+   "per_variant": [
+    {
+     "variant": "qwen3-coder:30b",
+     "structured_passes": 50,
+     "structured_attempts": 80,
+     "free-form_passes": 54,
+     "free-form_attempts": 60,
+     "log_odds_ratio": -1.6221518720996586,
+     "variance": 0.2247836431432863,
+     "rate_difference_points": -27.500000000000004
+    },
+    {
+     "variant": "qwen3-coder-next",
+     "structured_passes": 31,
+     "structured_attempts": 80,
+     "free-form_passes": 47,
+     "free-form_attempts": 60,
+     "log_odds_ratio": -1.710025149339269,
+     "variance": 0.14707475760107339,
+     "rate_difference_points": -39.58333333333333
+    },
+    {
+     "variant": "gpt-oss:20b (low)",
+     "structured_passes": 50,
+     "structured_attempts": 80,
+     "free-form_passes": 44,
+     "free-form_attempts": 60,
+     "log_odds_ratio": -0.4878821555977113,
+     "variance": 0.1356668361623416,
+     "rate_difference_points": -10.833333333333329
+    },
+    {
+     "variant": "gpt-oss:20b (medium)",
+     "structured_passes": 51,
+     "structured_attempts": 80,
+     "free-form_passes": 45,
+     "free-form_attempts": 60,
+     "log_odds_ratio": -0.5196807577077875,
+     "variance": 0.13980993182318113,
+     "rate_difference_points": -11.250000000000004
+    },
+    {
+     "variant": "gpt-oss:20b (high)",
+     "structured_passes": 32,
+     "structured_attempts": 80,
+     "free-form_passes": 42,
+     "free-form_attempts": 60,
+     "log_odds_ratio": -1.2320570524538377,
+     "variance": 0.12897125328902165,
+     "rate_difference_points": -29.999999999999993
+    },
+    {
+     "variant": "devstral-small-2:24b",
+     "structured_passes": 35,
+     "structured_attempts": 80,
+     "free-form_passes": 42,
+     "free-form_attempts": 60,
+     "log_odds_ratio": -1.0799129733216266,
+     "variance": 0.12773050188128895,
+     "rate_difference_points": -26.249999999999996
+    },
+    {
+     "variant": "gemini-2.5-pro (default)",
+     "structured_passes": 68,
+     "structured_attempts": 80,
+     "free-form_passes": 49,
+     "free-form_attempts": 60,
+     "log_odds_ratio": 0.24147946675448392,
+     "variance": 0.20175708208713605,
+     "rate_difference_points": 3.3333333333333326
+    },
+    {
+     "variant": "gemini-2.5-pro (low)",
+     "structured_passes": 51,
+     "structured_attempts": 80,
+     "free-form_passes": 44,
+     "free-form_attempts": 60,
+     "log_odds_ratio": -0.43493726394174326,
+     "variance": 0.13639375153132127,
+     "rate_difference_points": -9.583333333333332
+    },
+    {
+     "variant": "gemini-3-flash (default)",
+     "structured_passes": 74,
+     "structured_attempts": 80,
+     "free-form_passes": 55,
+     "free-form_attempts": 60,
+     "log_odds_ratio": 0.12736201996995888,
+     "variance": 0.3671051724743,
+     "rate_difference_points": 0.8333333333333415
+    },
+    {
+     "variant": "gemini-3-flash (low)",
+     "structured_passes": 73,
+     "structured_attempts": 80,
+     "free-form_passes": 50,
+     "free-form_attempts": 60,
+     "log_odds_ratio": 0.7117843065586898,
+     "variance": 0.2619788509463191,
+     "rate_difference_points": 7.916666666666661
+    }
+   ]
+  }
+ ],
+ "against_S580": [
+  {
+   "contrast": "introspection vs free-form",
+   "S488": {
+    "Q": 6.0,
+    "df": 10,
+    "P": 0.82,
+    "I2_pct": 0
+   },
+   "S580": {
+    "Q": 6.0,
+    "df": 10,
+    "P": 0.82,
+    "I2_pct": 0
+   },
+   "equal": true
+  },
+  {
+   "contrast": "structured vs free-form",
+   "S488": {
+    "Q": 40.4,
+    "df": 10,
+    "P": 1.4e-05,
+    "I2_pct": 75
+   },
+   "S580": {
+    "Q": 40.4,
+    "df": 10,
+    "P": 1.4e-05,
+    "I2_pct": 75
+   },
+   "equal": true
+  },
+  {
+   "contrast": "structured vs free-form, without gemma3:27b",
+   "S488": {
+    "Q": 29.0,
+    "df": 9,
+    "P": 0.00065,
+    "I2_pct": 69
+   },
+   "S580": {
+    "Q": 29.0,
+    "df": 9,
+    "P": 0.00065,
+    "I2_pct": 69
+   },
+   "equal": true
+  }
+ ],
+ "reproduced_21_october": {
+  "records": "s2_length_retries_20261021 (1,660 of 2,420)",
+  "fig6_cells_csv": "94262a0e:findings/figures_provisional/fig6/fig6_cells.csv",
+  "fig6_cells_csv_sha256": "ee23557d2b0c75e29332f9c9f6d4b1a90c3e7c89d678aa434c9615365d864866",
+  "tar_check": {
+   "tar": "s2_length_retries_20261021",
+   "tar_read": true,
+   "tar_sha256": "0085b2926f2ba8c442d1fa6c6ccceb54eb6fbc9d82fab581318b74662ace5ecf",
+   "totals": [
+    2420,
+    1660
+   ],
+   "cells_equal_to_fig6_cells_csv_24_oct": 121
+  },
+  "contrasts": [
+   {
+    "contrast": "introspection vs free-form",
+    "family_b": "introspection",
+    "family_a": "free-form",
+    "variants": 11,
+    "left_out": [],
+    "Q": 5.977521559651624,
+    "df": 10,
+    "P": 0.8171482350641561,
+    "I2": 0.0,
+    "pooled_log_odds_ratio": -0.0735296202059992,
+    "pooled_odds_ratio": 0.9291086249950675,
+    "pooled_se": 0.12342633786781816,
+    "printed": {
+     "Q": 6.0,
+     "df": 10,
+     "P": 0.82,
+     "I2_pct": 0,
+     "pooled_odds_ratio": 0.93
+    },
+    "per_variant": [
+     {
+      "variant": "qwen3-coder:30b",
+      "introspection_passes": 64,
+      "introspection_attempts": 80,
+      "free-form_passes": 54,
+      "free-form_attempts": 60,
+      "log_odds_ratio": -0.763093681872415,
+      "variance": 0.24830471427441772,
+      "rate_difference_points": -9.999999999999998
+     },
+     {
+      "variant": "qwen3-coder-next",
+      "introspection_passes": 58,
+      "introspection_attempts": 80,
+      "free-form_passes": 47,
+      "free-form_attempts": 60,
+      "log_odds_ratio": -0.30252858056877535,
+      "variance": 0.156665167191483,
+      "rate_difference_points": -5.833333333333335
+     },
+     {
+      "variant": "gpt-oss:20b (low)",
+      "introspection_passes": 55,
+      "introspection_attempts": 80,
+      "free-form_passes": 44,
+      "free-form_attempts": 60,
+      "log_odds_ratio": -0.21442423967765128,
+      "variance": 0.140311675010948,
+      "rate_difference_points": -4.583333333333329
+     },
+     {
+      "variant": "gpt-oss:20b (medium)",
+      "introspection_passes": 58,
+      "introspection_attempts": 80,
+      "free-form_passes": 45,
+      "free-form_attempts": 60,
+      "log_odds_ratio": -0.12136085700426748,
+      "variance": 0.1480326125487416,
+      "rate_difference_points": -2.500000000000002
+     },
+     {
+      "variant": "gpt-oss:20b (high)",
+      "introspection_passes": 59,
+      "introspection_attempts": 80,
+      "free-form_passes": 42,
+      "free-form_attempts": 60,
+      "log_odds_ratio": 0.186190033571875,
+      "variance": 0.1409018164148123,
+      "rate_difference_points": 3.750000000000009
+     },
+     {
+      "variant": "gemma3:27b",
+      "introspection_passes": 45,
+      "introspection_attempts": 80,
+      "free-form_passes": 38,
+      "free-form_attempts": 60,
+      "log_odds_ratio": -0.28896330260782954,
+      "variance": 0.12056550648099945,
+      "rate_difference_points": -7.08333333333333
+     },
+     {
+      "variant": "devstral-small-2:24b",
+      "introspection_passes": 57,
+      "introspection_attempts": 80,
+      "free-form_passes": 42,
+      "free-form_attempts": 60,
+      "log_odds_ratio": 0.0630511828070995,
+      "variance": 0.13752796165594772,
+      "rate_difference_points": 1.2500000000000067
+     },
+     {
+      "variant": "gemini-2.5-pro (default)",
+      "introspection_passes": 66,
+      "introspection_attempts": 80,
+      "free-form_passes": 49,
+      "free-form_attempts": 60,
+      "log_odds_ratio": 0.06342766402983946,
+      "variance": 0.19116165316749234,
+      "rate_difference_points": 0.8333333333333304
+     },
+     {
+      "variant": "gemini-2.5-pro (low)",
+      "introspection_passes": 58,
+      "introspection_attempts": 80,
+      "free-form_passes": 44,
+      "free-form_attempts": 60,
+      "log_odds_ratio": -0.03661736323822319,
+      "variance": 0.1446164322568817,
+      "rate_difference_points": -0.8333333333333304
+     },
+     {
+      "variant": "gemini-3-flash (default)",
+      "introspection_passes": 74,
+      "introspection_attempts": 80,
+      "free-form_passes": 55,
+      "free-form_attempts": 60,
+      "log_odds_ratio": 0.12736201996995888,
+      "variance": 0.3671051724743,
+      "rate_difference_points": 0.8333333333333415
+     },
+     {
+      "variant": "gemini-3-flash (low)",
+      "introspection_passes": 73,
+      "introspection_attempts": 80,
+      "free-form_passes": 50,
+      "free-form_attempts": 60,
+      "log_odds_ratio": 0.7117843065586898,
+      "variance": 0.2619788509463191,
+      "rate_difference_points": 7.916666666666661
+     }
+    ]
+   },
+   {
+    "contrast": "structured vs free-form",
+    "family_b": "structured",
+    "family_a": "free-form",
+    "variants": 11,
+    "left_out": [],
+    "Q": 55.864766232961095,
+    "df": 10,
+    "P": 2.1761834030402507e-08,
+    "I2": 0.8209962974104447,
+    "pooled_log_odds_ratio": -0.9485127137859316,
+    "pooled_odds_ratio": 0.38731664599872967,
+    "pooled_se": 0.13066848955263824,
+    "printed": {
+     "Q": 55.9,
+     "df": 10,
+     "P": 2.2e-08,
+     "I2_pct": 82,
+     "pooled_odds_ratio": 0.39
+    },
+    "per_variant": [
+     {
+      "variant": "qwen3-coder:30b",
+      "structured_passes": 53,
+      "structured_attempts": 80,
+      "free-form_passes": 54,
+      "free-form_attempts": 60,
+      "log_odds_ratio": -1.4609028755381717,
+      "variance": 0.22725000284804797,
+      "rate_difference_points": -23.750000000000004
+     },
+     {
+      "variant": "qwen3-coder-next",
+      "structured_passes": 29,
+      "structured_attempts": 80,
+      "free-form_passes": 47,
+      "free-form_attempts": 60,
+      "log_odds_ratio": -1.8152315699201282,
+      "variance": 0.14844248646592254,
+      "rate_difference_points": -42.083333333333336
+     },
+     {
+      "variant": "gpt-oss:20b (low)",
+      "structured_passes": 43,
+      "structured_attempts": 80,
+      "free-form_passes": 44,
+      "free-form_attempts": 60,
+      "log_odds_ratio": -0.8437088031473863,
+      "variance": 0.13273314313221327,
+      "rate_difference_points": -19.58333333333333
+     },
+     {
+      "variant": "gpt-oss:20b (medium)",
+      "structured_passes": 46,
+      "structured_attempts": 80,
+      "free-form_passes": 45,
+      "free-form_attempts": 60,
+      "log_odds_ratio": -0.7783793134757072,
+      "variance": 0.13698503460074288,
+      "rate_difference_points": -17.500000000000004
+     },
+     {
+      "variant": "gpt-oss:20b (high)",
+      "structured_passes": 11,
+      "structured_attempts": 80,
+      "free-form_passes": 42,
+      "free-form_attempts": 60,
+      "log_odds_ratio": -2.630713061047634,
+      "variance": 0.17892847676652346,
+      "rate_difference_points": -56.25
+     },
+     {
+      "variant": "gemma3:27b",
+      "structured_passes": 0,
+      "structured_attempts": 80,
+      "free-form_passes": 38,
+      "free-form_attempts": 60,
+      "log_odds_ratio": -5.618547297067827,
+      "variance": 2.082840830666917,
+      "rate_difference_points": -63.33333333333333
+     },
+     {
+      "variant": "devstral-small-2:24b",
+      "structured_passes": 35,
+      "structured_attempts": 80,
+      "free-form_passes": 42,
+      "free-form_attempts": 60,
+      "log_odds_ratio": -1.0799129733216266,
+      "variance": 0.12773050188128895,
+      "rate_difference_points": -26.249999999999996
+     },
+     {
+      "variant": "gemini-2.5-pro (default)",
+      "structured_passes": 67,
+      "structured_attempts": 80,
+      "free-form_passes": 49,
+      "free-form_attempts": 60,
+      "log_odds_ratio": 0.14981227822866008,
+      "variance": 0.1960474308300395,
+      "rate_difference_points": 2.083333333333337
+     },
+     {
+      "variant": "gemini-2.5-pro (low)",
+      "structured_passes": 51,
+      "structured_attempts": 80,
+      "free-form_passes": 44,
+      "free-form_attempts": 60,
+      "log_odds_ratio": -0.43493726394174326,
+      "variance": 0.13639375153132127,
+      "rate_difference_points": -9.583333333333332
+     },
+     {
+      "variant": "gemini-3-flash (default)",
+      "structured_passes": 74,
+      "structured_attempts": 80,
+      "free-form_passes": 55,
+      "free-form_attempts": 60,
+      "log_odds_ratio": 0.12736201996995888,
+      "variance": 0.3671051724743,
+      "rate_difference_points": 0.8333333333333415
+     },
+     {
+      "variant": "gemini-3-flash (low)",
+      "structured_passes": 74,
+      "structured_attempts": 80,
+      "free-form_passes": 50,
+      "free-form_attempts": 60,
+      "log_odds_ratio": 0.868398869366086,
+      "variance": 0.2823090480742152,
+      "rate_difference_points": 9.166666666666668
+     }
+    ]
+   },
+   {
+    "contrast": "structured vs free-form, without gemma3:27b",
+    "family_b": "structured",
+    "family_a": "free-form",
+    "variants": 10,
+    "left_out": [
+     "gemma3:27b"
+    ],
+    "Q": 45.30731833100708,
+    "df": 9,
+    "P": 8.094113280158533e-07,
+    "I2": 0.8013565946620891,
+    "pooled_log_odds_ratio": -0.9099133103842937,
+    "pooled_odds_ratio": 0.40255912021647644,
+    "pooled_se": 0.131207387764026,
+    "printed": {
+     "Q": 45.3,
+     "df": 9,
+     "P": 8.1e-07,
+     "I2_pct": 80,
+     "pooled_odds_ratio": 0.4
+    },
+    "per_variant": [
+     {
+      "variant": "qwen3-coder:30b",
+      "structured_passes": 53,
+      "structured_attempts": 80,
+      "free-form_passes": 54,
+      "free-form_attempts": 60,
+      "log_odds_ratio": -1.4609028755381717,
+      "variance": 0.22725000284804797,
+      "rate_difference_points": -23.750000000000004
+     },
+     {
+      "variant": "qwen3-coder-next",
+      "structured_passes": 29,
+      "structured_attempts": 80,
+      "free-form_passes": 47,
+      "free-form_attempts": 60,
+      "log_odds_ratio": -1.8152315699201282,
+      "variance": 0.14844248646592254,
+      "rate_difference_points": -42.083333333333336
+     },
+     {
+      "variant": "gpt-oss:20b (low)",
+      "structured_passes": 43,
+      "structured_attempts": 80,
+      "free-form_passes": 44,
+      "free-form_attempts": 60,
+      "log_odds_ratio": -0.8437088031473863,
+      "variance": 0.13273314313221327,
+      "rate_difference_points": -19.58333333333333
+     },
+     {
+      "variant": "gpt-oss:20b (medium)",
+      "structured_passes": 46,
+      "structured_attempts": 80,
+      "free-form_passes": 45,
+      "free-form_attempts": 60,
+      "log_odds_ratio": -0.7783793134757072,
+      "variance": 0.13698503460074288,
+      "rate_difference_points": -17.500000000000004
+     },
+     {
+      "variant": "gpt-oss:20b (high)",
+      "structured_passes": 11,
+      "structured_attempts": 80,
+      "free-form_passes": 42,
+      "free-form_attempts": 60,
+      "log_odds_ratio": -2.630713061047634,
+      "variance": 0.17892847676652346,
+      "rate_difference_points": -56.25
+     },
+     {
+      "variant": "devstral-small-2:24b",
+      "structured_passes": 35,
+      "structured_attempts": 80,
+      "free-form_passes": 42,
+      "free-form_attempts": 60,
+      "log_odds_ratio": -1.0799129733216266,
+      "variance": 0.12773050188128895,
+      "rate_difference_points": -26.249999999999996
+     },
+     {
+      "variant": "gemini-2.5-pro (default)",
+      "structured_passes": 67,
+      "structured_attempts": 80,
+      "free-form_passes": 49,
+      "free-form_attempts": 60,
+      "log_odds_ratio": 0.14981227822866008,
+      "variance": 0.1960474308300395,
+      "rate_difference_points": 2.083333333333337
+     },
+     {
+      "variant": "gemini-2.5-pro (low)",
+      "structured_passes": 51,
+      "structured_attempts": 80,
+      "free-form_passes": 44,
+      "free-form_attempts": 60,
+      "log_odds_ratio": -0.43493726394174326,
+      "variance": 0.13639375153132127,
+      "rate_difference_points": -9.583333333333332
+     },
+     {
+      "variant": "gemini-3-flash (default)",
+      "structured_passes": 74,
+      "structured_attempts": 80,
+      "free-form_passes": 55,
+      "free-form_attempts": 60,
+      "log_odds_ratio": 0.12736201996995888,
+      "variance": 0.3671051724743,
+      "rate_difference_points": 0.8333333333333415
+     },
+     {
+      "variant": "gemini-3-flash (low)",
+      "structured_passes": 74,
+      "structured_attempts": 80,
+      "free-form_passes": 50,
+      "free-form_attempts": 60,
+      "log_odds_ratio": 0.868398869366086,
+      "variance": 0.2823090480742152,
+      "rate_difference_points": 9.166666666666668
+     }
+    ]
+   }
+  ],
+  "against_inventory_F11": [
+   {
+    "contrast": "introspection vs free-form",
+    "inventory": {
+     "Q": 6.3,
+     "df": 10,
+     "P": 0.79,
+     "method": "risk differences, variance (p(1-p) + 0.5/n)/n",
+     "script": "SCR/audit_1025/synthesis/het.py",
+     "data": "figure7_numbers.json family pooled rows"
+    },
+    "S488": {
+     "Q": 6.0,
+     "df": 10,
+     "P": 0.82,
+     "I2_pct": 0,
+     "pooled_odds_ratio": 0.93
+    },
+    "Q_equal": false,
+    "P_equal": false,
+    "why": "different method: risk differences with het.py's variance (p(1-p) + 0.5/n)/n, which gives a variant near 0% or 100% in both families a near-infinite weight"
+   },
+   {
+    "contrast": "introspection vs free-form",
+    "inventory": {
+     "Q": 6.0,
+     "df": 10,
+     "P": 0.82,
+     "method": "log odds ratios, 0.5 added to every cell",
+     "script": "SCR/audit_1025/story_skeptic/fig6_check.py",
+     "data": "fig6_cells.csv (24 Oct)"
+    },
+    "S488": {
+     "Q": 6.0,
+     "df": 10,
+     "P": 0.82,
+     "I2_pct": 0,
+     "pooled_odds_ratio": 0.93
+    },
+    "Q_equal": true,
+    "P_equal": true,
+    "why": "same method on the same 121 cells (fig6_cells.csv of 24 Oct, the records of 21 Oct)"
+   },
+   {
+    "contrast": "structured vs free-form",
+    "inventory": {
+     "Q": 136.5,
+     "df": 10,
+     "P": 2e-24,
+     "method": "risk differences, variance (p(1-p) + 0.5/n)/n",
+     "script": "SCR/audit_1025/synthesis/het.py",
+     "data": "figure7_numbers.json family pooled rows"
+    },
+    "S488": {
+     "Q": 55.9,
+     "df": 10,
+     "P": 2.2e-08,
+     "I2_pct": 82,
+     "pooled_odds_ratio": 0.39
+    },
+    "Q_equal": false,
+    "P_equal": false,
+    "why": "different method: risk differences with het.py's variance (p(1-p) + 0.5/n)/n, which gives a variant near 0% or 100% in both families a near-infinite weight"
+   },
+   {
+    "contrast": "structured vs free-form",
+    "inventory": {
+     "Q": 55.9,
+     "df": 10,
+     "P": 2.2e-08,
+     "method": "log odds ratios, 0.5 added to every cell",
+     "script": "SCR/audit_1025/story_skeptic/fig6_check.py",
+     "data": "fig6_cells.csv (24 Oct)"
+    },
+    "S488": {
+     "Q": 55.9,
+     "df": 10,
+     "P": 2.2e-08,
+     "I2_pct": 82,
+     "pooled_odds_ratio": 0.39
+    },
+    "Q_equal": true,
+    "P_equal": true,
+    "why": "same method on the same 121 cells (fig6_cells.csv of 24 Oct, the records of 21 Oct)"
+   }
+  ],
+  "same_method_rows_equal": 2
+ },
+ "committed_interaction_chi2_is_another_test": {
+  "chi2": 68.03040769908199,
+  "df": 100,
+  "p": 0.9939824857500377,
+  "variants": [
+   "devstral-small-2-24b+default",
+   "gemini-2.5-pro+default",
+   "gemini-2.5-pro+off",
+   "gemini-3-flash-preview+default",
+   "gemini-3-flash-preview+off",
+   "gemma3-27b+default",
+   "gpt-oss-20b+high",
+   "gpt-oss-20b+low",
+   "gpt-oss-20b+medium",
+   "qwen3-coder-30b+default",
+   "qwen3-coder-next-q4_K_M+default"
+  ],
+  "table": "pass counts, rows variants, columns strategies with any pass",
+  "what": "S447's Pearson chi-square on pass counts, variants x strategies; not a test of one family's effect across variants"
+ }
+}
