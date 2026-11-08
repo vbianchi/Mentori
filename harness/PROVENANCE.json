@@ -1,0 +1,394 @@
+{
+ "script": "scripts/S609_release_harness.py",
+ "reanalysis_commit": "30b4a34e79896051642f73668f8d4dedbab77c31",
+ "builder_sha256": "1ff4bf60c67c64b9ee559feb4f947434211a41aa2119a56e58adad9643418556",
+ "built_at": "2026-11-08T18:39:31Z",
+ "platform": "darwin arm64 25.6.0",
+ "files": {
+  ".python-version": "Python 3.13.11 for every uv run here",
+  "data/ground_truth_v2/all_v2_4.json": "answer key v2.4 (experiments/runner/experiment.py:101 KEY_V24)",
+  "data/ground_truth_v2/ground_truth_v2_4_as_v1.json": "key v2.4 in v1 form (experiment.py:103 KEY_D5)",
+  "data/judge_system_prompts/devstral-small-2_24b.date-2026-10-10.txt": "the date-fixed system prompts and Modelfiles LOCK [date] names",
+  "data/judge_system_prompts/gpt-oss_120b.date-2026-10-10.Modelfile": "the date-fixed system prompts and Modelfiles LOCK [date] names",
+  "data/judge_system_prompts/gpt-oss_20b.date-2026-10-10.Modelfile": "the date-fixed system prompts and Modelfiles LOCK [date] names",
+  "data/judge_system_prompts/ministral-3_14b.date-2026-10-10.txt": "the date-fixed system prompts and Modelfiles LOCK [date] names",
+  "data/judge_system_prompts/ministral-3_3b.date-2026-10-10.txt": "the date-fixed system prompts and Modelfiles LOCK [date] names",
+  "data/judge_system_prompts/ministral-3_8b.date-2026-10-10.txt": "the date-fixed system prompts and Modelfiles LOCK [date] names",
+  "data/replication_inputs/ground_truth.json": "the submission's v1 key (check_experiment.py:136; the same bytes as Mentori-paper publication/data/ground_truth.json)",
+  "data/upstream/MANIFEST.sha256": "sha256 of the submission deposit's files; the judge's check reads exp00_phase2_latest.json from there",
+  "experiments/LOCK.toml": "the one settings file every call reads (experiments/runner/lock.py:34 LOCK)",
+  "findings/recompute/D98_subset/d98_subset.json": "a --question-ids-file the exp_01 docstring uses",
+  "findings/recompute/G19_runs/g19_questions.json": "the question ids file of the RLM package's Ollama arm (run_rlm_ref.py docstring)",
+  "findings/recompute/K0/bundle/sink/index_identity.jsonl": "the paper's s20_n0 identity the index gate compares with (build_index.py GATE_SOURCE)",
+  "findings/recompute/S440_judge_lock_check.jsonl": "the judge's stored lock pass its check compares with (judge_passages.py S440_LEDGER)",
+  "findings/recompute/S440_judge_lock_check_beelink.md": "the 95 of 107 hardware comparison HARNESS.md cites",
+  "findings/recompute/S66_corpus_grid.json": "the index inventory (exp_02_scaling_factorial.py:405 INVENTORY)",
+  "findings/recompute/T3_runs/inputs/MANIFEST.json": "the frozen component inputs (exp_04 and exp_04b --datasets)",
+  "findings/recompute/T3_runs/inputs/exp07_bench_analyzer_dataset.json": "the frozen component inputs (exp_04 and exp_04b --datasets)",
+  "findings/recompute/T3_runs/inputs/exp07_bench_distiller_dataset.json": "the frozen component inputs (exp_04 and exp_04b --datasets)",
+  "findings/recompute/T3_runs/inputs/exp07_bench_planner_dataset.json": "the frozen component inputs (exp_04 and exp_04b --datasets)",
+  "findings/recompute/T3_runs/inputs/exp07_bench_supervisor_dataset.json": "the frozen component inputs (exp_04 and exp_04b --datasets)",
+  "findings/recompute/T3_runs/inputs/exp07_bench_synthesizer_dataset.json": "the frozen component inputs (exp_04 and exp_04b --datasets)",
+  "findings/recompute/T3_runs/inputs/s12b_item_map.json": "the frozen component inputs (exp_04 and exp_04b --datasets)",
+  "pyproject.toml": "the scorers' environment (uv run python experiments/scorers/...)",
+  "recovered_harness/tests/experiments_v4/exp_common.py": "the judge's archived template, read under a sha256 pin (scripts/S141_runner/judge.py:47 V4_COMMON)",
+  "scripts/S07_baseline_metrics.py": "imported by scripts/S470_l1_signals.py",
+  "scripts/S141_campaign.py": "imported by scripts/judged_ledger.py",
+  "scripts/S141_runner/__init__.py": "imported by experiments/scorers/judge_passages.py",
+  "scripts/S141_runner/judge.py": "imported by experiments/scorers/judge_passages.py",
+  "scripts/S141_runner/providers.py": "imported by scripts/S376_judge_calibration.py",
+  "scripts/S141_runner/scorers.py": "imported by experiments/reuse_demo/i2_signals.py",
+  "scripts/S141_runner/store.py": "imported by scripts/S141_runner/providers.py",
+  "scripts/S141_scorers_4_2b.py": "imported by experiments/reuse_demo/i2_signals.py",
+  "scripts/S184_depth_share_2x2.py": "imported by scripts/S393_early_claims.py",
+  "scripts/S18b_rejudge.py": "imported by experiments/scorers/judge_evidence.py",
+  "scripts/S18c_analyze.py": "imported by experiments/scorers/judge_evidence.py",
+  "scripts/S18e_judge_evidence_devstral.py": "imported by experiments/scorers/judge_evidence.py",
+  "scripts/S19_minicheck_regrounded.py": "imported by experiments/reuse_demo/i2_signals.py",
+  "scripts/S21_full_answer_rejudge.py": "imported by scripts/S373_rejudge_v2.py",
+  "scripts/S21b_analyze.py": "imported by scripts/S393_early_claims.py",
+  "scripts/S281_corrected_figure_tables.py": "imported by scripts/S393_early_claims.py",
+  "scripts/S34_propagate_full_similarity.py": "imported by scripts/S78_rlm_draw_spread.py",
+  "scripts/S373_rejudge_v2.py": "imported by experiments/scorers/judge_passages.py",
+  "scripts/S376_judge_calibration.py": "imported by experiments/scorers/judge_passages.py",
+  "scripts/S382_exp04_objective_v22.py": "imported by experiments/reuse_demo/i2_signals.py",
+  "scripts/S384_exp04_minicheck_key_v22.py": "imported by scripts/S19_minicheck_regrounded.py",
+  "scripts/S388_merge_rejudge_v22.py": "imported by scripts/judged_ledger.py",
+  "scripts/S393_early_claims.py": "imported by scripts/judged_ledger.py",
+  "scripts/S439_concept_label_sheet.py": "imported by scripts/S505_question_aware_matcher.py",
+  "scripts/S447_fig6_panels.py": "imported by scripts/house_style.py",
+  "scripts/S451_k1_assign.py": "imported by experiments/scorers/check_k1.py",
+  "scripts/S452_q146_load_rebuild.py": "imported by experiments/runner/check_machine_load.py",
+  "scripts/S457_fig2_panels.py": "imported by scripts/S463_fig2_ranking.py",
+  "scripts/S463_fig2_ranking.py": "imported by experiments/reuse_demo/i2_report.py",
+  "scripts/S470_l1_signals.py": "imported by experiments/reuse_demo/i2_signals.py",
+  "scripts/S471_l3_concept_recall.py": "imported by experiments/reuse_demo/i2_signals.py",
+  "scripts/S495_t2_judge_code_proof.py": "imported by scripts/S463_fig2_ranking.py",
+  "scripts/S505_question_aware_matcher.py": "imported by scripts/d181_concept_recall.py",
+  "scripts/S511_g2_matched_budget.py": "imported by scripts/S463_fig2_ranking.py",
+  "scripts/S512_s6_rejudge_v25.py": "imported by scripts/g13_merge.py",
+  "scripts/S518_split_confirmation.py": "imported by scripts/S463_fig2_ranking.py",
+  "scripts/S522_fig3e_rows.py": "imported by scripts/S463_fig2_ranking.py",
+  "scripts/S66_corpus_grid.py": "imported by scripts/S393_early_claims.py",
+  "scripts/S78_rlm_draw_spread.py": "imported by scripts/S393_early_claims.py",
+  "scripts/bootstrap_upstream.py": "imported by scripts/judged_ledger.py",
+  "scripts/concept_match_loose.py": "imported by scripts/S382_exp04_objective_v22.py",
+  "scripts/concept_match_stem.py": "imported by scripts/S505_question_aware_matcher.py",
+  "scripts/d181_concept_recall.py": "imported by scripts/S471_l3_concept_recall.py",
+  "scripts/doc_paths.py": "imported by scripts/phase3_common.py",
+  "scripts/exp05_final.py": "imported by scripts/judged_ledger.py",
+  "scripts/fig_repro.py": "imported by experiments/runner/check_matched_budget_replan.py",
+  "scripts/figure_names.py": "imported by scripts/S463_fig2_ranking.py",
+  "scripts/g13_merge.py": "imported by scripts/S463_fig2_ranking.py",
+  "scripts/house_style.py": "imported by scripts/S463_fig2_ranking.py",
+  "scripts/judge_rows_v25.py": "imported by scripts/S463_fig2_ranking.py",
+  "scripts/judged_ledger.py": "imported by scripts/S505_question_aware_matcher.py",
+  "scripts/key_scope.py": "imported by experiments/runner/check_experiment.py",
+  "scripts/lock_equiv.py": "imported by scripts/S463_fig2_ranking.py",
+  "scripts/machine.py": "imported by scripts/S376_judge_calibration.py",
+  "scripts/phase3_common.py": "imported by scripts/S505_question_aware_matcher.py",
+  "scripts/stats_full.py": "imported by scripts/S393_early_claims.py",
+  "scripts/turn_limit_note.py": "imported by scripts/S471_l3_concept_recall.py",
+  "uv.lock": "its pinned packages"
+ },
+ "files_by_folder": {
+  "data and files": 28,
+  "experiments/mentori/": 139,
+  "experiments/reuse_demo/": 25,
+  "experiments/rlm_ref/": 11,
+  "experiments/runner/": 40,
+  "experiments/scorers/": 9,
+  "scripts/": 57,
+  "tools/mentori_cli/": 30
+ },
+ "pins": {
+  "tars": 14,
+  "runs": 606,
+  "commits": {
+   "4a4e99bfcc6ab269bc41353486a1ff1295f6e4bf|false": 560,
+   "df0cd717023fdcc765314587609a28b56531b1ff|false": 7820,
+   "43899c160dee1c3a486198242c44d289baeeaae2|false": 334,
+   "e27a3f180e5af56cb3479d49c68b86a78bf74fdf|true": 539,
+   "92f1d3ef4640c7461933817dfa2c22e4286cb63b|false": 2016,
+   "0b8074d73518c961a206430c53a69779989af1fb|false": 3708
+  },
+  "launchers": 9
+ },
+ "doc_checks": {
+  "paths": 68,
+  "absent_by_reason": 11,
+  "generated": 3,
+  "line_refs": 24,
+  "commands": 22,
+  "command_flags": 31,
+  "command_values": 16,
+  "table_flags": 24,
+  "table_values": 38
+ },
+ "checks": [
+  {
+   "command": "uv sync --frozen --project experiments/mentori",
+   "rc": 0,
+   "tail": [
+    " + zipp==3.23.0"
+   ]
+  },
+  {
+   "command": "uv sync --frozen --project .",
+   "rc": 0,
+   "tail": [
+    " + yarl==1.24.5"
+   ]
+  },
+  {
+   "command": "uv sync --frozen --project experiments/rlm_ref",
+   "rc": 0,
+   "tail": [
+    " + websockets==16.1.1"
+   ]
+  },
+  {
+   "command": "uv sync --frozen --project tools/mentori_cli",
+   "rc": 0,
+   "tail": [
+    " + zipp==3.23.0"
+   ]
+  },
+  {
+   "line": 46,
+   "command": "uv run --frozen --project experiments/mentori python -m experiments.runner.check_lock   # offline",
+   "rc": 0,
+   "seconds": 1.5,
+   "last_line": "85 of 85 checks pass; lock sha256 8730d401a5d7",
+   "reads_outside": []
+  },
+  {
+   "line": 47,
+   "command": "uv run --frozen --project experiments/mentori python -m experiments.runner.check_experiment   # offline",
+   "rc": 0,
+   "seconds": 70.4,
+   "last_line": "ERROR:exp_02_scaling_factorial:Index check (F48): exp_v4_s10_n0: not in Mentori's database for user u48",
+   "reads_outside": [
+    "/private/var/db/timezone/tz/2026f.1.0/zoneinfo/UTC",
+    "/proc/self/maps"
+   ]
+  },
+  {
+   "line": 48,
+   "command": "uv run --frozen --project experiments/mentori python -m experiments.runner.check_adapter --offline   # offline",
+   "rc": 0,
+   "seconds": 3.3,
+   "last_line": "86 of 86 checks pass",
+   "reads_outside": []
+  },
+  {
+   "line": 49,
+   "command": "uv run --frozen --project experiments/mentori python -m experiments.runner.check_retrieval   # offline",
+   "rc": 0,
+   "seconds": 4.5,
+   "last_line": "ERROR:exp_02_scaling_factorial:Generation failed: reranker unavailable: 10 results came back without rerank scores",
+   "reads_outside": [
+    "/private/var/db/timezone/tz/2026f.1.0/zoneinfo/UTC",
+    "/proc/self/maps"
+   ]
+  },
+  {
+   "line": 50,
+   "command": "uv run --frozen --project experiments/mentori python -m experiments.runner.check_rolling_pool   # offline",
+   "rc": 0,
+   "seconds": 36.3,
+   "last_line": "ERROR:exp_01_generation:Stopped on 01_sarek_FR1 (Q38, Q73): RLMStop: stopped by the check (RLMStop)",
+   "reads_outside": [
+    "/private/var/db/timezone/tz/2026f.1.0/zoneinfo/UTC",
+    "/proc/self/maps"
+   ]
+  },
+  {
+   "line": 51,
+   "command": "uv run --frozen --project experiments/mentori python -m experiments.runner.check_tool_server   # offline",
+   "rc": 0,
+   "seconds": 7.4,
+   "last_line": "                             papers...",
+   "reads_outside": [
+    "/private/var/db/timezone/tz/2026f.1.0/zoneinfo/UTC",
+    "/proc/self/maps"
+   ]
+  },
+  {
+   "line": 52,
+   "command": "uv run --frozen --project experiments/mentori python -m experiments.runner.check_anthropic   # offline",
+   "rc": 0,
+   "seconds": 17.7,
+   "last_line": "156 of 156 checks pass",
+   "reads_outside": []
+  },
+  {
+   "line": 53,
+   "command": "uv run --frozen --project experiments/mentori python -m experiments.runner.check_gemini --offline   # offline",
+   "rc": 0,
+   "seconds": 0.1,
+   "last_line": "62 of 62 checks pass (offline: no Google call)",
+   "reads_outside": []
+  },
+  {
+   "line": 54,
+   "command": "uv run --frozen --project experiments/mentori python -m experiments.runner.check_codegen   # offline",
+   "rc": 0,
+   "seconds": 77.4,
+   "last_line": "ERROR:backend.agents.notebook.step_executor:Error in step execution: qwen3-coder:30b: status error: error parsing tool call: raw='{\"cell_type\":\"code\",\"source\":\"# Step 6: ...', err=invalid character",
+   "reads_outside": [
+    "/private/var/db/timezone/tz/2026f.1.0/zoneinfo/UTC"
+   ]
+  },
+  {
+   "line": 88,
+   "command": "cd tools/mentori_cli && uv sync --frozen && uv run --frozen mentori-cli --help   # offline",
+   "rc": 0,
+   "seconds": 0.3,
+   "last_line": "  --version             show program's version number and exit",
+   "reads_outside": []
+  },
+  {
+   "line": 89,
+   "command": "cd tools/mentori_cli && uv run --frozen pytest -q   # offline",
+   "rc": 0,
+   "seconds": 75.7,
+   "last_line": "<sys>:0: DeprecationWarning: builtin type swigvarlink has no __module__ attribute",
+   "reads_outside": []
+  },
+  {
+   "line": 110,
+   "command": "uv run --frozen --project experiments/mentori python experiments/mentori/publication/scripts/exp_01_generation.py --dry-run",
+   "rc": 0,
+   "seconds": 4.3,
+   "last_line": "total: 135 questions x 6 configs x 3 draws = 2430 answers, 0 stored, 2430 pending (0 of them stored with an error, to run again)",
+   "reads_outside": [
+    "/private/var/db/timezone/tz/2026f.1.0/zoneinfo/UTC",
+    "/proc/self/maps"
+   ]
+  },
+  {
+   "line": 111,
+   "command": "uv run --frozen --project experiments/mentori python experiments/mentori/publication/scripts/exp_01_generation.py --dry-run --configs single_pass_cut800 rlm_10_nogate rlm_10_nosearch rlm_10_ctrl --max-questions 3",
+   "rc": 0,
+   "seconds": 4.3,
+   "last_line": "total: 3 questions x 4 configs x 3 draws = 36 answers, 0 stored, 36 pending (0 of them stored with an error, to run again)",
+   "reads_outside": [
+    "/private/var/db/timezone/tz/2026f.1.0/zoneinfo/UTC",
+    "/proc/self/maps"
+   ]
+  },
+  {
+   "line": 112,
+   "command": "uv run --frozen --project experiments/mentori python experiments/mentori/publication/scripts/exp_01_generation.py --dry-run --generator anthropic::claude-haiku-4-5",
+   "rc": 0,
+   "seconds": 4.3,
+   "last_line": "total: 135 questions x 6 configs x 3 draws = 2430 answers, 0 stored, 2430 pending (0 of them stored with an error, to run again)",
+   "reads_outside": [
+    "/private/var/db/timezone/tz/2026f.1.0/zoneinfo/UTC",
+    "/proc/self/maps"
+   ]
+  },
+  {
+   "line": 113,
+   "command": "uv run --frozen --project experiments/mentori python experiments/mentori/publication/scripts/exp_01_generation.py --dry-run --generator ollama::gemma3:27b --generator-url http://127.0.0.1:11434",
+   "rc": 0,
+   "seconds": 4.3,
+   "last_line": "total: 135 questions x 6 configs x 3 draws = 2430 answers, 0 stored, 2430 pending (0 of them stored with an error, to run again)",
+   "reads_outside": [
+    "/private/var/db/timezone/tz/2026f.1.0/zoneinfo/UTC",
+    "/proc/self/maps"
+   ]
+  },
+  {
+   "line": 114,
+   "command": "uv run --frozen --project experiments/mentori python experiments/mentori/publication/scripts/exp_02_scaling_factorial.py --dry-run --indexes exp_v4_s5_n0 exp_v4_s50_n3 --configs single_pass rlm_10",
+   "rc": 0,
+   "seconds": 4.3,
+   "last_line": "total: 0 answers stored, 2274 pending in 12 (run, draw) pairs",
+   "reads_outside": [
+    "/private/var/db/timezone/tz/2026f.1.0/zoneinfo/UTC",
+    "/proc/self/maps"
+   ]
+  },
+  {
+   "line": 115,
+   "command": "uv run --frozen --project experiments/mentori python experiments/mentori/publication/scripts/exp_03_orchestration_ablation.py --dry-run --configs full_orchestrator orch_no_distiller orch_no_planner",
+   "rc": 0,
+   "seconds": 4.3,
+   "last_line": "  todo  exp_v4_s20_n0|orch_no_planner|SY_009|d3  task_id v4_6_orch_SY_009_d3",
+   "reads_outside": [
+    "/private/var/db/timezone/tz/2026f.1.0/zoneinfo/UTC",
+    "/proc/self/maps"
+   ]
+  },
+  {
+   "line": 116,
+   "command": "uv run --frozen --project experiments/mentori python experiments/mentori/publication/scripts/exp_03_orchestration_ablation.py --dry-run --configs orch_distil_every_step orch_distil_every_step_f1",
+   "rc": 0,
+   "seconds": 4.3,
+   "last_line": "  todo  exp_v4_s20_n0|orch_distil_every_step_f1|SY_009|d3  task_id v4_6_orch_SY_009_d3",
+   "reads_outside": [
+    "/private/var/db/timezone/tz/2026f.1.0/zoneinfo/UTC",
+    "/proc/self/maps"
+   ]
+  },
+  {
+   "line": 117,
+   "command": "uv run --frozen --project experiments/mentori python experiments/mentori/publication/scripts/exp_04_component_bench.py --dry-run --benchmark all --datasets findings/recompute/T3_runs/inputs",
+   "rc": 0,
+   "seconds": 0.8,
+   "last_line": "  exp_04__synthesizer__gemini-3-flash-preview                300       0 stored",
+   "reads_outside": []
+  },
+  {
+   "line": 118,
+   "command": "uv run --frozen --project experiments/mentori python experiments/mentori/publication/scripts/exp_04b_distiller_ablation.py --dry-run --variants baseline F1 F2 F3 --datasets findings/recompute/T3_runs/inputs",
+   "rc": 0,
+   "seconds": 0.8,
+   "last_line": "97 items x 4 variants x 6 models x 3 draws = 6984 answers, 0 stored",
+   "reads_outside": []
+  },
+  {
+   "line": 119,
+   "command": "uv run --frozen --project experiments/mentori python experiments/mentori/publication/scripts/exp_05_coder_benchmark.py --dry-run",
+   "rc": 0,
+   "seconds": 0.8,
+   "last_line": "length stops (D112 Q8): retry (the rule of D114 Q29 O2)",
+   "reads_outside": []
+  },
+  {
+   "line": 120,
+   "command": "uv run --frozen --project experiments/mentori python experiments/mentori/publication/scripts/exp_06_depth_sweep.py --dry-run --depths 1 5 10",
+   "rc": 0,
+   "seconds": 4.2,
+   "last_line": "INFO:exp_06_depth_sweep:Index: exp_v4_s20_n0",
+   "reads_outside": [
+    "/private/var/db/timezone/tz/2026f.1.0/zoneinfo/UTC",
+    "/proc/self/maps"
+   ]
+  },
+  {
+   "line": 121,
+   "command": "uv run --frozen --project experiments/rlm_ref python -m experiments.rlm_ref.run_rlm_ref --dry-run --cap 10 --draw 1",
+   "rc": 0,
+   "seconds": 0.1,
+   "last_line": "  todo  cap10|SY_009|d1",
+   "reads_outside": []
+  }
+ ],
+ "warnings": [
+  "G8 Google API key pattern in experiments/rlm_ref/check_rlm_ref_ollama.py: allowed, line 56 FAKE_KEY = \"AIzaFAKE-b4-ollama-check-...\": the test's stand-in key, which the check asserts is never sent",
+  "G8 a private IP address S380 names, in experiments/runner/check_client.py: a lab machine's LAN address in a docstring or test (not a credential; Q for Valerio)",
+  "G8 a private IP address S380 names, in experiments/runner/check_proxy.py: a lab machine's LAN address in a docstring or test (not a credential; Q for Valerio)",
+  "G8 a private IP address S380 names, in experiments/runner/check_run_context.py: a lab machine's LAN address in a docstring or test (not a credential; Q for Valerio)",
+  "G8 a private IP address S380 names, in experiments/runner/run_context.py: a lab machine's LAN address in a docstring or test (not a credential; Q for Valerio)",
+  "G8 a private IP address S380 names, in scripts/S393_early_claims.py: a lab machine's LAN address in a docstring or test (not a credential; Q for Valerio)",
+  "G8 a private IP address S380 names, in scripts/S447_fig6_panels.py: a lab machine's LAN address in a docstring or test (not a credential; Q for Valerio)",
+  "G8 a private IP address S380 names, in scripts/S452_q146_load_rebuild.py: a lab machine's LAN address in a docstring or test (not a credential; Q for Valerio)",
+  "G8 a private IP address S380 names, in scripts/S457_fig2_panels.py: a lab machine's LAN address in a docstring or test (not a credential; Q for Valerio)",
+  "G7 JSON string fields over 20,000 characters in 2 files: findings/recompute/T3_runs/inputs/exp07_bench_distiller_dataset.json (33,666 chars); findings/recompute/T3_runs/inputs/exp07_bench_supervisor_dataset.json (52,836 chars)",
+  "G8 an account name S380 names (home-directory paths) in 7 files: experiments/scorers/check_k1.py, findings/recompute/K0/bundle/sink/index_identity.jsonl, scripts/S141_campaign.py, scripts/S141_runner/judge.py, scripts/S141_scorers_4_2b.py, scripts/S393_early_claims.py, scripts/S470_l1_signals.py"
+ ],
+ "failures": []
+}

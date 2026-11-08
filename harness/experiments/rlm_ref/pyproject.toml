@@ -1,0 +1,12 @@
+[project]
+name = "rlm-ref"
+version = "0.1.0"
+description = "B4: the authors' RLM package (rlms 0.1.3) as Figure 2's reference arm, every model call under experiments/LOCK.toml"
+requires-python = ">=3.11"
+dependencies = [
+    "rlms==0.1.3",   # wheel sha256 fac541ff745242540fee47b6e41a74c847fd7022091330dad7844d413eb5944f (PyPI, uploaded 2026-06-26); uv.lock holds it
+]
+
+[tool.uv]
+package = false
+exclude-newer = "2026-10-14T00:00:00Z"   # as experiments/scorers/ragchecker_run.py

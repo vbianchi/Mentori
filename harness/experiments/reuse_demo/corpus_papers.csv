@@ -1,0 +1,6 @@
+paper_id,bucket,filename,title,domain,doi,pmcid,arxiv_id,source_url,license,redistributable
+1,core,01_parra2021_dm_genes.pdf,Identification and mapping of new genes for resistance to downy mildew in lettuce,plant_breeding,10.1007/s00122-020-03711-z,PMC7843477,,https://pmc-oa-opendata.s3.amazonaws.com/PMC7843477.1/PMC7843477.1.pdf,CC BY 4.0,yes
+2,core,02_simko2013_qtl.pdf,Identification of QTLs conferring resistance to downy mildew in legacy cultivars of lettuce,plant_breeding,10.1038/srep02875,PMC3791445,,https://pmc-oa-opendata.s3.amazonaws.com/PMC3791445.1/PMC3791445.1.pdf,CC BY 3.0,yes
+3,core,03_christopoulou2015_mrc.pdf,Genome-Wide Architecture of Disease Resistance Genes in Lettuce,plant_breeding,10.1534/g3.115.020818,PMC4683639,,https://pmc-oa-opendata.s3.amazonaws.com/PMC4683639.1/PMC4683639.1.pdf,CC BY 4.0,yes
+4,core,04_giesbers2017_blr31.pdf,Effector-mediated discovery of a novel resistance gene against Bremia lactucae in a nonhost lettuce species,plant_breeding,10.1111/nph.14741,PMC5656935,,https://pmc-oa-opendata.s3.amazonaws.com/PMC5656935.1/PMC5656935.1.pdf,CC BY 4.0,yes
+5,core,05_pelgrom2019_blr38.pdf,Recognition of lettuce downy mildew effector BLR38 in Lactuca serriola LS102 requires two unlinked loci,plant_breeding,10.1111/mpp.12751,PMC6637914,,https://pmc-oa-opendata.s3.amazonaws.com/PMC6637914.1/PMC6637914.1.pdf,CC BY 4.0,yes

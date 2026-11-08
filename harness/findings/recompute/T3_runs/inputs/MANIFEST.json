@@ -1,0 +1,42 @@
+{
+ "provenance": {
+  "script": "findings/recompute/T3_runs/t3_inputs.py",
+  "frozen": "2026-11-02T06:52:15+0100",
+  "source": "../Mentori-paper/publication/results",
+  "source_commit": "83a4091989817367a6386007b5812aedecdadd9b",
+  "model_calls": 0
+ },
+ "total_items": 832,
+ "files": {
+  "analyzer": {
+   "file": "exp07_bench_analyzer_dataset.json",
+   "sha256": "48d71647941cfb5ec6c31700a9145db84b7c6889c47c565e9668e72521ccdf28",
+   "items": 345
+  },
+  "planner": {
+   "file": "exp07_bench_planner_dataset.json",
+   "sha256": "81272f75fe2593eb844fd2b2f994e84ff59b209c7862252274933d4414076036",
+   "items": 90
+  },
+  "supervisor": {
+   "file": "exp07_bench_supervisor_dataset.json",
+   "sha256": "e297af0361b5296ac497d57472986d5cbb48c638e2f1257dda485860c2b97090",
+   "items": 200
+  },
+  "distiller": {
+   "file": "exp07_bench_distiller_dataset.json",
+   "sha256": "f13852a265e72a48e56764968e5c0f52d6bcf02633d93f7ec48cf56938d84ed2",
+   "items": 97
+  },
+  "synthesizer": {
+   "file": "exp07_bench_synthesizer_dataset.json",
+   "sha256": "dcdf6937f9b01acd46dfa36a615fecf0b126971b0850bcc912f8f759bcf6e7ac",
+   "items": 100
+  }
+ },
+ "s12b_item_map": {
+  "file": "s12b_item_map.json",
+  "sha256": "d1d4cf3c8ef52184b2dcfe7a83e478be14ed01cfa2f55643d87fcc9bf86d2d84",
+  "rows": 200
+ }
+}

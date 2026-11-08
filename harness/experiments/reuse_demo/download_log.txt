@@ -1,0 +1,47 @@
+# download_log.txt, reuse demonstration corpus (D74, plan row I2), 2026-10-16
+# Command (both runs, from the repo root):
+#   uv run python zenodo/10_data/upstream/publication/data/download_papers.py --csv experiments/reuse_demo/corpus_papers.csv --output experiments/reuse_demo/corpus
+
+## Run 1: source_url in the deposit's form (https://europepmc.org/backend/ptpmcrender.fcgi?accid=<PMCID>&blobtype=pdf)
+## Manifest of this run kept as corpus_papers.europepmc_form.csv
+Manifest: experiments/reuse_demo/corpus_papers.csv
+Output:   experiments/reuse_demo/corpus
+Papers:   5
+==============================================================================
+[  1/5] [FAIL] 01_parra2021_dm_genes.pdf              HTTP 403
+[  2/5] [FAIL] 02_simko2013_qtl.pdf                   HTTP 403
+[  3/5] [FAIL] 03_christopoulou2015_mrc.pdf           HTTP 403
+[  4/5] [FAIL] 04_giesbers2017_blr31.pdf              HTTP 403
+[  5/5] [FAIL] 05_pelgrom2019_blr38.pdf               HTTP 403
+==============================================================================
+Summary:  OK 0   SKIP 0   FAIL 5
+
+Failed downloads, fetch by hand and place under the output directory:
+  paper_id=  1 core/01_parra2021_dm_genes.pdf  doi=10.1007/s00122-020-03711-z  pmcid=PMC7843477
+      https://europepmc.org/backend/ptpmcrender.fcgi?accid=PMC7843477&blobtype=pdf
+  paper_id=  2 core/02_simko2013_qtl.pdf  doi=10.1038/srep02875  pmcid=PMC3791445
+      https://europepmc.org/backend/ptpmcrender.fcgi?accid=PMC3791445&blobtype=pdf
+  paper_id=  3 core/03_christopoulou2015_mrc.pdf  doi=10.1534/g3.115.020818  pmcid=PMC4683639
+      https://europepmc.org/backend/ptpmcrender.fcgi?accid=PMC4683639&blobtype=pdf
+  paper_id=  4 core/04_giesbers2017_blr31.pdf  doi=10.1111/nph.14741  pmcid=PMC5656935
+      https://europepmc.org/backend/ptpmcrender.fcgi?accid=PMC5656935&blobtype=pdf
+  paper_id=  5 core/05_pelgrom2019_blr38.pdf  doi=10.1111/mpp.12751  pmcid=PMC6637914
+      https://europepmc.org/backend/ptpmcrender.fcgi?accid=PMC6637914&blobtype=pdf
+
+## Diagnosis of run 1: every row HTTP 403, a Cloudflare challenge page (response header cf-mitigated: challenge, title 'Just a moment...').
+## The same 403 is returned for the deposit's own row 1 (PMC7111497, Sarek) and with a browser User-Agent, so the failure is the host, not these papers.
+## Replacing papers would not help: every Europe PMC render URL fails the same way. No paper was replaced.
+## Change made: source_url switched to NLM's PMC Article Datasets bucket on AWS (https://pmc-oa-opendata.s3.amazonaws.com/<PMCID>.1/<PMCID>.1.pdf), same PMCIDs, same papers.
+
+## Run 2: source_url from the PMC open-access bucket (corpus_papers.csv as it now stands)
+Manifest: experiments/reuse_demo/corpus_papers.csv
+Output:   experiments/reuse_demo/corpus
+Papers:   5
+==============================================================================
+[  1/5] [OK  ] 01_parra2021_dm_genes.pdf              5252 KB
+[  2/5] [OK  ] 02_simko2013_qtl.pdf                   1574 KB
+[  3/5] [OK  ] 03_christopoulou2015_mrc.pdf           2223 KB
+[  4/5] [OK  ] 04_giesbers2017_blr31.pdf              1114 KB
+[  5/5] [OK  ] 05_pelgrom2019_blr38.pdf               642 KB
+==============================================================================
+Summary:  OK 5   SKIP 0   FAIL 0

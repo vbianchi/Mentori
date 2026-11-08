@@ -1,0 +1,2617 @@
+[
+  {
+    "query": "What is the total storage capacity required for the resulting BAM, annotated VCF, and CNV files for a 90x/90x tumor/normal WGS dataset processed by Sarek?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "01_sarek_FR1"
+  },
+  {
+    "query": "How does the Sarek workflow architecture address the dual needs of computational reproducibility and scientific best practices in variant calling?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "01_sarek_CO2"
+  },
+  {
+    "query": "Based on the benchmarking results, what is the specific F1 score achieved for somatic single-base mutations (SSM) when using the intersection of GATK4 Mutect2 and Strelka2?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "01_sarek_TE3"
+  },
+  {
+    "query": "According to the performance benchmarks provided in the paper, what are the specific time and memory requirements for the Snakemake scheduler to compute a graph of 90,000 jobs?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "02_snakemake_FR1"
+  },
+  {
+    "query": "How does Snakemake's implementation of a blockchain-style hashing scheme facilitate cross-workflow result caching?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "02_snakemake_CO2"
+  },
+  {
+    "query": "Explain the technical approach Snakemake uses to optimize job scheduling and how it handles job submission overhead in cluster or cloud environments.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "02_snakemake_TE3"
+  },
+  {
+    "query": "According to the findings, what was the specific reduction in storage usage for the work directory when switching from BAM to CRAM, and what were the corresponding data volumes?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "03_nfcore_framework_FR1"
+  },
+  {
+    "query": "How does the nf-core/sarek 3.1.1 pipeline leverage architectural and methodological changes to optimize cost and performance for large-scale data analysis?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "03_nfcore_framework_CO2"
+  },
+  {
+    "query": "Based on the benchmarking of mapping processes, what was the numerical impact of input sharding on median runtime, and at what point was the maximum efficiency plateau reached?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "03_nfcore_framework_TE3"
+  },
+  {
+    "query": "In a speed evaluation on a 9,316 M base dataset, what were the specific processing times for fastp (PE) compared to Trimmomatic?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "04_fastp_FR1"
+  },
+  {
+    "query": "What design choices and implementation strategies allow fastp to achieve higher performance and lower I/O overhead than traditional FASTQ tools?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "04_fastp_CO2"
+  },
+  {
+    "query": "How does fastp's methodology for adapter detection differ between single-end and paired-end sequencing data?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "04_fastp_TE3"
+  },
+  {
+    "query": "According to the paper, how many common bioinformatics tools does MultiQC support at the time of writing?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "05_multiqc_FR1"
+  },
+  {
+    "query": "How does MultiQC's approach to data presentation assist researchers in identifying quality issues across large-scale projects?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "05_multiqc_CO2"
+  },
+  {
+    "query": "Which specific software libraries and architectural mechanisms does MultiQC use to handle data visualization and support custom extensions?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "05_multiqc_TE3"
+  },
+  {
+    "query": "What is the reported mapping speed of STAR when using a 12-core server for 2 x 76 bp paired-end reads, and how does this compare to other aligners?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "06_star_aligner_FR1"
+  },
+  {
+    "query": "How does the Maximum Mappable Prefix (MMP) search mechanism facilitate the identification of diverse sequence features beyond simple genomic mapping?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "06_star_aligner_CO2"
+  },
+  {
+    "query": "According to the experimental benchmarks using ENCODE datasets, what percentage of reads did STAR successfully align, and which other aligner achieved a similar percentage?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "06_star_aligner_TE3"
+  },
+  {
+    "query": "By what percentage range was Salmon's sensitivity higher in differential expression testing compared to other tools at the same False Discovery Rates (FDRs)?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "07_salmon_FR1"
+  },
+  {
+    "query": "How does Salmon's method of bias correction specifically improve the outcomes of differential expression (DE) analysis?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "07_salmon_CO2"
+  },
+  {
+    "query": "Describe the algorithmic components and optimization techniques Salmon uses to achieve speed comparable to ultra-fast alignment-free tools while maintaining accuracy.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "07_salmon_TE3"
+  },
+  {
+    "query": "In the reproducibility analysis where a dataset was split into two independent halves, what specific improvement in the overlap of the top 100 genes was observed when using shrunken MAP estimates compared to standard MLE estimates?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "08_deseq2_FR1"
+  },
+  {
+    "query": "How does the DESeq2 framework utilize Empirical Bayes shrinkage to handle the high uncertainty associated with low-count genes in both dispersion and fold change estimation?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "08_deseq2_CO2"
+  },
+  {
+    "query": "What is the specific purpose of the regularized logarithm (rlog) transformation, and how does its performance compare to an ordinary log transformation in terms of variance stabilization?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "08_deseq2_TE3"
+  },
+  {
+    "query": "Which operating systems are supported by SeqKit and what are the requirements for their installation and configuration?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "09_seqkit_FR1"
+  },
+  {
+    "query": "How does SeqKit achieve stable memory usage and efficiency when processing datasets that are significantly larger than the human genome?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "09_seqkit_CO2"
+  },
+  {
+    "query": "What specific technical optimization was applied to SeqKit's reverse complementation process, and what was the measured performance gain compared to using standard hash maps?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "09_seqkit_TE3"
+  },
+  {
+    "query": "What unique capability does Cutadapt offer compared to other standalone tools in the context of read trimming?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "10_cutadapt_FR1"
+  },
+  {
+    "query": "How does the implementation of Cutadapt balance the trade-off between user accessibility and computational efficiency?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "10_cutadapt_CO2"
+  },
+  {
+    "query": "What are the specific performance metrics for Cutadapt when processing 35 bp colour-space reads with an 18 bp adapter on a 2.66 GHz Intel Core 2 processor?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "10_cutadapt_TE3"
+  },
+  {
+    "query": "In the study of the 2018 African Swine Fever Virus (ASFV) outbreaks, how many blood samples were collected in total and how many of those were confirmed positive for ASFV DNA?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "11_asf_burkina_faso_FR1"
+  },
+  {
+    "query": "How did the researchers use multi-gene analysis to establish the genetic identity and classification of the ASFV strains responsible for the outbreaks?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "11_asf_burkina_faso_CO2"
+  },
+  {
+    "query": "What specific software and phylogenetic methods were utilized for the analysis of the ASFV sequences, and what variation was found in the Central Variable Region (CVR)?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "11_asf_burkina_faso_TE3"
+  },
+  {
+    "query": "What was the specific percentage increase in the distribution of HPAI outbreaks in meat-type poultry when comparing the 2014\u20132018 period to the 2020\u20132022 period?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "12_hpai_netherlands_FR1"
+  },
+  {
+    "query": "How do the clinical presentations and mortality detection thresholds of HPAI differ between chicken populations (Galliformes) and duck populations (Anseriformes) according to the study?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "12_hpai_netherlands_CO2"
+  },
+  {
+    "query": "How did the researchers define and calculate the Mortality Ratio (MR) metric used to assess early warning signals on the infected farms?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "12_hpai_netherlands_TE3"
+  },
+  {
+    "query": "What were the overall morbidity, mortality, and case fatality rates recorded during the LSD outbreak in the study area?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "13_lsd_nepal_FR1"
+  },
+  {
+    "query": "Based on the epidemiological data, which specific cattle group was most affected by the outbreak and what were the primary clinical manifestations observed?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "13_lsd_nepal_CO2"
+  },
+  {
+    "query": "According to the multivariable logistic regression analysis, what was identified as the most significant risk factor for LSD transmission and what were its associated statistical metrics?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "13_lsd_nepal_TE3"
+  },
+  {
+    "query": "What were the specific bovine tuberculosis (bTB) prevalence estimates calculated in this study based on the different diagnostic tests and thresholds used?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "14_bovine_tb_cameroon_FR1"
+  },
+  {
+    "query": "How does the choice of diagnostic method and skinfold thickness threshold impact the assessment of bTB exposure according to the study's findings?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "14_bovine_tb_cameroon_CO2"
+  },
+  {
+    "query": "Which specific statistical software and metrics were employed to refine the logistic regression models and verify the independence of the identified risk factors?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "14_bovine_tb_cameroon_TE3"
+  },
+  {
+    "query": "How many human rabies deaths were recorded during the study period, and what was observed regarding their treatment status?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "15_rabies_tanzania_FR1"
+  },
+  {
+    "query": "Explain how spatial heterogeneity in vaccination coverage impacts the persistence of rabies even when average coverage targets are met.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "15_rabies_tanzania_CO2"
+  },
+  {
+    "query": "What methodological approach and software tool were used to distinguish between local rabies transmission and disease incursions, and how did the proportion of incursions change by 2022?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "15_rabies_tanzania_TE3"
+  },
+  {
+    "query": "How many total PPR outbreaks were recorded in the Borena Zone between 2018 and 2022, and which specific month saw the highest percentage of these outbreaks?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "16_ppr_ethiopia_FR1"
+  },
+  {
+    "query": "Why does the study conclude that the current PPR herd immunity in the Borena Zone is insufficient according to international standards?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "16_ppr_ethiopia_CO2"
+  },
+  {
+    "query": "Using the multivariable logistic regression results, how do animal age and origin (gifted or purchased) quantify the risk of PPR seropositivity in nonvaccinated animals?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "16_ppr_ethiopia_TE3"
+  },
+  {
+    "query": "What specific districts in the Somali Region of Ethiopia were included as study areas for this research?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "17_brucellosis_ethiopia_FR1"
+  },
+  {
+    "query": "Based on the study's findings, how does the clinical history of livestock relate to the likelihood of brucellosis seropositivity in both small ruminants and camels?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "17_brucellosis_ethiopia_CO2"
+  },
+  {
+    "query": "Describe the laboratory diagnostic sequence and the statistical methods used to identify significant risk factors for brucellosis in this study.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "17_brucellosis_ethiopia_TE3"
+  },
+  {
+    "query": "According to the paper, what are the primary sites of FMDV infection in ruminants and pigs?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "18_fmd_review_FR1"
+  },
+  {
+    "query": "How does the FMDV 'carrier state' differ between pigs and ruminants, and what biological evidence challenges the historical 28-day threshold for this state?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "18_fmd_review_CO2"
+  },
+  {
+    "query": "What are the specific quantitative estimates for preclinical transmission (theta) in pigs and cattle as identified in the research synthesis?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "18_fmd_review_TE3"
+  },
+  {
+    "query": "According to the epidemiological review of the 2022 H5N1 outbreak, how many birds were culled in Canada?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "19_hpai_canada_FR1"
+  },
+  {
+    "query": "What are the common clinical presentations and relative frequency of H5N1 clade 2.3.4.4b infections when comparing mammals to humans?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "19_hpai_canada_CO2"
+  },
+  {
+    "query": "Which specific viral mutations linked to mammalian adaptation were detected in the neurological tissues of carnivores in Canada and Europe?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "19_hpai_canada_TE3"
+  },
+  {
+    "query": "What is the reported efficacy of the homologous vaccine Lumpi-ProVacInd developed in India?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "20_lsd_review_FR1"
+  },
+  {
+    "query": "How does the clinical impact of Lumpy Skin Disease Virus (LSDV) differ in terms of its spread within a herd versus its lethality?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "20_lsd_review_CO2"
+  },
+  {
+    "query": "According to the comparative analysis of vaccinations, what is the specific cross-protection rate between LSDV and related poxviruses, and which viruses are involved?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "20_lsd_review_TE3"
+  },
+  {
+    "query": "In cattle, which two bacterial phyla are the most abundant and what percentage of the gastrointestinal tract bacterial community can they represent?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "21_livestock_gut_microbiome_review_FR1"
+  },
+  {
+    "query": "What are the primary biases currently existing in livestock gut microbiome research regarding breed selection and taxonomic focus?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "21_livestock_gut_microbiome_review_CO2"
+  },
+  {
+    "query": "Which specific bioinformatics tools and molecular sequencing techniques are utilized in the analysis of the livestock microbiome as described in the paper's methods?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "21_livestock_gut_microbiome_review_TE3"
+  },
+  {
+    "query": "What percentage of the recovered metagenome-assembled genomes (MAGs) were assigned to species without cultured representatives, and what does this suggest about the swine gut microbiome?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "22_pig_mags_FR1"
+  },
+  {
+    "query": "Based on the study's findings, how does the transition from nursing to weaning impact the taxonomic composition and relative abundance of specific bacterial groups in pigs?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "22_pig_mags_CO2"
+  },
+  {
+    "query": "Describe the bioinformatic workflow and specific quality thresholds used to identify, assess, and dereplicate the non-redundant MAGs reported in this research.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "22_pig_mags_TE3"
+  },
+  {
+    "query": "How many bacterial colonies were isolated in total, and how many distinct sub-ASVs were identified within the Lactobacillus ASV5 group?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "23_swine_cultivation_FR1"
+  },
+  {
+    "query": "How does the microbial diversity identified by culture-dependent (CD) methods compare to culture-independent (CI) methods across the four growth stages, and what does this imply about the overlap between the two approaches?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "23_swine_cultivation_CO2"
+  },
+  {
+    "query": "Based on the PERMANOVA analysis, what was the most significant factor influencing the culturable bacterial community composition, and what specific statistical result supports this?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "23_swine_cultivation_TE3"
+  },
+  {
+    "query": "Based on the longitudinal occurrence analysis over the 42-day study period, how many microbial genera were classified into the 'colonization', 'disappearance', and 'core' categories?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "24_chicken_microbiome_FR1"
+  },
+  {
+    "query": "How does the choice between Relative Microbiome Profiling (RMP) and Quantitative Microbiome Profiling (QMP) affect the interpretation of microbial interactions and community variations?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "24_chicken_microbiome_CO2"
+  },
+  {
+    "query": "Using the ecological modeling metrics employed in the study, what are the primary assembly processes for bacterial versus fungal communities in the chicken gut?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "24_chicken_microbiome_TE3"
+  },
+  {
+    "query": "Which specific genomic regions were identified as co-localizing the rumen microbiome and feed efficiency traits, and where was the cluster on BTA11 located?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "25_dairy_cow_feed_FR1"
+  },
+  {
+    "query": "How does the host genome at Chr3: 116.5 Mb influence residual feed intake (RFI), and what role do microbes play in this relationship?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "25_dairy_cow_feed_CO2"
+  },
+  {
+    "query": "What specific algorithm was used for causal structural learning in the study, and how was the stability of the resulting causal networks evaluated?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "25_dairy_cow_feed_TE3"
+  },
+  {
+    "query": "Which specific bacterial genera are positively correlated with higher intramuscular fat (IMF) content in pigs according to the gut microbiome studies cited?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "26_gut_meat_quality_FR1"
+  },
+  {
+    "query": "How do short-chain fatty acids (SCFAs) bridge the gap between dietary fiber intake and the regulation of host fat accumulation and metabolism?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "26_gut_meat_quality_CO2"
+  },
+  {
+    "query": "What metric is used to quantify the impact of the gut microbiome on rabbit finishing weight, and which specific host genes are highlighted as part of the microbial-influenced pathway for intramuscular fat accumulation?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "26_gut_meat_quality_TE3"
+  },
+  {
+    "query": "What are the names of the two specialized pipelines integrated into iNAP, and what specific types of microbial associations do they represent?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "27_inap_pipeline_FR1"
+  },
+  {
+    "query": "How does the iNAP system facilitate the visualization and downstream interpretation of the generated ecological networks?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "27_inap_pipeline_CO2"
+  },
+  {
+    "query": "Which specific algorithms and methods does iNAP recommend for constructing networks from non-temporal versus temporal microbial datasets?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "27_inap_pipeline_TE3"
+  },
+  {
+    "query": "How many total taxa were identified in the full dataset by the OTU-based pipeline compared to the ASV-based pipeline prior to filtering?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "28_otu_vs_asv_FR1"
+  },
+  {
+    "query": "How does the choice of bioinformatic pipeline influence the interpretation of microbial community diversity and composition across different sample types?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "28_otu_vs_asv_CO2"
+  },
+  {
+    "query": "What specific software tools and clustering parameters were utilized to define the OTU-based and ASV-based pipelines in this research?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "28_otu_vs_asv_TE3"
+  },
+  {
+    "query": "What is the recommended target for raw read numbers per sample when starting a 16S rRNA gene sequencing study without prior pilot data?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "29_16s_best_practices_FR1"
+  },
+  {
+    "query": "Why are Amplicon Sequence Variants (ASVs) considered superior to Operational Taxonomic Units (OTUs) for modern microbiome comparative analyses?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "29_16s_best_practices_CO2"
+  },
+  {
+    "query": "How does the technical approach of rarefaction differ from scaling normalization methods like TMM or DESeq2 in handling sample variance?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "29_16s_best_practices_TE3"
+  },
+  {
+    "query": "What specific percentages of prokaryotes, eukaryotes, archaea, and viruses were identified using the shotgun metagenomics data?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "30_aquaculture_metagenomics_FR1"
+  },
+  {
+    "query": "How do the three sequencing approaches (16S rRNA, PacBio long-read, and shotgun metagenomics) differ in their contribution to the study's characterization of the microbial environment?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "30_aquaculture_metagenomics_CO2"
+  },
+  {
+    "query": "Based on the comparative analysis of the Earth (V4) and MiSeq (V3-V4) primers, what were the quantitative differences in alpha richness and how did this impact the interpretation of community structure?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "30_aquaculture_metagenomics_TE3"
+  },
+  {
+    "query": "According to the World Health Organization's 2019 data, how many of the 32 antimicrobials in hospital development were classified as innovative?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "31_amr_one_health_FR1"
+  },
+  {
+    "query": "How does the metabolism and excretion of antimicrobials in animals contribute to environmental concerns within the One Health framework?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "31_amr_one_health_CO2"
+  },
+  {
+    "query": "Compare the recorded usage in tons of fluoroquinolones and third- and fourth-generation cephalosporins in animals between Europe (2017) and the USA (2018).",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "31_amr_one_health_TE3"
+  },
+  {
+    "query": "What is the projected annual human mortality rate associated with antimicrobial resistance by the year 2050 if current trends continue?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "32_amr_livestock_environment_FR1"
+  },
+  {
+    "query": "How do the interconnected domains of the One Health framework contribute to the cycle of antimicrobial resistance dissemination?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "32_amr_livestock_environment_CO2"
+  },
+  {
+    "query": "Based on statistical modeling estimates, what was the estimated global antimicrobial usage in livestock for 2020 and what is the projected usage for 2030?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "32_amr_livestock_environment_TE3"
+  },
+  {
+    "query": "What percentage of antibiotics administered to food animals is estimated to be excreted without being absorbed, and through what primary mediums does this occur?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "33_amr_food_animals_FR1"
+  },
+  {
+    "query": "How do antibiotic-resistant bacteria (ARB) and genes (ARGs) originate in food animal farms and eventually reach the human population through different environmental and occupational pathways?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "33_amr_food_animals_CO2"
+  },
+  {
+    "query": "Based on the findings regarding novel mitigation technologies, what is the specific mechanism and efficiency of using graphene oxide (GO) nanosheets for water treatment?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "33_amr_food_animals_TE3"
+  },
+  {
+    "query": "What are the estimated annual public health and economic benefits of the PulseNet laboratory network according to the paper?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "34_one_health_framework_FR1"
+  },
+  {
+    "query": "How does the Generalized One Health Framework (GOHF) aim to improve zoonotic disease programming?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "34_one_health_framework_CO2"
+  },
+  {
+    "query": "According to the paper, what is the specific threshold for dog vaccination coverage required for rabies control, and how does smartphone-based H5N1 detection compare to traditional methods?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "34_one_health_framework_TE3"
+  },
+  {
+    "query": "What are the five distinct levels of evaluation defined in the Integrated Surveillance System Evaluation (ISSE) framework?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "35_isse_framework_amr_FR1"
+  },
+  {
+    "query": "Why did the authors conclude that existing evaluation tools like ATLASS and NEOH were insufficient for assessing the full value of integrated surveillance systems?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "35_isse_framework_amr_CO2"
+  },
+  {
+    "query": "How does the ISSE framework technically measure the level of One Health integration across different surveillance activities?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "35_isse_framework_amr_TE3"
+  },
+  {
+    "query": "How many integrated surveillance systems for ABR were identified in the review, and what is their geographic distribution?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "36_integrated_amr_surveillance_FR1"
+  },
+  {
+    "query": "Based on the study's findings, what is the current state of knowledge regarding the outcomes and impacts of integrating ABR surveillance systems?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "36_integrated_amr_surveillance_CO2"
+  },
+  {
+    "query": "Describe the statistical methodology and the number of variables used to generate the typology of the identified surveillance systems.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "36_integrated_amr_surveillance_TE3"
+  },
+  {
+    "query": "According to the World Bank, what specific percentage of operational savings can be achieved by co-locating human and animal health laboratories?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "37_data_driven_one_health_FR1"
+  },
+  {
+    "query": "How does the One Health multisectoral framework theoretically reduce disease incidence and economic damage during a zoonotic spillover event?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "37_data_driven_one_health_CO2"
+  },
+  {
+    "query": "Regarding the machine learning modeling referenced from Mollentze et al., what features were used for zoonotic risk prediction and what was the reported accuracy for high-potential viruses?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "37_data_driven_one_health_TE3"
+  },
+  {
+    "query": "What is the reported case fatality rate for bat-originated viral zoonotic diseases in Africa according to the paper?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "38_one_health_africa_FR1"
+  },
+  {
+    "query": "How does the paper justify the 'business case' for the One Health approach in the context of zoonotic disease prevention?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "38_one_health_africa_CO2"
+  },
+  {
+    "query": "According to the disease burden metrics provided, what percentages of existing and emerging infectious diseases in humans are zoonotic, and what is the resulting impact in low- and middle-income countries?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "38_one_health_africa_TE3"
+  },
+  {
+    "query": "According to the study's findings, what was the reported seroprevalence of Japanese encephalitis in pigs in Vietnam in 2009?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "39_zoonotic_southeast_asia_FR1"
+  },
+  {
+    "query": "How does the research focus on different pathogen types (viral, bacterial, and parasitic) compare across the reviewed literature, and which countries were identified as high priority for pig and poultry zoonoses?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "39_zoonotic_southeast_asia_CO2"
+  },
+  {
+    "query": "Describe the systematic methodology used to select the final 95 publications from the initial search results, including the databases and criteria involved.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "39_zoonotic_southeast_asia_TE3"
+  },
+  {
+    "query": "What percentage of all human pathogens and emerging diseases affecting humans are estimated to be zoonotic in origin?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "40_animal_agriculture_one_health_FR1"
+  },
+  {
+    "query": "How does animal agriculture facilitate the development and transmission of antimicrobial resistance (AMR) from farms to the human population?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "40_animal_agriculture_one_health_CO2"
+  },
+  {
+    "query": "Based on the paper's findings, what are the specific projected global health and economic impacts of antimicrobial resistance (AMR) by the year 2050?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "40_animal_agriculture_one_health_TE3"
+  },
+  {
+    "query": "Which specific beta-lactam resistance gene was most commonly identified in Salmonella isolates from imported chicken, and what was its prevalence?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "41_salmonella_wgs_amr_FR1"
+  },
+  {
+    "query": "Based on the findings, how do the antimicrobial resistance (AMR) profiles and serovar distributions differ between Salmonella found in imported raw chicken versus imported edible leaves?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "41_salmonella_wgs_amr_CO2"
+  },
+  {
+    "query": "What bioinformatics pipeline and specific quantitative threshold did the researchers use to establish genetic relatedness between Salmonella isolates?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "41_salmonella_wgs_amr_TE3"
+  },
+  {
+    "query": "Which specific sequence type was identified as the most prominent in the study, and what was the assigned number for the novel sequence type discovered?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "42_campylobacter_wgs_thailand_FR1"
+  },
+  {
+    "query": "Based on the findings, how do the genotypic markers for resistance in C. jejuni relate to its observed phenotypic resistance against fluoroquinolones?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "42_campylobacter_wgs_thailand_CO2"
+  },
+  {
+    "query": "Describe the bioinformatic tools and methods used for the de novo assembly and the subsequent identification of antimicrobial resistance genes and virulence factors.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "42_campylobacter_wgs_thailand_TE3"
+  },
+  {
+    "query": "What are the reported annual figures for infections and deaths attributed to ESBL-producing E. coli in the European public health sector?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "43_esbl_ecoli_food_FR1"
+  },
+  {
+    "query": "How does the paper support the claim that ESBL-producing E. coli transmission constitutes a cycle between animals, the environment, and humans?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "43_esbl_ecoli_food_CO2"
+  },
+  {
+    "query": "According to the modeling studies reviewed, what specific reduction in ESBL-producing E. coli prevalence within poultry parent stock is necessary to impact human prevalence?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "43_esbl_ecoli_food_TE3"
+  },
+  {
+    "query": "According to the 2022 data for human Salmonella cases, what was the specific resistance percentage observed for S. Kentucky against ciprofloxacin?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "44_eu_amr_report_2022_FR1"
+  },
+  {
+    "query": "Based on the reported resistance levels in 2021-2022, what is the clinical implication regarding the use of fluoroquinolones for treating human Campylobacter infections?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "44_eu_amr_report_2022_CO2"
+  },
+  {
+    "query": "From 2021 onwards, what method was authorized as an alternative to the supplementary (panel 2) phenotypic testing for Salmonella and indicator E. coli isolates showing resistance to extended-spectrum cephalosporins and/or carbapenems?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "44_eu_amr_report_2022_TE3"
+  },
+  {
+    "query": "How many surveillance sites submitted data to the WHO Global Antimicrobial Resistance and Use Surveillance System (GLASS) during the 2022 data call?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "45_kenya_amr_digital_FR1"
+  },
+  {
+    "query": "How does the OHAMRS architecture enable a One Health approach to antimicrobial resistance surveillance?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "45_kenya_amr_digital_CO2"
+  },
+  {
+    "query": "What are the three specific methods used by the 17 human health surveillance sites to submit data to the system, and what is the percentage breakdown for each method?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "45_kenya_amr_digital_TE3"
+  },
+  {
+    "query": "According to the performance metrics, how many human promoters can methylPipe profile in approximately 50 seconds using a single core?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "46_methylpipe_FR1"
+  },
+  {
+    "query": "Based on the comparative analysis against other software tools, what distinguishes methylPipe and radMeth from packages such as BiSeq or bsseq for WGBS tasks?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "46_methylpipe_CO2"
+  },
+  {
+    "query": "What statistical algorithms does the system use for identifying Differentially Methylated Regions (DMRs), and what are the resource requirements for genome-wide identification?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "46_methylpipe_TE3"
+  },
+  {
+    "query": "What are the five critical issues identified by the authors for effective NGS data management?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "47_htsflow_FR1"
+  },
+  {
+    "query": "How does HTS-flow balance the trade-off between user accessibility and analytical flexibility compared to platforms like Galaxy?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "47_htsflow_CO2"
+  },
+  {
+    "query": "Which specific software libraries and packages does HTS-flow utilize to ensure genomic reproducibility and perform secondary analysis of mRNA kinetics?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "47_htsflow_TE3"
+  },
+  {
+    "query": "How many primary MYC-induced and repressed genes were identified via RNA-seq following a 16-hour inactivation of MYC?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "48_myc_oncogene_FR1"
+  },
+  {
+    "query": "Based on the findings regarding the V394D mutant, what is the functional significance of the MYC-MIZ1 interaction in the context of liver tumor development?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "48_myc_oncogene_CO2"
+  },
+  {
+    "query": "How does MYC activity influence RNA Polymerase II (RNAPII) across different gene categories, and how does this relate to the predictive power of MYC-binding profiles?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "48_myc_oncogene_TE3"
+  },
+  {
+    "query": "What specific Matthews Correlation Coefficient (MCC) and Positive Predictive Value (PPV) did PDBinder achieve on the holo (bound) test set of 239 complex pairs?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "49_pdbinder_FR1"
+  },
+  {
+    "query": "How does PDBinder's performance on apo proteins compare to its performance on holo proteins, and what does this suggest about the method's robustness?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "49_pdbinder_CO2"
+  },
+  {
+    "query": "Explain the role of 'Spatial Clustering' in the PDBinder methodology and the specific parameters used for this step.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "49_pdbinder_TE3"
+  },
+  {
+    "query": "According to the paper's subsampling analysis, what is the minimum number of cis-mapped reads required to generate reproducible 4C profiles?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "50_4cseq_protocol_FR1"
+  },
+  {
+    "query": "How does the distribution of sequencing reads across the genome serve as an indicator of a successful 4C-seq experiment?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "50_4cseq_protocol_CO2"
+  },
+  {
+    "query": "What is the function of the 'motifPosperc' metric within the pipe4C data processing pipeline, and what value indicates high specificity?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "50_4cseq_protocol_TE3"
+  },
+  {
+    "query": "How do the storage and cost-efficiency optimization strategies in the nf-core framework compare to the scheduling and transparency features of the Snakemake workflow system?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_001"
+  },
+  {
+    "query": "How does the 'all-in-one' preprocessing approach of fastp complement the visualization and quality control capabilities of MultiQC in a bioinformatics pipeline?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_002"
+  },
+  {
+    "query": "What common technical methodologies do Sarek, Snakemake, and the nf-core framework share to ensure reproducibility and portability across different computing environments?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_003"
+  },
+  {
+    "query": "How could integrating fastp and the nf-core framework's data management optimizations improve the performance and resource usage of the Sarek WGS workflow?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_004"
+  },
+  {
+    "query": "In the context of scaling large-scale genomic analyses, how do the parallelization strategies of the nf-core framework differ from the job scheduling approach of Snakemake?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_005"
+  },
+  {
+    "query": "How do the implementation languages and performance-optimization strategies of fastp, SeqKit, and Cutadapt differ in addressing computational bottlenecks in sequence data processing?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_006"
+  },
+  {
+    "query": "In the context of RNA-seq analysis, how do the mapping and quantification methods of STAR and Salmon address technical challenges before downstream differential expression analysis in DESeq2?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_007"
+  },
+  {
+    "query": "How do the methodological approaches of Cutadapt and Salmon differ in their treatment of technical artifacts in RNA-seq data, and what are the specific implications for downstream analysis?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_008"
+  },
+  {
+    "query": "How do the quality control and preprocessing capabilities of fastp and Cutadapt integrate with the visualization goals of MultiQC in high-throughput sequencing pipelines?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_009"
+  },
+  {
+    "query": "Contrast the algorithmic approaches used by STAR and SeqKit to manage large-scale genomic sequence data efficiently.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_010"
+  },
+  {
+    "query": "Compare the diagnostic methodologies and biological markers used to determine the prevalence of bovine tuberculosis (bTB) and Peste des petits ruminants (PPR) as described in studies from Cameroon and Ethiopia.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_011"
+  },
+  {
+    "query": "How do the challenges of disease control identified in the Serengeti rabies vaccination campaigns relate to the vaccine efficacy findings for Lumpy Skin Disease (LSD)?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_012"
+  },
+  {
+    "query": "How do the clinical manifestations and species-specific impacts of HPAI Clade 2.3.4.4 outbreaks compare between the intensive poultry sector in the Netherlands (2014-2022) and the broader ecological crisis observed in Canada during 2022?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_013"
+  },
+  {
+    "query": "How do the risk factors identified for brucellosis in Ethiopian camels and small ruminants compare to the risk factors for Peste des petits ruminants (PPR) in the same region?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_014"
+  },
+  {
+    "query": "How might the use of ultra-fast preprocessing tools like fastp or specialized trimming tools like Cutadapt facilitate the epidemiological investigation of bovine tuberculosis (bTB)?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_015"
+  },
+  {
+    "query": "Contrast the epidemiological findings of the 2022 Lumpy Skin Disease (LSD) outbreak in Nawalpur, Nepal, with the general disease characteristics and prevention strategies outlined in global systematic reviews.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_016"
+  },
+  {
+    "query": "Using a One Health perspective, compare the identified zoonotic risk factors and surveillance priorities for HPAI H5N1 in Canada versus brucellosis in the Somali region of Ethiopia.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_017"
+  },
+  {
+    "query": "How do the data management capabilities of MultiQC and SeqKit contrast with the data collection requirements for zoonotic disease studies in Ethiopia and Cameroon?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_018"
+  },
+  {
+    "query": "How do the implementation strategies for NGS workflow management and reproducibility differ between Nextflow-based systems like Sarek, the Snakemake system, and the HTS-flow platform?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_019"
+  },
+  {
+    "query": "How does Kenya's One Health AMR Surveillance System (OHAMRS) align with the Integrated Surveillance System Evaluation (ISSE) framework's levels of surveillance?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_020"
+  },
+  {
+    "query": "Contrast the impact of using Operational Taxonomic Units (OTUs) versus Amplicon Sequence Variants (ASVs) on microbial community interpretation as discussed in recent microbiome studies.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_021"
+  },
+  {
+    "query": "How do the strategies for managing large-scale NGS data efficiency compare between the nf-core framework, the fastp preprocessor, and the methylPipe epigenomics package?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_022"
+  },
+  {
+    "query": "In what ways do quantitative microbiome profiling (QMP) and culturomics address the biases of traditional relative microbiome profiling (RMP) in livestock research?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_023"
+  },
+  {
+    "query": "Based on WGS and genomic studies of foodborne pathogens (Salmonella, Campylobacter, and E. coli), how does the prevalence and transmission of antimicrobial resistance vary between different poultry-related sources and geographic regions?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_024"
+  },
+  {
+    "query": "How do One Health frameworks like GOHF and data-driven approaches incorporate technology to improve zoonotic disease detection and response?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_025"
+  },
+  {
+    "query": "How does the host genome indirectly and directly influence animal phenotypes through the gut microbiome in dairy cows and pigs?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_026"
+  },
+  {
+    "query": "Compare the organizational models and economic benefits of integrated One Health surveillance systems as discussed in global reviews and regional case studies.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_027"
+  },
+  {
+    "query": "How do tools for analyzing DNA methylation and chromatin structure complement traditional transcriptomic analysis of oncogene targets?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_028"
+  },
+  {
+    "query": "What are the shared methods and technical considerations for identifying antimicrobial resistance genes (ARGs) in different food animal environments?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_029"
+  },
+  {
+    "query": "How do Salmon's bias correction and DESeq2's statistical modeling improve RNA-seq analysis, and how are these processes managed in high-throughput workflows like HTS-flow?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_030"
+  },
+  {
+    "query": "Based on the development of Sarek, Snakemake, nf-core, and fastp, what is the emerging meta-strategy for balancing high-performance computational efficiency with scientific reproducibility in large-scale genomics?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_001"
+  },
+  {
+    "query": "How do the collective methodologies across Sarek, Snakemake, nf-core, and MultiQC redefine the concept of 'quality control' from a single-sample metric to a system-wide diagnostic process?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_002"
+  },
+  {
+    "query": "How does the corpus demonstrate an evolution from localized tool optimization to systemic computational efficiency across different layers of the bioinformatics stack?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_003"
+  },
+  {
+    "query": "Based on the various stages of data processing described, what meta-conclusion can be drawn regarding the relationship between technical artifact removal and statistical reliability in high-throughput sequencing analysis?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_004"
+  },
+  {
+    "query": "How do human-animal interface factors, ranging from professional habits to physiological events in livestock, collectively define the zoonotic risk landscape for bacterial and viral pathogens in endemic regions?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_005"
+  },
+  {
+    "query": "Analyze how the choice of diagnostic methodology and specific assay thresholds influences the reported prevalence and epidemiological understanding of transboundary diseases.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_006"
+  },
+  {
+    "query": "How do anthropogenic factors, such as animal management and vaccination distribution, create patterns of disease persistence in regions attempting control of transboundary pathogens?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_007"
+  },
+  {
+    "query": "What meta-conclusion can be drawn regarding the evolving clinical presentation of livestock and wildlife viral diseases and its impact on traditional early-warning surveillance systems?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_008"
+  },
+  {
+    "query": "Identify the gaps in translating standardized, large-scale genomic workflows into the context of rapid, localized veterinary outbreak characterization based on current literature.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_009"
+  },
+  {
+    "query": "How do high-performance sequence manipulation tools and modular workflow management systems collectively address the technical challenges of modern genomic surveillance for transboundary pathogens?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_010"
+  },
+  {
+    "query": "How do modern workflow management systems and graphical interfaces collectively address the 'reproducibility crisis' in high-throughput sequencing analysis across different computational environments?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_011"
+  },
+  {
+    "query": "Compare the strategies used by high-performance bioinformatics toolkits to overcome I/O and CPU bottlenecks when processing massive genomic and epigenomic datasets.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_012"
+  },
+  {
+    "query": "Analyze the shift from Operational Taxonomic Units (OTUs) to Amplicon Sequence Variants (ASVs) across diverse ecological studies and explain why this shift is critical for cross-study meta-analyses.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_013"
+  },
+  {
+    "query": "What meta-conclusions can be drawn regarding the structural and informational requirements for moving One Health surveillance from theoretical frameworks to functional digital implementations?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_014"
+  },
+  {
+    "query": "How do spatial and host-species heterogeneities influence the persistence of viral pathogens, and what are the implications for designing sentinel surveillance systems?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_015"
+  },
+  {
+    "query": "Evaluate how the integration of metagenomics, culturomics, and metabolomics is advancing our understanding of the 'functional' gut microbiome beyond simple taxonomic profiling.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_016"
+  },
+  {
+    "query": "Assess the role of Whole Genome Sequencing (WGS) in replacing or augmenting phenotypic testing for international antimicrobial resistance (AMR) monitoring.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_017"
+  },
+  {
+    "query": "Identify the critical gaps in current bioinformatics pipelines and experimental designs regarding the integration of non-bacterial domains and epigenetic data into microbial network models.",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_018"
+  },
+  {
+    "query": "How do anthropogenic factors and agricultural industrialization facilitate the environmental spread of antimicrobial resistance (AMR), and what does this imply for future mitigation strategies?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_019"
+  },
+  {
+    "query": "What collective evidence exists regarding the importance of 'viewpoint' and 'location' in the design of next-generation sequencing experiments, from chromosome conformation to rumen sampling?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_020"
+  },
+  {
+    "query": "Hello!",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Hi there",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Good morning",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Hey, how are you?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Hi!",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Hello, nice to meet you",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Good afternoon",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Hey!",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Greetings!",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Hi, I'm new here",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Hello there!",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Good evening",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Howdy!",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Hi, how's it going?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "What's up?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Yo!",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Hey there!",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Hiya!",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Sup?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Good day!",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Hello hello!",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Hi again",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Hey hey!",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Hola!",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Bonjour!",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Aloha!",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "What's happening?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "How are things?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Nice day, isn't it?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "Morning!",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "greeting",
+    "category": "greeting"
+  },
+  {
+    "query": "What can you do?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "How do you work?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "Who made you?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "What are your capabilities?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "Help",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "What is Mentori?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "Tell me about yourself",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "What tools do you have?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "How can you help me?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "What kind of questions can I ask?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "Are you an AI?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "What models do you use?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "Can you search the web?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "Do you remember our conversations?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "What file formats do you support?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "How do I upload documents?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "Can you write code?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "What programming languages do you support?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "How accurate are your answers?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "What's your knowledge cutoff?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "Can you analyze images?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "Do you support multiple languages?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "How do I create an index?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "What is RAG?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "Can you help with data analysis?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "What is deep research?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "How do you cite sources?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "What's the difference between simple and deep search?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "Can you generate plots?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "How do I export results?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "meta",
+    "category": "meta"
+  },
+  {
+    "query": "Can you explain that?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "clarification",
+    "category": "clarification"
+  },
+  {
+    "query": "What do you mean by that?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "clarification",
+    "category": "clarification"
+  },
+  {
+    "query": "Tell me more",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "clarification",
+    "category": "clarification"
+  },
+  {
+    "query": "Could you elaborate?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "clarification",
+    "category": "clarification"
+  },
+  {
+    "query": "I don't understand",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "clarification",
+    "category": "clarification"
+  },
+  {
+    "query": "Can you rephrase that?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "clarification",
+    "category": "clarification"
+  },
+  {
+    "query": "What does that mean?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "clarification",
+    "category": "clarification"
+  },
+  {
+    "query": "Could you simplify that?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "clarification",
+    "category": "clarification"
+  },
+  {
+    "query": "Can you give an example?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "clarification",
+    "category": "clarification"
+  },
+  {
+    "query": "That's confusing, explain again",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "clarification",
+    "category": "clarification"
+  },
+  {
+    "query": "What exactly do you mean?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "clarification",
+    "category": "clarification"
+  },
+  {
+    "query": "Break it down for me",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "clarification",
+    "category": "clarification"
+  },
+  {
+    "query": "Can you put that in simpler terms?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "clarification",
+    "category": "clarification"
+  },
+  {
+    "query": "I'm not following",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "clarification",
+    "category": "clarification"
+  },
+  {
+    "query": "Say that again?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "clarification",
+    "category": "clarification"
+  },
+  {
+    "query": "Huh?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "clarification",
+    "category": "clarification"
+  },
+  {
+    "query": "Could you be more specific?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "clarification",
+    "category": "clarification"
+  },
+  {
+    "query": "Can you clarify the last point?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "clarification",
+    "category": "clarification"
+  },
+  {
+    "query": "What was that about?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "clarification",
+    "category": "clarification"
+  },
+  {
+    "query": "Go on",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "clarification",
+    "category": "clarification"
+  },
+  {
+    "query": "What is PCR?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "general_knowledge",
+    "category": "general_knowledge"
+  },
+  {
+    "query": "Define epidemiology",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "general_knowledge",
+    "category": "general_knowledge"
+  },
+  {
+    "query": "Who discovered penicillin?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "general_knowledge",
+    "category": "general_knowledge"
+  },
+  {
+    "query": "What is a p-value?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "general_knowledge",
+    "category": "general_knowledge"
+  },
+  {
+    "query": "Explain the central dogma of molecular biology",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "general_knowledge",
+    "category": "general_knowledge"
+  },
+  {
+    "query": "What is CRISPR?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "general_knowledge",
+    "category": "general_knowledge"
+  },
+  {
+    "query": "Define bioinformatics",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "general_knowledge",
+    "category": "general_knowledge"
+  },
+  {
+    "query": "What is a genome?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "general_knowledge",
+    "category": "general_knowledge"
+  },
+  {
+    "query": "Explain natural selection",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "general_knowledge",
+    "category": "general_knowledge"
+  },
+  {
+    "query": "What is a confidence interval?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "general_knowledge",
+    "category": "general_knowledge"
+  },
+  {
+    "query": "What is RNA?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "general_knowledge",
+    "category": "general_knowledge"
+  },
+  {
+    "query": "Define phylogenetics",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "general_knowledge",
+    "category": "general_knowledge"
+  },
+  {
+    "query": "What is next-generation sequencing?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "general_knowledge",
+    "category": "general_knowledge"
+  },
+  {
+    "query": "Explain Hardy-Weinberg equilibrium",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "general_knowledge",
+    "category": "general_knowledge"
+  },
+  {
+    "query": "What is a meta-analysis?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "general_knowledge",
+    "category": "general_knowledge"
+  },
+  {
+    "query": "Define variant calling",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "general_knowledge",
+    "category": "general_knowledge"
+  },
+  {
+    "query": "What is machine learning?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "general_knowledge",
+    "category": "general_knowledge"
+  },
+  {
+    "query": "Explain Bayesian statistics",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "general_knowledge",
+    "category": "general_knowledge"
+  },
+  {
+    "query": "What is a transcriptome?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "general_knowledge",
+    "category": "general_knowledge"
+  },
+  {
+    "query": "Define proteomics",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "general_knowledge",
+    "category": "general_knowledge"
+  },
+  {
+    "query": "Tell me about CRISPR",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "What is whole genome sequencing?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Explain variant calling pipelines",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "What are the types of genomic variants?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "How does Illumina sequencing work?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "What is a BAM file?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Explain the difference between WGS and WES",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "What is copy number variation?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "How does read alignment work?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "What is a VCF file format?",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "simple",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "What does my CRISPR paper say?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Summarize the papers I uploaded",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "What methodology was used in the Sarek paper?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Compare the approaches across my papers",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Find the sample sizes mentioned in my documents",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "What are the main findings in my uploaded research?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Search my documents for mentions of machine learning",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Which papers discuss variant calling?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Extract the key statistics from my papers",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "What tools are mentioned across my documents?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Analyze the citations in my papers",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "List the datasets used in my uploaded papers",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "How do the results compare between paper A and paper B?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "What is the sample size in the HPAI study?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Show me all papers about AMR",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Search the web for the latest COVID-19 variants",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Run this Python code: print('hello')",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Create a plot of the data in results.csv",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Write a summary report to output.md",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "List all files in my workspace",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Tell me about the methodology",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "What were the results?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Any interesting findings?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "moderate",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "What's the conclusion?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "simple",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Can you summarize everything?",
+    "expected_decision": "needs_plan",
+    "expected_complexity": "complex",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Thanks!",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "That's helpful, thank you",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Perfect, that answers my question",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "OK",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Got it",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Never mind",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Forget it",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Let me think about that",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "I'll come back to this later",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "edge_case",
+    "category": "edge_case"
+  },
+  {
+    "query": "Sounds good",
+    "expected_decision": "direct_answer",
+    "expected_complexity": "trivial",
+    "source": "edge_case",
+    "category": "edge_case"
+  }
+]

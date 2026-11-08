@@ -1,0 +1,29 @@
+[project]
+name = "mentori-reanalysis"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "accelerate>=1.14.0",
+    "bert-score>=0.3.13",
+    "httpx>=0.28.1",
+    "krippendorff>=0.8.2",
+    "lxml>=6.1.1",
+    "matplotlib>=3.11.1",
+    "minicheck",
+    "nltk>=3.10.0",
+    "numpy>=2.5.1",
+    "openpyxl>=3.1.5",
+    "pandas>=3.0.3",
+    "pillow>=12.3.0",
+    "pingouin>=0.6.1",
+    "pymupdf>=1.28.0",
+    "python-docx>=1.2.0",
+    "rouge-score>=0.1.2",
+    "scipy>=1.18.0",
+    "sentence-transformers>=5.6.1",
+    "statsmodels>=0.14.6",
+    "torch>=2.13.0",
+]
+
+[tool.uv.sources]
+minicheck = { git = "https://github.com/Liyan06/MiniCheck.git" }

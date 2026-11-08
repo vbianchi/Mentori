@@ -1,0 +1,266 @@
+{
+  "version": "4.0",
+  "description": "Ground truth for coder agent benchmark. Each dataset has operations with verifiable numerical outputs and complexity tiers. v3.0: GT values corrected for airway_4-7. v3.1: Airway prompts refined. v3.2: Lung cancer prompts refined. v4.0: Added 6 new operations (airway_8-10, lung_8-10): CPM normalization, hierarchical clustering, differential testing with BH correction, missing data analysis, Schoenfeld residuals PH test, stratified Cox model. Total: 20 operations across 2 datasets.",
+  "datasets": {
+    "airway": {
+      "description": "Airway smooth muscle RNA-Seq gene expression dataset (Himes et al. 2014). Dexamethasone-treated vs control across 4 cell lines. IMPORTANT: airway_counts.csv has gene IDs in the first column ('ensgene') — always load with index_col=0 to set it as the DataFrame index.",
+      "files": {
+        "counts": "airway_counts.csv",
+        "metadata": "airway_metadata.csv"
+      },
+      "operations": {
+        "airway_1_dimensions": {
+          "prompt": "Load airway_counts.csv using pandas with index_col=0 so that the 'ensgene' column becomes the row index (not a data column). Load airway_metadata.csv normally without index_col. Report: genes = number of rows in the counts DataFrame, samples = number of columns in the counts DataFrame, metadata_rows = number of rows in the metadata DataFrame. Store results as genes, samples, metadata_rows.",
+          "ground_truth": {
+            "genes": 38694,
+            "samples": 8,
+            "metadata_rows": 8
+          },
+          "tolerance": "exact",
+          "category": "data_loading",
+          "complexity": "simple"
+        },
+        "airway_2_filter_genes": {
+          "prompt": "Load airway_counts.csv with index_col=0. For each gene (row), count how many of the 8 sample columns have a raw count value strictly greater than 10. Keep only genes where this count is at least 4. Store the number of genes that pass this filter as genes_passing.",
+          "ground_truth": {
+            "genes_passing": 15094
+          },
+          "tolerance": "exact",
+          "category": "data_filtering",
+          "complexity": "simple"
+        },
+        "airway_3_mean_expression": {
+          "prompt": "Load airway_counts.csv with index_col=0. Compute the arithmetic mean of raw count values for gene ENSG00000152583 across all 8 samples. Store the result as mean_expression.",
+          "ground_truth": {
+            "mean_expression": 916.625
+          },
+          "tolerance": 0.01,
+          "category": "descriptive_statistics",
+          "complexity": "simple"
+        },
+        "airway_4_log2fc": {
+          "prompt": "Load airway_counts.csv (index_col=0) and airway_metadata.csv. In the metadata, the 'id' column contains sample IDs that match the column names of the counts DataFrame, and the 'dex' column indicates treatment ('treated' or 'control'). For gene ENSG00000152583: compute the mean raw counts for treated samples and control samples separately, then compute log2fc = log2(mean_treated / mean_control). Store the result as log2fc.",
+          "ground_truth": {
+            "log2fc": 4.1816
+          },
+          "tolerance": 0.01,
+          "category": "differential_expression",
+          "complexity": "medium"
+        },
+        "airway_5_pca": {
+          "prompt": "Load airway_counts.csv (index_col=0). Perform PCA on the samples: transpose the counts matrix so rows are samples, apply log2(x+1) transformation, standardize each gene to zero mean and unit variance, then run PCA. Report the percentage of variance explained by PC1 and PC2 (as pc1_variance_pct and pc2_variance_pct), rounded to one decimal place.",
+          "ground_truth": {
+            "pc1_variance_pct": 39.6,
+            "pc2_variance_pct": 15.2
+          },
+          "tolerance": 1.0,
+          "category": "dimensionality_reduction",
+          "complexity": "medium"
+        },
+        "airway_6_top_variable_genes": {
+          "prompt": "Load airway_counts.csv (index_col=0). First filter to expressed genes: keep only genes where the raw count is greater than 10 in at least 4 of the 8 samples. For each passing gene, compute the coefficient of variation (CV = standard deviation / mean) of its raw counts across the 8 samples. Return the top 10 gene IDs with the highest CV as a Python list, sorted by descending CV. Store as top_10_genes.",
+          "ground_truth": {
+            "top_10_genes": [
+              "ENSG00000279483",
+              "ENSG00000244255",
+              "ENSG00000183311",
+              "ENSG00000128917",
+              "ENSG00000198732",
+              "ENSG00000243137",
+              "ENSG00000171819",
+              "ENSG00000228267",
+              "ENSG00000235715",
+              "ENSG00000228964"
+            ]
+          },
+          "tolerance": "set_overlap_8_of_10",
+          "category": "feature_selection",
+          "complexity": "complex"
+        },
+        "airway_7_sample_correlation": {
+          "prompt": "Load airway_counts.csv (index_col=0). Compute the 8x8 sample-sample Pearson correlation matrix on the raw count values (no log transformation). Each correlation is between two samples over all 38694 gene expression values. From the 28 unique pairwise correlations (excluding diagonal), store min_correlation and max_correlation.",
+          "ground_truth": {
+            "min_correlation": 0.8819,
+            "max_correlation": 0.9832
+          },
+          "tolerance": 0.005,
+          "category": "quality_control",
+          "complexity": "medium"
+        },
+        "airway_8_cpm_normalization": {
+          "prompt": "Load airway_counts.csv with index_col=0. Compute CPM (Counts Per Million) normalization: for each sample, divide each gene's count by the sample's total count (library size) and multiply by 1,000,000. Report mean_cpm = the mean CPM value for gene ENSG00000152583 across all 8 samples, and smallest_library = the total raw count of the sample with the smallest library size.",
+          "ground_truth": {
+            "mean_cpm": 42.3154,
+            "smallest_library": 15683017
+          },
+          "tolerance": {
+            "mean_cpm": 0.5,
+            "smallest_library": "exact"
+          },
+          "category": "normalization",
+          "complexity": "medium"
+        },
+        "airway_9_clustering": {
+          "prompt": "Load airway_counts.csv with index_col=0. Compute the 8x8 Pearson correlation matrix between samples using raw counts. Find the pair of samples with the highest correlation (most similar) and the pair with the lowest correlation (most distant). Report most_similar_pair as a sorted list of two sample IDs, and most_distant_pair as a sorted list of two sample IDs.",
+          "ground_truth": {
+            "most_similar_pair": ["SRR1039512", "SRR1039520"],
+            "most_distant_pair": ["SRR1039516", "SRR1039521"]
+          },
+          "tolerance": "exact",
+          "category": "clustering",
+          "complexity": "medium"
+        },
+        "airway_10_differential_testing": {
+          "prompt": "Load airway_counts.csv (index_col=0) and airway_metadata.csv. Filter to expressed genes (count > 10 in at least 4 of 8 samples). For each remaining gene, compute log2FC = log2(mean_treated / mean_control) using the 'dex' column in metadata to identify treated/control groups matched by 'id'. Run a Welch's t-test (scipy.stats.ttest_ind with equal_var=False) per gene. Apply Benjamini-Hochberg FDR correction (statsmodels.stats.multitest.multipletests with method='fdr_bh'). Count genes with nominal p < 0.05 AND |log2FC| > 1. Store as n_nominal_degs. Also report the adjusted p-value for gene ENSG00000152583 as gene_152583_padj.",
+          "ground_truth": {
+            "n_nominal_degs": 524,
+            "gene_152583_padj": 0.3679
+          },
+          "tolerance": {
+            "n_nominal_degs": 30,
+            "gene_152583_padj": 0.05
+          },
+          "category": "differential_expression",
+          "complexity": "complex"
+        }
+      }
+    },
+    "lung_cancer": {
+      "description": "NCCTG Lung Cancer survival dataset (Loprinzi et al. 1994). 228 patients with advanced lung cancer. IMPORTANT: lung_cancer.csv has an unnamed row index in the first column — always load with index_col=0. Columns after loading: inst, time, status, age, sex, ph.ecog, ph.karno, pat.karno, meal.cal, wt.loss (10 variables). status: 1=censored, 2=dead. sex: 1=male, 2=female.",
+      "files": {
+        "data": "lung_cancer.csv"
+      },
+      "operations": {
+        "lung_1_dimensions": {
+          "prompt": "Load lung_cancer.csv with index_col=0 (the first column is an unnamed row index). The DataFrame should have 10 columns: inst, time, status, age, sex, ph.ecog, ph.karno, pat.karno, meal.cal, wt.loss. Report n_patients = number of rows, n_variables = number of columns (should be 10), and n_events = number of rows where status equals 2 (dead).",
+          "ground_truth": {
+            "n_patients": 228,
+            "n_variables": 10,
+            "n_events": 165
+          },
+          "tolerance": "exact",
+          "category": "data_loading",
+          "complexity": "simple"
+        },
+        "lung_2_median_survival": {
+          "prompt": "Load lung_cancer.csv (index_col=0). Using the lifelines KaplanMeierFitter, fit on the 'time' column with event observed = (status == 2). Report the median survival time in days as median_survival_days.",
+          "ground_truth": {
+            "median_survival_days": 310.0
+          },
+          "tolerance": 5.0,
+          "category": "survival_analysis",
+          "complexity": "simple"
+        },
+        "lung_3_km_by_sex": {
+          "prompt": "Load lung_cancer.csv (index_col=0). Fit separate Kaplan-Meier curves (lifelines KaplanMeierFitter) for males (sex=1) and females (sex=2), using 'time' as duration and event observed = (status == 2). Report median_survival_male and median_survival_female in days.",
+          "ground_truth": {
+            "median_survival_male": 270.0,
+            "median_survival_female": 426.0
+          },
+          "tolerance": 10.0,
+          "category": "survival_analysis",
+          "complexity": "medium"
+        },
+        "lung_4_logrank": {
+          "prompt": "Load lung_cancer.csv (index_col=0). Perform a log-rank test (lifelines.statistics.logrank_test) comparing survival between males (sex=1) and females (sex=2), using 'time' as duration and event observed = (status == 2). Store the test_statistic and p_value.",
+          "ground_truth": {
+            "test_statistic": 10.3267,
+            "p_value": 0.001311
+          },
+          "tolerance": {
+            "test_statistic": 0.5,
+            "p_value": 0.001
+          },
+          "category": "hypothesis_testing",
+          "complexity": "complex"
+        },
+        "lung_5_cox_ph": {
+          "prompt": "Load lung_cancer.csv (index_col=0). Fit a Cox proportional hazards model (lifelines CoxPHFitter) with sex, age, and ph.ecog as covariates. Drop rows with any missing values in these columns or in time/status before fitting. Duration column is 'time', event column is (status == 2). Report sex_hazard_ratio = exp(coef) for sex, sex_p_value, and ph_ecog_hazard_ratio = exp(coef) for ph.ecog.",
+          "ground_truth": {
+            "sex_hazard_ratio": 0.5754,
+            "sex_p_value": 0.000986,
+            "ph_ecog_hazard_ratio": 1.5900
+          },
+          "tolerance": {
+            "sex_hazard_ratio": 0.02,
+            "sex_p_value": 0.001,
+            "ph_ecog_hazard_ratio": 0.05
+          },
+          "category": "regression",
+          "complexity": "complex"
+        },
+        "lung_6_survival_probabilities": {
+          "prompt": "Load lung_cancer.csv (index_col=0). Fit a Kaplan-Meier estimator (lifelines KaplanMeierFitter) on the full dataset with 'time' as duration and event observed = (status == 2). Report the survival probability at 180 days (survival_180d), 365 days (survival_365d), and 730 days (survival_730d). Use the predict() method or read from the survival function at those time points.",
+          "ground_truth": {
+            "survival_180d": 0.7217,
+            "survival_365d": 0.4092,
+            "survival_730d": 0.1157
+          },
+          "tolerance": 0.02,
+          "category": "survival_analysis",
+          "complexity": "medium"
+        },
+        "lung_7_concordance": {
+          "prompt": "Load lung_cancer.csv (index_col=0). Fit a Cox PH model (lifelines CoxPHFitter) with sex, age, and ph.ecog as covariates (drop rows with missing values). Duration is 'time', event is (status == 2). Report the concordance_index from the fitted model's concordance_index_ attribute.",
+          "ground_truth": {
+            "concordance_index": 0.6371
+          },
+          "tolerance": 0.01,
+          "category": "model_evaluation",
+          "complexity": "complex"
+        },
+        "lung_8_missing_data": {
+          "prompt": "Load lung_cancer.csv with index_col=0. Analyze missing data: count the total number of missing values across all cells in the DataFrame (total_missing), the number of rows with no missing values at all (n_complete_rows), and the number of columns that contain at least one missing value (n_cols_with_missing). Store these three values.",
+          "ground_truth": {
+            "total_missing": 67,
+            "n_complete_rows": 167,
+            "n_cols_with_missing": 6
+          },
+          "tolerance": "exact",
+          "category": "data_quality",
+          "complexity": "simple"
+        },
+        "lung_9_schoenfeld": {
+          "prompt": "Load lung_cancer.csv (index_col=0). Fit a Cox PH model (lifelines CoxPHFitter) with sex, age, and ph.ecog as covariates. Drop rows with missing values, duration='time', event=(status==2). Then test the proportional hazards assumption using lifelines.statistics.proportional_hazard_test with time_transform='rank'. Report the p-value for each covariate: sex_schoenfeld_p, age_schoenfeld_p, ph_ecog_schoenfeld_p. Also report any_violation = True if any p < 0.05, otherwise False.",
+          "ground_truth": {
+            "sex_schoenfeld_p": 0.1302,
+            "age_schoenfeld_p": 0.7302,
+            "ph_ecog_schoenfeld_p": 0.1458,
+            "any_violation": false
+          },
+          "tolerance": {
+            "sex_schoenfeld_p": 0.05,
+            "age_schoenfeld_p": 0.1,
+            "ph_ecog_schoenfeld_p": 0.05,
+            "any_violation": "exact"
+          },
+          "category": "model_diagnostics",
+          "complexity": "complex"
+        },
+        "lung_10_stratified_cox": {
+          "prompt": "Load lung_cancer.csv (index_col=0). Fit a stratified Cox proportional hazards model (lifelines CoxPHFitter) with sex and age as covariates, stratified by ph.ecog (convert to int). Drop rows with missing values in time, status, sex, age, or ph.ecog. Duration='time', event=(status==2), strata=['ph.ecog']. Report sex_hazard_ratio_stratified = exp(coef) for sex, sex_p_value_stratified, and concordance_stratified = the model's concordance_index_.",
+          "ground_truth": {
+            "sex_hazard_ratio_stratified": 0.5749,
+            "sex_p_value_stratified": 0.001198,
+            "concordance_stratified": 0.5827
+          },
+          "tolerance": {
+            "sex_hazard_ratio_stratified": 0.03,
+            "sex_p_value_stratified": 0.002,
+            "concordance_stratified": 0.02
+          },
+          "category": "regression",
+          "complexity": "medium"
+        }
+      }
+    }
+  },
+  "scoring": {
+    "description": "Each operation is scored as pass/fail based on tolerance. Final score = number of passed operations / total operations.",
+    "tolerance_types": {
+      "exact": "Values must match exactly",
+      "numeric": "Absolute difference must be within tolerance value",
+      "set_overlap_8_of_10": "At least 8 of 10 items must match"
+    }
+  }
+}

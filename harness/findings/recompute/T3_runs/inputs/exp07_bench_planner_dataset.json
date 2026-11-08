@@ -1,0 +1,975 @@
+[
+  {
+    "query": "What is the total storage capacity required for the resulting BAM, annotated VCF, and CNV files for a 90x/90x tumor/normal WGS dataset processed by Sarek?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "01_sarek_FR1"
+  },
+  {
+    "query": "According to the performance benchmarks provided in the paper, what are the specific time and memory requirements for the Snakemake scheduler to compute a graph of 90,000 jobs?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "02_snakemake_FR1"
+  },
+  {
+    "query": "According to the findings, what was the specific reduction in storage usage for the work directory when switching from BAM to CRAM, and what were the corresponding data volumes?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "03_nfcore_framework_FR1"
+  },
+  {
+    "query": "In a speed evaluation on a 9,316 M base dataset, what were the specific processing times for fastp (PE) compared to Trimmomatic?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "04_fastp_FR1"
+  },
+  {
+    "query": "According to the paper, how many common bioinformatics tools does MultiQC support at the time of writing?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "05_multiqc_FR1"
+  },
+  {
+    "query": "What is the reported mapping speed of STAR when using a 12-core server for 2 x 76 bp paired-end reads, and how does this compare to other aligners?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "06_star_aligner_FR1"
+  },
+  {
+    "query": "By what percentage range was Salmon's sensitivity higher in differential expression testing compared to other tools at the same False Discovery Rates (FDRs)?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "07_salmon_FR1"
+  },
+  {
+    "query": "In the reproducibility analysis where a dataset was split into two independent halves, what specific improvement in the overlap of the top 100 genes was observed when using shrunken MAP estimates compared to standard MLE estimates?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "08_deseq2_FR1"
+  },
+  {
+    "query": "Which operating systems are supported by SeqKit and what are the requirements for their installation and configuration?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "09_seqkit_FR1"
+  },
+  {
+    "query": "What unique capability does Cutadapt offer compared to other standalone tools in the context of read trimming?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "factual_recall",
+    "question_id": "10_cutadapt_FR1"
+  },
+  {
+    "query": "How does the Sarek workflow architecture address the dual needs of computational reproducibility and scientific best practices in variant calling?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "01_sarek_CO2"
+  },
+  {
+    "query": "How does Snakemake's implementation of a blockchain-style hashing scheme facilitate cross-workflow result caching?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "02_snakemake_CO2"
+  },
+  {
+    "query": "How does the nf-core/sarek 3.1.1 pipeline leverage architectural and methodological changes to optimize cost and performance for large-scale data analysis?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "03_nfcore_framework_CO2"
+  },
+  {
+    "query": "What design choices and implementation strategies allow fastp to achieve higher performance and lower I/O overhead than traditional FASTQ tools?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "04_fastp_CO2"
+  },
+  {
+    "query": "How does MultiQC's approach to data presentation assist researchers in identifying quality issues across large-scale projects?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "05_multiqc_CO2"
+  },
+  {
+    "query": "How does the Maximum Mappable Prefix (MMP) search mechanism facilitate the identification of diverse sequence features beyond simple genomic mapping?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "06_star_aligner_CO2"
+  },
+  {
+    "query": "How does Salmon's method of bias correction specifically improve the outcomes of differential expression (DE) analysis?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "07_salmon_CO2"
+  },
+  {
+    "query": "How does the DESeq2 framework utilize Empirical Bayes shrinkage to handle the high uncertainty associated with low-count genes in both dispersion and fold change estimation?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "08_deseq2_CO2"
+  },
+  {
+    "query": "How does SeqKit achieve stable memory usage and efficiency when processing datasets that are significantly larger than the human genome?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "09_seqkit_CO2"
+  },
+  {
+    "query": "How does the implementation of Cutadapt balance the trade-off between user accessibility and computational efficiency?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "conceptual",
+    "question_id": "10_cutadapt_CO2"
+  },
+  {
+    "query": "Based on the benchmarking results, what is the specific F1 score achieved for somatic single-base mutations (SSM) when using the intersection of GATK4 Mutect2 and Strelka2?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "01_sarek_TE3"
+  },
+  {
+    "query": "Explain the technical approach Snakemake uses to optimize job scheduling and how it handles job submission overhead in cluster or cloud environments.",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "02_snakemake_TE3"
+  },
+  {
+    "query": "Based on the benchmarking of mapping processes, what was the numerical impact of input sharding on median runtime, and at what point was the maximum efficiency plateau reached?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "03_nfcore_framework_TE3"
+  },
+  {
+    "query": "How does fastp's methodology for adapter detection differ between single-end and paired-end sequencing data?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "04_fastp_TE3"
+  },
+  {
+    "query": "Which specific software libraries and architectural mechanisms does MultiQC use to handle data visualization and support custom extensions?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "05_multiqc_TE3"
+  },
+  {
+    "query": "According to the experimental benchmarks using ENCODE datasets, what percentage of reads did STAR successfully align, and which other aligner achieved a similar percentage?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "06_star_aligner_TE3"
+  },
+  {
+    "query": "Describe the algorithmic components and optimization techniques Salmon uses to achieve speed comparable to ultra-fast alignment-free tools while maintaining accuracy.",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "07_salmon_TE3"
+  },
+  {
+    "query": "What is the specific purpose of the regularized logarithm (rlog) transformation, and how does its performance compare to an ordinary log transformation in terms of variance stabilization?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "08_deseq2_TE3"
+  },
+  {
+    "query": "What specific technical optimization was applied to SeqKit's reverse complementation process, and what was the measured performance gain compared to using standard hash maps?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "09_seqkit_TE3"
+  },
+  {
+    "query": "What are the specific performance metrics for Cutadapt when processing 35 bp colour-space reads with an 18 bp adapter on a 2.66 GHz Intel Core 2 processor?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "technical",
+    "question_id": "10_cutadapt_TE3"
+  },
+  {
+    "query": "How do the storage and cost-efficiency optimization strategies in the nf-core framework compare to the scheduling and transparency features of the Snakemake workflow system?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_001"
+  },
+  {
+    "query": "How does the 'all-in-one' preprocessing approach of fastp complement the visualization and quality control capabilities of MultiQC in a bioinformatics pipeline?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_002"
+  },
+  {
+    "query": "What common technical methodologies do Sarek, Snakemake, and the nf-core framework share to ensure reproducibility and portability across different computing environments?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_003"
+  },
+  {
+    "query": "How could integrating fastp and the nf-core framework's data management optimizations improve the performance and resource usage of the Sarek WGS workflow?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_004"
+  },
+  {
+    "query": "In the context of scaling large-scale genomic analyses, how do the parallelization strategies of the nf-core framework differ from the job scheduling approach of Snakemake?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_005"
+  },
+  {
+    "query": "How do the implementation languages and performance-optimization strategies of fastp, SeqKit, and Cutadapt differ in addressing computational bottlenecks in sequence data processing?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_006"
+  },
+  {
+    "query": "In the context of RNA-seq analysis, how do the mapping and quantification methods of STAR and Salmon address technical challenges before downstream differential expression analysis in DESeq2?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_007"
+  },
+  {
+    "query": "How do the methodological approaches of Cutadapt and Salmon differ in their treatment of technical artifacts in RNA-seq data, and what are the specific implications for downstream analysis?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_008"
+  },
+  {
+    "query": "How do the quality control and preprocessing capabilities of fastp and Cutadapt integrate with the visualization goals of MultiQC in high-throughput sequencing pipelines?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_009"
+  },
+  {
+    "query": "Contrast the algorithmic approaches used by STAR and SeqKit to manage large-scale genomic sequence data efficiently.",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "cross_document",
+    "question_id": "CD_010"
+  },
+  {
+    "query": "Based on the development of Sarek, Snakemake, nf-core, and fastp, what is the emerging meta-strategy for balancing high-performance computational efficiency with scientific reproducibility in large-scale genomics?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_001"
+  },
+  {
+    "query": "How do the collective methodologies across Sarek, Snakemake, nf-core, and MultiQC redefine the concept of 'quality control' from a single-sample metric to a system-wide diagnostic process?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_002"
+  },
+  {
+    "query": "How does the corpus demonstrate an evolution from localized tool optimization to systemic computational efficiency across different layers of the bioinformatics stack?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_003"
+  },
+  {
+    "query": "Based on the various stages of data processing described, what meta-conclusion can be drawn regarding the relationship between technical artifact removal and statistical reliability in high-throughput sequencing analysis?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_004"
+  },
+  {
+    "query": "How do human-animal interface factors, ranging from professional habits to physiological events in livestock, collectively define the zoonotic risk landscape for bacterial and viral pathogens in endemic regions?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_005"
+  },
+  {
+    "query": "Analyze how the choice of diagnostic methodology and specific assay thresholds influences the reported prevalence and epidemiological understanding of transboundary diseases.",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_006"
+  },
+  {
+    "query": "How do anthropogenic factors, such as animal management and vaccination distribution, create patterns of disease persistence in regions attempting control of transboundary pathogens?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_007"
+  },
+  {
+    "query": "What meta-conclusion can be drawn regarding the evolving clinical presentation of livestock and wildlife viral diseases and its impact on traditional early-warning surveillance systems?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_008"
+  },
+  {
+    "query": "Identify the gaps in translating standardized, large-scale genomic workflows into the context of rapid, localized veterinary outbreak characterization based on current literature.",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_009"
+  },
+  {
+    "query": "How do high-performance sequence manipulation tools and modular workflow management systems collectively address the technical challenges of modern genomic surveillance for transboundary pathogens?",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "ground_truth",
+    "category": "synthesis",
+    "question_id": "SY_010"
+  },
+  {
+    "query": "List all files in my workspace",
+    "expected_tools": [
+      "list_files"
+    ],
+    "expected_agent": "handyman",
+    "expected_steps": 1,
+    "source": "non_research",
+    "category": "non_research"
+  },
+  {
+    "query": "Show me what's in the data directory",
+    "expected_tools": [
+      "list_files"
+    ],
+    "expected_agent": "handyman",
+    "expected_steps": 1,
+    "source": "non_research",
+    "category": "non_research"
+  },
+  {
+    "query": "Search the web for latest COVID-19 variants",
+    "expected_tools": [
+      "web_search"
+    ],
+    "expected_agent": "handyman",
+    "expected_steps": 1,
+    "source": "non_research",
+    "category": "non_research"
+  },
+  {
+    "query": "Find recent news about antimicrobial resistance",
+    "expected_tools": [
+      "web_search"
+    ],
+    "expected_agent": "handyman",
+    "expected_steps": 1,
+    "source": "non_research",
+    "category": "non_research"
+  },
+  {
+    "query": "Look up the latest SARS-CoV-2 lineages online",
+    "expected_tools": [
+      "web_search"
+    ],
+    "expected_agent": "handyman",
+    "expected_steps": 1,
+    "source": "non_research",
+    "category": "non_research"
+  },
+  {
+    "query": "Run this Python code: print('hello world')",
+    "expected_tools": [
+      "execute_python"
+    ],
+    "expected_agent": "coder",
+    "expected_steps": 1,
+    "source": "non_research",
+    "category": "non_research"
+  },
+  {
+    "query": "Calculate the mean of [1, 2, 3, 4, 5] using Python",
+    "expected_tools": [
+      "execute_python"
+    ],
+    "expected_agent": "coder",
+    "expected_steps": 1,
+    "source": "non_research",
+    "category": "non_research"
+  },
+  {
+    "query": "Create a bar chart of these values: A=10, B=20, C=15",
+    "expected_tools": [
+      "execute_python"
+    ],
+    "expected_agent": "coder",
+    "expected_steps": 1,
+    "source": "non_research",
+    "category": "non_research"
+  },
+  {
+    "query": "Write a Python script to parse a FASTA file",
+    "expected_tools": [
+      "execute_python"
+    ],
+    "expected_agent": "coder",
+    "expected_steps": 1,
+    "source": "non_research",
+    "category": "non_research"
+  },
+  {
+    "query": "Generate a heatmap from my results",
+    "expected_tools": [
+      "execute_python"
+    ],
+    "expected_agent": "coder",
+    "expected_steps": 1,
+    "source": "non_research",
+    "category": "non_research"
+  },
+  {
+    "query": "Analyze the image at workspace/figure1.png",
+    "expected_tools": [
+      "read_image"
+    ],
+    "expected_agent": "vision",
+    "expected_steps": 1,
+    "source": "non_research",
+    "category": "non_research"
+  },
+  {
+    "query": "Describe what's shown in workspace/plot.png",
+    "expected_tools": [
+      "read_image"
+    ],
+    "expected_agent": "vision",
+    "expected_steps": 1,
+    "source": "non_research",
+    "category": "non_research"
+  },
+  {
+    "query": "Read the file at workspace/results.txt",
+    "expected_tools": [
+      "read_file"
+    ],
+    "expected_agent": "handyman",
+    "expected_steps": 1,
+    "source": "non_research",
+    "category": "non_research"
+  },
+  {
+    "query": "Show me the contents of config.json",
+    "expected_tools": [
+      "read_file"
+    ],
+    "expected_agent": "handyman",
+    "expected_steps": 1,
+    "source": "non_research",
+    "category": "non_research"
+  },
+  {
+    "query": "Write 'Hello World' to workspace/output.txt",
+    "expected_tools": [
+      "write_file"
+    ],
+    "expected_agent": "handyman",
+    "expected_steps": 1,
+    "source": "non_research",
+    "category": "non_research"
+  },
+  {
+    "query": "Save these notes to workspace/notes.md",
+    "expected_tools": [
+      "write_file"
+    ],
+    "expected_agent": "handyman",
+    "expected_steps": 1,
+    "source": "non_research",
+    "category": "non_research"
+  },
+  {
+    "query": "What document indexes do I have?",
+    "expected_tools": [
+      "list_document_indexes"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "non_research",
+    "category": "non_research"
+  },
+  {
+    "query": "Show me the details of my research index",
+    "expected_tools": [
+      "inspect_document_index"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "non_research",
+    "category": "non_research"
+  },
+  {
+    "query": "Read pages 1-5 of document 01_sarek.pdf",
+    "expected_tools": [
+      "read_document"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "non_research",
+    "category": "non_research"
+  },
+  {
+    "query": "What's in the first page of my HPAI paper?",
+    "expected_tools": [
+      "read_document"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "non_research",
+    "category": "non_research"
+  },
+  {
+    "query": "Find papers about CRISPR, then summarize the top 3 findings",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "multi_step",
+    "category": "multi_step"
+  },
+  {
+    "query": "Search my documents for machine learning methods and create a comparison table in Python",
+    "expected_tools": [
+      "smart_query",
+      "execute_python"
+    ],
+    "expected_agent": null,
+    "expected_steps": 2,
+    "source": "multi_step",
+    "category": "multi_step"
+  },
+  {
+    "query": "Look up recent COVID variants online, then search my papers for related content",
+    "expected_tools": [
+      "web_search",
+      "smart_query"
+    ],
+    "expected_agent": null,
+    "expected_steps": 2,
+    "source": "multi_step",
+    "category": "multi_step"
+  },
+  {
+    "query": "Read the methodology section of my Sarek paper and write a summary to a file",
+    "expected_tools": [
+      "smart_query",
+      "write_file"
+    ],
+    "expected_agent": null,
+    "expected_steps": 2,
+    "source": "multi_step",
+    "category": "multi_step"
+  },
+  {
+    "query": "Find all papers mentioning sample sizes, then calculate the average using Python",
+    "expected_tools": [
+      "smart_query",
+      "execute_python"
+    ],
+    "expected_agent": null,
+    "expected_steps": 2,
+    "source": "multi_step",
+    "category": "multi_step"
+  },
+  {
+    "query": "Search for variant calling tools in my papers, then look up their latest versions online",
+    "expected_tools": [
+      "smart_query",
+      "web_search"
+    ],
+    "expected_agent": null,
+    "expected_steps": 2,
+    "source": "multi_step",
+    "category": "multi_step"
+  },
+  {
+    "query": "Analyze figure1.png and compare it with the results described in my papers",
+    "expected_tools": [
+      "read_image",
+      "smart_query"
+    ],
+    "expected_agent": null,
+    "expected_steps": 2,
+    "source": "multi_step",
+    "category": "multi_step"
+  },
+  {
+    "query": "List my workspace files and read the most recent results file",
+    "expected_tools": [
+      "list_files",
+      "read_file"
+    ],
+    "expected_agent": "handyman",
+    "expected_steps": 2,
+    "source": "multi_step",
+    "category": "multi_step"
+  },
+  {
+    "query": "Search my papers for statistical methods, then write a Python script to replicate one",
+    "expected_tools": [
+      "smart_query",
+      "execute_python"
+    ],
+    "expected_agent": null,
+    "expected_steps": 2,
+    "source": "multi_step",
+    "category": "multi_step"
+  },
+  {
+    "query": "Find cross-document themes and save the analysis to a report",
+    "expected_tools": [
+      "smart_query",
+      "write_file"
+    ],
+    "expected_agent": null,
+    "expected_steps": 2,
+    "source": "multi_step",
+    "category": "multi_step"
+  },
+  {
+    "query": "Read my AMR paper and extract key statistics into a CSV",
+    "expected_tools": [
+      "smart_query",
+      "execute_python"
+    ],
+    "expected_agent": null,
+    "expected_steps": 2,
+    "source": "multi_step",
+    "category": "multi_step"
+  },
+  {
+    "query": "Search the web for bioinformatics best practices and compare with my papers",
+    "expected_tools": [
+      "web_search",
+      "smart_query"
+    ],
+    "expected_agent": null,
+    "expected_steps": 2,
+    "source": "multi_step",
+    "category": "multi_step"
+  },
+  {
+    "query": "Analyze the image in workspace/gel.png and write a description to results.md",
+    "expected_tools": [
+      "read_image",
+      "write_file"
+    ],
+    "expected_agent": null,
+    "expected_steps": 2,
+    "source": "multi_step",
+    "category": "multi_step"
+  },
+  {
+    "query": "Find papers about epidemiology methods, summarize them, and create a comparison plot",
+    "expected_tools": [
+      "smart_query",
+      "execute_python"
+    ],
+    "expected_agent": null,
+    "expected_steps": 2,
+    "source": "multi_step",
+    "category": "multi_step"
+  },
+  {
+    "query": "List all document indexes, inspect the largest one, then run a deep search",
+    "expected_tools": [
+      "list_document_indexes",
+      "inspect_document_index",
+      "smart_query"
+    ],
+    "expected_agent": null,
+    "expected_steps": 3,
+    "source": "multi_step",
+    "category": "multi_step"
+  },
+  {
+    "query": "Extract data from my papers, write it to a CSV, then generate a summary plot",
+    "expected_tools": [
+      "smart_query",
+      "execute_python",
+      "execute_python"
+    ],
+    "expected_agent": null,
+    "expected_steps": 3,
+    "source": "multi_step",
+    "category": "multi_step"
+  },
+  {
+    "query": "Search the web for three topics, then synthesize what I found",
+    "expected_tools": [
+      "web_search",
+      "web_search",
+      "web_search"
+    ],
+    "expected_agent": "handyman",
+    "expected_steps": 3,
+    "source": "multi_step",
+    "category": "multi_step"
+  },
+  {
+    "query": "Read three different documents and compare their methodologies",
+    "expected_tools": [
+      "smart_query"
+    ],
+    "expected_agent": "editor",
+    "expected_steps": 1,
+    "source": "multi_step",
+    "category": "multi_step"
+  },
+  {
+    "query": "Analyze two images and write a comparative report",
+    "expected_tools": [
+      "read_image",
+      "read_image",
+      "write_file"
+    ],
+    "expected_agent": null,
+    "expected_steps": 3,
+    "source": "multi_step",
+    "category": "multi_step"
+  },
+  {
+    "query": "Search papers, run analysis code, and save results to workspace",
+    "expected_tools": [
+      "smart_query",
+      "execute_python",
+      "write_file"
+    ],
+    "expected_agent": null,
+    "expected_steps": 3,
+    "source": "multi_step",
+    "category": "multi_step"
+  }
+]

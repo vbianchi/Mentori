@@ -1,0 +1,880 @@
+{
+ "what": "Independent re-read of key_v1.json, 25 Oct 2026 (Valerio asked). One fresh reader per question read its papers in full (text/*.pages.json), without SIGNOFF.md or earlier reviews; a second reader tried to refute each flag. The key is unchanged.",
+ "reads": [
+  {
+   "sentences": [
+    {
+     "text": "Three QTLs.",
+     "verdict": "supported",
+     "where": "02_simko2013 p4 (two QTLs in single-experiment analysis, a third from MCIM), Table 4 p6",
+     "comment": "Correct as long as the answer keeps the two levels of evidence apart, which the next sentences do. The abstract and Discussion lead with two QTLs and an 'additional' one (p1, p7)."
+    },
+    {
+     "text": "qDM2.1 on LG 2b and qDM5.1 on LG 5a were significant in individual experiments",
+     "verdict": "supported",
+     "where": "02_simko2013 p4, Table 3 p5, p7",
+     "comment": "qDM2.1: F-2009, F-2011, F-2012b, L-2012a and the integrated rating. qDM5.1: F-2008, F-2011, L-2012b and the integrated rating. Neither QTL was significant in every experiment, and the key does not say it was."
+    },
+    {
+     "text": "and were effective in field experiments both in Salinas, California and in the Netherlands",
+     "verdict": "supported",
+     "where": "02_simko2013 p7",
+     "comment": "Near-verbatim. It also holds per QTL: each was found in at least one Salinas trial and in F-2011 (the Netherlands)."
+    },
+    {
+     "text": "the alleles for elevated resistance at both come from cultivar Iceberg",
+     "verdict": "supported",
+     "where": "02_simko2013 p1, p4 (BYET gg 2.60 vs ii 1.64), Table 4 p6 (positive additive effects)",
+     "comment": ""
+    },
+    {
+     "text": "A third QTL, qDM9.1 on linkage group 9, was found only by the mixed-model analysis of all experiments together (LOD 0.9 to 2.1 when experiments were analysed separately)",
+     "verdict": "supported",
+     "where": "02_simko2013 p1, p4, p7; Table 4 p6",
+     "comment": "Its significance is 3.5 (-log10 P) in MCIM, against more than 6.0 for the other two QTLs. It sits near AFLP E33/M59-417.72 (p4)."
+    },
+    {
+     "text": "its additive effect was about 60% to 75% of those of qDM5.1 and qDM2.1",
+     "verdict": "supported",
+     "where": "02_simko2013 p4; Table 4 p6 (0.088 vs 0.147 and 0.117); p7 ('25% to 40% smaller')",
+     "comment": "The arithmetic checks: 0.088/0.147 = 0.60 and 0.088/0.117 = 0.75. The key drops the paper's 'respectively', so the pairing (60% of qDM5.1, 75% of qDM2.1) is implied rather than stated."
+    },
+    {
+     "text": "and its resistance allele comes from Grand Rapids",
+     "verdict": "supported",
+     "where": "02_simko2013 p1, p4, p7; Table 4 p6 (negative effect -0.088, footnote b)",
+     "comment": ""
+    },
+    {
+     "text": "None of the three is located in the clusters of known Dm genes",
+     "verdict": "supported",
+     "where": "02_simko2013 p7 ('None of qDM2.1, qDM5.1, or qDM9.1 is located in these resistance gene clusters'); p4 for the two main QTLs",
+     "comment": "The clusters are on LG 1, 2 and 4, plus Dm13 alone on LG 3 (p1, p7)."
+    },
+    {
+     "text": "the LG 2b QTL is well separated from the Dm cluster on LG 2a",
+     "verdict": "supported",
+     "where": "02_simko2013 p7",
+     "comment": "Verbatim in substance. LG 2a and 2b are two marker groups of the same chromosomal LG 2 in this map (p8 Methods)."
+    },
+    {
+     "text": "No QTL x QTL or QTL x environment interaction was detected.",
+     "verdict": "partly supported",
+     "where": "02_simko2013 p4",
+     "comment": "The paper says none was significant at P ≤ 0.001, a stringent threshold. Without the threshold the sentence reads as an absolute absence."
+    }
+   ],
+   "omissions": [
+    {
+     "what": "The direction of qDM9.1's allele is the only thing that separates a right answer from a wrong one on that QTL, and nothing in the key makes a contradiction disqualifying.",
+     "where": "key_concepts / min_core",
+     "matters": "Yes. An answer that says all three resistance alleles come from Iceberg still hits qDM2.1, qDM5.1, 'originate from cultivar Iceberg', qDM9.1 and the cluster statement: 5 of 7, which is min_core. It would pass with the donor wrong for qDM9.1, which is the crux of the question's 'which cultivar at each'. A note should say that naming Iceberg for qDM9.1, or Grand Rapids for qDM2.1 or qDM5.1, fails the answer whatever its concept count."
+    },
+    {
+     "what": "Dm13 is present in both parents but was ruled out: it is on LG 3, is homozygous in both parents so does not segregate, and is not recognised by the Salinas isolates.",
+     "where": "02_simko2013 p7",
+     "matters": "Minor. Without it, an answer attributing the resistance to Dm13 or to a Dm gene would not be flagged. Worth a note line, not a key concept."
+    },
+    {
+     "what": "qDM5.1 lies close to a predicted TIR-NBS-LRR gene, and qDM2.1 shares a region with rbq5 (downy mildew) and pm-2.2 (powdery mildew).",
+     "where": "02_simko2013 p4, p7",
+     "matters": "Minor. An answer that mentions the TIR-NBS-LRR gene near qDM5.1 is still correct, because that gene is not a known Dm cluster. The notes cover rbq5 but not the TIR-NBS-LRR point, so a grader could wrongly read 'near an NBS-LRR gene' as contradicting 'not in Dm clusters'."
+    },
+    {
+     "what": "The two main QTLs also delay sporulation at the seedling stage (7 DAI in the laboratory tests).",
+     "where": "02_simko2013 p1, p7",
+     "matters": "Low. The question does not ask about plant stage. Listed only so that an answer mentioning it is not penalised."
+    }
+   ],
+   "framing": [
+    {
+     "issue": "'No QTL x QTL or QTL x environment interaction was detected' leaves out the paper's threshold, P ≤ 0.001. A breeder reads 'no interaction' as a stronger, more general claim than a non-significant test at a strict alpha.",
+     "suggestion": "'No QTL x QTL or QTL x environment interaction was significant at P ≤ 0.001.'"
+    },
+    {
+     "issue": "'about 60% to 75% of those of qDM5.1 and qDM2.1' drops 'respectively', so the reader cannot tell which ratio belongs to which QTL.",
+     "suggestion": "'about 60% of qDM5.1's and 75% of qDM2.1's additive effect (0.088 vs 0.147 and 0.117)'."
+    },
+    {
+     "issue": "Calling qDM9.1 one of 'three QTLs' on equal footing slightly overstates it. The paper treats it as a weaker, mixed-model-only locus (significance 3.5 vs >6.0) and did not test it for marker-assisted selection (p7).",
+     "suggestion": "The key already qualifies it; keep the qualifier inside any grading note, and do not penalise an answer that calls it minor or tentative."
+    },
+    {
+     "issue": "In this paper 'Iceberg' is the 18th-century Batavia cultivar, not a modern iceberg-type crisphead (p3, p8). An answer that equates the two is a loose reading a breeder would notice.",
+     "suggestion": "Add to the notes that an answer describing the donor as modern iceberg-type lettuce is loose but does not change the allele attribution."
+    }
+   ],
+   "question_ok": "The question is clear and answerable from 02_simko2013 alone (p1, p4, p6, p7). The other four corpus papers do not discuss these QTLs. It is fairly typed as extractive, although the two tiers of QTL evidence mean an answer has to assemble the result from three places.",
+   "notes_ok": "The notes read the paper correctly: the two tiers of evidence, page 4's 'Neither' covering only the two main QTLs, the linked markers (BYET and BISR for qDM2.1, E45/M49-286.64 for qDM5.1) and rbq5 as context. One claim fails on the key's own arithmetic. The notes say a two-QTL-only answer is 'incomplete but not wrong', but such an answer that does not mention the LG 2a separation scores only 4 of 7 concepts (qDM2.1, qDM5.1, Iceberg, clusters) and fails min_core 5. Every supporting quote says what the key uses it for; evidence 3's 'this locus' resolves to qDM9.1 from the preceding sentence.",
+   "overall": "sound with minor fixes",
+   "summary": "Every claim in the short answer matches Simko et al. 2013 (pp. 1, 4, 6, 7). Only the interaction sentence loosens the paper, by dropping its P ≤ 0.001 threshold. The grading set-up needs two fixes: an answer naming Iceberg as qDM9.1's donor can still reach min_core 5, and the notes' 'two-QTL answer is not wrong' does not match the key's concept count."
+  },
+  {
+   "sentences": [
+    {
+     "text": "The NB-derived RGC2B trigger abrogated Dm3, Dm6 and Dm18.",
+     "verdict": "supported",
+     "where": "Christopoulou 2015 p10 (Results, 'Differential silencing...'); Table 1 RGC2B_NB_RNAi row, p4",
+     "comment": "Prose p10: Dm3 and Dm18 lost with both triggers, Dm6 'compromised by the NB-derived trigger'. Table 1 silenced column for the NB row: Dm3, Dm6, Dm18."
+    },
+    {
+     "text": "The LRR-derived trigger abrogated Dm3, Dm14, Dm16 and Dm18, and also Ra (resistance to root aphid); the LRR result is from Wroblewski et al. 2007.",
+     "verdict": "supported",
+     "where": "p2 (Introduction); p10 (first paragraph of the MRC2 RNAi section); Table 1 RGC2B_LRR_RNAi row with footnote e, p4",
+     "comment": "Ra is not a Dm specificity but the paper lists it with them, so including it is correct extra detail."
+    },
+    {
+     "text": "So Dm3 and Dm18 were lost with both triggers, Dm16 only with the LRR trigger, and Dm6 only with the NB trigger.",
+     "verdict": "supported",
+     "where": "p10; Table 1 p4",
+     "comment": "Table 1 shows Dm16 and Dm6 were tested with both constructs, so 'only' is backed by the tested columns as well as the prose."
+    },
+    {
+     "text": "Dm14 was lost with the LRR trigger and was not tested with the NB construct.",
+     "verdict": "supported",
+     "where": "p10 parenthesis '(Dm14 was not tested with the NB-RNAi construct)'; Table 1 NB row tested column omits Dm14, p4",
+     "comment": "This correctly settles the sloppy grouping 'Dm14 and Dm16 ... but not the NB-derived trigger' in the p10 prose."
+    },
+    {
+     "text": "Dm2 and Dm15 were tested with both constructs and lost with neither, and Dm1 was tested with the LRR construct and not lost (Table 1).",
+     "verdict": "supported",
+     "where": "Table 1 p4 (tested vs silenced columns of both RGC2B rows); p10 lists Dm2 and Dm15 among the specificities tested with the NB transgenics",
+     "comment": "Only the table gives these outcomes, as the notes say. Dm2, Dm6 and Dm15 were also tested with the LRR construct and not lost; the key names Dm6's LRR result elsewhere."
+    },
+    {
+     "text": "Because NB domains are usually more conserved than LRR domains, the authors found this surprising",
+     "verdict": "supported",
+     "where": "p10 last paragraph of the section; p10 earlier: 'NB domains tending to be more conserved than LRR domains'",
+     "comment": "'Usually' is a fair paraphrase of 'tend to be'."
+    },
+    {
+     "text": "and inferred that Dm16 is a chimeric Type I gene whose LRR domain is more closely related to Dm3 than to Dm6, but whose NB domain is more distantly related.",
+     "verdict": "supported",
+     "where": "p10",
+     "comment": "The paper's verb is 'suggests', and 'inferred' carries the same hedge. Adding 'to' before Dm6 picks one reading of the paper's slightly ambiguous 'more closely related to Dm3 than Dm6', and it is the natural one."
+    }
+   ],
+   "omissions": [
+    {
+     "what": "The negative half of each contrast is missing from the key concepts. Concept 2 says only that Dm14 and Dm16 'were abrogated by the LRR-derived trigger', and concept 3 says only that Dm6 'was compromised by the NB-derived trigger sequences'. Neither carries 'but not the NB-derived trigger' (Dm16) or 'but not those derived from the LRR' (Dm6), although the short answer and the supporting quotes do.",
+     "where": "key_concepts 2 and 3; source p10",
+     "matters": "Yes. The question asks what the authors inferred 'from the difference', and the difference is that Dm16 was not lost with the NB trigger and Dm6 was not lost with the LRR trigger. Read literally, the concept list would pass an answer saying Dm16 and Dm6 were lost with both triggers, which is a wrong answer."
+    },
+    {
+     "what": "The NB-domain half of the inference ('but with a more distantly related NB domain') has no key concept. Concept 5 covers only the LRR half.",
+     "where": "key_concepts 4-5; p10",
+     "matters": "Partly. 'Chimeric' implies it, but an answer that gets the chimera backwards (NB like Dm3, LRR distant) could still match concepts 4 and 5 loosely. A concept naming the NB-distant half would catch that error."
+    },
+    {
+     "what": "Context that the NB transgenics were made in cv. Diana (which carries Dm3) and crossed to other genotypes to test Dm2, Dm6, Dm15, Dm16 and Dm18. The general method used Cobham Green.",
+     "where": "p10; Table 2 p6; p5",
+     "matters": "No for grading. It is useful context only."
+    },
+    {
+     "what": "The Discussion's framing: when several triggers target the same gene, as for Dm3, overlapping sets of specificities are abrogated, which allows triggers to be designed that abrogate subsets of family members.",
+     "where": "p13",
+     "matters": "No. It is optional enrichment, and an answer that adds it should not be penalised."
+    }
+   ],
+   "framing": [
+    {
+     "issue": "Key concept 6 ('Dm14, Dm16, Dm18', tied to the p2 quote) is a bare fragment that repeats concepts 1 and 2 and asserts no relation. With min_core 5 of 6, it inflates the count without testing anything new, and it does not say which trigger these were lost with.",
+     "suggestion": "Replace it with the missing contrast, for example 'Dm16 was not abrogated by the NB-derived trigger', or with 'the LRR-trigger result was reported earlier (Wroblewski et al. 2007)'. Alternatively drop it and set min_core to 4 or 5 of 5."
+    },
+    {
+     "issue": "Concept 2 groups Dm14 with Dm16 under the LRR trigger. The paper's surrounding sentence says 'but not the NB-derived trigger' of both, although Dm14 was never tested with NB. A grader could take an answer that says 'Dm14 was not lost with the NB trigger' as correct, or penalise an answer that says 'Dm14 was not tested with NB' as contradicting the prose.",
+     "suggestion": "Add a grader note: an answer stating that Dm14 was untested with the NB construct is correct. An answer stating that Dm14 survived NB silencing repeats the paper's loose wording, and Table 1 contradicts it, so it should not be required."
+    },
+    {
+     "issue": "The key lists Ra among 'Dm specificities' lost with the LRR trigger. A pathologist would note that Ra is root aphid resistance, not a downy mildew specificity. The short answer handles this correctly by glossing it.",
+     "suggestion": "Keep the gloss, and make Ra optional for grading (not required, not penalised)."
+    },
+    {
+     "issue": "'Inferred that Dm16 is a chimeric Type I gene' is slightly firmer than the paper's 'suggests'.",
+     "suggestion": "Write 'suggested that Dm16 is likely a chimeric Type I gene' to keep the paper's hedge."
+    }
+   ],
+   "question_ok": "The question is clear, fair and answerable from Christopoulou 2015, p10 and Table 1 on p4. It asks for Dm specificities, so Ra is extra. The phrase 'RNAi tester stocks for the RGC2 family at MRC2' identifies the two RGC2B constructs without ambiguity.",
+   "notes_ok": "The notes and question_issues read the paper correctly. (1) The Dm14 handling matches p10 and Table 1. (2) The LRR result is attributed to Wroblewski 2007 (p2, p10, Table 1 footnote e). (3) Only Table 1 shows the Dm2/Dm15 outcomes and Dm1 tested with the LRR construct. (4) The Figure 4 caption on p11 says 'RGC2DB is Dm3' against 'RGC2B' in the text. Every supporting quote says what the key uses it for. Quote 3 (p2) is tied only to the weak concept 6.",
+   "overall": "sound with minor fixes",
+   "summary": "Every claim in the short answer is supported by p10 and Table 1 on p4, and the notes are accurate. The key concepts leave out the 'but not' half of the Dm16 and Dm6 contrasts (and the NB-distant half of the chimera inference), and concept 6 is a redundant fragment, so a grader working from the concepts could pass an answer saying Dm16 or Dm6 were lost with both triggers."
+  },
+  {
+   "sentences": [
+    {
+     "text": "No, on both counts.",
+     "verdict": "supported",
+     "where": "Parra 2021 p5 (segregation and MRC paragraphs); p4 Table 2",
+     "comment": "Both parts of the premise are contradicted: two 9:7 and one 1:3 population, and five resistances to C11O1326 mapped outside the MRCs."
+    },
+    {
+     "text": "Eight F2 populations (UC02202, UC02204, UC02206, UC07105, UC07106, UC12100, UC12102, UC12103) fitted 3:1, one dominant gene.",
+     "verdict": "supported",
+     "where": "p5 lines 304-309; p4 Table 2",
+     "comment": "The eight lines are named verbatim on p5."
+    },
+    {
+     "text": "UC07106 only as the closest fit to a ratio that deviated from simple Mendelian ratios.",
+     "verdict": "supported",
+     "where": "p8 'Segregation in the Salinas x UC07106 F2 population deviated ... closest fit was to a 3:1'; p4 Table 2 '~3:1', chi-square 3.59",
+     "comment": "This follows the p8 text. The paper is inconsistent with itself here: Table 2's chi-square of 3.59 is below 3.84 (1 df, P = 0.05), so on its own it would not reject 3:1. Recomputing from 90R/44S gives about 4.39, though. The key should not be graded on this point."
+    },
+    {
+     "text": "UC07108 and UC12101 segregated 9:7, consistent with two dominant genes being required for resistance.",
+     "verdict": "supported",
+     "where": "p5 lines 309-311; p8 lines 474-476; p4 Table 2 ('2 Dominant')",
+     "comment": ""
+    },
+    {
+     "text": "The two genes in each line are genetically unlinked, so the authors think them unlikely to be NLR pairs.",
+     "verdict": "supported",
+     "where": "p8 lines 486-488",
+     "comment": "This matches the map positions: UC07108 on MRC2 and MRC4 (Chr2 and Chr4), UC12101 on MRC1 and MRC2 (Chr1 and Chr2), p5."
+    },
+    {
+     "text": "The population from UC07107 segregated 1:3, consistent with a recessive gene.",
+     "verdict": "supported",
+     "where": "p5 lines 312-314; p8 lines 498-500; p4 Table 2 (32R/97S, Recessive)",
+     "comment": ""
+    },
+    {
+     "text": "The resistances to C11O1326 in UC02202, UC02204, UC02206, UC12100 and UC12103 mapped outside the MRCs.",
+     "verdict": "supported",
+     "where": "p5 lines 327-329; p4 Table 2 (position 'Chr1', not bold MRC)",
+     "comment": "All five are on chromosome 1 outside MRC1 (Table 2). The key does not say this."
+    },
+    {
+     "text": "UC07107's recessive gene is inside MRC1.",
+     "verdict": "supported",
+     "where": "p5 lines 320-322; Table 2",
+     "comment": ""
+    },
+    {
+     "text": "UC07106's resistance is in MRC1, a region of about 40 Mb; the authors suspect the gene lies in sequence missing from the reference genome.",
+     "verdict": "supported",
+     "where": "p8 lines 447-451, 466-468; Table 2 'MRC1'; p5 line 329-330 says only 'a region in Chr 1'",
+     "comment": "The 40 Mb figure is the F2 interval. F3 families narrowed it to 31 Mb (p8 lines 451-453), which the key leaves out. 'Missing from' is a fair paraphrase of 'not present in the reference genome'. The paper presents this as a hypothesis based on high divergence, and the key's 'suspect' keeps that hedge."
+    },
+    {
+     "text": "The resistance of UC07105 and UC12102 is in MRC4.",
+     "verdict": "supported",
+     "where": "p5 lines 322-323; Table 2; p7 'same region on Chromosome 4'",
+     "comment": ""
+    },
+    {
+     "text": "The two genes of UC07108 are in MRC2 and MRC4, and those of UC12101 in MRC1 and MRC2, the chromosome 2 gene supported by only a few markers.",
+     "verdict": "supported",
+     "where": "p5 lines 324-327; p8 lines 488-491; Table 2",
+     "comment": ""
+    },
+    {
+     "text": "A second gene in UC12103, for resistance to isolate C15L1691, is in MRC1; so UC12103 has one resistance outside the MRCs and one inside MRC1.",
+     "verdict": "supported",
+     "where": "p5 lines 341-343; p8 lines 510-514; Table 2 second UC12103 row (22R/10S, 3:1, MRC1, R63)",
+     "comment": ""
+    },
+    {
+     "text": "All F2 populations were screened with isolate C11O1326 except UC07108's, screened with C13O1407 because C11O1326 was virulent on it.",
+     "verdict": "partly supported",
+     "where": "p5 lines 296-304; p8 lines 508-514; Table 2",
+     "comment": "This is true of the ten primary F2 screens. However, UC12103's second gene was found with a different isolate, C15L1691 (22R/10S, Table 2). On p8 the authors say the two UC12103 genes were mapped 'depending on the isolate used for the phenotyping of the F2 Salinas x UC12103 population'. Read as written, 'all F2 populations' overstates the case. The isolate is printed C13C1407 in the p5 text and C13O1407 in Table 2."
+    }
+   ],
+   "omissions": [
+    {
+     "what": "Line identities are absent from key_concepts. No concept ties 9:7 to UC07108/UC12101, 1:3 to UC07107, or the outside-MRC set to the five named lines.",
+     "where": "p5 lines 304-314, 327-329",
+     "matters": "Yes. A wrong answer that names 9:7, two dominant genes, 1:3, recessive and outside the MRCs, but pins them on the wrong lines (for example UC07107 as 9:7), meets min_core 5 and passes. Either add the line names to the concepts or have the grader check attribution against the short answer."
+    },
+    {
+     "what": "The five outside-MRC resistances all sit on chromosome 1, outside MRC1. UC02206 and UC12100 overlap the earlier Dm17 region.",
+     "where": "p4 Table 2 ('Chr1'); p5 lines 317-319; p7 lines 400-407",
+     "matters": "Moderately. An answer that says 'mapped to chromosome 1 outside MRC1' is correct and should match the concept 'mapped outside the MRC regions'. Stating the chromosome in the key helps the grader accept it."
+    },
+    {
+     "what": "UC12103's second gene was detected with isolate C15L1691. It segregated 3:1 dominant (22R/10S).",
+     "where": "p4 Table 2; p5 lines 341-343; p8 lines 508-514",
+     "matters": "Low to moderate. Without this, a grader could mark down a correct answer that reports a second UC12103 F2 screen with a different isolate, because it seems to contradict the key's 'all ... except UC07108'."
+    },
+    {
+     "what": "UC07106 showed incomplete penetrance, and F3 data narrowed the interval from about 40 Mb to 31 Mb.",
+     "where": "p8 lines 447-456",
+     "matters": "Low. This explains why the ratio is only '~3:1', and a correct answer may give 31 Mb. A grader should not count 31 Mb as a contradiction of the key's 40 Mb."
+    },
+    {
+     "what": "For UC07107, the 1:3 ratio held regardless of inoculum concentration or temperature, so incomplete penetrance was excluded. The authors suggest the recessive gene came in by linkage drag with a linked dominant gene.",
+     "where": "p8 lines 500-508",
+     "matters": "Low. It is not needed to refute the premise, but it is accurate context that a grader should accept."
+    }
+   ],
+   "framing": [
+    {
+     "issue": "'All F2 populations were screened with isolate C11O1326 except UC07108's' reads as absolute. The second UC12103 resistance was mapped with C15L1691 (p8: 'depending on the isolate used for the phenotyping of the F2 Salinas x UC12103 population').",
+     "suggestion": "Write 'The ten primary F2 screens used C11O1326, except UC07108's (C13O1407, since C11O1326 was virulent on it). UC12103's second gene was found with isolate C15L1691.'"
+    },
+    {
+     "issue": "'UC07106's resistance (MRC1, a region of about 40 Mb...)' gives the F2 association interval as if it were the final map position.",
+     "suggestion": "Add 'narrowed to 31 Mb with F3 families' (p8)."
+    },
+    {
+     "issue": "'Five resistances mapped outside the MRCs' does not give their chromosome. A breeder would read Table 2 as 'Chr1, outside MRC1'.",
+     "suggestion": "Write 'mapped to chromosome 1 outside MRC1'."
+    },
+    {
+     "issue": "The UC07106 'deviated from Mendelian ratios' wording follows the p8 text. Table 2's chi-square (3.59) would not reject 3:1 at P = 0.05, so a reader checking the table could see a contradiction.",
+     "suggestion": "Add a note that the key follows the p8 text, and that Table 2's chi-square is internally inconsistent (recomputed from 90R/44S it is about 4.39). Do not penalise an answer that calls UC07106 3:1."
+    },
+    {
+     "issue": "The category 'out_of_domain' is attached to a question fully answerable from the corpus paper. The note says this follows the v2.4 convention, but a reader would take it as 'outside the corpus'.",
+     "suggestion": "Keep it if the convention binds. Otherwise relabel it as an in-domain refutation."
+    }
+   ],
+   "question_ok": "The question is clear, fair and answerable from Parra 2021 alone. Both premise parts (all 3:1 single dominant; all inside MRCs) are explicitly contradicted on p5 and p8, so 'refutation' is the right type.",
+   "notes_ok": "The notes and question_issues are correct readings. On (a), Table 2 does have nine 3:1 rows, counting UC07106 '~3:1' and UC12103's second row. A second reconciliation also works: the p5 'six Chr1 plus two Chr4' equals eight if UC07106 is left out, which the p5 text treats separately in its next sentence, so the ninth could be UC07106 rather than UC12103's second gene. Points (b) and (c) are accurate. All 15 quotes say what the key uses them for.",
+   "overall": "sound with minor fixes",
+   "summary": "Every substantive claim in the short answer is supported by Parra 2021 (p4 Table 2, p5, p8). The one overstatement is that all F2 populations except UC07108's were screened with C11O1326, which ignores UC12103's second gene (found with C15L1691). The main grading risk is that the key concepts carry no line names, so an answer that pins the 9:7 or 1:3 ratios on the wrong lines could still meet min_core 5."
+  },
+  {
+   "sentences": [
+    {
+     "text": "Not answerable from the five papers.",
+     "verdict": "supported",
+     "where": "All five papers read in full. Dm3 appears only in 02 p1 (LG2 cluster list), 03 pp2, 3-4, 6, 8-11, 13 and 04 pp5, 7, 9. Paper 01 has no Dm3 in its text, and paper 05 never mentions Dm3.",
+     "comment": "No page names a B. lactucae effector recognized by Dm3/RGC2B or gives its motifs. The only effectors with named motifs are BLR31, BLN08 (04 p4), BLG01, BLG03 and the paper 05 set (05 p2 Table 1), and none of them is tied to Dm3. The not_answerable type holds."
+    },
+    {
+     "text": "They say Dm3 is RGC2B",
+     "verdict": "supported",
+     "where": "03 p2 ('Sequencing of dm3 mutants and transgenic complementation established RGC2B as the gene conferring Dm3'); 03 p10; 03 p11 Fig. 4 legend",
+     "comment": "Supported. The same paper calls it 'RGC2DB is Dm3 and it is a Type I gene' in the Fig. 4 legend (p11), so the corpus uses both names."
+    },
+    {
+     "text": "an NLR gene",
+     "verdict": "supported",
+     "where": "04 p9 ('Dm3 is cloned and explained by an NLR gene'); 03 p10 Table 4 (RGC2 family, CNL); 02 p1 (NB-LRR)",
+     "comment": ""
+    },
+    {
+     "text": "in MRC2 on chromosome 2",
+     "verdict": "supported",
+     "where": "03 p2 ('The MRC on chromosome 2 ... MRC2 includes at least eight Dm genes ... including Dm3'); 03 p8; 04 p5; 02 p1 (LG 2)",
+     "comment": "No support quote covers 'chromosome 2' explicitly. Quote 0 and quote 3 name MRC2 only."
+    },
+    {
+     "text": "and test Dm3 with isolate IM25P11, listed as carrying Avr3",
+     "verdict": "supported",
+     "where": "03 p6 Table 2 (Diana: Dm1, Dm3, Dm5/8, Dm7; isolate IM25P11 (Avr3)); 03 p5 ('isolates diagnostic for specific Dm genes (Table 2)')",
+     "comment": "A fair reading of the column 'Isolates Tested (Relevant Avr)'. Avr3 here is the isolate's avirulence phenotype in a gene-for-gene sense. No gene or protein is identified for it."
+    },
+    {
+     "text": "but no paper names the effector protein that Dm3 recognizes or describes its motifs",
+     "verdict": "supported",
+     "where": "Full read of 01-05; motif statements are only general (04 p1, 05 p1) or concern other effectors (04 p4, 05 p2)",
+     "comment": "Correct. RXLR, EER and WY appear only as general oomycete features or attached to BLR31, BLN08, BLG01, BLG03 and the paper 05 effectors (BLR32-BLR40, BLN01-BLN06, BLQ04, BLC01)."
+    }
+   ],
+   "omissions": [
+    {
+     "what": "Paper 05's effectors are a trap that the key does not list: BLR38 (RLLR motif, recognized in L. serriola LS102 through two loci on chr 4 and chr 8), BLN06 and BLR40 (cv. Design). Paper 05 also attributes Bl:24 resistance in LS102 to Dm17 on chr 1 and never mentions Dm3.",
+     "where": "05 p1, p2 Table 1, p3, p4, p7, p8",
+     "matters": "An answer that names BLR38 or another paper 05 RXLR effector as Dm3's ligand could pass if the grader knows only the BLR31 and BLG03 traps. Adding it to question_issues closes that gap."
+    },
+    {
+     "what": "The alias RGC2DB for Dm3 ('RGC2DB is Dm3 and it is a Type I gene').",
+     "where": "03 p11, Fig. 4 legend",
+     "matters": "An answer that says Dm3 is RGC2DB is correct by the corpus and should not be penalized for disagreeing with the question's 'RGC2B'. The key lists RGC2DB only as a search term."
+    },
+    {
+     "what": "The papers state only general rules: oomycete effectors are 'often characterized by RXLR and EER' motifs, and RXLR-like effectors can carry WY domains.",
+     "where": "04 p1; 05 p1",
+     "matters": "Answers will often infer 'probably an RXLR effector'. The key should say this is acceptable only when it is marked as a general expectation, and that it does not answer the question. An answer that states it as the Dm3 ligand's motif should be marked wrong."
+    }
+   ],
+   "framing": [
+    {
+     "issue": "'listed as carrying Avr3' may read to some graders as if Avr3 were a cloned effector gene. In the paper it is the avirulence phenotype that makes IM25P11 diagnostic for Dm3.",
+     "suggestion": "Write 'isolate IM25P11, listed as avirulent on Dm3 (Avr3), a phenotype only; no Avr3 gene or protein is identified'."
+    },
+    {
+     "text_note": "",
+     "issue": "Label clash. question_issues says the question is 'in the corpus's domain', but the category is 'out_of_domain'. A reader could take that to mean the topic is off-corpus, when it is a corpus gap.",
+     "suggestion": "Keep the v2.4 category if the schema requires it, but add one line saying out_of_domain is the schema's tag for not-answerable records."
+    },
+    {
+     "issue": "question_issues says BLR31 was triggered 'only in L. saligna accessions'. Paper 04 p4 says BLR31 'triggered a consistent HR in three L. saligna accessions' out of 150 lines. It does not say whether a Dm3 differential line was screened.",
+     "suggestion": "Keep the existing hedge ('suggests but does not show'). Optionally add that no page says a Dm3 line was among the 150."
+    }
+   ],
+   "question_ok": "The question is clear and fair, and it uses the corpus's own name (RGC2B, 03 p2), so its premise does not mislead. After a full read of all five papers it cannot be answered: no effector is tied to Dm3, and no motif is given for one.",
+   "notes_ok": "The notes and question_issues are accurate readings. The 0-indexed evidence numbering matches the support list. The Table 2 columns match 03 p6. The BLR31 trap matches 04 p5 and p9. The BLG03 to Dm2 link matches 05 p2 and 04 p2. Ninja's HR to bacterial effectors maps to MRC1 via RGC1 (03 p3, p13). None of the notes is wrong. The only gap is that the paper 05 effectors (BLR38, BLN06, BLR40) are missing from the list of traps.",
+   "overall": "sound with minor fixes",
+   "summary": "The not_answerable type holds: no page in the five papers names Dm3's effector or its motifs, and every claim in the short answer is supported by papers 03 and 04. Three small fixes: accept RGC2DB as a name for Dm3, say that Avr3 is an isolate phenotype only, and add the paper 05 effectors (BLR38 and others) to the list of traps."
+  },
+  {
+   "sentences": [
+    {
+     "text": "BLN08 (Giesbers et al. 2017) triggered an HR in 55% of L. saligna accessions.",
+     "verdict": "supported",
+     "where": "Giesbers p1; p4 (30 of 55); p9",
+     "comment": "BLN08 also triggered a response in a few L. sativa, L. georgica and L. virosa lines (p4), but the 55% figure is right."
+    },
+    {
+     "text": "In BC1_CGN05318 the response was mapped as one dominant gene on chromosome 8 (20 to 33 cM)",
+     "verdict": "supported",
+     "where": "Giesbers p8; dominance from the F1s, p6",
+     "comment": "32 of 60 BC1 plants responded, which fits a single dominant gene. For CGN05271 the locus comes from preBIL6.2, a heterozygous introgression at 20 to 59 cM on C8 (p7)."
+    },
+    {
+     "text": "in CGN05271 and CGN05318 it co-localizes with MRC8A to B, a region with 42 NLR-encoding genes and no known Dm gene",
+     "verdict": "supported",
+     "where": "Giesbers p8 ('may overlap with ... MRC8A or B'), p9; Christopoulou p10 Table 5 (MRC8A 6 + MRC8B 36 NLRs = 42)",
+     "comment": "The Results hedge this ('may overlap') and the Discussion states it ('co-localized'). The count of 42 checks out against the cluster paper."
+    },
+    {
+     "text": "It did not co-segregate with Bl:24 resistance, which in CGN05318 came from a separate dominant R gene on chromosome 1 (32 to 73 cM, overlapping MRC1).",
+     "verdict": "partly supported",
+     "where": "Giesbers p8, p10",
+     "comment": "The C1 gene explained 30 of 36 resistant BC1 plants (83%). The other 6 are attributed to nonhost QTLs, so 'came from' slightly overstates it. In CGN05271 there is no R gene: the BLN08-responsive preBIL6.2 plants were as susceptible as Olof (p8)."
+    },
+    {
+     "text": "BLR31, by contrast, did co-segregate with Bl:24 resistance and mapped to MRC2.",
+     "verdict": "supported",
+     "where": "Giesbers p5-6, p9; Pelgrom p2",
+     "comment": ""
+    },
+    {
+     "text": "Giesbers et al. list explanations: suppression by other effectors (R gene may work against older isolates); a second unlinked gene required for resistance; a second tightly linked gene as in NLR pairs; the R gene targets another pathogen; poor translocation; mis-timed expression; incomplete resistance, excluded for BLN08.",
+     "verdict": "supported",
+     "where": "Giesbers p9",
+     "comment": "'Targets another pathogen' paraphrases loosely. The paper says the R gene confers resistance against another pathogen and recognizes the downy mildew effector as a side effect."
+    },
+    {
+     "text": "BLR38 recognition in L. serriola LS102 needs two unlinked, semi-dominant loci (F2 7:4:5, unresponsive : chlorosis : necrosis)",
+     "verdict": "supported",
+     "where": "Pelgrom p4 (1:2:1 rejected, χ2 = 37.8), p5, p6 (F3), p9 ('incomplete dominance')",
+     "comment": ""
+    },
+    {
+     "text": "one on chromosome 4 partly overlapping the upstream border of MRC4 and one on chromosome 8 just downstream of MRC8A",
+     "verdict": "supported",
+     "where": "Pelgrom p8, Fig. 7 p9",
+     "comment": "These are positions in the Salinas reference (v6 for the MRCs). The chr 4 QTL is at the bottom of chr 4 (LOD 21) and the chr 8 QTL at the top of chr 8 (LOD 5) (p4)."
+    },
+    {
+     "text": "plants lacking either locus never responded.",
+     "verdict": "supported",
+     "where": "Pelgrom p5; F3 families #6 and #28, p5-6",
+     "comment": ""
+    },
+    {
+     "text": "Recognition is not linked to Bl:24 resistance, which in LS102 is Dm17 at the top of chromosome 1",
+     "verdict": "supported",
+     "where": "Pelgrom p6-7 (3:1 in the whole F2 and in the BLR38-responsive subpopulation; LOD 79 at the reported Dm17 location)",
+     "comment": "The Dm17 identity rests on position and on Dm17's known spectrum. The section heading states it as fact, so the key may too."
+    },
+    {
+     "text": "but it is linked to resistance against Bl:22, Bl:23, Bl:26, Bl:28 and Bl:31",
+     "verdict": "supported",
+     "where": "Pelgrom p7, p9",
+     "comment": "Tested at family level in Dm17-free F3 families. For Bl:28 and Bl:31 the difference was much smaller because those races are less virulent (p7)."
+    },
+    {
+     "text": "and resistance and recognition map to the same markers.",
+     "verdict": "partly supported",
+     "where": "Pelgrom p8, Fig. S7",
+     "comment": "Co-mapping was done only for Bl:22, in F3 family #108. It was not done for all five races."
+    },
+    {
+     "text": "Pelgrom et al. explain the missing Bl:24 link by suppression: Bl:24 is thought to suppress recognition of, or response to, at least five of its own effectors, but not the one recognized by Dm17.",
+     "verdict": "supported",
+     "where": "Pelgrom p9-10",
+     "comment": "Pelgrom present this as a postulate they attribute to Giesbers et al. 2017 and Stassen et al. 2013. They do not test it."
+    },
+    {
+     "text": "So BLR38 fits the suppression explanation: the resistance works, but not against the effector's own race.",
+     "verdict": "supported",
+     "where": "Pelgrom p7, p9-10; Giesbers p9",
+     "comment": "This is the key's own inference. It is sound, and 'is consistent with' would be the accurate phrasing. It is strengthened by Pelgrom's allele data, which the key omits."
+    },
+    {
+     "text": "The corpus does not say whether the five races are older than Bl:24.",
+     "verdict": "supported",
+     "where": "searched all five papers; no dates for races Bl:22 to Bl:31",
+     "comment": ""
+    },
+    {
+     "text": "The two-locus requirement concerns recognition itself, so BLR38 is not a case of Giesbers' second unlinked gene required for resistance.",
+     "verdict": "supported",
+     "where": "Pelgrom p5, p8; Fig. 4 p6 (27.6% of BLR38 responders susceptible to Bl:24, the Dm17-lacking fraction)",
+     "comment": "A sound reading. Plants carrying both loci recognize BLR38 and resist the other races, yet are susceptible to Bl:24 without Dm17, so no missing unlinked gene explains the Bl:24 result."
+    },
+    {
+     "text": "Pelgrom et al. suggest the two loci may be a sensor and helper NLR pair, or an R protein and an effector target; this relates to Giesbers' NLR-pair explanation, though there the second gene is tightly linked and the BLR38 loci are unlinked.",
+     "verdict": "supported",
+     "where": "Pelgrom p10; Giesbers p9",
+     "comment": ""
+    },
+    {
+     "text": "In both systems Bl:24 resistance maps to chromosome 1, apart from the effector-recognition locus.",
+     "verdict": "partly supported",
+     "where": "Giesbers p8; Pelgrom p7; Christopoulou p3 table (Dm17 in the chr 1 cluster)",
+     "comment": "This holds for CGN05318 and LS102 only. In CGN05271 resistance is quantitative (nonhost QTLs) and no chr 1 R gene was found, so 'both systems' needs that qualifier."
+    }
+   ],
+   "omissions": [
+    {
+     "what": "BLR38 allele data: Bl:23 and Bl:28 carry the identical Bl:24 allele, and every variant (I82M, V188F) is still recognized in LS102. The effector itself is therefore not what lets Bl:24 escape, which is the strongest evidence that BLR38 fits the suppression explanation.",
+     "where": "Pelgrom p7-8, Fig. 5b, Fig. S6; p9",
+     "matters": "It answers the third part of the question directly. An answer that claims Bl:24 escapes through BLR38 sequence variation is contradicted by the paper, yet would not be caught against this key."
+    },
+    {
+     "what": "Pelgrom's 'at least five' suppressed effectors includes BLN08 (BLG01, BLG03, BLN06, BLN08 and BLR38, p9). Pelgrom thus applies the suppression postulate to BLN08 itself and credits it to Giesbers et al. 2017.",
+     "where": "Pelgrom p9-10",
+     "matters": "This is the explicit link between the two studies. An answer making it should get credit, and the key quotes the sentence (evidence 26) but never draws the connection."
+    },
+    {
+     "what": "BLR38 shows the recognizing loci do give downy mildew resistance: AABB, AaBB and AABb were highly resistant to Bl:22 and AaBb moderately resistant at 6.5%. That counts against Giesbers' 'R gene for another pathogen' and 'incomplete resistance' explanations in the BLR38 case. BLR38 is also expressed throughout Bl:24 infection without strong down-regulation, which bears on 'mis-timed expression' of the effector.",
+     "where": "Pelgrom p8, Fig. 6; p4, Fig. S4",
+     "matters": "Moderate. These are correct ways to answer 'how do the BLR38 results bear on Giesbers' explanations', and a grader using the key could treat them as unsupported extras."
+    },
+    {
+     "what": "Gene dosage strongly affects BLR38 HR intensity but plays a minor role in resistance. The chr 4 locus is the stronger and more rate-limiting one (LOD 21, 56.3% of variance, against LOD 5, 17.5% on chr 8).",
+     "where": "Pelgrom p1, p4-5, p8, p10",
+     "matters": "Low. It is inheritance detail, and its absence would not misgrade an answer."
+    },
+    {
+     "what": "The BLN08 response from CGN05947 was lost entirely in its F1 and BC1 progeny, so 'one dominant gene' holds only for the CGN05271 and CGN05318 progeny.",
+     "where": "Giesbers p6-8, p9",
+     "matters": "Low. The notes cover it (question_issues 6), but the short answer does not."
+    }
+   ],
+   "framing": [
+    {
+     "issue": "'resistance and recognition map to the same markers' reads as true for all five races. Co-mapping was shown only for Bl:22 in F3 family #108.",
+     "suggestion": "Write: 'in F3 family #108, resistance to Bl:22 and BLR38 recognition peak at the same markers on chr 4 and chr 8'."
+    },
+    {
+     "issue": "'In both systems Bl:24 resistance maps to chromosome 1' leaves out CGN05271, where resistance is QTL-based and BLN08-responsive preBIL6.2 plants were fully susceptible.",
+     "suggestion": "Write: 'In L. saligna CGN05318 and L. serriola LS102, Bl:24 resistance maps to chromosome 1...'."
+    },
+    {
+     "issue": "'Bl:24 resistance ... came from a separate dominant R gene on chromosome 1' overstates it slightly: the gene explained 30 of 36 resistant BC1 plants.",
+     "suggestion": "Add 'which explained most (83%) of the resistant BC1 plants'."
+    },
+    {
+     "issue": "'Pelgrom et al. explain ... by suppression' presents a hypothesis as an explanation. Pelgrom write 'has been postulated' and 'is thought to', and they do not test it.",
+     "suggestion": "Write: 'Pelgrom et al. attribute the missing Bl:24 link, as a hypothesis, to suppression...'."
+    },
+    {
+     "issue": "Notes item (3) says the difference is 'not dominant against semi-dominant'. Those are the papers' own labels: Giesbers call BLN08 responsiveness dominant (F1 responded, p6), and Pelgrom call the BLR38 loci semi-dominant (F1 chlorosis, p4).",
+     "suggestion": "Tell graders to accept 'dominant' against 'semi-dominant' when it is attributed to the papers, while treating one locus against two required loci as the substantive contrast."
+    },
+    {
+     "issue": "'the R gene targets another pathogen' is a loose paraphrase.",
+     "suggestion": "Write: 'the R gene confers resistance to another pathogen and recognizes BLN08 as a side effect'."
+    }
+   ],
+   "question_ok": "The question is clear, fair and answerable from papers 04 and 05, and its premises are true (both effectors come from Bl:24, and neither recognition co-segregates with Bl:24 resistance). The third part asks for interpretation, but the papers give enough to ground it.",
+   "notes_ok": "The notes and question_issues are correct readings. The 42 NLRs match Christopoulou Table 5 (6 + 36, p10), and the split quote across the Pelgrom p9/p10 break is real. Item (3) is slightly too strong in discounting the papers' own dominant and semi-dominant labels.",
+   "overall": "sound with minor fixes",
+   "summary": "The key is accurate: every quote says what the key uses it for, and the inheritance, map positions and suppression reading match the papers. The fixes are to limit the resistance co-mapping to Bl:22, qualify 'both systems' and the C1 gene's share, and add Pelgrom's allele finding (Bl:23 and Bl:28 carry the Bl:24 allele) and the inclusion of BLN08 among the five suppressed effectors, both of which bear on the comparison."
+  }
+ ],
+ "verifies": [
+  {
+   "items": [
+    {
+     "flag": "Sentence: 'No QTL x QTL or QTL x environment interaction was detected' drops the test threshold",
+     "verdict": "confirmed",
+     "evidence": "Page 4: 'No significant QTL 3 QTL or QTL 3 environment interaction was detected for these three QTLs at P # 0.001.' The key leaves out both 'significant' and the P <= 0.001 threshold, so it reads as if no interaction exists at all. At alpha 0.001, weak interactions could go undetected, and with 90 RILs that is plausible. This is a minor wording fix: 'none was significant at P <= 0.001'."
+    },
+    {
+     "flag": "Omission: a wrong donor for qDM9.1 (or for qDM2.1/qDM5.1) is not disqualifying",
+     "verdict": "confirmed",
+     "evidence": "The paper is unambiguous about the donors. Page 1: 'Alleles for elevated resistance at this locus originate from cultivar Grand Rapids.' Page 4: 'elevated resistance at qDM9.1 was associated with Grand Rapids alleles'. Page 6, Table 4 footnote: a negative additive effect means the allele is from Grand Rapids, and qDM9.1 is -0.088. Page 7: 'In contrast to QTLs qDM2.1 and qDM5.1, the allele for elevated resistance at qDM9.1 originates from cv. Grand Rapids.' Scored on the key's own concepts, an answer saying 'all three from Iceberg' hits qDM2.1, qDM5.1, 'originate from cultivar Iceberg', qDM9.1, the cluster sentence and (if it gives it) the LG 2a separation. That is 5 or 6 of 7, which clears min_core 5, even though the question asks 'which cultivar at each'. A note saying a reversed donor fails the answer is needed."
+    },
+    {
+     "flag": "Omission: Dm13 is in both parents but was ruled out",
+     "verdict": "uncertain",
+     "evidence": "Page 7 supports the reader's fact: 'Dm13 is present in both Grand Rapids and Iceberg; however, Dm13 was ruled out ... all isolates of B. lactucae from Salinas ... are not recognized by Dm13, the Dm13 gene is located on LG 3 ... and both parents are homozygous for Dm13, therefore Dm13 does not segregate'. Dm13 is a single gene, not one of the clusters the question asks about (page 1 lists the clusters on LG 1, 2 and 4, with Dm13 alone on LG 3). Whether an answer would ever credit Dm13 is a judgement call. A one-line note would help, but leaving it out does not make the key wrong."
+    },
+    {
+     "flag": "Omission: TIR-NBS-LRR gene near qDM5.1; qDM2.1 shares a region with rbq5 and pm-2.2",
+     "verdict": "confirmed",
+     "evidence": "Page 4: 'Neither of the QTLs mapped to the clusters of known Dm genes. However, ... qDM5.1 is located close to a gene potentially encoding a TIR-NBS-LRR disease resistance protein'. Page 7: 'qDM2.1 resides within the same chromosomal region as genes for quantitative resistance to downy mildew rbq5 and powdery mildew pm-2.2'. The paper's own 'However' marks an apparent tension that a grader could misread. The notes cover rbq5 only. A note line saying an NB-LRR candidate near qDM5.1 does not contradict 'not in Dm clusters' is warranted, though it is minor."
+    },
+    {
+     "flag": "Omission: the two main QTLs also delay sporulation at the seedling stage (7 DAI)",
+     "verdict": "refuted",
+     "evidence": "The fact is correct. Page 1: 'The same QTLs determined delayed sporulation at the seedling stage in laboratory experiments.' Page 7: 'qDM2.1 and qDM5.1 are active at the seedling stage; however, the QTLs do not prevent infection ... only delay sporulation.' But the question does not ask about plant stage, and the key counts concept hits without penalising extra correct content. Leaving this out does not change any grade."
+    },
+    {
+     "flag": "Framing: the threshold is missing from the interaction sentence (same point as the first sentence flag)",
+     "verdict": "confirmed",
+     "evidence": "Page 4: 'No significant ... interaction was detected for these three QTLs at P # 0.001.' The reader's suggested wording, 'none was significant at P <= 0.001', is what the paper says. This duplicates the first item."
+    },
+    {
+     "flag": "Framing: '60% to 75%' drops 'respectively'",
+     "verdict": "refuted",
+     "evidence": "Page 4: 'The additive effect of this QTL ... was 0.088 what is ca. 60% to 75% of the additive effects of QTLs qDM5.1 and qDM2.1, respectively.' Table 4, page 6, gives 0.147 for qDM5.1 and 0.117 for qDM2.1, so 0.088/0.147 = 0.60 and 0.088/0.117 = 0.75. The key keeps the paper's order (qDM5.1 first), and read as a range, '60% to 75%' is true of both. Page 7 says the same thing as '25% to 40% smaller'. Adding 'respectively' is optional; nothing is wrong or misleading for grading."
+    },
+    {
+     "flag": "Framing: 'three QTLs' puts qDM9.1 on an equal footing",
+     "verdict": "refuted",
+     "evidence": "The key already qualifies qDM9.1: 'found only by the mixed-model analysis of all experiments together (LOD 0.9 to 2.1 when experiments were analysed separately)'. This matches page 4 and page 7 ('detected on LG 9 only through simultaneous analysis'). Table 4 (page 6) gives significance 3.5 against >6.0 for the other two, and page 7 says it 'was not tested for its potential in MAS'. The paper itself counts it as a QTL ('these three QTLs', page 4). The reader concedes the key qualifies it."
+    },
+    {
+     "flag": "Framing: 'Iceberg' is an 18th-century Batavia, not a modern iceberg type",
+     "verdict": "refuted",
+     "evidence": "The fact is right. Page 3: 'note that cv. Iceberg is a Batavia rather than a modern iceberg type of lettuce'. Page 8: 'Iceberg is a Batavia type of lettuce that forms a loose head'. Page 7 calls it a '240+ years old cultivar'. But the key says only 'cultivar Iceberg' and never equates it with modern iceberg lettuce, so the key is not wrong. A note would be a nicety and changes no grade."
+    },
+    {
+     "flag": "question_ok: answerable from 02_simko2013 alone; the other papers do not discuss these QTLs",
+     "verdict": "refuted",
+     "evidence": "No problem here. The question can be answered from page 1, page 4, page 6 (Table 4) and page 7. A grep of 01, 03, 04 and 05 for 'qDM' and 'Grand Rapids' finds no hits; 01_parra2021 only cites Simko in its references. The reader's assessment stands."
+    },
+    {
+     "flag": "notes_ok: a two-QTL-only answer is called 'incomplete but not wrong' yet fails min_core",
+     "verdict": "uncertain",
+     "evidence": "The reader's arithmetic is right. An answer naming only the two main QTLs hits qDM2.1, qDM5.1, 'originate from cultivar Iceberg' and the cluster sentence (page 4, 'Neither of the QTLs mapped ...'), which is 4 of 7. It reaches 5 only if it also gives the LG 2a separation (page 7). But 'incomplete but not wrong in substance' describes the content and does not claim the answer passes, so whether this is a defect depends on how a grader reads the note. Stating the pass rule explicitly would remove the doubt. Separately, the reader is right that evidence 3's 'this locus' (page 1) follows the qDM9.1 sentence."
+    }
+   ],
+   "overall": "sound with minor fixes",
+   "summary": "The key's facts all match Simko et al. 2013 (QTLs, linkage groups, donors, LOD range, effect ratios, cluster placement). Two things need fixing: the interaction sentence needs 'significant at P <= 0.001', and a note must say that a reversed donor at any QTL, especially Grand Rapids at qDM9.1, fails the answer whatever its concept count."
+  },
+  {
+   "items": [
+    {
+     "flag": "Sentence: 'All F2 populations were screened with C11O1326 except UC07108's' overstates, since UC12103's second gene came from isolate C15L1691",
+     "verdict": "uncertain",
+     "evidence": "Page 5 supports the key word for word: 'F2 populations derived from ten NILs (...UC12103) were screened for resistance to B. lactucae isolate C11O1326. The F2 population derived from UC07108 was screened ... C13C1407 rather than C11O1326 because the latter isolate was virulent'. Table 2 (page 4) leaves the 'Isolate (F2 phenotyping)' cell empty for UC12103's second row (22R/10S) and puts C15L1691 under 'Isolate (F3 phenotyping)'. Page 5 says this gene was found when F3 families were tested 'against another four B. lactucae isolates'. Page 8 is looser: two genes mapped 'depending on the isolate used for the phenotyping of the F2 Salinas x UC12103 population', which can mean the F2 phenotyped through its F3 families. The paper does not settle which. The key already names the C15L1691 gene in MRC1, so a grader would see no contradiction. The C13C1407/C13O1407 misprint is real but is already recorded in note (c)."
+    },
+    {
+     "flag": "Omission: key_concepts do not tie 9:7, 1:3 or outside-MRC to the named lines, so a misattributed answer can reach min_core 5",
+     "verdict": "uncertain",
+     "evidence": "The paper attributes each ratio clearly. Page 5 says 'UC07108 and UC12101 showed a segregation ratio of 9:7' and 'UC07107 had a segregation ratio of 1:3'; outside MRCs are 'UC02202, UC02204, UC02206, UC12100, and UC12103'. None of the six key_concepts names a line, so the flag is factually right about the key. Whether that matters depends on whether the grader also checks the short answer. The question asks only whether the two-part premise holds, so the paper does not settle this design choice."
+    },
+    {
+     "flag": "Omission: the five outside-MRC resistances are all on chromosome 1 outside MRC1, and UC02206/UC12100 overlap Dm17",
+     "verdict": "refuted",
+     "evidence": "The fact is right. Table 2 (page 4) gives 'Chr1' for UC02202, UC02204, UC02206, UC12100 and UC12103 (first row). Page 7 says UC02206 and UC12100 'mapped to Chromosome 1, overlapping the genomic region where Dm17 had been previously mapped'. But the key's 'mapped outside the MRC regions' quotes page 5 exactly and is not misleading, and an answer saying 'chromosome 1, outside MRC1' plainly meets that concept. Adding the chromosome is optional."
+    },
+    {
+     "flag": "Omission: UC12103's second gene was detected with C15L1691 and segregated 3:1 dominant (22R/10S)",
+     "verdict": "refuted",
+     "evidence": "The key's short answer already says 'a second gene in UC12103, for resistance to isolate C15L1691 (MRC1)', quoting page 5. The 22R/10S 3:1 row in Table 2 (page 4) fits the premise rather than refuting it, so leaving out the ratio does not affect the refutation or the grading."
+    },
+    {
+     "flag": "Omission: UC07106 incomplete penetrance, and F3 narrowing from about 40 Mb to 31 Mb",
+     "verdict": "confirmed",
+     "evidence": "Page 8: 'a ~ 40 Mb region in MRC1 was significantly associated ... indicative of incomplete penetrance', then 'Phenotyping of F3 families followed by QTL mapping narrowed down the region to 31 Mb'. Page 5 also lists UC07106 among the lines whose interval was narrowed with F3 families. The key gives only 'about 40 Mb', which is the F2 association, not the final interval. A breeder would want 31 Mb, and a correct answer giving 31 Mb should not look like a contradiction. Minor fix: add 'narrowed to 31 Mb with F3 families'."
+    },
+    {
+     "flag": "Omission: UC07107's 1:3 held regardless of inoculum or temperature; the recessive gene may have come in by linkage drag",
+     "verdict": "refuted",
+     "evidence": "Page 8 does say this: 'This ratio was observed regardless of the inoculum concentration or temperature ... not due to incomplete penetrance', and suggests 'linkage drag of the recessive resistance gene'. It is accurate context, but the key's 'consistent with a recessive gene' (page 5) is already faithful and enough to refute the premise. No change to the key is needed. A grader would accept the extra detail anyway."
+    },
+    {
+     "flag": "Framing: 'All F2 populations ... except UC07108's' reads as absolute; rewrite as ten primary screens plus C15L1691 for UC12103's second gene",
+     "verdict": "uncertain",
+     "evidence": "This is the same point as the sentence flag. Page 5 and Table 2's F2/F3 isolate columns (page 4) support the key as written. Page 8's 'depending on the isolate used for the phenotyping of the F2 Salinas x UC12103 population' leaves it open. The suggested rewrite is harmless and clearer, but the text does not show the key is wrong."
+    },
+    {
+     "flag": "Framing: UC07106's 'region of about 40 Mb' is the F2 interval, given as if it were final",
+     "verdict": "confirmed",
+     "evidence": "Page 8: the F2 association was '~ 40 Mb'; 'Phenotyping of F3 families followed by QTL mapping narrowed down the region to 31 Mb'. The key's unqualified 40 Mb is quoted correctly but could mislead a breeder about the final map interval. Add the 31 Mb F3 result."
+    },
+    {
+     "flag": "Framing: 'Five resistances mapped outside the MRCs' gives no chromosome",
+     "verdict": "refuted",
+     "evidence": "The key quotes page 5 exactly: 'The resistances to C11O1326 present in UC02202, UC02204, UC02206, UC12100, and UC12103 mapped outside the MRC regions (Fig. 3)'. Table 2 (page 4) gives Chr1 for all five. A breeder would not be misled. Adding 'chromosome 1' is optional polish."
+    },
+    {
+     "flag": "Framing: 'deviated from Mendelian ratios' follows page 8, but Table 2's chi-square 3.59 would not reject 3:1; recomputed from 90R/44S it is about 4.39",
+     "verdict": "confirmed",
+     "evidence": "Table 2 (page 4) prints 'UC07106 C11O1326 90R/44S ~3:1 3.59', and page 8 says segregation 'deviated from simple Mendelian expected ratios; however, the closest fit was to a 3:1'. Recomputing with expected 100.5/33.5 gives 110.25/100.5 + 110.25/33.5 = 1.10 + 3.29 = 4.39. That exceeds 3.84 (df 1, P = 0.05), so the page 8 text holds and Table 2's 3.59 is internally inconsistent. The key is right but does not record this. Minor fix: add a note. The key already lists UC07106 among the 3:1 populations, so an answer calling it 3:1 is already accepted."
+    },
+    {
+     "flag": "Framing: category 'out_of_domain' is attached to a question fully answerable from the corpus",
+     "verdict": "uncertain",
+     "evidence": "The question is answered entirely from Parra 2021, pages 5 and 8. The key's notes say the label follows the v2.4 convention for refutation questions. The paper cannot settle a labelling convention; it is a project decision."
+    },
+    {
+     "flag": "Notes remark: second reconciliation of 'nine populations ... six Chr 1, two Chr 4' (UC07106 rather than UC12103's second gene could be the ninth)",
+     "verdict": "confirmed",
+     "evidence": "Table 2 (page 4) has nine 3:1 rows: Chr1 for UC02202, UC02204, UC02206, UC07106 (MRC1), UC12100 and both UC12103 rows (seven), and Chr4 (MRC4) for UC07105 and UC12102 (two). Page 5's 'six ... Chr 1' plus 'two ... Chr 4' makes eight whichever Chr1 row is dropped. Page 5 handles UC07106 separately in the next sentence ('For line UC07106, a region in Chr 1 ...'), so either reading reconciles. This does not change the key's eight named populations."
+    }
+   ],
+   "overall": "sound with minor fixes",
+   "summary": "The refutation holds on both counts and every quote is faithful to Parra 2021. Three minor fixes are warranted: give UC07106's F3-narrowed 31 Mb beside the 40 Mb, note that Table 2's chi-square of 3.59 for UC07106 is inconsistent (recomputed it is 4.39, which supports 'deviated'), and optionally clarify that UC12103's C15L1691 gene came from F3 testing."
+  },
+  {
+   "items": [
+    {
+     "flag": "Omission: concepts 2 and 3 drop the negative half of each contrast",
+     "verdict": "confirmed",
+     "evidence": "p10: \"Dm14 and Dm16 were abrogated by the LRR-derived trigger sequence but not the NB-derived trigger sequence (Dm14 was not tested with the NB-RNAi construct). Conversely, Dm6 was compromised by the NB-derived trigger sequences but not those derived from the LRR.\" The key's concepts 2 and 3 stop at the positive clause. Since concept 1 only asserts Dm3 and Dm18 were lost with both, an answer claiming Dm16 and Dm6 were also lost with both would still match concepts 1, 2, 3, 4, 5 and reach min_core 5, yet it destroys the contrast the question asks about and the chimera inference that rests on it. The negative clauses are in the paper verbatim, so adding them is faithful."
+    },
+    {
+     "flag": "Omission: no concept for the NB-distant half of the chimera",
+     "verdict": "confirmed",
+     "evidence": "p10: \"this suggests thatDm16 is a chimeric Type I gene with a LRR domain that is more closely related to Dm3 than Dm6 but with a more distantly related NB domain.\" Concept 5 is only \"more closely related to Dm3 than Dm6\" and does not name the LRR domain, so an answer that reverses the domains (NB like Dm3, LRR distant) can match concepts 4 and 5 on wording while stating the opposite of the paper. A breeder would call that the substantive half of the inference, because it is the NB conservation expectation that made the result surprising. Minor relative to flag 1, but real."
+    },
+    {
+     "flag": "Omission: cv. Diana transgenics crossed to test Dm2, Dm6, Dm15, Dm16, Dm18; general method used Cobham Green",
+     "verdict": "refuted",
+     "evidence": "Both facts are in the paper (p10: \"Transgenics were generated in cv. Diana\" and \"The two cv. Diana transgenics with the greatest levels of silencing were crossed to different genotypes to test forDm2, Dm6, Dm15, Dm16, and Dm18 speciﬁcities\"; p5: \"Stable transgenics of cv. Cobham Green (that lacks any of the tested disease resistance phenotypes)\"), and the Diana sentence is already support quote 7 of the key. The question asks which specificities were abrogated and what was inferred, not how the stocks were built, so nothing is missing from the answer. The first reader itself rates it \"No for grading\"."
+    },
+    {
+     "flag": "Omission: Discussion framing on p13 (overlapping sets, designing triggers for subsets)",
+     "verdict": "refuted",
+     "evidence": "p13 does say it: \"When multiple trigger sequences targeted the same gene, as for Dm3, overlapping sets of speciﬁcities were abrogated. This provides the opportunity for designing trigger sequences that can abrogate speciﬁc subsets of family members.\" It is a general Discussion consequence, not part of what the authors inferred about Dm16 from the NB/LRR difference, which is what the question asks. Optional enrichment, as the first reader says; no key change needed."
+    },
+    {
+     "flag": "Framing: concept 6 \"Dm14, Dm16, Dm18\" is a bare fragment that repeats concepts 1 and 2",
+     "verdict": "confirmed",
+     "evidence": "Concept 6 is tied to the p2 Introduction quote, which restates Wroblewski et al. 2007: \"abrogated the resistance mediated by not only Dm3 but also Dm14, Dm16, Dm18,a n d Ra\". As a concept it names no trigger, no relation and no contrast, and every one of its three gene names already appears in concepts 1 and 2. With min_core 5 of 6 it is a free point, so an answer can miss one genuine concept and still pass. Replacing it with the Dm16/NB negative, or dropping it and setting min_core to 4 or 5 of 5, is the right fix."
+    },
+    {
+     "flag": "Framing: concept 2 groups Dm14 with Dm16, risking mis-grading of Dm14's NB status",
+     "verdict": "refuted",
+     "evidence": "Concept 2 as written is true of both genes (p10 and the Table 1 LRR row on p4: silenced phenotypes \"Dm3, Dm14, Dm16, Dm18, Ra\"), and the key already resolves the paper's loose \"but not the NB-derived trigger sequence\" twice: the short answer says \"Dm14 was lost with the LRR trigger and was not tested with the NB construct\", and question_issues (1) spells out that the p10 parenthesis and the Table 1 NB row (tested: Dm2, Dm3, Dm6, Dm15, Dm16, Dm18) both exclude Dm14. No key concept requires a Dm14 NB claim, so neither mis-grading the reader describes is forced. An explicit grader note would be tidier but the record is not wrong or misleading."
+    },
+    {
+     "flag": "Framing: Ra listed among \"Dm specificities\" lost with the LRR trigger",
+     "verdict": "refuted",
+     "evidence": "The paper itself puts Ra in that column: the Table 1 LRR row on p4 lists \"Dm1 , Dm3, Dm2, Dm6, Dm14, Dm15, Dm16, Dm18, Ra\" under \"Dm Speciﬁcities Tested\", and p10 writes \"Not only Dm3,b u ta l s oDm14, Dm16 and Dm18, as well as Ra\". The key's short answer keeps Ra outside the Dm set and glosses it (\"and also Ra (resistance to root aphid)\"), which is what a pathologist would want, and no key concept mentions Ra, so it is already neither required nor penalised. Nothing to correct."
+    },
+    {
+     "flag": "Framing: \"inferred\" is firmer than the paper's \"suggests\"",
+     "verdict": "refuted",
+     "evidence": "p10 reads \"This was surprising because NB domains tend to be more conserved than LRR domains; this suggests thatDm16 is a chimeric Type I gene...\". The question asks what the authors \"infer\", and \"this suggests X\" is the authors making an inference, so reporting it as \"inferred that\" states the act, not a strengthened confidence; the key's own concept is the bare phrase \"chimeric Type I gene\", which carries no modality at all. A breeder would not read the key as claiming Dm16 is proven chimeric. Stylistic preference only."
+    },
+    {
+     "flag": "question_ok: question clear, fair, answerable from p10 and Table 1",
+     "verdict": "refuted",
+     "evidence": "No defect to act on; the remark checks out. p10 carries both trigger outcomes and the inference, and the Table 1 rows on p4 (not p10, and not p4 as the key's support says of the LRR/NB rows, which is correct) give the tested and silenced lists. \"RNAi tester stocks for the RGC2 family at MRC2\" maps to exactly the two rows named RGC2B_LRR_RNAi and RGC2B_NB_RNAi, no other construct in Table 1 targets RGC2, so the question is unambiguous."
+    },
+    {
+     "flag": "notes_ok: notes and question_issues read the paper correctly",
+     "verdict": "refuted",
+     "evidence": "No defect to act on; I checked all four points. (1) The p10 parenthesis and the Table 1 NB row exclude Dm14 from NB testing. (2) The LRR result is attributed to Wroblewski et al. 2007 at p2 and again at p10 (\"had been studied previously using RNAi (Wroblewski et al. 2007)\"). (3) The p10 prose names Dm2 and Dm15 as tested but only Table 1 shows they were not silenced, and only Table 1 shows Dm1 tested with the LRR construct. (4) The Figure 4 caption on p11 does read \"RGC2DB is Dm3 and it is a Type I gene\" against RGC2B in the text. The text-layer spacing faults the notes list are all present."
+    }
+   ],
+   "overall": "sound with minor fixes",
+   "summary": "The key's facts, quotes and page attributions all survive a fresh read: the two trigger outcomes, the Dm14-untested handling, the Dm1/Dm2/Dm15 Table 1 details and the chimera inference are faithful to p10 and Table 1 on p4, and the Ra gloss, the \"inferred\" wording, the Diana/Cobham Green context and the p13 Discussion framing need no change. Three fixes are worth making to the concept list, not the answer: concepts 2 and 3 should carry their \"but not\" halves, a concept should name the distant NB domain, and the empty concept 6 should be replaced or dropped with min_core reset, since as it stands an answer that says Dm16 and Dm6 were lost with both triggers can still pass."
+  },
+  {
+   "items": [
+    {
+     "flag": "Omission: paper 05's effectors (BLR38, BLN06, BLR40) missing from the trap list",
+     "verdict": "confirmed",
+     "evidence": "The facts hold. 05 p2 Table 1: 'BLR38 260 1-18 RLLR 46'. 05 p4 Fig. 2: 'Recognition of BLR38 maps to loci on chromosomes (chr) 4 and 8, whereas resistance to Bremia lactucae Bl:24 maps to chr 1 ... maps to the Dm17 locus on chr 1'. 05 p3: 'BLR40 triggered a robust HR in L. sativa cv. Design'. 05 p9 Fig. 7 places the BLR38 intervals at MRC4 and MRC8A. Dm3 appears nowhere in paper 05 (0 hits). The key's short answer already makes any named effector wrong. But question_issues gives an explicit list of 'Three traps' and leaves out the title effector of paper 05, an RXLR-like protein. It is a minor fix: add it as a fourth trap, recognized through chr 4 and chr 8 loci, not MRC2."
+    },
+    {
+     "flag": "Omission: alias RGC2DB for Dm3",
+     "verdict": "refuted",
+     "evidence": "03 p11, Fig. 4 legend: 'RGC2DB is Dm3 and it is a Type I gene'. 03 p2: 'established RGC2B as the gene conferring Dm3'. The key already finds both strings and says paper 03 has no effector for either. The question asks for the effector, not the gene name, so an answer that calls Dm3 RGC2DB loses nothing under a not-answerable key, and the question's 'RGC2B' matches 03 p2. Nothing needs to change for grading."
+    },
+    {
+     "flag": "Omission: general RXLR/EER/WY expectation should be graded as not an answer",
+     "verdict": "uncertain",
+     "evidence": "The text is accurate. 04 p1: 'effectors are often characterized by RXLR and EER amino acid motifs'. 05 p1 describes WY domains in RXLR effectors. The corpus also argues against inferring RXLR. 05 p2: 'BLG03 (GKLR motif) is recognized in L. sativa cv. Amplus and UCDM2 that harbour the resistance gene Dm2', and BLN08 has 'no RXLR motif'. So the only effector tied to a Dm gene in these papers lacks RXLR. The key's 'no paper ... describes its motifs' already rules out a stated motif. Whether to add an explicit rule for hedged 'probably RXLR' answers is a grading-policy call that the papers do not settle."
+    },
+    {
+     "flag": "Framing: 'listed as carrying Avr3' may read as a cloned gene",
+     "verdict": "refuted",
+     "evidence": "03 p6, Table 2, column 'Isolates Tested (Relevant Avr)': 'Diana Dm1, Dm3, Dm5/8, Dm7 IM25P11 (Avr3)'. In Bremia work, saying an isolate carries Avr3 is the standard way to describe its avirulence phenotype, and the same key sentence goes on to say 'no paper names the effector protein that Dm3 recognizes'. A breeder would not take it to mean a cloned gene. The suggested rewording is optional polish, not a correction."
+    },
+    {
+     "flag": "Framing: 'in the corpus's domain' vs category out_of_domain",
+     "verdict": "refuted",
+     "evidence": "The key itself ends question_issues with 'The v2.4 category for not-answerable questions is out_of_domain.' That sentence is the explanation the flag asks for. It is a schema matter and no paper bears on it."
+    },
+    {
+     "flag": "Framing: BLR31 HR 'only in L. saligna accessions'; was a Dm3 line screened",
+     "verdict": "refuted",
+     "evidence": "04 p4: 'In the germplasm screening of 150 lines, BLR31 triggered a consistent HR in three L. saligna accessions (CGN05947, CGN05310, CGN05304)'. 04 p2, Methods: the 150 lines included 'a differential set of L. sativa cultivars with single dominant R genes' (Table S1a), and no page names a Dm3 line in it. The key already hedges this: 'suggests but does not show that Dm3 lines do not recognize BLR31 (Table S1, which would show it, is not in the corpus)'. 'Only' is a fair reading of three positive accessions out of 150. The flag itself says to keep the hedge as it is."
+    }
+   ],
+   "overall": "sound with minor fixes",
+   "summary": "The key's verdict holds: no paper names the effector Dm3 recognizes or gives its motif, and every quote matches the text. One fix: add paper 05's BLR38 (RLLR motif, recognized through loci on chr 4 and chr 8, never linked to Dm3) to the trap list. Whether to add a grading rule for hedged 'probably RXLR' answers is Valerio's call."
+  },
+  {
+   "items": [
+    {
+     "flag": "Sentence: Bl:24 resistance in CGN05318 'came from' a dominant R gene on chr 1",
+     "verdict": "refuted",
+     "evidence": "Giesbers p8: 'a dominant R gene explained 83% (30 of 36, Table S4) of the resistant plants. This gene mapped on C1 between 32-73 cM, which overlaps with MRC1'; the six others 'are probably explained by a combination of nonhost QTLs'. The paper's own summary on p8 reads 'an R gene on C1 that was not associated with BLN08 responsiveness was identified in L. saligna CGN05318', which the key mirrors. The sentence is scoped to CGN05318, so the CGN05271 remark does not apply to it. Adding '(30 of 36 resistant BC1 plants)' is optional precision, not a correction."
+    },
+    {
+     "flag": "Sentence: 'resistance and recognition map to the same markers' (all five races)",
+     "verdict": "confirmed",
+     "evidence": "Pelgrom p8: co-mapping was done only in 'F3 family #108' with 'a leaf disc assay with Bl:22': 'Mapping of either disease resistance or BLR38 recognition resulted in maximum LOD scores at the same marker positions on chr 4 and chr 8' (resistance LOD 3.3 and 7.6; recognition 6.4 and 12.2, Fig. S7). For Bl:23, Bl:26, Bl:28 and Bl:31 linkage rests on comparing fixed F3 families #27 (AABB) against #6 and #28 and the CobhamGreen families (p7, Fig. 5a, Fig. S5), not on mapping. Placed after the five-race list, the key's clause overstates the evidence; scope it to Bl:22 in family #108."
+    },
+    {
+     "flag": "Sentence: 'In both systems Bl:24 resistance maps to chromosome 1'",
+     "verdict": "confirmed",
+     "evidence": "Holds for L. saligna CGN05318 (Giesbers p8, C1 32-73 cM) and L. serriola LS102 (Pelgrom p7, 'single, highly significant peak at the top of chromosome 1 with a LOD score of 79 ... Dm17'). But BLN08 was also mapped in CGN05271, where 'BLN08-responsive preBIL6.2 plants (n = 2) ... were as susceptible to Bl:24 as L. sativa cv Olof' (p8) and whose resistance 'is probably based on QTLs and did not show evidence for monogenic dominant resistance loci' (p6). 'Both systems' therefore over-generalizes for one of the two BLN08 mapping accessions. A minor fix: name CGN05318 and LS102."
+    },
+    {
+     "flag": "Omission: BLR38 allele data (Bl:23 and Bl:28 carry the Bl:24 allele; all variants still recognized)",
+     "verdict": "confirmed",
+     "evidence": "Pelgrom p7-8: 'Races Bl:23, Bl:24 and Bl:28 were all homozygous for the Bl:24 allele'; Bl:22 and Bl:31 carry I82M V188F; 'the effector variants with non-synonymous SNPs were all still recognized in L. serriola LS102 (Fig. S6)'; p9: 'BLR38 allelic variation in these races did not evolve to overcome resistance'. Because the BLR38-linked loci resist Bl:23 and Bl:28, which carry the identical allele, Bl:24's escape cannot lie in the BLR38 sequence. That is the strongest data point for the third part of the question, and the key does not mention it, so an answer claiming escape through effector variation would not be caught. Pelgrom do not spell out this inference, but it follows directly from their data."
+    },
+    {
+     "flag": "Omission: Pelgrom's 'at least five' suppressed effectors includes BLN08",
+     "verdict": "confirmed",
+     "evidence": "Pelgrom p9: 'the recognition of effectors BLG01, BLG03, BLN06 and BLN08 was not genetically linked to resistance against Bl:24 ... (Giesbers et al., 2017; Stassen et al., 2013). It has been postulated previously that B. lactucae expresses additional effectors that suppress effector recognition ... (Giesbers et al., 2017; ...'; p10: 'Race Bl:24 is thought to suppress the recognition or response to at least five Bl:24-derived effectors'. Those four plus BLR38 make five, so the postulate covers BLN08 by implication, though Pelgrom do not list the five by name. The key quotes both sentences but its short answer never states that Pelgrom extend suppression to BLN08, which is the explicit bridge between the two studies. Moderate importance."
+    },
+    {
+     "flag": "Omission: BLR38 results also bear on 'another pathogen', 'incomplete resistance' and 'mis-timed expression'",
+     "verdict": "confirmed",
+     "evidence": "Pelgrom p8, Fig. 6c (Bl:22, family #108): 'Heterozygous plants (AaBb) were moderately resistant (average infection severity, 6.5%). AABB, AaBB and AABb plants were highly resistant (average infection severity, 0.03%-1.34%)'. So the recognizing loci give strong downy mildew resistance, which counts against 'resistance against another pathogen' and 'incomplete resistance' for BLR38. Pelgrom p4, Fig. S4: BLR38 transcripts 'decreased slightly during the time course ... but did not show signs of strong down-regulation', which bears on mis-timed effector expression (R-gene timing is not tested). Pelgrom p6-7 (Fig. 4) adds that Bl:24 susceptibility is the same in the BLR38-responsive subpopulation (27.6%) as overall (27.3%). The question asks how BLR38 bears on 'the explanations' (plural); the key addresses only suppression and the second-gene and NLR-pair ideas, so a grader could mark these correct points as unsupported."
+    },
+    {
+     "flag": "Omission: gene dosage and the relative strength of the chr 4 and chr 8 loci",
+     "verdict": "refuted",
+     "evidence": "The facts are correct: Pelgrom p1 'Gene dosage affects the intensity of the BLR38-triggered HR, but is of minor importance for disease resistance'; p4 LOD 21 (56.3%) on chr 4 against LOD 5 (17.5%) on chr 8; p5 'the gene product of chr 4 is more rate limiting'. But the key already states 'two unlinked, semi-dominant loci' with the 7:4:5 ratio, which carries the inheritance the question asks for. Leaving out the dosage detail would not change the grade of any answer, as the first reader also judged ('Low')."
+    },
+    {
+     "flag": "Omission: CGN05947 BLN08 response lost in F1 and BC1",
+     "verdict": "refuted",
+     "evidence": "True: Giesbers p6-7 (F1_CGN05947 average 0.2; no response in 59 BC1 plants), p8 'completely absent in its F1 and BC1 progeny', p9. The short answer, however, already confines the mapping to BC1_CGN05318 and to 'CGN05271 and CGN05318'; it claims nothing for CGN05947, and question_issues (6) covers the point. No grading consequence."
+    },
+    {
+     "flag": "Framing: co-mapping shown only for Bl:22 in F3 #108",
+     "verdict": "confirmed",
+     "evidence": "Same evidence as the second sentence flag: Pelgrom p8, family #108 with Bl:22 is the only joint mapping of resistance and recognition (Fig. S7). The suggested rewording ('in F3 family #108, resistance to Bl:22 and BLR38 recognition peak at the same markers on chr 4 and chr 8') matches the text."
+    },
+    {
+     "flag": "Framing: 'In both systems' omits CGN05271",
+     "verdict": "confirmed",
+     "evidence": "Same evidence as the third sentence flag: Giesbers p8, preBIL6.2 responders as susceptible as Olof; p6, CGN05271 resistance is QTL-based. The suggested qualifier (CGN05318 and LS102) is accurate. Minor."
+    },
+    {
+     "flag": "Framing: 'came from a separate dominant R gene' overstates (30 of 36)",
+     "verdict": "refuted",
+     "evidence": "Giesbers p8 and p10 present the C1 gene as the resistance source in CGN05318 ('Two dominant monogenic R genes (on C4 for CGN05947 and C1 for CGN05318) ... explained all or a large part of the highly resistant plants'). The key's wording matches the authors' own framing. Adding '83%' is optional precision, and no breeder would read the sentence as wrong."
+    },
+    {
+     "flag": "Framing: 'Pelgrom et al. explain ... by suppression' presents a hypothesis as fact",
+     "verdict": "refuted",
+     "evidence": "The key's next clause already carries the hedge: 'Bl:24 is thought to suppress recognition of, or response to, at least five of its own effectors', which quotes Pelgrom p10. 'Explain' is used for a proposed explanation, the same sense as the key's 'Giesbers et al. list explanations', all of which are untested hypotheses (Giesbers p9 'A potential explanation', 'It is possible'). The wording does not present suppression as demonstrated."
+    },
+    {
+     "flag": "Framing: notes item (3) discounts the papers' 'dominant' and 'semi-dominant' labels",
+     "verdict": "refuted",
+     "evidence": "Notes (3) rests on the text: Giesbers p6 and p8 call the BLN08 response dominant, but p8 also reports higher responses with two alleles than one (P < 0.001) in all accessions except CGN05310, and non-overlapping dose ranges in CGN05318, the same intermediate-heterozygote pattern Pelgrom p4 call semi-dominant. Pelgrom's own contrast with Giesbers (p9) is single loci against two loci ('our data contrasted with previously characterized B. lactucae effector responses that mapped to single loci'). The short answer itself uses both labels ('one dominant gene', 'semi-dominant loci'), so an answer quoting them already matches the key. One sentence telling graders to accept the attributed labels would be harmless, but the note is not wrong."
+    },
+    {
+     "flag": "Framing: 'the R gene targets another pathogen' is a loose paraphrase",
+     "verdict": "refuted",
+     "evidence": "Giesbers p9: 'The R gene might also confer resistance against another pathogen and recognize the downy mildew effector as a side effect.' The key's paraphrase keeps the substance, and the support list quotes the full sentence. Adding 'and recognizes BLN08 as a side effect' would be more faithful, but the current wording would not mislead a grader or a breeder."
+    }
+   ],
+   "overall": "sound with minor fixes",
+   "summary": "Every number and locus in the PB_003 key checks out against Giesbers and Pelgrom. Two sentences generalize too far: co-mapping was shown only for Bl:22 in F3 family #108, and the chromosome 1 claim does not hold for CGN05271. The key also leaves out three points that answer the third part directly: Bl:23 and Bl:28 carry the identical BLR38 allele, Pelgrom's five suppressed effectors include BLN08, and the BLR38 loci give strong resistance while the effector is expressed throughout infection."
+  }
+ ]
+}
