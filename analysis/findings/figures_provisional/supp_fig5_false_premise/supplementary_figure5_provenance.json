@@ -1,6 +1,6 @@
 {
  "script": "scripts/S532_supp4_false_premise.py",
- "script_sha256": "49adb101e3e6f258a21966d63e8a9b9e01edb71856583708b35f2084c19dec76",
+ "script_sha256": "384ff46d11825e085dd317fad401beba5632e6a8c2174f2ecc62f68b6a8f17da",
  "command": "uv run --frozen python scripts/S532_supp4_false_premise.py plate",
  "python": "3.13.11",
  "model_calls": 0,
@@ -188,6 +188,6 @@
   "Supplementary Figure 5 data (provisional, 540 of 540).xlsx": "051c5b69e44b1cb7fded09e95c1d093869d01ae787df30ad0f23c2650919e66b",
   "Supplementary Figure 5 data caption (provisional, 540 of 540).md": "f7c310bd193eeecb30e2f5e2595aaecf4e3f5a3ed94e8e27ace6175d85ea7df2",
   "supplementary_figure5_numbers.json": "65190897134c743e0c1b8faeffaadb416805e04cbf9eaa52a9f932640e821990",
-  "legend_draft.md": "4cdb50b6b95dda9a00c09d3f07226123a7ea6bb7c3a26acb0f9ba1222c91f5c5"
+  "legend_draft.md": "bb4e98664a2420a867918478b3d6d95dde24762cdda9e6354326dfe8535cfc81"
  }
 }

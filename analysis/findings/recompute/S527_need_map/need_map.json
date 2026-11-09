@@ -3,7 +3,7 @@
   "command": "uv run --frozen python scripts/S527_need_map.py",
   "inputs_sha256": {
    "findings/figures_provisional/fig3_strategies/ranking.json": "ae8c82f2f43dc423a9fa0dcbfdf7ed5c6dca81d7604fc5b5fded443952b753e5",
-   "findings/figures_provisional/fig4/figure5_numbers.json": "8429825c65ec3c17da2c135a1dcd996c7657cd2717e21b8eec5256fd18b8088b",
+   "findings/figures_provisional/fig4/figure5_numbers.json": "67504fa642f9ca26194c2fae88417d9c6ea66beb57b34f7babce6882cf3ab684",
    "findings/figures_provisional/fig6/fig6_numbers.json": "14ea3bb30101edda9be40835c1f64e47fceb2c73b080190b9cc32c6b13ed9b6d",
    "findings/recompute/G4_fig3c_d185/verdicts.json": "06884d7121857e23dfbb4ffb18ad5019fa653ef2ae2e78eb266e428d0736b248",
    "findings/recompute/S511_g2_budget/results.json": "e225903ba4409374263dfe33626f6bca5c35ac957f1666a14553de937808b3f3",

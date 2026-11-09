@@ -1,24 +1,24 @@
 # Mentori analysis: the scripts that make the paper's figures, tables and numbers
 
-Built by `scripts/S608_release_analysis.py` from Mentori-reanalysis commit `5ee484034e`, copied from that commit
+Built by `scripts/S608_release_analysis.py` from Mentori-reanalysis commit `6fd2fe42a4`, copied from that commit
 (git cat-file), never from a working tree. `RELEASE_PROVENANCE.json` lists every file and where it went.
 
 ## What is here
 
 - `reproduce.py`: the one command (below).
-- `scripts/`: 112 of the 773 scripts tracked in Mentori-reanalysis, the ones the stages run or
+- `scripts/`: 115 of the 783 scripts tracked in Mentori-reanalysis, the ones the stages run or
   import (measured by the read audit, `scripts/fig_read_audit.py`).
 - `experiments/`: `LOCK.toml` (every model call's settings), `FIGURE_LOCK.toml` (every figure's rules), the runner,
   scorer and Mentori files the scripts import, and `rlm_ref/` (its own `pyproject.toml` and `uv.lock`).
 - `findings/figures_provisional/`: every committed plate, Source Data workbook and legend draft, and
   `MANIFEST.sha256`; `findings/recompute/`: the committed outputs the stages are compared with.
 - `data/`: the answer keys and prompt files the scripts read.
-- `expected/MANIFEST.sha256`: the sha256 of every expected output (368 files), the held ones included.
+- `expected/MANIFEST.sha256`: the sha256 of every expected output (366 files), the held ones included.
 - `DATA_FILES.tsv`: the files the data root must hold, with size and sha256.
 - `pyproject.toml`, `uv.lock`, `.python-version` (Python 3.13.11): the environment, as the analysis ran.
 
-574 files in git (107,280,670 bytes). The inputs the stages read (2175 files) are data and live in the
-Zenodo record as `analysis_inputs.tar` (911,677,440 bytes, sha256 `ab3e519140c2db4679d17f47ed99c0466f78acc81ded857ffdfc1d19463dc720`), beside the 14 frozen tars of
+645 files in git (101,217,516 bytes). The inputs the stages read (2176 files) are data and live in the
+Zenodo record as `analysis_inputs.tar` (912,896,000 bytes, sha256 `405062de2b3443f193e25d16d7b5b161f12098d518eb2149a19d19e333cc7046`), beside the 14 frozen tars of
 per-call records.
 
 ## The one command
@@ -38,9 +38,9 @@ file is checked by sha256 before anything runs. Then:
    because S494 compares every output with git HEAD and its read audit refuses files HEAD does not hold;
 2. stage `s494`: `scripts/S494_all_figures.py` rebuilds every plate and number step it knows from the frozen tars,
    compares each file byte for byte, runs S448 (the figure rules) on each plate and judges every read;
-3. stage `numbers`: 23 further producers (Supplementary Figures 12, 13 and 18, the Supplementary Tables
-   that need no model, Supplementary Data 1, the call counts, tokens and cost, the G17, G19 and G20 readings, the
-   Supplementary Information build and others; `NUMBERS` in reproduce.py), each run by its own command under the
+3. stage `numbers`: 22 further producers (Supplementary Figures 12, 13 and 18, the Supplementary Tables
+   that need no model, Supplementary Data 1, the call counts, tokens and cost, the G17, G19 and G20 readings and
+   others; `NUMBERS` in reproduce.py), each run by its own command under the
    same read audit and compared with the released copy, nothing masked;
 4. stage `held`: 30 entries that need a model call, a person, the rating rows or data not in this release,
    checked by sha256, each printed with its reason (`HELD` in reproduce.py);
@@ -68,13 +68,9 @@ in all on 8 cores (`boot_seconds` in `findings/recompute/S565_corpus_interaction
 
 ## What did not pass when this tree was built
 
-The build measured the stages in a fresh clone of `5ee484034e` (S494 exit 1). The producers' results then:
+The build measured the stages in a fresh clone of `6fd2fe42a4` (S494 exit 1). The producers' results then:
 see `RELEASE_PROVENANCE.json` `producers`. Known today:
 
-- Figure 5 (S472) refuses in any checkout not at `/Users/valeriobianchi/projects/Mentori-reanalysis`:
-  `findings/recompute/S576_d249/s576_d249.json` keys its input hashes by absolute path. Every S494 step that reads
-  Figure 5's outputs (Figure 1, Supplementary Figure 1, S489, the distiller count, S526, S527) is then reported
-  "blocked". A reader of this release cannot pass that stage until the script or the committed file is changed.
 - Several producers' committed outputs were written before later commits to their scripts and carry the older
   script hashes, commits and dates (and in some, older figure folder names): those rows show "differ" with the json
   keys or lines that differ.

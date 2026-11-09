@@ -1,16 +1,16 @@
 {
  "provenance": {
   "script": "scripts/S580_codegen_passages.py",
-  "script_sha256": "6ae922e638efca39fdf7e93a8c7f0baae0ec30f4eca996c46833170f0aefe08e",
+  "script_sha256": "69bfcea113aeabc21829da239fc35205d9481d504cb915862e54703f5f4b3dcd",
   "command": "uv run python scripts/S580_codegen_passages.py",
-  "repo_head": "8b542fae",
+  "repo_head": "75335042",
   "inputs_sha256": {
    "findings/figures_provisional/fig6/figure7_numbers.json": "d334db3de14c3990333cc6ae778c1700727e428714731199aa3e73b666e01049",
-   "findings/figures_provisional/supp_fig23_fig6_pairs/supplementary_figure23_numbers.json": "4f73ceed9715be369ed0ed3579bb27f61d2777d155b48a07505358523b4ff9d2",
+   "findings/figures_provisional/supp_fig15_fig6_pairs/supplementary_figure15_numbers.json": "3f04321a6cfa9227255e9c4aff03ab73d4d2a7c488cd9d8b0bb9225ede629f57",
    "findings/figures_provisional/fig6/fig6_numbers.json": "14ea3bb30101edda9be40835c1f64e47fceb2c73b080190b9cc32c6b13ed9b6d",
-   "findings/figures_provisional/supp_fig13_fig6_models/supplementary_figure13_numbers.json": "e520c6135e85375e578d3cda43aa8c884e347e362abb6ad171e0a0235b958615",
-   "findings/figures_provisional/supp_fig12_fig6_failures/supplementary_figure12_numbers.json": "329e10c883fecd6a0b0d179a87258c0c00b6f3ff04d24d8924bb2f36f00db8c3",
-   "findings/recompute/S488_fig6_heterogeneity/S488_fig6_heterogeneity.json": "edf9656b6d56bb3d3dd9932d3766ef9dcb67b9baaa663adc5b8604186629ba63",
+   "findings/figures_provisional/supp_fig16_fig6_models/supplementary_figure16_numbers.json": "edfdc53fac28d273517b630a52acbe8d1e9b50072c1e41a17fe476e85ffecd64",
+   "findings/figures_provisional/supp_fig14_fig6_failures/supplementary_figure14_numbers.json": "a735fe93d9b15b61a69141165a41840a0236bdf8df7aa8d7f601453013e6f0ca",
+   "findings/recompute/S488_fig6_heterogeneity/S488_fig6_heterogeneity.json": "e829f6bcf5ce6aa8405ddf4f7fb8609bfa14e8c59a4e290905e835f89bb5bf33",
    "scripts/S488_fig6_heterogeneity.py": "5ed25daad1815e7683d02f8f279ee3fb7e90d361bb8deeb2652b7e281c5b2d58"
   },
   "records": "PROVISIONAL: 2,420 of 2,420 attempts, 11 of 11 variants complete, records of 2026-11-04 08:35 CET; after the S4 reruns (D75, D80 V1, D81)",

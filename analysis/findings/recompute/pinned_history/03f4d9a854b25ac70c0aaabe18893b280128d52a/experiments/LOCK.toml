@@ -1,0 +1,141 @@
+# LOCK: the one set of settings for every model call in the revised paper's experiments.
+# Every script reads its settings from this file and sets none of its own. Nothing is cut. A model that
+# fails because its input or answer is too long shows that failure in its record. An experiment varies
+# only the one factor its row in experiments/LIST.md names. Decisions behind each value: README.md.
+
+status = "agreed"              # Valerio, 14 October (D53); a model without a digest in [models] cannot run
+
+[server]
+ollama_version = "0.40.2"      # the Studio's keg, ollama binary sha256 af75d4a611db...; same binary on every Mac
+num_parallel = 1               # one request per server
+flash_attention = true
+kv_cache_type = "q8_0"
+keep_alive = "24h"
+truncate = false               # a prompt longer than the context is an error, never cut in half
+shift = false                  # a full context stops the answer ("length"), never drops earlier text
+runner = "llama.cpp"           # GGUF models only; no MLX model in any run (its runner does not log or
+                               # honour these settings, and qwen3.8:27b-mlx did not repeat itself at temperature 0)
+
+[generation]
+num_ctx = 131072               # largest context gemma3, gpt-oss and deepseek-r1 support
+num_predict = -1               # no output limit; the context bounds every answer
+num_batch = 1024
+seed = "draw"                  # the draw number (1, 2, 3)
+think = "off"                  # or the model's lowest level where it cannot be off
+timeout = "none"               # calls are streamed; no new token for 10 minutes = recorded as stalled
+
+[judge]
+model = "devstral-small-2:24b"
+temperature = 0                # every other setting as [generation]; S440: 107 of 107 scores equal
+seed = "none"
+
+[scorers]
+model = "devstral-small-2:24b" # RAGAS and RAGChecker, at the judge's settings
+ragchecker_claims_per_call = 1
+
+[sampling]
+# Each model's maker's values, the same for that model in every experiment and role. Source order: the
+# maker's words or code, else the maker's generation_config.json, else the transformers library default
+# (top_k 50, top_p 1.0, temperature 1.0, no min_p, repetition 1.0). Presence and frequency penalties
+# are 0 unless the maker sets them. think: off, a level, omit (no thinking mode) or always.
+[sampling.models]
+"gemma3:27b"              = { temperature = 1.0,  top_p = 0.95, top_k = 64, min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 0.0, think = "omit" }   # Google config file; temperature library default
+"glm-4.7-flash"           = { temperature = 1.0,  top_p = 0.95, top_k = 50, min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 0.0, think = "off" }    # Z.ai card; top_k library default
+"nemotron-3-nano:30b"     = { temperature = 0.0,  top_p = 1.0,  top_k = 50, min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 0.0, think = "off" }    # NVIDIA card: greedy for reasoning off
+"devstral-small-2:24b"    = { temperature = 0.15, top_p = 1.0,  top_k = 50, min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 0.0, think = "omit" }   # Mistral config file; as judge, temperature 0
+"llama3:8b"               = { temperature = 0.6,  top_p = 0.9,  top_k = 0,  min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 0.0, think = "omit" }   # Meta reference code (no top-k)
+"gpt-oss:20b"             = { temperature = 1.0,  top_p = 1.0,  top_k = 0,  min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 0.0, think = "low" }    # OpenAI README and reference sampler (no top-k)
+"gpt-oss:120b"            = { temperature = 1.0,  top_p = 1.0,  top_k = 0,  min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 0.0, think = "low" }    # as gpt-oss:20b
+"qwen3-coder:30b"         = { temperature = 0.7,  top_p = 0.8,  top_k = 20, min_p = 0.0, repeat_penalty = 1.05, presence_penalty = 0.0, think = "omit" }   # Qwen card = config file
+"qwen3-coder-next:q4_K_M" = { temperature = 1.0,  top_p = 0.95, top_k = 40, min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 0.0, think = "omit" }   # Qwen card = config file
+"qwen3.5:35b"             = { temperature = 0.7,  top_p = 0.8,  top_k = 20, min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 1.5, think = "off" }    # Qwen card, non-thinking general tasks
+"qwen3.5:122b"            = { temperature = 0.7,  top_p = 0.8,  top_k = 20, min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 1.5, think = "off" }    # Qwen card, non-thinking general tasks
+"deepseek-r1:70b"         = { temperature = 0.6,  top_p = 0.95, top_k = 50, min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 0.0, think = "always" } # DeepSeek card; top_k library default; no system prompt
+"olmo-3"                  = { temperature = 0.6,  top_p = 0.95, top_k = 50, min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 0.0, think = "always" } # AllenAI card and its example code
+"claude-haiku-4-5"        = { temperature = 1.0,  think = "omit" }   # Anthropic default; top_p and top_k not sent; model claude-haiku-4-5-20251001
+
+# Thinking on, only where thinking is the row's factor (code generation): as above, except
+[sampling.thinking_on]
+"glm-4.7-flash"       = { temperature = 0.7, top_p = 1.0 }                                       # Z.ai card, coding settings
+"qwen3.5:35b"         = { temperature = 0.6, top_p = 0.95, top_k = 20, presence_penalty = 0.0 }  # Qwen card, precise coding
+"qwen3.5:122b"        = { temperature = 0.6, top_p = 0.95, top_k = 20, presence_penalty = 0.0 }  # Qwen card, precise coding
+"nemotron-3-nano:30b" = { temperature = 1.0, top_p = 1.0 }                                       # NVIDIA card, reasoning on
+"gpt-oss:20b"         = { think = "medium" }                                                     # OpenAI's default level
+
+# Thinking levels, where the level is the row's factor (code generation ran gpt-oss:20b at low, medium, high and
+# Ollama's default; D56). Sampling stays the model's row above.
+[sampling.thinking_levels]
+"gpt-oss:20b" = ["low", "medium", "high"]
+
+[gemini]
+temperature = 1.0              # Google: keep Gemini 3 at its default 1.0
+top_p = 0.95                   # API default
+top_k = 64                     # API default
+max_output_tokens = 65536      # the model maximum; it counts thinking and answer together
+seed = "draw"
+thinking_off = { "gemini-3-flash-preview" = "minimal", "gemini-2.5-pro" = 128 }   # the lowest each allows
+# thinking on: no thinking setting is sent, so each runs at Google's default (gemini-3-flash-preview "On (high)",
+# gemini-2.5-pro "On", both dynamic: ai.google.dev/gemini-api/docs/thinking, 14 October)
+# presence and frequency penalties are not sent (Google publishes no value for them)
+
+[thinking]
+# One rule per figure, the same for every model in it (D59). "off": think false; a model that cannot turn
+# thinking off runs at its lowest level (gpt-oss low, gemini-3-flash-preview minimal, gemini-2.5-pro 128);
+# deepseek-r1 and olmo-3 have neither an off nor levels, so they think. "on": the maker's default (gpt-oss
+# medium, Gemini its own dynamic thinking, the others think true with [sampling.thinking_on]). In Figure 6
+# thinking is the row's factor: off and on per model, and gpt-oss:20b also at low and high.
+figures = { "Fig 2" = "off", "Fig 3" = "off", "Fig 4" = "off", "Fig 5" = "off", "Fig 6" = "factor" }
+
+[anthropic]
+max_tokens = 64000             # claude-haiku-4-5-20251001's maximum ("Max output: 64K tokens",
+                               # platform.claude.com/docs/en/models/haiku-4-5/overview, 14 October); retirement
+                               # "not sooner than October 15, 2026"
+
+[date]
+# These models' Ollama templates write today's date into the prompt, so the same call reads different text on
+# different days. Each runs with the date fixed at 10 October 2026, in every role (Q31 of 10 October; D55).
+fixed = "2026-10-10"
+system_prompt = { "devstral-small-2:24b" = "data/judge_system_prompts/devstral-small-2_24b.date-2026-10-10.txt" }
+model_copy = { "gpt-oss:20b" = "gpt-oss:20b-date20261010", "gpt-oss:120b" = "gpt-oss:120b-date20261010" }
+# devstral: its built-in system prompt, sent with the date fixed. gpt-oss puts the date in a header a system
+# prompt cannot replace, so it runs as a copy whose template has the date fixed (same weights; Modelfiles in
+# data/judge_system_prompts/).
+
+[exceptions]
+# Models whose maximum context is below num_ctx run at their own maximum and stay out of the main comparison.
+"llama3:8b" = { num_ctx = 8192 }
+"olmo-3" = { num_ctx = 65536 }
+
+[models]
+# Ollama tag, the manifest digest it must have, and the machines that hold it with that digest (read from
+# each server's /api/tags, 14 October). A run refuses a model whose digest differs from this list.
+"gemma3:27b"              = { digest = "8dda00f4f636a0ae610bf6eae134d59de477256140276ec847510ce898cf910c", machines = ["studio"] }
+"glm-4.7-flash:latest"    = { digest = "5c61808ebf0db0d1c8ff84bd6fc3dd24a5495c682a78235381cef1c00a984625", machines = ["studio"] }
+"nemotron-3-nano:30b"     = { digest = "b725f11174073334edd0c2ff396b8d4e66d7dab22a5a63717ccad5a08a270cf1", machines = ["studio"] }
+"devstral-small-2:24b"    = { digest = "33af3142213a8f079412a71bb6a9759c35f5adf448c9d6d27e3994cde07679c8", machines = ["studio", "laptop", "beelink"] }
+"llama3:8b"               = { digest = "365c0bd3c000a25d28ddbf732fe1c6add414de7275464c4e4d1c3b5fcb5d8ad1", machines = ["studio"] }
+"gpt-oss:20b-date20261010"  = { digest = "41bf45e8998c34516dd702276336c7bb22a17278e53806194046bbc0afef8323", machines = ["studio"] }   # gpt-oss:20b f38aa0c53da5 with the date fixed ([date])
+"gpt-oss:120b-date20261010" = { digest = "6ae9cf77adc26e87b2151eba939358a0f37d608420abeb06c11782811d44bcb4", machines = ["studio"] }   # gpt-oss:120b ad84bf7720de with the date fixed
+"qwen3-coder:30b"         = { digest = "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca", machines = ["studio", "laptop", "beelink"] }
+"qwen3-coder-next:q4_K_M" = { digest = "530048d6faa07d7fde270ea7e4a7f6a22680c98a0ca55d39553493af5ade4aa4", machines = ["studio"] }
+"qwen3.5:122b"            = { digest = "b48ba378786285c5bf74134fda36f02dcc0025ac52d1aafe0e4fc2ce87a3b391", machines = ["studio"] }
+"deepseek-r1:70b"         = { digest = "0d0d6964cbff0648077e2ac5ec58a738186a6128e282d15a11286d8b47c87cf3", machines = ["studio"] }
+"bge-m3:latest"           = { digest = "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab", machines = ["studio", "laptop", "beelink"] }
+# Not yet runnable:
+# qwen3.5:35b  the registry sends Ollama on a Mac a safetensors nvfp4 build (the Studio's 26025611beeb,
+#              pulled 14 October) and other clients the Q4 GGUF; the GGUF is to be fetched (O1 of 14 October).
+# olmo-3       the Studio holds only olmo-3:latest, 7.3B; the 32B model waits on row D4 of plan.csv.
+
+[text]
+passages = "whole"
+judge_input = "whole"
+stored_text = "whole"
+scorer_input = "whole"         # an encoder with a fixed limit (bge-m3 8,192 tokens) splits the text, never cuts it
+component_cuts = "removed"     # except a view the model asks for itself (an RLM printing a preview)
+rerank = "all strategies"      # the RLM included
+
+[record]
+# Every call writes these; local calls also keep the server's own timings and how busy the machine was.
+fields = ["options_sent", "stop_reason", "prompt_tokens", "output_tokens", "model_digest",
+          "server", "ollama_version", "wall_s", "load_s", "prompt_eval_s", "eval_s",
+          "busy_servers_on_machine", "passages", "lock_sha256"]

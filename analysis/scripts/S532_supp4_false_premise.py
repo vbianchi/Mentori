@@ -19,7 +19,7 @@ WHAT IT READS.
 
 REPRODUCE FIRST (README.md:75-79; any difference exits 2 and nothing is written).
   (1) On key v2.4, every pass and fail answer key of the ten questions at scores 4 and 3 equals the false_premise lists
-      of Figure 3's ranking.json as committed at RANKING_AT (read with git show, so a later rebuild of that plate on key
+      of Figure 3's ranking.json as committed at RANKING_AT (its copy pinned in the tree, O3, so a later rebuild of that plate on key
       v2.5 does not move this anchor).
   (2) On key v2.5: 180 answers, 108 on changed questions, 163 pass at 4, per strategy 30, 28, 28, 26, 25, 26
       (facts_behind_notes.txt:485, :489).
@@ -53,6 +53,7 @@ ROOT = Path(__file__).resolve().parents[1]
 for _p in (str(ROOT), str(ROOT / "scripts")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
+import pinned_history as PH  # noqa: E402
 
 
 def _load(name, path):
@@ -146,10 +147,11 @@ def tally(cells: dict, qf: list) -> dict:
 
 def read_ranking() -> dict:
     """The false_premise lists of Figure 3's ranking.json at RANKING_AT."""
-    got = subprocess.run(["git", "-C", str(ROOT), "show", f"{RANKING_AT}:{RANKING_PATH}"], capture_output=True, text=True)
-    if got.returncode:
-        raise Refused(f"git show {RANKING_AT}:{RANKING_PATH}: {got.stderr.strip()[:200]}")
-    return json.loads(got.stdout)["keys"]
+    try:   # O3: as committed at RANKING_AT, pinned in the tree, held to its git blob id (scripts/pinned_history.py)
+        got = PH.text(PH.show(RANKING_AT, RANKING_PATH))
+    except PH.PinError as e:
+        raise Refused(f"git show {RANKING_AT}:{RANKING_PATH}: {str(e)[:200]}") from None
+    return json.loads(got)["keys"]
 
 
 def reproduce_v24(res: dict, rk: dict) -> int:
@@ -419,19 +421,31 @@ def check_drawn(readback) -> list:
 
 
 def legend(q66: dict, res: dict, qf: list) -> tuple:
+    # Editor row 45 round (Valerio, 8 Nov): no panel draws derived statistics (no error bar, box, interval or test), so
+    # no "n = " tag; every panel described in full, with no reference to another panel.
     ids = ", ".join(q[-3:] if i else q for i, q in enumerate(q66["ids"]))
+    labs = [lab for _, lab in STRATS]
+    strats = ", ".join(labs[:-1]) + " and " + labs[-1]
+    nq, nd, n5 = len(qf), len(DRAWS), len(q66["ids"])
+    word = {3: "three", 5: "five"}
+    sizes = sorted({e["core_papers"] for e in q66["main"]})
+    sizes_t = ", ".join(str(x) for x in sizes[:-1]) + f" and {sizes[-1]}"
     title = "Answers to the false-premise questions, by strategy and corpus size"
     body = (
-        f"Each question states a false claim about one paper and asks whether it is true. Answers by "
-        f"gemini-3-flash; a judge (devstral-small-2:24b) scores each from 0 to 5 for correctness against the "
-        f"key's refutation; an answer passes at {T_MAIN} or more, {T_RELAX} or more being the relaxed threshold. **a**, For "
-        f"each of the n = {len(qf)} questions (rows) and six strategies (columns), the draws of {len(DRAWS)} whose answer "
-        f"passed on the 20-paper index, at each threshold ({len(qf) * len(DRAWS) * len(STRATS)} answers). **b**, "
-        f"For each strategy, questions passed in each draw (of {len(qf)}) at {T_MAIN} or more, and the mean of the three "
-        f"draws. **c**, Answers passed of 15, by number of core papers (rows) and strategy (columns), for the "
-        f"n = {len(q66['ids'])} false-premise questions asked at every corpus size ({ids}), one draw: each count is of "
-        f"n = 15 answers ({len(q66['ids'])} questions on 3 indexes, with 0, 1 and 3 distractor papers per core paper), at "
-        f"each threshold. Counts are given as they are, with no test and no ranking.")
+        f"Each question states a false claim about one paper and asks whether it is true. Answers are by gemini-3-flash "
+        f"with six strategies ({strats}). A judge (devstral-small-2:24b) scores each answer from 0 to 5 for correctness "
+        f"against the key's refutation; an answer passes at a score of {T_MAIN} or more, or at {T_RELAX} or more, the "
+        f"relaxed threshold. **a**, Draws passed, of {word.get(nd, nd)}, for each of the {nq} false-premise questions "
+        f"(rows, by short claim and question number) and each strategy (columns), on the 20-paper index. Left grid, a "
+        f"score of {T_MAIN} or more; right grid, {T_RELAX} or more. The number and the colour of each cell give the draws "
+        f"passed: yellow {nd}, olive 2, grey 1, dark blue 0. **b**, Questions passed in a draw, of the {nq} false-premise "
+        f"questions on the 20-paper index at a score of {T_MAIN} or more (y axis), for each strategy (x axis). Grey dots, "
+        f"the {word.get(nd, nd)} draws; black line, the mean of the {word.get(nd, nd)} draws. **c**, Answers passed of 15, by "
+        f"number of core papers (rows) and strategy (columns), for the {word.get(n5, n5)} false-premise questions asked "
+        f"at every corpus size ({ids}), one draw. Rows are {sizes_t} core papers. Each cell counts 15 answers: "
+        f"{word.get(n5, n5)} questions, each on three indexes with 0, 1 and 3 distractor papers per core paper. Upper "
+        f"block, a score of {T_MAIN} or more; lower block, {T_RELAX} or more. Counts are shown as they are, with no test "
+        f"and no ranking.")
     return title, body
 
 
@@ -589,8 +603,13 @@ def selftest() -> int:
         ok("the fixture plate is written", r["ok"], r)
         s448 = subprocess.run([sys.executable, str(ROOT / "scripts" / "S448_figure_rules_check.py"), "--figure", str(SUPP_N),
                                "--supplementary", "--dir", str(out)], capture_output=True, text=True)
-        ok("S448 --supplementary passes on the fixture plate", s448.returncode == 0,
-           [ln for ln in s448.stdout.splitlines() if " FAIL" in ln][:3])
+        fails = [ln for ln in s448.stdout.splitlines() if " FAIL " in ln and not ln.startswith("FAIL:")]
+        # Editor row 45 round (8 Nov): the legend carries no 'n = ' (no panel draws derived statistics), so S448 R9's
+        # n check fails by design; every other rule must pass, and R9 may fail on that one point only.
+        ok("S448 --supplementary passes on the fixture plate except R9's n check (editor row 45, 8 Nov)",
+           s448.returncode == 0 or (len(fails) == 1 and fails[0].startswith("R9 ") and "no 'n = <number>'" in fails[0]),
+           fails[:3])
+        ok("the legend carries no 'n = ' tag (editor row 45, 8 Nov)", "n = " not in (out / "legend_draft.md").read_text())
         nums = json.loads((out / f"{SIDE}_numbers.json").read_text())
         ok("every number on the plate is in the printed map", len(nums["printed"]) > 200, len(nums["printed"]))
         svg = next(out.glob(f"{PLATE}*.svg")).read_text()

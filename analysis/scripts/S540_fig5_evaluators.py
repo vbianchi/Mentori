@@ -67,7 +67,8 @@ for _p in (str(ROOT), str(ROOT / "scripts")):
 
 SCRIPT = "scripts/S540_fig5_evaluators.py"
 REC = ROOT / "findings" / "recompute"
-README = ROOT / "experiments" / "README.md"
+README = None   # D2 (8 Nov): the decision lines come from fig_design (design_facts.json "readme_decisions", extracted
+#                 from experiments/README.md by S616 and checked by S616 check); a test passes its own README file
 S518_DIR = REC / "S518_split_confirmation"
 RELEASE = S518_DIR / "second_judge.json"       # R10: exists only after S518 ran on Valerio's word
 TIMING = REC / "S540_timing.json"
@@ -404,13 +405,22 @@ def _committed(path: Path, root: Path) -> bool:
                                                                                 rel).stdout.strip()
 
 
-def second_judge_rows(collect, word, *, release: Path = RELEASE, readme: Path = README, root: Path = ROOT) -> dict:
+def decision_text(readme: Path | None) -> str:
+    """The text the decision checks search: the README file given (a test), else the decision lines S616 extracted."""
+    if readme is not None:
+        return Path(readme).read_text()
+    import fig_design
+    return "\n".join(fig_design.facts()["readme_decisions"].values())
+
+
+def second_judge_rows(collect, word, *, release: Path = RELEASE, readme: Path | None = README,
+                      root: Path = ROOT) -> dict:
     """R10; the module docstring. collect: a jsonl of the second judge's rows, frozen after S518's run. word: the id of
     the decision that records Valerio's word (for example "D201"). Returns {(config, question, draw): {"correctness":
     value or None, "faithfulness": value or None}}. Nothing is opened before the four checks pass."""
     if not word or not re.fullmatch(r"D\d+", str(word)):
         raise Refused("second judge: no decision named: Valerio's word comes first (D195)")
-    text = Path(readme).read_text()
+    text = decision_text(readme)
     if DECISION not in text:
         raise Refused("second judge: D195 no longer stands in experiments/README.md; S518's condition fails")
     if f"**{word}**" not in text:
@@ -440,7 +450,7 @@ def second_judge_rows(collect, word, *, release: Path = RELEASE, readme: Path = 
 SECOND_ROLES = ("base", "collect")             # second_judge.json "inputs": key v2.4 base, key v2.5 collect
 
 
-def second_judge_final(word=SECOND_DECISION, *, release: Path = RELEASE, readme: Path = README,
+def second_judge_final(word=SECOND_DECISION, *, release: Path = RELEASE, readme: Path | None = README,
                        root: Path = ROOT) -> dict:
     """D267: the second judge's rows on the final key, as S518 read them for second_judge.json: its two inputs ("base",
     key v2.4; "collect", key v2.5), each found by its role in second_judge.json's "inputs" and held to the sha256

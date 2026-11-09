@@ -286,8 +286,8 @@ def legend(c: dict, ab: dict) -> str:
     x = {s: json.loads((S463.S518_DIR / f"{s}.json").read_text())["rows"].get("t2x_rows", 0) for s in ("gemma3", "qwen3-coder")}
     if x["gemma3"] != x["qwen3-coder"]:
         raise SystemExit(f"Supplementary Figure {N}: the T2X counts differ between gemma3 and qwen3-coder: {x}")
-    draws_loc = ("n = 3 draws" if not x["gemma3"] else
-                 f"n = 3 draws (RLM-10: 1 draw on {x['gemma3']} of the many-paper questions)")
+    draws_loc = ("three draws" if not x["gemma3"] else
+                 f"three draws (RLM-10: one draw on {x['gemma3']} of the many-paper questions)")
     na = a_counts(ab)
     nb = {g: next(r["questions"] for r in ab["b_rows"] if r["_gen"] == g) for g in B_GENS}
     big = [GEN_LABEL[g] for g in B_GENS if nb[g] == nb[JR.FLASH]]
@@ -298,26 +298,24 @@ def legend(c: dict, ab: dict) -> str:
     return (f"# Supplementary Figure {N}, title and legend (draft)\n\n"
             f"Written by `{SCRIPT}`. Data stamp: {stamp(c, ab)}.\n\n"
             f"**Supplementary Figure {N} | Replication on other generators in full.** Judged by devstral-small-2:24b on "
-            f"the final answer key; a pass is judge score 4 or more. **a**, For each generator, two rows: verified pass "
-            f"and RLM-10, each the generator's pass share with that strategy minus its pass share with single pass, per "
-            f"answerable question, in percentage points. Bar, the share of questions (%) where the strategy passed fewer draws than single "
-            f"pass (vermilion, left of 0) and more (blue, right of 0); ties are not drawn (counts in the Source Data). "
-            f"Diamond, the mean of the questions' differences in percentage points; line, its two-sided 95% percentile "
-            f"interval over 10,000 question resamples. A question counts in a row when the generator holds both "
-            f"strategies on it. n = {na['all']} questions per row, and n = "
-            f"{na['local_rlm10']} for RLM-10 of gemma3:27b and qwen3-coder:30b. A share is over the draws a generator "
-            f"holds: n = 3 draws, except gemini-2.5-pro (draw 1 only outside the fixed 45-question subset) and the local "
-            f"generators' RLM runs (the 45-question subset only). **b**, Rank of the six strategies by pass rate within each "
-            f"generator (1 is the highest, yellow; a tie shares the higher rank), on the answerable questions every "
-            f"strategy of that generator answered: n = {nb[JR.FLASH]} for {', '.join(big[:-1])} and {big[-1]}, n = "
-            f"{nsmall} for {' and '.join(small)}. **c**, RLM-10 minus single pass on one-paper (blue square) and "
-            f"many-paper (orange diamond) questions, by generation model, exploratory; Figure 3e draws their "
-            f"difference. Mark, the mean of the questions' differences; bar, its two-sided 95% percentile interval "
-            f"over 10,000 question resamples. Rows as Figure 3e: top, the reference; 2 to 4, the prespecified test; "
-            f"below the gap, models outside it; main judge unless the row names the second judge ({S463.judge2()}). "
-            f"gemma3:27b and qwen3-coder:30b, {draws_loc}, on n = {n_loc[0]} one-paper and n = {n_loc[1]} many-paper "
-            f"questions; the other rows on n = {n_cld[0]} and n = {n_cld[1]}. n = {len(GENERATORS)} generators "
-            f"beside gemini-3-flash.\n")
+            f"the final answer key; a pass is judge score 4 or more. **a**, For each generator, two rows: verified pass and "
+            f"RLM-10, each the generator's pass share with that strategy minus its pass share with single pass, per "
+            f"answerable question, over its draws (three, except "
+            f"gemini-2.5-pro, one draw outside the fixed 45-question subset, and the RLM runs of gemma3:27b and "
+            f"qwen3-coder:30b, that subset only). Bars, the share of questions (%) where the strategy passed fewer draws "
+            f"than single pass (vermilion, left of 0) and more (blue, right of 0); ties are not drawn. Diamond, the mean "
+            f"of the questions' differences; line, its two-sided 95% percentile interval over "
+            f"10,000 question resamples; dashed line, 0. A question counts in a row when the generator holds both "
+            f"strategies on it: n = {na['all']} questions per row, except n = {na['local_rlm10']} questions for RLM-10 "
+            f"of gemma3:27b and qwen3-coder:30b. **b**, Rank of six strategies (columns) by pass rate within each "
+            f"generator (rows), on the answerable questions every strategy of that generator answered; 1 is the highest "
+            f"and yellow, and a tie shares the higher rank. **c**, RLM-10 minus single pass, on "
+            f"one-paper (blue square) and many-paper (orange diamond) questions, per generator, exploratory. Mark, the "
+            f"mean of the questions' differences; bar, its two-sided 95% percentile interval over 10,000 question "
+            f"resamples; dashed line, 0. Top row, gemini-3-flash, the reference; rows 2 to 4, the prespecified test; "
+            f"below the gap, generators outside it. Main judge except the row naming the second judge "
+            f"({S463.judge2()}). gemma3:27b and qwen3-coder:30b use {draws_loc}, n = {n_loc[0]} one-paper and n = "
+            f"{n_loc[1]} many-paper questions; the other rows, n = {n_cld[0]} and n = {n_cld[1]} questions.\n")
 
 
 def table(rs: list[dict]) -> tuple[list, list]:

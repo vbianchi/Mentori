@@ -1,0 +1,123 @@
+# LOCK: the one set of settings for every model call in experiments/ (D20).
+#
+# STATUS: PROPOSED 14 October 2026, NOT AGREED. Nothing may run from this file until Valerio agrees
+# it and `status` below reads "agreed". Values marked with a Q code are his to decide.
+#
+# Rules this file serves (Valerio, 14 October): the same settings everywhere; nothing cut; a model
+# that fails because its answer or its input is too long must show that failure in its record.
+# A script reads every setting from here and sets none of its own. An experiment may vary only the
+# one factor its row in the list names (Q13), and nothing else.
+#
+# Evidence for every current value: scratchpad inventory of 14 October (workflow wf_6fffe51f-230),
+# summarised in the reply that proposed this file.
+
+status = "proposed"
+
+[server]
+# One Ollama build on every machine. The Studio still runs seven servers on 0.32.7 (a deleted binary,
+# started in August); 0.40.2 is the pinned keg there. The default repeat_penalty differs between the
+# two versions (1.1 against 1.0, api/types.go at each tag), so a call that omits it samples
+# differently on each.
+ollama_version = "0.40.2"
+num_parallel = 1               # one request per server (S377: batching changed 11 of 107 judge scores)
+flash_attention = true
+kv_cache_type = "q8_0"         # what the judge was validated under (S377)
+keep_alive = "24h"
+# Ollama's own switches for silent cuts, sent on every request. With both false, a prompt longer than
+# the context returns an error instead of being cut in half, and a generation that fills the context
+# stops with done_reason "length" instead of discarding earlier text (Ollama routes.go and
+# llama_server.go at v0.40.2). Both default to true when omitted.
+truncate = false
+shift = false
+
+[models]
+# Each tag pinned by digest: the same tag is a different build on different machines
+# (gpt-oss:20b is 9ba9cc2b4e02 on the Studio, 17052f91a42e on the laptop and the Beelink).
+# Filled in when the list fixes which models run.
+
+[generation]
+# Every generator, every role (root call, sub-call, verifier, planner, synthesizer...), every experiment.
+num_ctx = 131072               # Q14, OPEN (Valerio asked why). The largest context every main model supports natively
+                               # (gemma3, gpt-oss and deepseek-r1 stop at 131,072). August prompts
+                               # reached 73,449 tokens before Ollama cut them; 24,576 was the value then.
+                               # llama3:8b (8,192) and olmo-3 (65,536) cannot take it: see [exceptions].
+num_predict = -1               # No output limit. Ollama turns -1 into 10 x num_ctx, and with shift off
+                               # the answer stops when it ends or when the context is full ("length",
+                               # recorded, counted as a failure).
+num_batch = 1024               # Ollama otherwise picks 512, 1024 or 2048 by context size, and batch
+                               # size can change the numbers a model produces. 1024 is what the judge ran.
+seed = "draw"                  # the draw number (1, 2, 3) on every call that accepts a seed
+think = "off"                  # Off where the model allows it; where it cannot be turned off, the lowest
+                               # level: gpt-oss "low", gemini-2.5-pro budget 128, gemini-3-flash "minimal".
+                               # A row may vary it only if thinking is the factor it names (D22: one
+                               # named factor per row; the thinking level runs at the locked context).
+timeout = "none"               # A call is bounded by its context. Streamed, so a call with no new token
+                               # for 10 minutes is recorded as stalled, never silently dropped.
+
+[sampling]
+# Q16. Either one value for every model (O25) or each maker's recommended values, the same for that
+# model in every experiment and every role (O26). All five keys are always sent, so no Modelfile or
+# server default applies.
+choice = "O26"                 # D24 (Valerio, 14 October). Values pending the sweep of every
+                               # model's pages. Source order for each model, for the mode used (thinking
+                               # off): the maker's own recommendation (model card, README, docs), else the
+                               # maker's generation_config.json, else Ollama's packaged params; every value
+                               # carries its URL and the date read.
+# O25: temperature 0.1 for every model (the value most first-submission calls used), with the other
+#      four keys fixed to the same values for every model.
+# O26: per model, from the makers' cards (fetched 14 October):
+#   gemma3:27b            temperature 1.0, top_k 64, top_p 0.95 (Ollama's packaging; Google gives none)
+#   glm-4.7-flash         temperature 1.0, top_p 0.95 (Z.ai), min_p 0.01 (Ollama)
+#   nemotron-3-nano:30b   temperature 1.0, top_p 1.0 (NVIDIA, reasoning)
+#   devstral-small-2:24b  temperature 0.15 (Mistral)
+#   gpt-oss:20b, :120b    temperature 1.0, top_p 1.0 (OpenAI)
+#   qwen3-coder           temperature 0.7, top_p 0.8, top_k 20, repeat_penalty 1.05 (Qwen)
+#   qwen3-coder-next      temperature 1.0, top_p 0.95, top_k 40 (Qwen)
+#   deepseek-r1:70b       temperature 0.6, top_p 0.95 (DeepSeek)
+#   gemini-2.5-pro, gemini-3-flash-preview  temperature 1.0, top_p 0.95 (Google; for Gemini 3 Google
+#                         warns that values below 1.0 may cause looping)
+
+[gemini]
+max_output_tokens = 65536      # the model maximum; it counts thinking and answer together
+# Every call path passes the settings. Today router.generate drops them for Gemini
+# (Mentori-paper/backend/agents/model_router.py:218), so single pass ran at Google's defaults while
+# multi-hop ran at 0.1 and 8,192 tokens.
+
+[judge]
+# D21: the judge takes [generation] and [server] as they are, except temperature 0.
+temperature = 0
+# Its 37,912 existing judgments ran at num_ctx 32,768 and num_predict 8,192. Under this file they are
+# kept only if devstral-small-2:24b gives the same scores on its 107 calibration answers at these
+# settings (A11); otherwise the paper's answers are judged again.
+
+[text]
+# Nothing is cut between a source and a model, or between a model and its record.
+passages = "whole"             # was 800 characters (5 places) and 500 in the verifier
+judge_input = "whole"          # was 3,000 characters in the first submission
+stored_text = "whole"          # the component benchmarks stored 1,000 and 500 characters
+scorer_input = "whole"         # the similarity score read 2,000 characters; an encoder with a fixed
+                               # limit (bge-m3 8,192 tokens, MiniCheck 2,048) splits the text, never cuts it
+component_cuts = "removed"     # D25 (Valerio, 14 October): every cut inside Mentori's components that
+                               # hides text from a model without the model asking goes (RLM history trim,
+                               # orchestrator message windows, supervisor input, REPL output cap...). Kept
+                               # only: a view the model asks for itself, such as the RLM printing a preview
+                               # of a passage it could print whole.
+
+[exceptions]
+# D23 (Valerio, 14 October): models whose maximum context is below num_ctx run at their own maximum,
+# stay out of the main comparison, and go to the Supplementary or are removed (decided later).
+"llama3:8b" = { num_ctx = 8192 }
+"olmo-3" = { num_ctx = 65536 }   # olmo-3:32b, the model experiments 8 and 9 ran, is not installed on
+                                 # the Studio today; only olmo-3:latest (7B) is
+
+[scorers]
+# D28 (Valerio, 14 October): RAGAS and RAGChecker score every answerable answer of the re-run, so the
+# data exists even if the final figure leaves them out. They take the judge's settings ([judge]).
+# Scoring model: Q21. RAGChecker uses its LLM checker one claim per call (its NLI checker cuts at
+# 512 tokens; its joint mode fills missing labels with "Neutral" without saying so).
+
+[record]
+# Every call writes: the options actually sent, done_reason or finish_reason, prompt and output token
+# counts, model digest, server and its Ollama version, wall time, and the lock's sha256.
+fields = ["options_sent", "stop_reason", "prompt_tokens", "output_tokens", "model_digest",
+          "server", "ollama_version", "wall_s", "lock_sha256"]

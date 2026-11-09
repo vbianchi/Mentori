@@ -1,18 +1,18 @@
 {
  "provenance": {
   "script": "scripts/S543_supp_signal_pairs.py",
-  "script_sha256": "e198453d262471e319d213e7907cbb75aaaa7cd5de0ae07a6e1dc08f972187d9",
+  "script_sha256": "9fc9a9c1c1857c66278e1db463b54c6fc388147c1e8f3681022ee149fd3aa1ff",
   "imports_sha256": {
-   "S497_fig5_d166.py": "41b2f5c7fd2cf06c6538a0f5544a88fabee3d85260992cf12f11ca3802c60648",
-   "S540_fig5_evaluators.py": "f794d4e6e40179894d22905220e79daa42693710c3f6ba4c10ee09c5b7297c77",
+   "S497_fig5_d166.py": "fc17bb3af77503ddfd6346aa8b4c7dc33f3753e87b25da60bec2b4fcddc44068",
+   "S540_fig5_evaluators.py": "e227184bb004d52856be2ab4f8440120b108ae1cc7c6035e20ed6814b7d8c920",
    "house_style.py": "647c8991f4dcd2cea08e0be46eaf758beb55fb029c54bb267e7fba1e0b8b17b6",
    "figure_names.py": "a3c65ae0a1e8aa05e99a99610ea857f63b0d8fff60a99404bcb5bf6ff9a82e65",
    "minicheck_filter.py": "6d2258a6f691324de266824695da7a56eff02d60eef18456ab4d60ee9138242d",
-   "S473_fig5_panels.py": "14fb59be3a4e3e405d38f7c2b772acc3ac62ee88cabc6aa171a8a7124a90d49a",
-   "S457_fig2_panels.py": "acf59ee8e25f8907378a70b677cd77e5a959999ab4c3b9f3e711e0f9570c9cbe",
-   "S463_fig2_ranking.py": "eb493c8c69764d7ee7ad4962eb221114fe37b22c0edfaf9ec5c558bfec1c78ca",
+   "S473_fig5_panels.py": "6d637b9f4e990a3470661fedee652f2b8341d8cbb4abf79acc451992340f3b36",
+   "S457_fig2_panels.py": "8c29dab8b04a1bad4a955582a30831c51c2b70438be2f6d2698c7b81948d7520",
+   "S463_fig2_ranking.py": "8279a35d27c5a99d34980b59529203b104526035beba74031c9964a2ee360825",
    "fig_repro.py": "4bca103b599da4adc0bd473f5b8210dd48b6543caaf63e5589f2faaa7b37d18b",
-   "judge_rows_v25.py": "aa90f42264e2ce21acfca52c2421d852607418981b6e9be8d8984a716b1ebddd",
+   "judge_rows_v25.py": "77d4a84d7aff4dd0ee92366395a4be2e5f27fe20d5de99ccbc86b7333c401661",
    "S564_claimify_selection.py": "f768b4937529c1f4d2eb2971e80c3249a4cc988b4418527abd2909544e63d622"
   },
   "command": "uv run --frozen python scripts/S543_supp_signal_pairs.py figure"
@@ -190,7 +190,7 @@
   "Supplementary Figure 12 (provisional, 516 of 516).svg": "0660bbfcbe43750f7ecaa38419b5d165330fd9cc4a5b614a918132f0dea426aa",
   "Supplementary Figure 12 data (provisional, 516 of 516).xlsx": "31447e41e931cde9b7a0e56b66264dd654e84b1954acff3cade9dd3f0c66e89d",
   "Supplementary Figure 12 data caption (provisional, 516 of 516).md": "5e9c8cf6a84245c5f4ee12c7bed0e17bff755d0d3b5ada787b4627a317f428bb",
-  "legend_draft.md": "cc4917d819ae47d3acb977b119844ad5649fbb85f33eb3f180585dec3add0321",
+  "legend_draft.md": "ee3f53672c0fcc843cee23644f19892e7c6158ac230837454f436605c0cb836b",
   "methods_notes.md": "0524fd0a3800eb4f90f72bd78dfe7f7a549c2d3af6e925226af17cfaaea66a68",
   "supplementary_figure12_numbers.json": "5ba7cdc3ecdba647b652fd3492fb4347693e46a6293c631a99b3795d0df5c41d"
  }

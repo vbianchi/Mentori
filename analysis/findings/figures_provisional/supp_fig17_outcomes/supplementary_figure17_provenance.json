@@ -1,7 +1,7 @@
 {
  "provenance": {
   "script": "scripts/S457_fig2_panels.py",
-  "script_sha256": "13d631dd56b4311cc732f7fc28b2656014c58e0f6b61b9d9b2caa1e94d5a6699",
+  "script_sha256": "8c29dab8b04a1bad4a955582a30831c51c2b70438be2f6d2698c7b81948d7520",
   "command": "uv run --frozen python scripts/S457_fig2_panels.py rebuild",
   "python": "3.13.11",
   "deterministic": "D155: no build time and no repository HEAD are recorded; the script's and every input's sha256 identify the build",
@@ -44,10 +44,6 @@
    "findings/recompute/G13_runs/inputs/SHA256SUMS": "f698856a5f6f0dc8b0c22659eb25b1b1c9dedd3ed02f9eee61cedf149543efb0",
    "scripts/g13_merge.py": "7fd7e4da498eb22fd56fb0d3fd5e84b360f0945d1d9053469ce87a0e1cd49f86",
    "findings/recompute/G13_runs/S455_g13_scan.json": "b05aeda02b14da592524f0221b81f5dcff015c87f60bf85938dad5cde1ba753c",
-   "resubmission/02_response_to_reviewers/Point_by_point_response_all_reviewers.docx": "248132eb75839159fc8752d2ab7693598426c96bf7ee830da1f75cc7a00cf847",
-   "resubmission/04_manuscript/02_Main_Text.docx": "9656a177c71fa06118f6295b9431ded9a281ba643c4ca2ad0e37cd92a031f478",
-   "resubmission/04_manuscript/03_Methods.docx": "3ad57d50ea56496dbb563cd38ef44675076b4ca35038dd1a1c9619652636a867",
-   "resubmission/06_supplementary/Supplementary_Information.docx": "7678fba8dcb1550949b4797edf4aa163e8cd8031f52d3cc1ef8f5ea65601e1a4",
    "findings/recompute/fig2_inputs/g1_collect.jsonl": "f5ff75bc244cda492a48e7e11f54f2007ed7d586a8f49e78921edd7244b28965"
   },
   "model_calls": 0
@@ -956,8 +952,7 @@
   "Supplementary Figure 17 (provisional, 4050 of 4050).png": "2ec94b34604c8e01d8ba4faaac087c94e1f051f161ed2a86ae9dfee930bea961",
   "Supplementary Figure 17 data (provisional, 4050 of 4050).xlsx": "0cb1f1e962aba7787b70af762da17a818c35a72f55cd85d2a2df837d38ed9e14",
   "Supplementary Figure 17 data caption (provisional, 4050 of 4050).md": "4149e11090a8bd5aa1e498f57aa54e178ce12e010e55b8781d4b2276368a5b3b",
-  "supplementary_figure17_numbers.json": "732acab97d0b26f2e6eea9b16f78ae2a2d9ac806a50f5cbea29128fe413a6af5",
-  "legend_draft.md": "72ce0a95a434d9945ee71a1437894068615a18aeaf14aca097aba0cf2230b32a",
-  "claims.md": "f032498283d62c8ca88eb3873d01b1d16a3654df096e2880fad81192d823cdd6"
+  "supplementary_figure17_numbers.json": "352ea597a304a5d26da59ef6ee32911f3d0d62d63b78a603f62b06201a146827",
+  "legend_draft.md": "ab8443bb377ae0abc92eb591c280fd17e0d9431153952ffa5caa726f05fc6ffe"
  }
 }

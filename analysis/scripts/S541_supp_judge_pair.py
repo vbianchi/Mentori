@@ -683,52 +683,35 @@ def _and(xs: list) -> str:
 
 
 def b_clause(b_rows: list) -> str:
-    """Panel b's n and its empty cells, in the legend's words."""
+    """Panel b's empty cells, in the legend's words (editor row 45, 8 Nov: no n in a panel without derived statistics)."""
     drawn = [r for r in b_rows if r[-1] == "drawn"]
     if not drawn:
         raise Refused("b: no cell drawn")
-    common = Counter(r[6] for r in drawn).most_common(1)[0][0]
-    odd = {}                                     # n -> {generator: [strategies]}, every n other than the common one
-    for r in drawn:
-        if r[6] != common and r[2] == "Judge 1":
-            odd.setdefault(r[6], {}).setdefault(r[0].split(",")[0], []).append(r[1])
-    parts = []
-    for n, by in sorted(odd.items()):
-        groups = {}
-        for g, s in by.items():
-            groups.setdefault(tuple(s), []).append(g)
-        parts.append(f"n = {n:,} for " + _and([f"{_and(gs)} {_and(list(s))}" for s, gs in groups.items()]))
-    n_txt = f"n = {common:,}" + (f" (except {'; '.join(parts)})" if parts else "")
     empty = {}
     for r in b_rows:
         if r[-1] != "drawn" and r[2] == "Judge 2":
             why = "no second-judge rows" if r[-1] == NO_J2 else "answers without a second-judge row"
             empty.setdefault((r[0].split(",")[0], why), []).append(r[1].replace("Multi-hop", "multi-hop"))
-    tail = "".join(f"; {g}'s {_and(s)} empty, {why}" for (g, why), s in empty.items())
-    return (f"single pass taken on the same questions and draws as each strategy, {n_txt} answer pairs per strategy "
-            f"and judge{tail}")
+    return "".join(f" Empty, {why}: {g}'s {_and(s)}." for (g, why), s in empty.items())
 
 
 def legend(info: dict, b_rows: list) -> str:
-    n5 = {m: info[m]["answers"] for m in METRICS}
-    left = sum(sum(info[m]["left_out"].values()) for m in METRICS)
-    ans = [m for m in METRICS if m != "Refusal"]
-    common = Counter(n5[m] for m in ans).most_common(1)[0][0]
-    odd = [m for m in ans if n5[m] != common]
-    a_n = f"n = {common:,} answers per score" + "".join(f", {m.lower()} n = {n5[m]:,}" for m in odd)
     nq, nq_ref = info["Correctness"]["questions"], info["Refusal"]["questions"]
     return (f"**Supplementary Figure {N} | Two judges on the same answers, every metric.** Judge 1, devstral-small-2:24b; "
             f"judge 2, qwen3.8:27b, at the same settings, both on the final key. RLM-5, RLM-10 and RLM-20 are our "
-            f"RLM. **a**, Each score pair: {GEN_DISPLAY[FLASH]}'s answers to the n = {nq} answerable questions, six "
-            f"strategies, n = 3 draws ({a_n}); faithfulness with passages, the judge's prompt also holding the retrieved "
-            f"passages; refusal, its answers to the n = {nq_ref} out-of-scope questions (n = {n5['Refusal']:,}). Cell colour and number, share of a "
-            f"score's answers (%). A failed answer scores 0 under both judges; an answer either judge failed to score "
-            f"is left out of that score (n = {left:,} in all). **b**, Pass-rate difference (correctness 4 or more) from "
-            f"single pass under each judge, per generator, {b_clause(b_rows)}; 'same family', qwen3-coder:30b is of "
-            f"judge 2's model family; dot, the difference. **c**, Agreement per score; weighted kappa, quadratic weights on "
-            f"0 to 5; Spearman's ρ over answers; kappa at 4 and at 3, Cohen's kappa on pass or fail at that mark (refusal, kappa at 4 "
-            f"only); box, quartiles of 10,000 question resamples; line, median; "
-            f"whiskers, two-sided 95% percentile interval.")
+            f"RLM. **a**, Scores of the two judges on the same answers, one grid per metric: {GEN_DISPLAY[FLASH]}'s "
+            f"answers to the {nq} answerable questions, six strategies, three draws; for refusal, its answers to the "
+            f"{nq_ref} out-of-scope questions. Columns, judge 1's score (0 to 5); rows, judge 2's score; cell number and "
+            f"colour (dark blue, low; yellow, high), share of the metric's answers (%). Faithfulness with passages, the "
+            f"judge's prompt also holds the retrieved passages. A failed answer scores 0 under both judges; an answer "
+            f"either judge failed to score is left out of that metric. **b**, Change in pass rate (correctness 4 or "
+            f"more) from single pass, in percentage points, for each generator (rows) and strategy (columns); single "
+            f"pass taken on the same questions and draws as the strategy. Filled dot, judge 1; open dot, judge 2, drawn "
+            f"over the filled dot where the two coincide; vertical line, no change.{b_clause(b_rows)} 'Same family', "
+            f"qwen3-coder:30b is of judge 2's model family. **c**, Agreement of the two judges per metric (rows): "
+            f"quadratic-weighted kappa on scores 0 to 5, Spearman's ρ, and Cohen's kappa on pass or fail at marks 4 "
+            f"and 3 (refusal, kappa at 4 only), each over 10,000 resamples of the questions. Box, quartiles; line, "
+            f"median; whiskers, two-sided 95% percentile interval; n = {nq} questions (refusal, {nq_ref}).")
 
 
 def figure(out) -> None:

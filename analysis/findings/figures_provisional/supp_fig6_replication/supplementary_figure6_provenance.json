@@ -1,17 +1,17 @@
 {
  "provenance": {
   "script": "scripts/S523_supp_fig7_replication.py",
-  "script_sha256": "d94df6c418f4b2ef0042f60769b203fca6ef5c2a1e84d68f87e158acad324dfb",
+  "script_sha256": "0b9fd9c8e88f45d91acbbf66f8e908b30ff9e83c3c4c0923f3c8b2ca93cfd24c",
   "command": "uv run --frozen python scripts/S523_supp_fig7_replication.py",
   "python": "3.13.11",
   "deterministic": "no build time and no repository HEAD are recorded",
   "inputs_sha256": {
    "experiments/FIGURE_LOCK.toml": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
    "scripts/house_style.py": "647c8991f4dcd2cea08e0be46eaf758beb55fb029c54bb267e7fba1e0b8b17b6",
-   "scripts/S457_fig2_panels.py": "13d631dd56b4311cc732f7fc28b2656014c58e0f6b61b9d9b2caa1e94d5a6699",
-   "scripts/S463_fig2_ranking.py": "2f93a2b5df2bd68bdcf38a372d6c737ecdbce54a4e68406f0b261e03fbd9af31",
-   "scripts/S518_split_confirmation.py": "a2042e9a5ff3727f3e014a580dd2cbdf5ddd21b89414f0b144892571a1a1d94e",
-   "scripts/judge_rows_v25.py": "aa90f42264e2ce21acfca52c2421d852607418981b6e9be8d8984a716b1ebddd",
+   "scripts/S457_fig2_panels.py": "8c29dab8b04a1bad4a955582a30831c51c2b70438be2f6d2698c7b81948d7520",
+   "scripts/S463_fig2_ranking.py": "8279a35d27c5a99d34980b59529203b104526035beba74031c9964a2ee360825",
+   "scripts/S518_split_confirmation.py": "91230a9e51aaeb7b2d49c48841131de4eaf02cda1343274849ba9b33a8e82218",
+   "scripts/judge_rows_v25.py": "77d4a84d7aff4dd0ee92366395a4be2e5f27fe20d5de99ccbc86b7333c401661",
    "findings/figures_provisional/fig3_strategies/figure3_numbers.json": "984e34e93d115a98f5e07253c99d62bc09dcaea98a17ff3de8bc92831ddbab69",
    "findings/recompute/S518_split_confirmation/second_judge.json": "36ec03b05e7e23ba19d5b816bcf7e9190f267ffef09c3dbb25b64f8fa9787bfe",
    "findings/recompute/S518_split_confirmation/gemma3.json": "ebc15e1c2724bc4c554260a29e4e7735ae5d831c875a3783e9bb2bc8d83636ce",
@@ -237,6 +237,6 @@
   "Supplementary Figure 6 data (provisional, 7019 of 7020).xlsx": "11a97f35647386561b255b4051aad0ccb83f012375fa0af605b705c25225bcdc",
   "Supplementary Figure 6 data caption (provisional, 7019 of 7020).md": "925ffa9a5c99ffb6e54ef37bc8e09670cec13b5322383c7571b0116d0f9b395a",
   "supplementary_figure6_numbers.json": "654a9013d6eefd4bf3fa63dca0f5960d95434c2427d734c685b51172726fcb48",
-  "legend_draft.md": "6afd1118ed58652de0f50a67f8f4237925a73ae6ea2ca0a4e98b704c3e9ec19d"
+  "legend_draft.md": "c21310e7d348f0e75f68263c38fe74770bf52b64ac5832b110797ab4197b17ba"
  }
 }

@@ -255,23 +255,31 @@ def texts(dat: dict, e_rows: list, ranks: dict, n_out: int, k_all: int) -> dict:
     high = [r["ragas:faithfulness"] for r in table if r.get("ragas:faithfulness") is not None
             and r["correctness"] is not None and r["correctness"] >= S473.PASS_T]
     x, y = (S497.S457.half_up(statistics.median(v), 2) for v in (low, high))
-    bert = [r for r in e_rows if r["source"] == BERT_KEY]
-    bert_n = {r["judge_signal"]: r["answers"] for r in bert}
+    fams = [g for _, g, _ in ROWS_A]
+    qa = {r["questions"] for r in e_rows}
+    if len(qa) != 1:
+        raise S540.Refused(f"Supplementary Figure {N} a: the rho differ in their question count {sorted(qa)}")
+    n_rag, n_rc = fams.count("RAGAS"), fams.count("RAGChecker")
+    b_rag, b_rc = len(RAGAS_ROWS), len(RC_ROWS)
+    # Valerio, 8 Nov (editor row 45): n once, as "n = X <unit>", only in the panel that draws derived statistics (a,
+    # boxes and intervals); b draws ranks, so its count stays in words; no cross-figure reference; each panel in full.
     legend = (f"**Supplementary Figure {N} | RAGAS, RAGChecker and BERTScore against the judge and the three signals.** "
-              "Answers of "
-              f"the six strategies to the answerable questions, draw 1 (n = {len(table)} answers, {q} questions; "
-              f"{k_all} hold the judge's score and every RAGAS and RAGChecker score, the other {len(table) - k_all} lack "
-              "one or more of them). RAGAS "
-              f"and RAGChecker ran on devstral-small-2:24b at the judge's settings. **a**, Spearman's \u03c1 of the "
-              f"{len(ROWS_A)} scores not in Figure 6e with the judge's correctness and faithfulness, each over the "
-              f"answers holding both values (the answers per \u03c1 are in sheet a's answers column): box, "
-              "quartiles of 10,000 question resamples; whiskers, two-sided 95% percentile interval; open mark, \u03c1 "
-              "among the answers to one question. A negative \u03c1 means agreement for hallucination, self-knowledge and both noise "
-              f"sensitivities. BERTScore is the F1 of roberta-large over windows of at most 510 word pieces, each "
-              f"starting 255 pieces after the last, so no answer or key is cut (n = {bert_n['Judge correctness']} "
-              f"answers with correctness, {bert_n['Judge faithfulness']} with faithfulness). "
-              f"**b**, Strategy rank by each score (1, best; ties share the mean rank) on n = {ranks['questions']} "
-              f"questions; right, Spearman's \u03c1 of each row's ranks with the judge's at {S473.PASS_T} or more.")
+              f"Answers of the six strategies to the {q} answerable questions, draw 1; {len(table) - k_all} of the "
+              f"{len(table)} answers lack the judge's score or one or more RAGAS or RAGChecker scores. RAGAS and "
+              "RAGChecker ran on devstral-small-2:24b at the judge's settings. BERTScore is the F1 of roberta-large over "
+              "windows of at most 510 word pieces, each starting 255 pieces after the last, so no answer or key is cut. "
+              f"**a**, Spearman's \u03c1 (horizontal axis) of {len(ROWS_A)} scores (rows: {n_rag} RAGAS, "
+              f"{n_rc} RAGChecker and windowed BERTScore) with the judge's correctness (left) and faithfulness (right), "
+              "each over the answers holding both values. Box, quartiles of 10,000 resamples of the questions; line, "
+              "median; whiskers, two-sided 95% percentile interval; open circle, \u03c1 among the answers to one "
+              "question; vertical line, \u03c1 = 0. A negative \u03c1 means agreement for hallucination, "
+              f"self-knowledge and both noise sensitivities. n = {qa.pop()} questions per \u03c1. "
+              f"**b**, Rank of the six strategies (columns) by the mean of each score (rows: the judge's pass share at "
+              f"{S473.PASS_T} or more and at {S473.PASS_RELAXED} or more, Concepts, Papers, {b_rag} RAGAS and {b_rc} "
+              f"RAGChecker scores) on the {ranks['questions']} questions where every strategy holds all {len(RANK_ROWS)} "
+              "scores. 1 is the best and yellow, 6 the worst and dark blue; the best is the lowest for hallucination, "
+              "self-knowledge and both noise sensitivities; ties share the mean rank. Right column, Spearman's \u03c1 "
+              f"of each row's ranks with the ranks by the judge at {S473.PASS_T} or more.")
     notes = (f"- Ranks in b are draw 1 on {ranks['questions']} questions, so they can differ from Figure 6b, which uses "
              "three draws.\n- The Concepts and Papers rows meet the letter's promise of a comparison with \"our three "
              "signals\" (Reviewer 1, Comment 1.2).\n- The "

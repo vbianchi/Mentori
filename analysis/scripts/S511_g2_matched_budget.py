@@ -67,7 +67,7 @@ and refuses (exit 1, nothing written) unless each of these equals its committed 
 
 THE GATE'S FIGURE 3 VALUES ARE PINNED. Parts (2), (3) and (5) compare with key v2.4 numbers. Figure 3 moved to key v2.5
 (D186 (3)) and its sheets moved (old e to 3c), so the gate reads the ranking.json of commit RANKING_V24_AT, the last one
-on key v2.4 (git show, read only), in place of the plate's current file. What it compares is unchanged: 120 values, 10
+on key v2.4 (pinned in the tree, O3, held to its git blob id), in place of the plate's current file. What it compares is unchanged: 120 values, 10
 P values, 18 values.
 
 KEY v2.5 (D188-R1, fig3.md R8). The numbers above stay on key v2.4 under the gate. Beside them, results.json "v25" and
@@ -111,6 +111,7 @@ ROOT = Path(__file__).resolve().parents[1]
 for p in (str(ROOT / "scripts"), str(ROOT)):
     if p not in sys.path:
         sys.path.insert(0, p)
+import pinned_history as PH  # noqa: E402
 
 SCRIPT = "scripts/S511_g2_matched_budget.py"
 RECOMPUTE = ROOT / "findings" / "recompute"
@@ -548,11 +549,11 @@ def check_m01(g1: dict, qs: dict, report: dict) -> str:
 
 def ranking_v24() -> tuple[dict, str]:
     """ranking.json at RANKING_V24_AT (the module docstring, THE GATE'S FIGURE 3 VALUES ARE PINNED) and its sha256."""
-    r = subprocess.run(["git", "-C", str(ROOT), "show", f"{RANKING_V24_AT}:{RANKING.relative_to(ROOT)}"],
-                       capture_output=True)
-    if r.returncode:
-        raise Refused(f"git show {RANKING_V24_AT} ranking.json: {r.stderr.decode(errors='replace')[:200]}")
-    return json.loads(r.stdout), hashlib.sha256(r.stdout).hexdigest()
+    try:   # O3: ranking.json as committed at RANKING_V24_AT, pinned in the tree, held to its git blob id
+        b = PH.show(RANKING_V24_AT, str(RANKING.relative_to(ROOT)))
+    except PH.PinError as e:
+        raise Refused(f"git show {RANKING_V24_AT} ranking.json: {str(e)[:200]}") from None
+    return json.loads(b), hashlib.sha256(b).hexdigest()
 
 
 def gate(g1: dict, qs: dict, recs: dict) -> dict:

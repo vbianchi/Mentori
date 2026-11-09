@@ -66,8 +66,8 @@ READS (the trust boundary, README.md:13-27: run records are trusted, nothing els
                                                                   hold G1 and Figure 6)
   experiments/plan.csv                                            row G6: the counts reproduced first
   experiments/LIST.md, experiments/README.md                      the lines of the written design (found, not assumed)
-  (these three as they stood at DESIGN_AT, e44e636a, the commit the plate was drawn at: git show, read only; today's
-  text changes daily, D155)
+  (these three: their values as they stood at DESIGN_AT, e44e636a, the commit the plate was drawn at, read from
+  fig_design's design_facts.json since D2, never the documents or git; today's text changes daily, D155)
 (planned_total() reads G4_runs/README.md, G5_runs/README.md and D98_subset/d98_subset.json for main Figure 3's "of N";
 S475 calls it, this plate does not.)
   experiments/rlm_ref/.venv/.../rlms-0.1.3.dist-info/METADATA     the package's author and paper URL (a gitignored
@@ -140,7 +140,6 @@ import math
 import platform
 import io
 import re
-import subprocess
 import sys
 import tomllib
 from collections import Counter
@@ -149,6 +148,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import fig_repro as FR  # noqa: E402  (D155: frozen inputs, deterministic files)
+import pinned_history as PH  # noqa: E402  (O3: history reads, pinned in the tree)
 import house_style as hs  # noqa: E402  one drawing style for every plate
 from S457_fig2_panels import finish_plate  # noqa: E402  the last step of a plate, shared (S457, S463, S472)
 # D155: the records this plate draws are G6's as they stood on 23 October, before the D89 rerun of 24 October rewrote
@@ -182,7 +182,12 @@ LOCK = ROOT / "experiments" / "LOCK.toml"
 ADAPTER = ROOT / "experiments" / "rlm_ref" / "adapter.py"
 LIST_MD = ROOT / "experiments" / "LIST.md"
 README_EXP = ROOT / "experiments" / "README.md"
-REFERENCES = ROOT / "manuscript" / "sections" / "29_references.md"
+REFERENCES = ROOT / "manuscript" / "sections" / "29_references.md"   # named in the legend; read by S616, not here
+# D2 (Valerio, 8 Nov): figures are built from data only. plan.csv's row G6 and the LIST.md and README.md lines at
+# DESIGN_AT, and the reference number the list gives the rlms paper, are read from design_facts.json (S616 extract,
+# each source with its commit and blob id; S616 check holds them to the files): never plan.csv, LIST.md, README.md or
+# the reference list themselves, and never git show.
+import fig_design  # noqa: E402
 # D303: the revised paper's reference list (manuscript tab, rev 3688, accepted by Valerio 7 Nov) numbers the rlms paper
 # (Zhang, Kraska & Khattab, arXiv 2512.24601) 27; the legend cites that number. The list is not yet in the repository
 # (it enters with the .docx move), so package_citation() checks the URL against the submitted list above and the
@@ -267,13 +272,6 @@ def sha256_file(p: Path) -> str:
     return h.hexdigest()
 
 
-def git(*args) -> str:
-    try:
-        return subprocess.run(["git", "-C", str(ROOT), *args], capture_output=True, text=True).stdout.strip()
-    except OSError:
-        return ""
-
-
 def rel(p: Path) -> str:
     return str(p.relative_to(ROOT))
 
@@ -281,14 +279,6 @@ def rel(p: Path) -> str:
 def as_read(p: Path) -> str:
     """The name a G6 answers file had where it was read (RUNS_AS/<run>/answers.jsonl), as S455 records it."""
     return f"{RUNS_AS}/{p.parent.name}/{p.name}"
-
-
-def doc_text(path: Path) -> str:
-    """A design document's text at DESIGN_AT (git show, read only)."""
-    r = subprocess.run(["git", "-C", str(ROOT), "show", f"{DESIGN_AT}:{rel(path)}"], capture_output=True)
-    if r.returncode:
-        raise SystemExit(f"git show {DESIGN_AT}:{rel(path)} failed: {r.stderr.decode(errors='replace')[:200]}")
-    return r.stdout.decode("utf-8")
 
 
 def half_up(x, nd=0):
@@ -365,10 +355,11 @@ def read_answers(p: Path):
 # Reproduce first
 # ---------------------------------------------------------------------------------------------------------------
 def plan_row(rid):
-    for r in csv.DictReader(io.StringIO(doc_text(PLAN), newline="")):
-        if r["id"] == rid:
-            return r
-    raise SystemExit(f"{rel(PLAN)}: no row {rid}")
+    """plan.csv's row rid as it stood at DESIGN_AT, from design_facts.json (D2)."""
+    rows = fig_design.facts()[f"plan_csv_at_{DESIGN_AT}"]
+    if rid not in rows:
+        raise SystemExit(f"{rel(fig_design.FACTS)}: no plan.csv row {rid} at {DESIGN_AT}")
+    return rows[rid]
 
 
 def reproduce(full, caps, fig2_caps, files):
@@ -472,16 +463,28 @@ def planned_total(ids, caps):
 # ---------------------------------------------------------------------------------------------------------------
 def git_versions(path: Path) -> dict:
     """sha256 of every committed version of `path` -> the earliest commit (short) holding it, from the git history
-    (read only)."""
+    as pinned in the tree (O3: `git log --format=%H -- path` and each version's bytes, held to its git blob id;
+    scripts/S617_pin_history.py, whose verify checks the list against git in Mentori-reanalysis)."""
     out = {}
-    for c in git("log", "--format=%H", "--", rel(path)).split():          # newest first; the last one seen wins
-        try:
-            blob = subprocess.run(["git", "-C", str(ROOT), "show", f"{c}:{rel(path)}"], capture_output=True,
-                                  check=True).stdout
-        except subprocess.CalledProcessError:
-            continue
-        out[hashlib.sha256(blob).hexdigest()] = (c[:7], blob)   # 7 characters always (git's --short grows)
+    try:
+        for c in PH.log(rel(path)):                                   # newest first; the last one seen wins
+            if not PH.has(c, rel(path)):
+                continue                                              # git show failed there (no such file)
+            blob = PH.show(c, rel(path))
+            out[hashlib.sha256(blob).hexdigest()] = (c[:7], blob)   # 7 characters always (git's --short grows)
+    except PH.PinError as e:
+        print(f"VERSIONS NOT READ, nothing written: {e}", file=sys.stderr)
+        sys.exit(2)
     return out
+
+
+def subject(c: str) -> str:
+    """`git log -1 --format=%s c`, as pinned (O3) for every commit of the pinned logs; exit 2 when it is not."""
+    try:
+        return PH.subject(c)
+    except PH.PinError as e:
+        print(f"VERSIONS NOT READ, nothing written: {e}", file=sys.stderr)
+        sys.exit(2)
 
 
 def versions_of_records(allr):
@@ -497,7 +500,7 @@ def versions_of_records(allr):
                 continue
             c = vers[sha][0]
             out[key][sha[:8]] = {"commit": c, "records": k,
-                                 "commit_subject": git("log", "-1", "--format=%s", c)[:160]}
+                                 "commit_subject": subject(c)[:160]}
     if probs:
         print("VERSIONS NOT FOUND, nothing written:\n  " + "\n  ".join(probs), file=sys.stderr)
         sys.exit(2)
@@ -525,7 +528,7 @@ def versions_of_records(allr):
 
 def find_line(path: Path, pattern: str) -> int:
     """The first line of `path` matching `pattern` (1-based); exits when none does, so a cited line is never assumed."""
-    text = doc_text(path) if path in (LIST_MD, README_EXP, PLAN) else path.read_text()
+    text = path.read_text()
     for i, ln in enumerate(text.splitlines(), 1):
         if re.search(pattern, ln):
             return i
@@ -533,14 +536,13 @@ def find_line(path: Path, pattern: str) -> int:
 
 
 def design_lines():
-    return {"d31": f"{rel(LIST_MD)}:{find_line(LIST_MD, r'D31 \(agreed\): both')}",
-            "fig3_q19": f"{rel(LIST_MD)}:{find_line(LIST_MD, r'^Q19 is settled')}",
-            "list_q116": f"{rel(LIST_MD)}:"
-            f"{find_line(LIST_MD, r'G4, G5 and the authors. depth caps get three')}",
-            "readme_q116": f"{rel(README_EXP)}:{find_line(README_EXP, r'Figure 3: Q116, three draws')}",
-            "readme_q50": f"{rel(README_EXP)}:{find_line(README_EXP, r'Q50 the depth sweep uses')}",
+    """The lines the legend cites: LIST.md's and README.md's at DESIGN_AT from design_facts.json (D2; S616 finds them
+    with the patterns this function used until D2), run_rlm_ref.py's in the file."""
+    at = fig_design.facts()[f"design_lines_at_{DESIGN_AT}"]
+    return {"d31": at["d31"], "fig3_q19": at["fig3_q19"], "list_q116": at["list_q116"],
+            "readme_q116": at["readme_q116"], "readme_q50": at["readme_q50"],
             "fig2_caps": f"{rel(RUN_RLM_REF)}:{find_line(RUN_RLM_REF, r'^FIGURE2_CAPS\s*=')}",
-            "d123": f"{rel(README_EXP)}:{find_line(README_EXP, r'^- \*\*D123\*\* ')}"}
+            "d123": at["d123"]}
 
 
 def package_citation():
@@ -553,19 +555,15 @@ def package_citation():
     ver = re.search(r"^Version: (\S+)", t, re.M).group(1)
     author = re.search(r"^Author-email: ([^<\n]+?)\s*<", t, re.M).group(1)
     url = re.search(r"https://arxiv\.org/abs/[\d.]+", t).group(0)
-    lines = REFERENCES.read_text().splitlines()
-    at = next((i for i, ln in enumerate(lines) if url in ln), None)
-    if at is None:
-        raise SystemExit(f"{rel(REFERENCES)}: no reference cites {url}")
-    j = next((j for j in range(at, -1, -1) if re.match(r"^(\d+)\\?\.", lines[j])), None)
-    num = re.match(r"^(\d+)", lines[j]).group(1) if j is not None else None
-    if num is None:
-        raise SystemExit(f"{rel(REFERENCES)}: the reference citing {url} has no number")
+    ref = fig_design.facts()["references"].get(url)   # D2: S616 read the number from manuscript/sections/29_references.md
+    if ref is None:
+        raise SystemExit(f"{rel(fig_design.FACTS)}: no reference cites {url}")
+    num = ref["number"]
     if url != REVISED_REFERENCE["url"]:
         raise SystemExit(f"the installed rlms cites {url}, not the revised reference's {REVISED_REFERENCE['url']}")
     return {"version": ver, "author": author, "url": url, "reference": int(num),
             "reference_revised": REVISED_REFERENCE["number"],
-            "metadata": rel(meta[0]), "reference_line": f"{rel(REFERENCES)}:{j + 1}"}
+            "metadata": rel(meta[0]), "reference_line": ref["line"]}
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -1058,21 +1056,24 @@ def legend_and_caption(fn, caps, n_ids, stamp, tag, ctx, fn_gate=None):
                f"answer{'' if k_pkg == 1 else 's'}: " + "; ".join(f"cap {c}, {v}" for c, v in pkg.items()) + ")"
                if k_pkg else "")
     nbs = [str(r["n"]) for r in nb]
-    n_b_short = (f"n = {', '.join(nbs[:-1])} and {nbs[-1]} from cap {nb[0]['cap']} to cap {nb[-1]['cap']}, printed "
-                 f"at each row's right")
+    # Valerio, 8 November (editor row 45): an "n = X <unit>" only in a panel that draws derived statistics (b's boxes),
+    # once, in that panel; a carries no n; every panel described in full, no reference to another panel.
+    n_b_short = (f"n = {', '.join(nbs[:-1])} and {nbs[-1]} answers from cap {nb[0]['cap']} to cap "
+                 f"{nb[-1]['cap']}")
     legend = (
         f"Each answer is one of {n_ids} depth-sweep questions answered by gemini-3-flash in Zhang RLM, "
         f"the RLM package released by the method's authors (rlms {pk['version']}; ref. {pk['reference_revised']}), in which the model writes "
-        f"and runs code over the {ctx['papers']}-paper corpus for up to a set number of turns, the turn cap; one row "
-        f"per cap ({caps_txt}), three draws per question and cap. "
-        f"{A}, How each answer ended, as a share (%) of the n = {per_cap} answers at each cap: an answer within the "
+        f"and runs code over the {ctx['papers']}-paper corpus for up to a set number of turns, the turn cap. "
+        f"Each question was answered three times at each cap ({caps_txt}). "
+        f"{A}, How each answer ended: one bar per turn cap (vertical axis), divided by the share (%) of that cap's "
+        f"answers (horizontal axis) that ended each way, each way a colour named in the key: an answer within the "
         f"cap; an answer from the closing call the package makes when the cap is reached; a closing call that "
         f"returned code, kept as the answer; an answer with no text; "
-        f"{'' if k_pkg else 'or '}a failed model call in a turn{pkg_txt}. {B}, Turns used per answer, for the "
-        f"answers that did not fail (the closing call is not "
-        f"counted); triangles mark the row's turn cap; {n_b_short}; each grey dot is one "
-        f"answer, boxes span the first to the third quartile, the line is the median and whiskers reach the smallest "
-        f"and largest value; the horizontal axis is logarithmic.")
+        f"{'' if k_pkg else 'or '}a failed model call in a turn{pkg_txt}. {B}, Turns used per answer (horizontal "
+        f"axis, logarithmic) at each turn cap (vertical axis), for the answers that did not fail; the closing call is "
+        f"not counted. Each grey dot is one answer, boxes span the first to the third quartile, the line is the "
+        f"median and whiskers reach the smallest and largest value; a triangle marks the row's turn cap; "
+        f"{n_b_short}.")
     failures_txt = (
         ("**Failures and D92 (moved from the caption, 23 October).** " if fn_gate is None else
          "**Failures and D92, in the records before the D135 reruns, which the gates read (moved from the caption, 23 "
@@ -1337,15 +1338,14 @@ def main(argv=None):
               **{FR.frozen_label(p): sha256_file(p) for p in files.values()},
               **({FR.frozen_label(post / "SOURCE_MTIMES.json"): sha256_file(post / "SOURCE_MTIMES.json")}
                  if post is not None else {}),
-              **{rel(p): sha256_file(p) for p in [RUN_RLM_REF, S455, LOCK, FIGURE_LOCK, REFERENCES,
-                                                  ROOT / ctx["package"]["metadata"], G6_MTIMES_JSON]},
-              **{f"{rel(p)}@{DESIGN_AT}": hashlib.sha256(doc_text(p).encode("utf-8")).hexdigest()
-                 for p in (PLAN, LIST_MD, README_EXP)}}
+              **{rel(p): sha256_file(p) for p in [RUN_RLM_REF, S455, LOCK, FIGURE_LOCK, fig_design.FACTS,
+                                                  ROOT / ctx["package"]["metadata"], G6_MTIMES_JSON]}}
     prov = {"script": rel(Path(__file__)), "script_sha256": sha256_file(Path(__file__)),
             "command": REBUILD_CMD,
             "python": platform.python_version(),
             "deterministic": f"D155: no build time and no repository HEAD are recorded; the script's and every "
-                             f"input's sha256 identify the build; the design documents are read at {DESIGN_AT}",
+                             f"input's sha256 identify the build; the design documents' values as they stood at {DESIGN_AT} "
+                             f"are read from {rel(fig_design.FACTS)} (D2)",
             "inputs_sha256": inputs, "model_calls": 0,
             "stamp": stamp, "page_mm": [W, H],
             "figure_lock": {"path": rel(FIGURE_LOCK), "sha256": sha256_file(FIGURE_LOCK), "status": FLOCK["status"]},

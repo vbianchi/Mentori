@@ -609,7 +609,7 @@ RANGE_COLS = ["draws_read", "draw_min_pct", "draw_max_pct", "range_pp"]         
 TEST_COLS = ["d_pp", "d_ci95_lo_pp", "d_ci95_hi_pp", "p_signflip_two_sided", "p_holm", "rlm_higher", "zhang_higher",
              "tied"]
 A_COLS = S475.A_COLS + A_BOX_COLS + D_COLS + RANGE_COLS + TEST_COLS
-GEMINI_REF_NAME = "gemini-3-flash-preview (RLM, G5, draw 1)"
+GEMINI_REF_NAME = "gemini-3-flash-preview (RLM, G5, mean of draws 1 to 3; failed and cap counts draw 1)"   # D284: gemini_ref medians and means are over each question's three-draw mean; its counts read draw 1
 # D291 (Valerio, 7 Nov): plates and legends print the paper's name for the generator; data, keys and Source Data keep
 # the API id gemini-3-flash-preview
 GEN_DISPLAY = "gemini-3-flash"
@@ -2790,7 +2790,7 @@ def paired_test_rows(a_rows: list, caps: list, cols: list) -> list:
 
 def legend_and_caption(fn, caps, t1caps, k, stamp, detail, d181: bool = False, b_d181: bool = False):
     """d181 (D186 (4)): a's concept recall is D181's (key v2.5; words a concept shares with its question not
-    counted); b_d181 (D188): b's too, so b reads "as in a"; with d181 alone b is the loose matcher's (key v2.4, every
+    counted); b_d181 (D188): b's too; with d181 alone b is the loose matcher's (key v2.4, every
     concept word counted), and the legend says so in b."""
     b_loose = d181 and not b_d181
     A, B, C, D = (f"**{S475.LETTER_CASE(x)}**" for x in "abcd")
@@ -2811,38 +2811,54 @@ def legend_and_caption(fn, caps, t1caps, k, stamp, detail, d181: bool = False, b
     #   45-question subset behind the lower bars, the repeated "mean of three draws" and the repeated per-system n
     #   dropped (Source Data Fig. 4 sheet a's draw_range rows and Methods keep them)
     g5_one = all((r['draws'] or 1) == 1 for r in fn['a'] if r['row'] == 'question' and r['system'] == 'G5')
-    draws_txt = ("RLM (blue, left; one draw) and Zhang RLM (vermilion, right; mean of three draws)" if g5_one
-                 else "RLM (blue, left) and Zhang RLM (vermilion, right), mean of three draws")
-    n_strip = (f"n = {dn['G5']} answers per system and cap" if dn["G5"] == dn["G6"]
-               else f"n = {dn['G5']} answers (RLM) and n = {dn['G6']} (Zhang RLM) per cap")
+    # 8 Nov (Valerio, 20:40Z and 20:45Z, editor row 45): an "n = X <unit>" only where a panel draws a derived statistic
+    #   (a's boxes and the lower bars' range, b's medians), once, inside that description; no other n tag (the upper
+    #   bars' "n = 258 answers per system and cap" goes; they are shares of all three draws' answers); every panel
+    #   described in full, never "as in a"
+    n_q = sorted({r["questions"] for r in fn["a"] if r["row"] == "cap"})
+    if len(n_q) != 1:                               # a's legend gives one n of questions for every system and cap
+        raise Refused(f"a: the questions per system and cap differ: {n_q}")
+    dots = ("each question's value (RLM, one draw) or mean over three draws (Zhang RLM)" if g5_one
+            else "each question's mean over three draws")
     legend = (
-        f"{A}, Concept recall (%) by turn cap for {draws_txt}, with {GEN_DISPLAY}: the share of a question's "
-        f"expected concepts found in the answer"
+        f"{A}, Concept recall (%) by turn cap for RLM (blue, left of each cap) and Zhang RLM (vermilion, right), both "
+        f"with {GEN_DISPLAY}: the share of a question's expected concepts found in the answer"
         + (", not counting words the question also holds" if b_loose else "")   # the method is in Methods; said
         #   here only when b is scored otherwise and its legend sets the two readings side by side
-        + " (a failed answer scores 0). Dots: questions (n = 86 questions per system and cap); boxes: quartiles and median; "
-        f"whiskers: full range; thin line: joins the medians. " + (
-        f"{'Upper bars' if range_on else 'Bars'}: answers (%) reaching the cap (plain) or cut off by it (hatched), "
-        f"{n_strip}. " + (
-            f"Lower bars: range of the mean over the three draws (percentage points), n = {n_range} questions. "
+        + f" (a failed answer scores 0). Dots: {dots}; boxes: quartiles and median; whiskers: full range; thin line: joins the "
+        f"medians; n = {n_q[0]} questions per system and cap. " + (
+        f"{'Upper bars' if range_on else 'Bars'}: share of the answers of all draws (%) reaching the cap (plain) "
+        f"or cut off by it (hatched). " + (
+            f"Lower bars: the highest minus the lowest of the three draws' mean concept recall (percentage points), "
+            f"each draw's mean taken over n = {n_range} questions. "
             if range_on else "")) +
-        f"{B}, As in a" + (" but scored on key v2.4, with every concept word counted" if b_loose else "") +
-        f", for RLM with four local models (one panel each, one draw) at {len(t1caps)} turn caps, n = {k} "
-        f"question{'s' if k != 1 else ''} answered by every model at every cap. Grey lines: questions; black "
-        f"line: median; {ref_style} line: {GEN_DISPLAY}'s median on the same questions"
-        f"{', scored as in b' if b_loose else ''}. "
+        f"{B}, Concept recall (%) by turn cap for RLM with four local models (one panel each, one draw) at "
+        f"{len(t1caps)} turn caps: the share of a question's expected concepts found in the answer"
+        + (", scored on key v2.4, with every concept word counted" if b_loose else "") +
+        f" (a failed answer scores 0). Grey lines: each of the n = {k} question{'s' if k != 1 else ''} answered by "
+        f"every model at every cap; black line: median over these questions; {ref_style} line: median over the same "
+        f"questions of RLM with {GEN_DISPLAY}, each question's "
+        f"{'value in its one draw' if g5_one else 'mean over three draws'}"
+        f"{', on the same reading' if b_loose else ''}. "
         "RLM: Mentor::i's own; Zhang RLM: the authors' package (rlms 0.1.3).")
     title_c = "Generation strategies against single pass across corpus sizes"
+    # 8 Nov (Valerio, editor row 45, extended to the Supplementary legends): the frame marks a derived statistic (the
+    #   interval), so the grid states its n once, as "n = X questions", beside the frame; rows, columns, colour scale
+    #   and frame described in full
+    lim_c = fn["c_scale"]
     legend_c = (
-        f"Each strategy's pass rate minus single pass's (percentage points; number and colour) per index, by "
-        f"core papers and distractor papers per core paper; {GEN_DISPLAY}, one draw, "
-        f"answerable questions whose source papers are all in the index, judged for both (n = {COVERED_WANT[5]} per "
-        f"index at 5 core papers, {COVERED_WANT[10]} at 10, {COVERED_WANT[20]} at 20 and {COVERED_WANT[50]} at 50"
-        + (", fewer where a judge call failed or an answer was held out; per cell in the data workbook" if c_short else "")
-        + f"). Pass: judge "
-        f"correctness 4 or more (upper block); relaxed threshold: 3 or more (lower block). Frame: two-sided 95% percentile interval "
-        f"of the difference (10,000 question resamples) excludes 0."
-        + (" Empty: judging incomplete." if c_empty else ""))
+        f"One cell per strategy (rows: multi-hop, verified pass, and RLM stopped at 5, 10 and 20 turns, RLM-5, "
+        f"RLM-10 and RLM-20) and per index (columns). Each index holds 5, 10, 20 or 50 core papers (column groups) "
+        f"and 0, 1 or 3 distractor papers for every core paper (columns). Answers are from {GEN_DISPLAY}, one draw, to the "
+        f"answerable questions whose source papers are all in that index, with the strategy's and single pass's "
+        f"answers both judged. Each cell gives the strategy's pass rate minus single pass's on the same questions, in "
+        f"percentage points, printed in the cell and coloured from −{lim_c} (dark blue) through 0 (grey) to "
+        f"+{lim_c} (yellow). Upper block: pass is judge correctness 4 or more; lower block (relaxed): 3 or more. "
+        f"Frame inside a cell: the two-sided 95% percentile interval of the difference, from 10,000 resamples of the "
+        f"questions, excludes 0; n = {COVERED_WANT[5]} questions per index at 5 core papers, {COVERED_WANT[10]} at "
+        f"10, {COVERED_WANT[20]} at 20 and {COVERED_WANT[50]} at 50"
+        + (", fewer where a judge call failed or an answer was held out" if c_short else "") + "."
+        + (" Empty cell: judging incomplete." if c_empty else ""))
     stamp_ab, stamp_c = stamp
     lines = [f"# {MAIN_LABEL} (D283; D123), title and legend (draft)", "",
              f"Data stamp: {stamp_ab}.", "", detail, "",
@@ -2867,7 +2883,8 @@ def legend_and_caption(fn, caps, t1caps, k, stamp, detail, d181: bool = False, b
             f"answered by all four models at all six caps, answers, median concept recall (%), drawn, mean and its "
             f"95% interval (%) when two or more questions are complete, not drawn, failed answers, answers whose "
             f"turns used reached the cap, answers stopped by the cap), one 'gemini_ref' row per cap (the same "
-            f"questions with gemini-3-flash-preview, RLM, draw 1: median (%), drawn, mean, failed), then "
+            f"questions with gemini-3-flash-preview, RLM: median (%), drawn, and mean of each question's mean over draws 1 to 3; "
+            f"failed answers, answers whose turns used reached the cap and answers stopped by the cap, of draw 1), then "
             f"one 'answer' row per stored answer (whether its question is complete, the concept recall drawn (%), "
             f"the loose matcher's and the exact test's concept recall on the same concepts (%), failed, stop reason, "
             f"turns used, answer key)."),
@@ -3253,8 +3270,8 @@ def plate(out: Path = OUT, t1dir: Path = T1_L2, g4dir: Path = G4_FIG3C, mut=None
                             "caps evenly spaced, no mean (L2 all mode; the mean and its interval in the data workbook, D128)",
                        "b": "B-2 (Valerio, 26 October), with his 15:00 follow-up (question lines one grey, "
                             f"{Q_GREY}, caps evenly spaced): one small panel per local model, a line per complete question, "
-                            "the median, and the median of the same questions with gemini-3-flash-preview (G5, draw "
-                            f"1) in {GEMINI_REF_COLOUR}" + (" dashed" if GEMINI_REF_DASHES else " solid") +
+                            "the median, and the median of the same questions with gemini-3-flash-preview (G5, each question's "
+                            f"mean over draws 1 to 3) in {GEMINI_REF_COLOUR}" + (" dashed" if GEMINI_REF_DASHES else " solid") +
                             "; the key is line samples with their meanings",
                        "c": "D150 (Valerio, 26 October 19:00, layout O-b1): every strategy minus single pass per "
                             "index, judge score 4 (the pass rate) above score 3 (relaxed, D154), one cividis scale, the number in each cell, a frame "
@@ -3901,7 +3918,7 @@ def selftest_d188(root: Path) -> list:
     folders): the fixture drawn with b on fixture_t1_d181 and c on fixture_g4_d185, and again with b and c on the
     fixture's v2.4 readings. b's medians must be the medians of the D181 rows, its gemini-3-flash-preview reference the
     median of L2_d135_d181's G5 concept_recall on T1's complete questions; c's cells must differ exactly in the changed
-    cell's index and strategy; the legend must read b "as in a". Then each tie is refused when broken."""
+    cell's index and strategy; the legend must not name key v2.4 for b. Then each tie is refused when broken."""
     fails = []
     r1 = _run_fixture(root / "d188", d181=True, d188={})
     r0 = _run_fixture(root / "d181", d181=True)

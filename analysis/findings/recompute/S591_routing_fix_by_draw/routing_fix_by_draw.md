@@ -3,12 +3,12 @@
 <!-- provenance
 {
  "script": "scripts/S591_routing_fix_by_draw.py",
- "script_sha256": "c4a438430c76f6fd2d56d61d26e6a2a54758db5d99376ed825d5dd88af41940c",
+ "script_sha256": "f2031186a21c30e6b0de7478e1238d3836bb80705a312584dae701c27c3303f8",
  "command": "uv run --frozen python scripts/S591_routing_fix_by_draw.py",
  "imports": {
   "scripts/S480_fig4_recount.py": "7c432aa0524944649573f60009acb38450eb9886459783d3c8bf7aa1504950ee",
-  "scripts/S463_fig2_ranking.py": "799642c3dbff3516c38735141d21ada5c29671c5cbaec581b93cee04fcb6bc84",
-  "scripts/judge_rows_v25.py": "aa90f42264e2ce21acfca52c2421d852607418981b6e9be8d8984a716b1ebddd"
+  "scripts/S463_fig2_ranking.py": "8279a35d27c5a99d34980b59529203b104526035beba74031c9964a2ee360825",
+  "scripts/judge_rows_v25.py": "77d4a84d7aff4dd0ee92366395a4be2e5f27fe20d5de99ccbc86b7333c401661"
  },
  "frozen_defaults": {
   "records": "fig4_records_1023:fig4_records_1023",
@@ -23,7 +23,7 @@
 }
 -->
 
-Written by `scripts/S591_routing_fix_by_draw.py` (sha256 `c4a438430c76`): `uv run --frozen python scripts/S591_routing_fix_by_draw.py`. No model call. Rows: S480's (judge_rows_v25: key v2.5 where S6 judged). Refused: refusal accuracy 3 or more; passed: correctness 4 (3) or more; a no_answer row counts and fails. Draws 2 and 3 are on D98's subset (13 out-of-scope, 29 answerable questions); 2+3 sums both draws (n answers).
+Written by `scripts/S591_routing_fix_by_draw.py` (sha256 `f2031186a21c`): `uv run --frozen python scripts/S591_routing_fix_by_draw.py`. No model call. Rows: S480's (judge_rows_v25: key v2.5 where S6 judged). Refused: refusal accuracy 3 or more; passed: correctness 4 (3) or more; a no_answer row counts and fails. Draws 2 and 3 are on D98's subset (13 out-of-scope, 29 answerable questions); 2+3 sums both draws (n answers).
 
 ## Counts
 
@@ -74,4 +74,4 @@ No paired test of refusal: S472 computes none on draw 1, so none is computed her
 | draw 3, D98's subset | 7.7 (0.0 to 23.1) | 92.3 (76.9 to 100.0) | 92.3 (76.9 to 100.0) |
 | draws 2 and 3, D98's subset | 3.8 (0.0 to 11.5) | 92.3 (80.8 to 100.0) | 96.2 (88.5 to 100.0) |
 
-Reproduced first: draw 1 equal to KNOWN (refused 2, 37, 38 of 39; passed at 4 65, 60 of 86), to S480.count and the committed S480 recount (inputs sha256 equal), its draw_counts on draws 1 to 3, and Figure 4's Source Data (Fig. 4a and 4b setup rows, comparison and Holm P included)
+Reproduced first: draw 1 equal to KNOWN (refused 2, 37, 38 of 39; passed at 4 65, 60 of 86), to S480.count and the committed S480 recount (inputs sha256 equal), its draw_counts on draws 1 to 3, and Figure 5's Source Data (Fig. 5a and 5b setup rows, comparison and Holm P included)

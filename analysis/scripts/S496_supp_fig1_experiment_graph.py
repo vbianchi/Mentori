@@ -98,7 +98,10 @@ N = 1
 OUT = ROOT / "findings" / "figures_provisional" / "supp_fig1"
 FIGURE_LOCK = ROOT / "experiments" / "FIGURE_LOCK.toml"
 REGISTRY = ROOT / "findings" / "recompute" / "S492_answer_registry" / "registry.json"
-DRAWS = ROOT / "experiments" / "draws.csv"
+import fig_design  # noqa: E402
+# D2 (Valerio, 8 Nov): figures are built from data only. experiments/draws.csv is a working file; the plate reads its rows
+# from fig_design_inputs/draws.csv (S616 extract, every row, the columns read here among them), held to it by S616 check
+DRAWS = fig_design.DRAWS
 RLM_PYPROJECT = ROOT / "experiments" / "rlm_ref" / "pyproject.toml"   # package RLM's pinned rlms version (D228)
 FIG1_PROV = ROOT / "findings" / "figures_provisional" / "fig1" / "figure1_provenance.json"
 SUMS = ROOT / "findings" / "recompute" / "frozen_inputs" / "SHA256SUMS"
@@ -941,9 +944,13 @@ def legend_text(boxes, stamp, n_exp, s520=None) -> str:
     t2 = next((b for b in boxes if b.get("draws_legend") and b["draws_legend"] != b["draws"]), None)
     if t2:
         gives += f" The {t2['name'].lower()}'s draws: {t2['draws_legend']}."
+    # editor row 45 (Valerio, 8 Nov): no derived statistics on this plate, so no "n = " tag; the count stays in words,
+    # and the column headings are described in full so the legend reads on its own
+    cols = "; ".join(c.lower() for c in COLUMNS)
     body = (
-        f"Each white box is one experiment of the study (n = {n_exp} experiments); the shaded box is the "
-        f"evaluation corpus they share. {gives} The key under the graph says what each kind of draw means. Sent the "
+        f"Each white box is one of the study's {n_exp} experiments; the shaded box is the "
+        f"evaluation corpus they share. The five columns, left to right: {cols}. "
+        f"{gives} The key under the graph says what each kind of draw means. Sent the "
         f"same seed, a local model nearly always repeats its answer, so its draws differ through their seeds; "
         f"Gemini's draws are independent samples. The {say(kept).replace('optimisation', 'optimization')} were made "
         f"before the experiments reported here and not run again"

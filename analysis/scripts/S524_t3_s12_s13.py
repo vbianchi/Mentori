@@ -1007,34 +1007,51 @@ def finish(p, n, paths):
 # ---------------------------------------------------------------------------------------------------------------------
 # legends and captions
 # ---------------------------------------------------------------------------------------------------------------------
-def legend_12() -> str:
+def legend_12(a_text: str = "", n_text: str = "", n_after: str = "") -> str:
     """D294: a, the supervisor against the judge (c before); b, the component scores (d before). The items named are
-    those of the four components the plate draws (DRAWN; the synthesizer was in the dropped time panel only)."""
+    those of the four components the plate draws (DRAWN; the synthesizer was in the dropped time panel only).
+    Valerio, 8 Nov, editor row 45: the one n sits in a, the only panel with derived statistics (boxes); b draws one
+    dot per draw and carries none; every panel is described in full (no 'in a'). a_text adds a's figure-only
+    sentences, n_text qualifies a's n (the models whose n departs from the design); n_after counts, inside a, the
+    supervisor answers a leaves out (adversarial check of 8 Nov: they sat after b, so a's n pointed into b); the doc's
+    'the final key'."""
     a, b = "**a**", "**b**"
-    items = "n = " + _join(f"{KEPT[k]} {k.lower()}" for k in DRAWN) + " items"
-    return (f"**Supplementary Figure 10 | {TITLE[10]}.** Each component was tested alone on its own "
-            f"items ({items}; the {sum(LEFT_OUT[k] for k in DRAWN)} items built on questions later replaced "
-            f"in the answer key are left out) by "
-            f"five models once and {GEN_DISPLAY[GEMINI_MODEL]} on three draws; {APART} sits below the line (in {a}, right of it) "
-            f"because its context is {context_of_apart():,} tokens. {a}, Supervisor score against the judge score "
-            f"of the same answer, on key v2.5, or the refusal score for {FN.OUT_OF_SCOPE_QUESTIONS} (n = {JUDGED} answers); "
-            f"boxes: median and quartiles, whiskers the range, grey dots one answer each; ρ, Spearman's ρ. {b}, Component scores, one dot per draw (filled, {FN.GEMINI}; open, {FN.OPEN_WEIGHT}): analyser, "
-            f"decisions matching the label; planner, tools matching the label; distiller, numbers kept. The analyser's "
-            f"label counts sending an out-of-scope question to a direct answer as correct.")
+    gem, ctx = GEN_DISPLAY[GEMINI_MODEL], f"{context_of_apart():,}"
+    items = _join(f"{KEPT[k]} {k.lower()}" for k in DRAWN) + " items"
+    return (f"**Supplementary Figure 10 | {TITLE[10]}.** Each component was tested alone on its own items: {items}, "
+            f"the {sum(LEFT_OUT[k] for k in DRAWN)} items built on questions later replaced in the answer key left "
+            f"out. Five open-weight models answered each item once and {gem} answered it on three draws. "
+            f"{a}, Supervisor score against the judge score of the same answer, one panel per model; the judge scores "
+            f"an answer on the final key, or gives the refusal score for {FN.OUT_OF_SCOPE_QUESTIONS}. Boxes: median "
+            f"and quartiles; whiskers: the range; grey dots: one answer each; a judge score with fewer than "
+            f"{hs.SMALL_N} answers shows its dots and a tick at their median. ρ, Spearman's ρ of the two scores. "
+            f"{APART} sits right of the grey line because its context is {ctx} tokens.{a_text} "
+            f"n = {JUDGED} answers per model{n_text}.{n_after} "
+            f"{b}, Component score (%), one row per model and one column per component: analyser, decisions matching "
+            f"the label; planner, tools matching the label; distiller, numbers kept. The analyser's label counts "
+            f"sending an out-of-scope question to a direct answer as correct. One dot per draw: filled, {FN.GEMINI}; "
+            f"open, {FN.OPEN_WEIGHT}; a tick marks the median of {gem}'s three draws. {APART} sits below the grey "
+            f"line because its context is {ctx} tokens.")
 
 
-def legend_13() -> str:
+def legend_13(n_text: str = "") -> str:
+    """Valerio, 8 Nov, editor row 45: the one n sits in a, the only panel with derived statistics (boxes); b and c draw
+    means with no spread and carry none; every panel is described in full (no 'as in a'). n_text qualifies a's n (the
+    figure states each prompt row whose n departs from the design)."""
     a, b, c = "**a**", "**b**", "**c**"
     n = KEPT["Distiller"]
-    return (f"**Supplementary Figure 11 | {TITLE[11]}.** Six models compressed the same {n} long outputs with Mentor::i's "
-            f"prompt and with a worked-example prompt, which adds two worked examples that keep every number "
-            f"({LEFT_OUT['Distiller']} items built on questions later replaced in the answer key are left out); "
-            f"n = {n} items per model and prompt, draw 1; {APART} sits below the line because its context is "
-            f"{context_of_apart():,} tokens. {a}, Share of the input's numbers kept; boxes: median and quartiles, "
-            f"whiskers the range, grey dots one item each. {b}, Mean share of numbers kept against mean share of source "
-            f"names kept, one mark per model and prompt; dashed, equal shares. {c}, Mean change with the worked-example "
-            f"prompt in percentage points; blue, more kept; {FN.VERMILION}, fewer kept. The worked-example prompt is not "
-            f"Mentor::i's prompt in the pipeline.")
+    below = f"{APART} sits below the grey line because its context is {context_of_apart():,} tokens"
+    return (f"**Supplementary Figure 11 | {TITLE[11]}.** Six models compressed the same {n} long outputs, once each "
+            f"(draw 1), with Mentor::i's prompt and with a worked-example prompt, which adds two worked examples that "
+            f"keep every number ({LEFT_OUT['Distiller']} items built on questions later replaced in the answer key are "
+            f"left out). The worked-example prompt is not Mentor::i's prompt in the pipeline. {a}, Share of the "
+            f"input's numbers kept, one row per model, Mentor::i's prompt on the left and the worked-example prompt on "
+            f"the right; boxes: median and quartiles, whiskers the range, grey dots one item each; n = {n} items per "
+            f"model and prompt{n_text}; {below}. {b}, Mean share of the input's numbers kept against mean share of the "
+            f"input's source names kept, one mark per model and prompt: black circle, Mentor::i's prompt; orange "
+            f"square, worked-example prompt; dashed line, equal shares. {c}, Change in the mean share of the input's "
+            f"numbers kept with the worked-example prompt against Mentor::i's prompt, in percentage points, one dot per "
+            f"model, its value printed at the right; blue, more kept; {FN.VERMILION}, fewer kept; {below}.")
 
 
 CAPTION = {
@@ -1177,36 +1194,38 @@ def failures_text(V, exp, only=None) -> str:
 
 def legend_12_t3(V) -> str:
     """D294: the busy-machine sentence went with the time per item it qualified; a is the supervisor panel."""
-    base = legend_12()
     S = V.get("s12b")
     if S is None:
-        c_text = " Panel **a** is empty until the judge scores of the supervisor answers exist."
-    else:
-        tail = "ρ, Spearman's ρ."
-        if tail not in base:
-            raise Refused("legend_12 lost its rho sentence; legend_12_t3 cannot qualify it")
-        # rulings page 6 Nov, SUPP10C-DEVSTRAL: O1. The judge of c is also one of c's supervisor models; the legend
-        # names the pairing. No second-judge (qwen3.8:27b) row of S12b exists, so c keeps the main judge.
-        pair = (f" {V['s12b_judge']} is both one of the supervisor models and the judge in {'**a**'}."
-                if V.get("s12b_judge") in S["model"] else "")
-        base = base.replace(tail, f"ρ, Spearman's ρ; {GEN_DISPLAY[GEMINI_MODEL]}, the mean of its three draws.{pair}")
-        miss = [f"{m}, {e['no_score']}" for m, e in S["model"].items() if e["no_score"]]
-        c_text = (f" In **a**, answers that gave no supervisor score are left out and counted: {'; '.join(miss)}."
-                  if miss else "")
-    return base + c_text + failures_text(V, "exp_04", only=DRAWN) + who_is_in(V, 12)
+        return legend_12() + " Panel **a** is empty until the judge scores of the supervisor answers exist." \
+            + failures_text(V, "exp_04", only=DRAWN) + who_is_in(V, 12)
+    # rulings page 6 Nov, SUPP10C-DEVSTRAL: O1. The judge of a is also one of a's supervisor models; the legend
+    # names the pairing. No second-judge (qwen3.8:27b) row of S12b exists, so a keeps the main judge.
+    pair = (f" {V['s12b_judge']} is both one of the supervisor models and the judge."
+            if V.get("s12b_judge") in S["model"] else "")
+    a_text = (f" For {GEN_DISPLAY[GEMINI_MODEL]}, each answer's supervisor score is the mean of its three draws."
+              f"{pair}")
+    odd = [f"{e['n']} for {m}" for m in MODELS if (e := S["model"].get(m)) and e.get("n", JUDGED) != JUDGED]
+    n_text = f" ({_join(odd)}, less the answers left out)" if odd else ""
+    miss = [f"{m}, {e['no_score']}" for m, e in S["model"].items() if e["no_score"]]
+    c_text = (f" Answers that gave no supervisor score are left out and counted: {'; '.join(miss)}."
+              if miss else "")
+    # a's left-out answers are counted inside a, b's failed calls inside b (no "counted below" across panels)
+    a_fail = failures_text(V, "exp_04", only=["Supervisor"])
+    b_fail = failures_text(V, "exp_04", only=[c for c in DRAWN if c != "Supervisor"])
+    b_fail = "" if b_fail == " No call failed." else b_fail
+    return legend_12(a_text, n_text, c_text + a_fail) + b_fail + who_is_in(V, 12)
 
 
 def legend_13_t3(V) -> str:
     n = KEPT["Distiller"]
-    base = legend_13()
+    odd = [f"{e['n']} for {m} with the {SHOWN[pr].lower()}" for m in MODELS for pr in PROMPTS
+           if (e := V["13a"].get((m, pr))) and e["n"] != n]
+    base = legend_13(f" ({_join(odd)}; failed calls are left out)" if odd else "")
     who = who_is_in(V, 13)
-    for old, new in ((f"Six models compressed the same {n} long outputs",
-                      f"{'The' if who else 'Six'} models compressed the same {n} long outputs"),
-                     (f"n = {n} items per model and prompt, draw 1",
-                      f"n = {n} items per model and prompt, draw 1, less any failed answer (stated below)")):
-        if old not in base:
-            raise Refused(f"legend_13 lost {old!r}; legend_13_t3 cannot qualify it")
-        base = base.replace(old, new)
+    old = f"Six models compressed the same {n} long outputs"
+    if old not in base:
+        raise Refused(f"legend_13 lost {old!r}; legend_13_t3 cannot qualify it")
+    base = base.replace(old, f"{'The' if who else 'Six'} models compressed the same {n} long outputs")
     return base + failures_text(V, "exp_04b") + who
 
 
@@ -1597,7 +1616,7 @@ def selftest() -> bool:
           "four components drawn (D294)",
               "is empty until" not in leg12 and "gpt-oss:20b, 1." in leg12 and "the 15 items built on questions" in leg12
               and "synthesizer" not in leg12 and "step" not in leg12
-              and (("devstral-small-2:24b is both one of the supervisor models and the judge in **a**." in leg12)
+              and (("devstral-small-2:24b is both one of the supervisor models and the judge." in leg12)
                    == ("devstral-small-2:24b" in V["s12b"]["model"]))
               and "(3 items built on questions" in leg13, leg12[-600:])
         check("fixture: legend 12 names devstral as supervisor and judge only when c draws its row (SUPP10C-DEVSTRAL)",

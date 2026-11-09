@@ -1,17 +1,17 @@
 {
  "provenance": {
   "script": "scripts/S497_fig5_d166.py",
-  "script_sha256": "205d2442ef2a39854bda529b8c25f07714db5be6411aa3562257cc4b4702c9aa",
+  "script_sha256": "fc17bb3af77503ddfd6346aa8b4c7dc33f3753e87b25da60bec2b4fcddc44068",
   "imports_sha256": {
-   "S473_fig5_panels.py": "94acb36d0271a015df33a9446fab1977d5bbdcebb67a12a18ccfd250901c3941",
-   "S457_fig2_panels.py": "13d631dd56b4311cc732f7fc28b2656014c58e0f6b61b9d9b2caa1e94d5a6699",
-   "S463_fig2_ranking.py": "2f93a2b5df2bd68bdcf38a372d6c737ecdbce54a4e68406f0b261e03fbd9af31",
+   "S473_fig5_panels.py": "6d637b9f4e990a3470661fedee652f2b8341d8cbb4abf79acc451992340f3b36",
+   "S457_fig2_panels.py": "8c29dab8b04a1bad4a955582a30831c51c2b70438be2f6d2698c7b81948d7520",
+   "S463_fig2_ranking.py": "8279a35d27c5a99d34980b59529203b104526035beba74031c9964a2ee360825",
    "fig_repro.py": "4bca103b599da4adc0bd473f5b8210dd48b6543caaf63e5589f2faaa7b37d18b",
-   "judge_rows_v25.py": "aa90f42264e2ce21acfca52c2421d852607418981b6e9be8d8984a716b1ebddd",
+   "judge_rows_v25.py": "77d4a84d7aff4dd0ee92366395a4be2e5f27fe20d5de99ccbc86b7333c401661",
    "house_style.py": "647c8991f4dcd2cea08e0be46eaf758beb55fb029c54bb267e7fba1e0b8b17b6",
    "figure_names.py": "a3c65ae0a1e8aa05e99a99610ea857f63b0d8fff60a99404bcb5bf6ff9a82e65",
    "minicheck_filter.py": "6d2258a6f691324de266824695da7a56eff02d60eef18456ab4d60ee9138242d",
-   "S540_fig5_evaluators.py": "f794d4e6e40179894d22905220e79daa42693710c3f6ba4c10ee09c5b7297c77",
+   "S540_fig5_evaluators.py": "e227184bb004d52856be2ab4f8440120b108ae1cc7c6035e20ed6814b7d8c920",
    "S564_claimify_selection.py": "f768b4937529c1f4d2eb2971e80c3249a4cc988b4418527abd2909544e63d622",
    "pdf_font_determinism.py": "018af84dfdabbbd291674dcf07301bbfa270a9f5fc4aa005151870d565175d97"
   },
@@ -388,10 +388,9 @@
   "Figure 6 (provisional, 516 of 516).svg": "51c455923ffa48d6b4f8309e58eb801f5b3395e370c47081413b2313a7e36058",
   "Source Data Fig. 6 (provisional, 516 of 516).xlsx": "652a6a26dedfe32d5bcf26396b43cb5c3d2f9d56505c55b5c77bd1eff241663b",
   "Source Data Fig. 6 caption (provisional, 516 of 516).md": "7fd78930b717d497081e49152433319894df8725ccc4500d8d9419efd8045fab",
-  "claims.md": "7f963536dd2f8ee592a3d70587d3965f70f3b8fafd7451b0e3e95b7255362a38",
-  "fig5_data_state.json": "27cfd169ce8db4ed6d90af4c09a6de0ede7fff4c4b90cf0c2e34481f040b0857",
+  "fig5_data_state.json": "bbf95d0174011bc08ca111cfa5ff11e340c0a1181b2e69d5d843a5b6fde9c2b7",
   "figure6_numbers.json": "97c5b09905d441a972df2bf87cb4f5c55991784da17791da08bc19913154d3a3",
-  "legend_draft.md": "259953ab7c87ec8e2bd8231bfbbffa25d351ebe1685c17db8911a8dd68af5068",
+  "legend_draft.md": "b9fdac98f402895a22b890bbf405a9f0b57bfcbea2609e4592ad4c564e042d92",
   "methods_notes.md": "54d65d5f5dbccec928966f4910ecc30c53fa2cd95d7ddae3c8f7e5d8a299b2f0"
  }
 }

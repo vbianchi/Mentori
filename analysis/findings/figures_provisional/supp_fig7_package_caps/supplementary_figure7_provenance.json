@@ -1,9 +1,9 @@
 {
  "script": "scripts/S459_fig3_rlm_ref_caps.py",
- "script_sha256": "7d68dc5043a856ff89a31c30c20ea1c6f6bf1532a7494d316224c9c4588b4489",
+ "script_sha256": "cc2a2ad32ff99786e6e8d0e0e74ed0e4ac00483ec79a9cf5f8d69a5b9282c1a6",
  "command": "uv run --frozen python scripts/S459_fig3_rlm_ref_caps.py",
  "python": "3.13.11",
- "deterministic": "D155: no build time and no repository HEAD are recorded; the script's and every input's sha256 identify the build; the design documents are read at e44e636a",
+ "deterministic": "D155: no build time and no repository HEAD are recorded; the script's and every input's sha256 identify the build; the design documents' values as they stood at e44e636a are read from findings/recompute/fig_design_inputs/design_facts.json (D2)",
  "inputs_sha256": {
   "frozen:L2/g6/b4_rlm_ref__cap1__depthsweep86/answers.jsonl": "9ff176b3b488e37e121dfd2c4f732628cf205414986acca83af1a3a6b0e58e9e",
   "frozen:L2/g6/b4_rlm_ref__cap2__depthsweep86/answers.jsonl": "2430fdf9a0c83a3287841d5d6fe286b1687121b87fdb12db7b6371b10be7e308",
@@ -30,12 +30,9 @@
   "findings/recompute/Q145/S455_d92_affected.json": "c8fce3c6241ecdd1f3e2276f1ad3f532c7a199c8626bcd5c72b312b492ab97a3",
   "experiments/LOCK.toml": "8730d401a5d7b6baa1780e656f844261eaead60e45b5199afa29d57f989ad495",
   "experiments/FIGURE_LOCK.toml": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
-  "manuscript/sections/29_references.md": "adc0d95f0360f9aca3c1db8f5156e90dfb094572a027f1e0076481995a0cba79",
+  "findings/recompute/fig_design_inputs/design_facts.json": "9fb39a2d241543a10ba676057f552312de0133386a683fd0b5517dc468666e02",
   "experiments/rlm_ref/.venv/lib/python3.13/site-packages/rlms-0.1.3.dist-info/METADATA": "a25f6bb8c4c3de41b07b212ca0316201c8785197c5546fe8fe7009d134be0398",
-  "findings/recompute/frozen_inputs/g6_before_d89_mtimes.json": "46fdc919b3d1705a78b681e262d0e2ece737c6473e3370175f87bda1fcc7ef3d",
-  "experiments/plan.csv@e44e636a": "efa050f9e50868c07bef32ab8333ee11c0a13b8971a1922e07177434150d7a60",
-  "experiments/LIST.md@e44e636a": "7766a32c5b54e82f2ad4d7a08ce5d967a7c804dd12242d954d9a1cb9b5145d4d",
-  "experiments/README.md@e44e636a": "c3ff0755072b145c370e3a5fd5793603e291e422d6a6810183ab6a397dc64ae8"
+  "findings/recompute/frozen_inputs/g6_before_d89_mtimes.json": "46fdc919b3d1705a78b681e262d0e2ece737c6473e3370175f87bda1fcc7ef3d"
  },
  "model_calls": 0,
  "stamp": "PROVISIONAL: 2,580 of 2,580 answers, Zhang RLM at 10 turn caps (G6, records of 2026-10-25 00:46 CEST), no judge; after the D89 and D90 reruns (D135), the gates on the records before them",
@@ -541,6 +538,6 @@
   "Supplementary Figure 7 data (provisional, 2580 of 2580).xlsx": "96f9b9e3dbb927d967d6e1b853d41f24ec0de1e5f6b7ed31c1734aad810fada5",
   "Supplementary Figure 7 data caption (provisional, 2580 of 2580).md": "9d08cd7df77f2d7aefc4affa7e0dc745674a0331c849cbe9959e5542e30f64de",
   "supplementary_figure7_numbers.json": "2c6d46a4bf0cdaf2e907d4943869575bea6ab401a46bc660838314ee746e67fa",
-  "legend_draft.md": "1acab830a5ad2275af27607751e9caf604656122140fa84047632cd3e735c14a"
+  "legend_draft.md": "7108e89ac528c0b4961bbba0df4219e38d117bfe35b996937854adc9e7efad1f"
  }
 }

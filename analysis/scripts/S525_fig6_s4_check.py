@@ -20,7 +20,8 @@ draw_B.py, draw_G4.py, draw_C.py and _C_DRAFT_SHA256, and the literal 1,660 in S
 WHAT IT READS, through S447's own loader (load_mirror, keep_design, fail_kind), so every file is checked against its
 manifest, the length rule and S477's flips apply, and nothing is re-implemented here:
     old  frozen copy OLD_SET, with records_manifest.json and S477_lung9_rescore.json as they stood at commit OLD_AT
-         (git show; the working copies will have moved by then)
+         (pinned in the tree, O3: findings/recompute/pinned_history/, each copy held to its git blob id; the working
+         copies will have moved by then)
     new  S447.FROZEN_S2 with the working records_manifest.json and S477_lung9_rescore.json
     findings/recompute/S502_fig6_s4_reruns/S502_rerun_list.json   the 165 keys, held to its keys_sha256 and n_keys
 
@@ -41,7 +42,6 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
-import subprocess
 import sys
 import tempfile
 from collections import Counter
@@ -49,6 +49,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
+import pinned_history as PH  # noqa: E402
 SCRIPT = "scripts/S525_fig6_s4_check.py"
 OUT = ROOT / "findings/recompute/S525_fig6_s4_check.json"
 LIST = ROOT / "findings/recompute/S502_fig6_s4_reruns/S502_rerun_list.json"
@@ -126,10 +127,12 @@ def load_copy(S447, set_name: str, manifest: bytes | None = None, q4: bytes | No
 
 
 def git_show(rev: str, path: str) -> bytes:
-    r = subprocess.run(["git", "-C", str(ROOT), "show", f"{rev}:{path}"], capture_output=True)
-    if r.returncode:
-        raise Refused(f"git show {rev}:{path}: {r.stderr.decode(errors='replace')[:200]}")
-    return r.stdout
+    """path as committed at rev (O3, 8 Nov: no git; its copy pinned in the tree, held to the blob id git gave
+    <rev>:<path>, scripts/pinned_history.py)."""
+    try:
+        return PH.show(rev, path)
+    except PH.PinError as e:
+        raise Refused(f"git show {rev}:{path}: {e}") from None
 
 
 def compare(old: dict, new: dict, listed: set, want: tuple = OLD_WANT, n_listed: int = OLD_LISTED) -> tuple[list, dict]:

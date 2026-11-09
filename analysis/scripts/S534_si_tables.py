@@ -83,6 +83,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "scripts"))
 import fig_repro  # noqa: E402
+import fig_design  # noqa: E402
 import figure_names as FN  # noqa: E402
 from machine import RESULTS  # noqa: E402  the deposit's results folder, as every script finds it
 
@@ -91,7 +92,19 @@ from openpyxl.styles import Alignment, Font  # noqa: E402
 
 OUT = REPO / "findings/figures_provisional/supp_tables"
 REC = REPO / "findings/recompute"
-DRAWS = REPO / "experiments/draws.csv"
+DRAWS = REPO / "experiments/draws.csv"   # t7 (held in the release, not rerun there)
+# t1 (D2, Valerio, 8 Nov: built from data only): fig_design_inputs/draws.csv, S616 extract's copy of every row of
+# experiments/draws.csv with the columns t1 reads (experiment, plan_row, design), held to it by S616 check. Its
+# provenance keeps the sha256 of the draws.csv the extract was taken from (design_facts.json "sources"), so the table
+# records the same source as before.
+DRAWS_T1 = fig_design.DRAWS
+
+
+def draws_source_sha256() -> str:
+    hit = [s for s in fig_design.facts()["sources"] if s["path"] == "experiments/draws.csv"]
+    if len(hit) != 1:
+        die(f"design_facts.json names experiments/draws.csv {len(hit)} times as a source, not once")
+    return hit[0]["sha256"]
 LOCK = REPO / "experiments/LOCK.toml"
 REGISTRY = REC / "S492_answer_registry/registry.json"
 T2X_COLLECTS = {"gemma3": "T2X_runs/collect/t2xgemma_collect.jsonl",
@@ -683,7 +696,7 @@ def build_t1() -> tuple[list[list], dict]:
     for e in reg["today"]["experiments"]:
         by.setdefault(e["experiment"], []).append(e)
     kept = reg["today"]["kept_from_april"]
-    with DRAWS.open(newline="") as f:
+    with DRAWS_T1.open(newline="") as f:
         draws = list(csv.DictReader(f))
     man = json.loads(MANIFEST.read_text())
     rows = []
@@ -701,7 +714,7 @@ def build_t1() -> tuple[list[list], dict]:
     if total != reg["today"]["total_counted"]:
         die(f"the rows add to {total}, S492's total is {reg['today']['total_counted']}")
     return rows, {"anchor": got, "total_counted": total, "not_counted": reg["today"]["not_counted"],
-                  "registry_sha256": fig_repro.sha256_file(REGISTRY), "draws_sha256": fig_repro.sha256_file(DRAWS),
+                  "registry_sha256": fig_repro.sha256_file(REGISTRY), "draws_sha256": draws_source_sha256(),
                   "manifest_sha256": fig_repro.sha256_file(MANIFEST)}
 
 

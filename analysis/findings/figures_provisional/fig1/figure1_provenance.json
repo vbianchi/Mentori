@@ -1,6 +1,6 @@
 {
  "script": "scripts/S456_fig1_design.py",
- "script_sha256": "e1a944b116dc9b93301088a36006369ef5231f0534ed51477666beef18da389f",
+ "script_sha256": "f51799c5a136bfe87c2c35b4bf97750387ce94374902e2b7b8c3fe08c5c5da1c",
  "command": "uv run --frozen python scripts/S456_fig1_design.py figure",
  "python": "3.13.11",
  "inputs_read": "every file at its committed version (the blob at git HEAD; the file itself outside a git checkout), every check and tripwire on those; each design file (DESIGN_FILES) read again as it stood at DESIGN_AT f83c10b4 (git cat-file), its sha256 there recorded in inputs_sha256 under a name carrying @f83c10b4, and every value drawn or recorded from them required equal at HEAD and at DESIGN_AT (plan.csv's T2 status taken at DESIGN_AT); the files read through an import (experiments/runner, experiments/rlm_ref/__init__.py, experiments/rlm_ref/run_rlm_ref.py, experiments/LOCK.toml, data/ground_truth_v2, data/judge_system_prompts) required equal to HEAD, and the definitions S456 uses from experiment.py, lock.py and run_rlm_ref.py (IMPORT_USES) required the same at HEAD as at f83c10b4; the submitted retrieval runs from the committed frozen set upstream (findings/recompute/upstream_inputs, checked against findings/recompute/frozen_inputs/SHA256SUMS). S520's summary is read at HEAD for its total alone, and recorded while committed. No write time, HEAD or working-copy state is recorded (D155).",
@@ -21,8 +21,8 @@
   "findings/recompute/G3_runs/preflight.sh@f83c10b4": "271a642cd48d0bb6064fdaa93d534613789fa98d6a3f7edafc92df8b8c762238",
   "findings/recompute/G4_runs/g4_lib.sh@f83c10b4": "a5b22dd9c1d3596e2984b8469176acaf5fc4d2ffe0e39478cb33d0ba41558f58",
   "findings/recompute/G5_runs/g5_lib.sh@f83c10b4": "7447338cff92a799f897ef41d1f107b9d8ffff542d563dbb5dfc99c1062926dc",
-  "experiments/draws.csv@f83c10b4": "b03b6f655409e75943e4c41e74395d65d1306b6f7fab1108df2e92029e5fdc69",
-  "experiments/plan.csv@f83c10b4": "5e151a97d360f7a4e1e40fffc7e001200312dd89d4dcbbdeef04569d93b246bc",
+  "frozen:fig_design/draws.csv": "a49ddecafb4240d0700f1fcfa1d583c9a1333cfae3e68c5feeb71b365c622f6f",
+  "frozen:fig_design/design_facts.json": "9fb39a2d241543a10ba676057f552312de0133386a683fd0b5517dc468666e02",
   "scripts/S162_figure1_final.py@f83c10b4": "71c12d1739606bf02786776bfe785c7e92a63321d4efb1e9762a4fb84e8a8e86",
   "scripts/S447_fig6_panels.py@f83c10b4": "8c60e8a96d4dac395d12bff3e57c1d437b8485d8374553997c75e88ecd011ae1",
   "data/ground_truth_v2/all_v2_4.json": "5d8362ae931dc0fe0cc132be6b5e57187e3ae7d3131d86f63cdf1a44633fadd5",
@@ -38,18 +38,17 @@
   "findings/recompute/T2_runs/check_t2.py@f83c10b4": "0306d354b73113245b982d4fe0d14405ee457c9f2271fb0229be021d739bf6bc",
   "findings/recompute/T2_runs/t2_lib.sh@f83c10b4": "68d7c0af04d7895dace468d2389b2880e2074eea115a4ab13fcb69a6be5f183d",
   "findings/recompute/D98_subset/d98_subset.json@f83c10b4": "957c79b6b0f3afb12b70be51d0802e7853b4d4ff12e2bdb519d44a10111046bc",
-  "findings/S08b_PROTOCOL_HUMAN_EVAL_V22.md@f83c10b4": "3e637c72a3990dc8666c25cea886bcaa28304e2fef72ce61221a5b8be78c941b",
   "findings/recompute/S520_llm_calls/summary.json": "633090f4389a2c9c40369de0b23a4a312de2eec4a3432e8526def67ad2fa50c4",
   "findings/recompute/S492_answer_registry/registry.json": "50ec28658dfedaef28fe4489c50e5ef5289393960613e69e13c23c762b6b9dcb",
-  "findings/figures_provisional/fig2_human/legend_draft.md": "6a5843d54ff44ba0ef8e46a875f8aa32ba95680c22cd27e08b8aefc6536027ca",
-  "findings/figures_provisional/fig3_strategies/legend_draft.md": "8d274dbce02d14f99e451d261ef1fcd2d58d1770373d2d6e57d0a57a14c706ee",
-  "findings/figures_provisional/fig4_depth/legend_draft.md": "bbd86cd9f630fbcb9a2c61ca77738f43e88dba72913e13f5bbe508dc3698548e",
-  "findings/figures_provisional/fig4/legend_draft.md": "de13d9c3f3b004e27308421edd58eb9500f07dd7ea7fcfb67bbef2642a89385c",
-  "findings/figures_provisional/fig5/legend_draft.md": "259953ab7c87ec8e2bd8231bfbbffa25d351ebe1685c17db8911a8dd68af5068",
-  "findings/figures_provisional/fig6/legend_draft.md": "fcb649a3f740cccb9e953772124863840703a66db803783c75fb31ebca96941d",
-  "findings/figures_provisional/supp_fig2/legend_draft.md": "baa95ab2812cc473c516d4f4ebe1f40f6b96d66656d2b1d711db3d45fade1b18"
+  "findings/figures_provisional/fig2_human/legend_draft.md": "ca517e997667e07a5a2a1bd86704ccb9dac1404e95f35172ec7200d35bfa7846",
+  "findings/figures_provisional/fig3_strategies/legend_draft.md": "2886ea494e13922905a5f52cec312cde94f5b91c0b2da006017e6e34d8fd64c7",
+  "findings/figures_provisional/fig4_depth/legend_draft.md": "dd7dc47fb0e259c111cb23aa73f912b8acb9324f43af2009651a49aca7e98e2c",
+  "findings/figures_provisional/fig4/legend_draft.md": "075da51dbdbdc6920f32a21545e4ebaaa10f321c5704a035083ae015acfed8e3",
+  "findings/figures_provisional/fig5/legend_draft.md": "b9fdac98f402895a22b890bbf405a9f0b57bfcbea2609e4592ad4c564e042d92",
+  "findings/figures_provisional/fig6/legend_draft.md": "25146c4b2987373508588d29389d14ac5ff97c29ca0db7d26d6889c1042ef6db",
+  "findings/figures_provisional/supp_fig2/legend_draft.md": "0cbdfa2e9e8df2590fc2f90a7d9a8625e11f8b2835ad9e33361f259ebd08e116"
  },
- "inputs_digest": "8e7dd85af144355de73d674c49c6031d10bd433f76e9402afc16c895ada30c7a",
+ "inputs_digest": "7c5ebbff7c84290e944ef2815ae3f26db2045427c19bf8d98bc8bc81e94d073f",
  "model_calls": 0,
  "lock": {
   "path": "experiments/LOCK.toml",
@@ -71,7 +70,7 @@
   "Figure 6 runner attempts (D71): 3520 = known",
   "Figure 6 design attempts (D100, D116; draws.csv S2 answers): 2420 = known"
  ],
- "stamp": "PROVISIONAL: 2 of 2 panels (panel a, the signals; panel b, the design), 11 settings read from the design files (inputs sha256 8e7dd85af144)",
+ "stamp": "PROVISIONAL: 2 of 2 panels (panel a, the signals; panel b, the design), 11 settings read from the design files (inputs sha256 7c5ebbff7c84)",
  "page_mm": [
   183.0,
   118.0
@@ -642,8 +641,8 @@
   "Figure 1 (provisional, 2 of 2).svg": "888f88c5a2721ba01a121275d94589a620a20e78e1ab839015496eb5b3ac86f1",
   "Figure 1 (provisional, 2 of 2).png": "9947630e810a89b9829201e5ee629101064d7a7f3ca88776f084a54bcc092196",
   "Source Data Fig. 1 (provisional, 2 of 2).xlsx": "2e176378f839175e1d9c76c4811a618343b5296ec6aa1e0f080ad4034bab8cd7",
-  "Source Data Fig. 1 caption (provisional, 2 of 2).md": "f4417334bd85b8e4bce753673802f28881be2273d961c5b03cd6ea62eb65621d",
-  "figure1_numbers.json": "2cd5897867a2b6942d28e4d76d97c07c492b10a6a1b2c4b6cfb042e7a24b8b82",
-  "legend_draft.md": "5639cdbf844ac2bbe2ad7be6f08946fe7f987319657b722e7d26878f03325e85"
+  "Source Data Fig. 1 caption (provisional, 2 of 2).md": "c54d9b695c2b6c2104edd42172a504bf2bbfc24493fff1c3c7ad3571f879e3ae",
+  "figure1_numbers.json": "6fc5368b05e6e2ffd93b47686b3e7d883056a374f083a035a5b5dc8458c64a3a",
+  "legend_draft.md": "d950ef602764e559e738fc491abf7f3304a794264883c2b01f2fc99c3be06be6"
  }
 }

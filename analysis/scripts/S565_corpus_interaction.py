@@ -25,7 +25,7 @@ left unchanged; 0 covered answers await S6, so this is the final key). Pass valu
 over the covered questions (D126: answerable, every source paper among the index's core papers). A failed answer is a
 fail (S476.g4_cells); a judge call without a score is missing and left out. The 22: q66_tables.json ids.answerable
 (the questions in scope at every size, the "The same 22" block of Figure 3f). Also read for the reproduction: the
-committed Supplementary Figure 17 numbers (supp_fig17_corpus/, dropped by D302, read from git at FIG9_COMMIT), Figure 3's numbers (sheet
+committed Supplementary Figure 17 numbers (supp_fig17_corpus/, dropped by D302, as committed at FIG9_COMMIT, pinned in the tree, O3), Figure 3's numbers (sheet
 Fig. 3f) and q66_tables.json's pooled_over_ratios rates.
 
 REPRODUCE FIRST (README.md:75-79); exit 2 and no result written on any difference:
@@ -77,6 +77,7 @@ HERE = Path(__file__).resolve().parent
 for _p in (str(ROOT), str(ROOT / "scripts")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
+import pinned_history as PH  # noqa: E402  (O3: the dropped plate's files at FIG9_COMMIT, pinned in the tree)
 
 SCRIPT = "S565_corpus_interaction.py"
 RSCRIPT = HERE / "S565_corpus_interaction.R"
@@ -226,11 +227,12 @@ def question_sets(by, q66):
 # REPRODUCTION
 # ---------------------------------------------------------------------------------------------------------------
 def frozen_blob(path: str) -> bytes:
-    """A file of the dropped corpus plate as committed at FIG9_COMMIT (D303)."""
-    r = subprocess.run(["git", "-C", str(ROOT), "show", f"{FIG9_COMMIT}:{path}"], capture_output=True)
-    if r.returncode != 0:
-        raise Refused(f"git show {FIG9_COMMIT[:8]}:{path} failed: {r.stderr.decode()[-300:]}")
-    return r.stdout
+    """A file of the dropped corpus plate as committed at FIG9_COMMIT (D303); O3: from its copy pinned in the tree,
+    held to the blob id git gave it (scripts/pinned_history.py)."""
+    try:
+        return PH.show(FIG9_COMMIT, path)
+    except PH.PinError as e:
+        raise Refused(f"git show {FIG9_COMMIT[:8]}:{path} failed: {str(e)[-300:]}") from None
 
 
 def sheet(numbers, name):

@@ -497,31 +497,37 @@ def draw(sh: dict, qids: list):
 
 
 def legend(sh: dict, same: dict) -> str:
+    """Editor row 45 round (Valerio, 8 Nov): no panel draws derived statistics (no box, interval or test; the black
+    line is a median of question means), so the legend carries no "n = " tag, and each panel is described in full,
+    with no reference to another panel or figure. Counts are read from the sheets."""
+    nt = len(sh[B]["rows"])
     nb = sum(1 for r in sh[B]["rows"] if r[5] is not None)
     nc = sum(1 for r in sh[C]["rows"] if r[5] is not None)
     nc_null = len(sh[C]["rows"]) - nc
+    if nb != nt or len(sh[C]["rows"]) != nt:
+        raise Refused(f"S570: concepts {nb} of {nt}, Papers rows {len(sh[C]['rows'])}; the legend states every one")
     mc = sh[M]["columns"]
     nq = sorted({dict(zip(mc, r))["questions"] for r in sh[M]["rows"]})
     if nq != [4]:
         raise Refused(f"S570: the medians are over {nq} question means; the legend states 4")
+    n_ans = len(CONFIGS) * len(DRAWS) * 5
     return (f"**Supplementary Figure {N} | The pipeline and its evaluation on five plant-science papers.** The key "
             "covers five open-access papers on lettuce resistance to downy mildew. Questions 1 and 2 are extractive, 3 "
-            "is a synthesis, 4 has a false premise and 5 is out of scope. The six strategies of Figure 3 answered them "
-            "with gemini-3-flash in n = 3 draws, n = 90 answers. They were scored as on the main benchmark. "
-            "The judge (devstral-small-2:24b, plain call) scored every answer. Question 5 has no concept target, so "
-            "Concepts and Papers scored the answers to questions 1 to 4 only. RLM-5, RLM-10 and RLM-20 "
-            "are our RLM, stopped at those turns. **a**, Draws passed of 3 per question and strategy. Left, judge "
-            "correctness 4 or more; right, 3 or more. For question 5 a tile counts draws refused (refusal score 3 or "
-            "more, the same in both blocks). Answers stored, judged and with a Concepts and a Papers value, per "
-            "strategy, are in the Source Data (sheet a, coverage rows). **b**, Concept recall (loose matcher with the "
-            "question rule, as in Figure 6a) of the four answerable and false-premise questions: one dot per question "
-            "and strategy, the mean over its "
-            f"3 draws (n = {nb} answers). Colour and shape, question. **c**, Papers precision (MiniCheck against each "
-            f"question's source papers) of the same answers, as in **b**, the mean over the draws with a value (n = {nc} "
-            f"answers; the other {nc_null} are longer than the encoder's 2,048-token input and have no value). In three "
-            "question-draws the RLMs returned the same text: question 1 and question 4 (all three, one draw each) and "
-            "question 3 (RLM-5 and RLM-20, one draw). In **b** and **c**, per strategy, black line: median of the 4 "
-            "question means.")
+            "is a synthesis, 4 has a false premise and 5 is out of scope. Six strategies (single pass, multi-hop, "
+            "verified pass and our RLM stopped at 5, 10 and 20 turns: RLM-5, RLM-10 and RLM-20) answered each "
+            f"question with gemini-3-flash in {len(DRAWS)} draws, {n_ans} answers in all. The judge (devstral-small-2:24b, "
+            "plain call) scored every answer. Question 5 has no concept target. In three question-draws the RLMs returned the same text: questions 1 and 4 "
+            "(all three RLMs, one draw each) and question 3 (RLM-5 and RLM-20, one draw). **a**, One tile per "
+            "strategy (rows) and question (columns): the draws passed of 3, printed in the tile and coloured from 0 "
+            "(dark blue) to 3 (yellow). Left block, judge correctness 4 or more; right block, 3 or more. For question "
+            "5 a tile counts the draws refused instead (refusal score 3 or more, the same in both blocks). **b**, "
+            f"Concept recall (loose matcher with the question rule) of the {nt} answers to the first four questions, "
+            "one row per strategy: one dot per question, the mean over its "
+            f"{len(DRAWS)} draws; colour and shape, question; black line, the strategy's median of its 4 question means. "
+            "**c**, Papers precision (MiniCheck against each question's source papers) of the "
+            f"{nt} answers to the first four questions, one row per strategy: one dot per question, the mean over its draws "
+            f"with a value ({nc} answers have one; the other {nc_null} are longer than the encoder's 2,048-token input); "
+            "colour and shape, question; black line, the strategy's median of its 4 question means.")
 
 
 def claim(sh: dict) -> str:

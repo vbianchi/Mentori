@@ -107,6 +107,13 @@ def sha(p: Path) -> str:
     return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
 
+def rel(p: Path) -> str:
+    """p relative to the repository when it lies in it (S612 F2: provenance keys that do not depend on the checkout's
+    location), else as given."""
+    q = Path(p).resolve()
+    return str(q.relative_to(ROOT)) if q.is_relative_to(ROOT) else str(p)
+
+
 # ---------------------------------------------------------------- reading the rows
 
 def per_answer(rows: list, draws=ALL_DRAWS) -> tuple[dict, dict]:
@@ -349,7 +356,7 @@ def main(argv=None) -> int:
                                                       cwd=ROOT).stdout.strip(),
                            "command": " ".join([f"uv run --frozen python {SCRIPT}"] +
                                                list(argv if argv is not None else sys.argv[1:])),
-                           "inputs_sha256": {str(a.reading): sha(a.reading), str(a.s575): sha(a.s575)},
+                           "inputs_sha256": {rel(a.reading): sha(a.reading), rel(a.s575): sha(a.s575)},
                            "code_sha256": {SCRIPT: sha(Path(__file__)),
                                            "scripts/S463_fig2_ranking.py": sha(SCRIPTS / "S463_fig2_ranking.py"),
                                            "scripts/S575_g17_contrasts.py": sha(SCRIPTS / "S575_g17_contrasts.py")},

@@ -325,8 +325,9 @@ def legend_text(stamp: str) -> str:
             f"209,712 characters. The supervisor scores each step from 0 to 100; below 70, the step's arguments are "
             f"rewritten and the step reruns, up to 3 times. The synthesizer writes the answer from the question, the "
             f"goal and each step's last output. "
-            f"Blue, a model call; black, no model call; dashed {fn.VERMILION}, an ablation set-up, drawn under or beside "
-            f"the step it changes. n = {len(DRAWN)} ablation set-ups: no analyser, the routing fix (factual questions "
+            f"Blue box, a model call; black box, no model call; grey dashed frame, what runs for each plan step; dashed "
+            f"{fn.VERMILION} box, an ablation set-up, drawn under or beside the step it changes. The {len(DRAWN)} "
+            f"ablation set-ups are no analyser, the routing fix (factual questions "
             f"planned), no planner, no supervisor, no synthesizer and every step distilled with {fn.MENTORI}'s "
             f"prompt or with the worked-example prompt, which adds two worked examples that keep every number.")
     return (f"Legend DRAFT for {SI_LABEL} (written by {SCRIPT}). Data stamp: {stamp}.\n\n"

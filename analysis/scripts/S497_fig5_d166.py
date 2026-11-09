@@ -32,7 +32,8 @@ THE ONE COMMAND (D155; S494 calls it), from the repository root, with the tars b
     uv run --frozen python scripts/S497_fig5_d166.py figure [--out <folder>]
 It writes into --out (default findings/figures_provisional/fig5/): "Figure 5 (provisional, <n> of 516).{pdf,svg,png}",
 "Source Data Fig. 5 (provisional, <n> of 516).xlsx" and its caption, figure5_numbers.json, figure5_provenance.json,
-legend_draft.md, methods_notes.md, claims.md and fig5_data_state.json. n of 516 is compute()'s all4: the draw-1
+legend_draft.md, methods_notes.md and fig5_data_state.json (claims.md only with --claims-out DIR, into DIR: D2, the
+editorial step S616 claims). n of 516 is compute()'s all4: the draw-1
 answerable answers with a final row from all four scorers, of the 516 planned (S473 PLANNED["papers"]). A second run
 writes the same bytes, in any time zone (no time, git state or temporary path in any file but the collect's own
 time, read in COLLECT_TZ by collect_utc; fig_repro's deterministic PDF, SVG and xlsx; PYTHONHASHSEED pinned to 0,
@@ -174,6 +175,16 @@ def _load(name, path):
 
 
 S473 = _load("S473", ROOT / "scripts" / "S473_fig5_panels.py")
+# D2 (Valerio, 8 Nov): figures are built from data only. The claims list (S473.claims_md) reads the main text and the
+# Supplementary Information, so figure writes it only with `--claims-out DIR` (scripts/S616_figure_editorial.py claims),
+# into DIR; without it no document is opened and the plate's folder and provenance hold no claims.md.
+CLAIMS_OUT: "Path | None" = None
+
+
+def write_claims(text: str) -> None:
+    if CLAIMS_OUT is not None:
+        CLAIMS_OUT.mkdir(parents=True, exist_ok=True)
+        (CLAIMS_OUT / "claims.md").write_text(text)
 S457, S463, FR = S473.S457, S473.S463, S473.FR
 hs = _load("house_style", ROOT / "scripts" / "house_style.py")
 # D301: the plates print a Greek rho; this makes the embedded font subset the same on every run (its docstring)
@@ -2630,44 +2641,54 @@ def texts_d200(dat: dict, Z: dict, R: dict) -> dict:
     n_e = len(table)
     waits = dat["papers_waits"]
     if waits:                         # every Papers count is [PENDING], as the letter marks what waits (D212 Q5)
-        a_n = d_n = PENDING
+        a_pn = f"n = {PENDING} answerable questions with a Papers score per box"
     else:
-        # 4 Nov: with Papers drawn, papers_n's per-strategy clauses took the legend to 372 words. a gives the exact total
-        # of answers its Papers boxes hold (per strategy in sheet Fig. 5a, n_questions); d keeps one n per strategy, as
-        # the d200 test asks, listed in its rows' order
-        a_n = f"{sum(len(A['papers']['rows'][c]) for c in CONFIGS)} answers"
-        d_ns = [dat["D"][(o, "papers")]["n"] for o in OTHERS]
-        d_n = (str(d_ns[0]) if len(set(d_ns)) == 1 else
-               ", ".join(map(str, d_ns[:-1])) + f" and {d_ns[-1]}, top to bottom")
+        # 8 Nov (Valerio, after editor row 45): a panel that draws derived statistics states its n once, as "n = X
+        # <unit>", inside its own description. a's Papers boxes hold one draw-1 value per question, so the n of each
+        # box is its questions with a Papers score (sheet Fig. 6a, n_questions), listed in the rows' order
+        p_ns = [len(A["papers"]["rows"][c]) for c in CONFIGS]
+        a_pn = (f"n = {p_ns[0]} answerable questions with a Papers score per box" if len(set(p_ns)) == 1 else
+                "n = " + ", ".join(map(str, p_ns[:-1])) + f" and {p_ns[-1]} answerable questions with a Papers score, "
+                "top to bottom")
     j_n = sorted({dat["D"][(o, s)]["n"] for o in OTHERS for s in ("judge", "concept")})
     if j_n != [len(qw)]:
         raise Refused(f"c's legend: Judge and Concepts n {j_n}, not the {len(qw)} W questions; nothing written")
     # d leaves out an answer whose call with passages is not ok: no text, or an error (fig5.md legend {k})
     fo = faith_left_out(dat, R)
     f_no_text, f_errors, f_ctx, f_drawn = fo["no_text"], fo["errors"], fo["ctx"], fo["drawn"]
-    # 8 Nov (Valerio: the legends "are too long"): the signal definitions and what each panel draws, with its n; the
-    # filters, the refused calls and the cross-reference left for methods_notes.md, which holds each of them. The n of
-    # questions is stated once, as a's; b (the W questions) and d state their own only where it differs
+    # 8 Nov (Valerio, 20:40Z and 20:45Z, editor row 45): no "n = " tag tacked on; a panel with derived statistics
+    # (a's boxes, e's resampled boxes and interval) defines its n inside its own description, a panel without them
+    # (b ranks, c counts, d shares) carries none; every panel is described in full, with no "as in a"
     n_q = A["pass"]["n"]
-    b_n = "" if len(qw) == n_q else f", n = {len(qw)} questions"
-    f_n = "" if dat["f_nq"] == n_q else f" ({dat['f_nq']} questions)"
+    c_ns = {len(A["concept"]["rows"][c]) for c in CONFIGS}
+    if len(c_ns) != 1:
+        raise Refused(f"a's legend gives one n per Concepts box, the boxes hold {sorted(c_ns)} questions; nothing written")
+    c_conc = c_ns.pop()
+    e_q = len({r["question_id"] for r in table})
+    b_q = "the answerable questions" if len(qw) == n_q else f"the {len(qw)} questions every strategy has a value for"
+    f_n = "" if dat["f_nq"] == n_q else f", on {dat['f_nq']} questions"
     LEGEND = (
         f"**Figure {FIG_N} | Three signals and other evaluators on the same answers.** "
-        f"Answers of gemini-3-flash to n = {n_q} answerable questions. Judge, the judge's correctness score against "
-        f"the key (pass at {PASS_T} or more of 5); Concepts, concept recall against the key; Papers, MiniCheck precision "
-        "against the key's source papers. "
-        "**a**, Each signal per strategy; grey dots, questions. Judge (three draws): dots stacked at each pass rate, "
-        f"counted above. Concepts (three draws) and Papers (draw 1, {a_n}): box, quartiles; line, median; whiskers, "
-        "range. "
-        f"**b**, Strategy rank per signal (Judge, mean score) and mix of signals (mean rank; 1, best){b_n}. "
-        "**c**, Questions won by single pass or the strategy, and ties, on three-draw means (Papers, draw 1); "
-        f"n = {len(qw)} questions (Papers, {d_n}). "
-        "**d**, Faithfulness score from the judge with the retrieved passages, for answers the judge passes or fails "
-        f"(three draws): bars, share of each row's answers at each score; n at right, answers{f_n}. "
-        f"**e**, Spearman's \u03c1 with the judge, draw 1, n = {n_e} answers, less any unscored: box, quartiles "
-        "of 10,000 question resamples; line, median; whiskers, two-sided 95% percentile interval; open mark, \u03c1 "
-        "within one question. "
-        f"Second judge, {S540.SECOND_JUDGE}'s scores of the same kind."
+        f"Answers of gemini-3-flash to the {n_q} answerable questions under six strategies. Judge, correctness score "
+        f"against the key (pass, {PASS_T} or more of 5); Concepts, concept recall against the key; Papers, MiniCheck "
+        "precision against the key's source papers. "
+        "**a**, Each signal per strategy (rows). Judge: grey dots, questions, stacked at the share of three draws "
+        "passed; numbers, questions per stack. Concepts: grey dots, each question's mean of three draws; box, "
+        f"quartiles; line, median; whiskers, range; n = {c_conc} answerable questions per box. Papers: grey dots, "
+        f"each question's draw-1 value; box, quartiles; line, median; whiskers, range; {a_pn}. "
+        "**b**, Rank of each strategy (columns; 1, best) under each signal and mix of signals (rows), by its mean "
+        f"over {b_q} (Judge, correctness score); a mix ranks by its members' mean rank. "
+        "**c**, Each strategy (rows) against single pass per signal: questions where single pass scores higher "
+        "(vermilion), ties (grey) or the strategy scores higher (blue), counted in the bars. Judge correctness score "
+        "and Concepts, means of three draws; Papers, draw 1, questions with both scores. "
+        "**d**, Faithfulness score (0 to 5) from the judge reading the retrieved passages, for each strategy's answers "
+        f"the judge passes or fails, three draws pooled{f_n}: bars, share of the row's answers at each score; right, "
+        "the row's answers. "
+        "**e**, Spearman's \u03c1 of each evaluator (rows) with the judge's correctness (left) or faithfulness (right), "
+        f"over the draw-1 answers both scored (at most {n_e}; each row's count in Source Data). Box, quartiles of "
+        f"\u03c1 over 10,000 question resamples, n = {e_q} answerable questions; line, median; whiskers, two-sided "
+        "95% percentile interval; open circle, \u03c1 within one question. "
+        f"Second judge, {S540.SECOND_JUDGE}."
     )
     n_words = len(LEGEND.split())
     if n_words >= 350:
@@ -2888,13 +2909,15 @@ def write_d200(out: Path, R: dict, srcs: dict, d200: dict, dat: dict, Z: dict, T
         (stage / "methods_notes.md").write_text(
             f"# Figure {FIG_N}, notes for the Methods\n\nDetail that left the legend to keep it under 350 words. Written by "
             f"`{SCRIPT} figure`.\n\n" + "\n".join(f"- **{k}**: {v}" for k, v in T["methods"]) + "\n")
-        if waits:                       # every claim of S473.CLAIMS reads Papers (W, the three-signal rho, e)
-            (stage / "claims.md").write_text(
+        if CLAIMS_OUT is None:          # D2: the claims list is the editorial step's (S616 claims)
+            pass
+        elif waits:                     # every claim of S473.CLAIMS reads Papers (W, the three-signal rho, e)
+            write_claims(
                 f"# Figure {FIG_N}: claims list (D82)\n\nWritten by `{SCRIPT} figure` with the plate it sits beside. Data "
                 f"stamp: {stamp}.\n\nNo claim is computed: Papers {PAPERS_WAITS}, and every row of S473's claims list "
                 "(S473.CLAIMS) reads it.\n")
         else:
-            (stage / "claims.md").write_text(S473.claims_md(fn, stamp).replace(
+            write_claims(S473.claims_md(fn, stamp).replace(
                 "Written by `scripts/S473_fig5_panels.py figure` with the plate it sits beside.",
                 f"Written by `{SCRIPT} figure` with the plate it sits beside, through S473's claims list (S473.CLAIMS)."))
         c_state = ({"means": dat["cc"]["means"], "papers": PAPERS_WAITS} if waits else
@@ -3074,9 +3097,10 @@ def _figure(args, tmp: Path):
         (stage / "methods_notes.md").write_text(
             "# Figure 5, notes for the Methods\n\nDetail that left the legend to keep it under 350 words. Written by "
             f"`{SCRIPT} figure`.\n\n" + "\n".join(f"- **{k}**: {v}" for k, v in T["methods"]) + "\n")
-        (stage / "claims.md").write_text(S473.claims_md(fn, stamp).replace(
-            "Written by `scripts/S473_fig5_panels.py figure` with the plate it sits beside.",
-            f"Written by `{SCRIPT} figure` with the plate it sits beside, through S473's claims list (S473.CLAIMS)."))
+        if CLAIMS_OUT is not None:      # D2: the editorial step only
+            write_claims(S473.claims_md(fn, stamp).replace(
+                "Written by `scripts/S473_fig5_panels.py figure` with the plate it sits beside.",
+                f"Written by `{SCRIPT} figure` with the plate it sits beside, through S473's claims list (S473.CLAIMS)."))
         g = Z
         state = {"stamp": stamp, "planned": planned, "have": have, "answers_with_all_four": n4,
                  "W_questions": dat["qw"], "W_partial_blocks_left_out": fn["c"]["partial_blocks_left_out"],
@@ -3504,8 +3528,13 @@ def main(argv=None):
     f.add_argument("--out")
     f.add_argument("--s6", help="the folder holding out_s6_g1 and out_s6_g1r15 (S6G1, key v2.5; D186 (3)); default the "
                                 "folder holding the outs the collect read")
+    f.add_argument("--claims-out", help="D2: also write the claims list (claims.md, read from the documents) into "
+                                        "this folder; the editorial step, never the figure build")
     sub.add_parser("selftest")
     a = ap.parse_args(argv)
+    global CLAIMS_OUT
+    if getattr(a, "claims_out", None):
+        CLAIMS_OUT = Path(a.claims_out).resolve()
     try:
         if a.cmd == "selftest":
             return selftest()

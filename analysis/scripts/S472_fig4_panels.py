@@ -116,12 +116,14 @@ it; scripts/S480_fig4_recount.py's one command first, since this plate checks it
   carry no time: the workbook through fig_repro.deterministic_xlsx, the PDF and SVG checked by fig_repro (no date;
   S457's plate_rc fixes the SVG ids), the provenance with no write time, HEAD or working-tree state (each input and
   output by sha256).
-  The design documents and run code the plate reads or records (DESIGN_DOCS: plan.csv, experiments/LIST.md and
-  README.md, exp_03, distiller_firing.py, the main text and the letter) are read as they stand in the working tree by
-  every check and lookup: reproduce (2) reads plan.csv's row G3, claims.md finds each claim in the main text, the
-  letter and LIST.md as they stand, and distiller_firing.py is imported from the working tree. Only inputs_sha256
+  The run code the plate reads or records (DESIGN_DOCS: exp_03, distiller_firing.py; D2, 8 Nov, took plan.csv, LIST.md,
+  README.md, the main text and the letter out: reproduce (2) reads plan.csv's G3 sentence from design_facts.json, and
+  the claims list is --claims-out's, S616's editorial step) is read as it stands in the working tree by every check
+  and lookup, and distiller_firing.py is imported from the working tree. Only inputs_sha256
   records them as they stood at DESIGN_AT (96936742, the commit whose files give every sha256 the committed plate
-  recorded; git show, read only), their names carrying "@96936742": those files change with every dashboard update,
+  recorded; O3: exp_03 and distiller_firing.py from copies pinned in the tree, each held to its git blob id, the
+  documents by the sha256 pinned with their blob id, no copy shipped), their names carrying "@96936742": those files
+  change with every dashboard update,
   decision and letter round, and their sha256 at HEAD changed figure4_provenance.json with nothing in the figure
   changed (audit 27 Oct F1). The values the plate draws from them must be the same as at DESIGN_AT, or the run stops:
   exp_03's STRESS_CONFIG_NAMES (the planned answers), and distiller_firing.py's code less its docstring (reproduce
@@ -203,7 +205,8 @@ COMMANDS, from the repository root (uv run only; no model call; nothing on the S
            into --out, findings/figures_provisional/fig4/ by default (an earlier S472 plate there is removed first):
              Figure 4 (provisional, <n> of <N>).{pdf,svg,png}, Source Data Fig. 4 (...).xlsx and its caption,
              figure4_numbers.json (S448 R8: every sheet, and every printed number tied to its sheet and row),
-             figure4_provenance.json, legend_draft.md, claims.md, records_manifest.json;
+             figure4_provenance.json, legend_draft.md, records_manifest.json (claims.md only with --claims-out DIR,
+             into DIR: D2, the editorial step S616 claims);
            and into --steps-out (default findings/recompute/S472_supp12a_steps.json) old panel 4b's rows, the input
            of Supplementary Figure 10a (D250).
            n = the draw-1 answers drawn in c (G3's, G9's and RLM-10's); N = the answers Figure 4's written plan
@@ -257,6 +260,11 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 import S457_fig2_panels as S457  # noqa: E402  (FIGURE_LOCK's values, plate_rc, finish_plate, half_up, wcag)
 import fig_repro as FR  # noqa: E402  (D155: frozen inputs, deterministic xlsx, PDF and SVG checks)
+import fig_design  # noqa: E402  (D2: plan.csv's G3 sentence from design_facts.json, never plan.csv)
+# D2 (Valerio, 8 Nov): figures are built from data only. The claims list (claims_md) reads the main text, the legend,
+# the Supplementary Information and the letter, so it runs only with `figure --claims-out DIR` (scripts/
+# S616_figure_editorial.py claims), into DIR; without it no document is opened and claims.md is not written.
+CLAIMS_OUT: "Path | None" = None
 import figure_names as FN  # noqa: E402  (build order A4: one constant per printed name)
 import house_style as hs  # noqa: E402  (the plate's marks, keys and colours)
 import judge_rows_v25 as JR  # noqa: E402  (D188: the key v2.5 judge row where one exists, else key v2.4's)
@@ -429,8 +437,11 @@ def s576():
 
 
 def _named(shas: dict, path: Path):
-    """The sha256 a provenance's inputs_sha256 records for path (keys may be absolute or repository-relative)."""
-    hits = [v for k, v in shas.items() if k == str(path) or k == rel(path)]
+    """The sha256 a provenance's inputs_sha256 records for path, matched by its repository-relative path whatever the
+    checkout's location: a key equal to rel(path), or an absolute key (written in another checkout) ending in
+    "/" + rel(path). S612 F2: an exact match on the absolute path refused in every checkout but the one that wrote it."""
+    r = rel(path)
+    hits = [v for k, v in shas.items() if k == r or (Path(k).is_absolute() and k.endswith("/" + r))]
     return hits[0] if len(hits) == 1 else None
 
 
@@ -567,17 +578,37 @@ _DESIGN: dict = {}
 
 
 def design_bytes(p: Path, at: str | None = None, root: Path | None = None) -> bytes:
-    """A design document's bytes as it stood at DESIGN_AT (git show, read only); refused when git cannot give it."""
+    """A design document's bytes as it stood at DESIGN_AT; refused when they cannot be given. In this repository (O3)
+    from its copy pinned in the tree, held to the blob id git gave it (scripts/pinned_history.py); in another root (the
+    selftest's own repository) through git show there."""
     at, root = at or DESIGN_AT, Path(root or ROOT)
     key = (str(root), str(p), at)
     if key not in _DESIGN:
         r_ = Path(p).resolve().relative_to(root.resolve()).as_posix()
-        r_ = DESIGN_PATH_BEFORE_MOVE.get(r_, r_) if root.resolve() == ROOT.resolve() else r_
-        r = subprocess.run(["git", "-C", str(root), "show", f"{at}:{r_}"], capture_output=True)
-        if r.returncode:
-            raise Refused(f"git show {at}:{r_} failed: {r.stderr.decode(errors='replace')[:200]}")
-        _DESIGN[key] = r.stdout
+        if root.resolve() == ROOT.resolve():
+            import pinned_history as PH   # O3: the files at DESIGN_AT, pinned in the tree
+            r_ = DESIGN_PATH_BEFORE_MOVE.get(r_, r_)
+            try:
+                _DESIGN[key] = PH.show(at, r_)
+            except PH.PinError as e:
+                raise Refused(f"git show {at}:{r_} failed: {str(e)[:200]}") from None
+        else:
+            r = subprocess.run(["git", "-C", str(root), "show", f"{at}:{r_}"], capture_output=True)
+            if r.returncode:
+                raise Refused(f"git show {at}:{r_} failed: {r.stderr.decode(errors='replace')[:200]}")
+            _DESIGN[key] = r.stdout
     return _DESIGN[key]
+
+
+def design_sha256(p: Path) -> str:
+    """The sha256 of a design document at DESIGN_AT, as inputs_sha256 records it: from its pinned copy when one is
+    shipped, else the sha256 pinned with its blob id (O3; a document the plate does not read is not shipped)."""
+    import pinned_history as PH   # O3
+    r_ = DESIGN_PATH_BEFORE_MOVE.get(rel(p), rel(p))
+    try:
+        return PH.sha256(DESIGN_AT, r_)
+    except PH.PinError as e:
+        raise Refused(f"git show {DESIGN_AT}:{r_} failed: {str(e)[:200]}") from None
 
 
 def code_tree(src: str) -> str:
@@ -1123,9 +1154,12 @@ def stop_log_counts(text: str) -> dict:
     return out
 
 
-def plan_g3_note(plan_path: Path = PLAN) -> str:
-    """plan.csv's row G3, plan.csv as it stands (a check: never read at DESIGN_AT; audit 27 Oct F1, part 4)."""
+def plan_g3_note(plan_path: Path | None = None) -> str:
+    """plan.csv's row G3: by default the sentences of it that design_facts.json keeps (S616 extract from plan.csv at
+    HEAD, held to it by S616 check; D2), or the row of the plan.csv given (the selftest)."""
     import csv
+    if plan_path is None:
+        return " | ".join(fig_design.facts()["plan_csv"]["G3_states"])
     with open(plan_path, newline="") as f:
         for row in csv.reader(f):
             if row and row[0] == "G3":
@@ -2696,8 +2730,10 @@ def vs_full_text(S: dict) -> str:
         raise Refused(f"sheet a: the set-ups with a P have {sorted(ns)} questions: reword the legend's n; nothing written")
     five = {5: "five"}.get(len(FAMILY), len(FAMILY))
     # 8 Nov legend trim (Valerio: "too long"): the five set-ups' names are panel a's row labels
-    return (f"Each set-up minus the full pipeline: two-sided exact sign-flip test, alpha {ALPHA}, n = {ns.pop()} "
-            f"questions, Holm-adjusted over {five} pipeline set-ups, unadjusted for RLM-10, others untested; "
+    # 8 Nov (Valerio, editor row 45): panel a states its n once, in its first sentence; this sentence names the
+    # same questions without a second "n =" tag
+    return (f"Each set-up minus the full pipeline: two-sided exact sign-flip test, alpha {ALPHA}, on the same "
+            f"{ns.pop()} questions, Holm-adjusted over {five} pipeline set-ups, unadjusted for RLM-10, others untested; "
             f"results in Source Data.")
 
 
@@ -2796,28 +2832,35 @@ def legend_and_caption(P, st, n, N, plan, stamp, extra, command=None):
     legend = (
         f"**Figure {FIG_N} | Judge pass rate, refusal and cost of orchestration set-ups, and an "
         f"{FN.MENTORI_RLM_N.format(n=10)} ablation.** "
-        f"gemini-3-flash answered {N_Q} questions once (n = {N_Q} per set-up) over one "
+        # 8 Nov (Valerio, editor row 45): an "n = X <unit>" only in a panel that draws derived statistics (a: the
+        # interval and the test; c, d, e: boxes), once, defining what it counts; b draws no statistic and carries none.
+        # Every panel is described in full, with no reference to another panel.
+        f"gemini-3-flash answered {N_Q} questions once under each of {len(ALL)} set-ups over one "
         # 8 Nov legend trim (Valerio: "too long", 323 words): "in every role", RLM-10's origin, the distiller prompts, the time
         # measure's parts, the set-ups' definitions and panel c's answers with no text (sheet d's answers_no_text)
         # go to Supplementary Note 5 and Source Data; d_notes is kept computed, unprinted
-        f"20-paper index under {len(ALL)} set-ups (Supplementary Note 5). A pass is a judge score of {PASS_T}+. "
+        f"20-paper index (Supplementary Note 5). A pass is a judge score of {PASS_T}+. "
         + (f"{unscored} judge rows gave no score and are left out. " if unscored else "")
         + (f"The two always-distil rows hold no judge scores or search times yet. " if stress_open and no_time else
            f"The two always-distil rows hold no search times yet. " if no_time else "") +
-        f"{A}, Judge score of each answerable question (n = {GROUP_N['answerable']}). "
-        f"Right: pass rate, two-sided 95% percentile interval over 10,000 question resamples. {vs_full_text(S)} "
-        f"{B}, Each out-of-scope question (n = {GROUP_N['not_answerable']}), refused (refusal score 3+) or not; dot, "
-        f"sent to a direct answer. Right: each false-premise question (n = {GROUP_N['false_premise']}); outlined, "
-        f"passed. "
-        f"{C}, Model calls and time per answer; log axes. "
-        f"{D}, {E}, {G17_ARM_LABEL[G17_CTRL]} (rerun), {G17_ARM_LABEL['package']} and {G17_ARM_LABEL[G17_CTRL]} "
-        f"with {G17_ARM_LABEL['search_off']} or {G17_ARM_LABEL['gate_off']}, on one-paper and many-paper answerable "
-        f"questions. "
-        f"{D}, Concept recall (share of key concepts stated), each question's mean over {len(G17_DRAWS)} draws "
-        f"(n = {ng['one']} and {ng['many']} questions per box). {E}, Per draw-{G17_F_DRAW} answer (n = {ng['one']} and "
-        f"{ng['many']} answers per box): sub-calls returning paper text and distinct papers read; axes linear to "
-        f"2, logarithmic above. Boxes, median and quartiles; whiskers, range; dots, one answer ({C}, {E}) or "
-        f"question ({D}).")
+        f"{A}, Judge score of each of the n = {GROUP_N['answerable']} answerable questions, one row per set-up. "
+        f"Right: pass rate with its two-sided 95% percentile interval over 10,000 question resamples. {vs_full_text(S)} "
+        f"{B}, Each of the {GROUP_N['not_answerable']} out-of-scope questions, one row per set-up, refused (refusal "
+        f"score 3+) or not; dot, sent to a direct answer. Right: each of the {GROUP_N['false_premise']} false-premise "
+        f"questions; outlined, passed. "
+        f"{C}, Model calls and time in seconds per answer, one row per set-up, on log axes, n = {N_Q} answers per "
+        f"set-up: dots, answers; box, quartiles; line, median; whiskers, range. The number of answers drawn is "
+        f"printed above each column; {G17_ARM_LABEL[G17_CTRL]} records no search time, so its time is not drawn. "
+        f"{D}, Concept recall (share of the key's concepts stated in the answer) of {G17_ARM_LABEL[G17_CTRL]} "
+        f"(rerun), {G17_ARM_LABEL['package']} and {G17_ARM_LABEL[G17_CTRL]} with {G17_ARM_LABEL['search_off']} or "
+        f"{G17_ARM_LABEL['gate_off']}, on one-paper and many-paper answerable questions. Dots, each question's mean "
+        f"over {len(G17_DRAWS)} draws, n = {ng['one']} one-paper and {ng['many']} many-paper questions per box; box, "
+        f"quartiles; line, median; whiskers, range. "
+        f"{E}, Sub-calls that returned paper text and distinct papers read per draw-{G17_F_DRAW} answer of "
+        f"{G17_ARM_LABEL[G17_CTRL]} (rerun), {G17_ARM_LABEL['package']} and {G17_ARM_LABEL[G17_CTRL]} with "
+        f"{G17_ARM_LABEL['search_off']} or {G17_ARM_LABEL['gate_off']}, on one-paper and many-paper answerable "
+        f"questions. Dots, answers, n = {ng['one']} one-paper and {ng['many']} many-paper answers per box; box, "
+        f"quartiles; line, median; whiskers, range; axes linear to 2, logarithmic above.")
     cap = (f"# Source Data Fig. {FIG_N}, caption\n\n**Source Data Fig. {FIG_N} | Numerical values plotted in Figure "
            f"{FIG_N}.** Provisional: drawn from {fmt_int(n)} of the {fmt_int(N)} answers in this figure's written "
            f"plan (draw 1 of eight G3 set-ups, of G9's two set-ups and of RLM-10). Data stamp: {stamp}. One sheet per "
@@ -2867,8 +2910,9 @@ def legend_and_caption(P, st, n, N, plan, stamp, extra, command=None):
 DOCS = {"main text": doc("02_Main_Text.docx"),
         "letter": LETTER,
         "LIST.md": LIST_MD}
-# recorded in inputs_sha256 at DESIGN_AT; read as they stand by every check and the claims list (audit 27 Oct F1, part 4)
-DESIGN_DOCS = (PLAN, LIST_MD, README_EXP, EXP03, DISTILLER, *DOCS.values())
+# recorded in inputs_sha256 at DESIGN_AT; read as they stand by every check (audit 27 Oct F1, part 4). D2 (8 Nov): only the
+# run code; plan.csv, LIST.md, README.md, the main text and the letter are not inputs of the figure any more
+DESIGN_DOCS = (EXP03, DISTILLER)
 # D304 (8 Nov): the claims list reads the agreed text (Claude Docs rev 3688) as the live documents read with every mark
 # accepted: the main text, the Figure 5 legend (04_Figures_Tables) and the Supplementary Notes as S602 wrote them from the
 # same export; the letter with every mark accepted (its round will be rebuilt, so the letter's anchor is provisional).
@@ -2880,7 +2924,7 @@ CLAIM_DOCS = {"main text": doc("02_Main_Text.docx"), "legend": doc("04_Figures_T
 # and Supplementary Note 5 that state them.
 CLAIMS = [
     ("legend", "Figure 5 legend, 'Figure 5 | Judge pass rate, refusal and cost of orchestration set-ups'",
-     "answered 135 questions once (n = 135 per set-up) over one 20-paper index under 11 set-ups",
+     "answered 135 questions once under each of 11 set-ups over one 20-paper index",   # 8 Nov: the legend's n tag goes
      "{n_setups} set-ups, 135 questions (D48), {n_drawn} draw-1 answers drawn, judged"),
     ("main text", "Results, 'One routing decision sets refusal', 'To find what each part of Mentor::i's multi-agent "
      "pipeline contributes'", "Without retrieval, gemini-3-flash passed 37.2% of the 86 answerable questions",
@@ -3173,19 +3217,22 @@ def _figure(args, ins, recount_p, out, given, frozen_rec, view_tmp):
         (stage / "legend_draft.md").write_text(legend)
         capf = stage / f"Source Data Fig. {FIG_N} caption{tag}.md"
         capf.write_text(cap)
-        (stage / "claims.md").write_text(claims_md(P, st, n, stamp))
+        if CLAIMS_OUT is not None:                      # D2: the editorial step's folder, never the plate's
+            CLAIMS_OUT.mkdir(parents=True, exist_ok=True)
+            (CLAIMS_OUT / "claims.md").write_text(claims_md(P, st, n, stamp))
         manifest = {"what": "the G3 records this plate reads, copied read-only from the Studio by S472 pull",
                     "copied_to": (f"frozen (D155): {FROZEN['records'][0]}.tar, folder {FROZEN['records'][1]} (the tar's "
                                   f"sha256 in {rel(FROZEN_SUMS)})" if given["records"] is None else
                                   rel(rec) if rec.is_relative_to(ROOT) else "outside the repository (pull --to)"),
                     **pj}
         (stage / "records_manifest.json").write_text(json.dumps(manifest, indent=1) + "\n")
-        repo_inputs = [PLAN, PREFLIGHT, D98_SUBSET, DISTILLER, EXP03, LOCK, FIGURE_LOCK, LIST_MD, README_EXP,
+        # D2: plan.csv, LIST.md, README.md, the main text and the letter left the inputs; plan.csv's G3 sentence is
+        # read from design_facts.json
+        repo_inputs = [fig_design.FACTS, PREFLIGHT, D98_SUBSET, DISTILLER, EXP03, LOCK, FIGURE_LOCK,
                        ROOT / "scripts" / "S457_fig2_panels.py", ROOT / "scripts" / "S463_fig2_ranking.py",
                        ROOT / "scripts" / "judge_rows_v25.py", ROOT / "scripts" / "house_style.py",
                        ROOT / "scripts" / "figure_names.py", ROOT / "scripts" / "S575_g17_contrasts.py",
-                       ROOT / "scripts" / "S576_d249_hypotheses.py", G17_READING, G17_S576, G17_CONTRASTS,
-                       *DOCS.values()]
+                       ROOT / "scripts" / "S576_d249_hypotheses.py", G17_READING, G17_S576, G17_CONTRASTS]
         side = lambda p: p.with_name(p.name + ".json")
         # D155: no build time, HEAD or working-tree state (each made two builds of the same inputs differ); the
         # script, every input and every output are named by sha256 instead
@@ -3227,13 +3274,14 @@ def _figure(args, ins, recount_p, out, given, frozen_rec, view_tmp):
                             "script_sha256": (recount.get("provenance") or {}).get("script_sha256"),
                             "inputs_checked": sorted(recount.get("inputs") or {})},
                 "inputs_sha256": {(f"{rel(p)}@{DESIGN_AT}" if p in DESIGN_DOCS else rel(p)):
-                                  (hashlib.sha256(design_bytes(p)).hexdigest() if p in DESIGN_DOCS else sha256_file(p))
+                                  (design_sha256(p) if p in DESIGN_DOCS else sha256_file(p))
                                   for p in repo_inputs},
-                "inputs_read": f"every input as it stands in the working tree, every check and the claims list on "
-                               f"those; inputs_sha256 records the design documents (DESIGN_DOCS) as they stood at "
-                               f"DESIGN_AT {DESIGN_AT} (git show), under names carrying @{DESIGN_AT}; exp_03's "
-                               f"STRESS_CONFIG_NAMES and distiller_firing.py's code (less its docstring) required "
-                               f"the same as at DESIGN_AT",
+                "inputs_read": f"every input as it stands in the working tree, every check on those; plan.csv's G3 "
+                               f"sentence from {rel(fig_design.FACTS)} (D2: no document or working file is read; the "
+                               f"claims list is S616's editorial step); inputs_sha256 records exp_03 and "
+                               f"distiller_firing.py (DESIGN_DOCS) as they stood at DESIGN_AT {DESIGN_AT} (git show), "
+                               f"under names carrying @{DESIGN_AT}; exp_03's STRESS_CONFIG_NAMES and "
+                               f"distiller_firing.py's code (less its docstring) required the same as at DESIGN_AT",
                 "model_calls": 0, "stamp": stamp, "page_mm": [W, H],
                 "figure_lock": {"path": rel(FIGURE_LOCK), "sha256": sha256_file(FIGURE_LOCK),
                                 "status": S457.FLOCK["status"]},
@@ -3268,7 +3316,7 @@ def _figure(args, ins, recount_p, out, given, frozen_rec, view_tmp):
                             "b false-premise pass": FP_PASS,
                             "d, e arms": {G17_ARM_LABEL[a]: G17_COL[a] for a, _ in G17_ARMS}}}
         prov["files"] = {p.name: sha256_file(p) for p in [*paths.values(), sd, capf, numbers,
-                                                            stage / "legend_draft.md", stage / "claims.md",
+                                                            stage / "legend_draft.md",
                                                             stage / "records_manifest.json"]}
         (stage / f"figure{FIG_N}_provenance.json").write_text(json.dumps(prov, indent=1, default=str) + "\n")
         steps = steps_file(P)
@@ -3295,7 +3343,7 @@ def _figure(args, ins, recount_p, out, given, frozen_rec, view_tmp):
           f"(passed at {PASS_T}, refused, false premise passed at {FP_T}): " + extra["known"])
     print(f"check_drawn: {n_checked} drawn marks equal their Source Data")
     print(f"wrote {', '.join(p.name for p in paths.values())} ({W:.0f} x {H:.1f} mm), Source Data, caption, "
-          f"figure{FIG_N}_numbers.json, legend_draft.md, claims.md, records_manifest.json, "
+          f"figure{FIG_N}_numbers.json, legend_draft.md, records_manifest.json, "
           f"figure{FIG_N}_provenance.json into {rel(out)}")
 
 
@@ -3862,7 +3910,7 @@ def selftest_stress(check, refused, td: Path, data: dict, groups: dict, types: d
     txt = vs_full_text({"a": rows})
     check("vs_full_text: the test named, no outcome stated (S3, 7 Nov)",
           txt.startswith("Each set-up minus the full pipeline") and "two-sided" in txt and "alpha 0.05" in txt
-          and "n = 86" in txt and "Source Data" in txt and "detected" not in txt and "\u221215.0" not in txt, txt)
+          and "same 86 questions" in txt and "n = " not in txt and "Source Data" in txt and "detected" not in txt and "\u221215.0" not in txt, txt)
     rows[1].update(p_drawn=0.01, minus_full_low=-0.15, minus_full_high=-0.01)
     check("vs_full_text: the same words whatever the outcome", vs_full_text({"a": rows}) == txt)
     rows[1]["questions"] = 85
@@ -4061,8 +4109,13 @@ def main(argv=None):
     f.add_argument("--out", default=str(OUT), help="the plate's folder; default findings/figures_provisional/fig4")
     f.add_argument("--steps-out", default=str(STEPS_OUT),
                    help="old panel 4b's rows for Supplementary Figure 10a (D250); default " + rel(STEPS_OUT))
+    f.add_argument("--claims-out", help="D2: also write the claims list (claims.md, read from the documents) into "
+                                        "this folder; the editorial step, never the figure build")
     sub.add_parser("selftest")
     args = ap.parse_args(argv)
+    global CLAIMS_OUT
+    if getattr(args, "claims_out", None):
+        CLAIMS_OUT = Path(args.claims_out).resolve()
     if args.cmd == "pull":
         pull(args)
     elif args.cmd == "pull-judge":

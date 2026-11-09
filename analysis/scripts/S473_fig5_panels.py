@@ -101,7 +101,7 @@ checks, reproduce(), compute(), build_sheets() and check_fig2().
 
 D201 Q2 (Valerio, 2 November 2026, yes). Figure 3 moved to key v2.5 and Figure 5 has not, so check_fig2 would compare key
 v2.4 rows with key v2.5 rows and refuse. It now reads figure3_provenance.json and figure3_numbers.json at commit
-FIG3_V24_AT (94262a0e, the last one on key v2.4) through git show, as S511 and S532 pin Figure 3, so this script's selftest
+FIG3_V24_AT (94262a0e, the last one on key v2.4), pinned in the tree (O3), as S511 and S532 pin Figure 3, so this script's selftest
 and build and S497's D166 fallback keep testing the same 48 values on key v2.4. S497's D200 path, which reads key v2.5
 rows, passes at=None and compares with the plate's current files. The pin stops proving the v2.4 numbers against the live
 plate, which is the point: the selftest kills a run read through the live files, and a revision that does not resolve.
@@ -141,6 +141,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT), str(ROOT / "scripts")]
+import pinned_history as PH  # noqa: E402
 
 
 def _load(name, path):
@@ -976,14 +977,14 @@ FIG3_V24_AT = "94262a0e"            # D201 Q2: the last commit whose Figure 3 is
 
 
 def fig3_text(name: str, fig2_dir: Path, at: str | None) -> str:
-    """Figure 3's file name: at commit at through git show (read only), or the working file when at is None."""
+    """Figure 3's file name: as committed at commit at (O3: its copy pinned in the tree, held to the blob id git gave
+    it, scripts/pinned_history.py; read as git show's text was), or the working file when at is None."""
     if at is None:
         return (fig2_dir / name).read_text()
-    r = subprocess.run(["git", "-C", str(ROOT), "show", f"{at}:{(fig2_dir / name).relative_to(ROOT)}"],
-                       capture_output=True, text=True)
-    if r.returncode:
-        raise Refused(f"check_fig2: git show {at}:{name}: {r.stderr.strip()[:200]}")
-    return r.stdout
+    try:
+        return PH.text(PH.show(at, str((fig2_dir / name).relative_to(ROOT))))
+    except PH.PinError as e:
+        raise Refused(f"check_fig2: git show {at}:{name}: {str(e)[:200]}") from None
 
 
 def check_fig2(sheets: dict, collect_sha: str, fig2_dir: Path = FIG2_DIR, at: str | None = FIG3_V24_AT) -> str:
@@ -1835,12 +1836,12 @@ def selftest() -> int:
             g[fname] = real
     # D160 (6), Q18: check_fig2 passes on this script's plate of 26 October (git FIG5_S473_AT, since D166 replaced
     # the files of fig5/) and Figure 3 at FIG3_V24_AT (D201 Q2), and refuses a changed rate and another collect
-    shown = subprocess.run(["git", "show", f"{FIG5_S473_AT}:{(OUT / 'figure5_numbers.json').relative_to(ROOT)}"],
-                           cwd=ROOT, capture_output=True, text=True)
-    if shown.returncode:
-        print(f"  FAIL    git show {FIG5_S473_AT}: {shown.stderr.strip()[:200]}")
+    try:   # O3: the plate as committed at FIG5_S473_AT, pinned in the tree (scripts/pinned_history.py)
+        shown = PH.text(PH.show(FIG5_S473_AT, str((OUT / "figure5_numbers.json").relative_to(ROOT))))
+    except PH.PinError as e:
+        print(f"  FAIL    git show {FIG5_S473_AT}: {str(e)[:200]}")
         return 1
-    fig5 = json.loads(shown.stdout)["sheets"]
+    fig5 = json.loads(shown)["sheets"]
     sha = FR.sha256_file(FR.frozen(FIG2_SET, "g1_collect.jsonl"))
     try:
         check_fig2(fig5, sha)

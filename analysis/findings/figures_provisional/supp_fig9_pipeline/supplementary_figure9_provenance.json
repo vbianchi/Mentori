@@ -1,7 +1,7 @@
 {
  "provenance": {
   "script": "scripts/S590_supp_fig9_pipeline.py",
-  "script_sha256": "5ea4aa746587b3293629a2819211dedb1aef06ecdd8c5fc02d1792534e770e56",
+  "script_sha256": "7c0e295a9d8febb54644a988c0e83edcb72d72b3ed3bf08f87bcf219fb70c88e",
   "command": "uv run --frozen python scripts/S590_supp_fig9_pipeline.py",
   "python": "3.13.11",
   "deterministic": "D155: no build time and no repository HEAD are recorded",
@@ -44,6 +44,6 @@
   "Supplementary Figure 9 data.xlsx": "668f0bd6f33c4cce386355f758567d048569071c46352183fcce6b4c69180c17",
   "Supplementary Figure 9 data caption.md": "ddeb1c3e3457c8a4244b3e7eb263dd4bcca194b4f04376b37442531d5c0bbe03",
   "supplementary_figure9_numbers.json": "70eddb152656182497dd511ae3de87de30d7f26a79965724fa490b800710d583",
-  "legend_draft.md": "85ba892b42e38ff676b41ec55bc2aeaa02787d3d5f7029c6f98a1be67d66c311"
+  "legend_draft.md": "4c0f92554597159261ab9954cac8373316089a357fd8f0a25879fae1ccf6cf57"
  }
 }

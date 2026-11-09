@@ -1,16 +1,16 @@
 {
  "_provenance": {
   "script": "scripts/S576_d249_hypotheses.py",
-  "at": "2026-11-05T10:49:24",
-  "git_head": "c8ddc4f40da1bd37898609819cdd79bc8e4dd4f3",
+  "at": "2026-11-08T23:36:24",
+  "git_head": "79c1c01f02d10a39c77d17756a28de8ced76d49c",
   "command": "uv run --frozen python scripts/S576_d249_hypotheses.py",
   "inputs_sha256": {
-   "/Users/valeriobianchi/projects/Mentori-reanalysis/findings/recompute/S571_rlm_reading/g17_d123/g17_reading.json": "e824e35e084ab7ff7788a38248ce399d6f8188f564a3b3088d3ecb052f4a6880",
-   "/Users/valeriobianchi/projects/Mentori-reanalysis/findings/recompute/S575_g17_contrasts/contrasts.json": "7670e44cae5f998eeb7d26157d865d6cae387d328a8f4a586fdfda6da624b2c8"
+   "findings/recompute/S571_rlm_reading/g17_d123/g17_reading.json": "e824e35e084ab7ff7788a38248ce399d6f8188f564a3b3088d3ecb052f4a6880",
+   "findings/recompute/S575_g17_contrasts/contrasts.json": "14efe8a7b69e7d66b73f3bb845dad7f0efdaa4bfd53e9b885a07d7907ff453fd"
   },
   "code_sha256": {
-   "scripts/S576_d249_hypotheses.py": "65c2fec33e12db6f89b1008d591e4ee96efff3053b1ec458b741c7c7211730c5",
-   "scripts/S463_fig2_ranking.py": "906affaedad63a6bf3ffb96e5363467ddde580b339ef9cb58a287b2ab74f00f8",
+   "scripts/S576_d249_hypotheses.py": "eabafff3df26540a8de0337eea2434a46f54f10712ad383fcc87e0994ad46b8d",
+   "scripts/S463_fig2_ranking.py": "9d8bac6d5624a7664c6a3a8859bda43811ac387d51ee6ddcb579c9a9755b4447",
    "scripts/S575_g17_contrasts.py": "c5b6ee839516c3305e152e3fb999d6e9634d1b86633db7dd4287be92c254e440"
   },
   "boot": 10000,

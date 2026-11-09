@@ -1589,8 +1589,15 @@ def rerun_tally(attempts, flags, by_machine):
                 if ev:
                     c[f"{side}_with_add_cell_as_text_and_d80v1_event"] += 1
         commits = sorted({k.split()[-1] for k in by_machine.get(v, {})})
-        has = {cm: subprocess.run(["git", "-C", str(ROOT), "merge-base", "--is-ancestor", D80_COMMIT, cm],
-                                  capture_output=True).returncode == 0 for cm in commits}
+        # O3 (8 Nov): whether each clone commit holds D80_COMMIT, as `git merge-base --is-ancestor` gave it, pinned in
+        # the tree (scripts/pinned_history.py; S617 verify checks it against git), so no history is read
+        if str(ROOT / "scripts") not in sys.path:
+            sys.path.insert(0, str(ROOT / "scripts"))
+        import pinned_history as PH
+        try:
+            has = {cm: PH.is_ancestor(D80_COMMIT, cm) for cm in commits}
+        except PH.PinError as e:
+            raise SystemExit(f"rerun_tally: {e} (scripts/S617_pin_history.py ANCESTRY)") from None
         out[v] = {"attempts": len(xs), "failed_owing_d80v1_rerun": c["failed_with_d80v1_event"],
                   "failed_with_add_cell_as_text_d81": c["failed_with_add_cell_as_text"],
                   "clone_commits_have_d80": has, **dict(sorted(c.items()))}

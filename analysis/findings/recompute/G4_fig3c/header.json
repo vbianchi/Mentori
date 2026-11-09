@@ -2010,7 +2010,7 @@
  "provisional": true,
  "rows": 1359,
  "script": "scripts/S476_fig3_d123.py",
- "script_sha256": "b50f91c05d5539fedc95dfec4601e0c718605d4800cb8dffb8ed776c24c72a42",
+ "script_sha256": "535add18e3e795d4250651b07b71114284a901b8329a255ab11a2b48a39c04c7",
  "seed": 20261013,
  "what": "G4 draw 1, rlm_10 and single_pass, judged by S3 (plain call (a)); a cell passes at correctness 4 or more (Rule 5, D154), and at 3 or more on the relaxed threshold; an input answer with an error or no text fails (Rule 10); a G4R38 key not judged again is held out (setup error, Rule 10); a failed judge call is unscored; an index is drawn when both units are complete; d over the questions the index can answer (D126: of the common set's answerable questions, those whose source papers are all in the index); the common-86 reading (Q105) kept beside it"
 }

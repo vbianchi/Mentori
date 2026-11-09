@@ -33,7 +33,8 @@ WHAT IT DOES
   4. Stage numbers: every producer in NUMBERS, run in the work copy by the command its docstring gives, one at a time,
      under the same read audit (scripts/fig_read_audit.py). A producer that writes in place is compared with git HEAD
      through `git status` (a tracked file it changed differs; an untracked file it left is new); one given an --out
-     folder is compared file by file with its committed folder. After each producer the work copy is reset to HEAD
+     folder is compared file by file with its committed folder. A producer that compares no file fails ("compared no
+     file"), so a command that writes nothing cannot pass. After each producer the work copy is reset to HEAD
      (`git checkout -- .`, `git clean -fdq`), so every producer reads the released inputs, as S494's steps do. A
      difference is never masked: the row shows the files that differ, and for a json file the key paths that differ.
   5. Stage held: every file of HELD (tier 3: needs a model call, a person, the rating rows or data not in the release)
@@ -102,12 +103,17 @@ NUMBERS = [
     {"name": "S603", "label": "tokens and cost", "cmd": ["scripts/S603_tokens_cost.py", "report"]},
     {"name": "S575", "label": "G17 contrasts", "cmd": ["scripts/S575_g17_contrasts.py"]},
     {"name": "S576", "label": "D249 hypotheses", "cmd": ["scripts/S576_d249_hypotheses.py"]},
-    {"name": "S578", "label": "G19 reading (reproduce only)",
-     "cmd": ["scripts/S578_g19_reading.py", "--reproduce-only", "--r-collect-t2x",
-             "findings/recompute/S518_inputs/gemma3/t2x_collect.jsonl"]},
-    {"name": "S595", "label": "G20 reading (reproduce only)",
-     "cmd": ["scripts/S595_g20_reading.py", "--reproduce-only", "--r-collect-t2x",
-             "findings/recompute/S518_inputs/qwen3-coder/t2x_collect.jsonl"]},
+    # S578 and S595 --from-rows: the reproduce-only check, then the table, contrasts and hypotheses of the committed
+    # reading (reading.md: Supplementary Note 5) computed again from its per-answer rows, which are held (their sinks,
+    # judge folders and chunk store are not released); S612: --reproduce-only alone compared no file
+    {"name": "S578", "label": "G19 reading (from the committed rows)",
+     "cmd": ["scripts/S578_g19_reading.py", "--from-rows", "--r-collect-t2x",
+             "findings/recompute/S518_inputs/gemma3/t2x_collect.jsonl", "--out", "{out}"],
+     "committed": "findings/recompute/G19_reading"},
+    {"name": "S595", "label": "G20 reading (from the committed rows)",
+     "cmd": ["scripts/S595_g20_reading.py", "--from-rows", "--r-collect-t2x",
+             "findings/recompute/S518_inputs/qwen3-coder/t2x_collect.jsonl", "--out", "{out}"],
+     "committed": "findings/recompute/G20_reading"},
     {"name": "S518", "label": "T2 split confirmation (reference)",
      "cmd": ["scripts/S518_split_confirmation.py", "reference"]},
     {"name": "S566", "label": "answer length and concept recall", "cmd": ["scripts/S566_length_recall.py"]},
@@ -121,8 +127,10 @@ NUMBERS = [
     {"name": "S596", "label": "windowed BERTScore (roberta-large, an encoder)",
      "cmd": ["scripts/S596_windowed_bertscore.py", "run", "--out", "{out}"],
      "committed": "findings/recompute/S596_windowed_bertscore"},
-    {"name": "S602", "label": "Supplementary Information PDF and .docx", "cmd": ["scripts/S602_si_draft.py", "build"],
-     "content_equal": True},   # fidelity rule 3: the PDF's trailer /ID and the .docx zip dates change on every run
+    # S602 (the Supplementary Information PDF and .docx) is not here (D2, Valerio, 8 Nov): it builds a document from
+    # the agreed manuscript text (resubmission/06_supplementary/si_text_from_doc_20261107.md), an editorial step run in
+    # Mentori-reanalysis; the release ships no document and reads none. content_equal (fidelity rule 3) stays for a
+    # producer that needs it.
 ]
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -450,13 +458,16 @@ def run_producer(work: Path, spec: dict, logs: Path, tars: Path | None) -> dict:
         equal = [p for p in written if p in head and p not in differ and p not in same_content]
         subprocess.run(["git", "checkout", "--", "."], cwd=work, check=True)
         subprocess.run(["git", "clean", "-fdq"], cwd=work, check=True)
-    ok = rc == 0 and not viol and not differ and not new and not missing
+    compared = len(equal) + len(same_content) + len(differ) + len(missing)
+    ok = rc == 0 and not viol and not differ and not new and not missing and compared > 0
+    if not compared:
+        notes.append("compared no file: a producer must rebuild at least one released file to pass (S612)")
     if rc:
         tail = [x for x in (logs / f"{name}.log").read_text(errors="replace").splitlines() if x.strip()][-3:]
         notes.append(f"exit {rc}: " + " | ".join(tail)[:400])
     return {"stage": "numbers", "item": f"{spec['label']} ({spec['name']})",
-            "files": str(len(equal) + len(same_content) + len(differ) + len(missing)), "ok": ok,
-            "note": (f"{len(equal)} byte-equal" + (f", {len(same_content)} content-equal" if same_content else "")
+            "files": str(compared), "ok": ok,
+            "note": ("compared no file, " if not compared else "") + (f"{len(equal)} byte-equal" + (f", {len(same_content)} content-equal" if same_content else "")
                      + (f", {len(differ)} differ" if differ else "")
                      + (f", {len(missing)} not rebuilt" if missing else "") + (f", {len(new)} new" if new else "")
                      + (f", {len(viol)} audit violations" if viol else "") + f", {secs:.0f} s"),

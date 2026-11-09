@@ -1002,9 +1002,13 @@ def draw_H1(D, F, S):
     n_in = H["fam_pa"][(cols[0], "introspection")][1]
     n_st = H["fam_pa"][(cols[0], "structured")][1]
     n_cell = H["cell"][(cols[0], D.STRATS[0])][1]
-    return {"legend": (f"Pass rate per model variant (column) and strategy (row), n = {n_cell} attempts per cell. "
-                       f"Bold rows pool each family (n = {n_ff} free-form, {n_in} introspection and {n_st} structured "
-                       f"attempts per variant); bottom row, pooled structured minus free-form (percentage points). "
+    # 8 Nov (Valerio, editor row 45): a panel with no derived statistics carries no "n ="; each count is said once,
+    # in plain words, as part of what the cell shows. Strategies per family = the family's attempts / one cell's.
+    k_ff, k_in, k_st = n_ff // n_cell, n_in // n_cell, n_st // n_cell
+    return {"legend": (f"Pass rate of each model variant (column) under each prompting strategy (row): each cell is "
+                       f"the percentage of its {n_cell} attempts, one per operation, that passed. Bold rows pool the "
+                       f"strategies of each family ({k_ff} free-form, {k_in} introspection and {k_st} structured); bottom "
+                       f"row, pooled structured minus pooled free-form (percentage points). "
                        f"Columns: {D.blocks[0][0]}, then {D.blocks[1][0]}, each ordered high to low by pooled free-form, "
                        f"then overall, pass rate. "
                        f"Gemini's lowest thinking setting is "
@@ -1328,10 +1332,13 @@ def draw_K1(D, F, S):
     ax.set_ylabel("Pass rate (%)", labelpad=2)
     n = {t: len(K["ops"][t]) for t in TIERS}
     pf = K["pooled"]
-    return {"legend": (f"Pass rate of each operation by family and difficulty, all {len(D.VARS)} variants pooled; one "
-                       f"dot per operation ({pf['free-form']} free-form, {pf['introspection']} introspection or "
-                       f"{pf['structured']} structured attempts). Box, median and quartiles; whiskers, range; "
-                       f"n = {n['simple']} simple, {n['medium']} medium and {n['complex']} complex operations.")}
+    # 8 Nov (Valerio, editor row 45): the boxes are derived statistics, so their n is stated in the editor's form,
+    # once, inside this panel's description; no "as in" reference to another panel.
+    return {"legend": (f"Pass rate of each operation by prompting family (colour and marker) and difficulty, all "
+                       f"{len(D.VARS)} variants pooled: each dot is one operation, its pass rate over "
+                       f"{pf['free-form']} free-form, {pf['introspection']} introspection or {pf['structured']} "
+                       f"structured attempts. Box, median and quartiles of the dots; whiskers, range; n = {n['simple']} "
+                       f"simple, {n['medium']} medium and {n['complex']} complex operations per box.")}
 
 
 SIZE_K5 = (183.0, 96.0)
@@ -1870,10 +1877,12 @@ def draw_X1(D, F, S):
     F.text(LAB - 2.0, BOT + (plt.rcParams["xtick.major.size"] + plt.rcParams["xtick.major.pad"]) * MMPT,
            "Attempts (% of n)", va="top", ha="right")
     (g_name, g_v), (o_name, o_v) = D.blocks
-    return {"legend": (f"Outcome of each attempt per strategy: {g_name}, n = {X['n_sb'][(STRATS[0], g_name)]} attempts "
-                       f"per bar ({len(g_v)} variants on {len(D.OPS)} operations); {o_name}, "
-                       f"n = {X['n_sb'][(STRATS[0], o_name)]} ({len(o_v)} variants); the number is the percentage "
-                       f"passed. {_X_outcome_words(D, short=True)}")}
+    # 8 Nov (Valerio, editor row 45): no derived statistics here, so no "n ="; the attempts per bar are said once,
+    # as what each bar holds and as the plate prints them.
+    return {"legend": (f"Outcome of the attempts of each prompting strategy (row), as percentages: each {g_name} bar "
+                       f"holds {X['n_sb'][(STRATS[0], g_name)]} attempts ({len(g_v)} variants on {len(D.OPS)} "
+                       f"operations) and each {o_name} bar {X['n_sb'][(STRATS[0], o_name)]} ({len(o_v)} variants); the number on each bar is the percentage passed. "
+                       f"{_X_outcome_words(D, short=True)}")}
 
 
 def _X_outcome_words(D, short=False):
@@ -1999,12 +2008,17 @@ def draw_X2(D, F, S):
                 F.text(0.5, TOP + PH * (y + 0.5) / NR, b, va="center", ha="left", color=GREY_NOTE)
     F.text(LAB + (2 * cw + GAPW + gap) / 2, H - 2.0, "Pass rate (%)", va="baseline", ha="center")
     nd = len(D.OPS) // len(DSETS)
-    tie = " (a tie broken by the pass rate over all strategies)" if X["ties"] else ""
-    return {"legend": (f"Pass rate per variant and dataset under free-form (circle, n = {ffn} attempts: "
-                       f"{ffn // nd} strategies on {nd} operations) and structured prompting (diamond, n = {stn}), "
-                       f"joined by a grey line where the diamond's centre lies outside the circle. Right, structured "
-                       f"minus free-form (percentage points). Rows: {D.blocks[0][0]}, then {D.blocks[1][0]}, each by "
-                       f"free-form pass rate{tie}.")}
+    # Valerio, 8 Nov (editor row 45): pass rates with no spread drawn derive no statistics, so no n tag; the attempt
+    # counts stay in words and the rows are written out (no reference to another panel)
+    if ffn % nd or stn % nd:
+        raise SystemExit(f"X2 legend: {ffn} free-form or {stn} structured attempts are not whole strategies of {nd} "
+                         f"operations")
+    rows = _rows_words16(D)
+    return {"legend": (f"Pass rate per model variant and dataset (left, {DHEAD[DSETS[0]]}; right, "
+                       f"{DHEAD[DSETS[1]]}; {nd} operations each) under free-form (circle; {ffn // nd} "
+                       f"strategies, {ffn} attempts) and structured prompting (diamond; {stn // nd} strategies, {stn} "
+                       f"attempts), joined by a grey line where the diamond's centre lies outside the circle. Gap, "
+                       f"structured minus free-form (percentage points). {rows}")}
 
 
 # ---- X-3 (Supplementary, difficulty in detail): operations by tier and family, per dataset (alt3) ----------------
@@ -2143,15 +2157,23 @@ def draw_X4(D, F, S):
             kinds[_X_group6(r)].add(r["fail_kind"])
     if kinds["tools refused by Ollama"] - {_X_REFUSED}:
         _X_stop("X-4 legend: the tool refusal group holds other kinds")
-    return {"legend": (f"Failed attempts of each model variant under each prompting family, as a share of its n "
-                       f"attempts, one per strategy and operation (n = {n['free-form']} free-form, "
-                       f"{n['introspection']} introspection and {n['structured']} structured). Wrong values and no "
-                       f"result as in Figure {S447.FIG_N}c. Length stops are shown apart from tool or call failure, other, which "
-                       f"is split into tools refused by Ollama (the model as served has no tool support), other tool "
-                       f"or call failure ({_X_kinds_words(kinds['other tool or call failure'])}) and other "
-                       f"({_X_kinds_words(kinds['other (harness, no code)'])}). Rows: {D.blocks[0][0]}, then "
-                       f"{D.blocks[1][0]}, each by free-form pass rate, high to low, ties by pass rate over all "
-                       f"{len(D.STRATS)} strategies. {_gemini_low()}")}
+    # Valerio, 8 Nov (editor row 45): no statistics are derived here, so no n tag; every term written out, no
+    # reference to another figure. The family sizes are counted from the rows (nn per family above, one per
+    # strategy and operation), so the words cannot drift from the plate.
+    per_f = {f: n[f] // len(D.OPS) for f in FAMS}
+    if any(per_f[f] * len(D.OPS) != n[f] for f in FAMS):
+        _X_stop(f"X-4 legend: a family's attempts are not whole strategies of {len(D.OPS)} operations: {n}")
+    return {"legend": (f"Each bar is the share of one model variant's attempts (row) that failed under one prompting "
+                       f"family (column: free-form, {per_f['free-form']} strategies; introspection, "
+                       f"{per_f['introspection']}; structured, {per_f['structured']}), one attempt per strategy and "
+                       f"operation; x axis, attempts failed as a percentage of that variant's attempts in that family. The bar is split by kind of failure (colour and "
+                       f"pattern, key above). Wrong values: the code returned values that did not match the "
+                       f"reference. No result: the code returned no values. Length stop: the reply filled its "
+                       f"context or output cap. Tools refused by Ollama: the model as served has no tool support. "
+                       f"Other tool or call failure: {_X_kinds_words(kinds['other tool or call failure'])}. Other: "
+                       f"{_X_kinds_words(kinds['other (harness, no code)'])}. Rows: {D.blocks[0][0]}, then "
+                       f"{D.blocks[1][0]}, each ordered high to low by free-form pass rate, ties by pass rate over "
+                       f"all {len(D.STRATS)} strategies. {_gemini_low()}")}
 
 
 # ---- panels B ----------------------------------------------------------------------------------------------------------------
@@ -2480,11 +2502,13 @@ def draw_B1(D, F, S, size, letter_x=0.0):
         "ylabel": "Change in pass rate (points)"})                                             # and its interval: legend
     _B1_not_drawn(D, S, B)
     nv, no = len(D.VARS), len(D.OPS)
-    return {"legend": (f"change in pass rate of each repeated-attempt strategy against the single-attempt strategy of "
-                       f"its family, same variant and operation, one column per contrast of a to e. Dot, one variant over "
-                       f"{no} operations; "
-                       f"diamond, net change over n = {nv * no} pairs; line, two-sided 95% percentile interval from "
-                       f"{BOOT_N:,} resamples of the {no} operations.")}
+    # Valerio, 8 Nov (editor row 45): f draws derived statistics (the interval), so it states its n once; the panel
+    # is described in full, with no reference to another panel.
+    return {"legend": (f"change in pass rate (points) of each repeated-attempt strategy (column) over the "
+                       f"single-attempt strategy of its family, same variant and operation. Dot, one variant over "
+                       f"{no} operations (filled, Gemini; open, open-weight); diamond, net change over all pairs; line, "
+                       f"two-sided 95% percentile interval from {BOOT_N:,} resamples of the {no} operations; "
+                       f"n = {nv * no} pairs per strategy.")}
 
 
 def _B1_not_drawn(D, S, B):
@@ -2692,19 +2716,19 @@ def draw_B4(D, F, S):
     nv, no = len(order), len(D.OPS)
     n_ds = Counter(D.dataset_of[o] for o in D.OPS)
     # D303 (manuscript tab rev 3688): one sentence per panel, each opening with a capital
-    named = ". ".join(f"**{lt}**, {contrast_of_letter[lt][:1].upper()}{contrast_of_letter[lt][1:]}" for lt in letters)
+    named = ". ".join(f"**{lt}**, {contrast_of_letter[lt][:1].upper()}{contrast_of_letter[lt][1:]}: each tile is one "
+                      f"pair, coloured by outcome (key above); header, pairs rescued and lost" for lt in letters)
     return {"sheets_note": (f"Two sheets. Sheet {S.name}, the {len(letters)} panels {letters[0]} to {letters[-1]}: the "
                             f"column 'panel' gives the letter of each 'contrast' and 'tile' row; the 'variant' rows give "
                             f"the row order all {len(letters)} panels share and have no letter. Sheet {S.name}f, panel "
                             f"f: {_B1_SHEET_TXT}"),
-            "legend": (f"Every pair of the five repeated-attempt contrasts ({letters[0]} to {letters[-1]}) and their net "
-                       f"change (f). In {letters[0]} to {letters[-1]}, a tile is one model "
-                       f"variant (row) on one operation (column; {n_ds['RNA-seq']} {DHEAD['RNA-seq']} and "
-                       f"{n_ds['survival']} {DHEAD['survival']} operations, numbered within each dataset), coloured by "
-                       f"which of the two strategies passed. n = {nv * no} pairs per contrast ({nv} variants "
-                       f"{_B_TIMES} {no} operations). Rows: {D.blocks[0][0]}, then {D.blocks[1][0]}, each by pooled "
-                       f"free-form pass rate, high to low. A dot before a variant's name marks a Gemini model (filled) "
-                       f"or an open-weight model (open). Gemini low: its lowest thinking setting. {named}. **f**, "
+            # Valerio, 8 Nov (editor row 45): a to e derive no statistics, so no n tag; each panel says in full
+            # what a tile is and what its colour means, with no reference to another panel.
+            "legend": (f"In grids {letters[0]} to {letters[-1]}, rows are variants ({D.blocks[0][0]}, then "
+                       f"{D.blocks[1][0]}, each by pooled free-form pass rate, high to low; filled dot, Gemini; open "
+                       f"dot, open-weight; low, the lowest thinking setting) and columns are operations, numbered "
+                       f"within each dataset ({n_ds['RNA-seq']} {DHEAD['RNA-seq']} and {n_ds['survival']} "
+                       f"{DHEAD['survival']}). {named}. **f**, "
                        f"{out_f['legend'][:1].upper()}{out_f['legend'][1:]}")}
 
 
@@ -2847,11 +2871,12 @@ def draw_G4(D, F, S):
     F.letter()
     n_st = sum(1 for x in D.STRATS if FAM[x] == "structured")
     n_ff = sum(1 for x in D.STRATS if FAM[x] == "free-form")
-    legend = (f"Per model variant, each operation's pass share under the {n_st} structured strategies minus under the "
-              f"{n_ff} free-form ones (percentage points). Box, quartiles; thick line, median; whiskers, range; grey "
-              f"dots, one per operation (n = {len(D.OPS)} per box). Right column, operations below / above 0. Rows: "
-              f"{D.blocks[0][0]}, then {D.blocks[1][0]}, each by free-form pass rate, ties by passes over all "
-              f"{len(D.STRATS)} strategies.")
+    # Valerio, 8 Nov (editor row 45): the boxes derive statistics, so n is stated once, as "n = X <unit>"; the rows
+    # are written out here (no reference to another panel)
+    legend = (f"Per model variant, grey dots, one per operation: its pass share under the {n_st} structured "
+              f"strategies minus under the {n_ff} free-form ones (percentage points). Box, quartiles; thick line, "
+              f"median; whiskers, range; n = {len(D.OPS)} operations per box. Right, operations below / above 0. "
+              f"{_rows_words16(D)}")
     return {"legend": legend}
 
 
@@ -2965,6 +2990,20 @@ def _C_outcome_words(D, vs, n_len):
                                                   else kinds[0]) + ". ")
     w += ("Length stops are shown apart, in black." if n_len else "Length stops are shown apart; there are none here.")
     return w
+
+
+def _C_cost16(ladder, N):
+    """Supplementary Figure 16b's right-hand columns in one sentence (Valerio, 8 Nov: the legend under 300 words);
+    _C_cost_words is kept as the guard on which models record no thinking count and which ran locally."""
+    _C_cost_words(ladder, N)
+    none_ = [m for m, vv in ladder if all(N[v]["thinking_rows"] == 0 for v in vv)]
+    local = [m for m, vv in ladder if not any(is_gemini(v) for v in vv)]
+    if none_ != local or len(local) != 1:
+        raise SystemExit(f"C2 legend: no thinking count for {none_}, run locally {local}; the words name one model "
+                         f"for both")
+    m = local[0]
+    return (f"Right: medians per attempt of output tokens ({m}'s may include thinking, which it does not count), "
+            f"thinking tokens (n.r., not recorded) and wall time (s; {m} local, Gemini through Google's API).")
 
 
 def _C_cost_words(ladder, N):
@@ -3137,13 +3176,21 @@ def draw_C2(D, F, S):
     S.num(axes[-1].xaxis.label, first_bar, "Attempts (% of n = {attempts_n} per setting)")
 
     n_set = S.rows[first_bar]["attempts_n"]
-    _C_outcome_words(D, [v for _, vv in ladder for v in vv], n_len)        # its guard: every kind is covered
-    legend = (f"One bar per thinking setting of the {len(ladder)} models run at more than one (n = {n_set} attempts "
-              f"each), split by outcome as in Figure {S447.FIG_N}c, length stops shown apart"
-              f"{' (none here)' if not n_len else ''}. "
-              + ("Segments too narrow for one whole mark of their pattern are colour only. " if plain else "")
-              + f"{_gemini_low()} Right: medians per attempt. "
-              + _C_cost_words(ladder, N))
+    # Valerio, 8 Nov (editor row 45): shares and medians with no spread drawn derive no statistics, so no n tag; the
+    # outcomes are defined here (_C_outcome_words, guarded on the rows), not by reference to Figure 7c
+    vs = [v for _, vv in ladder for v in vv]
+    _C_outcome_words(D, vs, n_len)                 # its guards: each group holds only what these words say
+    tc = {r["fail_kind"] for r in D.rows if r["variant_id"] in vs and not r["passed"]
+          and r["outcome5"] == "tool or call failure, other"}
+    told = {"tool call written as text", "other call error", "tool-call parse error", "stall", "no code",
+            "step produced no cell and no error", "harness error", "other"}
+    if tc - told or n_len:
+        raise SystemExit(f"C2 legend: outcome kinds {sorted(tc - told)} or {n_len} length stops the words do not name")
+    legend = (f"One bar per thinking setting of {', '.join(m for m, _ in ladder[:-1])} and {ladder[-1][0]}, its "
+              f"{n_set} attempts split by outcome (% of attempts). Wrong values: values returned, not matching the "
+              f"reference. No result: no values returned. Tool or call failure, other: a malformed or failed call, "
+              f"no code, a harness error or a timeout after returning values. "
+              + f"{_gemini_low()} " + _C_cost16(ladder, N))
     return {"legend": legend}
 
 
@@ -3386,7 +3433,7 @@ def lead_main(D):
     return (f"An attempt is one model variant (a model at one thinking setting), one prompting strategy and one of "
             f"{len(D.OPS)} data-analysis operations on two datasets (airway RNA-seq and NCCTG lung survival), run once "
             f"({_rerun_clause()}); "
-            f"n = {len(D.rows):,} attempts ({len(D.VARS)} variants {_B_TIMES} {len(D.STRATS)} strategies {_B_TIMES} "
+            f"{len(D.rows):,} attempts in all ({len(D.VARS)} variants {_B_TIMES} {len(D.STRATS)} strategies {_B_TIMES} "
             f"{len(D.OPS)} operations). An attempt passes when its code returns values matching the reference.")
     # D303 (manuscript tab rev 3688, accepted by Valerio): the gemma3:27b sentence (_no_tools_clause) is deleted from
     # the legend. _no_tools_clause is no longer called; it is kept so the sentence can return if the tab restores it.
@@ -3457,6 +3504,43 @@ def lead_supp(D, rescored=False):
                if rescored else "") + ".")
 
 
+def lead_supp15(D):
+    """Supplementary Figure 15's opening (Valerio, 8 Nov, editor row 45): the attempt and the pair defined in full
+    (the plate's key defines the four pair outcomes), with no reference to Figure 7 and no n tag (only panel f derives statistics, and states
+    its n); every count from the rows."""
+    op, n = _rescore(D)
+    return (f"An attempt is one model variant (a model at one thinking setting), one prompting strategy and one of "
+            f"{len(D.OPS)} data-analysis operations on two datasets (airway RNA-seq and NCCTG lung survival), run once "
+            f"({_rerun_clause()}); {n} attempts on one {D.dataset_of[op]} operation are re-scored by running their "
+            f"stored code again. A pair is one variant on one operation under a repeated-attempt strategy and under "
+            f"the single-attempt strategy of its family.")
+
+
+def lead_supp14(D):
+    """Supplementary Figure 14's opening (Valerio, 8 Nov, editor row 45): the attempt defined in full, with no
+    reference to Figure 7 and no n tag (the plate derives no statistics); every count from the rows."""
+    return (f"An attempt is one model variant (a model at one thinking setting), one prompting strategy and one of "
+            f"{len(D.OPS)} data-analysis operations on two datasets (airway RNA-seq and NCCTG lung survival), run once "
+            f"({_rerun_clause()}); {len(D.rows):,} attempts in all ({len(D.VARS)} variants {_B_TIMES} "
+            f"{len(D.STRATS)} strategies {_B_TIMES} {len(D.OPS)} operations). An attempt passes when its code returns "
+            f"values matching the reference.")
+
+
+def lead_supp16(D):
+    """Supplementary Figure 16's opening (Valerio, 8 Nov, editor row 45): the attempt and the three prompting families
+    defined in full, with no reference to Figure 7 and no n tag (each panel states its own n where it derives
+    statistics); the re-score named (audit 27 Oct F2); every count from the rows."""
+    op, n_rs = _rescore(D)
+    return (f"An attempt is one model variant (a model at one thinking setting), one prompting strategy and one of "
+            f"{len(D.OPS)} data-analysis operations, run once ({_rerun_clause()}). An attempt passes when its code returns values matching the reference; {n_rs} attempts on one "
+            f"{D.dataset_of[op]} operation pass on running their stored code again (no model call).")
+
+
+def _rows_words16(D):
+    """Supplementary Figure 16, panels a and c: the row order in full, each panel's own words (no 'as in a')."""
+    return f"Rows: {D.blocks[0][0]}, then {D.blocks[1][0]} variants, each high to low by free-form pass rate."
+
+
 # D299: sheet Supplementary Fig. 15f (B1, sheet Fig. 7d until 7 Nov), its columns and the words that describe them
 _B1_SHEET_COLS = ("part", "strategy", "against", "variant", "model", "setting", "gemini", "n_pairs", "rescued", "lost",
                   "both_passed", "both_failed", "n_operations", "change_pct_points", "net_change_pct_points",
@@ -3504,12 +3588,13 @@ MAIN = {"n": S447.FIG_N, "rows": [["H1", "K1"], ["X1"]], "lead": lead_main, "kin
         "title": "Code-generation pass rates by prompting strategy, task difficulty and outcome"}
 SUPP = [   # D302 (Valerio, 7 Nov, "Q1: drop them"): the manuscript's order of first citation, 14 to 16 (12, 23 and 13
     # under D257); difficulty, operations and cost (21, 22, 24, not cited) dropped
-    {"n": 14, "slug": "failures", "rows": [["X4"]], "kinds": ("outcome",),
+    {"n": 14, "slug": "failures", "rows": [["X4"]], "kinds": ("outcome",), "lead": lead_supp14,
      "title": "How code-generation attempts failed, per model variant"},
     # B1b ("best_of_3", 22 before D257) dropped, 3 Nov (D222): its values are rows of sheet Supplementary Fig. 15f not drawn
-    {"n": 15, "rescored": True, "slug": "pairs", "rows": [["B4"]], "kinds": ("comparison",),   # f: B1 (D299)
+    {"n": 15, "rescored": True, "slug": "pairs", "rows": [["B4"]], "kinds": ("comparison",), "lead": lead_supp15,   # f: B1 (D299)
      "title": "Paired outcomes and net change of repeated against single attempts"},
     {"n": 16, "rescored": True, "slug": "models", "rows": [["G4", "C2"], ["X2"]], "kinds": ("family", "outcome"),
+     "lead": lead_supp16,
      "title": "Structured prompting, thinking setting and dataset, model by model"},
 ]
 

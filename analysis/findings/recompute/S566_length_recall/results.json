@@ -1,15 +1,15 @@
 {
  "_provenance": {
   "script": "scripts/S566_length_recall.py",
-  "script_sha256": "9445cdff1e6d50a3f0ce1dfd37919d4adfd91ae4fb766e9956d04aeacb8e45fc",
+  "script_sha256": "6914e784f5fef75f291322e15bf4e86a0a6a78478345da8abd6c2484c103cdb6",
   "command": "uv run python scripts/S566_length_recall.py",
-  "git_head": "cb6e51840a9a02621371788721ad58002cb37aba",
-  "written_utc": "2026-11-03T15:48:40Z",
+  "git_head": "f96637b06e1bc8c5c57f604f86d57cd13761e480",
+  "written_utc": "2026-11-08T23:16:54Z",
   "method": "experiments/README.md D220",
   "reader": {
    "function": "S463_fig2_ranking.read_answers",
-   "sha256": "78dea40def8280cbe46dd699982f7f080414531e04bba2271735ef2b199787d9",
-   "S457_sha256": "194fbacd4fe8016436f986fb53c337180df381cfc7b9971295d1e260d64a82f7",
+   "sha256": "8279a35d27c5a99d34980b59529203b104526035beba74031c9964a2ee360825",
+   "S457_sha256": "8c29dab8b04a1bad4a955582a30831c51c2b70438be2f6d2698c7b81948d7520",
    "S463_differs_from_head": false
   },
   "inputs_sha256": {
@@ -28,8 +28,8 @@
   "concept_recall": {
    "workbook": "findings/figures_provisional/fig3_strategies/Source Data Fig. 3 (provisional, 14860 of 21402).xlsx",
    "read_at": "HEAD",
-   "last_commit": "dfc503b7ab8ec64154af645749a7533d697c9095",
-   "sha256": "447f128b2efaac48057b185584c2a334f3d2dca7176400ccf9d2c91bd6c4f477",
+   "last_commit": "8219d3833eeb06d07e161a86a4f998d519e8360e",
+   "sha256": "7a9dcfcc4cb866c56bbab92dd2b24cd374296827649307a8fc751c931be4ff52",
    "sheet": "Fig. 3a",
    "rows": "concept recall (not drawn): question (grey dot)",
    "column": "concept_recall_question_pct"

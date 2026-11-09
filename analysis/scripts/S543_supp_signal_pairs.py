@@ -217,31 +217,37 @@ def b_papers_n(dat: dict) -> str:
 
 
 def legend(dat: dict, R: dict) -> str:
-    C = dat["C"]
-    n = sum(C[c]["pass"] + C[c]["fail"] for c in CONFIGS)
-    if dat["b_median"] is None:         # Papers waits (S497.blank_papers)
-        c_na, c_med = S497.PENDING, S497.PENDING
-    else:
-        c_na, c_med = len(dat["pts_b"]), S497.S457.half_up(dat["b_median"], 3)
-    d_n, d_nq = (S497.PENDING, S497.PENDING) if dat["G_N"] is None else (dat["G_N"], dat["G_NQ"])
-    # D295: c is old Figure 5b, its clause moved from Figure 6's legend; a's answers are c's, and b's counterpart is
-    # Figure 6c (old 5d). D298: d is old Figure 6e, its clause moved from Figure 6's legend with the faithfulness
-    # definition it shared there with Figure 6d, and the box spelled out
-    f_ctx = S497.faith_left_out(dat, R)["ctx"]
+    # 8 Nov (Valerio, doc comments, and editor row 45): a panel that draws derived statistics states its n once, as
+    # "n = X <unit>", inside its own description; a panel without them carries no n; every panel is described in full,
+    # never by reference to another panel or figure. Only d draws derived statistics (boxes); its n is each box's answers.
+    # Adversarial check (8 Nov): b draws three draws, so 'draw-1' sits in a, c and d, not in the head.
+    c_med = S497.PENDING if dat["b_median"] is None else S497.S457.half_up(dat["b_median"], 3)
+    S497.faith_left_out(dat, R)        # refuses unless every faithfulness error is a call longer than the judge's context
+    if dat["G"]:
+        g_ns = [str(len(g["values"])) for g in dat["G"]]      # the rows' order, top to bottom, as d draws them
+        d_n = ", ".join(g_ns[:-1]) + f" and {g_ns[-1]}"
+    else:                               # Papers waits (S497.blank_papers)
+        d_n = S497.PENDING
     return (f"**Supplementary Figure {N} | Answers stating every concept; each strategy against single pass; Papers "
-            "by the judge's verdict and by faithfulness.** Answers "
-            "of gemini-3-flash to the answerable questions. **a**, Of the draw-1 answers of c, those that "
-            f"state every key concept, by the judge's verdict (n = {n}); n at right counts only these answers. "
+            "by the judge's verdict and by faithfulness.** Answers of gemini-3-flash to the answerable questions "
+            "under six strategies (rows). Judge, correctness score against the answer key, from 0 to 5, with a pass "
+            f"at {PASS_T} or more; Concepts, concept recall against the key; Papers, MiniCheck precision against the key's "
+            "source papers. "
+            "**a**, Draw-1 answers holding all three scores that state every key concept, split by the judge's verdict: grey, "
+            "passes; blue, fails. Numbers in and beside the bars, answers; right, all such answers of the row. "
             # S3 (7 Nov): the count of RLM fails at score 3 is a result, left to the text and sheet a
-            f"**b**, Questions won minus lost against "
-            f"single pass, as a percentage of n = {len(dat['qw'])} questions (Papers, {b_papers_n(dat)}), one mark per draw "
-            f"(Papers, draw 1). The judge compares 0 to 5 scores, and the marks show how far each draw moves. Figure "
-            f"{S497.FIG_N}c gives the same comparison as counts on three-draw means. "
-            f"**c**, Draw-1 answers to {len(dat['qw'])} questions (n = {c_na} answers) by the judge's verdict and "
-            f"Papers: high, at or above their median ({c_med}). "
-            f"**d**, Papers of draw-1 answers with faithfulness 5 and below 5 (n = {d_n} answers, {d_nq} questions; n at "
-            "right). Faithfulness score, from the judge with the retrieved passages; calls longer than the judge's "
-            f"context are refused ({f_ctx}). Dots, answers; box, quartiles; black line, median; whiskers, range.")
+            "**b**, Each strategy against single pass, question by question within the same draw: questions where the "
+            "strategy scores higher minus questions where single pass scores higher, as a percentage of the questions "
+            "where both hold a score. Blue circles, Judge correctness score, one per draw (three draws); orange "
+            "squares, Concepts, one per draw; black diamonds, Papers, draw 1. "
+            "**c**, Draw-1 answers holding all three scores, split by the judge's verdict and by Papers, high at or above "
+            f"the median of these answers pooled ({c_med}): blue, judge fails and Papers high; light grey, judge "
+            "passes and Papers high; dark grey, judge fails and Papers low; pink, judge passes and Papers low. Numbers "
+            "in the bars, answers; right, the row's answers. "
+            "**d**, Papers of the draw-1 answers with a faithfulness score, split by faithfulness 5 and 0 to 4 (rows). "
+            "Faithfulness score, from the judge reading the retrieved passages; an answer with no text, or whose call "
+            "is longer than the judge's context, has none. Grey dots, answers; box, quartiles; black line, median; "
+            f"whiskers, range; n = {d_n} answers per box, top to bottom, printed at right.")
 
 
 def figure(out, set_dir=None) -> None:

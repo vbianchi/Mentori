@@ -1,11 +1,11 @@
 {
  "provenance": {
   "script": "scripts/S481_fig6_d138.py",
-  "script_sha256": "6cdf83ff943dcffc1892d70c3689fdd366c6a468226acef94134018dddca61ec",
+  "script_sha256": "4f63c78ee591a3c23ddbeab6d034c9e9ced362f29323d93e445c7494c7e257e3",
   "command": "uv run --frozen python scripts/S481_fig6_d138.py supplementary",
   "code_sha256": {
-   "scripts/S447_fig6_panels.py": "ce7c58ebbf4d4ccc5cf205ccddbedd76463571fd462d4a5a2a16f013cfa23efe",
-   "scripts/S457_fig2_panels.py": "13d631dd56b4311cc732f7fc28b2656014c58e0f6b61b9d9b2caa1e94d5a6699",
+   "scripts/S447_fig6_panels.py": "611c4da95690f0a71ffffe94cc8b7ff3d2e4f857bfbe1b19d0d0f8da77e17050",
+   "scripts/S457_fig2_panels.py": "8c29dab8b04a1bad4a955582a30831c51c2b70438be2f6d2698c7b81948d7520",
    "scripts/S478_fig6_thinking_gap.py": "214d58e3ac60b38ab48b5693998ed99edeb42e1ff4e306b13a92a8b3b1bffc4d",
    "scripts/S479_fig6_by_tier.py": "c12358734134cbd02c63c124f677b7a15c8369727174089d02db4812cb33856c",
    "scripts/house_style.py": "647c8991f4dcd2cea08e0be46eaf758beb55fb029c54bb267e7fba1e0b8b17b6",
@@ -317,7 +317,7 @@
     2420,
     1692
    ],
-   "S525_json_sha256": "f57bd98a12d3127731dcaeb5477f8e03262c774c7a4eea369784e12b94577621",
+   "S525_json_sha256": "912246df181a529f113f4eae716a11fe597acd151c74ee352d2fa72e13113437",
    "old_copy": "s2_length_retries_20261021",
    "old_tar_sha256": "0085b2926f2ba8c442d1fa6c6ccceb54eb6fbc9d82fab581318b74662ace5ecf",
    "old_totals": [
@@ -362,6 +362,6 @@
   "Supplementary Figure 14 data (provisional, 2420 of 2420).xlsx": "52261789d3583d703be0d4470259bf13d9545afb599b2ac96dcba5dfa431c544",
   "Supplementary Figure 14 data caption (provisional, 2420 of 2420).md": "092d56c2428fda7513be12d51bf1a3532dbed14b56498dbe9413f00f5bd64499",
   "supplementary_figure14_numbers.json": "a735fe93d9b15b61a69141165a41840a0236bdf8df7aa8d7f601453013e6f0ca",
-  "legend_draft.md": "a913c4aee8b689d745d82dc3add3289225a994e5170fb7a3aa8223a3e79fd44d"
+  "legend_draft.md": "44ff66e86be01e517314dcd6c62aeca1c78ad39bf71d73ca4efb3db202480661"
  }
 }

@@ -1,0 +1,43 @@
+{
+ "script": "scripts/S578_g19_reading.py",
+ "script_sha256": "0ac1f2f02178120bacee2eff8082b104348c64d6cd65ea97ed2d576a092d5daa",
+ "at": "2026-11-06T07:30:08Z",
+ "git_head": "1ca320468585b5a962fa00ea3521d4b13a672a0b",
+ "dependencies_changed_from_head": [
+  "scripts/S578_g19_reading.py"
+ ],
+ "code_sha256": {
+  "scripts/S578_g19_reading.py": "0ac1f2f02178120bacee2eff8082b104348c64d6cd65ea97ed2d576a092d5daa",
+  "scripts/S577_g19_concept_recall.py": "bdf0049f22573648d251f896ec308b119573eb6c91db86d7485e358752368b24",
+  "scripts/S579_g19_judge.py": "81f878e7a526ad107e1a78ec976c5ba1f0165833574c5329b955baa0bef0e0d1",
+  "scripts/S576_d249_hypotheses.py": "65c2fec33e12db6f89b1008d591e4ee96efff3053b1ec458b741c7c7211730c5",
+  "scripts/S575_g17_contrasts.py": "c5b6ee839516c3305e152e3fb999d6e9634d1b86633db7dd4287be92c254e440",
+  "scripts/S571_rlm_reading.py": "bf4bfe597be481fa8dfa1416f2467a64ac6d8d1bb2693d6060526566e1cd68ee",
+  "scripts/S463_fig2_ranking.py": "7012155ed4f39e43c7f0f9f8600b1f28bc68b6892037f4110fc6c7a91f4e94ed",
+  "scripts/S518_split_confirmation.py": "a2042e9a5ff3727f3e014a580dd2cbdf5ddd21b89414f0b144892571a1a1d94e",
+  "scripts/S511_g2_matched_budget.py": "2d416dbeb6ebe5b982b96e741f3cc9e188ee3ac221eee6484ab1e737d6cde5e0",
+  "scripts/S512_s6_rejudge_v25.py": "caf423b0aa950e24ce28a14e90061fe55b66ae6fc82ebaf91b609f7ba10b05c0",
+  "findings/recompute/G19_runs/g19_check.py": "1691ee9cae1de889898904b2a7af2058a39ecf01094232107434c779769fa49d"
+ },
+ "command": "uv run --frozen python scripts/S578_g19_reading.py --runs-root /Users/valeriobianchi/s3_inputs/g19 --r-t2 /Users/valeriobianchi/s3_inputs/t2lgemma_20261104T070719Z/runs/exp_01__rlm_10__exp_v4_s20_n0+gemma3-27b --r-t2x /Users/valeriobianchi/s3_inputs/g19/r_t2x/exp_01__rlm_10__exp_v4_s20_n0+gemma3-27b --manifest /Users/valeriobianchi/s3_inputs/g19/g19_stored_R.json --judge /Users/valeriobianchi/s3_inputs/g19/out_s6_w_g19 --r-collect-t2x /Users/valeriobianchi/s3_inputs/g19/t2xgemma_collect.jsonl",
+ "inputs_sha256": {
+  "/Users/valeriobianchi/s3_inputs/g19/runs/b4_rlm_ref_gemma3__cap10__d239a46/answers.jsonl": "aa16e17ca6928cea61e27fca9ccd1d8d93369dfaa8b0d8378dbfb23ee5bab98b",
+  "/Users/valeriobianchi/s3_inputs/g19/runs/exp_01__rlm_10_nosearch__exp_v4_s20_n0+gemma3-27b/answers.jsonl": "7d0e327bfdf9aa60d6188597d68ff285b810783f482120e69e8a91767436efaf",
+  "/Users/valeriobianchi/s3_inputs/g19/runs/exp_01__rlm_10_nogate__exp_v4_s20_n0+gemma3-27b/answers.jsonl": "117ae3fab6a1f59772451bb268956fabe5fbe05314e1b10fe60421c5d9094314",
+  "/Users/valeriobianchi/s3_inputs/g19/g19_stored_R.json": "9aa8ffcc4bec1880e994bbf766d9eed1246e9bc789657cfd1dedd067907b0355",
+  "/Users/valeriobianchi/s3_inputs/t2lgemma_20261104T070719Z/runs/exp_01__rlm_10__exp_v4_s20_n0+gemma3-27b/answers.jsonl": "7c1e454a3d904ae20bcbdd04757ad8a3376999fa01c7aaecd43b139516dbcffa",
+  "/Users/valeriobianchi/s3_inputs/g19/r_t2x/exp_01__rlm_10__exp_v4_s20_n0+gemma3-27b/answers.jsonl": "313bbbe13ab34a2a7515745d57b37077165a43e921976ddbb9572bae9e1434b9",
+  "/Users/valeriobianchi/projects/Mentori-reanalysis/findings/recompute/S518_inputs/gemma3/collect.jsonl": "7fe93cde92d374b3e54c2d7db750152e9a4abe90f4a4e3b76b4ad383889a57e0",
+  "/Users/valeriobianchi/s3_inputs/g19/t2xgemma_collect.jsonl": "461c356835dee58530acf3b0de3119320622217d7f99d0f545c89c5360d88787",
+  "/Users/valeriobianchi/projects/Mentori-reanalysis/findings/recompute/G19_concept_recall/concept_recall.jsonl": "42f75651f0323dd301a785aa00e8a2316f589b485132286a5a4eee3f52037038",
+  "/Users/valeriobianchi/projects/Mentori-reanalysis/findings/recompute/B4_rlm_ref_context.json": "479e3dea3da73b581c66dceb99ae129c8befe9ad893ab1cd47fbf07ab1352728",
+  "/Users/valeriobianchi/s3_inputs/g19/out_s6_w_g19/judge/b4_rlm_ref_gemma3__cap10__d239a46/judge_passages.jsonl": "59c091c3f4b5b1459d631e9b70affad12c5e1f90da2869353f2b33ea5fe5e52e",
+  "/Users/valeriobianchi/s3_inputs/g19/out_s6_w_g19/judge/exp_01__rlm_10_nogate__exp_v4_s20_n0+gemma3-27b/judge_passages.jsonl": "90d019d4bae60af6eb0267c024ab23160884af0c2be9542cd25342133f3601fe",
+  "/Users/valeriobianchi/s3_inputs/g19/out_s6_w_g19/judge/exp_01__rlm_10_nosearch__exp_v4_s20_n0+gemma3-27b/judge_passages.jsonl": "54f45716e3c08216156596185aa7c9b8e8d8e648330c25e24440eda34050aef6",
+  "/Users/valeriobianchi/s3_inputs/g19/runs/b4_rlm_ref_gemma3__cap10__d239a46/calls.jsonl": "9013bd4892fcccf26652d5b6e20181fd8d916e01d75d8ae5e480eb81fe320896"
+ },
+ "decision": "D249 O2",
+ "draw": 1,
+ "boot": 10000,
+ "seed": 20261013
+}

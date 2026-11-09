@@ -92,7 +92,7 @@
   },
   "figure3_provenance": {
    "path": "findings/figures_provisional/fig3_strategies/figure3_provenance.json",
-   "sha256": "1c451c7d914678dd3443e24511ffcb450040edf040df8d41a27d3b9c3a0c40c0"
+   "sha256": "b9a67f91ff1610495624e51226e426a6c35b12cee8e13e7190dae65f70f97810"
   },
   "rlm_manifest": {
    "path": "findings/recompute/frozen_inputs/extracted/fig2_g1r15_inputs/fig2_g1r15_inputs/MANIFEST.sha256",
@@ -176,7 +176,7 @@
  },
  "judge_rows_v25": {
   "what": "D188: counts is on the draw-1 rows scripts/judge_rows_v25.py chooses (an answer's key v2.5 row where S6 judged it, else its key v2.4 row); counts_v24 on the collects' key v2.4 rows",
-  "script_sha256": "aa90f42264e2ce21acfca52c2421d852607418981b6e9be8d8984a716b1ebddd",
+  "script_sha256": "77d4a84d7aff4dd0ee92366395a4be2e5f27fe20d5de99ccbc86b7333c401661",
   "G3": {
    "sources": {
     "G3": {

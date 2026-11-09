@@ -26,8 +26,8 @@ REPRODUCE FIRST (README.md:75-79). Refused, nothing written, unless
       'concept recall (not drawn): strategy' row (concept_recall_pct), within 1e-8 percentage points (the sheet rounds
       each value to 9 decimals);
   (2) RLM-10's draw-1 whitespace token count of every answer equals Figure 4's words sheet (Source Data Fig. 4, sheet
-      Fig. 4d, rows 'answer', config rlm_10; an empty cell means no text, 0 tokens) as committed at 698b22c6, read with
-      git show (D219 removes that sheet); all 135 questions, exactly.
+      Fig. 4d, rows 'answer', config rlm_10; an empty cell means no text, 0 tokens) as committed at 698b22c6, read from
+      its copy pinned in the tree, held to its git blob id (O3; D219 removes that sheet); all 135 questions, exactly.
 
 OUTPUTS, findings/recompute/S566_length_recall/: results.json (provenance first), per_question.csv (a provenance line
 first), README.md. No model call, no network.
@@ -51,6 +51,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT), str(ROOT / "scripts")]
 import S463_fig2_ranking as S463  # noqa: E402  (Figure 3's reader of the answer records; read, never edited here)
+import pinned_history as PH  # noqa: E402  (O3: Figure 4's workbook at FIG4_COMMIT, pinned in the tree)
 
 S457 = S463.S457
 FR = S463.FR
@@ -307,7 +308,10 @@ def main() -> int:
         raise Refused(f"{len(fig3_rel)} committed Source Data Fig. 3 workbooks, want 1")
     fig3_b = git("show", f"HEAD:{fig3_rel[0]}", binary=True)
     fig3_commit = git("log", "-1", "--format=%H", "--", fig3_rel[0])
-    fig4_b = git("show", f"{FIG4_COMMIT}:{FIG4_PATH}", binary=True)
+    try:   # O3: the workbook as committed at FIG4_COMMIT, pinned in the tree, held to its git blob id
+        fig4_b = PH.show(FIG4_COMMIT, FIG4_PATH)
+    except PH.PinError as e:
+        raise Refused(f"git show {FIG4_COMMIT}:{FIG4_PATH}: {e}") from None
     per_cr, cr_means = read_concept_recall(sheet_rows(fig3_b, "Fig. 3a"))
     gates = {"concept_recall_means": gate_concept_recall(per_cr, cr_means, qa),
              "rlm10_draw1_words": gate_words(sheet_rows(fig4_b, "Fig. 4d"), answers, len(groups)),
@@ -324,7 +328,7 @@ def main() -> int:
             "concept_recall": {"workbook": fig3_rel[0], "read_at": "HEAD", "last_commit": fig3_commit,
                                "sha256": sha(fig3_b), "sheet": "Fig. 3a", "rows": CR_Q_ROW,
                                "column": "concept_recall_question_pct"},
-            "figure4_words": {"workbook": FIG4_PATH, "commit": git("rev-parse", FIG4_COMMIT), "sha256": sha(fig4_b),
+            "figure4_words": {"workbook": FIG4_PATH, "commit": PH.commit(FIG4_COMMIT), "sha256": sha(fig4_b),
                               "sheet": "Fig. 4d", "rows": "answer, config rlm_10", "read_with": "git show"},
             "words": "len(generation.answer.split()); 0 where S463 status is not ok", "draws": list(DRAWS),
             "resamples": int(S457.N_BOOT), "seed": int(S457.BOOT_SEED), "interval": "two-sided 95% percentile"}

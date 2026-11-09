@@ -42,6 +42,7 @@ REPRODUCE FIRST (README.md:75-79), before anything is read for A, B or C:
 Any difference refuses and nothing is written.
 
     uv run --frozen python scripts/S578_g19_reading.py --reproduce-only [--r-collect-t2x F]
+    uv run --frozen python scripts/S578_g19_reading.py --from-rows --r-collect-t2x F --out DIR
     uv run --frozen python scripts/S578_g19_reading.py --runs-root ~/s3_inputs/g19 --r-t2 <sink> --r-t2x <sink> \
         --manifest <g19_stored_R.json> --judge <out_s6_w_g19> --r-collect-t2x <t2xgemma_collect.jsonl> \
         --concept-recall findings/recompute/G19_concept_recall/concept_recall.jsonl [--store ~/l1_inputs/store] [--out DIR]
@@ -49,6 +50,15 @@ Any difference refuses and nothing is written.
 
 Writes findings/recompute/G19_reading/: reading.json (provenance, reproduce, table, contrasts, hypotheses, every answer's
 row), reading.md (the tables), header.json (provenance). No model call.
+
+--from-rows (the release's check, reproduce.py; S612: --reproduce-only alone compared no file). The arms' sinks, S579's
+judge folder and the chunk store are not released, so the per-answer rows cannot be read again from them. This mode
+runs the --reproduce-only check first, then holds every R row of the committed reading.json (OUT/reading.json, read
+whatever --out is) to the R cell read here from the T2 and T2X collects, then computes the table, the contrasts and
+D249's five hypotheses again from the committed rows by this script's own functions, and writes reading.json,
+reading.md and header.json into --out, the provenance and the reproduce record copied from the committed file. A
+reader compares the three with the committed ones: equal bytes mean every number of reading.md (Supplementary Note 5)
+follows from the committed rows by the released code. The rows themselves are held, not rebuilt.
 """
 from __future__ import annotations
 
@@ -597,6 +607,29 @@ def build(a) -> dict:
             "answers": rows, "_inputs": inputs}
 
 
+def from_rows(a) -> dict:
+    """--from-rows (module docstring): the committed reading, its table, contrasts and hypotheses computed again from
+    its rows, after the reproduce-only check and with R's rows held to the collects."""
+    q = CR.questions()
+    qs = S511.questions()
+    judged_r, rep = r_judge(a.r_collect_t2, a.r_collect_t2x, q, qs)
+    stored = json.loads((OUT / "reading.json").read_text())
+    rows = stored["answers"]
+    r_rows = {r["question_id"]: r for r in rows if r["arm"] == "R"}
+    if set(r_rows) != set(judged_r):
+        raise Refused(f"the committed reading's R rows ({len(r_rows)}) are not the {len(judged_r)} questions read here")
+    for i, r in r_rows.items():
+        c = cell(judged_r[i], qs)
+        if (r["cell"], r["score"]) != (c["kind"], c.get("score")):
+            raise Refused(f"R {i}: the committed row's cell {r['cell']} {r['score']} is not the collect's "
+                          f"{c['kind']} {c.get('score')}")
+    print(f"reproduced: {rep['s518']['what']}; the committed reading's {len(r_rows)} R rows equal the collects' cells")
+    R = {k: stored[k] for k in stored}
+    R.update({"hypotheses_text": d249().WORDING, "table": table(rows), "contrasts": contrasts(rows),
+              "hypotheses": hypotheses(rows)})
+    return R
+
+
 def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
@@ -611,6 +644,7 @@ def main(argv=None) -> int:
     ap.add_argument("--store", type=Path, default=STORE, help="the Chroma folder exp_01's passage ids resolve against")
     ap.add_argument("--out", type=Path, default=OUT)
     ap.add_argument("--reproduce-only", action="store_true")
+    ap.add_argument("--from-rows", action="store_true", help="the release's check (module docstring); needs --out")
     a = ap.parse_args(argv)
     for k in ("runs_root", "r_t2", "r_t2x", "manifest", "judge", "r_collect_t2", "r_collect_t2x", "concept_recall",
               "store", "out"):
@@ -624,6 +658,16 @@ def main(argv=None) -> int:
             print(f"reproduced: R's T2 cells equal S518.read_rows' for {rep['t2_cells_equal_s518']} keys"
                   + (f"; R's T2X cells equal S518.t2x_cells' for {rep['t2x_cells_equal_s518_t2x_cells']} keys"
                      if "t2x_cells_equal_s518_t2x_cells" in rep else " (no --r-collect-t2x: T2X's 17 not read)"))
+            return 0
+        if a.from_rows:
+            if a.out.resolve() == OUT.resolve():
+                raise Refused("--from-rows writes beside the committed reading, never over it: give --out DIR")
+            R = from_rows(a)
+            a.out.mkdir(parents=True, exist_ok=True)
+            (a.out / "reading.json").write_text(json.dumps(R, indent=1, default=list) + "\n")
+            write_md(R, a.out / "reading.md")
+            (a.out / "header.json").write_text(json.dumps(R["_provenance"], indent=1) + "\n")
+            print(f"wrote {a.out} (reading.json, reading.md, header.json) from the committed rows")
             return 0
         need = [k for k in ("runs_root", "r_t2", "r_t2x", "judge", "r_collect_t2x") if getattr(a, k) is None]
         if need:

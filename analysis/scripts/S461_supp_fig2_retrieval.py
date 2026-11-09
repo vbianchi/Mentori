@@ -30,7 +30,8 @@ REPRODUCE BEFORE WRITING (README.md:75-79). Nothing is written unless (1) every 
 mean of its per-query MRRs and its per-query count equals its n_queries, (2) the rows are exactly the grid each
 record's config declares, once each, and (3) the values S295 printed on the committed plate are regenerated: the
 chunking means and the scalability values, read from manuscript/submission/supplementary/Supplementary_Figure_2.pdf
-(sha256 922dd598, commit b143bf2) on 17 October 2026. If that PDF changes, the gate stops and asks for a re-read.
+(sha256 922dd598, commit b143bf2) on 17 October 2026 and held here as REF_C and REF_D. D2 (8 Nov): the build does not
+open that PDF; scripts/S616_figure_editorial.py check stops when it changes and asks for a re-read.
 
 No model call. Reads the deposit's five records from their frozen copy (D155), findings/recompute/upstream_inputs/
 publication/results/ (fig_repro.frozen; each file checked against frozen_inputs/SHA256SUMS, whose lines equal
@@ -206,9 +207,8 @@ def reproduce(recs, qa_ids):
         planned += len(want)
         if sorted(map(str, got)) != sorted(map(str, want)):
             probs.append(f"{FILES[k]}: rows are not the config's grid once each")
-    if sha256_file(REF_PDF) != REF_PDF_SHA:
-        probs.append(f"{REF_PDF.relative_to(ROOT)} changed since its printed values were read (sha256 "
-                     f"{REF_PDF_SHA[:8]}): re-read them into REF_C and REF_D")
+    # D2 (Valerio, 8 Nov): the submitted PDF is a document, not data: the build compares with REF_C and REF_D, the
+    # values read from it, and S616 check (an editorial step, not shipped) holds the PDF to REF_PDF_SHA
     means = {}
     for r in c["results"]:
         means.setdefault(r["config_label"], []).append(r["overall"]["MRR"])
@@ -227,7 +227,8 @@ def reproduce(recs, qa_ids):
                        f"{len(ret_ids)} retrieval query ids, none among the {len(qa_ids)} question ids of {QA_FILE}; "
                        f"no per-query row carries {', '.join(ANSWER_KEYS)}",
                        f"S295's printed values regenerated: {len(REF_C)} chunking means and {len(REF_D)} "
-                       f"scalability values, against {REF_PDF.relative_to(ROOT)} sha256 {REF_PDF_SHA[:16]}"]}
+                       f"scalability values, against the values read from {REF_PDF.relative_to(ROOT)} sha256 "
+                       f"{REF_PDF_SHA[:16]} (REF_C, REF_D; S616 check holds the PDF to that sha256)"]}
 
 
 def run_numbers(results) -> dict:
@@ -694,13 +695,14 @@ def legend_text(recs, tab, drawn, stamp, tag):
         return any(vals[u][i] == vals[v][i] and vals[u][i + 1] == vals[v][i + 1]
                    for x, u in enumerate(ks) for v in ks[x + 1:] for i in range(len(sizes_ab) - 1))
     hidden = [p for p, v in (("a", val_a), ("b", val_b)) if coincide(v)]
-    hidden_sentence = (f" In {join(hidden)}, where two series are tied at neighbouring corpus sizes, only the line "
-                       f"drawn last shows between them; the points show every series." if hidden else "")
+    def hidden_sentence(k, many):
+        return (f" Where two {many} tie at neighbouring sizes, only the line drawn last shows between them."
+                if k in hidden else "")
     # audit 27 Oct F6 (fig1_2_5): `disjoint` compares raw query ids, and the second and third runs carry the prefixes B_ and C_, so
     # it holds by construction; whether the queries' texts differ cannot be read from these records (per_query holds
     # ids and scores, no query text). The sentence therefore speaks of query ids, which is what is compared.
     run_no = run_numbers(c["results"])
-    run_sentence = (f"run {join([str(run_no[u]) for u in same_as_abd])} on the {nq} queries of a, b and d, "
+    run_sentence = (f"run {join([str(run_no[u]) for u in same_as_abd])} on the {nq} queries, "
                     f"run{'s' if len(others) > 1 else ''} {join([str(run_no[u]) for u in others])} each on "
                     f"{join(other_n)} other query ids"
                     + (", no query id shared between runs" if disjoint else ""))
@@ -708,25 +710,32 @@ def legend_text(recs, tab, drawn, stamp, tag):
     # Valerio, 23 Oct: the legend describes the image only, in the style of resubmission/05_figures/*_caption.md;
     # no method narrative, no run dates, no statement on tests, no provisional note (the data stamp stays in the
     # header above the title, where S448 R9 finds it).
+    # Valerio, 8 Nov (editor row 45, extended to the Supplementary legends): an "n = X" only in a panel that draws
+    # derived statistics (this plate draws none: c's mean tile has no spread), and every panel described in full,
+    # never "as in a" or "in a and b".
+    shown = "a, b and d" + (f" and run {join([str(run_no[u]) for u in same_as_abd])} of c" if same_as_abd else "")
+    spread = "points at one size set apart along the axis, so ties stay visible."
     body = (
-        f"**a**, Mean reciprocal rank (MRR) against corpus size ({join(sizes_ab)} papers, evenly spaced) for "
+        f"Each value is a mean reciprocal rank (MRR) over retrieval queries of their own, not questions of the "
+        f"question-answering benchmark; no answer is generated and no judge is involved. Panels {shown} use one set "
+        f"of {nq} queries. "
+        f"**a**, MRR on the {nq} queries against corpus size ({join(sizes_ab)} papers, evenly spaced) for "
         f"{words(len(cfg_a['models']))} embedding models with "
         f"{cfg_a['search_mode'].replace('_only', '').replace('_', ' ')} search only ({cfg_a['chunk_size']}-token "
         f"chunks, overlap {cfg_a['chunk_overlap']}); one colour and shape per model, labelled at the largest corpus; "
-        f"n = {nq} retrieval queries at every size. "
-        f"**b**, MRR against corpus size for {words(len(b['config']['configs_tested']))} search strategies with "
-        f"{b['config']['embedding_model']} embeddings, on the same {nq} queries; one colour and shape per strategy."
-        f"{merged_sentence} In a and b, the points at one corpus size are set apart along the axis, one place "
-        f"per series, so tied values stay visible.{hidden_sentence} "
+        f"{spread}{hidden_sentence('a', 'models')} "
+        f"**b**, MRR on the {nq} queries against corpus size ({join(sizes_ab)} papers, evenly spaced) for "
+        f"{words(len(b['config']['configs_tested']))} search strategies with {b['config']['embedding_model']} "
+        f"embeddings; one colour and shape per strategy, labelled at the largest corpus; {spread}{merged_sentence}"
+        f"{hidden_sentence('b', 'strategies')} "
         f"**c**, MRR of {words(len(c['config']['configs_tested']))} chunking configurations "
-        f"({c['config']['model']}, {c['config']['search']} search, {c['config']['corpus_size']} papers), each run "
-        f"{words(n_runs)} times: {run_sentence}. One row per configuration, highest mean at the top; each tile gives "
-        f"one run's MRR and the last column the mean of the n = {n_runs} runs, coloured on the scale above. "
-        f"**d**, MRR of {d['config']['search'].replace('BGE-M3', 'bge-m3')} search against corpus size ({join(sizes_d)} papers, evenly spaced), "
-        f"on the same "
-        f"{nq} queries, one run per size; each value is printed above its size. "
-        f"The retrieval queries are a set of their own, not questions of the question-answering benchmark; no "
-        f"answer is generated and no judge is involved.\n")
+        f"({c['config']['model']} embeddings, {c['config']['search']} search, {c['config']['corpus_size']} papers), "
+        f"each run {words(n_runs)} times: {run_sentence}. One row per configuration, highest mean at the top; each "
+        f"tile gives one run's MRR and the last column the mean of the {words(n_runs)} runs, coloured on the scale "
+        f"above the tiles. "
+        f"**d**, MRR on the {nq} queries against corpus size ({join(sizes_d)} papers, evenly spaced) for "
+        f"{d['config']['search'].replace('BGE-M3', 'bge-m3')} search, one run per size; each value is printed above "
+        f"its size.\n")
     title = f"**{SI_LABEL} | Retrieval pipeline selection.**"
     head = (f"Legend DRAFT for {SI_LABEL} (provisional; written by scripts/S461_supp_fig2_retrieval.py). Data stamp: "
             f"{stamp}.\n\n")

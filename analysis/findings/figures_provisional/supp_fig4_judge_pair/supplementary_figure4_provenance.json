@@ -1,18 +1,18 @@
 {
  "provenance": {
   "script": "scripts/S541_supp_judge_pair.py",
-  "script_sha256": "81e258d10e86c993fbc43aa449f4af6c89b3c4c8c048f6d790478ab2a0e5666d",
+  "script_sha256": "48354572154dff33ff30701dc195ec67ae25d353beee8c4aaff959185c0ea3b6",
   "imports_sha256": {
-   "S497_fig5_d166.py": "205d2442ef2a39854bda529b8c25f07714db5be6411aa3562257cc4b4702c9aa",
-   "S540_fig5_evaluators.py": "f794d4e6e40179894d22905220e79daa42693710c3f6ba4c10ee09c5b7297c77",
+   "S497_fig5_d166.py": "fc17bb3af77503ddfd6346aa8b4c7dc33f3753e87b25da60bec2b4fcddc44068",
+   "S540_fig5_evaluators.py": "e227184bb004d52856be2ab4f8440120b108ae1cc7c6035e20ed6814b7d8c920",
    "house_style.py": "647c8991f4dcd2cea08e0be46eaf758beb55fb029c54bb267e7fba1e0b8b17b6",
    "figure_names.py": "a3c65ae0a1e8aa05e99a99610ea857f63b0d8fff60a99404bcb5bf6ff9a82e65",
-   "S457_fig2_panels.py": "13d631dd56b4311cc732f7fc28b2656014c58e0f6b61b9d9b2caa1e94d5a6699",
+   "S457_fig2_panels.py": "8c29dab8b04a1bad4a955582a30831c51c2b70438be2f6d2698c7b81948d7520",
    "fig_repro.py": "4bca103b599da4adc0bd473f5b8210dd48b6543caaf63e5589f2faaa7b37d18b",
-   "S511_g2_matched_budget.py": "2d416dbeb6ebe5b982b96e741f3cc9e188ee3ac221eee6484ab1e737d6cde5e0",
-   "S518_split_confirmation.py": "a2042e9a5ff3727f3e014a580dd2cbdf5ddd21b89414f0b144892571a1a1d94e",
-   "S473_fig5_panels.py": "94acb36d0271a015df33a9446fab1977d5bbdcebb67a12a18ccfd250901c3941",
-   "judge_rows_v25.py": "aa90f42264e2ce21acfca52c2421d852607418981b6e9be8d8984a716b1ebddd",
+   "S511_g2_matched_budget.py": "bed3774dadfff61b3122b815a0851ef74fa0db7e5830ffd50fa69a8fd27f5b90",
+   "S518_split_confirmation.py": "91230a9e51aaeb7b2d49c48841131de4eaf02cda1343274849ba9b33a8e82218",
+   "S473_fig5_panels.py": "6d637b9f4e990a3470661fedee652f2b8341d8cbb4abf79acc451992340f3b36",
+   "judge_rows_v25.py": "77d4a84d7aff4dd0ee92366395a4be2e5f27fe20d5de99ccbc86b7333c401661",
    "S512_s6_rejudge_v25.py": "caf423b0aa950e24ce28a14e90061fe55b66ae6fc82ebaf91b609f7ba10b05c0",
    "S373_rejudge_v2.py": "0c74eebfedac5f42f079d6ee58e019f5c40ec6eac6471a0e38325adea5c4f677",
    "lock_equiv.py": "3e8b7860ceb7b7cb0f5c0fd72ceb868ce35cfed310974d39b4119bf6b306c2fb"
@@ -123,7 +123,7 @@
   "Supplementary Figure 4 (provisional, 1548 of 1548).svg": "30a4abe7465cb21db9fa4f5a3faca7ac12479df7a3083bdd7b7104baa4975176",
   "Supplementary Figure 4 data (provisional, 1548 of 1548).xlsx": "74a28c1f4ae4a2d1a0f4be7ca9e9ac29f4d81f88180534412e36e6258d495a6d",
   "Supplementary Figure 4 data caption (provisional, 1548 of 1548).md": "e52ce74a170897d1b1e1ebb0cfbd937fdd0d66b6c49250829ff0bc75ec45be4a",
-  "legend_draft.md": "f0a7496709c8b51fa09e23e507c69580f0026192fe52af4e77e04157b51fc09c",
+  "legend_draft.md": "1b03326982ef55b50f7ee676400b611213102eb5f3c496ac89cd0963b033ac6d",
   "supplementary_figure4_numbers.json": "4488734e6b89d08006fbbd9897a9ab1e26e69994813744fb82ca5ccf8990e80f",
   "supplementary_figure4_state.json": "675a5489587e4909602a815a001f7b788fdef590b8e80a2b16a35813df703351"
  }

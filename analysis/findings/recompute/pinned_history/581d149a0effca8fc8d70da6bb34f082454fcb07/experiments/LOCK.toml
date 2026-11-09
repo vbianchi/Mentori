@@ -1,0 +1,94 @@
+# LOCK: the one set of settings for every model call in the revised paper's experiments.
+# Every script reads its settings from this file and sets none of its own. Nothing is cut. A model that
+# fails because its input or answer is too long shows that failure in its record. An experiment varies
+# only the one factor its row in experiments/LIST.md names. Decisions behind each value: README.md.
+
+status = "proposed"            # becomes "agreed" when [models] holds the digests of every machine
+
+[server]
+ollama_version = "0.40.2"      # the Studio's keg, ollama binary sha256 af75d4a611db...; same binary on every Mac
+num_parallel = 1               # one request per server
+flash_attention = true
+kv_cache_type = "q8_0"
+keep_alive = "24h"
+truncate = false               # a prompt longer than the context is an error, never cut in half
+shift = false                  # a full context stops the answer ("length"), never drops earlier text
+runner = "llama.cpp"           # GGUF models only; no MLX model in any run (its runner does not log or
+                               # honour these settings, and qwen3.8:27b-mlx did not repeat itself at temperature 0)
+
+[generation]
+num_ctx = 131072               # largest context gemma3, gpt-oss and deepseek-r1 support
+num_predict = -1               # no output limit; the context bounds every answer
+num_batch = 1024
+seed = "draw"                  # the draw number (1, 2, 3)
+think = "off"                  # or the model's lowest level where it cannot be off
+timeout = "none"               # calls are streamed; no new token for 10 minutes = recorded as stalled
+
+[judge]
+model = "devstral-small-2:24b"
+temperature = 0                # every other setting as [generation]; S440: 107 of 107 scores equal
+seed = "none"
+
+[scorers]
+model = "devstral-small-2:24b" # RAGAS and RAGChecker, at the judge's settings
+ragchecker_claims_per_call = 1
+
+[sampling]
+# Each model's maker's values, the same for that model in every experiment and role. Source order: the
+# maker's words or code, else the maker's generation_config.json, else the transformers library default
+# (top_k 50, top_p 1.0, temperature 1.0, no min_p, repetition 1.0). Presence and frequency penalties
+# are 0 unless the maker sets them. think: off, a level, omit (no thinking mode) or always.
+[sampling.models]
+"gemma3:27b"              = { temperature = 1.0,  top_p = 0.95, top_k = 64, min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 0.0, think = "omit" }   # Google config file; temperature library default
+"glm-4.7-flash"           = { temperature = 1.0,  top_p = 0.95, top_k = 50, min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 0.0, think = "off" }    # Z.ai card; top_k library default
+"nemotron-3-nano:30b"     = { temperature = 0.0,  top_p = 1.0,  top_k = 50, min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 0.0, think = "off" }    # NVIDIA card: greedy for reasoning off
+"devstral-small-2:24b"    = { temperature = 0.15, top_p = 1.0,  top_k = 50, min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 0.0, think = "omit" }   # Mistral config file; as judge, temperature 0
+"llama3:8b"               = { temperature = 0.6,  top_p = 0.9,  top_k = 0,  min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 0.0, think = "omit" }   # Meta reference code (no top-k)
+"gpt-oss:20b"             = { temperature = 1.0,  top_p = 1.0,  top_k = 0,  min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 0.0, think = "low" }    # OpenAI README and reference sampler (no top-k)
+"gpt-oss:120b"            = { temperature = 1.0,  top_p = 1.0,  top_k = 0,  min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 0.0, think = "low" }    # as gpt-oss:20b
+"qwen3-coder:30b"         = { temperature = 0.7,  top_p = 0.8,  top_k = 20, min_p = 0.0, repeat_penalty = 1.05, presence_penalty = 0.0, think = "omit" }   # Qwen card = config file
+"qwen3-coder-next:q4_K_M" = { temperature = 1.0,  top_p = 0.95, top_k = 40, min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 0.0, think = "omit" }   # Qwen card = config file
+"qwen3.5:35b"             = { temperature = 0.7,  top_p = 0.8,  top_k = 20, min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 1.5, think = "off" }    # Qwen card, non-thinking general tasks
+"qwen3.5:122b"            = { temperature = 0.7,  top_p = 0.8,  top_k = 20, min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 1.5, think = "off" }    # Qwen card, non-thinking general tasks
+"deepseek-r1:70b"         = { temperature = 0.6,  top_p = 0.95, top_k = 50, min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 0.0, think = "always" } # DeepSeek card; top_k library default; no system prompt
+"olmo-3"                  = { temperature = 0.6,  top_p = 0.95, top_k = 50, min_p = 0.0, repeat_penalty = 1.0,  presence_penalty = 0.0, think = "always" } # AllenAI card and its example code
+"claude-haiku-4-5"        = { temperature = 1.0,  think = "omit" }   # Anthropic default; top_p and top_k not sent; model claude-haiku-4-5-20251001
+
+# Thinking on, only where thinking is the row's factor (code generation): as above, except
+[sampling.thinking_on]
+"glm-4.7-flash"       = { temperature = 0.7, top_p = 1.0 }                                       # Z.ai card, coding settings
+"qwen3.5:35b"         = { temperature = 0.6, top_p = 0.95, top_k = 20, presence_penalty = 0.0 }  # Qwen card, precise coding
+"qwen3.5:122b"        = { temperature = 0.6, top_p = 0.95, top_k = 20, presence_penalty = 0.0 }  # Qwen card, precise coding
+"nemotron-3-nano:30b" = { temperature = 1.0, top_p = 1.0 }                                       # NVIDIA card, reasoning on
+
+[gemini]
+temperature = 1.0              # Google: keep Gemini 3 at its default 1.0
+top_p = 0.95                   # API default
+top_k = 64                     # API default
+max_output_tokens = 65536      # the model maximum; it counts thinking and answer together
+seed = "draw"
+thinking = { "gemini-3-flash-preview" = "minimal", "gemini-2.5-pro" = 128 }   # the lowest each allows
+# presence and frequency penalties are not sent (Google publishes no value for them)
+
+[exceptions]
+# Models whose maximum context is below num_ctx run at their own maximum and stay out of the main comparison.
+"llama3:8b" = { num_ctx = 8192 }
+"olmo-3" = { num_ctx = 65536 }
+
+[models]
+# Tag and digest per machine, filled after the pulls of 14 October. A run refuses a model whose digest
+# differs from this list.
+
+[text]
+passages = "whole"
+judge_input = "whole"
+stored_text = "whole"
+scorer_input = "whole"         # an encoder with a fixed limit (bge-m3 8,192 tokens) splits the text, never cuts it
+component_cuts = "removed"     # except a view the model asks for itself (an RLM printing a preview)
+rerank = "all strategies"      # the RLM included
+
+[record]
+# Every call writes these; local calls also keep the server's own timings and how busy the machine was.
+fields = ["options_sent", "stop_reason", "prompt_tokens", "output_tokens", "model_digest",
+          "server", "ollama_version", "wall_s", "load_s", "prompt_eval_s", "eval_s",
+          "busy_servers_on_machine", "passages", "lock_sha256"]

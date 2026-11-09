@@ -164,9 +164,11 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 import figure_names                                                           # noqa: E402
+import fig_design                                                             # noqa: E402
 from fig_repro import FrozenInputError, check_committed, frozen, frozen_label   # noqa: E402
 from experiments.runner import experiment as ex                              # noqa: E402
 from experiments.runner.lock import load as load_lock                        # noqa: E402
+import pinned_history as PH                                                   # noqa: E402  (O3)
 
 N = 1                                             # the figure
 OUT = ROOT / "findings" / "figures_provisional" / "fig1"
@@ -190,8 +192,12 @@ F = {
     "g3_preflight": ROOT / "findings" / "recompute" / "G3_runs" / "preflight.sh",
     "g4_lib": ROOT / "findings" / "recompute" / "G4_runs" / "g4_lib.sh",
     "g5_lib": ROOT / "findings" / "recompute" / "G5_runs" / "g5_lib.sh",
-    "draws": ROOT / "experiments" / "draws.csv",
-    "plan": ROOT / "experiments" / "plan.csv",
+    # D2 (Valerio, 8 Nov): figures are built from data only. draws.csv, plan.csv and the human-evaluation protocol are
+    # working files; the build reads the values S456 takes from them out of findings/recompute/fig_design_inputs/
+    # (S616 extract, from the files at HEAD, which equal DESIGN_AT's for every value read: draws.csv and the protocol
+    # byte for byte, plan.csv's T2 feeds and status), and S616 check holds them to the working files
+    "draws": fig_design.DRAWS,
+    "design_facts": fig_design.FACTS,
     "s162": ROOT / "scripts" / "S162_figure1_final.py",
     "s447": ROOT / "scripts" / "S447_fig6_panels.py",
     "key_v24": ex.KEY_V24,
@@ -211,8 +217,8 @@ F = {
     "check_t2": ROOT / "findings" / "recompute" / "T2_runs" / "check_t2.py",
     "t2_lib": ROOT / "findings" / "recompute" / "T2_runs" / "t2_lib.sh",
     "d98_subset": ROOT / "findings" / "recompute" / "D98_subset" / "d98_subset.json",
-    # the human ratings row (D183 FD7 a): its item count and rating scale, from the human-evaluation protocol
-    "s08b": ROOT / "findings" / "S08b_PROTOCOL_HUMAN_EVAL_V22.md",
+    # the human ratings row (D183 FD7 a): its item count and rating scale, from the human-evaluation protocol's two
+    # lines in design_facts.json (s08b_protocol, from findings/S08b_PROTOCOL_HUMAN_EVAL_V22.md; D2)
     # the total of LLM calls (D199, D200): read at HEAD, not a design file; absent from the inputs while not committed
     "s520_summary": ROOT / "findings" / "recompute" / "S520_llm_calls" / "summary.json",
     # D307 (alt2): the answer count under panel b, S492's today.total_counted, read at HEAD (not a design file)
@@ -249,9 +255,10 @@ F.update({f"legend_fig{k.replace('Supp. ', 's')}": v for k, v in LEGENDS.items()
 # value that differed (drawn_moved() stopped the run as it intends).
 DESIGN_AT = "f83c10b4"
 DESIGN_KEYS = ("exp_01", "exp_02", "exp_03", "exp_05", "exp_06", "v2_8", "v4_common", "rlm_ref", "rlm_ref_pyproject",
-               "experiment", "lock_py", "g3_preflight", "g4_lib", "g5_lib", "draws", "plan", "s162", "s447",
-               "coder_gt", "t1_assignment", "t1_check", "d85_check", "s483", "check_t2", "t2_lib", "d98_subset",
-               "s08b")
+               "experiment", "lock_py", "g3_preflight", "g4_lib", "g5_lib", "s162", "s447",
+               "coder_gt", "t1_assignment", "t1_check", "d85_check", "s483", "check_t2", "t2_lib", "d98_subset")
+# D2: draws.csv, plan.csv and the protocol left DESIGN_KEYS for the data files F "draws" and "design_facts", read at
+# HEAD like any other input: they hold no dashboard text that changes with a run, so nothing needs pinning
 DESIGN_FILES = {F[k] for k in DESIGN_KEYS}
 # the files of DESIGN_FILES that S456 also imports, and the top-level names it uses from each (ex.<name>, load_lock,
 # depth_sweep86_questions, module_const): each name's definition, and every top-level definition it reaches, must be
@@ -315,7 +322,10 @@ def at_of(p: Path, root: Path = ROOT) -> str:
 
 def committed_bytes(p: Path, root: Path = ROOT, at: str | None = None) -> bytes:
     """p's bytes at commit `at` (default at_of(p): HEAD, or DESIGN_AT for a design file inside design_pinned();
-    refused when p is outside root or not committed there); outside a git checkout, p as on disk."""
+    refused when p is outside root or not committed there); outside a git checkout, p as on disk. O3 (8 Nov): a file
+    of this repository at a commit other than HEAD (DESIGN_AT) is read from its copy pinned in the tree, held to the
+    blob id git gave it (scripts/pinned_history.py), never from the history; another root (the selftest's own
+    repository) is still read with git cat-file there."""
     p = Path(p)
     at = at or at_of(p, root)
     key = (str(root), str(p), at)
@@ -325,7 +335,12 @@ def committed_bytes(p: Path, root: Path = ROOT, at: str | None = None) -> bytes:
         r_ = p.resolve().relative_to(Path(root).resolve()).as_posix()
     except ValueError:
         stop(f"{p} is outside the repository: S456 reads committed files only (D155)")
-    if not in_git(root) or at == "WORKTREE":
+    if Path(root) == ROOT and at not in ("HEAD", "WORKTREE"):
+        try:
+            data = PH.show(at, r_)
+        except PH.PinError as e:
+            stop(f"{r_} is not committed (no blob at {at}): S456 reads committed files only (D155; {e})")
+    elif not in_git(root) or at == "WORKTREE":
         data = p.read_bytes()
     else:
         r = subprocess.run(["git", "cat-file", "blob", f"{at}:{r_}"], cwd=root, capture_output=True)
@@ -893,7 +908,7 @@ def design():
     # draws, of which a generator's subset draws (check_t2.py subset_draws, run from its own source: a Gemini
     # generator's draws 2 and 3, a local generator's RLM set-ups at every draw, D175 Q3 and D176) run on D98's fixed
     # third (d98_subset.json).
-    plan = {r["id"]: r for r in csv_rows(F["plan"])}
+    plan = json.loads(read_text(F["design_facts"]))["plan_csv"]          # D2: plan.csv's T2 row (feeds, status)
     t2 = plan.get("T2", {})
     t2_gens = t2_generators()
     t2_configs = module_const(F["check_t2"], "CONFIGS")
@@ -991,16 +1006,16 @@ def design():
         named = sorted((k for k, t in legend_text.items() if re.search(rx, t, re.I)), key=list(LEGENDS).index)
         need(named == figs, f"measure {name!r}: panel a says figures {figs}, the legends name it in {named}")
     # the human ratings row (D183 FD7 a): the protocol's item count and scale
-    proto = read_text(F["s08b"])
+    proto = "\n".join(json.loads(read_text(F["design_facts"]))["s08b_protocol"]["lines"])   # D2
     m_items = re.findall(r"^- \*\*(\d+) items\*\*", proto, re.M)
     m_scales = re.findall(r"^- \*\*Scales\*\*: [^\n]*?(\d+) to (\d+) for ([^.\n]+?), plus notes", proto, re.M)
-    need(len(m_items) == 1 and len(m_scales) == 1, f"{rel(F['s08b'])}: want one '**N items**' line and one "
+    need(len(m_items) == 1 and len(m_scales) == 1, f"{rel(F['design_facts'])} s08b_protocol: want one '**N items**' line and one "
          f"'**Scales**' line, found {len(m_items)} and {len(m_scales)}")
     hr_n = int(m_items[0]) if len(m_items) == 1 else None
     hr_lo, hr_hi, hr_all = (int(m_scales[0][0]), int(m_scales[0][1]), m_scales[0][2]) if len(m_scales) == 1 \
         else (None, None, "")
     proto_scales = [x.strip() for x in re.split(r",| and ", hr_all) if x.strip()]
-    need(set(HUMAN_SCALES) <= set(proto_scales), f"{rel(F['s08b'])}: scales {proto_scales}, S456 names "
+    need(set(HUMAN_SCALES) <= set(proto_scales), f"{rel(F['design_facts'])} s08b_protocol: scales {proto_scales}, S456 names "
          f"{list(HUMAN_SCALES)}")
 
     if probs:
@@ -1563,8 +1578,8 @@ def s492_answers() -> int:
 
 def setting_n(f) -> dict:
     """The n behind each setting of panel b, by setting name, for sheet SHEET_SET's "n" column (first line of each
-    setting). Valerio, 8 Nov evening: the legend's per-setting n list moved here, word for word, and the legend says
-    "Source Data gives the n of each setting". The judge model has no n of its own: it scores the other settings'
+    setting). Valerio, 8 Nov evening: the legend's per-setting n list moved here, word for word, and since 8 Nov 20:45Z
+    (editor row 45: an n only where statistics are derived) the legend gives no n for Figure 1. The judge model has no n of its own: it scores the other settings'
     answers."""
     chunk_q = f["queries_chunk"]
     retr = f"n = {f['queries']} retrieval queries"
@@ -1628,6 +1643,10 @@ def legend_and_caption(rows, f, stamp, tag, total, answers):
     # text, with O1 scopes, O2 n clause, O3 sentence split): the per-setting n list moved to sheet SHEET_SET's "n"
     # column (setting_n), and the derivation pointer, the stress set-up and second-judge sentence and the counting
     # date left the legend; the plate's panel b still marks the stress set-ups and the second judge.
+    # Valerio, 8 Nov 20:40Z: no "n = " tag in any legend; each count once, in plain words, with its unit.
+    # Valerio, 8 Nov 20:45Z (editor row 45): an n only on a panel that shows derived statistics. Figure 1 shows none,
+    # so it carries no n and no count added only to give one: the 244-questions sentence and its Source Data pointer
+    # left the legend (the per-setting n stays in sheet SHEET_SET's "n" column and the Source Data caption).
     legend = (
         f"{A}, Each answer is read by three signals, each against its own reference and reported on its own; under "
         f"each, the tool that scores it and its readouts. Judge: correctness, pass at a score of 4 or more; refusal of an "
@@ -1636,8 +1655,7 @@ def legend_and_caption(rows, f, stamp, tag, total, answers):
         f"occur in the question are not counted. Papers: MiniCheck's share of the answer's claims supported by the "
         f"key's source papers. "
         f"{B}, The settings varied, by the pipeline stage they act on: indexing (INDEX), retrieval (RETRIEVE), generation "
-        f"(GENERATE) and judging (JUDGE). Each number is a setting's number of levels. n = "
-        f"{f['per_size'][max(f['core'])]} questions in all; Source Data gives the n of each setting. "
+        f"(GENERATE) and judging (JUDGE). Each number is a setting's number of levels. "
         f"{answers_sentence(answers)} {calls_sentence(total)} Supplementary Table 2 names the models.")
     title = "The three signals that read every answer, and what the study varied"
     lines = [f"# Figure {N}, title and legend (draft)", "",
@@ -1878,12 +1896,12 @@ def selftest():
         # (5) part 4: the checks read HEAD; only design_pinned() and inputs_sha256 read DESIGN_AT
         global _PIN
         res.append(("(5) a design file is read at HEAD outside design_pinned()",
-                    at_of(F["draws"]) == "HEAD" and at_of(F["plan"]) == "HEAD"))
+                    at_of(F["exp_01"]) == "HEAD" and at_of(F["g4_lib"]) == "HEAD"))
         global LEGENDS_AT
         res.append(("(6) a legend draft is read at HEAD by default", at_of(LEGENDS["2"]) == "HEAD"))
         LEGENDS_AT = "worktree"
         try:
-            leg = (at_of(LEGENDS["2"]), at_of(F["draws"]), recorded_at(LEGENDS["2"]), input_name(LEGENDS["2"]))
+            leg = (at_of(LEGENDS["2"]), at_of(F["exp_01"]), recorded_at(LEGENDS["2"]), input_name(LEGENDS["2"]))
         finally:
             LEGENDS_AT = "HEAD"
         res.append(("(6) under S494 --write (LEGENDS_AT worktree) a legend draft is read and recorded from the "
@@ -1891,13 +1909,13 @@ def selftest():
                         "WORKTREE", "HEAD", "WORKTREE", frozen_label(LEGENDS["2"]))))
         _PIN = True
         try:
-            pinned_at = (at_of(F["draws"]), at_of(LOCK))
+            pinned_at = (at_of(F["exp_01"]), at_of(LOCK))
         finally:
             _PIN = False
         res.append(("(5) inside design_pinned() a design file is read at DESIGN_AT, any other file at HEAD",
                     pinned_at == (DESIGN_AT, "HEAD")))
         res.append(("(5) inputs_sha256 records a design file at DESIGN_AT, any other file at HEAD",
-                    input_name(F["draws"]).endswith(f"@{DESIGN_AT}") and recorded_at(LOCK) == "HEAD"))
+                    input_name(F["exp_01"]).endswith(f"@{DESIGN_AT}") and recorded_at(LOCK) == "HEAD"))
         r_ = [("INDEX", "Corpus scale", 12)]
         res.append(("(5) drawn_moved: equal rows and facts pass, a T2 status change alone passes",
                     drawn_moved(r_, {"core": [1], "t2_status": "done"}, r_, {"core": [1], "t2_status": "running"})

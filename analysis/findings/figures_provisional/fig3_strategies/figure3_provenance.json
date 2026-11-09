@@ -1,7 +1,7 @@
 {
  "provenance": {
   "script": "scripts/S463_fig2_ranking.py",
-  "script_sha256": "2f93a2b5df2bd68bdcf38a372d6c737ecdbce54a4e68406f0b261e03fbd9af31",
+  "script_sha256": "8279a35d27c5a99d34980b59529203b104526035beba74031c9964a2ee360825",
   "command": "uv run --frozen python scripts/S463_fig2_ranking.py rebuild",
   "python": "3.13.11",
   "deterministic": "D155: no build time and no repository HEAD are recorded; the script's and every input's sha256 identify the build",
@@ -419,7 +419,7 @@
    "findings/recompute/S518_split_confirmation/gemini-2.5-pro.json": "33de43424f593c360a917ebcf0822381b345b7f9ec69a13b5db399513ba1496a",
    "findings/recompute/S518_split_confirmation/gemini-3-flash-preview.json": "fbb5a6eeaa3db06ea5adcb0269660bde91c4b8452a3d21a69342992268461b6e",
    "findings/recompute/S607_refusal_person_check/summary.json": "45bed1d60e3de3cc262c8c68a62dcd5925094215a6d31ff3c86fb45a4e47ba65",
-   "scripts/S518_split_confirmation.py": "a2042e9a5ff3727f3e014a580dd2cbdf5ddd21b89414f0b144892571a1a1d94e",
+   "scripts/S518_split_confirmation.py": "91230a9e51aaeb7b2d49c48841131de4eaf02cda1343274849ba9b33a8e82218",
    "frozen:s457_mirror_20261022.tar/s457_mirror_20261022/matched_budget/answers.jsonl": "6b4c46531eca233b1bd73a5cb56819874e1807e9ee6c80152e9ce904a2d32728",
    "frozen:g6_d135/b4_rlm_ref__cap10__all135/answers.jsonl": "e5fa8d97d40859dd60f36c385b7d4e04a05a8f212d2857e9e462b82147b12637",
    "findings/recompute/G13_runs/inputs/runs/exp_01__matched_budget__exp_v4_s20_n0/answers.jsonl": "5cb3ac4eaab59be3e16d27e76f0a983cbcdee997b00e86355951d50ac365e9b7",
@@ -434,13 +434,13 @@
    "findings/recompute/S511_g2_budget/results.json": "e225903ba4409374263dfe33626f6bca5c35ac957f1666a14553de937808b3f3",
    "scripts/house_style.py": "647c8991f4dcd2cea08e0be46eaf758beb55fb029c54bb267e7fba1e0b8b17b6",
    "scripts/figure_names.py": "a3c65ae0a1e8aa05e99a99610ea857f63b0d8fff60a99404bcb5bf6ff9a82e65",
-   "scripts/S511_g2_matched_budget.py": "2d416dbeb6ebe5b982b96e741f3cc9e188ee3ac221eee6484ab1e737d6cde5e0",
+   "scripts/S511_g2_matched_budget.py": "bed3774dadfff61b3122b815a0851ef74fa0db7e5830ffd50fa69a8fd27f5b90",
    "findings/recompute/G1_runs/rerun_d89.sh": "8549210c7e829229ba83b0dd5afcc804454cda00aed665ce586ede5e24d98260",
    "findings/recompute/S04a_flip_stats.json": "45fe073e4e3954be54be2c9852c6bdaeecee05fd0f549abcf208fac566af7d21",
    "experiments/LOCK.toml": "8730d401a5d7b6baa1780e656f844261eaead60e45b5199afa29d57f989ad495",
    "experiments/FIGURE_LOCK.toml": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
-   "scripts/S457_fig2_panels.py": "13d631dd56b4311cc732f7fc28b2656014c58e0f6b61b9d9b2caa1e94d5a6699",
-   "scripts/judge_rows_v25.py": "aa90f42264e2ce21acfca52c2421d852607418981b6e9be8d8984a716b1ebddd",
+   "scripts/S457_fig2_panels.py": "8c29dab8b04a1bad4a955582a30831c51c2b70438be2f6d2698c7b81948d7520",
+   "scripts/judge_rows_v25.py": "77d4a84d7aff4dd0ee92366395a4be2e5f27fe20d5de99ccbc86b7333c401661",
    "findings/recompute/L3/concept_recall.jsonl": "56f0f23b3415169a2ec5a79f6fb9cbf427939054279b9ebc32b21cf07c6e2f36",
    "findings/recompute/L3/header.json": "01597d0c39704f1e1abfa132231eee57a9a839b111340ea0b5a85b2482bf0b5f",
    "findings/recompute/L3_d181/concept_recall.jsonl": "2ce0985ee014cf33f84417410282271b518c06a220138d2d6f67145c539e6371",
@@ -751,13 +751,12 @@
  "files": {
   "ranking.json": "ae8c82f2f43dc423a9fa0dcbfdf7ed5c6dca81d7604fc5b5fded443952b753e5",
   "ranking_report.md": "11e97dec8843cf991e1637a85eb1d12511d1c474b820426c2fbc6a8626d1084f",
-  "claims.md": "07d11fdc220ce1bc724d04c2a447ed2f67711f2a5061573eef5a586284a17039",
   "Figure 3 (provisional, 14860 of 21402).pdf": "639776fca3a36b33c11b76db5480575de06dd21e5e60fb1410e015b4d59fdf32",
   "Figure 3 (provisional, 14860 of 21402).svg": "b1b4b1b9da885bbc607a44a97029b1e14bc31bdbbd7bd4f7e2165bac6b8586b5",
   "Figure 3 (provisional, 14860 of 21402).png": "c91d4f9aca4209a74bbb240f4627a637e503b2135b8618a4b5fbc4d158df4e7c",
   "Source Data Fig. 3 (provisional, 14860 of 21402).xlsx": "7a9dcfcc4cb866c56bbab92dd2b24cd374296827649307a8fc751c931be4ff52",
   "Source Data Fig. 3 caption (provisional, 14860 of 21402).md": "1b55e8c44e39707c1ecf37ecbf13fe0770880a3baa36e6c0457e9cba71533ed8",
   "figure3_numbers.json": "984e34e93d115a98f5e07253c99d62bc09dcaea98a17ff3de8bc92831ddbab69",
-  "legend_draft.md": "8d274dbce02d14f99e451d261ef1fcd2d58d1770373d2d6e57d0a57a14c706ee"
+  "legend_draft.md": "2886ea494e13922905a5f52cec312cde94f5b91c0b2da006017e6e34d8fd64c7"
  }
 }

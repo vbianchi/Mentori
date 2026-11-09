@@ -1,7 +1,7 @@
 {
  "stamp": "PROVISIONAL two raters, 49 of 49 answers drawn",
  "script": "scripts/S531_fig2_s3_plates.py",
- "script_sha256": "50ec719568f060b9db444d8b3238808a9991861ea54547f4b6f9bf2eab7fc03f",
+ "script_sha256": "8c88cd5fcf3f60772422d9c0758e6e82ef8df86d06597ed387315bb1c88d799e",
  "command": "uv run --frozen python scripts/S531_fig2_s3_plates.py --raters 2",
  "raters": 2,
  "inputs": {
@@ -15,6 +15,6 @@
   "Source Data Fig. 2 (provisional, 49 of 49).xlsx": "c9dc7f641bdb9624d0c6d3c3d1a3775d7383b7bc3ad3b6df08108525a231d6c3",
   "Source Data Fig. 2 caption (provisional, 49 of 49).md": "204b82414b249e0d2de74625af9cb19b8c082485a195e9fc28a6f36e809b9818",
   "figure2_numbers.json": "a1969bec6049b5f620b5d0ff249b2def87fcfe6a4706864a5b51f04a2b648545",
-  "legend_draft.md": "6a5843d54ff44ba0ef8e46a875f8aa32ba95680c22cd27e08b8aefc6536027ca"
+  "legend_draft.md": "ca517e997667e07a5a2a1bd86704ccb9dac1404e95f35172ec7200d35bfa7846"
  }
 }

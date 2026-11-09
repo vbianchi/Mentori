@@ -1,6 +1,6 @@
 {
  "script": "scripts/S476_fig3_d123.py",
- "script_sha256": "b50f91c05d5539fedc95dfec4601e0c718605d4800cb8dffb8ed776c24c72a42",
+ "script_sha256": "535add18e3e795d4250651b07b71114284a901b8329a255ab11a2b48a39c04c7",
  "command": "uv run --frozen python scripts/S476_fig3_d123.py plate",
  "python": "3.13.11",
  "inputs_sha256": {
@@ -9,7 +9,7 @@
   "findings/recompute/L2/header.json": "fde95a55d86ecf8423319373af80e2cbd55095ec14bcb44cfb86c621eb8a6152",
   "findings/recompute/L2_d135/concept_recall.jsonl": "043d78a3d442de55ee76c4ebaca2bfb822363e34937ae5f185a933aa2b1d0dd6",
   "findings/recompute/L2_d135/cap_tables.json": "da7c7ef80c25aa1d2cb1fd9e6caa10161d2211b2950069c4292488399edc2db1",
-  "findings/recompute/L2_d135/header.json": "892e194c91d865a2f1209e4a329f1e3b70d1fc630aa6e1f6ac38d7c5884e0d3f",
+  "findings/recompute/L2_d135/header.json": "7c9dfc88ff441bd79bac55257f55d2b04058602cb9b84f1f18bdd34e985af165",
   "findings/recompute/L2_d181/concept_recall.jsonl": "713773461aab4575e0ea0d746ae3dc8e42735db7509b8a474e19184cb1e1355d",
   "findings/recompute/L2_d181/cap_tables.json": "982f658d268d3175b45a4a5ee8f5f4de5a6557e081541fafe70caf54cac6b2d6",
   "findings/recompute/L2_d181/header.json": "078155046fdb8d89bcb149a150852187903ca994d84e8166d6ba51259870ffe6",
@@ -18,10 +18,10 @@
   "findings/recompute/L2_d135_d181/header.json": "40ad807a471d70c486c91088a03656eb10410375b7f54b9dafcb9c1795719d06",
   "findings/recompute/T1_L2/concept_recall.jsonl": "7b9c996460c9cb57062673c7b3fa6520c0d2099ef75c2f3a6b6eac7268d01b84",
   "findings/recompute/T1_L2/cap_tables.json": "81a0730063767180c21dba223d1eabd17bdab00a1a31c24eaf34a495e5c3b162",
-  "findings/recompute/T1_L2/header.json": "8253d4d1f21d510b102c549d94b6b8d8ce7789df67939ad1c8fa5d71a5cddef4",
+  "findings/recompute/T1_L2/header.json": "05e55efe72617eb706eab14d6ff680eb944e21f951e5e0c432d0c4b85760d8d9",
   "findings/recompute/G4_fig3c/pairs.jsonl": "ff6e97483938bab2e0a1030ea8144b3629b8e68481bba69bec0775cea37bc8f1",
   "findings/recompute/G4_fig3c/point_tables.json": "9b34ed146a48abccdabc1f27fe0e967d2a6fbabc3626b58d1919bfb9b31b3350",
-  "findings/recompute/G4_fig3c/header.json": "4caf4d9d14c86c74728315dac41fe5d5b9a48bafa0acb3c315bdba2d3bdd3069",
+  "findings/recompute/G4_fig3c/header.json": "49932ceda11ef9e0f41f704f8bcccfbbb9bd1965994a79bfc7389dfe3895c084",
   "findings/recompute/G4_fig3c/grid_pairs.jsonl": "0d8d8785aebc3b23dacc8eb0d74fb113d1ec33ba19d166733b5f0dc6cf283172",
   "findings/recompute/G4_fig3c/grid_tables.json": "5e4bdb0048699526b152b43aa2d1c895dc984c43610760830b6b7e4dbf9e4f3a",
   "findings/recompute/T1_L2_d181/concept_recall.jsonl": "0b8173f95644c29a9b7bc54367c5c6642dfb99c014022a713228fcb348d8ab68",
@@ -234,12 +234,12 @@
  },
  "panels": {
   "a": "A-1 (Valerio, 26 October): per cap two boxes, Mentori's RLM left, the package right, quartiles, median, full range, every question a dot, a thin line joining the medians, caps evenly spaced, no mean (L2 all mode; the mean and its interval in the data workbook, D128)",
-  "b": "B-2 (Valerio, 26 October), with his 15:00 follow-up (question lines one grey, #ABABAB, caps evenly spaced): one small panel per local model, a line per complete question, the median, and the median of the same questions with gemini-3-flash-preview (G5, draw 1) in #0072B2 dashed; the key is line samples with their meanings",
+  "b": "B-2 (Valerio, 26 October), with his 15:00 follow-up (question lines one grey, #ABABAB, caps evenly spaced): one small panel per local model, a line per complete question, the median, and the median of the same questions with gemini-3-flash-preview (G5, each question's mean over draws 1 to 3) in #0072B2 dashed; the key is line samples with their meanings",
   "c": "D150 (Valerio, 26 October 19:00, layout O-b1): every strategy minus single pass per index, judge score 4 (the pass rate) above score 3 (relaxed, D154), one cividis scale, the number in each cell, a frame where the two-sided 95% interval excludes 0, empty where a unit is not complete; on the questions the index can answer (D126, {'10': 44, '20': 86, '5': 22, '50': 86} by core papers)",
   "strip": "D-3b (D149, Valerio 26 October 18:40): under a, per system and cap two bars side by side, reached the cap (plain) and cut off by the cap (hatched); no panel d",
   "range strip": "FF30 a (supp.md section 7): under the first strip, per system and cap the range of the mean over the draws on D98's questions; an axis alone until G7 is read"
  },
- "legend_words": 165,
+ "legend_words": 210,
  "font": "Helvetica",
  "plates": {
   "Figure 4 (D283)": {
@@ -250,7 +250,7 @@
     183.0,
     97.78888888888889
    ],
-   "legend_words": 165
+   "legend_words": 210
   },
   "Supplementary Figure 8 (D283)": {
    "folder": "supp_fig8_depth",
@@ -260,16 +260,16 @@
     183.0,
     70.8111111111111
    ],
-   "legend_words": 98
+   "legend_words": 176
   }
  },
  "files": {
   "Figure 4 (provisional, 5520 of 5520).pdf": "cdc4cb7695a306bc54ed60bd05265f02433fbd1063ae818e472d20ff9e8bc0cd",
   "Figure 4 (provisional, 5520 of 5520).svg": "04ca63bee080c1b73d8ec9fcd3643e53636525e347df95a83db17d2fc83b60ee",
   "Figure 4 (provisional, 5520 of 5520).png": "581d9b502c462d3ff98dc7f08f797408e35e661e47e0c750792057e1c49d4333",
-  "Source Data Fig. 4 (provisional, 5520 of 5520).xlsx": "f4655b467d03b176c04118760083476fcc07a3180dce291fdd926356d9c68760",
-  "Source Data Fig. 4 caption (provisional, 5520 of 5520).md": "8fd2878bb80eb45506cb9f476b901a210a02cb502538d70524116e0e1c070e8f",
-  "figure4_numbers.json": "44915ccad6907267c5ad6328efe9b27214e84f1df49462a6a401e2d494e7a161",
-  "legend_draft.md": "bbd86cd9f630fbcb9a2c61ca77738f43e88dba72913e13f5bbe508dc3698548e"
+  "Source Data Fig. 4 (provisional, 5520 of 5520).xlsx": "b86f863eeb035398b71408723b0037efe29fb084c907ee4deaecaa4b00a58bc0",
+  "Source Data Fig. 4 caption (provisional, 5520 of 5520).md": "a634184e3c4ed70772f41cc3377173e3ebbf71f5e0ac44b00e6918ef76a373f0",
+  "figure4_numbers.json": "55b6d340d5db5ff4ecbc7230529f22d80c7f52fe06462b480d917cfb56f19cbd",
+  "legend_draft.md": "dd7dc47fb0e259c111cb23aa73f912b8acb9324f43af2009651a49aca7e98e2c"
  }
 }

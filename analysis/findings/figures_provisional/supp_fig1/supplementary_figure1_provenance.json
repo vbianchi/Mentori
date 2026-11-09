@@ -1,14 +1,14 @@
 {
  "provenance": {
   "script": "scripts/S496_supp_fig1_experiment_graph.py",
-  "script_sha256": "ec088071f12697538b7ee4cd9e177c109f996c292e3b81b3cd0140ec4122c306",
+  "script_sha256": "557dec2aab4f439ecf05199b7d38c9518b46b7821f317e36d431b1c9aa7a963c",
   "command": "uv run --frozen python scripts/S496_supp_fig1_experiment_graph.py",
   "python": "3.13.11",
   "deterministic": "D155: no build time and no repository HEAD are recorded; draws.csv is recorded by the sha256 of the fields drawn, not of the file",
   "inputs_sha256": {
    "findings/recompute/S492_answer_registry/registry.json": "50ec28658dfedaef28fe4489c50e5ef5289393960613e69e13c23c762b6b9dcb",
-   "findings/figures_provisional/fig1/figure1_provenance.json": "9910c6233f0b4440239f5292d8548eff4e50f0770678e83a988fcc366bcd4c78",
-   "experiments/draws.csv (fields experiment, plan_row, design, draws, status)": "d8a4adaa93474cbf9a0a31f7b25dfe5b75254bd26a9b3d40d21c35b67c4cb1ef",
+   "findings/figures_provisional/fig1/figure1_provenance.json": "0739c52206a888199123f821e3c26e8ab3df99c6963a992594b00e59875c3cf7",
+   "findings/recompute/fig_design_inputs/draws.csv (fields experiment, plan_row, design, draws, status)": "d8a4adaa93474cbf9a0a31f7b25dfe5b75254bd26a9b3d40d21c35b67c4cb1ef",
    "experiments/rlm_ref/pyproject.toml": "7b8b26c479d8fe9ef349ed5e283902fe8bab1b4725633909c532fb72fe22b2cb"
   },
   "model_calls": 0
@@ -511,6 +511,6 @@
   "Supplementary Figure 1 data (provisional, 22 of 22).xlsx": "a2b48922853c408a946f51396fd8d41d15ba37f2c11ba871a61f1960ebecf382",
   "Supplementary Figure 1 data caption (provisional, 22 of 22).md": "799eb2b7347d3a99d024bb093ef3e3a3f24f1c571d4674d2cdc89ab22f926740",
   "supplementary_figure1_numbers.json": "10a78c3712e4e37b02e649b3cc57ce75cbf77f64aec3a6d2f46fca3e815df062",
-  "legend_draft.md": "6185b08b1c76d0f420be49da47d773b4a7a26dffe5d7d00983e4a4b5af95b68c"
+  "legend_draft.md": "e99ce1509a1eca6540b981720c379fe55adf1eb90dc4c67d29648f539e321b00"
  }
 }

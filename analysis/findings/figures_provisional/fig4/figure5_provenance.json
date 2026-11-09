@@ -1,6 +1,6 @@
 {
  "script": "scripts/S472_fig4_panels.py",
- "script_sha256": "3e455cc6e435d4bc6ed99ccb0311bae72049776b330a4b43945a6be545a9f4aa",
+ "script_sha256": "84297a37e74db0d0f80b9704b26a232115c53bbc8eab66b0e8de24d100fdd791",
  "command": "uv run --frozen python scripts/S472_fig4_panels.py figure",
  "python": "3.13.11",
  "frozen_inputs": {
@@ -825,14 +825,14 @@
   "reading": "findings/recompute/S571_rlm_reading/g17_d123/g17_reading.json",
   "reading_sha256": "e824e35e084ab7ff7788a38248ce399d6f8188f564a3b3088d3ecb052f4a6880",
   "s576": "findings/recompute/S576_d249/s576_d249.json",
-  "s576_sha256": "3c819abbdbf982216e4d3552951c7fe132eac20a7d3d5d4879eb2e507dfd70b8",
+  "s576_sha256": "c01d745d051e737feb60ce1ac6735e51f34b6828450c12377de3a3ac0b16463d",
   "s576_code_sha256": {
-   "scripts/S576_d249_hypotheses.py": "65c2fec33e12db6f89b1008d591e4ee96efff3053b1ec458b741c7c7211730c5",
-   "scripts/S463_fig2_ranking.py": "906affaedad63a6bf3ffb96e5363467ddde580b339ef9cb58a287b2ab74f00f8",
+   "scripts/S576_d249_hypotheses.py": "eabafff3df26540a8de0337eea2434a46f54f10712ad383fcc87e0994ad46b8d",
+   "scripts/S463_fig2_ranking.py": "9d8bac6d5624a7664c6a3a8859bda43811ac387d51ee6ddcb579c9a9755b4447",
    "scripts/S575_g17_contrasts.py": "c5b6ee839516c3305e152e3fb999d6e9634d1b86633db7dd4287be92c254e440"
   },
   "s575_contrasts": "findings/recompute/S575_g17_contrasts/contrasts.json",
-  "s575_contrasts_sha256": "7670e44cae5f998eeb7d26157d865d6cae387d328a8f4a586fdfda6da624b2c8",
+  "s575_contrasts_sha256": "14efe8a7b69e7d66b73f3bb845dad7f0efdaa4bfd53e9b885a07d7907ff453fd",
   "resamples": 10000,
   "seed": 20261013,
   "unscored_cells": {
@@ -866,7 +866,7 @@
  },
  "recount": {
   "path": "findings/recompute/S480_fig4_recount.json",
-  "sha256": "6305958ce9e25d2f146b7ea6db5959414c1ac98906bb7fb35c098c64c5a23e8b",
+  "sha256": "7703379904bae05011c4579e52a6560ff007c7cea38af3e8651380d8ddf75f77",
   "script": "scripts/S480_fig4_recount.py",
   "script_sha256": "7c432aa0524944649573f60009acb38450eb9886459783d3c8bf7aa1504950ee",
   "inputs_checked": [
@@ -889,31 +889,27 @@
   ]
  },
  "inputs_sha256": {
-  "experiments/plan.csv@96936742": "f5fd5e87b08c4121f345e0db7b11293d6fbe107145aec08f2477ff912564e38b",
+  "findings/recompute/fig_design_inputs/design_facts.json": "9fb39a2d241543a10ba676057f552312de0133386a683fd0b5517dc468666e02",
   "findings/recompute/fig4_repo_inputs/G3_runs/preflight.sh": "01b8a87a2bd08c7fca12a3948f47931033089904b7bf7dd85668ecb84c4f14a5",
   "findings/recompute/D98_subset/d98_subset.json": "957c79b6b0f3afb12b70be51d0802e7853b4d4ff12e2bdb519d44a10111046bc",
   "experiments/mentori/orchestrator/distiller_firing.py@96936742": "65766687222d78b8af6e872345047cbad778a94c0a5c53b9bdbe1b52e49be50b",
   "experiments/mentori/publication/scripts/exp_03_orchestration_ablation.py@96936742": "6783d3f6a5868807b87580a5e3f12a4ee6b38a3d509334636aa17aa2c208c0f0",
   "experiments/LOCK.toml": "8730d401a5d7b6baa1780e656f844261eaead60e45b5199afa29d57f989ad495",
   "experiments/FIGURE_LOCK.toml": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
-  "experiments/LIST.md@96936742": "d2fce3fff97d06f2d35eb4295518f6ce30c9319e0b31be16080ef4d1d8cc070b",
-  "experiments/README.md@96936742": "6a1fac64adc05f2be648aac3fcf8ed15f6078a1e5388ce6025ec2ab9b75169eb",
-  "scripts/S457_fig2_panels.py": "13d631dd56b4311cc732f7fc28b2656014c58e0f6b61b9d9b2caa1e94d5a6699",
-  "scripts/S463_fig2_ranking.py": "2f93a2b5df2bd68bdcf38a372d6c737ecdbce54a4e68406f0b261e03fbd9af31",
-  "scripts/judge_rows_v25.py": "aa90f42264e2ce21acfca52c2421d852607418981b6e9be8d8984a716b1ebddd",
+  "scripts/S457_fig2_panels.py": "8c29dab8b04a1bad4a955582a30831c51c2b70438be2f6d2698c7b81948d7520",
+  "scripts/S463_fig2_ranking.py": "8279a35d27c5a99d34980b59529203b104526035beba74031c9964a2ee360825",
+  "scripts/judge_rows_v25.py": "77d4a84d7aff4dd0ee92366395a4be2e5f27fe20d5de99ccbc86b7333c401661",
   "scripts/house_style.py": "647c8991f4dcd2cea08e0be46eaf758beb55fb029c54bb267e7fba1e0b8b17b6",
   "scripts/figure_names.py": "a3c65ae0a1e8aa05e99a99610ea857f63b0d8fff60a99404bcb5bf6ff9a82e65",
   "scripts/S575_g17_contrasts.py": "c5b6ee839516c3305e152e3fb999d6e9634d1b86633db7dd4287be92c254e440",
-  "scripts/S576_d249_hypotheses.py": "65c2fec33e12db6f89b1008d591e4ee96efff3053b1ec458b741c7c7211730c5",
+  "scripts/S576_d249_hypotheses.py": "eabafff3df26540a8de0337eea2434a46f54f10712ad383fcc87e0994ad46b8d",
   "findings/recompute/S571_rlm_reading/g17_d123/g17_reading.json": "e824e35e084ab7ff7788a38248ce399d6f8188f564a3b3088d3ecb052f4a6880",
-  "findings/recompute/S576_d249/s576_d249.json": "3c819abbdbf982216e4d3552951c7fe132eac20a7d3d5d4879eb2e507dfd70b8",
-  "findings/recompute/S575_g17_contrasts/contrasts.json": "7670e44cae5f998eeb7d26157d865d6cae387d328a8f4a586fdfda6da624b2c8",
-  "resubmission/04_manuscript/02_Main_Text.docx@96936742": "fcb60d13eeba61a55167b3615ca6e1b5b12a9e8b0438b42b4bede999d5332fb2",
-  "resubmission/02_response_to_reviewers/Point_by_point_response_all_reviewers.docx@96936742": "dbfcc49bc340cc14e2818f027ce7a9e3bc1568510b0827029e2cd363f3369463"
+  "findings/recompute/S576_d249/s576_d249.json": "c01d745d051e737feb60ce1ac6735e51f34b6828450c12377de3a3ac0b16463d",
+  "findings/recompute/S575_g17_contrasts/contrasts.json": "14efe8a7b69e7d66b73f3bb845dad7f0efdaa4bfd53e9b885a07d7907ff453fd"
  },
- "inputs_read": "every input as it stands in the working tree, every check and the claims list on those; inputs_sha256 records the design documents (DESIGN_DOCS) as they stood at DESIGN_AT 96936742 (git show), under names carrying @96936742; exp_03's STRESS_CONFIG_NAMES and distiller_firing.py's code (less its docstring) required the same as at DESIGN_AT",
+ "inputs_read": "every input as it stands in the working tree, every check on those; plan.csv's G3 sentence from findings/recompute/fig_design_inputs/design_facts.json (D2: no document or working file is read; the claims list is S616's editorial step); inputs_sha256 records exp_03 and distiller_firing.py (DESIGN_DOCS) as they stood at DESIGN_AT 96936742 (git show), under names carrying @96936742; exp_03's STRESS_CONFIG_NAMES and distiller_firing.py's code (less its docstring) required the same as at DESIGN_AT",
  "model_calls": 0,
- "stamp": "PROVISIONAL: 1,485 of 3,015 answers, draw 1 of eight G3 set-ups (records of 2026-10-19 01:54 CEST, copied 2026-10-23T07:41:05Z, judged by S3, G3 collect of 2026-11-03T15:22:54), of RLM-10 (G1, G1 collect of 2026-10-23T09:41:17) and of G9's two set-ups (judged, retrievals read); key v2.5 judge rows: RLM-10's 60 from S6G1 after phase 3 (frozen fig3_s6_inputs, S528), G3's 600; 0 G3 answers of changed questions still on key v2.4 (D188, awaiting S6G3); 'draw' rows in; T3 not drawn; d, e: G17 (D250), concept recall the mean of draws 1 to 3, reading paper text draw 1, S571's reading e824e35e, S576's differences 3c819abb",
+ "stamp": "PROVISIONAL: 1,485 of 3,015 answers, draw 1 of eight G3 set-ups (records of 2026-10-19 01:54 CEST, copied 2026-10-23T07:41:05Z, judged by S3, G3 collect of 2026-11-03T15:22:54), of RLM-10 (G1, G1 collect of 2026-10-23T09:41:17) and of G9's two set-ups (judged, retrievals read); key v2.5 judge rows: RLM-10's 60 from S6G1 after phase 3 (frozen fig3_s6_inputs, S528), G3's 600; 0 G3 answers of changed questions still on key v2.4 (D188, awaiting S6G3); 'draw' rows in; T3 not drawn; d, e: G17 (D250), concept recall the mean of draws 1 to 3, reading paper text draw 1, S571's reading e824e35e, S576's differences c01d745d",
  "page_mm": [
   183.0,
   162.90166666666667
@@ -1476,10 +1472,9 @@
   "Figure 5 (provisional, 1485 of 3015).svg": "cb4ee79e6c53241e4248015912ae7a96d0167e549d6f0979b9678f7694b8f782",
   "Figure 5 (provisional, 1485 of 3015).png": "73c1cccd846a8c04b67e4386cedd3c13cdbe7f1882657d7a2556be3bd175a4d0",
   "Source Data Fig. 5 (provisional, 1485 of 3015).xlsx": "aa90b86ddfda998826864c8f6cf42f17a881c71044b83ddfb6a1a6d008b31d20",
-  "Source Data Fig. 5 caption (provisional, 1485 of 3015).md": "124b50d1b30d3ce071850cc828b335962f33a102ae9fbeb7df2a978c88987e67",
-  "figure5_numbers.json": "8429825c65ec3c17da2c135a1dcd996c7657cd2717e21b8eec5256fd18b8088b",
-  "legend_draft.md": "de13d9c3f3b004e27308421edd58eb9500f07dd7ea7fcfb67bbef2642a89385c",
-  "claims.md": "377abe7ee022b641035c58c51ac2b2801d72551c39930a8aa01bbdddea09ebe4",
+  "Source Data Fig. 5 caption (provisional, 1485 of 3015).md": "d1634560e211bd1affb1681e60f9d6ee82cdc3e30246c4c20ee8e7596047aee4",
+  "figure5_numbers.json": "67504fa642f9ca26194c2fae88417d9c6ea66beb57b34f7babce6882cf3ab684",
+  "legend_draft.md": "075da51dbdbdc6920f32a21545e4ebaaa10f321c5704a035083ae015acfed8e3",
   "records_manifest.json": "4cb9dee23516ce041f169d7527190c41e99b2efebf4509ba9e3c9908bf4b1131"
  }
 }

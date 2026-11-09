@@ -21,7 +21,7 @@
    },
    {
     "path": "findings/figures_provisional/fig5/fig5_data_state.json",
-    "sha256": "27cfd169ce8db4ed6d90af4c09a6de0ede7fff4c4b90cf0c2e34481f040b0857",
+    "sha256": "bbf95d0174011bc08ca111cfa5ff11e340c0a1181b2e69d5d843a5b6fde9c2b7",
     "role": "anchor: Figure 6's d_all (S473 compute(), written by S497)"
    },
    {
@@ -31,7 +31,7 @@
    },
    {
     "path": "findings/figures_provisional/fig5/figure6_provenance.json",
-    "sha256": "d90c10bc85474d46d44ba5cdec494e1f66835f74b96bc3843edbcfde40d59822",
+    "sha256": "c7ee5871f5acda01398a7fd3f70a715ba28b4775539ca1b18f48e53271a577f0",
     "role": "anchor: the collect sha256 Figure 6 read"
    },
    {
@@ -57,8 +57,8 @@
   "s6_folder": "findings/recompute/fig3_s6_inputs",
   "plate_held_on": "key v2.5",
   "code_sha256": {
-   "scripts/S463_fig2_ranking.py": "2f93a2b5df2bd68bdcf38a372d6c737ecdbce54a4e68406f0b261e03fbd9af31",
-   "scripts/judge_rows_v25.py": "aa90f42264e2ce21acfca52c2421d852607418981b6e9be8d8984a716b1ebddd"
+   "scripts/S463_fig2_ranking.py": "8279a35d27c5a99d34980b59529203b104526035beba74031c9964a2ee360825",
+   "scripts/judge_rows_v25.py": "77d4a84d7aff4dd0ee92366395a4be2e5f27fe20d5de99ccbc86b7333c401661"
   }
  },
  "judge_rows": {

@@ -1,7 +1,7 @@
 {
  "provenance": {
   "script": "scripts/S524_t3_s12_s13.py",
-  "script_sha256": "e388ff60e30c347663c45de82bf9081127209e0ce0e8008e8f2ed67040566f79",
+  "script_sha256": "e2e8e056864b0dd69fdef9a6b8b048928b85d2595e218a05c93e7018f03b7fd5",
   "command": "uv run --frozen python scripts/S524_t3_s12_s13.py figure --t3 findings/recompute/frozen_inputs/extracted/count_records_20261106/count_records_20261106/t3/T3_frozen_20261104T131439Z --s12b findings/recompute/s12b_inputs --results findings/recompute/exp07_bench_20261107/exp07_bench_20261107.tar",
   "python": "3.13.11",
   "deterministic": "no build time and no repository HEAD are recorded",
@@ -108,6 +108,6 @@
   "Supplementary Figure 11 data (provisional, 1128 of 1128).xlsx": "3bcff8ea25407b073e5ec91b3bd4a01ccd9510c0f39bc231241a94d64bf1a953",
   "Supplementary Figure 11 data caption (provisional, 1128 of 1128).md": "afe6bcdb06c9fe36bdb1b42c94cdb138b093b43b60e66158109c4c372c7c8dbb",
   "supplementary_figure11_numbers.json": "00692b4c0590f1d4a2a4cf59f5e6020be22bb32939b8d030ef1e98e4feac393f",
-  "legend_draft.md": "239a26e77c7ce7b12f93c35253fdf728e26d91c3422e14f8a51186595c3c5cfe"
+  "legend_draft.md": "5e60a65758feb57e30769daf229af7b10006d2f680425e99f29ac4dc1dad3a1d"
  }
 }

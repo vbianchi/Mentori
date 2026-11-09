@@ -2,12 +2,12 @@
  "what": "Refused out-of-scope questions and answerable passes at 4 and 3, per set-up and draw (1 on all questions; 1, 2, 3 and 2+3 on D98's subset), and the routing fix minus the full pipeline",
  "provenance": {
   "script": "scripts/S591_routing_fix_by_draw.py",
-  "script_sha256": "c4a438430c76f6fd2d56d61d26e6a2a54758db5d99376ed825d5dd88af41940c",
+  "script_sha256": "f2031186a21c30e6b0de7478e1238d3836bb80705a312584dae701c27c3303f8",
   "command": "uv run --frozen python scripts/S591_routing_fix_by_draw.py",
   "imports": {
    "scripts/S480_fig4_recount.py": "7c432aa0524944649573f60009acb38450eb9886459783d3c8bf7aa1504950ee",
-   "scripts/S463_fig2_ranking.py": "799642c3dbff3516c38735141d21ada5c29671c5cbaec581b93cee04fcb6bc84",
-   "scripts/judge_rows_v25.py": "aa90f42264e2ce21acfca52c2421d852607418981b6e9be8d8984a716b1ebddd"
+   "scripts/S463_fig2_ranking.py": "8279a35d27c5a99d34980b59529203b104526035beba74031c9964a2ee360825",
+   "scripts/judge_rows_v25.py": "77d4a84d7aff4dd0ee92366395a4be2e5f27fe20d5de99ccbc86b7333c401661"
   },
   "frozen_defaults": {
    "records": "fig4_records_1023:fig4_records_1023",
@@ -89,11 +89,11 @@
  "known_inputs": {
   "s480_recount": {
    "path": "findings/recompute/S480_fig4_recount.json",
-   "sha256": "e78a7b3ac75edcee0f0aae9c8155e084c070ddee5824afa5492c6e7734a7d6dd"
+   "sha256": "7703379904bae05011c4579e52a6560ff007c7cea38af3e8651380d8ddf75f77"
   },
   "figure4_numbers": {
-   "path": "findings/figures_provisional/fig4/figure4_numbers.json",
-   "sha256": "44abc1d40a839022e184d64b650d8c4df69c1b03c0daa6eaa2f87e624dcc198b"
+   "path": "findings/figures_provisional/fig4/figure5_numbers.json",
+   "sha256": "67504fa642f9ca26194c2fae88417d9c6ea66beb57b34f7babce6882cf3ab684"
   },
   "rlm_manifest": {
    "path": "findings/recompute/frozen_inputs/extracted/fig2_g1r15_inputs/fig2_g1r15_inputs/MANIFEST.sha256",
@@ -127,7 +127,7 @@
   "no_answer": "in n, a fail",
   "unscored": "out of n"
  },
- "reproduced": "draw 1 equal to KNOWN (refused 2, 37, 38 of 39; passed at 4 65, 60 of 86), to S480.count and the committed S480 recount (inputs sha256 equal), its draw_counts on draws 1 to 3, and Figure 4's Source Data (Fig. 4a and 4b setup rows, comparison and Holm P included)",
+ "reproduced": "draw 1 equal to KNOWN (refused 2, 37, 38 of 39; passed at 4 65, 60 of 86), to S480.count and the committed S480 recount (inputs sha256 equal), its draw_counts on draws 1 to 3, and Figure 5's Source Data (Fig. 5a and 5b setup rows, comparison and Holm P included)",
  "counts": {
   "full_orchestrator": {
    "1": {

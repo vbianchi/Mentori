@@ -1,7 +1,7 @@
 {
  "stamp": "PROVISIONAL two raters, 49 of 49 answers drawn",
  "script": "scripts/S531_fig2_s3_plates.py",
- "script_sha256": "50ec719568f060b9db444d8b3238808a9991861ea54547f4b6f9bf2eab7fc03f",
+ "script_sha256": "8c88cd5fcf3f60772422d9c0758e6e82ef8df86d06597ed387315bb1c88d799e",
  "command": "uv run --frozen python scripts/S531_fig2_s3_plates.py --raters 2",
  "raters": 2,
  "inputs": {
@@ -14,7 +14,7 @@
   "Supplementary Figure 3 (provisional, 49 of 49).svg": "e0691ea31cbdb7bbc16327c3b10f98092469ed85993bc84f14e0435910fbee7f",
   "Supplementary Figure 3 data (provisional, 49 of 49).xlsx": "6b7cba72c4099c78d2531a20e73bf1670ca6f5359d147f8cbe4055d86d7abc39",
   "Supplementary Figure 3 data caption (provisional, 49 of 49).md": "fb99e0a9e4a958987c987c881b1ac0f74520e012b80c5f344c23719c8f45fb32",
-  "legend_draft.md": "60f12617c3fb39c4d96a9272688868a84f090747ccf4b354f1c6d4827b2e76fb",
+  "legend_draft.md": "37608f64bc7680c20232fa1c97b51e9f42b6bc03324554b76b159771ee0b35c8",
   "supplementary_figure3_numbers.json": "94ed1fa81e4e7ebf510cae87f243bf1d4b5d645a9f464c296b161c47e948f0a3"
  }
 }

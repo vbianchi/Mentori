@@ -1,7 +1,7 @@
 {
  "provenance": {
   "script": "scripts/S461_supp_fig2_retrieval.py",
-  "script_sha256": "edad5bffbf8e0d3f7d799ce5019b20feb9f40e95d9e5270170286e5f79efb967",
+  "script_sha256": "a99148afb5fcedbd87178f0ec704e728a215326fc5aecc5d9b9638173051ec27",
   "command": "uv run --frozen python scripts/S461_supp_fig2_retrieval.py",
   "python": "3.13.11",
   "deterministic": "D155: no build time and no repository HEAD are recorded; the script's and every input's sha256 identify the build",
@@ -19,7 +19,7 @@
   "84 result rows: overall MRR equals the mean of the per-query MRRs, per-query count equals n_queries",
   "rows equal each record's config grid once each (84 planned)",
   "82 retrieval query ids, none among the 138 question ids of exp04_generation_latest.json; no per-query row carries answer, generation, response, judge_scores",
-  "S295's printed values regenerated: 8 chunking means and 5 scalability values, against manuscript/submission/supplementary/Supplementary_Figure_2.pdf sha256 922dd598ad200705"
+  "S295's printed values regenerated: 8 chunking means and 5 scalability values, against the values read from manuscript/submission/supplementary/Supplementary_Figure_2.pdf sha256 922dd598ad200705 (REF_C, REF_D; S616 check holds the PDF to that sha256)"
  ],
  "stamp": "PROVISIONAL: 84 of 84 result rows, the deposit's four retrieval sweeps of February 2026 as they are (no run planned, experiments/LIST.md); legend a draft",
  "figure": "Supplementary Figure 2",
@@ -107,6 +107,6 @@
   "Supplementary Figure 2 data (provisional, 84 of 84).xlsx": "0310640487db19b579ed741faf7f4f887097cbbdf0480864bdb93714e0f090d9",
   "Supplementary Figure 2 data caption (provisional, 84 of 84).md": "a2e78be054b341b35eefc3630c1b6dfe4972f5d22b3c41384f940262e9e7ab51",
   "supplementary_figure2_numbers.json": "7fc88885646cf3450adfe974bdb14c94aa89fec3b9c12d3ebf880b3bc9d5ad39",
-  "legend_draft.md": "baa95ab2812cc473c516d4f4ebe1f40f6b96d66656d2b1d711db3d45fade1b18"
+  "legend_draft.md": "0cbdfa2e9e8df2590fc2f90a7d9a8625e11f8b2835ad9e33361f259ebd08e116"
  }
 }

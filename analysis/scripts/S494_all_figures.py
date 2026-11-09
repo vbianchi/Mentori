@@ -90,6 +90,14 @@ experiments/rlm_ref/.venv (D4):
 Exit 0 only when every frozen input checks, every step exits 0 with no audit violation, every file is byte-equal,
 S448 passes and the audit was on.
 
+D2 (Valerio, 8 November 2026): figures are built from data only. No step reads the manuscript, the letter, the
+Supplementary Information, the submitted plates or a working file (plan.csv, draws.csv, experiments/README.md, LIST.md,
+the human-evaluation protocol, the reference list): the design values a plate needs come from
+findings/recompute/fig_design_inputs/ (scripts/S616_figure_editorial.py extract), and the editorial checks (the claims
+lists of Figures 3, 5 and 6 and Supplementary Figure 17, the data files against the working files, the submitted
+Supplementary Figure 2 PDF) are `S616 claims` and `S616 check`, run in this repository and never shipped. Their
+claims.md files sit in findings/editorial_claims/, outside the plate folders this script compares.
+
 D201 Q9 O1 (Valerio, 2 November 2026; findings/audits/tracked_scripts_2026-11-01/README.md row 3). The concept recall and
 panel c values the plates draw sit in five folders no step rebuilt, because S505's import changes two KMP_* variables the
 audit refused in git children (fig_read_audit.CHILD_ENV_MAY_CHANGE now names them, with the reason). Step d181 runs their
