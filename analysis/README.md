@@ -1,6 +1,6 @@
 # Mentori analysis: the scripts that make the paper's figures, tables and numbers
 
-Built by `scripts/S608_release_analysis.py` from Mentori-reanalysis commit `e058482faa`, copied from that commit
+Built by `scripts/S608_release_analysis.py` from Mentori-reanalysis commit `249f9d3554`, copied from that commit
 (git cat-file), never from a working tree. `RELEASE_PROVENANCE.json` lists every file and where it went.
 
 ## What is here
@@ -68,7 +68,7 @@ in all on 8 cores (`boot_seconds` in `findings/recompute/S565_corpus_interaction
 
 ## What did not pass when this tree was built
 
-The build measured the stages in a fresh clone of `e058482faa` (S494 exit 1). The producers' results then:
+The build measured the stages in a fresh clone of `249f9d3554` (S494 exit 1). The producers' results then:
 see `RELEASE_PROVENANCE.json` `producers`. Known today:
 
 - Several producers' committed outputs were written before later commits to their scripts and carry the older

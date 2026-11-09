@@ -172,7 +172,7 @@
   "findings/recompute/S564_claimify_selection/full/shard_5_of_8/rows.jsonl": "98aa0c9a01228b529822db4afb417ff2d089e0a57ad5858723aa329d1d381143",
   "findings/recompute/S564_claimify_selection/full/shard_6_of_8/rows.jsonl": "c2207de96ab259dfe75f845250f4854fe1f8c76a1f20ce7c93e0a3c9fe96bd9d",
   "findings/recompute/S564_claimify_selection/full/shard_7_of_8/rows.jsonl": "d79480616e40d3ffa7c7043eb7ab62ab88fbea9ce4ecb63061e7137af8b66eb0",
-  "findings/recompute/S596_windowed_bertscore/evaluator_rows.json": "28e56269b0ba5d473848a708902bff3a13242cfe99266416a6311504a7aea3ea",
+  "findings/recompute/S596_windowed_bertscore/evaluator_rows.json": "356d6f1c6f4b811d6b40bbfaaf73ef5fdb27b610e3ddbe22792f88e4d6ed0415",
   "findings/recompute/S596_windowed_bertscore/rows.jsonl": "2abfc647ad2fc641743f35c0d1267f14665617350fa6ead42f046fb5c1b00a61",
   "k1_inputs_runs.tar:k1_inputs_runs/exp_01__multi_hop__exp_v4_s20_n0/answers.jsonl": "518b0efefd170ec4e172b8ba1d8218aa25612a4eaf27ebab98a824343864ad42",
   "k1_inputs_runs.tar:k1_inputs_runs/exp_01__rlm_10__exp_v4_s20_n0/answers.jsonl": "7d5d2651b0111d96cc863af5a5e9349d07466d6028be2407c1644ef31e7ab90b",
