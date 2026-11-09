@@ -77,6 +77,7 @@ source holds (`shares`, unchanged). The hypothesis, the threshold, the statistic
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
 import json
 import subprocess
@@ -350,9 +351,12 @@ def refuse_unless_fixed() -> str:
     for path in (SCRIPT, S511_SCRIPT):
         if git("status", "--porcelain", "--", path):
             raise Refused(f"{path} differs from its commit")
-        if not git("log", "-1", "--format=%h", "--", path):
+        if not git("ls-files", "--", path):
             raise Refused(f"{path} is not committed")
-    head = git("log", "-1", "--format=%h", "--", SCRIPT)
+    # O3 (Valerio, 8 Nov): no history read. The script is named by its git blob id (git hash-object, content only),
+    # where the last commit to touch it (git log) named a commit the release does not hold
+    b = (ROOT / SCRIPT).read_bytes()
+    head = "blob " + hashlib.sha1(b"blob %d\0" % len(b) + b).hexdigest()
     if DECISION not in decision_text():
         raise Refused(f"{DECISION} is not in experiments/README.md")
     return head

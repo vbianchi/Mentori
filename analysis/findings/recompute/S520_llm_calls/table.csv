@@ -1,4 +1,4 @@
-# provenance: scripts/S520_llm_calls.py sha256 77e1923de98c937c, HEAD not stamped (report --frozen), written not stamped (report --frozen)
+# provenance: scripts/S520_llm_calls.py sha256 312cedbe6967d0a4, HEAD not stamped (report --frozen), written not stamped (report --frozen)
 # command: uv run --frozen python scripts/S520_llm_calls.py report --frozen
 # read: {"studio": {"started_utc": "2026-11-07T05:27:31Z", "ended_utc": "2026-11-07T05:30:24Z", "host": "Bioinfos-Mac-Studio.local"}, "beelink": {"started_utc": "2026-11-07T05:33:50Z", "ended_utc": "2026-11-07T05:34:10Z", "host": "DESKTOP-QJFE6FS"}, "laptop": {"started_utc": "2026-11-07T05:34:18Z", "ended_utc": "2026-11-07T05:35:31Z", "host": "mac.home"}}
 experiment,plan_row,role,model,machine,calls_ok,calls_failed,failed_by_status,replaced,no_answer_line,not_joined,tier,s1_box,note

@@ -288,9 +288,9 @@ def main():
                             "tools_refused_by_Ollama": gk["tools refused by Ollama"],
                             "other_groups": {g: n for g, n in gk.items() if n and g != "tools refused by Ollama"}}
     out["ties"] = TIES
-    head = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+    # no git head (S608, 9 Nov): a rerun of the same code on the same inputs is byte-equal
     prov = {"script": SCRIPT, "script_sha256": sha(ROOT / SCRIPT), "command": f"uv run python {SCRIPT}",
-            "repo_head": head, "inputs_sha256": {str(p.relative_to(ROOT)): sha(p)
+            "inputs_sha256": {str(p.relative_to(ROOT)): sha(p)
                                                  for p in (FIG6, SUPP23, S447, SUPP19, SUPP20, S488_JSON, S488_PY)},
             "records": json.loads(FIG6.read_text())["stamp"],
             "reproduced": ["S488 committed Q 55.9 / 6.0 by its own cochran_q", "WANT 2,420 / 1,692",

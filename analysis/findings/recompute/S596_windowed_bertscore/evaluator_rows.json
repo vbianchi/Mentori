@@ -1,14 +1,12 @@
 {
  "_provenance": {
   "script": "scripts/S596_windowed_bertscore.py",
-  "script_sha256": "b25cb9fdc4ca30bdaf9e87314aa108048c65a85bc00dc3240374e26f8b9bf62e",
-  "git_head": "f3ccbde8ac0b267ec2e672b715f6c2bbc64ebb37",
-  "at": "2026-11-06T09:55:45Z",
+  "script_sha256": "44e51693a03f598cb76a9875b813bf063a6e8686f44f8d55ed8c07baac12f7eb",
   "command": "uv run --frozen python scripts/S596_windowed_bertscore.py run",
   "ruling": "rulings page 6 Nov, RUN-BERTSCORE: O1",
   "imports_sha256": {
-   "scripts/S497_fig5_d166.py": "191495f5b8a88ed2d2ec10f18e1296a7e8c33aed8deb47c297bdb9ee2bbc42c0",
-   "scripts/S540_fig5_evaluators.py": "f794d4e6e40179894d22905220e79daa42693710c3f6ba4c10ee09c5b7297c77",
+   "scripts/S497_fig5_d166.py": "fc17bb3af77503ddfd6346aa8b4c7dc33f3753e87b25da60bec2b4fcddc44068",
+   "scripts/S540_fig5_evaluators.py": "e227184bb004d52856be2ab4f8440120b108ae1cc7c6035e20ed6814b7d8c920",
    "scripts/S470_l1_signals.py": "e301c6a6d7c4f50bcc3ab8ba679be2d8caf1211d95c67241b9031c1aacaa5b37"
   },
   "inputs": {
@@ -25,7 +23,7 @@
     "exp_01__rlm_20__exp_v4_s20_n0": "1e5b124d8bbd98640c87051916305ed0c04d668447967c60a08d6945fca32c62"
    },
    "reader": "S497.d200_data table, S540.evaluator_rows",
-   "fig5_numbers_at_head": "findings/figures_provisional/fig5/figure5_numbers.json"
+   "fig5_numbers_at_head": "findings/figures_provisional/fig5/figure6_numbers.json"
   },
   "encoder": {
    "repo": "roberta-large",
@@ -50,11 +48,10 @@
    "python": "3.13.11"
   },
   "gates": [
-   "G1: S540.evaluator_rows on S497's table equals all 20 drawn Fig. 5e records of findings/figures_provisional/fig5/figure5_numbers.json at HEAD (2 held there, D195, not compared)",
+   "G1: S540.evaluator_rows on S497's table equals all 22 drawn Fig. 6e records of findings/figures_provisional/fig5/figure6_numbers.json at HEAD (0 held there, D195, not compared)",
    "G2: all 516 answers' sha256 equal L1's overlap rows; every word-piece count equals L1's",
    "G3: on the 164 answers L1 scored (answer and key within 512), the windowed F1 equals L1's BERTScore F1, largest difference 8.9e-07 (tolerance 0.0001)"
-  ],
-  "wall_s": 220.7
+  ]
  },
  "counts": {
   "answers": 516,

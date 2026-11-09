@@ -7,7 +7,7 @@
   "deterministic": "D155: no build time and no repository HEAD are recorded; draws.csv is recorded by the sha256 of the fields drawn, not of the file",
   "inputs_sha256": {
    "findings/recompute/S492_answer_registry/registry.json": "50ec28658dfedaef28fe4489c50e5ef5289393960613e69e13c23c762b6b9dcb",
-   "findings/figures_provisional/fig1/figure1_provenance.json": "0739c52206a888199123f821e3c26e8ab3df99c6963a992594b00e59875c3cf7",
+   "findings/figures_provisional/fig1/figure1_provenance.json": "92b674446ec91cf207eadbdf9c9b5e64711b8cf5d5089c3d41af0e9d3b828d4a",
    "findings/recompute/fig_design_inputs/draws.csv (fields experiment, plan_row, design, draws, status)": "d8a4adaa93474cbf9a0a31f7b25dfe5b75254bd26a9b3d40d21c35b67c4cb1ef",
    "experiments/rlm_ref/pyproject.toml": "7b8b26c479d8fe9ef349ed5e283902fe8bab1b4725633909c532fb72fe22b2cb"
   },

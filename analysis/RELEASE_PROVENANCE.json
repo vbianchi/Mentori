@@ -1,68 +1,68 @@
 {
  "what": "S608 build of Mentori-paper analysis/ from Mentori-reanalysis git HEAD",
  "script": "scripts/S608_release_analysis.py",
- "commit": "6fd2fe42a4b1960a560253a02cedc4c01ab7d80a",
- "commit10": "6fd2fe42a4",
+ "commit": "e058482faa05ea1ef699499afa01502b4292764d",
+ "commit10": "e058482faa",
  "n_git": 645,
  "n_tar": 2176,
- "git_bytes": 101217516,
+ "git_bytes": 101217501,
  "tar_bytes": 912896000,
  "tar_sha256": "405062de2b3443f193e25d16d7b5b161f12098d518eb2149a19d19e333cc7046",
- "n_outputs": 366,
+ "n_outputs": 392,
  "n_head": 11370,
  "font_sha256": "25eceb458d4baf628ee0b6a135a9f8ac5ec7b2826646720834bd2bf00dfc825a",
  "n_scripts": 115,
  "n_head_scripts": 783,
- "measured_seconds": 966,
+ "measured_seconds": 847,
  "s494_exit": 1,
  "producers": {
   "S543": {
-   "ok": false,
-   "note": "compared no file, 0 byte-equal, 1 audit violations, 22 s"
+   "ok": true,
+   "note": "9 byte-equal, 21 s"
   },
   "S570": {
-   "ok": false,
-   "note": "0 byte-equal, 1 differ, 1 audit violations, 4 s"
+   "ok": true,
+   "note": "9 byte-equal, 4 s"
   },
   "S542": {
    "ok": false,
-   "note": "compared no file, 0 byte-equal, 1 audit violations, 23 s"
+   "note": "8 byte-equal, 1 differ, 23 s"
   },
   "S583": {
-   "ok": false,
-   "note": "1 byte-equal, 1 differ, 0 s"
+   "ok": true,
+   "note": "2 byte-equal, 0 s"
   },
   "S534 t1": {
    "ok": true,
    "note": "2 byte-equal, 0 s"
   },
   "S533": {
-   "ok": false,
-   "note": "0 byte-equal, 2 differ, 0 s"
+   "ok": true,
+   "note": "2 byte-equal, 0 s"
   },
   "S535": {
    "ok": true,
    "note": "2 byte-equal, 0 s"
   },
   "S582": {
-   "ok": false,
-   "note": "1 byte-equal, 1 differ, 0 s"
+   "ok": true,
+   "note": "2 byte-equal, 0 s"
   },
   "S520": {
-   "ok": false,
-   "note": "0 byte-equal, 3 differ, 1 s"
+   "ok": true,
+   "note": "3 byte-equal, 1 s"
   },
   "S603": {
    "ok": true,
    "note": "2 byte-equal, 4 s"
   },
   "S575": {
-   "ok": false,
-   "note": "0 byte-equal, 2 differ, 3 s"
+   "ok": true,
+   "note": "2 byte-equal, 3 s"
   },
   "S576": {
-   "ok": false,
-   "note": "0 byte-equal, 2 differ, 3 s"
+   "ok": true,
+   "note": "2 byte-equal, 3 s"
   },
   "S578": {
    "ok": true,
@@ -73,20 +73,20 @@
    "note": "3 byte-equal, 0 s"
   },
   "S518": {
-   "ok": false,
-   "note": "0 byte-equal, 1 differ, 0 s"
+   "ok": true,
+   "note": "1 byte-equal, 0 s"
   },
   "S566": {
-   "ok": false,
-   "note": "0 byte-equal, 3 differ, 2 s"
+   "ok": true,
+   "note": "3 byte-equal, 1 s"
   },
   "S580": {
-   "ok": false,
-   "note": "0 byte-equal, 1 differ, 0 s"
+   "ok": true,
+   "note": "1 byte-equal, 0 s"
   },
   "S581": {
    "ok": true,
-   "note": "3 byte-equal, 232 s"
+   "note": "3 byte-equal, 229 s"
   },
   "S591": {
    "ok": true,
@@ -98,11 +98,11 @@
   },
   "S565": {
    "ok": false,
-   "note": "1 byte-equal, 7 differ, 1 not rebuilt, 27 s"
+   "note": "1 byte-equal, 7 differ, 1 not rebuilt, 25 s"
   },
   "S596": {
    "ok": false,
-   "note": "1 byte-equal, 2 differ, 10 audit violations, 328 s"
+   "note": "3 byte-equal, 10 audit violations, 216 s"
   }
  },
  "measure_args": {

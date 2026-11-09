@@ -351,8 +351,8 @@ def run(out: Path, threads: int | None) -> dict:
     import bert_score
     import torch
     import transformers
-    prov = {"script": SCRIPT, "script_sha256": sha256_file(ROOT / SCRIPT), "git_head": git("rev-parse", "HEAD").strip(),
-            "at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+    # no run time, git head or wall time (S608, 9 Nov): a rerun of the same code on the same inputs is byte-equal
+    prov = {"script": SCRIPT, "script_sha256": sha256_file(ROOT / SCRIPT),
             "command": f"uv run --frozen python {SCRIPT} run", "ruling": "rulings page 6 Nov, RUN-BERTSCORE: O1",
             "imports_sha256": {p: sha256_file(ROOT / p) for p in ("scripts/S497_fig5_d166.py",
                                                                   "scripts/S540_fig5_evaluators.py",
@@ -367,7 +367,7 @@ def run(out: Path, threads: int | None) -> dict:
             "lock_sha256": sha256_file(ROOT / "experiments" / "LOCK.toml"),
             "versions": {"bert_score": bert_score.__version__, "transformers": transformers.__version__,
                          "torch": torch.__version__, "python": platform.python_version()},
-            "gates": rep, "wall_s": round(time.time() - t0, 1)}
+            "gates": rep}
     out.mkdir(parents=True, exist_ok=True)
     with open(out / "rows.jsonl", "w") as fh:
         for r in rows:
@@ -382,7 +382,7 @@ def summary(res: dict) -> str:
     c, p = res["counts"], res["_provenance"]
     f2 = lambda v: "n/a" if v is None else f"{v:.2f}"   # noqa: E731
     lines = [f"# S596, windowed BERTScore against the judge (Figure 5 e form)", "",
-             f"Written by `{p['command']}` at {p['at']}, git {p['git_head'][:8]}, script {p['script_sha256'][:12]}. "
+             f"Written by `{p['command']}`, script {p['script_sha256'][:12]}. "
              f"{p['ruling']}.", "",
              f"Answers: {c['answers']} draw-1 answerable (Figure 5 e's table); scored {c['scored']}, no answer "
              f"{c['no_answer']}. L1 had scored {c['l1_scored']}: {c['l1_over_limit']} over the {LIMIT}-token limit, "

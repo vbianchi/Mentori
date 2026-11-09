@@ -38,17 +38,17 @@
   "findings/recompute/T2_runs/check_t2.py@f83c10b4": "0306d354b73113245b982d4fe0d14405ee457c9f2271fb0229be021d739bf6bc",
   "findings/recompute/T2_runs/t2_lib.sh@f83c10b4": "68d7c0af04d7895dace468d2389b2880e2074eea115a4ab13fcb69a6be5f183d",
   "findings/recompute/D98_subset/d98_subset.json@f83c10b4": "957c79b6b0f3afb12b70be51d0802e7853b4d4ff12e2bdb519d44a10111046bc",
-  "findings/recompute/S520_llm_calls/summary.json": "633090f4389a2c9c40369de0b23a4a312de2eec4a3432e8526def67ad2fa50c4",
+  "findings/recompute/S520_llm_calls/summary.json": "31c3cf603a91b8efed6c8000d8a9d22f036a4c3d5606691fec7e5caf5cfff57f",
   "findings/recompute/S492_answer_registry/registry.json": "50ec28658dfedaef28fe4489c50e5ef5289393960613e69e13c23c762b6b9dcb",
   "findings/figures_provisional/fig2_human/legend_draft.md": "ca517e997667e07a5a2a1bd86704ccb9dac1404e95f35172ec7200d35bfa7846",
   "findings/figures_provisional/fig3_strategies/legend_draft.md": "2886ea494e13922905a5f52cec312cde94f5b91c0b2da006017e6e34d8fd64c7",
   "findings/figures_provisional/fig4_depth/legend_draft.md": "dd7dc47fb0e259c111cb23aa73f912b8acb9324f43af2009651a49aca7e98e2c",
-  "findings/figures_provisional/fig4/legend_draft.md": "075da51dbdbdc6920f32a21545e4ebaaa10f321c5704a035083ae015acfed8e3",
+  "findings/figures_provisional/fig4/legend_draft.md": "39a4ed597c0d7501e7e07bfa1070640644f0708185325e7876ca383f1e67d370",
   "findings/figures_provisional/fig5/legend_draft.md": "b9fdac98f402895a22b890bbf405a9f0b57bfcbea2609e4592ad4c564e042d92",
   "findings/figures_provisional/fig6/legend_draft.md": "25146c4b2987373508588d29389d14ac5ff97c29ca0db7d26d6889c1042ef6db",
   "findings/figures_provisional/supp_fig2/legend_draft.md": "0cbdfa2e9e8df2590fc2f90a7d9a8625e11f8b2835ad9e33361f259ebd08e116"
  },
- "inputs_digest": "7c5ebbff7c84290e944ef2815ae3f26db2045427c19bf8d98bc8bc81e94d073f",
+ "inputs_digest": "5896dda872ad74591dd32cb3afcf4b2967ca124d64686ce87950ded63e5717d8",
  "model_calls": 0,
  "lock": {
   "path": "experiments/LOCK.toml",
@@ -70,7 +70,7 @@
   "Figure 6 runner attempts (D71): 3520 = known",
   "Figure 6 design attempts (D100, D116; draws.csv S2 answers): 2420 = known"
  ],
- "stamp": "PROVISIONAL: 2 of 2 panels (panel a, the signals; panel b, the design), 11 settings read from the design files (inputs sha256 7c5ebbff7c84)",
+ "stamp": "PROVISIONAL: 2 of 2 panels (panel a, the signals; panel b, the design), 11 settings read from the design files (inputs sha256 5896dda872ad)",
  "page_mm": [
   183.0,
   118.0
@@ -641,8 +641,8 @@
   "Figure 1 (provisional, 2 of 2).svg": "888f88c5a2721ba01a121275d94589a620a20e78e1ab839015496eb5b3ac86f1",
   "Figure 1 (provisional, 2 of 2).png": "9947630e810a89b9829201e5ee629101064d7a7f3ca88776f084a54bcc092196",
   "Source Data Fig. 1 (provisional, 2 of 2).xlsx": "2e176378f839175e1d9c76c4811a618343b5296ec6aa1e0f080ad4034bab8cd7",
-  "Source Data Fig. 1 caption (provisional, 2 of 2).md": "c54d9b695c2b6c2104edd42172a504bf2bbfc24493fff1c3c7ad3571f879e3ae",
-  "figure1_numbers.json": "6fc5368b05e6e2ffd93b47686b3e7d883056a374f083a035a5b5dc8458c64a3a",
-  "legend_draft.md": "d950ef602764e559e738fc491abf7f3304a794264883c2b01f2fc99c3be06be6"
+  "Source Data Fig. 1 caption (provisional, 2 of 2).md": "2257ac06b821e50fd8f8f41da8c017c34fa683a9e662784f318e64b08345fca1",
+  "figure1_numbers.json": "7fb52049398426b737e37ef1564727bae0cb29b4dbfdfe8eb3dab45c223b5570",
+  "legend_draft.md": "3c6b94f1646174d79c7b7ae0e9a98924a7140e7badf395101808ed4728770ed9"
  }
 }

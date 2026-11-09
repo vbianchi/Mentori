@@ -417,9 +417,9 @@
    "findings/recompute/S518_split_confirmation/qwen3-coder.json": "5ef0b4716ddb200938b3fbcb2d66a189be95a12a7a96062242d9bb46d3094215",
    "findings/recompute/S518_split_confirmation/claude-haiku-4-5.json": "6c6569362612c7724f6f6c12c0a9ce07d96658b5ca3f19c0f2d0625e630cc4eb",
    "findings/recompute/S518_split_confirmation/gemini-2.5-pro.json": "33de43424f593c360a917ebcf0822381b345b7f9ec69a13b5db399513ba1496a",
-   "findings/recompute/S518_split_confirmation/gemini-3-flash-preview.json": "fbb5a6eeaa3db06ea5adcb0269660bde91c4b8452a3d21a69342992268461b6e",
+   "findings/recompute/S518_split_confirmation/gemini-3-flash-preview.json": "e2cf25daf854c3b3eb50086ae052465192774a973f2fc5cbcda845fbbec27c7f",
    "findings/recompute/S607_refusal_person_check/summary.json": "45bed1d60e3de3cc262c8c68a62dcd5925094215a6d31ff3c86fb45a4e47ba65",
-   "scripts/S518_split_confirmation.py": "91230a9e51aaeb7b2d49c48841131de4eaf02cda1343274849ba9b33a8e82218",
+   "scripts/S518_split_confirmation.py": "7c694c8eb5f40a171d5e4991a0d219291724d0bd46798d2720360f7e5dfcbae2",
    "frozen:s457_mirror_20261022.tar/s457_mirror_20261022/matched_budget/answers.jsonl": "6b4c46531eca233b1bd73a5cb56819874e1807e9ee6c80152e9ce904a2d32728",
    "frozen:g6_d135/b4_rlm_ref__cap10__all135/answers.jsonl": "e5fa8d97d40859dd60f36c385b7d4e04a05a8f212d2857e9e462b82147b12637",
    "findings/recompute/G13_runs/inputs/runs/exp_01__matched_budget__exp_v4_s20_n0/answers.jsonl": "5cb3ac4eaab59be3e16d27e76f0a983cbcdee997b00e86355951d50ac365e9b7",
@@ -749,14 +749,14 @@
   "status": "agreed"
  },
  "files": {
-  "ranking.json": "ae8c82f2f43dc423a9fa0dcbfdf7ed5c6dca81d7604fc5b5fded443952b753e5",
+  "ranking.json": "cb96451647f2984c7db0eac402f3cf50a7c38def3cf005b5cb9dda0fb26bf15b",
   "ranking_report.md": "11e97dec8843cf991e1637a85eb1d12511d1c474b820426c2fbc6a8626d1084f",
   "Figure 3 (provisional, 14860 of 21402).pdf": "639776fca3a36b33c11b76db5480575de06dd21e5e60fb1410e015b4d59fdf32",
   "Figure 3 (provisional, 14860 of 21402).svg": "b1b4b1b9da885bbc607a44a97029b1e14bc31bdbbd7bd4f7e2165bac6b8586b5",
   "Figure 3 (provisional, 14860 of 21402).png": "c91d4f9aca4209a74bbb240f4627a637e503b2135b8618a4b5fbc4d158df4e7c",
-  "Source Data Fig. 3 (provisional, 14860 of 21402).xlsx": "7a9dcfcc4cb866c56bbab92dd2b24cd374296827649307a8fc751c931be4ff52",
+  "Source Data Fig. 3 (provisional, 14860 of 21402).xlsx": "afd31d704ffcd1d78af9f312be1fe04a4d4cf33078bde7525955ae0da32f6c67",
   "Source Data Fig. 3 caption (provisional, 14860 of 21402).md": "1b55e8c44e39707c1ecf37ecbf13fe0770880a3baa36e6c0457e9cba71533ed8",
-  "figure3_numbers.json": "984e34e93d115a98f5e07253c99d62bc09dcaea98a17ff3de8bc92831ddbab69",
+  "figure3_numbers.json": "2b6343abf731d6a8ad4a56158310ab13cc196948f8f9ce743f4c510e32dd0196",
   "legend_draft.md": "2886ea494e13922905a5f52cec312cde94f5b91c0b2da006017e6e34d8fd64c7"
  }
 }

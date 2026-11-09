@@ -3,11 +3,11 @@
   "script": "scripts/S570_supp_i2_reuse.py",
   "script_sha256": "9f971dfc104b264538180972fafe0d20fdcaac67f930195f27a0f4f131922f71",
   "imports_sha256": {
-   "S497_fig5_d166.py": "943643ac0b3bf8c5c7ba69f82b0fe8686d97fd8a626f8012f9660c953f49d2d0",
-   "S540_fig5_evaluators.py": "f794d4e6e40179894d22905220e79daa42693710c3f6ba4c10ee09c5b7297c77",
+   "S497_fig5_d166.py": "fc17bb3af77503ddfd6346aa8b4c7dc33f3753e87b25da60bec2b4fcddc44068",
+   "S540_fig5_evaluators.py": "e227184bb004d52856be2ab4f8440120b108ae1cc7c6035e20ed6814b7d8c920",
    "house_style.py": "647c8991f4dcd2cea08e0be46eaf758beb55fb029c54bb267e7fba1e0b8b17b6",
    "figure_names.py": "a3c65ae0a1e8aa05e99a99610ea857f63b0d8fff60a99404bcb5bf6ff9a82e65",
-   "S457_fig2_panels.py": "13d631dd56b4311cc732f7fc28b2656014c58e0f6b61b9d9b2caa1e94d5a6699",
+   "S457_fig2_panels.py": "8c29dab8b04a1bad4a955582a30831c51c2b70438be2f6d2698c7b81948d7520",
    "fig_repro.py": "4bca103b599da4adc0bd473f5b8210dd48b6543caaf63e5589f2faaa7b37d18b",
    "d181_concept_recall.py": "f297bb619f9e125a587b8f834a97af293f437ec1545466147d491d6a1a0ac039",
    "S505_question_aware_matcher.py": "179a80fbde63790294f2a35e7b637c1601d7583a6873c4d33171c3493eb86d2f",
@@ -38,7 +38,7 @@
   "frozen:i2/sinks/exp_01__rlm_5__i2_plant5/answers.jsonl": "e3afc8106a91d2c4723891aaa808380f30fca92c36ec9907171c99bd386f1b43",
   "frozen:i2/sinks/exp_01__single_pass__i2_plant5/answers.jsonl": "c0edfb2d784b1a33e262337bcba6f73831a1b6c294d76e4d1a7cb4f60aab791c",
   "frozen:i2/sinks/exp_01__verified_pass__i2_plant5/answers.jsonl": "cf3fbef0d739c0e5de26de326e608955fac4fa726d35ba7b446641ba3e73c047",
-  "scripts/S463_fig2_ranking.py at HEAD (METRIC, THRESHOLDS, PRIMARY, REFUSAL_T, JUDGE_FAILED)": "git blob 3183e0f89d09102d7674187fa16a36a3658c70c7"
+  "scripts/S463_fig2_ranking.py at HEAD (METRIC, THRESHOLDS, PRIMARY, REFUSAL_T, JUDGE_FAILED)": "git blob 8a09c191c4282d96ca26c44f7c89e40a277b4a53"
  },
  "figure_lock": {
   "path": "experiments/FIGURE_LOCK.toml",

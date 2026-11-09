@@ -1,4 +1,4 @@
-# provenance: scripts/S566_length_recall.py sha256 6914e784f5fe, git head f96637b06e, 2026-11-08T23:16:54Z; see results.json
+# provenance: scripts/S566_length_recall.py sha256 fed307e42d8c; see results.json
 question_id,words_single_pass,words_multi_hop,words_verified_pass,words_rlm_5,words_rlm_10,words_rlm_20,concept_recall_pct_single_pass,concept_recall_pct_multi_hop,concept_recall_pct_verified_pass,concept_recall_pct_rlm_5,concept_recall_pct_rlm_10,concept_recall_pct_rlm_20
 01_sarek_CO2,329.6666666666667,76.66666666666667,345.6666666666667,1448.0,1445.3333333333333,1512.0,45.833333333,33.333333333,50.0,75.0,70.833333333,70.833333333
 01_sarek_FR1,118.66666666666667,35.666666666666664,118.0,282.0,351.0,339.6666666666667,58.333333333,50.0,50.0,58.333333333,66.666666667,66.666666667

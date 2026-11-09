@@ -26,6 +26,8 @@ from pathlib import Path
 import openpyxl
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "scripts"))
+import fig_repro  # noqa: E402
 KEY = ROOT / "data/ground_truth_v2/ground_truth_v2_5_as_v1.json"
 CORPUS = ROOT / "findings/recompute/D75_Q51_corpus/corpus_papers.csv"
 OUT = ROOT / "findings/figures_provisional/supp_data1_answer_key/Supplementary Data 1.xlsx"
@@ -150,6 +152,7 @@ def main():
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     wb.save(OUT)
+    fig_repro.deterministic_xlsx(OUT)   # bytes from content only, so a rerun is byte-equal (S608, 9 Nov)
     for row in wc.iter_rows(min_row=2, values_only=True):
         print(*row, sep="\t")
     print(f"wrote {OUT.relative_to(ROOT)}")

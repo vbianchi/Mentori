@@ -1,33 +1,33 @@
 # Supplementary Table 66 questions
 
-Draw 1 of corpus scaling, gemini-3-flash-preview, judged by devstral-small-2:24b. Groups are never pooled. Refused: a refusal accuracy of 3 or more under the decline prompt. Each interval is two-sided 95% (percentile bootstrap, 10,000 resamples of the questions); at 100% refused the cell gives the one-sided lower bound, at 0% the one-sided upper bound. Provisional: 864 answerable answers await S6G4 and are read on key v2.4 until it ends. Run to run gives the lowest to the highest rate over the draws on the fixed third of each group, and stays blank until a second draw is read. Failed answers are kept in every rate, as not passed and not refused.
+Draw 1 of corpus scaling, gemini-3-flash-preview, judged by devstral-small-2:24b. Groups are never pooled. Refused: a refusal accuracy of 3 or more under the decline prompt. Each interval is two-sided 95% (percentile bootstrap, 10,000 resamples of the questions); at 100% refused the cell gives the one-sided lower bound, at 0% the one-sided upper bound. Provisional: 0 answerable answers await S6G4 and are read on key v2.4 until it ends. Run to run gives the lowest to the highest rate over the draws on the fixed third of each group, and stays blank until a second draw is read. Failed answers are kept in every rate, as not passed and not refused.
 
 | Group | Core papers | Strategy | Questions | Pass rate 4+ (%) | Interval 4+ (two-sided 95%) | Pass rate 3+ (%) | Interval 3+ (two-sided 95%) | Answers awaiting S6G4 | Run to run |
 |---|---|---|---|---|---|---|---|---|---|
-| 22 answerable questions | 5 | single pass | 22 | 81.8 | 65.2 to 95.5 | 90.9 | 77.3 to 100.0 | 36 |  |
-| 22 answerable questions | 5 | multi-hop | 22 | 77.3 | 60.6 to 90.9 | 97.0 | 90.9 to 100.0 | 36 |  |
-| 22 answerable questions | 5 | verified pass | 22 | 86.4 | 72.7 to 98.5 | 87.9 | 74.2 to 100.0 | 36 |  |
-| 22 answerable questions | 5 | RLM-5 | 22 | 66.7 | 51.5 to 80.3 | 92.4 | 84.8 to 98.5 | 36 |  |
-| 22 answerable questions | 5 | RLM-10 | 22 | 77.3 | 65.2 to 87.9 | 90.9 | 83.3 to 97.0 | 36 |  |
-| 22 answerable questions | 5 | RLM-20 | 22 | 74.2 | 59.1 to 86.4 | 95.5 | 90.9 to 100.0 | 36 |  |
-| 22 answerable questions | 10 | single pass | 22 | 81.8 | 63.6 to 95.5 | 90.9 | 77.3 to 100.0 | 36 |  |
-| 22 answerable questions | 10 | multi-hop | 22 | 74.2 | 57.6 to 89.4 | 95.5 | 87.9 to 100.0 | 36 |  |
-| 22 answerable questions | 10 | verified pass | 22 | 78.8 | 63.6 to 92.4 | 87.9 | 74.2 to 100.0 | 36 |  |
-| 22 answerable questions | 10 | RLM-5 | 22 | 74.2 | 62.1 to 86.4 | 92.4 | 86.4 to 98.5 | 36 |  |
-| 22 answerable questions | 10 | RLM-10 | 22 | 71.2 | 57.6 to 83.3 | 97.0 | 92.4 to 100.0 | 36 |  |
-| 22 answerable questions | 10 | RLM-20 | 22 | 74.2 | 60.6 to 86.4 | 97.0 | 92.4 to 100.0 | 36 |  |
-| 22 answerable questions | 20 | single pass | 22 | 78.8 | 60.6 to 95.5 | 90.9 | 77.3 to 100.0 | 36 |  |
-| 22 answerable questions | 20 | multi-hop | 22 | 86.4 | 72.7 to 97.0 | 100.0 | 100.0 to 100.0 | 36 |  |
-| 22 answerable questions | 20 | verified pass | 22 | 83.3 | 68.2 to 95.5 | 87.9 | 74.2 to 100.0 | 36 |  |
-| 22 answerable questions | 20 | RLM-5 | 22 | 71.2 | 56.1 to 84.8 | 84.8 | 72.7 to 95.5 | 36 |  |
-| 22 answerable questions | 20 | RLM-10 | 22 | 77.3 | 65.2 to 87.9 | 93.9 | 84.8 to 100.0 | 36 |  |
-| 22 answerable questions | 20 | RLM-20 | 22 | 71.2 | 56.1 to 84.8 | 89.4 | 80.3 to 97.0 | 36 |  |
-| 22 answerable questions | 50 | single pass | 22 | 84.8 | 69.7 to 97.0 | 90.9 | 77.3 to 100.0 | 36 |  |
-| 22 answerable questions | 50 | multi-hop | 22 | 78.8 | 63.6 to 92.4 | 98.5 | 95.5 to 100.0 | 36 |  |
-| 22 answerable questions | 50 | verified pass | 22 | 87.9 | 74.2 to 98.5 | 90.9 | 77.3 to 100.0 | 36 |  |
-| 22 answerable questions | 50 | RLM-5 | 22 | 75.8 | 62.1 to 87.9 | 90.9 | 81.8 to 98.5 | 36 |  |
-| 22 answerable questions | 50 | RLM-10 | 22 | 69.7 | 54.5 to 83.3 | 97.0 | 92.4 to 100.0 | 36 |  |
-| 22 answerable questions | 50 | RLM-20 | 22 | 75.8 | 65.2 to 84.8 | 93.9 | 87.9 to 98.5 | 36 |  |
+| 22 answerable questions | 5 | single pass | 22 | 81.8 | 65.2 to 95.5 | 90.9 | 77.3 to 100.0 | 0 |  |
+| 22 answerable questions | 5 | multi-hop | 22 | 78.8 | 63.6 to 92.4 | 97.0 | 90.9 to 100.0 | 0 |  |
+| 22 answerable questions | 5 | verified pass | 22 | 86.4 | 72.7 to 98.5 | 87.9 | 74.2 to 100.0 | 0 |  |
+| 22 answerable questions | 5 | RLM-5 | 22 | 68.2 | 53.0 to 81.8 | 92.4 | 84.8 to 98.5 | 0 |  |
+| 22 answerable questions | 5 | RLM-10 | 22 | 78.8 | 66.7 to 87.9 | 90.9 | 83.3 to 97.0 | 0 |  |
+| 22 answerable questions | 5 | RLM-20 | 22 | 74.2 | 59.1 to 86.4 | 97.0 | 92.4 to 100.0 | 0 |  |
+| 22 answerable questions | 10 | single pass | 22 | 80.3 | 63.6 to 95.5 | 90.9 | 77.3 to 100.0 | 0 |  |
+| 22 answerable questions | 10 | multi-hop | 22 | 74.2 | 57.6 to 89.4 | 95.5 | 87.9 to 100.0 | 0 |  |
+| 22 answerable questions | 10 | verified pass | 22 | 81.8 | 66.7 to 93.9 | 87.9 | 74.2 to 100.0 | 0 |  |
+| 22 answerable questions | 10 | RLM-5 | 22 | 74.2 | 62.1 to 86.4 | 92.4 | 86.4 to 98.5 | 0 |  |
+| 22 answerable questions | 10 | RLM-10 | 22 | 71.2 | 57.6 to 83.3 | 97.0 | 92.4 to 100.0 | 0 |  |
+| 22 answerable questions | 10 | RLM-20 | 22 | 74.2 | 60.6 to 86.4 | 97.0 | 92.4 to 100.0 | 0 |  |
+| 22 answerable questions | 20 | single pass | 22 | 77.3 | 59.1 to 95.5 | 90.9 | 77.3 to 100.0 | 0 |  |
+| 22 answerable questions | 20 | multi-hop | 22 | 86.4 | 72.7 to 97.0 | 100.0 | 100.0 to 100.0 | 0 |  |
+| 22 answerable questions | 20 | verified pass | 22 | 83.3 | 68.2 to 95.5 | 87.9 | 74.2 to 100.0 | 0 |  |
+| 22 answerable questions | 20 | RLM-5 | 22 | 68.2 | 53.0 to 81.8 | 84.8 | 72.7 to 95.5 | 0 |  |
+| 22 answerable questions | 20 | RLM-10 | 22 | 74.2 | 59.1 to 87.9 | 93.9 | 84.8 to 100.0 | 0 |  |
+| 22 answerable questions | 20 | RLM-20 | 22 | 72.7 | 57.6 to 86.4 | 90.9 | 83.3 to 97.0 | 0 |  |
+| 22 answerable questions | 50 | single pass | 22 | 80.3 | 63.6 to 95.5 | 90.9 | 77.3 to 100.0 | 0 |  |
+| 22 answerable questions | 50 | multi-hop | 22 | 77.3 | 62.1 to 90.9 | 98.5 | 95.5 to 100.0 | 0 |  |
+| 22 answerable questions | 50 | verified pass | 22 | 87.9 | 74.2 to 98.5 | 90.9 | 77.3 to 100.0 | 0 |  |
+| 22 answerable questions | 50 | RLM-5 | 22 | 77.3 | 65.2 to 89.4 | 90.9 | 81.8 to 98.5 | 0 |  |
+| 22 answerable questions | 50 | RLM-10 | 22 | 71.2 | 57.6 to 83.3 | 98.5 | 95.5 to 100.0 | 0 |  |
+| 22 answerable questions | 50 | RLM-20 | 22 | 75.8 | 65.2 to 84.8 | 93.9 | 87.9 to 98.5 | 0 |  |
 
 | Group | Core papers | Distractors per core paper | Strategy | Questions | Refused (%) | Interval or bound | Answers awaiting S6G4 | Run to run |
 |---|---|---|---|---|---|---|---|---|

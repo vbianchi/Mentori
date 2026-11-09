@@ -1,13 +1,11 @@
 {
  "_provenance": {
   "script": "scripts/S575_g17_contrasts.py",
-  "at": "2026-11-08T23:32:08",
-  "git_head": "75335042a02ebf6c0fb060a20bf0af321e752dba",
   "inputs_sha256": {
    "findings/recompute/S571_rlm_reading/g17/g17_reading.json": "5a2ed30a43aad8a23cc036349d0295b621b8c3c4d25ef6f416a6357c30d2de2d",
    "findings/recompute/G17_concept_recall/header.json": "0181718bef51ac974d7ab20345586681ec48ef27c9e3af332cf122dabd01d401"
   },
-  "code_sha256": "c5b6ee839516c3305e152e3fb999d6e9634d1b86633db7dd4287be92c254e440",
+  "code_sha256": "b3a94aee797e9cb5236943f43e4ec35c561941028c43cae2c61b70d867a80cd7",
   "boot": 10000,
   "seed": 20261013,
   "decision": "D240"

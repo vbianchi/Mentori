@@ -4,7 +4,7 @@
  "key": "v2.5",
  "judge": "devstral-small-2:24b",
  "label": "Gemini 3 Flash (reference), key v2.5",
- "script_commit": "db34af67",
+ "script_commit": "blob a939edf0c52d4b60d48a1903158c33ea032255f7",
  "decision": "D235",
  "method": "D195",
  "threshold": 4,
@@ -17,7 +17,7 @@
   {
    "role": "gate: S511 results",
    "path": "findings/recompute/S511_g2_budget/results.json",
-   "sha256": "f8197b6853da40cd8570025bf22d0ede7106de11fe0f8f5384e300a0ad4e2cb1"
+   "sha256": "e225903ba4409374263dfe33626f6bca5c35ac957f1666a14553de937808b3f3"
   },
   {
    "role": "questions: D5 key",
@@ -27,7 +27,7 @@
   {
    "role": "import: S511",
    "path": "scripts/S511_g2_matched_budget.py",
-   "sha256": "4568ba70a8b30ef6477d5b526bdd84c9c18d5d2859f4e9f05376ef50f5c214da"
+   "sha256": "bed3774dadfff61b3122b815a0851ef74fa0db7e5830ffd50fa69a8fd27f5b90"
   },
   {
    "role": "reference base (key v2.4)",

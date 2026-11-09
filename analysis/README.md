@@ -1,6 +1,6 @@
 # Mentori analysis: the scripts that make the paper's figures, tables and numbers
 
-Built by `scripts/S608_release_analysis.py` from Mentori-reanalysis commit `6fd2fe42a4`, copied from that commit
+Built by `scripts/S608_release_analysis.py` from Mentori-reanalysis commit `e058482faa`, copied from that commit
 (git cat-file), never from a working tree. `RELEASE_PROVENANCE.json` lists every file and where it went.
 
 ## What is here
@@ -13,11 +13,11 @@ Built by `scripts/S608_release_analysis.py` from Mentori-reanalysis commit `6fd2
 - `findings/figures_provisional/`: every committed plate, Source Data workbook and legend draft, and
   `MANIFEST.sha256`; `findings/recompute/`: the committed outputs the stages are compared with.
 - `data/`: the answer keys and prompt files the scripts read.
-- `expected/MANIFEST.sha256`: the sha256 of every expected output (366 files), the held ones included.
+- `expected/MANIFEST.sha256`: the sha256 of every expected output (392 files), the held ones included.
 - `DATA_FILES.tsv`: the files the data root must hold, with size and sha256.
 - `pyproject.toml`, `uv.lock`, `.python-version` (Python 3.13.11): the environment, as the analysis ran.
 
-645 files in git (101,217,516 bytes). The inputs the stages read (2176 files) are data and live in the
+645 files in git (101,217,501 bytes). The inputs the stages read (2176 files) are data and live in the
 Zenodo record as `analysis_inputs.tar` (912,896,000 bytes, sha256 `405062de2b3443f193e25d16d7b5b161f12098d518eb2149a19d19e333cc7046`), beside the 14 frozen tars of
 per-call records.
 
@@ -68,7 +68,7 @@ in all on 8 cores (`boot_seconds` in `findings/recompute/S565_corpus_interaction
 
 ## What did not pass when this tree was built
 
-The build measured the stages in a fresh clone of `6fd2fe42a4` (S494 exit 1). The producers' results then:
+The build measured the stages in a fresh clone of `e058482faa` (S494 exit 1). The producers' results then:
 see `RELEASE_PROVENANCE.json` `producers`. Known today:
 
 - Several producers' committed outputs were written before later commits to their scripts and carry the older

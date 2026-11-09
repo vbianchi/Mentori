@@ -14,4 +14,4 @@ k1_inputs_runs.tar	79175680	10551bc6a9a8ce8f62e606a78aefe81f28501c73410d0ebdda5f
 s2_after_s4_20261105.tar	613427200	f879ea24f6398634f65d09d468e08210b9044a408822e45a52a0c1249182354d	frozen	frozen per-call records; members in findings/recompute/frozen_inputs/members/s2_after_s4_20261105.sha256
 s2_length_retries_20261021.tar	525977600	0085b2926f2ba8c442d1fa6c6ccceb54eb6fbc9d82fab581318b74662ace5ecf	frozen	frozen per-call records; members in findings/recompute/frozen_inputs/members/s2_length_retries_20261021.sha256
 s457_mirror_20261022.tar	84162560	b8d4b175eb42e25cbeeb1277a8fad3ad7f4cd9bf67cfa66c5a31017aa6fdbc98	frozen	frozen per-call records; members in findings/recompute/frozen_inputs/members/s457_mirror_20261022.sha256
-analysis_inputs.tar	912896000	405062de2b3443f193e25d16d7b5b161f12098d518eb2149a19d19e333cc7046	.	the committed inputs the stages read, at their repository paths (2176 files; S608 from Mentori-reanalysis 6fd2fe42a4)
+analysis_inputs.tar	912896000	405062de2b3443f193e25d16d7b5b161f12098d518eb2149a19d19e333cc7046	.	the committed inputs the stages read, at their repository paths (2176 files; S608 from Mentori-reanalysis e058482faa)

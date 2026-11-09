@@ -26,7 +26,7 @@
    },
    {
     "path": "findings/figures_provisional/fig4/figure5_provenance.json",
-    "sha256": "e85904feabbcc3cddeb2a5af434812529fedafb21ee6801502f7d66172e01ebb",
+    "sha256": "943e334531aead1edec818d0680c99072c88513882ec2c619d0cb760ecd2f14d",
     "role": "anchor: the answers file's recorded sha256"
    }
   ],

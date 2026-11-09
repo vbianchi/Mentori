@@ -10,7 +10,7 @@
    "S457_fig2_panels.py": "8c29dab8b04a1bad4a955582a30831c51c2b70438be2f6d2698c7b81948d7520",
    "fig_repro.py": "4bca103b599da4adc0bd473f5b8210dd48b6543caaf63e5589f2faaa7b37d18b",
    "S511_g2_matched_budget.py": "bed3774dadfff61b3122b815a0851ef74fa0db7e5830ffd50fa69a8fd27f5b90",
-   "S518_split_confirmation.py": "91230a9e51aaeb7b2d49c48841131de4eaf02cda1343274849ba9b33a8e82218",
+   "S518_split_confirmation.py": "7c694c8eb5f40a171d5e4991a0d219291724d0bd46798d2720360f7e5dfcbae2",
    "S473_fig5_panels.py": "6d637b9f4e990a3470661fedee652f2b8341d8cbb4abf79acc451992340f3b36",
    "judge_rows_v25.py": "77d4a84d7aff4dd0ee92366395a4be2e5f27fe20d5de99ccbc86b7333c401661",
    "S512_s6_rejudge_v25.py": "caf423b0aa950e24ce28a14e90061fe55b66ae6fc82ebaf91b609f7ba10b05c0",
@@ -25,7 +25,7 @@
   106.9
  ],
  "inputs_sha256": {
-  "findings/figures_provisional/fig3_strategies/figure3_numbers.json": "984e34e93d115a98f5e07253c99d62bc09dcaea98a17ff3de8bc92831ddbab69",
+  "findings/figures_provisional/fig3_strategies/figure3_numbers.json": "2b6343abf731d6a8ad4a56158310ab13cc196948f8f9ce743f4c510e32dd0196",
   "findings/recompute/D98_subset/d98_subset.json": "957c79b6b0f3afb12b70be51d0802e7853b4d4ff12e2bdb519d44a10111046bc",
   "findings/recompute/S518_inputs/claude-haiku-4-5/s6t2_collect.jsonl": "fae78e98fa12028509e2b66a52486ac1723ea9df20f8821e2ab353eb13bbe045",
   "findings/recompute/S518_inputs/claude-haiku-4-5/t2_v24_collect.jsonl": "1c4ba5c388ec0db38cd78683b290a8bf77b13bfc60ea7fc64ddc1846bd8ebc85",

@@ -1,9 +1,8 @@
 {
  "provenance": {
   "script": "scripts/S580_codegen_passages.py",
-  "script_sha256": "69bfcea113aeabc21829da239fc35205d9481d504cb915862e54703f5f4b3dcd",
+  "script_sha256": "d5c939771e9ce7b1e292d73d8e18bf9e557d448c766e98554a6c8feb0da7c2f7",
   "command": "uv run python scripts/S580_codegen_passages.py",
-  "repo_head": "75335042",
   "inputs_sha256": {
    "findings/figures_provisional/fig6/figure7_numbers.json": "d334db3de14c3990333cc6ae778c1700727e428714731199aa3e73b666e01049",
    "findings/figures_provisional/supp_fig15_fig6_pairs/supplementary_figure15_numbers.json": "3f04321a6cfa9227255e9c4aff03ab73d4d2a7c488cd9d8b0bb9225ede629f57",

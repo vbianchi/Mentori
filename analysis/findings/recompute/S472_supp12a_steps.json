@@ -16954,7 +16954,7 @@
   "script": "scripts/S472_fig4_panels.py",
   "script_sha256": "84297a37e74db0d0f80b9704b26a232115c53bbc8eab66b0e8de24d100fdd791",
   "command": "uv run --frozen python scripts/S472_fig4_panels.py figure",
-  "figure4_provenance_sha256": "e85904feabbcc3cddeb2a5af434812529fedafb21ee6801502f7d66172e01ebb",
+  "figure4_provenance_sha256": "943e334531aead1edec818d0680c99072c88513882ec2c619d0cb760ecd2f14d",
   "records_sha256": {
    "findings/runs/exp_03__raw_gemini__exp_v4_s20_n0/answers.json": "afa5aa7eca967a07d3098c3bb53159c6114948b185e06aab85274123bd6f87ee",
    "findings/runs/exp_03__raw_gemini__exp_v4_s20_n0/run_identity.json": "ee7150a4c9f16ba05a8145a6c368b80f54321b19f1cda4a72985b7eef884c56a",

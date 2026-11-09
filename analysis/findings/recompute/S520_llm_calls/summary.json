@@ -878,7 +878,7 @@
    "gate": "G2 Studio log",
    "got": 405,
    "pass": true,
-   "source": "supp_fig15_outcomes records_manifest calls_lines",
+   "source": "supp_fig17_outcomes records_manifest calls_lines",
    "want": 405
   },
   {
@@ -1131,7 +1131,7 @@
   },
   "repository_head": "not stamped (report --frozen)",
   "script": "scripts/S520_llm_calls.py",
-  "script_sha256": "77e1923de98c937cd0efd1ba54484c093fd54915677a080bb31f8b73101978cf",
+  "script_sha256": "312cedbe6967d0a4c92a17259b273a2d22666e8e66b4e54265b2288f9e995c85",
   "written_utc": "not stamped (report --frozen)"
  },
  "reconcile": {

@@ -21,6 +21,8 @@ from pathlib import Path
 import openpyxl
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "scripts"))
+import fig_repro  # noqa: E402
 R1 = ROOT / "findings/recompute/S376_calibration_analysis.json"
 R2 = ROOT / "findings/recompute/S404/S404_analysis.json"
 OUT = ROOT / "findings/figures_provisional/supp_tables/Supplementary Table 1"   # the manuscript's number (J7: O1, 6 Nov)
@@ -79,6 +81,7 @@ def main():
     pv.append([str(R2.relative_to(ROOT)), sha(R2)])
     OUT.parent.mkdir(parents=True, exist_ok=True)
     wb.save(OUT.with_suffix(".xlsx"))
+    fig_repro.deterministic_xlsx(OUT.with_suffix(".xlsx"))   # bytes from content only, so a rerun is byte-equal (S608, 9 Nov)
     md = [f"# {TITLE}", "", note, "", "| " + " | ".join(HEAD) + " |", "|" + "---|" * len(HEAD)]
     md += ["| " + " | ".join(str(c) for c in r) + " |" for r in body]
     OUT.with_suffix(".md").write_text("\n".join(md) + "\n")

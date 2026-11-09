@@ -84,7 +84,7 @@
  "known_inputs": {
   "figure3_numbers": {
    "path": "findings/figures_provisional/fig3_strategies/figure3_numbers.json",
-   "sha256": "984e34e93d115a98f5e07253c99d62bc09dcaea98a17ff3de8bc92831ddbab69"
+   "sha256": "2b6343abf731d6a8ad4a56158310ab13cc196948f8f9ce743f4c510e32dd0196"
   },
   "rerun_keys": {
    "path": "findings/recompute/G1_runs/rerun_d89.sh",
@@ -92,7 +92,7 @@
   },
   "figure3_provenance": {
    "path": "findings/figures_provisional/fig3_strategies/figure3_provenance.json",
-   "sha256": "b9a67f91ff1610495624e51226e426a6c35b12cee8e13e7190dae65f70f97810"
+   "sha256": "ab3cf1b23f4691e514bf2e6e547cfc559b1f639e712baa41977665f9c78b6b79"
   },
   "rlm_manifest": {
    "path": "findings/recompute/frozen_inputs/extracted/fig2_g1r15_inputs/fig2_g1r15_inputs/MANIFEST.sha256",

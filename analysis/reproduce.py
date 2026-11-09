@@ -90,9 +90,16 @@ __pycache__/
 # docstring gives it), and, when the command takes an --out folder ("{out}"), the committed folder it is held to.
 # ---------------------------------------------------------------------------------------------------------------
 NUMBERS = [
-    {"name": "S543", "label": "Supplementary Figure 12", "cmd": ["scripts/S543_supp_signal_pairs.py", "figure"]},
-    {"name": "S570", "label": "Supplementary Figure 13", "cmd": ["scripts/S570_supp_i2_reuse.py", "figure"]},
-    {"name": "S542", "label": "Supplementary Figure 18", "cmd": ["scripts/S542_supp_evaluators.py", "figure"]},
+    # the three plates are drawn into --out and held to their committed folder file by file: in place, each draws into a
+    # .staging folder it then renames, so the comparison by git status saw no written released file and the audit
+    # flagged the staged PNG as a read outside HEAD (S608 measure, 9 Nov)
+    {"name": "S543", "label": "Supplementary Figure 12",
+     "cmd": ["scripts/S543_supp_signal_pairs.py", "figure", "--out", "{out}"],
+     "committed": "findings/figures_provisional/supp_fig12_signal_pairs"},
+    {"name": "S570", "label": "Supplementary Figure 13", "cmd": ["scripts/S570_supp_i2_reuse.py", "figure", "--out", "{out}"],
+     "committed": "findings/figures_provisional/supp_fig13_i2_reuse"},
+    {"name": "S542", "label": "Supplementary Figure 18", "cmd": ["scripts/S542_supp_evaluators.py", "figure", "--out", "{out}"],
+     "committed": "findings/figures_provisional/supp_fig18_evaluators"},
     {"name": "S583", "label": "Supplementary Table 1", "cmd": ["scripts/S583_judge_calibration_table.py"]},
     {"name": "S534 t1", "label": "Supplementary Table answer counts", "cmd": ["scripts/S534_si_tables.py", "t1"]},
     {"name": "S533", "label": "Supplementary Table 66 questions", "cmd": ["scripts/S533_table_66_questions.py"]},

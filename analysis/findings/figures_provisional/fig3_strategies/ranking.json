@@ -32345,7 +32345,7 @@
     "p_signflip_exact_two_sided": 2.3283064365386963e-10,
     "reading": null,
     "s518_file": "findings/recompute/S518_split_confirmation/gemini-3-flash-preview.json",
-    "s518_sha256": "fbb5a6eeaa3db06ea5adcb0269660bde91c4b8452a3d21a69342992268461b6e"
+    "s518_sha256": "e2cf25daf854c3b3eb50086ae052465192774a973f2fc5cbcda845fbbec27c7f"
    },
    {
     "row_kind": "split (RLM-10 minus single pass)",
@@ -32363,7 +32363,7 @@
     "p_signflip_exact_two_sided": 0.00292205810546875,
     "reading": null,
     "s518_file": "findings/recompute/S518_split_confirmation/gemini-3-flash-preview.json",
-    "s518_sha256": "fbb5a6eeaa3db06ea5adcb0269660bde91c4b8452a3d21a69342992268461b6e"
+    "s518_sha256": "e2cf25daf854c3b3eb50086ae052465192774a973f2fc5cbcda845fbbec27c7f"
    },
    {
     "row_kind": "split (RLM-10 minus single pass)",
@@ -32381,7 +32381,7 @@
     "p_signflip_exact_two_sided": null,
     "reading": "agrees",
     "s518_file": "findings/recompute/S518_split_confirmation/gemini-3-flash-preview.json",
-    "s518_sha256": "fbb5a6eeaa3db06ea5adcb0269660bde91c4b8452a3d21a69342992268461b6e"
+    "s518_sha256": "e2cf25daf854c3b3eb50086ae052465192774a973f2fc5cbcda845fbbec27c7f"
    }
   ],
   "Fig. 3f": [

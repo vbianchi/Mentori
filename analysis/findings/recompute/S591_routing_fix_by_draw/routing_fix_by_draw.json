@@ -89,11 +89,11 @@
  "known_inputs": {
   "s480_recount": {
    "path": "findings/recompute/S480_fig4_recount.json",
-   "sha256": "7703379904bae05011c4579e52a6560ff007c7cea38af3e8651380d8ddf75f77"
+   "sha256": "82e9149e1c6f2261a6af247ca0c1022fce50f243621e3c7844afe255e1188c9b"
   },
   "figure4_numbers": {
    "path": "findings/figures_provisional/fig4/figure5_numbers.json",
-   "sha256": "67504fa642f9ca26194c2fae88417d9c6ea66beb57b34f7babce6882cf3ab684"
+   "sha256": "fe2652805ed3c0af11a3b95f4defc5f077c1bd8bf3caa55f5a751ef17bfb856e"
   },
   "rlm_manifest": {
    "path": "findings/recompute/frozen_inputs/extracted/fig2_g1r15_inputs/fig2_g1r15_inputs/MANIFEST.sha256",
