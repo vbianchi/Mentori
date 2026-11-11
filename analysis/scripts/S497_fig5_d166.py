@@ -30,8 +30,8 @@ means checked against compute()'s), and the drawing is build_fig5.py's, ported.
 THE ONE COMMAND (D155; S494 calls it), from the repository root, with the tars below in FROZEN_TARS (default
 ~/Mentori_scratch_keep/frozen_2026-10-26, or the Zenodo deposit's data files):
     uv run --frozen python scripts/S497_fig5_d166.py figure [--out <folder>]
-It writes into --out (default findings/figures_provisional/fig5/): "Figure 5 (provisional, <n> of 516).{pdf,svg,png}",
-"Source Data Fig. 5 (provisional, <n> of 516).xlsx" and its caption, figure5_numbers.json, figure5_provenance.json,
+It writes into --out (default findings/figures_provisional/fig5/): "Figure 5.{pdf,svg,png}",
+"Source Data Fig. 5.xlsx" and its caption, figure5_numbers.json, figure5_provenance.json,
 legend_draft.md, methods_notes.md and fig5_data_state.json (claims.md only with --claims-out DIR, into DIR: D2, the
 editorial step S616 claims). n of 516 is compute()'s all4: the draw-1
 answerable answers with a final row from all four scorers, of the 516 planned (S473 PLANNED["papers"]). A second run
@@ -1700,7 +1700,7 @@ def texts(dat, Z, R, reading: str = "loose") -> dict:
 def caption_text(stamp, reading: str = "D181") -> str:
     return (
         f"# Source Data Fig. 5, caption\n\n**Source Data Fig. 5 | Numerical values plotted in Figure 5.** "
-        f"Provisional. Data stamp: {stamp}. One sheet per panel. "     # S448 R8: a provisional plate's caption says so
+        f"Data stamp: {stamp}. One sheet per panel. "                   # S448 R8 (4): the caption carries the stamp
         "Fig. 5a: per strategy and signal a summary row (median, quartiles, "
         + ("Tukey whisker ends" if reading == "loose" else "whisker ends, the range") + ", questions) and one row "
         "per plotted question. Fig. 5b: per strategy the draw-1 "
@@ -2072,8 +2072,37 @@ def ablation(dat: dict) -> dict:
     if papers_waits():
         keep = tuple((n, m) for n, m in SUBSETS if "papers" not in m)
         got = subset_ranks({s: dat["cc"]["means"][s] for s in ("judge", "concept")}, keep, CONFIGS)
-        return {"ranks": {n: got.get(n, {c: None for c in CONFIGS}) for n, _ in SUBSETS}}
-    return {"ranks": subset_ranks(dat["cc"]["means"], SUBSETS, CONFIGS)}
+        return {"ranks": {n: got.get(n, {c: None for c in CONFIGS}) for n, _ in SUBSETS}, "kendall": None}
+    ranks = subset_ranks(dat["cc"]["means"], SUBSETS, CONFIGS)
+    singles = [n for n, m in SUBSETS if len(m) == 1]
+    kw = kendall_w_exact([[ranks[n][c] for c in CONFIGS] for n in singles], singles)
+    # reproduce before writing: the same W and P as S473's concordance on the means (fig5_data_state.json c.W, c.P)
+    if any(abs(kw[a] - dat["cc"][b]) > 1e-9 for a, b in (("W", "W"), ("exact_P", "P")) if dat["cc"].get(b) is not None):
+        raise Refused(f"Kendall's W from b's ranks {kw['W']}, P {kw['exact_P']} differ from S473's {dat['cc'].get('W')}, "
+                      f"{dat['cc'].get('P')}")
+    return {"ranks": ranks, "kendall": kw}
+
+
+def kendall_w_exact(rk: list, names: list) -> dict:
+    """D309 N6 O1 (and A70): Kendall's W of the single signals' ranks of the strategies (b's one-signal rows), with the
+    tie correction, and its exact P: the share of all orderings of every signal's ranks but the first (6!^2 = 518,400 for
+    three signals and six strategies) whose W is at least the observed. One-sided by construction (W >= observed)."""
+    import itertools
+    import numpy as np
+    rk = np.asarray(rk, float)
+    m, n = rk.shape
+
+    def spread(tot):
+        return ((tot - tot.mean(-1, keepdims=True)) ** 2).sum(-1)
+    ties = sum(float(sum(t ** 3 - t for t in np.unique(r, return_counts=True)[1])) for r in rk)
+    s_obs = float(spread(rk.sum(0)))
+    W = 12 * s_obs / (m * m * (n ** 3 - n) - m * ties)
+    tot = rk[0][None, :]
+    for r in rk[1:]:
+        perms = np.array(list(itertools.permutations(r)))
+        tot = (tot[:, None, :] + perms[None, :, :]).reshape(-1, n)
+    P = float(np.mean(spread(tot) >= s_obs - 1e-9))
+    return {"W": W, "exact_P": P, "signals": list(names), "strategies": n, "orderings": int(tot.shape[0])}
 
 
 def panel_data_d200(R: dict) -> dict:
@@ -2208,12 +2237,13 @@ def d200_layout() -> dict:
     # (d's 100 tick, D_END below), no longer 0.2 mm inside the page, so a's facets narrow by the width of d's (n) column
     g["F_W"] = 34.0
     g["D_END"] = hs.PAGE_W_MM - 0.2 - max(tw("(n)"), tw("888")) - 1.2   # d's bars end here (x0 + w in _draw_5f)
-    g["B_CW"], g["B_HEAD"] = 4.4, 19.4                 # b's tile width and the top of its tiles
+    g["B_CW"], g["B_HEAD"] = 5.4, 19.4                 # b's tile width and the top of its tiles; 11 Nov (F3): 5.4 for
+                                                       # 4.4, so neighbouring ranks "3.5" "3.5" stand 1.5 mm apart
     g["B_X1"] = g["D_END"] - 6 * g["B_CW"]
     g["B_X"] = round(g["B_X1"] - 0.8 - max(tw(s) for s, _ in SUBSETS), 1)
     g["B_TH"] = min(5.1, (g["R1B"] + g["PAD"] - 0.5 - g["B_HEAD"]) / 7)   # tiles end level with a's axis title
-    g["A_X"], g["A_G"] = LABW + 1.8, 3.6
-    g["A_W"] = (g["B_X"] - 6.0 - g["A_X"] - 2 * g["A_G"]) / 3
+    g["A_X"], g["A_G"] = LABW + 1.8, 3.0              # 11 Nov (F3): a's gaps 3.0 for 3.6 and 4.0 for 6.0 before b,
+    g["A_W"] = (g["B_X"] - 4.0 - g["A_X"] - 2 * g["A_G"]) / 3   # so b's wider tiles cost a's facets under 1 mm each
     g["Y2"] = g["R1B"] + g["GAP"] + 0.6
     g["R2"] = g["Y2"] + 8.4                            # c's rows, under its key and facet heads
     g["R2B"] = g["R2"] + 5 * g["P2"]
@@ -2236,8 +2266,14 @@ def d200_layout() -> dict:
                                        + max(tw("(n)"), tw("888")))
     # band 2, left: c's three facets, a count printed right of a bar (up to two digits) ending 2 mm before d's letter
     g["D_X"], g["D_G"] = LABW + 1.8, 4.2
-    g["D_W"] = (g["F_LET"] - 2.0 - 0.5 - tw("88") - g["D_X"] - 2 * g["D_G"]) / 3
+    g["D_W"] = (g["F_LET"] - 2.0 - C_OUT - tw("88") - g["D_X"] - 2 * g["D_G"]) / 3
     return g
+
+
+# c's counts (11 Nov, F3): one prints inside its segment only with C_IN mm to spare (0.4 mm each side; 0.3 before, so
+# "7" and "11" filled their segments edge to edge); a last segment's count too wide for it prints C_OUT mm right of the bar
+# (0.5 before, so "5" sat against its thin segment); any other stays in the sheet and in methods_notes.
+C_IN, C_OUT = 0.8, 1.0
 
 
 def _row_labels(pl, x, ys, names):
@@ -2370,14 +2406,19 @@ def _draw_5c(pl, dat, g, sheet):
             row_i = len(sheet["rows"])
             if r is None:                                    # a subset holding Papers while Papers waits: a grey tile
                 sheet["rows"].append(["rank", sub, " + ".join(SIG_NAME[m] for m in members), LABEL[c], None, None,
-                                      nq])
+                                      nq, None, None])
                 pl.rect(x1 + j * cw, y, cw, th, hs.GREY["band"], ec=hs.WHITE, lw=0.5)
                 continue
             fc = hs.cividis_value(7 - r, 1, 6)
-            sheet["rows"].append(["rank", sub, " + ".join(SIG_NAME[m] for m in members), LABEL[c], r, rank_text(r), nq])
+            sheet["rows"].append(["rank", sub, " + ".join(SIG_NAME[m] for m in members), LABEL[c], r, rank_text(r), nq,
+                                  None, None])
             pl.rect(x1 + j * cw, y, cw, th, fc, ec=hs.WHITE, lw=0.5)
             pl.t(x1 + (j + 0.5) * cw, y + th / 2, rank_text(r), ha="center", va="center_baseline",
                  color=hs.ink_on(fc), printed={"sheet": f"Fig. {FIG_N}b", "row": row_i, "format": "{rank_text}"})
+    kw = dat["ablation"].get("kendall")         # D309 N6 O1: not drawn; the SI's W and its exact P stand in this row
+    sheet["rows"].append(["kendall_W", ", ".join(kw["signals"]) if kw else None, None,
+                          f"{kw['strategies']} strategies" if kw else None, None, None, nq,
+                          kw["W"] if kw else None, kw["exact_P"] if kw else None])
 
 
 def _draw_5d(pl, dat, g, sheet, unprinted):
@@ -2418,11 +2459,11 @@ def _draw_5d(pl, dat, g, sheet, unprinted):
                 v = m[key]
                 hs.bar(axes[s], i + 0.5, [v], [fc], start=left, slot=4.4 / P2 / hs.BAR_FRAC)
                 pr = {"sheet": f"Fig. {FIG_N}c", "row": row_i, "format": "{" + col + "}"}
-                if v and v * mm >= tw(str(v)) + 0.3:
+                if v and v * mm >= tw(str(v)) + C_IN:
                     pl.t(x + (left + v / 2) * mm, yc, str(v), ha="center", va="center_baseline", color=hs.ink_on(fc),
                          printed=pr)
                 elif v and key == "ot":
-                    pl.t(x + m["n"] * mm + 0.5, yc, str(v), va="center_baseline", printed=pr)
+                    pl.t(x + m["n"] * mm + C_OUT, yc, str(v), va="center_baseline", printed=pr)
                 elif v:
                     unprinted.append((LABEL[o], SIG_NAME[s], col, v))
                 left += v
@@ -2587,7 +2628,8 @@ PAPERS_FAITH_COLS = ["strategy", "faithfulness", "row", "question_id", "papers_p
                      "quartile_75", "whisker_low", "whisker_high"]
 SHEET_COLS = {"a": ["strategy", "signal", "reference", "row", "question_id", "value", "median", "quartile_25",
                     "quartile_75", "whisker_low", "whisker_high", "n_questions", "n_questions_column", "draws"],
-              "b": ["row_kind", "subset", "members", "strategy", "rank", "rank_text", "n_questions"],   # D296
+              "b": ["row_kind", "subset", "members", "strategy", "rank", "rank_text", "n_questions", "kendall_W",
+                    "kendall_W_exact_P"],   # D296; D309 N6: one 'kendall_W' row after the rank rows
               "c": ["strategy", "reference", "signal", "single_pass_higher", "tie", "strategy_higher", "n_questions"],
               "d": ["strategy", "judge"] + [f"faithfulness_{k}" for k in range(6)] + ["n"]
                    + [f"share_pct_{k}" for k in range(6)],
@@ -2786,10 +2828,12 @@ def texts_d200(dat: dict, Z: dict, R: dict) -> dict:
 def caption_d200(stamp: str) -> str:
     return (
         f"# Source Data Fig. {FIG_N}, caption\n\n**Source Data Fig. {FIG_N} | Numerical values plotted in Figure {FIG_N}.** "
-        f"Provisional. Data stamp: {stamp}. One sheet per panel. "
+        f"Data stamp: {stamp}. One sheet per panel. "
         f"Fig. {FIG_N}a: per strategy and signal a summary row (median, quartiles, whisker ends at the range, questions), one "
         f"row per plotted question, and for the Judge the questions at each pass rate. Fig. {FIG_N}b: each strategy's "
-        f"rank under each signal and mix of signals. Fig. {FIG_N}c: per "
+        f"rank under each signal and mix of signals, then one 'kendall_W' row, not drawn: Kendall's W of the three "
+        "single signals' ranks of the six strategies (tie-corrected) and its exact P, the share of all 518,400 orderings "
+        f"of the second and third signals' ranks whose W is at least as large. Fig. {FIG_N}c: per "
         "strategy against single pass and signal, the questions where single pass scores higher, the ties, the questions "
         f"where the strategy scores higher and the questions compared. Fig. {FIG_N}d: per strategy and judge verdict the "
         f"answers of the three draws pooled at each faithfulness score and their share of that row. Fig. {FIG_N}e: per "
@@ -2863,13 +2907,13 @@ def write_d200(out: Path, R: dict, srcs: dict, d200: dict, dat: dict, Z: dict, T
                     if waits else f"MiniCheck against the papers {have['papers']:,} of {planned['papers']:,} (draw 1, "
                                   + ("S564's selection D208 and the claim filter D172)"
                                      if "selection" in R["l1"]["filter_note"] else "claim filter D172)"))
-    stamp = (f"PROVISIONAL: {n4} of {planned['papers']} draw-1 answerable answers have a final row from all four "
+    stamp = (f"{n4} of {planned['papers']} draw-1 answerable answers have a final row from all four "
              f"scorers; judge plain call {have['judge']:,} of {planned['judge']:,}, concept recall "
              f"{have['concept']:,} of {planned['concept']:,} (D181's reading, L3_d181), {papers_stamp}, judge with passages "
              f"{have['faith']:,} of {planned['faith']:,}; RAGAS {len(R['k1']['rows']['ragas'])} and RAGChecker "
              f"{len(R['k1']['rows']['ragchecker'])} rows (K1); the Second judge row of panel e from S518's {S540.SECOND_JUDGE} rows (D267); S3 collect "
              f"{when}, run_sha256 {str(read['run_sha256'])[:12]}")
-    tag = f" (provisional, {n4} of {planned['papers']})"
+    tag = ""                                  # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
     plate, sd = f"Figure {FIG_N}{tag}", f"Source Data Fig. {FIG_N}{tag}"
     sheets = {f"Fig. {FIG_N}{k}": Z["SHEET"][k] for k in LETTERS}
     PL = Z["PL"]
@@ -2902,10 +2946,11 @@ def write_d200(out: Path, R: dict, srcs: dict, d200: dict, dat: dict, Z: dict, T
         (stage / f"figure{FIG_N}_numbers.json").write_text(json.dumps(
             {"stamp": stamp, "what": f"Figure {FIG_N} (D200), Source Data values and printed numbers (S448 R8 compares the "
                                      "workbook with this file)",
-             "sheets": sheets, "printed": PL.printed}, indent=1, default=float) + "\n")
+             "sheets": sheets, "printed": PL.printed, "kendall": dat["ablation"].get("kendall")}, indent=1,
+            default=float) + "\n")
         (stage / "legend_draft.md").write_text(
             f"# Figure {FIG_N}, title and legend (draft)\n\n"
-            f"Written by `{SCRIPT} figure`. Data stamp: {stamp}.\n\n" + T["legend"] + "\n")
+            f"Written by `{SCRIPT} figure`.\n\n" + T["legend"] + "\n")
         (stage / "methods_notes.md").write_text(
             f"# Figure {FIG_N}, notes for the Methods\n\nDetail that left the legend to keep it under 350 words. Written by "
             f"`{SCRIPT} figure`.\n\n" + "\n".join(f"- **{k}**: {v}" for k, v in T["methods"]) + "\n")
@@ -3052,13 +3097,13 @@ def _figure(args, tmp: Path):
     when = (read["side"].get("_provenance") or {}).get("at")
     if when:
         when = collect_utc(when, pull_log)
-    stamp = (f"PROVISIONAL: {n4} of {planned['papers']} draw-1 answerable answers have a final row from all four "
+    stamp = (f"{n4} of {planned['papers']} draw-1 answerable answers have a final row from all four "
              f"scorers; judge plain call {have['judge']:,} of {planned['judge']:,}, concept recall "
              f"{have['concept']:,} of {planned['concept']:,} (D181's reading, L3_d181), MiniCheck against the papers "
              f"{have['papers']:,} of {planned['papers']:,} (draw 1), judge with passages {have['faith']:,} of "
              f"{planned['faith']:,}; read {pull_log['ended_utc']} (S3 collect {when}, run_sha256 "
              f"{str(read['run_sha256'])[:12]})")
-    tag = f" (provisional, {n4} of {planned['papers']})"
+    tag = ""                                  # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
     plate, sd = f"Figure 5{tag}", f"Source Data Fig. 5{tag}"
     Z = build(dat, g_whiskers=True, a_range=True)
     T = texts(dat, Z, R, "D181")
@@ -3093,7 +3138,7 @@ def _figure(args, tmp: Path):
         (stage / "legend_draft.md").write_text(
             "# Figure 5, title and legend (draft)\n\n"
             f"Written by `{SCRIPT} figure` (the legend D166 locked; since D186 (4) with c's RLM fails counted from the "
-            f"data). Data stamp: {stamp}.\n\n" + T["legend"] + "\n")
+            f"data).\n\n" + T["legend"] + "\n")
         (stage / "methods_notes.md").write_text(
             "# Figure 5, notes for the Methods\n\nDetail that left the legend to keep it under 350 words. Written by "
             f"`{SCRIPT} figure`.\n\n" + "\n".join(f"- **{k}**: {v}" for k, v in T["methods"]) + "\n")

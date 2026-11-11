@@ -1,0 +1,7 @@
+{
+ "id": "OOD_041",
+ "category": "out_of_domain",
+ "subcategory": "contradictory",
+ "question": "According to the Sarek paper, the pipeline only supports Illumina short-read sequencing data and cannot process any other data types. Is this correct?",
+ "papers": []
+}

@@ -722,7 +722,17 @@ def collect(outs: list[Path], replace: Path | None, dest: Path, set_name: str | 
     # one file, one definition (judge_passages.py's own rule; review of 18 October F1): every row, the --replace rows
     # included, under one run_sha256 (lock, code, options, system prompt); two answers differ in item_sha256 by design
     runs = Counter(d.get("run_sha256") for d in merged.values())
-    if len(runs) > 1:
+    # D204 lock equivalence (Valerio 10 Nov, "Supplementary Fig. 4b: do it"; D204 "If you need to change the lock ...
+    # do it"): rows judged under locks lock_equiv.py proves equivalent may share a file, one run_sha256 per lock; the
+    # code and options in run_sha256 are held equal by that rule (the six code_identity files did not change between
+    # the two clones' commits, 34bb2d55 and 99357a12, 11 Nov)
+    import lock_equiv
+    by_lock = {}
+    for d in merged.values():
+        by_lock.setdefault(d.get("lock_sha256"), set()).add(d.get("run_sha256"))
+    equivalent = (len(runs) > 1 and set(by_lock) <= lock_equiv.EQUIVALENT
+                  and all(len(v) == 1 for v in by_lock.values()) and len(by_lock) == len(runs))
+    if len(runs) > 1 and not equivalent:
         by = {}
         for k, d in merged.items():
             by.setdefault(d.get("run_sha256"), set()).add(src[k])
@@ -739,7 +749,8 @@ def collect(outs: list[Path], replace: Path | None, dest: Path, set_name: str | 
             fh.write(json.dumps(merged[k], ensure_ascii=False) + "\n")
     side = {"_provenance": {"script": "findings/recompute/S3_runs/s3_guard.py collect", "at": time.strftime("%Y-%m-%dT%H:%M:%S"),
                             "inputs": [str(o) for o in outs] + ([str(replace)] if replace else [])},
-            "rows": len(merged), "run_sha256": next(iter(runs), None), "replaced": replaced,
+            "rows": len(merged), "run_sha256": (next(iter(runs), None) if len(runs) <= 1 else sorted(runs)),
+            "lock_equivalent": ({k: next(iter(v)) for k, v in sorted(by_lock.items())} if equivalent else None), "replaced": replaced,
             "added_by_replace": added, "from": dict(Counter(src.values())),
             "status_a": dict(Counter(d["a"]["status"] for d in merged.values())),
             "status_b": dict(Counter(d["b"]["status"] for d in merged.values()))}

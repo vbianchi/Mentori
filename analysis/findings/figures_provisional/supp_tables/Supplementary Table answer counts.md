@@ -18,12 +18,12 @@ Stored answers per experiment, counted from the run records (S492's unit: one ge
 | 12 | Pipeline ablation | 8 set-ups x 135 questions | 1373 |
 | 13 | No retrieval and naive RAG | 2 baselines x 135 questions | 810 |
 | 14 | Always distil (stress) | 2 set-ups x 135 questions | 450 |
-| 15 | Component benchmarks | orchestrator components x models x 832 items | 6656 |
-| 16 | Distiller intervention | 7 prompt variants x models x 97 items | 1164 |
+| 15 | Component benchmarks | 6 models x 832 benchmark items | 6656 |
+| 16 | Distiller intervention | 2 prompts x 6 models x 97 items | 1164 |
 | 17 | Code generation | 121 model and strategy set-ups x 20 operations | 2420 |
 | 18 | Strategy replication | 4 generators x 6 strategies x 135 questions | 7054 |
 | 19 | Plant-science reuse demonstration | Figure 3's six strategies x 5 questions on 5 papers | 90 |
 | 20 | RLM ablation | 3 arms (control, search off, gate off) x 86 questions | 774 |
-| 21 | RLM ablation, gemma3:27b | 3 arms (Zhang RLM, search off, gate off) x 46 questions | 138 |
+| 21 | RLM ablation, local generators | 3 arms x 2 generators x 46 questions | 276 |
 | 22 | Judge with evidence | 4 arms (no source, own papers, unrelated papers, repeat) x 366 answers (S18f, key v2.5) | 0 |
-| | Total counted | | 51441 |
+| | Total counted | | 51579 |

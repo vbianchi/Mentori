@@ -1,0 +1,7 @@
+{
+ "id": "OOD_045",
+ "category": "out_of_domain",
+ "subcategory": "contradictory",
+ "question": "The nf-core framework paper reports that switching from BAM to CRAM format increased storage requirements by 65%. Is this finding correct?",
+ "papers": []
+}

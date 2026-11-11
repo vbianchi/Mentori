@@ -1,0 +1,28 @@
+{
+ "id": "SY_008",
+ "category": "synthesis",
+ "subcategory": "trend_identification",
+ "question": "What meta-conclusion can be drawn regarding the evolving clinical presentation of livestock and wildlife viral diseases and its impact on traditional early-warning surveillance systems?",
+ "papers": [
+  {
+   "paper": "12_hpai_netherlands",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/12_hpai_netherlands.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/12_hpai_netherlands.pypdf.txt"
+  },
+  {
+   "paper": "18_fmd_review",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/18_fmd_review.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/18_fmd_review.pypdf.txt"
+  },
+  {
+   "paper": "19_hpai_canada",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/19_hpai_canada.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/19_hpai_canada.pypdf.txt"
+  },
+  {
+   "paper": "20_lsd_review",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/20_lsd_review.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/20_lsd_review.pypdf.txt"
+  }
+ ]
+}

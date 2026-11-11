@@ -302,14 +302,14 @@ def figure(out, set_dir=None) -> None:
         sh = sheets(dat, e_rows, ranks)
         k = sum(1 for r in table if r.get("correctness") is not None and all(r.get(x) is not None for x in TOOL_KEYS))
         m = S473.PLANNED["papers"]
-        tag = f"provisional, {k} of {m}"
-        stamp = (f"PROVISIONAL: {k} of {m} draw-1 answerable answers have the judge's score and all {len(TOOL_KEYS)} tool "
+        tag = ""                                  # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
+        stamp = (f"{k} of {m} draw-1 answerable answers have the judge's score and all {len(TOOL_KEYS)} tool "
                  "scores; "
                  f"RAGAS {len(R['k1']['rows']['ragas'])} and RAGChecker {len(R['k1']['rows']['ragchecker'])} rows (K1); "
                  f"ranks on {ranks['questions']} questions")
         T = texts(dat, e_rows, ranks, not_answerable_rows(R["k1"]), k)
         pl = draw(e_rows, ranks, sh[f"Supplementary Fig. {N}b"])
-        cap = (f"# Supplementary Figure {N} data, caption\n\n**Supplementary Figure {N} data.** Provisional. Data stamp: "
+        cap = (f"# Supplementary Figure {N} data, caption\n\n**Supplementary Figure {N} data.** Data stamp: "
                f"{stamp}. Sheet a: per score and judge signal rho, the resample quartiles and percentiles, the "
                "within-question rho and the pairs used. Sheet b: per row and strategy the mean, rank and order against the "
                f"judge. Sheet answers: the answers' judge scores, Concepts, Papers, {len(TOOL_KEYS)} tool scores and the windowed "

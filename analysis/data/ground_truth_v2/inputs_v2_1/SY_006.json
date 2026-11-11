@@ -1,0 +1,28 @@
+{
+ "id": "SY_006",
+ "category": "synthesis",
+ "subcategory": "methodology_comparison",
+ "question": "Analyze how the choice of diagnostic methodology and specific assay thresholds influences the reported prevalence and epidemiological understanding of transboundary diseases.",
+ "papers": [
+  {
+   "paper": "11_asf_burkina_faso",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/11_asf_burkina_faso.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/11_asf_burkina_faso.pypdf.txt"
+  },
+  {
+   "paper": "14_bovine_tb_cameroon",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/14_bovine_tb_cameroon.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/14_bovine_tb_cameroon.pypdf.txt"
+  },
+  {
+   "paper": "16_ppr_ethiopia",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/16_ppr_ethiopia.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/16_ppr_ethiopia.pypdf.txt"
+  },
+  {
+   "paper": "17_brucellosis_ethiopia",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/17_brucellosis_ethiopia.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/17_brucellosis_ethiopia.pypdf.txt"
+  }
+ ]
+}

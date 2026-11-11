@@ -1,5 +1,5 @@
 {
-"stamp": "PROVISIONAL two raters, 49 of 49 answers drawn",
+"stamp": "two raters, 49 of 49 answers drawn",
 "sheets": {
 "Fig. 2a": {
 "columns": [
@@ -31736,5 +31736,9 @@ null
 "fixed": "Pass at 3",
 "why": "a label of the design, no data"
 }
+},
+"counts": {
+"rated_answers": 49,
+"verified_pass_answers": 5
 }
 }

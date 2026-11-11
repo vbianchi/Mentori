@@ -491,12 +491,14 @@ def write_supp(out, n: int, tag: str, stamp: str, page, sheets: dict, legend: st
                imports: tuple, inputs: dict, notes: str | None = None, state: dict | None = None) -> None:
     """The plate, its data workbook and caption, the numbers and provenance files S448 reads and the legend, into a
     staging folder, then moved over this figure's earlier files. page: S497.Page. Nothing here holds a time, a git state
-    or a temporary path. tag: "provisional, <k> of <m>", the same in every name."""
+    or a temporary path. tag: "" since Q9 (Valerio, 11 Nov: no "(provisional, ...)" in any name), so every file is
+    named by the lock alone; a non-empty tag would still be written as " (<tag>)" after each name."""
     S473 = s473()
     FR, S457 = S473.FR, S473.S457
     out = Path(out).resolve()
-    base, data = f"Supplementary Figure {n} ({tag})", f"Supplementary Figure {n} data ({tag})"
-    cap = f"Supplementary Figure {n} data caption ({tag}).md"
+    sfx = f" ({tag})" if tag else ""
+    base, data = f"Supplementary Figure {n}{sfx}", f"Supplementary Figure {n} data{sfx}"
+    cap = f"Supplementary Figure {n} data caption{sfx}.md"
     nums, prov = f"supplementary_figure{n}_numbers.json", f"supplementary_figure{n}_provenance.json"
     stage = out.with_name(out.name + ".staging")
     import shutil
@@ -524,7 +526,7 @@ def write_supp(out, n: int, tag: str, stamp: str, page, sheets: dict, legend: st
                                               "numbers (S448 R8 compares the workbook with this file)",
                                               "sheets": sheets, "printed": page.printed}, indent=1, default=float) + "\n")
         (stage / "legend_draft.md").write_text(f"# Supplementary Figure {n}, title and legend (draft)\n\nWritten by "
-                                               f"`{script} figure`. Data stamp: {stamp}.\n\n{legend}\n")
+                                               f"`{script} figure`.\n\n{legend}\n")
         if notes:
             (stage / "methods_notes.md").write_text(f"# Supplementary Figure {n}, notes for the Methods\n\nWritten by "
                                                     f"`{script} figure`.\n\n{notes}\n")

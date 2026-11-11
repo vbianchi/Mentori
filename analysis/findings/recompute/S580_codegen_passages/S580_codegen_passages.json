@@ -4,15 +4,15 @@
   "script_sha256": "d5c939771e9ce7b1e292d73d8e18bf9e557d448c766e98554a6c8feb0da7c2f7",
   "command": "uv run python scripts/S580_codegen_passages.py",
   "inputs_sha256": {
-   "findings/figures_provisional/fig6/figure7_numbers.json": "d334db3de14c3990333cc6ae778c1700727e428714731199aa3e73b666e01049",
-   "findings/figures_provisional/supp_fig15_fig6_pairs/supplementary_figure15_numbers.json": "3f04321a6cfa9227255e9c4aff03ab73d4d2a7c488cd9d8b0bb9225ede629f57",
+   "findings/figures_provisional/fig6/figure7_numbers.json": "3c31ae611da291bfe2bea56ba5a3382fb3b39cb502f5253b29f9d6f31bd7776d",
+   "findings/figures_provisional/supp_fig15_fig6_pairs/supplementary_figure15_numbers.json": "9330db21225b5922411e7a85fdfde4c4fa768e9b498e2a6cd560a9b638681e70",
    "findings/figures_provisional/fig6/fig6_numbers.json": "14ea3bb30101edda9be40835c1f64e47fceb2c73b080190b9cc32c6b13ed9b6d",
-   "findings/figures_provisional/supp_fig16_fig6_models/supplementary_figure16_numbers.json": "edfdc53fac28d273517b630a52acbe8d1e9b50072c1e41a17fe476e85ffecd64",
-   "findings/figures_provisional/supp_fig14_fig6_failures/supplementary_figure14_numbers.json": "a735fe93d9b15b61a69141165a41840a0236bdf8df7aa8d7f601453013e6f0ca",
-   "findings/recompute/S488_fig6_heterogeneity/S488_fig6_heterogeneity.json": "e829f6bcf5ce6aa8405ddf4f7fb8609bfa14e8c59a4e290905e835f89bb5bf33",
+   "findings/figures_provisional/supp_fig16_fig6_models/supplementary_figure16_numbers.json": "5c745c5f56ed74f7145e811056c9c7ced6ae28f4dc2a6bd0d29cec6afa1c67b8",
+   "findings/figures_provisional/supp_fig14_fig6_failures/supplementary_figure14_numbers.json": "c1ee33fa3bd7c40f593161f581b6edf546ce3c246a621b37e8b377a4458a4bd4",
+   "findings/recompute/S488_fig6_heterogeneity/S488_fig6_heterogeneity.json": "d90df7583e72e506c028b319a806ed2d8b46df70a1a835e2563b963d31176f09",
    "scripts/S488_fig6_heterogeneity.py": "5ed25daad1815e7683d02f8f279ee3fb7e90d361bb8deeb2652b7e281c5b2d58"
   },
-  "records": "PROVISIONAL: 2,420 of 2,420 attempts, 11 of 11 variants complete, records of 2026-11-04 08:35 CET; after the S4 reruns (D75, D80 V1, D81)",
+  "records": "2,420 of 2,420 attempts, 11 of 11 variants complete, records of 2026-11-04 08:35 CET; after the S4 reruns (D75, D80 V1, D81)",
   "reproduced": [
    "S488 committed Q 55.9 / 6.0 by its own cochran_q",
    "WANT 2,420 / 1,692",

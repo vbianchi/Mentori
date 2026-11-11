@@ -65,7 +65,7 @@ THE CONSISTENCY RULES OF THE BUILD (D138; the drafts differed, 25 October):
 COMMANDS, from the repository root (uv run only):
 
   figure        uv run --frozen python scripts/S481_fig6_d138.py figure [--final]
-                Figure 6 into findings/figures_provisional/fig6/ (S447.OUT): "Figure 6 (provisional, <n> of <N>)"
+                Figure 7 into findings/figures_provisional/fig6/ (S447.OUT): "Figure 7" (no suffix, Q9)
                 .pdf/.svg/.png, "Source Data Fig. 6 ...".xlsx (one sheet per panel), its caption, figure6_numbers.json
                 (the sheets and the "printed" map S448 R8 (6) reads), figure6_provenance.json, legend_draft.md; files
                 of an earlier data state ("Figure 6*", "Source Data Fig. 6*") are deleted first. Then S448 on the folder.
@@ -1320,14 +1320,12 @@ def draw_K1(D, F, S):
         for fi, f in enumerate(FAMS):
             _K_cell(ax, S, K, "all", ti, t, fi, f, 1.05, mm_y, mm_x)
     ax.set_xticks([])
-    # the tier names with their operation counts, where the draft's tick labels sat (3.5 pt below the axis, the tick
-    # pad), drawn as text so each "n =" is tied to its box row in the sheet (S.num)
+    # the tier names, where the draft's tick labels sat (3.5 pt below the axis, the tick pad). Valerio, 11 Nov (F2):
+    # the plate names the tier only; its operation count is in the legend ("n = 6 simple, 8 medium and 6 complex")
     pad = plt.rcParams["xtick.major.pad"]
     for ti, t in enumerate(TIERS):
-        b = next(i for i, r in enumerate(S.rows) if r["part"] == "box" and r["tier"] == t and r["family"] == FAMS[1])
-        lab = ax.annotate(f"{t}\nn = {len(K['ops'][t])}", xy=(ti * 4 + 1.15, 0), xycoords=("data", "axes fraction"),
-                          xytext=(0, -pad), textcoords="offset points", ha="center", va="top", fontsize=PT)
-        S.num(lab, b, "{tier}\nn = {n_operations}")
+        ax.annotate(t, xy=(ti * 4 + 1.15, 0), xycoords=("data", "axes fraction"),
+                    xytext=(0, -pad), textcoords="offset points", ha="center", va="top", fontsize=PT)
     ax.set_yticks([0, 25, 50, 75, 100])
     ax.set_ylabel("Pass rate (%)", labelpad=2)
     n = {t: len(K["ops"][t]) for t in TIERS}
@@ -1806,6 +1804,9 @@ def _X_rows_y(X):
 # ---- X-1 (Figure 6c): outcome bars per strategy, Gemini above open-weight (FF32; D138's datasets moved to X-2) ------
 SIZE_X1 = (183.0, 85.7)                     # house: 1 mm taller so 0.70-row bars still hold their digits; D299 (7 Nov):
                                             # the page's width, since d (B1) left the row
+X1_BOTTOM = 7.8                             # Valerio, 11 Nov (F3): below the bars, the tick labels (4.8 mm) and the
+                                            # axis title on its own line under them
+X1_TITLE_BELOW = 0.6                        # the axis title's baseline above the slot's foot (its descenders)
 
 
 def draw_X1(D, F, S):
@@ -1813,7 +1814,8 @@ def draw_X1(D, F, S):
     W, H = SIZE_X1
     F.letter()
     STRATS = D.STRATS
-    BAR_FRAC, FGAP = hs.BAR_FRAC, 0.30                 # bar height in rows (house 0.70); gap between families
+    BAR_FRAC, FGAP = hs.BAR_FRAC, 0.20                 # bar height in rows (house 0.70); gap between families (0.30
+                                                       # until 11 Nov: F3 took 2.4 mm for the axis title's own line)
     CAP = 0.717 * PT * MMPT                            # Helvetica digit height, mm: the pass % on the bar's centre
     LAB = max(tw(D.SLAB[s]) for s in STRATS) + 2.0
     RIGHT = tw("100") / 2 + 0.3
@@ -1829,9 +1831,9 @@ def draw_X1(D, F, S):
     # inside the slot (two lines would leave the bars too thin for their numbers within the 170 mm page)
     _, klines = hkey(F, [("swatch", (OCOL[o], OPAT[o] or None), o) for o in OUTCOMES], LAB + cw / 2,
                      PT_LETTER * MMPT)
-    HEAD1 = klines[-1][2] - F.oy + 4.2
+    HEAD1 = klines[-1][2] - F.oy + 3.6                 # baseline to baseline (4.2 until F3, 11 Nov)
     TOP1 = HEAD1 + 0.9
-    PH = (H - 4.8 - TOP1 - 3.6 - 0.9) / 2              # the two model groups fill the slot
+    PH = (H - X1_BOTTOM - TOP1 - 3.6 - 0.9) / 2        # the two model groups fill the slot
     PITCH = PH / NROWS
     if PITCH * BAR_FRAC < CAP:
         raise SystemExit(f"X1: a bar {PITCH * BAR_FRAC:.2f} mm thick cannot hold its {CAP:.2f} mm digits")
@@ -1872,10 +1874,11 @@ def draw_X1(D, F, S):
         if j == 0:
             ax.set_xticklabels([])
         _X_strip_y(ax)
-        t = F.text(0.5, head, f"{b}, n = {X['n_sb'][(STRATS[0], b)]} per bar", va="baseline", ha="left")
-        S.num(t, first, b + ", n = {attempts_in_bar} per bar")
-    F.text(LAB - 2.0, BOT + (plt.rcParams["xtick.major.size"] + plt.rcParams["xtick.major.pad"]) * MMPT,
-           "Attempts (% of n)", va="top", ha="right")
+        # Valerio, 11 Nov (F2): the head names the model group only; the attempts per bar are in the legend
+        F.text(0.5, head, b, va="baseline", ha="left")
+    # Valerio, 11 Nov (F3): the axis title centred under the bars, below the tick labels (no longer on their line
+    # beside "0", where it read as one string with it); "(%)" since the plate no longer prints the n it was a share of
+    F.text(LAB + cw / 2, H - X1_TITLE_BELOW, "Attempts (%)", va="baseline", ha="center")
     (g_name, g_v), (o_name, o_v) = D.blocks
     # 8 Nov (Valerio, editor row 45): no derived statistics here, so no "n ="; the attempts per bar are said once,
     # as what each bar holds and as the plate prints them.
@@ -1964,11 +1967,10 @@ def draw_X2(D, F, S):
     gap = 2.0
     cw = (W - LAB - 2 * GAPW - gap - 1.0) / 2
     # house key: free-form a filled blue circle (as Figure 6b), centred over the two dataset columns
-    (k1, k2), _ = hkey(F, [("mark", (FCOL["free-form"], FMARK["free-form"]), f"free-form (n = {ffn})"),
-                           ("mark", (FCOL["structured"], FMARK["structured"]), f"structured (n = {stn})")],
-                       LAB + (2 * cw + GAPW + gap) / 2, PT_LETTER * MMPT)
-    S.num(k1, r0, "free-form (n = {free_form_attempts})")
-    S.num(k2, r0, "structured (n = {structured_attempts})")
+    # Valerio, 11 Nov (F2): the key names the family only; its attempts per dot are in the legend
+    hkey(F, [("mark", (FCOL["free-form"], FMARK["free-form"]), "free-form"),
+             ("mark", (FCOL["structured"], FMARK["structured"]), "structured")],
+         LAB + (2 * cw + GAPW + gap) / 2, PT_LETTER * MMPT)
     r_ring_mm = S447.ms_pt(1.5) * MMPT / 2              # the filled circle's radius (house: 1.5 mm marks)
     for j, d in enumerate(DSETS):
         x = LAB + j * (cw + GAPW + gap)
@@ -2143,13 +2145,14 @@ def draw_X4(D, F, S):
         ax.set_yticks([y for _, _, y in rows_y], [vlabel(v) for v, _, _ in rows_y] if j == 0 else [])
         ax.set_xticks([0, 50, 100])
         _X_strip_y(ax)
-        F.text(x, HEAD_Y, f, va="baseline", ha="left")
-        t = F.text(x, HEAD_Y + 3.4, f"n = {nn}", va="baseline", ha="left")
-        S.num(t, first, "n = {attempts}")
+        # Valerio, 11 Nov (F2): the column head names the family only; its attempts per variant are in the legend.
+        # The head stays tied to its sheet row (S.num), so the plate keeps a printed map for S448 R8 (6)
+        t = F.text(x, HEAD_Y, f, va="baseline", ha="left")
+        S.num(t, first, "{family}")
         if j == 0:
             for b, y in heads:
                 F.text(0.5, TOP + BH * (y + 0.5) / NR, b, va="center", ha="left", color=GREY_NOTE)
-    F.text(LAB + (3 * cw + 2 * gap) / 2, H - 2.0, "Attempts failed (% of n)", va="baseline", ha="center")
+    F.text(LAB + (3 * cw + 2 * gap) / 2, H - 2.0, "Attempts failed (%)", va="baseline", ha="center")
     n = {f: cnt[("v_f", D.VARS[0], f)][1] for f in FAMS}
     kinds = defaultdict(set)                          # the fail kinds each group holds in this panel
     for r in D.rows:
@@ -2164,8 +2167,9 @@ def draw_X4(D, F, S):
     if any(per_f[f] * len(D.OPS) != n[f] for f in FAMS):
         _X_stop(f"X-4 legend: a family's attempts are not whole strategies of {len(D.OPS)} operations: {n}")
     return {"legend": (f"Each bar is the share of one model variant's attempts (row) that failed under one prompting "
-                       f"family (column: free-form, {per_f['free-form']} strategies; introspection, "
-                       f"{per_f['introspection']}; structured, {per_f['structured']}), one attempt per strategy and "
+                       f"family (column: free-form, {per_f['free-form']} strategies, {n['free-form']} attempts; "
+                       f"introspection, {per_f['introspection']}, {n['introspection']}; structured, "
+                       f"{per_f['structured']}, {n['structured']}), one attempt per strategy and "
                        f"operation; x axis, attempts failed as a percentage of that variant's attempts in that family. The bar is split by kind of failure (colour and "
                        f"pattern, key above). Wrong values: the code returned values that did not match the "
                        f"reference. No result: the code returned no values. Length stop: the reply filled its "
@@ -2498,7 +2502,7 @@ def draw_B1(D, F, S, size, letter_x=0.0):
         "size": size, "lab_w": 11.0, "plot_w": size[0] - 11.0 - 0.3, "head_h": 11.0, "foot_h": 8.5,
         "head_text_mm": 3.2, "head_rule_mm": 2.0, "label_pad_mm": 1.4, "line_off_mm": 2.6, "letter_x": letter_x,
         "dot_mm": 1.0, "pitch_mm": 1.1, "dot": OK["black"],
-        "key": [figure_names.GEMINI + " ({count})", figure_names.OPEN_WEIGHT + " ({count})"],   # 3 Nov (Valerio): the net
+        "key": [figure_names.GEMINI, figure_names.OPEN_WEIGHT],   # 11 Nov (Valerio, F2): series names only; 3 Nov: the net
         "ylabel": "Change in pass rate (points)"})                                             # and its interval: legend
     _B1_not_drawn(D, S, B)
     nv, no = len(D.VARS), len(D.OPS)
@@ -2506,7 +2510,8 @@ def draw_B1(D, F, S, size, letter_x=0.0):
     # is described in full, with no reference to another panel.
     return {"legend": (f"change in pass rate (points) of each repeated-attempt strategy (column) over the "
                        f"single-attempt strategy of its family, same variant and operation. Dot, one variant over "
-                       f"{no} operations (filled, Gemini; open, open-weight); diamond, net change over all pairs; line, "
+                       f"{no} operations (filled, the {sum(map(is_gemini, D.VARS))} Gemini variants; open, the "
+                       f"{sum(not is_gemini(v) for v in D.VARS)} open-weight); diamond, net change over all pairs; line, "
                        f"two-sided 95% percentile interval from {BOOT_N:,} resamples of the {no} operations; "
                        f"n = {nv * no} pairs per strategy.")}
 
@@ -2647,7 +2652,7 @@ def draw_B4(D, F, S):
         lt = hs.panel_letter(F.fig, 0.0 if c_ == 0 else x0 - 4.0, top - 1.2, letters[li])   # at the panel's left edge
         ax_letter[ax] = lt
         contrast_of_letter[letters[li]] = f"{SLAB[arm]} against {SLAB[base]}"
-        fmt = "rescued {rescued}, lost {lost} of {n_pairs} pairs"
+        fmt = "rescued {rescued}, lost {lost}"   # 11 Nov (Valerio, F2): the pairs per panel are in the legend
         t = F.text(x0, top - 1.2, S447.HALF_UP.format(fmt, **S.rows[ci]), ha="left", va="baseline", color=TXT_GREY)
         S.num(t, ci, fmt)
         captions.append(F.text(x0 + grid_w / 4, top + grid_h + 4.0, DHEAD["RNA-seq"], ha="center", va="top",
@@ -3171,9 +3176,9 @@ def draw_C2(D, F, S):
     S.check("bar start (% of the setting's attempts)", bars, "share_start_pct", lefts)
     ns = {S.rows[i]["attempts_n"] for i in bars}
     if len(ns) != 1:
-        raise SystemExit(f"C2: the settings hold {sorted(ns)} attempts, the axis title states one n")
-    axes[-1].set_xlabel(f"Attempts (% of n = {ns.pop()} per setting)", labelpad=2)
-    S.num(axes[-1].xaxis.label, first_bar, "Attempts (% of n = {attempts_n} per setting)")
+        raise SystemExit(f"C2: the settings hold {sorted(ns)} attempts, the legend states one n")
+    # Valerio, 11 Nov (F2): the axis title names the quantity only; the legend gives the attempts per setting
+    axes[-1].set_xlabel("Attempts (%)", labelpad=2)
 
     n_set = S.rows[first_bar]["attempts_n"]
     # Valerio, 8 Nov (editor row 45): shares and medians with no spread drawn derive no statistics, so no n tag; the
@@ -3513,7 +3518,8 @@ def lead_supp15(D):
             f"{len(D.OPS)} data-analysis operations on two datasets (airway RNA-seq and NCCTG lung survival), run once "
             f"({_rerun_clause()}); {n} attempts on one {D.dataset_of[op]} operation are re-scored by running their "
             f"stored code again. A pair is one variant on one operation under a repeated-attempt strategy and under "
-            f"the single-attempt strategy of its family.")
+            f"the single-attempt strategy of its family ({len(D.VARS) * len(D.OPS)} pairs per comparison: "
+            f"{len(D.VARS)} variants {_B_TIMES} {len(D.OPS)} operations).")
 
 
 def lead_supp14(D):
@@ -3622,8 +3628,9 @@ def stamp_of(D, final):
     when = S447.iso_local(D.notes["newest_answers_mtime"])
     if final:
         return f"FINAL: {n:,} of {total:,} attempts, records of {when}", ""
-    return (f"PROVISIONAL: {n:,} of {total:,} attempts, {done} of {len(vs)} variants complete, records of {when}; "
-            f"after the S4 reruns (D75, D80 V1, D81)", f" (provisional, {n} of {total})")
+    # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name and no PROVISIONAL in any stamp
+    return (f"{n:,} of {total:,} attempts, {done} of {len(vs)} variants complete, records of {when}; "
+            f"after the S4 reruns (D75, D80 V1, D81)", "")
 
 
 # D155: the files each panel family reads beside Data's own inputs, recorded in the provenance of every plate that
@@ -3885,8 +3892,7 @@ def draw_plate(D, spec, out_dir, final, cmd, main, accept=()):
     lead = spec["lead"](D) if "lead" in spec else lead_supp(D, spec.get("rescored", False))
     head = f"**{base} | {title}.** {lead}"
     body = " ".join((f"**{lt}**, {txt}" if lt else txt) for lt, txt in legends.values())
-    legend = (f"# {base}, title and legend (draft)\n\nWritten by `{SCRIPT}` from the plotted numbers. Data stamp: "
-              f"{stamp}.\n\n{head} {body}\n")
+    legend = f"# {base}, title and legend (draft)\n\nWritten by `{SCRIPT}` from the plotted numbers.\n\n{head} {body}\n"
     (out_dir / "legend_draft.md").write_text(legend)
     capf = out_dir / f"{sd_stem} caption{tag}.md"
     if main:                                       # the sheets described column by column, as Figures 1 to 5's
@@ -3907,9 +3913,9 @@ def draw_plate(D, spec, out_dir, final, cmd, main, accept=()):
             raise SystemExit(f"{sd_stem}: the sheets' columns are not the ones its caption describes: {bad_cols}")
         sheets_txt, avail = sheets_note or f"One sheet per panel ({', '.join(nm for nm, _, _ in sheets)}).", ""
     capf.write_text(f"# {sd_stem}, caption\n\n**{sd_stem} | Numerical values plotted in {base}.** "
-                    f"{'Provisional: drawn' if not final else 'Drawn'} from all {len(D.rows):,} attempts of the design "
-                    f"({len(D.VARS)} model and thinking-setting variants), after the S4 reruns (D75, D80 V1, D81); every value "
-                    f"will be redrawn from the full records by the same script. Data stamp: {stamp}. {sheets_txt} "
+                    f"Drawn from all {len(D.rows):,} attempts of the design "
+                    f"({len(D.VARS)} model and thinking-setting variants), after the S4 reruns (D75, D80 V1, D81). "
+                    f"Data stamp: {stamp}. {sheets_txt} "
                     f"{_rescore_clause(D)} Generated by `uv run --frozen python {SCRIPT} "
                     f"{'figure' if main else 'supplementary'}` from the run records and S477's re-score.{avail}\n")
     prov = {"provenance": provenance(cmd, D, inputs), "reproduced": D.reproduced, "stamp": stamp, "page_mm": [PAGE_W, H],

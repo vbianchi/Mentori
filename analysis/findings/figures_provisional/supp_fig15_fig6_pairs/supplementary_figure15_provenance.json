@@ -1,15 +1,15 @@
 {
  "provenance": {
   "script": "scripts/S481_fig6_d138.py",
-  "script_sha256": "4f63c78ee591a3c23ddbeab6d034c9e9ced362f29323d93e445c7494c7e257e3",
+  "script_sha256": "26f025963ac2a5b7d2e9e9c9b1593742b620ffffdede50f3e2aec51930c4d088",
   "command": "uv run --frozen python scripts/S481_fig6_d138.py supplementary",
   "code_sha256": {
-   "scripts/S447_fig6_panels.py": "611c4da95690f0a71ffffe94cc8b7ff3d2e4f857bfbe1b19d0d0f8da77e17050",
-   "scripts/S457_fig2_panels.py": "8c29dab8b04a1bad4a955582a30831c51c2b70438be2f6d2698c7b81948d7520",
+   "scripts/S447_fig6_panels.py": "4e234fa55063961400f6c9f59f8376cdd151aa036ed558bbd91eb734bba1a97f",
+   "scripts/S457_fig2_panels.py": "33dc73444a80cf9d9b429fff6e489322bb01ca828a10f12a90487d84e7eaa4a1",
    "scripts/S478_fig6_thinking_gap.py": "214d58e3ac60b38ab48b5693998ed99edeb42e1ff4e306b13a92a8b3b1bffc4d",
    "scripts/S479_fig6_by_tier.py": "c12358734134cbd02c63c124f677b7a15c8369727174089d02db4812cb33856c",
    "scripts/house_style.py": "647c8991f4dcd2cea08e0be46eaf758beb55fb029c54bb267e7fba1e0b8b17b6",
-   "scripts/figure_names.py": "a3c65ae0a1e8aa05e99a99610ea857f63b0d8fff60a99404bcb5bf6ff9a82e65"
+   "scripts/figure_names.py": "025f8904861fd8d916cd875346a1384e915ea6601bfd2f7624dd71e49f2948a7"
   },
   "python": "3.13.11",
   "packages": {
@@ -268,7 +268,7 @@
    "findings/recompute/S478_fig6_thinking_gap.json": "a15ec7131ade7a0d64fe409c49333303991225e89f88c5a6d97c3907826cc37d",
    "findings/recompute/S479_fig6_by_tier.json": "76bab1ad384b863b3da6d36dba4f1e7e51bfb68a62c36dbed7de4843119d372c",
    "experiments/mentori/tests/experiments_v2/datasets/coder_ground_truth.json": "afcef9ffea67b2ea1659dad7513948693027648f02f887e6db4e07f6ca3b9c35",
-   "experiments/FIGURE_LOCK.toml": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+   "experiments/FIGURE_LOCK.toml": "ac39c4e311f340654fe1ebe3333a3fe439bc6286e38fc0334fdb0e0cf2a97aef",
    "findings/recompute/fig6_options_2026-10-25/B_numbers.json": "c307f0dccb8682b82ccdad91d4f131f0db63452735bc32cb9b644fea96cadf53"
   },
   "model_calls": 0
@@ -331,7 +331,7 @@
    }
   }
  },
- "stamp": "PROVISIONAL: 2,420 of 2,420 attempts, 11 of 11 variants complete, records of 2026-11-04 08:35 CET; after the S4 reruns (D75, D80 V1, D81)",
+ "stamp": "2,420 of 2,420 attempts, 11 of 11 variants complete, records of 2026-11-04 08:35 CET; after the S4 reruns (D75, D80 V1, D81)",
  "page_mm": [
   183.0,
   156.1
@@ -351,16 +351,16 @@
  },
  "figure_lock": {
   "path": "experiments/FIGURE_LOCK.toml",
-  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b"
+  "sha256": "ac39c4e311f340654fe1ebe3333a3fe439bc6286e38fc0334fdb0e0cf2a97aef"
  },
  "read_back": "3458 drawn values equal to the workbook",
  "files": {
-  "Supplementary Figure 15 (provisional, 2420 of 2420).pdf": "8ed588ec60ae3cb3cc660eca2436c6c11c20086a335437a249adc48ff029f4dd",
-  "Supplementary Figure 15 (provisional, 2420 of 2420).svg": "89682ec4397656af75d4a178b12b04a2621f1d12fcc11a91203c34cb6b8e8268",
-  "Supplementary Figure 15 (provisional, 2420 of 2420).png": "a8e32299310b828c38c3b0c01367e35556f191738cf9d6021f4f5484bb995488",
-  "Supplementary Figure 15 data (provisional, 2420 of 2420).xlsx": "c4302b1f5947f2e843b9282c37d3de20342e2920e7ee357e8ab4de7a81689e9c",
-  "Supplementary Figure 15 data caption (provisional, 2420 of 2420).md": "40845dc2bac04020b9e1f1d5d509e62bae37d27fa7a4da517ac4366a2db458e7",
-  "supplementary_figure15_numbers.json": "3f04321a6cfa9227255e9c4aff03ab73d4d2a7c488cd9d8b0bb9225ede629f57",
-  "legend_draft.md": "365eac0535a0ad6f874dbcf2b25ace1b1f3176f9e3e7754331aa2409abb61146"
+  "Supplementary Figure 15.pdf": "70bdb19824233936b23c9bd6226dab941103894c1fc205f7bf3329707500f196",
+  "Supplementary Figure 15.svg": "ea183aa5ba3cd730a7b011056d28e950c028ad5d4efb710899102c4be1976b1f",
+  "Supplementary Figure 15.png": "a2862e536c5d6469f668efc3358918b9e4c8a5a8eaa261679ea96afaf3788ad8",
+  "Supplementary Figure 15 data.xlsx": "c4302b1f5947f2e843b9282c37d3de20342e2920e7ee357e8ab4de7a81689e9c",
+  "Supplementary Figure 15 data caption.md": "3adae84fa352ecb7f1b5c1784c63dfac4da8df9eba82033d838b8143408addca",
+  "supplementary_figure15_numbers.json": "9330db21225b5922411e7a85fdfde4c4fa768e9b498e2a6cd560a9b638681e70",
+  "legend_draft.md": "f0ab7de247a566b386e08b7fb07b3b3486c5596325c9b8286fcd530805e46c6b"
  }
 }

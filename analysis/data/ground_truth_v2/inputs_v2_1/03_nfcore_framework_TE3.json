@@ -1,0 +1,13 @@
+{
+ "id": "03_nfcore_framework_TE3",
+ "category": "technical",
+ "subcategory": null,
+ "question": "Based on the benchmarking of mapping processes, what was the numerical impact of input sharding on median runtime, and at what point was the maximum efficiency plateau reached?",
+ "papers": [
+  {
+   "paper": "03_nfcore_framework",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/03_nfcore_framework.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/03_nfcore_framework.pypdf.txt"
+  }
+ ]
+}

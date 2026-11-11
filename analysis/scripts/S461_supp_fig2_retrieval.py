@@ -20,9 +20,9 @@ ONE COMMAND (D155), from the repository root, rebuilds the committed plate from 
 It writes every file of findings/figures_provisional/supp_fig2/ (or of --out) byte-equal to the committed one
 (26 October: PDF, SVG, PNG, workbook, caption, legend, numbers and provenance; run twice, the same bytes).
 
-NAMING (D92 Q194). The plate is named by FIGURE_LOCK [files] supplementary_name, "Supplementary Figure 2
-(provisional, ...)" (scripts/si_names.tsv, row ED1), so no file here shares a name with main Figure 2's; the data
-workbook is "Supplementary Figure 2 data (...)", since Source Data is a main-figure rule (editor row 20); S448
+NAMING (D92 Q194). The plate is named by FIGURE_LOCK [files] supplementary_name, "Supplementary Figure 2"
+(scripts/si_names.tsv, row ED1; no suffix since Q9, 11 Nov), so no file here shares a name with main Figure 2's; the
+data workbook is "Supplementary Figure 2 data", since Source Data is a main-figure rule (editor row 20); S448
 --supplementary holds a Supplementary figure to the drawing rules and to R8's consistency parts (2) to (6) on that
 workbook, not to the Source Data paperwork of R8's part (1) (D94 O-b).
 
@@ -702,43 +702,43 @@ def legend_text(recs, tab, drawn, stamp, tag):
     # it holds by construction; whether the queries' texts differ cannot be read from these records (per_query holds
     # ids and scores, no query text). The sentence therefore speaks of query ids, which is what is compared.
     run_no = run_numbers(c["results"])
-    run_sentence = (f"run {join([str(run_no[u]) for u in same_as_abd])} on the {nq} queries, "
+    run_sentence = (f"run {join([str(run_no[u]) for u in same_as_abd])} on n = {nq} queries, "
                     f"run{'s' if len(others) > 1 else ''} {join([str(run_no[u]) for u in others])} each on "
-                    f"{join(other_n)} other query ids"
+                    f"n = {join(other_n)} other query ids"
                     + (", no query id shared between runs" if disjoint else ""))
     merged_sentence = "".join(f" {join(g)} are equal at every corpus size and are drawn as one line." for g in merged)
     # Valerio, 23 Oct: the legend describes the image only, in the style of resubmission/05_figures/*_caption.md;
     # no method narrative, no run dates, no statement on tests, no provisional note (the data stamp stays in the
     # header above the title, where S448 R9 finds it).
     # Valerio, 8 Nov (editor row 45, extended to the Supplementary legends): an "n = X" only in a panel that draws
-    # derived statistics (this plate draws none: c's mean tile has no spread), and every panel described in full,
-    # never "as in a" or "in a and b".
+    # derived statistics, and every panel described in full, never "as in a" or "in a and b". D310 (9 Nov): every
+    # value drawn is an MRR, a mean over queries, so each panel states its query count as "n = X queries", and c's
+    # last column, the mean of the runs, "n = X runs" (audit 9 Nov, X090, S448 R9).
     shown = "a, b and d" + (f" and run {join([str(run_no[u]) for u in same_as_abd])} of c" if same_as_abd else "")
     spread = "points at one size set apart along the axis, so ties stay visible."
     body = (
         f"Each value is a mean reciprocal rank (MRR) over retrieval queries of their own, not questions of the "
         f"question-answering benchmark; no answer is generated and no judge is involved. Panels {shown} use one set "
         f"of {nq} queries. "
-        f"**a**, MRR on the {nq} queries against corpus size ({join(sizes_ab)} papers, evenly spaced) for "
+        f"**a**, MRR on n = {nq} queries against corpus size ({join(sizes_ab)} papers, evenly spaced) for "
         f"{words(len(cfg_a['models']))} embedding models with "
         f"{cfg_a['search_mode'].replace('_only', '').replace('_', ' ')} search only ({cfg_a['chunk_size']}-token "
         f"chunks, overlap {cfg_a['chunk_overlap']}); one colour and shape per model, labelled at the largest corpus; "
         f"{spread}{hidden_sentence('a', 'models')} "
-        f"**b**, MRR on the {nq} queries against corpus size ({join(sizes_ab)} papers, evenly spaced) for "
+        f"**b**, MRR on n = {nq} queries against corpus size ({join(sizes_ab)} papers, evenly spaced) for "
         f"{words(len(b['config']['configs_tested']))} search strategies with {b['config']['embedding_model']} "
         f"embeddings; one colour and shape per strategy, labelled at the largest corpus; {spread}{merged_sentence}"
         f"{hidden_sentence('b', 'strategies')} "
         f"**c**, MRR of {words(len(c['config']['configs_tested']))} chunking configurations "
         f"({c['config']['model']} embeddings, {c['config']['search']} search, {c['config']['corpus_size']} papers), "
         f"each run {words(n_runs)} times: {run_sentence}. One row per configuration, highest mean at the top; each "
-        f"tile gives one run's MRR and the last column the mean of the {words(n_runs)} runs, coloured on the scale "
+        f"tile gives one run's MRR and the last column the mean of the n = {n_runs} runs, coloured on the scale "
         f"above the tiles. "
-        f"**d**, MRR on the {nq} queries against corpus size ({join(sizes_d)} papers, evenly spaced) for "
+        f"**d**, MRR on n = {nq} queries against corpus size ({join(sizes_d)} papers, evenly spaced) for "
         f"{d['config']['search'].replace('BGE-M3', 'bge-m3')} search, one run per size; each value is printed above "
         f"its size.\n")
     title = f"**{SI_LABEL} | Retrieval pipeline selection.**"
-    head = (f"Legend DRAFT for {SI_LABEL} (provisional; written by scripts/S461_supp_fig2_retrieval.py). Data stamp: "
-            f"{stamp}.\n\n")
+    head = f"Legend DRAFT for {SI_LABEL} (written by scripts/S461_supp_fig2_retrieval.py).\n\n"
     return head + title + "\n\n" + body
 
 
@@ -775,10 +775,10 @@ def main(argv=None):
     rep = reproduce(recs, qa_ids)                       # exit 2 before anything is written
     tab = tables(recs)
     n_in, n_plan = rep["rows"], rep["planned"]
-    tag = f" (provisional, {n_in} of {n_plan})"
+    tag = ""                                  # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
     months = sorted({datetime.strptime(r["timestamp"], "%Y%m%d_%H%M%S").strftime("%B %Y") for r in recs.values()})
-    stamp = (f"PROVISIONAL: {n_in} of {n_plan} result rows, the deposit's four retrieval sweeps of "
-             f"{join(months)} as they are (no run planned, experiments/LIST.md); legend a draft")
+    stamp = (f"{n_in} of {n_plan} result rows, the deposit's four retrieval sweeps of "
+             f"{join(months)} as they are (no run planned, experiments/LIST.md)")
     OUT.mkdir(parents=True, exist_ok=True)
     before_q194 = list(OUT.glob(f"Figure {N}*")) + list(OUT.glob(f"Source Data Fig. {N}*")) + \
         [p for p in (OUT / f"figure{N}_numbers.json", OUT / f"figure{N}_provenance.json") if p.exists()]
@@ -824,7 +824,7 @@ def main(argv=None):
         f"`run_number` the number the plate and the legend print), {sheet('d')} RRF search "
         f"over the pre-built BGE-M3 indexes (the record's words) by corpus size. Each row is one result row of the "
         f"deposit's records (exp01_embedding_latest.json, exp02_search_latest.json, exp03a_chunking_latest.json, exp03b_scalability_latest.json) with its mean "
-        f"reciprocal rank unrounded.\n\nProvisional: {stamp}.\n")
+        f"reciprocal rank unrounded.\n\nData stamp: {stamp}.\n")
     prov_cmd = "uv run --frozen python scripts/S461_supp_fig2_retrieval.py"
     out = {
         "provenance": {"script": "scripts/S461_supp_fig2_retrieval.py",

@@ -1,6 +1,6 @@
 {
- "stamp": "PROVISIONAL: 2,420 of 2,420 attempts, 11 of 11 variants complete, records of 2026-11-04 08:35 CET; after the S4 reruns (D75, D80 V1, D81)",
- "what": "every number the plate draws, sheet by sheet as Supplementary Figure 16 data (provisional, 2420 of 2420).xlsx holds them (S448 R8 compares the workbook with this file)",
+ "stamp": "2,420 of 2,420 attempts, 11 of 11 variants complete, records of 2026-11-04 08:35 CET; after the S4 reruns (D75, D80 V1, D81)",
+ "what": "every number the plate draws, sheet by sheet as Supplementary Figure 16 data.xlsx holds them (S448 R8 compares the workbook with this file)",
  "sheets": {
   "Supplementary Fig. 16a": {
    "columns": [
@@ -7432,126 +7432,111 @@
    "format": "{median_wall_time_s_printed:,}"
   },
   "s16num33": {
-   "sheet": "Supplementary Fig. 16b",
-   "row": 0,
-   "format": "Attempts (% of n = {attempts_n} per setting)"
-  },
-  "s16num34": {
-   "sheet": "Supplementary Fig. 16c",
-   "row": 0,
-   "format": "free-form (n = {free_form_attempts})"
-  },
-  "s16num35": {
-   "sheet": "Supplementary Fig. 16c",
-   "row": 0,
-   "format": "structured (n = {structured_attempts})"
-  },
-  "s16num36": {
    "sheet": "Supplementary Fig. 16c",
    "row": 0,
    "format": "{structured_minus_free_form_points:+.1f}"
   },
-  "s16num37": {
+  "s16num34": {
    "sheet": "Supplementary Fig. 16c",
    "row": 1,
    "format": "{structured_minus_free_form_points:+.1f}"
   },
-  "s16num38": {
+  "s16num35": {
    "sheet": "Supplementary Fig. 16c",
    "row": 2,
    "format": "\u2212{free_form_minus_structured_points:.1f}"
   },
-  "s16num39": {
+  "s16num36": {
    "sheet": "Supplementary Fig. 16c",
    "row": 3,
    "format": "{structured_minus_free_form_points:+.1f}"
   },
-  "s16num40": {
+  "s16num37": {
    "sheet": "Supplementary Fig. 16c",
    "row": 4,
    "format": "\u2212{free_form_minus_structured_points:.1f}"
   },
-  "s16num41": {
+  "s16num38": {
    "sheet": "Supplementary Fig. 16c",
    "row": 5,
    "format": "\u2212{free_form_minus_structured_points:.1f}"
   },
-  "s16num42": {
+  "s16num39": {
    "sheet": "Supplementary Fig. 16c",
    "row": 6,
    "format": "\u2212{free_form_minus_structured_points:.1f}"
   },
-  "s16num43": {
+  "s16num40": {
    "sheet": "Supplementary Fig. 16c",
    "row": 7,
    "format": "{structured_minus_free_form_points:+.1f}"
   },
-  "s16num44": {
+  "s16num41": {
    "sheet": "Supplementary Fig. 16c",
    "row": 8,
    "format": "\u2212{free_form_minus_structured_points:.1f}"
   },
-  "s16num45": {
+  "s16num42": {
    "sheet": "Supplementary Fig. 16c",
    "row": 9,
    "format": "\u2212{free_form_minus_structured_points:.1f}"
   },
-  "s16num46": {
+  "s16num43": {
    "sheet": "Supplementary Fig. 16c",
    "row": 10,
    "format": "\u2212{free_form_minus_structured_points:.1f}"
   },
-  "s16num47": {
+  "s16num44": {
    "sheet": "Supplementary Fig. 16c",
    "row": 11,
    "format": "\u2212{free_form_minus_structured_points:.1f}"
   },
-  "s16num48": {
+  "s16num45": {
    "sheet": "Supplementary Fig. 16c",
    "row": 12,
    "format": "{structured_minus_free_form_points:+.1f}"
   },
-  "s16num49": {
+  "s16num46": {
    "sheet": "Supplementary Fig. 16c",
    "row": 13,
    "format": "{structured_minus_free_form_points:+.1f}"
   },
-  "s16num50": {
+  "s16num47": {
    "sheet": "Supplementary Fig. 16c",
    "row": 14,
    "format": "\u2212{free_form_minus_structured_points:.1f}"
   },
-  "s16num51": {
+  "s16num48": {
    "sheet": "Supplementary Fig. 16c",
    "row": 15,
    "format": "\u2212{free_form_minus_structured_points:.1f}"
   },
-  "s16num52": {
+  "s16num49": {
    "sheet": "Supplementary Fig. 16c",
    "row": 16,
    "format": "\u2212{free_form_minus_structured_points:.1f}"
   },
-  "s16num53": {
+  "s16num50": {
    "sheet": "Supplementary Fig. 16c",
    "row": 17,
    "format": "\u2212{free_form_minus_structured_points:.1f}"
   },
-  "s16num54": {
+  "s16num51": {
    "sheet": "Supplementary Fig. 16c",
    "row": 18,
    "format": "\u2212{free_form_minus_structured_points:.1f}"
   },
-  "s16num55": {
+  "s16num52": {
    "sheet": "Supplementary Fig. 16c",
    "row": 19,
    "format": "\u2212{free_form_minus_structured_points:.1f}"
   },
-  "s16num56": {
+  "s16num53": {
    "sheet": "Supplementary Fig. 16c",
    "row": 20,
    "format": "\u2212{free_form_minus_structured_points:.1f}"
   },
-  "s16num57": {
+  "s16num54": {
    "sheet": "Supplementary Fig. 16c",
    "row": 21,
    "format": "\u2212{free_form_minus_structured_points:.1f}"

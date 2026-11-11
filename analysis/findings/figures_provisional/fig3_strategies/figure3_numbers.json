@@ -1,5 +1,5 @@
 {
- "stamp": "PROVISIONAL: draws 1, 2, 3 of 3 (D82, D88), 14,860 of 21,402 answers read from their final-key row (G1 2,430, G2 and G6 810, G4 11,620), 2,425 G1 answers judged (devstral-small-2:24b, plain call), collect of 2026-10-23T09:41:17, run_sha256 38ae79ab023b; concept recall: D181's reading on key v2.5, L3_d181 rows of 2026-10-31T00:03:05Z",
+ "stamp": "draws 1, 2, 3 of 3 (D82, D88), 14,860 of 21,402 answers read from their final-key row (G1 2,430, G2 and G6 810, G4 11,620), 2,425 G1 answers judged (devstral-small-2:24b, plain call), collect of 2026-10-23T09:41:17, run_sha256 38ae79ab023b; concept recall: D181's reading on key v2.5, L3_d181 rows of 2026-10-31T00:03:05Z",
  "what": "every number the plate draws, sheet by sheet as Source Data Fig. 3 holds them (S448 R8 compares the workbook with this file)",
  "sheets": {
   "Fig. 3a": {
@@ -209323,7 +209323,7 @@
      2.3283064365386963e-10,
      null,
      "findings/recompute/S518_split_confirmation/gemini-3-flash-preview.json",
-     "e2cf25daf854c3b3eb50086ae052465192774a973f2fc5cbcda845fbbec27c7f"
+     "450b31ee0d01c8b91b53747129e80d56bdb94a2ac50c1a7f8ea2b56ccc959cdd"
     ],
     [
      "split (RLM-10 minus single pass)",
@@ -209341,7 +209341,7 @@
      0.00292205810546875,
      null,
      "findings/recompute/S518_split_confirmation/gemini-3-flash-preview.json",
-     "e2cf25daf854c3b3eb50086ae052465192774a973f2fc5cbcda845fbbec27c7f"
+     "450b31ee0d01c8b91b53747129e80d56bdb94a2ac50c1a7f8ea2b56ccc959cdd"
     ],
     [
      "split (RLM-10 minus single pass)",
@@ -209359,7 +209359,7 @@
      null,
      "agrees",
      "findings/recompute/S518_split_confirmation/gemini-3-flash-preview.json",
-     "e2cf25daf854c3b3eb50086ae052465192774a973f2fc5cbcda845fbbec27c7f"
+     "450b31ee0d01c8b91b53747129e80d56bdb94a2ac50c1a7f8ea2b56ccc959cdd"
     ]
    ]
   },
@@ -211056,110 +211056,110 @@
    "why": "the row's name"
   },
   "s448num_19": {
-   "fixed": "judge, 3 draws",
-   "why": "the key to the marks"
+   "fixed": "RLM-5",
+   "why": "the strategy's name"
   },
   "s448num_20": {
-   "fixed": "person, draw 1",
-   "why": "the key to the marks"
+   "fixed": "RLM-10",
+   "why": "the strategy's name"
   },
   "s448num_21": {
-   "fixed": "RLM-5",
+   "fixed": "RLM-20",
    "why": "the strategy's name"
   },
   "s448num_22": {
-   "fixed": "RLM-10",
-   "why": "the strategy's name"
-  },
-  "s448num_23": {
-   "fixed": "RLM-20",
-   "why": "the strategy's name"
-  },
-  "s448num_24": {
    "fixed": "at judge score 4 or more",
    "why": "the axis label"
   },
-  "s448num_25": {
-   "fixed": "All 86",
-   "why": "the key to the marks"
-  },
-  "s448num_26": {
-   "fixed": "One paper 60",
-   "why": "the key to the marks"
-  },
-  "s448num_27": {
-   "fixed": "Many papers 26",
-   "why": "the key to the marks"
-  },
-  "s448num_28": {
+  "s448num_23": {
    "fixed": "score 3",
    "why": "the key to the marks"
   },
-  "s448num_29": {
+  "s448num_24": {
    "fixed": "RLM-5",
    "why": "the strategy's name"
   },
-  "s448num_30": {
+  "s448num_25": {
    "fixed": "RLM-10",
    "why": "the strategy's name"
   },
-  "s448num_31": {
+  "s448num_26": {
    "fixed": "RLM-20",
    "why": "the strategy's name"
   },
-  "s448num_32": {
+  "s448num_27": {
    "fixed": "gemini-3-flash, second judge",
    "why": "the source's name"
   },
-  "s448num_33": {
+  "s448num_28": {
    "sheet": "Fig. 3e",
    "row": 2,
    "format": "{d_pp:.1f}"
   },
-  "s448num_34": {
+  "s448num_29": {
    "fixed": "gemma3:27b",
    "why": "the source's name"
   },
-  "s448num_35": {
+  "s448num_30": {
    "sheet": "Fig. 3e",
    "row": 5,
    "format": "{d_pp:.1f}"
   },
-  "s448num_36": {
+  "s448num_31": {
    "fixed": "qwen3-coder:30b",
    "why": "the source's name"
   },
-  "s448num_37": {
+  "s448num_32": {
    "sheet": "Fig. 3e",
    "row": 8,
    "format": "{d_pp:.1f}"
   },
-  "s448num_38": {
+  "s448num_33": {
    "fixed": "claude-haiku-4-5",
    "why": "the source's name"
   },
-  "s448num_39": {
+  "s448num_34": {
    "sheet": "Fig. 3e",
    "row": 11,
    "format": "{d_pp:.1f}"
   },
-  "s448num_40": {
+  "s448num_35": {
    "fixed": "gemini-2.5-pro",
    "why": "the source's name"
   },
-  "s448num_41": {
+  "s448num_36": {
    "sheet": "Fig. 3e",
    "row": 14,
    "format": "{d_pp:.1f}"
   },
-  "s448num_42": {
+  "s448num_37": {
    "fixed": "gemini-3-flash",
    "why": "the source's name"
   },
-  "s448num_43": {
+  "s448num_38": {
    "sheet": "Fig. 3e",
    "row": 17,
    "format": "{d_pp:.1f}"
+  },
+  "s448num_39": {
+   "fixed": "5",
+   "why": "a core-paper size"
+  },
+  "s448num_40": {
+   "fixed": "10",
+   "why": "a core-paper size"
+  },
+  "s448num_41": {
+   "fixed": "20",
+   "why": "a core-paper size"
+  },
+  "s448num_42": {
+   "fixed": "50",
+   "why": "a core-paper size"
+  },
+  "s448num_43": {
+   "fixed": "The same 22",
+   "why": "the block's name"
   },
   "s448num_44": {
    "fixed": "5",
@@ -211178,7 +211178,7 @@
    "why": "a core-paper size"
   },
   "s448num_48": {
-   "fixed": "The same 22",
+   "fixed": "Refusal, same 39",
    "why": "the block's name"
   },
   "s448num_49": {
@@ -211198,444 +211198,364 @@
    "why": "a core-paper size"
   },
   "s448num_53": {
-   "fixed": "Refusal, same 39",
-   "why": "the block's name"
-  },
-  "s448num_54": {
-   "fixed": "5",
-   "why": "a core-paper size"
-  },
-  "s448num_55": {
-   "fixed": "10",
-   "why": "a core-paper size"
-  },
-  "s448num_56": {
-   "fixed": "20",
-   "why": "a core-paper size"
-  },
-  "s448num_57": {
-   "fixed": "50",
-   "why": "a core-paper size"
-  },
-  "s448num_58": {
    "sheet": "Fig. 3f",
    "row": 0,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_59": {
+  "s448num_54": {
    "sheet": "Fig. 3f",
    "row": 7,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_60": {
+  "s448num_55": {
    "sheet": "Fig. 3f",
    "row": 14,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_61": {
+  "s448num_56": {
    "sheet": "Fig. 3f",
    "row": 21,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_62": {
+  "s448num_57": {
    "sheet": "Fig. 3f",
    "row": 28,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_63": {
+  "s448num_58": {
    "sheet": "Fig. 3f",
    "row": 33,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_64": {
+  "s448num_59": {
    "sheet": "Fig. 3f",
    "row": 38,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_65": {
+  "s448num_60": {
    "sheet": "Fig. 3f",
    "row": 43,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_66": {
+  "s448num_61": {
    "sheet": "Fig. 3f",
    "row": 48,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_67": {
+  "s448num_62": {
    "sheet": "Fig. 3f",
    "row": 53,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_68": {
+  "s448num_63": {
    "sheet": "Fig. 3f",
    "row": 58,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_69": {
+  "s448num_64": {
    "sheet": "Fig. 3f",
    "row": 63,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_70": {
+  "s448num_65": {
    "sheet": "Fig. 3f",
    "row": 1,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_71": {
+  "s448num_66": {
    "sheet": "Fig. 3f",
    "row": 8,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_72": {
+  "s448num_67": {
    "sheet": "Fig. 3f",
    "row": 15,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_73": {
+  "s448num_68": {
    "sheet": "Fig. 3f",
    "row": 22,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_74": {
+  "s448num_69": {
    "sheet": "Fig. 3f",
    "row": 29,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_75": {
+  "s448num_70": {
    "sheet": "Fig. 3f",
    "row": 34,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_76": {
+  "s448num_71": {
    "sheet": "Fig. 3f",
    "row": 39,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_77": {
+  "s448num_72": {
    "sheet": "Fig. 3f",
    "row": 44,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_78": {
+  "s448num_73": {
    "sheet": "Fig. 3f",
    "row": 49,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_79": {
+  "s448num_74": {
    "sheet": "Fig. 3f",
    "row": 54,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_80": {
+  "s448num_75": {
    "sheet": "Fig. 3f",
    "row": 59,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_81": {
+  "s448num_76": {
    "sheet": "Fig. 3f",
    "row": 64,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_82": {
+  "s448num_77": {
    "fixed": "RLM-5",
    "why": "the row's name"
   },
-  "s448num_83": {
+  "s448num_78": {
    "sheet": "Fig. 3f",
    "row": 2,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_84": {
+  "s448num_79": {
    "sheet": "Fig. 3f",
    "row": 9,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_85": {
+  "s448num_80": {
    "sheet": "Fig. 3f",
    "row": 16,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_86": {
+  "s448num_81": {
    "sheet": "Fig. 3f",
    "row": 23,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_87": {
+  "s448num_82": {
    "sheet": "Fig. 3f",
    "row": 30,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_88": {
+  "s448num_83": {
    "sheet": "Fig. 3f",
    "row": 35,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_89": {
+  "s448num_84": {
    "sheet": "Fig. 3f",
    "row": 40,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_90": {
+  "s448num_85": {
    "sheet": "Fig. 3f",
    "row": 45,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_91": {
+  "s448num_86": {
    "sheet": "Fig. 3f",
    "row": 50,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_92": {
+  "s448num_87": {
    "sheet": "Fig. 3f",
    "row": 55,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_93": {
+  "s448num_88": {
    "sheet": "Fig. 3f",
    "row": 60,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_94": {
+  "s448num_89": {
    "sheet": "Fig. 3f",
    "row": 65,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_95": {
+  "s448num_90": {
    "fixed": "RLM-10",
    "why": "the row's name"
   },
-  "s448num_96": {
+  "s448num_91": {
    "sheet": "Fig. 3f",
    "row": 3,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_97": {
+  "s448num_92": {
    "sheet": "Fig. 3f",
    "row": 10,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_98": {
+  "s448num_93": {
    "sheet": "Fig. 3f",
    "row": 17,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_99": {
+  "s448num_94": {
    "sheet": "Fig. 3f",
    "row": 24,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_100": {
+  "s448num_95": {
    "sheet": "Fig. 3f",
    "row": 31,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_101": {
+  "s448num_96": {
    "sheet": "Fig. 3f",
    "row": 36,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_102": {
+  "s448num_97": {
    "sheet": "Fig. 3f",
    "row": 41,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_103": {
+  "s448num_98": {
    "sheet": "Fig. 3f",
    "row": 46,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_104": {
+  "s448num_99": {
    "sheet": "Fig. 3f",
    "row": 51,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_105": {
+  "s448num_100": {
    "sheet": "Fig. 3f",
    "row": 56,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_106": {
+  "s448num_101": {
    "sheet": "Fig. 3f",
    "row": 61,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_107": {
+  "s448num_102": {
    "sheet": "Fig. 3f",
    "row": 66,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_108": {
+  "s448num_103": {
    "fixed": "RLM-10, one paper",
    "why": "the row's name"
   },
-  "s448num_109": {
+  "s448num_104": {
    "sheet": "Fig. 3f",
    "row": 4,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_110": {
+  "s448num_105": {
    "sheet": "Fig. 3f",
    "row": 11,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_111": {
+  "s448num_106": {
    "sheet": "Fig. 3f",
    "row": 18,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_112": {
+  "s448num_107": {
    "sheet": "Fig. 3f",
    "row": 25,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_113": {
+  "s448num_108": {
    "fixed": "RLM-10, many papers",
    "why": "the row's name"
   },
-  "s448num_114": {
+  "s448num_109": {
    "sheet": "Fig. 3f",
    "row": 5,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_115": {
+  "s448num_110": {
    "sheet": "Fig. 3f",
    "row": 12,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_116": {
+  "s448num_111": {
    "sheet": "Fig. 3f",
    "row": 19,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_117": {
+  "s448num_112": {
    "sheet": "Fig. 3f",
    "row": 26,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_118": {
+  "s448num_113": {
    "fixed": "RLM-20",
    "why": "the row's name"
   },
-  "s448num_119": {
+  "s448num_114": {
    "sheet": "Fig. 3f",
    "row": 6,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_120": {
+  "s448num_115": {
    "sheet": "Fig. 3f",
    "row": 13,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_121": {
+  "s448num_116": {
    "sheet": "Fig. 3f",
    "row": 20,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_122": {
+  "s448num_117": {
    "sheet": "Fig. 3f",
    "row": 27,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_123": {
+  "s448num_118": {
    "sheet": "Fig. 3f",
    "row": 32,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_124": {
+  "s448num_119": {
    "sheet": "Fig. 3f",
    "row": 37,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_125": {
+  "s448num_120": {
    "sheet": "Fig. 3f",
    "row": 42,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_126": {
+  "s448num_121": {
    "sheet": "Fig. 3f",
    "row": 47,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_127": {
+  "s448num_122": {
    "sheet": "Fig. 3f",
    "row": 52,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_128": {
+  "s448num_123": {
    "sheet": "Fig. 3f",
    "row": 57,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_129": {
+  "s448num_124": {
    "sheet": "Fig. 3f",
    "row": 62,
    "format": "{d_sign}{d_size_pp:.0f}"
   },
-  "s448num_130": {
+  "s448num_125": {
    "sheet": "Fig. 3f",
    "row": 67,
    "format": "{d_sign}{d_size_pp:.0f}"
-  },
-  "s448num_131": {
-   "sheet": "Fig. 3f",
-   "row": 68,
-   "format": "{n_questions}"
-  },
-  "s448num_132": {
-   "sheet": "Fig. 3f",
-   "row": 71,
-   "format": "{n_questions}"
-  },
-  "s448num_133": {
-   "sheet": "Fig. 3f",
-   "row": 74,
-   "format": "{n_questions}"
-  },
-  "s448num_134": {
-   "sheet": "Fig. 3f",
-   "row": 77,
-   "format": "{n_questions}"
-  },
-  "s448num_135": {
-   "sheet": "Fig. 3f",
-   "row": 80,
-   "format": "{n_questions}"
-  },
-  "s448num_136": {
-   "sheet": "Fig. 3f",
-   "row": 81,
-   "format": "{n_questions}"
-  },
-  "s448num_137": {
-   "sheet": "Fig. 3f",
-   "row": 82,
-   "format": "{n_questions}"
-  },
-  "s448num_138": {
-   "sheet": "Fig. 3f",
-   "row": 83,
-   "format": "{n_questions}"
-  },
-  "s448num_139": {
-   "sheet": "Fig. 3f",
-   "row": 84,
-   "format": "{n_questions}"
-  },
-  "s448num_140": {
-   "sheet": "Fig. 3f",
-   "row": 85,
-   "format": "{n_questions}"
-  },
-  "s448num_141": {
-   "sheet": "Fig. 3f",
-   "row": 86,
-   "format": "{n_questions}"
-  },
-  "s448num_142": {
-   "sheet": "Fig. 3f",
-   "row": 87,
-   "format": "{n_questions}"
   }
  }
 }

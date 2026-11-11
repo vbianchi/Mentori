@@ -1,5 +1,5 @@
 {
- "stamp": "PROVISIONAL: 1,548 of 1,548 gemini-3-flash-preview answers drawn under both judges, from the committed rows (S518_inputs/second_judge, fig2_inputs, fig3_s6_inputs); panel b from T2's rows of both judges (judge_rows_v25.t2_source; t2_second_inputs, S592), empty: gemini-2.5-pro RLM-20, gemini-2.5-pro RLM-5, gemini-2.5-pro multi-hop; reproduced first: six pass rates at 4 equal Figure 3a's committed strategy rows; S518 D_one, D_many and their intervals equal second_judge.json; the T2 reader gives gemini-3-flash-preview's ten b rows exactly as the G1 reader",
+ "stamp": "1,548 of 1,548 gemini-3-flash-preview answers drawn under both judges, from the committed rows (S518_inputs/second_judge, fig2_inputs, fig3_s6_inputs); panel b from T2's rows of both judges (judge_rows_v25.t2_source; t2_second_inputs, S592); reproduced first: six pass rates at 4 equal Figure 3a's committed strategy rows; S518 D_one, D_many and their intervals equal second_judge.json; the T2 reader gives gemini-3-flash-preview's ten b rows exactly as the G1 reader",
  "what": "Supplementary Figure 4, data values and printed numbers (S448 R8 compares the workbook with this file)",
  "sheets": {
   "Supplementary Fig. 4a": {
@@ -1641,21 +1641,21 @@
      "gemini-2.5-pro",
      "multi-hop",
      "Judge 1",
-     null,
-     null,
-     null,
-     null,
-     "empty: no second-judge rows of this strategy"
+     5.555555555555557,
+     89.58333333333333,
+     84.02777777777777,
+     144,
+     "drawn"
     ],
     [
      "gemini-2.5-pro",
      "multi-hop",
      "Judge 2",
-     null,
-     null,
-     null,
-     null,
-     "empty: no second-judge rows of this strategy"
+     -2.0833333333333286,
+     79.16666666666667,
+     81.25,
+     144,
+     "drawn"
     ],
     [
      "gemini-2.5-pro",
@@ -1681,21 +1681,21 @@
      "gemini-2.5-pro",
      "RLM-5",
      "Judge 1",
-     null,
-     null,
-     null,
-     null,
-     "empty: no second-judge rows of this strategy"
+     4.861111111111114,
+     88.88888888888889,
+     84.02777777777777,
+     144,
+     "drawn"
     ],
     [
      "gemini-2.5-pro",
      "RLM-5",
      "Judge 2",
-     null,
-     null,
-     null,
-     null,
-     "empty: no second-judge rows of this strategy"
+     -1.3888888888888857,
+     79.86111111111111,
+     81.25,
+     144,
+     "drawn"
     ],
     [
      "gemini-2.5-pro",
@@ -1721,21 +1721,21 @@
      "gemini-2.5-pro",
      "RLM-20",
      "Judge 1",
-     null,
-     null,
-     null,
-     null,
-     "empty: no second-judge rows of this strategy"
+     4.166666666666671,
+     88.19444444444444,
+     84.02777777777777,
+     144,
+     "drawn"
     ],
     [
      "gemini-2.5-pro",
      "RLM-20",
      "Judge 2",
-     null,
-     null,
-     null,
-     null,
-     "empty: no second-judge rows of this strategy"
+     -2.0833333333333286,
+     79.16666666666667,
+     81.25,
+     144,
+     "drawn"
     ],
     [
      "claude-haiku-4-5",
@@ -2323,6 +2323,19 @@
      0.8405833668408598,
      0.7331161334811392,
      0.8796405398998964,
+     702,
+     39,
+     0
+    ],
+    [
+     "Refusal",
+     "Kappa at 3",
+     0.8094687404120743,
+     0.780566223095472,
+     0.8087594300083822,
+     0.8360718379824226,
+     0.7222865536550348,
+     0.884249511681591,
      702,
      39,
      0

@@ -1,6 +1,6 @@
 {
  "script": "scripts/S459_fig3_rlm_ref_caps.py",
- "script_sha256": "cc2a2ad32ff99786e6e8d0e0e74ed0e4ac00483ec79a9cf5f8d69a5b9282c1a6",
+ "script_sha256": "1bef67c842e8ce787da96b1e920938fa79dcc9405f8e14139979c93e92f30e0d",
  "command": "uv run --frozen python scripts/S459_fig3_rlm_ref_caps.py",
  "python": "3.13.11",
  "deterministic": "D155: no build time and no repository HEAD are recorded; the script's and every input's sha256 identify the build; the design documents' values as they stood at e44e636a are read from findings/recompute/fig_design_inputs/design_facts.json (D2)",
@@ -29,20 +29,20 @@
   "experiments/rlm_ref/run_rlm_ref.py": "327d18987c9faa092ce525a4f6b3c7d6c88dcaafe42b9ff8e7de74676fcbba48",
   "findings/recompute/Q145/S455_d92_affected.json": "c8fce3c6241ecdd1f3e2276f1ad3f532c7a199c8626bcd5c72b312b492ab97a3",
   "experiments/LOCK.toml": "8730d401a5d7b6baa1780e656f844261eaead60e45b5199afa29d57f989ad495",
-  "experiments/FIGURE_LOCK.toml": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
-  "findings/recompute/fig_design_inputs/design_facts.json": "9fb39a2d241543a10ba676057f552312de0133386a683fd0b5517dc468666e02",
+  "experiments/FIGURE_LOCK.toml": "ac39c4e311f340654fe1ebe3333a3fe439bc6286e38fc0334fdb0e0cf2a97aef",
+  "findings/recompute/fig_design_inputs/design_facts.json": "118fa72e45d0b61095ed974282d6fba3fb9b708e2502639e64e6c5ca4f9c445d",
   "experiments/rlm_ref/.venv/lib/python3.13/site-packages/rlms-0.1.3.dist-info/METADATA": "a25f6bb8c4c3de41b07b212ca0316201c8785197c5546fe8fe7009d134be0398",
   "findings/recompute/frozen_inputs/g6_before_d89_mtimes.json": "46fdc919b3d1705a78b681e262d0e2ece737c6473e3370175f87bda1fcc7ef3d"
  },
  "model_calls": 0,
- "stamp": "PROVISIONAL: 2,580 of 2,580 answers, Zhang RLM at 10 turn caps (G6, records of 2026-10-25 00:46 CEST), no judge; after the D89 and D90 reruns (D135), the gates on the records before them",
+ "stamp": "2,580 of 2,580 answers, Zhang RLM at 10 turn caps (G6, records of 2026-10-25 00:46 CEST), no judge; after the D89 and D90 reruns (D135), the gates on the records before them",
  "page_mm": [
   183.0,
   82.41222222222223
  ],
  "figure_lock": {
   "path": "experiments/FIGURE_LOCK.toml",
-  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "sha256": "ac39c4e311f340654fe1ebe3333a3fe439bc6286e38fc0334fdb0e0cf2a97aef",
   "status": "agreed"
  },
  "run_lock_now": {
@@ -513,7 +513,7 @@
  },
  "panels": {
   "a": "share of the answers at each cap by stop_reason (turn_cap split by forced_final_has_code; an answer of status ok with no text its own slice; the package's own TypeError, package_error(), its own slice, D161 (1)), n printed per row",
-  "b": "root turns used per answered answer (no-text answers included), box (quartiles, median, range), cap marked by a triangle above the box, n printed per row, log axis",
+  "b": "root turns used per answered answer (no-text answers included), box (quartiles, median, range), n printed per row, the caps evenly spaced (11 Nov), no cap triangle and no key",
   "dropped": "tokens per answer (D217), wall_s per answer (D224 Q5)"
  },
  "type_pt": {
@@ -532,12 +532,12 @@
  },
  "box_fill": "#56B4E9",
  "files": {
-  "Supplementary Figure 7 (provisional, 2580 of 2580).pdf": "c8bac3c5cdbba939b208df3a1412e53bddbd0d7a5482d8dc57a8e34e4b0c9371",
-  "Supplementary Figure 7 (provisional, 2580 of 2580).svg": "a8760a0cbdd365f5145836c9eed11045329794500e6a59b395497823938fe027",
-  "Supplementary Figure 7 (provisional, 2580 of 2580).png": "30dce9391afce3e5cd667649cada6b63f8cbb9b855ed1c2d563351d040695bce",
-  "Supplementary Figure 7 data (provisional, 2580 of 2580).xlsx": "96f9b9e3dbb927d967d6e1b853d41f24ec0de1e5f6b7ed31c1734aad810fada5",
-  "Supplementary Figure 7 data caption (provisional, 2580 of 2580).md": "9d08cd7df77f2d7aefc4affa7e0dc745674a0331c849cbe9959e5542e30f64de",
-  "supplementary_figure7_numbers.json": "2c6d46a4bf0cdaf2e907d4943869575bea6ab401a46bc660838314ee746e67fa",
-  "legend_draft.md": "7108e89ac528c0b4961bbba0df4219e38d117bfe35b996937854adc9e7efad1f"
+  "Supplementary Figure 7.pdf": "2b7497cb7547c46037aba7dc45a8f9cd74a80622f5bf86e30ab6882241f5f207",
+  "Supplementary Figure 7.svg": "eb30fb2fda1441b589e7f10d75d255066fd6bb25e6f44278ed20325a7a385559",
+  "Supplementary Figure 7.png": "88e2e75d24d2e1fb76c842c01ea9f881d14b25b8e64f6306de12d1611d4e7528",
+  "Supplementary Figure 7 data.xlsx": "96f9b9e3dbb927d967d6e1b853d41f24ec0de1e5f6b7ed31c1734aad810fada5",
+  "Supplementary Figure 7 data caption.md": "be92d2698631d7754d69c8d6fa7212bc5501994474a6c6ec043d431b915f7488",
+  "supplementary_figure7_numbers.json": "884be8d6539cf29429903ad3b0318efd78ce93058b47515445ca32220d291e69",
+  "legend_draft.md": "5bf7391b75bbd073017b88aca76fb9b08ef8b33af401192b7935cec40faec3d8"
  }
 }

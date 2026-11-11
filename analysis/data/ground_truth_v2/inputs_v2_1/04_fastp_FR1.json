@@ -1,0 +1,13 @@
+{
+ "id": "04_fastp_FR1",
+ "category": "factual_recall",
+ "subcategory": null,
+ "question": "In a speed evaluation on a 9,316 M base dataset, what were the specific processing times for fastp (PE) compared to Trimmomatic?",
+ "papers": [
+  {
+   "paper": "04_fastp",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/04_fastp.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/04_fastp.pypdf.txt"
+  }
+ ]
+}

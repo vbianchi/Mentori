@@ -1,0 +1,13 @@
+{
+ "id": "11_asf_burkina_faso_FR1",
+ "category": "factual_recall",
+ "subcategory": null,
+ "question": "In the study of the 2018 African Swine Fever Virus (ASFV) outbreaks, how many blood samples were collected in total and how many of those were confirmed positive for ASFV DNA?",
+ "papers": [
+  {
+   "paper": "11_asf_burkina_faso",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/11_asf_burkina_faso.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/11_asf_burkina_faso.pypdf.txt"
+  }
+ ]
+}

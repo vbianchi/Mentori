@@ -1,0 +1,13 @@
+{
+ "id": "03_nfcore_framework_FR1",
+ "category": "factual_recall",
+ "subcategory": null,
+ "question": "According to the findings, what was the specific reduction in storage usage for the work directory when switching from BAM to CRAM, and what were the corresponding data volumes?",
+ "papers": [
+  {
+   "paper": "03_nfcore_framework",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/03_nfcore_framework.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/03_nfcore_framework.pypdf.txt"
+  }
+ ]
+}

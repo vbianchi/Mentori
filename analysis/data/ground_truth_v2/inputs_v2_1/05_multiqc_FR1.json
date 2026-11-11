@@ -1,0 +1,13 @@
+{
+ "id": "05_multiqc_FR1",
+ "category": "factual_recall",
+ "subcategory": null,
+ "question": "According to the paper, how many common bioinformatics tools does MultiQC support at the time of writing?",
+ "papers": [
+  {
+   "paper": "05_multiqc",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/05_multiqc.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/05_multiqc.pypdf.txt"
+  }
+ ]
+}

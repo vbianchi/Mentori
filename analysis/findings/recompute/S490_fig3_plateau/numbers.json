@@ -1,7 +1,7 @@
 {
  "header": {
   "script": "scripts/S490_fig3_plateau.py",
-  "script_sha256": "d6776aea0a9882884e71419f774de55a47f43cb778b50e3b83d94b64e296699c",
+  "script_sha256": "ad2e9eb4e391d3c681ecc8c1a9832e8a3c42b586ec413fcaba3ef59b7e458501",
   "command": "uv run python scripts/S490_fig3_plateau.py",
   "inputs": {
    "findings/recompute/L2_d135_d181/concept_recall.jsonl": "43307c4b4a6c56adfdfd9297ef90be27e8ed577c64e66c2781ac9b933d85684f",
@@ -12,8 +12,8 @@
    "findings/recompute/T1_L2/cap_tables.json": "81a0730063767180c21dba223d1eabd17bdab00a1a31c24eaf34a495e5c3b162",
    "findings/recompute/G4_fig3c/pairs.jsonl": "ff6e97483938bab2e0a1030ea8144b3629b8e68481bba69bec0775cea37bc8f1",
    "findings/recompute/G4_fig3c/grid_tables.json": "5e4bdb0048699526b152b43aa2d1c895dc984c43610760830b6b7e4dbf9e4f3a",
-   "findings/figures_provisional/supp_fig8_depth/Supplementary Figure 8 data (provisional, 4284 of 4284).xlsx": "e1ad06d60c0244a1e02e32e52882aa529825e15fea5ea7bcf1e6e28e8cdf6b93",
-   "findings/figures_provisional/fig4_depth/Source Data Fig. 4 (provisional, 5520 of 5520).xlsx": "b86f863eeb035398b71408723b0037efe29fb084c907ee4deaecaa4b00a58bc0",
+   "findings/figures_provisional/supp_fig8_depth/Supplementary Figure 8 data.xlsx": "e1ad06d60c0244a1e02e32e52882aa529825e15fea5ea7bcf1e6e28e8cdf6b93",
+   "findings/figures_provisional/fig4_depth/Source Data Fig. 4.xlsx": "10b2e4c4946d873c91379bd0b547fae2b3fa4a29c89e606d051d9687d18557d2",
    "findings/recompute/L2_d135_d181_d284/concept_recall_g7.jsonl": "914e07004913f678c3dff674f1954b1bd6f2b27af70aaad785630232cb14bd69"
   },
   "readings": {

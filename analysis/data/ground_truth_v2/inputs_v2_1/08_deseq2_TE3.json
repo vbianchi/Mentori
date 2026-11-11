@@ -1,0 +1,13 @@
+{
+ "id": "08_deseq2_TE3",
+ "category": "technical",
+ "subcategory": null,
+ "question": "What is the specific purpose of the regularized logarithm (rlog) transformation, and how does its performance compare to an ordinary log transformation in terms of variance stabilization?",
+ "papers": [
+  {
+   "paper": "08_deseq2",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/08_deseq2.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/08_deseq2.pypdf.txt"
+  }
+ ]
+}

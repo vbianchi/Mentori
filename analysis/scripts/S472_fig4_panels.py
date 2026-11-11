@@ -203,9 +203,9 @@ COMMANDS, from the repository root (uv run only; no model call; nothing on the S
            reproduces S576 on the d123 reading (above, panel e). After drawing, check_drawn reads every mark back
            against its sheet row. (The step curve's PDF read-back moved with the panel to S524, D250.) Then writes
            into --out, findings/figures_provisional/fig4/ by default (an earlier S472 plate there is removed first):
-             Figure 4 (provisional, <n> of <N>).{pdf,svg,png}, Source Data Fig. 4 (...).xlsx and its caption,
-             figure4_numbers.json (S448 R8: every sheet, and every printed number tied to its sheet and row),
-             figure4_provenance.json, legend_draft.md, records_manifest.json (claims.md only with --claims-out DIR,
+             Figure 5.{pdf,svg,png}, Source Data Fig. 5.xlsx and Source Data Fig. 5 caption.md (final names,
+             Q9 of 11 Nov; "(provisional, <n> of <N>)" until then), figure5_numbers.json (S448 R8: every sheet, and
+             every printed number tied to its sheet and row), figure5_provenance.json, legend_draft.md, records_manifest.json (claims.md only with --claims-out DIR,
              into DIR: D2, the editorial step S616 claims);
            and into --steps-out (default findings/recompute/S472_supp12a_steps.json) old panel 4b's rows, the input
            of Supplementary Figure 10a (D250).
@@ -408,6 +408,14 @@ G17_CTRL = "ctrl"                                # S576.ARMS: Mentori RLM-10 run
 G17_ARMS = [(G17_CTRL, FN.MENTORI_RLM_N.format(n=10)), ("package", FN.PACKAGE_RLM_N.format(n=10)),
             ("search_off", "search tools off"), ("gate_off", "quality gate off")]
 G17_ARM_LABEL = dict(G17_ARMS)
+# 11 Nov (Valerio, doc comment): d and e each carry their own key. S472_DE_KEY picks the drawing: "shared" (one key over
+# both, as before), "two" (a key over d and one over e, two rows each) or "names" (each box named under it at 45
+# degrees, no key; Valerio's pick, 11 Nov 11:10, "if this is printed black and white makes it extremely clear")
+DE_KEY = __import__("os").environ.get("S472_DE_KEY", "names")
+if DE_KEY not in ("shared", "two", "names"):
+    raise SystemExit(f"S472_DE_KEY {DE_KEY!r}: want shared, two or names")
+G17_SHORT = {G17_CTRL: FN.MENTORI_RLM_N.format(n=10), "package": "Zhang",
+             "search_off": "tools off", "gate_off": "gate off"}
 G17_COL = {G17_CTRL: hs.OKABE["blue"], "search_off": hs.OKABE["sky blue"], "gate_off": hs.OKABE["reddish purple"],
            "package": hs.OKABE["vermillion"]}
 G17_MK = {G17_CTRL: "o", "search_off": "s", "gate_off": "D", "package": "^"}
@@ -2080,8 +2088,8 @@ def panel_rows(fn, q82, st, cells, rlm, groups, order, thr, draws=None, g17=None
     """Every panel's rows, in plate order: a pass (P-1), b distiller (F-2), c refusal (R-1), d cost (model calls and own
     time per answer, one panel since 4 November), e G17 (read_g17; empty when g17 is None, as in the selftest). Each
     sheet holds its 'setup' (or 'pooled', or 'difference') rows first, the rows the printed numbers point at, then its
-    tile, step, answer or question rows; d holds one 'total' row per measure after that measure's 'setup' rows, the
-    line printed above its column. A set-up with no judge rows keeps every row of a and c, its judge values blank.
+    tile, step, answer or question rows; d holds one 'total' row per measure after that measure's 'setup' rows (not
+    printed on the plate since 11 Nov). A set-up with no judge rows keeps every row of a and c, its judge values blank.
     draws: the 'draw' rows of sheet a, none until S6G7G3 is copied."""
     S = {L: [] for L in "abcdef"}
     by = {g: [q for q in order if groups[q] == g] for g, _ in GROUPS}
@@ -2340,9 +2348,11 @@ def draw(P, paths):
     top_e = body_c + HR + XAX2 + GAP
     let_e = top_e + KEY_BASE                          # d, e: the letters, and the arms' key on the next line
     key_e = let_e + LINE + 0.4
-    body_e = key_e + 3.0
-    AX_E = 33.0                                       # d, e: the plot height (option 2b)
-    H = body_e + AX_E + 1.0 + 2 * LINE + M            # the question types' two-line labels under the axes
+    body_e = key_e + 3.0 + (LINE if DE_KEY == "two" else 0.0) - (LINE + 0.4 if DE_KEY == "names" else 0.0)
+    AX_E = 33.0 if DE_KEY != "names" else 32.5        # d, e: the plot height (option 2b); 32.5 leaves room for the names
+    NAMES_W = (max(tw(v) for v in G17_SHORT.values()) + PT * MMP) * math.sqrt(0.5) + 1.6 if DE_KEY == "names" else 0.0
+    # the names, turned 45 degrees: the longest name's drop plus a line's, and a gap
+    H = body_e + AX_E + 1.0 + 2 * LINE + M + NAMES_W  # the question types' two-line labels under the axes
     if H > S457.FIG_H_MAX_MM - 0.5:
         raise SystemExit(f"Figure {FIG_N}: the page would be {H:.1f} mm high, over [page] height_max_mm less 0.5")
     fig = hs.figure(W, H)
@@ -2512,9 +2522,8 @@ def draw(P, paths):
     n = len(ALL)
     for k, (field, meas) in enumerate(D_MEASURES):
         x0 = xs_d[k]
-        ri, tot = sheet_index("d", row="total", measure=meas)
-        num(text(x0 + WD / 2, yc_key, f"n = {tot['n']:,} answers", va="baseline", ha="center"),
-            {"sheet": sheet_name("d"), "row": ri, "format": "n = {n:,} answers"})
+        # 11 Nov (Valerio, F2): no "n = ... answers" above the columns; the legend gives n = 135 answers per set-up
+        _, tot = sheet_index("d", row="total", measure=meas)
         ax = axes_mm(x0, body_c, WD, HR)
         ax.set_ylim(HR, 0)
         ax.yaxis.set_major_locator(FixedLocator([ys_c[c] for c in ALL]))
@@ -2532,7 +2541,9 @@ def draw(P, paths):
         else:
             ticks = [10 ** e for e in range(-1, 7) if lo / 1.5 <= 10 ** e <= hi * 1.5]
             xl = (math.log10(lo / 1.5), math.log10(hi * 1.5))
-            labs = [fmt_int(t) if t >= 1 else f"{t:g}" for t in ticks]
+            # 11 Nov (F3): a decade is about 6 mm in this column, too narrow for "100" beside "1,000"; every decade
+            # keeps its tick, every other one its label (even powers of ten: 1, 100, 10,000)
+            labs = [(fmt_int(t) if t >= 1 else f"{t:g}") if round(math.log10(t)) % 2 == 0 else "" for t in ticks]
         ax.set_xlim(*xl)
         ax.xaxis.set_major_locator(FixedLocator([math.log10(t) for t in ticks]))
         ax.xaxis.set_major_formatter(FixedFormatter(labs))
@@ -2571,7 +2582,13 @@ def draw(P, paths):
     XE, WE, XF_L, XF, WF_ = 14.0, 60.0, 80.0, (93.0, 142.0), 38.0   # option 2b's block, mm from the left
     letter(M, let_e, "e")
     letter(XF_L, let_e, "f")
-    key([("mark", (G17_COL[a], G17_MK[a]), lab) for a, lab in G17_ARMS], (XE + XF[1] + WF_) / 2, key_e)
+    g17_items = [("mark", (G17_COL[a], G17_MK[a]), lab) for a, lab in G17_ARMS]
+    if DE_KEY == "shared":
+        key(g17_items, (XE + XF[1] + WF_) / 2, key_e)
+    elif DE_KEY == "two":
+        for cx_ in (XE + WE / 2, (XF[0] + XF[1] + WF_) / 2):
+            key(g17_items[:2], cx_, key_e)
+            key(g17_items[2:], cx_, key_e + LINE)
 
     def g17_positions(gap=0.8):
         pos, centres, x = {}, [], 0.0
@@ -2602,10 +2619,21 @@ def draw(P, paths):
                                       b["flat"] == "yes"))
                 rb["overlap"].append((f"{PLATE_LETTER[L]} {key_kw.get('measure_key', 'cr')} {g}", a,
                                       art.get("overlapping", 0)))
-            ri, b0 = sheet_index(L, row="box", arm_key=G17_ARMS[0][0], group_key=g, **key_kw)
-            num(ax.text(cx, -0.03, f"{glab}\nn = {b0['n']}", transform=ax.get_xaxis_transform(), ha="center",
-                        va="top", multialignment="center"),
-                {"sheet": sheet_name(L), "row": ri, "format": "{question_type}\nn = {n}"})
+            gtr = ax.get_xaxis_transform()
+            if DE_KEY == "names":
+                from matplotlib.transforms import offset_copy
+                for a, _ in G17_ARMS:
+                    t_ = ax.text(pos[(g, a)], 0, G17_SHORT[a], rotation=45, ha="right", va="top",
+                                 rotation_mode="anchor",
+                                 transform=offset_copy(gtr, fig=fig, x=1.0 / MMP, y=-1.0 / MMP, units="points"))
+                    if re.search(r"\d", G17_SHORT[a]):
+                        fixed(t_, "an arm's name")
+                gtr = offset_copy(gtr, fig=fig, y=-(1.0 + NAMES_W) / MMP, units="points")
+                gy = 0
+            else:
+                gy = -0.03
+            # 11 Nov (Valerio, F2): the question type only; the legend gives n = 60 one-paper and 26 many-paper
+            ax.text(cx, gy, glab, transform=gtr, ha="center", va="top")
 
     ae = axes_mm(XE, body_e, WE, AX_E)
     ae.set_ylim(-3, 103)
@@ -2780,8 +2808,7 @@ def legend_and_caption(P, st, n, N, plan, stamp, extra, command=None):
     head = [
         f"# Figure {FIG_N}, title and legend (draft)", "",
         # audit 27 Oct F5 (fig4_6): the command that made the plate, as the provenance records it (command_of)
-        f"Written by `{command or f'uv run --frozen python {SCRIPT} figure'}` from the plotted numbers. "
-        f"Data stamp: {stamp}.", "",
+        f"Written by `{command or f'uv run --frozen python {SCRIPT} figure'}` from the plotted numbers.", "",
         f"**Records.** G3's sinks on the Studio (~/{G3_CLONE}, clone at {extra['clone_head'][:7]}), copied by "
         f"`{SCRIPT} pull` through stdin scripts on {extra['listed_utc']}; every set-up's start record names commit "
         f"{', '.join(sorted(extra['commits']))} and lock {', '.join(sorted(x[:8] for x in extra['locks']))}. "
@@ -2849,20 +2876,22 @@ def legend_and_caption(P, st, n, N, plan, stamp, extra, command=None):
         f"score 3+) or not; dot, sent to a direct answer. Right: each of the {GROUP_N['false_premise']} false-premise "
         f"questions; outlined, passed. "
         f"{C}, Model calls and time in seconds per answer, one row per set-up, on log axes, n = {N_Q} answers per "
-        f"set-up: dots, answers; box, quartiles; line, median; whiskers, range. The number of answers drawn is "
-        f"printed above each column; {G17_ARM_LABEL[G17_CTRL]} records no search time, so its time is not drawn. "
+        f"set-up: dots, answers; box, quartiles; line, median; whiskers, range. "
+        f"{G17_ARM_LABEL[G17_CTRL]} records no search time, so its time is not drawn. "
         f"{D}, Concept recall (share of the key's concepts stated in the answer) of {G17_ARM_LABEL[G17_CTRL]} "
         f"(rerun), {G17_ARM_LABEL['package']} and {G17_ARM_LABEL[G17_CTRL]} with {G17_ARM_LABEL['search_off']} or "
         f"{G17_ARM_LABEL['gate_off']}, on one-paper and many-paper answerable questions. Dots, each question's mean "
         f"over {len(G17_DRAWS)} draws, n = {ng['one']} one-paper and {ng['many']} many-paper questions per box; box, "
         f"quartiles; line, median; whiskers, range. "
+        + (f"Under the boxes: Zhang, {G17_ARM_LABEL['package']}; tools off and gate off, {G17_ARM_LABEL[G17_CTRL]} "
+           f"with {G17_ARM_LABEL['search_off']} or {G17_ARM_LABEL['gate_off']}. " if DE_KEY == "names" else "") +
         f"{E}, Sub-calls that returned paper text and distinct papers read per draw-{G17_F_DRAW} answer of "
         f"{G17_ARM_LABEL[G17_CTRL]} (rerun), {G17_ARM_LABEL['package']} and {G17_ARM_LABEL[G17_CTRL]} with "
         f"{G17_ARM_LABEL['search_off']} or {G17_ARM_LABEL['gate_off']}, on one-paper and many-paper answerable "
         f"questions. Dots, answers, n = {ng['one']} one-paper and {ng['many']} many-paper answers per box; box, "
         f"quartiles; line, median; whiskers, range; axes linear to 2, logarithmic above.")
     cap = (f"# Source Data Fig. {FIG_N}, caption\n\n**Source Data Fig. {FIG_N} | Numerical values plotted in Figure "
-           f"{FIG_N}.** Provisional: drawn from {fmt_int(n)} of the {fmt_int(N)} answers in this figure's written "
+           f"{FIG_N}.** Drawn from {fmt_int(n)} of the {fmt_int(N)} answers in this figure's written "
            f"plan (draw 1 of eight G3 set-ups, of G9's two set-ups and of RLM-10). Data stamp: {stamp}. One sheet per "
            f"panel. "
            f"The pass rate is the share of answers the judge scores {PASS_T} or more; {PASS_RELAXED} or more is the "
@@ -2887,7 +2916,7 @@ def legend_and_caption(P, st, n, N, plan, stamp, extra, command=None):
            f"seconds): one 'setup' row per set-up with the "
            f"answers, n drawn, minimum, first quartile, median, third quartile and maximum (model calls also the "
            f"calls, failed calls, cut calls and calls by failure kind; a set-up with no value its note), and one "
-           f"'total' row (the answers, n drawn and set-ups drawn; the plate prints n drawn above each column); then "
+           f"'total' row (the answers, n drawn and set-ups drawn); then "
            f"one 'answer' row per answer: model calls with failed and cut calls and the count of calls by status, own "
            f"time in seconds with the calls' seconds and the search seconds. Sheet {sheet_name('e')} (G17, D250): "
            f"one 'box' row per arm and question type (n, minimum, first quartile, median, third quartile, maximum of "
@@ -2957,7 +2986,7 @@ CLAIMS = [
      "{longest:,} ({longest_pct}% of the threshold)"),
     ("SI", "Supplementary Note 5, 'Single components'",
      "Forced onto every step, the distiller lowered the pass rate: the always-distil set-up passed 62.8% (54 of 86)",
-     "G9, descriptive, one draw: always distil {g9_a_steps} step attempts, always distil F1 {g9_f_steps}, status "
+     "G9, descriptive, one draw: always distil {g9_a_steps} step attempts, always distil Ex {g9_f_steps}, status "
      "{g9_status}; median model calls {g9_a_calls}, {g9_f_calls}; {g9_judged}"),
 ]
 
@@ -3161,7 +3190,8 @@ def _figure(args, ins, recount_p, out, given, frozen_rec, view_tmp):
                  f"Their retrievals are not copied, so e prints '{NO_SEARCH}'."))
     draws_state = ("The 'draw' rows of sheet a are in." if draws else
                    "The 'draw' rows of sheet a stay out until S6G7G3 is copied.")
-    stamp = (f"PROVISIONAL: {fmt_int(n)} of {fmt_int(N)} answers, draw 1 of eight G3 set-ups (records of {when}, copied "
+    # Q9 (Valerio, 11 Nov): final names, no "(provisional, ...)" and no PROVISIONAL stamp; the stamp keeps the data state
+    stamp = (f"{fmt_int(n)} of {fmt_int(N)} answers, draw 1 of eight G3 set-ups (records of {when}, copied "
              f"{pj['listed_utc']}, judged by S3, G3 collect of {g3['collect_at']}), of RLM-10 (G1, G1 collect of "
              f"{rlm['collect_at']}) and of G9's two set-ups ({'judged' if g3['stress_judged'] else 'judge rows not copied'}"
              f", {'retrievals read' if g9_retr else 'retrievals not copied'}); key v2.5 judge rows: RLM-10's "
@@ -3170,7 +3200,7 @@ def _figure(args, ins, recount_p, out, given, frozen_rec, view_tmp):
              f"{'in' if draws else 'out until S6G7G3 is copied'}; T3 not drawn; d, e: G17 (D250), concept recall the mean "
              f"of draws 1 to {len(G17_DRAWS)}, reading paper text draw {G17_F_DRAW}, S571's reading "
              f"{g17['reading_sha256'][:8]}, S576's differences {g17['s576_sha256'][:8]}")
-    tag = f" (provisional, {n} of {N})"
+    tag = ""                                           # Q9: "Figure 5", "Source Data Fig. 5.xlsx"
     example = next(q["question"] for q in questions_of() if q["id"] == EXAMPLE_OUT_OF_SCOPE)
     if groups[EXAMPLE_OUT_OF_SCOPE] != "not_answerable":
         raise Refused(f"{EXAMPLE_OUT_OF_SCOPE} is not an out-of-scope question in the D5 key")

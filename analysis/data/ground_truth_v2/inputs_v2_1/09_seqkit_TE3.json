@@ -1,0 +1,13 @@
+{
+ "id": "09_seqkit_TE3",
+ "category": "technical",
+ "subcategory": null,
+ "question": "What specific technical optimization was applied to SeqKit's reverse complementation process, and what was the measured performance gain compared to using standard hash maps?",
+ "papers": [
+  {
+   "paper": "09_seqkit",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/09_seqkit.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/09_seqkit.pypdf.txt"
+  }
+ ]
+}

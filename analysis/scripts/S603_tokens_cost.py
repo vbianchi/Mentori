@@ -10,10 +10,21 @@ THE UNIT IS S520's. A call is one line of a named call log, counted by S520's ru
 line hash the S520 row it fell in, and looks the hash up in its own collects, which hold, per call-log line, the same hash
 and the token and time fields. A line counts once, where S520 counted it.
 
+D311, Q4 (Valerio, 9 November, "extend"): S603 covers the same calls as S520's joined total. S520's report --frozen
+joins the D311 collect (findings/recompute/S520_inputs_d311/s520_laptop_d311.json: 155 laptop files its frozen collects
+left unmapped) after the three machines' and gives 1,182,144 calls (was 1,158,418). S603 runs the same join
+(S520.build over S520_inputs plus the D311 collect, which S520.check_d311_input holds to D311_RULES and to the frozen
+laptop collect), and reads the D311 files' tokens and times from its own D311 collect, frozen in
+findings/recompute/S603_inputs_d311/ (all laptop files; plan --d311, collect, freeze). The D311 lines bring T3's Gemini
+calls into the cost. Without S520_inputs_d311 the report is the base one of 7 November.
+
 REPRODUCE FIRST (README.md:75-79). `report` writes nothing (exit 2) unless:
   R1  S520's build over its frozen inputs gives the frozen total, 1,158,418 calls (laptop_gates.json total_calls), and
-      the calls per model of the committed findings/recompute/S520_llm_calls/summary.json, so the calls per provider too.
-  R2  the line hashes S603 attributes to each S520 row sum to that row's calls, row by row.
+      the calls per model of the committed findings/recompute/S520_llm_calls/summary.json's d311.base_by_model (the
+      base by_model before D311), so the calls per provider too. Then (D311) S520's build with the D311 collect joined
+      gives the committed summary's total.calls and by_model (1,182,144 on 9 November).
+  R2  the line hashes S603 attributes to each S520 row sum to that row's calls, row by row, on the joined build, and
+      the run-tier hashes sum to the joined total.
   R3  the line reader S603 ships to the machines (top_fields, value_at and their patterns) is S520's, character for
       character, so a hash means the same line in both.
 Then the token join: every counted line of the run tier whose hash is not in S603's collects is counted and named (a
@@ -53,6 +64,9 @@ holds its log (S520's machine column).
 
 MODES.
   plan --machine <m> --out <json>         (laptop) the call logs of S520's frozen input for that machine, copies left out.
+  plan --d311 --out <json>                (laptop) the same for S520's D311 collect, each file with its listed size;
+      collect refuses a file whose size differs, and writes source "d311", so freeze names it s603_laptop_d311.json.gz:
+      freeze --in <it> --dest findings/recompute/S603_inputs_d311.
   collect --machine <m> --files <json> --out <json.gz>   (ON the machine; standard library only; sent by stdin)
       ssh <host> 'python3 - collect --machine studio --files s603_files_studio.json --out s603_studio.json.gz' \
           < scripts/S603_tokens_cost.py
@@ -230,12 +244,20 @@ def collect(machine, files_path, out_path):
         sys.exit(2)
     home = os.path.expanduser("~")
     now = time.time()
-    doc = {"schema": SCHEMA, "machine": machine, "host": socket.gethostname(),
+    doc = {"schema": SCHEMA, "machine": machine, "source": wanted.get("source"), "host": socket.gethostname(),
            "zone": "%s %s" % (time.strftime("%Z"), time.strftime("%z")),
            "started_utc": datetime.fromtimestamp(now, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "files": []}
     for e in wanted["files"]:
         path = os.path.join(home, "projects", e["clone"], "findings", e["path"])
         entry = {"clone": e["clone"], "path": e["path"]}
+        if "size" in e:
+            try:
+                size = os.stat(path).st_size
+            except OSError:
+                size = None
+            if size is not None and size != e["size"]:
+                print("REFUSED: %s holds %d bytes, S520's collect listed %d" % (e["path"], size, e["size"]))
+                sys.exit(2)
         try:
             rec, lines, skipped = scan_file(path, e["scan_kind"])
             entry.update(lines=lines, skipped=skipped, rec=base64.b64encode(bytes(rec)).decode("ascii"))
@@ -260,6 +282,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 S520_FROZEN = "findings/recompute/S520_inputs"
 S520_SUMMARY = "findings/recompute/S520_llm_calls/summary.json"
 FROZEN_DIR = "findings/recompute/S603_inputs"
+S520_D311 = "findings/recompute/S520_inputs_d311"        # S520.D311_DIR
+FROZEN_DIR_D311 = "findings/recompute/S603_inputs_d311"
 DEFAULT_OUT = "findings/recompute/S603_tokens_cost"
 SUMS = "SHA256SUMS"
 TZ_NAME = "Europe/Amsterdam"
@@ -315,15 +339,34 @@ def frozen_s520(S520):
     return inputs, doc, sums
 
 
-def plan(machine, out):
+def frozen_d311(S520, sums520):
+    """S520's frozen D311 collect (None when the folder is absent), held to its SHA256SUMS and to S520's D311 rules."""
+    folder = os.path.join(ROOT, S520_D311)
+    if not os.path.isdir(folder):
+        return None, {}
+    files, sums = S520.read_frozen(folder)
+    with open(files[S520.D311_INPUT]) as fh:
+        extra = json.load(fh)
+    S520.check_d311_input(extra, sums520["s520_laptop.json"])
+    return extra, sums
+
+
+def plan(machine, out, d311=False):
     S520 = s520()
-    inputs, _, _ = frozen_s520(S520)
-    inp = next(i for i in inputs if i["machine"] == machine)
-    files = [{"clone": f["clone"], "path": f["path"], "scan_kind": f["scan_kind"]} for f in inp["files"]
-             if f["kind"] != "copy"]
+    inputs, _, sums520 = frozen_s520(S520)
+    if d311:
+        inp, _ = frozen_d311(S520, sums520)
+        if inp is None:
+            print("REFUSED: %s is absent" % S520_D311)
+            sys.exit(2)
+        machine = inp["machine"]
+    else:
+        inp = next(i for i in inputs if i["machine"] == machine)
+    files = [dict({"clone": f["clone"], "path": f["path"], "scan_kind": f["scan_kind"]},
+                  **({"size": f["size"]} if d311 else {})) for f in inp["files"] if f["kind"] != "copy"]
     with open(out, "w") as fh:
-        json.dump({"machine": machine, "files": files}, fh)
-    print("%s: %d call logs (copies left out)" % (machine, len(files)))
+        json.dump(dict({"machine": machine, "files": files}, **({"source": "d311"} if d311 else {})), fh)
+    print("%s%s: %d call logs (copies left out)" % (machine, " (D311)" if d311 else "", len(files)))
 
 
 def freeze(in_paths, dest):
@@ -334,8 +377,8 @@ def freeze(in_paths, dest):
     names = []
     for p in in_paths:
         with gzip.open(p, "rt") as fh:
-            m = json.load(fh)["machine"]
-        name = "s603_%s.json.gz" % m
+            d = json.load(fh)
+        name = "s603_%s%s.json.gz" % (d["machine"], "_" + d["source"] if d.get("source") else "")
         with open(p, "rb") as src, open(os.path.join(dest, name), "wb") as out:
             out.write(src.read())
         names.append(name)
@@ -345,15 +388,18 @@ def freeze(in_paths, dest):
     print("froze %s in %s" % (", ".join(sorted(names)), dest))
 
 
-def read_collects(folder):
+def read_collects(folder, tokens=None, meta=None):
+    """Adds a frozen collect folder's records to tokens (a hash already held keeps its first record: the same line)."""
     S520 = s520()
     files, sums = S520.read_frozen(folder)
-    tokens, meta = {}, {}
+    tokens = {} if tokens is None else tokens
+    meta = {} if meta is None else meta
     for name in sorted(files):
         with gzip.open(files[name], "rt") as fh:
             doc = json.load(fh)
-        meta[doc["machine"]] = {k: doc[k] for k in ("host", "zone", "started_utc", "ended_utc")}
-        meta[doc["machine"]]["files_missing"] = [f["clone"] + "/" + f["path"] for f in doc["files"] if "error" in f]
+        key = doc["machine"] + (" (%s)" % doc["source"].upper() if doc.get("source") else "")
+        meta[key] = {k: doc[k] for k in ("host", "zone", "started_utc", "ended_utc")}
+        meta[key]["files_missing"] = [f["clone"] + "/" + f["path"] for f in doc["files"] if "error" in f]
         for f in doc["files"]:
             raw = base64.b64decode(f.get("rec", ""))
             for i in range(0, len(raw), REC.size):
@@ -557,14 +603,27 @@ def report(out_dir):
          S520_FROZEN + "/laptop_gates.json total_calls")
     with open(os.path.join(ROOT, S520_SUMMARY)) as fh:
         committed = json.load(fh)
-    gate("R1 S520 calls per model", {k: v["calls"] for k, v in built["by_model"].items()},
-         {k: v["calls"] for k, v in committed["by_model"].items()}, S520_SUMMARY + " by_model")
-    book, hashes = attribute(S520, inputs, changed)
+    # D311: the committed summary joins S520_inputs_d311 too; S603 reads S520_inputs alone, which d311.base_by_model holds
+    want_by_model = (committed.get("d311") or {}).get("base_by_model") or {
+        k: v["calls"] for k, v in committed["by_model"].items()}
+    gate("R1 S520 calls per model", {k: v["calls"] for k, v in built["by_model"].items()}, want_by_model,
+         S520_SUMMARY + (" d311.base_by_model" if committed.get("d311") else " by_model"))
+    extra, sums_d311 = frozen_d311(S520, sums520)
+    ledger, want_total, total_src = inputs, doc["total_calls"], "laptop_gates.json total_calls"
+    if extra is not None:          # D311, Q4: the same join S520's report --frozen runs
+        joined = S520.build(inputs + [extra], changed)["summary"]
+        gate("R1 S520 total with the D311 collect joined", joined["total"]["calls"], committed["total"]["calls"],
+             S520_SUMMARY + " total.calls")
+        gate("R1 S520 calls per model, D311 joined", {k: v["calls"] for k, v in joined["by_model"].items()},
+             {k: v["calls"] for k, v in committed["by_model"].items()}, S520_SUMMARY + " by_model")
+        ledger, want_total, total_src = inputs + [extra], committed["total"]["calls"], S520_SUMMARY + " total.calls"
+        built = joined
+    book, hashes = attribute(S520, ledger, changed)
     rows = {k: sum(r["status"].values()) for k, r in book.rows.items()}
     mine = {k: len(v) // 8 for k, v in hashes.items()}
     gate("R2 hashes per S520 row equal its calls", mine == {k: v for k, v in rows.items() if v}, True, "S520.Book rows")
     run_mine = sum(v for k, v in mine.items() if k[5] == "run")
-    gate("R2 run-tier hashes equal the total", run_mine, doc["total_calls"], "laptop_gates.json total_calls")
+    gate("R2 run-tier hashes equal the total", run_mine, want_total, total_src)
     for r in g:
         print("  %s %s: %s" % ("PASS" if r["pass"] else "FAIL", r["gate"],
                                r["got"] if not isinstance(r["got"], dict) else "%d models" % len(r["got"])))
@@ -577,13 +636,21 @@ def report(out_dir):
     print("Reproduced S520: %d calls; per provider %s" % (built["total"]["calls"], dict(per_provider)))
 
     tokens, meta, sums603 = read_collects(os.path.join(ROOT, FROZEN_DIR))
+    if extra is not None:
+        _, _, sums603_d311 = read_collects(os.path.join(ROOT, FROZEN_DIR_D311), tokens, meta)
+        sums520 = dict(sums520, **{"S520_inputs_d311/" + k: v for k, v in sums_d311.items()})
+        sums603 = dict(sums603, **{"S603_inputs_d311/" + k: v for k, v in sums603_d311.items()})
     stats, times = tally(hashes, tokens)
     RUN = ("run",)
     ALL = ("run", "dropped", "check", "smoke", "unmapped")
+    unm = committed.get("unmapped")
     res = {
         "provenance": {"script": "scripts/S603_tokens_cost.py", "script_sha256": sha256_path(me),
                        "command": "uv run --frozen python scripts/S603_tokens_cost.py report",
-                       "s520_inputs_sha256": sums520, "s603_inputs_sha256": sums603, "collects": meta},
+                       "s520_inputs_sha256": sums520, "s603_inputs_sha256": sums603, "collects": meta,
+                       "d311": extra is not None},
+        "s520_total": built["total"]["calls"],
+        "s520_unmapped_files": len(unm) if isinstance(unm, (list, dict)) else None,
         "gates": g, "s520_calls_per_provider": dict(per_provider), "prices_usd_per_million": PRICES,
         "eur": "not converted: the repository records no USD to EUR rate (Valerio's, from the invoices)",
         "run": {"by_model": {"%s|%s" % k: v for k, v in roll(stats, RUN, lambda k: (k[1], k[2])).items()},
@@ -607,11 +674,14 @@ def write(res, out_dir):
         json.dump(res, fh, indent=1, sort_keys=True)
         fh.write("\n")
     prov = res["provenance"]
+    d311 = prov.get("d311")
     L = ["<!-- provenance: %s sha256 %s, inputs %s (S520) and %s (S603), HEAD not stamped, written not stamped -->" % (
-        prov["script"], prov["script_sha256"][:16], S520_FROZEN, FROZEN_DIR),
+        prov["script"], prov["script_sha256"][:16],
+        S520_FROZEN + (" + " + S520_D311 if d311 else ""), FROZEN_DIR + (" + " + FROZEN_DIR_D311 if d311 else "")),
         "# Tokens and cloud cost of the study's language-model calls", "",
-        "One call is one line of a named call log, counted by S520's rule on S520's frozen inputs of 7 November; each "
-        "counted line's tokens are read from S603's collects by the same line hash. Command: `%s`." % prov["command"], "",
+        "One call is one line of a named call log, counted by S520's rule on S520's frozen inputs of 7 November%s; each "
+        "counted line's tokens are read from S603's collects by the same line hash. Command: `%s`." % (
+            " joined with the D311 collect of 9 November (D311, Q4)" if d311 else "", prov["command"]), "",
         "Collects read: " + "; ".join("%s %s to %s (%s)" % (m, v["started_utc"], v["ended_utc"], v["zone"])
                                        for m, v in sorted(prov["collects"].items())) + ".", "",
         "## Reproduced first", ""]
@@ -629,7 +699,7 @@ def write(res, out_dir):
 
     head = ["Provider, model", "Calls", "With prompt and output", "Total only", "No count", "Prompt tokens",
             "Output tokens", "Thinking tokens", "Tokens of total-only calls", "Anthropic cache tokens"]
-    L += ["## Tokens, run tier (the 1,158,418 calls)", ""] + md_table(head, tok_rows(res["run"]["by_model"]))
+    L += ["## Tokens, run tier (the %s calls)" % n(res["s520_total"]), ""] + md_table(head, tok_rows(res["run"]["by_model"]))
     L += [""] + md_table(["Provider"] + head[1:], tok_rows(res["run"]["by_provider"]))
     L += ["", "No count = no token field on the line (or the line not in the collects, %s calls of the run tier)." %
           n(sum(st["not_in_collects"] for st in res["run"]["by_provider"].values())), "",
@@ -672,7 +742,8 @@ def write(res, out_dir):
                                                  if p.get("tier_above") else "", p["source"]) for m, p in PRICES.items()) + ".",
           "", "Not in these costs: Google's implicit-cache discount (the Gemini records hold no cached-token count, so "
           "Gemini input is at the full price, an upper bound); calls outside S520's ledger (April and pre-lock work, the "
-          "258 unmapped call-log files, Gemini countTokens); taxes and any free-tier credit. EUR: %s." % res["eur"], ""]
+          "%s unmapped call-log files, Gemini countTokens); taxes and any free-tier credit. EUR: %s." % (
+              n(res["s520_unmapped_files"]), res["eur"]), ""]
 
     def time_rows(t):
         rows = []
@@ -698,7 +769,8 @@ def main():
     ap = argparse.ArgumentParser(description="Tokens and cloud cost on S520's call ledger.")
     sub = ap.add_subparsers(dest="mode")
     p = sub.add_parser("plan")
-    p.add_argument("--machine", required=True)
+    p.add_argument("--machine")
+    p.add_argument("--d311", action="store_true", help="S520's D311 collect (laptop) instead of a machine's")
     p.add_argument("--out", required=True)
     c = sub.add_parser("collect")
     c.add_argument("--machine", required=True)
@@ -711,7 +783,9 @@ def main():
     r.add_argument("--out-dir", default=os.path.join(ROOT, DEFAULT_OUT))
     a = ap.parse_args()
     if a.mode == "plan":
-        plan(a.machine, a.out)
+        if not a.d311 and not a.machine:
+            ap.error("plan needs --machine or --d311")
+        plan(a.machine, a.out, a.d311)
     elif a.mode == "collect":
         collect(a.machine, a.files, a.out)
     elif a.mode == "freeze":

@@ -63,7 +63,7 @@ WHAT IS DRAWN.
      (gemini-2.5-pro's multi-hop, RLM-5 and RLM-20: S6WT2G judged single pass, verified pass and RLM-10, D198 O4) or
      with a pair missing its second-judge row stays empty, its sheet rows saying why and how many.
   c  four facets (Weighted kappa: quadratic weights on 0 to 5, the protocol's statistic; Spearman's rho; Kappa at 4 and
-     Kappa at 3: Cohen's kappa on score at or above the mark), six metric rows, Refusal in Kappa at 4 only: box,
+     Kappa at 3: Cohen's kappa on score at or above the mark), six metric rows, Refusal in Kappa at 4 and Kappa at 3 only (D309 A34): box,
      quartiles of 10,000 question resamples (S473.boot_rows, every answer of a question drawn together); whiskers,
      the 2.5th and 97.5th percentiles. A resample on which a statistic is undefined is left out and counted.
 
@@ -98,7 +98,7 @@ GEN_DISPLAY = {FLASH: "gemini-3-flash"}
 NO_J2 = "empty: no second-judge rows of this strategy"
 INCOMPLETE = "empty: {n} answer pairs without a second-judge row"
 STATS = ("Weighted kappa", "Spearman's rho", "Kappa at 4", "Kappa at 3")
-REFUSAL_ONLY = "Kappa at 4"
+REFUSAL_STATS = ("Kappa at 4", "Kappa at 3")   # D309 A34 O1: refusal also at 3, the paper's refusal mark
 CONFIGS = ("single_pass", "multi_hop", "verified_pass", "rlm_5", "rlm_10", "rlm_20")
 SECOND = "qwen3.8:27b"                                    # LOCK.toml [judge] second_model
 PASS, SHARE_TOP = 4, 40.0
@@ -147,6 +147,7 @@ S518 = _load("S518", ROOT / "scripts" / "S518_split_confirmation.py")
 S511 = S518.S511
 Refused = S540.Refused
 import judge_rows_v25 as JR  # noqa: E402
+import lock_equiv  # noqa: E402  D204: equivalent locks (Supplementary Figure 4b, 11 Nov)
 STRATS = FN.STRATEGIES[1:]
 LABEL = dict(zip(CONFIGS, FN.STRATEGIES))
 
@@ -201,7 +202,8 @@ def _rows(path: Path, judge: str) -> dict:
         if k in rows:
             raise Refused(f"{path.name}: {k} doubled")
         rows[k] = r
-    if len({r.get("lock_sha256") for r in rows.values()}) != 1:
+    locks = {r.get("lock_sha256") for r in rows.values()}
+    if len(locks) != 1 and not locks <= lock_equiv.EQUIVALENT:   # D204: locks lock_equiv.py proves equivalent may mix
         raise Refused(f"{path.name}: rows under more than one lock")
     return rows
 
@@ -419,7 +421,12 @@ def _check_second(rows: dict, path: Path, kind: str, tag: str) -> None:
             raise Refused(f"{path.name} {k}: answerable_prompt {d.get('answerable_prompt')}")
     runs = {d.get("run_sha256") for d in rows.values()}
     side = json.loads(path.with_name(path.name + ".json").read_text())
-    if len(runs) != 1 or side.get("rows") != len(rows) or side.get("run_sha256") != next(iter(runs)):
+    by_lock = {}
+    for d in rows.values():
+        by_lock.setdefault(d.get("lock_sha256"), set()).add(d.get("run_sha256"))
+    one_per_lock = set(by_lock) <= lock_equiv.EQUIVALENT and all(len(v) == 1 for v in by_lock.values())
+    want = next(iter(runs)) if len(runs) == 1 else sorted(runs)
+    if (len(runs) != 1 and not one_per_lock) or side.get("rows") != len(rows) or side.get("run_sha256") != want:
         raise Refused(f"{path.name}: {len(runs)} run_sha256 values, or its sidecar disagrees")
 
 
@@ -560,7 +567,7 @@ def compute(R: dict, T: dict) -> dict:
                 a["rows"].append([m, j1, j2, 100.0 * k / n, k])
         info[m] = {"answers": n, "questions": len({q for q, _, _ in pts}), "left_out": dict(sorted(left.items()))}
         for st in STATS:
-            if m == "Refusal" and st != REFUSAL_ONLY:
+            if m == "Refusal" and st not in REFUSAL_STATS:
                 continue
             s = stat(pts, st)
             if s["lo"] < 0 or s["hi"] > 1:
@@ -709,8 +716,8 @@ def legend(info: dict, b_rows: list) -> str:
             f"pass taken on the same questions and draws as the strategy. Filled dot, judge 1; open dot, judge 2, drawn "
             f"over the filled dot where the two coincide; vertical line, no change.{b_clause(b_rows)} 'Same family', "
             f"qwen3-coder:30b is of judge 2's model family. **c**, Agreement of the two judges per metric (rows): "
-            f"quadratic-weighted kappa on scores 0 to 5, Spearman's ρ, and Cohen's kappa on pass or fail at marks 4 "
-            f"and 3 (refusal, kappa at 4 only), each over 10,000 resamples of the questions. Box, quartiles; line, "
+            f"quadratic-weighted kappa on scores 0 to 5, Spearman's ρ and Cohen's kappa on pass or fail at marks 4 "
+            f"and 3 (refusal, kappa at 4 and 3 only), each over 10,000 resamples of the questions. Box, quartiles; line, "
             f"median; whiskers, two-sided 95% percentile interval; n = {nq} questions (refusal, {nq_ref}).")
 
 
@@ -734,14 +741,14 @@ def figure(out) -> None:
     res = compute(R, T)
     planned = S473.PLANNED["judge"]
     drawn = res["info"]["Correctness"]["answers"] + sum(res["info"]["Correctness"]["left_out"].values())
-    tag = f"provisional, {drawn} of {planned}"
+    tag = ""                                  # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
     empty = sorted({f"{r[0].split(',')[0]} {r[1]}" for r in res["sheets"][f"Supplementary Fig. {N}b"]["rows"]
                     if r[-1] != "drawn"})
-    stamp = (f"PROVISIONAL: {drawn:,} of {planned:,} gemini-3-flash-preview answers drawn under both judges, from the "
+    stamp = (f"{drawn:,} of {planned:,} gemini-3-flash-preview answers drawn under both judges, from the "
              "committed rows (S518_inputs/second_judge, fig2_inputs, fig3_s6_inputs); panel b from T2's rows of both "
              "judges (judge_rows_v25.t2_source; t2_second_inputs, S592)"
              + (f", empty: {', '.join(empty)}" if empty else "") + "; reproduced first: " + "; ".join(gates.values()))
-    caption = (f"# Supplementary Figure {N} data, caption\n\n**Supplementary Figure {N} data.** Provisional. Data stamp: "
+    caption = (f"# Supplementary Figure {N} data, caption\n\n**Supplementary Figure {N} data.** Data stamp: "
                f"{stamp}. One sheet per panel: a, one row per score pair and metric (share of the metric's answers and "
                f"their count); b, one row per generator, strategy and judge (rows marked empty hold no value); c, one "
                f"row per metric and statistic (value, resample quartiles, two-sided 95% interval, answers, questions, "

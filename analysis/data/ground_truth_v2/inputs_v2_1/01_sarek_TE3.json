@@ -1,0 +1,13 @@
+{
+ "id": "01_sarek_TE3",
+ "category": "technical",
+ "subcategory": null,
+ "question": "Based on the benchmarking results, what is the specific F1 score achieved for somatic single-base mutations (SSM) when using the intersection of GATK4 Mutect2 and Strelka2?",
+ "papers": [
+  {
+   "paper": "01_sarek",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/01_sarek.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/01_sarek.pypdf.txt"
+  }
+ ]
+}

@@ -24,8 +24,8 @@ the PDF at 600 dpi, S448 R7), "Supplementary Figure 9 data.xlsx" (sheets "Supp. 
 line; "Supp. Fig. 9 elements", each box, arrow and label with what the code does and where; "Supp. Fig. 9 set-ups",
 each set-up of the orchestration ablation and the label that draws it), its caption, legend_draft.md,
 supplementary_figure9_numbers.json (every sheet, and every printed line tied to its sheet row, S448 R8 (6)) and
-supplementary_figure9_provenance.json (each input's sha256, the figure lock's, every output's). The plate carries no
-"(provisional, ...)" suffix: it counts no data, so there is no "n of m" to give; its stamp says what it is drawn from.
+supplementary_figure9_provenance.json (each input's sha256, the figure lock's, every output's). No file carries a
+suffix (Q9, 11 Nov); its stamp says what it is drawn from.
 
 INPUTS, both committed: experiments/mentori/publication/scripts/exp_03_orchestration_ablation.py (its
 ORCHESTRATOR_CONFIGS and MAX_STEPS, read with ast, nothing imported) and experiments/FIGURE_LOCK.toml.
@@ -330,7 +330,7 @@ def legend_text(stamp: str) -> str:
             f"ablation set-ups are no analyser, the routing fix (factual questions "
             f"planned), no planner, no supervisor, no synthesizer and every step distilled with {fn.MENTORI}'s "
             f"prompt or with the worked-example prompt, which adds two worked examples that keep every number.")
-    return (f"Legend DRAFT for {SI_LABEL} (written by {SCRIPT}). Data stamp: {stamp}.\n\n"
+    return (f"Legend DRAFT for {SI_LABEL} (written by {SCRIPT}).\n\n"
             f"**{SI_LABEL} | {TITLE}.**\n\n{body}\n")
 
 

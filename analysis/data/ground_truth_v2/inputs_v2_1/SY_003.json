@@ -1,0 +1,28 @@
+{
+ "id": "SY_003",
+ "category": "synthesis",
+ "subcategory": "trend_identification",
+ "question": "How does the corpus demonstrate an evolution from localized tool optimization to systemic computational efficiency across different layers of the bioinformatics stack?",
+ "papers": [
+  {
+   "paper": "03_nfcore_framework",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/03_nfcore_framework.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/03_nfcore_framework.pypdf.txt"
+  },
+  {
+   "paper": "04_fastp",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/04_fastp.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/04_fastp.pypdf.txt"
+  },
+  {
+   "paper": "06_star_aligner",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/06_star_aligner.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/06_star_aligner.pypdf.txt"
+  },
+  {
+   "paper": "09_seqkit",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/09_seqkit.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/09_seqkit.pypdf.txt"
+  }
+ ]
+}

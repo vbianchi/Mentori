@@ -6,7 +6,7 @@
   "command": "uv run --frozen python scripts/S591_routing_fix_by_draw.py",
   "imports": {
    "scripts/S480_fig4_recount.py": "7c432aa0524944649573f60009acb38450eb9886459783d3c8bf7aa1504950ee",
-   "scripts/S463_fig2_ranking.py": "8279a35d27c5a99d34980b59529203b104526035beba74031c9964a2ee360825",
+   "scripts/S463_fig2_ranking.py": "8d9070c7036276ac1fb48a8cfa859b48e207b4c8ce15a84f2832e5a2bf88aa6d",
    "scripts/judge_rows_v25.py": "77d4a84d7aff4dd0ee92366395a4be2e5f27fe20d5de99ccbc86b7333c401661"
   },
   "frozen_defaults": {
@@ -89,11 +89,11 @@
  "known_inputs": {
   "s480_recount": {
    "path": "findings/recompute/S480_fig4_recount.json",
-   "sha256": "82e9149e1c6f2261a6af247ca0c1022fce50f243621e3c7844afe255e1188c9b"
+   "sha256": "a8ad499002156fc9e29cb6251b081d9bbfb14c7fb67ce30fc1aa7bf92dfe618a"
   },
   "figure4_numbers": {
    "path": "findings/figures_provisional/fig4/figure5_numbers.json",
-   "sha256": "fe2652805ed3c0af11a3b95f4defc5f077c1bd8bf3caa55f5a751ef17bfb856e"
+   "sha256": "9a284da66018038289f86aeb48c9a18a7c2846838b09d8a0f7e26a0e2110eab2"
   },
   "rlm_manifest": {
    "path": "findings/recompute/frozen_inputs/extracted/fig2_g1r15_inputs/fig2_g1r15_inputs/MANIFEST.sha256",

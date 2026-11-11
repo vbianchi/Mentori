@@ -1,0 +1,13 @@
+{
+ "id": "03_nfcore_framework_CO2",
+ "category": "conceptual",
+ "subcategory": null,
+ "question": "How does the nf-core/sarek 3.1.1 pipeline leverage architectural and methodological changes to optimize cost and performance for large-scale data analysis?",
+ "papers": [
+  {
+   "paper": "03_nfcore_framework",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/03_nfcore_framework.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/03_nfcore_framework.pypdf.txt"
+  }
+ ]
+}

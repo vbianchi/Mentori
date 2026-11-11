@@ -89,7 +89,7 @@ NO_SUPERVISOR = "no supervisor"
 NO_SYNTHESIZER = "no synthesizer"
 ROUTING_FIX = "routing fix"
 ALWAYS_DISTIL = "always distil"
-ALWAYS_DISTIL_F1 = "always distil F1"
+ALWAYS_DISTIL_F1 = "always distil Ex"                   # Ex, the worked-example prompt (Valerio, 11 Nov; was "F1")
 FIGURE_4_ROWS = (NO_RETRIEVAL, NAIVE_RAG, FULL_PIPELINE, NO_ANALYSER, NO_PLANNER, NO_SUPERVISOR, NO_SYNTHESIZER,
                  ROUTING_FIX, ALWAYS_DISTIL, ALWAYS_DISTIL_F1, RLM_10)
 

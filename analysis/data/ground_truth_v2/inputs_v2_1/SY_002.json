@@ -1,0 +1,28 @@
+{
+ "id": "SY_002",
+ "category": "synthesis",
+ "subcategory": "theme_analysis",
+ "question": "How do the collective methodologies across Sarek, Snakemake, nf-core, and MultiQC redefine the concept of 'quality control' from a single-sample metric to a system-wide diagnostic process?",
+ "papers": [
+  {
+   "paper": "01_sarek",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/01_sarek.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/01_sarek.pypdf.txt"
+  },
+  {
+   "paper": "02_snakemake",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/02_snakemake.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/02_snakemake.pypdf.txt"
+  },
+  {
+   "paper": "03_nfcore_framework",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/03_nfcore_framework.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/03_nfcore_framework.pypdf.txt"
+  },
+  {
+   "paper": "05_multiqc",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/05_multiqc.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/05_multiqc.pypdf.txt"
+  }
+ ]
+}

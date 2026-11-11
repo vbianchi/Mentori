@@ -13,7 +13,7 @@ computes no statistic: it reads the raw files and counts. Reads only committed f
     findings/recompute/fig3_s6_inputs (S528, its own SHA256SUMS) frozen set "fig3_s6": RLM-10's key v2.5 rows (D201)
     findings/recompute/frozen_inputs/SHA256SUMS                 each collect and sidecar must have its listed sha256
     experiments.runner.experiment.questions()                    the D5 key: group (Rule 8) and answer_type per question
-    findings/figures_provisional/fig4/Source Data Fig. 4 (provisional, ...).xlsx   the plate's numbers (sheet Fig. 4a)
+    findings/figures_provisional/fig4/Source Data Fig. 5.xlsx   the plate's numbers (sheet Fig. 4a)
     findings/recompute/S281_exp06_per_answer.csv                the resubmission's answers (judge qwen3-coder:30b)
     findings/recompute/S281_exp06_per_config.csv                its per-set-up pass rate and mean (S281)
 
@@ -92,7 +92,7 @@ G1_COLLECT = fig_repro.frozen("fig2", "g1_collect.jsonl")
 S6_G1 = fig_repro.frozen("fig3_s6", ".")                         # D201 Q2 (b): S528's set, as S472 and S480 read it
 SUMS = REPO / "findings/recompute/frozen_inputs/SHA256SUMS"
 PLATE = REPO / "findings/figures_provisional/fig4"
-SD_GLOB = "Source Data Fig. 5 (provisional*.xlsx"   # D283: Figure 5 (4 until 6 Nov)
+SD_GLOB = "Source Data Fig. 5.xlsx"   # Q9 (11 Nov): no suffix; D283: Figure 5 (4 until 6 Nov)
 RESUB = REPO / "findings/recompute/S281_exp06_per_answer.csv"
 RESUB_CFG = REPO / "findings/recompute/S281_exp06_per_config.csv"
 RERUN_SH = REPO / "findings/recompute/G1_runs/rerun_d89.sh"      # G1's 15 reruns (D93 Q-c), S463.RERUN_SH

@@ -1,0 +1,13 @@
+{
+ "id": "13_lsd_nepal_FR1",
+ "category": "factual_recall",
+ "subcategory": null,
+ "question": "What were the overall morbidity, mortality, and case fatality rates recorded during the LSD outbreak in the study area?",
+ "papers": [
+  {
+   "paper": "13_lsd_nepal",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/13_lsd_nepal.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/13_lsd_nepal.pypdf.txt"
+  }
+ ]
+}

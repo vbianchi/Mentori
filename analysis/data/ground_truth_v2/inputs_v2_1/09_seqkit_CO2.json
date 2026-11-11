@@ -1,0 +1,13 @@
+{
+ "id": "09_seqkit_CO2",
+ "category": "conceptual",
+ "subcategory": null,
+ "question": "How does SeqKit achieve stable memory usage and efficiency when processing datasets that are significantly larger than the human genome?",
+ "papers": [
+  {
+   "paper": "09_seqkit",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/09_seqkit.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/09_seqkit.pypdf.txt"
+  }
+ ]
+}

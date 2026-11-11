@@ -1,5 +1,5 @@
 {
- "stamp": "PROVISIONAL: 540 of 540 answers on their final key: a and b, all 180 (G1, three draws, 108 on changed questions read from S6G1, the others unchanged by key v2.5); c, 360 of 360 (G4 draw 1, 0 awaiting S6G4, read on key v2.4 until it ends)",
+ "stamp": "540 of 540 answers on their final key: a and b, all 180 (G1, three draws, 108 on changed questions read from S6G1, the others unchanged by key v2.5); c, 360 of 360 (G4 draw 1, 0 awaiting S6G4, read on key v2.4 until it ends)",
  "what": "every number Supplementary Figure 5 draws, sheet by sheet as the data workbook holds them (S448 --supplementary R8 (2) to (6))",
  "sheets": {
   "Supplementary Fig. 5a": {
@@ -4085,314 +4085,310 @@
    "why": "a step of the key"
   },
   "s448num_141": {
-   "fixed": "0 of 3",
+   "fixed": "0",
    "why": "a step of the key"
   },
-  "s532_b_ylab": {
-   "fixed": "in a draw (of 10)",
-   "why": "the axis label"
+  "s448num_142": {
+   "fixed": "5",
+   "why": "a strategy's name, on two lines"
   },
   "s448num_143": {
-   "fixed": "5",
+   "fixed": "10",
    "why": "a strategy's name, on two lines"
   },
   "s448num_144": {
-   "fixed": "10",
+   "fixed": "20",
    "why": "a strategy's name, on two lines"
   },
   "s448num_145": {
-   "fixed": "20",
+   "fixed": "5",
    "why": "a strategy's name, on two lines"
   },
   "s448num_146": {
-   "fixed": "5",
-   "why": "a strategy's name, on two lines"
-  },
-  "s448num_147": {
    "fixed": "10",
    "why": "a strategy's name, on two lines"
   },
-  "s448num_148": {
+  "s448num_147": {
    "fixed": "20",
    "why": "a strategy's name, on two lines"
   },
-  "s448num_149": {
+  "s448num_148": {
    "fixed": "5",
    "why": "core papers in the index"
   },
-  "s448num_150": {
+  "s448num_149": {
    "sheet": "Supplementary Fig. 5c",
    "row": 0,
+   "format": "{passed_4}"
+  },
+  "s448num_150": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 1,
    "format": "{passed_4}"
   },
   "s448num_151": {
    "sheet": "Supplementary Fig. 5c",
-   "row": 1,
+   "row": 2,
    "format": "{passed_4}"
   },
   "s448num_152": {
    "sheet": "Supplementary Fig. 5c",
-   "row": 2,
+   "row": 3,
    "format": "{passed_4}"
   },
   "s448num_153": {
    "sheet": "Supplementary Fig. 5c",
-   "row": 3,
+   "row": 4,
    "format": "{passed_4}"
   },
   "s448num_154": {
    "sheet": "Supplementary Fig. 5c",
-   "row": 4,
-   "format": "{passed_4}"
-  },
-  "s448num_155": {
-   "sheet": "Supplementary Fig. 5c",
    "row": 5,
    "format": "{passed_4}"
   },
-  "s448num_156": {
+  "s448num_155": {
    "fixed": "10",
    "why": "core papers in the index"
   },
-  "s448num_157": {
+  "s448num_156": {
    "sheet": "Supplementary Fig. 5c",
    "row": 6,
+   "format": "{passed_4}"
+  },
+  "s448num_157": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 7,
    "format": "{passed_4}"
   },
   "s448num_158": {
    "sheet": "Supplementary Fig. 5c",
-   "row": 7,
+   "row": 8,
    "format": "{passed_4}"
   },
   "s448num_159": {
    "sheet": "Supplementary Fig. 5c",
-   "row": 8,
+   "row": 9,
    "format": "{passed_4}"
   },
   "s448num_160": {
    "sheet": "Supplementary Fig. 5c",
-   "row": 9,
+   "row": 10,
    "format": "{passed_4}"
   },
   "s448num_161": {
    "sheet": "Supplementary Fig. 5c",
-   "row": 10,
-   "format": "{passed_4}"
-  },
-  "s448num_162": {
-   "sheet": "Supplementary Fig. 5c",
    "row": 11,
    "format": "{passed_4}"
   },
-  "s448num_163": {
+  "s448num_162": {
    "fixed": "20",
    "why": "core papers in the index"
   },
-  "s448num_164": {
+  "s448num_163": {
    "sheet": "Supplementary Fig. 5c",
    "row": 12,
+   "format": "{passed_4}"
+  },
+  "s448num_164": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 13,
    "format": "{passed_4}"
   },
   "s448num_165": {
    "sheet": "Supplementary Fig. 5c",
-   "row": 13,
+   "row": 14,
    "format": "{passed_4}"
   },
   "s448num_166": {
    "sheet": "Supplementary Fig. 5c",
-   "row": 14,
+   "row": 15,
    "format": "{passed_4}"
   },
   "s448num_167": {
    "sheet": "Supplementary Fig. 5c",
-   "row": 15,
+   "row": 16,
    "format": "{passed_4}"
   },
   "s448num_168": {
    "sheet": "Supplementary Fig. 5c",
-   "row": 16,
-   "format": "{passed_4}"
-  },
-  "s448num_169": {
-   "sheet": "Supplementary Fig. 5c",
    "row": 17,
    "format": "{passed_4}"
   },
-  "s448num_170": {
+  "s448num_169": {
    "fixed": "50",
    "why": "core papers in the index"
   },
-  "s448num_171": {
+  "s448num_170": {
    "sheet": "Supplementary Fig. 5c",
    "row": 18,
+   "format": "{passed_4}"
+  },
+  "s448num_171": {
+   "sheet": "Supplementary Fig. 5c",
+   "row": 19,
    "format": "{passed_4}"
   },
   "s448num_172": {
    "sheet": "Supplementary Fig. 5c",
-   "row": 19,
+   "row": 20,
    "format": "{passed_4}"
   },
   "s448num_173": {
    "sheet": "Supplementary Fig. 5c",
-   "row": 20,
+   "row": 21,
    "format": "{passed_4}"
   },
   "s448num_174": {
    "sheet": "Supplementary Fig. 5c",
-   "row": 21,
+   "row": 22,
    "format": "{passed_4}"
   },
   "s448num_175": {
    "sheet": "Supplementary Fig. 5c",
-   "row": 22,
-   "format": "{passed_4}"
-  },
-  "s448num_176": {
-   "sheet": "Supplementary Fig. 5c",
    "row": 23,
    "format": "{passed_4}"
   },
-  "s448num_177": {
+  "s448num_176": {
    "fixed": "Score 4+",
    "why": "the threshold (Rule 9)"
   },
-  "s448num_178": {
+  "s448num_177": {
    "fixed": "5",
    "why": "core papers in the index"
   },
-  "s448num_179": {
+  "s448num_178": {
    "sheet": "Supplementary Fig. 5c",
    "row": 0,
    "format": "{passed_3}"
   },
-  "s448num_180": {
+  "s448num_179": {
    "sheet": "Supplementary Fig. 5c",
    "row": 1,
    "format": "{passed_3}"
   },
-  "s448num_181": {
+  "s448num_180": {
    "sheet": "Supplementary Fig. 5c",
    "row": 2,
    "format": "{passed_3}"
   },
-  "s448num_182": {
+  "s448num_181": {
    "sheet": "Supplementary Fig. 5c",
    "row": 3,
    "format": "{passed_3}"
   },
-  "s448num_183": {
+  "s448num_182": {
    "sheet": "Supplementary Fig. 5c",
    "row": 4,
    "format": "{passed_3}"
   },
-  "s448num_184": {
+  "s448num_183": {
    "sheet": "Supplementary Fig. 5c",
    "row": 5,
    "format": "{passed_3}"
   },
-  "s448num_185": {
+  "s448num_184": {
    "fixed": "10",
    "why": "core papers in the index"
   },
-  "s448num_186": {
+  "s448num_185": {
    "sheet": "Supplementary Fig. 5c",
    "row": 6,
    "format": "{passed_3}"
   },
-  "s448num_187": {
+  "s448num_186": {
    "sheet": "Supplementary Fig. 5c",
    "row": 7,
    "format": "{passed_3}"
   },
-  "s448num_188": {
+  "s448num_187": {
    "sheet": "Supplementary Fig. 5c",
    "row": 8,
    "format": "{passed_3}"
   },
-  "s448num_189": {
+  "s448num_188": {
    "sheet": "Supplementary Fig. 5c",
    "row": 9,
    "format": "{passed_3}"
   },
-  "s448num_190": {
+  "s448num_189": {
    "sheet": "Supplementary Fig. 5c",
    "row": 10,
    "format": "{passed_3}"
   },
-  "s448num_191": {
+  "s448num_190": {
    "sheet": "Supplementary Fig. 5c",
    "row": 11,
    "format": "{passed_3}"
   },
-  "s448num_192": {
+  "s448num_191": {
    "fixed": "20",
    "why": "core papers in the index"
   },
-  "s448num_193": {
+  "s448num_192": {
    "sheet": "Supplementary Fig. 5c",
    "row": 12,
    "format": "{passed_3}"
   },
-  "s448num_194": {
+  "s448num_193": {
    "sheet": "Supplementary Fig. 5c",
    "row": 13,
    "format": "{passed_3}"
   },
-  "s448num_195": {
+  "s448num_194": {
    "sheet": "Supplementary Fig. 5c",
    "row": 14,
    "format": "{passed_3}"
   },
-  "s448num_196": {
+  "s448num_195": {
    "sheet": "Supplementary Fig. 5c",
    "row": 15,
    "format": "{passed_3}"
   },
-  "s448num_197": {
+  "s448num_196": {
    "sheet": "Supplementary Fig. 5c",
    "row": 16,
    "format": "{passed_3}"
   },
-  "s448num_198": {
+  "s448num_197": {
    "sheet": "Supplementary Fig. 5c",
    "row": 17,
    "format": "{passed_3}"
   },
-  "s448num_199": {
+  "s448num_198": {
    "fixed": "50",
    "why": "core papers in the index"
   },
-  "s448num_200": {
+  "s448num_199": {
    "sheet": "Supplementary Fig. 5c",
    "row": 18,
    "format": "{passed_3}"
   },
-  "s448num_201": {
+  "s448num_200": {
    "sheet": "Supplementary Fig. 5c",
    "row": 19,
    "format": "{passed_3}"
   },
-  "s448num_202": {
+  "s448num_201": {
    "sheet": "Supplementary Fig. 5c",
    "row": 20,
    "format": "{passed_3}"
   },
-  "s448num_203": {
+  "s448num_202": {
    "sheet": "Supplementary Fig. 5c",
    "row": 21,
    "format": "{passed_3}"
   },
-  "s448num_204": {
+  "s448num_203": {
    "sheet": "Supplementary Fig. 5c",
    "row": 22,
    "format": "{passed_3}"
   },
-  "s448num_205": {
+  "s448num_204": {
    "sheet": "Supplementary Fig. 5c",
    "row": 23,
    "format": "{passed_3}"
   },
-  "s448num_206": {
+  "s448num_205": {
    "fixed": "Score 3+",
    "why": "the threshold (Rule 9)"
   }

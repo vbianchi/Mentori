@@ -45,21 +45,21 @@
     "above_200k_calls": 0,
     "cache_read": 0,
     "cache_write": 0,
-    "calls": 205200,
+    "calls": 207905,
     "no_count": 43,
     "not_in_collects": 0,
-    "output": 183413555,
+    "output": 184089050,
     "output_from_total": 177,
     "output_from_total_tokens": 0,
-    "prompt": 1770445317,
-    "split": 205157,
-    "thinking": 197797041,
+    "prompt": 1774437873,
+    "split": 207862,
+    "thinking": 199968335,
     "total_gap_calls": 0,
     "total_gap_tokens": 0,
     "total_only": 0,
     "total_only_tokens": 0,
     "usd_estimated": 0.0,
-    "usd_split": 2028.8544464999652
+    "usd_split": 2039.3910914999615
    },
    "local (Ollama)|deepseek-r1:70b": {
     "above_200k_calls": 0,
@@ -85,14 +85,14 @@
     "above_200k_calls": 0,
     "cache_read": 0,
     "cache_write": 0,
-    "calls": 988314,
+    "calls": 1006272,
     "no_count": 258,
     "not_in_collects": 0,
-    "output": 21124416,
+    "output": 27166482,
     "output_from_total": 0,
     "output_from_total_tokens": 0,
-    "prompt": 1658937727,
-    "split": 988056,
+    "prompt": 1693594853,
+    "split": 1006014,
     "thinking": 0,
     "total_gap_calls": 0,
     "total_gap_tokens": 0,
@@ -105,14 +105,14 @@
     "above_200k_calls": 0,
     "cache_read": 0,
     "cache_write": 0,
-    "calls": 8316,
+    "calls": 9342,
     "no_count": 380,
     "not_in_collects": 0,
-    "output": 1472940,
+    "output": 1775210,
     "output_from_total": 0,
     "output_from_total_tokens": 0,
-    "prompt": 33385309,
-    "split": 7936,
+    "prompt": 34845402,
+    "split": 8962,
     "thinking": 0,
     "total_gap_calls": 0,
     "total_gap_tokens": 0,
@@ -165,14 +165,34 @@
     "above_200k_calls": 0,
     "cache_read": 0,
     "cache_write": 0,
-    "calls": 16062,
+    "calls": 17088,
     "no_count": 103,
     "not_in_collects": 0,
-    "output": 20282825,
+    "output": 20946287,
     "output_from_total": 0,
     "output_from_total_tokens": 0,
-    "prompt": 54048552,
-    "split": 15959,
+    "prompt": 55477514,
+    "split": 16985,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "local (Ollama)|llama3:8b": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 1026,
+    "no_count": 4,
+    "not_in_collects": 0,
+    "output": 207440,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 1345303,
+    "split": 1022,
     "thinking": 0,
     "total_gap_calls": 0,
     "total_gap_tokens": 0,
@@ -225,14 +245,14 @@
     "above_200k_calls": 0,
     "cache_read": 0,
     "cache_write": 0,
-    "calls": 10087,
+    "calls": 11113,
     "no_count": 0,
     "not_in_collects": 0,
-    "output": 2901202,
+    "output": 3184257,
     "output_from_total": 0,
     "output_from_total_tokens": 0,
-    "prompt": 38763922,
-    "split": 10087,
+    "prompt": 40182830,
+    "split": 11113,
     "thinking": 0,
     "total_gap_calls": 0,
     "total_gap_tokens": 0,
@@ -265,14 +285,14 @@
     "above_200k_calls": 0,
     "cache_read": 0,
     "cache_write": 0,
-    "calls": 13116,
+    "calls": 13175,
     "no_count": 52,
     "not_in_collects": 0,
-    "output": 2419436,
+    "output": 2430616,
     "output_from_total": 0,
     "output_from_total_tokens": 0,
-    "prompt": 97476457,
-    "split": 13064,
+    "prompt": 97570136,
+    "split": 13123,
     "thinking": 0,
     "total_gap_calls": 0,
     "total_gap_tokens": 0,
@@ -327,34 +347,34 @@
     "above_200k_calls": 5,
     "cache_read": 0,
     "cache_write": 0,
-    "calls": 219217,
+    "calls": 221922,
     "no_count": 45,
     "not_in_collects": 0,
-    "output": 186248466,
+    "output": 186923961,
     "output_from_total": 1146,
     "output_from_total_tokens": 0,
-    "prompt": 1814639472,
-    "split": 219172,
-    "thinking": 207723737,
+    "prompt": 1818632028,
+    "split": 221877,
+    "thinking": 209895031,
     "total_gap_calls": 0,
     "total_gap_tokens": 0,
     "total_only": 0,
     "total_only_tokens": 0,
     "usd_estimated": 0.0,
-    "usd_split": 2213.294576499965
+    "usd_split": 2223.8312214999614
    },
    "local (Ollama)": {
     "above_200k_calls": 0,
     "cache_read": 0,
     "cache_write": 0,
-    "calls": 1043950,
-    "no_count": 809,
+    "calls": 1066071,
+    "no_count": 813,
     "not_in_collects": 0,
-    "output": 56131469,
+    "output": 63640942,
     "output_from_total": 0,
     "output_from_total_tokens": 0,
-    "prompt": 1897385968,
-    "split": 1043141,
+    "prompt": 1937790039,
+    "split": 1065258,
     "thinking": 0,
     "total_gap_calls": 0,
     "total_gap_tokens": 0,
@@ -389,14 +409,14 @@
     "above_200k_calls": 0,
     "cache_read": 0,
     "cache_write": 0,
-    "calls": 111816,
+    "calls": 112901,
     "no_count": 0,
     "not_in_collects": 0,
-    "output": 1431053,
+    "output": 1620877,
     "output_from_total": 2,
     "output_from_total_tokens": 0,
-    "prompt": 156055702,
-    "split": 111816,
+    "prompt": 158690053,
+    "split": 112901,
     "thinking": 0,
     "total_gap_calls": 0,
     "total_gap_tokens": 0,
@@ -409,41 +429,41 @@
     "above_200k_calls": 0,
     "cache_read": 0,
     "cache_write": 0,
-    "calls": 2533,
+    "calls": 2548,
     "no_count": 15,
     "not_in_collects": 0,
-    "output": 6939411,
+    "output": 6942803,
     "output_from_total": 0,
     "output_from_total_tokens": 0,
-    "prompt": 2673171,
-    "split": 2518,
-    "thinking": 0,
+    "prompt": 3311604,
+    "split": 2533,
+    "thinking": 18049,
     "total_gap_calls": 0,
     "total_gap_tokens": 0,
     "total_only": 0,
     "total_only_tokens": 0,
     "usd_estimated": 0.0,
-    "usd_split": 0.0
+    "usd_split": 0.38353950000000003
    },
    "run": {
     "above_200k_calls": 5,
     "cache_read": 0,
     "cache_write": 0,
-    "calls": 1158418,
-    "no_count": 954,
+    "calls": 1182144,
+    "no_count": 958,
     "not_in_collects": 0,
-    "output": 246690809,
+    "output": 254682561,
     "output_from_total": 1142,
     "output_from_total_tokens": 0,
-    "prompt": 3697953272,
-    "split": 1157464,
-    "thinking": 204128349,
+    "prompt": 3739077115,
+    "split": 1181186,
+    "thinking": 206281594,
     "total_gap_calls": 0,
     "total_gap_tokens": 0,
     "total_only": 0,
     "total_only_tokens": 0,
     "usd_estimated": 0.0,
-    "usd_split": 2437.894239249963
+    "usd_split": 2448.047344749959
    },
    "smoke": {
     "above_200k_calls": 0,
@@ -498,7 +518,7 @@
     "qwen3.8:27b": 12234
    },
    "pass": true,
-   "source": "findings/recompute/S520_llm_calls/summary.json by_model",
+   "source": "findings/recompute/S520_llm_calls/summary.json d311.base_by_model",
    "want": {
     "?": 2,
     "claude-haiku-4-5": 13668,
@@ -513,6 +533,44 @@
    }
   },
   {
+   "gate": "R1 S520 total with the D311 collect joined",
+   "got": 1182144,
+   "pass": true,
+   "source": "findings/recompute/S520_llm_calls/summary.json total.calls",
+   "want": 1182144
+  },
+  {
+   "gate": "R1 S520 calls per model, D311 joined",
+   "got": {
+    "?": 2,
+    "claude-haiku-4-5": 13668,
+    "devstral-small-2:24b": 894272,
+    "gemini-2.5-pro": 13991,
+    "gemini-3-flash-preview": 204181,
+    "gemma3:27b": 9251,
+    "gpt-oss:20b-date20261010": 16965,
+    "llama3:8b": 1026,
+    "qwen3-coder-next:q4_K_M": 5444,
+    "qwen3-coder:30b": 11051,
+    "qwen3.8:27b": 12293
+   },
+   "pass": true,
+   "source": "findings/recompute/S520_llm_calls/summary.json by_model",
+   "want": {
+    "?": 2,
+    "claude-haiku-4-5": 13668,
+    "devstral-small-2:24b": 894272,
+    "gemini-2.5-pro": 13991,
+    "gemini-3-flash-preview": 204181,
+    "gemma3:27b": 9251,
+    "gpt-oss:20b-date20261010": 16965,
+    "llama3:8b": 1026,
+    "qwen3-coder-next:q4_K_M": 5444,
+    "qwen3-coder:30b": 11051,
+    "qwen3.8:27b": 12293
+   }
+  },
+  {
    "gate": "R2 hashes per S520 row equal its calls",
    "got": true,
    "pass": true,
@@ -521,10 +579,10 @@
   },
   {
    "gate": "R2 run-tier hashes equal the total",
-   "got": 1158418,
+   "got": 1182144,
    "pass": true,
-   "source": "laptop_gates.json total_calls",
-   "want": 1158418
+   "source": "findings/recompute/S520_llm_calls/summary.json total.calls",
+   "want": 1182144
   }
  ],
  "prices_usd_per_million": {
@@ -568,6 +626,13 @@
     "started_utc": "2026-11-07T08:28:15Z",
     "zone": "CET +0100"
    },
+   "laptop (D311)": {
+    "ended_utc": "2026-11-09T20:03:47Z",
+    "files_missing": [],
+    "host": "Valerios-MacBook-Pro.local",
+    "started_utc": "2026-11-09T20:03:45Z",
+    "zone": "CET +0100"
+   },
    "studio": {
     "ended_utc": "2026-11-07T08:32:01Z",
     "files_missing": [],
@@ -577,19 +642,23 @@
    }
   },
   "command": "uv run --frozen python scripts/S603_tokens_cost.py report",
+  "d311": true,
   "s520_inputs_sha256": {
+   "S520_inputs_d311/d311_gates.json": "91f34bc83e669783203ccd43936cd2ac3dba81bd2221c431f2785ccbcbbb01c9",
+   "S520_inputs_d311/s520_laptop_d311.json": "22f91732986eaa43557117e407eabe6213a3f596b4484beb465e543bbab468a9",
    "laptop_gates.json": "76dd4c325869b57e4fe73b090a0975e3fe33e626212a4a9fa4e3a8e4bb46de98",
    "s520_beelink.json": "83745c3e0a0e7032a87c43e43debbd5e85508ee61645df7886e8248c5a329809",
    "s520_laptop.json": "18c4d4483523f2bd85fd5015ca670eea1907bc4ecc73ce78ac558209ec3b7700",
    "s520_studio.json": "25488c4ce4d39d7d7eb8b2de60558c83df365718f0274dcf2bb81c18a2dfa253"
   },
   "s603_inputs_sha256": {
+   "S603_inputs_d311/s603_laptop_d311.json.gz": "978a8aff62c5395624c22f094e1cb8a0f6a592d7d98b1ba054422f1b8093fdbc",
    "s603_beelink.json.gz": "53e7700bfc245a54215c7ecd50557fb49e78ca6866b1e7055f7530214282d6bb",
    "s603_laptop.json.gz": "066e13f0fb059527a26c1eec33c08ec70ac1caf4187f1f54e7fb40a500cce913",
    "s603_studio.json.gz": "8db44273c487f49d2bc1421d6f2d830349b31f511a7e7bd8ac3f115b6aaca871"
   },
   "script": "scripts/S603_tokens_cost.py",
-  "script_sha256": "3752aa49d05e8d9f2598f8cf32cb3bf781458b3368a4425790d44b0ac45f36c8"
+  "script_sha256": "1f17babcd822d029c24b5d0b9bc2f258d343a465409fda830d123fb2f0e3f194"
  },
  "run": {
   "by_model": {
@@ -637,34 +706,34 @@
     "above_200k_calls": 0,
     "cache_read": 0,
     "cache_write": 0,
-    "calls": 201491,
+    "calls": 204181,
     "no_count": 41,
     "not_in_collects": 0,
-    "output": 178940351,
+    "output": 179612454,
     "output_from_total": 174,
     "output_from_total_tokens": 0,
-    "prompt": 1738738999,
-    "split": 201450,
-    "thinking": 194227142,
+    "prompt": 1742093122,
+    "split": 204140,
+    "thinking": 196380387,
     "total_gap_calls": 0,
     "total_gap_tokens": 0,
     "total_only": 0,
     "total_only_tokens": 0,
     "usd_estimated": 0.0,
-    "usd_split": 1988.871978499965
+    "usd_split": 1999.0250839999612
    },
    "local (Ollama)|devstral-small-2:24b": {
     "above_200k_calls": 0,
     "cache_read": 0,
     "cache_write": 0,
-    "calls": 877399,
+    "calls": 894272,
     "no_count": 256,
     "not_in_collects": 0,
-    "output": 19977410,
+    "output": 25829652,
     "output_from_total": 0,
     "output_from_total_tokens": 0,
-    "prompt": 1505993294,
-    "split": 877143,
+    "prompt": 1538016069,
+    "split": 894016,
     "thinking": 0,
     "total_gap_calls": 0,
     "total_gap_tokens": 0,
@@ -677,14 +746,14 @@
     "above_200k_calls": 0,
     "cache_read": 0,
     "cache_write": 0,
-    "calls": 8225,
+    "calls": 9251,
     "no_count": 380,
     "not_in_collects": 0,
-    "output": 1459196,
+    "output": 1761466,
     "output_from_total": 0,
     "output_from_total_tokens": 0,
-    "prompt": 33032647,
-    "split": 7845,
+    "prompt": 34492740,
+    "split": 8871,
     "thinking": 0,
     "total_gap_calls": 0,
     "total_gap_tokens": 0,
@@ -697,14 +766,34 @@
     "above_200k_calls": 0,
     "cache_read": 0,
     "cache_write": 0,
-    "calls": 15939,
+    "calls": 16965,
     "no_count": 99,
     "not_in_collects": 0,
-    "output": 20155727,
+    "output": 20819189,
     "output_from_total": 0,
     "output_from_total_tokens": 0,
-    "prompt": 53137984,
-    "split": 15840,
+    "prompt": 54566946,
+    "split": 16866,
+    "thinking": 0,
+    "total_gap_calls": 0,
+    "total_gap_tokens": 0,
+    "total_only": 0,
+    "total_only_tokens": 0,
+    "usd_estimated": 0.0,
+    "usd_split": 0.0
+   },
+   "local (Ollama)|llama3:8b": {
+    "above_200k_calls": 0,
+    "cache_read": 0,
+    "cache_write": 0,
+    "calls": 1026,
+    "no_count": 4,
+    "not_in_collects": 0,
+    "output": 207440,
+    "output_from_total": 0,
+    "output_from_total_tokens": 0,
+    "prompt": 1345303,
+    "split": 1022,
     "thinking": 0,
     "total_gap_calls": 0,
     "total_gap_tokens": 0,
@@ -737,14 +826,14 @@
     "above_200k_calls": 0,
     "cache_read": 0,
     "cache_write": 0,
-    "calls": 10025,
+    "calls": 11051,
     "no_count": 0,
     "not_in_collects": 0,
-    "output": 2868203,
+    "output": 3151258,
     "output_from_total": 0,
     "output_from_total_tokens": 0,
-    "prompt": 38222278,
-    "split": 10025,
+    "prompt": 39641186,
+    "split": 11051,
     "thinking": 0,
     "total_gap_calls": 0,
     "total_gap_tokens": 0,
@@ -757,14 +846,14 @@
     "above_200k_calls": 0,
     "cache_read": 0,
     "cache_write": 0,
-    "calls": 12234,
+    "calls": 12293,
     "no_count": 52,
     "not_in_collects": 0,
-    "output": 2245499,
+    "output": 2256679,
     "output_from_total": 0,
     "output_from_total_tokens": 0,
-    "prompt": 94522176,
-    "split": 12182,
+    "prompt": 94615855,
+    "split": 12241,
     "thinking": 0,
     "total_gap_calls": 0,
     "total_gap_tokens": 0,
@@ -819,34 +908,34 @@
     "above_200k_calls": 5,
     "cache_read": 0,
     "cache_write": 0,
-    "calls": 215482,
+    "calls": 218172,
     "no_count": 43,
     "not_in_collects": 0,
-    "output": 181766391,
+    "output": 182438494,
     "output_from_total": 1142,
     "output_from_total_tokens": 0,
-    "prompt": 1782785905,
-    "split": 215439,
-    "thinking": 204128349,
+    "prompt": 1786140028,
+    "split": 218129,
+    "thinking": 206281594,
     "total_gap_calls": 0,
     "total_gap_tokens": 0,
     "total_only": 0,
     "total_only_tokens": 0,
     "usd_estimated": 0.0,
-    "usd_split": 2172.7844472499646
+    "usd_split": 2182.937552749961
    },
    "local (Ollama)": {
     "above_200k_calls": 0,
     "cache_read": 0,
     "cache_write": 0,
-    "calls": 929266,
-    "no_count": 790,
+    "calls": 950302,
+    "no_count": 794,
     "not_in_collects": 0,
-    "output": 47606083,
+    "output": 54925732,
     "output_from_total": 0,
     "output_from_total_tokens": 0,
-    "prompt": 1736649250,
-    "split": 928476,
+    "prompt": 1774418970,
+    "split": 949508,
     "thinking": 0,
     "total_gap_calls": 0,
     "total_gap_tokens": 0,
@@ -879,14 +968,16 @@
  },
  "s520_calls_per_provider": {
   "Anthropic": 13668,
-  "Google": 215482,
-  "local (Ollama)": 929266,
+  "Google": 218172,
+  "local (Ollama)": 950302,
   "unknown": 2
  },
+ "s520_total": 1182144,
+ "s520_unmapped_files": 28,
  "times_all_tiers": {
   "all": {
-   "busy_hours": 484.3,
-   "calls_with_time": 1276865,
+   "busy_hours": 497.8,
+   "calls_with_time": 1301691,
    "first_start": {
     "amsterdam": "2026-10-03 00:27 CEST",
     "utc": "2026-10-02T22:27:42Z"
@@ -896,7 +987,7 @@
     "utc": "2026-11-07T00:50:56Z"
    },
    "span_days": 35.1,
-   "wall_s_sum_hours": 4135.3
+   "wall_s_sum_hours": 4347.3
   },
   "by_machine": {
    "beelink": {
@@ -914,18 +1005,18 @@
     "wall_s_sum_hours": 579.8
    },
    "laptop": {
-    "busy_hours": 359.5,
-    "calls_with_time": 286327,
+    "busy_hours": 413.9,
+    "calls_with_time": 311153,
     "first_start": {
      "amsterdam": "2026-10-15 23:48 CEST",
      "utc": "2026-10-15T21:48:03Z"
     },
     "last_end": {
-     "amsterdam": "2026-11-01 20:34 CET",
-     "utc": "2026-11-01T19:34:38Z"
+     "amsterdam": "2026-11-06 17:01 CET",
+     "utc": "2026-11-06T16:01:59Z"
     },
-    "span_days": 16.91,
-    "wall_s_sum_hours": 444.4
+    "span_days": 21.76,
+    "wall_s_sum_hours": 656.4
    },
    "studio": {
     "busy_hours": 483.2,
@@ -958,8 +1049,8 @@
     "wall_s_sum_hours": 48.4
    },
    "Google": {
-    "busy_hours": 141.5,
-    "calls_with_time": 219217,
+    "busy_hours": 145.5,
+    "calls_with_time": 221922,
     "first_start": {
      "amsterdam": "2026-10-15 23:00 CEST",
      "utc": "2026-10-15T21:00:33Z"
@@ -969,21 +1060,21 @@
      "utc": "2026-11-07T00:50:56Z"
     },
     "span_days": 22.16,
-    "wall_s_sum_hours": 613.7
+    "wall_s_sum_hours": 617.8
    },
    "local (Ollama)": {
-    "busy_hours": 480.4,
-    "calls_with_time": 1043950,
+    "busy_hours": 493.9,
+    "calls_with_time": 1066071,
     "first_start": {
      "amsterdam": "2026-10-03 00:27 CEST",
      "utc": "2026-10-02T22:27:42Z"
     },
     "last_end": {
-     "amsterdam": "2026-11-05 03:22 CET",
-     "utc": "2026-11-05T02:22:55Z"
+     "amsterdam": "2026-11-06 17:01 CET",
+     "utc": "2026-11-06T16:01:59Z"
     },
-    "span_days": 33.16,
-    "wall_s_sum_hours": 3473.2
+    "span_days": 34.73,
+    "wall_s_sum_hours": 3681.1
    },
    "unknown": {
     "busy_hours": 0.0,
@@ -1001,8 +1092,8 @@
    }
   },
   "cloud": {
-   "busy_hours": 162.3,
-   "calls_with_time": 232913,
+   "busy_hours": 166.2,
+   "calls_with_time": 235618,
    "first_start": {
     "amsterdam": "2026-10-15 23:00 CEST",
     "utc": "2026-10-15T21:00:33Z"
@@ -1012,13 +1103,13 @@
     "utc": "2026-11-07T00:50:56Z"
    },
    "span_days": 22.16,
-   "wall_s_sum_hours": 662.1
+   "wall_s_sum_hours": 666.2
   }
  },
  "times_run": {
   "all": {
-   "busy_hours": 477.2,
-   "calls_with_time": 1158418,
+   "busy_hours": 490.5,
+   "calls_with_time": 1182144,
    "first_start": {
     "amsterdam": "2026-10-15 23:00 CEST",
     "utc": "2026-10-15T21:00:33Z"
@@ -1028,7 +1119,7 @@
     "utc": "2026-11-07T00:50:56Z"
    },
    "span_days": 22.16,
-   "wall_s_sum_hours": 3746.7
+   "wall_s_sum_hours": 3951.0
   },
   "by_machine": {
    "beelink": {
@@ -1046,18 +1137,18 @@
     "wall_s_sum_hours": 530.0
    },
    "laptop": {
-    "busy_hours": 357.3,
-    "calls_with_time": 285781,
+    "busy_hours": 407.8,
+    "calls_with_time": 309507,
     "first_start": {
      "amsterdam": "2026-10-16 00:27 CEST",
      "utc": "2026-10-15T22:27:23Z"
     },
     "last_end": {
-     "amsterdam": "2026-11-01 20:34 CET",
-     "utc": "2026-11-01T19:34:38Z"
+     "amsterdam": "2026-11-06 17:01 CET",
+     "utc": "2026-11-06T16:01:59Z"
     },
-    "span_days": 16.88,
-    "wall_s_sum_hours": 442.2
+    "span_days": 21.73,
+    "wall_s_sum_hours": 646.5
    },
    "studio": {
     "busy_hours": 476.7,
@@ -1090,8 +1181,8 @@
     "wall_s_sum_hours": 48.3
    },
    "Google": {
-    "busy_hours": 139.0,
-    "calls_with_time": 215482,
+    "busy_hours": 142.9,
+    "calls_with_time": 218172,
     "first_start": {
      "amsterdam": "2026-10-15 23:00 CEST",
      "utc": "2026-10-15T21:00:33Z"
@@ -1101,21 +1192,21 @@
      "utc": "2026-11-07T00:50:56Z"
     },
     "span_days": 22.16,
-    "wall_s_sum_hours": 600.3
+    "wall_s_sum_hours": 604.4
    },
    "local (Ollama)": {
-    "busy_hours": 473.8,
-    "calls_with_time": 929266,
+    "busy_hours": 487.1,
+    "calls_with_time": 950302,
     "first_start": {
      "amsterdam": "2026-10-15 23:00 CEST",
      "utc": "2026-10-15T21:00:34Z"
     },
     "last_end": {
-     "amsterdam": "2026-11-05 03:22 CET",
-     "utc": "2026-11-05T02:22:55Z"
+     "amsterdam": "2026-11-06 17:01 CET",
+     "utc": "2026-11-06T16:01:59Z"
     },
-    "span_days": 20.22,
-    "wall_s_sum_hours": 3098.1
+    "span_days": 21.79,
+    "wall_s_sum_hours": 3298.3
    },
    "unknown": {
     "busy_hours": 0.0,
@@ -1133,8 +1224,8 @@
    }
   },
   "cloud": {
-   "busy_hours": 159.7,
-   "calls_with_time": 229150,
+   "busy_hours": 163.6,
+   "calls_with_time": 231840,
    "first_start": {
     "amsterdam": "2026-10-15 23:00 CEST",
     "utc": "2026-10-15T21:00:33Z"
@@ -1144,7 +1235,7 @@
     "utc": "2026-11-07T00:50:56Z"
    },
    "span_days": 22.16,
-   "wall_s_sum_hours": 648.6
+   "wall_s_sum_hours": 652.7
   }
  }
 }

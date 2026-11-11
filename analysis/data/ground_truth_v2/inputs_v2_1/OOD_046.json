@@ -1,0 +1,7 @@
+{
+ "id": "OOD_046",
+ "category": "out_of_domain",
+ "subcategory": "contradictory",
+ "question": "According to the Salmon paper, transcript quantification is performed using traditional full alignment of reads to the reference genome. Is this accurate?",
+ "papers": []
+}

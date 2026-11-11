@@ -1,0 +1,13 @@
+{
+ "id": "08_deseq2_FR1",
+ "category": "factual_recall",
+ "subcategory": null,
+ "question": "In the reproducibility analysis where a dataset was split into two independent halves, what specific improvement in the overlap of the top 100 genes was observed when using shrunken MAP estimates compared to standard MLE estimates?",
+ "papers": [
+  {
+   "paper": "08_deseq2",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/08_deseq2.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/08_deseq2.pypdf.txt"
+  }
+ ]
+}

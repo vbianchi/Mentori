@@ -1,7 +1,7 @@
 {
  "provenance": {
   "script": "scripts/S463_fig2_ranking.py",
-  "script_sha256": "8279a35d27c5a99d34980b59529203b104526035beba74031c9964a2ee360825",
+  "script_sha256": "8d9070c7036276ac1fb48a8cfa859b48e207b4c8ce15a84f2832e5a2bf88aa6d",
   "command": "uv run --frozen python scripts/S463_fig2_ranking.py rebuild",
   "python": "3.13.11",
   "deterministic": "D155: no build time and no repository HEAD are recorded; the script's and every input's sha256 identify the build",
@@ -417,7 +417,7 @@
    "findings/recompute/S518_split_confirmation/qwen3-coder.json": "5ef0b4716ddb200938b3fbcb2d66a189be95a12a7a96062242d9bb46d3094215",
    "findings/recompute/S518_split_confirmation/claude-haiku-4-5.json": "6c6569362612c7724f6f6c12c0a9ce07d96658b5ca3f19c0f2d0625e630cc4eb",
    "findings/recompute/S518_split_confirmation/gemini-2.5-pro.json": "33de43424f593c360a917ebcf0822381b345b7f9ec69a13b5db399513ba1496a",
-   "findings/recompute/S518_split_confirmation/gemini-3-flash-preview.json": "e2cf25daf854c3b3eb50086ae052465192774a973f2fc5cbcda845fbbec27c7f",
+   "findings/recompute/S518_split_confirmation/gemini-3-flash-preview.json": "450b31ee0d01c8b91b53747129e80d56bdb94a2ac50c1a7f8ea2b56ccc959cdd",
    "findings/recompute/S607_refusal_person_check/summary.json": "45bed1d60e3de3cc262c8c68a62dcd5925094215a6d31ff3c86fb45a4e47ba65",
    "scripts/S518_split_confirmation.py": "7c694c8eb5f40a171d5e4991a0d219291724d0bd46798d2720360f7e5dfcbae2",
    "frozen:s457_mirror_20261022.tar/s457_mirror_20261022/matched_budget/answers.jsonl": "6b4c46531eca233b1bd73a5cb56819874e1807e9ee6c80152e9ce904a2d32728",
@@ -430,16 +430,16 @@
    "findings/recompute/G13_runs/inputs/s6wg13_collect.jsonl": "09d5e5bd359d35c78e2ea0c931d5797de6ca845be342e915fa2da0da579b4336",
    "findings/recompute/G13_runs/inputs/SHA256SUMS": "f698856a5f6f0dc8b0c22659eb25b1b1c9dedd3ed02f9eee61cedf149543efb0",
    "scripts/g13_merge.py": "7fd7e4da498eb22fd56fb0d3fd5e84b360f0945d1d9053469ce87a0e1cd49f86",
-   "findings/figures_provisional/supp_fig17_outcomes/Supplementary Figure 17 data (provisional, 4050 of 4050).xlsx": "0cb1f1e962aba7787b70af762da17a818c35a72f55cd85d2a2df837d38ed9e14",
+   "findings/figures_provisional/supp_fig17_outcomes/Supplementary Figure 17 data.xlsx": "0cb1f1e962aba7787b70af762da17a818c35a72f55cd85d2a2df837d38ed9e14",
    "findings/recompute/S511_g2_budget/results.json": "e225903ba4409374263dfe33626f6bca5c35ac957f1666a14553de937808b3f3",
    "scripts/house_style.py": "647c8991f4dcd2cea08e0be46eaf758beb55fb029c54bb267e7fba1e0b8b17b6",
-   "scripts/figure_names.py": "a3c65ae0a1e8aa05e99a99610ea857f63b0d8fff60a99404bcb5bf6ff9a82e65",
-   "scripts/S511_g2_matched_budget.py": "bed3774dadfff61b3122b815a0851ef74fa0db7e5830ffd50fa69a8fd27f5b90",
+   "scripts/figure_names.py": "025f8904861fd8d916cd875346a1384e915ea6601bfd2f7624dd71e49f2948a7",
+   "scripts/S511_g2_matched_budget.py": "218c6af5f953c952af9adda7a4f5e09003f341ab0a1abd58c8ce3d25da357772",
    "findings/recompute/G1_runs/rerun_d89.sh": "8549210c7e829229ba83b0dd5afcc804454cda00aed665ce586ede5e24d98260",
    "findings/recompute/S04a_flip_stats.json": "45fe073e4e3954be54be2c9852c6bdaeecee05fd0f549abcf208fac566af7d21",
    "experiments/LOCK.toml": "8730d401a5d7b6baa1780e656f844261eaead60e45b5199afa29d57f989ad495",
-   "experiments/FIGURE_LOCK.toml": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
-   "scripts/S457_fig2_panels.py": "8c29dab8b04a1bad4a955582a30831c51c2b70438be2f6d2698c7b81948d7520",
+   "experiments/FIGURE_LOCK.toml": "ac39c4e311f340654fe1ebe3333a3fe439bc6286e38fc0334fdb0e0cf2a97aef",
+   "scripts/S457_fig2_panels.py": "33dc73444a80cf9d9b429fff6e489322bb01ca828a10f12a90487d84e7eaa4a1",
    "scripts/judge_rows_v25.py": "77d4a84d7aff4dd0ee92366395a4be2e5f27fe20d5de99ccbc86b7333c401661",
    "findings/recompute/L3/concept_recall.jsonl": "56f0f23b3415169a2ec5a79f6fb9cbf427939054279b9ebc32b21cf07c6e2f36",
    "findings/recompute/L3/header.json": "01597d0c39704f1e1abfa132231eee57a9a839b111340ea0b5a85b2482bf0b5f",
@@ -451,7 +451,7 @@
   },
   "model_calls": 0
  },
- "stamp": "PROVISIONAL: draws 1, 2, 3 of 3 (D82, D88), 14,860 of 21,402 answers read from their final-key row (G1 2,430, G2 and G6 810, G4 11,620), 2,425 G1 answers judged (devstral-small-2:24b, plain call), collect of 2026-10-23T09:41:17, run_sha256 38ae79ab023b; concept recall: D181's reading on key v2.5, L3_d181 rows of 2026-10-31T00:03:05Z",
+ "stamp": "draws 1, 2, 3 of 3 (D82, D88), 14,860 of 21,402 answers read from their final-key row (G1 2,430, G2 and G6 810, G4 11,620), 2,425 G1 answers judged (devstral-small-2:24b, plain call), collect of 2026-10-23T09:41:17, run_sha256 38ae79ab023b; concept recall: D181's reading on key v2.5, L3_d181 rows of 2026-10-31T00:03:05Z",
  "reproduced": [
   "S04a threshold_3: 15 against 4, P 0.0192108154296875",
   "S04a threshold_4: 15 against 3, P 0.007537841796875",
@@ -466,7 +466,7 @@
   "panel f: (3) Refusal, the same 39: 40 rates equal q66_tables.json's pooled_over_ratios where no cell is missing",
   "panel e: S518's verdicts read, each reading S518.reading's for its interval: second_judge (test) I 33.3 points, agrees; gemma3 (test) I 13.8 points, not shown; qwen3-coder (test) I 28.2 points, agrees; claude-haiku-4-5 (beside) I 55.7 points, agrees; gemini-2.5-pro (beside) I 56.7 points, agrees; gemini-3-flash-preview (reference, key v2.5) I 56.9 points, agrees",
   "person check (S607, D306): S607's judge counts equal this build's draw-1 refusals (Single pass 39 of 39; RLM-10 39 of 39); S607 itself: REPRODUCED comparison_20261103.md: the 3 breakdown rows of each strategy, the D227 and re-reading tables, agreement 77 of 78",
-  "3a's clock-time margin equals Supplementary Fig. 17c: 688 per-question means of 8 rows, means single pass 42.1, multi-hop 61.3, verified pass 97.2, RLM-5 121.9, RLM-10 129.0, RLM-20 124.4, matched budget 134.6, Zhang RLM-10 53.4 s (Supplementary Figure 17 data (provisional, 4050 of 4050).xlsx)"
+  "3a's clock-time margin equals Supplementary Fig. 17c: 688 per-question means of 8 rows, means single pass 42.1, multi-hop 61.3, verified pass 97.2, RLM-5 121.9, RLM-10 129.0, RLM-20 124.4, matched budget 134.6, Zhang RLM-10 53.4 s (Supplementary Figure 17 data.xlsx)"
  ],
  "page_mm": [
   183.0,
@@ -745,18 +745,18 @@
  },
  "figure_lock": {
   "path": "experiments/FIGURE_LOCK.toml",
-  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "sha256": "ac39c4e311f340654fe1ebe3333a3fe439bc6286e38fc0334fdb0e0cf2a97aef",
   "status": "agreed"
  },
  "files": {
-  "ranking.json": "cb96451647f2984c7db0eac402f3cf50a7c38def3cf005b5cb9dda0fb26bf15b",
-  "ranking_report.md": "11e97dec8843cf991e1637a85eb1d12511d1c474b820426c2fbc6a8626d1084f",
-  "Figure 3 (provisional, 14860 of 21402).pdf": "639776fca3a36b33c11b76db5480575de06dd21e5e60fb1410e015b4d59fdf32",
-  "Figure 3 (provisional, 14860 of 21402).svg": "b1b4b1b9da885bbc607a44a97029b1e14bc31bdbbd7bd4f7e2165bac6b8586b5",
-  "Figure 3 (provisional, 14860 of 21402).png": "c91d4f9aca4209a74bbb240f4627a637e503b2135b8618a4b5fbc4d158df4e7c",
-  "Source Data Fig. 3 (provisional, 14860 of 21402).xlsx": "afd31d704ffcd1d78af9f312be1fe04a4d4cf33078bde7525955ae0da32f6c67",
-  "Source Data Fig. 3 caption (provisional, 14860 of 21402).md": "1b55e8c44e39707c1ecf37ecbf13fe0770880a3baa36e6c0457e9cba71533ed8",
-  "figure3_numbers.json": "2b6343abf731d6a8ad4a56158310ab13cc196948f8f9ce743f4c510e32dd0196",
-  "legend_draft.md": "2886ea494e13922905a5f52cec312cde94f5b91c0b2da006017e6e34d8fd64c7"
+  "ranking.json": "6349da4595348d743190d3925e4ffd04758130c3261ebb8d6e26456859fbdb78",
+  "ranking_report.md": "8c56a04fb96fb8e069d556e2002db92cfdf50ca215416e244c46b362a4a65c35",
+  "Figure 3.pdf": "7855d04e8183ed24a900b594ff0c75305f2d4d068a1c6dfc0075ea3eea720fed",
+  "Figure 3.svg": "28149317ddde158f1bb1ef9ae9f290a826dab0cd52047a1ff3c85dc55a44a932",
+  "Figure 3.png": "2c32ba19741522e3250dbd0ff85f7611765654d7c3aa9195ed585580913b3698",
+  "Source Data Fig. 3.xlsx": "fcfdd6dad19de96c7dac0c34c0ca14876df920fb0d6862bd46b7f178892bfb0a",
+  "Source Data Fig. 3 caption.md": "f2552c33c90fa28742feb0f902b38209cb51335afe6e4f0737e0ae12e656b077",
+  "figure3_numbers.json": "55915b1daa5825fe4ac98d1942e1148003d8f60c29d5c8235098e7c1d1eeb15a",
+  "legend_draft.md": "115296f666da4434af9a446b33c1c260e9d621b498bd5e90f7a1ab51a8194d0f"
  }
 }

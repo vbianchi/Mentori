@@ -1,0 +1,13 @@
+{
+ "id": "16_ppr_ethiopia_TE3",
+ "category": "technical",
+ "subcategory": null,
+ "question": "Using the multivariable logistic regression results, how do animal age and origin (gifted or purchased) quantify the risk of PPR seropositivity in nonvaccinated animals?",
+ "papers": [
+  {
+   "paper": "16_ppr_ethiopia",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/16_ppr_ethiopia.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/16_ppr_ethiopia.pypdf.txt"
+  }
+ ]
+}

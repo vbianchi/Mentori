@@ -1,4 +1,4 @@
-Legend DRAFT for Supplementary Figure 9 (written by scripts/S590_supp_fig9_pipeline.py). Data stamp: drawn from the code at experiments/mentori/, no data: the 7 orchestration ablation set-ups of Figure 5 and at most 10 plan steps.
+Legend DRAFT for Supplementary Figure 9 (written by scripts/S590_supp_fig9_pipeline.py).
 
 **Supplementary Figure 9 | Mentor::i's question-answering pipeline.**
 

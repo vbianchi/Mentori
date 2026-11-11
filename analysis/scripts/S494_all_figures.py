@@ -14,12 +14,16 @@ dependency order, into a fresh folder, and holds every output file to the commit
   --tars DIR  the folder holding the frozen tars (env FROZEN_TARS for every step; default
               ~/Mentori_scratch_keep/frozen_2026-10-26, or the folder the Zenodo deposit's tars were downloaded to).
   --only NAME one step (repeatable): frozen, d181, fig1, fig3, fig4, fig5, fig6, supp2, supp4, supp5, supp7, supp8,
-              supp9, supp10_11, supp14_16, supp17, numbers, need_map, supp1 (d181 under --out only, see D201 Q9 below). A step that reads the committed outputs of a step not run gets a note:
+              supp9, supp10_11, supp14_16, supp17, numbers, need_map, supp1, text (d181 under --out only, see D201 Q9 below). A step that reads the committed outputs of a step not run gets a note:
               those outputs are held to git HEAD only, not proven by a rebuild. Without frozen among them the frozen
               inputs are not checked, and a run whose steps all pass ends "PARTIAL" and exits 1 (audit 27 Oct F8).
   --write     rebuild in place (into findings/figures_provisional/ and findings/recompute/) instead of --out; the
               comparison is then against git HEAD. Never needed to check reproducibility.
   --keep      keep the temporary --out folder.
+  text        (not a figure step) the final check: S618_text_numbers_check.py, every number in the manuscript, the
+              SI and the letter against the artifact its register names, and the SI tables cell by cell against their
+              artifacts. The default run calls it after the figures; its report goes to the logs folder, never into
+              the repository; a FAIL fails S494.
   --no-audit  run without the read audit; the run then ends "NOT VERIFIED" and exits 1 even when every file is equal.
 
   uv run python scripts/S494_all_figures.py manifest [--check]
@@ -187,6 +191,10 @@ def call(script, sets: dict, args=(), argv0=False, strs: dict | None = None):
     return spec + (["--argv0"] if argv0 else []) + ["--", *args]
 
 
+# Checks a step runs as one of its commands (they build nothing): the table gives each its own verdict row.
+CHECK_CMDS = {"S619_draws_registry_check.py": "draws check (S619)"}
+
+
 def steps(out: Path | None) -> list[dict]:
     """The build, in dependency order. out None means --write (each script's default folder)."""
     def o(step, *parts):
@@ -321,8 +329,14 @@ def steps(out: Path | None) -> list[dict]:
                           ("S527_need_map", "findings/recompute/S527_need_map")]})
     # Supplementary Figure 1, the experiment graph (D160 (9)), last: it reads S492's registry (numbers) and Figure 1's
     # design facts (fig1/figure1_provenance.json), so it is blocked when either fails
+    # S619 first (audit 2026-11-09 A28): the draws.csv rows the boxes read are held to S492's registry and the T3
+    # MANIFEST; a disagreement exits 1 and S494 stops the step before S496 draws a wrong box. --no-write: it prints
+    # its verdict into the step log and writes nothing; it reads only the plate's draws.csv (D2), which S616 check
+    # holds to experiments/draws.csv
     s.append({"name": "supp1", "label": "Supplementary Figure 1",
-              "cmds": [py("scripts/S496_supp_fig1_experiment_graph.py", *opt("--out", o("supp1", "supp_fig1")))],
+              "cmds": [py("scripts/S619_draws_registry_check.py", "--no-write",
+                          "--draws", "findings/recompute/fig_design_inputs/draws.csv"),
+                       py("scripts/S496_supp_fig1_experiment_graph.py", *opt("--out", o("supp1", "supp_fig1")))],
               "plates": [(1, True, "supp_fig1", "supp_fig1")]})
     return s
 
@@ -791,7 +805,7 @@ def cmd_run(a) -> int:
                 print(f"   {msg}", flush=True)
                 prepared[st["name"]] = None if ok else msg
         u.update({"rc": 0, "failed": None, "log": log, "audit_dirs": [], "prep": prepared[st["name"]],
-                  "git_state": git_state()})
+                  "git_state": git_state(), "ran": []})
         t1 = time.time()
         if u["prep"]:
             u["rc"], u["failed"] = 2, ["S494 prepare: " + u["prep"]]
@@ -799,6 +813,7 @@ def cmd_run(a) -> int:
             adir = logs / "audit" / st["name"] / str(i)
             adir.mkdir(parents=True, exist_ok=True)
             u["audit_dirs"].append(adir)
+            u["ran"].append(i)
             r = run_cmd(st["cmds"][i], log, fig_read_audit.env_for(env, adir) if audit_on else env)
             if r:
                 u["rc"], u["failed"] = r, st["cmds"][i]
@@ -853,6 +868,19 @@ def cmd_run(a) -> int:
         u["own_ok"] = bool(own_ok)
     resolve_blocked(units, owners(every), frozen_failed)
 
+    # The text check (S618): not part of the figure build; run after it, on the default run or with --only text.
+    text_ok = True
+    if not wanted or "text" in wanted:
+        t0 = time.time()
+        tlog = logs / "text.log"
+        trc = run_cmd(py("scripts/S618_text_numbers_check.py", "--out", str(logs / "S618")), tlog, env)
+        text_ok = trc == 0
+        summary = next((x for x in reversed(tlog.read_text().splitlines()) if x.startswith("S618:")), f"exit {trc}")
+        text_row = ("text numbers (S618)", "", "PASS" if text_ok else "FAILED", "", "", f"{time.time() - t0:.0f}")
+        text_problem = ("text numbers (S618)", [summary, f"report: {logs / 'S618' / 'report.md'}"])
+    else:
+        text_row = None
+
     # The table and the problems.
     rows = [frozen_row] if frozen_row else []
     for u in units:
@@ -868,6 +896,14 @@ def cmd_run(a) -> int:
             n = len(c["equal"]) + len(c["differ"]) + len(c["not_rebuilt"])         # outputs; inputs apart
             eq = blocked or f"{len(c['equal'])} of {n}" + inputs_note(c)
             rows.append((r["label"], str(n), eq, r["s448"], aud, f"{u['secs']:.0f}" if k == 0 else "(above)"))
+        # a check a step runs before it draws (S619 in supp1) gets its own row: PASS, FAILED or not run
+        for i in u["idx"]:
+            cmd = u["step"]["cmds"][i]
+            for script, label in CHECK_CMDS.items():
+                if any(script in x for x in cmd):
+                    v = ("not run" if i not in u.get("ran", []) else
+                         "FAILED" if u["failed"] is cmd else "PASS")
+                    rows.append((f"  {label}", "", v, "", aud, "(above)"))
         lines = []
         if u["rc"]:
             lines.append(f"command exit {u['rc']}: {' '.join(u['failed'])}")
@@ -893,6 +929,11 @@ def cmd_run(a) -> int:
                          f"rebuild; it is held to git HEAD only")
         if lines and (u["status"] != "ok" or u["unchecked_deps"]):
             problems.append((u["label"] if u["plates"] or not u["rows"] else u["rows"][0]["label"].strip(), lines))
+    # the text check is the last row and, when it fails, the last problem
+    if text_row:
+        rows.append(text_row)
+        if not text_ok:
+            problems.append(text_problem)
 
     total = time.time() - t_all
     widths = [max(len(r[i]) for r in rows + [HEAD]) for i in range(len(HEAD))]
@@ -922,6 +963,8 @@ def cmd_run(a) -> int:
                 print(f"    {x}")
     steps_ok = all(u["status"] == "ok" for u in units)
     frozen_checked = frozen_row is not None
+    # the text check counts as a step in every verdict below: a failing S618 never reads "passing" or "NOT VERIFIED"
+    steps_ok = steps_ok and text_ok
     all_ok = frozen_checked and not frozen_failed and audit_on and steps_ok
     verdict = "ALL EQUAL AND PASSING" if all_ok else (
         "NOT VERIFIED: read audit off" if not audit_on and steps_ok and not frozen_failed
@@ -1016,7 +1059,7 @@ def main(argv=None) -> int:
     ap.add_argument("--only", action="append",
                     choices=["frozen", "d181", "fig1", "fig3", "fig4", "fig5", "fig6", "supp2", "supp5", "supp8",
                              "supp17", "supp7", "supp14_16", "supp10_11", "supp4", "supp9", "numbers", "need_map",
-                             "supp1"])
+                             "supp1", "text"])
     ap.add_argument("--write", action="store_true")
     ap.add_argument("--keep", action="store_true")
     ap.add_argument("--no-audit", action="store_true")

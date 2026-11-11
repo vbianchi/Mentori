@@ -1,0 +1,13 @@
+{
+ "id": "01_sarek_FR1",
+ "category": "factual_recall",
+ "subcategory": null,
+ "question": "What is the total storage capacity required for the resulting BAM, annotated VCF, and CNV files for a 90x/90x tumor/normal WGS dataset processed by Sarek?",
+ "papers": [
+  {
+   "paper": "01_sarek",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/01_sarek.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/01_sarek.pypdf.txt"
+  }
+ ]
+}

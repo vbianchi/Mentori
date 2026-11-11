@@ -1,22 +1,23 @@
 {
  "provenance": {
   "script": "scripts/S570_supp_i2_reuse.py",
-  "script_sha256": "9f971dfc104b264538180972fafe0d20fdcaac67f930195f27a0f4f131922f71",
+  "script_sha256": "abc7c43e0827efe78d293a3a75899af3a8e127096c0997df8dbd19536cc072a5",
   "imports_sha256": {
-   "S497_fig5_d166.py": "fc17bb3af77503ddfd6346aa8b4c7dc33f3753e87b25da60bec2b4fcddc44068",
-   "S540_fig5_evaluators.py": "e227184bb004d52856be2ab4f8440120b108ae1cc7c6035e20ed6814b7d8c920",
+   "S497_fig5_d166.py": "40fb4d6f94b4c4e84991f821529313a5326c7c81ea2aa3b2722d6ac5a438fef6",
+   "S540_fig5_evaluators.py": "30290ee53f3da1b1b34428cc66f96b358b89dc0ecd7e2da33dee0765ec777eec",
    "house_style.py": "647c8991f4dcd2cea08e0be46eaf758beb55fb029c54bb267e7fba1e0b8b17b6",
-   "figure_names.py": "a3c65ae0a1e8aa05e99a99610ea857f63b0d8fff60a99404bcb5bf6ff9a82e65",
-   "S457_fig2_panels.py": "8c29dab8b04a1bad4a955582a30831c51c2b70438be2f6d2698c7b81948d7520",
+   "figure_names.py": "025f8904861fd8d916cd875346a1384e915ea6601bfd2f7624dd71e49f2948a7",
+   "S457_fig2_panels.py": "33dc73444a80cf9d9b429fff6e489322bb01ca828a10f12a90487d84e7eaa4a1",
    "fig_repro.py": "4bca103b599da4adc0bd473f5b8210dd48b6543caaf63e5589f2faaa7b37d18b",
    "d181_concept_recall.py": "f297bb619f9e125a587b8f834a97af293f437ec1545466147d491d6a1a0ac039",
    "S505_question_aware_matcher.py": "179a80fbde63790294f2a35e7b637c1601d7583a6873c4d33171c3493eb86d2f",
    "concept_match_loose.py": "85bf57a09929dfb88c9bf221cd2a969b0cd78c22c97b77c129ce74a278934609",
-   "turn_limit_note.py": "34fcfb8a71b478b0fc61d66bdf34aa590e19d87f235c969f239be17ea429c3da"
+   "turn_limit_note.py": "34fcfb8a71b478b0fc61d66bdf34aa590e19d87f235c969f239be17ea429c3da",
+   "minicheck_filter.py": "6d2258a6f691324de266824695da7a56eff02d60eef18456ab4d60ee9138242d"
   },
   "command": "uv run --frozen python scripts/S570_supp_i2_reuse.py figure"
  },
- "stamp": "PROVISIONAL: 90 of 90 answers drawn (I2, draws 1, 2, 3 of 3), frozen set i2 (S569, ecf1e368); judge devstral-small-2:24b plain call, run_sha256 11e51fde8218; key PB v1.1 sha256 eb58a724f103; concept recall D181 (loose matcher, question rule; D285)",
+ "stamp": "90 of 90 answers drawn (I2, draws 1, 2, 3 of 3), frozen set i2 (S569, ecf1e368); judge devstral-small-2:24b plain call, run_sha256 11e51fde8218; key PB v1.1 sha256 eb58a724f103; concept recall D181 (loose matcher, question rule; D285)",
  "page_mm": [
   183.0,
   98.5
@@ -38,21 +39,21 @@
   "frozen:i2/sinks/exp_01__rlm_5__i2_plant5/answers.jsonl": "e3afc8106a91d2c4723891aaa808380f30fca92c36ec9907171c99bd386f1b43",
   "frozen:i2/sinks/exp_01__single_pass__i2_plant5/answers.jsonl": "c0edfb2d784b1a33e262337bcba6f73831a1b6c294d76e4d1a7cb4f60aab791c",
   "frozen:i2/sinks/exp_01__verified_pass__i2_plant5/answers.jsonl": "cf3fbef0d739c0e5de26de326e608955fac4fa726d35ba7b446641ba3e73c047",
-  "scripts/S463_fig2_ranking.py at HEAD (METRIC, THRESHOLDS, PRIMARY, REFUSAL_T, JUDGE_FAILED)": "git blob 8a09c191c4282d96ca26c44f7c89e40a277b4a53"
+  "scripts/S463_fig2_ranking.py at HEAD (METRIC, THRESHOLDS, PRIMARY, REFUSAL_T, JUDGE_FAILED)": "git blob 06bd00a6d316f50dcde502fb4cfd9854195b122c"
  },
  "figure_lock": {
   "path": "experiments/FIGURE_LOCK.toml",
-  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "sha256": "ac39c4e311f340654fe1ebe3333a3fe439bc6286e38fc0334fdb0e0cf2a97aef",
   "status": "agreed"
  },
  "files": {
-  "Supplementary Figure 13 (provisional, 90 of 90).pdf": "d298d5465de8ef300653adda824b6f528ff147c0e72d2177c7c5df562a2bf7a9",
-  "Supplementary Figure 13 (provisional, 90 of 90).png": "48539a343fe2b05c2256213e3377eaff10bd10bcc07d54a89b22d94bdf79c571",
-  "Supplementary Figure 13 (provisional, 90 of 90).svg": "058f09e13d49cd1dd9fdbdb9d79c64879e46d8240ea0c9c295461ae0a4133f1e",
-  "Supplementary Figure 13 data (provisional, 90 of 90).xlsx": "7f88ac347a452047b4cdbe0d270ad555e1d756aa535d84ae63fae4f5777cee4e",
-  "Supplementary Figure 13 data caption (provisional, 90 of 90).md": "702b964891103c715be80b2dcf446efefe71ce975017ff2590b4b5337a32823c",
-  "legend_draft.md": "db5f68ef965ab5610e54b3f95d43ac23b4fa0504e286719de9247683bd54927b",
+  "Supplementary Figure 13 data caption.md": "aa99fa3af07a99192ba42d832cf870f8363cb8c965a47cfadb4e46013dc72051",
+  "Supplementary Figure 13 data.xlsx": "8a81509ab79e64ad041d0326ad36572a79ff5bdad8bd39cc7700e67664ff380b",
+  "Supplementary Figure 13.pdf": "84371d9caa310690752934b4366135e977c9afd94286e3207b50beb51cb2209b",
+  "Supplementary Figure 13.png": "9745c30e6f07914ab15628ca0a9d0be6f4556f98f82d0155a97dc3954148c9af",
+  "Supplementary Figure 13.svg": "eecc3fe96a7b0aedeceb683a625d77ce5e9da3161efcda55782401b5944f37f5",
+  "legend_draft.md": "00a4745931cb33318ec0b7542ce331fef2fa5c943618fe6e68dcf59ff75fea3c",
   "methods_notes.md": "ec836211f7a232202d29f0002d730f70836d466e6dbee3883d29ab391c6a0513",
-  "supplementary_figure13_numbers.json": "e5523d2dcbaceb79b073e11f5db8b47c23f3e85c0c7186570850fb935ae14232"
+  "supplementary_figure13_numbers.json": "01a9e3289b8d137dac231b416e46510031a38eaf5db282484a257e1c3dc54771"
  }
 }

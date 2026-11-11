@@ -1,0 +1,18 @@
+{
+ "id": "CD_011",
+ "category": "cross_document",
+ "subcategory": "comparison",
+ "question": "Compare the diagnostic methodologies and biological markers used to determine the prevalence of bovine tuberculosis (bTB) and Peste des petits ruminants (PPR) as described in studies from Cameroon and Ethiopia.",
+ "papers": [
+  {
+   "paper": "14_bovine_tb_cameroon",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/14_bovine_tb_cameroon.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/14_bovine_tb_cameroon.pypdf.txt"
+  },
+  {
+   "paper": "16_ppr_ethiopia",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/16_ppr_ethiopia.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/16_ppr_ethiopia.pypdf.txt"
+  }
+ ]
+}

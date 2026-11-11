@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""S459 - Supplementary Figure 7 (provisional): the original RLM package (rlms 0.1.3, released by the method's
+"""S459 - Supplementary Figure 7: the original RLM package (rlms 0.1.3, released by the method's
 authors, not Mentori's RLM) at ten turn caps, how each answer ended and its turns.
 
 D217 (Valerio, 3 November, experiments/README.md "D217"): panel c (tokens per answer by cap) is dropped; its tokens are
@@ -89,12 +89,12 @@ that cap's run on the figure's questions. Any difference stops the run
 WRITES findings/figures_provisional/supp_fig7_package_caps/ (files of an earlier data state, "Supplementary Figure
 10*", are deleted first; findings/figures_provisional/fig3/, where this plate was drawn as Figure 3 until D123, is not
 written):
-  Supplementary Figure 7 (provisional, <n> of <N>).{pdf,svg,png}   one page, [page] width_double_mm wide, under height_max_mm; every
+  Supplementary Figure 7.{pdf,svg,png}   one page, [page] width_double_mm wide, under height_max_mm; every
         text at [type] font_min_pt in the first of [type] font_families, embedded TrueType; panel letters
         panel_letter_pt bold lowercase; no panel titles; [colour] categorical only, grey and black; no line under
         [lines] line_min_pt; a and b side by side in one row (D217, D224 Q5); the PNG is the PDF rasterised by MuPDF at 600 dpi (S448 R7). Nothing on the plate but
-        the figure: the data state is in the file name.
-  Supplementary Figure 7 data (provisional, ...).xlsx (the data workbook, sheets "Supplementary Fig. 7a" and "10b"),
+        the figure: the data state is in the stamp (numbers, provenance and caption).
+  Supplementary Figure 7 data.xlsx (the data workbook, sheets "Supplementary Fig. 7a" and "10b"),
         its caption .md, supplementary_figure7_numbers.json (the same sheets, and "printed": every number printed on
         the plate, by SVG group id, with its sheet, row and format), supplementary_figure7_provenance.json (inputs and
         outputs with sha256, the lock's sha256, the reproduction), legend_draft.md.
@@ -117,15 +117,15 @@ never cited. supplementary_figure7_provenance.json maps each record's adapter_sh
      call of a turn failed). An answer of status ok whose text is empty or whitespace only is drawn as its own slice,
      "answer with no text", whatever its stop_reason (the Source Data gives both). D161 (1) N1: an answer the
      package's own code failed on (stop_reason "error" with the TypeError package_error() names; 2 after the D135
-     reruns) is its own slice, "the package's own code failed", bluish green, keyed only when drawn. "n = 258"
-     printed at each bar's right, tied to the workbook. D161 (2) N2: with the D135 set frozen, sheet a gives every
+     reruns) is its own slice, "the package's own code failed", bluish green, keyed only when drawn. No n on
+     the plate (Valerio, 11 Nov: 258 answers per cap, 86 questions x 3 draws, in the legend). D161 (2) N2: with the D135 set frozen, sheet a gives every
      column but cap and answers_n twice, <name>_before_reruns (the gated reading the legend's Reruns and Failures
      paragraphs quote) and <name>_after_reruns (drawn).
   b  root turns used per answered answer (status ok, fbbcfb3:1081, the answers with no text included; turns_used = the
      root calls, fbbcfb3:1083, so the closing call is not counted): box from the first to the third quartile (numpy
      linear interpolation), median line, whiskers to the smallest and largest value, no point left out as an outlier;
-     a black triangle above the box marks the cap, so a box that sits on the cap stays visible. Log axis. "n =" the
-     answered answers, printed at each row's right.
+     a black triangle above the box marks the cap, so a box that sits on the cap stays visible. Log axis. The answered
+     answers per cap ("n =") are in the legend, not on the plate (Valerio, 11 Nov).
   (D224 Q5: the time panel, the answer's wall_s, is no longer drawn and has no sheet.)
 No hypothesis test, no interval. No model call; no Ollama port contacted; no ssh.
 """
@@ -792,7 +792,6 @@ def draw_figure(fn, caps, paths):
     import matplotlib.pyplot as plt
     from matplotlib.patches import Rectangle
     from matplotlib.ticker import FixedLocator, FixedFormatter, NullLocator
-    from matplotlib.transforms import blended_transform_factory
 
     tw = hs._text_width_mm
     W = FIG_W_MM
@@ -803,10 +802,12 @@ def draw_figure(fn, caps, paths):
     AX_H = nC * ROW
     GAP_COL = 5.0
     ylab_w = LINE + PAD + max(tw(str(c)) for c in caps) + PAD + 2 * MM_PER_PT
-    na_w = 1.2 + max(tw(f"n = {r['answers_n']}") for r in fn["a"]) + 0.3
-    nb_w = 1.2 + max(tw(f"n = {r['n']}") for r in fn["b"] if r["row"] == "cap") + 0.3
-    # D217, D224 Q5: a and b in one row, the two axes equally wide, each with its n at the right; the row ends at b's
-    # n column, at the page's right margin, so the time panel's place leaves no hole
+    # Valerio, 11 Nov: the plate holds only the figure; the n of each cap is in the legend, so no n column at a's or
+    # b's right (na_w, nb_w kept as 0 so the layout arithmetic below is unchanged in form)
+    na_w = 0.0
+    nb_w = 0.0
+    # D217, D224 Q5: a and b in one row, the two axes equally wide; the row ends at b's right edge, at the page's right
+    # margin, so the time panel's place leaves no hole
     ax_w = (W - 2 * M - 2 * ylab_w - na_w - nb_w - GAP_COL) / 2
     col_a = M
     xa, wa = col_a + ylab_w, ax_w
@@ -819,18 +820,20 @@ def draw_figure(fn, caps, paths):
              if o not in ("package_error", "forced_final_failed") or any(r[f"{o}_n"] for r in fn["a"])]
     KEY_PITCH = 3.7
 
-    KEY_A_W = wa + na_w                               # a's key sits within a's axes and its n column
+    KEY_A_W = wa + na_w                               # a's key sits within a's axes
     # a's key in columns, each entry starting at its column's left edge, so the swatches line up (D217 review): the
     # most columns that fit, filled row by row
     KEY_COL_GAP = 2.4
     ka_w = [hs._glyph_w(k) + 0.8 + tw(t) for k, _, t in key_a]
-    ka_cols = max(n_ for n_ in range(1, len(key_a) + 1)
-                  if n_ == 1 or n_ * max(ka_w) + (n_ - 1) * KEY_COL_GAP <= KEY_A_W)
-    ka_colw = max(ka_w)
-    nka = math.ceil(len(key_a) / ka_cols)
+    # 11 Nov (Valerio, doc comment): a's key in two columns of three, filled down; the rows it frees go to the axes
+    nka = math.ceil(len(key_a) / 2)
+    ka_cols = 2 if len(key_a) > 1 else 1
+    ka_colws = [max(ka_w[j * nka:(j + 1) * nka]) for j in range(ka_cols)]
     KEY_Y = M + PT_TEXT * MM_PER_PT                  # the first key line's baseline, and every panel letter's
+    H = KEY_Y + (len(key_a) - 1) * KEY_PITCH + 3.2 + AX_H + XAX + M   # the page as with the key in one column
     top1 = KEY_Y + (nka - 1) * KEY_PITCH + 3.2
-    H = top1 + AX_H + XAX + M
+    AX_H = H - top1 - XAX - M
+    ROW = AX_H / nC
     if H > FIG_H_MAX_MM - 0.05:
         raise SystemExit(f"{SI_LABEL}: the page would be {H:.1f} mm high, over [page] height_max_mm {FIG_H_MAX_MM}")
     fig = hs.figure(W, H)
@@ -915,45 +918,54 @@ def draw_figure(fn, caps, paths):
             left += wv
         if abs(left - 100.0) > 1e-9:
             raise SystemExit(f"a, cap {r['cap']}: the shares add to {left}, not 100")
-        t = ax_a.text(1.0 + 1.2 / wa, ypos[r["cap"]], f"n = {r['answers_n']}",
-                      transform=blended_transform_factory(ax_a.transAxes, ax_a.transData),
-                      ha="left", va="center", clip_on=False)
-        num(t, {"sheet": f"{SHEET}{LETTER_CASE('a')}", "row": i, "format": "n = {answers_n}",
-                "on_row": {"gid": f"s459_a_bar_{r['cap']}"}})
-    hs.panel_letter(fig, M, KEY_Y, "a")
-    ka_x0 = xa + (KEY_A_W - (ka_cols * ka_colw + (ka_cols - 1) * KEY_COL_GAP)) / 2
+    # 11 Nov: with the n labels off, the plate prints no number but tick labels; panel a's letter is entered in the
+    # printed map as fixed text (as S524 enters its panel letters), so S448 R8 (6) reads a map that is not empty
+    t_a = hs.panel_letter(fig, M, KEY_Y, "a")
+    num(t_a, {"fixed": t_a.get_text(), "why": "panel letter"})
+    ka_tot = sum(ka_colws) + (ka_cols - 1) * KEY_COL_GAP
+    ka_x0 = max(xa + (KEY_A_W - ka_tot) / 2, M + 4.0)
+    if ka_x0 + ka_tot > col_b - 1.0:
+        raise SystemExit(f"a's key ({ka_tot:.1f} mm) would reach b's letter")
     for i_, (item, w_) in enumerate(zip(key_a, ka_w)):
-        x0 = ka_x0 + (i_ % ka_cols) * (ka_colw + KEY_COL_GAP)
-        hs.key(fig, [item], centre_x=x0 + w_ / 2, y=KEY_Y + (i_ // ka_cols) * KEY_PITCH)
+        j_ = i_ // nka
+        x0 = ka_x0 + sum(ka_colws[:j_]) + j_ * KEY_COL_GAP
+        hs.key(fig, [item], centre_x=x0 + w_ / 2, y=KEY_Y + (i_ % nka) * KEY_PITCH)
 
     # ---- b: root turns used
     ax_b = hs.axes_mm(fig, xb, top1, wb_, AX_H)
     rows_axis(ax_b)
-    # a tick at every cap; a cap's number only where it clears the last one printed (D217)
-    b_lo, b_hi = 0.8, max(caps) * 1.25
-    b_mm = wb_ / math.log10(b_hi / b_lo)
-    b_labs, last = [], None
-    for c in caps:
-        x_mm = math.log10(c / b_lo) * b_mm
-        if last is None or x_mm - last[0] >= (last[1] + tw(str(c))) / 2 + 0.8:
-            b_labs.append(str(c))
-            last = (x_mm, tw(str(c)))
-        else:
-            b_labs.append("")
-    log_axis(ax_b, list(caps), b_labs, b_lo, b_hi)
-    rb = boxes(ax_b, "b", wb_)
-    ax_b.plot(caps, [ypos[c] - CAP_DY for c in caps], ls="none", marker="v", ms=CAP_MM / hs.MM_PT, mfc=hs.BLACK,
-              mec="none", mew=0, clip_on=False, zorder=8)
-    ax_b.set_xlabel(hs.axis_label("turns used per answer"), labelpad=2)
+    # 11 Nov (Valerio, doc comment): the caps evenly spaced, every cap labelled; a value between two caps sits at its
+    # linear place between them; no cap triangle and no key
+    import numpy as np
+    cidx = list(range(nC))
+
+    def b_t(v):
+        if v < caps[0] or v > caps[-1]:
+            raise SystemExit(f"b: a value {v} outside the caps {caps[0]} to {caps[-1]}")
+        return float(np.interp(v, caps, cidx))
+    ax_b.set_xlim(-0.4, nC - 0.6)
+    ax_b.xaxis.set_major_locator(FixedLocator(cidx))
+    ax_b.xaxis.set_major_formatter(FixedFormatter([str(c) for c in caps]))
+    ax_b.xaxis.set_minor_locator(NullLocator())
+    b_mm = wb_ / (nC - 0.2)
+    rb = [r for r in fn["b"] if r["row"] == "cap"]
     for r in rb:
-        i = fn["b"].index(r)
-        t = ax_b.text(1.0 + 1.2 / wb_, ypos[r["cap"]], f"n = {r['n']}",
-                      transform=blended_transform_factory(ax_b.transAxes, ax_b.transData),
-                      ha="left", va="center", clip_on=False)
-        num(t, {"sheet": f"{SHEET}{LETTER_CASE('b')}", "row": i, "format": "n = {n}",
-                "on_row": {"gid": f"s459_b_box_{r['cap']}"}})
+        vals = [a["value"] for a in fn["b"] if a["row"] == "answer" and a["cap"] == r["cap"]]
+        if len(vals) != r["n"]:
+            raise SystemExit(f"b cap {r['cap']}: {len(vals)} answer rows, n = {r['n']}")
+        dmm = hs.DOT_MM if len(vals) > 30 else hs.DOT_SPARSE_MM
+        off, over = hs.swarm([b_t(v) * b_mm for v in vals], half=hs.BAND_FRAC * ROW / 2 - dmm / 2,
+                             pitch=hs.DOT_PITCH_MM if dmm <= hs.DOT_MM else dmm + 0.05, dot=dmm)
+        overlaps[("b", r["cap"])] = over
+        ax_b.plot([b_t(v) for v in vals], [ypos[r["cap"]] + o / ROW for o in off], ls="none", marker="o",
+                  ms=dmm / hs.MM_PT, mfc=hs.GREY["dot"], mec="none", mew=0, zorder=2, clip_on=False)
+        st = {k_: b_t(r[f_]) for k_, f_ in (("q1", "q1"), ("median", "median"), ("q3", "q3"),
+                                            ("whisker_low", "minimum"), ("whisker_high", "maximum"))}
+        art = hs.boxplot(ax_b, ypos[r["cap"]], stats=st, orient="h", slot=1.0, dots=False)
+        (art.get("box") or art["median"]).set_gid(f"s459_b_box_{r['cap']}")
+        readback["b"].append((r["cap"], float(np.interp(art["median"].get_xdata()[0], cidx, caps)), r["median"]))
+    ax_b.set_xlabel(hs.axis_label("turns used per answer"), labelpad=2)
     hs.panel_letter(fig, col_b, KEY_Y, "b")
-    hs.key(fig, [("mark", (hs.BLACK, "v"), "the row's turn cap")], centre_x=xb + wb_ / 2, y=KEY_Y)
 
     bad_c = hs.check_figure_colours(fig)
     if bad_c:
@@ -1070,9 +1082,9 @@ def legend_and_caption(fn, caps, n_ids, stamp, tag, ctx, fn_gate=None):
         f"cap; an answer from the closing call the package makes when the cap is reached; a closing call that "
         f"returned code, kept as the answer; an answer with no text; "
         f"{'' if k_pkg else 'or '}a failed model call in a turn{pkg_txt}. {B}, Turns used per answer (horizontal "
-        f"axis, logarithmic) at each turn cap (vertical axis), for the answers that did not fail; the closing call is "
+        f"axis, caps evenly spaced) at each turn cap (vertical axis), for the answers that did not fail; the closing call is "
         f"not counted. Each grey dot is one answer, boxes span the first to the third quartile, the line is the "
-        f"median and whiskers reach the smallest and largest value; a triangle marks the row's turn cap; "
+        f"median and whiskers reach the smallest and largest value; "
         f"{n_b_short}.")
     failures_txt = (
         ("**Failures and D92 (moved from the caption, 23 October).** " if fn_gate is None else
@@ -1107,8 +1119,7 @@ def legend_and_caption(fn, caps, n_ids, stamp, tag, ctx, fn_gate=None):
     locks = "; ".join(f"{k} = commit {v['commit']} ({v['records']} records)" for k, v in vr["lock"].items())
     header = [
         f"# {SI_LABEL}, title and legend (draft)", "",
-        f"Written by `uv run --frozen python scripts/S459_fig3_rlm_ref_caps.py` from the plotted numbers. "
-        f"Data stamp: {stamp}.", "",
+        f"Written by `uv run --frozen python scripts/S459_fig3_rlm_ref_caps.py` from the plotted numbers.", "",
         f"**Place.** D123 ({dl['d123']}) moves this plate, drawn as Figure 3 until then, to the Supplementary; "
         f"Supplementary Figure 8 (main Figure 3 at D123) shows concept recall against the turn cap for both RLMs, the "
         f"local models, corpus scale and the share of answers reaching the cap. Number {SUPP_N} comes from the "
@@ -1163,7 +1174,7 @@ def legend_and_caption(fn, caps, n_ids, stamp, tag, ctx, fn_gate=None):
             + f". Sheet {s['b']}: one 'cap' row per turn cap with n, "
             f"minimum, first quartile, median, third quartile and maximum (the box), then one 'answer' row per "
             f"answer that did not fail (question, draw, value): root turns used."),
-           "", f"Provisional: {stamp}.", ""]
+           "", f"Data stamp: {stamp}.", ""]
     return "\n".join(lines), "\n".join(cap)
 
 
@@ -1302,11 +1313,11 @@ def main(argv=None):
     newest = max((mt_post if post is not None else mtimes)[as_read(files[c])]["mtime"] for c in caps)   # a copy keeps none
     from zoneinfo import ZoneInfo
     when = dt.datetime.fromtimestamp(newest, ZoneInfo(STAMP_TZ)).strftime("%Y-%m-%d %H:%M %Z")
-    stamp = (f"PROVISIONAL: {fmt_int(n)} of {fmt_int(N)} answers, Zhang RLM at {len(caps)} turn caps (G6, "
+    stamp = (f"{fmt_int(n)} of {fmt_int(N)} answers, Zhang RLM at {len(caps)} turn caps (G6, "
              f"records of {when}), no judge; "
              + ("after the D89 and D90 reruns (D135), the gates on the records before them" if post is not None
                 else "before the D89 and D90 reruns"))
-    tag = f" (provisional, {n} of {N})"
+    tag = ""                                        # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
     OUT.mkdir(parents=True, exist_ok=True)
     for old in OUT.glob(f"{SI_LABEL}*"):           # the plate, its data workbook and caption of another data state
         old.unlink()
@@ -1380,7 +1391,7 @@ def main(argv=None):
                             "an answer of status ok with no text its own slice; the package's own TypeError, "
                             "package_error(), its own slice, D161 (1)), n printed per row",
                        "b": "root turns used per answered answer (no-text answers included), box (quartiles, median, "
-                            "range), cap marked by a triangle above the box, n printed per row, log axis",
+                            "range), n printed per row, the caps evenly spaced (11 Nov), no cap triangle and no key",
                        "dropped": "tokens per answer (D217), wall_s per answer (D224 Q5)"},
             "type_pt": {"panel letters": PT_LETTER, "all other text": PT_TEXT}, "font": FONT,
             "colours_panel_a": {o: col for o, _, col in OUTCOMES}, "box_fill": BOX_FILL,

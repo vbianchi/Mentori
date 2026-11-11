@@ -1,6 +1,6 @@
 {
- "stamp": "PROVISIONAL: 4,050 of 4,050 answers settled (all 4,050 stored: G1 2,430, G2 405, G6 1,215; settled: no rerun owed, no matched-budget token target out of date, checked by S455 for the D89 and D90 Gemini cases), judged only in a's split columns, records of 2026-11-04 12:45 CET; of the answers S455's D92 list gives to rerun, stored again since: Mentor::i 15 of 15; Zhang RLM 17 of 17, 4 more stay failed (D92 Q185); matched-budget answers whose token target was set before an RLM-10 answer of their question was stored again: 0 (questions none); matched-budget answers checked by S455 for the D89 and D90 Gemini cases: yes",
- "what": "every number the plate draws, sheet by sheet as the data workbook Supplementary Figure 17 data (provisional, 4050 of 4050).xlsx holds them (S448 R8 compares the workbook with this file)",
+ "stamp": "4,050 of 4,050 answers settled (all 4,050 stored: G1 2,430, G2 405, G6 1,215; settled: no rerun owed, no matched-budget token target out of date, checked by S455 for the D89 and D90 Gemini cases), judged only in a's split columns, records of 2026-11-04 12:45 CET; of the answers S455's D92 list gives to rerun, stored again since: Mentor::i 15 of 15; Zhang RLM 17 of 17, 4 more stay failed (D92 Q185); matched-budget answers whose token target was set before an RLM-10 answer of their question was stored again: 0 (questions none); matched-budget answers checked by S455 for the D89 and D90 Gemini cases: yes",
+ "what": "every number the plate draws, sheet by sheet as the data workbook Supplementary Figure 17 data.xlsx holds them (S448 R8 compares the workbook with this file)",
  "sheets": {
   "Supplementary Fig. 17a": {
    "columns": [

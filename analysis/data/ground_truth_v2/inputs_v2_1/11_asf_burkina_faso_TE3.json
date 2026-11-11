@@ -1,0 +1,13 @@
+{
+ "id": "11_asf_burkina_faso_TE3",
+ "category": "technical",
+ "subcategory": null,
+ "question": "What specific software and phylogenetic methods were utilized for the analysis of the ASFV sequences, and what variation was found in the Central Variable Region (CVR)?",
+ "papers": [
+  {
+   "paper": "11_asf_burkina_faso",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/11_asf_burkina_faso.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/11_asf_burkina_faso.pypdf.txt"
+  }
+ ]
+}

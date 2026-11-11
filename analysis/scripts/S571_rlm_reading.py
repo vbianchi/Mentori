@@ -69,7 +69,7 @@ sys.path.insert(0, str(ROOT))
 SCRIPT = "scripts/S571_rlm_reading.py"
 OUT = ROOT / "findings" / "recompute" / "S571_rlm_reading"
 FIG3_DIR = ROOT / "findings" / "figures_provisional" / "fig3_strategies"
-FIG3_SD_GLOB = "Source Data Fig. 3 (*).xlsx"
+FIG3_SD_GLOB = "Source Data Fig. 3.xlsx"              # Q9 (11 Nov): the lock's name, no suffix
 S511_RESULTS = ROOT / "findings" / "recompute" / "S511_g2_budget" / "results.json"
 CONTEXT = ROOT / "findings" / "recompute" / "B4_rlm_ref_context.json"
 INDEX = "exp_v4_s20_n0"

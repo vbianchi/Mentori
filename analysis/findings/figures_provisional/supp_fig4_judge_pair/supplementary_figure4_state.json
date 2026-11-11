@@ -84,10 +84,10 @@
   "gemini-2.5-pro": {
    "strategies": {
     "multi_hop": {
-     "pairs": 0,
+     "pairs": 144,
      "left_out": {},
      "failed_cells_no_judge2_call": 0,
-     "pairs_without_judge2_row": 144,
+     "pairs_without_judge2_row": 0,
      "strategy_answers_without_single_pass": 0
     },
     "verified_pass": {
@@ -98,10 +98,10 @@
      "strategy_answers_without_single_pass": 0
     },
     "rlm_5": {
-     "pairs": 0,
+     "pairs": 144,
      "left_out": {},
      "failed_cells_no_judge2_call": 0,
-     "pairs_without_judge2_row": 144,
+     "pairs_without_judge2_row": 0,
      "strategy_answers_without_single_pass": 0
     },
     "rlm_10": {
@@ -112,10 +112,10 @@
      "strategy_answers_without_single_pass": 0
     },
     "rlm_20": {
-     "pairs": 0,
+     "pairs": 144,
      "left_out": {},
      "failed_cells_no_judge2_call": 0,
-     "pairs_without_judge2_row": 144,
+     "pairs_without_judge2_row": 0,
      "strategy_answers_without_single_pass": 0
     }
    },

@@ -1,0 +1,18 @@
+{
+ "id": "CD_010",
+ "category": "cross_document",
+ "subcategory": "contrasting",
+ "question": "Contrast the algorithmic approaches used by STAR and SeqKit to manage large-scale genomic sequence data efficiently.",
+ "papers": [
+  {
+   "paper": "06_star_aligner",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/06_star_aligner.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/06_star_aligner.pypdf.txt"
+  },
+  {
+   "paper": "09_seqkit",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/09_seqkit.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/09_seqkit.pypdf.txt"
+  }
+ ]
+}

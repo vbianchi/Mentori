@@ -1,6 +1,6 @@
 # Figure 3, first ranking: draws 1, 2, 3 of 3, provisional (D82, D88)
 
-PROVISIONAL: draws 1, 2, 3 of 3 (D82, D88), 14,860 of 21,402 answers read from their final-key row (G1 2,430, G2 and G6 810, G4 11,620), 2,425 G1 answers judged (devstral-small-2:24b, plain call), collect of 2026-10-23T09:41:17, run_sha256 38ae79ab023b; concept recall: D181's reading on key v2.5, L3_d181 rows of 2026-10-31T00:03:05Z.
+draws 1, 2, 3 of 3 (D82, D88), 14,860 of 21,402 answers read from their final-key row (G1 2,430, G2 and G6 810, G4 11,620), 2,425 G1 answers judged (devstral-small-2:24b, plain call), collect of 2026-10-23T09:41:17, run_sha256 38ae79ab023b; concept recall: D181's reading on key v2.5, L3_d181 rows of 2026-10-31T00:03:05Z.
 
 Read by `scripts/S463_fig2_ranking.py rank` from `g1_collect.jsonl`: 2430 rows under one run_sha256 (38ae79ab023b) and lock d66daa28 (D88). 2430 answers of the draws read: 2425 went to the judge, 5 had no text and no judge call. The judge is devstral-small-2:24b (digest 33af3142213a, checked in each unit's headers), the plain call (a), with no passages in its prompt. Each of the 10 judging units read passed its recheck (the first answers judged again after a fresh load gave the same scores). G1's reruns of 18 October in the draws read (15 answers) come from their own pass (D93 Q-c), checked row by row. The rules are experiments/LIST.md's (Rules 2, 3, 4, 5, 6, 9, 10, 11, 12); no rule is new (D84).
 

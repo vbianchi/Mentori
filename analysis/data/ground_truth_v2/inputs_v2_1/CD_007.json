@@ -1,0 +1,23 @@
+{
+ "id": "CD_007",
+ "category": "cross_document",
+ "subcategory": "sequential",
+ "question": "In the context of RNA-seq analysis, how do the mapping and quantification methods of STAR and Salmon address technical challenges before downstream differential expression analysis in DESeq2?",
+ "papers": [
+  {
+   "paper": "06_star_aligner",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/06_star_aligner.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/06_star_aligner.pypdf.txt"
+  },
+  {
+   "paper": "07_salmon",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/07_salmon.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/07_salmon.pypdf.txt"
+  },
+  {
+   "paper": "08_deseq2",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/08_deseq2.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/08_deseq2.pypdf.txt"
+  }
+ ]
+}

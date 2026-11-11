@@ -1,0 +1,13 @@
+{
+ "id": "13_lsd_nepal_CO2",
+ "category": "conceptual",
+ "subcategory": null,
+ "question": "Based on the epidemiological data, which specific cattle group was most affected by the outbreak and what were the primary clinical manifestations observed?",
+ "papers": [
+  {
+   "paper": "13_lsd_nepal",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/13_lsd_nepal.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/13_lsd_nepal.pypdf.txt"
+  }
+ ]
+}

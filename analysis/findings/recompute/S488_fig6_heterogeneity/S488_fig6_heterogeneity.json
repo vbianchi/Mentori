@@ -6,7 +6,7 @@
   "inputs": [
    {
     "path": "findings/figures_provisional/fig6/figure7_numbers.json",
-    "sha256": "d334db3de14c3990333cc6ae778c1700727e428714731199aa3e73b666e01049",
+    "sha256": "3c31ae611da291bfe2bea56ba5a3382fb3b39cb502f5253b29f9d6f31bd7776d",
     "role": "Figure 7 plate numbers (S481, after S4), sheet Fig. 7a: the cells tested"
    },
    {
@@ -31,7 +31,7 @@
     "role": "D253 check: S580's Q, df, P and I2 (the part read; canonical JSON, sorted keys)"
    }
   ],
-  "data_stamp": "PROVISIONAL: 2,420 of 2,420 attempts, 11 of 11 variants complete, records of 2026-11-04 08:35 CET; after the S4 reruns (D75, D80 V1, D81)",
+  "data_stamp": "2,420 of 2,420 attempts, 11 of 11 variants complete, records of 2026-11-04 08:35 CET; after the S4 reruns (D75, D80 V1, D81)",
   "model_calls": 0,
   "method": "(one, for every contrast). Cochran's Q on log odds ratios (Woolf's inverse-variance test): - per variant v, the 2x2 table of passes and failures, family B (structured or introspection) against family A (free-form), pooled over the family's strategies and the 20 operations (B: 4 strategies, 80 attempts; A: 3 strategies, 60 attempts); - 0.5 added to all four cells of every variant's table (Haldane-Anscombe), so a cell at 0% or 100% (gemma3:27b passes 0 of 80 structured attempts) keeps a finite log odds ratio and variance; - log OR_v = ln((a d) / (b c)), var_v = 1/a + 1/b + 1/c + 1/d, w_v = 1 / var_v; - pooled log OR = sum(w_v log OR_v) / sum(w_v) (fixed effect); Q = sum(w_v (log OR_v - pooled)^2), referred to chi-square with k - 1 degrees of freedom (k variants); I^2 = max(0, (Q - df) / Q). Woolf's variance treats each variant's 80 and 60 attempts as independent, though they are 20 operations repeated over the strategies, the same operations in both families; with each variant's variance from a bootstrap over the 20 operations instead (paired across families, 4,000 resamples; computed by the audit's verifier, scratch code, as findings/audits/audit_2026-10-27_scripts/fig4_6_verified.md F4 records it, not by this script), no conclusion changes: introspection Q 5.98, P 0.817 becomes 5.90, P 0.824; structured 55.86, P 2.2e-08 becomes 146.6, P 1.8e-26 (gemma3:27b's 0 of 80 gives a near-zero bootstrap variance); structured without gemma3:27b 45.31, P 8.1e-07 becomes 42.72, P 2.4e-06. Why not risk differences (het.py): the variance of a difference of two proportions is near zero when both sit at 0% or 100%, so such a variant gets a near-infinite weight and dominates Q. het.py patched that with + 0.5 / n inside the variance, a choice no reference states. Why not the committed interaction_chi2 (S447, fig6_numbers.json): a Pearson chi-square on the 11 x 11 table of pass counts alone (chi2 88.38, df 100, P 0.79), which asks whether the variants' passes spread alike over all 11 strategies, not whether one family's effect depends on the model; its P 0.79 matching the introspection P is a coincidence.",
   "ported_from": [

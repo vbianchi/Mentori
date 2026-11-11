@@ -1,7 +1,7 @@
 {
  "header": {
   "script": "scripts/S492_answer_registry.py",
-  "script_sha256": "221451e2c30407cb31de99d93e9a3c57055ec67d37aad3bc8a4cf376d64a1fe5",
+  "script_sha256": "c88b0a6b7554dc5aefee32fa898695d8af0831e1a161cb01bb02a07701380092",
   "command": "uv run python scripts/S492_answer_registry.py",
   "anchor_inputs": {
    "findings/recompute/S04b_counts_audit.json": "e75eca2304365166c450d63eef7d87301f12a142ea01b21732f34cca56d0befb",
@@ -18,6 +18,7 @@
     "answer_lengths_20261020": "adb177a692451d3331b5c1463a90e40b480ed07bbdb7b9741092f3adcdfb3902",
     "count_records_20261106": "b6f334760dfc837bdde9d3b965cf50a12aac589a000d86ee58bcf9a1e8f4a1bb",
     "count_records_20261108": "a43a504f0a6fe73a40cb388a4aec9dec77ade8201fd54bd69788264a0981ae11",
+    "count_records_20261109": "4112e345bc498dccd165a9194f4fb80cafbb1d4a6d8946dab8e88057bc1c8e38",
     "fig3_t1": "0b0326de1814167de5663e68f28738b427c3e0df8ac80301a03bdbc31a92e950",
     "fig4_records_1023": "7283205a989ba66179c78bb36b7add786a45f224f38fdf7a45af52a351fa5e72",
     "g4_draws_20261101": "c02cef9c048786dfa7cbcf2c4827af35741b56cea6e4a05c04679169cf3aaf19",
@@ -652,6 +653,40 @@
      "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_no_synthesiser__exp_v4_s20_n0/answers.json": "a5d82c4b338548759ea32aa26415b368f37da0e67960844c68d3f51c44cf7bdc",
      "count_records_20261108.tar:count_records_20261108/g3/runs/exp_03__orch_factual_to_documents__exp_v4_s20_n0/answers.json": "485aa26a11407cb5bd5421f29d4cfa2db9a57296214fba4a2042e8da6901ad46",
      "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__orch_factual_to_documents__exp_v4_s20_n0/answers.json": "126eeda5385dafc2414eb24ea7171d4633d0ab02a833ce0b9de10a540240e152"
+    },
+    "note": {
+     "per_setup_draws": {
+      "full_orchestrator": {
+       "1": 135,
+       "2": 45,
+       "3": 45
+      },
+      "orch_no_analyser": {
+       "1": 135,
+       "2": 45,
+       "3": 45
+      },
+      "orch_no_planner": {
+       "1": 135,
+       "2": 45,
+       "3": 45
+      },
+      "orch_no_supervisor": {
+       "1": 135,
+       "2": 68,
+       "3": 45
+      },
+      "orch_no_synthesiser": {
+       "1": 135,
+       "2": 45,
+       "3": 45
+      },
+      "orch_factual_to_documents": {
+       "1": 135,
+       "2": 45,
+       "3": 45
+      }
+     }
     }
    },
    {
@@ -670,6 +705,20 @@
      "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__raw_gemini__exp_v4_s20_n0/answers.json": "afa5aa7eca967a07d3098c3bb53159c6114948b185e06aab85274123bd6f87ee",
      "count_records_20261108.tar:count_records_20261108/g3/runs/exp_03__naive_rag__exp_v4_s20_n0/answers.json": "544d3cb4174ec1c9649d2bc436ddcfadc42e6c3d0da5a82612db9ad3d42d21b1",
      "fig4_records_1023.tar:fig4_records_1023/findings/runs/exp_03__naive_rag__exp_v4_s20_n0/answers.json": "544d3cb4174ec1c9649d2bc436ddcfadc42e6c3d0da5a82612db9ad3d42d21b1"
+    },
+    "note": {
+     "per_setup_draws": {
+      "raw_gemini": {
+       "1": 135,
+       "2": 135,
+       "3": 135
+      },
+      "naive_rag": {
+       "1": 135,
+       "2": 135,
+       "3": 135
+      }
+     }
     }
    },
    {
@@ -688,6 +737,20 @@
      "findings/recompute/g9_inputs/runs/exp_03__orch_distil_every_step__exp_v4_s20_n0/answers.json": "d08585ab9a8f853eea7a6acaa8b19e5c83cccfbff03b619503fe14b6a30571f4",
      "count_records_20261108.tar:count_records_20261108/g3/runs/exp_03__orch_distil_every_step_f1__exp_v4_s20_n0/answers.json": "efe7b642b5c39268efbe332e176753c2ea3ebf9af72ab0161a335cffba0f5337",
      "findings/recompute/g9_inputs/runs/exp_03__orch_distil_every_step_f1__exp_v4_s20_n0/answers.json": "0b12c674719289fbf8bac43b217c5751ba26535533979099ca8bb66a88bd1973"
+    },
+    "note": {
+     "per_setup_draws": {
+      "orch_distil_every_step": {
+       "1": 135,
+       "2": 45,
+       "3": 45
+      },
+      "orch_distil_every_step_f1": {
+       "1": 135,
+       "2": 45,
+       "3": 45
+      }
+     }
     }
    },
    {
@@ -1087,19 +1150,29 @@
     }
    },
    {
-    "experiment": "RLM ablation, gemma3:27b",
-    "plan_row": "G19",
+    "experiment": "RLM ablation, local generators",
+    "plan_row": "G19, G20",
     "counted": true,
-    "stored": 138,
+    "stored": 276,
     "draws": {
-     "1": 138
+     "1": 276
     },
-    "basis": "count_records_20261106.tar (sha256 b6f334760dfc): g19/runs, arms A (package RLM), B and C, distinct answer keys, equal to S573's concept-recall rows",
+    "basis": "count_records_20261106.tar (sha256 b6f334760dfc): g19/runs (gemma3:27b) and count_records_20261109.tar (sha256 4112e345bc49): g20/runs (qwen3-coder:30b), arms A (package RLM), B and C, distinct answer keys, equal to S573's and S594's concept-recall rows",
     "files_sha256": {
      "count_records_20261106.tar:count_records_20261106/g19/runs/exp_01__rlm_10_nosearch__exp_v4_s20_n0+gemma3-27b/answers.jsonl": "7d0e327bfdf9aa60d6188597d68ff285b810783f482120e69e8a91767436efaf",
      "count_records_20261106.tar:count_records_20261106/g19/runs/exp_01__rlm_10_nogate__exp_v4_s20_n0+gemma3-27b/answers.jsonl": "117ae3fab6a1f59772451bb268956fabe5fbe05314e1b10fe60421c5d9094314",
      "count_records_20261106.tar:count_records_20261106/g19/runs/b4_rlm_ref_gemma3__cap10__d239a46/answers.jsonl": "aa16e17ca6928cea61e27fca9ccd1d8d93369dfaa8b0d8378dbfb23ee5bab98b",
-     "findings/recompute/G19_concept_recall/concept_recall.jsonl": "42f75651f0323dd301a785aa00e8a2316f589b485132286a5a4eee3f52037038"
+     "findings/recompute/G19_concept_recall/concept_recall.jsonl": "42f75651f0323dd301a785aa00e8a2316f589b485132286a5a4eee3f52037038",
+     "count_records_20261109.tar:count_records_20261109/g20/runs/exp_01__rlm_10_nosearch__exp_v4_s20_n0+qwen3-coder-30b/answers.jsonl": "6e1543133c670eef94a3e72cf339cc7ba969a493f0b85f66cdb76fae36f8b161",
+     "count_records_20261109.tar:count_records_20261109/g20/runs/exp_01__rlm_10_nogate__exp_v4_s20_n0+qwen3-coder-30b/answers.jsonl": "32b12278d547c728b360da50f5b2717847e82debfb3688f89c4fe697a8e8d472",
+     "count_records_20261109.tar:count_records_20261109/g20/runs/b4_rlm_ref_qwen3coder__cap10__d239a46/answers.jsonl": "4167b3080725e82c50e804056708602e35ab62ab452acc927611b08094593db2",
+     "findings/recompute/G20_concept_recall/concept_recall.jsonl": "ec7875423776725aa4677f15c4651f40d7a8f6443c8b2b2cf1b30a918b07deb6"
+    },
+    "note": {
+     "per_model": {
+      "gemma3-27b": 138,
+      "qwen3-coder-30b": 138
+     }
     }
    },
    {
@@ -1119,8 +1192,8 @@
    "Model selection": 408,
    "Retrieval optimisation": 2336
   },
-  "stored_new_counted": 48697,
-  "total_counted": 51441,
+  "stored_new_counted": 48835,
+  "total_counted": 51579,
   "not_counted": [],
   "by_experiment": {
    "Generation strategies (G1)": 2430,
@@ -1141,13 +1214,13 @@
    "Flat wide call (G10)": 585,
    "Short-passage single pass (G11)": 225,
    "RLM ablation (G17)": 774,
-   "RLM ablation, gemma3:27b (G19)": 138,
+   "RLM ablation, local generators (G19, G20)": 276,
    "Judge with evidence (S12)": 0
   }
  },
  "inventory_compare": {
   "stored_new": {
-   "computed": 48697,
+   "computed": 48835,
    "inventory": 23062,
    "equal": false
   },
@@ -1157,7 +1230,7 @@
    "equal": true
   },
   "total": {
-   "computed": 51441,
+   "computed": 51579,
    "inventory": 25806,
    "equal": false
   },

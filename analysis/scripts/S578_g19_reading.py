@@ -46,6 +46,7 @@ Any difference refuses and nothing is written.
     uv run --frozen python scripts/S578_g19_reading.py --runs-root ~/s3_inputs/g19 --r-t2 <sink> --r-t2x <sink> \
         --manifest <g19_stored_R.json> --judge <out_s6_w_g19> --r-collect-t2x <t2xgemma_collect.jsonl> \
         --concept-recall findings/recompute/G19_concept_recall/concept_recall.jsonl [--store ~/l1_inputs/store] [--out DIR]
+    (--store defaults to env MENTORI_L1_STORE, else ~/l1_inputs/store)
     uv run --frozen python scripts/S578_g19_reading_test.py           (made-up rows; no model call)
 
 Writes findings/recompute/G19_reading/: reading.json (provenance, reproduce, table, contrasts, hypotheses, every answer's
@@ -66,6 +67,7 @@ import argparse
 import datetime
 import hashlib
 import json
+import os
 import subprocess
 import sys
 from collections import Counter
@@ -89,7 +91,8 @@ OUT = ROOT / "findings" / "recompute" / "G19_reading"
 S518_GEMMA3 = ROOT / "findings" / "recompute" / "S518_split_confirmation" / "gemma3.json"
 T2_COLLECT = ROOT / "findings" / "recompute" / "S518_inputs" / "gemma3" / "collect.jsonl"
 CONTEXT = M.CONTEXT
-STORE = Path.home() / "l1_inputs" / "store"
+STORE = Path(os.environ.get("MENTORI_L1_STORE") or Path.home() / "l1_inputs" / "store").expanduser()   # Q5 O1 (11 Nov):
+#   env MENTORI_L1_STORE names the Chroma folder (S511 reads the same variable), today's path the default
 ARMS = CR.ARMS                                     # R, A, B, C
 LABEL = CR.LABEL
 SET = "whole:g19"                                  # S579's scope on its rows

@@ -1,0 +1,18 @@
+{
+ "id": "CD_017",
+ "category": "cross_document",
+ "subcategory": "comparison",
+ "question": "Using a One Health perspective, compare the identified zoonotic risk factors and surveillance priorities for HPAI H5N1 in Canada versus brucellosis in the Somali region of Ethiopia.",
+ "papers": [
+  {
+   "paper": "19_hpai_canada",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/19_hpai_canada.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/19_hpai_canada.pypdf.txt"
+  },
+  {
+   "paper": "17_brucellosis_ethiopia",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/17_brucellosis_ethiopia.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/17_brucellosis_ethiopia.pypdf.txt"
+  }
+ ]
+}

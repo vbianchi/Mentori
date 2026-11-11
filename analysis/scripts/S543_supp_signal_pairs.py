@@ -228,8 +228,7 @@ def legend(dat: dict, R: dict) -> str:
         d_n = ", ".join(g_ns[:-1]) + f" and {g_ns[-1]}"
     else:                               # Papers waits (S497.blank_papers)
         d_n = S497.PENDING
-    return (f"**Supplementary Figure {N} | Answers stating every concept; each strategy against single pass; Papers "
-            "by the judge's verdict and by faithfulness.** Answers of gemini-3-flash to the answerable questions "
+    return (f"**Supplementary Figure {N} | The three signals on the same answers, by strategy.** Answers of gemini-3-flash to the answerable questions "
             "under six strategies (rows). Judge, correctness score against the answer key, from 0 to 5, with a pass "
             f"at {PASS_T} or more; Concepts, concept recall against the key; Papers, MiniCheck precision against the key's "
             "source papers. "
@@ -255,11 +254,11 @@ def figure(out, set_dir=None) -> None:
         R, dat, srcs, d200 = S497.d200_data(Path(t), set_dir)
         fn = R["fn"]
         n4, m = fn["all4"], S473.PLANNED["papers"]
-        tag = f"provisional, {n4} of {m}"
-        stamp = (f"PROVISIONAL: {n4} of {m} draw-1 answerable answers have a final row from all four scorers; numbers "
+        tag = ""                                  # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
+        stamp = (f"{n4} of {m} draw-1 answerable answers have a final row from all four scorers; numbers "
                  "from S497's panel_data on the claim-filtered rows")
         sh = sheets(dat)
-        cap = (f"# Supplementary Figure {N} data, caption\n\n**Supplementary Figure {N} data.** Provisional. Data stamp: "
+        cap = (f"# Supplementary Figure {N} data, caption\n\n**Supplementary Figure {N} data.** Data stamp: "
                f"{stamp}. Sheet a: per strategy the draw-1 answers that state every key concept, by the judge's verdict. "
                "Sheet b: per strategy, signal and draw against single pass, the wins, ties, losses, questions and the "
                "margin. Sheet c: per strategy the draw-1 answers in the four groups of the judge's verdict and Papers "

@@ -1,0 +1,13 @@
+{
+ "id": "11_asf_burkina_faso_CO2",
+ "category": "conceptual",
+ "subcategory": null,
+ "question": "How did the researchers use multi-gene analysis to establish the genetic identity and classification of the ASFV strains responsible for the outbreaks?",
+ "papers": [
+  {
+   "paper": "11_asf_burkina_faso",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/11_asf_burkina_faso.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/11_asf_burkina_faso.pypdf.txt"
+  }
+ ]
+}

@@ -1,0 +1,7 @@
+{
+ "id": "OOD_039",
+ "category": "out_of_domain",
+ "subcategory": "excluded_topic",
+ "question": "How does the Monte Carlo tree search algorithm work in game-playing AI systems like AlphaGo?",
+ "papers": []
+}

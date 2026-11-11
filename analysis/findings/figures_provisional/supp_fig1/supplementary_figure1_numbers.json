@@ -1,5 +1,5 @@
 {
- "stamp": "PROVISIONAL: 22 of 22 experiments with answers counted (51,441 answers, scripts/S492_answer_registry.py)",
+ "stamp": "22 of 22 experiments with answers counted (51,579 answers, scripts/S492_answer_registry.py)",
  "what": "every value Supplementary Figure 1 draws, sheet by sheet as the data workbook holds them",
  "sheets": {
   "Supp. Fig. 1 lines": {
@@ -146,7 +146,7 @@
      "Model selection",
      "design",
      2,
-     "9 language models"
+     "10 language models"
     ],
     [
      "MS",
@@ -154,7 +154,7 @@
      "Model selection",
      "design",
      3,
-     "from 5 makers"
+     "from 6 makers"
     ],
     [
      "G1",
@@ -562,7 +562,7 @@
      "Distiller on every step (stress)",
      "draws",
      4,
-     "1 draw"
+     "1 + 2 draws"
     ],
     [
      "G3A",
@@ -618,7 +618,7 @@
      "Component benchmarks",
      "design",
      3,
-     "orchestrator"
+     "6 models × 832"
     ],
     [
      "T3C",
@@ -626,15 +626,15 @@
      "Component benchmarks",
      "design",
      4,
-     "components × models"
+     "benchmark items"
     ],
     [
      "T3C",
      "T3",
      "Component benchmarks",
-     "design",
+     "draws",
      5,
-     "× 832 items"
+     "1 draw;"
     ],
     [
      "T3C",
@@ -642,7 +642,7 @@
      "Component benchmarks",
      "draws",
      6,
-     "1 draw"
+     "gemini-3-flash 3"
     ],
     [
      "T3D",
@@ -658,7 +658,7 @@
      "Distiller intervention",
      "design",
      2,
-     "7 prompt variants ×"
+     "2 prompts × 6 models"
     ],
     [
      "T3D",
@@ -666,7 +666,7 @@
      "Distiller intervention",
      "design",
      3,
-     "models × 97 items"
+     "× 97 items"
     ],
     [
      "T3D",
@@ -842,7 +842,7 @@
      "Flat wide call",
      "design",
      4,
-     "third index: draw 1"
+     "index with no"
     ],
     [
      "G10",
@@ -850,14 +850,22 @@
      "Flat wide call",
      "design",
      5,
-     "only"
+     "distractors:"
+    ],
+    [
+     "G10",
+     "G10",
+     "Flat wide call",
+     "design",
+     6,
+     "draw 1 only"
     ],
     [
      "G10",
      "G10",
      "Flat wide call",
      "draws",
-     6,
+     7,
      "1 + 2 draws"
     ],
     [
@@ -950,50 +958,42 @@
     ],
     [
      "G19",
-     "G19",
-     "RLM ablation, gemma3:27b",
+     "G19, G20",
+     "RLM ablation, local generators",
      "name",
      1,
-     "RLM ablation,"
+     "RLM ablation, local"
     ],
     [
      "G19",
-     "G19",
-     "RLM ablation, gemma3:27b",
+     "G19, G20",
+     "RLM ablation, local generators",
      "name",
      2,
-     "gemma3:27b"
+     "generators"
     ],
     [
      "G19",
-     "G19",
-     "RLM ablation, gemma3:27b",
+     "G19, G20",
+     "RLM ablation, local generators",
      "design",
      3,
-     "3 arms (Zhang RLM,"
+     "3 arms × 2 generators"
     ],
     [
      "G19",
-     "G19",
-     "RLM ablation, gemma3:27b",
+     "G19, G20",
+     "RLM ablation, local generators",
      "design",
      4,
-     "search off, gate off) ×"
+     "× 46 questions"
     ],
     [
      "G19",
-     "G19",
-     "RLM ablation, gemma3:27b",
-     "design",
-     5,
-     "46 questions"
-    ],
-    [
-     "G19",
-     "G19",
-     "RLM ablation, gemma3:27b",
+     "G19, G20",
+     "RLM ablation, local generators",
      "draws",
-     6,
+     5,
      "1 draw"
     ],
     [
@@ -1138,7 +1138,7 @@
      "",
      "Model selection",
      "Corpus and choices",
-     "9 language models from 5 makers",
+     "10 language models from 6 makers",
      "",
      408,
      null,
@@ -1218,7 +1218,7 @@
      2420,
      null,
      "answers",
-     "16 model variants x 11 strategies x 20 operations",
+     "11 model variants x 11 strategies x 20 operations",
      "1",
      "done",
      "s2_after_s4_20261105.tar (sha256 f879ea24f639): the 121 runs findings/figures_provisional/fig6/records_manifest.json names, distinct answer keys"
@@ -1289,12 +1289,12 @@
      "Distiller on every step (stress)",
      "Ablation",
      "2 stress set-ups × 135 questions",
-     "1 draw",
+     "1 + 2 draws",
      450,
      null,
      "answers",
      "2 set-ups (Q82: Mentori's prompt, F1) x 135 questions",
-     "1 (D98)",
+     "1, and 2 and 3 on a fixed third (D98)",
      "done",
      "count_records_20261108.tar (sha256 a43a504f0a6f): g3/runs, distinct answer keys over every draw; the 270 keys of the earlier source (committed g9_inputs) reproduced, each holding the same row"
     ],
@@ -1318,13 +1318,13 @@
      "T3",
      "Component benchmarks",
      "Ablation",
-     "orchestrator components × models × 832 items",
-     "1 draw",
+     "6 models × 832 benchmark items",
+     "1 draw; gemini-3-flash 3",
      6656,
      null,
      "answers",
-     "orchestrator components x models x 832 items",
-     "1 (Gemini 3)",
+     "6 models x 832 benchmark items (D213, D309 A28: the items of 5 components; the analyses leave out 18 on replaced questions, 814)",
+     "1 (gemini-3-flash 3)",
      "running",
      "count_records_20261106.tar (sha256 b6f334760dfc): t3/T3_frozen_20261104T131439Z, each sink's rows equal to its MANIFEST.json answers_per_sink, distinct answer keys"
     ],
@@ -1333,12 +1333,12 @@
      "T3",
      "Distiller intervention",
      "Ablation",
-     "7 prompt variants × models × 97 items",
+     "2 prompts × 6 models × 97 items",
      "1 draw",
      1164,
      null,
      "answers",
-     "7 prompt variants x models x 97 items",
+     "2 prompts x 6 models x 97 items (D213, D309 A28: the analyses leave out 3 on replaced questions, 94)",
      "1",
      "running",
      "count_records_20261106.tar (sha256 b6f334760dfc): t3/T3_frozen_20261104T131439Z, each sink's rows equal to its MANIFEST.json answers_per_sink, distinct answer keys"
@@ -1393,7 +1393,7 @@
      "G10",
      "Flat wide call",
      "Replication and reuse",
-     "3 indexes × 1 call at a fixed passage count | third index: draw 1 only",
+     "3 indexes × 1 call at a fixed passage count | index with no distractors: draw 1 only",
      "1 + 2 draws",
      585,
      null,
@@ -1435,18 +1435,18 @@
     ],
     [
      "G19",
-     "G19",
-     "RLM ablation, gemma3:27b",
+     "G19, G20",
+     "RLM ablation, local generators",
      "Replication and reuse",
-     "3 arms (Zhang RLM, search off, gate off) × 46 questions",
+     "3 arms × 2 generators × 46 questions",
      "1 draw",
-     138,
+     276,
      null,
      "answers",
-     "3 arms (Zhang RLM, search off, gate off) x 46 questions (D249 O2)",
+     "3 arms x 2 generators x 46 questions (D249 O2, D260, D309 A26: Zhang RLM, search off and gate off; gemma3:27b in G19, qwen3-coder:30b in G20)",
      "1",
      "running",
-     "count_records_20261106.tar (sha256 b6f334760dfc): g19/runs, arms A (package RLM), B and C, distinct answer keys, equal to S573's concept-recall rows"
+     "count_records_20261106.tar (sha256 b6f334760dfc): g19/runs (gemma3:27b) and count_records_20261109.tar (sha256 4112e345bc49): g20/runs (qwen3-coder:30b), arms A (package RLM), B and C, distinct answer keys, equal to S573's and S594's concept-recall rows"
     ]
    ]
   },
@@ -1648,7 +1648,7 @@
      "Flat wide call",
      "uses the output or the choice of",
      "its top_k comes from G4's token counts and it pairs with G4 by question (D196; S519)",
-     "106.80,51.83 112.05,51.83 112.05,82.53 151.40,82.53"
+     "106.80,51.83 112.05,51.83 112.05,101.88 151.40,101.88"
     ],
     [
      "G1",
@@ -1672,9 +1672,9 @@
      "G17",
      "G19",
      "RLM ablation",
-     "RLM ablation, gemma3:27b",
+     "RLM ablation, local generators",
      "uses the output or the choice of",
-     "the same three switches on gemma3:27b (D249 O2)",
+     "the same three switches on gemma3:27b and qwen3-coder:30b (D249 O2, D260; D309 A26)",
      "144.40,113.22 151.40,113.22"
     ],
     [

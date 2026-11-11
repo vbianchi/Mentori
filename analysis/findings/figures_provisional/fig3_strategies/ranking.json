@@ -1,5 +1,5 @@
 {
- "stamp": "PROVISIONAL: draws 1, 2, 3 of 3 (D82, D88), 14,860 of 21,402 answers read from their final-key row (G1 2,430, G2 and G6 810, G4 11,620), 2,425 G1 answers judged (devstral-small-2:24b, plain call), collect of 2026-10-23T09:41:17, run_sha256 38ae79ab023b; concept recall: D181's reading on key v2.5, L3_d181 rows of 2026-10-31T00:03:05Z",
+ "stamp": "draws 1, 2, 3 of 3 (D82, D88), 14,860 of 21,402 answers read from their final-key row (G1 2,430, G2 and G6 810, G4 11,620), 2,425 G1 answers judged (devstral-small-2:24b, plain call), collect of 2026-10-23T09:41:17, run_sha256 38ae79ab023b; concept recall: D181's reading on key v2.5, L3_d181 rows of 2026-10-31T00:03:05Z",
  "draws": [
   1,
   2,
@@ -19,7 +19,7 @@
   "panel f: (3) Refusal, the same 39: 40 rates equal q66_tables.json's pooled_over_ratios where no cell is missing",
   "panel e: S518's verdicts read, each reading S518.reading's for its interval: second_judge (test) I 33.3 points, agrees; gemma3 (test) I 13.8 points, not shown; qwen3-coder (test) I 28.2 points, agrees; claude-haiku-4-5 (beside) I 55.7 points, agrees; gemini-2.5-pro (beside) I 56.7 points, agrees; gemini-3-flash-preview (reference, key v2.5) I 56.9 points, agrees",
   "person check (S607, D306): S607's judge counts equal this build's draw-1 refusals (Single pass 39 of 39; RLM-10 39 of 39); S607 itself: REPRODUCED comparison_20261103.md: the 3 breakdown rows of each strategy, the D227 and re-reading tables, agreement 77 of 78",
-  "3a's clock-time margin equals Supplementary Fig. 17c: 688 per-question means of 8 rows, means single pass 42.1, multi-hop 61.3, verified pass 97.2, RLM-5 121.9, RLM-10 129.0, RLM-20 124.4, matched budget 134.6, Zhang RLM-10 53.4 s (Supplementary Figure 17 data (provisional, 4050 of 4050).xlsx)"
+  "3a's clock-time margin equals Supplementary Fig. 17c: 688 per-question means of 8 rows, means single pass 42.1, multi-hop 61.3, verified pass 97.2, RLM-5 121.9, RLM-10 129.0, RLM-20 124.4, matched budget 134.6, Zhang RLM-10 53.4 s (Supplementary Figure 17 data.xlsx)"
  ],
  "what": "every number of the ranking with the answer keys it is counted from (S463 rank)",
  "read": {
@@ -32345,7 +32345,7 @@
     "p_signflip_exact_two_sided": 2.3283064365386963e-10,
     "reading": null,
     "s518_file": "findings/recompute/S518_split_confirmation/gemini-3-flash-preview.json",
-    "s518_sha256": "e2cf25daf854c3b3eb50086ae052465192774a973f2fc5cbcda845fbbec27c7f"
+    "s518_sha256": "450b31ee0d01c8b91b53747129e80d56bdb94a2ac50c1a7f8ea2b56ccc959cdd"
    },
    {
     "row_kind": "split (RLM-10 minus single pass)",
@@ -32363,7 +32363,7 @@
     "p_signflip_exact_two_sided": 0.00292205810546875,
     "reading": null,
     "s518_file": "findings/recompute/S518_split_confirmation/gemini-3-flash-preview.json",
-    "s518_sha256": "e2cf25daf854c3b3eb50086ae052465192774a973f2fc5cbcda845fbbec27c7f"
+    "s518_sha256": "450b31ee0d01c8b91b53747129e80d56bdb94a2ac50c1a7f8ea2b56ccc959cdd"
    },
    {
     "row_kind": "split (RLM-10 minus single pass)",
@@ -32381,7 +32381,7 @@
     "p_signflip_exact_two_sided": null,
     "reading": "agrees",
     "s518_file": "findings/recompute/S518_split_confirmation/gemini-3-flash-preview.json",
-    "s518_sha256": "e2cf25daf854c3b3eb50086ae052465192774a973f2fc5cbcda845fbbec27c7f"
+    "s518_sha256": "450b31ee0d01c8b91b53747129e80d56bdb94a2ac50c1a7f8ea2b56ccc959cdd"
    }
   ],
   "Fig. 3f": [

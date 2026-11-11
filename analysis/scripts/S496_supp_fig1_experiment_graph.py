@@ -32,15 +32,15 @@ ONE COMMAND (D155), from the repository root:
         --dir findings/figures_provisional/supp_fig1
 
 writes into findings/figures_provisional/supp_fig1/ (or --out; files of an earlier state deleted first):
-  Supplementary Figure 1 (provisional, n of m).{pdf,svg,png}   one page, [page] width_double_mm wide, at most
+  Supplementary Figure 1.{pdf,svg,png}   one page, [page] width_double_mm wide, at most
         height_max_mm high; every text at [type] font_min_pt in [type] font_families[0]; black text, column labels in
         a grey that reaches [type] contrast_min_ratio; boxes and arrows in black at 0.6 pt, every box solid;
         hs.check_figure_colours checks the colours, then S457.finish_plate (build order F4) refuses a text off the page or
         on another and writes the PDF, the SVG and the PNG, the PDF rasterised by MuPDF at 600 dpi (S448 R7)
-  Supplementary Figure 1 data (provisional, n of m).xlsx   sheets "Supp. Fig. 1 lines" (one row per printed line),
+  Supplementary Figure 1 data.xlsx   sheets "Supp. Fig. 1 lines" (one row per printed line),
         "Supp. Fig. 1 boxes" (one row per box: design, draws, answers, and the draws.csv and registry text beside
         them), "Supp. Fig. 1 arrows" (one row per arrow, with its basis); no write time, fixed zip dates
-  Supplementary Figure 1 data caption (provisional, n of m).md, legend_draft.md,
+  Supplementary Figure 1 data caption.md, legend_draft.md,
   supplementary_figure1_numbers.json (every sheet, and every printed line tied to its sheet row, S448 R8 (6)),
   supplementary_figure1_provenance.json (each input's sha256, the figure lock's, every output's)
 "n of m": the experiments with answers counted, of all experiments (draws.csv's rows); once S520's output is frozen,
@@ -154,7 +154,7 @@ BOXES = [("RO", "", "Retrieval optimisation", 0), ("CORPUS", None, None, 0), ("M
          ("G11", "G11", "Short-passage single pass", 4), ("G10", "G10", "Flat wide call", 4),
          # Valerio, 5 Nov (Q1, "yes"): the RLM ablation, its gemma3 run and the judge with evidence
          ("S18F", "S12", "Judge with evidence", 2), ("G17", "G17", "RLM ablation", 3),
-         ("G19", "G19", "RLM ablation, gemma3:27b", 4)]
+         ("G19", "G19, G20", "RLM ablation, local generators", 4)]   # D309 A26 O1: G19 and G20, one experiment
 # A box's name on the plate where draws.csv's name is a form figure_names.NEVER refuses (build order A4). The plate takes
 # Figure 4's name for the row; every sheet's experiment column keeps draws.csv's.
 PLATE_NAMES = {"G9": f"{fn.ALWAYS_DISTIL.capitalize()} (stress)",
@@ -198,7 +198,7 @@ ARROWS = [
     ("G4", "G10", "its top_k comes from G4's token counts and it pairs with G4 by question (D196; S519)"),
     ("G1", "G17", "the control is G1's RLM-10 on today's code, and G1's RLM-10 draw 1 checks what the code changed (D240)"),
     ("G6C", "G17", "the package arm is G6's cap-10 answers, stored and judged (D240, D249 O1)"),
-    ("G17", "G19", "the same three switches on gemma3:27b (D249 O2)"),
+    ("G17", "G19", "the same three switches on gemma3:27b and qwen3-coder:30b (D249 O2, D260; D309 A26)"),
     ("G1", "S18F", "judges G1's draw-1 answers with no source, their own papers or unrelated papers (D107; S18f)"),
 ]
 
@@ -345,6 +345,25 @@ def draw_kind(text: str) -> str | None:
     raise Refused(f"draws.csv draws {t!r}: not '3', D98's text or '1'")
 
 
+# audit 2026-11-10 N-5 (Valerio, 10 Nov, "as proposed"): draws.csv's "1 (<model> <n>)" (Component benchmarks: "1
+# (gemini-3-flash 3)") is one draw, and n draws for that model. draw_kind() still reads it as "1 draw" (S619 imports it);
+# the plate prints both, and the key lists both kinds. A parenthesis of another form ("1 (D98)") stays "1 draw".
+ONE_BUT = re.compile(r"1 \(([a-z][\w.:-]*) (\d+)\)")
+N_DRAWS_KIND = {3: "3 draws"}   # a model's draw count as Figure 1's draw kind; another count has no kind and is refused
+
+
+def draws_plate(text: str) -> tuple:
+    """(the box's draws line, [the draw kinds it uses], (model, its kind) or None) for draws.csv's draws text."""
+    kind = draw_kind(text)
+    m = ONE_BUT.fullmatch((text or "").strip())
+    if not m:
+        return kind, [kind] if kind else [], None
+    model, n = m.group(1), int(m.group(2))
+    if n not in N_DRAWS_KIND:
+        raise Refused(f"draws.csv draws {text!r}: {model} at {n} draws, which no draw kind of Figure 1 states")
+    return f"{kind}; {model} {n}", [kind, N_DRAWS_KIND[n]], (model, N_DRAWS_KIND[n])
+
+
 def reproduce(reg, rows) -> list:
     """Known numbers first: draws.csv's experiments are the registry's plus the two kept from April, once each; every
     box's experiment is one of them and every experiment has a box; the counts sum to the registry's totals."""
@@ -386,7 +405,9 @@ def g10_design(r) -> list:
     design = plain_design(r["design"])
     if not design.startswith("3 indexes ") or not r["draws"].endswith(" on two indexes"):
         raise Refused(f"G10: design {r['design']!r}, draws {r['draws']!r}: not 3 indexes with draws 2 and 3 on two")
-    return [design, "third index: draw 1 only"]
+    # audit 2026-11-10 N-6 (Valerio, 10 Nov, "as proposed"): Methods lists the indexes 49, 58, 92 passages, so "third"
+    # read as the 92-passage run; the draw-1-only run is the 20-paper index with no distractors
+    return [design, "index with no distractors: draw 1 only"]
 
 
 def i2_design(r, n_strategies: int) -> list:
@@ -536,7 +557,10 @@ def box_table(reg, rows, prov, calls=None) -> list:
                     raise Refused(f"{exp}: 0 stored, but draws.csv's status is {r['status'][:40]!r}")
             else:
                 n, kind, count = e["stored"], "answers", f"{e['stored']:,} answers"
-        draws = t2_draws(prov) if bid == "T2" else draw_kind(r["draws"])
+        if bid == "T2":
+            draws, kinds_used, draws_other = t2_draws(prov), None, None
+        else:
+            draws, kinds_used, draws_other = draws_plate(r["draws"])
         draws_legend = t2_draws_full(prov) if bid == "T2" else None
         if bid == "RO":
             # D183 FD6 B: Figure 1's "1 run" settings (embedding model, chunking, search strategy) are this box's
@@ -544,9 +568,10 @@ def box_table(reg, rows, prov, calls=None) -> list:
             if draws is not None or len(run) != 1 or not run[0].get("settings"):
                 raise Refused(f"retrieval optimisation: draws.csv draws {r['draws']!r}, Figure 1's run kind {run!r}")
             draws = run[0]["name"]
+            kinds_used = [draws]
         out.append({"id": bid, "plan_row": plan_row, "experiment": exp, "column": col,
                     "name": PLATE_NAMES.get(bid, exp), "design": design, "draws": draws, "count": count, "answers": n, "calls": calls.get(bid),
-                    "count_kind": kind, "draws_legend": draws_legend,
+                    "count_kind": kind, "draws_legend": draws_legend, "draw_kinds": kinds_used, "draws_other": draws_other,
                     "dashed": False, "csv_design": r["design"], "csv_draws": r["draws"],   # no progress drawn (28 Oct)
                     "csv_status": status_word(r["status"]), "registry_basis": basis})
     return out
@@ -584,6 +609,18 @@ def wrap(s, width, bold=False):
     return out
 
 
+def wrap_at_marks(s, width, bold=False):
+    """wrap(), but a text that does not fit one line breaks after its "; " or ": " first, when that takes no more lines
+    (audit 2026-11-10 N-5, N-6: "1 draw; gemini-3-flash 3" would leave "3" alone on a line, "index with no distractors:
+    draw 1 only" would leave "only")."""
+    plain = wrap(s, width, bold)
+    if len(plain) == 1:
+        return plain
+    parts = [x for x in re.split(r"(?<=[;:]) ", s) if x]
+    marked = [ln for x in parts for ln in wrap(x, width, bold)]
+    return marked if len(parts) > 1 and len(marked) <= len(plain) else plain
+
+
 def grey_text(want="#5A5A5A"):
     def lum(c):
         c = tuple(int(c.lstrip("#")[i:i + 2], 16) / 255 for i in (0, 2, 4))
@@ -603,7 +640,7 @@ def key_rows(boxes, prov) -> list:
     order. T2's box names several kinds in one line (t2_draws()); each of them counts."""
     dk = draw_kinds(prov)
     name = {d["key"]: d["name"] for d in dk}
-    used = {b["draws"] for b in boxes if b["draws"] and b["id"] != "T2"}
+    used = {k for b in boxes if b["draws"] and b["id"] != "T2" for k in (b.get("draw_kinds") or [b["draws"]])}
     used |= {name[k] for k in prov["design"]["t2_draws"].values()} if any(b["id"] == "T2" for b in boxes) else set()
     unknown = used - set(name.values())
     if unknown:
@@ -633,9 +670,9 @@ def layout(boxes, key=None):
     top = y_lab + (nlab - 1) * LEAD + 2.6
     for b in boxes:
         lines = [("name", ln, True) for ln in wrap(b["name"], tw, True)]
-        lines += [("design", ln, False) for d in b["design"] for ln in wrap(GEN_DISPLAY.get(d, d), tw)]
+        lines += [("design", ln, False) for d in b["design"] for ln in wrap_at_marks(GEN_DISPLAY.get(d, d), tw)]
         if b["draws"]:
-            lines += [("draws", ln, False) for ln in wrap(b["draws"], tw)]
+            lines += [("draws", ln, False) for ln in wrap_at_marks(b["draws"], tw)]
         # no count of answers (Valerio, 28 Oct: the plate shows no progress); b["count"] stays in the workbook. The
         # last line is the box's LLM calls (FF5), when S520's frozen summary gives a count above 0
         if calls_line(b["calls"]):
@@ -936,6 +973,31 @@ def rlms_version() -> str:
     return m.group(1)
 
 
+def stored_items_sentences(boxes) -> str:
+    """Audit 2026-11-10 N-5 (Valerio, 10 Nov, "as proposed"; the verifier's clause): a box whose draws.csv cell names
+    another model's draws (draws_plate()) gets them spelled out, and the component benchmark and distiller boxes say they
+    count the items stored, with how many sit on questions later replaced, read from their draws.csv design cells ("the
+    analyses leave out <n> on replaced questions"). Refused when either cell no longer states it."""
+    out = ""
+    for b in boxes:
+        if b.get("draws_other"):
+            model, kind = b["draws_other"]
+            name = b["name"].lower()
+            owner = name + ("'" if name.endswith("s") else "'s")
+            out += f" The {owner} draws: {b['draw_kinds'][0]}, {kind} for {model}."
+    by_id = {b["id"]: b for b in boxes}
+    if "T3C" in by_id and "T3D" in by_id:
+        left = []
+        for bid in ("T3C", "T3D"):
+            m = re.search(r"leave out (\d+) on replaced questions", by_id[bid]["csv_design"])
+            if not m:
+                raise Refused(f"{bid}: draws.csv design {by_id[bid]['csv_design']!r} does not state the items left out")
+            left.append(m.group(1))
+        out += (f" The component benchmark and distiller boxes count the items stored, {left[0]} and {left[1]} of them on "
+                f"questions later replaced in the answer key and left out of the analyses.")
+    return out
+
+
 def legend_text(boxes, stamp, n_exp, s520=None) -> str:
     kept = [b["name"].lower() for b in boxes if b["count_kind"] == "answers, kept from April"]
     say = lambda xs: xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + " and " + xs[-1]   # noqa: E731
@@ -944,6 +1006,7 @@ def legend_text(boxes, stamp, n_exp, s520=None) -> str:
     t2 = next((b for b in boxes if b.get("draws_legend") and b["draws_legend"] != b["draws"]), None)
     if t2:
         gives += f" The {t2['name'].lower()}'s draws: {t2['draws_legend']}."
+    gives += stored_items_sentences(boxes)
     # editor row 45 (Valerio, 8 Nov): no derived statistics on this plate, so no "n = " tag; the count stays in words,
     # and the column headings are described in full so the legend reads on its own
     cols = "; ".join(c.lower() for c in COLUMNS)
@@ -960,8 +1023,8 @@ def legend_text(boxes, stamp, n_exp, s520=None) -> str:
         f"{fn.PACKAGE_RLM[:1].upper() + fn.PACKAGE_RLM[1:]} is the RLM package released by the method's authors (rlms {rlms_version()}), "
         f"drawn as {fn.PACKAGE_RLM_N.format(n=10)} in Figure 3 at its cap of 10 turns; {fn.MENTORI_RLM} is Mentor::i's own "
         f"implementation. RAG, retrieval-augmented generation.")
-    return (f"Legend DRAFT for {SI_LABEL} (provisional; written by scripts/S496_supp_fig1_experiment_graph.py). "
-            f"Data stamp: {stamp}.\n\n**{SI_LABEL} | How the experiments of the study connect.**\n\n{body}\n")
+    return (f"Legend DRAFT for {SI_LABEL} (written by scripts/S496_supp_fig1_experiment_graph.py)."
+            f"\n\n**{SI_LABEL} | How the experiments of the study connect.**\n\n{body}\n")
 
 
 def write_workbook(sheets: dict, path: Path):
@@ -1001,16 +1064,16 @@ def build(out: Path, argv) -> dict:
     n_counted = sum(1 for b in boxes if b["count_kind"] in ("answers", "answers, kept from April"))
     if s520:
         n_counted = sum(1 for b in boxes if calls_line(b["calls"]))
-    tag = f" (provisional, {n_counted} of {n_exp})"
+    tag = ""                                  # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
     total = reg["today"]["total_counted"]
     # audit 27 Oct: was a fixed text; 30 Oct: each not-counted experiment with its draws.csv status word (box_table())
     started = [f"the {b['name'].lower()} {b['count_kind']}" for b in boxes if b["answers"] is None
                and b["count_kind"] not in ("corpus", "answers", "answers, kept from April")]
-    stamp = (f"PROVISIONAL: {n_counted} of {n_exp} experiments with answers counted ({total:,} answers, "
+    stamp = (f"{n_counted} of {n_exp} experiments with answers counted ({total:,} answers, "
              f"scripts/S492_answer_registry.py)"
              + (f"; {' and '.join(started)}, not counted" if started else ""))
     if s520:
-        stamp = (f"PROVISIONAL: {n_counted} of {n_exp} experiments with calls counted "
+        stamp = (f"{n_counted} of {n_exp} experiments with calls counted "
                  f"({s520['figure1_legend_total']:,} LLM calls, scripts/S520_llm_calls.py)")
     cols_l = ["box", "plan_row", "experiment", "kind", "line", "text"]
     lines_rows = [[t["box"], next((b["plan_row"] for b in boxes if b["id"] == t["box"]), ""),

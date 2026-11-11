@@ -1,0 +1,7 @@
+{
+ "id": "OOD_043",
+ "category": "out_of_domain",
+ "subcategory": "contradictory",
+ "question": "According to the DESeq2 paper, the method uses raw read counts without any normalization or variance stabilization. Is this true?",
+ "papers": []
+}

@@ -1,15 +1,15 @@
 {
  "provenance": {
   "script": "scripts/S481_fig6_d138.py",
-  "script_sha256": "4f63c78ee591a3c23ddbeab6d034c9e9ced362f29323d93e445c7494c7e257e3",
+  "script_sha256": "26f025963ac2a5b7d2e9e9c9b1593742b620ffffdede50f3e2aec51930c4d088",
   "command": "uv run --frozen python scripts/S481_fig6_d138.py supplementary",
   "code_sha256": {
-   "scripts/S447_fig6_panels.py": "611c4da95690f0a71ffffe94cc8b7ff3d2e4f857bfbe1b19d0d0f8da77e17050",
-   "scripts/S457_fig2_panels.py": "8c29dab8b04a1bad4a955582a30831c51c2b70438be2f6d2698c7b81948d7520",
+   "scripts/S447_fig6_panels.py": "4e234fa55063961400f6c9f59f8376cdd151aa036ed558bbd91eb734bba1a97f",
+   "scripts/S457_fig2_panels.py": "33dc73444a80cf9d9b429fff6e489322bb01ca828a10f12a90487d84e7eaa4a1",
    "scripts/S478_fig6_thinking_gap.py": "214d58e3ac60b38ab48b5693998ed99edeb42e1ff4e306b13a92a8b3b1bffc4d",
    "scripts/S479_fig6_by_tier.py": "c12358734134cbd02c63c124f677b7a15c8369727174089d02db4812cb33856c",
    "scripts/house_style.py": "647c8991f4dcd2cea08e0be46eaf758beb55fb029c54bb267e7fba1e0b8b17b6",
-   "scripts/figure_names.py": "a3c65ae0a1e8aa05e99a99610ea857f63b0d8fff60a99404bcb5bf6ff9a82e65"
+   "scripts/figure_names.py": "025f8904861fd8d916cd875346a1384e915ea6601bfd2f7624dd71e49f2948a7"
   },
   "python": "3.13.11",
   "packages": {
@@ -268,7 +268,7 @@
    "findings/recompute/S478_fig6_thinking_gap.json": "a15ec7131ade7a0d64fe409c49333303991225e89f88c5a6d97c3907826cc37d",
    "findings/recompute/S479_fig6_by_tier.json": "76bab1ad384b863b3da6d36dba4f1e7e51bfb68a62c36dbed7de4843119d372c",
    "experiments/mentori/tests/experiments_v2/datasets/coder_ground_truth.json": "afcef9ffea67b2ea1659dad7513948693027648f02f887e6db4e07f6ca3b9c35",
-   "experiments/FIGURE_LOCK.toml": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+   "experiments/FIGURE_LOCK.toml": "ac39c4e311f340654fe1ebe3333a3fe439bc6286e38fc0334fdb0e0cf2a97aef",
    "findings/recompute/fig6_options_2026-10-25/G4_numbers.json": "5a7de344747b1be15a9fd1eadaba2a7874be6e3a3e293f0152dd03d80d0c9381",
    "findings/recompute/fig6_options_2026-10-25/C_numbers.json": "c13507d1335aadf20ca0871bac29cf0bd9f6c9c3d25106983d753bc64834a8ae",
    "findings/figures_provisional/fig6/fig6_numbers.json": "14ea3bb30101edda9be40835c1f64e47fceb2c73b080190b9cc32c6b13ed9b6d",
@@ -334,7 +334,7 @@
    }
   }
  },
- "stamp": "PROVISIONAL: 2,420 of 2,420 attempts, 11 of 11 variants complete, records of 2026-11-04 08:35 CET; after the S4 reruns (D75, D80 V1, D81)",
+ "stamp": "2,420 of 2,420 attempts, 11 of 11 variants complete, records of 2026-11-04 08:35 CET; after the S4 reruns (D75, D80 V1, D81)",
  "page_mm": [
   183.0,
   168.51
@@ -376,16 +376,16 @@
  },
  "figure_lock": {
   "path": "experiments/FIGURE_LOCK.toml",
-  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b"
+  "sha256": "ac39c4e311f340654fe1ebe3333a3fe439bc6286e38fc0334fdb0e0cf2a97aef"
  },
  "read_back": "393 drawn values equal to the workbook",
  "files": {
-  "Supplementary Figure 16 (provisional, 2420 of 2420).pdf": "c08f1287a4b017ff7de6aa958454c8786e679973723893e9fc2d61b63507dbf6",
-  "Supplementary Figure 16 (provisional, 2420 of 2420).svg": "e668d7e293d6b2994306d68db2ce111e58fd9cfc5fb645a8e5d2bb0f1a6558f7",
-  "Supplementary Figure 16 (provisional, 2420 of 2420).png": "e950f9bb60e3f6e9505195d02662f4f7492ca894c63cb2d1aa66c7b5f2a98d6c",
-  "Supplementary Figure 16 data (provisional, 2420 of 2420).xlsx": "060427b8bfec03f55e0472f979103c5421ed9fbd3c8485f5dbb89b86f0c1f502",
-  "Supplementary Figure 16 data caption (provisional, 2420 of 2420).md": "9b1938d56917e7763b26ab4a264800ab3436f11290cfcefd0cce5bb8863694ac",
-  "supplementary_figure16_numbers.json": "edfdc53fac28d273517b630a52acbe8d1e9b50072c1e41a17fe476e85ffecd64",
-  "legend_draft.md": "3c6fc56c631a62e823be36ec67dbd94533102be11950a8abe4d7162ea6f81351"
+  "Supplementary Figure 16.pdf": "e6f8d553b834cf9ef5b73873ceea0d16df82271173881c4966023dc6fd5d2cef",
+  "Supplementary Figure 16.svg": "f93af96808c5651f450022e685392d937791ed2f810bcb9b58f3cfe761fba2d5",
+  "Supplementary Figure 16.png": "a6c2a37d71157c197dd9133cff0304c77d4e3b07aae8d3dafe2cec1449cc509e",
+  "Supplementary Figure 16 data.xlsx": "060427b8bfec03f55e0472f979103c5421ed9fbd3c8485f5dbb89b86f0c1f502",
+  "Supplementary Figure 16 data caption.md": "ed884a0b5ca15e42f106eb5e0408dddc0b756521258845cf7cb4a637bc981bf5",
+  "supplementary_figure16_numbers.json": "5c745c5f56ed74f7145e811056c9c7ced6ae28f4dc2a6bd0d29cec6afa1c67b8",
+  "legend_draft.md": "80a342f72b97121b2bd1e33c59d365c896043eae1e08d11d43c1191df11d314d"
  }
 }

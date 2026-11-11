@@ -1,0 +1,18 @@
+{
+ "id": "CD_005",
+ "category": "cross_document",
+ "subcategory": "contrasting",
+ "question": "In the context of scaling large-scale genomic analyses, how do the parallelization strategies of the nf-core framework differ from the job scheduling approach of Snakemake?",
+ "papers": [
+  {
+   "paper": "02_snakemake",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/02_snakemake.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/02_snakemake.pypdf.txt"
+  },
+  {
+   "paper": "03_nfcore_framework",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/03_nfcore_framework.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/03_nfcore_framework.pypdf.txt"
+  }
+ ]
+}

@@ -1,7 +1,7 @@
 {
  "provenance": {
   "script": "scripts/S457_fig2_panels.py",
-  "script_sha256": "8c29dab8b04a1bad4a955582a30831c51c2b70438be2f6d2698c7b81948d7520",
+  "script_sha256": "33dc73444a80cf9d9b429fff6e489322bb01ca828a10f12a90487d84e7eaa4a1",
   "command": "uv run --frozen python scripts/S457_fig2_panels.py rebuild",
   "python": "3.13.11",
   "deterministic": "D155: no build time and no repository HEAD are recorded; the script's and every input's sha256 identify the build",
@@ -23,7 +23,7 @@
    "data/ground_truth_v2/all_v2_4.json": "5d8362ae931dc0fe0cc132be6b5e57187e3ae7d3131d86f63cdf1a44633fadd5",
    "experiments/mentori/backend/retrieval/chunk_verifier.py": "cf112eab40460d01be26990d7ea0577352bbd98a3e8dd24a881c4b88717d03d5",
    "experiments/LOCK.toml": "8730d401a5d7b6baa1780e656f844261eaead60e45b5199afa29d57f989ad495",
-   "experiments/FIGURE_LOCK.toml": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+   "experiments/FIGURE_LOCK.toml": "ac39c4e311f340654fe1ebe3333a3fe439bc6286e38fc0334fdb0e0cf2a97aef",
    "findings/figures_provisional/supp_fig17_outcomes/records_manifest.json": "f49f320008f30414b3d90ac9dca8726d3a1eb86e26c5d1e4c273d61247f6d3af",
    "findings/recompute/Q145/S455_d92_affected_studio_g1.json": "f6139c042c31207a9eab8c396d0eba6834a4dab393ddb8d63053454f06d05ca6",
    "findings/recompute/Q145/S455_d92_affected.json": "c8fce3c6241ecdd1f3e2276f1ad3f532c7a199c8626bcd5c72b312b492ab97a3",
@@ -48,7 +48,7 @@
   },
   "model_calls": 0
  },
- "stamp": "PROVISIONAL: 4,050 of 4,050 answers settled (all 4,050 stored: G1 2,430, G2 405, G6 1,215; settled: no rerun owed, no matched-budget token target out of date, checked by S455 for the D89 and D90 Gemini cases), judged only in a's split columns, records of 2026-11-04 12:45 CET; of the answers S455's D92 list gives to rerun, stored again since: Mentor::i 15 of 15; Zhang RLM 17 of 17, 4 more stay failed (D92 Q185); matched-budget answers whose token target was set before an RLM-10 answer of their question was stored again: 0 (questions none); matched-budget answers checked by S455 for the D89 and D90 Gemini cases: yes",
+ "stamp": "4,050 of 4,050 answers settled (all 4,050 stored: G1 2,430, G2 405, G6 1,215; settled: no rerun owed, no matched-budget token target out of date, checked by S455 for the D89 and D90 Gemini cases), judged only in a's split columns, records of 2026-11-04 12:45 CET; of the answers S455's D92 list gives to rerun, stored again since: Mentor::i 15 of 15; Zhang RLM 17 of 17, 4 more stay failed (D92 Q185); matched-budget answers whose token target was set before an RLM-10 answer of their question was stored again: 0 (questions none); matched-budget answers checked by S455 for the D89 and D90 Gemini cases: yes",
  "named": "Supplementary Figure 17: FIGURE_LOCK [files] supplementary_name with --n 17 (D95 Q200, Q208)",
  "reproduced": {
   "compared": 0,
@@ -292,7 +292,7 @@
  },
  "figure_lock": {
   "path": "experiments/FIGURE_LOCK.toml",
-  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "sha256": "ac39c4e311f340654fe1ebe3333a3fe439bc6286e38fc0334fdb0e0cf2a97aef",
   "status": "agreed"
  },
  "font": "Helvetica",
@@ -947,12 +947,12 @@
   "exp01_clone_head_when_copied_is_not_the_run_commit": "records_manifest.json exp01.<set-up>.processes gives each process's commit from the Studio's start records"
  },
  "files": {
-  "Supplementary Figure 17 (provisional, 4050 of 4050).pdf": "5f586d8071fbed61e49c2d89edfb68b951873862335a7748fedc797915bd162c",
-  "Supplementary Figure 17 (provisional, 4050 of 4050).svg": "b6119f61fcae0b2495b8beaae533958a555a10bd44d29e269ff44b96a2f1ae70",
-  "Supplementary Figure 17 (provisional, 4050 of 4050).png": "2ec94b34604c8e01d8ba4faaac087c94e1f051f161ed2a86ae9dfee930bea961",
-  "Supplementary Figure 17 data (provisional, 4050 of 4050).xlsx": "0cb1f1e962aba7787b70af762da17a818c35a72f55cd85d2a2df837d38ed9e14",
-  "Supplementary Figure 17 data caption (provisional, 4050 of 4050).md": "4149e11090a8bd5aa1e498f57aa54e178ce12e010e55b8781d4b2276368a5b3b",
-  "supplementary_figure17_numbers.json": "352ea597a304a5d26da59ef6ee32911f3d0d62d63b78a603f62b06201a146827",
-  "legend_draft.md": "ab8443bb377ae0abc92eb591c280fd17e0d9431153952ffa5caa726f05fc6ffe"
+  "Supplementary Figure 17.pdf": "5f586d8071fbed61e49c2d89edfb68b951873862335a7748fedc797915bd162c",
+  "Supplementary Figure 17.svg": "b6119f61fcae0b2495b8beaae533958a555a10bd44d29e269ff44b96a2f1ae70",
+  "Supplementary Figure 17.png": "2ec94b34604c8e01d8ba4faaac087c94e1f051f161ed2a86ae9dfee930bea961",
+  "Supplementary Figure 17 data.xlsx": "0cb1f1e962aba7787b70af762da17a818c35a72f55cd85d2a2df837d38ed9e14",
+  "Supplementary Figure 17 data caption.md": "abdf853c16db38965fed6c8bd4668bc831a5a1428b136ddbdbaa9c6cd3e7e8a5",
+  "supplementary_figure17_numbers.json": "b9210ef9ef23b8246dc6df2f5efb681eb12e93c3643fdc8f81423bfc3fd38f71",
+  "legend_draft.md": "0e63d6087f85601e7ab775ddc64bd73e65d2586a212120eb9644b4da93adff38"
  }
 }

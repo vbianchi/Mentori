@@ -50,7 +50,9 @@ INPUTS, each checked by sha256 before it is read further:
   Concept recall: findings/recompute/L3/concept_recall.jsonl (G1, D12's loose matcher, key v2.4, provisional) and
       S471.score() for G2's answers.
   Passage to paper: the paper store's chroma.sqlite3 (metadata file_name), the copy in ~/l1_inputs/store, sha256
-      332a587a (its MANIFEST.sha256 and COPY.json), read only.
+      332a587a (its MANIFEST.sha256 and COPY.json), read only. Env MENTORI_L1_STORE names another folder holding it
+      (RELEASE_DESIGN.md Q5 O1, 11 Nov: reproduce.py points it at the data root); the provenance key stays
+      STORE_KEY whatever the folder, so no output changes.
 
 REPRODUCE FIRST (README.md:75-79). Before any G2 number is computed, the same code recomputes from the same G1 rows
 and refuses (exit 1, nothing written) unless each of these equals its committed value:
@@ -97,6 +99,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import os
 import re
 import sqlite3
 import statistics
@@ -121,7 +124,9 @@ G2_COLLECT_SHA = "b31508d05557290d0791ba686117ea379397deee0a9df7bc5cc04e725c4cc2
 G2_SIDE_SHA = "313b947dc7ebcf62da6cbf62742cee932186ef96e812f011e0a1f0d0de23212c"
 G1_COLLECT_SHA = "f5ff75bc244cda492a48e7e11f54f2007ed7d586a8f49e78921edd7244b28965"      # figure3_provenance.json
 G2_ANSWERS_SHA = "6b4c46531eca233b1bd73a5cb56819874e1807e9ee6c80152e9ce904a2d32728"      # S3_runs/README.md:77
-STORE = Path.home() / "l1_inputs" / "store" / "chroma.sqlite3"
+STORE_DIR_DEFAULT = Path.home() / "l1_inputs" / "store"
+STORE = Path(os.environ.get("MENTORI_L1_STORE") or STORE_DIR_DEFAULT).expanduser() / "chroma.sqlite3"   # Q5 O1
+STORE_KEY = "~/l1_inputs/store/chroma.sqlite3"          # its name in inputs_sha256, the same wherever STORE is
 STORE_SHA = "332a587a932d62af5af59497b29dd990d127191b6fe8318b16615cd874937d4b"           # its MANIFEST.sha256
 RANKING = ROOT / "findings" / "figures_provisional" / "fig3_strategies" / "ranking.json"
 RANKING_V24_AT = "94262a0e"                           # the last commit whose ranking.json is on key v2.4 with old sheets
@@ -1164,7 +1169,7 @@ def main(argv=None) -> int:
               "findings/recompute/fig3_s6_inputs/SHA256SUMS": sha256_file(FROZEN_S6 / "SHA256SUMS"),
               "data/ground_truth_v2/ground_truth_v2_4_as_v1.json":
                   sha256_file(ROOT / "data/ground_truth_v2/ground_truth_v2_4_as_v1.json"),
-              rel(STORE): STORE_SHA, "experiments/LOCK.toml": sha256_file(ROOT / "experiments/LOCK.toml"),
+              STORE_KEY: STORE_SHA, "experiments/LOCK.toml": sha256_file(ROOT / "experiments/LOCK.toml"),
               **info["sha256"]}
     head = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
     R = {"_provenance": {"script": SCRIPT, "script_sha256": sha256_file(Path(__file__)), "at": t0, "git_head": head,

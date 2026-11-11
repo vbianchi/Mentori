@@ -1,17 +1,17 @@
 {
  "provenance": {
   "script": "scripts/S497_fig5_d166.py",
-  "script_sha256": "fc17bb3af77503ddfd6346aa8b4c7dc33f3753e87b25da60bec2b4fcddc44068",
+  "script_sha256": "40fb4d6f94b4c4e84991f821529313a5326c7c81ea2aa3b2722d6ac5a438fef6",
   "imports_sha256": {
-   "S473_fig5_panels.py": "6d637b9f4e990a3470661fedee652f2b8341d8cbb4abf79acc451992340f3b36",
-   "S457_fig2_panels.py": "8c29dab8b04a1bad4a955582a30831c51c2b70438be2f6d2698c7b81948d7520",
-   "S463_fig2_ranking.py": "8279a35d27c5a99d34980b59529203b104526035beba74031c9964a2ee360825",
+   "S473_fig5_panels.py": "2ff460af2fc1f47ac5eaa70a3bcce85c84aced56b8b67ec078f9c6b8dc7990dc",
+   "S457_fig2_panels.py": "33dc73444a80cf9d9b429fff6e489322bb01ca828a10f12a90487d84e7eaa4a1",
+   "S463_fig2_ranking.py": "8d9070c7036276ac1fb48a8cfa859b48e207b4c8ce15a84f2832e5a2bf88aa6d",
    "fig_repro.py": "4bca103b599da4adc0bd473f5b8210dd48b6543caaf63e5589f2faaa7b37d18b",
    "judge_rows_v25.py": "77d4a84d7aff4dd0ee92366395a4be2e5f27fe20d5de99ccbc86b7333c401661",
    "house_style.py": "647c8991f4dcd2cea08e0be46eaf758beb55fb029c54bb267e7fba1e0b8b17b6",
-   "figure_names.py": "a3c65ae0a1e8aa05e99a99610ea857f63b0d8fff60a99404bcb5bf6ff9a82e65",
+   "figure_names.py": "025f8904861fd8d916cd875346a1384e915ea6601bfd2f7624dd71e49f2948a7",
    "minicheck_filter.py": "6d2258a6f691324de266824695da7a56eff02d60eef18456ab4d60ee9138242d",
-   "S540_fig5_evaluators.py": "e227184bb004d52856be2ab4f8440120b108ae1cc7c6035e20ed6814b7d8c920",
+   "S540_fig5_evaluators.py": "30290ee53f3da1b1b34428cc66f96b358b89dc0ecd7e2da33dee0765ec777eec",
    "S564_claimify_selection.py": "f768b4937529c1f4d2eb2971e80c3249a4cc988b4418527abd2909544e63d622",
    "pdf_font_determinism.py": "018af84dfdabbbd291674dcf07301bbfa270a9f5fc4aa005151870d565175d97"
   },
@@ -23,7 +23,7 @@
   "command": "uv run --frozen python scripts/S497_fig5_d166.py figure",
   "design": "D200 on D166's bands (build spec fig5.md section 4), with Valerio's notes of 2 November on the bands and on panels d and f"
  },
- "stamp": "PROVISIONAL: 516 of 516 draw-1 answerable answers have a final row from all four scorers; judge plain call 1,548 of 1,548, concept recall 1,548 of 1,548 (D181's reading, L3_d181), MiniCheck against the papers 516 of 516 (draw 1, S564's selection D208 and the claim filter D172), judge with passages 1,548 of 1,548; RAGAS 576 and RAGChecker 576 rows (K1); the Second judge row of panel e from S518's qwen3.8:27b rows (D267); S3 collect 2026-10-28T10:19:31Z, run_sha256 38ae79ab023b",
+ "stamp": "516 of 516 draw-1 answerable answers have a final row from all four scorers; judge plain call 1,548 of 1,548, concept recall 1,548 of 1,548 (D181's reading, L3_d181), MiniCheck against the papers 516 of 516 (draw 1, S564's selection D208 and the claim filter D172), judge with passages 1,548 of 1,548; RAGAS 576 and RAGChecker 576 rows (K1); the Second judge row of panel e from S518's qwen3.8:27b rows (D267); S3 collect 2026-10-28T10:19:31Z, run_sha256 38ae79ab023b",
  "reproduced": [
   "W 0.927 and exact P 0.000181 on S26's per-configuration means (S318: W 0.927, P 0.000181 under the untied null)",
   "mean pairwise rho 0.9037, PC1 share 0.9361, participation ratio 1.137 on S30's 528 answers (S26, S318 _triangulation)",
@@ -379,18 +379,18 @@
  },
  "figure_lock": {
   "path": "experiments/FIGURE_LOCK.toml",
-  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "sha256": "ac39c4e311f340654fe1ebe3333a3fe439bc6286e38fc0334fdb0e0cf2a97aef",
   "status": "agreed"
  },
  "files": {
-  "Figure 6 (provisional, 516 of 516).pdf": "6dbc565f55a2ce9d7a480e0cb557e9c8f4b0c65c96a18c5df579bfa1c6e8bc7b",
-  "Figure 6 (provisional, 516 of 516).png": "c30cd4747aa93d55c262edab227e5341bbd584e6609c7ec06341560195f755c6",
-  "Figure 6 (provisional, 516 of 516).svg": "51c455923ffa48d6b4f8309e58eb801f5b3395e370c47081413b2313a7e36058",
-  "Source Data Fig. 6 (provisional, 516 of 516).xlsx": "652a6a26dedfe32d5bcf26396b43cb5c3d2f9d56505c55b5c77bd1eff241663b",
-  "Source Data Fig. 6 caption (provisional, 516 of 516).md": "7fd78930b717d497081e49152433319894df8725ccc4500d8d9419efd8045fab",
-  "fig5_data_state.json": "bbf95d0174011bc08ca111cfa5ff11e340c0a1181b2e69d5d843a5b6fde9c2b7",
-  "figure6_numbers.json": "97c5b09905d441a972df2bf87cb4f5c55991784da17791da08bc19913154d3a3",
-  "legend_draft.md": "b9fdac98f402895a22b890bbf405a9f0b57bfcbea2609e4592ad4c564e042d92",
-  "methods_notes.md": "54d65d5f5dbccec928966f4910ecc30c53fa2cd95d7ddae3c8f7e5d8a299b2f0"
+  "Figure 6.pdf": "31be6b5f0a9d35fa62957af05b993103f10e4c1cdc2368c00fa9f6da5a4e07e4",
+  "Figure 6.png": "d641ad3895858558ad9268c96991ebfac7ac3a9d0d3dfdad3a18b8c5e1ab2fe7",
+  "Figure 6.svg": "51a7df79503ce3320b11a680802e1544d18221ad83510d7e9240d12ebf6153f0",
+  "Source Data Fig. 6 caption.md": "60e4911b984ed43cd0340d986f6fe195f52b67737853550a454ec83d11e1d963",
+  "Source Data Fig. 6.xlsx": "ebd814f7a4067e75e488a68069fcc818bb66fe839df3a2bb10da8752240efbce",
+  "fig5_data_state.json": "7eabc78d010f2aa15e13587f92651e9f01e18ed0dccc22f892fe2afe09940f3e",
+  "figure6_numbers.json": "cf2814757c23c2b42ed6be89fd5c6d52badb42698fc91cb5f25887006cd0d0e3",
+  "legend_draft.md": "c952b7b357b860c6cc1dd4dae4c3b3e39b2f124b024fdf06a53aab30101eddb5",
+  "methods_notes.md": "11ed02774f4a624095852553d1b4359c3d666490a70199c194438feccb9ba2e9"
  }
 }

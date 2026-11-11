@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """S524 - Supplementary Figures 10 and 11 (12 and 13 before D257), the component benchmarks and the distiller prompts (T3): frames, and
-provisional plates from T3's answers (figure --t3, note of 4 November below).
+plates from T3's answers (figure --t3, note of 4 November below).
 
 NOTE, 7 November 2026 (D294, Valerio, "O1" in thread 96158401: "keep c and d; drop a and b. a's fact becomes one
 sentence in the text"). Supplementary Figure 10 keeps two panels: a, the supervisor against the judge (c before), and
@@ -46,7 +46,7 @@ COMMANDS, from the repository root (uv run only; no model call; frame reads no r
       Row counts and every value cell blank on the sheets of both plates; two builds byte for byte; S448 passes on both
       frames; a value edited into a workbook cell makes S448 R8 fail. Last line "selftest: <k> of <k> checks pass".
   uv run --frozen python scripts/S524_t3_s12_s13.py figure --t3 <frozen set> [--out <folder>]
-      Both plates from T3's sinks, as provisional plates named "(provisional, k of N)", k the answers stored in the set.
+      Both plates from T3's sinks, named by the lock alone (Q9, 11 Nov); the stamp counts k, the answers stored in the set.
       <frozen set> is a folder findings/recompute/T3_runs/copy_t3_frozen.sh writes (findings/runs/T3_frozen_<stamp>).
       Refuses, exit 2, writing nothing: while findings/recompute/S518_split_confirmation/ does not exist (D195, fig4.md
       Q3); without --t3; on any refusal of read_s12b (R6, NOTE of 6 November); on any refusal of the
@@ -128,7 +128,7 @@ S12_DRAWS = [(m, d) for m in MODELS for d in ((1, 2, 3) if m == GEMINI_MODEL els
 N_PLANNED = {10: len(S12_DRAWS) * sum(KEPT.values()), 11: len(MODELS) * len(PROMPTS) * KEPT["Distiller"]}
 
 W = hs.PAGE_W_MM
-RHO_ROOM = 3.4                                    # S10 a: the line "rho x, n = y" under each small panel (6 Nov)
+RHO_ROOM = 3.4                                    # S10 a: the line "rho x" under each small panel (6 Nov; n off, 11 Nov)
 H_S13 = 100.4                                     # S10's height is computed from its layout (draw_12, D294)
 H_GUARD = 169.5                                   # S472's guard: past this the plate is refused
 ROW_GAP = 1.6                                     # the space above the row that sits apart
@@ -865,12 +865,11 @@ def draw_12(paths, fill=None):
                     hs.strip(ax, js, vs, orient="v", size_mm=hs.DOT_MM)
                     hs.summary_tick(ax, js, statistics.median(vs), orient="v")
             row = MODELS.index(m)
+            # Valerio, 11 Nov: the plate holds only the figure; each model's n is in the legend ("n = 194 answers
+            # per model; 190 for gpt-oss:20b and 191 for llama3:8b"), so the line under a panel prints rho only
             if e["rho"] is not None:
-                p.tied(p.text(x + wb / 2, yt + MS_BOX_H + 10.4, f"ρ {e['rho']:.2f}, n = {e['n']}", ha="center",
-                              va="center"), "Supplementary Fig. 10a", row, "ρ {rho:.2f}, n = {n}")
-            else:
-                p.tied(p.text(x + wb / 2, yt + MS_BOX_H + 10.4, f"n = {e['n']}", ha="center", va="center"),
-                       "Supplementary Fig. 10a", row, "n = {n}")
+                p.tied(p.text(x + wb / 2, yt + MS_BOX_H + 10.4, f"ρ {e['rho']:.2f}", ha="center",
+                              va="center"), "Supplementary Fig. 10a", row, "ρ {rho:.2f}")
     p.text(1.8, yt + MS_BOX_H / 2, "Supervisor score", rotation=90, ha="left", va="center")
     xd = x_b + N_ABOVE * (wb + MS_GAP) - MS_GAP / 2
     pg = p.fig.add_axes((0, 0, 1, 1))
@@ -1019,7 +1018,7 @@ def legend_12(a_text: str = "", n_text: str = "", n_after: str = "") -> str:
     gem, ctx = GEN_DISPLAY[GEMINI_MODEL], f"{context_of_apart():,}"
     items = _join(f"{KEPT[k]} {k.lower()}" for k in DRAWN) + " items"
     return (f"**Supplementary Figure 10 | {TITLE[10]}.** Each component was tested alone on its own items: {items}, "
-            f"the {sum(LEFT_OUT[k] for k in DRAWN)} items built on questions later replaced in the answer key left "
+            f"the {sum(LEFT_OUT[k] for k in DRAWN)} of these four components' items built on questions later replaced in the answer key left "
             f"out. Five open-weight models answered each item once and {gem} answered it on three draws. "
             f"{a}, Supervisor score against the judge score of the same answer, one panel per model; the judge scores "
             f"an answer on the final key, or gives the refusal score for {FN.OUT_OF_SCOPE_QUESTIONS}. Boxes: median "
@@ -1071,8 +1070,8 @@ CAPTION = {
 # ---------------------------------------------------------------------------------------------------------------------
 def write_frame(n: int, folder: Path) -> Path:
     planned = N_PLANNED[n]
-    tag = f" (provisional, 0 of {planned})"
-    stamp = (f"PROVISIONAL: 0 of {planned:,} planned T3 answers, a frame: T3 has not run, so no value is drawn or held")
+    tag = ""                                  # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
+    stamp = (f"0 of {planned:,} planned T3 answers, a frame: T3 has not run, so no value is drawn or held")
     name = f"Supplementary Figure {n}"
     side = f"supplementary_figure{n}"
     folder.parent.mkdir(parents=True, exist_ok=True)
@@ -1094,12 +1093,12 @@ def write_frame(n: int, folder: Path) -> Path:
             "printed_what": "the digit-bearing texts on the plate that are not tick labels, each declared fixed, and "
                             "the first panel letter (build_order.md F7)"}, indent=1) + "\n")
         legend = stage / "legend_draft.md"
-        legend.write_text(f"Legend DRAFT for {name} (a frame; written by {SCRIPT}). Data stamp: {stamp}.\n\n"
+        legend.write_text(f"Legend DRAFT for {name} (a frame; written by {SCRIPT}).\n\n"
                           f"{legend_12() if n == 10 else legend_13()}\n")
         cap = stage / f"{name} data caption{tag}.md"
         cap.write_text(f"# {name} data, caption\n\n**{name} data | The planned rows of {name}.** {CAPTION[n]} Every value "
                        f"cell is empty until T3 has run. Generated by `uv run --frozen python {SCRIPT} frame`.\n\n"
-                       f"Provisional: {stamp}.\n")
+                       f"Data stamp: {stamp}.\n")
         out = {"provenance": {"script": SCRIPT, "script_sha256": sha256_file(Path(__file__)),
                               "command": f"uv run --frozen python {SCRIPT} frame", "python": platform.python_version(),
                               "deterministic": "no build time and no repository HEAD are recorded",
@@ -1205,7 +1204,7 @@ def legend_12_t3(V) -> str:
     a_text = (f" For {GEN_DISPLAY[GEMINI_MODEL]}, each answer's supervisor score is the mean of its three draws."
               f"{pair}")
     odd = [f"{e['n']} for {m}" for m in MODELS if (e := S["model"].get(m)) and e.get("n", JUDGED) != JUDGED]
-    n_text = f" ({_join(odd)}, less the answers left out)" if odd else ""
+    n_text = f"; {_join(odd)}, whose missing answers are counted below" if odd else ""   # audit 9 Nov, X087 (A101)
     miss = [f"{m}, {e['no_score']}" for m, e in S["model"].items() if e["no_score"]]
     c_text = (f" Answers that gave no supervisor score are left out and counted: {'; '.join(miss)}."
               if miss else "")
@@ -1233,10 +1232,10 @@ def write_figure(n: int, folder: Path, V: dict, prov: dict) -> Path:
     """One plate from T3's values: its PDF, SVG, PNG, data workbook, caption, numbers, provenance and legend draft,
     staged and moved into place as write_frame does."""
     planned, k = N_PLANNED[n], V["stored"][n]
-    tag = f" (provisional, {k} of {planned})"
+    tag = ""                                  # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
     models_in = [m for m in MODELS if any(c["stored"] for (e, mm, _, _), c in V["counts"].items()
                                           if mm == m and e == ("exp_04" if n == 10 else "exp_04b"))]
-    stamp = (f"PROVISIONAL: {k:,} of {planned:,} planned T3 answers, from frozen set {prov['frozen_set']} (SHA256SUMS "
+    stamp = (f"{k:,} of {planned:,} planned T3 answers, from frozen set {prov['frozen_set']} (SHA256SUMS "
              f"{prov['frozen_set_sha256'][:12]}); models in: {', '.join(models_in) or 'none'}"
              + ("; panel a a frame: no S12b copy read" if n == 10 and V.get("s12b") is None else "")
              + (f"; panel a from S12b's {JUDGED} judge rows on key v2.5 (run_sha256 {V['s12b_run'][:12]}, "
@@ -1269,7 +1268,7 @@ def write_figure(n: int, folder: Path, V: dict, prov: dict) -> Path:
                             "printed values tied to their sheet row and format",
             "counts": counts}, indent=1) + "\n")
         legend = stage / "legend_draft.md"
-        legend.write_text(f"Legend DRAFT for {name} (provisional; written by {SCRIPT} figure). Data stamp: {stamp}.\n\n"
+        legend.write_text(f"Legend DRAFT for {name} (written by {SCRIPT} figure).\n\n"
                           f"{legend_12_t3(V) if n == 10 else legend_13_t3(V)}\n")
         cap = stage / f"{name} data caption{tag}.md"
         cap.write_text(f"# {name} data, caption\n\n**{name} data | The values of {name}.** {CAPTION[n]} A value cell "
@@ -1277,7 +1276,7 @@ def write_figure(n: int, folder: Path, V: dict, prov: dict) -> Path:
                        + (", and every value cell of sheet a is empty until the judge scores of the submitted "
                           "supervisor answers exist" if n == 10 and V.get("s12b") is None else "")
                        + f". Generated by `uv run --frozen python {SCRIPT} {prov['args']}`.\n\n"
-                         f"Provisional: {stamp}.\n")
+                         f"Data stamp: {stamp}.\n")
         out = {"provenance": {"script": SCRIPT, "script_sha256": sha256_file(Path(__file__)),
                               "command": f"uv run --frozen python {SCRIPT} {prov['args']}",
                               "python": platform.python_version(),

@@ -1,0 +1,13 @@
+{
+ "id": "09_seqkit_FR1",
+ "category": "factual_recall",
+ "subcategory": null,
+ "question": "Which operating systems are supported by SeqKit and what are the requirements for their installation and configuration?",
+ "papers": [
+  {
+   "paper": "09_seqkit",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/09_seqkit.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/09_seqkit.pypdf.txt"
+  }
+ ]
+}

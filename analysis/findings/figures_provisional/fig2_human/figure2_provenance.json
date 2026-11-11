@@ -1,20 +1,20 @@
 {
- "stamp": "PROVISIONAL two raters, 49 of 49 answers drawn",
+ "stamp": "two raters, 49 of 49 answers drawn",
  "script": "scripts/S531_fig2_s3_plates.py",
- "script_sha256": "8c88cd5fcf3f60772422d9c0758e6e82ef8df86d06597ed387315bb1c88d799e",
+ "script_sha256": "4ede08413dba0461a05cf1ba41812255b342e38f3b76e39f23e1e2309dd8d3e7",
  "command": "uv run --frozen python scripts/S531_fig2_s3_plates.py --raters 2",
  "raters": 2,
  "inputs": {
-  "results.json": "c809d46729f4038c2d38b6cd84cffc408c3dcea7279bdb696b58b711b11f918d",
+  "results.json": "49b35308d73bbd8a6d0a6ed87041fd5b996a4dbe61abab2d03c904dc512c4bb2",
   "resamples.npz": "95b450e930277d7d22cdab5bcb4221b400d396282910d7cb83e25101f0ffb0dc"
  },
  "files": {
-  "Figure 2 (provisional, 49 of 49).pdf": "bffa4a70730e75a2ef01280ef5810c95861b7271fec45cdbc595c3a6cd7a68bf",
-  "Figure 2 (provisional, 49 of 49).png": "e6501a0306102188bca9dfb3f7eaf122babee4c3a6ee022b457bc02d998e98cb",
-  "Figure 2 (provisional, 49 of 49).svg": "8fc621e20802f1f47c2965dc60d36d9d376b38085bb27ba9531cf1d666ead9eb",
-  "Source Data Fig. 2 (provisional, 49 of 49).xlsx": "c9dc7f641bdb9624d0c6d3c3d1a3775d7383b7bc3ad3b6df08108525a231d6c3",
-  "Source Data Fig. 2 caption (provisional, 49 of 49).md": "204b82414b249e0d2de74625af9cb19b8c082485a195e9fc28a6f36e809b9818",
-  "figure2_numbers.json": "a1969bec6049b5f620b5d0ff249b2def87fcfe6a4706864a5b51f04a2b648545",
-  "legend_draft.md": "ca517e997667e07a5a2a1bd86704ccb9dac1404e95f35172ec7200d35bfa7846"
+  "Figure 2.pdf": "d57ca7a35f72d3480b0f9c6e5769881cfeefa556ad36c7b9f1a20edd6689ef90",
+  "Figure 2.png": "66cb278c89dc90b44a7744139afbe2e7a14b0b29b500e7ca9982f20260d3f8f6",
+  "Figure 2.svg": "7446abf6fd2c1bdb30de4e44ae260006612489bbcbfba2040d27d355a41a7d6e",
+  "Source Data Fig. 2 caption.md": "1c3b90817892ef3722e487a487a8f43d29a976af6d938200b91816beb3988831",
+  "Source Data Fig. 2.xlsx": "c9dc7f641bdb9624d0c6d3c3d1a3775d7383b7bc3ad3b6df08108525a231d6c3",
+  "figure2_numbers.json": "6f0cd3dea473cdd78ff30e38903dc03d7b22fb6ec3d985b665261d2b82402d08",
+  "legend_draft.md": "922ac87e647f8906fa3691a5b48599f8bf3e0f32e959ee87d04103fc3262c076"
  }
 }

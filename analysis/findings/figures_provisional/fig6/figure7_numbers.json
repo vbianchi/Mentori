@@ -1,6 +1,6 @@
 {
- "stamp": "PROVISIONAL: 2,420 of 2,420 attempts, 11 of 11 variants complete, records of 2026-11-04 08:35 CET; after the S4 reruns (D75, D80 V1, D81)",
- "what": "every number the plate draws, sheet by sheet as Source Data Fig. 7 (provisional, 2420 of 2420).xlsx holds them (S448 R8 compares the workbook with this file)",
+ "stamp": "2,420 of 2,420 attempts, 11 of 11 variants complete, records of 2026-11-04 08:35 CET; after the S4 reruns (D75, D80 V1, D81)",
+ "what": "every number the plate draws, sheet by sheet as Source Data Fig. 7.xlsx holds them (S448 R8 compares the workbook with this file)",
  "sheets": {
   "Fig. 7a": {
    "columns": [
@@ -6927,139 +6927,114 @@
    "format": "{variant}"
   },
   "num180": {
-   "sheet": "Fig. 7b",
-   "row": 13,
-   "format": "{tier}\nn = {n_operations}"
-  },
-  "num181": {
-   "sheet": "Fig. 7b",
-   "row": 38,
-   "format": "{tier}\nn = {n_operations}"
-  },
-  "num182": {
-   "sheet": "Fig. 7b",
-   "row": 61,
-   "format": "{tier}\nn = {n_operations}"
-  },
-  "num183": {
    "sheet": "Fig. 7c",
    "row": 0,
    "format": "{share_pct:.0f}"
   },
-  "num184": {
+  "num181": {
    "sheet": "Fig. 7c",
    "row": 4,
    "format": "{share_pct:.0f}"
   },
-  "num185": {
+  "num182": {
    "sheet": "Fig. 7c",
    "row": 8,
    "format": "{share_pct:.0f}"
   },
-  "num186": {
+  "num183": {
    "sheet": "Fig. 7c",
    "row": 12,
    "format": "{share_pct:.0f}"
   },
-  "num187": {
+  "num184": {
    "sheet": "Fig. 7c",
    "row": 16,
    "format": "{share_pct:.0f}"
   },
-  "num188": {
+  "num185": {
    "sheet": "Fig. 7c",
    "row": 20,
    "format": "{share_pct:.0f}"
   },
-  "num189": {
+  "num186": {
    "sheet": "Fig. 7c",
    "row": 24,
    "format": "{share_pct:.0f}"
   },
-  "num190": {
+  "num187": {
    "sheet": "Fig. 7c",
    "row": 28,
    "format": "{share_pct:.0f}"
   },
-  "num191": {
+  "num188": {
    "sheet": "Fig. 7c",
    "row": 32,
    "format": "{share_pct:.0f}"
   },
-  "num192": {
+  "num189": {
    "sheet": "Fig. 7c",
    "row": 36,
    "format": "{share_pct:.0f}"
   },
-  "num193": {
+  "num190": {
    "sheet": "Fig. 7c",
    "row": 40,
    "format": "{share_pct:.0f}"
   },
-  "num194": {
-   "sheet": "Fig. 7c",
-   "row": 0,
-   "format": "Gemini, n = {attempts_in_bar} per bar"
-  },
-  "num195": {
+  "num191": {
    "sheet": "Fig. 7c",
    "row": 44,
    "format": "{share_pct:.0f}"
   },
-  "num196": {
+  "num192": {
    "sheet": "Fig. 7c",
    "row": 48,
    "format": "{share_pct:.0f}"
   },
-  "num197": {
+  "num193": {
    "sheet": "Fig. 7c",
    "row": 52,
    "format": "{share_pct:.0f}"
   },
-  "num198": {
+  "num194": {
    "sheet": "Fig. 7c",
    "row": 56,
    "format": "{share_pct:.0f}"
   },
-  "num199": {
+  "num195": {
    "sheet": "Fig. 7c",
    "row": 60,
    "format": "{share_pct:.0f}"
   },
-  "num200": {
+  "num196": {
    "sheet": "Fig. 7c",
    "row": 64,
    "format": "{share_pct:.0f}"
   },
-  "num201": {
+  "num197": {
    "sheet": "Fig. 7c",
    "row": 68,
    "format": "{share_pct:.0f}"
   },
-  "num202": {
+  "num198": {
    "sheet": "Fig. 7c",
    "row": 72,
    "format": "{share_pct:.0f}"
   },
-  "num203": {
+  "num199": {
    "sheet": "Fig. 7c",
    "row": 76,
    "format": "{share_pct:.0f}"
   },
-  "num204": {
+  "num200": {
    "sheet": "Fig. 7c",
    "row": 80,
    "format": "{share_pct:.0f}"
   },
-  "num205": {
+  "num201": {
    "sheet": "Fig. 7c",
    "row": 84,
    "format": "{share_pct:.0f}"
-  },
-  "num206": {
-   "sheet": "Fig. 7c",
-   "row": 44,
-   "format": "open-weight, n = {attempts_in_bar} per bar"
   }
  }
 }

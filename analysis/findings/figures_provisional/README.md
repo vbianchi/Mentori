@@ -1,5 +1,7 @@
 # findings/figures_provisional
 
+This folder holds the final figures of the revised paper; it keeps its working name (D315 Q3).
+
 One folder per plate: main Figures 1 to 7 (`fig1/`, `fig2_human/`, `fig3_strategies/`, `fig4_depth/`, `fig4/`, `fig5/`,
 `fig6/`; D283's folder names) and Supplementary Figures 1 to 18 (`supp_fig<N>*/`): 25 plates, 20 of them in steps of S494.
 The other five are built outside it: Figure 2 and Supplementary Figure 3 by `scripts/S531_fig2_s3_plates.py` (`--raters 0`

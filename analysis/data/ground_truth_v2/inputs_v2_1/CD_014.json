@@ -1,0 +1,18 @@
+{
+ "id": "CD_014",
+ "category": "cross_document",
+ "subcategory": "comparison",
+ "question": "How do the risk factors identified for brucellosis in Ethiopian camels and small ruminants compare to the risk factors for Peste des petits ruminants (PPR) in the same region?",
+ "papers": [
+  {
+   "paper": "16_ppr_ethiopia",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/16_ppr_ethiopia.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/16_ppr_ethiopia.pypdf.txt"
+  },
+  {
+   "paper": "17_brucellosis_ethiopia",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/17_brucellosis_ethiopia.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/17_brucellosis_ethiopia.pypdf.txt"
+  }
+ ]
+}

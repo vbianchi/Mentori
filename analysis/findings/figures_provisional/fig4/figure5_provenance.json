@@ -1,12 +1,12 @@
 {
  "script": "scripts/S472_fig4_panels.py",
- "script_sha256": "84297a37e74db0d0f80b9704b26a232115c53bbc8eab66b0e8de24d100fdd791",
+ "script_sha256": "9da54879fd6cf90ad4bfd22e93f6633a75e0b68bce676a4df770d0b8f6e5f5a5",
  "command": "uv run --frozen python scripts/S472_fig4_panels.py figure",
  "python": "3.13.11",
  "frozen_inputs": {
   "sums": {
    "path": "findings/recompute/frozen_inputs/SHA256SUMS",
-   "sha256": "3e29c46426981fd1cfa45b51241b0f4a71899e1c011c60388c8bfb7e44bba423"
+   "sha256": "b550d0b34ef6527d8be824b4056c0026205892b015185d9174b03bbdf0cd76b6"
   },
   "read_by_default": {
    "records": "fig4_records_1023:fig4_records_1023",
@@ -825,10 +825,10 @@
   "reading": "findings/recompute/S571_rlm_reading/g17_d123/g17_reading.json",
   "reading_sha256": "e824e35e084ab7ff7788a38248ce399d6f8188f564a3b3088d3ecb052f4a6880",
   "s576": "findings/recompute/S576_d249/s576_d249.json",
-  "s576_sha256": "ddb7c24b86873b91ad84e9859cb54e87d41fbab3701a11078477eaf9c53097d6",
+  "s576_sha256": "0a287c4fe276f4f8a50ce8527c11832554a8cdb5c9f89a8075a9e5960af807db",
   "s576_code_sha256": {
    "scripts/S576_d249_hypotheses.py": "38b2c545925803ff56c7a0b887fe51b076c4728caed4c89c11ddc2ca957d704c",
-   "scripts/S463_fig2_ranking.py": "8279a35d27c5a99d34980b59529203b104526035beba74031c9964a2ee360825",
+   "scripts/S463_fig2_ranking.py": "8d9070c7036276ac1fb48a8cfa859b48e207b4c8ce15a84f2832e5a2bf88aa6d",
    "scripts/S575_g17_contrasts.py": "b3a94aee797e9cb5236943f43e4ec35c561941028c43cae2c61b70d867a80cd7"
   },
   "s575_contrasts": "findings/recompute/S575_g17_contrasts/contrasts.json",
@@ -866,7 +866,7 @@
  },
  "recount": {
   "path": "findings/recompute/S480_fig4_recount.json",
-  "sha256": "82e9149e1c6f2261a6af247ca0c1022fce50f243621e3c7844afe255e1188c9b",
+  "sha256": "a8ad499002156fc9e29cb6251b081d9bbfb14c7fb67ce30fc1aa7bf92dfe618a",
   "script": "scripts/S480_fig4_recount.py",
   "script_sha256": "7c432aa0524944649573f60009acb38450eb9886459783d3c8bf7aa1504950ee",
   "inputs_checked": [
@@ -889,34 +889,34 @@
   ]
  },
  "inputs_sha256": {
-  "findings/recompute/fig_design_inputs/design_facts.json": "9fb39a2d241543a10ba676057f552312de0133386a683fd0b5517dc468666e02",
+  "findings/recompute/fig_design_inputs/design_facts.json": "118fa72e45d0b61095ed974282d6fba3fb9b708e2502639e64e6c5ca4f9c445d",
   "findings/recompute/fig4_repo_inputs/G3_runs/preflight.sh": "01b8a87a2bd08c7fca12a3948f47931033089904b7bf7dd85668ecb84c4f14a5",
   "findings/recompute/D98_subset/d98_subset.json": "957c79b6b0f3afb12b70be51d0802e7853b4d4ff12e2bdb519d44a10111046bc",
   "experiments/mentori/orchestrator/distiller_firing.py@96936742": "65766687222d78b8af6e872345047cbad778a94c0a5c53b9bdbe1b52e49be50b",
   "experiments/mentori/publication/scripts/exp_03_orchestration_ablation.py@96936742": "6783d3f6a5868807b87580a5e3f12a4ee6b38a3d509334636aa17aa2c208c0f0",
   "experiments/LOCK.toml": "8730d401a5d7b6baa1780e656f844261eaead60e45b5199afa29d57f989ad495",
-  "experiments/FIGURE_LOCK.toml": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
-  "scripts/S457_fig2_panels.py": "8c29dab8b04a1bad4a955582a30831c51c2b70438be2f6d2698c7b81948d7520",
-  "scripts/S463_fig2_ranking.py": "8279a35d27c5a99d34980b59529203b104526035beba74031c9964a2ee360825",
+  "experiments/FIGURE_LOCK.toml": "ac39c4e311f340654fe1ebe3333a3fe439bc6286e38fc0334fdb0e0cf2a97aef",
+  "scripts/S457_fig2_panels.py": "33dc73444a80cf9d9b429fff6e489322bb01ca828a10f12a90487d84e7eaa4a1",
+  "scripts/S463_fig2_ranking.py": "8d9070c7036276ac1fb48a8cfa859b48e207b4c8ce15a84f2832e5a2bf88aa6d",
   "scripts/judge_rows_v25.py": "77d4a84d7aff4dd0ee92366395a4be2e5f27fe20d5de99ccbc86b7333c401661",
   "scripts/house_style.py": "647c8991f4dcd2cea08e0be46eaf758beb55fb029c54bb267e7fba1e0b8b17b6",
-  "scripts/figure_names.py": "a3c65ae0a1e8aa05e99a99610ea857f63b0d8fff60a99404bcb5bf6ff9a82e65",
+  "scripts/figure_names.py": "025f8904861fd8d916cd875346a1384e915ea6601bfd2f7624dd71e49f2948a7",
   "scripts/S575_g17_contrasts.py": "b3a94aee797e9cb5236943f43e4ec35c561941028c43cae2c61b70d867a80cd7",
   "scripts/S576_d249_hypotheses.py": "38b2c545925803ff56c7a0b887fe51b076c4728caed4c89c11ddc2ca957d704c",
   "findings/recompute/S571_rlm_reading/g17_d123/g17_reading.json": "e824e35e084ab7ff7788a38248ce399d6f8188f564a3b3088d3ecb052f4a6880",
-  "findings/recompute/S576_d249/s576_d249.json": "ddb7c24b86873b91ad84e9859cb54e87d41fbab3701a11078477eaf9c53097d6",
+  "findings/recompute/S576_d249/s576_d249.json": "0a287c4fe276f4f8a50ce8527c11832554a8cdb5c9f89a8075a9e5960af807db",
   "findings/recompute/S575_g17_contrasts/contrasts.json": "cc84d66ef3e709907f3ea3051d30900d04d7c2efce839573bdd52dee28f4dc32"
  },
  "inputs_read": "every input as it stands in the working tree, every check on those; plan.csv's G3 sentence from findings/recompute/fig_design_inputs/design_facts.json (D2: no document or working file is read; the claims list is S616's editorial step); inputs_sha256 records exp_03 and distiller_firing.py (DESIGN_DOCS) as they stood at DESIGN_AT 96936742 (git show), under names carrying @96936742; exp_03's STRESS_CONFIG_NAMES and distiller_firing.py's code (less its docstring) required the same as at DESIGN_AT",
  "model_calls": 0,
- "stamp": "PROVISIONAL: 1,485 of 3,015 answers, draw 1 of eight G3 set-ups (records of 2026-10-19 01:54 CEST, copied 2026-10-23T07:41:05Z, judged by S3, G3 collect of 2026-11-03T15:22:54), of RLM-10 (G1, G1 collect of 2026-10-23T09:41:17) and of G9's two set-ups (judged, retrievals read); key v2.5 judge rows: RLM-10's 60 from S6G1 after phase 3 (frozen fig3_s6_inputs, S528), G3's 600; 0 G3 answers of changed questions still on key v2.4 (D188, awaiting S6G3); 'draw' rows in; T3 not drawn; d, e: G17 (D250), concept recall the mean of draws 1 to 3, reading paper text draw 1, S571's reading e824e35e, S576's differences ddb7c24b",
+ "stamp": "1,485 of 3,015 answers, draw 1 of eight G3 set-ups (records of 2026-10-19 01:54 CEST, copied 2026-10-23T07:41:05Z, judged by S3, G3 collect of 2026-11-03T15:22:54), of RLM-10 (G1, G1 collect of 2026-10-23T09:41:17) and of G9's two set-ups (judged, retrievals read); key v2.5 judge rows: RLM-10's 60 from S6G1 after phase 3 (frozen fig3_s6_inputs, S528), G3's 600; 0 G3 answers of changed questions still on key v2.4 (D188, awaiting S6G3); 'draw' rows in; T3 not drawn; d, e: G17 (D250), concept recall the mean of draws 1 to 3, reading paper text draw 1, S571's reading e824e35e, S576's differences 0a287c4f",
  "page_mm": [
   183.0,
-  162.90166666666667
+  169.3078211370312
  ],
  "figure_lock": {
   "path": "experiments/FIGURE_LOCK.toml",
-  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "sha256": "ac39c4e311f340654fe1ebe3333a3fe439bc6286e38fc0334fdb0e0cf2a97aef",
   "status": "agreed"
  },
  "run_lock_now": {
@@ -1404,7 +1404,7 @@
   "model calls no synthesizer": 100,
   "model calls routing fix": 109,
   "model calls always distil": 109,
-  "model calls always distil F1": 107,
+  "model calls always distil Ex": 107,
   "model calls RLM-10": 111,
   "own time (s) no retrieval": 112,
   "own time (s) naive RAG": 129,
@@ -1415,7 +1415,7 @@
   "own time (s) no synthesizer": 105,
   "own time (s) routing fix": 124,
   "own time (s) always distil": 106,
-  "own time (s) always distil F1": 110,
+  "own time (s) always distil Ex": 110,
   "d cr one RLM-10": 12,
   "d cr one Zhang RLM-10": 5,
   "d cr one search tools off": 1,
@@ -1427,18 +1427,18 @@
   "e sub_calls_with_paper_text one Zhang RLM-10": 21,
   "e sub_calls_with_paper_text one search tools off": 38,
   "e sub_calls_with_paper_text one quality gate off": 37,
-  "e sub_calls_with_paper_text many RLM-10": 19,
-  "e sub_calls_with_paper_text many Zhang RLM-10": 18,
-  "e sub_calls_with_paper_text many search tools off": 20,
-  "e sub_calls_with_paper_text many quality gate off": 19,
+  "e sub_calls_with_paper_text many RLM-10": 20,
+  "e sub_calls_with_paper_text many Zhang RLM-10": 19,
+  "e sub_calls_with_paper_text many search tools off": 21,
+  "e sub_calls_with_paper_text many quality gate off": 20,
   "e n_papers one RLM-10": 43,
   "e n_papers one Zhang RLM-10": 36,
   "e n_papers one search tools off": 46,
   "e n_papers one quality gate off": 44,
-  "e n_papers many RLM-10": 19,
+  "e n_papers many RLM-10": 20,
   "e n_papers many Zhang RLM-10": 20,
   "e n_papers many search tools off": 21,
-  "e n_papers many quality gate off": 18
+  "e n_papers many quality gate off": 19
  },
  "held_not_drawn": {
   "baselines draws 2 and 3": {
@@ -1468,13 +1468,13 @@
   }
  },
  "files": {
-  "Figure 5 (provisional, 1485 of 3015).pdf": "0da186644f44f36a54f47d8f208b28961fc222fc4bb1a263838772048b97e05a",
-  "Figure 5 (provisional, 1485 of 3015).svg": "cb4ee79e6c53241e4248015912ae7a96d0167e549d6f0979b9678f7694b8f782",
-  "Figure 5 (provisional, 1485 of 3015).png": "73c1cccd846a8c04b67e4386cedd3c13cdbe7f1882657d7a2556be3bd175a4d0",
-  "Source Data Fig. 5 (provisional, 1485 of 3015).xlsx": "aa90b86ddfda998826864c8f6cf42f17a881c71044b83ddfb6a1a6d008b31d20",
-  "Source Data Fig. 5 caption (provisional, 1485 of 3015).md": "908979b89605f6f5090f7e3035cd8a245f6a4a838c8c1938d28a0ae34219bb65",
-  "figure5_numbers.json": "fe2652805ed3c0af11a3b95f4defc5f077c1bd8bf3caa55f5a751ef17bfb856e",
-  "legend_draft.md": "39a4ed597c0d7501e7e07bfa1070640644f0708185325e7876ca383f1e67d370",
+  "Figure 5.pdf": "4196ff1bf2f9874783e42fb4901965572784ab75b136e945ed612dc8472e89a4",
+  "Figure 5.svg": "0c52ee1a151cb483cff74a72a0fd68b6430088f1e56b7f950859239f9ef92af0",
+  "Figure 5.png": "2066908d781af640fcbfad6d42fd480f7b34f96d574b1c623d79e0cb24368bb7",
+  "Source Data Fig. 5.xlsx": "76d3bebe64820cbaeb74340a1d1cf54e025358b0b6c55103dd1e4828eed0c706",
+  "Source Data Fig. 5 caption.md": "0e4f64339403bc1bd86b9f89e0f886e69c65dc818b16f20baa7eacc77d48fe32",
+  "figure5_numbers.json": "9a284da66018038289f86aeb48c9a18a7c2846838b09d8a0f7e26a0e2110eab2",
+  "legend_draft.md": "93082c67b1054a01a14260f30c1f5d997f65083bd6a7a2458263e011d6e7b9f6",
   "records_manifest.json": "4cb9dee23516ce041f169d7527190c41e99b2efebf4509ba9e3c9908bf4b1131"
  }
 }

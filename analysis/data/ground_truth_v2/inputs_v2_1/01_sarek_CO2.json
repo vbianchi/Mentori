@@ -1,0 +1,13 @@
+{
+ "id": "01_sarek_CO2",
+ "category": "conceptual",
+ "subcategory": null,
+ "question": "How does the Sarek workflow architecture address the dual needs of computational reproducibility and scientific best practices in variant calling?",
+ "papers": [
+  {
+   "paper": "01_sarek",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/01_sarek.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/01_sarek.pypdf.txt"
+  }
+ ]
+}

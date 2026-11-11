@@ -1,6 +1,6 @@
 {
  "script": "scripts/S532_supp4_false_premise.py",
- "script_sha256": "384ff46d11825e085dd317fad401beba5632e6a8c2174f2ecc62f68b6a8f17da",
+ "script_sha256": "391ef365de75a9ac189b5821828afec3eb917e8d1938981036ec199e1da9052f",
  "command": "uv run --frozen python scripts/S532_supp4_false_premise.py plate",
  "python": "3.13.11",
  "model_calls": 0,
@@ -8,7 +8,7 @@
   "findings/recompute/fig2_inputs/g1_collect.jsonl": "f5ff75bc244cda492a48e7e11f54f2007ed7d586a8f49e78921edd7244b28965",
   "findings/recompute/G4_fig3c_d185/q66_tables.json": "e08237f293a4e9867307f01229f75dfe2cbfe60d0457a7a37942f6e6c2bf7579"
  },
- "stamp": "PROVISIONAL: 540 of 540 answers on their final key: a and b, all 180 (G1, three draws, 108 on changed questions read from S6G1, the others unchanged by key v2.5); c, 360 of 360 (G4 draw 1, 0 awaiting S6G4, read on key v2.4 until it ends)",
+ "stamp": "540 of 540 answers on their final key: a and b, all 180 (G1, three draws, 108 on changed questions read from S6G1, the others unchanged by key v2.5); c, 360 of 360 (G4 draw 1, 0 awaiting S6G4, read on key v2.4 until it ends)",
  "figure": "Supplementary Figure 5",
  "page_mm": [
   183.0,
@@ -182,12 +182,12 @@
   "status": "agreed"
  },
  "files": {
-  "Supplementary Figure 5 (provisional, 540 of 540).pdf": "67510d3b3222270a6eea10d41e11b355f688d30f8b1e7977044819efe480a391",
-  "Supplementary Figure 5 (provisional, 540 of 540).svg": "31068e1dd615dfc95a739cf17a3b641101f393405872e392e5e94909efbbb60a",
-  "Supplementary Figure 5 (provisional, 540 of 540).png": "94ac5a6dfa3fe4d2303249f2e2035fdcd440f5ad65aeedc42e420740864a014a",
-  "Supplementary Figure 5 data (provisional, 540 of 540).xlsx": "051c5b69e44b1cb7fded09e95c1d093869d01ae787df30ad0f23c2650919e66b",
-  "Supplementary Figure 5 data caption (provisional, 540 of 540).md": "f7c310bd193eeecb30e2f5e2595aaecf4e3f5a3ed94e8e27ace6175d85ea7df2",
-  "supplementary_figure5_numbers.json": "65190897134c743e0c1b8faeffaadb416805e04cbf9eaa52a9f932640e821990",
-  "legend_draft.md": "bb4e98664a2420a867918478b3d6d95dde24762cdda9e6354326dfe8535cfc81"
+  "Supplementary Figure 5.pdf": "3b8010e92bbc07de161a0f06ec30aebe25917f9b115e1e1649719ffe22dedb74",
+  "Supplementary Figure 5.svg": "32e5881813f859b8e076ba079111e430f823f917783be75bd3a8b310b75c0bff",
+  "Supplementary Figure 5.png": "3f87b03705dd1cb219ff74c0961bf548c6ce0f7f6fa700eb75a469e9d786d819",
+  "Supplementary Figure 5 data.xlsx": "051c5b69e44b1cb7fded09e95c1d093869d01ae787df30ad0f23c2650919e66b",
+  "Supplementary Figure 5 data caption.md": "a478abef2eb8ae9ec18fa7592f55677b8b644d41d5a98cc40ed2d10e223efb61",
+  "supplementary_figure5_numbers.json": "ec385fb50d12d5096ed4aef2244865ed93a5c9246ead9109d54e16965de9d4e8",
+  "legend_draft.md": "48991ed97097183b5cb8f7a50000baa5628ad463502aa2df11fb5d848a1548f1"
  }
 }

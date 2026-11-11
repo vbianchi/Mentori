@@ -1,0 +1,13 @@
+{
+ "id": "19_hpai_canada_CO2",
+ "category": "conceptual",
+ "subcategory": null,
+ "question": "What are the common clinical presentations and relative frequency of H5N1 clade 2.3.4.4b infections when comparing mammals to humans?",
+ "papers": [
+  {
+   "paper": "19_hpai_canada",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/19_hpai_canada.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/19_hpai_canada.pypdf.txt"
+  }
+ ]
+}

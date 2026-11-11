@@ -65,7 +65,8 @@ in the repository or a frozen set (findings/recompute/frozen_inputs/, read throu
                                                G4's question sets of each index (g4_qids)
   G17 RLM ablation                             committed G17_runs/inputs (draw 1) and inputs_d23 (draws 2 and 3), each
                                                file tracked and equal to its folder's MANIFEST.sha256
-  G19 RLM ablation, gemma3:27b                 the tar's g19/runs: arms B and C, and arm A (the package RLM, key cap10)
+  G19, G20 RLM ablation, local generators     the tar's g19/runs (gemma3:27b) and count_records_20261109.tar's g20/runs
+                                               (qwen3-coder:30b, D309 A26): arms B and C, and arm A (package RLM, cap10)
   T3 component benchmarks, distiller           the tar's t3/T3_frozen_20261104T131439Z (the set S524 and S534 read):
      intervention                              each sink's answers.jsonl, rows equal to its MANIFEST.json
                                                answers_per_sink, keys <model>|<item>|d<n>; totals equal draws.csv's
@@ -85,7 +86,8 @@ is listed as not counted, with the reason. When such an experiment's records are
 leaves STATUS_ONLY, so a stale status cannot stand for a count (I2 left it on 4 Nov, D232; T2, T3, G10, G11, G17, G19
 and S12 on 6 Nov, D281, leaving it empty). WHICH SETS COUNT (Valerio, 8 Nov): a stored set counts only when it ends up
 in a figure or a table of this paper (main figures, Supplementary Figures, Supplementary Tables, Source Data). G20 (D260,
-the RLM ablation with qwen3-coder:30b, 138 answers) is in none of them, so it has no row. The 2,336 retrieval-
+the RLM ablation with qwen3-coder:30b, 138 answers) was in none of them and had no row until D309 A26 O1 (9 Nov) joined
+it to G19 as "RLM ablation, local generators" (count_records_20261109.tar). The 2,336 retrieval-
 optimisation records stay in the total, and orch_no_supervisor's 23 off-design draw-2 answers stay in G3's count.
 
 Writes findings/recompute/S492_answer_registry/registry.json (no time in it, so a rerun is byte-equal): the anchor, the
@@ -140,6 +142,13 @@ G19_RUNS = (("exp_01__rlm_10_nosearch__exp_v4_s20_n0+gemma3-27b", "exp_v4_s20_n0
             ("exp_01__rlm_10_nogate__exp_v4_s20_n0+gemma3-27b", "exp_v4_s20_n0|rlm_10_nogate", "C"),
             ("b4_rlm_ref_gemma3__cap10__d239a46", "cap10", "A"))                    # D249 O2; G19_runs/README.md
 G19_ROWS = "G19_concept_recall/concept_recall.jsonl"                                  # S573, arms A, B, C (R is T2's)
+# D309 A26 O1 (Valerio, 9 Nov): G20, G19's design with qwen3-coder:30b, joins G19 in one row, "RLM ablation, local
+# generators" (gemma3:27b 138, qwen3-coder:30b 138); its records frozen by frozen_inputs/freeze_count_records_1109.py
+COUNT_SET_1109 = "count_records_20261109"
+G20_RUNS = (("exp_01__rlm_10_nosearch__exp_v4_s20_n0+qwen3-coder-30b", "exp_v4_s20_n0|rlm_10_nosearch", "B"),
+            ("exp_01__rlm_10_nogate__exp_v4_s20_n0+qwen3-coder-30b", "exp_v4_s20_n0|rlm_10_nogate", "C"),
+            ("b4_rlm_ref_qwen3coder__cap10__d239a46", "cap10", "A"))                # findings/recompute/G20_runs/README.md
+G20_ROWS = "G20_concept_recall/concept_recall.jsonl"                                  # S594, arms A, B, C (R is T2's)
 T3_DIR = "t3/T3_frozen_20261104T131439Z"
 T3_ROWS = (("Component benchmarks", "exp_04__", 6656), ("Distiller intervention", "exp_04b__", 1164))  # draws.csv answers
 S18F = REC / "S18f_v25_results.json"
@@ -174,7 +183,7 @@ G5_ALL = REC / "L2_d284_inputs"            # D287 (1): G5's three draws (D284), 
 G4_SET = "g4_draws_20261101"               # D287 (1): G4's three draws, frozen_inputs/freeze_g4_draws.py
 # Valerio, 8 Nov (a stored set counts only when it ends up in a figure or a table of the paper): G3's and G9's set-ups
 # with draws 2 and 3 (Source Data Fig. 5, sheet Fig. 5a) and T2X (Figure 3e, Supplementary Figure 6), frozen by
-# frozen_inputs/freeze_count_records_1108.py. G20 is in no figure or table, so it is not counted.
+# frozen_inputs/freeze_count_records_1108.py. G20 joined G19's row under D309 A26 O1 (COUNT_SET_1109).
 COUNT_SET_1108 = "count_records_20261108"
 # The counts of the earlier sources, as the registry committed in 368a088a (7 Nov) holds them: reproduced first
 G3_G9_BEFORE = {"Pipeline ablation": 844, "No retrieval and naive RAG": 810, "Distiller on every step (stress)": 270}
@@ -519,7 +528,7 @@ def g3_g9_rows(add, qids: set, sums: dict, base: Path | None = None):
     if have_runs != want_runs:
         raise Refused(f"{stem}: g3/runs holds {sorted(have_runs ^ want_runs)} beyond or short of the ten set-ups")
     for exp, plan, confs in groups:
-        n, n_before, dr, files = 0, 0, Counter(), {}
+        n, n_before, dr, files, per_setup = 0, 0, Counter(), {}, {}
         for c in confs:
             rid = f"exp_03__{c}__{INDEX}"
             p = base / rid / "answers.json"
@@ -541,13 +550,14 @@ def g3_g9_rows(add, qids: set, sums: dict, base: Path | None = None):
             n += k
             n_before += len(before)
             dr += d
+            per_setup[c] = dict(sorted(d.items()))   # D309 N5 O1: each set-up's answer records per draw
             files[f"{stem}.tar:{stem}/g3/runs/{rid}/answers.json"] = sha(p)
             files[q_name] = sha(q)
         if n_before != G3_G9_BEFORE[exp]:
             raise Refused(f"{exp}: the earlier source counts {n_before}, the committed registry {G3_G9_BEFORE[exp]}")
         add(exp, plan, n, f"{stem}.tar (sha256 {tar_sha(stem, sums)[:12]}): g3/runs, distinct answer keys over every "
             f"draw; the {n_before} keys of the earlier source ({G3_G9_BEFORE_SOURCE[plan]}) reproduced, each holding "
-            "the same row", files, dr)
+            "the same row", files, dr, note={"per_setup_draws": per_setup})
 
 
 # ------------------------------------------------------------------------------------------------ D281's counters
@@ -758,8 +768,26 @@ def count_rows(add, qids: set, sums: dict, base: Path | None = None):
     known, cf = committed_keys([G19_ROWS], pick=lambda x: x["arm"] in ("A", "B", "C"))
     reproduce_keys("G19", rec, known, allow_unread=False)
     files.update(cf)
-    add("RLM ablation, gemma3:27b", "G19", len(rec), f"{stem}.tar (sha256 {tar_h[:12]}): g19/runs, arms A (package "
-        "RLM), B and C, distinct answer keys, equal to S573's concept-recall rows", files, dr)
+    n19 = len(rec)
+    # G20 (D309 A26 O1): the same three arms with qwen3-coder:30b, from count_records_20261109.tar; reproduced against
+    # S594's rows of those arms
+    stem20 = COUNT_SET_1109
+    base20 = fig_repro.frozen(stem20, stem20)
+    rec20 = {}
+    for rid, prefix, _arm in G20_RUNS:
+        p = base20 / "g20" / "runs" / rid / "answers.jsonl"
+        for k, r in last_rows(p, rid).items():
+            dr[check_key(k, prefix, qids, f"{stem20}.tar:{p.relative_to(base20.parent)}")] += 1
+            rec20[(rid, k)] = r
+        files[f"{stem20}.tar:{p.relative_to(base20.parent)}"] = sha(p)
+    known20, cf20 = committed_keys([G20_ROWS], pick=lambda x: x["arm"] in ("A", "B", "C"))
+    reproduce_keys("G20", rec20, known20, allow_unread=False)
+    files.update(cf20)
+    add("RLM ablation, local generators", "G19, G20", n19 + len(rec20),
+        f"{stem}.tar (sha256 {tar_h[:12]}): g19/runs (gemma3:27b) and {stem20}.tar (sha256 "
+        f"{tar_sha(stem20, sums)[:12]}): g20/runs (qwen3-coder:30b), arms A (package RLM), B and C, distinct answer "
+        "keys, equal to S573's and S594's concept-recall rows", files, dr,
+        note={"per_model": {"gemma3-27b": n19, "qwen3-coder-30b": len(rec20)}})
 
     # S12: no answer of its own
     s18 = json.loads(S18F.read_text())

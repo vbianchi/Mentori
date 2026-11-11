@@ -1,0 +1,13 @@
+{
+ "id": "07_salmon_FR1",
+ "category": "factual_recall",
+ "subcategory": null,
+ "question": "By what percentage range was Salmon's sensitivity higher in differential expression testing compared to other tools at the same False Discovery Rates (FDRs)?",
+ "papers": [
+  {
+   "paper": "07_salmon",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/07_salmon.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/07_salmon.pypdf.txt"
+  }
+ ]
+}

@@ -1,0 +1,13 @@
+{
+ "id": "04_fastp_TE3",
+ "category": "technical",
+ "subcategory": null,
+ "question": "How does fastp's methodology for adapter detection differ between single-end and paired-end sequencing data?",
+ "papers": [
+  {
+   "paper": "04_fastp",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/04_fastp.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/04_fastp.pypdf.txt"
+  }
+ ]
+}

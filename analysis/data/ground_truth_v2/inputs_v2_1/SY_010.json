@@ -1,0 +1,24 @@
+{
+ "id": "SY_010",
+ "category": "synthesis",
+ "subcategory": "theme_analysis",
+ "question": "How do Snakemake, MultiQC and SeqKit each cope with the growing scale of sequencing data?",
+ "papers": [
+  {
+   "paper": "02_snakemake",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/02_snakemake.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/02_snakemake.pypdf.txt"
+  },
+  {
+   "paper": "05_multiqc",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/05_multiqc.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/05_multiqc.pypdf.txt"
+  },
+  {
+   "paper": "09_seqkit",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/09_seqkit.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/09_seqkit.pypdf.txt"
+  }
+ ],
+ "replaces_question": "How do high-performance sequence manipulation tools and modular workflow management systems collectively address the technical challenges of modern genomic surveillance for transboundary pathogens?"
+}

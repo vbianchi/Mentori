@@ -5,8 +5,8 @@
   "command": "uv run --frozen python scripts/S596_windowed_bertscore.py run",
   "ruling": "rulings page 6 Nov, RUN-BERTSCORE: O1",
   "imports_sha256": {
-   "scripts/S497_fig5_d166.py": "fc17bb3af77503ddfd6346aa8b4c7dc33f3753e87b25da60bec2b4fcddc44068",
-   "scripts/S540_fig5_evaluators.py": "e227184bb004d52856be2ab4f8440120b108ae1cc7c6035e20ed6814b7d8c920",
+   "scripts/S497_fig5_d166.py": "40fb4d6f94b4c4e84991f821529313a5326c7c81ea2aa3b2722d6ac5a438fef6",
+   "scripts/S540_fig5_evaluators.py": "30290ee53f3da1b1b34428cc66f96b358b89dc0ecd7e2da33dee0765ec777eec",
    "scripts/S470_l1_signals.py": "e301c6a6d7c4f50bcc3ab8ba679be2d8caf1211d95c67241b9031c1aacaa5b37"
   },
   "inputs": {

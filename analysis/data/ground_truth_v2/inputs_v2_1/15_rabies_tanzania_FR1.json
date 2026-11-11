@@ -1,0 +1,13 @@
+{
+ "id": "15_rabies_tanzania_FR1",
+ "category": "factual_recall",
+ "subcategory": null,
+ "question": "How many human rabies deaths were recorded during the study period, and what was observed regarding their treatment status?",
+ "papers": [
+  {
+   "paper": "15_rabies_tanzania",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/15_rabies_tanzania.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/15_rabies_tanzania.pypdf.txt"
+  }
+ ]
+}

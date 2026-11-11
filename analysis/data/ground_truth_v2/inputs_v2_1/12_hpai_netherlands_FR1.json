@@ -1,0 +1,13 @@
+{
+ "id": "12_hpai_netherlands_FR1",
+ "category": "factual_recall",
+ "subcategory": null,
+ "question": "What was the specific percentage increase in the distribution of HPAI outbreaks in meat-type poultry when comparing the 2014–2018 period to the 2020–2022 period?",
+ "papers": [
+  {
+   "paper": "12_hpai_netherlands",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/12_hpai_netherlands.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/12_hpai_netherlands.pypdf.txt"
+  }
+ ]
+}

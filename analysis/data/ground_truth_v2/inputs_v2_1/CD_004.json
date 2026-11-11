@@ -1,0 +1,23 @@
+{
+ "id": "CD_004",
+ "category": "cross_document",
+ "subcategory": "sequential",
+ "question": "How could integrating fastp and the nf-core framework's data management optimizations improve the performance and resource usage of the Sarek WGS workflow?",
+ "papers": [
+  {
+   "paper": "01_sarek",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/01_sarek.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/01_sarek.pypdf.txt"
+  },
+  {
+   "paper": "03_nfcore_framework",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/03_nfcore_framework.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/03_nfcore_framework.pypdf.txt"
+  },
+  {
+   "paper": "04_fastp",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/04_fastp.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/04_fastp.pypdf.txt"
+  }
+ ]
+}

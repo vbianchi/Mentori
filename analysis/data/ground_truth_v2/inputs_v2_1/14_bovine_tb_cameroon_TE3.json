@@ -1,0 +1,13 @@
+{
+ "id": "14_bovine_tb_cameroon_TE3",
+ "category": "technical",
+ "subcategory": null,
+ "question": "Which specific statistical software and metrics were employed to refine the logistic regression models and verify the independence of the identified risk factors?",
+ "papers": [
+  {
+   "paper": "14_bovine_tb_cameroon",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/14_bovine_tb_cameroon.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/14_bovine_tb_cameroon.pypdf.txt"
+  }
+ ]
+}

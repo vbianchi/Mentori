@@ -1,0 +1,13 @@
+{
+ "id": "02_snakemake_TE3",
+ "category": "technical",
+ "subcategory": null,
+ "question": "Explain the technical approach Snakemake uses to optimize job scheduling and how it handles job submission overhead in cluster or cloud environments.",
+ "papers": [
+  {
+   "paper": "02_snakemake",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/02_snakemake.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/02_snakemake.pypdf.txt"
+  }
+ ]
+}

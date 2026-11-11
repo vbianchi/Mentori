@@ -1,0 +1,13 @@
+{
+ "id": "04_fastp_CO2",
+ "category": "conceptual",
+ "subcategory": null,
+ "question": "What design choices and implementation strategies allow fastp to achieve higher performance and lower I/O overhead than traditional FASTQ tools?",
+ "papers": [
+  {
+   "paper": "04_fastp",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/04_fastp.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/04_fastp.pypdf.txt"
+  }
+ ]
+}

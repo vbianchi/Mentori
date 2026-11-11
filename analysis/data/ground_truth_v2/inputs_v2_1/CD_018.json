@@ -1,0 +1,28 @@
+{
+ "id": "CD_018",
+ "category": "cross_document",
+ "subcategory": "contrasting",
+ "question": "How do the data management capabilities of MultiQC and SeqKit contrast with the data collection requirements for zoonotic disease studies in Ethiopia and Cameroon?",
+ "papers": [
+  {
+   "paper": "05_multiqc",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/05_multiqc.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/05_multiqc.pypdf.txt"
+  },
+  {
+   "paper": "09_seqkit",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/09_seqkit.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/09_seqkit.pypdf.txt"
+  },
+  {
+   "paper": "14_bovine_tb_cameroon",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/14_bovine_tb_cameroon.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/14_bovine_tb_cameroon.pypdf.txt"
+  },
+  {
+   "paper": "17_brucellosis_ethiopia",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/17_brucellosis_ethiopia.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/17_brucellosis_ethiopia.pypdf.txt"
+  }
+ ]
+}

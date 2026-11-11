@@ -15,26 +15,27 @@ design change moves the plate instead of slipping past a typed copy.
 
 writes into findings/figures_provisional/fig1/ (files of an earlier state, "Figure 1*" and "Source Data Fig. 1*",
 deleted first):
-  Figure 1 (provisional, 2 of 2).{pdf,svg,png}   D307 (Valerio, 8 Nov): the design of Figure 1 alt2
+  Figure 1.{pdf,svg,png}   D307 (Valerio, 8 Nov): the design of Figure 1 alt2
                          (findings/recompute/fig1_alt_drafts/draw_fig1_alt2.py), drawn here from this script's own rows.
                          One page under experiments/FIGURE_LOCK.toml: [page] width_double_mm wide, at most height_max_mm
-                         high; text at PT_TEXT (10 pt), the answer, signal names and totals line at PT_HEAD (12 pt), stage
+                         high; text at PT_TEXT (10 pt), the answer and signal names at PT_HEAD (12 pt), stage
                          names at PT_STAGE (11 pt), the tool line at [type] font_min_pt, panel letters at panel_letter_pt
                          and panel_letter_weight, all in the first of [type] font_families (TrueType, pdf.fonttype 42);
                          every box border and arrow black (Valerio, 8 Nov); no title, stamp or caption on the plate (E5);
                          house_style.check_figure_colours, then S457.finish_plate (build order F4: no text off the
                          page or on another, the PNG the PDF rasterised by MuPDF at 600 dpi, as S448 R7 compares them)
-  Source Data Fig. 1 (provisional, 2 of 2).xlsx  sheet "Fig. 1a": one row per readout of panel a (name, signal,
+  Source Data Fig. 1.xlsx  sheet "Fig. 1a": one row per readout of panel a (name, signal,
                          reference, tool, clause, the readout printed, rated, figures, figures as printed, full definition,
                          source); sheet "Fig. 1b": one row per logical line of panel b's setting (stage, axis, levels, how
                          levels is made up, the word for each factor, the line's text, figure, plan row, the design files
                          it is read from), so every level list and model name that is not on the plate stays here, then
-                         two rows for the totals printed under the stages: the answers (S492) and the model calls (S520);
+                         two rows for the whole study's totals the legend states: the answers (S492) and the model
+                         calls (S520);
                          no creation or modification time and fixed zip dates, so a re-run on the same inputs is
                          byte-identical
   figure1_numbers.json   the same sheets as JSON, and "printed": every level, readout, reference, tool and total by its
                          SVG group id, with the sheet row and format it is written from (S448 R8 (6))
-  Source Data Fig. 1 caption (provisional, 2 of 2).md, legend_draft.md, figure1_provenance.json (every input's
+  Source Data Fig. 1 caption.md, legend_draft.md, figure1_provenance.json (every input's
                          sha256, both locks' sha256, every output's sha256, the data stamp)
 
 "2 of 2" counts panels (D153 Q8, 26 Oct, with F2 and F4 of 25 Oct): b is drawn under a. The stamp and the Source Data
@@ -54,11 +55,11 @@ Supplementary Figure 1 (S496) since D183 FD6 B, from the draw kinds this script 
 ("draw_kinds"); they are still read and checked here (every tripwire stays). Valerio, 23 Oct: no draws in the legend.
 
 PANEL b (alt2): the four pipeline stages left to right, each with its settings and their number of levels (bold, right
-aligned); a black arrow between stages. Under the stages, the totals line "<answers> answers | <model calls> model
-calls": the answers are S492's today.total_counted (findings/recompute/S492_answer_registry/registry.json, read at HEAD;
+aligned); a black arrow between stages. The totals are not on the plate (Valerio, 11 Nov: figure files hold only the
+figure); the legend states them and sheet Fig. 1b's two ALL rows hold them: the answers are S492's today.total_counted (findings/recompute/S492_answer_registry/registry.json, read at HEAD;
 one generation row per question, configuration and draw, every stored draw counted, plus the April model-selection and
 retrieval rows), the model calls S520's "figure1_legend_total", read from its committed summary at HEAD (with that file
-not committed the plate prints the slot "n model calls"; TOTAL_ON_PLATE False takes the line off the plate). Model
+not committed the sheet holds the slot "n" and the legend says "the model calls"). Model
 names, level lists and the make-up of each count are not on the plate; they are in sheet Fig. 1b, and the names in
 Supplementary Table 2. The legend says Supplementary Figure 1 gives the calls per experiment only while
 frozen_inputs/SHA256SUMS lists S520's inputs, which is when S496 prints them.
@@ -217,6 +218,7 @@ F = {
     "check_t2": ROOT / "findings" / "recompute" / "T2_runs" / "check_t2.py",
     "t2_lib": ROOT / "findings" / "recompute" / "T2_runs" / "t2_lib.sh",
     "d98_subset": ROOT / "findings" / "recompute" / "D98_subset" / "d98_subset.json",
+    "t2x_questions": ROOT / "findings" / "recompute" / "T2X_runs" / "t2x_questions.json",   # D241's 17 (D309 A95)
     # the human ratings row (D183 FD7 a): its item count and rating scale, from the human-evaluation protocol's two
     # lines in design_facts.json (s08b_protocol, from findings/S08b_PROTOCOL_HUMAN_EVAL_V22.md; D2)
     # the total of LLM calls (D199, D200): read at HEAD, not a design file; absent from the inputs while not committed
@@ -599,13 +601,13 @@ RUN_ONCE = ("1 run", "each retrieval query scored once")       # the retrieval s
 # Figure 2's legend is committed. The literal stays evaluable: S497_fig5_d200_test.py reads it from this source.
 MEASURES = [("Judge correctness", "each answer scored against the expert answer key; pass at score 4 or more; relaxed, "
              "3 or more", ["2", "3", "5", "6"], r"judge(?:'s)? (?:correctness|score)|the judge's and the raters' scores",
-             figure_names.JUDGE, "against key and passages", "pass 4+, relaxed 3+", "yes"),
+             figure_names.JUDGE, "against key, or key and passages", "pass 4+, relaxed 3+", "yes"),
             ("Judge refusal", "each answer to an out-of-scope question scored for refusal; refused at 3 or more",
-             ["3", "5"], r"refusal score", figure_names.JUDGE, "against key and passages", "refused 3+", "no"),
+             ["3", "5"], r"refusal score", figure_names.JUDGE, "against key, or key and passages", "refused 3+", "no"),
             ("Judge faithfulness", "each answer scored by the plain call, without passages, or the call with passages; "
              "the raters check the plain call only", ["2", "6"],
              r"faithfulness score|Faithfulness: share of each judge band", figure_names.JUDGE,
-             "against key and passages", "with or without passages", "part"),
+             "against key, or key and passages", "with or without passages", "part"),
             ("Concept recall", "share of the key's expected concepts that a concept matcher finds in the answer; a "
              "concept's content words that also occur in the question are not counted", ["2", "4", "5", "6"], r"concept recall",
              figure_names.CONCEPTS, "against the key", "concepts found", "yes"),
@@ -862,8 +864,9 @@ def design():
     fig6_draws = ex.draws(6)
     d = drawn_design("S2", "code generation")
     if d:
-        # the design column states the runner's list; the answers column Figure 6's design (D100, D116)
-        need(ints(d["design"])[:3] == [len(runner_variants), len(cg), n_ops], f"draws.csv S2 design {d['design']!r}")
+        # the design column and the answers column both state Figure 6's design (D100, D116): Q1 (Valerio, 11 Nov,
+        # commit 56320837) set the design column to 11 model variants, the variants Figure 6 draws, not the runner's list
+        need(ints(d["design"])[:3] == [len(variants), len(cg), n_ops], f"draws.csv S2 design {d['design']!r}")
         need(int(d["answers"]) == len(variants) * len(cg) * n_ops * len(fig6_draws),
              f"draws.csv S2 answers {d['answers']!r}, Figure 6's design {len(variants) * len(cg) * n_ops} "
              f"({len(variants)} variants, D100 and D116 applied)")
@@ -933,6 +936,9 @@ def design():
     need(len(d98["ids"]) == d98["n"] and 3 * d98["n"] == len(questions) and set(d98["ids"]) <= {q["id"] for q in questions},
          f"d98_subset.json: {d98['n']} ids, not a third of the {len(questions)} questions")
     rlm_configs = tuple(c for c in t2_configs if c.startswith("rlm_"))
+    t2x = json.loads(read_text(F["t2x_questions"]))
+    need(len(t2x["ids"]) == t2x["n"] and not set(t2x["ids"]) & set(d98["ids"]),
+         f"t2x_questions.json: {len(t2x['ids'])} ids for n {t2x['n']}, or ids inside D98's subset")
     t2_draws = {}
     for g in t2_gens:
         sub = {c: tuple(ns["subset_draws"](c, g) if by_config else ns["subset_draws"](g)) for c in t2_configs}
@@ -1098,7 +1104,7 @@ def design():
              "n_ops": n_ops, "variants": len(variants), "per_model": per_model, "fig6_models": len(fig6_models),
              "judges": list(judges), "judge_temperature": jt, "judge2_check_n": j2_check,
              "t2_generators": [model_name(g) for g in t2_gens], "t2_providers": [g.partition("::")[0] for g in t2_gens],
-             "t2_configs": len(t2_configs), "t2_draws": t2_draws, "d98_n": d98["n"],
+             "t2_configs": len(t2_configs), "t2_draws": t2_draws, "d98_n": d98["n"], "t2x_n": t2x["n"],
              "rlm_configs": list(rlm_configs),
              "human_rating": {"items": hr_n, "scale": [hr_lo, hr_hi], "scales": list(HUMAN_SCALES),
                               "protocol_scales": proto_scales,
@@ -1198,16 +1204,35 @@ LETTER_B = "b" if LETTER == "a" else "B"
 # holds the signals' readouts and sheet Fig. 1b the settings (before D307 the other way round).
 SHEET_SIG = f"Fig. {N}{LETTER}"
 SHEET_SET = f"Fig. {N}{LETTER_B}"
-COLUMNS_SET = ["stage", "axis", "levels", "levels_as", "factors", "line", "text", "n", "figure", "plan_row", "source"]
+COLUMNS_SET = ["stage", "axis", "levels", "configurations", "levels_as", "factors", "line", "text", "n", "figure",
+               "plan_row", "source"]
+# D309 A21 O1 (Valerio, 9 Nov): the plate prints each setting's own number of levels, as Methods counts them, and no
+# longer the configurations run (its levels times the factors crossed with it, which stay in the "configurations" column
+# with their make-up, levels_as). "first": the first number of the make-up (the factors after it belong to other
+# settings: corpus size, query set, RLM, local model, model variant); "all": the whole count. Embedding model 4, chunking
+# 8, search strategy 7, retrieval depth 10, generation model 5, generation strategy 6 (the 4 reference arms aside),
+# code-generation strategy 11; corpus scale (size x distractor), system configuration, orchestrator set-up (6 set-ups and
+# 2 stress set-ups) and judge model keep their count, which is their own levels.
+OWN_LEVELS = {"Corpus scale": "all", "Embedding model": "first", "Chunking": "first", "Search strategy": "first",
+              "Retrieval depth": "first", "Generation model": "all", "Generation strategy": "first",
+              "System configuration": "all", "Orchestrator set-up": "all", "Code-generation strategy": "first",
+              "Judge model": "all"}
+
+
+def own_levels(axis, levels, levels_as):
+    """D309 A21: the setting's own levels (OWN_LEVELS), from its make-up; refused for a setting with no entry."""
+    rule = OWN_LEVELS.get(axis)
+    if rule is None:
+        stop(f"setting {axis!r} has no entry in OWN_LEVELS (D309 A21: the plate prints the setting's own levels)")
+    return levels if rule == "all" else int(re.match(r"\s*(\d+)", levels_as).group(1))
 COLUMNS_SIG = ["name", "signal", "reference", "tool", "clause", "readout", "rated", "figure", "figure_printed", "text",
                "source"]
-TOTAL_ON_PLATE = True             # C1: False takes the total off the plate; the legend's sentence stays
 CALLS_LOWER_BOUND = True          # D212 Q7 (Valerio, 3 Nov): S520 frozen while runs continue, so the total is a lower bound;
                                   # refrozen 6 Nov (collects of 6 Nov 07:33Z) and 7 Nov after G5 D284 (collects of 7 Nov 05:27Z
                                   # to 05:35Z) with S520's MACHINES unchanged, so clones made
                                   # since 1 Nov are still not read and the total stays a lower bound
                                   # (plate '≥ n', legend 'At least n'); False once the real total is frozen at the end
-PT_HEAD = 12.0                    # D307 (alt2): "Answer", the signal names and the totals line; inside [type] font_max_pt
+PT_HEAD = 12.0                    # D307 (alt2): "Answer" and the signal names; inside [type] font_max_pt
 PT_STAGE = 11.0                   # alt2: stage names; at 12 pt the PDF kerns "AT" in GENERATE 0.3 mm off the SVG (S448 R10)
 # What each signal box prints under its rule, one line per measure row (alt2, 8 Nov): "measure" is the row's name without
 # the signal's own word, "measure+clause1" adds the first part of its clause in brackets, "name" the row's name, "clause"
@@ -1267,8 +1292,8 @@ def layout(rows, srows, total, answers, n_of=None):
     centre line), with the two sheets. Items: "text", "line", "rect" (fill, edge, width) and "arrow". Panel a: the
     answer, one stem down that forks at right angles into three arrows, one per signal box (srows grouped by signal:
     name, reference, tool, a grey rule, one readout line per measure row). Panel b: the four stages left to right, each
-    with its settings and number of levels, an arrow between stages; under them the totals line, answers and model
-    calls. Returns items, {sheet: rows}, H, geometry. Stops when the plate passes [page] height_max_mm or panel b does
+    with its settings and number of levels, an arrow between stages (the totals, answers and model calls, are in sheet
+    Fig. 1b and the legend, not on the plate: Valerio, 11 Nov). Returns items, {sheet: rows}, H, geometry. Stops when the plate passes [page] height_max_mm or panel b does
     not fit the page width."""
     items, sheet_set = [], []
 
@@ -1287,24 +1312,27 @@ def layout(rows, srows, total, answers, n_of=None):
     def arrow(x0, y0, x1, y1):
         items.append(dict(kind="arrow", xs=[x0, x1], ys=[y0, y1], lw=LW_LINE, color=INK))
 
-    # the settings sheet, one row per logical line, then the two totals
+    # the settings sheet, one row per logical line, then the two totals (stated in the legend, not drawn)
     stages = []
     for stg, axis, levels, levels_as, fig, plan_row, logical, source in rows:
         words = factor_words(axis, levels_as)
         if not stages or stages[-1][0] != stg:
             stages.append((stg, []))
-        stages[-1][1].append((axis, levels, len(sheet_set)))
+        own = own_levels(axis, levels, levels_as)
+        stages[-1][1].append((axis, own, len(sheet_set)))
         for j, it in enumerate(logical):
-            sheet_set.append({"stage": stg, "axis": axis, "levels": levels, "levels_as": levels_as,
+            sheet_set.append({"stage": stg, "axis": axis, "levels": own, "configurations": levels, "levels_as": levels_as,
                               "factors": words if j == 0 else "", "line": j + 1,
                               "text": SEP.join(it) if isinstance(it, list) else it,
                               "n": (n_of or {}).get(axis, "") if j == 0 else "", "figure": fig, "plan_row": plan_row,
                               "source": source})
-    sheet_set.append({"stage": "ALL", "axis": "Answers, whole study", "levels": None, "levels_as": "", "factors": "",
+    sheet_set.append({"stage": "ALL", "axis": "Answers, whole study", "levels": None, "configurations": None,
+                      "levels_as": "", "factors": "",
                       "line": 1, "text": f"{answers:,}", "n": "", "figure": f"Figure {N}", "plan_row": "",
                       "source": f"S492 {rel(F['s492_registry'])} today.total_counted"})
     total_text = (f"≥ {total:,}" if CALLS_LOWER_BOUND else f"{total:,}") if total is not None else "n"
-    sheet_set.append({"stage": "ALL", "axis": "Model calls, whole study", "levels": None, "levels_as": "",
+    sheet_set.append({"stage": "ALL", "axis": "Model calls, whole study", "levels": None, "configurations": None,
+                      "levels_as": "",
                       "factors": "", "line": 1, "text": total_text, "n": "", "figure": f"Figure {N}", "plan_row": "",
                       "source": "S520 figure1_legend_total"})
 
@@ -1315,8 +1343,9 @@ def layout(rows, srows, total, answers, n_of=None):
     y_st = y_b + 3.0
     n_max = max(len(r) for _, r in stages)
     st_h = 10.5 + 5.0 * n_max + 0.5
-    y_total = y_st + st_h + 6.5
-    H = round(y_total + 3.5, 1)
+    # Valerio, 11 Nov (F1, review of the figure files): the totals line left the plate; the legend states both counts
+    # (answers_sentence, calls_sentence) and sheet Fig. 1b's two ALL rows keep them, so the plate ends under the stages
+    H = round(y_st + st_h + 1.0, 1)
     if H > H_MAX_MM:
         stop(f"panels a and b need {H} mm, over [page] height_max_mm {H_MAX_MM}; no plate is drawn")
 
@@ -1383,19 +1412,6 @@ def layout(rows, srows, total, answers, n_of=None):
     tight = min(gaps)
     if tight[0] < MIN_GAP_MM:
         stop(f"panel {LETTER_B}: {tight[1]!r} sits {tight[0]} mm from its numeral, under {MIN_GAP_MM}")
-    # the totals line, centred: answers, a bar, model calls; each count tied to its row of the settings sheet
-    if TOTAL_ON_PLATE:
-        s_ans, s_calls = f"{answers:,} answers", f"{total_text} model calls"
-        full = f"{s_ans} | {s_calls}"
-        w_full = text_width_mm(full, bold=True, size=PT_HEAD)
-        w_ans = text_width_mm(s_ans, bold=True, size=PT_HEAD)
-        w_calls = text_width_mm(s_calls, bold=True, size=PT_HEAD)
-        w_bar = text_width_mm("|", bold=True, size=PT_HEAD)
-        xl = W_MM / 2 - w_full / 2
-        text(xl, y_total, s_ans, size=PT_HEAD, bold=True, tie=(SHEET_SET, len(sheet_set) - 2, "{text} answers"))
-        text(xl + w_ans + (w_full - w_ans - w_calls - w_bar) / 2, y_total, "|", size=PT_HEAD, bold=True)
-        text(xl + w_full, y_total, s_calls, ha="right", size=PT_HEAD, bold=True,
-             tie=(SHEET_SET, len(sheet_set) - 1, "{text} model calls"))
     return items, {SHEET_SIG: srows, SHEET_SET: sheet_set}, H, {
         "signal_boxes": [round(EDGE + k * (wbox + GAP_A), 2) for k in range(3)], "signal_box_w": round(wbox, 2),
         "stage_boxes_w": [round(w, 2) for w in widths], "y_signal_boxes": y_box, "y_stage_boxes": y_st,
@@ -1519,7 +1535,9 @@ def local_rlm_clause(f) -> str:
     few = [m for m, k in f["t2_draws"].items() if k == "rlm45"]
     if not few:
         return ""
-    return f" ({len(few)} of them: n = {f['d98_n']} with the {len(f['rlm_configs'])} RLM strategies)"
+    # D309 A95: the two generators named, and D241's further many-paper questions under RLM-10
+    return (f" ({say_list(few)}: n = {f['d98_n']} under the {len(f['rlm_configs'])} RLM strategies, and "
+            f"{f['t2x_n']} more many-paper questions under RLM-10)")
 
 
 def s520_total():
@@ -1540,6 +1558,26 @@ def s520_total():
     if got.get("machines_not_read") or not isinstance(total, int) or total <= 0:
         stop(f"{rel(p)}: figure1_legend_total {total!r}, machines not read {got.get('machines_not_read')!r}")
     return total
+
+
+def s520_rerun_clause() -> str:
+    """D309 A22 O1: S520's collects are committed (findings/recompute/S520_inputs, with their SHA256SUMS), and `S520 report
+    --frozen` rebuilds the committed summary from them (scripts/S623_s520_unmapped_check.py checks it byte for byte); the
+    scoring share and the unmapped logs read from the committed summary. Used while frozen_inputs/SHA256SUMS does not list
+    the collects (s1_prints_calls), which waits for S520 to map Supplementary Figure 1's G10, G11, G17, G19 and S18F boxes."""
+    sums = ROOT / "findings" / "recompute" / "S520_inputs" / "SHA256SUMS"
+    s = json.loads(committed_bytes(F["s520_summary"]))
+    sc = sum(s["by_role"][k]["calls"] for k in ("RAGAS", "RAGChecker check", "RAGChecker extract"))
+    tot = s["figure1_legend_total"]
+    if not committed_bytes(sums):
+        return (", whose call-log inputs are not frozen yet, so its report cannot be rerun from the repository and the "
+                "count stops at the day the logs were read. ")
+    d311 = " and findings/recompute/S520_inputs_d311" if s.get("d311") else ""   # D311: the laptop logs added 9 Nov
+    return (f", which `uv run --frozen python scripts/S520_llm_calls.py report --frozen` rebuilds from the committed "
+            f"call-log collects (findings/recompute/S520_inputs{d311}); the logs were read on the day those collects record, "
+            f"and {len(s['unmapped'])} call logs no S520 rule maps are not counted, so the total is a lower bound "
+            f"(scripts/S623_s520_unmapped_check.py). Of the {tot:,} calls, {sc:,} ({100 * sc / tot:.1f}%) are RAGAS and "
+            f"RAGChecker scoring calls. ")
 
 
 def s1_prints_calls() -> bool:
@@ -1593,8 +1631,13 @@ def setting_n(f) -> dict:
                              f"core papers)"),
             "Retrieval depth": (f"n = {f['n86']} questions at each turn cap with the main generation model and "
                                 f"n = {f['t1_questions']} with each local model"),
-            "Generation model": gen, "Generation strategy": gen, "System configuration": gen,
-            "Orchestrator set-up": gen,
+            "Generation model": gen, "Generation strategy": gen,
+            # D309 A95: the pipeline rows ran gemini-3-flash alone; draws 2 and 3 of the orchestrator set-ups on D98's
+            # subset, the two baselines on every question (S492 registry per_setup_draws)
+            "System configuration": (f"n = {f['n_questions']} questions with {f['gen_model']} in each of 3 draws (the "
+                                     f"full orchestrator: draws 2 and 3 on the fixed {f['d98_n']}-question subset)"),
+            "Orchestrator set-up": (f"n = {f['n_questions']} questions with {f['gen_model']} (draws 2 and 3 on the "
+                                    f"fixed {f['d98_n']}-question subset)"),
             "Code-generation strategy": (f"n = {f['n_ops']} operations per strategy and model variant (a model at one "
                                          f"thinking setting)")}
 
@@ -1621,10 +1664,8 @@ def legend_and_caption(rows, f, stamp, tag, total, answers):
     n_single = sum(len(ms) for (t, _), ms in by_settings.items() if len(t) == 1)
     total_source = ("The total of LLM calls is pending: S520's summary is not committed. " if total is None else
                     "The total of LLM calls is S520's committed summary"
-                    + (". " if s1_prints_calls() else ", whose call-log inputs are not frozen yet, so its report cannot "
-                       "be rerun from the repository and the count stops at the day the logs were read. "))
-    prov = (f"Provisional. "
-            f"{drawn_sentence(f)}"
+                    + (". " if s1_prints_calls() else s520_rerun_clause()))
+    prov = (f"{drawn_sentence(f)}"
             f"Thinking settings: {'; '.join(multi)}; the other {n_single} models at their default. "
             f"Retrieval depth's local models are T1's {len(f['t1_models'])} ({say_list(f['t1_models'])})"
             + t1_out_sentence(f["t1_held_why"]) + ". "
@@ -1639,7 +1680,7 @@ def legend_and_caption(rows, f, stamp, tag, total, answers):
     # words, with no sentence on what is not drawn or not run yet; that state stays in the data stamp and in the
     # Source Data caption (prov). Valerio, 23 Oct: the legend describes the image only (what each line means, the n
     # behind each setting). D307 (Valerio, 8 Nov): alt2's legend (findings/recompute/fig1_alt_drafts/legend_alt2.md),
-    # panel a the signals, panel b the settings and the totals line. Valerio, 8 Nov evening ("too long"; his own
+    # panel a the signals, panel b the settings and the totals line (the line left the plate 11 Nov). Valerio, 8 Nov evening ("too long"; his own
     # text, with O1 scopes, O2 n clause, O3 sentence split): the per-setting n list moved to sheet SHEET_SET's "n"
     # column (setting_n), and the derivation pointer, the stress set-up and second-judge sentence and the counting
     # date left the legend; the plate's panel b still marks the stress set-ups and the second judge.
@@ -1648,7 +1689,7 @@ def legend_and_caption(rows, f, stamp, tag, total, answers):
     # so it carries no n and no count added only to give one: the 244-questions sentence and its Source Data pointer
     # left the legend (the per-setting n stays in sheet SHEET_SET's "n" column and the Source Data caption).
     legend = (
-        f"{A}, Each answer is read by three signals, each against its own reference and reported on its own; under "
+        f"{A}, Each answer is read by up to three signals, each against its own reference and reported on its own; under "
         f"each, the tool that scores it and its readouts. Judge: correctness, pass at a score of 4 or more; refusal of an "
         f"out-of-scope question, refused at 3 or more; faithfulness, scored without or with the retrieved passages. "
         f"Concepts: share of the key's expected concepts found in the answer; a concept's content words that also "
@@ -1657,9 +1698,9 @@ def legend_and_caption(rows, f, stamp, tag, total, answers):
         f"{B}, The settings varied, by the pipeline stage they act on: indexing (INDEX), retrieval (RETRIEVE), generation "
         f"(GENERATE) and judging (JUDGE). Each number is a setting's number of levels. "
         f"{answers_sentence(answers)} {calls_sentence(total)} Supplementary Table 2 names the models.")
-    title = "The three signals that read every answer, and what the study varied"
+    title = "The three signals that can read an answer, and what the study varied"
     lines = [f"# Figure {N}, title and legend (draft)", "",
-             f"Written by `scripts/S456_fig1_design.py figure` from the design files. Data stamp: {stamp}.", "",
+             f"Written by `scripts/S456_fig1_design.py figure` from the design files.", "",
              f"**Figure {N} | {title}.** {legend}", ""]
     cap = [f"# Source Data Fig. {N}, caption", "",
            (f"**Source Data Fig. {N} | The measures and configurations drawn in Figure {N}.** {prov}Data stamp: "
@@ -1667,10 +1708,11 @@ def legend_and_caption(rows, f, stamp, tag, total, answers):
             f"that scores it, its clause, the readout line printed in its signal's box, whether the expert ratings check "
             f"it, the figures that report it, those figures as printed, its full definition and where it is read from. "
             f"Sheet {SHEET_SET}: one row per logical line of panel {LETTER_B}'s setting: its stage, setting, number of "
-            f"levels, how that number is made up, the word for each factor, the line's text, the n behind the setting (on its "
+            f"levels (printed on the plate), the configurations run for it (its levels times the factors crossed with "
+            f"it), how that number is made up, the word for each factor, the line's text, the n behind the setting (on its "
             f"first line; the judge model has none of its own), the figure that reports the "
-            f"setting, the plan row of its run and the design files it is read from; the last two rows hold the totals "
-            f"printed under the stages, the answers (S492) and the model calls (S520). Generated by "
+            f"setting, the plan row of its run and the design files it is read from; the last two rows hold the whole "
+            f"study's totals stated in the legend, the answers (S492) and the model calls (S520). Generated by "
             f"`uv run --frozen python scripts/S456_fig1_design.py figure`."), "",
            f"Proposed Data Availability sentence: \"The source data for Figure {N} is in Supplementary Data {N + 1}.\"",   # D303 (D302)
            ""]
@@ -1747,12 +1789,12 @@ def figure(argv):
     inputs = {input_name(p): input_sha256(p) for p in [LOCK, FIGURE_LOCK, *F.values()]
               if p != F["s520_summary"] or total is not None}
     digest = sha256_bytes("".join(f"{h}  {k}\n" for k, h in sorted(inputs.items())).encode())
-    tag = " (provisional, 2 of 2)"
-    if total is None and "provisional" not in tag:
+    tag = ""                                          # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
+    if total is None:
         stop("the total of LLM calls is still a slot: a plate with a final name cannot print it")
     answers = s492_answers()
     srows = signal_rows(facts)
-    stamp = (f"PROVISIONAL: 2 of 2 panels (panel {LETTER}, the signals; panel {LETTER_B}, the design), "
+    stamp = (f"2 of 2 panels (panel {LETTER}, the signals; panel {LETTER_B}, the design), "
              f"{len(rows)} settings read from the design files"
              + (", total of LLM calls pending" if total is None else "") + f" (inputs sha256 {digest[:12]})")
     items, sheets, H, geom = layout(rows, srows, total, answers, setting_n(facts))
@@ -1797,14 +1839,15 @@ def figure(argv):
             "figure_lock": {"path": rel(FIGURE_LOCK), "sha256": inputs[rel(FIGURE_LOCK)], "status": FLOCK["status"]},
             "reproduced": reproduced, "stamp": stamp, "page_mm": [W_MM, H], "geometry_mm": geom,
             "type_pt": {"panel letter (bold)": PT_LETTER, "the tool line in a signal box": PT_SMALL,
-                        "answer, signal names and the totals line": PT_HEAD, "stage names": PT_STAGE,
+                        "answer and signal names": PT_HEAD, "stage names": PT_STAGE,
                         "all other text": PT_TEXT},
             "font": FONT, "colours": {"text, box borders, stem, fork, arrows and signal bands": INK,
                                       "box fills": WHITE, "the tool line": GREY, "the rule in a signal box": LINE_GREY,
                                       "stage head bands": INK_FILL},
             "llm_calls_total": total, "answers_total": answers,
             "design": {k: v for k, v in facts.items()},
-            "rows": [{"stage": r[0], "axis": r[1], "levels": r[2], "levels_as": r[3], "figure": r[4],
+            "rows": [{"stage": r[0], "axis": r[1], "levels": own_levels(r[1], r[2], r[3]), "configurations": r[2],
+                      "levels_as": r[3], "figure": r[4],
                       "plan_row": r[5], "source": r[7]} for r in rows],
             "panel_a": [{"name": b["name"], "signal": b["signal"], "readout": b["readout"], "figure": b["figure"],
                          "source": b["source"]} for b in srows],
@@ -1839,9 +1882,9 @@ def selftest():
     at HEAD, and from the working tree only under LEGENDS_AT "worktree" (S494 --write; audit 27 Oct F1b); (7) the plate as
     D307 (alt2) draws it: panel a the three signal boxes, black-bordered, Judge, Concepts and Papers
     left to right, one arrow from the answer's fork into each, every readout tied to sheet Fig. 1a; panel b the stages in
-    pipeline order with black borders and arrows, every setting with its levels tied to sheet Fig. 1b, the totals line
-    answers then model calls; the words refused when they do not match the make-up; (8) with no committed S520 summary
-    the total is the slot "n model calls", and the stamp says it is pending."""
+    pipeline order with black borders and arrows, every setting with its levels tied to sheet Fig. 1b, no totals line
+    (Valerio, 11 Nov), the totals in sheet Fig. 1b's two ALL rows; the words refused when they do not match the make-up;
+    (8) with no committed S520 summary the sheet holds the slot "n", and the stamp says it is pending."""
     import shutil
     import tempfile
     global OUT
@@ -1962,16 +2005,17 @@ def selftest():
                     len(lv7) == len(rows7) and all(it["sheet"] == SHEET_SET
                                                    and sheets7[SHEET_SET][it["row"]]["levels"] == int(it["s"])
                                                    for it in lv7)))
-        res.append(("(7) the totals line: answers, then model calls, each tied to its ALL row of sheet Fig. 1b",
-                    [it["s"] for it in texts7 if it["size"] == PT_HEAD and it["y"] > letters7[LETTER_B]]
-                    == ["51,441 answers", "|", "≥ 1,234,567 model calls"]
-                    and [r["stage"] for r in sheets7[SHEET_SET][-2:]] == ["ALL", "ALL"]))
+        res.append(("(7) no totals line on the plate (Valerio, 11 Nov); the totals in sheet Fig. 1b's two ALL rows",
+                    not [it["s"] for it in texts7 if it["size"] == PT_HEAD and it["y"] > letters7[LETTER_B]]
+                    and not any("answers" in it["s"] or "model calls" in it["s"] for it in texts7)
+                    and [(r["stage"], r["text"]) for r in sheets7[SHEET_SET][-2:]]
+                    == [("ALL", "51,441"), ("ALL", "≥ 1,234,567")]))
         res.append(("(7) a word line that does not match its make-up is refused (the Fig. 1b factors column)",
                     refused(lambda: factor_words("Corpus scale", f"4 {TIMES} 3 {TIMES} 2"))
                     and refused(lambda: factor_words("No such setting", "4"))))
         items8, sheets8, _, _ = layout(rows7, srows7, None, 51441)
-        res.append(("(8) with no summary the plate prints the slot and the sheet holds n",
-                    any(it["s"] == "n model calls" for it in items8 if it["kind"] == "text")
+        res.append(("(8) with no summary the plate prints no slot and the sheet holds n",
+                    not any("model calls" in it["s"] for it in items8 if it["kind"] == "text")
                     and sheets8[SHEET_SET][-1]["text"] == "n" and sheets8[SHEET_SET][-1]["stage"] == "ALL"))
         res.append(("(3) and (8) the summary is committed, so the total is a count",
                     isinstance(s520_total(), int)))

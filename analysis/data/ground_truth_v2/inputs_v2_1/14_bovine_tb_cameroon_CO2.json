@@ -1,0 +1,13 @@
+{
+ "id": "14_bovine_tb_cameroon_CO2",
+ "category": "conceptual",
+ "subcategory": null,
+ "question": "How does the choice of diagnostic method and skinfold thickness threshold impact the assessment of bTB exposure according to the study's findings?",
+ "papers": [
+  {
+   "paper": "14_bovine_tb_cameroon",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/14_bovine_tb_cameroon.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/14_bovine_tb_cameroon.pypdf.txt"
+  }
+ ]
+}

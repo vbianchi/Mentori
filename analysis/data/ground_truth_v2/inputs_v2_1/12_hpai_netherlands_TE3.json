@@ -1,0 +1,13 @@
+{
+ "id": "12_hpai_netherlands_TE3",
+ "category": "technical",
+ "subcategory": null,
+ "question": "How did the researchers define and calculate the Mortality Ratio (MR) metric used to assess early warning signals on the infected farms?",
+ "papers": [
+  {
+   "paper": "12_hpai_netherlands",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/12_hpai_netherlands.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/12_hpai_netherlands.pypdf.txt"
+  }
+ ]
+}

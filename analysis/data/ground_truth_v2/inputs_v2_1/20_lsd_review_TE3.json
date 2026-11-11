@@ -1,0 +1,13 @@
+{
+ "id": "20_lsd_review_TE3",
+ "category": "technical",
+ "subcategory": null,
+ "question": "According to the comparative analysis of vaccinations, what is the specific cross-protection rate between LSDV and related poxviruses, and which viruses are involved?",
+ "papers": [
+  {
+   "paper": "20_lsd_review",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/20_lsd_review.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/20_lsd_review.pypdf.txt"
+  }
+ ]
+}

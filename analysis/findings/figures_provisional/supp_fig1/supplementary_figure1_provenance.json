@@ -1,26 +1,26 @@
 {
  "provenance": {
   "script": "scripts/S496_supp_fig1_experiment_graph.py",
-  "script_sha256": "557dec2aab4f439ecf05199b7d38c9518b46b7821f317e36d431b1c9aa7a963c",
+  "script_sha256": "98d8f2094905faca11dfd065724df304ec9d7bc8fc23334bf4ec3f3bcb0e1680",
   "command": "uv run --frozen python scripts/S496_supp_fig1_experiment_graph.py",
   "python": "3.13.11",
   "deterministic": "D155: no build time and no repository HEAD are recorded; draws.csv is recorded by the sha256 of the fields drawn, not of the file",
   "inputs_sha256": {
-   "findings/recompute/S492_answer_registry/registry.json": "50ec28658dfedaef28fe4489c50e5ef5289393960613e69e13c23c762b6b9dcb",
-   "findings/figures_provisional/fig1/figure1_provenance.json": "92b674446ec91cf207eadbdf9c9b5e64711b8cf5d5089c3d41af0e9d3b828d4a",
-   "findings/recompute/fig_design_inputs/draws.csv (fields experiment, plan_row, design, draws, status)": "d8a4adaa93474cbf9a0a31f7b25dfe5b75254bd26a9b3d40d21c35b67c4cb1ef",
+   "findings/recompute/S492_answer_registry/registry.json": "bd4f68f68fb8e145a88817ea7aa1f4e86c530fac5e0c7cca1f015eada78c1a4e",
+   "findings/figures_provisional/fig1/figure1_provenance.json": "58c89c60222768016d11394e3cb46b4aae2c9a64d8ef82b94d9f851245909ad0",
+   "findings/recompute/fig_design_inputs/draws.csv (fields experiment, plan_row, design, draws, status)": "885e3e90b58882529270ea56b3215fb5728a0961cf71223ec04b7e5eef947637",
    "experiments/rlm_ref/pyproject.toml": "7b8b26c479d8fe9ef349ed5e283902fe8bab1b4725633909c532fb72fe22b2cb"
   },
   "model_calls": 0
  },
  "reproduced": [
-  "answers stored and counted (registry stored_new_counted): 48697 = registry",
+  "answers stored and counted (registry stored_new_counted): 48835 = registry",
   "answers kept from April (registry kept_from_april): 2744 = registry",
-  "total counted (registry total_counted): 51441 = registry",
+  "total counted (registry total_counted): 51579 = registry",
   "not counted (registry not_counted): 0 = registry"
  ],
  "box_sum_check": null,
- "stamp": "PROVISIONAL: 22 of 22 experiments with answers counted (51,441 answers, scripts/S492_answer_registry.py)",
+ "stamp": "22 of 22 experiments with answers counted (51,579 answers, scripts/S492_answer_registry.py)",
  "figure": "Supplementary Figure 1",
  "named": "Supplementary Figure 1: FIGURE_LOCK [files] supplementary_name (D92 Q194)",
  "page_mm": [
@@ -33,11 +33,11 @@
   "lead_mm": 3.33,
   "top_mm": 5.999,
   "key_top_mm": 140.788,
-  "arrow_crossings": 4
+  "arrow_crossings": 3
  },
  "figure_lock": {
   "path": "experiments/FIGURE_LOCK.toml",
-  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "sha256": "ac39c4e311f340654fe1ebe3333a3fe439bc6286e38fc0334fdb0e0cf2a97aef",
   "status": "agreed"
  },
  "type_pt": {
@@ -86,7 +86,7 @@
    "experiment": "Model selection",
    "column": 0,
    "design": [
-    "9 language models from 5 makers"
+    "10 language models from 6 makers"
    ],
    "draws": null,
    "answers": 408,
@@ -229,7 +229,7 @@
    "design": [
     "2 stress set-ups × 135 questions"
    ],
-   "draws": "1 draw",
+   "draws": "1 + 2 draws",
    "answers": 450,
    "calls": null,
    "count_kind": "answers",
@@ -255,9 +255,9 @@
    "experiment": "Component benchmarks",
    "column": 3,
    "design": [
-    "orchestrator components × models × 832 items"
+    "6 models × 832 benchmark items"
    ],
-   "draws": "1 draw",
+   "draws": "1 draw; gemini-3-flash 3",
    "answers": 6656,
    "calls": null,
    "count_kind": "answers",
@@ -269,7 +269,7 @@
    "experiment": "Distiller intervention",
    "column": 3,
    "design": [
-    "7 prompt variants × models × 97 items"
+    "2 prompts × 6 models × 97 items"
    ],
    "draws": "1 draw",
    "answers": 1164,
@@ -326,7 +326,7 @@
    "column": 4,
    "design": [
     "3 indexes × 1 call at a fixed passage count",
-    "third index: draw 1 only"
+    "index with no distractors: draw 1 only"
    ],
    "draws": "1 + 2 draws",
    "answers": 585,
@@ -364,14 +364,14 @@
   },
   {
    "id": "G19",
-   "plan_row": "G19",
-   "experiment": "RLM ablation, gemma3:27b",
+   "plan_row": "G19, G20",
+   "experiment": "RLM ablation, local generators",
    "column": 4,
    "design": [
-    "3 arms (Zhang RLM, search off, gate off) × 46 questions"
+    "3 arms × 2 generators × 46 questions"
    ],
    "draws": "1 draw",
-   "answers": 138,
+   "answers": 276,
    "calls": null,
    "count_kind": "answers",
    "dashed": false
@@ -496,7 +496,7 @@
   {
    "from": "G17",
    "to": "G19",
-   "basis": "the same three switches on gemma3:27b (D249 O2)"
+   "basis": "the same three switches on gemma3:27b and qwen3-coder:30b (D249 O2, D260; D309 A26)"
   },
   {
    "from": "G1",
@@ -505,12 +505,12 @@
   }
  ],
  "files": {
-  "Supplementary Figure 1 (provisional, 22 of 22).pdf": "a1e9251608a0e6f92df11fe9188cdbcb951f1f1ca4145a61a8c4ac5e4af801df",
-  "Supplementary Figure 1 (provisional, 22 of 22).svg": "90b87a18b5458ccefb3bdac3f83cadaebbcb3401db7ec31e0cd0ad918fd7fc9b",
-  "Supplementary Figure 1 (provisional, 22 of 22).png": "773c3d09878bc2ce646613cf69a433ed33d749d56ed9fc4992fdf744a2be8034",
-  "Supplementary Figure 1 data (provisional, 22 of 22).xlsx": "a2b48922853c408a946f51396fd8d41d15ba37f2c11ba871a61f1960ebecf382",
-  "Supplementary Figure 1 data caption (provisional, 22 of 22).md": "799eb2b7347d3a99d024bb093ef3e3a3f24f1c571d4674d2cdc89ab22f926740",
-  "supplementary_figure1_numbers.json": "10a78c3712e4e37b02e649b3cc57ce75cbf77f64aec3a6d2f46fca3e815df062",
-  "legend_draft.md": "e99ce1509a1eca6540b981720c379fe55adf1eb90dc4c67d29648f539e321b00"
+  "Supplementary Figure 1.pdf": "da07642debe896b7af918e581800dd14210ad844195bce786e053dc6b85dfca2",
+  "Supplementary Figure 1.svg": "713ebf5cc006a32d9bd79462ca08477bb6d99ae502cfb38dacbdb177d0e6791a",
+  "Supplementary Figure 1.png": "726df8244bc31e5b2ed6aab095fc340ace9f79a823122061e3435ca2c8ea604e",
+  "Supplementary Figure 1 data.xlsx": "1cbb5ab01beef63e3f4019d020be4fad3b7925aba5c66a3a126f942757df9c8f",
+  "Supplementary Figure 1 data caption.md": "933b47e0ebf5bbe2c5c7d18103a3a0f2554501b65d1ac543605ee085015f391f",
+  "supplementary_figure1_numbers.json": "945684c457e2ab66235dab7714d03307c0a29ec3f5cf1f270bdfdbdbc03055b1",
+  "legend_draft.md": "f15052c529be32ab0ed54d4567bc1bb984b726185199c9778452aaf521d0597f"
  }
 }

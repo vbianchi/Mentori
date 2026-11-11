@@ -1,0 +1,13 @@
+{
+ "id": "16_ppr_ethiopia_CO2",
+ "category": "conceptual",
+ "subcategory": null,
+ "question": "Why does the study conclude that the current PPR herd immunity in the Borena Zone is insufficient according to international standards?",
+ "papers": [
+  {
+   "paper": "16_ppr_ethiopia",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/16_ppr_ethiopia.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/16_ppr_ethiopia.pypdf.txt"
+  }
+ ]
+}

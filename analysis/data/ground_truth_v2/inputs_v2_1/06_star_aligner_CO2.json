@@ -1,0 +1,13 @@
+{
+ "id": "06_star_aligner_CO2",
+ "category": "conceptual",
+ "subcategory": null,
+ "question": "How does the Maximum Mappable Prefix (MMP) search mechanism facilitate the identification of diverse sequence features beyond simple genomic mapping?",
+ "papers": [
+  {
+   "paper": "06_star_aligner",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/06_star_aligner.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/06_star_aligner.pypdf.txt"
+  }
+ ]
+}

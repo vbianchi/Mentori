@@ -1,0 +1,18 @@
+{
+ "id": "CD_002",
+ "category": "cross_document",
+ "subcategory": "complementary",
+ "question": "How does the 'all-in-one' preprocessing approach of fastp complement the visualization and quality control capabilities of MultiQC in a bioinformatics pipeline?",
+ "papers": [
+  {
+   "paper": "04_fastp",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/04_fastp.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/04_fastp.pypdf.txt"
+  },
+  {
+   "paper": "05_multiqc",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/05_multiqc.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/05_multiqc.pypdf.txt"
+  }
+ ]
+}

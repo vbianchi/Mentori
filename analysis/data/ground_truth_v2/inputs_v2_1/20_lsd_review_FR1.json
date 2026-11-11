@@ -1,0 +1,13 @@
+{
+ "id": "20_lsd_review_FR1",
+ "category": "factual_recall",
+ "subcategory": null,
+ "question": "What is the reported efficacy of the homologous vaccine Lumpi-ProVacInd developed in India?",
+ "papers": [
+  {
+   "paper": "20_lsd_review",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/20_lsd_review.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/20_lsd_review.pypdf.txt"
+  }
+ ]
+}

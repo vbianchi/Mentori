@@ -1,0 +1,13 @@
+{
+ "id": "10_cutadapt_TE3",
+ "category": "technical",
+ "subcategory": null,
+ "question": "What are the specific performance metrics for Cutadapt when processing 35 bp colour-space reads with an 18 bp adapter on a 2.66 GHz Intel Core 2 processor?",
+ "papers": [
+  {
+   "paper": "10_cutadapt",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/10_cutadapt.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/10_cutadapt.pypdf.txt"
+  }
+ ]
+}

@@ -1,0 +1,28 @@
+{
+ "id": "SY_007",
+ "category": "synthesis",
+ "subcategory": "theme_analysis",
+ "question": "How do anthropogenic factors, such as animal management and vaccination distribution, create patterns of disease persistence in regions attempting control of transboundary pathogens?",
+ "papers": [
+  {
+   "paper": "13_lsd_nepal",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/13_lsd_nepal.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/13_lsd_nepal.pypdf.txt"
+  },
+  {
+   "paper": "15_rabies_tanzania",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/15_rabies_tanzania.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/15_rabies_tanzania.pypdf.txt"
+  },
+  {
+   "paper": "16_ppr_ethiopia",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/16_ppr_ethiopia.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/16_ppr_ethiopia.pypdf.txt"
+  },
+  {
+   "paper": "20_lsd_review",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/20_lsd_review.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/20_lsd_review.pypdf.txt"
+  }
+ ]
+}

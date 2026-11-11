@@ -300,8 +300,10 @@ def main() -> int:
     if len(qa) != 86:
         raise Refused(f"{len(qa)} answerable questions, want 86")
     answers, inputs = read_records()
-    fig3_rel = [p for p in git("ls-files", FIG3_DIR).splitlines() if Path(p).name.startswith("Source Data Fig. 3 (")
-                and p.endswith(".xlsx")]
+    # the final name since D313 Q9 (45078c0c); the "(provisional, ...)" name before it
+    fig3_rel = [p for p in git("ls-files", FIG3_DIR).splitlines()
+                if Path(p).name == "Source Data Fig. 3.xlsx"
+                or (Path(p).name.startswith("Source Data Fig. 3 (") and p.endswith(".xlsx"))]
     if len(fig3_rel) != 1:
         raise Refused(f"{len(fig3_rel)} committed Source Data Fig. 3 workbooks, want 1")
     fig3_b = git("show", f"HEAD:{fig3_rel[0]}", binary=True)

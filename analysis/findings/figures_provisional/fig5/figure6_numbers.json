@@ -1,5 +1,5 @@
 {
- "stamp": "PROVISIONAL: 516 of 516 draw-1 answerable answers have a final row from all four scorers; judge plain call 1,548 of 1,548, concept recall 1,548 of 1,548 (D181's reading, L3_d181), MiniCheck against the papers 516 of 516 (draw 1, S564's selection D208 and the claim filter D172), judge with passages 1,548 of 1,548; RAGAS 576 and RAGChecker 576 rows (K1); the Second judge row of panel e from S518's qwen3.8:27b rows (D267); S3 collect 2026-10-28T10:19:31Z, run_sha256 38ae79ab023b",
+ "stamp": "516 of 516 draw-1 answerable answers have a final row from all four scorers; judge plain call 1,548 of 1,548, concept recall 1,548 of 1,548 (D181's reading, L3_d181), MiniCheck against the papers 516 of 516 (draw 1, S564's selection D208 and the claim filter D172), judge with passages 1,548 of 1,548; RAGAS 576 and RAGChecker 576 rows (K1); the Second judge row of panel e from S518's qwen3.8:27b rows (D267); S3 collect 2026-10-28T10:19:31Z, run_sha256 38ae79ab023b",
  "what": "Figure 6 (D200), Source Data values and printed numbers (S448 R8 compares the workbook with this file)",
  "sheets": {
   "Fig. 6a": {
@@ -25294,7 +25294,9 @@
     "strategy",
     "rank",
     "rank_text",
-    "n_questions"
+    "n_questions",
+    "kendall_W",
+    "kendall_W_exact_P"
    ],
    "rows": [
     [
@@ -25304,7 +25306,9 @@
      "single pass",
      1.0,
      "1",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25313,7 +25317,9 @@
      "multi-hop",
      3.0,
      "3",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25322,7 +25328,9 @@
      "verified pass",
      2.0,
      "2",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25331,7 +25339,9 @@
      "RLM-5",
      4.0,
      "4",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25340,7 +25350,9 @@
      "RLM-10",
      5.0,
      "5",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25349,7 +25361,9 @@
      "RLM-20",
      6.0,
      "6",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25358,7 +25372,9 @@
      "single pass",
      5.0,
      "5",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25367,7 +25383,9 @@
      "multi-hop",
      6.0,
      "6",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25376,7 +25394,9 @@
      "verified pass",
      4.0,
      "4",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25385,7 +25405,9 @@
      "RLM-5",
      3.0,
      "3",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25394,7 +25416,9 @@
      "RLM-10",
      1.0,
      "1",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25403,7 +25427,9 @@
      "RLM-20",
      2.0,
      "2",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25412,7 +25438,9 @@
      "single pass",
      2.0,
      "2",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25421,7 +25449,9 @@
      "multi-hop",
      6.0,
      "6",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25430,7 +25460,9 @@
      "verified pass",
      1.0,
      "1",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25439,7 +25471,9 @@
      "RLM-5",
      4.0,
      "4",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25448,7 +25482,9 @@
      "RLM-10",
      3.0,
      "3",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25457,7 +25493,9 @@
      "RLM-20",
      5.0,
      "5",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25466,7 +25504,9 @@
      "single pass",
      2.0,
      "2",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25475,7 +25515,9 @@
      "multi-hop",
      6.0,
      "6",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25484,7 +25526,9 @@
      "verified pass",
      2.0,
      "2",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25493,7 +25537,9 @@
      "RLM-5",
      4.0,
      "4",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25502,7 +25548,9 @@
      "RLM-10",
      2.0,
      "2",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25511,7 +25559,9 @@
      "RLM-20",
      5.0,
      "5",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25520,7 +25570,9 @@
      "single pass",
      1.5,
      "1.5",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25529,7 +25581,9 @@
      "multi-hop",
      5.0,
      "5",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25538,7 +25592,9 @@
      "verified pass",
      1.5,
      "1.5",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25547,7 +25603,9 @@
      "RLM-5",
      3.5,
      "3.5",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25556,7 +25614,9 @@
      "RLM-10",
      3.5,
      "3.5",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25565,7 +25625,9 @@
      "RLM-20",
      6.0,
      "6",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25574,7 +25636,9 @@
      "single pass",
      4.0,
      "4",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25583,7 +25647,9 @@
      "multi-hop",
      6.0,
      "6",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25592,7 +25658,9 @@
      "verified pass",
      2.0,
      "2",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25601,7 +25669,9 @@
      "RLM-5",
      4.0,
      "4",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25610,7 +25680,9 @@
      "RLM-10",
      1.0,
      "1",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25619,7 +25691,9 @@
      "RLM-20",
      4.0,
      "4",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25628,7 +25702,9 @@
      "single pass",
      2.0,
      "2",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25637,7 +25713,9 @@
      "multi-hop",
      6.0,
      "6",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25646,7 +25724,9 @@
      "verified pass",
      1.0,
      "1",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25655,7 +25735,9 @@
      "RLM-5",
      4.0,
      "4",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25664,7 +25746,9 @@
      "RLM-10",
      3.0,
      "3",
-     86
+     86,
+     null,
+     null
     ],
     [
      "rank",
@@ -25673,7 +25757,20 @@
      "RLM-20",
      5.0,
      "5",
-     86
+     86,
+     null,
+     null
+    ],
+    [
+     "kendall_W",
+     "Judge, Concepts, Papers",
+     null,
+     "6 strategies",
+     null,
+     null,
+     86,
+     0.30158730158730157,
+     0.5339564043209877
     ]
    ]
   },
@@ -26895,196 +26992,202 @@
   "s448num_100": {
    "sheet": "Fig. 6c",
    "row": 8,
-   "format": "{tie}"
+   "format": "{strategy_higher}"
   },
   "s448num_101": {
    "sheet": "Fig. 6c",
-   "row": 8,
-   "format": "{strategy_higher}"
+   "row": 9,
+   "format": "{single_pass_higher}"
   },
   "s448num_102": {
    "sheet": "Fig. 6c",
    "row": 9,
-   "format": "{single_pass_higher}"
+   "format": "{tie}"
   },
   "s448num_103": {
    "sheet": "Fig. 6c",
    "row": 9,
-   "format": "{tie}"
+   "format": "{strategy_higher}"
   },
   "s448num_104": {
    "sheet": "Fig. 6c",
-   "row": 9,
-   "format": "{strategy_higher}"
+   "row": 10,
+   "format": "{single_pass_higher}"
   },
   "s448num_105": {
    "sheet": "Fig. 6c",
    "row": 10,
-   "format": "{single_pass_higher}"
+   "format": "{tie}"
   },
   "s448num_106": {
    "sheet": "Fig. 6c",
    "row": 10,
-   "format": "{tie}"
+   "format": "{strategy_higher}"
   },
   "s448num_107": {
    "sheet": "Fig. 6c",
-   "row": 10,
-   "format": "{strategy_higher}"
+   "row": 11,
+   "format": "{single_pass_higher}"
   },
   "s448num_108": {
    "sheet": "Fig. 6c",
    "row": 11,
-   "format": "{single_pass_higher}"
+   "format": "{strategy_higher}"
   },
   "s448num_109": {
    "sheet": "Fig. 6c",
-   "row": 11,
-   "format": "{strategy_higher}"
+   "row": 12,
+   "format": "{single_pass_higher}"
   },
   "s448num_110": {
    "sheet": "Fig. 6c",
    "row": 12,
-   "format": "{single_pass_higher}"
+   "format": "{tie}"
   },
   "s448num_111": {
    "sheet": "Fig. 6c",
    "row": 12,
-   "format": "{tie}"
+   "format": "{strategy_higher}"
   },
   "s448num_112": {
    "sheet": "Fig. 6c",
-   "row": 12,
-   "format": "{strategy_higher}"
+   "row": 13,
+   "format": "{single_pass_higher}"
   },
   "s448num_113": {
    "sheet": "Fig. 6c",
    "row": 13,
-   "format": "{single_pass_higher}"
+   "format": "{tie}"
   },
   "s448num_114": {
    "sheet": "Fig. 6c",
    "row": 13,
-   "format": "{tie}"
-  },
-  "s448num_115": {
-   "sheet": "Fig. 6c",
-   "row": 13,
    "format": "{strategy_higher}"
   },
-  "s448num_116": {
+  "s448num_115": {
    "sheet": "Fig. 6c",
    "row": 14,
    "format": "{single_pass_higher}"
   },
-  "s448num_117": {
+  "s448num_116": {
    "sheet": "Fig. 6c",
    "row": 14,
    "format": "{strategy_higher}"
   },
-  "s448num_118": {
+  "s448num_117": {
    "fixed": "0",
    "why": "faithfulness score of the swatch"
   },
-  "s448num_119": {
+  "s448num_118": {
    "fixed": "1",
    "why": "faithfulness score of the swatch"
   },
-  "s448num_120": {
+  "s448num_119": {
    "fixed": "2",
    "why": "faithfulness score of the swatch"
   },
-  "s448num_121": {
+  "s448num_120": {
    "fixed": "3",
    "why": "faithfulness score of the swatch"
   },
-  "s448num_122": {
+  "s448num_121": {
    "fixed": "4",
    "why": "faithfulness score of the swatch"
   },
-  "s448num_123": {
+  "s448num_122": {
    "fixed": "5",
    "why": "faithfulness score of the swatch"
   },
-  "s448num_124": {
+  "s448num_123": {
    "sheet": "Fig. 6d",
    "row": 0,
    "format": "{n}"
   },
-  "s448num_125": {
+  "s448num_124": {
    "sheet": "Fig. 6d",
    "row": 1,
    "format": "{n}"
   },
-  "s448num_126": {
+  "s448num_125": {
    "sheet": "Fig. 6d",
    "row": 2,
    "format": "{n}"
   },
-  "s448num_127": {
+  "s448num_126": {
    "sheet": "Fig. 6d",
    "row": 3,
    "format": "{n}"
   },
-  "s448num_128": {
+  "s448num_127": {
    "sheet": "Fig. 6d",
    "row": 4,
    "format": "{n}"
   },
-  "s448num_129": {
+  "s448num_128": {
    "sheet": "Fig. 6d",
    "row": 5,
    "format": "{n}"
   },
-  "s448num_130": {
+  "s448num_129": {
    "fixed": "RLM-5",
    "why": "strategy name"
   },
-  "s448num_131": {
+  "s448num_130": {
    "sheet": "Fig. 6d",
    "row": 6,
    "format": "{n}"
   },
-  "s448num_132": {
+  "s448num_131": {
    "sheet": "Fig. 6d",
    "row": 7,
    "format": "{n}"
   },
-  "s448num_133": {
+  "s448num_132": {
    "fixed": "RLM-10",
    "why": "strategy name"
   },
-  "s448num_134": {
+  "s448num_133": {
    "sheet": "Fig. 6d",
    "row": 8,
    "format": "{n}"
   },
-  "s448num_135": {
+  "s448num_134": {
    "sheet": "Fig. 6d",
    "row": 9,
    "format": "{n}"
   },
-  "s448num_136": {
+  "s448num_135": {
    "fixed": "RLM-20",
    "why": "strategy name"
   },
-  "s448num_137": {
+  "s448num_136": {
    "sheet": "Fig. 6d",
    "row": 10,
    "format": "{n}"
   },
-  "s448num_138": {
+  "s448num_137": {
    "sheet": "Fig. 6d",
    "row": 11,
    "format": "{n}"
   },
-  "s448num_139": {
+  "s448num_138": {
    "fixed": "RAGChecker F1",
    "why": "evaluator's name"
   },
-  "s448num_140": {
+  "s448num_139": {
    "fixed": "bge-m3 similarity",
    "why": "evaluator's name"
   }
+ },
+ "kendall": {
+  "W": 0.30158730158730157,
+  "exact_P": 0.5339564043209877,
+  "signals": [
+   "Judge",
+   "Concepts",
+   "Papers"
+  ],
+  "strategies": 6,
+  "orderings": 518400
  }
 }

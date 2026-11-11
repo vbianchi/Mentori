@@ -26,6 +26,14 @@
    "ok": 225,
    "replaced": 0
   },
+  "G17": {
+   "calls": 834,
+   "failed": 0,
+   "no_answer_line": 0,
+   "not_joined": 0,
+   "ok": 834,
+   "replaced": 0
+  },
   "G2": {
    "calls": 1338,
    "failed": 9,
@@ -99,11 +107,11 @@
    "replaced": 0
   },
   "R49": {
-   "calls": 59,
+   "calls": 118,
    "failed": 0,
    "no_answer_line": 0,
    "not_joined": 0,
-   "ok": 59,
+   "ok": 118,
    "replaced": 0
   },
   "S2": {
@@ -113,6 +121,14 @@
    "not_joined": 0,
    "ok": 38085,
    "replaced": 5243
+  },
+  "S564": {
+   "calls": 14809,
+   "failed": 4,
+   "no_answer_line": 0,
+   "not_joined": 0,
+   "ok": 14805,
+   "replaced": 0
   },
   "T1": {
    "calls": 2779,
@@ -129,6 +145,22 @@
    "not_joined": 0,
    "ok": 47474,
    "replaced": 2219
+  },
+  "T3C": {
+   "calls": 6860,
+   "failed": 3,
+   "no_answer_line": 0,
+   "not_joined": 0,
+   "ok": 6857,
+   "replaced": 0
+  },
+  "T3D": {
+   "calls": 1164,
+   "failed": 3,
+   "no_answer_line": 0,
+   "not_joined": 0,
+   "ok": 1161,
+   "replaced": 0
   }
  },
  "by_machine": {
@@ -141,11 +173,11 @@
    "replaced": 14204
   },
   "laptop": {
-   "calls": 285781,
-   "failed": 383,
+   "calls": 309507,
+   "failed": 393,
    "no_answer_line": 3735,
    "not_joined": 0,
-   "ok": 285398,
+   "ok": 309114,
    "replaced": 3755
   },
   "studio": {
@@ -175,11 +207,11 @@
    "replaced": 121
   },
   "devstral-small-2:24b": {
-   "calls": 877399,
-   "failed": 295,
+   "calls": 894272,
+   "failed": 299,
    "no_answer_line": 222,
    "not_joined": 705,
-   "ok": 877104,
+   "ok": 893973,
    "replaced": 26888
   },
   "gemini-2.5-pro": {
@@ -191,28 +223,36 @@
    "replaced": 756
   },
   "gemini-3-flash-preview": {
-   "calls": 201491,
+   "calls": 204181,
    "failed": 1528,
    "no_answer_line": 2438,
    "not_joined": 15104,
-   "ok": 199963,
+   "ok": 202653,
    "replaced": 2438
   },
   "gemma3:27b": {
-   "calls": 8225,
+   "calls": 9251,
    "failed": 380,
    "no_answer_line": 46,
    "not_joined": 675,
-   "ok": 7845,
+   "ok": 8871,
    "replaced": 46
   },
   "gpt-oss:20b-date20261010": {
-   "calls": 15939,
+   "calls": 16965,
    "failed": 99,
    "no_answer_line": 3066,
    "not_joined": 0,
-   "ok": 15840,
+   "ok": 16866,
    "replaced": 3074
+  },
+  "llama3:8b": {
+   "calls": 1026,
+   "failed": 6,
+   "no_answer_line": 0,
+   "not_joined": 0,
+   "ok": 1020,
+   "replaced": 0
   },
   "qwen3-coder-next:q4_K_M": {
    "calls": 5444,
@@ -223,19 +263,19 @@
    "replaced": 465
   },
   "qwen3-coder:30b": {
-   "calls": 10025,
+   "calls": 11051,
    "failed": 1,
    "no_answer_line": 390,
    "not_joined": 686,
-   "ok": 10024,
+   "ok": 11050,
    "replaced": 390
   },
   "qwen3.8:27b": {
-   "calls": 12234,
+   "calls": 12293,
    "failed": 52,
    "no_answer_line": 0,
    "not_joined": 0,
-   "ok": 12182,
+   "ok": 12241,
    "replaced": 0
   }
  },
@@ -262,6 +302,14 @@
    "no_answer_line": 0,
    "not_joined": 0,
    "ok": 225,
+   "replaced": 0
+  },
+  "G17": {
+   "calls": 834,
+   "failed": 0,
+   "no_answer_line": 0,
+   "not_joined": 0,
+   "ok": 834,
    "replaced": 0
   },
   "G2": {
@@ -344,6 +392,14 @@
    "ok": 818855,
    "replaced": 14204
   },
+  "S12B": {
+   "calls": 204,
+   "failed": 0,
+   "no_answer_line": 0,
+   "not_joined": 0,
+   "ok": 204,
+   "replaced": 0
+  },
   "S2": {
    "calls": 38738,
    "failed": 653,
@@ -368,12 +424,20 @@
    "ok": 2662,
    "replaced": 0
   },
+  "S564": {
+   "calls": 14809,
+   "failed": 4,
+   "no_answer_line": 0,
+   "not_joined": 0,
+   "ok": 14805,
+   "replaced": 0
+  },
   "S6": {
-   "calls": 16611,
+   "calls": 16670,
    "failed": 17,
    "no_answer_line": 0,
    "not_joined": 0,
-   "ok": 16594,
+   "ok": 16653,
    "replaced": 0
   },
   "T1": {
@@ -391,6 +455,14 @@
    "not_joined": 0,
    "ok": 33081,
    "replaced": 214
+  },
+  "T3": {
+   "calls": 7820,
+   "failed": 6,
+   "no_answer_line": 0,
+   "not_joined": 0,
+   "ok": 7814,
+   "replaced": 0
   }
  },
  "by_role": {
@@ -434,6 +506,14 @@
    "ok": 119715,
    "replaced": 1458
   },
+  "claim selection": {
+   "calls": 14809,
+   "failed": 4,
+   "no_answer_line": 0,
+   "not_joined": 0,
+   "ok": 14805,
+   "replaced": 0
+  },
   "code generation": {
    "calls": 37850,
    "failed": 653,
@@ -451,19 +531,19 @@
    "replaced": 133
   },
   "generator": {
-   "calls": 29067,
-   "failed": 252,
+   "calls": 30231,
+   "failed": 255,
    "no_answer_line": 84,
    "not_joined": 0,
-   "ok": 28815,
+   "ok": 29976,
    "replaced": 84
   },
   "judge (a)": {
-   "calls": 43935,
+   "calls": 44973,
    "failed": 0,
    "no_answer_line": 0,
    "not_joined": 0,
-   "ok": 43935,
+   "ok": 44973,
    "replaced": 11352
   },
   "judge (b)": {
@@ -491,19 +571,19 @@
    "replaced": 0
   },
   "orchestrator component": {
-   "calls": 9122,
-   "failed": 8,
+   "calls": 15778,
+   "failed": 11,
    "no_answer_line": 14,
    "not_joined": 0,
-   "ok": 9114,
+   "ok": 15767,
    "replaced": 14
   },
   "second judge": {
-   "calls": 12234,
+   "calls": 12293,
    "failed": 52,
    "no_answer_line": 0,
    "not_joined": 0,
-   "ok": 12182,
+   "ok": 12241,
    "replaced": 0
   },
   "verifier": {
@@ -545,6 +625,122 @@
    "mentori-runs-t3"
   ]
  },
+ "d311": {
+  "added_by_source": {
+   "recompute/G17_runs": 834,
+   "recompute/S508_judge_49_v25_second": 59,
+   "recompute/S564_claimify_selection": 14809,
+   "recompute/s12b_inputs": 204,
+   "runs/T3_frozen_20261104T131439Z": 7820
+  },
+  "added_by_tier": {
+   "check": 1085,
+   "dropped": 15,
+   "run": 23726
+  },
+  "added_to_total": 23726,
+  "base_by_model": {
+   "?": 2,
+   "claude-haiku-4-5": 13668,
+   "devstral-small-2:24b": 877399,
+   "gemini-2.5-pro": 13991,
+   "gemini-3-flash-preview": 201491,
+   "gemma3:27b": 8225,
+   "gpt-oss:20b-date20261010": 15939,
+   "qwen3-coder-next:q4_K_M": 5444,
+   "qwen3-coder:30b": 10025,
+   "qwen3.8:27b": 12234
+  },
+  "base_total": 1158418,
+  "decision": "D311",
+  "inputs": "findings/recompute/S520_inputs_d311",
+  "models_after": [
+   "claude-haiku-4-5",
+   "devstral-small-2:24b",
+   "gemini-2.5-pro",
+   "gemini-3-flash-preview",
+   "gemma3:27b",
+   "gpt-oss:20b-date20261010",
+   "llama3:8b",
+   "qwen3-coder-next:q4_K_M",
+   "qwen3-coder:30b",
+   "qwen3.8:27b"
+  ],
+  "models_before": [
+   "claude-haiku-4-5",
+   "devstral-small-2:24b",
+   "gemini-2.5-pro",
+   "gemini-3-flash-preview",
+   "gemma3:27b",
+   "gpt-oss:20b-date20261010",
+   "qwen3-coder-next:q4_K_M",
+   "qwen3-coder:30b",
+   "qwen3.8:27b"
+  ],
+  "rows": [
+   {
+    "calls": 15,
+    "experiment": "G13",
+    "source": "recompute/G13_runs",
+    "tier": "dropped"
+   },
+   {
+    "calls": 321,
+    "experiment": "CHECK",
+    "source": "recompute/G17_runs",
+    "tier": "check"
+   },
+   {
+    "calls": 834,
+    "experiment": "G17",
+    "source": "recompute/G17_runs",
+    "tier": "run"
+   },
+   {
+    "calls": 59,
+    "experiment": "R49",
+    "source": "recompute/S508_judge_49_v25_second",
+    "tier": "run"
+   },
+   {
+    "calls": 100,
+    "experiment": "CHECK",
+    "source": "recompute/S564_claimify_selection",
+    "tier": "check"
+   },
+   {
+    "calls": 14809,
+    "experiment": "S564",
+    "source": "recompute/S564_claimify_selection",
+    "tier": "run"
+   },
+   {
+    "calls": 664,
+    "experiment": "CHECK",
+    "source": "recompute/S584_judge_rater_scale",
+    "tier": "check"
+   },
+   {
+    "calls": 204,
+    "experiment": "T3C",
+    "source": "recompute/s12b_inputs",
+    "tier": "run"
+   },
+   {
+    "calls": 6656,
+    "experiment": "T3C",
+    "source": "runs/T3_frozen_20261104T131439Z",
+    "tier": "run"
+   },
+   {
+    "calls": 1164,
+    "experiment": "T3D",
+    "source": "runs/T3_frozen_20261104T131439Z",
+    "tier": "run"
+   }
+  ],
+  "total": 1182144
+ },
  "dropped_after_freeze": {
   "calls_moved": 0,
   "decisions": [],
@@ -554,7 +750,7 @@
  "duplicate_lines_within_a_file": 0,
  "duplicates_by_clone": {
   "Mentori-reanalysis (check)": 1802,
-  "Mentori-reanalysis (copy)": 209422,
+  "Mentori-reanalysis (copy)": 217535,
   "Mentori-reanalysis (run)": 165,
   "mentori-runs (check)": 1682,
   "mentori-runs (copy)": 10327,
@@ -625,9 +821,9 @@
   "mentori-runs-t2g (check)": 1682,
   "mentori-runs-t2g (run)": 106
  },
- "duplicates_removed": 289539,
- "figure1_legend_total": 1158418,
- "files": 2429,
+ "duplicates_removed": 297652,
+ "figure1_legend_total": 1182144,
+ "files": 2584,
  "gates": [
   {
    "gate": "K1 laptop log, the 86 committed answers",
@@ -964,6 +1160,433 @@
    "pass": true,
    "source": "fig5_inputs/k1 rows, sum of calls",
    "want": ">= 72845"
+  },
+  {
+   "gate": "D311 T3 exp_04__analyzer__devstral-small-2-24b call lines",
+   "got": 345,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 345
+  },
+  {
+   "gate": "D311 T3 exp_04__analyzer__gemini-3-flash-preview call lines",
+   "got": 1035,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 1035
+  },
+  {
+   "gate": "D311 T3 exp_04__analyzer__gemma3-27b call lines",
+   "got": 345,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 345
+  },
+  {
+   "gate": "D311 T3 exp_04__analyzer__gpt-oss-20b call lines",
+   "got": 345,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 345
+  },
+  {
+   "gate": "D311 T3 exp_04__analyzer__llama3-8b call lines",
+   "got": 345,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 345
+  },
+  {
+   "gate": "D311 T3 exp_04__analyzer__qwen3-coder-30b call lines",
+   "got": 345,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 345
+  },
+  {
+   "gate": "D311 T3 exp_04__distiller__devstral-small-2-24b call lines",
+   "got": 97,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 97
+  },
+  {
+   "gate": "D311 T3 exp_04__distiller__gemini-3-flash-preview call lines",
+   "got": 291,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 291
+  },
+  {
+   "gate": "D311 T3 exp_04__distiller__gemma3-27b call lines",
+   "got": 97,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 97
+  },
+  {
+   "gate": "D311 T3 exp_04__distiller__gpt-oss-20b call lines",
+   "got": 97,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 97
+  },
+  {
+   "gate": "D311 T3 exp_04__distiller__llama3-8b call lines",
+   "got": 97,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 97
+  },
+  {
+   "gate": "D311 T3 exp_04__distiller__qwen3-coder-30b call lines",
+   "got": 97,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 97
+  },
+  {
+   "gate": "D311 T3 exp_04__planner__devstral-small-2-24b call lines",
+   "got": 90,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 90
+  },
+  {
+   "gate": "D311 T3 exp_04__planner__gemini-3-flash-preview call lines",
+   "got": 270,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 270
+  },
+  {
+   "gate": "D311 T3 exp_04__planner__gemma3-27b call lines",
+   "got": 90,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 90
+  },
+  {
+   "gate": "D311 T3 exp_04__planner__gpt-oss-20b call lines",
+   "got": 90,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 90
+  },
+  {
+   "gate": "D311 T3 exp_04__planner__llama3-8b call lines",
+   "got": 90,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 90
+  },
+  {
+   "gate": "D311 T3 exp_04__planner__qwen3-coder-30b call lines",
+   "got": 90,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 90
+  },
+  {
+   "gate": "D311 T3 exp_04__supervisor__devstral-small-2-24b call lines",
+   "got": 200,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 200
+  },
+  {
+   "gate": "D311 T3 exp_04__supervisor__gemini-3-flash-preview call lines",
+   "got": 600,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 600
+  },
+  {
+   "gate": "D311 T3 exp_04__supervisor__gemma3-27b call lines",
+   "got": 200,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 200
+  },
+  {
+   "gate": "D311 T3 exp_04__supervisor__gpt-oss-20b call lines",
+   "got": 200,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 200
+  },
+  {
+   "gate": "D311 T3 exp_04__supervisor__llama3-8b call lines",
+   "got": 200,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 200
+  },
+  {
+   "gate": "D311 T3 exp_04__supervisor__qwen3-coder-30b call lines",
+   "got": 200,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 200
+  },
+  {
+   "gate": "D311 T3 exp_04__synthesizer__devstral-small-2-24b call lines",
+   "got": 100,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 100
+  },
+  {
+   "gate": "D311 T3 exp_04__synthesizer__gemini-3-flash-preview call lines",
+   "got": 300,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 300
+  },
+  {
+   "gate": "D311 T3 exp_04__synthesizer__gemma3-27b call lines",
+   "got": 100,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 100
+  },
+  {
+   "gate": "D311 T3 exp_04__synthesizer__gpt-oss-20b call lines",
+   "got": 100,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 100
+  },
+  {
+   "gate": "D311 T3 exp_04__synthesizer__llama3-8b call lines",
+   "got": 100,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 100
+  },
+  {
+   "gate": "D311 T3 exp_04__synthesizer__qwen3-coder-30b call lines",
+   "got": 100,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 100
+  },
+  {
+   "gate": "D311 T3 exp_04b__F1__devstral-small-2-24b call lines",
+   "got": 97,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 97
+  },
+  {
+   "gate": "D311 T3 exp_04b__F1__gemini-3-flash-preview call lines",
+   "got": 97,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 97
+  },
+  {
+   "gate": "D311 T3 exp_04b__F1__gemma3-27b call lines",
+   "got": 97,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 97
+  },
+  {
+   "gate": "D311 T3 exp_04b__F1__gpt-oss-20b call lines",
+   "got": 97,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 97
+  },
+  {
+   "gate": "D311 T3 exp_04b__F1__llama3-8b call lines",
+   "got": 97,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 97
+  },
+  {
+   "gate": "D311 T3 exp_04b__F1__qwen3-coder-30b call lines",
+   "got": 97,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 97
+  },
+  {
+   "gate": "D311 T3 exp_04b__baseline__devstral-small-2-24b call lines",
+   "got": 97,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 97
+  },
+  {
+   "gate": "D311 T3 exp_04b__baseline__gemini-3-flash-preview call lines",
+   "got": 97,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 97
+  },
+  {
+   "gate": "D311 T3 exp_04b__baseline__gemma3-27b call lines",
+   "got": 97,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 97
+  },
+  {
+   "gate": "D311 T3 exp_04b__baseline__gpt-oss-20b call lines",
+   "got": 97,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 97
+  },
+  {
+   "gate": "D311 T3 exp_04b__baseline__llama3-8b call lines",
+   "got": 97,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 97
+  },
+  {
+   "gate": "D311 T3 exp_04b__baseline__qwen3-coder-30b call lines",
+   "got": 97,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink",
+   "want": 97
+  },
+  {
+   "gate": "D311 T3 call lines, all sinks",
+   "got": 7820,
+   "pass": true,
+   "source": "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json answers_per_sink, sum",
+   "want": 7820
+  },
+  {
+   "gate": "D311 new lines recompute/G13_runs",
+   "got": 15,
+   "pass": true,
+   "source": "scripts/S623_s520_unmapped_check.py, 9 Nov",
+   "want": 15
+  },
+  {
+   "gate": "D311 new lines recompute/G17_runs",
+   "got": 1155,
+   "pass": true,
+   "source": "scripts/S623_s520_unmapped_check.py, 9 Nov",
+   "want": 1155
+  },
+  {
+   "gate": "D311 new lines recompute/S508_judge_49_v25_second",
+   "got": 59,
+   "pass": true,
+   "source": "scripts/S623_s520_unmapped_check.py, 9 Nov",
+   "want": 59
+  },
+  {
+   "gate": "D311 new lines recompute/S564_claimify_selection",
+   "got": 14909,
+   "pass": true,
+   "source": "scripts/S623_s520_unmapped_check.py, 9 Nov",
+   "want": 14909
+  },
+  {
+   "gate": "D311 new lines recompute/S584_judge_rater_scale",
+   "got": 664,
+   "pass": true,
+   "source": "scripts/S623_s520_unmapped_check.py, 9 Nov",
+   "want": 664
+  },
+  {
+   "gate": "D311 new lines recompute/s12b_inputs",
+   "got": 204,
+   "pass": true,
+   "source": "scripts/S623_s520_unmapped_check.py, 9 Nov",
+   "want": 204
+  },
+  {
+   "gate": "D311 new lines runs/T3_frozen_20261104T110249Z",
+   "got": 5130,
+   "pass": true,
+   "source": "scripts/S623_s520_unmapped_check.py, 9 Nov",
+   "want": 5130
+  },
+  {
+   "gate": "D311 new lines runs/T3_frozen_20261104T131439Z",
+   "got": 7820,
+   "pass": true,
+   "source": "scripts/S623_s520_unmapped_check.py, 9 Nov",
+   "want": 7820
+  },
+  {
+   "gate": "D311 new lines, every folder",
+   "got": 24826,
+   "pass": true,
+   "source": "scripts/S623_s520_unmapped_check.py, 9 Nov",
+   "want": 24826
+  },
+  {
+   "gate": "D311 S564 full set, call lines",
+   "got": 14809,
+   "pass": true,
+   "source": "experiments/README.md D211: the full set of 14,809",
+   "want": 14809
+  },
+  {
+   "gate": "D311 S508 second judge, call lines",
+   "got": 59,
+   "pass": true,
+   "source": "S520 rule 6: S508's 59 calls (49 and 10 rechecks); the second judge the same",
+   "want": 59
+  },
+  {
+   "gate": "D311 join, tier run grows by the new lines",
+   "got": 23726,
+   "pass": true,
+   "source": "d311_new_by",
+   "want": 23726
+  },
+  {
+   "gate": "D311 join, tier check grows by the new lines",
+   "got": 1085,
+   "pass": true,
+   "source": "d311_new_by",
+   "want": 1085
+  },
+  {
+   "gate": "D311 join, tier smoke grows by the new lines",
+   "got": 0,
+   "pass": true,
+   "source": "d311_new_by",
+   "want": 0
+  },
+  {
+   "gate": "D311 join, tier dropped grows by the new lines",
+   "got": 15,
+   "pass": true,
+   "source": "d311_new_by",
+   "want": 15
+  },
+  {
+   "gate": "D311 join, tier unmapped grows by the new lines",
+   "got": 0,
+   "pass": true,
+   "source": "d311_new_by",
+   "want": 0
+  },
+  {
+   "gate": "D311 join, every experiment grows by its new lines only",
+   "got": [],
+   "pass": true,
+   "source": "d311_new_by",
+   "want": []
+  },
+  {
+   "gate": "D311 join, lines found only in a copy",
+   "got": 0,
+   "pass": true,
+   "source": "T3_frozen_20261104T110249Z and S18f_runs/out_v25 are copies",
+   "want": 0
   }
  ],
  "generator_call_sites": {
@@ -971,7 +1594,8 @@
   "backend/retrieval/pipeline.py": 4985,
   "backend/retrieval/rlm/verification.py": 1625,
   "publication/scripts/exp_03_orchestration_ablation.py": 840,
-  "tests/experiments/exp1_rlm_vs_singlepass.py": 21558
+  "publication/scripts/exp_04b_distiller_ablation.py": 1164,
+  "tests/experiments/exp1_rlm_vs_singlepass.py": 21573
  },
  "judge_v24_replaced_by_v25": 12461,
  "known_out": {
@@ -995,7 +1619,7 @@
   "mentori-runs-s2-laptop": 0,
   "mentori-runs-s2-laptop-d75": 0
  },
- "lines_read": 1567556,
+ "lines_read": 1600495,
  "live": [],
  "machines_not_read": [],
  "machines_read": [
@@ -1012,20 +1636,28 @@
    "ok": 818855,
    "replaced": 14204
   },
+  "claim selection": {
+   "calls": 14809,
+   "failed": 4,
+   "no_answer_line": 0,
+   "not_joined": 0,
+   "ok": 14805,
+   "replaced": 0
+  },
   "generation": {
-   "calls": 273575,
-   "failed": 2308,
+   "calls": 281395,
+   "failed": 2314,
    "no_answer_line": 7372,
    "not_joined": 17883,
-   "ok": 271267,
+   "ok": 279081,
    "replaced": 7380
   },
   "judges": {
-   "calls": 65946,
+   "calls": 67043,
    "failed": 258,
    "no_answer_line": 132,
    "not_joined": 0,
-   "ok": 65688,
+   "ok": 66785,
    "replaced": 12594
   }
  },
@@ -1039,10 +1671,6 @@
  },
  "not_joined_exp06": 17883,
  "not_planned": [
-  {
-   "job": "T3 component benchmarks and distiller prompts",
-   "why": "not started; draws.csv holds no call or answer count for it (D198 O7: the 59-hour core)"
-  },
   {
    "job": "Second judge outside 3f, 5e and S14",
    "why": "held by D198 O4 (2,025 calls)"
@@ -1107,6 +1735,8 @@
  "provenance": {
   "command": "uv run --frozen python scripts/S520_llm_calls.py report --frozen",
   "inputs_sha256": {
+   "S520_inputs_d311/d311_gates.json": "91f34bc83e669783203ccd43936cd2ac3dba81bd2221c431f2785ccbcbbb01c9",
+   "S520_inputs_d311/s520_laptop_d311.json": "22f91732986eaa43557117e407eabe6213a3f596b4484beb465e543bbab468a9",
    "laptop_gates.json": "76dd4c325869b57e4fe73b090a0975e3fe33e626212a4a9fa4e3a8e4bb46de98",
    "s520_beelink.json": "83745c3e0a0e7032a87c43e43debbd5e85508ee61645df7886e8248c5a329809",
    "s520_laptop.json": "18c4d4483523f2bd85fd5015ca670eea1907bc4ecc73ce78ac558209ec3b7700",
@@ -1129,9 +1759,14 @@
     "started_utc": "2026-11-07T05:27:31Z"
    }
   },
+  "read_d311": {
+   "ended_utc": "2026-11-09T18:16:38Z",
+   "host": "Valerios-MacBook-Pro.local",
+   "started_utc": "2026-11-09T18:16:35Z"
+  },
   "repository_head": "not stamped (report --frozen)",
   "script": "scripts/S520_llm_calls.py",
-  "script_sha256": "312cedbe6967d0a4c92a17259b273a2d22666e8e66b4e54265b2288f9e995c85",
+  "script_sha256": "72555ae22486b98eca36ab560eabd9102d259e1ff818e40c5e02956bcd360304",
   "written_utc": "not stamped (report --frozen)"
  },
  "reconcile": {
@@ -1249,7 +1884,7 @@
     "worker": "laptop"
    }
   ],
-  "sinks_checked": 303,
+  "sinks_checked": 304,
   "sinks_differ": [
    {
     "kept_lines": 20,
@@ -1327,6 +1962,7 @@
  },
  "s1_boxes": {
   "G1": 846196,
+  "G17": 834,
   "G2": 1338,
   "G3A": 19587,
   "G3B": 2060,
@@ -1341,25 +1977,25 @@
   "S2": 38738,
   "T1": 2779,
   "T2": 47821,
-  "T3C": 0,
-  "T3D": 0,
-  "not in a box": 869
+  "T3C": 6860,
+  "T3D": 1164,
+  "not in a box": 15737
  },
  "tiers": {
-  "check": 111816,
-  "dropped": 2533,
-  "run": 1158418,
+  "check": 112901,
+  "dropped": 2548,
+  "run": 1182144,
   "smoke": 4098,
   "unmapped": 0
  },
  "total": {
-  "calls": 1158418,
-  "failed": 2608,
+  "calls": 1182144,
+  "failed": 2618,
   "failed_by_status": {
    "blocked": 55,
    "empty": 154,
-   "error": 1064,
-   "length": 934,
+   "error": 1068,
+   "length": 940,
    "malformed_function_call": 57,
    "malformed_response": 234,
    "proxy_error": 2,
@@ -1369,225 +2005,15 @@
   },
   "no_answer_line": 7504,
   "not_joined": 17883,
-  "ok": 1155810,
+  "ok": 1179526,
   "replaced": 34178
  },
  "unmapped": [
   {
    "clone": "mentori-runs",
    "machine": "studio",
-   "path": "recompute/G13_runs/inputs/runs/exp_01__matched_budget__exp_v4_s20_n0/calls.jsonl",
-   "size": 2890136
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17/check_11453/check_calls.jsonl",
-   "size": 618078
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17/judge/exp_01__rlm_10_ctrl__exp_v4_s20_n0/judge_passages_calls.jsonl",
-   "size": 506118
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17/judge/exp_01__rlm_10_ctrl__exp_v4_s20_n0/judge_passages_recheck_calls.jsonl",
-   "size": 58819
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17/judge/exp_01__rlm_10_nogate__exp_v4_s20_n0/judge_passages_calls.jsonl",
-   "size": 509602
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17/judge/exp_01__rlm_10_nogate__exp_v4_s20_n0/judge_passages_recheck_calls.jsonl",
-   "size": 59031
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17/judge/exp_01__rlm_10_nosearch__exp_v4_s20_n0/judge_passages_calls.jsonl",
-   "size": 510770
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17/judge/exp_01__rlm_10_nosearch__exp_v4_s20_n0/judge_passages_recheck_calls.jsonl",
-   "size": 59281
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/check_11454/check_calls.jsonl",
-   "size": 618272
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/check_11455/check_calls.jsonl",
-   "size": 618274
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/judge/exp_01__rlm_10_ctrl__exp_v4_s20_n0/judge_passages_calls.jsonl",
-   "size": 1017924
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/judge/exp_01__rlm_10_ctrl__exp_v4_s20_n0/judge_passages_recheck_calls.jsonl",
-   "size": 59824
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/judge/exp_01__rlm_10_nogate__exp_v4_s20_n0/judge_passages_calls.jsonl",
-   "size": 1015595
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/judge/exp_01__rlm_10_nogate__exp_v4_s20_n0/judge_passages_recheck_calls.jsonl",
-   "size": 58106
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/judge/exp_01__rlm_10_nosearch__exp_v4_s20_n0/judge_passages_calls.jsonl",
-   "size": 1019589
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/judge/exp_01__rlm_10_nosearch__exp_v4_s20_n0/judge_passages_recheck_calls.jsonl",
-   "size": 57880
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
    "path": "recompute/R0_pilot_studio/proxy_calls.jsonl",
    "size": 5049298
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/S18f_runs/out_v25/B2_shard0of2/judge_evidence_v25_calls.jsonl",
-   "size": 1120949
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/S18f_runs/out_v25/B2_shard1of2/judge_evidence_v25_calls.jsonl",
-   "size": 1091676
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/S18f_runs/out_v25/B_shard0of2/judge_evidence_v25_calls.jsonl",
-   "size": 1120388
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/S18f_runs/out_v25/B_shard1of2/judge_evidence_v25_calls.jsonl",
-   "size": 1091154
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/S18f_runs/out_v25/C_shard0of2/judge_evidence_v25_calls.jsonl",
-   "size": 1142204
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/S18f_runs/out_v25/C_shard1of2/judge_evidence_v25_calls.jsonl",
-   "size": 1113477
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/S18f_runs/out_v25/D_shard0of2/judge_evidence_v25_calls.jsonl",
-   "size": 1161833
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/S18f_runs/out_v25/D_shard1of2/judge_evidence_v25_calls.jsonl",
-   "size": 1123159
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/S564_claimify_selection/full/shard_0_of_8/calls.jsonl",
-   "size": 7158686
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/S564_claimify_selection/full/shard_1_of_8/calls.jsonl",
-   "size": 7163505
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/S564_claimify_selection/full/shard_2_of_8/calls.jsonl",
-   "size": 7161427
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/S564_claimify_selection/full/shard_3_of_8/calls.jsonl",
-   "size": 7131439
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/S564_claimify_selection/full/shard_4_of_8/calls.jsonl",
-   "size": 7153912
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/S564_claimify_selection/full/shard_5_of_8/calls.jsonl",
-   "size": 7132720
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/S564_claimify_selection/full/shard_6_of_8/calls.jsonl",
-   "size": 7173071
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/S564_claimify_selection/full/shard_7_of_8/calls.jsonl",
-   "size": 7149974
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/S564_claimify_selection/timing_100/calls.jsonl",
-   "size": 386794
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/s12b_inputs/out/judge/s12b_april/judge_passages_calls.jsonl",
-   "size": 1105559
-  },
-  {
-   "clone": "mentori-runs",
-   "machine": "studio",
-   "path": "recompute/s12b_inputs/out/judge/s12b_april/judge_passages_recheck_calls.jsonl",
-   "size": 57531
   },
   {
    "clone": "mentori-runs-g4",
@@ -1606,108 +2032,6 @@
    "machine": "studio",
    "path": "recompute/G4_runs/g4r38_d2_sinks/exp_02_scaling_factorial__rlm_10__exp_v4_s5_n3/calls.jsonl",
    "size": 5263102
-  },
-  {
-   "clone": "mentori-runs-g4",
-   "machine": "studio",
-   "path": "recompute/S564_claimify_selection/timing_100/calls.jsonl",
-   "size": 386794
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/G13_runs/inputs/runs/exp_01__matched_budget__exp_v4_s20_n0/calls.jsonl",
-   "size": 2890136
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17/check_11453/check_calls.jsonl",
-   "size": 618078
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17/judge/exp_01__rlm_10_ctrl__exp_v4_s20_n0/judge_passages_calls.jsonl",
-   "size": 506118
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17/judge/exp_01__rlm_10_ctrl__exp_v4_s20_n0/judge_passages_recheck_calls.jsonl",
-   "size": 58819
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17/judge/exp_01__rlm_10_nogate__exp_v4_s20_n0/judge_passages_calls.jsonl",
-   "size": 509602
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17/judge/exp_01__rlm_10_nogate__exp_v4_s20_n0/judge_passages_recheck_calls.jsonl",
-   "size": 59031
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17/judge/exp_01__rlm_10_nosearch__exp_v4_s20_n0/judge_passages_calls.jsonl",
-   "size": 510770
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17/judge/exp_01__rlm_10_nosearch__exp_v4_s20_n0/judge_passages_recheck_calls.jsonl",
-   "size": 59281
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/check_11454/check_calls.jsonl",
-   "size": 618272
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/check_11455/check_calls.jsonl",
-   "size": 618274
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/judge/exp_01__rlm_10_ctrl__exp_v4_s20_n0/judge_passages_calls.jsonl",
-   "size": 1017924
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/judge/exp_01__rlm_10_ctrl__exp_v4_s20_n0/judge_passages_recheck_calls.jsonl",
-   "size": 59824
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/judge/exp_01__rlm_10_nogate__exp_v4_s20_n0/judge_passages_calls.jsonl",
-   "size": 1015595
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/judge/exp_01__rlm_10_nogate__exp_v4_s20_n0/judge_passages_recheck_calls.jsonl",
-   "size": 58106
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/judge/exp_01__rlm_10_nosearch__exp_v4_s20_n0/judge_passages_calls.jsonl",
-   "size": 1019589
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/judge/exp_01__rlm_10_nosearch__exp_v4_s20_n0/judge_passages_recheck_calls.jsonl",
-   "size": 57880
   },
   {
    "clone": "mentori-runs-g5",
@@ -1830,144 +2154,6 @@
    "size": 1459965
   },
   {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/S18f_runs/out_v25/B2_shard0of2/judge_evidence_v25_calls.jsonl",
-   "size": 1120949
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/S18f_runs/out_v25/B2_shard1of2/judge_evidence_v25_calls.jsonl",
-   "size": 1091676
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/S18f_runs/out_v25/B_shard0of2/judge_evidence_v25_calls.jsonl",
-   "size": 1120388
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/S18f_runs/out_v25/B_shard1of2/judge_evidence_v25_calls.jsonl",
-   "size": 1091154
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/S18f_runs/out_v25/C_shard0of2/judge_evidence_v25_calls.jsonl",
-   "size": 1142204
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/S18f_runs/out_v25/C_shard1of2/judge_evidence_v25_calls.jsonl",
-   "size": 1113477
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/S18f_runs/out_v25/D_shard0of2/judge_evidence_v25_calls.jsonl",
-   "size": 1161833
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/S18f_runs/out_v25/D_shard1of2/judge_evidence_v25_calls.jsonl",
-   "size": 1123159
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/S508_judge_49_v25_second/calls.jsonl",
-   "size": 173648
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/S508_judge_49_v25_second/recheck_calls.jsonl",
-   "size": 36841
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/S564_claimify_selection/full/shard_0_of_8/calls.jsonl",
-   "size": 7158686
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/S564_claimify_selection/full/shard_1_of_8/calls.jsonl",
-   "size": 7163505
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/S564_claimify_selection/full/shard_2_of_8/calls.jsonl",
-   "size": 7161427
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/S564_claimify_selection/full/shard_3_of_8/calls.jsonl",
-   "size": 7131439
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/S564_claimify_selection/full/shard_4_of_8/calls.jsonl",
-   "size": 7153912
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/S564_claimify_selection/full/shard_5_of_8/calls.jsonl",
-   "size": 7132720
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/S564_claimify_selection/full/shard_6_of_8/calls.jsonl",
-   "size": 7173071
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/S564_claimify_selection/full/shard_7_of_8/calls.jsonl",
-   "size": 7149974
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/S564_claimify_selection/timing_100/calls.jsonl",
-   "size": 386794
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/s12b_inputs/out/judge/s12b_april/judge_passages_calls.jsonl",
-   "size": 1105559
-  },
-  {
-   "clone": "mentori-runs-g5",
-   "machine": "studio",
-   "path": "recompute/s12b_inputs/out/judge/s12b_april/judge_passages_recheck_calls.jsonl",
-   "size": 57531
-  },
-  {
-   "clone": "mentori-runs-s18f",
-   "machine": "studio",
-   "path": "recompute/G13_runs/inputs/runs/exp_01__matched_budget__exp_v4_s20_n0/calls.jsonl",
-   "size": 2890136
-  },
-  {
-   "clone": "mentori-runs-s18f",
-   "machine": "studio",
-   "path": "recompute/S564_claimify_selection/timing_100/calls.jsonl",
-   "size": 386794
-  },
-  {
    "clone": "mentori-runs",
    "machine": "beelink",
    "path": "recompute/R0_pilot_beelink/attempt1_lock_changed/proxy_calls.jsonl",
@@ -1990,937 +2176,14 @@
    "machine": "beelink",
    "path": "recompute/R0_pilot_beelink/attempt4_beelink/proxy_calls.jsonl",
    "size": 1402258
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/G13_runs/inputs/runs/exp_01__matched_budget__exp_v4_s20_n0/calls.jsonl",
-   "size": 2890136
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/G17_runs/out_s6_w_g17/check_11453/check_calls.jsonl",
-   "size": 618078
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/G17_runs/out_s6_w_g17/judge/exp_01__rlm_10_ctrl__exp_v4_s20_n0/judge_passages_calls.jsonl",
-   "size": 506118
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/G17_runs/out_s6_w_g17/judge/exp_01__rlm_10_ctrl__exp_v4_s20_n0/judge_passages_recheck_calls.jsonl",
-   "size": 58819
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/G17_runs/out_s6_w_g17/judge/exp_01__rlm_10_nogate__exp_v4_s20_n0/judge_passages_calls.jsonl",
-   "size": 509602
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/G17_runs/out_s6_w_g17/judge/exp_01__rlm_10_nogate__exp_v4_s20_n0/judge_passages_recheck_calls.jsonl",
-   "size": 59031
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/G17_runs/out_s6_w_g17/judge/exp_01__rlm_10_nosearch__exp_v4_s20_n0/judge_passages_calls.jsonl",
-   "size": 510770
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/G17_runs/out_s6_w_g17/judge/exp_01__rlm_10_nosearch__exp_v4_s20_n0/judge_passages_recheck_calls.jsonl",
-   "size": 59281
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/check_11454/check_calls.jsonl",
-   "size": 618272
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/check_11455/check_calls.jsonl",
-   "size": 618274
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/judge/exp_01__rlm_10_ctrl__exp_v4_s20_n0/judge_passages_calls.jsonl",
-   "size": 1017924
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/judge/exp_01__rlm_10_ctrl__exp_v4_s20_n0/judge_passages_recheck_calls.jsonl",
-   "size": 59824
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/judge/exp_01__rlm_10_nogate__exp_v4_s20_n0/judge_passages_calls.jsonl",
-   "size": 1015595
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/judge/exp_01__rlm_10_nogate__exp_v4_s20_n0/judge_passages_recheck_calls.jsonl",
-   "size": 58106
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/judge/exp_01__rlm_10_nosearch__exp_v4_s20_n0/judge_passages_calls.jsonl",
-   "size": 1019589
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/G17_runs/out_s6_w_g17_d23/judge/exp_01__rlm_10_nosearch__exp_v4_s20_n0/judge_passages_recheck_calls.jsonl",
-   "size": 57880
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/B2_shard0of2/judge_evidence_v25_calls.jsonl",
-   "size": 1120949
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/B2_shard1of2/judge_evidence_v25_calls.jsonl",
-   "size": 1091676
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/B_shard0of2/judge_evidence_v25_calls.jsonl",
-   "size": 1120388
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/B_shard1of2/judge_evidence_v25_calls.jsonl",
-   "size": 1091154
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/C_shard0of2/judge_evidence_v25_calls.jsonl",
-   "size": 1142204
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/C_shard1of2/judge_evidence_v25_calls.jsonl",
-   "size": 1113477
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/D_shard0of2/judge_evidence_v25_calls.jsonl",
-   "size": 1161833
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/D_shard1of2/judge_evidence_v25_calls.jsonl",
-   "size": 1123159
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/check_11451_b292315f9d38/check_calls.jsonl",
-   "size": 618272
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/check_11452/check_calls.jsonl",
-   "size": 614206
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/check_11452_b292315f9d38/check_calls.jsonl",
-   "size": 618208
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/judge/u01/judge_evidence_calls.jsonl",
-   "size": 671773
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/judge/u01/judge_evidence_recheck_calls.jsonl",
-   "size": 58876
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/judge/u02/judge_evidence_calls.jsonl",
-   "size": 687677
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/judge/u02/judge_evidence_recheck_calls.jsonl",
-   "size": 57405
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/judge/u03/judge_evidence_calls.jsonl",
-   "size": 691764
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/judge/u03/judge_evidence_recheck_calls.jsonl",
-   "size": 58686
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/judge/u04/judge_evidence_calls.jsonl",
-   "size": 709666
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/judge/u04/judge_evidence_recheck_calls.jsonl",
-   "size": 59180
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/judge/u05/judge_evidence_calls.jsonl",
-   "size": 700625
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/judge/u05/judge_evidence_recheck_calls.jsonl",
-   "size": 58971
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/judge/u06/judge_evidence_calls.jsonl",
-   "size": 698763
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/judge/u06/judge_evidence_recheck_calls.jsonl",
-   "size": 58062
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/judge/u07/judge_evidence_calls.jsonl",
-   "size": 711194
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/judge/u07/judge_evidence_recheck_calls.jsonl",
-   "size": 59618
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/judge/u08/judge_evidence_calls.jsonl",
-   "size": 710647
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/judge/u08/judge_evidence_recheck_calls.jsonl",
-   "size": 57966
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/judge/u09/judge_evidence_calls.jsonl",
-   "size": 429741
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S18f_runs/out_v25/judge/u09/judge_evidence_recheck_calls.jsonl",
-   "size": 60990
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S508_judge_49_v25_second/calls.jsonl",
-   "size": 173648
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S508_judge_49_v25_second/recheck_calls.jsonl",
-   "size": 36841
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S564_claimify_selection/full/shard_0_of_8/calls.jsonl",
-   "size": 7158686
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S564_claimify_selection/full/shard_1_of_8/calls.jsonl",
-   "size": 7163505
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S564_claimify_selection/full/shard_2_of_8/calls.jsonl",
-   "size": 7161427
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S564_claimify_selection/full/shard_3_of_8/calls.jsonl",
-   "size": 7131439
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S564_claimify_selection/full/shard_4_of_8/calls.jsonl",
-   "size": 7153912
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S564_claimify_selection/full/shard_5_of_8/calls.jsonl",
-   "size": 7132720
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S564_claimify_selection/full/shard_6_of_8/calls.jsonl",
-   "size": 7173071
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S564_claimify_selection/full/shard_7_of_8/calls.jsonl",
-   "size": 7149974
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S564_claimify_selection/timing_100/calls.jsonl",
-   "size": 386794
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S584_judge_rater_scale/a/Bioinfos-Mac-Studio_11451/calls.jsonl",
-   "size": 67741
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S584_judge_rater_scale/a/Bioinfos-Mac-Studio_11451/recheck_calls.jsonl",
-   "size": 56610
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S584_judge_rater_scale/a/Bioinfos-Mac-Studio_11452/calls.jsonl",
-   "size": 69527
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S584_judge_rater_scale/a/Bioinfos-Mac-Studio_11452/recheck_calls.jsonl",
-   "size": 57466
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S584_judge_rater_scale/a/Bioinfos-Mac-Studio_11454/calls.jsonl",
-   "size": 68320
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S584_judge_rater_scale/a/Bioinfos-Mac-Studio_11454/recheck_calls.jsonl",
-   "size": 56207
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S584_judge_rater_scale/a/studio_11451_shard0/calls.jsonl",
-   "size": 74273
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S584_judge_rater_scale/a/studio_11451_shard0/recheck_calls.jsonl",
-   "size": 57676
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S584_judge_rater_scale/b/Bioinfos-Mac-Studio_11451/calls.jsonl",
-   "size": 159143
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S584_judge_rater_scale/b/Bioinfos-Mac-Studio_11451/recheck_calls.jsonl",
-   "size": 58083
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S584_judge_rater_scale/b/Bioinfos-Mac-Studio_11452/calls.jsonl",
-   "size": 156917
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S584_judge_rater_scale/b/Bioinfos-Mac-Studio_11452/recheck_calls.jsonl",
-   "size": 57557
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S584_judge_rater_scale/b/Bioinfos-Mac-Studio_11454/calls.jsonl",
-   "size": 152161
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S584_judge_rater_scale/b/Bioinfos-Mac-Studio_11454/recheck_calls.jsonl",
-   "size": 57385
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S584_judge_rater_scale/b/studio_11451_shard0/calls.jsonl",
-   "size": 158701
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S584_judge_rater_scale/b/studio_11451_shard0/recheck_calls.jsonl",
-   "size": 58785
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S584_judge_rater_scale/check_11458/check_calls.jsonl",
-   "size": 612151
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S584_judge_rater_scale/studio_checks/check_11451/check_calls.jsonl",
-   "size": 614103
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S584_judge_rater_scale/studio_checks/check_11452/check_calls.jsonl",
-   "size": 614119
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/S584_judge_rater_scale/studio_checks/check_11454/check_calls.jsonl",
-   "size": 614094
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/s12b_inputs/out/judge/s12b_april/judge_passages_calls.jsonl",
-   "size": 1105559
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "recompute/s12b_inputs/out/judge/s12b_april/judge_passages_recheck_calls.jsonl",
-   "size": 57531
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__analyzer__devstral-small-2-24b/calls.jsonl",
-   "size": 3602450
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__analyzer__gemma3-27b/calls.jsonl",
-   "size": 1897175
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__analyzer__gpt-oss-20b/calls.jsonl",
-   "size": 2055886
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__analyzer__llama3-8b/calls.jsonl",
-   "size": 1878229
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__analyzer__qwen3-coder-30b/calls.jsonl",
-   "size": 1901986
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__distiller__devstral-small-2-24b/calls.jsonl",
-   "size": 1773372
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__distiller__gemma3-27b/calls.jsonl",
-   "size": 1339340
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__distiller__gpt-oss-20b/calls.jsonl",
-   "size": 1634748
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__distiller__llama3-8b/calls.jsonl",
-   "size": 1274841
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__distiller__qwen3-coder-30b/calls.jsonl",
-   "size": 1318358
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__planner__devstral-small-2-24b/calls.jsonl",
-   "size": 900010
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__planner__gemma3-27b/calls.jsonl",
-   "size": 865413
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__planner__gpt-oss-20b/calls.jsonl",
-   "size": 942318
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__planner__llama3-8b/calls.jsonl",
-   "size": 854805
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__planner__qwen3-coder-30b/calls.jsonl",
-   "size": 897692
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__supervisor__devstral-small-2-24b/calls.jsonl",
-   "size": 2796463
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__supervisor__gemma3-27b/calls.jsonl",
-   "size": 1811597
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__supervisor__gpt-oss-20b/calls.jsonl",
-   "size": 2030238
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__supervisor__llama3-8b/calls.jsonl",
-   "size": 1754074
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__supervisor__qwen3-coder-30b/calls.jsonl",
-   "size": 1831840
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__synthesizer__devstral-small-2-24b/calls.jsonl",
-   "size": 1133304
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__synthesizer__gemma3-27b/calls.jsonl",
-   "size": 1101447
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__synthesizer__gpt-oss-20b/calls.jsonl",
-   "size": 1275024
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__synthesizer__llama3-8b/calls.jsonl",
-   "size": 1117362
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04__synthesizer__qwen3-coder-30b/calls.jsonl",
-   "size": 1127891
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04b__F1__devstral-small-2-24b/calls.jsonl",
-   "size": 2027763
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04b__F1__gemma3-27b/calls.jsonl",
-   "size": 1581632
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04b__F1__gpt-oss-20b/calls.jsonl",
-   "size": 2033652
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04b__F1__llama3-8b/calls.jsonl",
-   "size": 1501858
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04b__F1__qwen3-coder-30b/calls.jsonl",
-   "size": 1578343
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04b__baseline__devstral-small-2-24b/calls.jsonl",
-   "size": 1772305
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04b__baseline__gemma3-27b/calls.jsonl",
-   "size": 1337415
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04b__baseline__gpt-oss-20b/calls.jsonl",
-   "size": 1676454
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04b__baseline__llama3-8b/calls.jsonl",
-   "size": 1271128
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T110249Z/sinks/exp_04b__baseline__qwen3-coder-30b/calls.jsonl",
-   "size": 1308439
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__analyzer__devstral-small-2-24b/calls.jsonl",
-   "size": 3602450
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__analyzer__gemini-3-flash-preview/calls.jsonl",
-   "size": 14106124
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__analyzer__gemma3-27b/calls.jsonl",
-   "size": 1897175
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__analyzer__gpt-oss-20b/calls.jsonl",
-   "size": 2055886
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__analyzer__llama3-8b/calls.jsonl",
-   "size": 1878229
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__analyzer__qwen3-coder-30b/calls.jsonl",
-   "size": 1901986
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__distiller__devstral-small-2-24b/calls.jsonl",
-   "size": 1773372
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__distiller__gemini-3-flash-preview/calls.jsonl",
-   "size": 12575792
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__distiller__gemma3-27b/calls.jsonl",
-   "size": 1339340
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__distiller__gpt-oss-20b/calls.jsonl",
-   "size": 1634748
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__distiller__llama3-8b/calls.jsonl",
-   "size": 1274841
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__distiller__qwen3-coder-30b/calls.jsonl",
-   "size": 1318358
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__planner__devstral-small-2-24b/calls.jsonl",
-   "size": 900010
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__planner__gemini-3-flash-preview/calls.jsonl",
-   "size": 7703602
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__planner__gemma3-27b/calls.jsonl",
-   "size": 865413
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__planner__gpt-oss-20b/calls.jsonl",
-   "size": 942318
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__planner__llama3-8b/calls.jsonl",
-   "size": 854805
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__planner__qwen3-coder-30b/calls.jsonl",
-   "size": 897692
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__supervisor__devstral-small-2-24b/calls.jsonl",
-   "size": 2796463
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__supervisor__gemini-3-flash-preview/calls.jsonl",
-   "size": 15165983
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__supervisor__gemma3-27b/calls.jsonl",
-   "size": 1811597
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__supervisor__gpt-oss-20b/calls.jsonl",
-   "size": 2030238
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__supervisor__llama3-8b/calls.jsonl",
-   "size": 1754074
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__supervisor__qwen3-coder-30b/calls.jsonl",
-   "size": 1831840
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__synthesizer__devstral-small-2-24b/calls.jsonl",
-   "size": 1133304
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__synthesizer__gemini-3-flash-preview/calls.jsonl",
-   "size": 9712229
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__synthesizer__gemma3-27b/calls.jsonl",
-   "size": 1101447
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__synthesizer__gpt-oss-20b/calls.jsonl",
-   "size": 1275024
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__synthesizer__llama3-8b/calls.jsonl",
-   "size": 1117362
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04__synthesizer__qwen3-coder-30b/calls.jsonl",
-   "size": 1127891
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04b__F1__devstral-small-2-24b/calls.jsonl",
-   "size": 2027763
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04b__F1__gemini-3-flash-preview/calls.jsonl",
-   "size": 4128576
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04b__F1__gemma3-27b/calls.jsonl",
-   "size": 1581632
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04b__F1__gpt-oss-20b/calls.jsonl",
-   "size": 2033652
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04b__F1__llama3-8b/calls.jsonl",
-   "size": 1501858
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04b__F1__qwen3-coder-30b/calls.jsonl",
-   "size": 1578343
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04b__baseline__devstral-small-2-24b/calls.jsonl",
-   "size": 1772305
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04b__baseline__gemini-3-flash-preview/calls.jsonl",
-   "size": 4164352
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04b__baseline__gemma3-27b/calls.jsonl",
-   "size": 1337415
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04b__baseline__gpt-oss-20b/calls.jsonl",
-   "size": 1676454
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04b__baseline__llama3-8b/calls.jsonl",
-   "size": 1271128
-  },
-  {
-   "clone": "Mentori-reanalysis",
-   "machine": "laptop",
-   "path": "runs/T3_frozen_20261104T131439Z/sinks/exp_04b__baseline__qwen3-coder-30b/calls.jsonl",
-   "size": 1308439
   }
  ],
+ "unmapped_covered_d311": {
+  "laptop:Mentori-reanalysis": 155,
+  "studio:mentori-runs": 35,
+  "studio:mentori-runs-g4": 1,
+  "studio:mentori-runs-g5": 37,
+  "studio:mentori-runs-s18f": 2
+ },
  "unmapped_opened": []
 }

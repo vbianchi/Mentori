@@ -1,5 +1,5 @@
 {
- "stamp": "PROVISIONAL: 516 of 516 draw-1 answerable answers have a final row from all four scorers; judge plain call 1,548 of 1,548, concept recall 1,548 of 1,548 (D181's reading, L3_d181), MiniCheck against the papers 516 of 516 (draw 1, S564's selection D208 and the claim filter D172), judge with passages 1,548 of 1,548; RAGAS 576 and RAGChecker 576 rows (K1); the Second judge row of panel e from S518's qwen3.8:27b rows (D267); S3 collect 2026-10-28T10:19:31Z, run_sha256 38ae79ab023b",
+ "stamp": "516 of 516 draw-1 answerable answers have a final row from all four scorers; judge plain call 1,548 of 1,548, concept recall 1,548 of 1,548 (D181's reading, L3_d181), MiniCheck against the papers 516 of 516 (draw 1, S564's selection D208 and the claim filter D172), judge with passages 1,548 of 1,548; RAGAS 576 and RAGChecker 576 rows (K1); the Second judge row of panel e from S518's qwen3.8:27b rows (D267); S3 collect 2026-10-28T10:19:31Z, run_sha256 38ae79ab023b",
  "planned": {
   "judge": 1548,
   "concept": 1548,
@@ -306,6 +306,17 @@
     "rlm_10": 3.0,
     "rlm_20": 5.0
    }
+  },
+  "kendall": {
+   "W": 0.30158730158730157,
+   "exact_P": 0.5339564043209877,
+   "signals": [
+    "Judge",
+    "Concepts",
+    "Papers"
+   ],
+   "strategies": 6,
+   "orderings": 518400
   }
  },
  "k1_length_done": [
@@ -379,14 +390,14 @@
   "R1B": 43.0,
   "F_W": 34.0,
   "D_END": 176.892,
-  "B_CW": 4.4,
+  "B_CW": 5.4,
   "B_HEAD": 19.4,
-  "B_X1": 150.492,
-  "B_X": 125.6,
+  "B_X1": 144.492,
+  "B_X": 119.6,
   "B_TH": 4.5,
   "A_X": 18.042,
-  "A_G": 3.6,
-  "A_W": 31.453,
+  "A_G": 3.0,
+  "A_W": 30.519,
   "Y2": 55.6,
   "R2": 64.0,
   "R2B": 96.0,
@@ -404,10 +415,16 @@
   "F_LET": 108.4,
   "D_X": 18.042,
   "D_G": 4.2,
-  "D_W": 25.439
+  "D_W": 25.273
  },
  "legend_words": 299,
  "c_unprinted": [
+  [
+   "RLM-5",
+   "Papers",
+   "tie",
+   7
+  ],
   [
    "RLM-10",
    "Papers",

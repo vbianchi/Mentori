@@ -28,8 +28,8 @@ REPRODUCE FIRST (README.md:75-79; any difference exits 2 and nothing is written)
 Rule 9 (experiments/LIST.md:353-370): counts k of n, no interval, no test, no ranking. Rule 10: a failed answer counts as
 a fail. S4c is the one home of the five false-premise questions (supp.md C5).
 
-WRITES findings/figures_provisional/supp_fig5_false_premise/: "Supplementary Figure 5 (provisional, k of N)".{pdf,svg,png},
-"Supplementary Figure 5 data (...)".xlsx (sheets 4a, 4b, 4c), its caption, supplementary_figure5_numbers.json,
+WRITES findings/figures_provisional/supp_fig5_false_premise/: "Supplementary Figure 5".{pdf,svg,png},
+"Supplementary Figure 5 data".xlsx (sheets 4a, 4b, 4c), its caption, supplementary_figure5_numbers.json,
 supplementary_figure5_provenance.json, legend_draft.md. k of N counts a and b's 180 answers, all on their final key, and
 c's 360 answers less those awaiting S6G4. No model call.
 """
@@ -334,7 +334,9 @@ def draw(fn: dict, qf: list, paths: dict, mut=None) -> tuple:
     for i, q in enumerate(qf):
         fixed(ax.text(X0 - 1.5, Y0 + i * TH + TH / 2, f"{SHORT[q]} ({q[-3:]})", ha="right", va="center"),
               "our short wording of the false claim, with the question's number")
-    hs.key(fig, [("swatch", TILE[k], "0 of 3" if k == 0 else str(k)) for k in (3, 2, 1, 0)],
+    # Valerio 11 Nov (figure files hold only the figure): the key's steps carry no "of 3"; the legend's a says "Draws
+    # passed, of three". The title "Draws passed:" stays, since draws passed is the quantity each cell measures
+    hs.key(fig, [("swatch", TILE[k], str(k)) for k in (3, 2, 1, 0)],
             centre_x=(X0 + XB[T_RELAX] + 6 * CW) / 2, y=3.6, title="Draws passed:")
     for tx in fig.texts:
         if any(ch.isdigit() for ch in tx.get_text()):
@@ -353,9 +355,8 @@ def draw(fn: dict, qf: list, paths: dict, mut=None) -> tuple:
     bx.yaxis.set_major_locator(FixedLocator(list(range(0, 11, 2))))
     bx.yaxis.set_major_formatter(FixedFormatter([str(v) for v in range(0, 11, 2)]))
     bx.yaxis.set_minor_locator(NullLocator())
-    ax.text(XBB - 11.0, Y_B + BH / 2, "Questions passed", ha="center", va="center", rotation=90)
-    ax.text(XBB - 7.6, Y_B + BH / 2, "in a draw (of 10)", ha="center", va="center", rotation=90).set_gid("s532_b_ylab")
-    printed["s532_b_ylab"] = {"fixed": "in a draw (of 10)", "why": "the axis label"}
+    # Valerio 11 Nov: the axis names its quantity only; "in a draw, of the 10 false-premise questions" is in the legend's b
+    ax.text(XBB - 8.6, Y_B + BH / 2, "Questions passed", ha="center", va="center", rotation=90)
     b_idx = {(r["row"], r["strategy"], r["draw"]): i for i, r in enumerate(fn["b"])}
     DOT = hs.DOT_SPARSE_MM
     mm_y = BH / 10.3
@@ -376,7 +377,7 @@ def draw(fn: dict, qf: list, paths: dict, mut=None) -> tuple:
             lb = ax.text(XBB + (j + 0.5) * CWB, Y_B + BH + dy, word, ha="center", va="baseline")
             if any(ch.isdigit() for ch in word):
                 fixed(lb, "a strategy's name, on two lines")
-    hs.key(fig, [("mark", (hs.GREY["dot"], "o"), "one draw"), ("line", ("#000000", hs.LW["median"]), "mean of three draws")],
+    hs.key(fig, [("mark", (hs.GREY["dot"], "o"), "Draw"), ("line", ("#000000", hs.LW["median"]), "Mean")],
            centre_x=XBB + 3 * CWB, y=Y_B - 10.0)
 
     # ---- c: the five questions asked at every corpus size, printed counts to the right margin
@@ -421,8 +422,9 @@ def check_drawn(readback) -> list:
 
 
 def legend(q66: dict, res: dict, qf: list) -> tuple:
-    # Editor row 45 round (Valerio, 8 Nov): no panel draws derived statistics (no error bar, box, interval or test), so
-    # no "n = " tag; every panel described in full, with no reference to another panel.
+    # Editor row 45 round (Valerio, 8 Nov): every panel described in full, with no reference to another panel. D310
+    # (9 Nov): b's black line is a mean over draws, a derived statistic, so b states "n = X draws" (S448 R9). c names the
+    # five questions by where they sit, not by internal id (audit 9 Nov, A77).
     ids = ", ".join(q[-3:] if i else q for i, q in enumerate(q66["ids"]))
     labs = [lab for _, lab in STRATS]
     strats = ", ".join(labs[:-1]) + " and " + labs[-1]
@@ -440,13 +442,33 @@ def legend(q66: dict, res: dict, qf: list) -> tuple:
         f"score of {T_MAIN} or more; right grid, {T_RELAX} or more. The number and the colour of each cell give the draws "
         f"passed: yellow {nd}, olive 2, grey 1, dark blue 0. **b**, Questions passed in a draw, of the {nq} false-premise "
         f"questions on the 20-paper index at a score of {T_MAIN} or more (y axis), for each strategy (x axis). Grey dots, "
-        f"the {word.get(nd, nd)} draws; black line, the mean of the {word.get(nd, nd)} draws. **c**, Answers passed of 15, by "
-        f"number of core papers (rows) and strategy (columns), for the {word.get(n5, n5)} false-premise questions asked "
-        f"at every corpus size ({ids}), one draw. Rows are {sizes_t} core papers. Each cell counts 15 answers: "
+        f"the {word.get(nd, nd)} draws; black line, the mean of the n = {nd} draws. **c**, Answers passed of 15, by "
+        f"number of core papers (rows) and strategy (columns), for the {word.get(n5, n5)} false-premise questions in scope "
+        f"at every corpus size (Supplementary Data 1), one draw. Rows are {sizes_t} core papers. Each cell counts 15 answers: "
         f"{word.get(n5, n5)} questions, each on three indexes with 0, 1 and 3 distractor papers per core paper. Upper "
         f"block, a score of {T_MAIN} or more; lower block, {T_RELAX} or more. Counts are shown as they are, with no test "
-        f"and no ranking.")
+        f"and no ranking. " + class_sentence())
     return title, body
+
+
+# Q20 (Valerio, 10 Nov: "For the 27 cards, go with suggestions"): S586's classes of a and b's 180 answers enter the
+# legend, read from S586's own summary. The labels are Claude's (labels_status in its header); D259 confirmed the one
+# "affirmed" label, so the sentence says who classed them.
+S586_SUMMARY = ROOT / "findings/recompute/S586_false_premise_classes/summary.json"
+
+
+def class_sentence() -> str:
+    d = json.loads(S586_SUMMARY.read_text())
+    tot = next(r for r in d["summary"] if r["strategy"] == "all")      # S586's row over the six strategies
+    cj = d["class_by_judge"]
+    other_pass = sum(cj[f"{c}|pass"] for c in ("hedged", "refused", "affirmed"))
+    other = tot["hedged"] + tot["refused"] + tot["affirmed"]
+    assert sum(tot[c] for c in ("contradicted", "hedged", "refused", "affirmed")) == tot["answers"]
+    return (f"Claude (Anthropic), the writing aid, also classed each of the {tot['answers']} answers on the 20-paper "
+            f"index by reading it against its question and the key: {tot['contradicted']} contradict the false claim "
+            f"with evidence, {tot['hedged']} hedge, {tot['refused']} say the papers do not hold the answer and "
+            f"{tot['affirmed']} affirms the claim (confirmed by the first author). The judge passed "
+            f"{cj['contradicted|pass']} of the {tot['contradicted']} and {other_pass} of the other {other}.")
 
 
 def build(out: Path = OUT, fixture: dict | None = None, mut=None, quiet=False) -> dict:
@@ -471,10 +493,10 @@ def build(out: Path = OUT, fixture: dict | None = None, mut=None, quiet=False) -
     fn = sheets_of(res, v25, qf, q66)
     awaiting = q66["awaiting"]["answers"]
     n, m = len(v25) + 24 * 15 - awaiting, len(v25) + 24 * 15
-    stamp = (f"PROVISIONAL: {n} of {m} answers on their final key: a and b, all {len(v25)} (G1, three draws, {n_changed} on "
+    stamp = (f"{n} of {m} answers on their final key: a and b, all {len(v25)} (G1, three draws, {n_changed} on "
              f"changed questions read from S6G1, the others unchanged by key v2.5); c, {24 * 15 - awaiting} of {24 * 15} "
              f"(G4 draw 1, {awaiting} awaiting S6G4, read on key v2.4 until it ends)")
-    tag = f" (provisional, {n} of {m})"
+    tag = ""                                  # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
     out.mkdir(parents=True, exist_ok=True)
     tmp = Path(tempfile.mkdtemp(prefix="S532_"))
     paths = {x: tmp / f"{PLATE}{tag}.{x}" for x in ("pdf", "svg", "png")}
@@ -507,9 +529,9 @@ def build(out: Path = OUT, fixture: dict | None = None, mut=None, quiet=False) -
     FR.deterministic_xlsx(xlsx)
     title, body = legend(q66, res, qf)
     lp = out / "legend_draft.md"
-    lp.write_text(f"Legend DRAFT for {PLATE} (written by {SCRIPT}). Data stamp: {stamp}.\n\n**{PLATE} | {title}.**\n\n{body}\n")
+    lp.write_text(f"Legend DRAFT for {PLATE} (written by {SCRIPT}).\n\n**{PLATE} | {title}.**\n\n{body}\n")
     cap = out / f"{PLATE} data caption{tag}.md"
-    cap.write_text(f"# {PLATE} data, caption\n\n**{PLATE} data | Numerical values plotted in {PLATE}.** Provisional. Data "
+    cap.write_text(f"# {PLATE} data, caption\n\n**{PLATE} data | Numerical values plotted in {PLATE}.** Data "
                    f"stamp: {stamp}. Sheet {SHEET}a: one 'cell' row per threshold, strategy and question (draws passed of "
                    f"3), then one 'total' row per threshold and strategy, not drawn (answers passed of 30, the pass and fail "
                    f"answer keys, the key version of its rows). Sheet {SHEET}b: one 'draw' row per strategy and draw (questions "
@@ -604,12 +626,9 @@ def selftest() -> int:
         s448 = subprocess.run([sys.executable, str(ROOT / "scripts" / "S448_figure_rules_check.py"), "--figure", str(SUPP_N),
                                "--supplementary", "--dir", str(out)], capture_output=True, text=True)
         fails = [ln for ln in s448.stdout.splitlines() if " FAIL " in ln and not ln.startswith("FAIL:")]
-        # Editor row 45 round (8 Nov): the legend carries no 'n = ' (no panel draws derived statistics), so S448 R9's
-        # n check fails by design; every other rule must pass, and R9 may fail on that one point only.
-        ok("S448 --supplementary passes on the fixture plate except R9's n check (editor row 45, 8 Nov)",
-           s448.returncode == 0 or (len(fails) == 1 and fails[0].startswith("R9 ") and "no 'n = <number>'" in fails[0]),
-           fails[:3])
-        ok("the legend carries no 'n = ' tag (editor row 45, 8 Nov)", "n = " not in (out / "legend_draft.md").read_text())
+        # D310 (9 Nov): b's mean over draws carries its n, so S448 --supplementary passes on every rule, R9 included
+        ok("S448 --supplementary passes on the fixture plate (D310)", s448.returncode == 0, fails[:3])
+        ok("b's mean states its n (D310)", "the mean of the n = 3 draws" in (out / "legend_draft.md").read_text())
         nums = json.loads((out / f"{SIDE}_numbers.json").read_text())
         ok("every number on the plate is in the printed map", len(nums["printed"]) > 200, len(nums["printed"]))
         svg = next(out.glob(f"{PLATE}*.svg")).read_text()

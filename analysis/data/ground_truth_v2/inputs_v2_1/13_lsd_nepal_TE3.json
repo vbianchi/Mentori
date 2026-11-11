@@ -1,0 +1,13 @@
+{
+ "id": "13_lsd_nepal_TE3",
+ "category": "technical",
+ "subcategory": null,
+ "question": "According to the multivariable logistic regression analysis, what was identified as the most significant risk factor for LSD transmission and what were its associated statistical metrics?",
+ "papers": [
+  {
+   "paper": "13_lsd_nepal",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/13_lsd_nepal.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/13_lsd_nepal.pypdf.txt"
+  }
+ ]
+}

@@ -16952,9 +16952,9 @@
  ],
  "provenance": {
   "script": "scripts/S472_fig4_panels.py",
-  "script_sha256": "84297a37e74db0d0f80b9704b26a232115c53bbc8eab66b0e8de24d100fdd791",
+  "script_sha256": "9da54879fd6cf90ad4bfd22e93f6633a75e0b68bce676a4df770d0b8f6e5f5a5",
   "command": "uv run --frozen python scripts/S472_fig4_panels.py figure",
-  "figure4_provenance_sha256": "943e334531aead1edec818d0680c99072c88513882ec2c619d0cb760ecd2f14d",
+  "figure4_provenance_sha256": "c60fef72245a9fac667e43c6a5556d8f9cf5d739234df8d0a3a4b8d6b763554a",
   "records_sha256": {
    "findings/runs/exp_03__raw_gemini__exp_v4_s20_n0/answers.json": "afa5aa7eca967a07d3098c3bb53159c6114948b185e06aab85274123bd6f87ee",
    "findings/runs/exp_03__raw_gemini__exp_v4_s20_n0/run_identity.json": "ee7150a4c9f16ba05a8145a6c368b80f54321b19f1cda4a72985b7eef884c56a",

@@ -117,7 +117,10 @@ RULES (the E number is FIGURE_RULES.md's; every threshold is a key of FIGURE_LOC
           phrase with "two" read as "one" ("one-sided"), stated only where the legend describes an interval, an
           error bar or band, a test or a P value ([statistics] sidedness_when, a regex, case ignored; "no hypothesis
           test" does not count) (D122, Valerio, 23 October, Q3: editor row 46 "where appropriate"); a legend that
-          draws only medians, quartiles or ranges needs none. A provisional plate's legend_draft.md carries the
+          draws only medians, quartiles or ranges needs none. The "n = <number>" is asked for only where the legend
+          names a mean, a median, an interval, an error bar or band, or a test ([statistics] n_when, a regex, case
+          ignored; D310, Valerio, 9 November, Q1); a legend that draws no statistic needs none, and a range fails
+          wherever it stands. A provisional plate's legend_draft.md carries the
           provenance file's stamp; its legend need not say "provisional" (D122: the file name's suffix, R1, and the
           data stamp carry it). The panel check is [legend] panels_defined,
           the n checks [statistics] n_exact; the dashes and count words are n_range_dashes and n_count_words. The
@@ -192,7 +195,8 @@ without the change. A mutant may set other keys in both copies (its base: a key 
 the lock leaves movable, so R3's panel-letter keys run with the type bounds opened to 1 to 100 pt, since a figure
 whose type fails R3 fails it whatever they say), and may alter a copy of the folder for both runs, where a key matters only on
 a figure that breaks its rule (a second PDF page for one_page, a font not embedded for fonts_embedded, a raster image
-for vector_only, the faint stamp for raster_delta, a range in the legend for n_exact); sidedness_when runs with
+for vector_only, the faint stamp for raster_delta, a range in the legend for n_exact, every "n = <number>" written as
+"count <number>" for n_when); sidedness_when runs with
 sidedness_phrase set to a phrase no legend holds in both copies, so the trigger alone moves R9. The file_max_mb mutant also
 requires the rules after R1 to have run. The last line counts both kinds and says whether the lock coverage is
 complete.
@@ -255,7 +259,7 @@ def apply_lock(lock, path: Path, sha: str):
     global LETTER_WEIGHT, LETTER_CASE, LETTER_STYLE, FONT_FAMILIES, FONTS_EMBEDDED, FONT_TYPES_REFUSED, TEXT_AS_TEXT
     global CONTRAST_MIN, COLOURED_TEXT, LINE_MIN_PT, OKABE, CONTINUOUS, CONT_TOL, GREY_TOL, VECTOR_ONLY, RED_HUE
     global GREEN_HUE, SAT_MIN, VAL_MIN, NAME_TMPL, PLATE_FILES, UPLOAD_FORMAT, DPI_WANT, RASTER_DELTA, FILE_MAX_MB
-    global STAMP, WORDS_UNDER, TITLE_PANEL, PANELS_DEFINED, N_EXACT, RANGE, SIDEDNESS, SIDED_WHEN, SD_REQUIRED
+    global STAMP, WORDS_UNDER, TITLE_PANEL, PANELS_DEFINED, N_EXACT, RANGE, SIDEDNESS, SIDED_WHEN, N_WHEN, SD_REQUIRED
     global SD_FORMATS, SD_NAME, SD_CAPTION, SUPP_NAME_TMPL
     READ.clear()
     LOCK, LOCK_PATH, LOCK_SHA256 = lock, path, sha
@@ -299,6 +303,9 @@ def apply_lock(lock, path: Path, sha: str):
     # R9: the sidedness is asked for only where the legend describes an interval, an error bar or band, a test or a P
     # value (D122, Valerio, 23 October, Q3: editor row 46 "where appropriate"); case is ignored
     SIDED_WHEN = re.compile(st["sidedness_when"], re.I)                                          # R9
+    # R9: "n = <number>" is asked for only where the legend names a mean, a median, an interval, an error bar or band,
+    # or a test (D310, Valerio, 9 November, Q1: R9 O1); case is ignored
+    N_WHEN = re.compile(st["n_when"], re.I)                                                      # R9
     # R9: a count given as a range. Two numbers joined by "to", "or", a dash of n_range_dashes, or "between N and
     # M"; a range after "n =" whatever follows, otherwise only when a count word of n_count_words follows within three
     # words, the words separated by spaces, commas, semicolons, colons, brackets or quotes (_SEP) (so "4-5 (matched)
@@ -1101,8 +1108,10 @@ def r9(d: Path, n: int, panels, provisional):
     missing = [x for x in panels if f"**{x}**," not in body]
     if PANELS_DEFINED and missing:
         probs.append(f"panels not defined: {missing}")
-    if N_EXACT and not re.search(r"\bn = \d", body):
-        probs.append("no 'n = <number>'")
+    n_trigger = N_WHEN.search(body)
+    if N_EXACT and n_trigger and not re.search(r"\bn = \d", body):
+        probs.append(f"no 'n = <number>', and the legend names a statistic ({n_trigger.group(0)!r}; "
+                     f"[statistics] n_when)")
     ranges = [m.group(0) for m in RANGE.finditer(body)] if N_EXACT else []
     if ranges:
         probs.append(f"n given as a range: {ranges[:3]}")
@@ -1131,8 +1140,9 @@ def r9(d: Path, n: int, panels, provisional):
     say("R9", "FAIL" if probs else "PASS", "; ".join(probs) + (" | " if probs else "") +
         f"(heuristic) title {title!r}" + ("" if probs else
                                           (f"; panels {', '.join(panels)} defined" if PANELS_DEFINED else "") +
-                                          (f"; an 'n = <number>' present; no count as a range in the forms seen "
-                                           f"({RANGE_FORMS})" if N_EXACT else "") +
+                                          ((f"; an 'n = <number>' present ({n_trigger.group(0)!r})" if n_trigger
+                                            else "; no mean, median, interval or test named, so no 'n =' asked") +
+                                           f"; no count as a range in the forms seen ({RANGE_FORMS})" if N_EXACT else "") +
                                           (f"; {next(x for x in sided if x in body)} stated "
                                            f"({trigger.group(0)!r})" if trigger else
                                            "; no interval or test described, so no sidedness asked") +
@@ -2003,6 +2013,16 @@ def _alt_drop_panel(d, n):
     return f"legend_draft.md: panel {m.group(1)!r} no longer defined ('**{m.group(1)}**,' -> '{m.group(1)},')"
 
 
+def _alt_drop_n(d, n):
+    p = d / "legend_draft.md"
+    s = p.read_text()
+    new, k = re.subn(r"\bn = (?=\d)", "count ", s)
+    if not k:
+        return None
+    p.write_text(new)
+    return f"legend_draft.md: every 'n = <number>' ({k}) written as 'count <number>'"
+
+
 def _alt_no_workbook(d, n):
     xs = sd_files(d, n)[0]
     for x in xs:
@@ -2036,7 +2056,7 @@ def _alt_as_supplementary(d, n):
 
 ALTER = {"as supplementary": _alt_as_supplementary, "two pages": _alt_two_pages, "unembedded font": _alt_unembedded, "coloured text": _alt_coloured,
          "pdf image": _alt_pdf_image, "svg no text": _alt_svg_no_text, "drop panel": _alt_drop_panel,
-         "no workbook": _alt_no_workbook, "no caption": _alt_no_caption,
+         "drop n": _alt_drop_n, "no workbook": _alt_no_workbook, "no caption": _alt_no_caption,
          "faint stamp": lambda d, n: m_faint_stamp(d, n, None),
          "range hyphen": lambda d, n: _legend_range("Each operation holds n = 4-5 attempts.")(d, n, None),
          "range to": lambda d, n: _legend_range("Each operation holds 4 to 5 matched attempts.")(d, n, None)}
@@ -2098,6 +2118,7 @@ def lock_mutants(W):
         ("statistics.n_count_words", ["zzzz"], {}, "range to"),
         ("statistics.sidedness_phrase", "zzzz-sided", {}, None),
         ("statistics.sidedness_when", "(?!)", {"statistics.sidedness_phrase": "zzzz-sided"}, None),   # matches nothing
+        ("statistics.n_when", "(?!)", {}, "drop n"),   # matches nothing: a legend without n then passes the n check
     ]
 
 

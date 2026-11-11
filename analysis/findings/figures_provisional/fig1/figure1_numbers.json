@@ -1,5 +1,5 @@
 {
- "stamp": "PROVISIONAL: 2 of 2 panels (panel a, the signals; panel b, the design), 11 settings read from the design files (inputs sha256 5896dda872ad)",
+ "stamp": "2 of 2 panels (panel a, the signals; panel b, the design), 11 settings read from the design files (inputs sha256 e1c5d2ea7070)",
  "what": "every value Figure 1 prints, as Source Data Fig. 1 holds it (S448 R8)",
  "sheets": {
   "Fig. 1a": {
@@ -20,7 +20,7 @@
     [
      "Judge correctness",
      "Judge",
-     "against key and passages",
+     "against key, or key and passages",
      "devstral-small-2:24b, qwen3.8:27b",
      "pass 4+, relaxed 3+",
      "Correctness (pass 4+)",
@@ -33,7 +33,7 @@
     [
      "Judge refusal",
      "Judge",
-     "against key and passages",
+     "against key, or key and passages",
      "devstral-small-2:24b, qwen3.8:27b",
      "refused 3+",
      "Refusal",
@@ -46,7 +46,7 @@
     [
      "Judge faithfulness",
      "Judge",
-     "against key and passages",
+     "against key, or key and passages",
      "devstral-small-2:24b, qwen3.8:27b",
      "with or without passages",
      "Faithfulness",
@@ -89,6 +89,7 @@
     "stage",
     "axis",
     "levels",
+    "configurations",
     "levels_as",
     "factors",
     "line",
@@ -103,6 +104,7 @@
      "INDEX",
      "Corpus scale",
      12,
+     12,
      "4 \u00d7 3",
      "size \u00d7 distractor",
      1,
@@ -115,6 +117,7 @@
     [
      "INDEX",
      "Embedding model",
+     4,
      20,
      "4 \u00d7 5",
      "model \u00d7 size",
@@ -128,6 +131,7 @@
     [
      "INDEX",
      "Embedding model",
+     4,
      20,
      "4 \u00d7 5",
      "",
@@ -141,6 +145,7 @@
     [
      "INDEX",
      "Chunking",
+     8,
      24,
      "8 \u00d7 3",
      "chunking \u00d7 queries",
@@ -154,6 +159,7 @@
     [
      "INDEX",
      "Chunking",
+     8,
      24,
      "8 \u00d7 3",
      "",
@@ -167,6 +173,7 @@
     [
      "INDEX",
      "Chunking",
+     8,
      24,
      "8 \u00d7 3",
      "",
@@ -180,6 +187,7 @@
     [
      "RETRIEVE",
      "Search strategy",
+     7,
      35,
      "7 \u00d7 5",
      "strategy \u00d7 size",
@@ -193,6 +201,7 @@
     [
      "RETRIEVE",
      "Search strategy",
+     7,
      35,
      "7 \u00d7 5",
      "",
@@ -206,6 +215,7 @@
     [
      "RETRIEVE",
      "Retrieval depth",
+     10,
      44,
      "10 \u00d7 2 + 6 \u00d7 4",
      "cap \u00d7 RLM + cap \u00d7 model",
@@ -219,6 +229,7 @@
     [
      "RETRIEVE",
      "Retrieval depth",
+     10,
      44,
      "10 \u00d7 2 + 6 \u00d7 4",
      "",
@@ -232,6 +243,7 @@
     [
      "RETRIEVE",
      "Retrieval depth",
+     10,
      44,
      "10 \u00d7 2 + 6 \u00d7 4",
      "",
@@ -245,6 +257,7 @@
     [
      "RETRIEVE",
      "Retrieval depth",
+     10,
      44,
      "10 \u00d7 2 + 6 \u00d7 4",
      "",
@@ -259,11 +272,12 @@
      "GENERATE",
      "Generation model",
      5,
+     5,
      "1 + 4",
      "main + replication",
      1,
      "gemini-3-flash-preview + 4 replication models",
-     "n = 135 questions with the main generation model, and with each of the 4 other generation models on the 6 generation strategies (2 of them: n = 45 with the 3 RLM strategies)",
+     "n = 135 questions with the main generation model, and with each of the 4 other generation models on the 6 generation strategies (gemma3:27b and qwen3-coder:30b: n = 45 under the 3 RLM strategies, and 17 more many-paper questions under RLM-10)",
      "Figure 3",
      "G1, T2",
      "experiments_v4/exp_common.py GEN_MODEL (G1); T2_runs/check_t2.py GENERATORS (= t2_lib.sh's case), CONFIGS"
@@ -271,6 +285,7 @@
     [
      "GENERATE",
      "Generation model",
+     5,
      5,
      "1 + 4",
      "",
@@ -284,12 +299,13 @@
     [
      "GENERATE",
      "Generation strategy",
+     6,
      10,
      "6 + 4",
      "strategy + reference",
      1,
      "6 strategies + 4 reference arms",
-     "n = 135 questions with the main generation model, and with each of the 4 other generation models on the 6 generation strategies (2 of them: n = 45 with the 3 RLM strategies)",
+     "n = 135 questions with the main generation model, and with each of the 4 other generation models on the 6 generation strategies (gemma3:27b and qwen3-coder:30b: n = 45 under the 3 RLM strategies, and 17 more many-paper questions under RLM-10)",
      "Figure 3",
      "G1, G2, G6",
      "exp_01 CONFIG_NAMES, MATCHED_BUDGET; run_rlm_ref.py FIGURE2_CAPS"
@@ -297,6 +313,7 @@
     [
      "GENERATE",
      "Generation strategy",
+     6,
      10,
      "6 + 4",
      "",
@@ -310,6 +327,7 @@
     [
      "GENERATE",
      "Generation strategy",
+     6,
      10,
      "6 + 4",
      "",
@@ -324,11 +342,12 @@
      "GENERATE",
      "System configuration",
      4,
+     4,
      "4",
      "system",
      1,
      "no retrieval (model alone) / naive RAG / RLM-10 / full orchestrator",
-     "n = 135 questions with the main generation model, and with each of the 4 other generation models on the 6 generation strategies (2 of them: n = 45 with the 3 RLM strategies)",
+     "n = 135 questions with gemini-3-flash-preview in each of 3 draws (the full orchestrator: draws 2 and 3 on the fixed 45-question subset)",
      "Figure 5",
      "G3",
      "exp_03 CONFIG_NAMES (those not in ORCHESTRATOR_CONFIGS, and full_orchestrator); G3 preflight.sh WAVE1"
@@ -337,11 +356,12 @@
      "GENERATE",
      "Orchestrator set-up",
      8,
+     8,
      "6 + 2",
      "set-up + stress",
      1,
      "6 set-ups + 2 stress set-ups (not Mentor::i's default)",
-     "n = 135 questions with the main generation model, and with each of the 4 other generation models on the 6 generation strategies (2 of them: n = 45 with the 3 RLM strategies)",
+     "n = 135 questions with gemini-3-flash-preview (draws 2 and 3 on the fixed 45-question subset)",
      "Figure 5",
      "G3, G9",
      "exp_03 ORCHESTRATOR_CONFIGS in G3 preflight.sh WAVE1, and STRESS_CONFIG_NAMES (G9)"
@@ -349,6 +369,7 @@
     [
      "GENERATE",
      "Orchestrator set-up",
+     8,
      8,
      "6 + 2",
      "",
@@ -363,6 +384,7 @@
      "GENERATE",
      "Orchestrator set-up",
      8,
+     8,
      "6 + 2",
      "",
      3,
@@ -375,6 +397,7 @@
     [
      "GENERATE",
      "Code-generation strategy",
+     11,
      121,
      "11 \u00d7 11",
      "strategy \u00d7 variant",
@@ -388,6 +411,7 @@
     [
      "GENERATE",
      "Code-generation strategy",
+     11,
      121,
      "11 \u00d7 11",
      "",
@@ -401,6 +425,7 @@
     [
      "GENERATE",
      "Code-generation strategy",
+     11,
      121,
      "11 \u00d7 11",
      "",
@@ -415,6 +440,7 @@
      "JUDGE",
      "Judge model",
      2,
+     2,
      "2",
      "judge",
      1,
@@ -428,10 +454,11 @@
      "ALL",
      "Answers, whole study",
      null,
+     null,
      "",
      "",
      1,
-     "51,441",
+     "51,579",
      "",
      "Figure 1",
      "",
@@ -441,10 +468,11 @@
      "ALL",
      "Model calls, whole study",
      null,
+     null,
      "",
      "",
      1,
-     "\u2265 1,158,418",
+     "\u2265 1,182,144",
      "",
      "Figure 1",
      "",
@@ -563,16 +591,6 @@
    "sheet": "Fig. 1b",
    "row": 24,
    "format": "{levels}"
-  },
-  "s448num_22": {
-   "sheet": "Fig. 1b",
-   "row": 25,
-   "format": "{text} answers"
-  },
-  "s448num_23": {
-   "sheet": "Fig. 1b",
-   "row": 26,
-   "format": "{text} model calls"
   }
  },
  "printed_what": "every numeral and level line printed on the plate: the SVG group id of its text and the Source Data row and format it is written from (S448 R8 (6))"

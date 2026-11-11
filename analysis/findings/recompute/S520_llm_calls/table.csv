@@ -1,10 +1,11 @@
-# provenance: scripts/S520_llm_calls.py sha256 312cedbe6967d0a4, HEAD not stamped (report --frozen), written not stamped (report --frozen)
+# provenance: scripts/S520_llm_calls.py sha256 72555ae22486b98e, HEAD not stamped (report --frozen), written not stamped (report --frozen)
 # command: uv run --frozen python scripts/S520_llm_calls.py report --frozen
 # read: {"studio": {"started_utc": "2026-11-07T05:27:31Z", "ended_utc": "2026-11-07T05:30:24Z", "host": "Bioinfos-Mac-Studio.local"}, "beelink": {"started_utc": "2026-11-07T05:33:50Z", "ended_utc": "2026-11-07T05:34:10Z", "host": "DESKTOP-QJFE6FS"}, "laptop": {"started_utc": "2026-11-07T05:34:18Z", "ended_utc": "2026-11-07T05:35:31Z", "host": "mac.home"}}
 experiment,plan_row,role,model,machine,calls_ok,calls_failed,failed_by_status,replaced,no_answer_line,not_joined,tier,s1_box,note
 Checks and calibrations,G1,generator,gemini-2.5-pro,studio,0,1,empty=1,0,0,0,check,,
 Checks and calibrations,G1,generator,gemini-3-flash-preview,studio,0,1,blocked=1,0,0,0,check,,
 Checks and calibrations,G1,verifier,gpt-oss:20b-date20261010,studio,40,0,,0,0,0,check,,
+Checks and calibrations,G17,judge (a),devstral-small-2:24b,laptop,321,0,,0,0,0,check,,
 Checks and calibrations,I2,judge (a),devstral-small-2:24b,laptop,107,0,,0,0,0,check,,
 Checks and calibrations,K0,RAGChecker check,devstral-small-2:24b,beelink,14806,0,,0,0,0,check,,
 Checks and calibrations,K0,RAGChecker extract,devstral-small-2:24b,beelink,96,0,,0,0,0,check,,
@@ -20,6 +21,10 @@ Checks and calibrations,S3,judge (a),devstral-small-2:24b,studio,2707,0,,0,0,0,c
 Checks and calibrations,S3,judge (b),devstral-small-2:24b,studio,30,0,,0,0,0,check,,
 Checks and calibrations,S3,second judge,qwen3.8:27b,beelink,882,0,,0,0,0,check,,
 Checks and calibrations,S5,judge (a),devstral-small-2:24b,studio,321,0,,0,0,0,check,,
+Checks and calibrations,S564,claim selection,devstral-small-2:24b,laptop,100,0,,0,0,0,check,,
+Checks and calibrations,S584,judge (a),devstral-small-2:24b,laptop,428,0,,0,0,0,check,,
+Checks and calibrations,S584,judge (rater_scale),devstral-small-2:24b,laptop,156,0,,0,0,0,check,,
+Checks and calibrations,S584,judge (recheck),devstral-small-2:24b,laptop,80,0,,0,0,0,check,,
 Checks and calibrations,T2,judge (a),devstral-small-2:24b,studio,120,0,,0,0,0,check,,
 Generation strategies,G1,RLM root,gemini-3-flash-preview,studio,3666,62,empty=1;length=44;malformed_function_call=3;malformed_response=11;recitation=3,55,55,0,run,G1,
 Generation strategies,G1,RLM root,gemini-3-flash-preview,studio,32,2,length=2,0,0,0,smoke,,
@@ -50,6 +55,8 @@ Flat wide call,G10,generator,gemini-3-flash-preview,studio,585,0,,0,0,0,run,not 
 Flat wide call,G10,generator,gemini-3-flash-preview,studio,3,0,,0,0,0,smoke,,
 Short-passage single pass,G11,generator,gemini-3-flash-preview,studio,225,0,,0,0,0,run,not in a box,
 Short-passage single pass,G11,generator,gemini-3-flash-preview,studio,3,0,,0,0,0,smoke,,
+"Matched-budget rerun of five questions (G13, closed by D233)",G13,generator,gemini-3-flash-preview,laptop,15,0,,0,0,0,dropped,,
+RLM ablation,G17,judge (a),devstral-small-2:24b,laptop,834,0,,0,0,0,run,G17,
 Matched-budget arm,G2,generator,gemini-3-flash-preview,studio,405,0,,0,0,0,run,G2,
 Matched-budget arm,G2,generator,gemini-3-flash-preview,studio,5,0,,0,0,0,smoke,,
 Matched-budget arm,S3,judge (a),devstral-small-2:24b,studio,435,0,,195,0,0,run,G2,
@@ -138,6 +145,7 @@ Plant-science reuse demonstration,I2,judge (a),devstral-small-2:24b,laptop,150,0
 Plant-science reuse demonstration,I2,verifier,gpt-oss:20b-date20261010,laptop,15,0,,0,0,0,run,I2,
 Judge on the 49 rated answers,S6,judge (a),devstral-small-2:24b,studio,49,0,,0,0,0,run,not in a box,
 Judge on the 49 rated answers,S6,judge (recheck),devstral-small-2:24b,studio,10,0,,0,0,0,run,not in a box,
+Judge on the 49 rated answers,S6,second judge,qwen3.8:27b,laptop,59,0,,0,0,0,run,not in a box,
 Code generation,S2,code generation,deepseek-r1:70b,studio,829,5,length=5,4,4,0,dropped,,
 Code generation,S2,code generation,devstral-small-2:24b,laptop,4038,49,error=26;length=23,90,90,0,run,S2,
 Code generation,S2,code generation,gemini-2.5-pro,studio,7367,121,empty=109;error=1;malformed_function_call=11,756,756,0,run,S2,
@@ -152,6 +160,7 @@ Code generation,S2,code generation,qwen3-coder:30b,studio,3997,0,,367,367,0,run,
 Code generation,S2,code judge,devstral-small-2:24b,laptop,269,0,,44,44,0,run,S2,
 Code generation,S2,code judge,devstral-small-2:24b,studio,185,2,error=2,0,0,0,dropped,,
 Code generation,S2,code judge,devstral-small-2:24b,studio,619,0,,89,88,0,run,S2,
+"Claim selection for Papers (Claimify, S564)",S564,claim selection,devstral-small-2:24b,laptop,14805,4,length=4,0,0,0,run,not in a box,
 "Retrieval depth, local models",T1,RLM root,devstral-small-2:24b,studio,492,0,,0,0,492,run,T1,exp_06 keeps answers in a results file outside the sink (records.py:15-16)
 "Retrieval depth, local models",T1,RLM root,gemma3:27b,studio,506,0,,0,0,506,run,T1,exp_06 keeps answers in a results file outside the sink (records.py:15-16)
 "Retrieval depth, local models",T1,RLM root,qwen3-coder-next:q4_K_M,studio,539,0,,0,0,539,run,T1,exp_06 keeps answers in a results file outside the sink (records.py:15-16)
@@ -193,3 +202,16 @@ Strategy replication,T2,generator,qwen3-coder:30b,studio,1858,1,length=1,9,9,0,r
 Strategy replication,T2,generator,qwen3-coder:30b,studio,3,0,,0,0,0,smoke,,
 Strategy replication,T2,verifier,gpt-oss:20b-date20261010,studio,1465,0,,25,25,0,run,T2,
 Strategy replication,T2,verifier,gpt-oss:20b-date20261010,studio,4,0,,0,0,0,smoke,,
+Component benchmarks,S12B,judge (a),devstral-small-2:24b,laptop,204,0,,0,0,0,run,T3C,
+Component benchmarks,T3,orchestrator component,devstral-small-2:24b,laptop,832,0,,0,0,0,run,T3C,
+Component benchmarks,T3,orchestrator component,gemini-3-flash-preview,laptop,2496,0,,0,0,0,run,T3C,
+Component benchmarks,T3,orchestrator component,gemma3:27b,laptop,832,0,,0,0,0,run,T3C,
+Component benchmarks,T3,orchestrator component,gpt-oss:20b-date20261010,laptop,832,0,,0,0,0,run,T3C,
+Component benchmarks,T3,orchestrator component,llama3:8b,laptop,829,3,error=3,0,0,0,run,T3C,
+Component benchmarks,T3,orchestrator component,qwen3-coder:30b,laptop,832,0,,0,0,0,run,T3C,
+Distiller intervention,T3,generator,devstral-small-2:24b,laptop,194,0,,0,0,0,run,T3D,
+Distiller intervention,T3,generator,gemini-3-flash-preview,laptop,194,0,,0,0,0,run,T3D,
+Distiller intervention,T3,generator,gemma3:27b,laptop,194,0,,0,0,0,run,T3D,
+Distiller intervention,T3,generator,gpt-oss:20b-date20261010,laptop,194,0,,0,0,0,run,T3D,
+Distiller intervention,T3,generator,llama3:8b,laptop,191,3,error=1;length=2,0,0,0,run,T3D,
+Distiller intervention,T3,generator,qwen3-coder:30b,laptop,194,0,,0,0,0,run,T3D,

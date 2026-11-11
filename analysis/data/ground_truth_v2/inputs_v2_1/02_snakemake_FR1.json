@@ -1,0 +1,13 @@
+{
+ "id": "02_snakemake_FR1",
+ "category": "factual_recall",
+ "subcategory": null,
+ "question": "According to the performance benchmarks provided in the paper, what are the specific time and memory requirements for the Snakemake scheduler to compute a graph of 90,000 jobs?",
+ "papers": [
+  {
+   "paper": "02_snakemake",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/02_snakemake.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/02_snakemake.pypdf.txt"
+  }
+ ]
+}

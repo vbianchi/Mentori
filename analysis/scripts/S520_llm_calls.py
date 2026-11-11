@@ -82,6 +82,30 @@ and the laptop gates read files outside the repository. Two more steps tie the r
       one set of bytes (bar this script's own sha256). The counting rule is unchanged, bar DROPPED_RUNS: it first builds
       under FROZEN_RULE_DROPS and refuses unless that equals the frozen total, then builds under every drop (D265).
 
+D311 (Valerio, 9 November, "Total calls: O1"): THE CALLS THE FROZEN COLLECTS MISS. S623 found the laptop's call logs that
+no rule above maps (the frozen laptop collect lists them as unmapped, never opened). The tables above stay as they are,
+so the frozen collects keep their table_sha256 and still give 1,158,418; D311_RULES map those logs, and only those:
+  collect-d311 --out <json>   (on the laptop) reads each file of s520_laptop.json's unmapped list that D311_RULES names,
+      refused when its size is not the listed one, with the scanner above; it never walks the tree.
+  freeze-d311 --in <json>   writes findings/recompute/S520_inputs_d311/ (the collect, d311_gates.json, SHA256SUMS): the
+      gates that need the laptop's untracked files (T3's MANIFEST.json) are run there and stored, as freeze does.
+  report --frozen   reads S520_inputs and, when it exists, S520_inputs_d311. It reproduces 1,158,418 from S520_inputs
+      first (refused otherwise), then joins the D311 collect after the three machines' (a line already counted is a
+      duplicate, as for any source), requires each folder's new lines to equal S623's count and the run total to grow by
+      exactly the D311 collect's new run-tier lines, and writes the joined report. --base writes the report of
+      S520_inputs alone (byte-equal to the 7 November report bar this script's sha256).
+  Rows: T3 sinks under T3C (exp_04, the component benchmarks: orchestrator component) and T3D (exp_04b, the distiller
+  intervention: generator); S12b's judge on T3's supervisor answers under T3C (D255); G17's judge under G17; S508's
+  second judge under R49, as S508's main judge; S564's Claimify selection (D208, D211: the full set of 14,809) under
+  the new row S564. Checks: G17's check_calls, S564's timing_100, and every S584 log (its judge on the raters' 1-to-5
+  scale, on the 49 rated and 107 calibration answers, and its check_calls): Valerio delegated Q1 (9 November, "no
+  idea"), and Claude ruled S584 a check, outside the total, because scripts/S584_judge_rater_scale.py's docstring says
+  "Exploratory: nothing here enters a figure, a gate or the paper" and no manuscript document cites it. Its rule in
+  D311_RULES is unchanged, so the D311 collect and its freeze stand; only classify reads it as a check. Dropped: G13's
+  15 calls (D233 closed G13 and kept
+  G2's answers). Copies, never counted: T3_frozen_20261104T110249Z (T3_frozen_20261104T131439Z holds its lines) and
+  S18f_runs/out_v25 (the Studio's S18f logs hold them).
+
 Offline test (a fake tree): uv run --frozen python scripts/S520_llm_calls_test.py
 """
 import argparse
@@ -173,6 +197,45 @@ KNOWN_OUT = [
     (r"^recompute/S2_launch(_laptop)?/.*\.guard\.json$", "a guard record, not a call log"),
 ]
 KNOWN_OUT = [(re.compile(rx), why) for rx, why in KNOWN_OUT]
+
+# D311: the laptop's logs the tables above leave unmapped, by rel path under findings/ (module docstring, D311). Not part
+# of table_sha(), so the frozen collects stay valid; d311_table_sha() ties the D311 collect to these rules.
+D311_RULES = [
+    (r"^runs/T3_frozen_20261104T110249Z/sinks/[^/]+/calls\.jsonl$", "copy"),       # 131439Z holds every line of it
+    (r"^runs/T3_frozen_20261104T131439Z/sinks/[^/]+/calls\.jsonl$", "sink"),       # T3's frozen sinks (S524 --t3)
+    (r"^recompute/S18f_runs/out_v25/.*calls\.jsonl$", "copy"),                     # the Studio's S18f logs hold them
+    (r"^recompute/G17_runs/out[^/]*/judge/[^/]+/judge_[a-z_]*calls\.jsonl$", "judge"),
+    (r"^recompute/G17_runs/out[^/]*/check[^/]*/check_calls\.jsonl$", "judge"),
+    (r"^recompute/s12b_inputs/out/judge/[^/]+/judge_[a-z_]*calls\.jsonl$", "judge"),
+    (r"^recompute/S508_judge_49_v25_second/[a-z_]*calls\.jsonl$", "judge"),
+    (r"^recompute/S584_judge_rater_scale/.*calls\.jsonl$", "judge"),
+    (r"^recompute/S564_claimify_selection/(full/shard_\d+_of_\d+|timing_100)/calls\.jsonl$", "plain"),
+    (r"^recompute/G13_runs/inputs/runs/[^/]+/calls\.jsonl$", "sink"),
+]
+D311_RULES = [(re.compile(rx), k) for rx, k in D311_RULES]
+# S623's printed count of distinct lines no frozen collect holds, per folder (its run of 9 November, 24,826 in all):
+# the D311 report reproduces these before it counts.
+D311_S623 = {"recompute/G13_runs": 15, "recompute/G17_runs": 1155, "recompute/S508_judge_49_v25_second": 59,
+             "recompute/S564_claimify_selection": 14909, "recompute/S584_judge_rater_scale": 664,
+             "recompute/s12b_inputs": 204, "runs/T3_frozen_20261104T110249Z": 5130,
+             "runs/T3_frozen_20261104T131439Z": 7820}
+D311_S623_ALL = 24826
+D311_DIR = "findings/recompute/S520_inputs_d311"
+D311_INPUT = "s520_laptop_d311.json"
+D311_GATES = "d311_gates.json"
+T3_MANIFEST = "findings/runs/T3_frozen_20261104T131439Z/MANIFEST.json"
+
+
+def d311_rule(rel):
+    for rx, kind in D311_RULES:
+        if rx.search(rel):
+            return kind
+    return None
+
+
+def d311_folder(rel):
+    """The folder a D311 source is reported under: the first two parts of its path."""
+    return "/".join(rel.split("/")[:2])
 
 WANT = {"sink": (b"status", b"model", b"role", b"call_site", b"ctx_uid", b"run_draw", b"retry"),
         "judge": (b"status", b"model", b"variant", b"attempt", b"answer"),
@@ -399,6 +462,13 @@ def table_sha():
     return hashlib.sha256(blob.encode()).hexdigest()
 
 
+def d311_table_sha():
+    """Ties the D311 collect to D311_RULES and the scanner's fields."""
+    blob = repr((SCHEMA, "d311", [(r.pattern, k) for r, k in D311_RULES],
+                 sorted((k, v) for k, v in WANT.items()), sorted((k, v) for k, v in SIG.items())))
+    return hashlib.sha256(blob.encode()).hexdigest()
+
+
 def sink_key(clone, rel):
     return clone + "/" + rel.rsplit("/", 1)[0]
 
@@ -431,33 +501,39 @@ def collect_clone(home, clone_rel, now, out):
             if kind is None:
                 out["unmapped"].append({"clone": clone, "path": rel, "size": st.st_size})
                 continue
-            scan_kind = kind
+            read_file(out, clone, rel, path, kind, st, now)
+
+
+def read_file(out, clone, rel, path, kind, st, now):
+    """One call log into `out` (files, sinks, unreadable), as collect reads it."""
+    dirpath, name = os.path.split(path)
+    scan_kind = kind
+    ans = None
+    if kind == "copy":
+        scan_kind = "plain"
+    if kind == "sink":
+        try:
+            ans = scan_answers(dirpath)
+        except OSError:
             ans = None
-            if kind == "copy":
-                scan_kind = "plain"
-            if kind == "sink":
-                try:
-                    ans = scan_answers(dirpath)
-                except OSError:
-                    ans = None
-                if ans is not None:
-                    out["sinks"][sink_key(clone, rel)] = {"keys": ans["keys"], "lines": ans["lines"],
-                                                          "by_draw": {str(k): v for k, v in ans["by_draw"].items()},
-                                                          "llm_calls": ans["llm_calls"], "source": ans["source"]}
-            try:
-                info, groups = scan_calls(path, scan_kind, ans)
-            except OSError as e:
-                out["unreadable"].append({"clone": clone, "path": rel, "error": type(e).__name__})
-                continue
-            entry = {"clone": clone, "path": rel, "kind": kind, "scan_kind": scan_kind, "size": st.st_size,
-                     "mtime": int(st.st_mtime), "age_s": int(now - st.st_mtime), "groups": []}
-            entry.update(info)
-            if kind == "ragchecker" and name == "ragchecker_calls.jsonl":
-                entry["rows"] = k1_rows(os.path.join(dirpath, "ragchecker.jsonl"))
-            for sig, hashes in groups.items():
-                entry["groups"].append({"k": list(sig), "n": len(hashes) // 8,
-                                        "h": base64.b64encode(bytes(hashes)).decode("ascii")})
-            out["files"].append(entry)
+        if ans is not None:
+            out["sinks"][sink_key(clone, rel)] = {"keys": ans["keys"], "lines": ans["lines"],
+                                                  "by_draw": {str(k): v for k, v in ans["by_draw"].items()},
+                                                  "llm_calls": ans["llm_calls"], "source": ans["source"]}
+    try:
+        info, groups = scan_calls(path, scan_kind, ans)
+    except OSError as e:
+        out["unreadable"].append({"clone": clone, "path": rel, "error": type(e).__name__})
+        return
+    entry = {"clone": clone, "path": rel, "kind": kind, "scan_kind": scan_kind, "size": st.st_size,
+             "mtime": int(st.st_mtime), "age_s": int(now - st.st_mtime), "groups": []}
+    entry.update(info)
+    if kind == "ragchecker" and name == "ragchecker_calls.jsonl":
+        entry["rows"] = k1_rows(os.path.join(dirpath, "ragchecker.jsonl"))
+    for sig, hashes in groups.items():
+        entry["groups"].append({"k": list(sig), "n": len(hashes) // 8,
+                                "h": base64.b64encode(bytes(hashes)).decode("ascii")})
+    out["files"].append(entry)
 
 
 def k1_rows(path):
@@ -509,6 +585,44 @@ def collect(machine, out_path, home=None):
         sum(1 for f in out["files"] if f["bad_last_line"])))
 
 
+def collect_d311(out_path, repo):
+    """D311 (module docstring): the files of the frozen laptop collect's unmapped list that D311_RULES name, read from
+    this laptop's clone; refused when one is gone or its size is not the listed one. The rest stay unmapped."""
+    base_path = os.path.join(repo, FROZEN_DIR, "s520_laptop.json")
+    with open(base_path) as fh:
+        base = json.load(fh)
+    now = time.time()
+    out = {"schema": SCHEMA, "table_sha256": d311_table_sha(), "machine": "laptop", "source": "d311",
+           "host": socket.gethostname(), "base_laptop_sha256": sha256_path(base_path),
+           "started_utc": datetime.fromtimestamp(now, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "files": [],
+           "sinks": {}, "unmapped": [], "unreadable": [], "missing_roots": [], "known_out": {},
+           "clones_not_in_table": []}
+    root = os.path.join(repo, "findings")
+    for u in base["unmapped"]:
+        kind = d311_rule(u["path"]) if u["clone"] == REPO_CLONE else None
+        if kind is None:
+            out["unmapped"].append(u)
+            continue
+        path = os.path.join(root, u["path"])
+        try:
+            st = os.stat(path)
+        except OSError:
+            print("REFUSED: %s is gone" % u["path"])
+            sys.exit(2)
+        if st.st_size != u["size"]:
+            print("REFUSED: %s holds %d bytes, the frozen collect listed %d" % (u["path"], st.st_size, u["size"]))
+            sys.exit(2)
+        read_file(out, u["clone"], u["path"], path, kind, st, now)
+    out["ended_utc"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    tmp = out_path + ".tmp"
+    with open(tmp, "w") as fh:
+        json.dump(out, fh)
+    os.replace(tmp, out_path)
+    print("collected D311: %d files, %d lines, %d still unmapped, %d bad last lines" % (
+        len(out["files"]), sum(f["lines"] for f in out["files"]), len(out["unmapped"]),
+        sum(1 for f in out["files"] if f["bad_last_line"])))
+
+
 # ---------------------------------------------------------------------------------------------------------------
 # Report: what each source is.
 # ---------------------------------------------------------------------------------------------------------------
@@ -522,6 +636,10 @@ EXPERIMENTS = {  # id: (draws.csv name, S1 box in S496:107-115; G10, G11 and S50
     "T2": ("Strategy replication", "T2"), "S2": ("Code generation", "S2"),
     "I2": ("Plant-science reuse demonstration", "I2"), "G10": ("Flat wide call", NO_BOX),
     "G11": ("Short-passage single pass", NO_BOX), "R49": ("Judge on the 49 rated answers", NO_BOX),
+    # D311: T3's two draws.csv rows and G17's; the three without a draws.csv row are named for their script
+    "T3C": ("Component benchmarks", "T3C"), "T3D": ("Distiller intervention", "T3D"), "G17": ("RLM ablation", "G17"),
+    "S564": ("Claim selection for Papers (Claimify, S564)", NO_BOX),
+    "G13": ("Matched-budget rerun of five questions (G13, closed by D233)", NO_BOX),
     "CHECK": ("Checks and calibrations", ""), "UNMAPPED": ("Not mapped to an experiment", "")}
 S1_READS = {"RO": "kept from April", "MS": "kept from April", "T3C": 0, "T3D": 0}   # block 1.2: T3 has not started
 OUT_SET = {"out": "G1", "out_g1r15": "G1", "out_g2": "G2", "out_g6": "G6", "out_g3": "G3", "out_g4": "G4",
@@ -546,6 +664,7 @@ TIER_RANK = {"run": 0, "dropped": 1, "check": 2, "smoke": 3, "unmapped": 4, "cop
 GENERATION = ("generator", "RLM root", "RLM sub-call", "verifier", "orchestrator component", "code generation")
 SCORER_ROLES = ("RAGAS", "RAGChecker extract", "RAGChecker check")
 SECOND_JUDGE_MODEL = "qwen3.8:27b"        # LOCK.toml [judge] second_model
+CLAIM_ROLE = "claim selection"            # D311: S564's Claimify Selection calls, their own role and Methods group
 PLANNED = [
     {"job": "G10 flat wide call", "experiment": "G10", "due": 585, "unit": "answers",
      "source": "experiments/draws.csv row Flat wide call"},
@@ -648,6 +767,20 @@ def classify(clone, rel, kind):
         return done("S2", "S2", moved=True)
     if rel.startswith("recompute/S508_"):
         return done("R49", "S6")
+    # D311: paths only the D311 collect holds (D311_RULES); no frozen collect opened one of them
+    if rel.startswith("runs/T3_frozen_"):
+        e = "T3D" if run.startswith("exp_04b__") else "T3C" if run.startswith("exp_04__") else None
+        return done(e, "T3") if e else r
+    if rel.startswith("recompute/G17_runs/"):
+        return done("CHECK", "G17", "check") if parts[3].startswith("check") else done("G17", "G17")
+    if rel.startswith("recompute/s12b_inputs/"):
+        return done("T3C", "S12B")                    # D255: S12b judges T3's submitted supervisor answers
+    if rel.startswith("recompute/S584_"):
+        return done("CHECK", "S584", "check")         # D311 Q1 (9 Nov): exploratory (S584's docstring), a check
+    if rel.startswith("recompute/S564_"):
+        return done("S564", "S564") if parts[2] == "full" else done("CHECK", "S564", "check")
+    if rel.startswith("recompute/G13_runs/"):
+        return done("G13", "G13", "dropped")          # D233: G13 closed, G2's answers kept
     for prefix, row in (("recompute/B7_judge_passages/", "S3"), ("recompute/S512_", "S6"), ("recompute/S440_", "S3"),
                         ("recompute/S495_", "T2"), ("recompute/S483_", "S3"), ("recompute/Q152_", "G1"),
                         ("recompute/Q145/", "G1")):
@@ -690,6 +823,8 @@ def role_of(kind, rel, v, plan_row):
         va = str(v.get("variant") or "")
         return "judge (%s)" % ("a" if va.startswith("a") else "b" if va.startswith("b") else va or "?")
     if kind == "plain":
+        if "S564_" in rel:
+            return CLAIM_ROLE
         return "verifier" if "Q152" in rel else "generator"
     if kind == "resend":
         return "generator"
@@ -709,10 +844,14 @@ def role_of(kind, rel, v, plan_row):
         return "orchestrator component"
     if "agents/notebook/" in site or plan_row == "S2":
         return "code generation"
+    if "exp_04_component_bench" in site:                # D311: T3's component benchmarks
+        return "orchestrator component"
     return "generator"
 
 
 def role_group(role):
+    if role == CLAIM_ROLE:
+        return CLAIM_ROLE
     if role in GENERATION:
         return "generation"
     return "RAGAS and RAGChecker" if role in SCORER_ROLES else "judges"
@@ -905,6 +1044,7 @@ def live_jobs(inputs):
 
 def build(inputs, changed):
     """The join and every grouped number, pure: no file is read or written here."""
+    machines = [i for i in inputs if i.get("source") != "d311"]    # the D311 collect is no machine's walk
     order = []
     for inp in inputs:
         rank_machine = MACHINE_ORDER.index(inp["machine"])
@@ -932,7 +1072,9 @@ def build(inputs, changed):
             k, v = part.split("=")
             fail[k] += int(v)
     boxes = {k: v["calls"] for k, v in sum_by([r for r in run if r["s1_box"]], lambda r: r["s1_box"]).items()}
-    boxes.update(S1_READS)
+    for k, v in S1_READS.items():          # a box the logs give calls keeps them (D311: T3C, T3D)
+        boxes.setdefault(k, v)
+    t3_counted = any(r["exp_id"] in ("T3C", "T3D") for r in run)
     tiers = {t: sum(r["calls_ok"] + r["calls_failed"] for r in rows if r["tier"] == t)
              for t in ("run", "check", "smoke", "dropped", "unmapped")}
     return {
@@ -951,15 +1093,16 @@ def build(inputs, changed):
             "duplicate_lines_within_a_file": book.dup_in_file, "lines_found_only_in_copies": dict(book.only_copy),
             "generator_call_sites": {str(k): v for k, v in book.sites.most_common(40)},
             "live": live_jobs(inputs), "planned_left": planned_left(book, rows, sinks_done),
-            "not_planned": [{"job": a, "why": b} for a, b in NOT_PLANNED], "reconcile": reconcile(inputs),
+            "not_planned": [{"job": a, "why": b} for a, b in NOT_PLANNED if not (t3_counted and a.startswith("T3 "))],
+            "reconcile": reconcile(inputs),
             "files": len(order), "lines_read": sum(t[-1]["lines"] for t in order),
             "bad_last_lines": [t[-1]["clone"] + "/" + t[-1]["path"] for t in order if t[-1]["bad_last_line"]],
             "bad_lines": sum(t[-1]["bad_lines"] for t in order),
-            "unmapped": [dict(u, machine=i["machine"]) for i in inputs for u in i["unmapped"]],
+            "unmapped": [dict(u, machine=i["machine"]) for i in machines for u in i["unmapped"]],
             "unmapped_opened": ["%s:%s/%s" % (t[4], t[2], t[3]) for t in order if t[0] == TIER_RANK["unmapped"]],
-            "clones_not_in_table": {i["machine"]: i["clones_not_in_table"] for i in inputs},
-            "missing_roots": {i["machine"]: i["missing_roots"] for i in inputs},
-            "known_out": {i["machine"]: i["known_out"] for i in inputs}}}
+            "clones_not_in_table": {i["machine"]: i["clones_not_in_table"] for i in machines},
+            "missing_roots": {i["machine"]: i["missing_roots"] for i in machines},
+            "known_out": {i["machine"]: i["known_out"] for i in machines}}}
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -1245,6 +1388,169 @@ def freeze(in_paths, summary_path, dest):
     print("froze %d collects and %d laptop gates in %s" % (len(names), len(laptop), dest))
 
 
+def t3_manifest_gates(extra, repo):
+    """D311: each T3 sink's call lines in the D311 collect against T3's MANIFEST.json answers (one call per answer: S624
+    printed equal answers and calls on every llama3 sink). Reads the laptop's untracked findings/runs, so freeze-d311
+    runs it and stores the results; report reruns the line side from the frozen collect."""
+    with open(os.path.join(repo, T3_MANIFEST)) as fh:
+        aps = json.load(fh)["answers_per_sink"]
+    lines = d311_t3_lines(extra)
+    out = [{"gate": "D311 T3 %s call lines" % s, "got": lines.get(s, 0), "want": a, "pass": lines.get(s, 0) == a,
+            "source": T3_MANIFEST + " answers_per_sink"} for s, a in sorted(aps.items())]
+    tot = sum(lines.values())
+    out.append({"gate": "D311 T3 call lines, all sinks", "got": tot, "want": sum(aps.values()),
+                "pass": tot == sum(aps.values()), "source": T3_MANIFEST + " answers_per_sink, sum"})
+    return out
+
+
+def d311_t3_lines(extra):
+    return {f["path"].split("/")[-2]: f["lines"] for f in extra["files"]
+            if f["path"].startswith("runs/T3_frozen_20261104T131439Z/")}
+
+
+def freeze_d311(in_path, dest):
+    """D311: copies the D311 collect, writes d311_gates.json (T3's MANIFEST gates) and SHA256SUMS. Frozen once."""
+    repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    with open(in_path) as fh:
+        extra = json.load(fh)
+    check_d311_input(extra, sha256_path(os.path.join(repo, FROZEN_DIR, "s520_laptop.json")))
+    if os.path.exists(dest):
+        print("REFUSED: %s exists: the D311 collect is frozen once" % dest)
+        sys.exit(2)
+    gates = t3_manifest_gates(extra, repo)
+    bad = [x["gate"] for x in gates if not x["pass"]]
+    if bad:
+        print("REFUSED: %s" % ", ".join(bad))
+        sys.exit(2)
+    os.makedirs(dest)
+    with open(in_path, "rb") as src, open(os.path.join(dest, D311_INPUT), "wb") as out:
+        out.write(src.read())
+    doc = {"what": "D311: the gates of the D311 collect that need the laptop's untracked T3 MANIFEST.json, run at freeze",
+           "decision": "D311 (experiments/README.md)", "gates": gates}
+    with open(os.path.join(dest, D311_GATES), "w") as fh:
+        json.dump(doc, fh, indent=1, sort_keys=True)
+        fh.write("\n")
+    with open(os.path.join(dest, SUMS), "w") as fh:
+        for name in sorted([D311_INPUT, D311_GATES]):
+            fh.write("%s  %s\n" % (sha256_path(os.path.join(dest, name)), name))
+    print("froze the D311 collect and %d gates in %s" % (len(gates), dest))
+
+
+def check_d311_input(extra, base_laptop_sha):
+    if extra.get("table_sha256") != d311_table_sha() or extra.get("source") != "d311":
+        print("REFUSED: the D311 collect was made with other rules; collect-d311 again")
+        sys.exit(2)
+    if extra.get("base_laptop_sha256") != base_laptop_sha:
+        print("REFUSED: the D311 collect read another frozen laptop collect's unmapped list")
+        sys.exit(2)
+
+
+def hashes_of(f):
+    out = []
+    for g in f["groups"]:
+        raw = base64.b64decode(g["h"])
+        out.extend(raw[i:i + 8] for i in range(0, len(raw), 8))
+    return out
+
+
+def d311_gates(g, inputs, extra, doc):
+    """D311's reproduce-first gates, before any count: the stored T3 gates with their line side read again, S623's
+    distinct new lines per folder, and two counts the README gives."""
+    lines = d311_t3_lines(extra)
+    for x in doc["gates"]:
+        if x["gate"] == "D311 T3 call lines, all sinks":
+            got = sum(lines.values())
+        else:
+            got = lines.get(x["gate"][len("D311 T3 "):-len(" call lines")], 0)
+        g.equal(x["gate"], got, x["want"], x["source"])
+    base = set()
+    for inp in inputs:
+        for f in inp["files"]:
+            base.update(hashes_of(f))
+    fresh = defaultdict(set)
+    for f in extra["files"]:
+        fresh[d311_folder(f["path"])].update(h for h in hashes_of(f) if h not in base)
+    for folder, want in sorted(D311_S623.items()):
+        g.equal("D311 new lines " + folder, len(fresh.get(folder, ())), want,
+                "scripts/S623_s520_unmapped_check.py, 9 Nov")
+    g.equal("D311 new lines, every folder", len(set().union(*fresh.values())) if fresh else 0, D311_S623_ALL,
+            "scripts/S623_s520_unmapped_check.py, 9 Nov")
+    by = Counter()
+    for f in extra["files"]:
+        if f["path"].startswith("recompute/S564_claimify_selection/full/"):
+            by["S564 full"] += f["lines"]
+        if f["path"].startswith("recompute/S508_judge_49_v25_second/"):
+            by["S508 second"] += f["lines"]
+    g.equal("D311 S564 full set, call lines", by["S564 full"], 14809, "experiments/README.md D211: the full set of 14,809")
+    g.equal("D311 S508 second judge, call lines", by["S508 second"], 59,
+            "S520 rule 6: S508's 59 calls (49 and 10 rechecks); the second judge the same")
+
+
+def d311_new_by(inputs, extra):
+    """The D311 collect's lines no earlier source holds, in the join's order (tier, then path), by (folder, tier,
+    experiment): what the D311 collect adds, independent of Book."""
+    seen = set()
+    for inp in inputs:
+        for f in inp["files"]:
+            seen.update(hashes_of(f))
+    files = sorted(extra["files"], key=lambda f: (TIER_RANK[classify(f["clone"], f["path"], f["kind"])["tier"]],
+                                                  f["clone"], f["path"]))
+    out = Counter()
+    for f in files:
+        m = classify(f["clone"], f["path"], f["kind"])
+        for h in hashes_of(f):
+            if h in seen:
+                continue
+            seen.add(h)
+            out[(d311_folder(f["path"]), m["tier"], m["experiment"])] += 1
+    return out
+
+
+def d311_join(g, base, ext, inputs, extra):
+    """After the join: every tier and every experiment grows by exactly the D311 collect's new lines, so no line is
+    counted twice and no base count moves. Returns the summary's d311 block."""
+    new = d311_new_by(inputs, extra)
+    by_tier, by_exp = Counter(), Counter()
+    for (folder, tier, e), v in new.items():
+        by_tier[tier] += v
+        if tier == "run":
+            by_exp[e] += v
+    for t in ("run", "check", "smoke", "dropped", "unmapped"):
+        g.equal("D311 join, tier %s grows by the new lines" % t, ext["tiers"][t] - base["tiers"][t], by_tier[t],
+                "d311_new_by")
+    exps = set(base["by_experiment"]) | set(ext["by_experiment"])
+    moved = {e: ext["by_experiment"].get(e, {}).get("calls", 0) - base["by_experiment"].get(e, {}).get("calls", 0)
+             - by_exp[e] for e in exps}
+    g.equal("D311 join, every experiment grows by its new lines only", sorted(e for e, v in moved.items() if v), [],
+            "d311_new_by")
+    g.equal("D311 join, lines found only in a copy", sum(v for (f, t, e), v in new.items() if t == "copy"), 0,
+            "T3_frozen_20261104T110249Z and S18f_runs/out_v25 are copies")
+    rows = [{"source": f, "tier": t, "experiment": e, "calls": v} for (f, t, e), v in sorted(new.items())]
+    inc = Counter()
+    for r in rows:
+        if r["tier"] == "run":
+            inc[r["source"]] += r["calls"]
+    return {"decision": "D311", "inputs": D311_DIR, "base_total": base["figure1_legend_total"],
+            "total": ext["figure1_legend_total"], "added_to_total": ext["figure1_legend_total"] -
+            base["figure1_legend_total"], "added_by_source": dict(sorted(inc.items())), "added_by_tier": dict(by_tier),
+            "rows": rows, "models_before": sorted(m for m in base["by_model"] if m != "?"),
+            "models_after": sorted(m for m in ext["by_model"] if m != "?"),
+            "base_by_model": {m: v["calls"] for m, v in base["by_model"].items()}}   # S603 R1 reads it (S520_inputs alone)
+
+
+def d311_unmapped(base_unmapped, extra):
+    """The frozen collects' unmapped list less what the D311 collect read: the laptop file itself, or a file on another
+    machine with the same path and size (S623: a copy of it). Returns (left, covered)."""
+    read = {(f["path"], f["size"]) for f in extra["files"]}
+    left, covered = [], Counter()
+    for u in base_unmapped:
+        if (u["path"], u["size"]) in read:
+            covered["%s:%s" % (u["machine"], u["clone"])] += 1
+        else:
+            left.append(u)
+    return left, dict(sorted(covered.items()))
+
+
 def n(v):
     return "{:,}".format(v) if isinstance(v, int) else str(v)
 
@@ -1321,8 +1627,24 @@ def write_report(built, gates, prov, out_dir, missing):
     L += ["", "## Supplementary Figure 1 boxes", ""]
     L += md_table(["Box", "Calls"], [[k, v] for k, v in s["s1_boxes"].items()])
     L += ["", "G7 and G8 sit in G3, G4 and G5; K1 and S18f sit in G1. G10, G11 and S508's 49 answers are not in a box.",
-          "",
-          "## Still running at read time", ""]
+          ""]
+    d = s.get("d311")
+    if d:
+        L += ["S564 is not in a box either; S12b's judge sits in T3C (D255). G17's box holds only its judge's "
+              "calls: its generation logs are in Studio clones S520 does not read.", "",
+              "## Added by D311", "",
+              "D311 (Valerio, 9 Nov, \"Total calls: O1\"): the laptop's call logs no rule of the frozen collects maps, read "
+              "from %s and joined after them; a line already counted is a duplicate. Total %s before, %s after (+%s)." % (
+                  d["inputs"], n(d["base_total"]), n(d["total"]), n(d["added_to_total"])), ""]
+        L += md_table(["Source (findings/)", "Tier", "Experiment", "Calls added"],
+                      [[r["source"], r["tier"], EXPERIMENTS.get(r["experiment"], (r["experiment"], ""))[0], r["calls"]]
+                       for r in d["rows"]])
+        L += ["", "Models: %d before, %d after (%s added)." % (
+            len(d["models_before"]), len(d["models_after"]),
+            ", ".join(sorted(set(d["models_after"]) - set(d["models_before"]))) or "none"),
+              "Frozen-collect logs read here, or on another machine with the same path and size: %s." % json.dumps(
+                  s["unmapped_covered_d311"]), ""]
+    L += ["## Still running at read time", ""]
     L += md_table(["Machine", "Plan row", "Experiment", "Tier", "Logs written in the last 30 min", "Newest (s ago)"],
                   [[x["machine"], x["plan_row"], x["experiment"], x["tier"], x["logs"], x["newest_age_s"]]
                    for x in s["live"]]) if s["live"] else ["No log written in the last 30 minutes on the machines read."]
@@ -1352,10 +1674,18 @@ def write_report(built, gates, prov, out_dir, missing):
         fh.write("\n".join(L) + "\n")
 
 
-def report(in_paths, out_dir, frozen_dir=None):
+def report(in_paths, out_dir, frozen_dir=None, base_only=False):
     repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     home = os.path.expanduser("~")
     frozen_doc = None
+    extra = d311_doc = None
+    d311_dir = os.path.join(repo, D311_DIR)
+    if frozen_dir and not base_only and os.path.isdir(d311_dir):
+        d311_files, d311_sums = read_frozen(d311_dir)
+        with open(d311_files[D311_GATES]) as fh:
+            d311_doc = json.load(fh)
+        with open(d311_files[D311_INPUT]) as fh:
+            extra = json.load(fh)
     if frozen_dir:
         files, sums = read_frozen(frozen_dir)
         with open(files.pop(LAPTOP_GATES)) as fh:
@@ -1381,6 +1711,9 @@ def report(in_paths, out_dir, frozen_dir=None):
     else:
         g = reproduce(repo, home)
     machine_gates(g, inputs, repo)
+    if extra is not None:
+        check_d311_input(extra, sums["s520_laptop.json"])
+        d311_gates(g, inputs, extra, d311_doc)
     g.refuse_on_failure()
     sys.path.insert(0, os.path.join(repo, "scripts"))
     import S512_s6_rejudge_v25 as S512   # the 132 questions, under S512's sha256 pin
@@ -1406,11 +1739,25 @@ def report(in_paths, out_dir, frozen_dir=None):
             "frozen_total": old["total"]["calls"], "calls_moved": moved}
         print("Reproduced: %d calls under the frozen rule; the later drops move %d to the dropped tier" % (
             old["total"]["calls"], moved))
-        command = "uv run --frozen python scripts/S520_llm_calls.py report --frozen"
+        command = "uv run --frozen python scripts/S520_llm_calls.py report --frozen" + (" --base" if base_only else "")
     else:
         command = "uv run --frozen python scripts/S520_llm_calls.py report --in %s --out-dir %s" % (
             " ".join(os.path.basename(p) for p in in_paths), out_dir)
+    if extra is not None:
+        base_summary = built["summary"]
+        built = build(inputs + [extra], S512.changed_ids())
+        g2 = Gates()
+        d311 = d311_join(g2, base_summary, built["summary"], inputs, extra)
+        g2.refuse_on_failure()
+        g.results += g2.results
+        left, covered = d311_unmapped(base_summary["unmapped"], extra)
+        built["summary"].update(d311=d311, unmapped=left, unmapped_covered_d311=covered,
+                                dropped_after_freeze=base_summary["dropped_after_freeze"])
+        sums = dict(sums, **{"S520_inputs_d311/" + k: v for k, v in d311_sums.items()})
+        print("D311: %d calls before, %d after (+%d)" % (d311["base_total"], d311["total"], d311["added_to_total"]))
     prov = provenance(repo, inputs, command, sums, frozen=bool(frozen_doc))
+    if extra is not None:
+        prov["read_d311"] = {k: extra[k] for k in ("started_utc", "ended_utc", "host")}
     write_report(built, g.results, prov, out_dir, missing)
     t = built["summary"]["total"]
     print("%d calls, %d ok, %d failed, %d replaced; machines not read: %s" % (
@@ -1431,9 +1778,20 @@ def main():
     z.add_argument("--in", dest="inputs", nargs="+", required=True)
     z.add_argument("--summary", required=True)
     z.add_argument("--dest", default=FROZEN_DIR)
+    c2 = sub.add_parser("collect-d311", help="D311: the laptop's logs the frozen laptop collect left unmapped")
+    c2.add_argument("--out", required=True)
+    z2 = sub.add_parser("freeze-d311")
+    z2.add_argument("--in", dest="inputs", required=True)
+    z2.add_argument("--dest", default=D311_DIR)
+    r.add_argument("--base", action="store_true", help="with --frozen: %s alone, without %s" % (FROZEN_DIR, D311_DIR))
     a = ap.parse_args()
+    repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     if a.mode == "collect":
         collect(a.machine, os.path.expanduser(a.out))
+    elif a.mode == "collect-d311":
+        collect_d311(os.path.expanduser(a.out), repo)
+    elif a.mode == "freeze-d311":
+        freeze_d311(a.inputs, a.dest)
     elif a.mode == "freeze":
         freeze(a.inputs, a.summary, a.dest)
     elif a.mode == "report":
@@ -1442,7 +1800,10 @@ def main():
             ap.error("report takes --in or --frozen, one of them")
         if not a.frozen and not a.out_dir:
             ap.error("report --in needs --out-dir")
-        report(a.inputs, a.out_dir or os.path.join(repo, DEFAULT_OUT), os.path.join(repo, FROZEN_DIR) if a.frozen else None)
+        if a.base and not a.frozen:
+            ap.error("--base goes with --frozen")
+        report(a.inputs, a.out_dir or os.path.join(repo, DEFAULT_OUT), os.path.join(repo, FROZEN_DIR) if a.frozen else None,
+               base_only=a.base)
     else:
         ap.error("collect or report")
 

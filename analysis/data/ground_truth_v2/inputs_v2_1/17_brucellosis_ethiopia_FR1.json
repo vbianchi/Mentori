@@ -1,0 +1,13 @@
+{
+ "id": "17_brucellosis_ethiopia_FR1",
+ "category": "factual_recall",
+ "subcategory": null,
+ "question": "What specific districts in the Somali Region of Ethiopia were included as study areas for this research?",
+ "papers": [
+  {
+   "paper": "17_brucellosis_ethiopia",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/17_brucellosis_ethiopia.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/17_brucellosis_ethiopia.pypdf.txt"
+  }
+ ]
+}

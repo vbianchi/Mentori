@@ -1,0 +1,13 @@
+{
+ "id": "10_cutadapt_CO2",
+ "category": "conceptual",
+ "subcategory": null,
+ "question": "How does the implementation of Cutadapt balance the trade-off between user accessibility and computational efficiency?",
+ "papers": [
+  {
+   "paper": "10_cutadapt",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/10_cutadapt.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/10_cutadapt.pypdf.txt"
+  }
+ ]
+}

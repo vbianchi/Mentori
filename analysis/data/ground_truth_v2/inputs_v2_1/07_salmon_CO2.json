@@ -1,0 +1,13 @@
+{
+ "id": "07_salmon_CO2",
+ "category": "conceptual",
+ "subcategory": null,
+ "question": "How does Salmon's method of bias correction specifically improve the outcomes of differential expression (DE) analysis?",
+ "papers": [
+  {
+   "paper": "07_salmon",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/07_salmon.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/07_salmon.pypdf.txt"
+  }
+ ]
+}

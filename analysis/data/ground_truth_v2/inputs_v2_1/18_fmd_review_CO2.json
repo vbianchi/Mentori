@@ -1,0 +1,13 @@
+{
+ "id": "18_fmd_review_CO2",
+ "category": "conceptual",
+ "subcategory": null,
+ "question": "How does the FMDV 'carrier state' differ between pigs and ruminants, and what biological evidence challenges the historical 28-day threshold for this state?",
+ "papers": [
+  {
+   "paper": "18_fmd_review",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/18_fmd_review.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/18_fmd_review.pypdf.txt"
+  }
+ ]
+}

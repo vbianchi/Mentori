@@ -1,0 +1,23 @@
+{
+ "id": "CD_006",
+ "category": "cross_document",
+ "subcategory": "comparison",
+ "question": "How do the implementation languages and performance-optimization strategies of fastp, SeqKit, and Cutadapt differ in addressing computational bottlenecks in sequence data processing?",
+ "papers": [
+  {
+   "paper": "04_fastp",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/04_fastp.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/04_fastp.pypdf.txt"
+  },
+  {
+   "paper": "09_seqkit",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/09_seqkit.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/09_seqkit.pypdf.txt"
+  },
+  {
+   "paper": "10_cutadapt",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/10_cutadapt.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/10_cutadapt.pypdf.txt"
+  }
+ ]
+}

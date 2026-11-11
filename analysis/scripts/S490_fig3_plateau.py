@@ -24,7 +24,7 @@ audit_1025/fig3/recompute.py (the same text at caps 20 and 50). Reads only commi
                                                      v2.5 judge rows where S6 has judged), c is reproduced from its
                                                      grid_pairs.jsonl, the rows the plate then draws
     findings/recompute/G4_fig3c/grid_tables.json     the v2.4 anchor of c (below)
-    findings/figures_provisional/supp_fig8_depth/Supplementary Figure 8 data (provisional, ...).xlsx   the plate's numbers
+    findings/figures_provisional/supp_fig8_depth/Supplementary Figure 8 data.xlsx   the plate's numbers
 
 REPRODUCE FIRST. D188: the v2.4 readings first, whatever the plate draws: T1_L2's cap_tables.json (each model and
 cap's mean of concept_recall_loose over the complete questions, questions, failed, cap-reached and stopped-by-cap
@@ -94,12 +94,12 @@ if _T1D:
 if _G4D:
     G4_ROWS = REPO / _G4D / "grid_pairs.jsonl"
 PLATE = REPO / "findings/figures_provisional/supp_fig8_depth"
-SD_GLOB = "Supplementary Figure 8 data (provisional*.xlsx"
+SD_GLOB = "Supplementary Figure 8 data.xlsx"           # Q9 (11 Nov): the lock's name, no suffix
 SHEET = "Supplementary Fig. 8"
 # D283: a and b moved to main Figure 4 (sheets "Fig. 4a", "Fig. 4b"), c alone stays Supplementary Figure 8 (one sheet,
 # "Supplementary Fig. 8"); the sheets are read under the names a, b and c this script has always used
 PLATE_AB = REPO / "findings/figures_provisional/fig4_depth"
-SD_GLOB_AB = "Source Data Fig. 4 (provisional*.xlsx"
+SD_GLOB_AB = "Source Data Fig. 4.xlsx"              # Q9 (11 Nov): the lock's name, no suffix
 # D284: RLM's draws 2 and 3 on all 86 (S514 l2g7 --all86), joined to the drawn D181 rows as S476 joins them
 L2_D284_ROWS = REPO / "findings/recompute/L2_d135_d181_d284/concept_recall_g7.jsonl"
 OUT = REPO / "findings/recompute/S490_fig3_plateau"

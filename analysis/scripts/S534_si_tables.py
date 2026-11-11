@@ -73,6 +73,7 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 import re
 import sys
 import tempfile
@@ -122,10 +123,11 @@ CONTRIBUTES = {
                               "model (made before the experiments reported here, not run again)",
     "Generation strategies": "Strategy comparison (Figure 3)",
     "Matched-budget arm": "Single pass at matched budget (Figure 3)",
-    "Package RLM at caps 5 10 20": "Zhang RLM at caps 5, 10 and 20 (Figure 3, Supplementary Figure 17)",
-    "Retrieval depth": "Turn caps, RLM (Figure 4a); concept recall",   # N4a Q: Supplementary Figure 8 is corpus size, not depth
+    "Package RLM at caps 5 10 20": "Zhang RLM at caps 5, 10 and 20 (Figure 3, Figure 4a, Supplementary Figures 7 and 17)",   # D309 A40
+    "Retrieval depth": "Turn caps, RLM (Figure 4a); concept recall, no judge",   # N4a Q: Supplementary Figure 8 is corpus size, not depth; D309 A40
     "Retrieval depth, local models": "Turn caps, local generators (Figure 4b); concept recall, no judge",
-    "Package RLM depth caps": "Turn caps, Zhang RLM (Figure 4a, Supplementary Figure 7); concept recall, no judge",
+    "Package RLM depth caps": "Turn caps, Zhang RLM (Figure 4a, Supplementary Figure 7, with caps 5, 10 and 20 from the row "
+                              "Zhang RLM at caps 5, 10 and 20); concept recall, no judge",   # D309 A40
     "Corpus scaling": "Corpus size (Figure 3, Supplementary Figure 8)",
     "Flat wide call": "One wide call at a fixed passage count (Discussion)",
     "Short-passage single pass": "Single pass with each passage cut to its first 800 characters (Discussion)",
@@ -139,7 +141,8 @@ CONTRIBUTES = {
     "Component benchmarks": "Each orchestrator component against its benchmark items (Supplementary Figure 10)",
     "Distiller intervention": "The distiller's prompt, Mentor::i's against the worked-example prompt (Supplementary Figure 11)",
     "RLM ablation": "RLM-10 with search off or the gate off, against its control (Figure 5)",
-    "RLM ablation, gemma3:27b": "Zhang RLM, search off and gate off with a local generator (Supplementary Note 5)",
+    "RLM ablation, local generators": "Zhang RLM, search off and gate off with two local generators (Supplementary "
+                                      "Note 5)",   # D309 A26 O1: G19 (gemma3:27b) and G20 (qwen3-coder:30b)
     "Judge with evidence": "The judge given the answer's own papers, unrelated papers or none (Results)",
 }
 
@@ -179,7 +182,8 @@ JUDGE_HEADERS = {
     "Short-passage single pass": ["g10_g11_v25_inputs/out_s6_w_g11/judge"],
     "RLM ablation": ["G17_runs/out_s6_w_g17/judge"],
 }
-NO_JUDGE = ("Retrieval optimisation", "Retrieval depth, local models", "Package RLM depth caps", "Code generation",
+NO_JUDGE = ("Retrieval optimisation", "Retrieval depth", "Retrieval depth, local models",   # D309 A40: G5 is scored by concept recall alone
+            "Package RLM depth caps", "Code generation",
             "Component benchmarks", "Distiller intervention")
 JUDGED_LATER: tuple = ()     # G10 and G11 judged 2 November, frozen by S600 (6 November)
 
@@ -190,8 +194,12 @@ def die(msg: str):
 
 
 def rel(p: Path) -> str:
+    q = Path(p).resolve()
+    t3 = T3_SET.resolve()
+    if q == t3 or t3 in q.parents:          # a T3 file keeps its repository name wherever MENTORI_RUNS puts the set
+        return str(Path(T3_NAME) / q.relative_to(t3))
     try:
-        return str(Path(p).resolve().relative_to(REPO))
+        return str(q.relative_to(REPO))
     except ValueError:
         return fig_repro.frozen_label(p)
 
@@ -395,8 +403,16 @@ def run_groups(reg: dict) -> "OrderedDict[str, list[dict]]":
     tails = {x["run_id"].split("+")[1] for x in g19 if "+" in x["run_id"]}
     if tails != {"gemma3-27b"}:
         die(f"G19: run ids name {sorted(tails)}, gemma3-27b expected")
-    r["RLM ablation, gemma3:27b"] = [{"gen": "gemma3:27b", "verifier": None, "files": len({x["run_id"] for x in g19}),
-                                      "records": len({(x["run_id"], x["answer_key"]) for x in g19})}]
+    # D309 A26 O1: G20, the same arms with qwen3-coder:30b (S594's rows), is the experiment's second generator row
+    g20 = [json.loads(ln) for ln in (REC / "G20_concept_recall/concept_recall.jsonl").read_text().splitlines() if ln.strip()]
+    g20 = [x for x in g20 if x["arm"] in ("A", "B", "C")]
+    tails = {x["run_id"].split("+")[1] for x in g20 if "+" in x["run_id"]}
+    if tails != {"qwen3-coder-30b"}:
+        die(f"G20: run ids name {sorted(tails)}, qwen3-coder-30b expected")
+    r["RLM ablation, local generators"] = [
+        {"gen": g, "verifier": None, "files": len({x["run_id"] for x in xs}),
+         "records": len({(x["run_id"], x["answer_key"]) for x in xs})}
+        for g, xs in (("gemma3:27b", g19), ("qwen3-coder:30b", g20))]
     # G10 and G11: their judge rows name the run (S600's collects); the generator is D196's
     for exp, f in (("Flat wide call", "g10_collect.jsonl"), ("Short-passage single pass", "g11_collect.jsonl")):
         xs = [json.loads(ln) for ln in (REC / "g10_g11_v25_inputs" / f).read_text().splitlines() if ln.strip()]
@@ -443,10 +459,19 @@ def run_groups(reg: dict) -> "OrderedDict[str, list[dict]]":
 
     # T1: its results rows, the registry's per_model
     t1 = next(e for e in reg["today"]["experiments"] if e["experiment"] == "Retrieval depth, local models")
-    t1_files = Counter()
+    t1_files, t1_keys = Counter(), {}
     for f in sorted(fig_repro.frozen("fig3_t1", "fig3_t1/results_v4").glob("*.json")):
-        for m in {x["model"] for x in json.loads(f.read_text())["results"]}:
+        res = json.loads(f.read_text())["results"]
+        for m in {x["model"] for x in res}:
             t1_files[m] += 1
+            t1_keys.setdefault(m, []).append(frozenset((x["answer_key"], x.get("depth")) for x in res if x["model"] == m))
+    # D309 A100: a model's results files are successive saves of one growing file, each holding the one before it, the
+    # largest holding every answer; checked here, and said in the table's note (T1_FILES_NOTE)
+    for m, ks in t1_keys.items():
+        ks = sorted(ks, key=len)
+        if any(not a <= b for a, b in zip(ks, ks[1:])) or len(ks[-1]) != t1["note"]["per_model"][m]:
+            die(f"T1 {m}: its results files are not successive saves of one file holding its answers")
+    T1_FILES_INFO.update({"files": sorted(set(t1_files.values())), "answers": sorted(set(t1["note"]["per_model"].values()))})
     r["Retrieval depth, local models"] = [{"gen": short(m), "verifier": None, "files": t1_files[m], "records": n}
                                           for m, n in sorted(t1["note"]["per_model"].items())]
     # S2: the 121 runs Figure 6's manifest names, each model from its run identity
@@ -616,7 +641,7 @@ def build_t7() -> tuple[list[list], list[list], dict]:
         if tag == lock["scorers"]["embedding"]:
             roles = ["encoder for answer relevancy (RAGAS)"]
         models.append([tag, pool[tag]["where"], pool[tag]["digest"], pool[tag]["machines"],
-                       ", ".join(roles) if roles else "in the lock, in no experiment of this table",
+                       ", ".join(roles) if roles else "in the settings file, used in no experiment of this table",
                        ", ".join(sorted(DISPLAY.get(e, e) for e in used.get(name, []))) if name else "-"])
     prov = {"not_yet_run": list(NOT_YET_RUN),
             "registry_sha256": fig_repro.sha256_file(REGISTRY), "lock_sha256": fig_repro.sha256_file(LOCK),
@@ -637,7 +662,68 @@ T7_NOTE = ("Generator and judge for every experiment of this study. Generator na
            "repository, otherwise from the study's settings file, experiments/LOCK.toml. devstral-small-2:24b is the main "
            "judge. qwen3.8:27b is the second judge and appears only on the rows it judged; its scores are not read here. "
            "Records counts stored answers. Files and Records are blank on the second judge's rows: their answers are "
-           "counted once, on the main judge's row.")
+           "counted once, on the main judge's row. Below, every model with its Ollama digest, the machines that served "
+           "it, its role and the experiments it took part in.")   # D309 A99: the caption names the second table
+
+
+T1_FILES_INFO: dict = {}     # D309 A100: filled by build_t7 from the T1 files it checks
+
+
+def int_format(ws) -> None:
+    """D309 A73: integer cells shown with thousands separators in the workbook as in the .md (values unchanged)."""
+    for row in ws.iter_rows(min_row=2):
+        for c in row:
+            if isinstance(c.value, int) and not isinstance(c.value, bool):
+                c.number_format = "#,##0"
+
+
+def cell_text(v) -> str:
+    """A table cell as printed: blank for None; an integer with thousands separators (D309 A73: 2,336, not 2336)."""
+    if v is None:
+        return ""
+    if isinstance(v, int) and not isinstance(v, bool):
+        return f"{v:,}"
+    return str(v)
+
+
+def t1_files_note() -> str:
+    """D309 A100: why the local-model depth sweep's Files exceed its Records."""
+    f, a = T1_FILES_INFO["files"], T1_FILES_INFO["answers"]
+    if len(f) != 1 or len(a) != 1:
+        die(f"T1: files per model {f}, answers per model {a}: the note assumes one value of each")
+    return (f"For the local-model depth sweep, each model's {f[0]} files are successive saves of one growing results "
+            f"file, the largest holding its {a[0]} answers; Records counts each answer once.")
+
+
+def date_copies_note() -> str:
+    """D309 A81: the date-fixed model copies, from LOCK.toml [date] (model_copy, fixed)."""
+    from datetime import date
+    d = tomllib.loads(LOCK.read_text())["date"]
+    copies = d["model_copy"]
+    day = date.fromisoformat(d["fixed"])
+    names = list(copies)
+    return (f"{' and '.join(copies[n] for n in names)} are copies of {' and '.join(names)}, with the same weights, "
+            f"whose template fixes the date written into the prompt at {day.day} {day.strftime('%B')} {day.year}.")
+
+
+def t3_analysed_note() -> str:
+    """D309 A66: the note on T3's two rows, for Supplementary Tables 2 and 3. Stored answers from S492's registry;
+    analysed answers from the stamps of the plates that analyse them (S524's Supplementary Figures 10 and 11)."""
+    reg = {e["experiment"]: e["stored"] for e in json.loads(REGISTRY.read_text())["today"]["experiments"]}
+    got = []
+    for folder, n in (("supp_fig10_components", 10), ("supp_fig11_distiller_prompts", 11)):
+        stamp = json.loads((REPO / "findings/figures_provisional" / folder /
+                            f"supplementary_figure{n}_numbers.json").read_text())["stamp"]
+        m = re.search(r"([\d,]+) of ([\d,]+) planned T3 answers", stamp)
+        if not m or m.group(1) != m.group(2):
+            die(f"Supplementary Figure {n}'s stamp gives no complete count of analysed T3 answers: {stamp[:120]}")
+        got.append(int(m.group(1).replace(",", "")))
+    stored = (reg["Component benchmarks"], reg["Distiller intervention"])
+    if not all(a < b for a, b in zip(got, stored)):
+        die(f"T3: analysed {got} not below stored {stored}")
+    return (f"Component benchmarks and Distiller intervention count every stored answer, {stored[0]:,} and "
+            f"{stored[1]:,}; the analyses leave out the items built on questions later replaced in the answer key, "
+            f"which gives {got[0]:,} and {got[1]:,} (Methods).")
 
 
 def write_t7() -> int:
@@ -663,14 +749,16 @@ def write_t7() -> int:
         ws2.append(m)
     for c in ws2[1]:
         c.font = Font(bold=True)
+    int_format(ws)
     provenance(wb, "uv run --frozen python scripts/S534_si_tables.py t7", prov)
     x = OUT / "Supplementary Table 2.xlsx"
     wb.save(x)
     fig_repro.deterministic_xlsx(x)
-    md = ["# Supplementary Table 2 | Generator and judge pairing", "", T7_NOTE, "",
+    md = ["# Supplementary Table 2 | Generator and judge pairing", "", T7_NOTE + " " + date_copies_note() + " " + t1_files_note() + " " +
+          t3_analysed_note(), "",
           "| " + " | ".join(HEAD) + " |", "|" + "---|" * len(HEAD)]
     for t in table:
-        md.append("| " + " | ".join("" if v is None else str(v) for v in [DISPLAY.get(t[0], t[0])] + t[1:]) + " |")
+        md.append("| " + " | ".join(cell_text(v) for v in [DISPLAY.get(t[0], t[0])] + t[1:]) + " |")
     md += ["", "## Models", "", "| " + " | ".join(mh) + " |", "|" + "---|" * len(mh)]
     md += ["| " + " | ".join(str(v) for v in m) + " |" for m in models]
     (OUT / "Supplementary Table 2.md").write_text("\n".join(md) + "\n")
@@ -751,15 +839,61 @@ def write_t1() -> int:
 # ---------------------------------------------------------------------------------------------------------------
 # Table 9
 # ---------------------------------------------------------------------------------------------------------------
-T9_HEAD = ["Experiment", "Records", "Deterministic", "LLM judge", "NLI (MiniCheck)", "Execution", "Retrieval ranking"]
+T9_HEAD = ["Experiment", "Records", "Deterministic", "LLM judge", "Claim checking (MiniCheck)", "Execution",   # D309 A79
+           "Retrieval ranking"]
 JUDGED = (("Generation strategies", REC / "fig2_inputs/g1_collect.jsonl"),
           ("Matched-budget arm", REC / "fig3_s6_inputs/g2_collect.jsonl"),
           ("Package RLM at caps 5, 10 and 20", REC / "fig3_s6_inputs/g6_collect.jsonl"),
           ("Corpus scaling", REC / "fig3_inputs/g4_collect.jsonl"),
-          ("Pipeline ablation and baselines", REC / "fig4_inputs/g3_collect.jsonl"))
+          ("Pipeline ablation and baselines", "G3_ALL_DRAWS"))   # D309 A25: g3_all_rows(), every draw
 CONCEPTS = {"Generation strategies": REC / "L3_d181/concept_recall.jsonl"}
-DEPTH = (("Retrieval depth, Mentori RLM and package RLM", REC / "L2_d135_d181/concept_recall.jsonl"),
-         ("Retrieval depth, local models", REC / "T1_L2_d181/concept_recall.jsonl"))
+# D309 A25 O1: the depth row reads RLM's draws 2 and 3 (D284, L2_d135_d181_d284) beside the draw-1 file, as Figure 4
+DEPTH = (("Retrieval depth, Mentori RLM and package RLM", [REC / "L2_d135_d181/concept_recall.jsonl",
+                                                          REC / "L2_d135_d181_d284/concept_recall_g7.jsonl"]),
+         ("Retrieval depth, local models", [REC / "T1_L2_d181/concept_recall.jsonl"]))
+# D309 A25 O1: the pipeline row's judge rows at every draw, as Source Data Fig. 5's 'draw' rows read them (S472): the
+# frozen G3 collect (draw 1 and the baselines' three draws) and S6G7G3's draws 2 and 3 of the six pipeline set-ups;
+# G9's two stress set-ups are their own experiment and left out. Held to S492's Pipeline ablation plus No retrieval and
+# naive RAG (1,373 + 810)
+G3_ALL = REC / "fig4_g9_inputs"
+G3_PIPELINE = ("full_orchestrator", "orch_no_analyser", "orch_no_planner", "orch_no_supervisor", "orch_no_synthesiser",
+               "orch_factual_to_documents")
+G3_BASE = ("raw_gemini", "naive_rag")
+
+
+def g3_all_rows(read: list) -> list[dict]:
+    """D309 A25: one judge row per stored answer of Pipeline ablation and No retrieval and naive RAG, every draw.
+    S6G7G3's raw outs are collected by s3_guard into a temporary file (as S472 read_draw_rows does); a row of it stands
+    over the collect's row of the same answer. Refused unless the answers equal the registry's two counts."""
+    import contextlib
+    import io
+    import judge_rows_v25 as JR
+    keep = set(G3_PIPELINE + G3_BASE)
+    rows = {}
+    base = G3_ALL / "g3_collect.jsonl"
+    read.append(base)
+    for x in JR.read_jsonl(base):
+        if x["config"] in keep:
+            rows[(x["run_id"], x["answer_key"])] = x
+    src = next(s for s in JR.sources(G3_ALL, "G3") if s["name"] == "S6G7G3")
+    if not src["present"]:
+        die(f"G3: {src['missing']} not present")
+    with tempfile.TemporaryDirectory(prefix="S534_g3_") as t:
+        dest = Path(t) / "s6g7g3.jsonl"
+        with contextlib.redirect_stdout(io.StringIO()) as buf:
+            rc = JR.guard().collect(src["outs"], None, dest, src["set"])
+        if rc:
+            die(f"G3: s3_guard collect refused S6G7G3: {buf.getvalue().strip()[-300:]}")
+        for x in JR.read_jsonl(dest):
+            if x["config"] in G3_PIPELINE and x["draw"] in (2, 3):
+                rows[(x["run_id"], x["answer_key"])] = x
+    for o in src["outs"]:
+        read += sorted(Path(o).glob("judge/*/judge_passages.jsonl"))
+    reg = {e["experiment"]: e["stored"] for e in json.loads(REGISTRY.read_text())["today"]["experiments"]}
+    want = reg["Pipeline ablation"] + reg["No retrieval and naive RAG"]
+    if len(rows) != want:
+        die(f"G3: {len(rows)} judge rows over every draw, S492 counts {want} stored answers")
+    return list(rows.values())
 JUDGED += (("Flat wide call", REC / "g10_g11_v25_inputs/g10_collect.jsonl"),
            ("Short-passage single pass", REC / "g10_g11_v25_inputs/g11_collect.jsonl"),
            ("Plant-science reuse demonstration", REC / "i2_inputs/judge/judge_passages.jsonl"))
@@ -777,7 +911,7 @@ NLI_SOURCES = {
                                           ("against the source papers", [I2_SIGNALS / "papers.jsonl"],
                                            I2_SIGNALS / "papers_header.json", None)]}
 # rows with no MiniCheck job: plan.csv runs MiniCheck under rows L1 (Figure 2's answers) and I2 only
-NLI_NOT_IN_PLAN = "not run: the NLI check was run on the generation-strategy and plant-science answers only"
+NLI_NOT_IN_PLAN = "not run: claim checking was run on the generation-strategy and plant-science answers only"   # D309 A79
 NLI_NONE = {"Matched-budget arm": NLI_NOT_IN_PLAN, "Package RLM at caps 5, 10 and 20": NLI_NOT_IN_PLAN,
             "Corpus scaling": NLI_NOT_IN_PLAN, "Pipeline ablation and baselines": NLI_NOT_IN_PLAN,
             "Flat wide call": NLI_NOT_IN_PLAN, "Short-passage single pass": NLI_NOT_IN_PLAN,
@@ -786,7 +920,10 @@ NLI_NONE = {"Matched-budget arm": NLI_NOT_IN_PLAN, "Package RLM at caps 5, 10 an
 T9_DISPLAY = {"Package RLM at caps 5, 10 and 20": "Zhang RLM at caps 5, 10 and 20",
               "Retrieval depth, Mentori RLM and package RLM": "Retrieval depth, RLM and Zhang RLM"}
 T2_GENERATORS = ("claude-haiku-4-5", "gemini-2.5-pro", "gemma3", "qwen3-coder")
-T3_SET = REPO / "findings/runs/T3_frozen_20261104T131439Z"
+T3_NAME = "findings/runs/T3_frozen_20261104T131439Z"      # its name in inputs_sha256, the same wherever T3_SET is
+# Q5 O1 (RELEASE_DESIGN.md, 11 Nov): env MENTORI_RUNS names another folder holding findings/runs/'s sets, so
+# reproduce.py points it at the data root; findings/runs/ in this repository is the default
+T3_SET = Path(os.environ.get("MENTORI_RUNS") or REPO / "findings/runs").expanduser() / Path(T3_NAME).name
 T3_PLANNED = {"Component benchmarks": 6656, "Distiller intervention": 1164}      # draws.csv, design words; S524 THE DESIGN
 # each T3 benchmark's signals: (key, column); the rest of a row is the model's own output
 T3_SIGNALS = {"analyzer": [("decision_correct", "det"), ("complexity_correct", "det")],
@@ -823,7 +960,26 @@ def share_cell(have: dict, n: int) -> str:
 T1_NAMES = {"Generation strategies": ["Generation strategies"], "Matched-budget arm": ["Matched-budget arm"],
             "Plant-science reuse demonstration": ["Plant-science reuse demonstration"],
             "Package RLM at caps 5, 10 and 20": ["Package RLM at caps 5 10 20"], "Corpus scaling": ["Corpus scaling"],
-            "Pipeline ablation and baselines": ["Pipeline ablation", "No retrieval and naive RAG"]}
+            "Pipeline ablation and baselines": ["Pipeline ablation", "No retrieval and naive RAG"],
+            # D309 A25 O1: every row with a Supplementary Table 2 count is compared, not only the six above
+            "Flat wide call": ["Flat wide call"], "Short-passage single pass": ["Short-passage single pass"],
+            "Strategy replication": ["Strategy replication"], "Component benchmarks": ["Component benchmarks"],
+            "Distiller intervention": ["Distiller intervention"],
+            "Retrieval depth, Mentori RLM and package RLM": ["Retrieval depth", "Package RLM depth caps"],
+            "Retrieval depth, local models": ["Retrieval depth, local models"], "Code generation": ["Code generation"]}
+# D309 A25 O1: why a row's Records differ from Supplementary Table 2's stored answers, (Table 3's count, Table 2's) each,
+# held to the counts: a difference with no reason here, or a reason whose counts no longer hold, refuses
+T9_DIFFER_WHY = {
+    "Corpus scaling": ((11620, 18162), "here the judge rows of draw 1; Supplementary Table 2 counts the stored answers of "
+                                       "all three draws"),
+    "Strategy replication": ((7019, 7054), "Supplementary Table 2 also counts the 34 answers of gemma3:27b and "
+                                           "qwen3-coder:30b on 17 further many-paper questions, judged apart, and one "
+                                           "stored answer with no text, which the judge does not read"),
+    "Retrieval depth, Mentori RLM and package RLM": ((5160, 4386), "here Zhang RLM's caps 5, 10 and 20 on the 86 "
+                                                                    "answerable questions (774 answers) are included, "
+                                                                    "which Supplementary Table 2 counts under Zhang RLM at "
+                                                                    "caps 5, 10 and 20"),
+}
 
 
 def rows_shares(rows: list[dict]) -> tuple[int, dict]:
@@ -951,6 +1107,10 @@ def build_t9() -> tuple[list[list], dict]:
     rows = []
     read = [REGISTRY, MANIFEST]
     for name, path in JUDGED:
+        if path == "G3_ALL_DRAWS":
+            n, have = rows_shares(g3_all_rows(read))
+            rows.append([name, n, "-", share_cell(have, n), nli_cell(name, path, n, read), "-", "-"])
+            continue
         n, have = key_shares(path)
         read.append(path)
         det = "-"
@@ -970,9 +1130,9 @@ def build_t9() -> tuple[list[list], dict]:
     t3, t3_read, t3_info = t3_rows()
     read += t3_read
     rows += t3
-    for name, path in DEPTH:
-        lines = [ln for ln in path.read_text().splitlines() if ln.strip()]
-        read.append(path)
+    for name, paths in DEPTH:
+        lines = [ln for path in paths for ln in path.read_text().splitlines() if ln.strip()]
+        read += paths
         n = len(lines)
         c = sum('"concept_recall":' in ln for ln in lines)
         rows.append([name, n, f"concept recall {100 * c / n:.1f}%", "-", "-", "-", "-"])
@@ -986,6 +1146,13 @@ def build_t9() -> tuple[list[list], dict]:
     for e in reg["today"]["experiments"]:
         stored.setdefault(e["experiment"], e.get("stored"))
     differ = [(r[0], r[1], sum(stored[x] for x in T1_NAMES[r[0]])) for r in rows if r[0] in T1_NAMES]
+    for a, b, c in differ:
+        why = T9_DIFFER_WHY.get(a)
+        if b != c and (why is None or why[0] != (b, c)):
+            die(f"Table 3 row {a}: {b} records against {c} stored answers, and T9_DIFFER_WHY "
+                f"{'gives no reason' if why is None else 'holds ' + str(why[0])}")
+        if b == c and why is not None:
+            die(f"Table 3 row {a}: T9_DIFFER_WHY gives a reason, but the counts agree ({b})")
     info = {"inputs_sha256": {rel(p): fig_repro.sha256_file(p) for p in read},
             "differ_from_table_1": [d for d in differ if d[1] != d[2]],
             "strategy_replication": t2_info, "t3_rows_by_benchmark": t3_info}
@@ -1006,22 +1173,24 @@ def write_t9() -> int:
         ws.append(r)
     for c in ws[1]:
         c.font = Font(bold=True)
+    int_format(ws)
     provenance(wb, "uv run --frozen python scripts/S534_si_tables.py t9", info)
     x = OUT / "Supplementary Table 3.xlsx"      # D276: the manuscript's number
     wb.save(x)
     fig_repro.deterministic_xlsx(x)
     # the stored answers come from S492's registry, as Supplementary Table 2's Records column does (its gate: got == want)
-    differ = "; ".join(f"{T9_DISPLAY.get(a, a)}, {b:,} here and {c:,} in Supplementary Table 2"
+    differ = "; ".join(f"{T9_DISPLAY.get(a, a)}, {b:,} here and {c:,} in Supplementary Table 2 ({T9_DIFFER_WHY[a][1]})"
                        for a, b, c in info["differ_from_table_1"])
     note = ("Share of each experiment's records that hold each signal's key, on the records in the analysis repository. Only key "
-            "names are counted, never a value; in the NLI (MiniCheck) column and the component benchmarks a record counts where "
+            "names are counted, never a value; in the Claim checking (MiniCheck) column and the component benchmarks a record counts where "
             "the signal holds a value, since MiniCheck stores no value where it does not apply (questions with no answer "
             "in the papers) or could not score the answer. Records is the row count of the file each share is taken over, which can "
-            f"differ from the stored answers of Supplementary Table 2{': ' + differ if differ else ''}."
+            f"differ from the stored answers of Supplementary Table 2{': ' + differ if differ else ''}. "
+            + t3_analysed_note()
             + (" Provisional: rows marked not read wait for their records." if NOT_READ else ""))
     md = ["# Supplementary Table 3 | Signals recorded per experiment", "", note, "", "| " + " | ".join(T9_HEAD) + " |",
           "|" + "---|" * len(T9_HEAD)]
-    md += ["| " + " | ".join("" if v is None else str(v) for v in r) + " |" for r in rows]
+    md += ["| " + " | ".join(cell_text(v) for v in r) + " |" for r in rows]
     (OUT / "Supplementary Table 3.md").write_text("\n".join(md) + "\n")
     print(f"wrote {rel(x)}: {len(rows)} rows, {sum(r[1] is None for r in rows)} not read yet")
     return 0

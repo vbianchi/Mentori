@@ -1,0 +1,13 @@
+{
+ "id": "17_brucellosis_ethiopia_TE3",
+ "category": "technical",
+ "subcategory": null,
+ "question": "Describe the laboratory diagnostic sequence and the statistical methods used to identify significant risk factors for brucellosis in this study.",
+ "papers": [
+  {
+   "paper": "17_brucellosis_ethiopia",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/17_brucellosis_ethiopia.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/17_brucellosis_ethiopia.pypdf.txt"
+  }
+ ]
+}

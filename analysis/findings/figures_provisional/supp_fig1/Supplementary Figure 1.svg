@@ -1,0 +1,964 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="518.740157pt" height="457.517795pt" viewBox="0 0 518.740157 457.517795" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <title>Supplementary Figure 1</title>
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title>Supplementary Figure 1</dc:title>
+    <dc:format>image/svg+xml</dc:format>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 457.517795 
+L 518.740157 457.517795 
+L 518.740157 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="patch_2">
+   <path d="M 2.834646 145.397165 
+L 89.574803 145.397165 
+L 89.574803 83.560945 
+L 2.834646 83.560945 
+L 2.834646 145.397165 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_3">
+   <path d="M 2.834646 212.164409 
+L 89.574803 212.164409 
+L 89.574803 169.208189 
+L 2.834646 169.208189 
+z
+" style="fill: #eeeeee; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_4">
+   <path d="M 2.834646 269.491654 
+L 89.574803 269.491654 
+L 89.574803 235.975433 
+L 2.834646 235.975433 
+L 2.834646 269.491654 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_5">
+   <path d="M 109.417323 78.840945 
+L 196.15748 78.840945 
+L 196.15748 17.004724 
+L 109.417323 17.004724 
+L 109.417323 78.840945 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_6">
+   <path d="M 109.417323 143.142677 
+L 196.15748 143.142677 
+L 196.15748 90.746457 
+L 109.417323 90.746457 
+L 109.417323 143.142677 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_7">
+   <path d="M 109.417323 198.004409 
+L 196.15748 198.004409 
+L 196.15748 155.048189 
+L 109.417323 155.048189 
+L 109.417323 198.004409 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_8">
+   <path d="M 109.417323 271.746142 
+L 196.15748 271.746142 
+L 196.15748 209.909921 
+L 109.417323 209.909921 
+L 109.417323 271.746142 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_9">
+   <path d="M 109.417323 336.047874 
+L 196.15748 336.047874 
+L 196.15748 283.651654 
+L 109.417323 283.651654 
+L 109.417323 336.047874 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_10">
+   <path d="M 216 108.822992 
+L 302.740157 108.822992 
+L 302.740157 56.426772 
+L 216 56.426772 
+L 216 108.822992 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_11">
+   <path d="M 216 173.124724 
+L 302.740157 173.124724 
+L 302.740157 120.728504 
+L 216 120.728504 
+L 216 173.124724 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_12">
+   <path d="M 216 237.426457 
+L 302.740157 237.426457 
+L 302.740157 185.030236 
+L 216 185.030236 
+L 216 237.426457 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_13">
+   <path d="M 216 311.168189 
+L 302.740157 311.168189 
+L 302.740157 249.331969 
+L 216 249.331969 
+L 216 311.168189 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_14">
+   <path d="M 322.582677 99.382992 
+L 409.322835 99.382992 
+L 409.322835 56.426772 
+L 322.582677 56.426772 
+L 322.582677 99.382992 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_15">
+   <path d="M 322.582677 154.244724 
+L 409.322835 154.244724 
+L 409.322835 111.288504 
+L 322.582677 111.288504 
+L 322.582677 154.244724 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_16">
+   <path d="M 322.582677 227.986457 
+L 409.322835 227.986457 
+L 409.322835 166.150236 
+L 322.582677 166.150236 
+L 322.582677 227.986457 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_17">
+   <path d="M 322.582677 282.848189 
+L 409.322835 282.848189 
+L 409.322835 239.891969 
+L 322.582677 239.891969 
+L 322.582677 282.848189 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_18">
+   <path d="M 429.165354 78.840945 
+L 515.905512 78.840945 
+L 515.905512 17.004724 
+L 429.165354 17.004724 
+L 429.165354 78.840945 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_19">
+   <path d="M 429.165354 143.142677 
+L 515.905512 143.142677 
+L 515.905512 90.746457 
+L 429.165354 90.746457 
+L 429.165354 143.142677 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_20">
+   <path d="M 429.165354 216.884409 
+L 515.905512 216.884409 
+L 515.905512 155.048189 
+L 429.165354 155.048189 
+L 429.165354 216.884409 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_21">
+   <path d="M 429.165354 300.066142 
+L 515.905512 300.066142 
+L 515.905512 228.789921 
+L 429.165354 228.789921 
+L 429.165354 300.066142 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_22">
+   <path d="M 216 384.909921 
+L 302.740157 384.909921 
+L 302.740157 323.073701 
+L 216 323.073701 
+L 216 384.909921 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_23">
+   <path d="M 322.582677 347.149921 
+L 409.322835 347.149921 
+L 409.322835 294.753701 
+L 322.582677 294.753701 
+L 322.582677 347.149921 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_24">
+   <path d="M 429.165354 364.367874 
+L 515.905512 364.367874 
+L 515.905512 311.971654 
+L 429.165354 311.971654 
+L 429.165354 364.367874 
+z
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="patch_25">
+   <path d="M 46.204724 145.397197 
+L 47.871496 149.365701 
+L 44.537953 149.365701 
+z
+"/>
+  </g>
+  <g id="patch_26">
+   <path d="M 46.204724 235.975465 
+L 44.537953 232.006961 
+L 47.871496 232.006961 
+z
+"/>
+  </g>
+  <g id="patch_27">
+   <path d="M 109.417323 37.616882 
+L 105.448819 39.283654 
+L 105.448819 35.95011 
+z
+"/>
+  </g>
+  <g id="patch_28">
+   <path d="M 109.417323 114.47915 
+L 105.448819 116.145921 
+L 105.448819 112.812378 
+z
+"/>
+  </g>
+  <g id="patch_29">
+   <path d="M 109.417323 58.229008 
+L 105.448819 59.89578 
+L 105.448819 56.562236 
+z
+"/>
+  </g>
+  <g id="patch_30">
+   <path d="M 109.417323 252.733606 
+L 105.448819 254.400378 
+L 105.448819 251.066835 
+z
+"/>
+  </g>
+  <g id="patch_31">
+   <path d="M 109.417323 309.849732 
+L 105.448819 311.516504 
+L 105.448819 308.182961 
+z
+"/>
+  </g>
+  <g id="patch_32">
+   <path d="M 216 82.624819 
+L 212.031496 84.291591 
+L 212.031496 80.958047 
+z
+"/>
+  </g>
+  <g id="patch_33">
+   <path d="M 216 146.926488 
+L 212.031496 148.59326 
+L 212.031496 145.259717 
+z
+"/>
+  </g>
+  <g id="patch_34">
+   <path d="M 216 211.228441 
+L 212.031496 212.895213 
+L 212.031496 209.561669 
+z
+"/>
+  </g>
+  <g id="patch_35">
+   <path d="M 322.582677 132.766583 
+L 318.614173 134.433354 
+L 318.614173 131.099811 
+z
+"/>
+  </g>
+  <g id="patch_36">
+   <path d="M 429.165354 47.922803 
+L 425.19685 49.589575 
+L 425.19685 46.256031 
+z
+"/>
+  </g>
+  <g id="patch_37">
+   <path d="M 429.165354 116.944441 
+L 425.19685 118.611213 
+L 425.19685 115.277669 
+z
+"/>
+  </g>
+  <g id="patch_38">
+   <path d="M 152.787402 209.910047 
+L 151.12063 205.941543 
+L 154.454173 205.941543 
+z
+"/>
+  </g>
+  <g id="patch_39">
+   <path d="M 216 280.250079 
+L 212.031496 281.91685 
+L 212.031496 278.583307 
+z
+"/>
+  </g>
+  <g id="patch_40">
+   <path d="M 259.370079 249.332031 
+L 257.703307 245.363528 
+L 261.03685 245.363528 
+z
+"/>
+  </g>
+  <g id="patch_41">
+   <path d="M 365.952756 99.382961 
+L 367.619528 103.351465 
+L 364.285984 103.351465 
+z
+"/>
+  </g>
+  <g id="patch_42">
+   <path d="M 365.952756 166.150205 
+L 364.285984 162.181701 
+L 367.619528 162.181701 
+z
+"/>
+  </g>
+  <g id="patch_43">
+   <path d="M 365.952756 239.892094 
+L 364.285984 235.923591 
+L 367.619528 235.923591 
+z
+"/>
+  </g>
+  <g id="patch_44">
+   <path d="M 429.165354 185.966362 
+L 425.19685 187.633134 
+L 425.19685 184.299591 
+z
+"/>
+  </g>
+  <g id="patch_45">
+   <path d="M 429.165354 288.801071 
+L 425.19685 290.467843 
+L 425.19685 287.134299 
+z
+"/>
+  </g>
+  <g id="patch_46">
+   <path d="M 322.582677 312.219213 
+L 318.614173 313.885984 
+L 318.614173 310.552441 
+z
+"/>
+  </g>
+  <g id="patch_47">
+   <path d="M 322.582677 329.684598 
+L 318.614173 331.35137 
+L 318.614173 328.017827 
+z
+"/>
+  </g>
+  <g id="patch_48">
+   <path d="M 429.165354 320.951906 
+L 425.19685 322.618677 
+L 425.19685 319.285134 
+z
+"/>
+  </g>
+  <g id="patch_49">
+   <path d="M 216 353.991685 
+L 212.031496 355.658457 
+L 212.031496 352.324913 
+z
+"/>
+  </g>
+  <g id="line2d_1">
+   <path d="M 46.204724 169.20822 
+L 46.204724 148.96885 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_2">
+   <path d="M 46.204724 212.164441 
+L 46.204724 232.403811 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_3">
+   <path d="M 89.574803 114.47915 
+L 96.188882 114.47915 
+L 96.188882 37.616882 
+L 105.845669 37.616882 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_4">
+   <path d="M 89.574803 114.47915 
+L 105.845669 114.47915 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_5">
+   <path d="M 89.574803 252.733606 
+L 102.803244 252.733606 
+L 102.803244 58.229008 
+L 105.845669 58.229008 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_6">
+   <path d="M 89.574803 252.733606 
+L 105.845669 252.733606 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_7">
+   <path d="M 89.574803 252.733606 
+L 102.803244 252.733606 
+L 102.803244 309.849732 
+L 105.845669 309.849732 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_8">
+   <path d="M 196.15748 47.922803 
+L 209.385921 47.922803 
+L 209.385921 82.624819 
+L 212.428346 82.624819 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_9">
+   <path d="M 196.15748 47.922803 
+L 209.385921 47.922803 
+L 209.385921 146.926488 
+L 212.428346 146.926488 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_10">
+   <path d="M 196.15748 47.922803 
+L 209.385921 47.922803 
+L 209.385921 211.228441 
+L 212.428346 211.228441 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_11">
+   <path d="M 196.15748 47.922803 
+L 312.661417 47.922803 
+L 312.661417 132.766583 
+L 319.011024 132.766583 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_12">
+   <path d="M 196.15748 47.922803 
+L 425.593701 47.922803 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_13">
+   <path d="M 196.15748 47.922803 
+L 414.283465 47.922803 
+L 414.283465 116.944441 
+L 425.593701 116.944441 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_14">
+   <path d="M 152.787402 198.004535 
+L 152.787402 206.338394 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_15">
+   <path d="M 196.15748 176.526425 
+L 202.771559 176.526425 
+L 202.771559 280.250079 
+L 212.428346 280.250079 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_16">
+   <path d="M 259.370079 237.42652 
+L 259.370079 245.760378 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_17">
+   <path d="M 365.952756 111.288472 
+L 365.952756 102.954614 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_18">
+   <path d="M 365.952756 154.244693 
+L 365.952756 162.578551 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_19">
+   <path d="M 365.952756 227.986583 
+L 365.952756 236.320441 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_20">
+   <path d="M 196.15748 47.922803 
+L 414.283465 47.922803 
+L 414.283465 185.966362 
+L 425.593701 185.966362 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_21">
+   <path d="M 302.740157 146.926488 
+L 317.622047 146.926488 
+L 317.622047 288.801071 
+L 425.593701 288.801071 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_22">
+   <path d="M 196.15748 47.922803 
+L 312.661417 47.922803 
+L 312.661417 312.219213 
+L 319.011024 312.219213 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_23">
+   <path d="M 302.740157 211.228441 
+L 307.700787 211.228441 
+L 307.700787 329.684598 
+L 319.011024 329.684598 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_24">
+   <path d="M 409.322835 320.951906 
+L 425.593701 320.951906 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="line2d_25">
+   <path d="M 196.15748 47.922803 
+L 209.385921 47.922803 
+L 209.385921 353.991685 
+L 212.428346 353.991685 
+" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+  </g>
+  <g id="s448num_0">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start; fill: #5a5a5a" x="2.834646" y="9.634646" transform="rotate(-0 2.834646 9.634646)">Corpus and choices</text>
+  </g>
+  <g id="s448num_1">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start; fill: #5a5a5a" x="109.417323" y="9.634646" transform="rotate(-0 109.417323 9.634646)">Core experiments</text>
+  </g>
+  <g id="s448num_2">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start; fill: #5a5a5a" x="216" y="9.634646" transform="rotate(-0 216 9.634646)">Built on the core</text>
+  </g>
+  <g id="s448num_3">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start; fill: #5a5a5a" x="322.582677" y="9.634646" transform="rotate(-0 322.582677 9.634646)">Ablation</text>
+  </g>
+  <g id="s448num_4">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start; fill: #5a5a5a" x="429.165354" y="9.634646" transform="rotate(-0 429.165354 9.634646)">Replication and reuse</text>
+  </g>
+  <g id="s448num_5">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="5.952756" y="92.679055" transform="rotate(-0 5.952756 92.679055)">Retrieval</text>
+  </g>
+  <g id="s448num_6">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="5.952756" y="102.119055" transform="rotate(-0 5.952756 102.119055)">optimization</text>
+  </g>
+  <g id="s448num_7">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="5.952756" y="111.559055" transform="rotate(-0 5.952756 111.559055)">4 embedding models,</text>
+  </g>
+  <g id="s448num_8">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="5.952756" y="120.999055" transform="rotate(-0 5.952756 120.999055)">8 chunkings, 7 search</text>
+  </g>
+  <g id="s448num_9">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="5.952756" y="130.439055" transform="rotate(-0 5.952756 130.439055)">strategies</text>
+  </g>
+  <g id="s448num_10">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="5.952756" y="139.879055" transform="rotate(-0 5.952756 139.879055)">1 run</text>
+  </g>
+  <g id="s448num_11">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="5.952756" y="178.326299" transform="rotate(-0 5.952756 178.326299)">Evaluation corpus</text>
+  </g>
+  <g id="s448num_12">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="5.952756" y="187.766299" transform="rotate(-0 5.952756 187.766299)">244 questions on 50</text>
+  </g>
+  <g id="s448num_13">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="5.952756" y="197.206299" transform="rotate(-0 5.952756 197.206299)">core papers</text>
+  </g>
+  <g id="s448num_14">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="5.952756" y="206.646299" transform="rotate(-0 5.952756 206.646299)">150 distractor papers</text>
+  </g>
+  <g id="s448num_15">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="5.952756" y="245.093543" transform="rotate(-0 5.952756 245.093543)">Model selection</text>
+  </g>
+  <g id="s448num_16">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="5.952756" y="254.533543" transform="rotate(-0 5.952756 254.533543)">10 language models</text>
+  </g>
+  <g id="s448num_17">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="5.952756" y="263.973543" transform="rotate(-0 5.952756 263.973543)">from 6 makers</text>
+  </g>
+  <g id="s448num_18">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="26.122835" transform="rotate(-0 112.535433 26.122835)">Generation</text>
+  </g>
+  <g id="s448num_19">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="35.562835" transform="rotate(-0 112.535433 35.562835)">strategies</text>
+  </g>
+  <g id="s448num_20">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="45.002835" transform="rotate(-0 112.535433 45.002835)">6 strategies × 135</text>
+  </g>
+  <g id="s448num_21">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="54.442835" transform="rotate(-0 112.535433 54.442835)">questions</text>
+  </g>
+  <g id="s448num_22">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="63.882835" transform="rotate(-0 112.535433 63.882835)">gemini-3-flash</text>
+  </g>
+  <g id="s448num_23">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="73.322835" transform="rotate(-0 112.535433 73.322835)">3 draws</text>
+  </g>
+  <g id="s448num_24">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="99.864567" transform="rotate(-0 112.535433 99.864567)">No retrieval and</text>
+  </g>
+  <g id="s448num_25">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="109.304567" transform="rotate(-0 112.535433 109.304567)">naive RAG</text>
+  </g>
+  <g id="s448num_26">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="118.744567" transform="rotate(-0 112.535433 118.744567)">2 baselines × 135</text>
+  </g>
+  <g id="s448num_27">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="128.184567" transform="rotate(-0 112.535433 128.184567)">questions</text>
+  </g>
+  <g id="s448num_28">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="137.624567" transform="rotate(-0 112.535433 137.624567)">3 draws</text>
+  </g>
+  <g id="s448num_29">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="164.166299" transform="rotate(-0 112.535433 164.166299)">Retrieval depth</text>
+  </g>
+  <g id="s448num_30">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="173.606299" transform="rotate(-0 112.535433 173.606299)">RLM at 10 turn caps ×</text>
+  </g>
+  <g id="s448num_31">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="183.046299" transform="rotate(-0 112.535433 183.046299)">86 questions</text>
+  </g>
+  <g id="s448num_32">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="192.486299" transform="rotate(-0 112.535433 192.486299)">3 draws</text>
+  </g>
+  <g id="s448num_33">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="219.028031" transform="rotate(-0 112.535433 219.028031)">Retrieval depth, local</text>
+  </g>
+  <g id="s448num_34">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="228.468031" transform="rotate(-0 112.535433 228.468031)">models</text>
+  </g>
+  <g id="s448num_35">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="237.908031" transform="rotate(-0 112.535433 237.908031)">RLM at 6 turn caps ×</text>
+  </g>
+  <g id="s448num_36">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="247.348031" transform="rotate(-0 112.535433 247.348031)">4 local models × 15</text>
+  </g>
+  <g id="s448num_37">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="256.788031" transform="rotate(-0 112.535433 256.788031)">questions</text>
+  </g>
+  <g id="s448num_38">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="266.228031" transform="rotate(-0 112.535433 266.228031)">1 draw</text>
+  </g>
+  <g id="s448num_39">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="292.769764" transform="rotate(-0 112.535433 292.769764)">Code generation</text>
+  </g>
+  <g id="s448num_40">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="302.209764" transform="rotate(-0 112.535433 302.209764)">11 strategies × 11</text>
+  </g>
+  <g id="s448num_41">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="311.649764" transform="rotate(-0 112.535433 311.649764)">model variants × 20</text>
+  </g>
+  <g id="s448num_42">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="321.089764" transform="rotate(-0 112.535433 321.089764)">operations</text>
+  </g>
+  <g id="s448num_43">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="112.535433" y="330.529764" transform="rotate(-0 112.535433 330.529764)">1 draw</text>
+  </g>
+  <g id="s448num_44">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="65.544882" transform="rotate(-0 219.11811 65.544882)">Matched-budget arm</text>
+  </g>
+  <g id="s448num_45">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="74.984882" transform="rotate(-0 219.11811 74.984882)">single pass at</text>
+  </g>
+  <g id="s448num_46">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="84.424882" transform="rotate(-0 219.11811 84.424882)">matched budget × 135</text>
+  </g>
+  <g id="s448num_47">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="93.864882" transform="rotate(-0 219.11811 93.864882)">questions</text>
+  </g>
+  <g id="s448num_48">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="103.304882" transform="rotate(-0 219.11811 103.304882)">3 draws</text>
+  </g>
+  <g id="s448num_49">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="129.846614" transform="rotate(-0 219.11811 129.846614)">Corpus scaling</text>
+  </g>
+  <g id="s448num_50">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="139.286614" transform="rotate(-0 219.11811 139.286614)">12 indexes × 6</text>
+  </g>
+  <g id="s448num_51">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="148.726614" transform="rotate(-0 219.11811 148.726614)">strategies × the</text>
+  </g>
+  <g id="s448num_52">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="158.166614" transform="rotate(-0 219.11811 158.166614)">questions in scope</text>
+  </g>
+  <g id="s448num_53">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="167.606614" transform="rotate(-0 219.11811 167.606614)">1 + 2 draws</text>
+  </g>
+  <g id="s448num_54">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="194.148346" transform="rotate(-0 219.11811 194.148346)">Zhang RLM at caps</text>
+  </g>
+  <g id="s448num_55">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="203.588346" transform="rotate(-0 219.11811 203.588346)">5, 10 and 20</text>
+  </g>
+  <g id="s448num_56">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="213.028346" transform="rotate(-0 219.11811 213.028346)">Zhang RLM at 3 turn</text>
+  </g>
+  <g id="s448num_57">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="222.468346" transform="rotate(-0 219.11811 222.468346)">caps × 135 questions</text>
+  </g>
+  <g id="s448num_58">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="231.908346" transform="rotate(-0 219.11811 231.908346)">3 draws</text>
+  </g>
+  <g id="s448num_59">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="258.450079" transform="rotate(-0 219.11811 258.450079)">Zhang RLM at the</text>
+  </g>
+  <g id="s448num_60">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="267.890079" transform="rotate(-0 219.11811 267.890079)">depth caps</text>
+  </g>
+  <g id="s448num_61">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="277.330079" transform="rotate(-0 219.11811 277.330079)">Zhang RLM at 7 more</text>
+  </g>
+  <g id="s448num_62">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="286.770079" transform="rotate(-0 219.11811 286.770079)">turn caps × 86</text>
+  </g>
+  <g id="s448num_63">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="296.210079" transform="rotate(-0 219.11811 296.210079)">questions</text>
+  </g>
+  <g id="s448num_64">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="305.650079" transform="rotate(-0 219.11811 305.650079)">3 draws</text>
+  </g>
+  <g id="s448num_65">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="65.544882" transform="rotate(-0 325.700787 65.544882)">Always distil (stress)</text>
+  </g>
+  <g id="s448num_66">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="74.984882" transform="rotate(-0 325.700787 74.984882)">2 stress set-ups × 135</text>
+  </g>
+  <g id="s448num_67">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="84.424882" transform="rotate(-0 325.700787 84.424882)">questions</text>
+  </g>
+  <g id="s448num_68">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="93.864882" transform="rotate(-0 325.700787 93.864882)">1 + 2 draws</text>
+  </g>
+  <g id="s448num_69">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="120.406614" transform="rotate(-0 325.700787 120.406614)">Pipeline ablation</text>
+  </g>
+  <g id="s448num_70">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="129.846614" transform="rotate(-0 325.700787 129.846614)">6 orchestrator set-ups</text>
+  </g>
+  <g id="s448num_71">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="139.286614" transform="rotate(-0 325.700787 139.286614)">× 135 questions</text>
+  </g>
+  <g id="s448num_72">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="148.726614" transform="rotate(-0 325.700787 148.726614)">1 + 2 draws</text>
+  </g>
+  <g id="s448num_73">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="175.268346" transform="rotate(-0 325.700787 175.268346)">Component</text>
+  </g>
+  <g id="s448num_74">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="184.708346" transform="rotate(-0 325.700787 184.708346)">benchmarks</text>
+  </g>
+  <g id="s448num_75">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="194.148346" transform="rotate(-0 325.700787 194.148346)">6 models × 832</text>
+  </g>
+  <g id="s448num_76">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="203.588346" transform="rotate(-0 325.700787 203.588346)">benchmark items</text>
+  </g>
+  <g id="s448num_77">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="213.028346" transform="rotate(-0 325.700787 213.028346)">1 draw;</text>
+  </g>
+  <g id="s448num_78">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="222.468346" transform="rotate(-0 325.700787 222.468346)">gemini-3-flash 3</text>
+  </g>
+  <g id="s448num_79">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="249.010079" transform="rotate(-0 325.700787 249.010079)">Distiller intervention</text>
+  </g>
+  <g id="s448num_80">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="258.450079" transform="rotate(-0 325.700787 258.450079)">2 prompts × 6 models</text>
+  </g>
+  <g id="s448num_81">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="267.890079" transform="rotate(-0 325.700787 267.890079)">× 97 items</text>
+  </g>
+  <g id="s448num_82">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="277.330079" transform="rotate(-0 325.700787 277.330079)">1 draw</text>
+  </g>
+  <g id="s448num_83">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="26.122835" transform="rotate(-0 432.283465 26.122835)">Strategy replication</text>
+  </g>
+  <g id="s448num_84">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="35.562835" transform="rotate(-0 432.283465 35.562835)">4 generation models ×</text>
+  </g>
+  <g id="s448num_85">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="45.002835" transform="rotate(-0 432.283465 45.002835)">6 strategies × 135</text>
+  </g>
+  <g id="s448num_86">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="54.442835" transform="rotate(-0 432.283465 54.442835)">questions</text>
+  </g>
+  <g id="s448num_87">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="63.882835" transform="rotate(-0 432.283465 63.882835)">3 draws, RLM on a</text>
+  </g>
+  <g id="s448num_88">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="73.322835" transform="rotate(-0 432.283465 73.322835)">third</text>
+  </g>
+  <g id="s448num_89">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="99.864567" transform="rotate(-0 432.283465 99.864567)">Plant-science reuse</text>
+  </g>
+  <g id="s448num_90">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="109.304567" transform="rotate(-0 432.283465 109.304567)">demonstration</text>
+  </g>
+  <g id="s448num_91">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="118.744567" transform="rotate(-0 432.283465 118.744567)">6 strategies × 5</text>
+  </g>
+  <g id="s448num_92">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="128.184567" transform="rotate(-0 432.283465 128.184567)">questions on 5 papers</text>
+  </g>
+  <g id="s448num_93">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="137.624567" transform="rotate(-0 432.283465 137.624567)">3 draws</text>
+  </g>
+  <g id="s448num_94">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="164.166299" transform="rotate(-0 432.283465 164.166299)">Short-passage</text>
+  </g>
+  <g id="s448num_95">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="173.606299" transform="rotate(-0 432.283465 173.606299)">single pass</text>
+  </g>
+  <g id="s448num_96">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="183.046299" transform="rotate(-0 432.283465 183.046299)">single pass with each</text>
+  </g>
+  <g id="s448num_97">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="192.486299" transform="rotate(-0 432.283465 192.486299)">passage cut to its first</text>
+  </g>
+  <g id="s448num_98">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="201.926299" transform="rotate(-0 432.283465 201.926299)">800 characters</text>
+  </g>
+  <g id="s448num_99">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="211.366299" transform="rotate(-0 432.283465 211.366299)">1 + 2 draws</text>
+  </g>
+  <g id="s448num_100">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="237.908031" transform="rotate(-0 432.283465 237.908031)">Flat wide call</text>
+  </g>
+  <g id="s448num_101">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="247.348031" transform="rotate(-0 432.283465 247.348031)">3 indexes × 1 call at a</text>
+  </g>
+  <g id="s448num_102">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="256.788031" transform="rotate(-0 432.283465 256.788031)">fixed passage count</text>
+  </g>
+  <g id="s448num_103">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="266.228031" transform="rotate(-0 432.283465 266.228031)">index with no</text>
+  </g>
+  <g id="s448num_104">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="275.668031" transform="rotate(-0 432.283465 275.668031)">distractors:</text>
+  </g>
+  <g id="s448num_105">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="285.108031" transform="rotate(-0 432.283465 285.108031)">draw 1 only</text>
+  </g>
+  <g id="s448num_106">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="294.548031" transform="rotate(-0 432.283465 294.548031)">1 + 2 draws</text>
+  </g>
+  <g id="s448num_107">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="332.191811" transform="rotate(-0 219.11811 332.191811)">Judge with evidence</text>
+  </g>
+  <g id="s448num_108">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="341.631811" transform="rotate(-0 219.11811 341.631811)">4 arms (no source,</text>
+  </g>
+  <g id="s448num_109">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="351.071811" transform="rotate(-0 219.11811 351.071811)">own papers, unrelated</text>
+  </g>
+  <g id="s448num_110">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="360.511811" transform="rotate(-0 219.11811 360.511811)">papers, repeat) × 366</text>
+  </g>
+  <g id="s448num_111">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="369.951811" transform="rotate(-0 219.11811 369.951811)">answers</text>
+  </g>
+  <g id="s448num_112">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="219.11811" y="379.391811" transform="rotate(-0 219.11811 379.391811)">1 draw</text>
+  </g>
+  <g id="s448num_113">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="303.871811" transform="rotate(-0 325.700787 303.871811)">RLM ablation</text>
+  </g>
+  <g id="s448num_114">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="313.311811" transform="rotate(-0 325.700787 313.311811)">3 arms (control,</text>
+  </g>
+  <g id="s448num_115">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="322.751811" transform="rotate(-0 325.700787 322.751811)">search off, gate off) ×</text>
+  </g>
+  <g id="s448num_116">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="332.191811" transform="rotate(-0 325.700787 332.191811)">86 questions</text>
+  </g>
+  <g id="s448num_117">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="325.700787" y="341.631811" transform="rotate(-0 325.700787 341.631811)">3 draws</text>
+  </g>
+  <g id="s448num_118">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="321.089764" transform="rotate(-0 432.283465 321.089764)">RLM ablation, local</text>
+  </g>
+  <g id="s448num_119">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="330.529764" transform="rotate(-0 432.283465 330.529764)">generators</text>
+  </g>
+  <g id="s448num_120">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="339.969764" transform="rotate(-0 432.283465 339.969764)">3 arms × 2 generators</text>
+  </g>
+  <g id="s448num_121">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="349.409764" transform="rotate(-0 432.283465 349.409764)">× 46 questions</text>
+  </g>
+  <g id="s448num_122">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="432.283465" y="358.849764" transform="rotate(-0 432.283465 358.849764)">1 draw</text>
+  </g>
+  <g id="s448num_123">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start; fill: #5a5a5a" x="2.834646" y="405.08315" transform="rotate(-0 2.834646 405.08315)">Draws</text>
+  </g>
+  <g id="s448num_124">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="2.834646" y="414.52315" transform="rotate(-0 2.834646 414.52315)">3 draws</text>
+  </g>
+  <g id="s448num_125">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="101.563583" y="414.52315" transform="rotate(-0 101.563583 414.52315)">every question answered three times</text>
+  </g>
+  <g id="s448num_126">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="2.834646" y="423.96315" transform="rotate(-0 2.834646 423.96315)">1 + 2 draws</text>
+  </g>
+  <g id="s448num_127">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="101.563583" y="423.96315" transform="rotate(-0 101.563583 423.96315)">every question answered once, and a fixed third of them twice more</text>
+  </g>
+  <g id="s448num_128">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="2.834646" y="433.40315" transform="rotate(-0 2.834646 433.40315)">3 draws, RLM on a third</text>
+  </g>
+  <g id="s448num_129">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="101.563583" y="433.40315" transform="rotate(-0 101.563583 433.40315)">every question answered three times, except by the RLM set-ups, which answer a fixed third of them three times</text>
+  </g>
+  <g id="s448num_130">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="2.834646" y="442.84315" transform="rotate(-0 2.834646 442.84315)">1 draw</text>
+  </g>
+  <g id="s448num_131">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="101.563583" y="442.84315" transform="rotate(-0 101.563583 442.84315)">every question answered once</text>
+  </g>
+  <g id="s448num_132">
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="2.834646" y="452.28315" transform="rotate(-0 2.834646 452.28315)">1 run</text>
+  </g>
+  <g id="s448num_133">
+   <text style="font-size: 8px; font-family: 'Helvetica'; text-anchor: start" x="101.563583" y="452.28315" transform="rotate(-0 101.563583 452.28315)">each retrieval query scored once</text>
+  </g>
+ </g>
+</svg>

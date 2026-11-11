@@ -45,7 +45,8 @@ def sha(p):
 
 def rows():
     r1 = json.loads(R1.read_text())["all_answers"]
-    r2 = json.loads(R2.read_text())["table_A"]
+    r2_all = json.loads(R2.read_text())
+    r2 = r2_all["table_A"]
     if round(r2["devstral-small-2:24b"]["composite"], 3) != 0.576 or round(r2["qwen3.8:27b-mlx"]["composite"], 3) != 0.628:
         sys.exit("S583: round 2 composites do not reproduce D8's 0.576 and 0.628")
     out = []
@@ -54,7 +55,7 @@ def rows():
                     f"{v['ci95'][0]:.3f} to {v['ci95'][1]:.3f}", round(v["correctness~similarity"], 3),
                     round(v["completeness~concept_recall"], 3), round(v["citation~citation_composite"], 3)])
     for j, v in sorted(r2.items(), key=lambda kv: -kv[1]["composite"]):
-        out.append(["2 (1,500 answers)", j, f"{v['n']:,}", round(v["composite"], 3),
+        out.append(["2 (1,500 answers)", j, f"{v['n']:,} of {r2_all['n_planned']:,}", round(v["composite"], 3),   # D309 A73
                     f"{v['ci95'][0]:.3f} to {v['ci95'][1]:.3f}", round(v["correctness~semantic_similarity"], 3),
                     round(v["completeness~concept_recall"], 3), round(v["citation_quality~cite_composite"], 3)])
     return out
@@ -68,6 +69,10 @@ def main():
     ws.append(HEAD)
     for r in body:
         ws.append(r)
+    for row in ws.iter_rows(min_row=2):              # D309 A73: three decimals throughout, trailing zeros kept
+        for c in row:
+            if isinstance(c.value, float):
+                c.number_format = "0.000"
     r1 = json.loads(R1.read_text())["all_answers"]
     r2 = json.loads(R2.read_text())["table_A"]
     a1 = {v["n_calls"] for v in r1.values()}
@@ -83,7 +88,7 @@ def main():
     wb.save(OUT.with_suffix(".xlsx"))
     fig_repro.deterministic_xlsx(OUT.with_suffix(".xlsx"))   # bytes from content only, so a rerun is byte-equal (S608, 9 Nov)
     md = [f"# {TITLE}", "", note, "", "| " + " | ".join(HEAD) + " |", "|" + "---|" * len(HEAD)]
-    md += ["| " + " | ".join(str(c) for c in r) + " |" for r in body]
+    md += ["| " + " | ".join(f"{c:.3f}" if isinstance(c, float) else str(c) for c in r) + " |" for r in body]   # D309 A73
     OUT.with_suffix(".md").write_text("\n".join(md) + "\n")
     print("\n".join(md))
 

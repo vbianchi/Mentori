@@ -1,0 +1,19 @@
+{
+ "id": "CD_015",
+ "category": "cross_document",
+ "subcategory": "complementary",
+ "question": "How do fastp and Cutadapt differ in how they find the adapters they trim?",
+ "papers": [
+  {
+   "paper": "04_fastp",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/04_fastp.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/04_fastp.pypdf.txt"
+  },
+  {
+   "paper": "10_cutadapt",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/10_cutadapt.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/10_cutadapt.pypdf.txt"
+  }
+ ],
+ "replaces_question": "How might the use of ultra-fast preprocessing tools like fastp or specialized trimming tools like Cutadapt facilitate the epidemiological investigation of bovine tuberculosis (bTB)?"
+}

@@ -2296,7 +2296,7 @@
  ],
  "rows": 360,
  "script": "scripts/S476_fig3_d123.py",
- "script_sha256": "535add18e3e795d4250651b07b71114284a901b8329a255ab11a2b48a39c04c7",
+ "script_sha256": "06faebaa66525ef6155d2878b6440a54cc22ddb430ce8b7dee2a30ccb8226153",
  "seed": 20261013,
  "what": "T1 (D97, D118, D121): every stored draw-1 answer of the four local models, concept recall on the loose matcher (S474.score, provisional until P2's labels choose the matcher, D17), a failed answer 0 (Rule 10); per model and cap the mean over the questions every model not held stored at every cap (D118)"
 }

@@ -1,0 +1,18 @@
+{
+ "id": "CD_013",
+ "category": "cross_document",
+ "subcategory": "comparison",
+ "question": "How do the clinical manifestations and species-specific impacts of HPAI Clade 2.3.4.4 outbreaks compare between the intensive poultry sector in the Netherlands (2014-2022) and the broader ecological crisis observed in Canada during 2022?",
+ "papers": [
+  {
+   "paper": "12_hpai_netherlands",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/12_hpai_netherlands.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/12_hpai_netherlands.pypdf.txt"
+  },
+  {
+   "paper": "19_hpai_canada",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/19_hpai_canada.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/19_hpai_canada.pypdf.txt"
+  }
+ ]
+}

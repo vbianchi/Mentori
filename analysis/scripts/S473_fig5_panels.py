@@ -77,7 +77,7 @@ COMMANDS, from the repository root (uv run only; no model call, nothing written 
            scripts/S497_fig5_d166.py draws (S494 calls S497 for Figure 5). This command draws S473's own plate of 26
            October (the design before D166) and refuses to run without --out, so it never overwrites the locked plate.
            Reproduces, reads, checks, computes and writes into --out:
-           "Figure 5 (provisional, <n> of <m>).{pdf,svg,png}", "Source Data Fig. 5 (...).xlsx" and its caption,
+           "Figure 5.{pdf,svg,png}", "Source Data Fig. 5.xlsx" and its caption,
            figure5_numbers.json, figure5_provenance.json and legend_draft.md (what S448 reads). n of m: n counts the
            draw-1 answerable answers with a final row from all four scorers (a null or an unscored row with a final
            status counts; see compute's all4), m the 516 planned for MiniCheck against the papers (PLANNED["papers"]).
@@ -1522,7 +1522,7 @@ def legend_text(fn, stamp, have):
 
 def caption_text(stamp, tag):
     return (f"# Source Data Fig. 5, caption\n\n**Source Data Fig. 5 | Numerical values plotted in Figure 5.** "
-            f"Provisional{tag}. Data stamp: {stamp}. One sheet per panel. Sheet Fig. 5a: per strategy and signal "
+            f"Data stamp: {stamp}. One sheet per panel. Sheet Fig. 5a: per strategy and signal "
             f"(the judge's pass rate against the key at score {PASS_T} or more, drawn, and at the relaxed threshold of "
             f"{PASS_RELAXED} or more, in Source Data only; MiniCheck precision against the papers) a 'summary' row (mean, "
             "its 95% percentile interval over 10,000 question resamples, median, quartiles, questions, answers, draws) "
@@ -1617,7 +1617,7 @@ def _docx_text(p) -> str:
 def claims_md(fn, stamp):
     texts = {k: _docx_text(p) for k, p in CLAIM_DOCS.items() if p.exists()}
     out = ["# Figure 5: claims list (D82)", "",
-           f"Written by `{SCRIPT} figure` with the plate it sits beside. Data stamp: {stamp}.", "",
+           f"Written by `{SCRIPT} figure` with the plate it sits beside.", "",
            "Every Figure 6 number S393 and S318 located in the submitted Main Text, the Figure 5 legend and the letter, "
            "against what S473 computes now. Provisional: the comparison is read again on the final run. D304 (8 "
            "November): each row is anchored on the sentence of the agreed text (Claude Docs rev 3688) that now states "
@@ -1705,13 +1705,13 @@ def _figure(args, tmp: Path):
         from datetime import datetime, timezone
         when = datetime.fromisoformat(when).astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     n4 = fn["all4"]
-    stamp = (f"PROVISIONAL: {n4} of {PLANNED['papers']} draw-1 answerable answers have a final row from all four "
+    stamp = (f"{n4} of {PLANNED['papers']} draw-1 answerable answers have a final row from all four "
              f"scorers; judge plain "
              f"call {have['judge']:,} of {PLANNED['judge']:,}, concept recall {have['concept']:,} of "
              f"{PLANNED['concept']:,}, MiniCheck against the papers {have['papers']:,} of {PLANNED['papers']:,} "
              f"(draw 1), judge with passages {have['faith']:,} of {PLANNED['faith']:,}; read "
              f"{pull_log['ended_utc']} (S3 collect {when}, run_sha256 {str(read['run_sha256'])[:12]})")
-    tag = f" (provisional, {n4} of {PLANNED['papers']})"
+    tag = ""                                  # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
     plate = f"Figure 5{tag}"
     sd = f"Source Data Fig. 5{tag}"
     sheets = build_sheets(fn, stamp)
@@ -1734,7 +1734,7 @@ def _figure(args, tmp: Path):
     leg = legend_text(fn, stamp, have)
     (stage / "legend_draft.md").write_text(
         "# Figure 5, title and legend (draft)\n\n"
-        f"Written by `{SCRIPT} figure` from the plotted numbers. Data stamp: {stamp}.\n\n" + leg + "\n")
+        f"Written by `{SCRIPT} figure` from the plotted numbers.\n\n" + leg + "\n")
     (stage / "claims.md").write_text(claims_md(fn, stamp))
     state = {"stamp": stamp, "planned": PLANNED, "have": have, "answers_with_all_four": n4,
              "W_questions": fn["c"]["questions"], "W_partial_blocks_left_out": fn["c"]["partial_blocks_left_out"],

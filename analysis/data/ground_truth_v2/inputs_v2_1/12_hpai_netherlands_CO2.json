@@ -1,0 +1,13 @@
+{
+ "id": "12_hpai_netherlands_CO2",
+ "category": "conceptual",
+ "subcategory": null,
+ "question": "How do the clinical presentations and mortality detection thresholds of HPAI differ between chicken populations (Galliformes) and duck populations (Anseriformes) according to the study?",
+ "papers": [
+  {
+   "paper": "12_hpai_netherlands",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/12_hpai_netherlands.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/12_hpai_netherlands.pypdf.txt"
+  }
+ ]
+}

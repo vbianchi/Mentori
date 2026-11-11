@@ -1,0 +1,13 @@
+{
+ "id": "16_ppr_ethiopia_FR1",
+ "category": "factual_recall",
+ "subcategory": null,
+ "question": "How many total PPR outbreaks were recorded in the Borena Zone between 2018 and 2022, and which specific month saw the highest percentage of these outbreaks?",
+ "papers": [
+  {
+   "paper": "16_ppr_ethiopia",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/16_ppr_ethiopia.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/16_ppr_ethiopia.pypdf.txt"
+  }
+ ]
+}

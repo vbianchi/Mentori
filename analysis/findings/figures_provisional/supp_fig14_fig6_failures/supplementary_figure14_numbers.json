@@ -1,6 +1,6 @@
 {
- "stamp": "PROVISIONAL: 2,420 of 2,420 attempts, 11 of 11 variants complete, records of 2026-11-04 08:35 CET; after the S4 reruns (D75, D80 V1, D81)",
- "what": "every number the plate draws, sheet by sheet as Supplementary Figure 14 data (provisional, 2420 of 2420).xlsx holds them (S448 R8 compares the workbook with this file)",
+ "stamp": "2,420 of 2,420 attempts, 11 of 11 variants complete, records of 2026-11-04 08:35 CET; after the S4 reruns (D75, D80 V1, D81)",
+ "what": "every number the plate draws, sheet by sheet as Supplementary Figure 14 data.xlsx holds them (S448 R8 compares the workbook with this file)",
  "sheets": {
   "Supplementary Fig. 14": {
    "columns": [
@@ -2200,17 +2200,17 @@
   "s14num1": {
    "sheet": "Supplementary Fig. 14",
    "row": 0,
-   "format": "n = {attempts}"
+   "format": "{family}"
   },
   "s14num2": {
    "sheet": "Supplementary Fig. 14",
    "row": 66,
-   "format": "n = {attempts}"
+   "format": "{family}"
   },
   "s14num3": {
    "sheet": "Supplementary Fig. 14",
    "row": 132,
-   "format": "n = {attempts}"
+   "format": "{family}"
   }
  }
 }

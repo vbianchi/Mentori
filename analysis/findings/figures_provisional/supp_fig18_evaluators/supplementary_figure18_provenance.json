@@ -1,23 +1,23 @@
 {
  "provenance": {
   "script": "scripts/S542_supp_evaluators.py",
-  "script_sha256": "4c4c1ed9cd676a766df801c2adb0dd3487a60eda35cc61d0ead8b4ffc7a473cb",
+  "script_sha256": "8ced7914b28bdac561c61570c313bfebbbd0ab1f8a0a48e9504c109899c4549d",
   "imports_sha256": {
-   "S497_fig5_d166.py": "fc17bb3af77503ddfd6346aa8b4c7dc33f3753e87b25da60bec2b4fcddc44068",
-   "S540_fig5_evaluators.py": "e227184bb004d52856be2ab4f8440120b108ae1cc7c6035e20ed6814b7d8c920",
+   "S497_fig5_d166.py": "40fb4d6f94b4c4e84991f821529313a5326c7c81ea2aa3b2722d6ac5a438fef6",
+   "S540_fig5_evaluators.py": "30290ee53f3da1b1b34428cc66f96b358b89dc0ecd7e2da33dee0765ec777eec",
    "house_style.py": "647c8991f4dcd2cea08e0be46eaf758beb55fb029c54bb267e7fba1e0b8b17b6",
-   "figure_names.py": "a3c65ae0a1e8aa05e99a99610ea857f63b0d8fff60a99404bcb5bf6ff9a82e65",
+   "figure_names.py": "025f8904861fd8d916cd875346a1384e915ea6601bfd2f7624dd71e49f2948a7",
    "minicheck_filter.py": "6d2258a6f691324de266824695da7a56eff02d60eef18456ab4d60ee9138242d",
-   "S473_fig5_panels.py": "6d637b9f4e990a3470661fedee652f2b8341d8cbb4abf79acc451992340f3b36",
-   "S457_fig2_panels.py": "8c29dab8b04a1bad4a955582a30831c51c2b70438be2f6d2698c7b81948d7520",
-   "S463_fig2_ranking.py": "8279a35d27c5a99d34980b59529203b104526035beba74031c9964a2ee360825",
+   "S473_fig5_panels.py": "2ff460af2fc1f47ac5eaa70a3bcce85c84aced56b8b67ec078f9c6b8dc7990dc",
+   "S457_fig2_panels.py": "33dc73444a80cf9d9b429fff6e489322bb01ca828a10f12a90487d84e7eaa4a1",
+   "S463_fig2_ranking.py": "8d9070c7036276ac1fb48a8cfa859b48e207b4c8ce15a84f2832e5a2bf88aa6d",
    "fig_repro.py": "4bca103b599da4adc0bd473f5b8210dd48b6543caaf63e5589f2faaa7b37d18b",
    "judge_rows_v25.py": "77d4a84d7aff4dd0ee92366395a4be2e5f27fe20d5de99ccbc86b7333c401661",
    "S564_claimify_selection.py": "f768b4937529c1f4d2eb2971e80c3249a4cc988b4418527abd2909544e63d622"
   },
   "command": "uv run --frozen python scripts/S542_supp_evaluators.py figure"
  },
- "stamp": "PROVISIONAL: 506 of 516 draw-1 answerable answers have the judge's score and all 16 tool scores; RAGAS 576 and RAGChecker 576 rows (K1); ranks on 75 questions",
+ "stamp": "506 of 516 draw-1 answerable answers have the judge's score and all 16 tool scores; RAGAS 576 and RAGChecker 576 rows (K1); ranks on 75 questions",
  "page_mm": [
   183.0,
   115.0
@@ -172,7 +172,7 @@
   "findings/recompute/S564_claimify_selection/full/shard_5_of_8/rows.jsonl": "98aa0c9a01228b529822db4afb417ff2d089e0a57ad5858723aa329d1d381143",
   "findings/recompute/S564_claimify_selection/full/shard_6_of_8/rows.jsonl": "c2207de96ab259dfe75f845250f4854fe1f8c76a1f20ce7c93e0a3c9fe96bd9d",
   "findings/recompute/S564_claimify_selection/full/shard_7_of_8/rows.jsonl": "d79480616e40d3ffa7c7043eb7ab62ab88fbea9ce4ecb63061e7137af8b66eb0",
-  "findings/recompute/S596_windowed_bertscore/evaluator_rows.json": "356d6f1c6f4b811d6b40bbfaaf73ef5fdb27b610e3ddbe22792f88e4d6ed0415",
+  "findings/recompute/S596_windowed_bertscore/evaluator_rows.json": "4a1bc9ea245d609c67e570684301972e8874de3f9a402e128ef85dc04c71bdff",
   "findings/recompute/S596_windowed_bertscore/rows.jsonl": "2abfc647ad2fc641743f35c0d1267f14665617350fa6ead42f046fb5c1b00a61",
   "k1_inputs_runs.tar:k1_inputs_runs/exp_01__multi_hop__exp_v4_s20_n0/answers.jsonl": "518b0efefd170ec4e172b8ba1d8218aa25612a4eaf27ebab98a824343864ad42",
   "k1_inputs_runs.tar:k1_inputs_runs/exp_01__rlm_10__exp_v4_s20_n0/answers.jsonl": "7d5d2651b0111d96cc863af5a5e9349d07466d6028be2407c1644ef31e7ab90b",
@@ -183,17 +183,17 @@
  },
  "figure_lock": {
   "path": "experiments/FIGURE_LOCK.toml",
-  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "sha256": "ac39c4e311f340654fe1ebe3333a3fe439bc6286e38fc0334fdb0e0cf2a97aef",
   "status": "agreed"
  },
  "files": {
-  "Supplementary Figure 18 (provisional, 506 of 516).pdf": "7e64385639080751a6041aeb7097102028179165625de74b31c14aab5824e9fc",
-  "Supplementary Figure 18 (provisional, 506 of 516).png": "8bbe5709c694fa5c8e17cc47115b0de5d0a85868aa45961d32bf212ee0340925",
-  "Supplementary Figure 18 (provisional, 506 of 516).svg": "c7dd9c4d75ca6305204f9282a1e2cd381a0c9e5c469ffe2897512b71c358f2e5",
-  "Supplementary Figure 18 data (provisional, 506 of 516).xlsx": "d9485d11a3277ed604886571a571117f28fbea06d147258bd560bb2227229af5",
-  "Supplementary Figure 18 data caption (provisional, 506 of 516).md": "812edfe78ba631bc8327544a0a9a0f0e4cf8273e30caa3a3132ba8a1892e24dd",
-  "legend_draft.md": "4f330878bdd49ea938a3d220f34f9fe60bddb124a1bda1d10c1dd72bb417a23b",
+  "Supplementary Figure 18 data caption.md": "c15699f760d193a3f23c606a732c80ff417684ff830d65198774b8144ebd6ed3",
+  "Supplementary Figure 18 data.xlsx": "d9485d11a3277ed604886571a571117f28fbea06d147258bd560bb2227229af5",
+  "Supplementary Figure 18.pdf": "7e64385639080751a6041aeb7097102028179165625de74b31c14aab5824e9fc",
+  "Supplementary Figure 18.png": "8bbe5709c694fa5c8e17cc47115b0de5d0a85868aa45961d32bf212ee0340925",
+  "Supplementary Figure 18.svg": "c7dd9c4d75ca6305204f9282a1e2cd381a0c9e5c469ffe2897512b71c358f2e5",
+  "legend_draft.md": "79aa8721028dc4d578bd5de1e6ea607e7a263e31a28464bdae67fbc416fe7581",
   "methods_notes.md": "5ce8793940f6e0a8fa21240afe6d9e641bd4671cca1d1a1313eb660c51f4cd83",
-  "supplementary_figure18_numbers.json": "78d0df96e167ecd29c9795a62df8415bf1e8dd18f96abf26e6dc4e2bb94ca655"
+  "supplementary_figure18_numbers.json": "2aef3b2919d4accb5f6dcdeb39f43617593721c4c9fab87a4ee91c4f51f4da90"
  }
 }

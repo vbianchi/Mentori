@@ -1,0 +1,13 @@
+{
+ "id": "20_lsd_review_CO2",
+ "category": "conceptual",
+ "subcategory": null,
+ "question": "How does the clinical impact of Lumpy Skin Disease Virus (LSDV) differ in terms of its spread within a herd versus its lethality?",
+ "papers": [
+  {
+   "paper": "20_lsd_review",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/20_lsd_review.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/20_lsd_review.pypdf.txt"
+  }
+ ]
+}

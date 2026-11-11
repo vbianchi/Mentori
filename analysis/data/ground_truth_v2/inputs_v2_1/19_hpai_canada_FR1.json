@@ -1,0 +1,13 @@
+{
+ "id": "19_hpai_canada_FR1",
+ "category": "factual_recall",
+ "subcategory": null,
+ "question": "According to the epidemiological review of the 2022 H5N1 outbreak, how many birds were culled in Canada?",
+ "papers": [
+  {
+   "paper": "19_hpai_canada",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/19_hpai_canada.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/19_hpai_canada.pypdf.txt"
+  }
+ ]
+}

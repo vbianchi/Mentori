@@ -1,0 +1,7 @@
+{
+ "id": "OOD_044",
+ "category": "out_of_domain",
+ "subcategory": "contradictory",
+ "question": "The Snakemake paper describes a system that uses a simple first-come-first-served job queue without any optimization of task scheduling. Is this correct?",
+ "papers": []
+}

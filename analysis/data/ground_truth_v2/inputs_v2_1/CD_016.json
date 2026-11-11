@@ -1,0 +1,18 @@
+{
+ "id": "CD_016",
+ "category": "cross_document",
+ "subcategory": "contrast",
+ "question": "Contrast the epidemiological findings of the 2022 Lumpy Skin Disease (LSD) outbreak in Nawalpur, Nepal, with the general disease characteristics and prevention strategies outlined in global systematic reviews.",
+ "papers": [
+  {
+   "paper": "13_lsd_nepal",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/13_lsd_nepal.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/13_lsd_nepal.pypdf.txt"
+  },
+  {
+   "paper": "20_lsd_review",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/20_lsd_review.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/20_lsd_review.pypdf.txt"
+  }
+ ]
+}

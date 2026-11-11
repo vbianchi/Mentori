@@ -1,0 +1,13 @@
+{
+ "id": "18_fmd_review_FR1",
+ "category": "factual_recall",
+ "subcategory": null,
+ "question": "According to the paper, what are the primary sites of FMDV infection in ruminants and pigs?",
+ "papers": [
+  {
+   "paper": "18_fmd_review",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/18_fmd_review.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/18_fmd_review.pypdf.txt"
+  }
+ ]
+}

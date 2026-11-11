@@ -1,0 +1,13 @@
+{
+ "id": "17_brucellosis_ethiopia_CO2",
+ "category": "conceptual",
+ "subcategory": null,
+ "question": "Based on the study's findings, how does the clinical history of livestock relate to the likelihood of brucellosis seropositivity in both small ruminants and camels?",
+ "papers": [
+  {
+   "paper": "17_brucellosis_ethiopia",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/17_brucellosis_ethiopia.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/17_brucellosis_ethiopia.pypdf.txt"
+  }
+ ]
+}

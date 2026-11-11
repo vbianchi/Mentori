@@ -19,8 +19,8 @@ for the median over the questions, and a reference line, the median of the same 
 drawn on top; the key is a short sample of each line with its meaning only, no line style in words.
 
 THE RANGE STRIP (FF30 a; supp.md section 7). Under the strip of a, a second strip draws, per cap and system, the range of the
-mean concept recall over three draws on D98's 29 questions (draw_range_rows): Mentori RLM's from S514 l2g7's noise_tables.json,
-Zhang RLM's from the rows a draws. While noise_tables.json has read draw 1 alone it draws its axis only, its sheet rows are
+mean concept recall over three draws on a's 86 questions (draw_range_rows; D309 A20, D98's 29 before), both systems from the
+rows a draws (Mentori RLM's from S514 l2g7's noise_tables.json while its rows held one draw). While noise_tables.json has read draw 1 alone it draws its axis only, its sheet rows are
 blank and the legend has no clause for it. Numbers print as "{d_sign}{d_size_pp:.1f}" from two sheet columns (build_order F6).
 
 WHY A SCRIPT OF ITS OWN. S475 (two panels, L2 only) stays as committed; D123 adds two sources that need a pull from
@@ -288,6 +288,7 @@ GEMINI_REF_DASHES = (3.0, 1.5)                                         # on, off
 # b's question lines (Valerio, 26 October, 15:00): one light grey for every model (the panel names the model); the
 # plate's grey already (c's zero line), a grey of S448 R5 (channels within [colour] grey_tol), at least 0.6 pt wide.
 Q_GREY = "#ABABAB"
+B_MODEL_KEY = "local model"                      # b's black line, the model its small panel names (11 Nov)
 LW_Q_MIN = 0.6                                                         # b's question lines, points
 COLOUR_WORD = {v: k.replace("vermillion", "vermilion") for k, v in S475.OKABE.items()}   # the legend's colour names
 
@@ -2038,6 +2039,28 @@ def box_stats(vals) -> dict:
             "max_pct": float(a.max())}
 
 
+def draw_range_reproduces(noise, l2rows, caps, field, d98) -> str:
+    """D309 A20, reproduce before writing: on D98's questions, the means of G5's rows at each draw give the smallest and
+    largest mean noise_tables.json holds (S514 l2g7), cap by cap; refused otherwise."""
+    if not noise or len(noise["draws_read"]) < 2:
+        return "noise_tables.json reads one draw: nothing to reproduce"
+    sub = sorted(d98)
+    for c in caps:
+        ms = []
+        for d in noise["draws_read"]:
+            R = [r for r in l2rows if r["system"] == "G5" and r["cap"] == c and r["draw"] == d and r["question_id"] in d98]
+            if len(R) != len(sub):
+                raise Refused(f"range strip check: G5 cap {c} draw {d} holds {len(R)} of {len(sub)} D98 questions")
+            ms.append(float(np.mean([r[field] for r in R])))
+        e = noise["per_cap"][str(c)]
+        if round(min(ms), 4) != e["min"] or round(max(ms), 4) != e["max"]:     # the table stores 4 decimals
+            raise Refused(f"range strip check: G5 cap {c} on D98's questions gives {min(ms)} to {max(ms)} from the rows, "
+                          f"noise_tables.json {e['min']} to {e['max']}")
+    return (f"G5's rows on D98's {len(sub)} questions give noise_tables.json's smallest and largest draw mean (4 "
+            f"decimals) at every "
+            f"one of {len(caps)} caps")
+
+
 def draw_range_rows(noise, l2rows, caps, field, subset, a_cols) -> list:
     """Sheet a's 'draw_range' rows: per cap and system, the mean concept recall (%) over D98's questions at each draw,
     failed answers kept at their stored value (Rule 10), then the smallest mean, the largest and the range between them
@@ -2048,8 +2071,20 @@ def draw_range_rows(noise, l2rows, caps, field, subset, a_cols) -> list:
     out = []
     sub = sorted(subset)
     for s, info in S475.SYSTEMS.items():
+        own = sorted({r["draw"] for r in l2rows if r["system"] == s})
         for c in caps:
-            if len(read) < 2:
+            if len(read) >= 2 and len(own) >= 2:
+                # D309 A20 O1: three draws of both systems on every question a draws (G5 D284, G6), so the strip takes
+                # each system's means from the rows a draws, on a's own questions, by one rule
+                ms = []
+                for d in own:
+                    R = [r for r in l2rows if r["system"] == s and r["cap"] == c and r["draw"] == d
+                         and r["question_id"] in subset]
+                    if len(R) != len(sub):
+                        raise Refused(f"range strip: {s} cap {c} draw {d} holds {len(R)} of {len(sub)} questions")
+                    ms.append(100 * float(np.mean([r[field] for r in R])))
+                lo, hi, used = min(ms), max(ms), ", ".join(str(d) for d in own)
+            elif len(read) < 2:
                 lo, hi, used = None, None, "1"
             elif s == "G5":
                 e = noise["per_cap"][str(c)]
@@ -2379,13 +2414,12 @@ def draw_figure(fn, caps, t1caps, paths, mut=None, part="ab"):
         letter(1.5, KEY1, "a")
         for s, info in SYSTEMS.items():                  # each key line centred over a's plotting area
             col = info["colour"]
-            g5_one = all((r["draws"] or 1) == 1 for r in a_rows if r["row"] == "question" and r["system"] == "G5")
-            fmt = info["name"] + (", one draw" if s == "G5" and g5_one else ", mean of three draws") + ", n = {questions} questions"
-            txt_ = fmt.format(questions=a_rows[a_idx[(s, caps[0])]]["questions"])
+            # Valerio, 11 Nov: a key names the series only; its draws and its n = 86 questions are in the legend
+            txt_ = info["name"]
             x0k = LEFT + AX_W / 2 - (hs.KEY_MARK_MM + 0.8 + tw(txt_)) / 2
             marker_mm(x0k + hs.KEY_MARK_MM / 2, KEY1, col, "o", size=hs.KEY_MARK_MM)
             t = text_mm(x0k + hs.KEY_MARK_MM + 0.8, KEY1, txt_, va="center", ha="left")
-            num(t, {"sheet": f"{MAIN_SHEET}a", "row": a_idx[(s, caps[0])], "format": fmt})
+            num(t, {"fixed": txt_, "why": "the system's name; a's colour key"})
             KEY1 += 3.5                                  # O-b1: one system per key line
         # ---- the strip under a (D-3, Valerio 26 October 18:20): bars side by side, aligned with a's boxes
         sx = axes_mm(LEFT, A_TOP + A_H + STRIP_GAP, AX_W, STRIP_H)
@@ -2490,7 +2524,12 @@ def draw_figure(fn, caps, t1caps, paths, mut=None, part="ab"):
         TICKD = 2 * MM_PT + 2 * MM_PT + LINE             # an x axis with tick labels and no axis name
         B_ROW0 = HEAD0 + PITCH + 2.3                     # top of the first row of names
         B_NROW = 4 // B_NCOL
-        B_MW = (BW - (B_NCOL - 1) * B_GAP) / B_NCOL
+        # 11 Nov (review of the figure files): every small panel's name, left-aligned on its panel, ends at least RIGHT
+        # mm inside the page; b narrows until the widest name in the right column fits (qwen3-coder-next:q4_K_M sat
+        # 2.7 pt from the edge)
+        name_w = max(tw(m) for j, m in enumerate(T1_FOUR) if j % B_NCOL == B_NCOL - 1)
+        B_MW = min((BW - (B_NCOL - 1) * B_GAP) / B_NCOL, (W - RIGHT - name_w - BX) / (B_NCOL - 1) - B_GAP)
+        BW = B_NCOL * B_MW + (B_NCOL - 1) * B_GAP
         B_MH = (R2_TOP + R2_H - (B_ROW0 + NAME_H) - (B_NROW - 1) * (TICKD + 1.0 + NAME_H)) / B_NROW
         if B_MH < 20.0:
             raise Refused(f"b: the small panels would be {B_MH:.1f} mm high")
@@ -2514,13 +2553,7 @@ def draw_figure(fn, caps, t1caps, paths, mut=None, part="ab"):
                 bxi.set_xlim(XLO, XHI)
             xs_ = list(t1caps) if mut == "b_log_x" else bx_pos
             b_axes.append(bxi)
-            qcol = OKABE[MODEL_COLOUR_MUT[m]] if mut == "b_model_colours" else Q_GREY
-            for q in bqs:
-                ys_ = [bq[(m, c)][q] for c in t1caps]
-                ln, = bxi.plot(xs_, ys_, color=qcol, lw=LW_Q, marker="o", ms=0.45 / MM_PT, mew=0, zorder=3,
-                               clip_on=False)
-                readback.append((f"b {m} {q}", list(ln.get_ydata()), ys_))
-                b_style.append(("question", ln.get_color(), list(ln.get_xdata())))
+            # Valerio, 11 Nov (doc comment on Figure 4): the question lines and their key go; b draws the two medians
             want = [bcap[(m, c)]["median_pct"] for c in t1caps]
             ln, = bxi.plot(xs_, want, color="#000000", lw=LW_BMED, solid_capstyle="butt", zorder=4, clip_on=False)
             readback.append((f"b {m} median", list(ln.get_ydata()), want))
@@ -2547,22 +2580,18 @@ def draw_figure(fn, caps, t1caps, paths, mut=None, part="ab"):
             plt.close(fig)
             raise Refused(f"b: lines or cap axis not as Valerio's follow-up of 26 October: {bad_style[:2]}")
         text_mm(BX + BW / 2, R2_TOP + R2_H + XAX - LINE / 2, "Turn cap (caps evenly spaced)", va="center", ha="center")
-        BK1 = BX + BW / 2 - (6.2 + tw("one question") + 5.0 + 6.2 + tw("median")) / 2   # b's keys centred over its panels
-        fig.add_artist(Line2D([BK1 / W, (BK1 + 5.0) / W], [1 - HEAD0 / H] * 2, transform=fig.transFigure,   # key
-                              color=Q_GREY, lw=LW_Q, solid_capstyle="butt"))
-        text_mm(BK1 + 6.2, HEAD0, "one question", va="center", ha="left")
-        xk = BK1 + 6.2 + tw("one question") + 5.0
-        fig.add_artist(Line2D([xk / W, (xk + 5.0) / W], [1 - HEAD0 / H] * 2, transform=fig.transFigure, color="#000000",
+        gk = GEN_DISPLAY                                 # 11 Nov (Valerio): b's two keys on one line, centred over its panels
+        BK1 = BX + BW / 2 - (6.2 + tw(B_MODEL_KEY) + 5.0 + 7.2 + tw(gk)) / 2
+        fig.add_artist(Line2D([BK1 / W, (BK1 + 5.0) / W], [1 - HEAD0 / H] * 2, transform=fig.transFigure, color="#000000",
                               lw=LW_BMED, solid_capstyle="butt"))
-        text_mm(xk + 6.2, HEAD0, "median", va="center", ha="left")
-        gk = f"{GEN_DISPLAY}, median"
-        BK2 = BX + BW / 2 - (7.2 + tw(gk)) / 2
-        kl = Line2D([BK2 / W, (BK2 + 6.0) / W], [1 - (HEAD0 + PITCH) / H] * 2, transform=fig.transFigure,
+        text_mm(BK1 + 6.2, HEAD0, B_MODEL_KEY, va="center", ha="left")
+        BK2 = BK1 + 6.2 + tw(B_MODEL_KEY) + 5.0
+        kl = Line2D([BK2 / W, (BK2 + 6.0) / W], [1 - HEAD0 / H] * 2, transform=fig.transFigure,
                     color=GEMINI_REF_COLOUR, lw=LW_REF, solid_capstyle="butt", dash_capstyle="butt")
         if GEMINI_REF_DASHES:
             kl.set_dashes(GEMINI_REF_DASHES)
         fig.add_artist(kl)
-        num(text_mm(BK2 + 7.2, HEAD0 + PITCH, gk, va="center", ha="left"),
+        num(text_mm(BK2 + 7.2, HEAD0, gk, va="center", ha="left"),
             {"fixed": gk, "why": "the model's name; the reference line's key"})
         letter(BX - 12.0, HEAD0, "b")
 
@@ -2835,9 +2864,8 @@ def legend_and_caption(fn, caps, t1caps, k, stamp, detail, d181: bool = False, b
         f"{B}, Concept recall (%) by turn cap for RLM with four local models (one panel each, one draw) at "
         f"{len(t1caps)} turn caps: the share of a question's expected concepts found in the answer"
         + (", scored on key v2.4, with every concept word counted" if b_loose else "") +
-        f" (a failed answer scores 0). Grey lines: each of the n = {k} question{'s' if k != 1 else ''} answered by "
-        f"every model at every cap; black line: median over these questions; {ref_style} line: median over the same "
-        f"questions of RLM with {GEN_DISPLAY}, each question's "
+        f" (a failed answer scores 0). Lines: medians over the n = {k} question{'s' if k != 1 else ''} answered by "
+        f"every model at every cap; black, the panel's model; {ref_style}, RLM with {GEN_DISPLAY}, each question's "
         f"{'value in its one draw' if g5_one else 'mean over three draws'}"
         f"{', on the same reading' if b_loose else ''}. "
         "RLM: Mentor::i's own; Zhang RLM: the authors' package (rlms 0.1.3).")
@@ -2847,7 +2875,7 @@ def legend_and_caption(fn, caps, t1caps, k, stamp, detail, d181: bool = False, b
     #   and frame described in full
     lim_c = fn["c_scale"]
     legend_c = (
-        f"One cell per strategy (rows: multi-hop, verified pass, and RLM stopped at 5, 10 and 20 turns, RLM-5, "
+        f"One cell per strategy (rows: multi-hop, verified pass and RLM stopped at 5, 10 and 20 turns: RLM-5, "
         f"RLM-10 and RLM-20) and per index (columns). Each index holds 5, 10, 20 or 50 core papers (column groups) "
         f"and 0, 1 or 3 distractor papers for every core paper (columns). Answers are from {GEN_DISPLAY}, one draw, to the "
         f"answerable questions whose source papers are all in that index, with the strategy's and single pass's "
@@ -2861,13 +2889,13 @@ def legend_and_caption(fn, caps, t1caps, k, stamp, detail, d181: bool = False, b
         + (" Empty cell: judging incomplete." if c_empty else ""))
     stamp_ab, stamp_c = stamp
     lines = [f"# {MAIN_LABEL} (D283; D123), title and legend (draft)", "",
-             f"Data stamp: {stamp_ab}.", "", detail, "",
+             detail, "",
              f"**{MAIN_LABEL} | {title}.** {legend}", ""]
     lines_c = [f"# {SI_LABEL} (D283; D150), title and legend (draft)", "",
-               f"Data stamp: {stamp_c}.", "", detail, "",
+               detail, "",
                f"**{SI_LABEL} | {title_c}.** {legend_c}", ""]
     cap = [f"# {MAIN_SD}, caption", "",
-           (f"**{MAIN_SD} | Numerical values plotted in {MAIN_LABEL}.** Provisional. Data stamp: {stamp_ab}. One "
+           (f"**{MAIN_SD} | Numerical values plotted in {MAIN_LABEL}.** Data stamp: {stamp_ab}. One "
             f"sheet per panel. Sheet {MAIN_SHEET}a: one 'cap' row per system and turn cap (questions, answers, mean concept "
             f"recall (%) and its 95% interval (%), not drawn, failed answers, and the box drawn: median, first and "
             f"third quartiles, minimum and maximum (%)), then one 'question' row per system, cap and question with "
@@ -2892,7 +2920,7 @@ def legend_and_caption(fn, caps, t1caps, k, stamp, detail, d181: bool = False, b
            f"Proposed Data Availability sentence: \"The source data for {MAIN_LABEL} is in Supplementary Data {MAIN_N + 1}.\"",   # D303 (D302)
            ""]
     cap_c = [f"# {SI_LABEL} data, caption", "",
-             (f"**{SI_LABEL} data | Numerical values plotted in {SI_LABEL}.** Provisional. Data stamp: {stamp_c}. One "
+             (f"**{SI_LABEL} data | Numerical values plotted in {SI_LABEL}.** Data stamp: {stamp_c}. One "
               f"sheet. Sheet {C_SHEET}: one "
               f"'cell' row per judge score (4, the pass rate, then 3, the relaxed threshold), strategy and index (core papers, distractor papers per core paper, "
               f"whether both units are judged in full, questions paired, the strategy's and single pass's pass rates "
@@ -3007,8 +3035,10 @@ def plate(out: Path = OUT, t1dir: Path = T1_L2, g4dir: Path = G4_FIG3C, mut=None
             if r["row"] == "strip":
                 r["cap_reached_pct"], r["stopped_by_cap_pct"] = r["stopped_by_cap_pct"], r["cap_reached_pct"]
     noise = json.loads((L2_D135_D181_G7 / "noise_tables.json").read_text()) if d181 is not None else None
-    a_rows = a_rows + draw_range_rows(noise, rows, caps, a_field, set(json.loads(D98_SUBSET.read_text())["ids"]) & set(ids),
-                                      A_COLS)
+    # D309 A20 O1: the strip on all of a's questions (86), as every box, not D98's 29
+    print("range strip:", draw_range_reproduces(noise, rows, caps, a_field,
+                                                      set(json.loads(D98_SUBSET.read_text())["ids"]) & set(ids)))
+    a_rows = a_rows + draw_range_rows(noise, rows, caps, a_field, set(ids), A_COLS)
     a_rows = a_rows + paired_test_rows(a_rows, caps, A_COLS)
     fn = {"a": a_rows, "d": f475["b"], "b": b_sheet(t1rows_b, t1tab_b, gref, d181=b_d181), "c": grid_sheet(grid_c, mut)}
     top = max([abs(r["d_pp"]) for r in fn["c"] if r["complete"]] + [5.0])
@@ -3067,15 +3097,15 @@ def plate(out: Path = OUT, t1dir: Path = T1_L2, g4dir: Path = G4_FIG3C, mut=None
     # D283: two plates, each with its own count. Figure 4: a and b; Supplementary Figure 8: the grid (c)
     n_ab, m_ab = n_parts["a"] + n_parts["b"], m_parts["G5"] + m_parts["G6"] + m_parts["T1"]
     n_c, m_c = n_parts["c"], m_parts["G4c"]
-    stamp_ab = (f"PROVISIONAL: {n_ab} of {m_ab} answers; a and the strip under it, RLM ({'three draws' if g5_three else 'draw 1'}, "
+    stamp_ab = (f"{n_ab} of {m_ab} answers; a and the strip under it, RLM ({'three draws' if g5_three else 'draw 1'}, "
                 f"{sum(r['system'] == 'G5' for r in rows)} of "
                 f"{m_parts['G5']}) and Zhang RLM (three draws, {want_n['G6']} of {m_parts['G6']}) at {len(caps)} turn "
                 f"caps{range_txt}; b, T1's four local models, {n_parts['b']} of {m_parts['T1']} (the {k} "
                 f"question{'s' if k != 1 else ''} stored by every model at every cap); {concept_txt}")
-    stamp_c = (f"PROVISIONAL: {n_c} of {m_c} answers; G4 draw 1 of the six strategies judged by S3 ({cells_done} of "
+    stamp_c = (f"{n_c} of {m_c} answers; G4 draw 1 of the six strategies judged by S3 ({cells_done} of "
                f"{len(GRID_STRATS) * 12} strategy and index cells with both units judged){c_key_txt}")
     stamp = f"{stamp_ab} | {stamp_c}"
-    tag, tag_ab = f" (provisional, {n_c} of {m_c})", f" (provisional, {n_ab} of {m_ab})"
+    tag = tag_ab = ""                         # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
     t1f = sum(r["failed"] for r in t1rows)
     st6 = {s_: collections.Counter(r["cells"][s_]["status"] for r in rows6_c if r["covered"]) for s_ in G4_ALL}
     cov_n = g4head["inputs"]["covered"]
@@ -3268,9 +3298,9 @@ def plate(out: Path = OUT, t1dir: Path = T1_L2, g4dir: Path = G4_FIG3C, mut=None
             "panels": {"a": "A-1 (Valerio, 26 October): per cap two boxes, Mentori's RLM left, the package right, "
                             "quartiles, median, full range, every question a dot, a thin line joining the medians, "
                             "caps evenly spaced, no mean (L2 all mode; the mean and its interval in the data workbook, D128)",
-                       "b": "B-2 (Valerio, 26 October), with his 15:00 follow-up (question lines one grey, "
-                            f"{Q_GREY}, caps evenly spaced): one small panel per local model, a line per complete question, "
-                            "the median, and the median of the same questions with gemini-3-flash-preview (G5, each question's "
+                       "b": "B-2 (Valerio, 26 October; caps evenly spaced), the question lines removed 11 Nov: "
+                            "one small panel per local model, the median over its complete questions, "
+                            "and the median of the same questions with gemini-3-flash-preview (G5, each question's "
                             f"mean over draws 1 to 3) in {GEMINI_REF_COLOUR}" + (" dashed" if GEMINI_REF_DASHES else " solid") +
                             "; the key is line samples with their meanings",
                        "c": "D150 (Valerio, 26 October 19:00, layout O-b1): every strategy minus single pass per "
@@ -4056,14 +4086,14 @@ def selftest(keep: Path | None = None) -> int:
     if pl["a_boxes"] != 2 * len(a_caps):
         fails.append(f"plate a: {pl['a_boxes']} boxes checked, want {2 * len(a_caps)} (two per cap)")
     kk = r["t1"]["k"]
-    if (pl["b_lines"], pl["b_medians"], pl["b_refs"]) != (len(T1_FOUR) * kk, len(T1_FOUR), len(T1_FOUR)):
+    if (pl["b_lines"], pl["b_medians"], pl["b_refs"]) != (0, len(T1_FOUR), len(T1_FOUR)):    # 11 Nov: medians only
         fails.append(f"plate b: {pl['b_lines']} question lines, {pl['b_medians']} medians, {pl['b_refs']} references "
-                     f"checked, want {len(T1_FOUR) * kk}, {len(T1_FOUR)} and {len(T1_FOUR)}")
-    bs = pl["b_summary"]                         # Valerio's follow-up: grey question lines, caps evenly spaced
-    if bs["question_line_colours"] != [Q_GREY] or bs["x_positions"] != [tuple(float(i) for i in
-                                                                        range(len(pl["t1caps"])))]:
+                     f"checked, want 0, {len(T1_FOUR)} and {len(T1_FOUR)} (k {kk})")
+    bs = pl["b_summary"]                         # caps evenly spaced; no question line (11 Nov)
+    if bs["question_line_colours"] != [] or bs["x_positions"] != [tuple(float(i) for i in
+                                                                  range(len(pl["t1caps"])))]:
         fails.append(f"plate b: question line colours {bs['question_line_colours']}, x positions "
-                     f"{bs['x_positions']}; want [{Q_GREY}] and the caps at 0 to {len(pl['t1caps']) - 1}")
+                     f"{bs['x_positions']}; want none and the caps at 0 to {len(pl['t1caps']) - 1}")
     # D149: the strip under a, two bars per system and cap, each equal to the data workbook and to L2, cut-off bars hatched
     st = bs["strip"]
     if len(st) != 2 * 2 * len(a_caps):

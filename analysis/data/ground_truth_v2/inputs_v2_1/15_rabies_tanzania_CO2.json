@@ -1,0 +1,13 @@
+{
+ "id": "15_rabies_tanzania_CO2",
+ "category": "conceptual",
+ "subcategory": null,
+ "question": "Explain how spatial heterogeneity in vaccination coverage impacts the persistence of rabies even when average coverage targets are met.",
+ "papers": [
+  {
+   "paper": "15_rabies_tanzania",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/15_rabies_tanzania.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/15_rabies_tanzania.pypdf.txt"
+  }
+ ]
+}

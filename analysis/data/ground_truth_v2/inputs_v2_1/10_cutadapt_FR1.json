@@ -1,0 +1,13 @@
+{
+ "id": "10_cutadapt_FR1",
+ "category": "factual_recall",
+ "subcategory": null,
+ "question": "What unique capability does Cutadapt offer compared to other standalone tools in the context of read trimming?",
+ "papers": [
+  {
+   "paper": "10_cutadapt",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/10_cutadapt.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/10_cutadapt.pypdf.txt"
+  }
+ ]
+}

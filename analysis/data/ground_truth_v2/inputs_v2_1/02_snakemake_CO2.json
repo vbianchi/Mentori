@@ -1,0 +1,13 @@
+{
+ "id": "02_snakemake_CO2",
+ "category": "conceptual",
+ "subcategory": null,
+ "question": "How does Snakemake's implementation of a blockchain-style hashing scheme facilitate cross-workflow result caching?",
+ "papers": [
+  {
+   "paper": "02_snakemake",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/02_snakemake.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/02_snakemake.pypdf.txt"
+  }
+ ]
+}

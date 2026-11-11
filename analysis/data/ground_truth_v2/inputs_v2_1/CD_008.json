@@ -1,0 +1,18 @@
+{
+ "id": "CD_008",
+ "category": "cross_document",
+ "subcategory": "comparison",
+ "question": "How do the methodological approaches of Cutadapt and Salmon differ in their treatment of technical artifacts in RNA-seq data, and what are the specific implications for downstream analysis?",
+ "papers": [
+  {
+   "paper": "07_salmon",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/07_salmon.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/07_salmon.pypdf.txt"
+  },
+  {
+   "paper": "10_cutadapt",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/10_cutadapt.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/10_cutadapt.pypdf.txt"
+  }
+ ]
+}

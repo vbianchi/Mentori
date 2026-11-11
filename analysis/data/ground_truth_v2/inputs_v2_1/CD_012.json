@@ -1,0 +1,18 @@
+{
+ "id": "CD_012",
+ "category": "cross_document",
+ "subcategory": "complementary",
+ "question": "How do the challenges of disease control identified in the Serengeti rabies vaccination campaigns relate to the vaccine efficacy findings for Lumpy Skin Disease (LSD)?",
+ "papers": [
+  {
+   "paper": "15_rabies_tanzania",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/15_rabies_tanzania.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/15_rabies_tanzania.pypdf.txt"
+  },
+  {
+   "paper": "20_lsd_review",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/20_lsd_review.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/20_lsd_review.pypdf.txt"
+  }
+ ]
+}

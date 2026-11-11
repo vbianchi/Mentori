@@ -1,0 +1,13 @@
+{
+ "id": "07_salmon_TE3",
+ "category": "technical",
+ "subcategory": null,
+ "question": "Describe the algorithmic components and optimization techniques Salmon uses to achieve speed comparable to ultra-fast alignment-free tools while maintaining accuracy.",
+ "papers": [
+  {
+   "paper": "07_salmon",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/07_salmon.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/07_salmon.pypdf.txt"
+  }
+ ]
+}

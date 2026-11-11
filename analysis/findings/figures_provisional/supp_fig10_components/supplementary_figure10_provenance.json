@@ -1,7 +1,7 @@
 {
  "provenance": {
   "script": "scripts/S524_t3_s12_s13.py",
-  "script_sha256": "e2e8e056864b0dd69fdef9a6b8b048928b85d2595e218a05c93e7018f03b7fd5",
+  "script_sha256": "99499bdcd9873ccf6754894e6e9221a20b4cad3191925e6cf0f26f0fba84e780",
   "command": "uv run --frozen python scripts/S524_t3_s12_s13.py figure --t3 findings/recompute/frozen_inputs/extracted/count_records_20261106/count_records_20261106/t3/T3_frozen_20261104T131439Z --s12b findings/recompute/s12b_inputs --results findings/recompute/exp07_bench_20261107/exp07_bench_20261107.tar",
   "python": "3.13.11",
   "deterministic": "no build time and no repository HEAD are recorded",
@@ -91,7 +91,7 @@
   ],
   "model_calls": 0
  },
- "stamp": "PROVISIONAL: 6,512 of 6,512 planned T3 answers, from frozen set findings/recompute/frozen_inputs/extracted/count_records_20261106/count_records_20261106/t3/T3_frozen_20261104T131439Z (SHA256SUMS 0d1312adf1bf); models in: gpt-oss:20b, devstral-small-2:24b, gemma3:27b, qwen3-coder:30b, gemini-3-flash-preview, llama3:8b; panel a from S12b's 194 judge rows on key v2.5 (run_sha256 05ef318daed4, findings/recompute/s12b_inputs/SHA256SUMS 2ce95c580962); D213: the 18 items on D9's six questions left out",
+ "stamp": "6,512 of 6,512 planned T3 answers, from frozen set findings/recompute/frozen_inputs/extracted/count_records_20261106/count_records_20261106/t3/T3_frozen_20261104T131439Z (SHA256SUMS 0d1312adf1bf); models in: gpt-oss:20b, devstral-small-2:24b, gemma3:27b, qwen3-coder:30b, gemini-3-flash-preview, llama3:8b; panel a from S12b's 194 judge rows on key v2.5 (run_sha256 05ef318daed4, findings/recompute/s12b_inputs/SHA256SUMS 2ce95c580962); D213: the 18 items on D9's six questions left out",
  "figure": "Supplementary Figure 10",
  "page_mm": [
   183.0,
@@ -99,15 +99,15 @@
  ],
  "figure_lock": {
   "path": "experiments/FIGURE_LOCK.toml",
-  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b"
+  "sha256": "ac39c4e311f340654fe1ebe3333a3fe439bc6286e38fc0334fdb0e0cf2a97aef"
  },
  "files": {
-  "Supplementary Figure 10 (provisional, 6512 of 6512).pdf": "83812100ab8367c2a44292228f3052fb3124472b6435617d690bf222b7a1df1d",
-  "Supplementary Figure 10 (provisional, 6512 of 6512).svg": "28db3ee8431aa8da66715fdd11956adb016fa96127f53c71c4248daf6663296e",
-  "Supplementary Figure 10 (provisional, 6512 of 6512).png": "a9a9620006b09db4800f0fd09f70ecb67258c973dfad3ef8193b683ff1e7c3c7",
-  "Supplementary Figure 10 data (provisional, 6512 of 6512).xlsx": "ff7cb38fc85a56af0bb0a0fbb038fce76681ab1135c9991cda2ce6620cacea38",
-  "Supplementary Figure 10 data caption (provisional, 6512 of 6512).md": "2954ffe6e598b701b422235982205b05dac8d87ed27839114868a6f724708a9d",
-  "supplementary_figure10_numbers.json": "96eefbffed0ea73aaf244f0d00d0689b91e906be2557d1a79b958db8db4a0719",
-  "legend_draft.md": "ed6fe757d4683efa780ebf6426e26d1115cdc66689f3ae8e7b40e34b20c24372"
+  "Supplementary Figure 10.pdf": "3eea2999e3c3fcc4303db6ce2e7e8a623e056944ce9d480681ca3fe0b6119cfe",
+  "Supplementary Figure 10.svg": "f371591996d6884c8cab9528e121299309cd1feb6b9831a76eec0b7a1e0af9b5",
+  "Supplementary Figure 10.png": "d7e6d99da05ca1d953fb632c96c26a0d85cbe1cf3c2626fc8d98c72f0110777a",
+  "Supplementary Figure 10 data.xlsx": "ff7cb38fc85a56af0bb0a0fbb038fce76681ab1135c9991cda2ce6620cacea38",
+  "Supplementary Figure 10 data caption.md": "a7ce3e4c979fb5b7d3d3a73d67d27d789cadc159a225733c7593a9ea0af83e03",
+  "supplementary_figure10_numbers.json": "214ce42873bbe8041a5789d69f60159421128ce639ceaded1aaae3a986c41ee1",
+  "legend_draft.md": "8ba4bb0fe0489906b370da0d1b7079e14849ad93d9b4a32b6e73cfc15a7bceb8"
  }
 }

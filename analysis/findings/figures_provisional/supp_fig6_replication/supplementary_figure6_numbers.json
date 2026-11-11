@@ -1,5 +1,5 @@
 {
- "stamp": "PROVISIONAL: panels a and b from the T2 judge rows on the final key (D256), 7,019 of 7,020 T2 answers read (claude-haiku-4-5 2,430, gemini-2.5-pro 1,349, gemma3:27b 1,620, qwen3-coder:30b 1,620); panel c from S518's committed verdicts (D195)",
+ "stamp": "panels a and b from the T2 judge rows on the final key (D256), 7,019 of 7,020 T2 answers read (claude-haiku-4-5 2,430, gemini-2.5-pro 1,349, gemma3:27b 1,620, qwen3-coder:30b 1,620); panel c from S518's committed verdicts (D195)",
  "what": "a: per question and its bar row (fewer, tied, more; mean and interval), the generator's pass share with the strategy minus with single pass (percentage points); b: pass rate and rank of the six strategies per generator; c: S518's D_one and D_many per generator, as S518 stored them (percentage points)",
  "sheets": {
   "Supplementary Fig. 6a": {
@@ -19282,7 +19282,7 @@
      2.3283064365386963e-10,
      null,
      "findings/recompute/S518_split_confirmation/gemini-3-flash-preview.json",
-     "e2cf25daf854c3b3eb50086ae052465192774a973f2fc5cbcda845fbbec27c7f",
+     "450b31ee0d01c8b91b53747129e80d56bdb94a2ac50c1a7f8ea2b56ccc959cdd",
      "panel c"
     ],
     [
@@ -19301,7 +19301,7 @@
      0.00292205810546875,
      null,
      "findings/recompute/S518_split_confirmation/gemini-3-flash-preview.json",
-     "e2cf25daf854c3b3eb50086ae052465192774a973f2fc5cbcda845fbbec27c7f",
+     "450b31ee0d01c8b91b53747129e80d56bdb94a2ac50c1a7f8ea2b56ccc959cdd",
      "panel c"
     ],
     [
@@ -19543,262 +19543,212 @@
    "why": "the strategy's name"
   },
   "s448num_11": {
-   "sheet": "Supplementary Fig. 6a",
-   "row": 0,
-   "format": "n = {n_questions}"
-  },
-  "s448num_12": {
-   "sheet": "Supplementary Fig. 6a",
-   "row": 1,
-   "format": "n = {n_questions}"
-  },
-  "s448num_13": {
-   "sheet": "Supplementary Fig. 6a",
-   "row": 2,
-   "format": "n = {n_questions}"
-  },
-  "s448num_14": {
-   "sheet": "Supplementary Fig. 6a",
-   "row": 3,
-   "format": "n = {n_questions}"
-  },
-  "s448num_15": {
-   "sheet": "Supplementary Fig. 6a",
-   "row": 4,
-   "format": "n = {n_questions}"
-  },
-  "s448num_16": {
-   "sheet": "Supplementary Fig. 6a",
-   "row": 5,
-   "format": "n = {n_questions}"
-  },
-  "s448num_17": {
-   "sheet": "Supplementary Fig. 6a",
-   "row": 6,
-   "format": "n = {n_questions}"
-  },
-  "s448num_18": {
-   "sheet": "Supplementary Fig. 6a",
-   "row": 7,
-   "format": "n = {n_questions}"
-  },
-  "s448num_19": {
-   "sheet": "Supplementary Fig. 6a",
-   "row": 8,
-   "format": "n = {n_questions}"
-  },
-  "s448num_20": {
-   "sheet": "Supplementary Fig. 6a",
-   "row": 9,
-   "format": "n = {n_questions}"
-  },
-  "s448num_21": {
    "fixed": "RLM-5",
    "why": "the strategy's name"
   },
-  "s448num_22": {
+  "s448num_12": {
    "fixed": "RLM-10",
    "why": "the strategy's name"
   },
-  "s448num_23": {
+  "s448num_13": {
    "fixed": "RLM-20",
    "why": "the strategy's name"
   },
-  "s448num_24": {
+  "s448num_14": {
    "fixed": "gemini-3-flash",
    "why": "the generator's name"
   },
-  "s448num_25": {
+  "s448num_15": {
    "sheet": "Supplementary Fig. 6b",
    "row": 0,
+   "format": "{rank}"
+  },
+  "s448num_16": {
+   "sheet": "Supplementary Fig. 6b",
+   "row": 1,
+   "format": "{rank}"
+  },
+  "s448num_17": {
+   "sheet": "Supplementary Fig. 6b",
+   "row": 2,
+   "format": "{rank}"
+  },
+  "s448num_18": {
+   "sheet": "Supplementary Fig. 6b",
+   "row": 3,
+   "format": "{rank}"
+  },
+  "s448num_19": {
+   "sheet": "Supplementary Fig. 6b",
+   "row": 4,
+   "format": "{rank}"
+  },
+  "s448num_20": {
+   "sheet": "Supplementary Fig. 6b",
+   "row": 5,
+   "format": "{rank}"
+  },
+  "s448num_21": {
+   "fixed": "gemma3:27b",
+   "why": "the generator's name"
+  },
+  "s448num_22": {
+   "sheet": "Supplementary Fig. 6b",
+   "row": 6,
+   "format": "{rank}"
+  },
+  "s448num_23": {
+   "sheet": "Supplementary Fig. 6b",
+   "row": 7,
+   "format": "{rank}"
+  },
+  "s448num_24": {
+   "sheet": "Supplementary Fig. 6b",
+   "row": 8,
+   "format": "{rank}"
+  },
+  "s448num_25": {
+   "sheet": "Supplementary Fig. 6b",
+   "row": 9,
    "format": "{rank}"
   },
   "s448num_26": {
    "sheet": "Supplementary Fig. 6b",
-   "row": 1,
+   "row": 10,
    "format": "{rank}"
   },
   "s448num_27": {
    "sheet": "Supplementary Fig. 6b",
-   "row": 2,
-   "format": "{rank}"
-  },
-  "s448num_28": {
-   "sheet": "Supplementary Fig. 6b",
-   "row": 3,
-   "format": "{rank}"
-  },
-  "s448num_29": {
-   "sheet": "Supplementary Fig. 6b",
-   "row": 4,
-   "format": "{rank}"
-  },
-  "s448num_30": {
-   "sheet": "Supplementary Fig. 6b",
-   "row": 5,
-   "format": "{rank}"
-  },
-  "s448num_31": {
-   "fixed": "gemma3:27b",
-   "why": "the generator's name"
-  },
-  "s448num_32": {
-   "sheet": "Supplementary Fig. 6b",
-   "row": 6,
-   "format": "{rank}"
-  },
-  "s448num_33": {
-   "sheet": "Supplementary Fig. 6b",
-   "row": 7,
-   "format": "{rank}"
-  },
-  "s448num_34": {
-   "sheet": "Supplementary Fig. 6b",
-   "row": 8,
-   "format": "{rank}"
-  },
-  "s448num_35": {
-   "sheet": "Supplementary Fig. 6b",
-   "row": 9,
-   "format": "{rank}"
-  },
-  "s448num_36": {
-   "sheet": "Supplementary Fig. 6b",
-   "row": 10,
-   "format": "{rank}"
-  },
-  "s448num_37": {
-   "sheet": "Supplementary Fig. 6b",
    "row": 11,
    "format": "{rank}"
   },
-  "s448num_38": {
+  "s448num_28": {
    "fixed": "qwen3-coder:30b",
    "why": "the generator's name"
   },
-  "s448num_39": {
+  "s448num_29": {
    "sheet": "Supplementary Fig. 6b",
    "row": 12,
    "format": "{rank}"
   },
-  "s448num_40": {
+  "s448num_30": {
    "sheet": "Supplementary Fig. 6b",
    "row": 13,
    "format": "{rank}"
   },
-  "s448num_41": {
+  "s448num_31": {
    "sheet": "Supplementary Fig. 6b",
    "row": 14,
    "format": "{rank}"
   },
-  "s448num_42": {
+  "s448num_32": {
    "sheet": "Supplementary Fig. 6b",
    "row": 15,
    "format": "{rank}"
   },
-  "s448num_43": {
+  "s448num_33": {
    "sheet": "Supplementary Fig. 6b",
    "row": 16,
    "format": "{rank}"
   },
-  "s448num_44": {
+  "s448num_34": {
    "sheet": "Supplementary Fig. 6b",
    "row": 17,
    "format": "{rank}"
   },
-  "s448num_45": {
+  "s448num_35": {
    "fixed": "claude-haiku-4-5",
    "why": "the generator's name"
   },
-  "s448num_46": {
+  "s448num_36": {
    "sheet": "Supplementary Fig. 6b",
    "row": 18,
    "format": "{rank}"
   },
-  "s448num_47": {
+  "s448num_37": {
    "sheet": "Supplementary Fig. 6b",
    "row": 19,
    "format": "{rank}"
   },
-  "s448num_48": {
+  "s448num_38": {
    "sheet": "Supplementary Fig. 6b",
    "row": 20,
    "format": "{rank}"
   },
-  "s448num_49": {
+  "s448num_39": {
    "sheet": "Supplementary Fig. 6b",
    "row": 21,
    "format": "{rank}"
   },
-  "s448num_50": {
+  "s448num_40": {
    "sheet": "Supplementary Fig. 6b",
    "row": 22,
    "format": "{rank}"
   },
-  "s448num_51": {
+  "s448num_41": {
    "sheet": "Supplementary Fig. 6b",
    "row": 23,
    "format": "{rank}"
   },
-  "s448num_52": {
+  "s448num_42": {
    "fixed": "gemini-2.5-pro",
    "why": "the generator's name"
   },
-  "s448num_53": {
+  "s448num_43": {
    "sheet": "Supplementary Fig. 6b",
    "row": 24,
    "format": "{rank}"
   },
-  "s448num_54": {
+  "s448num_44": {
    "sheet": "Supplementary Fig. 6b",
    "row": 25,
    "format": "{rank}"
   },
-  "s448num_55": {
+  "s448num_45": {
    "sheet": "Supplementary Fig. 6b",
    "row": 26,
    "format": "{rank}"
   },
-  "s448num_56": {
+  "s448num_46": {
    "sheet": "Supplementary Fig. 6b",
    "row": 27,
    "format": "{rank}"
   },
-  "s448num_57": {
+  "s448num_47": {
    "sheet": "Supplementary Fig. 6b",
    "row": 28,
    "format": "{rank}"
   },
-  "s448num_58": {
+  "s448num_48": {
    "sheet": "Supplementary Fig. 6b",
    "row": 29,
    "format": "{rank}"
   },
-  "s448num_59": {
+  "s448num_49": {
    "fixed": "gemini-3-flash",
    "why": "the generator's name"
   },
-  "s448num_60": {
+  "s448num_50": {
    "fixed": "gemini-3-flash, second judge",
    "why": "the generator's name"
   },
-  "s448num_61": {
+  "s448num_51": {
    "fixed": "gemma3:27b",
    "why": "the generator's name"
   },
-  "s448num_62": {
+  "s448num_52": {
    "fixed": "qwen3-coder:30b",
    "why": "the generator's name"
   },
-  "s448num_63": {
+  "s448num_53": {
    "fixed": "claude-haiku-4-5",
    "why": "the generator's name"
   },
-  "s448num_64": {
+  "s448num_54": {
    "fixed": "gemini-2.5-pro",
    "why": "the generator's name"
   },
-  "s448num_65": {
+  "s448num_55": {
    "fixed": "RLM-10 minus single pass (percentage points)",
    "why": "the axis label"
   }

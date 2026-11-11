@@ -1,0 +1,13 @@
+{
+ "id": "18_fmd_review_TE3",
+ "category": "technical",
+ "subcategory": null,
+ "question": "What are the specific quantitative estimates for preclinical transmission (theta) in pigs and cattle as identified in the research synthesis?",
+ "papers": [
+  {
+   "paper": "18_fmd_review",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/18_fmd_review.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/18_fmd_review.pypdf.txt"
+  }
+ ]
+}

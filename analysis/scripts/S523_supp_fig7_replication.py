@@ -96,7 +96,9 @@ OWNED = (f"Supplementary Figure {N}*", f"supplementary_figure{N}_numbers.json", 
          "legend_draft.md")
 # panel a, in mm: one axis; per generator two rows (verified pass, RLM-10)
 A_GLAB, A_SLAB = 35.0, 55.0                      # right edges: the generators' names, the strategies' names
-A_X0, A_X1, A_XN = 57.0, 163.0, 182.5            # axes left, axes right, the n column's right edge
+A_X0, A_X1 = 57.0, 182.5                         # axes left, axes right (Valerio 11 Nov: the n column is gone, its
+                                                 # n = 86 and n = 29 are in the legend's a, so the axis takes its width)
+A_KEY_X = 110.0                                  # a's key centre, where it sat before the axis widened (inside the page)
 A_TOP, A_RP, A_GGAP = 8.0, 7.0, 2.0              # first row's top, a row's height, the gap between two generators
 A_XLIM, A_TICKS = (-55.0, 55.0), (-50, -25, 0, 25, 50)   # O1 bars: every share and interval within 45
 A_BAR_MM = 4.0                                   # a row's bar thickness
@@ -256,7 +258,7 @@ def read_ab() -> dict:
 
 def stamp(c: dict, ab: dict) -> str:
     parts = ", ".join(f"{GEN_LABEL[g]} {hs.fmt_num(v)}" for g, v in ab["k"].items())
-    return (f"PROVISIONAL: panels a and b from the T2 judge rows on the final key (D256), {hs.fmt_num(sum(ab['k'].values()))} "
+    return (f"panels a and b from the T2 judge rows on the final key (D256), {hs.fmt_num(sum(ab['k'].values()))} "
             f"of {hs.fmt_num(T2_PLANNED)} T2 answers read ({parts}); panel c from S518's committed verdicts (D195)")
 
 
@@ -296,12 +298,12 @@ def legend(c: dict, ab: dict) -> str:
         raise SystemExit(f"Supplementary Figure {N} b: the legend's question counts are not shared as written: {nb}")
     nsmall = nb[next(g for g in B_GENS if GEN_LABEL[g] in small)]
     return (f"# Supplementary Figure {N}, title and legend (draft)\n\n"
-            f"Written by `{SCRIPT}`. Data stamp: {stamp(c, ab)}.\n\n"
+            f"Written by `{SCRIPT}`.\n\n"
             f"**Supplementary Figure {N} | Replication on other generators in full.** Judged by devstral-small-2:24b on "
             f"the final answer key; a pass is judge score 4 or more. **a**, For each generator, two rows: verified pass and "
             f"RLM-10, each the generator's pass share with that strategy minus its pass share with single pass, per "
             f"answerable question, over its draws (three, except "
-            f"gemini-2.5-pro, one draw outside the fixed 45-question subset, and the RLM runs of gemma3:27b and "
+            f"gemini-2.5-pro, one draw outside the fixed 45-question subset (29 of them answerable), and the RLM runs of gemma3:27b and "
             f"qwen3-coder:30b, that subset only). Bars, the share of questions (%) where the strategy passed fewer draws "
             f"than single pass (vermilion, left of 0) and more (blue, right of 0); ties are not drawn. Diamond, the mean "
             f"of the questions' differences; line, its two-sided 95% percentile interval over "
@@ -435,8 +437,6 @@ def draw(paths: dict, c: dict, ab: dict) -> dict:
                if not A_XLIM[0] <= v <= A_XLIM[1]]
         if out:
             raise SystemExit(f"Supplementary Figure {N} a: a value outside the axis {A_XLIM}: {out}")
-        num(hs.text_mm(fig, A_XN, top + yc, f"n = {hs.fmt_num(b['n_questions'])}", va="center", ha="right"),
-            {"sheet": SHEETS["a"], "row": bi, "format": "n = {n_questions}"})
         th = A_BAR_MM / hs.mm_per_unit(ax)[1]
         left = ax.barh(yc, -b["fewer_pct"], left=0.0, height=th, color=A_FEWER, edgecolor="none", lw=0, zorder=2.0)
         right = ax.barh(yc, b["more_pct"], left=0.0, height=th, color=A_MORE, edgecolor="none", lw=0, zorder=2.0)
@@ -445,7 +445,7 @@ def draw(paths: dict, c: dict, ab: dict) -> dict:
     hs.key(fig, [("swatch", A_FEWER, "Fewer draws passed than single pass"),
                  ("swatch", A_MORE, "More draws passed"),
                  ("mark", (hs.BLACK, "D"), "Mean difference and its interval")],
-           centre_x=A_X0 + (A_X1 - A_X0) / 2, y=ya + 2.4, max_width=None)
+           centre_x=A_KEY_X, y=ya + 2.4, max_width=None)
     text(A_X0 + (A_X1 - A_X0) / 2, top + ha + 6.4, "Share of questions (%); mean difference (percentage points)",
          "the axis label",
          ha="center")
@@ -529,7 +529,7 @@ def build(out: Path) -> dict:
     c = read_c()
     ab = read_ab()
     k = sum(ab["k"].values())
-    tag = f" (provisional, {k} of {T2_PLANNED})"
+    tag = ""                                  # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
     out = Path(out).resolve()
     out.mkdir(parents=True, exist_ok=True)
     for pat in OWNED:
@@ -555,7 +555,7 @@ def build(out: Path) -> dict:
     lf = out / "legend_draft.md"
     lf.write_text(legend(c, ab))
     cap = out / f"Supplementary Figure {N} data caption{tag}.md"
-    cap.write_text(f"# Supplementary Figure {N} data, caption\n\nProvisional. Data stamp: {st}. Sheet {SHEETS['a']}: per "
+    cap.write_text(f"# Supplementary Figure {N} data, caption\n\nData stamp: {st}. Sheet {SHEETS['a']}: per "
                    f"generator and strategy (verified pass, RLM-10), one bar row (n_questions; questions where the "
                    f"strategy passed fewer, the same and more draws than single pass, and the first and last as % of "
                    f"n; mean_pp with its two-sided 95% percentile interval over 10,000 question resamples, seed "

@@ -1,23 +1,23 @@
 {
  "provenance": {
   "script": "scripts/S543_supp_signal_pairs.py",
-  "script_sha256": "9fc9a9c1c1857c66278e1db463b54c6fc388147c1e8f3681022ee149fd3aa1ff",
+  "script_sha256": "d879947c973ae8d9489a131dddb767b1daa0bc05d31fc0999504199bde2d0022",
   "imports_sha256": {
-   "S497_fig5_d166.py": "fc17bb3af77503ddfd6346aa8b4c7dc33f3753e87b25da60bec2b4fcddc44068",
-   "S540_fig5_evaluators.py": "e227184bb004d52856be2ab4f8440120b108ae1cc7c6035e20ed6814b7d8c920",
+   "S497_fig5_d166.py": "40fb4d6f94b4c4e84991f821529313a5326c7c81ea2aa3b2722d6ac5a438fef6",
+   "S540_fig5_evaluators.py": "30290ee53f3da1b1b34428cc66f96b358b89dc0ecd7e2da33dee0765ec777eec",
    "house_style.py": "647c8991f4dcd2cea08e0be46eaf758beb55fb029c54bb267e7fba1e0b8b17b6",
-   "figure_names.py": "a3c65ae0a1e8aa05e99a99610ea857f63b0d8fff60a99404bcb5bf6ff9a82e65",
+   "figure_names.py": "025f8904861fd8d916cd875346a1384e915ea6601bfd2f7624dd71e49f2948a7",
    "minicheck_filter.py": "6d2258a6f691324de266824695da7a56eff02d60eef18456ab4d60ee9138242d",
-   "S473_fig5_panels.py": "6d637b9f4e990a3470661fedee652f2b8341d8cbb4abf79acc451992340f3b36",
-   "S457_fig2_panels.py": "8c29dab8b04a1bad4a955582a30831c51c2b70438be2f6d2698c7b81948d7520",
-   "S463_fig2_ranking.py": "8279a35d27c5a99d34980b59529203b104526035beba74031c9964a2ee360825",
+   "S473_fig5_panels.py": "2ff460af2fc1f47ac5eaa70a3bcce85c84aced56b8b67ec078f9c6b8dc7990dc",
+   "S457_fig2_panels.py": "33dc73444a80cf9d9b429fff6e489322bb01ca828a10f12a90487d84e7eaa4a1",
+   "S463_fig2_ranking.py": "8d9070c7036276ac1fb48a8cfa859b48e207b4c8ce15a84f2832e5a2bf88aa6d",
    "fig_repro.py": "4bca103b599da4adc0bd473f5b8210dd48b6543caaf63e5589f2faaa7b37d18b",
    "judge_rows_v25.py": "77d4a84d7aff4dd0ee92366395a4be2e5f27fe20d5de99ccbc86b7333c401661",
    "S564_claimify_selection.py": "f768b4937529c1f4d2eb2971e80c3249a4cc988b4418527abd2909544e63d622"
   },
   "command": "uv run --frozen python scripts/S543_supp_signal_pairs.py figure"
  },
- "stamp": "PROVISIONAL: 516 of 516 draw-1 answerable answers have a final row from all four scorers; numbers from S497's panel_data on the claim-filtered rows",
+ "stamp": "516 of 516 draw-1 answerable answers have a final row from all four scorers; numbers from S497's panel_data on the claim-filtered rows",
  "page_mm": [
   183.0,
   119.0
@@ -181,17 +181,17 @@
  },
  "figure_lock": {
   "path": "experiments/FIGURE_LOCK.toml",
-  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "sha256": "ac39c4e311f340654fe1ebe3333a3fe439bc6286e38fc0334fdb0e0cf2a97aef",
   "status": "agreed"
  },
  "files": {
-  "Supplementary Figure 12 (provisional, 516 of 516).pdf": "76316a1d399eaa3d133c538214abbf6acc7e1fae2242b0ab946b2f11f0d80736",
-  "Supplementary Figure 12 (provisional, 516 of 516).png": "55b662b2f4947b2373eaabfcd550468a7821d3e00b3f89ea4b2ef66d279f5234",
-  "Supplementary Figure 12 (provisional, 516 of 516).svg": "0660bbfcbe43750f7ecaa38419b5d165330fd9cc4a5b614a918132f0dea426aa",
-  "Supplementary Figure 12 data (provisional, 516 of 516).xlsx": "31447e41e931cde9b7a0e56b66264dd654e84b1954acff3cade9dd3f0c66e89d",
-  "Supplementary Figure 12 data caption (provisional, 516 of 516).md": "5e9c8cf6a84245c5f4ee12c7bed0e17bff755d0d3b5ada787b4627a317f428bb",
-  "legend_draft.md": "ee3f53672c0fcc843cee23644f19892e7c6158ac230837454f436605c0cb836b",
+  "Supplementary Figure 12 data caption.md": "6bb65665801f390272e82652581042ef9f6a73179b586aa17184402d9f3ed8b2",
+  "Supplementary Figure 12 data.xlsx": "31447e41e931cde9b7a0e56b66264dd654e84b1954acff3cade9dd3f0c66e89d",
+  "Supplementary Figure 12.pdf": "76316a1d399eaa3d133c538214abbf6acc7e1fae2242b0ab946b2f11f0d80736",
+  "Supplementary Figure 12.png": "55b662b2f4947b2373eaabfcd550468a7821d3e00b3f89ea4b2ef66d279f5234",
+  "Supplementary Figure 12.svg": "0660bbfcbe43750f7ecaa38419b5d165330fd9cc4a5b614a918132f0dea426aa",
+  "legend_draft.md": "342bb21cc616bc5dd294abbf9946a66fdbd6de9bbd07db42fe990811e6535310",
   "methods_notes.md": "0524fd0a3800eb4f90f72bd78dfe7f7a549c2d3af6e925226af17cfaaea66a68",
-  "supplementary_figure12_numbers.json": "5ba7cdc3ecdba647b652fd3492fb4347693e46a6293c631a99b3795d0df5c41d"
+  "supplementary_figure12_numbers.json": "4842e9a240817f29d1b35ae0345d2cad861e57b3ea2b359d96df9dc270dfe5ff"
  }
 }

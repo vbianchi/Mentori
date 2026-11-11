@@ -1,0 +1,13 @@
+{
+ "id": "14_bovine_tb_cameroon_FR1",
+ "category": "factual_recall",
+ "subcategory": null,
+ "question": "What were the specific bovine tuberculosis (bTB) prevalence estimates calculated in this study based on the different diagnostic tests and thresholds used?",
+ "papers": [
+  {
+   "paper": "14_bovine_tb_cameroon",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/14_bovine_tb_cameroon.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/14_bovine_tb_cameroon.pypdf.txt"
+  }
+ ]
+}

@@ -1,0 +1,7 @@
+{
+ "id": "OOD_042",
+ "category": "out_of_domain",
+ "subcategory": "contradictory",
+ "question": "The fastp paper states that fastp requires separate tools for adapter trimming and quality filtering, processing data in multiple sequential passes. Is this accurate?",
+ "papers": []
+}

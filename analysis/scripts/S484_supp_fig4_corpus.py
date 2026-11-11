@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""S484 - Supplementary Figure 17 (provisional): every G4 strategy against every other, pooled by corpus
+"""S484 - Supplementary Figure 17: every G4 strategy against every other, pooled by corpus
 size, design S-2 as Valerio approved it (D151) and placed in the Supplementary stack by D152.
 
 WHERE IT GOES. D151 (Valerio, 26 October about 19:10, experiments/README.md "D151"): "I agree with S-2 [...] it
@@ -97,7 +97,7 @@ plain call (a), G4_fig3c_d185; the covered questions of D126). D154
 
 WRITES findings/figures_provisional/supp_fig17_corpus/ (earlier "Supplementary Figure 17*" and
 supplementary_figure17_* files deleted first): the plate as PDF, SVG and PNG (the PDF rasterised at 600 dpi), the data
-workbook "Supplementary Figure 17 data (provisional, k of 72).xlsx" (its panel sheets and "Supplementary Fig. 17 units"),
+workbook "Supplementary Figure 17 data.xlsx" (its panel sheets and "Supplementary Fig. 17 units"),
 its caption, supplementary_figure17_numbers.json (sheets and the printed map S448 R8 reads),
 supplementary_figure17_provenance.json and legend_draft.md. k is the index x strategy units judged complete.
 
@@ -858,7 +858,7 @@ def legend_text(stamp, drawn, cells, ranks, reason, covered, by):
     n_cmp = {c: len(drawn[c]) * (len(drawn[c]) - 1) // 2 for c in SIZES}
     cmp_words = join_words([f"{n_cmp[c]}" for c in SIZES])
     return (
-        f"Legend DRAFT for {PLATE} (written by {SCRIPT}). Data stamp: {stamp}.\n\n"
+        f"Legend DRAFT for {PLATE} (written by {SCRIPT}).\n\n"
         f"**{PLATE} | Every strategy against every other, by corpus size**\n\n"
         "**a**, Difference in pass rate between two strategies, row minus column, in percentage points, a "
         "pass being a judge correctness score of 4 or more (gemini-3-flash, one draw; devstral-small-2 "
@@ -883,7 +883,7 @@ def legend_text(stamp, drawn, cells, ranks, reason, covered, by):
 
 def caption_text(stamp, tag, k, d185: bool = False):
     return (f"# {PLATE} data, caption\n\n"
-            f"**{PLATE} data | Numerical values plotted in {PLATE}.** Provisional: {k} of {UNITS_TOTAL} index x "
+            f"**{PLATE} data | Numerical values plotted in {PLATE}.** {k} of {UNITS_TOTAL} index x "
             "strategy units of G4 draw 1 are judged complete" + (
                 "; verified pass is drawn only at the sizes where its three units are complete, and every value "
                 "will be redrawn by the same script when its judging ends. " if k < UNITS_TOTAL else ". ") +
@@ -931,9 +931,9 @@ def build(D, numbers3, scratch=None, out=OUT, write=True, quiet=False, vmax=V, m
     drawn, cells, ranks = compute(by, units)
     g2 = gate2(cells, ranks, scratch, scratch_R)
     k = sum(bool(v["complete"]) for v in units.values())
-    tag = f"(provisional, {k} of {UNITS_TOTAL})"
+    tag = ""                                  # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
     vp_open = [c for c in SIZES if "verified_pass" not in drawn[c]]
-    stamp = (f"PROVISIONAL: {k} of {UNITS_TOTAL} index x strategy units judged complete (G4 draw 1, judge S3, "
+    stamp = (f"{k} of {UNITS_TOTAL} index x strategy units judged complete (G4 draw 1, judge S3, "
              f"devstral-small-2:24b plain call (a)); "
              + (f"verified pass not yet judged at {join_words([str(c) for c in vp_open])} core papers; " if vp_open
                 else "") + (f"S476 g4c on {g4_reading_id(D['header'])}" if "d185" not in D else
@@ -948,7 +948,7 @@ def build(D, numbers3, scratch=None, out=OUT, write=True, quiet=False, vmax=V, m
     if lp:
         raise Refused("; ".join(lp))
     tmp = Path(tempfile.mkdtemp(prefix="s484_"))
-    base = f"{PLATE} {tag}"
+    base = f"{PLATE}{tag}"
     paths = {x: tmp / f"{base}.{x}" for x in ("pdf", "svg", "png")}
     printed, rb, (W, H) = draw(paths, drawn, cells, ranks, vmax=vmax, mut=mut)
     bad = check_drawn(rb, drawn, cells, ranks, vmax=vmax)
@@ -977,12 +977,12 @@ def build(D, numbers3, scratch=None, out=OUT, write=True, quiet=False, vmax=V, m
         ws.append(sh["columns"])
         for r in sh["rows"]:
             ws.append(r)
-    xlsx = tmp / f"{PLATE} data {tag}.xlsx"
+    xlsx = tmp / f"{PLATE} data{tag}.xlsx"
     wb.save(xlsx)
     fig_repro.deterministic_xlsx(xlsx)                 # D155: no write time in core.xml or the zip members
     fig_repro.check_pdf_deterministic(paths["pdf"])
     fig_repro.check_svg_deterministic(paths["svg"])
-    cap = tmp / f"{PLATE} data caption {tag}.md"
+    cap = tmp / f"{PLATE} data caption{tag}.md"
     cap.write_text(caption_text(stamp, tag, k, "d185" in D))
     numbers = {"stamp": stamp, "sheets": sheets, "printed": printed,
                "drawn_strategies_by_core_papers": {str(c): v for c, v in drawn.items()},

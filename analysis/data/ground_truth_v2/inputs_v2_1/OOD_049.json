@@ -1,0 +1,7 @@
+{
+ "id": "OOD_049",
+ "category": "out_of_domain",
+ "subcategory": "contradictory",
+ "question": "According to the MultiQC paper, the tool can only process output from a single bioinformatics tool at a time and does not support aggregation across tools. Is this correct?",
+ "papers": []
+}

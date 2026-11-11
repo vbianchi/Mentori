@@ -1,5 +1,5 @@
 {
- "stamp": "PROVISIONAL: 6,512 of 6,512 planned T3 answers, from frozen set findings/recompute/frozen_inputs/extracted/count_records_20261106/count_records_20261106/t3/T3_frozen_20261104T131439Z (SHA256SUMS 0d1312adf1bf); models in: gpt-oss:20b, devstral-small-2:24b, gemma3:27b, qwen3-coder:30b, gemini-3-flash-preview, llama3:8b; panel a from S12b's 194 judge rows on key v2.5 (run_sha256 05ef318daed4, findings/recompute/s12b_inputs/SHA256SUMS 2ce95c580962); D213: the 18 items on D9's six questions left out",
+ "stamp": "6,512 of 6,512 planned T3 answers, from frozen set findings/recompute/frozen_inputs/extracted/count_records_20261106/count_records_20261106/t3/T3_frozen_20261104T131439Z (SHA256SUMS 0d1312adf1bf); models in: gpt-oss:20b, devstral-small-2:24b, gemma3:27b, qwen3-coder:30b, gemini-3-flash-preview, llama3:8b; panel a from S12b's 194 judge rows on key v2.5 (run_sha256 05ef318daed4, findings/recompute/s12b_inputs/SHA256SUMS 2ce95c580962); D213: the 18 items on D9's six questions left out",
  "what": "the rows of Supplementary Figure 10, sheet by sheet as its data workbook holds them, from T3's frozen set; a cell is empty where its model has no answer in the set; sheet a from S12b's judge rows",
  "sheets": {
   "Supplementary Fig. 10a": {
@@ -17372,7 +17372,7 @@
   "s448num_2": {
    "sheet": "Supplementary Fig. 10a",
    "row": 0,
-   "format": "\u03c1 {rho:.2f}, n = {n}"
+   "format": "\u03c1 {rho:.2f}"
   },
   "s448num_3": {
    "fixed": "devstral-small-2:24b",
@@ -17381,7 +17381,7 @@
   "s448num_4": {
    "sheet": "Supplementary Fig. 10a",
    "row": 1,
-   "format": "\u03c1 {rho:.2f}, n = {n}"
+   "format": "\u03c1 {rho:.2f}"
   },
   "s448num_5": {
    "fixed": "gemma3:27b",
@@ -17390,7 +17390,7 @@
   "s448num_6": {
    "sheet": "Supplementary Fig. 10a",
    "row": 2,
-   "format": "\u03c1 {rho:.2f}, n = {n}"
+   "format": "\u03c1 {rho:.2f}"
   },
   "s448num_7": {
    "fixed": "qwen3-coder:30b",
@@ -17399,7 +17399,7 @@
   "s448num_8": {
    "sheet": "Supplementary Fig. 10a",
    "row": 3,
-   "format": "\u03c1 {rho:.2f}, n = {n}"
+   "format": "\u03c1 {rho:.2f}"
   },
   "s448num_9": {
    "fixed": "gemini-3-flash",
@@ -17408,7 +17408,7 @@
   "s448num_10": {
    "sheet": "Supplementary Fig. 10a",
    "row": 4,
-   "format": "\u03c1 {rho:.2f}, n = {n}"
+   "format": "\u03c1 {rho:.2f}"
   },
   "s448num_11": {
    "fixed": "llama3:8b",
@@ -17417,7 +17417,7 @@
   "s448num_12": {
    "sheet": "Supplementary Fig. 10a",
    "row": 5,
-   "format": "\u03c1 {rho:.2f}, n = {n}"
+   "format": "\u03c1 {rho:.2f}"
   },
   "s448num_13": {
    "fixed": "gpt-oss:20b",

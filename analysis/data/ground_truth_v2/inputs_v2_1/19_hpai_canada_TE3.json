@@ -1,0 +1,13 @@
+{
+ "id": "19_hpai_canada_TE3",
+ "category": "technical",
+ "subcategory": null,
+ "question": "Which specific viral mutations linked to mammalian adaptation were detected in the neurological tissues of carnivores in Canada and Europe?",
+ "papers": [
+  {
+   "paper": "19_hpai_canada",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/19_hpai_canada.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/19_hpai_canada.pypdf.txt"
+  }
+ ]
+}

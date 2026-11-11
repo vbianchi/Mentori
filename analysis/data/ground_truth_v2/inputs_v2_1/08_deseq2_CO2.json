@@ -1,0 +1,13 @@
+{
+ "id": "08_deseq2_CO2",
+ "category": "conceptual",
+ "subcategory": null,
+ "question": "How does the DESeq2 framework utilize Empirical Bayes shrinkage to handle the high uncertainty associated with low-count genes in both dispersion and fold change estimation?",
+ "papers": [
+  {
+   "paper": "08_deseq2",
+   "pymupdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/08_deseq2.pymupdf.txt",
+   "pypdf": "/Users/valeriobianchi/projects/Mentori-reanalysis/data/ground_truth_v2/paper_text/08_deseq2.pypdf.txt"
+  }
+ ]
+}

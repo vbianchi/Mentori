@@ -67,17 +67,17 @@ THREE STEPS, from the repository root (--as and --n name the plate; the defaults
      (findings/letter_check/question_2.md:16, :26). Then writes into the plate's folder,
      findings/figures_provisional/supp_fig<N>/ (supp_fig17_outcomes/ for Supplementary Figure 17, fig<N>/ for a main
      figure; a folder holding another script's provenance file is refused, and so is a main "Figure 2", which is S531's):
-       <name> (provisional, <n> of 4050).{pdf,svg,png}   <name> is FIGURE_LOCK [files] supplementary_name or name
+       <name>.{pdf,svg,png}                         <name> is FIGURE_LOCK [files] supplementary_name or name
                                     with --n; one page, every size, font, colour and limit read from
                                     experiments/FIGURE_LOCK.toml (D84, D87): [page] width_double_mm wide, at most
                                     height_max_mm high; the first of [type] font_families, every text at [type]
                                     font_min_pt, panel letters panel_letter_pt and panel_letter_weight, no panel
                                     titles; [colour] categorical (Okabe and Ito) and grey; no line under [lines]
                                     line_min_pt; no ligatures; the PNG is the PDF rasterised at 600 dpi (MuPDF), so
-                                    S448 R7 can compare them pixel by pixel; the data state in the file name only
-       the data workbook             a Supplementary figure: "<name> data (provisional, ...).xlsx", sheets
+                                    S448 R7 can compare them pixel by pixel; the data state in the stamp only
+       the data workbook             a Supplementary figure: "<name> data.xlsx", sheets
                                     "Supplementary Fig. <N>a" and so on (S461's convention; Source Data is a
-                                    main-figure rule, editor row 20); a main figure: "Source Data Fig. <N> (...).xlsx",
+                                    main-figure rule, editor row 20); a main figure: "Source Data Fig. <N>.xlsx",
                                     sheets "Fig. <N>a" and so on; one sheet per panel, the numbers plotted
        [supplementary_]figure<N>_numbers.json   the same sheets as JSON, "printed": every number printed on the plate,
                                     by its SVG group id, with the sheet, row and format it is written from (S448 R8
@@ -93,8 +93,8 @@ THREE STEPS, from the repository root (--as and --n name the plate; the defaults
      "rerun", not yet stored again; "stays_failed" answers are settled, D92 Q185), it was not planned from an
      out-of-date token target (G2), and its answers file was checked by S455 for the D89 and D90 Gemini cases (G2: a
      scan of its current file, experiments/NOW.md:29). Files of an earlier data state (the plate's name and the
-     workbook's stem) are deleted first. --final drops the provisional suffix and is refused while an answer is not
-     settled. The provenance file's command writes a records folder outside the repository as <records>.
+     workbook's stem) are deleted first. No name carries a "(provisional, ...)" suffix (Q9, Valerio, 11 Nov); --final
+     is refused while an answer is not settled. The provenance file's command writes a records folder outside the repository as <records>.
 
   3. selftest uv run --frozen python scripts/S457_fig2_panels.py selftest
      The plate's calculations on synthetic records (the wait taken off the clock time, the times adding up, the G2
@@ -1731,7 +1731,7 @@ def legend_and_caption(fn, stamp, n_in, extra, nm, rerun, command=None):
     box_txt = "Grey dots, question means over three draws; box, interquartile range; line, median; whiskers, range; "
     legend = (
         f"# {nm['plate']}, title and legend (draft)\n\n"
-        f"Written by `{SCRIPT} figure` from the plotted numbers. Data stamp: {stamp}.\n\n"
+        f"Written by `{SCRIPT} figure` from the plotted numbers.\n\n"
         f"{title} Each set-up answered the {N_Q} questions three times with {GEN_DISPLAY.get(extra['gen_model'], extra['gen_model'])} "
         # editor row 45 (Valerio, 8 Nov): n = X only in the panels that draw boxes (b, c, d, f); a and e draw
         # counts, so their counts stay in words; every panel described in full, no "as in b"
@@ -1740,7 +1740,7 @@ def legend_and_caption(fn, stamp, n_in, extra, nm, rerun, command=None):
         f"({extra['pkg']}), each with its turn cap ({extra['max_iter']}) after the dash. "
         f"**a**, Answers that did not end in a plain answer, stacked by kind. Right: answers that "
         f"did; answers with no text; and, of the {n_oos * len(DRAWS)} answers per set-up to the "
-        f"{n_oos} out-of-scope questions, those judged refused (refusal accuracy {REFUSED_AT} or "
+        f"{n_oos} out-of-scope questions, those judged refused (refusal score {REFUSED_AT} or "
         f"more), among those cut at the turn limit (RLM-5) or by the closing turn (multi-hop), "
         f"and the rest (no judge row: not refused). "
         f"**b**, Tokens per answer (prompt, output and thinking, verifier's included), log scale. " + box_txt + f"n = {N_Q} questions per set-up. "
@@ -1756,10 +1756,9 @@ def legend_and_caption(fn, stamp, n_in, extra, nm, rerun, command=None):
     sh = nm["sheet_prefix"]
     cap = (
         f"# {cap_name}, caption\n\n"
-        f"**{cap_name} | Numerical values plotted in {nm['plate']}.** Provisional: drawn from {fmt_int(n_in)} of the "
+        f"**{cap_name} | Numerical values plotted in {nm['plate']}.** Drawn from {fmt_int(n_in)} of the "
         f"{fmt_int(TOTAL)} answers the plate plans, {fmt_int(rerun['settled'])} of them settled, judged only in a's "
-        f"split columns; every value will be redrawn from the "
-        f"full records by the same script. Data stamp: {stamp}. One sheet per panel. Sheet {sh}a: per set-up and "
+        f"split columns. Data stamp: {stamp}. One sheet per panel. Sheet {sh}a: per set-up and "
         f"outcome (stop reason as stored, empty answer text, verifier status), the answers counted and the set-up's "
         f"answers; the set-up's first row also gives how many of its answers S455's D92 list names "
         f"(to rerun or left as stored). "
@@ -2434,11 +2433,11 @@ def figure(args):
         raise SystemExit(f"--final: {rerun['settled']} of {TOTAL} answers settled; {rerun_state(rerun)}; the plate "
                          f"stays provisional")
     final = args.final
-    stamp = ("" if final else "PROVISIONAL: ") + (
+    stamp = (                               # Q9 (Valerio, 11 Nov): no PROVISIONAL in any stamp
         f"{rerun['settled']:,} of {TOTAL:,} answers settled (all {n_in:,} stored: G1 {g1_n:,}, G2 {g2_n}, G6 "
         f"{g6_n:,}; settled: no rerun owed, no matched-budget token target out of date, checked by S455 for the D89 "
         f"and D90 Gemini cases), judged only in a's split columns, records of {iso_local(newest)}; {rerun_state(rerun)}")
-    tag = "" if final else f" (provisional, {rerun['settled']} of {TOTAL})"
+    tag = ""                                # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
     out = Path(args.out).resolve() if getattr(args, "out", None) else nm["out"]    # rebuild --out (D155)
     out.mkdir(parents=True, exist_ok=True)
     for old in sorted(set(out.glob(f"{nm['plate']}*")) | set(out.glob(f"{nm['stem']}*"))):   # the data's name

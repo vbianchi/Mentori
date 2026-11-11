@@ -8,7 +8,9 @@ released data and holds every output to the released copy.
 
   --data DIR        the data root (env MENTORI_DATA): DIR/frozen/<the 14 frozen tars> and DIR/analysis_inputs.tar, the
                     names, sizes and sha256 DATA_FILES.tsv lists. Every file is checked against DATA_FILES.tsv first;
-                    any file missing or with another sha256 stops the run before anything is built.
+                    any file missing or with another sha256 stops the run before anything is built. One row is
+                    optional (folder "optional"): DIR/ratings.tar, the anonymised rating rows (D313 R-Q1 O1). Absent,
+                    Figure 2 and Supplementary Figure 3 are held by sha256; present with another sha256, the run stops.
   --download        fetch every file DATA_FILES.tsv lists that DIR does not hold yet, from
                     <zenodo-url>/files/<name>?download=1, into DIR (a .part file, renamed once its sha256 is right).
   --zenodo-url URL  the record's base URL. Default ZENODO_URL below, whose record id is TO FILL AFTER DEPOSIT.
@@ -25,7 +27,9 @@ WHAT IT DOES
   2. Makes a work copy: this folder (without .venv, __pycache__ and earlier work copies), then analysis_inputs.tar
      unpacked into it at its repository paths. Then `git init`, `git add -A` and one commit with a fixed author and
      date, because S494 compares every output with git HEAD and its read audit fails any read of a file HEAD does not
-     hold. Nothing in the analysis code is edited.
+     hold. Nothing in the analysis code is edited. With ratings.tar, its files are unpacked into the work copy and
+     listed in its .gitignore, so none enters its git (D168); a member the tree already holds must have the same
+     bytes. RATED's read audit allows exactly those paths.
   3. Stage s494: `uv run --frozen python scripts/S494_all_figures.py --out <work>_s494 --tars <DIR>/frozen` in the
      work copy, unchanged (its --out folder sits beside the work copy, outside it). It checks the frozen inputs, rebuilds every plate and number step it knows, compares each file
      byte for byte with the released copy, runs S448 on each plate, and judges every read (scripts/S494_all_figures.py
@@ -33,12 +37,23 @@ WHAT IT DOES
   4. Stage numbers: every producer in NUMBERS, run in the work copy by the command its docstring gives, one at a time,
      under the same read audit (scripts/fig_read_audit.py). A producer that writes in place is compared with git HEAD
      through `git status` (a tracked file it changed differs; an untracked file it left is new); one given an --out
-     folder is compared file by file with its committed folder. A producer that compares no file fails ("compared no
+     folder is compared file by file with its committed folder. A producer's "env" sets its environment variables:
+     S534 t9 gets MENTORI_RUNS, the t3 folder of count_records_20261106.tar as fig_repro.frozen extracts it in the work
+     copy. With ratings.tar, RATED runs last: S530 then S531 --raters 2, by their committed commands, under one audit,
+     S530 with MENTORI_GENERATED_AT set to ratings.tar's findings/recompute/S530_human_signals/generated_at.txt (D315:
+     the time of the run the released plates record, so the results.json whose sha256 their provenance files record is
+     rebuilt byte for byte; a ratings.tar without that member leaves it unset, S530 stamps the current time, and the
+     two provenance files then differ in that sha256 alone, shown as differing, never masked),
+     each plate folder S531 writes (git-ignored in the work copy) compared file by file with its committed folder. A producer that compares no file fails ("compared no
      file"), so a command that writes nothing cannot pass. After each producer the work copy is reset to HEAD
      (`git checkout -- .`, `git clean -fdq`), so every producer reads the released inputs, as S494's steps do. A
      difference is never masked: the row shows the files that differ, and for a json file the key paths that differ.
   5. Stage held: every file of HELD (tier 3: needs a model call, a person, the rating rows or data not in the release)
-     against its sha256 in expected/MANIFEST.sha256, each printed with the reason it is not rebuilt.
+     against its sha256 in expected/MANIFEST.sha256, each printed with the reason it is not rebuilt. RATED_HELD's
+     entries (Figure 2, Supplementary Figure 3) are left out when RATED rebuilt them.
+     No producer of NUMBERS or RATED opens the chunk store (S511 and S578 read env MENTORI_L1_STORE, default
+     ~/l1_inputs/store, but S511 is in no stage and S578 --from-rows reads its committed rows), so reproduce.py sets no
+     MENTORI_L1_STORE; a store read would show as an audit violation.
   6. One pass table, and the platform record (Python, the Helvetica the plates were drawn with). Exit 0 only when
      every stage passes.
 
@@ -83,7 +98,23 @@ __pycache__/
 *.pyc
 .DS_Store
 /findings/recompute/frozen_inputs/extracted/
+/findings/recompute/S530_human_signals/
+/findings/recompute/S531_plates/
 """
+# ratings.tar (D313 R-Q1 O1, built by Mentori-reanalysis scripts/S626_release_extras.py ratings_entries and staged by
+# S610): the anonymised rating rows S530 --ratings reads, S08's v2.2 results S530's gate reproduces, the master sheet
+# they were collected on, the rating protocol, and the Supplementary Figure 3 data file and caption (also in this tree,
+# the same bytes). DATA_FILES.tsv lists it in folder "optional": when the data root holds it with that sha256, make_work
+# unpacks it into the work copy and the numbers stage redraws Figure 2 and Supplementary Figure 3 (RATED); when it is
+# absent, or DATA_FILES.tsv has no row for it, the two plates are held by sha256 (HELD, RATED_HELD).
+RATINGS_TAR = "ratings.tar"
+RATINGS_MEMBERS = {"findings/recompute/S354_v22_human_ratings.csv",     # S530 --ratings (D168: never in git)
+                   "findings/recompute/S08_v22_results.json",           # S530's gate reproduces it
+                   "response/human_eval_v22/human_eval_master_v22.csv",  # the master, every rating cell blank
+                   "findings/S08b_PROTOCOL_HUMAN_EVAL_V22.md"}          # the protocol, its decision rule
+# D315 Q4 O2: one line, S530's "generated" time in the run the released plates record. Optional: an older ratings.tar
+# lacks it, and RATED then runs S530 without MENTORI_GENERATED_AT (its provenance files then differ, never masked).
+GENERATED_AT_MEMBER = "findings/recompute/S530_human_signals/generated_at.txt"
 
 # ---------------------------------------------------------------------------------------------------------------
 # Tier 2: the producers of the numbers and tables outside S494. Each: name, what it makes, the command (as its
@@ -102,6 +133,10 @@ NUMBERS = [
      "committed": "findings/figures_provisional/supp_fig18_evaluators"},
     {"name": "S583", "label": "Supplementary Table 1", "cmd": ["scripts/S583_judge_calibration_table.py"]},
     {"name": "S534 t1", "label": "Supplementary Table answer counts", "cmd": ["scripts/S534_si_tables.py", "t1"]},
+    # t9 reads the T3 frozen set from env MENTORI_RUNS (Q5 O1, D313): the folder holding T3_frozen_20261104T131439Z,
+    # here count_records_20261106.tar's t3/ as fig_repro.frozen extracts it inside the work copy ("{frozen:SET:REL}")
+    {"name": "S534 t9", "label": "Supplementary Table 3", "cmd": ["scripts/S534_si_tables.py", "t9"],
+     "env": {"MENTORI_RUNS": "{frozen:count_records_20261106:count_records_20261106/t3}"}},
     {"name": "S533", "label": "Supplementary Table 66 questions", "cmd": ["scripts/S533_table_66_questions.py"]},
     {"name": "S535", "label": "Supplementary Table human evaluation grid (frame)",
      "cmd": ["scripts/S535_table_human_grid.py", "frame"]},
@@ -140,12 +175,31 @@ NUMBERS = [
     # producer that needs it.
 ]
 
+# Run only when the data root holds ratings.tar (RATINGS_TAR): S530 then S531, each by the command its committed run
+# recorded (findings/recompute/S530_human_signals/results.json _provenance.command; the plates' *_provenance.json
+# command), so the rebuilt files carry the same commands. "cmds" run in order under one audit; "compare" holds each
+# folder the chain writes (inside the work copy, git-ignored there, removed after the comparison) to its committed
+# folder, file by file. The upstream files S530 reads through S08 (exp04_generation_latest.json, exp04_minicheck_latest
+# .json, analysis_human_eval_20260310.key.json) are in analysis_inputs.tar under data/upstream/publication/results/.
+RATED = [
+    {"name": "S530+S531", "label": "Figure 2 and Supplementary Figure 3 (from ratings.tar)",
+     # D315: env "from_file" values are read from the work copy before the scratch folders are emptied
+     "env_from_file": {"MENTORI_GENERATED_AT": GENERATED_AT_MEMBER},
+     "cmds": [["scripts/S530_human_signals.py", "--raters", "2", "--ratings",
+               "findings/recompute/S354_v22_human_ratings.csv"],
+              ["scripts/S531_fig2_s3_plates.py", "--raters", "2"]],
+     "compare": [("findings/recompute/S531_plates/fig2_human", "findings/figures_provisional/fig2_human"),
+                 ("findings/recompute/S531_plates/supp_fig3", "findings/figures_provisional/supp_fig3")],
+     "scratch": ["findings/recompute/S530_human_signals", "findings/recompute/S531_plates"]},
+]
+
 # ---------------------------------------------------------------------------------------------------------------
 # Tier 3: held by sha256, each with the reason it is not rebuilt here. Paths are files or folders (every file under).
 # ---------------------------------------------------------------------------------------------------------------
 HELD = [
     ("Figure 2", "findings/figures_provisional/fig2_human",
-     "drawn by S531 from S530's reading of the human rating rows, which are not released (D168; Q1)"),
+     "drawn by S531 from S530's reading of the rating rows; the data root holds no ratings.tar with the sha256 "
+     "DATA_FILES.tsv gives (RATED redraws it when it does)"),
     ("Supplementary Figure 3", "findings/figures_provisional/supp_fig3",
      "drawn by S531 from the rating rows, as Figure 2"),
     ("judge lock check", "findings/recompute/S440_judge_lock_check.md", "S440 calls the judge through Ollama"),
@@ -183,10 +237,6 @@ HELD = [
     ("Supplementary Table 2", "findings/figures_provisional/supp_tables/Supplementary Table 2.xlsx",
      "S534 t7 lists findings/recompute/I2_runs/sinks, which is not committed"),
     ("Supplementary Table 2", "findings/figures_provisional/supp_tables/Supplementary Table 2.md", "as the .xlsx"),
-    ("Supplementary Table 3", "findings/figures_provisional/supp_tables/Supplementary Table 3.xlsx",
-     "S534 t9 reads findings/runs/T3_frozen_20261104T131439Z (not committed; the same files are in "
-     "count_records_20261106.tar, but the script reads the findings/runs path)"),
-    ("Supplementary Table 3", "findings/figures_provisional/supp_tables/Supplementary Table 3.md", "as the .xlsx"),
     ("baseline strategy rank", "findings/recompute/S597_baseline_strategy_rank",
      "S597 at the release commit stops on the committed Figure 3 Source Data (KeyError 'row_kind')"),
     ("signal run time", "findings/recompute/S598_signal_run_time",
@@ -197,6 +247,7 @@ HELD = [
     ("retrieval sweep provenance", "findings/recompute/S601_retrieval_sweep_provenance",
      "S601 reads the git history of the sibling repository Mentori-backup, not in this release"),
 ]
+RATED_HELD = {"findings/figures_provisional/fig2_human", "findings/figures_provisional/supp_fig3"}   # RATED rebuilds
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -220,7 +271,8 @@ def data_files() -> list[dict]:
 
 
 def where(data: Path, row: dict) -> Path:
-    return data / row["name"] if row["folder"] == "." else data / row["folder"] / row["name"]
+    """Folder "." and "optional" (a file the run uses when present, ratings.tar) sit at the data root."""
+    return data / row["name"] if row["folder"] in (".", "optional") else data / row["folder"] / row["name"]
 
 
 def download(url: str, dest: Path, row: dict) -> None:
@@ -236,10 +288,16 @@ def download(url: str, dest: Path, row: dict) -> None:
     part.rename(dest)
 
 
-def check_data(data: Path, fetch: bool, base_url: str) -> list[str]:
-    lines, bad = [], []
+def check_data(data: Path, fetch: bool, base_url: str) -> tuple[list[str], set[str]]:
+    """Every row's file checked by sha256; returns the lines to print and the optional files present and equal. An
+    optional file that is absent is printed and skipped (with --download it is fetched like any other); one present
+    with another sha256 refuses the run, as any other file does."""
+    lines, bad, optional = [], [], set()
     for row in data_files():
         p = where(data, row)
+        if row["folder"] == "optional" and not p.is_file() and not fetch:
+            lines.append(f"{row['name']}: absent (optional): what it rebuilds is held by sha256")
+            continue
         if not p.is_file() and fetch:
             if "TO-FILL-AFTER-DEPOSIT" in base_url:
                 raise SystemExit("REFUSED: the Zenodo record id is not filled in yet: give --zenodo-url")
@@ -252,12 +310,42 @@ def check_data(data: Path, fetch: bool, base_url: str) -> list[str]:
             bad.append(f"{p}: sha256 {got[:12]}, DATA_FILES.tsv {row['sha256'][:12]}")
         else:
             lines.append(f"{row['name']}: sha256 {got[:12]} equal")
+            if row["folder"] == "optional":
+                optional.add(row["name"])
     if bad:
         raise SystemExit("REFUSED: the data root does not match DATA_FILES.tsv:\n  " + "\n  ".join(bad))
-    return lines
+    return lines, optional
 
 
-def make_work(work: Path, data: Path) -> None:
+def unpack_ratings(work: Path, tar: Path) -> list[str]:
+    """ratings.tar into the work copy. A member the analysis tree already holds (the Supplementary Figure 3 data file
+    and caption) must have the same bytes and is not written again; any other difference refuses. Every member of
+    RATINGS_MEMBERS must be there. Returns the paths written: make_work lists them in the work copy's .gitignore, so no
+    rating file enters its git (D168), and RATED's read audit allows exactly these paths ("allowed"). No member's
+    content is printed."""
+    with tarfile.open(tar) as t:
+        members = t.getmembers()
+        names = {m.name for m in members if m.isfile()}
+        if RATINGS_MEMBERS - names:
+            raise SystemExit(f"REFUSED: {tar} lacks {len(RATINGS_MEMBERS - names)} of the files S530 reads, e.g. "
+                             f"{sorted(RATINGS_MEMBERS - names)[0]}")
+        new = []
+        for m in members:
+            if m.name.startswith("/") or ".." in Path(m.name).parts or not (m.isfile() or m.isdir()):
+                raise SystemExit(f"REFUSED: {tar} member {m.name!r} is not a plain relative file")
+            if not m.isfile():
+                continue
+            if (work / m.name).exists():
+                if (work / m.name).read_bytes() != t.extractfile(m).read():
+                    raise SystemExit(f"REFUSED: {tar} member {m.name} differs from the analysis tree's copy")
+                continue
+            new.append(m)
+        t.extractall(work, members=new, filter="data")
+    return sorted(m.name for m in new)
+
+
+def make_work(work: Path, data: Path, ratings: Path | None = None) -> list[str]:
+    """The work copy; returns the paths unpacked from ratings (empty without it), git-ignored there."""
     def ignore(d, names):
         skip = {".venv", "__pycache__", ".DS_Store"}
         here = Path(d).resolve()
@@ -272,11 +360,15 @@ def make_work(work: Path, data: Path) -> None:
             if m.isfile() and (work / m.name).exists():
                 raise SystemExit(f"REFUSED: {tar} member {m.name} would overwrite a file of the analysis tree")
         t.extractall(work, members=members, filter="data")
-    (work / ".gitignore").write_text(WORK_IGNORE)
+    unpacked = unpack_ratings(work, ratings) if ratings is not None else []
+    if ratings is not None:
+        print(f"  {ratings.name}: {len(unpacked)} files unpacked into the work copy, git-ignored there", flush=True)
+    (work / ".gitignore").write_text(WORK_IGNORE + "".join(f"/{p}\n" for p in unpacked))
     env = {**os.environ, **GIT_ENV}
     for cmd in (["git", "init", "-q", "-b", "main"], ["git", "add", "-A"],
                 ["git", "commit", "-q", "-m", "reproduce.py work copy"]):
         subprocess.run(cmd, cwd=work, env=env, check=True)
+    return unpacked
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -396,39 +488,128 @@ def content_equal(name: str, a: bytes, b: bytes) -> bool:
     return False
 
 
+FROZEN_REF = re.compile(r"\{frozen:([A-Za-z0-9][A-Za-z0-9._-]*):([^}]*)\}")
+
+
+def resolve_env(work: Path, spec: dict, env: dict) -> dict:
+    """A producer's own environment variables ("env"). "{frozen:SET:REL}" is the path fig_repro.frozen(SET, REL) gives in
+    the work copy: the frozen tar SET extracted (sha256 checked, members checked against the committed list) into the
+    work copy's git-ignored findings/recompute/frozen_inputs/extracted/, which the read audit allows. Run before the
+    producer, outside its audit."""
+    out = {}
+    for k, v in spec.get("env", {}).items():
+        m = FROZEN_REF.fullmatch(v)
+        if m:
+            code = ("import sys; sys.path.insert(0, 'scripts'); import fig_repro; "
+                    "print(fig_repro.frozen(sys.argv[1], sys.argv[2]))")
+            r = subprocess.run([*UV, "-c", code, m.group(1), m.group(2)], cwd=work, env=env, capture_output=True,
+                               text=True)
+            if r.returncode or not r.stdout.strip():
+                raise RuntimeError(f"{k}: fig_repro.frozen({m.group(1)!r}, {m.group(2)!r}) failed: "
+                                   + (r.stderr.strip().splitlines() or ["no output"])[-1][:300])
+            v = r.stdout.strip().splitlines()[-1]
+        out[k] = v
+    return out
+
+
 def run_producer(work: Path, spec: dict, logs: Path, tars: Path | None) -> dict:
-    """Run one producer in the work copy under the read audit; compare; reset the work copy to HEAD."""
+    """Run one producer (one command, or a chain of "cmds" under one audit) in the work copy under the read audit;
+    compare; reset the work copy to HEAD."""
     sys.path.insert(0, str(work / "scripts"))
     import fig_read_audit as fa                     # the work copy's own audit module
-    name = spec["name"].replace(" ", "_")
+    name = spec["name"].replace(" ", "_").replace("+", "_")
     adir = logs / "audit" / name
     adir.mkdir(parents=True, exist_ok=True)
     outdir = logs / "out" / name if spec.get("committed") else None
-    cmd = [*UV, *[str(outdir) if x == "{out}" else x for x in spec["cmd"]]]
+    cmds = [[*UV, *[str(outdir) if x == "{out}" else x for x in c]] for c in (spec.get("cmds") or [spec["cmd"]])]
+    cmd = cmds[0]
     env = {k: v for k, v in os.environ.items() if k != "VIRTUAL_ENV"}
     if tars is not None:
         env["FROZEN_TARS"] = str(tars.resolve())
     head = set(git(work, "ls-tree", "-r", "--name-only", "-z", "HEAD").split("\0")) - {""}
     t0 = time.time()
+    rc, env_note = 0, None
+    scratch = [os.path.realpath(str(work / d)) for d in spec.get("scratch", [])]
+    env_file_notes = []
+    for k, rel_ in spec.get("env_from_file", {}).items():   # D315: before the scratch folders are emptied
+        f = work / rel_
+        if f.is_file():
+            env[k] = f.read_text(encoding="ascii").strip()
+            env_file_notes.append(f"{k}={env[k]} (from {rel_})")
+        else:
+            env.pop(k, None)
+            env_file_notes.append(f"{k} not set: {rel_} is not in the work copy (a ratings.tar without it); S530 "
+                                  "stamps the current time, so its results.json and the two plates' provenance files "
+                                  "that record its sha256 differ")
+    for d in scratch:                       # empty before the run: whatever is read in them, the chain wrote
+        shutil.rmtree(d, ignore_errors=True)
+    try:
+        env.update(resolve_env(work, spec, env))
+    except RuntimeError as e:
+        rc, env_note = 98, str(e)
     with open(logs / f"{name}.log", "w") as fh:
-        fh.write("$ " + " ".join(cmd) + "\n")
-        fh.flush()
-        rc = subprocess.run(cmd, cwd=work, stdout=fh, stderr=subprocess.STDOUT, env=fa.env_for(env, adir)).returncode
+        if env_note:
+            fh.write(env_note + "\n")
+        for n in env_file_notes:
+            fh.write(n + "\n")
+        for k in spec.get("env", {}):
+            if k in env:
+                fh.write(f"{k}={env[k]}\n")
+        for cmd in cmds if not rc else []:
+            fh.write("$ " + " ".join(cmd) + "\n")
+            fh.flush()
+            rc = subprocess.run(cmd, cwd=work, stdout=fh, stderr=subprocess.STDOUT,
+                                env=fa.env_for(env, adir)).returncode
+            if rc:
+                break
     secs = time.time() - t0
     ev = fa.read_logs(adir)
-    ctx = fa.Context(work, tars if tars is not None else work, head, set(), extra_allowed=[logs], uv_dirs=[], write_run=True, changed=set())
+    allowed = [work / p for p in spec.get("allowed", [])]    # RATED: ratings.tar's git-ignored files, by exact path
+    ctx = fa.Context(work, tars if tars is not None else work, head, set(), extra_allowed=[logs, *allowed], uv_dirs=[],
+                     write_run=True, changed=set())
     j = fa.judge(ev, ctx)
     wrote = {os.path.realpath(p) for p in ev["write"] | ev["update"]}
-    viol, notes = [], []
+    viol, notes = [], [n for n in env_file_notes if " not set: " in n]   # D315: shown in the row, never failed alone
     for p, why_ in j["violations"]:
         if p.startswith("[") or "child process" in why_:
             notes.append(f"audit note: {p[:120]}: {why_[:120]}")     # a read-only git child, listed, not failed
         elif os.path.realpath(os.path.join(str(work), p)) in wrote or p == "<unknown>":
             continue                                          # a file the producer itself wrote and read back
+        elif any(os.path.realpath(os.path.join(str(work), p)).startswith(d + "/") for d in scratch):
+            continue                                          # in a scratch folder emptied before the run (RATED)
         else:
             viol.append(f"{p}: {why_}")
     differ, equal, new, missing, same_content = [], [], [], [], []
-    if outdir is not None:
+    if spec.get("compare"):
+        # each folder the chain wrote inside the work copy (git-ignored there) against its committed folder, file by
+        # file; then any tracked file changed or untracked file left (git status) differs or is new, as below
+        for made_rel, committed_rel in spec["compare"]:
+            made_dir = work / made_rel
+            committed = [p for p in head if p.startswith(committed_rel + "/")]
+            made = ({f.relative_to(made_dir).as_posix() for f in made_dir.rglob("*") if f.is_file()}
+                    if made_dir.is_dir() else set())
+            for p in sorted(committed):
+                rel_ = p[len(committed_rel) + 1:]
+                if rel_ not in made:
+                    missing.append(p)
+                    continue
+                want = subprocess.run(["git", "show", f"HEAD:{p}"], cwd=work, capture_output=True, check=True).stdout
+                got = (made_dir / rel_).read_bytes()
+                (equal if got == want else differ).append(p)
+                if got != want:
+                    notes.append(f"{p}: {why_differs(p, want, got)}")
+            new += [f"{committed_rel}/{x}" for x in sorted(made - {p[len(committed_rel) + 1:] for p in committed})]
+        for s in git(work, "status", "--porcelain", "-z", "-uall").split("\0"):
+            if s and s[:2].strip() == "??":
+                new.append(s[3:])
+            elif s:
+                differ.append(s[3:])
+                notes.append(f"{s[3:]}: a released file the chain changed in place")
+        for d in spec.get("scratch", []):
+            shutil.rmtree(work / d, ignore_errors=True)
+        subprocess.run(["git", "checkout", "--", "."], cwd=work, check=True)
+        subprocess.run(["git", "clean", "-fdq"], cwd=work, check=True)
+    elif outdir is not None:
         committed = [p for p in head if p.startswith(spec["committed"] + "/")]
         made = {f.relative_to(outdir).as_posix() for f in outdir.rglob("*") if f.is_file()} if outdir.is_dir() else set()
         for p in sorted(committed):
@@ -469,6 +650,8 @@ def run_producer(work: Path, spec: dict, logs: Path, tars: Path | None) -> dict:
     ok = rc == 0 and not viol and not differ and not new and not missing and compared > 0
     if not compared:
         notes.append("compared no file: a producer must rebuild at least one released file to pass (S612)")
+    if env_note:
+        notes.append(env_note)
     if rc:
         tail = [x for x in (logs / f"{name}.log").read_text(errors="replace").splitlines() if x.strip()][-3:]
         notes.append(f"exit {rc}: " + " | ".join(tail)[:400])
@@ -483,11 +666,12 @@ def run_producer(work: Path, spec: dict, logs: Path, tars: Path | None) -> dict:
 
 
 def stage_numbers(work: Path, data: Path | None, only: list[str] | None = None,
-                  skip: list[str] | None = None) -> list[dict]:
+                  skip: list[str] | None = None, rated: list[str] | None = None) -> list[dict]:
+    """NUMBERS, then RATED when the work copy holds ratings.tar's files (rated: the paths make_work unpacked)."""
     logs = work.parent / (work.name + "_numbers_logs")
     logs.mkdir(parents=True, exist_ok=True)
     rows = []
-    for spec in NUMBERS:
+    for spec in NUMBERS + ([{**x, "allowed": rated} for x in RATED] if rated is not None else []):
         if only and spec["name"] not in only:
             continue
         if skip and spec["name"] in skip:
@@ -516,10 +700,13 @@ def expected_manifest() -> dict[str, str]:
     return rows
 
 
-def stage_held(work: Path) -> list[dict]:
+def stage_held(work: Path, rated: bool = False) -> list[dict]:
+    """HELD by sha256; with rated, RATED_HELD's entries are left to RATED (rebuilt in the numbers stage)."""
     exp = expected_manifest()
     rows = []
     for label, path, reason in HELD:
+        if rated and path in RATED_HELD:
+            continue
         keys = [k for k in exp if k == path or k.startswith(path + "/")]
         bad = [k for k in keys if not (work / k).is_file() or sha256_file(work / k) != exp[k]]
         rows.append({"stage": "held", "item": f"{label}: {path}", "files": str(len(keys)), "ok": bool(keys) and not bad,
@@ -566,14 +753,16 @@ def main(argv=None) -> int:
     data.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
     print(f"reproduce.py: data root {data}", flush=True)
-    for x in check_data(data, a.download, a.zenodo_url):
+    lines, optional = check_data(data, a.download, a.zenodo_url)
+    for x in lines:
         print("  " + x, flush=True)
+    rated = RATINGS_TAR in optional
     work = Path(a.work).expanduser().resolve() if a.work else data / "work"
     if work.exists() and any(work.iterdir()):
         print(f"REFUSED: the work folder {work} is not empty: give a new or empty --work")
         return 2
     print(f"making the work copy {work}", flush=True)
-    make_work(work, data)
+    unpacked = make_work(work, data, (data / RATINGS_TAR) if rated else None)
     plat, font_ok = platform_lines()
     for x in plat:
         print("  " + x, flush=True)
@@ -582,9 +771,9 @@ def main(argv=None) -> int:
     if "s494" in stages:
         rows += stage_s494(work, data, font_ok)
     if "numbers" in stages:
-        rows += stage_numbers(work, data, skip=a.skip_producer)
+        rows += stage_numbers(work, data, skip=a.skip_producer, rated=unpacked if rated else None)
     if "held" in stages:
-        rows += stage_held(work)
+        rows += stage_held(work, rated=rated and "numbers" in stages)
     print("\nPASS TABLE")
     print(table(rows))
     for x in plat:

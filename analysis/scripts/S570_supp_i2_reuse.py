@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""S570 - Supplementary Figure 13 (provisional): the pipeline and its evaluation run end to end on a second field (I2).
+"""S570 - Supplementary Figure 13: the pipeline and its evaluation run end to end on a second field (I2).
 
 WHY. The letter tells Reviewer 1 (Comment 1.6, the reuse cost) that "to show what reuse involves, we also ran the whole
 pipeline on five questions about five open-access papers from another life-science field" (letter round 2026-10-31,
@@ -70,7 +70,7 @@ CONFIGS = ("single_pass", "multi_hop", "verified_pass", "rlm_5", "rlm_10", "rlm_
 DRAWS = (1, 2, 3)
 IMPORTS = ("S497_fig5_d166.py", "S540_fig5_evaluators.py", "house_style.py", "figure_names.py", "S457_fig2_panels.py",
            "fig_repro.py", "d181_concept_recall.py", "S505_question_aware_matcher.py", "concept_match_loose.py",
-           "turn_limit_note.py")
+           "turn_limit_note.py", "minicheck_filter.py")
 S463_RULES = ("METRIC", "THRESHOLDS", "PRIMARY", "REFUSAL_T", "JUDGE_FAILED")   # Figure 3's pass rules, read at HEAD
 SIGNAL = {"concept": "concepts.concept_recall_loose", "papers": "papers.precision"}   # the frozen signals read
 OTHER_INPUTS = ("experiments/reuse_demo/i2_report.py", "experiments/reuse_demo/plant_key.py",
@@ -93,6 +93,7 @@ S497 = _load("S497", ROOT / "scripts" / "S497_fig5_d166.py")
 hs, FN, S540, S473 = S497.hs, S497.FN, S497.S540, S497.S473
 FR = S473.FR
 D181 = _load("d181_concept_recall", ROOT / "scripts" / "d181_concept_recall.py")
+MF = _load("minicheck_filter", ROOT / "scripts" / "minicheck_filter.py")   # Q15: the main benchmark's Papers rule
 LABEL = {"single_pass": FN.SINGLE_PASS, "multi_hop": FN.MULTI_HOP, "verified_pass": FN.VERIFIED_PASS,
          "rlm_5": FN.MENTORI_RLM_N.format(n=5), "rlm_10": FN.MENTORI_RLM_N.format(n=10),
          "rlm_20": FN.MENTORI_RLM_N.format(n=20)}
@@ -249,9 +250,33 @@ def d181_values(d: dict) -> dict:
     return out
 
 
+def papers_values(d: dict) -> dict:
+    """Q15 (Valerio, 10 Nov, as advised; the one-rule note of 1 Nov, experiments/README.md:1304-1310): Papers precision
+    with minicheck_filter's rule, the main benchmark's, so source-list lines leave the claims here too. Each stored
+    value is first reproduced from its own per-claim detail (minicheck_filter._supported_share, S470's rounding); a
+    row with no detail keeps its stored null and reason."""
+    out = {}
+    for r in rows(d["files"]["papers"]):
+        k = (r["config"], r["question_id"], r["draw"])
+        stored = (r.get("signals") or {}).get("precision")
+        pc = (r.get("detail") or {}).get("per_claim")
+        if pc is None:
+            if stored is not None:
+                raise Refused(f"S570: {k}: a stored Papers value with no per-claim detail")
+            out[k] = (None, (r.get("null_reasons") or {}).get("precision"))
+            continue
+        if stored is None or MF._supported_share(pc) != round(stored, 4):
+            raise Refused(f"S570: {k}: the per-claim detail does not give the stored Papers value {stored}")
+        out[k] = MF.precision_and_reason(pc)
+    if len(out) != 90:
+        raise Refused(f"S570: {len(out)} Papers rows, want 90")
+    return out
+
+
 def sheets(d: dict) -> dict:
     key, built = d["key"], d["built"]
     d181 = d181_values(d)
+    pap = papers_values(d)
     R = built["rules"]
     qids = list(key.ids)
     types = {r["id"]: r["answer_type"] for r in key.records}
@@ -282,7 +307,7 @@ def sheets(d: dict) -> dict:
         a["rows"].append(["coverage", c, LABEL[c], None, None, None, None, None, None, None, len(ans),
                           sum(1 for x in ans if x["judge_status"] == "ok"),
                           sum(1 for x in ans if isinstance(x["signals"].get("concepts.concept_recall_loose"), float)),
-                          sum(1 for x in ans if isinstance(x["signals"].get("papers.precision"), float))])
+                          sum(1 for x in ans if pap[(x["config"], x["question_id"], x["draw"])][0] is not None)])
 
     def per_answer(sig):
         cols = ["strategy", "strategy_label", "question_id", "question_group", "draw", "value", "null_reason",
@@ -300,6 +325,10 @@ def sheets(d: dict) -> dict:
                         out.append([c, LABEL[c], q, GROUP[types[q]], dr, v,
                                     None if v is not None else "no concept left after the question rule",
                                     x["judge_score"], sa, loose])
+                        continue
+                    if sig == SIGNAL["papers"]:                     # Q15: filtered, papers_values
+                        v, why = pap[(c, q, dr)]
+                        out.append([c, LABEL[c], q, GROUP[types[q]], dr, v, why, x["judge_score"], sa])
                         continue
                     v = x["signals"].get(sig)
                     out.append([c, LABEL[c], q, GROUP[types[q]], dr, v if isinstance(v, float) else None,
@@ -416,8 +445,9 @@ def draw(sh: dict, qids: list):
     for xb in (x1, x2):
         for j, q in enumerate(qids):
             pl.t(xb + (j + 0.5) * tile_w, ybot + 3.2, str(j + 1), ha="center", why="question number (PB_00n)")
-    pl.t(x1 + (2 * bw + GAP_BLOCK) / 2, ybot + 6.9, "Question (4, false premise; 5, out of scope: draws refused)",
-         ha="center", why="question numbers on the axis title")
+    # the axis title names the axis only (Valerio, 11 Nov): what questions 4 and 5 are, and that question 5's tiles
+    # count draws refused, is in the legend
+    pl.t(x1 + (2 * bw + GAP_BLOCK) / 2, ybot + 6.9, "Question", ha="center", why="the axis title")
 
     # b and c: per answer, the whole width of the bottom row --------------------------------------------------------------
     st = q_style(qids)
@@ -497,9 +527,10 @@ def draw(sh: dict, qids: list):
 
 
 def legend(sh: dict, same: dict) -> str:
-    """Editor row 45 round (Valerio, 8 Nov): no panel draws derived statistics (no box, interval or test; the black
-    line is a median of question means), so the legend carries no "n = " tag, and each panel is described in full,
-    with no reference to another panel or figure. Counts are read from the sheets."""
+    """Editor row 45 round (Valerio, 8 Nov): each panel is described in full, with no reference to another panel or
+    figure. D310 (9 Nov): b and c draw derived statistics (each dot a question's mean over its draws, the black line a
+    median of question means), so each states its n: "n = X draws" or "n = X answers" for the dots, "n = 4 question
+    means" for the line (audit 9 Nov, X091, S448 R9). Counts are read from the sheets."""
     nt = len(sh[B]["rows"])
     nb = sum(1 for r in sh[B]["rows"] if r[5] is not None)
     nc = sum(1 for r in sh[C]["rows"] if r[5] is not None)
@@ -523,11 +554,12 @@ def legend(sh: dict, same: dict) -> str:
             "5 a tile counts the draws refused instead (refusal score 3 or more, the same in both blocks). **b**, "
             f"Concept recall (loose matcher with the question rule) of the {nt} answers to the first four questions, "
             "one row per strategy: one dot per question, the mean over its "
-            f"{len(DRAWS)} draws; colour and shape, question; black line, the strategy's median of its 4 question means. "
+            f"n = {len(DRAWS)} draws; colour and shape, question; black line, the strategy's median of its n = 4 question "
+            "means. "
             "**c**, Papers precision (MiniCheck against each question's source papers) of the "
             f"{nt} answers to the first four questions, one row per strategy: one dot per question, the mean over its draws "
-            f"with a value ({nc} answers have one; the other {nc_null} are longer than the encoder's 2,048-token input); "
-            "colour and shape, question; black line, the strategy's median of its 4 question means.")
+            f"with a value (n = {nc} answers have one; the other {nc_null} are longer than the encoder's 2,048-token "
+            "input); colour and shape, question; black line, the strategy's median of its n = 4 question means.")
 
 
 def claim(sh: dict) -> str:
@@ -568,12 +600,12 @@ def figure(out) -> None:
     sh, same = sheets(d)
     qids = list(d["key"].ids)
     k = sum(r[sh[A]["columns"].index("answers_stored")] for r in sh[A]["rows"] if r[0] == "coverage")
-    tag = f"provisional, {k} of 90"
+    tag = ""                                  # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
     run_sha = {json.loads(x)["run_sha256"] for x in d["files"]["judge"].read_text().splitlines() if x.strip()}
-    stamp = (f"PROVISIONAL: {k} of 90 answers drawn (I2, draws 1, 2, 3 of 3), frozen set i2 (S569, ecf1e368); judge "
+    stamp = (f"{k} of 90 answers drawn (I2, draws 1, 2, 3 of 3), frozen set i2 (S569, ecf1e368); judge "
              f"devstral-small-2:24b plain call, run_sha256 {sorted(run_sha)[0][:12]}; key PB v1.1 sha256 "
              f"{d['key'].sha256[:12]}; concept recall D181 (loose matcher, question rule; D285)")
-    caption = (f"# Supplementary Figure {N} data, caption\n\n**Supplementary Figure {N} data.** Provisional. Data stamp: "
+    caption = (f"# Supplementary Figure {N} data, caption\n\n**Supplementary Figure {N} data.** Data stamp: "
                f"{stamp}. Sheet {A}: one row per tile (strategy, question, judge threshold; draws passed or refused "
                f"of 3) and one coverage row per strategy. Sheets {B} and {C}: one row per answer to questions 1 to 4 "
                "(strategy, question, draw), with its value or the reason it has none, its judge correctness and any "

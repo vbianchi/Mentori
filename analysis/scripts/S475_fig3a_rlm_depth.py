@@ -39,12 +39,11 @@ and OUT below still names the folder of main Figure 3 as it was, which no longer
 
 WRITES findings/figures_provisional/fig3a_rlm_depth/ (earlier "Figure 3*" and "Source Data Fig. 3*" files there are
 deleted first; findings/figures_provisional/fig3/, S459's plate, is not touched):
-  Figure 3 (provisional, <n> of <N>).{pdf,svg,png}   [page] width_double_mm wide; [type] font_min_pt text in the first
+  Figure 3.{pdf,svg,png}   [page] width_double_mm wide; [type] font_min_pt text in the first
         of [type] font_families; panel letters [type] panel_letter_pt bold lowercase; Okabe-Ito colours (blue for
         Mentori's RLM, vermillion for the authors' package) and black; no gridlines; the PNG is the PDF rasterised by
-        MuPDF at 600 dpi (S457.finish_plate). The name is the "(provisional, n of m)" form: S448 R1 also accepts
-        "(provisional, panel a draft, n of m)", but R8 part (5) reads the tag as "(provisional, <n> of <m>)" only.
-  Source Data Fig. 3 (provisional, ...).xlsx, its caption .md, figure3_numbers.json, figure3_provenance.json,
+        MuPDF at 600 dpi (S457.finish_plate). No name carries a "(provisional, ...)" suffix (Q9, 11 Nov).
+  Source Data Fig. 3.xlsx, its caption .md, figure3_numbers.json, figure3_provenance.json,
         legend_draft.md. n = the answers drawn (860 + 2,580); N = Figure 3's written plan under D98, as S459 counts it.
 
 THE PANELS
@@ -482,12 +481,11 @@ def legend_and_caption(fn, tables, header, caps, stamp, n, N):
              "Written by `uv run --frozen python scripts/S475_fig3a_rlm_depth.py` from S474's L2 outputs "
              "(findings/recompute/L2/, committed e4823e1). A panel draft beside S459's provisional Figure 3 "
              "(findings/figures_provisional/fig3/), not a replacement of it.", "",
-             f"Data stamp: {stamp}.", "",
              detail_txt, "",
              f"**Figure 3 | {title}.** {legend}", ""]
     cap = ["# Source Data Fig. 3, caption", "",
            (f"**Source Data Fig. 3 | Numerical values plotted in Figure 3 (panel draft, the two RLMs by turn cap).** "
-            f"Provisional. Data stamp: {stamp}. One sheet per panel. Sheet Fig. 3a: one 'cap' row per system and "
+            f"Data stamp: {stamp}. One sheet per panel. Sheet Fig. 3a: one 'cap' row per system and "
             f"turn cap with the questions, answers, the mean concept recall (%), its 95% interval (%), the failed "
             f"answers (scored 0) and the failed answers by the action D92 gives them (rebuild, rerun, stays_failed) "
             f"or none, "
@@ -531,10 +529,10 @@ def main(argv=None):
     plan = S459.planned_total(ids, caps)
     n = len(rows)
     N = plan["G4"] + plan["G5"] + want_n["G6"]
-    stamp = (f"PROVISIONAL: {n:,} of {N:,} answers, RLM (G5, draw 1, {want_n['G5']:,}) and the RLM authors' "
+    stamp = (f"{n:,} of {N:,} answers, RLM (G5, draw 1, {want_n['G5']:,}) and the RLM authors' "
              f"package (G6, three draws, {want_n['G6']:,}) at {len(caps)} turn caps, concept recall on D12's loose "
              f"matcher (S474, L2 of {header.get('written_utc', 'frozen inputs (D155)')}), no judge; G6 before the D92 reruns")
-    tag = f" (provisional, {n} of {N})"
+    tag = ""                                  # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
     fn = compute(rows, tables, caps, qorder)
     legend, cap = legend_and_caption(fn, tables, header, caps, stamp, n, N)
     OUT.mkdir(parents=True, exist_ok=True)

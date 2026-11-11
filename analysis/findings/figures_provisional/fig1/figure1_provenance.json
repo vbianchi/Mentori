@@ -1,12 +1,12 @@
 {
  "script": "scripts/S456_fig1_design.py",
- "script_sha256": "f51799c5a136bfe87c2c35b4bf97750387ce94374902e2b7b8c3fe08c5c5da1c",
+ "script_sha256": "9418cf0ce8f0393dbe3bd93cd1d88966753449f165a641347ec2141940bffc30",
  "command": "uv run --frozen python scripts/S456_fig1_design.py figure",
  "python": "3.13.11",
  "inputs_read": "every file at its committed version (the blob at git HEAD; the file itself outside a git checkout), every check and tripwire on those; each design file (DESIGN_FILES) read again as it stood at DESIGN_AT f83c10b4 (git cat-file), its sha256 there recorded in inputs_sha256 under a name carrying @f83c10b4, and every value drawn or recorded from them required equal at HEAD and at DESIGN_AT (plan.csv's T2 status taken at DESIGN_AT); the files read through an import (experiments/runner, experiments/rlm_ref/__init__.py, experiments/rlm_ref/run_rlm_ref.py, experiments/LOCK.toml, data/ground_truth_v2, data/judge_system_prompts) required equal to HEAD, and the definitions S456 uses from experiment.py, lock.py and run_rlm_ref.py (IMPORT_USES) required the same at HEAD as at f83c10b4; the submitted retrieval runs from the committed frozen set upstream (findings/recompute/upstream_inputs, checked against findings/recompute/frozen_inputs/SHA256SUMS). S520's summary is read at HEAD for its total alone, and recorded while committed. No write time, HEAD or working-copy state is recorded (D155).",
  "inputs_sha256": {
   "experiments/LOCK.toml": "8730d401a5d7b6baa1780e656f844261eaead60e45b5199afa29d57f989ad495",
-  "experiments/FIGURE_LOCK.toml": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "experiments/FIGURE_LOCK.toml": "ac39c4e311f340654fe1ebe3333a3fe439bc6286e38fc0334fdb0e0cf2a97aef",
   "experiments/mentori/publication/scripts/exp_01_generation.py@f83c10b4": "00bd041e276bfed60b97f531cff622d34b741926c9ff487bc71e5a4043880825",
   "experiments/mentori/publication/scripts/exp_02_scaling_factorial.py@f83c10b4": "513165acb80e2956f7d9e6409b9a14b87753175d204e8bc68a83791680c9cbee",
   "experiments/mentori/publication/scripts/exp_03_orchestration_ablation.py@f83c10b4": "55f2562d68a8ffea4e68a7069b62cf9c58859a9fbfb7f6cbf0bb696fcc99efd7",
@@ -21,8 +21,8 @@
   "findings/recompute/G3_runs/preflight.sh@f83c10b4": "271a642cd48d0bb6064fdaa93d534613789fa98d6a3f7edafc92df8b8c762238",
   "findings/recompute/G4_runs/g4_lib.sh@f83c10b4": "a5b22dd9c1d3596e2984b8469176acaf5fc4d2ffe0e39478cb33d0ba41558f58",
   "findings/recompute/G5_runs/g5_lib.sh@f83c10b4": "7447338cff92a799f897ef41d1f107b9d8ffff542d563dbb5dfc99c1062926dc",
-  "frozen:fig_design/draws.csv": "a49ddecafb4240d0700f1fcfa1d583c9a1333cfae3e68c5feeb71b365c622f6f",
-  "frozen:fig_design/design_facts.json": "9fb39a2d241543a10ba676057f552312de0133386a683fd0b5517dc468666e02",
+  "frozen:fig_design/draws.csv": "ca8fa3d5db91280ae44bf1b0c58498901d725e3a6e4d90037bd7dfaf04043dfb",
+  "frozen:fig_design/design_facts.json": "118fa72e45d0b61095ed974282d6fba3fb9b708e2502639e64e6c5ca4f9c445d",
   "scripts/S162_figure1_final.py@f83c10b4": "71c12d1739606bf02786776bfe785c7e92a63321d4efb1e9762a4fb84e8a8e86",
   "scripts/S447_fig6_panels.py@f83c10b4": "8c60e8a96d4dac395d12bff3e57c1d437b8485d8374553997c75e88ecd011ae1",
   "data/ground_truth_v2/all_v2_4.json": "5d8362ae931dc0fe0cc132be6b5e57187e3ae7d3131d86f63cdf1a44633fadd5",
@@ -38,17 +38,18 @@
   "findings/recompute/T2_runs/check_t2.py@f83c10b4": "0306d354b73113245b982d4fe0d14405ee457c9f2271fb0229be021d739bf6bc",
   "findings/recompute/T2_runs/t2_lib.sh@f83c10b4": "68d7c0af04d7895dace468d2389b2880e2074eea115a4ab13fcb69a6be5f183d",
   "findings/recompute/D98_subset/d98_subset.json@f83c10b4": "957c79b6b0f3afb12b70be51d0802e7853b4d4ff12e2bdb519d44a10111046bc",
-  "findings/recompute/S520_llm_calls/summary.json": "31c3cf603a91b8efed6c8000d8a9d22f036a4c3d5606691fec7e5caf5cfff57f",
-  "findings/recompute/S492_answer_registry/registry.json": "50ec28658dfedaef28fe4489c50e5ef5289393960613e69e13c23c762b6b9dcb",
-  "findings/figures_provisional/fig2_human/legend_draft.md": "ca517e997667e07a5a2a1bd86704ccb9dac1404e95f35172ec7200d35bfa7846",
-  "findings/figures_provisional/fig3_strategies/legend_draft.md": "2886ea494e13922905a5f52cec312cde94f5b91c0b2da006017e6e34d8fd64c7",
-  "findings/figures_provisional/fig4_depth/legend_draft.md": "dd7dc47fb0e259c111cb23aa73f912b8acb9324f43af2009651a49aca7e98e2c",
-  "findings/figures_provisional/fig4/legend_draft.md": "39a4ed597c0d7501e7e07bfa1070640644f0708185325e7876ca383f1e67d370",
-  "findings/figures_provisional/fig5/legend_draft.md": "b9fdac98f402895a22b890bbf405a9f0b57bfcbea2609e4592ad4c564e042d92",
-  "findings/figures_provisional/fig6/legend_draft.md": "25146c4b2987373508588d29389d14ac5ff97c29ca0db7d26d6889c1042ef6db",
-  "findings/figures_provisional/supp_fig2/legend_draft.md": "0cbdfa2e9e8df2590fc2f90a7d9a8625e11f8b2835ad9e33361f259ebd08e116"
+  "findings/recompute/T2X_runs/t2x_questions.json": "1943af5bc2ef4fca5c116b00050580fe7031c9d0c35d23546144d4422c18822c",
+  "findings/recompute/S520_llm_calls/summary.json": "a1c792424abc20e58af436d39e14d4d4d2aaa98128bae9c631cbf6ebb84ec231",
+  "findings/recompute/S492_answer_registry/registry.json": "bd4f68f68fb8e145a88817ea7aa1f4e86c530fac5e0c7cca1f015eada78c1a4e",
+  "findings/figures_provisional/fig2_human/legend_draft.md": "922ac87e647f8906fa3691a5b48599f8bf3e0f32e959ee87d04103fc3262c076",
+  "findings/figures_provisional/fig3_strategies/legend_draft.md": "115296f666da4434af9a446b33c1c260e9d621b498bd5e90f7a1ab51a8194d0f",
+  "findings/figures_provisional/fig4_depth/legend_draft.md": "9cf184a873faf1ad80a3bbb4348cf82f0ce10569f89b217a4b94ee1d6308e2b0",
+  "findings/figures_provisional/fig4/legend_draft.md": "93082c67b1054a01a14260f30c1f5d997f65083bd6a7a2458263e011d6e7b9f6",
+  "findings/figures_provisional/fig5/legend_draft.md": "c952b7b357b860c6cc1dd4dae4c3b3e39b2f124b024fdf06a53aab30101eddb5",
+  "findings/figures_provisional/fig6/legend_draft.md": "05b67c0ac179f51bb3cf8455e478e718b2f82035a5b3095300e9a67ed7bfd0b2",
+  "findings/figures_provisional/supp_fig2/legend_draft.md": "00bfbcab6c0c220339676144a08897b8de3cd782de1729d089ccf49952be2d71"
  },
- "inputs_digest": "5896dda872ad74591dd32cb3afcf4b2967ca124d64686ce87950ded63e5717d8",
+ "inputs_digest": "e1c5d2ea707017b48e15b5c0714abdbb4b9c8ecbcd5b6b04b78834b723b33e36",
  "model_calls": 0,
  "lock": {
   "path": "experiments/LOCK.toml",
@@ -56,7 +57,7 @@
  },
  "figure_lock": {
   "path": "experiments/FIGURE_LOCK.toml",
-  "sha256": "7ab123230380159f678645009f252de1e1856b0e66fb8824f2b469049c0d4e2b",
+  "sha256": "ac39c4e311f340654fe1ebe3333a3fe439bc6286e38fc0334fdb0e0cf2a97aef",
   "status": "agreed"
  },
  "reproduced": [
@@ -70,10 +71,10 @@
   "Figure 6 runner attempts (D71): 3520 = known",
   "Figure 6 design attempts (D100, D116; draws.csv S2 answers): 2420 = known"
  ],
- "stamp": "PROVISIONAL: 2 of 2 panels (panel a, the signals; panel b, the design), 11 settings read from the design files (inputs sha256 5896dda872ad)",
+ "stamp": "2 of 2 panels (panel a, the signals; panel b, the design), 11 settings read from the design files (inputs sha256 e1c5d2ea7070)",
  "page_mm": [
   183.0,
-  118.0
+  109.0
  ],
  "geometry_mm": {
   "signal_boxes": [
@@ -83,19 +84,19 @@
   ],
   "signal_box_w": 57.4,
   "stage_boxes_w": [
-   41.0,
-   37.27,
-   54.33,
-   30.8
+   40.31,
+   37.56,
+   53.45,
+   32.07
   ],
   "y_signal_boxes": 20.0,
   "y_stage_boxes": 72.0,
-  "tightest_gap_panel_b": 3.84
+  "tightest_gap_panel_b": 5.11
  },
  "type_pt": {
   "panel letter (bold)": 8.0,
   "the tool line in a signal box": 8.0,
-  "answer, signal names and the totals line": 12.0,
+  "answer and signal names": 12.0,
   "stage names": 11.0,
   "all other text": 10.0
  },
@@ -107,8 +108,8 @@
   "the rule in a signal box": "#999999",
   "stage head bands": "#EEEEEE"
  },
- "llm_calls_total": 1158418,
- "answers_total": 51441,
+ "llm_calls_total": 1182144,
+ "answers_total": 51579,
  "design": {
   "core": [
    5,
@@ -379,6 +380,7 @@
    "qwen3-coder:30b": "rlm45"
   },
   "d98_n": 45,
+  "t2x_n": 17,
   "rlm_configs": [
    "rlm_5",
    "rlm_10",
@@ -426,7 +428,7 @@
    "corpus scale": "d98",
    "RLM with gemini-3-flash-preview": "3",
    "the 6 orchestrator set-ups": "d98",
-   "the 2 stress set-ups": "1",
+   "the 2 stress set-ups": "d98",
    "the local models": "1",
    "code-generation strategy": "1"
   },
@@ -444,6 +446,7 @@
    "stage": "INDEX",
    "axis": "Corpus scale",
    "levels": 12,
+   "configurations": 12,
    "levels_as": "4 \u00d7 3",
    "figure": "Figure 3",
    "plan_row": "G4",
@@ -452,7 +455,8 @@
   {
    "stage": "INDEX",
    "axis": "Embedding model",
-   "levels": 20,
+   "levels": 4,
+   "configurations": 20,
    "levels_as": "4 \u00d7 5",
    "figure": "Supplementary Figure 2",
    "plan_row": "",
@@ -461,7 +465,8 @@
   {
    "stage": "INDEX",
    "axis": "Chunking",
-   "levels": 24,
+   "levels": 8,
+   "configurations": 24,
    "levels_as": "8 \u00d7 3",
    "figure": "Supplementary Figure 2",
    "plan_row": "",
@@ -470,7 +475,8 @@
   {
    "stage": "RETRIEVE",
    "axis": "Search strategy",
-   "levels": 35,
+   "levels": 7,
+   "configurations": 35,
    "levels_as": "7 \u00d7 5",
    "figure": "Supplementary Figure 2",
    "plan_row": "",
@@ -479,7 +485,8 @@
   {
    "stage": "RETRIEVE",
    "axis": "Retrieval depth",
-   "levels": 44,
+   "levels": 10,
+   "configurations": 44,
    "levels_as": "10 \u00d7 2 + 6 \u00d7 4",
    "figure": "Figure 4",
    "plan_row": "G5, G6, T1",
@@ -489,6 +496,7 @@
    "stage": "GENERATE",
    "axis": "Generation model",
    "levels": 5,
+   "configurations": 5,
    "levels_as": "1 + 4",
    "figure": "Figure 3",
    "plan_row": "G1, T2",
@@ -497,7 +505,8 @@
   {
    "stage": "GENERATE",
    "axis": "Generation strategy",
-   "levels": 10,
+   "levels": 6,
+   "configurations": 10,
    "levels_as": "6 + 4",
    "figure": "Figure 3",
    "plan_row": "G1, G2, G6",
@@ -507,6 +516,7 @@
    "stage": "GENERATE",
    "axis": "System configuration",
    "levels": 4,
+   "configurations": 4,
    "levels_as": "4",
    "figure": "Figure 5",
    "plan_row": "G3",
@@ -516,6 +526,7 @@
    "stage": "GENERATE",
    "axis": "Orchestrator set-up",
    "levels": 8,
+   "configurations": 8,
    "levels_as": "6 + 2",
    "figure": "Figure 5",
    "plan_row": "G3, G9",
@@ -524,7 +535,8 @@
   {
    "stage": "GENERATE",
    "axis": "Code-generation strategy",
-   "levels": 121,
+   "levels": 11,
+   "configurations": 121,
    "levels_as": "11 \u00d7 11",
    "figure": "Figure 7",
    "plan_row": "S2",
@@ -534,6 +546,7 @@
    "stage": "JUDGE",
    "axis": "Judge model",
    "levels": 2,
+   "configurations": 2,
    "levels_as": "2",
    "figure": "Figures 2, 3, 5 and 6",
    "plan_row": "S3",
@@ -597,7 +610,8 @@
    "settings": [
     "generation model gemini-2.5-pro",
     "corpus scale",
-    "the 6 orchestrator set-ups"
+    "the 6 orchestrator set-ups",
+    "the 2 stress set-ups"
    ]
   },
   {
@@ -613,7 +627,6 @@
    "name": "1 draw",
    "means": "every question answered once",
    "settings": [
-    "the 2 stress set-ups",
     "the local models",
     "code-generation strategy"
    ]
@@ -637,12 +650,12 @@
   "measures outside the signals": "D307 (alt2): Human rating, Execution, Mean reciprocal rank not drawn; panel a draws the three signals alone"
  },
  "files": {
-  "Figure 1 (provisional, 2 of 2).pdf": "21c989d5a914693662b2b5d3b8368f70105c3853dae011cf68a44ba1750a74ee",
-  "Figure 1 (provisional, 2 of 2).svg": "888f88c5a2721ba01a121275d94589a620a20e78e1ab839015496eb5b3ac86f1",
-  "Figure 1 (provisional, 2 of 2).png": "9947630e810a89b9829201e5ee629101064d7a7f3ca88776f084a54bcc092196",
-  "Source Data Fig. 1 (provisional, 2 of 2).xlsx": "2e176378f839175e1d9c76c4811a618343b5296ec6aa1e0f080ad4034bab8cd7",
-  "Source Data Fig. 1 caption (provisional, 2 of 2).md": "2257ac06b821e50fd8f8f41da8c017c34fa683a9e662784f318e64b08345fca1",
-  "figure1_numbers.json": "7fb52049398426b737e37ef1564727bae0cb29b4dbfdfe8eb3dab45c223b5570",
-  "legend_draft.md": "3c6b94f1646174d79c7b7ae0e9a98924a7140e7badf395101808ed4728770ed9"
+  "Figure 1.pdf": "1d31cecc9149017925f3b47da62bdfa11316c35062517deca9ac26ba86f1a97d",
+  "Figure 1.svg": "b19756f57cd1fd8e9b465a9d0a0eba85a19336a92b6ad90e3fa100047664c142",
+  "Figure 1.png": "aefa6c0be915e2950b8a768ff9fd4f3cda452d859112f6ad4a8740282a586743",
+  "Source Data Fig. 1.xlsx": "5a21114e60503373f9a8d2360664cb4deeb5e2208760dd71c87bef9e5f7fd971",
+  "Source Data Fig. 1 caption.md": "fbea104120b36b1757a22860ea7a31ebdd185846d1a7a02d3cee418c317ae4bd",
+  "figure1_numbers.json": "edbfa7824589914b5db9fa191c1cc5eb3357b69f6d2dd2f0a3df24428f26ddfd",
+  "legend_draft.md": "da7318b61808364f9d4f6eebdc01c2e56eed68d50338dde9861276e964eba9d5"
  }
 }

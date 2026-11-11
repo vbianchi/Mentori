@@ -1,14 +1,14 @@
 {
  "header": {
   "script": "scripts/S489_fig4_by_question_type.py",
-  "script_sha256": "ad85780f4ecf151115a285e9bd5fdfb71cf223d8ccf3d887a95df538cf302369",
+  "script_sha256": "63ca3c5bf7ca009727a82e79e3892c587fb65e23ab40a515a1eb189d89b12a28",
   "command": "uv run python scripts/S489_fig4_by_question_type.py",
   "inputs": {
    "findings/recompute/fig4_inputs/g3_collect.jsonl": "41d3105db493fa05fe6fc702ce315c4c4417f528699dc51b05da5b9240e7ec37",
    "findings/recompute/fig4_inputs/g3_collect.jsonl.json": "8ad99ba4071eb289166ca16b9ff48c541f7208cc55f2bbf151d893ec9b1451c7",
    "findings/recompute/fig2_inputs/g1_collect.jsonl": "f5ff75bc244cda492a48e7e11f54f2007ed7d586a8f49e78921edd7244b28965",
    "findings/recompute/fig2_inputs/g1_collect.jsonl.json": "04996e9dd9c3cca49177068f0143fbe0d1c7fa265a4eb6f617d24551f501f895",
-   "findings/figures_provisional/fig4/Source Data Fig. 5 (provisional, 1485 of 3015).xlsx": "aa90b86ddfda998826864c8f6cf42f17a881c71044b83ddfb6a1a6d008b31d20",
+   "findings/figures_provisional/fig4/Source Data Fig. 5.xlsx": "76d3bebe64820cbaeb74340a1d1cf54e025358b0b6c55103dd1e4828eed0c706",
    "findings/recompute/S281_exp06_per_answer.csv": "492890420b3218588d68e935ab0ffa0b92bd515341d6c2c580598b6012b4f1f8",
    "findings/recompute/S281_exp06_per_config.csv": "f92e3bd306a7b9e7cde9103e26fc94e4cb1c6a078ffa14599ee11b0bede3fb96",
    "experiments/runner/experiment.py": "ca35a8aac2381d4a4dfcc0d7685f76c82dea8ed5531396cb7ef0aea6891a52b3",
