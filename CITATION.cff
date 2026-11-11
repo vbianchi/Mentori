@@ -1,49 +1,56 @@
 cff-version: 1.2.0
-message: "If you use Mentori or the evaluation methodology in your own work, please cite both the paper and this software."
+message: "If you use Mentor::i or the evaluation methodology in your own work, please cite both the paper and this software."
 type: software
-title: "Mentori: a locally-hosted agentic AI workspace for scientists"
+title: "Mentor::i: an open-source multi-agent workspace for the life-science literature"
 abstract: >-
-  Mentori is a multi-agent AI workspace that combines a chat interface,
-  retrieval-augmented document analysis, and a Jupyter-based code execution
-  sandbox. This repository accompanies the paper "Systematic ablation of
-  multiagent artificial intelligence for the life sciences" (Bianchi &
-  Schokker, submitted to Communications AI & Computing), which applies a
-  triple-triangulation evaluation methodology for retrieval-augmented
-  multi-agent systems to more than 50,000 individual evaluations spanning
-  200 scientific papers and 250 expert-curated questions.
+  Mentor::i is an open-source multi-agent scientific workspace for the
+  life-science literature that orchestrates local and cloud-hosted large
+  language models. This repository accompanies the paper "Systematic ablation
+  of a multi-agent language model system for life sciences research" (Bianchi
+  & Schokker, Communications AI & Computing), which ablates Mentor::i across
+  11 pipeline settings in 22 experiments (244 expert-curated questions on 50
+  papers among 200; over 1.18 million model calls) and reads every answer with
+  three signals that check each other: a language model judge, concept recall
+  against expert answers and claim checking against the source papers. The
+  folder analysis/ holds the scripts that reproduce the paper's figures, tables
+  and numbers; the data are in the Zenodo record doi:10.5281/zenodo.24143367.
 authors:
   - family-names: "Bianchi"
     given-names: "Valerio"
-    affiliation: "Wageningen Bioveterinary Research, Wageningen University & Research"
+    affiliation: "Department of Veterinary Integrative Data Analytics, Wageningen Bioveterinary Research, Wageningen University & Research, Lelystad, The Netherlands"
+    orcid: "https://orcid.org/0000-0001-9025-7923"
   - family-names: "Schokker"
     given-names: "Dirkjan"
-    affiliation: "Wageningen Bioveterinary Research, Wageningen University & Research"
-version: "1.0.0"
-date-released: "2026-04-09"
+    affiliation: "Department of Veterinary Integrative Data Analytics, Wageningen Bioveterinary Research, Wageningen University & Research, Lelystad, The Netherlands"
+    orcid: "https://orcid.org/0000-0001-6082-7227"
+version: "2.0.0"
+date-released: "2026-11-11"
 license: MIT
 repository-code: "https://github.com/vbianchi/Mentori"
 url: "https://github.com/vbianchi/Mentori"
 identifiers:
   - type: doi
-    value: 10.5281/zenodo.19476756
-    description: "Data and code archive on Zenodo"
+    value: 10.5281/zenodo.24143367
+    description: "Data of the revised paper (Zenodo record, this version)"
 keywords:
   - retrieval-augmented generation
-  - multi-agent AI
-  - RAG evaluation
-  - LLM-as-judge
-  - scientific AI
-  - benchmark
+  - multi-agent systems
+  - large language models
+  - evaluation
   - ablation
-  - bioinformatics
+  - LLM-as-a-judge
+  - life sciences
+  - reproducibility
 preferred-citation:
   type: article
-  title: "Systematic ablation of multiagent artificial intelligence for the life sciences"
+  title: "Systematic ablation of a multi-agent language model system for life sciences research"
   authors:
     - family-names: "Bianchi"
       given-names: "Valerio"
+      orcid: "https://orcid.org/0000-0001-9025-7923"
     - family-names: "Schokker"
       given-names: "Dirkjan"
+      orcid: "https://orcid.org/0000-0001-6082-7227"
   journal: "Communications AI & Computing"
   status: submitted
   year: 2026
