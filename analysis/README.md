@@ -52,7 +52,7 @@ uv run --frozen python reproduce.py --data DIR --download [--zenodo-url https://
 
 `DIR` is one data root: `DIR/frozen/<the 15 tars>`, `DIR/analysis_inputs.tar`, `DIR/stripped_records.tsv`
 and, optionally, `DIR/ratings.tar`
-(the anonymised rating rows; no ratings.tar row: /Users/valeriobianchi/Mentori_release_stage/ratings.tar is not a file; Figure 2 and Supplementary Figure 3 held). With `--download`, each file
+(the anonymised rating rows; ratings.tar pinned (sha256 f0ae63f00c51)). With `--download`, each file
 `DATA_FILES.tsv` lists and `DIR` lacks is fetched from `<zenodo-url>/files/<name>?download=1`. The record id in
 `ZENODO_URL` is a placeholder until the deposit exists (TO FILL AFTER DEPOSIT); give `--zenodo-url` meanwhile. Every
 file is checked by sha256 before anything runs. Then:
