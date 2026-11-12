@@ -1,7 +1,7 @@
 {
   "title": "Mentor::i: software for \"Systematic ablation of a multi-agent language model system for life sciences research\"",
   "upload_type": "software",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "<p>Mentor::i is an open-source multi-agent scientific workspace for the life-science literature that orchestrates local and cloud-hosted large language models. This release accompanies the revised paper \"Systematic ablation of a multi-agent language model system for life sciences research\" by Valerio Bianchi and Dirkjan Schokker (2026).</p><p>It holds the Mentor::i application; harness/, the code that ran the revision's experiments, with PINS.md naming the commit each frozen run used; and analysis/, the scripts that draw every figure, write its Source Data and compute the paper's numbers, with reproduce.py, the one command that checks the data against their recorded sha256 and rebuilds them. The data (questions, answer key, frozen per-call records, anonymised ratings) are in the companion Zenodo record, doi:10.5281/zenodo.24143367. The 200 papers of the corpus are not redistributed: publication/data/corpus_papers.csv lists each with its source URL and licence, and publication/data/download_papers.py fetches them.</p>",
   "creators": [
     {

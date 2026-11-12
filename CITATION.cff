@@ -23,8 +23,8 @@ authors:
     given-names: "Dirkjan"
     affiliation: "Department of Veterinary Integrative Data Analytics, Wageningen Bioveterinary Research, Wageningen University & Research, Lelystad, The Netherlands"
     orcid: "https://orcid.org/0000-0001-6082-7227"
-version: "2.0.0"
-date-released: "2026-11-11"
+version: "2.0.1"
+date-released: "2026-11-12"
 license: MIT
 repository-code: "https://github.com/vbianchi/Mentori"
 url: "https://github.com/vbianchi/Mentori"

@@ -6,12 +6,12 @@ Mentori orchestrates multiple specialised agents (lead researcher, supervisor, l
 
 This repository accompanies the paper:
 
-> **Systematic Ablation Reveals Hidden Failures in Multi-Agent AI for Science**
+> **Systematic ablation of a multi-agent language model system for life sciences research**
 > Valerio Bianchi & Dirkjan Schokker
 > Wageningen Bioveterinary Research, Wageningen University & Research
-> DOI: TBD · Data and code archive: [10.5281/zenodo.19476756](https://doi.org/10.5281/zenodo.19476756)
+> Communications AI & Computing (under review) · Data: [10.5281/zenodo.24143367](https://doi.org/10.5281/zenodo.24143367) · Software: [10.5281/zenodo.24147197](https://doi.org/10.5281/zenodo.24147197)
 
-The figure-generation code, experiment scripts, and the manuscript itself are in [`publication/`](publication/). The raw experiment outputs (~200 MB across 10 experiments) and the 200-paper evaluation corpus manifest are deposited at Zenodo: [10.5281/zenodo.19476756](https://doi.org/10.5281/zenodo.19476756).
+The scripts that draw every figure, write its Source Data and compute the paper's numbers are in [`analysis/`](analysis/), with `reproduce.py`, the one command that rebuilds them. The code that ran the revision's experiments is in [`harness/`](harness/). The data (questions, answer key, frozen per-call records, anonymised ratings) are in the Zenodo record [10.5281/zenodo.24143367](https://doi.org/10.5281/zenodo.24143367). The 200 papers of the corpus are not redistributed: `publication/data/corpus_papers.csv` lists each with its source URL and licence, and `publication/data/download_papers.py` fetches them.
 
 ---
 
@@ -306,18 +306,27 @@ If you use Mentori or the evaluation methodology in your own work, please cite:
 
 ```bibtex
 @article{bianchi2026mentori,
-  title   = {Systematic Ablation Reveals Hidden Failures in Multi-Agent AI for Science},
+  title   = {Systematic ablation of a multi-agent language model system for life sciences research},
   author  = {Bianchi, Valerio and Schokker, Dirkjan},
+  journal = {Communications AI \& Computing},
   year    = {2026},
-  doi     = {TBD}
+  note    = {under review}
 }
 
-@dataset{bianchi2026mentori_zenodo,
-  title     = {Mentori — code, data, and supplementary materials for ``Systematic Ablation Reveals Hidden Failures in Multi-Agent AI for Science''},
+@software{bianchi2026mentori_software,
+  title     = {Mentor::i: software for ``Systematic ablation of a multi-agent language model system for life sciences research''},
   author    = {Bianchi, Valerio and Schokker, Dirkjan},
   year      = {2026},
   publisher = {Zenodo},
-  doi       = {10.5281/zenodo.19476756}
+  doi       = {10.5281/zenodo.24147197}
+}
+
+@dataset{bianchi2026mentori_data,
+  title     = {Mentor::i: code, data, and supplementary materials for ``Systematic ablation of a multi-agent language model system for life sciences research''},
+  author    = {Bianchi, Valerio and Schokker, Dirkjan},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.24143367}
 }
 ```
 
@@ -355,3 +364,29 @@ uv run --frozen python reproduce.py --data <empty folder> --download --zenodo-ur
 `analysis/README.md` says what it rebuilds, what it holds by sha256 and why, and what "100%" means for each kind of
 file. `publication/` is the submitted version's material; `analysis/` is the revision's.
 <!-- S608 analysis end -->
+
+## Run the paper's RLM on your own papers
+
+The RLM (recursive language model: the model writes Python to search and read the papers, and calls itself on the
+passages it picks) that the revised paper measured is in `harness/experiments/mentori/backend/retrieval/rlm/`.
+`harness/tools/mentori_cli` runs it, unchanged, on any folder of PDFs, under the paper's settings file
+(`harness/experiments/LOCK.toml`):
+
+```
+cd harness/tools/mentori_cli
+uv sync --frozen
+uv run mentori-cli fetch-encoders                      # once: bge-m3 and its reranker, about 6.4 GB
+uv run mentori-cli init ~/mentori_lab                  # then set [model] in ~/mentori_lab/mentori.toml
+export MENTORI_CLI_CONFIG=~/mentori_lab/mentori.toml
+cp your_papers/*.pdf ~/mentori_lab/papers/
+uv run mentori-cli index
+uv run mentori-cli ask --strategy rlm --rlm-turns 10 "your question"
+```
+
+The answer comes with the passages it cites and a record of every model call; `departs_from_lock` in the record lists
+every setting that differs from the paper's (empty: run as the paper ran). `--off rlm_gate` and `--off rlm_search`
+are the paper's two RLM ablations. `harness/tools/mentori_cli/README.md` explains the models you can use (Ollama,
+Gemini, Claude), the prompts you can edit and the limits; its install lines name another repository, so start in
+`harness/tools/mentori_cli/` here. The RLM runs the code the model writes on your machine, with no sandbox: run it in
+a container or a virtual machine. `backend/retrieval/rlm/` is the Mentori app's own RLM, an earlier version that
+differs from the one the paper measured.
