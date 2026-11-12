@@ -114,8 +114,7 @@ value here is checked against the script's own argument parser when this folder 
     uv run --frozen --project experiments/mentori python experiments/mentori/publication/scripts/exp_02_scaling_factorial.py --dry-run --indexes exp_v4_s5_n0 exp_v4_s50_n3 --configs single_pass rlm_10
     uv run --frozen --project experiments/mentori python experiments/mentori/publication/scripts/exp_03_orchestration_ablation.py --dry-run --configs full_orchestrator orch_no_distiller orch_no_planner
     uv run --frozen --project experiments/mentori python experiments/mentori/publication/scripts/exp_03_orchestration_ablation.py --dry-run --configs orch_distil_every_step orch_distil_every_step_f1
-    uv run --frozen --project experiments/mentori python experiments/mentori/publication/scripts/exp_04_component_bench.py --dry-run --benchmark all --datasets findings/recompute/T3_runs/inputs
-    uv run --frozen --project experiments/mentori python experiments/mentori/publication/scripts/exp_04b_distiller_ablation.py --dry-run --variants baseline F1 F2 F3 --datasets findings/recompute/T3_runs/inputs
+    uv run --frozen --project experiments/mentori python experiments/mentori/publication/scripts/exp_04_component_bench.py --dry-run --benchmark analyzer --datasets findings/recompute/T3_runs/inputs
     uv run --frozen --project experiments/mentori python experiments/mentori/publication/scripts/exp_05_coder_benchmark.py --dry-run
     uv run --frozen --project experiments/mentori python experiments/mentori/publication/scripts/exp_06_depth_sweep.py --dry-run --depths 1 5 10
     uv run --frozen --project experiments/rlm_ref python -m experiments.rlm_ref.run_rlm_ref --dry-run --cap 10 --draw 1
@@ -123,6 +122,12 @@ value here is checked against the script's own argument parser when this folder 
 `--datasets findings/recompute/T3_runs/inputs` is the frozen set of component inputs the paper's component runs read
 (its `MANIFEST.json` holds each file's sha256). Without `--datasets`, `exp_04_component_bench.py` and
 `exp_04b_distiller_ablation.py` look for the submission's results files, which are not here, and say so.
+The papers' text is stripped from this set as in the data record (D316): in `exp07_bench_distiller_dataset.json`
+(`raw_content`) and `exp07_bench_synthesizer_dataset.json` (`step_result_content`) each such value is
+`{"stripped": true, "sha256", "chars", "passage_ids"}`. `MANIFEST.json` keeps the original files' sha256 and
+`PROVENANCE.json` (`d316_stripped`) gives both, so `--benchmark distiller`, `--benchmark synthesizer`, `all` and
+`exp_04b_distiller_ablation.py` refuse these two files ("the manifest says ...; nothing was started") until the
+values are rebuilt from the corpus. `analyzer`, `planner` and `supervisor` run as they are.
 
 The same switches in the short tool: `mentori-cli ask --strategy single_pass|multi_hop|rlm|verified_pass|orchestrator`
 and `--off analyser,planner,supervisor,synthesiser,distiller,rlm_gate,rlm_search`

@@ -23,7 +23,8 @@ ONE COMMAND (D155), from the repository root: the committed Supplementary Figure
   uv run --frozen python scripts/S457_fig2_panels.py rebuild [--out <dir>]
 
 It writes every file of findings/figures_provisional/supp_fig17_outcomes/ (or of --out) byte-equal to the committed one (26
-October: PDF, SVG, PNG, data workbook, caption, legend, claims.md, numbers and provenance; run twice, the same bytes;
+October: PDF, SVG, PNG, data workbook, caption, legend, numbers and provenance; run twice, the same bytes; claims.md is
+--claims-out's since D2;
 records_manifest.json is an input and is not written). It reads no Studio and no findings/runs/: the G1 and G2 records
 from the frozen mirror s457_mirror_20261022.tar, G6's answers from findings/recompute/L2_inputs/g6/ and its calls from
 g6_calls_before_d89.tar (the bytes of 23 October; the D89 rerun of 24 October rewrote findings/runs/), and G6's source
@@ -66,22 +67,23 @@ THREE STEPS, from the repository root (--as and --n name the plate; the defaults
      (findings/letter_check/question_2.md:16, :26). Then writes into the plate's folder,
      findings/figures_provisional/supp_fig<N>/ (supp_fig17_outcomes/ for Supplementary Figure 17, fig<N>/ for a main
      figure; a folder holding another script's provenance file is refused, and so is a main "Figure 2", which is S531's):
-       <name> (provisional, <n> of 4050).{pdf,svg,png}   <name> is FIGURE_LOCK [files] supplementary_name or name
+       <name>.{pdf,svg,png}                         <name> is FIGURE_LOCK [files] supplementary_name or name
                                     with --n; one page, every size, font, colour and limit read from
                                     experiments/FIGURE_LOCK.toml (D84, D87): [page] width_double_mm wide, at most
                                     height_max_mm high; the first of [type] font_families, every text at [type]
                                     font_min_pt, panel letters panel_letter_pt and panel_letter_weight, no panel
                                     titles; [colour] categorical (Okabe and Ito) and grey; no line under [lines]
                                     line_min_pt; no ligatures; the PNG is the PDF rasterised at 600 dpi (MuPDF), so
-                                    S448 R7 can compare them pixel by pixel; the data state in the file name only
-       the data workbook             a Supplementary figure: "<name> data (provisional, ...).xlsx", sheets
+                                    S448 R7 can compare them pixel by pixel; the data state in the stamp only
+       the data workbook             a Supplementary figure: "<name> data.xlsx", sheets
                                     "Supplementary Fig. <N>a" and so on (S461's convention; Source Data is a
-                                    main-figure rule, editor row 20); a main figure: "Source Data Fig. <N> (...).xlsx",
+                                    main-figure rule, editor row 20); a main figure: "Source Data Fig. <N>.xlsx",
                                     sheets "Fig. <N>a" and so on; one sheet per panel, the numbers plotted
        [supplementary_]figure<N>_numbers.json   the same sheets as JSON, "printed": every number printed on the plate,
                                     by its SVG group id, with the sheet, row and format it is written from (S448 R8
-                                    (6)), and "claims": the letter's cost numbers against these records
-       the workbook's caption, legend_draft.md, claims.md (every number printed on the plate with its workbook cell;
+                                    (6)); "claims", the letter's cost numbers against these records, until D2
+       the workbook's caption, legend_draft.md; with --claims-out DIR (D2, the editorial step S616 claims) claims.json
+       (the "claims" key) and claims.md into DIR (every number printed on the plate with its workbook cell;
                                     every sentence of the letter, the main text, the Methods and the Supplementary
                                     Information that gives a number for these panels or that the plate bears on,
                                     with the artifact it came from and what these records give; D82),
@@ -91,8 +93,8 @@ THREE STEPS, from the repository root (--as and --n name the plate; the defaults
      "rerun", not yet stored again; "stays_failed" answers are settled, D92 Q185), it was not planned from an
      out-of-date token target (G2), and its answers file was checked by S455 for the D89 and D90 Gemini cases (G2: a
      scan of its current file, experiments/NOW.md:29). Files of an earlier data state (the plate's name and the
-     workbook's stem) are deleted first. --final drops the provisional suffix and is refused while an answer is not
-     settled. The provenance file's command writes a records folder outside the repository as <records>.
+     workbook's stem) are deleted first. No name carries a "(provisional, ...)" suffix (Q9, Valerio, 11 Nov); --final
+     is refused while an answer is not settled. The provenance file's command writes a records folder outside the repository as <records>.
 
   3. selftest uv run --frozen python scripts/S457_fig2_panels.py selftest
      The plate's calculations on synthetic records (the wait taken off the clock time, the times adding up, the G2
@@ -184,6 +186,12 @@ DEFAULT_FOLDER = "supp_fig17_outcomes"            # that plate's folder; any oth
 S77 = ROOT / "findings" / "recompute" / "S77_r2q2_cost.json"   # the letter's cost numbers (question_2.md:16, :26)
 from doc_paths import LETTER, doc  # noqa: E402  the live documents, resubmission/ (Valerio, 4 Nov)
 MAIN_TEXT = doc("02_Main_Text.docx")
+# D2 (Valerio, 8 Nov): figures are built from data only. The claims list (claims_now, claims_md) reads the documents,
+# so it is an editorial check run outside the figure build: figure and rebuild write it only with `--claims-out DIR`
+# (scripts/S616_figure_editorial.py claims): claims.md and claims.json (the "claims" key the numbers file carried until
+# D2) into DIR. Without it no document is opened, the numbers file has no "claims" key and the provenance lists no
+# document and no claims.md.
+CLAIMS_OUT: Path | None = None
 
 
 def g1_run(s):
@@ -1720,38 +1728,37 @@ def legend_and_caption(fn, stamp, n_in, extra, nm, rerun, command=None):
     other_waits = {k: v for k, v in vw["other_exp01_calls_with_a_wait_over_0_s"].items() if v}
     n_oos = fn["a_split"][0]["questions_n"]
     no_wall = {k: v for k, v in fn["g1_calls_without_wall"].items() if v}
+    box_txt = "Grey dots, question means over three draws; box, interquartile range; line, median; whiskers, range; "
     legend = (
         f"# {nm['plate']}, title and legend (draft)\n\n"
-        f"Written by `{SCRIPT} figure` from the plotted numbers. Data stamp: {stamp}.\n\n"
+        f"Written by `{SCRIPT} figure` from the plotted numbers.\n\n"
         f"{title} Each set-up answered the {N_Q} questions three times with {GEN_DISPLAY.get(extra['gen_model'], extra['gen_model'])} "
-        f"on the 20-paper index (n = 405 answers per set-up): Mentor::i's single pass, multi-hop and verified pass; "
-        f"RLM at turn caps 5, 10 and 20; matched budget, single pass with "
-        f"passages matching RLM-10's input tokens; and Zhang RLM at "
-        f"turn caps {extra['max_iter']}. "
-        f"**a**, Answers that did not end in a plain answer, by kind; right, answers that did, answers with "
-        f"no text and, on the {n_oos} out-of-scope questions (n = {n_oos * len(DRAWS)} answers per set-up), answers "
-        f"the judge scored as refused (refusal accuracy {REFUSED_AT} or more) among those cut at the turn limit "
-        f"(RLM-5) or ended by the closing turn (multi-hop), and among the others; an answer with no judge "
-        f"row counts as not refused. "
-        f"**b**, Tokens per answer (prompt, output and thinking, the verifier's included), log scale. Grey dots, "
-        f"one per question, the mean of its three draws (n = {N_Q} questions per set-up); box, 25th to 75th "
-        f"percentile; line, median; whiskers, the range over questions. "
-        f"**c**, Clock time per answer (s) less the wait for the local verifier, as in **b**. "
-        f"**d**, Model-call time per answer (s), summed over its calls, as in **b**; blank for Zhang RLM, whose "
-        f"sub-calls run in parallel. "
-        f"**e**, Turns used per answer by the six RLM set-ups: cell colour, how many of the set-up's 405 answers "
-        f"used that many turns (log scale); no cell, none; black outline, the turn cap. "
-        f"**f**, Verified pass, linear scale: clock time per answer with the wait, and the wait alone, as in "
-        f"**b**. RLM is Mentor::i's own RLM; Zhang RLM is the RLM package "
-        f"released by the method's authors ({extra['pkg']}).\n")
+        # editor row 45 (Valerio, 8 Nov): n = X only in the panels that draw boxes (b, c, d, f); a and e draw
+        # counts, so their counts stay in words; every panel described in full, no "as in b"
+        f"on the 20-paper index ({N_Q * len(DRAWS)} answers). Matched budget is a single pass with passages "
+        f"matching RLM-10's input tokens; RLM is Mentor::i's own and Zhang RLM the method authors' package "
+        f"({extra['pkg']}), each with its turn cap ({extra['max_iter']}) after the dash. "
+        f"**a**, Answers that did not end in a plain answer, stacked by kind. Right: answers that "
+        f"did; answers with no text; and, of the {n_oos * len(DRAWS)} answers per set-up to the "
+        f"{n_oos} out-of-scope questions, those judged refused (refusal score {REFUSED_AT} or "
+        f"more), among those cut at the turn limit (RLM-5) or by the closing turn (multi-hop), "
+        f"and the rest (no judge row: not refused). "
+        f"**b**, Tokens per answer (prompt, output and thinking, verifier's included), log scale. " + box_txt + f"n = {N_Q} questions per set-up. "
+        f"**c**, Clock time per answer (s) less the local verifier wait, log scale. " + box_txt + f"n = {N_Q} questions per set-up. "
+        f"**d**, Model-call time per answer (s), summed over calls, log scale; blank for Zhang RLM (parallel "
+        f"sub-calls). " + box_txt + f"n = {N_Q} questions per set-up. "
+        f"**e**, Turns used by the six RLM set-ups: cell colour, answers of the set-up's "
+        f"{N_Q * len(DRAWS)} using that many turns (log scale); no cell, none; black "
+        f"outline, turn cap. "
+        f"**f**, Verified pass, time per answer (s), linear scale: clock time with the verifier wait, "
+        f"and the wait alone. " + box_txt + f"n = {N_Q} questions.\n")
     cap_name = f"{nm['stem']}"
     sh = nm["sheet_prefix"]
     cap = (
         f"# {cap_name}, caption\n\n"
-        f"**{cap_name} | Numerical values plotted in {nm['plate']}.** Provisional: drawn from {fmt_int(n_in)} of the "
+        f"**{cap_name} | Numerical values plotted in {nm['plate']}.** Drawn from {fmt_int(n_in)} of the "
         f"{fmt_int(TOTAL)} answers the plate plans, {fmt_int(rerun['settled'])} of them settled, judged only in a's "
-        f"split columns; every value will be redrawn from the "
-        f"full records by the same script. Data stamp: {stamp}. One sheet per panel. Sheet {sh}a: per set-up and "
+        f"split columns. Data stamp: {stamp}. One sheet per panel. Sheet {sh}a: per set-up and "
         f"outcome (stop reason as stored, empty answer text, verifier status), the answers counted and the set-up's "
         f"answers; the set-up's first row also gives how many of its answers S455's D92 list names "
         f"(to rerun or left as stored). "
@@ -2413,9 +2420,7 @@ def figure(args):
         rep["g13"]["out_of_date_after_merge"] = 0
         inputs.update(rep["g13"]["inputs_sha256"])
         newest = max(newest, g13_end)
-    rep["claims"] = claims_reproduce()
-    for p in DOCS.values():
-        inputs[str(p.relative_to(ROOT))] = sha256_file(p)
+    rep["claims"] = claims_reproduce()                 # S77 only (the submitted run's artifact), no document
     collect = [json.loads(x) for x in G1_COLLECT.read_text().splitlines() if x.strip()]
     inputs[str(G1_COLLECT.relative_to(ROOT))] = sha256_file(G1_COLLECT)
     fn = compute(data, qtype, named, collect)
@@ -2428,11 +2433,11 @@ def figure(args):
         raise SystemExit(f"--final: {rerun['settled']} of {TOTAL} answers settled; {rerun_state(rerun)}; the plate "
                          f"stays provisional")
     final = args.final
-    stamp = ("" if final else "PROVISIONAL: ") + (
+    stamp = (                               # Q9 (Valerio, 11 Nov): no PROVISIONAL in any stamp
         f"{rerun['settled']:,} of {TOTAL:,} answers settled (all {n_in:,} stored: G1 {g1_n:,}, G2 {g2_n}, G6 "
         f"{g6_n:,}; settled: no rerun owed, no matched-budget token target out of date, checked by S455 for the D89 "
         f"and D90 Gemini cases), judged only in a's split columns, records of {iso_local(newest)}; {rerun_state(rerun)}")
-    tag = "" if final else f" (provisional, {rerun['settled']} of {TOTAL})"
+    tag = ""                                # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
     out = Path(args.out).resolve() if getattr(args, "out", None) else nm["out"]    # rebuild --out (D155)
     out.mkdir(parents=True, exist_ok=True)
     for old in sorted(set(out.glob(f"{nm['plate']}*")) | set(out.glob(f"{nm['stem']}*"))):   # the data's name
@@ -2464,7 +2469,7 @@ def figure(args):
             raise SystemExit(f"{k_}: more than one value in the records: {vals}")
         extra[k_] = ", ".join(vals[:-1]) + " and " + vals[-1] if len(vals) > 1 else vals[0]
     legend, cap = legend_and_caption(fn, stamp, n_in, extra, nm, rerun, getattr(args, "command", None))
-    claims = claims_now(fn, data)
+    claims = claims_now(fn, data) if CLAIMS_OUT is not None else None   # D2: the editorial step only
     numbers = out / f"{nm['side']}_numbers.json"
     numbers.write_text(json.dumps({"stamp": stamp, "what": f"every number the plate draws, sheet by sheet as the data "
                                    f"workbook {sd.name} holds them (S448 R8 compares the workbook with this file)",
@@ -2472,12 +2477,18 @@ def figure(args):
                                    "printed": printed,
                                    "printed_what": "every number printed on the plate: the SVG group id of its text, "
                                                    "and the workbook sheet and row and format it is written "
-                                                   "from (S448 R8 (6))",
-                                   "claims": claims}, indent=1, default=str) + "\n")
+                                                   "from (S448 R8 (6))"}, indent=1, default=str) + "\n")
     (out / "legend_draft.md").write_text(legend)
     capf = out / f"{nm['stem']} caption{tag}.md"
     capf.write_text(cap)
-    (out / "claims.md").write_text(claims_md(nm, stamp, printed, sheets, claims, rep["claims"]))
+    if CLAIMS_OUT is not None:                         # D2: the editorial step's folder, never the plate's
+        CLAIMS_OUT.mkdir(parents=True, exist_ok=True)
+        (CLAIMS_OUT / "claims.md").write_text(claims_md(nm, stamp, printed, sheets, claims, rep["claims"]))
+        (CLAIMS_OUT / "claims.json").write_text(json.dumps(
+            {"stamp": stamp, "what": f"the claims list of {nm['plate']} (D82): each sentence of the documents with its "
+             "numbers, from the submitted run (S77) and from these records; the numbers file's \"claims\" key until D2",
+             "documents_sha256": {str(p.relative_to(ROOT)): sha256_file(p) for p in DOCS.values()},
+             "claims": claims}, indent=1, default=str) + "\n")
     prov = {
         "provenance": {"script": SCRIPT, "script_sha256": sha256_file(Path(__file__)),
                        "command": getattr(args, "command", None)
@@ -2512,15 +2523,16 @@ def figure(args):
                   "exp01_answers_per_commit": extra["commits"],
                   "exp01_clone_head_when_copied_is_not_the_run_commit": "records_manifest.json exp01.<set-up>."
                   "processes gives each process's commit from the Studio's start records"},
-        "files": {p.name: sha256_file(p) for p in list(paths.values()) + [sd, capf, numbers, out / "legend_draft.md",
-                                                                            out / "claims.md"]},
+        "files": {p.name: sha256_file(p) for p in list(paths.values()) + [sd, capf, numbers, out / "legend_draft.md"]},
     }
     (out / f"{nm['side']}_provenance.json").write_text(json.dumps(prov, indent=1, default=str) + "\n")
     print(stamp)
     print(f"wrote {', '.join(p.name for p in paths.values())} ({W:.0f} x {H:.1f} mm, dot rows {pitch} mm apart), "
-          f"{sd.name}, {capf.name}, {numbers.name}, legend_draft.md, claims.md, {nm['side']}_provenance.json into "
+          f"{sd.name}, {capf.name}, {numbers.name}, legend_draft.md, {nm['side']}_provenance.json into "
           f"{out.relative_to(ROOT) if out.is_relative_to(ROOT) else out}")
     print(f"dots overlapping per panel and set-up: {overlaps}")
+    if claims is None:
+        return
     t = claims_tally(claims)
     print(f"claims: {len(claims)} sentences ({sum(1 for c in claims if c['found'])} found in their document); of "
           f"{t['quoted']} quoted numbers {t['differ']} differ from these records and {t['absent']} have no counterpart "
@@ -2650,10 +2662,15 @@ def main(argv=None):
     f.add_argument("--records", "--g1", dest="records", required=True,
                    help="the folder mirror copied the G1 and G2 records into")
     f.add_argument("--final", action="store_true")
+    f.add_argument("--claims-out", help="D2: also write the claims list (claims.md, claims.json) into this folder")
     sub.add_parser("selftest", help="the plate's calculations on synthetic records; writes nothing")
     rb = sub.add_parser("rebuild", help="Supplementary Figure 17 from the frozen inputs (D155)")
     rb.add_argument("--out", help="default the plate's folder, findings/figures_provisional/supp_fig17_outcomes")
+    rb.add_argument("--claims-out", help="D2: also write the claims list (claims.md, claims.json) into this folder")
     args = ap.parse_args(argv)
+    global CLAIMS_OUT
+    if getattr(args, "claims_out", None):
+        CLAIMS_OUT = Path(args.claims_out).resolve()
     {"mirror": mirror, "figure": figure, "rebuild": rebuild, "selftest": lambda a: selftest()}[args.cmd](args)
 
 

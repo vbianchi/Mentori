@@ -1,6 +1,6 @@
 # Which code ran which run
 
-Built by `scripts/S609_release_harness.py` from Mentori-reanalysis `30b4a34e`. The harness in this folder
+Built by `scripts/S609_release_harness.py` from Mentori-reanalysis `7c02e422`. The harness in this folder
 is the code at that one commit. The runs of the paper used earlier commits: there is no single commit that
 ran every experiment. This file lists what the records themselves say.
 
@@ -174,6 +174,9 @@ answer that embeds its calls, so the counts are occurrences, not calls).
 | count_records_20261106 | `count_records_20261106/t3/T3_frozen_20261104T131439Z/sinks/exp_04b__baseline__qwen3-coder-30b` | 194 | `df0cd717` (false): 97 |
 | count_records_20261108 | `count_records_20261108/t2x/gemma3-27b/runs/exp_01__rlm_10__exp_v4_s20_n0+gemma3-27b` | 200 | `43899c16` (false): 175 |
 | count_records_20261108 | `count_records_20261108/t2x/qwen3-coder-30b/runs/exp_01__rlm_10__exp_v4_s20_n0+qwen3-coder-30b` | 201 | `43899c16` (false): 159 |
+| count_records_20261109 | `count_records_20261109/g20/runs/b4_rlm_ref_qwen3coder__cap10__d239a46` | 341 | `a0749d02` (false): 295 |
+| count_records_20261109 | `count_records_20261109/g20/runs/exp_01__rlm_10_nogate__exp_v4_s20_n0+qwen3-coder-30b` | 47 | none recorded |
+| count_records_20261109 | `count_records_20261109/g20/runs/exp_01__rlm_10_nosearch__exp_v4_s20_n0+qwen3-coder-30b` | 47 | none recorded |
 | fig2_g1r15_inputs | `fig2_g1r15_inputs/runs/exp_01__rlm_10__exp_v4_s20_n0` | 405 | none recorded |
 | fig2_g1r15_inputs | `fig2_g1r15_inputs/runs/exp_01__rlm_20__exp_v4_s20_n0` | 405 | none recorded |
 | fig2_g1r15_inputs | `fig2_g1r15_inputs/runs/exp_01__rlm_5__exp_v4_s20_n0` | 405 | none recorded |
@@ -633,13 +636,14 @@ themselves are not in this folder: they name the paper's machines and ports.
 | `findings/recompute/S3_runs/s6/start_s6w_second_laptop.sh:18` | `99357a12` |
 | `findings/recompute/S3_runs/s6/start_s6w_second_local.sh:53` | `34bb2d55` |
 | `findings/recompute/S3_runs/s6/start_s6w_studio.sh:22` | `46a60e5a` |
+| `findings/recompute/S3_runs/s6/start_s6wt2g_rest_laptop.sh:15` | `99357a12` |
 | `findings/recompute/S3_runs/s6/start_t2q_second_studio.sh:8` | `99357a12` |
 | `findings/recompute/S564_claimify_selection/start_s564_laptop.sh:14` | `5f20c8c3` |
 | `findings/recompute/T3_runs/launch_t3.sh:24` | `df0cd717` |
 
 ## How far each commit is from this folder
 
-Files that differ between the commit and `30b4a34e` in the harness folders (`experiments/mentori`, `experiments/runner`, `experiments/scorers`, `experiments/rlm_ref`, `experiments/reuse_demo`, `tools/mentori_cli`, `experiments/LOCK.toml`).
+Files that differ between the commit and `7c02e422` in the harness folders (`experiments/mentori`, `experiments/runner`, `experiments/scorers`, `experiments/rlm_ref`, `experiments/reuse_demo`, `tools/mentori_cli`, `experiments/LOCK.toml`).
 
 | commit | date | ancestor of the release commit | files that differ |
 |---|---|---|---|
@@ -651,6 +655,7 @@ Files that differ between the commit and `30b4a34e` in the harness folders (`exp
 | `5f20c8c3` | 2026-11-02 | True | 42 |
 | `92f1d3ef` | 2026-10-29 | True | 48 |
 | `99357a12` | 2026-11-02 | True | 42 |
+| `a0749d02` | 2026-11-06 | True | 10 |
 | `b292315f` | 2026-11-04 | True | 35 |
 | `df0cd717` | 2026-11-02 | True | 42 |
 | `e27a3f18` | 2026-10-24 | True | 73 |

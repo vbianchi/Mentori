@@ -51,7 +51,7 @@ TWO STEPS, two commands, both from the repository root:
      The submission plate, drawn to the editor's figure rules (experiments/FIGURE_RULES.md E1-E8; checked by
      scripts/S448_figure_rules_check.py --figure 6 --dir findings/figures_provisional/fig6). Same reproduce-first
      check and the same records as draw. Writes into findings/figures_provisional/fig6/:
-       Figure 6 (provisional, <n> of <N>).{pdf,svg,png}    one page; every size, font, colour and limit read from
+       Figure 7.{pdf,svg,png}    one page; every size, font, colour and limit read from
                                     experiments/FIGURE_LOCK.toml (D84, D87), none written here: [page]
                                     width_double_mm wide, at most height_max_mm high; the first of [type]
                                     font_families; every text at [type] font_min_pt, panel letters
@@ -63,11 +63,11 @@ TWO STEPS, two commands, both from the repository root:
                                     (MuPDF), so S448 R7 can compare
                                     them pixel by pixel; nothing on the plate but the figure: the data state is in
                                     the file name, never in the file
-       Source Data Fig. 6 (provisional, ...).xlsx    one sheet per panel, the numbers plotted
+       Source Data Fig. 7.xlsx    one sheet per panel, the numbers plotted
        figure6_numbers.json        the same sheets as JSON (S448 R8 compares the workbook with it), and "printed":
                                     every number printed on the plate, by its SVG group id, with the sheet, row and
                                     format it is written from (S448 R8 (6) holds the plate to the workbook)
-       Source Data Fig. 6 caption (provisional, ...).md, legend_draft.md (title and legend), figure6_provenance.json
+       Source Data Fig. 7 caption.md, legend_draft.md (title and legend), figure6_provenance.json
      Files of an earlier data state ("Figure 6*", "Source Data Fig. 6*") are deleted first. --final names them
      "Figure 6" and is refused unless every attempt of the design is stored (2,420 while D100's three if-time
      variants are not complete; D112 Q15 O-a, D116). The panels:
@@ -1589,8 +1589,15 @@ def rerun_tally(attempts, flags, by_machine):
                 if ev:
                     c[f"{side}_with_add_cell_as_text_and_d80v1_event"] += 1
         commits = sorted({k.split()[-1] for k in by_machine.get(v, {})})
-        has = {cm: subprocess.run(["git", "-C", str(ROOT), "merge-base", "--is-ancestor", D80_COMMIT, cm],
-                                  capture_output=True).returncode == 0 for cm in commits}
+        # O3 (8 Nov): whether each clone commit holds D80_COMMIT, as `git merge-base --is-ancestor` gave it, pinned in
+        # the tree (scripts/pinned_history.py; S617 verify checks it against git), so no history is read
+        if str(ROOT / "scripts") not in sys.path:
+            sys.path.insert(0, str(ROOT / "scripts"))
+        import pinned_history as PH
+        try:
+            has = {cm: PH.is_ancestor(D80_COMMIT, cm) for cm in commits}
+        except PH.PinError as e:
+            raise SystemExit(f"rerun_tally: {e} (scripts/S617_pin_history.py ANCESTRY)") from None
         out[v] = {"attempts": len(xs), "failed_owing_d80v1_rerun": c["failed_with_d80v1_event"],
                   "failed_with_add_cell_as_text_d81": c["failed_with_add_cell_as_text"],
                   "clone_commits_have_d80": has, **dict(sorted(c.items()))}
@@ -3360,8 +3367,7 @@ def legend_and_caption(fn, stamp, n, k, ops, counted=(), design=None):
             f"{n:,} of the {d_total:,} attempts of the design ({k} of {len(d_vs)} model and thinking-setting variants "
             f"complete)")
     prov = "" if final else (
-        f"Provisional: drawn from {held}, after the S4 reruns (D75, D80 V1, D81); every value will be redrawn from the "
-        f"full records by the same script. ")
+        f"Drawn from {held}, after the S4 reruns (D75, D80 V1, D81). ")
     if not final and set(REMOVED) - set(d_vs):
         prov += REMOVED_SENTENCE + " "
     # D100, D112 Q15 O-a: a variant stopped before completion and left out of the design is named, with its count
@@ -3425,7 +3431,7 @@ def legend_and_caption(fn, stamp, n, k, ops, counted=(), design=None):
         + "gemini-3-flash is gemini-3-flash-preview and qwen3-coder-next is qwen3-coder-next:q4_K_M; a variant "
         "without a setting runs at its maker's default.")
     lines = [f"# Figure {FIG_N}, title and legend (draft)", "",
-             f"Written by `scripts/S447_fig6_panels.py figure` from the plotted numbers. Data stamp: {stamp}.", "",
+             f"Written by `scripts/S447_fig6_panels.py figure` from the plotted numbers.", "",
              f"**Figure {FIG_N} | {title}.** {legend}", ""]
     cap = [f"# Source Data Fig. {FIG_N}, caption", "",
            (f"**Source Data Fig. {FIG_N} | Numerical values plotted in Figure {FIG_N}.** " + prov +
@@ -3458,7 +3464,7 @@ def render(attempts, flags, out_dir, final, stamp, meta, mutate=None, strict=Tru
     cells, variants, strat, panel_a_set, think, pooled, chi = compute(attempts, flags)
     n = sum(v["attempts"] for v in variants.values())
     k = sum(v["complete"] for v in variants.values())
-    tag = "" if final else f" (provisional, {n} of {d_total})"
+    tag = ""                                      # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
     fn = figure_numbers(attempts, cells, variants, think, panel_a_set, flags)
     ops = {"n": len({a["op_id"] for a in attempts}),
            "by_dataset": dict(Counter(d for d in {a["op_id"]: a.get("dataset") for a in attempts}.values()))}
@@ -3539,7 +3545,7 @@ def figure(argv, final=False):
         raise SystemExit(f"--final: {n} of {d_total} attempts of the design stored; the plate is still provisional")
     variants_done = sum(1 for v in d_vs if sum(1 for a in kept if variant_of(a["run_id"]) == v) == PER_VARIANT)
     when = iso_local(notes["newest_answers_mtime"])
-    stamp = (f"PROVISIONAL: {n:,} of {d_total:,} attempts, {variants_done} of {len(d_vs)} variants complete, "
+    stamp = (f"{n:,} of {d_total:,} attempts, {variants_done} of {len(d_vs)} variants complete, "
              f"records of {when}; after the S4 reruns (D75, D80 V1, D81)") if not final else \
         f"FINAL: {n:,} of {d_total:,} attempts, records of {when}"
     if d_left:

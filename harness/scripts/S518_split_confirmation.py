@@ -77,6 +77,7 @@ source holds (`shares`, unchanged). The hypothesis, the threshold, the statistic
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
 import json
 import subprocess
@@ -338,15 +339,25 @@ def t2x_cells(path: Path, qs: dict, source: str, held: set, qfile: Path = None) 
     return mine, {"t2x_rows": len(mine), "t2x_single_pass_not_read": sum(1 for k in rows if k[0] == B)}
 
 
+def decision_text() -> str:
+    """The decision lines S616 extracted from experiments/README.md (fig_design, design_facts.json "readme_decisions";
+    D2, 8 Nov: the release reads no working file; S616 check holds them to the README)."""
+    import fig_design
+    return "\n".join(fig_design.facts()["readme_decisions"].values())
+
+
 def refuse_unless_fixed() -> str:
     git = lambda *a: subprocess.run(["git", "-C", str(ROOT), *a], capture_output=True, text=True).stdout.strip()
     for path in (SCRIPT, S511_SCRIPT):
         if git("status", "--porcelain", "--", path):
             raise Refused(f"{path} differs from its commit")
-        if not git("log", "-1", "--format=%h", "--", path):
+        if not git("ls-files", "--", path):
             raise Refused(f"{path} is not committed")
-    head = git("log", "-1", "--format=%h", "--", SCRIPT)
-    if DECISION not in (ROOT / "experiments" / "README.md").read_text():
+    # O3 (Valerio, 8 Nov): no history read. The script is named by its git blob id (git hash-object, content only),
+    # where the last commit to touch it (git log) named a commit the release does not hold
+    b = (ROOT / SCRIPT).read_bytes()
+    head = "blob " + hashlib.sha1(b"blob %d\0" % len(b) + b).hexdigest()
+    if DECISION not in decision_text():
         raise Refused(f"{DECISION} is not in experiments/README.md")
     return head
 
@@ -381,7 +392,7 @@ def reference(records: list, g: dict, dry: bool) -> int:
     commit = None
     if not dry:
         commit = refuse_unless_fixed()
-        if REF_DECISION not in (ROOT / "experiments" / "README.md").read_text():
+        if REF_DECISION not in decision_text():
             raise Refused(f"{REF_DECISION} is not in experiments/README.md")
     qs = S511.questions()
     records += [input_record("reference base (key v2.4)", REF_BASE), input_record("reference collect (key v2.5)", REF_COLLECT),
@@ -429,7 +440,7 @@ def main() -> int:
         records += [input_record("collect", a.collect)] + ([input_record("base", a.base)] if a.base else [])
         cells, info = merge(read_rows(a.base, qs) if a.base else {}, read_rows(a.collect, qs))
         if a.t2x:
-            if T2X_DECISION not in (ROOT / "experiments" / "README.md").read_text():
+            if T2X_DECISION not in decision_text():
                 raise Refused(f"{T2X_DECISION} is not in experiments/README.md")
             records += [input_record("t2x collect", a.t2x), input_record("t2x questions", T2X_QUESTIONS)]
             extra, t2x_info = t2x_cells(a.t2x, qs, a.source, set(cells))

@@ -58,8 +58,8 @@ ONE COMMAND (D155), from the repository root: the committed plate, rebuilt from 
   uv run --frozen python scripts/S463_fig2_ranking.py rebuild [--out <dir>]
 
 It writes every file of findings/figures_provisional/fig3_strategies/ (or of --out) byte-equal to the committed one
-(26 October: PDF, SVG, PNG, workbook, caption, legend, claims.md, ranking.json, ranking_report.md, figure3_numbers.json
-and figure3_provenance.json; run twice, the same bytes). The frozen inputs and how each is checked: rebuild() below.
+(26 October: PDF, SVG, PNG, workbook, caption, legend, ranking.json, ranking_report.md, figure3_numbers.json and
+figure3_provenance.json; run twice, the same bytes; claims.md is --claims-out's since D2). The frozen inputs and how each is checked: rebuild() below.
 The tars come from the folder in env FROZEN_TARS (default ~/Mentori_scratch_keep/frozen_2026-10-26; the paper's
 Zenodo deposit holds them), extracted once into findings/recompute/frozen_inputs/extracted/ (gitignored). Every
 command re-executes itself under PYTHONHASHSEED=0 (fig_repro.pin_hash_seed: the PDF's font subsets depend on it).
@@ -85,15 +85,17 @@ COMMANDS, from the repository root (uv run only; no model call anywhere):
                [--concept-recall findings/recompute/L3/concept_recall.jsonl] \
                [--concept-recall-d181 findings/recompute/L3_d181]
            Reads, checks, computes, and writes into --out (default findings/figures_provisional/fig3_strategies/):
-           the plate "Figure 3 (provisional, <n> of 2430).{pdf,svg,png}", "Source Data Fig. 3 (...).xlsx" and its
+           the plate "Figure 3.{pdf,svg,png}", "Source Data Fig. 3.xlsx" and its
            caption, figure3_numbers.json, figure3_provenance.json, legend_draft.md (what S448 reads), ranking.json
            (every number with the answer keys it is counted from), ranking_report.md (one page, plain English) and
-           claims.md (D82's claims list), and beside --out, in supp_fig16_score3/, Supplementary Figure 16's plate, data
+           with --claims-out DIR claims.md into DIR (D82's claims list; D2: the editorial step S616 claims, the only
+           reader of the documents), and beside --out, in supp_fig16_score3/, Supplementary Figure 16's plate, data
            workbook, numbers, provenance and legend. --extra <folder> (fig3_s6_inputs) and --fig3e <folder> are needed for a
            plate. Every file is first written into a staging folder beside --out; only when
            all are written are the earlier S463 files of --out removed and the new ones moved in, so a refusal or a
            plate that fails to draw leaves --out as it was (exit 1, nothing written). With --no-plate only
-           ranking.json, ranking_report.md and claims.md are written, and an earlier plate in --out is removed with
+           ranking.json and ranking_report.md are written (and claims.md with --claims-out), and an earlier plate in
+           --out is removed with
            the rest, so no file of an earlier reading stays beside them.
            --s6 <folder>: where out_s6_g1 and out_s6_g1r15 are (D186 (3), JUDGE ROWS below). --answers (K1's runs, then G1R15's) is
            required: the stop reasons and the verifier status come from the records judged.
@@ -209,7 +211,7 @@ HOW EACH NUMBER IS MADE (LIST.md rules; pass on threshold t = judge score t or m
              by S457.exp01_row; per question the mean over its draws, then the mean over the 86 answerable questions
              (plotted) and over all 135, with the Rule 2 interval. Above each scatter, each strategy over single pass on
              the 86: model-call time as a ratio of means; tokens as a ratio of means and a ratio of medians.
-  flips      panel c at score 4 and Supplementary Figure 16b at score 3 (flips, self_flips), Rule 4: every single-pass draw of a question against every draw of the
+  flips      panel c at score 4 (flips, self_flips; the score-3 plate was dropped by D302, D309 A23), Rule 4: every single-pass draw of a question against every draw of the
              strategy; harmed = sum s(1 - v), helped = sum (1 - s)v (the means over the pairings of the questions
              changed), both denominators with the Rule 2 interval, Rule 3's P; each draw's 2 x 2 table; the noise
              baseline (Rule 4 (b)) per strategy, and per ordered pair of distinct draws the questions passing on one
@@ -2519,7 +2521,7 @@ def cost_rows(res, cost, draws, read, kinds=None):
 
 
 def flip_rows(res, q78, draws):
-    """Fig. 3c (score 4) and Supplementary Figure 16b (score 3): Rule 4 per strategy and threshold (the plotted means of harmed and helped over the pairings, both
+    """Fig. 3c (score 4; the score-3 plate was dropped by D302, D309 A23): Rule 4 per strategy and threshold (the plotted means of harmed and helped over the pairings, both
     denominators with their intervals, Rule 3's P, the same-draw totals); each draw's 2 x 2 table; each strategy's
     noise baseline (the reference band is single pass's, each other strategy's own is drawn on its row); verified pass
     without the answers whose verifier was not ok (Q78)."""
@@ -3413,7 +3415,9 @@ def draw(book, paths, sd, nd):
             P.rb.append({"panel": "b", "kind": "person mark", "c": c, "artist": dm, "ax": ax_bm})
     if prow:
         n0 = len(fig.texts)
-        P.key([("mark", (hs.BLACK, "o"), "judge, 3 draws"), ("open", (hs.BLACK, "D"), "person, draw 1")],
+        # the key names the series only; the draws (3 for the judge, draw 1 for the person) are in the legend
+        # (Valerio, 11 November: figure files hold only the figure)
+        P.key([("mark", (hs.BLACK, "o"), "judge"), ("open", (hs.BLACK, "D"), "person")],
               centre_x=X + WB / 2, y=Y + 2.4, max_width=WB - 4)
         for t_ in fig.texts[n0:]:
             P.rb.append({"panel": "b", "kind": "key text", "text": t_, "artist": None})
@@ -3437,10 +3441,10 @@ def draw(book, paths, sd, nd):
     hs.panel_letter(fig, X, Y + 2.4, "d")
     D = "Fig. 3d"
     gm = {(r["strategy"], r["question_group"]): r for r in rows_of(book, D, GROUP_D_KIND)}
-    nq_g = {g: gm[(CONFIGS[0], g)]["questions"] for g, *_ in D_GROUPS}
-    # D216: one line, centred over 3d, no entry for the grey dots; each group's n read from its rows
+    # D216: one line, centred over 3d, no entry for the grey dots; each group named only, its n in the legend
+    # (Valerio, 11 November: figure files hold only the figure)
     n0 = len(fig.texts)
-    P.key([("mark", (col_, mk_), f"{head} {nq_g[g]}") for g, head, col_, mk_ in (D_GROUPS[2], D_GROUPS[0], D_GROUPS[1])]
+    P.key([("mark", (col_, mk_), head) for g, head, col_, mk_ in (D_GROUPS[2], D_GROUPS[0], D_GROUPS[1])]
           + [("open", (hs.BLACK, "o"), f"score {THRESHOLDS[1]}"), ("mark", (D_CROSS, "X"), fn.MATCHED_BUDGET)],
           centre_x=X + WD / 2, y=Y + 2.4, max_width=None)
     for t_ in fig.texts[n0:]:
@@ -3603,18 +3607,9 @@ def draw(book, paths, sd, nd):
                                       color=hs.ink_on(c)),
                            {"sheet": "Fig. 3f", "row": i, "format": "{d_sign}{d_size_pp:.0f}"})
                 P.rb.append({"panel": "f", "kind": "cell", "i": i, "artist": cell, "ax": ax, "frame": fr, "text": t_})
-    # FIG3F O2 (rulings page 6 Nov): the grey run-to-run row is dropped; the n row sits under the last strategy row
-    nidx = {(r["block"], r["core_papers"]): i for i, r in enumerate(E) if r["row_kind"] == "n"
-            and r["question_group"] == "all"}
-    y_n = top_e + (n_rows - 1) * RP + THE + 2.3
-    P.text(X + LAB - 1.0, y_n, "Questions (n)", ha="right")
-    for b, block in enumerate(blocks_e):
-        for k, sz in enumerate(sizes):
-            xx = x0s[b] - X + k * CP
-            j_ = nidx[(block, sz)]
-            t_ = P.num(hs.text_mm(fig, X + xx + TWE / 2, y_n, str(E[j_]["n_questions"]), ha="center", va="center"),
-                       {"sheet": "Fig. 3f", "row": j_, "format": "{n_questions}"})
-            P.rb.append({"panel": "f", "kind": "n", "i": j_, "text": t_, "ax": ax, "artist": None})
+    # FIG3F O2 (rulings page 6 Nov): the grey run-to-run row is dropped. The 'Questions (n)' row is dropped too
+    # (Valerio, 11 November: figure files hold only the figure): each column's n stays in sheet Fig. 3f's n rows and
+    # in the legend
 
     return P.finish(paths, "Figure 3", sd, nd, "fig3")
 
@@ -3874,7 +3869,7 @@ def check_drawn(rb, sheets, nd, plate="fig3"):
                     bad.append(f"person mark {e['c']}: at ({a_.get_xdata()[0]}, {a_.get_ydata()[0]}), the row gives "
                                f"{r['person_refused']} of {r['questions']} on {e['c']}'s row")
             keys = [e["text"].get_text() for e in marks(pan, "key text")]
-            if bool(keys) != bool(prow) or (prow and "person, draw 1" not in keys):
+            if bool(keys) != bool(prow) or (prow and "person" not in keys):
                 bad.append(f"3b's key {keys} with {len(prow)} person rows")
             n[f"{pan} person marks"] = len(pm)
         probs += [f"{pan}: {x}" for x in bad]
@@ -4076,7 +4071,7 @@ def check_drawn(rb, sheets, nd, plate="fig3"):
                 n["d group marks"] += 1
     if [e for e in rb if e["panel"] == "d" and e["kind"] in ("mean", "calls bar", "pass bar", "cross bar")]:
         bad.append("an interval or a mean mark of the old 3d is drawn (D216: no interval on any mark)")
-    want_k = [f"{h} {gr[(CONFIGS[0], g)]['questions']}" for g, h, *_ in (D_GROUPS[2], D_GROUPS[0], D_GROUPS[1])
+    want_k = [h for g, h, *_ in (D_GROUPS[2], D_GROUPS[0], D_GROUPS[1])
               if (CONFIGS[0], g) in gr] + [f"score {THRESHOLDS[1]}", fn.MATCHED_BUDGET]
     kt = [e["text"] for e in marks("d", "key text")]
     if [t.get_text() for t in kt] != want_k or len({round(at_mm(t)[1], 6) for t in kt}) != 1:
@@ -4225,10 +4220,8 @@ def check_drawn(rb, sheets, nd, plate="fig3"):
         if e["text"].get_text() != E_HEADS[e["block"]] or abs(at_mm(e["text"])[0] - (
                 F_X + E_LAB + e["block"] * (len(sizes) * E_CP + E_BG) + 2 * E_CP - 0.2)) > 1e-6:
             bad.append(f"the block head {e['text'].get_text()!r} is not over block {e['block']}")
-    for e in marks("f", "n"):
-        r = E[e["i"]]
-        if abs(at_mm(e["text"])[0] - (ax_mm(e["ax"])[0] + e_x(r["block"], r["core_papers"]) + E_TW / 2)) > 1e-6:
-            bad.append(f"the n of {r['block']} {r['core_papers']} is not under its column")
+    if marks("f", "n"):
+        bad.append(f"{len(marks('f', 'n'))} n texts drawn; the n of each column is in the legend (11 November)")
     probs += [f"f: {x}" for x in bad]
     return probs, ", ".join(f"{v:,} {k}" for k, v in n.items()) + (" read back from the plate's artists and equal to "
                                                                    "the Source Data workbook")
@@ -4239,6 +4232,11 @@ def check_drawn(rb, sheets, nd, plate="fig3"):
 # for panels a to d, re-anchored on the agreed text (D304)
 # ---------------------------------------------------------------------------------------------------------------
 from doc_paths import LETTER as _LETTER_LIVE, ROOT as _DOC_ROOT, doc as _doc  # noqa: E402  the live documents (4 Nov)
+# D2 (Valerio, 8 Nov): figures are built from data only. The claims list reads the documents, so it is an editorial
+# check run outside the figure build: rank writes claims.md only when CLAIMS_OUT is set, by `--claims-out DIR`
+# (scripts/S616_figure_editorial.py claims), or to "beside" (the selftests: claims.md in --out, as before D2). Unset,
+# no document is opened and the plate's provenance lists no claims.md.
+CLAIMS_OUT: "Path | str | None" = None
 # D304 (8 Nov): the rows are anchored on the agreed text, Claude Docs rev 3688, as the live documents read with every
 # mark accepted: 02_Main_Text and 04_Figures_Tables (S605's tracked round), and the Supplementary Notes as S602 wrote
 # them from the same export (Supplementary_Information.docx, named Supplementary_Information_20261107.docx until D305 of
@@ -4351,12 +4349,12 @@ CLAIM_ROWS = [
                                       "rates (C02)"),
     dict(id="C22", doc="MT", sec=SEC_GEN, loc=("text", P_COST, "about six times the model calls"),
          claimed="about six times the model calls", m=("cost_words", "answerable", "calls")),
-    dict(id="C23", doc="FT", sec=LEG, loc=("text", P_FIG3, "a, The n = 86 answerable questions (n = 60 one-paper, "
-         "n = 26 many-paper) by strategy"), claimed="n = 86 answerable (60 one-paper, 26 many-paper)",
+    dict(id="C23", doc="FT", sec=LEG, loc=("text", P_FIG3, "a, The 86 answerable questions (60 one-paper, "
+         "26 many-paper), by strategy"), claimed="n = 86 answerable (60 one-paper, 26 many-paper)",
          m=("n", "answerable_split")),
     dict(id="C24", doc="FT", sec=LEG, loc=("text", P_FIG3, "judged by devstral-small-2:24b for judge correctness (pass, "
          "score 4 or more; relaxed, 3 or more)"), claimed="devstral-small-2:24b, n = 3 draws", m=("judge",)),
-    dict(id="C25", doc="FT", sec=LEG, loc=("text", P_FIG3, "b, As a for the n = 39 out-of-scope questions"),
+    dict(id="C25", doc="FT", sec=LEG, loc=("text", P_FIG3, "b, The 39 out-of-scope questions, by strategy"),
          claimed="n = 39", m=("n", "not_answerable")),
     *[dict(id=f"C{26 + i}", doc="SI", sec="Supplementary Table 8, Pass %",
            loc=("cell", "Supplementary Table 8 | Compute cost per answer by generation strategy", c, 9),
@@ -4453,7 +4451,7 @@ CLAIM_ROWS = [
            ("flip", "verified_pass", 3, "degraded")),
           ("At a threshold of 4, 15 of 18 did (83.3%; exact P = 0.0075), degrading 15 of 47 (31.9%)",
            "15 of 18, 83.3%", ("flip", "verified_pass", 4, "share"))])],
-    dict(id="C64", doc="FT", sec=LEG, loc=("text", P_FIG3, "Bars, means over n = 9 pairings of draws"),
+    dict(id="C64", doc="FT", sec=LEG, loc=("text", P_FIG3, "dots, the 9 pairings of draws; bars, their mean"),
          claimed="n = 9 pairings of draws", m=("n", "pairings")),
     dict(id="C65", doc="LT", sec="Reviewer 1, Comment 1.1, self-correction", loc=(
          "text", P_LT_R1_SELF, "The harmed share of changed answers was 48.5% (95% CI 28.2% to 73.4%; two-sided exact "
@@ -4821,31 +4819,28 @@ def legend_text(res, read, draws, stamp, out_t, cost, q78, crx=None, extra=None,
     depicts_not_results), with no provisional wording, no results, no codes. Each count and n is read from the rows
     drawn: answers with no text from sheet 3a's eight rows and sheet 3b's cells, the split and block n from sheet 3f,
     the distractor ratios and the draws read from S522's tables."""
-    def n_kind(kind, grp):
-        return sum(1 for (c, q, d), cl in read["cells"].items() if cl["kind"] == kind and read["groups"][q] == grp)
     a4 = [r for r in rows_of(book, "Fig. 3a", "strategy") if r["threshold"] == PRIMARY]
-    nfa = sum(r["answers_failed_counted_as_fail"] for r in a4)
     nua = sum(r["judge_calls_without_score"] for r in a4)
-    nfr = n_kind("failed", "not_answerable")
     ng = Counter(read["groups"].values())
     na, nn = ng["answerable"], ng["not_answerable"]
     o = rows_of(book, "Fig. 3a", ORDER_KIND)
     n1, n2 = (sum(1 for r in o if r["question_type"] == g) for g in ("one", "many"))
     rf = res["refusal"][REFUSAL_T]["summary"]
-    prow = rows_of(book, "Fig. 3b", PERSON_KIND)
     dashed = any(rf[c]["zero_bound"] is not None or rf[c]["full_bound"] is not None for c in CONFIGS)
     nd = len(draws)
+    # F1 (Valerio, 8 Nov 22:25): the opening counts the rows 3a draws (the six, matched budget, Zhang RLM-10); G2 and
+    # G6 each hold 405 records, 135 questions x 3 draws, with gemini-3-flash-preview (read 8 Nov)
+    n_rows_w = {6: "Six", 7: "Seven", 8: "Eight"}.get(len(a4))
+    if n_rows_w is None:
+        raise Refused(f"legend_text: sheet 3a draws {len(a4)} strategy rows; the opening has no word for it")
     E = book["Fig. 3f"]
     ns = {(r["block"], r["question_group"], r["core_papers"]): r["n_questions"] for r in E if r["row_kind"] == "n"}
     sizes = sorted({k[2] for k in ns})
-    ratios = (fe or {}).get("tables", {}).get("ratios") or []
-    tr = ", ".join(str(x) for x in ratios[:-1]) + f" and {ratios[-1]}" if ratios else ""
 
     def nlist(block, group):
         return ", ".join(str(ns[(block, group, c)]) for c in sizes)
     over = any(r["row_kind"] == "cell" and r["d_pp"] is not None and abs(r["d_pp"]) > E_SCALE for r in E)
     past = f"; colour capped at {E_SCALE:.0f} points" if over else ""
-    n22, n39 = ns[(E_BLOCKS[1], "all", sizes[0])], ns[(E_BLOCKS[2], "all", sizes[0])]
     mk = {r["strategy"]: r for r in rows_of(book, "Fig. 3a", MARGIN_KIND)}
     vp_wait = S457.half_up(mk["verified_pass"]["clock_s_mean_with_wait"], 0) if "verified_pass" in mk else None
     # 3e (the T2 panel): with S518's rows drawn, fig3.md section 5's room for the filled panel: the resampling clause
@@ -4866,57 +4861,60 @@ def legend_text(res, read, draws, stamp, out_t, cost, q78, crx=None, extra=None,
         order_e = [role_e[s] for s in sorted(ys_e, key=ys_e.get)]
         t_rows = [k + 1 for k, ro in enumerate(order_e) if ro == "test"]
         where = []
-        if order_e and order_e[0] == "reference":
-            where.append("Top row, the reference")
         if t_rows:
             where.append(f"rows {t_rows[0]} to {t_rows[-1]}, the prespecified test" if len(t_rows) > 1
                          else f"row {t_rows[0]}, the prespecified test")
-        if "beside" in order_e:
-            where.append("below the gap, models outside it")
         where_t = "; ".join(where)
         where_t = (where_t[0].upper() + where_t[1:] + ". ") if where_t else ""
-        e_t = (f"**e**, Many-paper gain minus one-paper gain at score {PRIMARY}, each RLM-10 minus single pass; "
-               f"lines, intervals; dashed line, 0. {where_t}Second judge, {judge2()}"   # D306: per-type gains left to Source Data
-               + (". n as **a**" if full == (n1, n2) else f". n = {full[0]} one-paper and n = {full[1]} many-paper questions")
-               + (f" ({part})" if part else "") + ". ")
-        # the manuscript tab (6 Nov) keeps the pass definition and the resample count in the legend
+        # Valerio, 8 Nov 20:40Z and 20:45Z (editor row 45): no tacked-on "n =" tag; a panel that draws a derived statistic
+        # (an interval) states its n once, as "n = X <unit>", inside its own description; a panel with none states no n;
+        # every panel is described in full, never "as a". Each count is read from the rows drawn (sheets 3e and 3f)
+        n_e = (f"n = {full[0]} one-paper and {full[1]} many-paper answerable questions"
+               + "".join(f" (n = {k[0]} one-paper for {' and '.join(lab[k])})" for k in nq if k != full))
+        e_t = (f"**e**, RLM-10's gain over single pass on many-paper minus one-paper questions, per generator or judge; "
+               f"lines, two-sided 95% intervals, question bootstrap. {where_t}Second judge, {judge2()}. {n_e}. ")
         pass_t = f" (pass, score {PRIMARY} or more; relaxed, {THRESHOLDS[1]} or more)"
-        iv_t = f"Intervals: two-sided 95% percentile, {N_BOOT:,} question resamples. "
     else:
         e_t = "**e**, Replication on other generators. "
         pass_t = f" (pass, score {PRIMARY} or more; relaxed, {THRESHOLDS[1]} or more)"
-        iv_t = f"Intervals: two-sided 95% percentile, {N_BOOT:,} question resamples. "
+    b_all, b_same, b_ref = list(dict.fromkeys(r["block"] for r in E if r["row_kind"] == "n"))
+
+    def nl(vals):
+        v = [str(x) for x in vals]
+        return ", ".join(v[:-1]) + " and " + v[-1]
+    n_same = sorted({ns[(b_same, "all", c)] for c in sizes})
+    n_ref = sorted({ns[(b_ref, "all", c)] for c in sizes})
+    assert len(n_same) == 1 and len(n_ref) == 1, (n_same, n_ref)
+    f_t = (f"**f**, Strategy minus single pass (percentage points) by core papers in the index, draw 1: pass rate on "
+           f"answerable questions in scope and on the same {n_same[0]}, refusal rate on the {n_ref[0]} out-of-scope; thick "
+           f"frame, two-sided 95% interval excludes 0{past}. n, the questions printed under each column; RLM-10 split "
+           f"rows, n = {nl([ns[(b_all, 'one', c)] for c in sizes])} one-paper and "
+           f"{nl([ns[(b_all, 'many', c)] for c in sizes])} many-paper questions.\n")
+    person_drawn = bool(rows_of(book, "Fig. 3b", PERSON_KIND))
     return (
         f"# Figure 3, title and legend (draft)\n\n"
-        f"Written by `scripts/S463_fig2_ranking.py rank` from the plotted numbers. Data stamp: {stamp}.\n\n"
-        f"**Figure 3 | Answer strategies against single pass, by the judge's pass rate.** Six strategies answered "
-        f"{sum(ng.values())} questions with {E3_LABEL.get(generator(read), generator(read))} in n = {nd} draws, judged by {JUDGE} for judge correctness"
-        f"{pass_t}. RLM-5, RLM-10 and RLM-20, our RLM stopped at those turns; Zhang RLM-10, "
-        f"Zhang et al.'s package (rlms 0.1.3) at 10 turns. Matched budget, single pass given RLM-10's input "
-        f"tokens, and Zhang RLM-10 are unranked. "
-        f"{iv_t}**a**, The n = {na} answerable questions "
-        f"(n = {n1} one-paper, n = {n2} many-paper) by strategy; tiles, draws passed at score {PRIMARY}."
-        + (f" Answers with no text count as fails (n = {nfa}, {nfr} on **b**)" if nfa or nfr else "")
-        + ("." if nfa or nfr else "")
-        + (f" Judge calls with no score (n = {nua}) are left out." if nua else "")
-        + (" Right, time per answer less the local server's wait: questions (grey, mean over draws), their mean "
-           "(black, number)." if vp_wait else "")
-        + f" **b**, As **a** for the n = {nn} {fn.OUT_OF_SCOPE_QUESTIONS} (no distractors): tiles, draws refused (refusal score {REFUSAL_T} or "
-        f"more); right, refusal rate and interval (bar"
-        + ("; dashed, one-sided 95% bound at 0 or 100%" if dashed else "") + ")."
-        + (" Diamonds, a person reading draw 1 blind, partly counted as refused." if prow else "")
-        # D231, D306 (D223, D227): its n is b's; words cut for it in a, d and e (350 words, FIGURE_LOCK [legend])
-        + f" **c**, At score {PRIMARY}, questions single pass passes and the strategy fails (harmed, {fn.VERMILION}) or the "
-        f"reverse (helped, blue). Bars, means over n = {nd * nd} pairing{'s' if nd > 1 else ''} of "
-        f"draws; dots, pairings. "
-        f"**d**, Model calls per question against draws passing: grey dots, questions (mean over draws) at "
-        f"score {PRIMARY}; marks, pass rates at mean calls, filled at score {PRIMARY}, open at {THRESHOLDS[1]}. "
+        f"Written by `scripts/S463_fig2_ranking.py rank` from the plotted numbers.\n\n"
+        f"**Figure 3 | Answer strategies against single pass, by the judge's pass rate.** {n_rows_w} strategies answered "
+        f"{sum(ng.values())} questions with {E3_LABEL.get(generator(read), generator(read))} in {nd} draws, judged by "
+        f"{JUDGE} for judge correctness{pass_t}. "
+        f"**a**, The {na} answerable questions ({n1} one-paper, {n2} many-paper), by strategy; tile "
+        f"colour, draws passed at score {PRIMARY}."
+        + (" Judge calls with no score are left out." if nua else "")
+        + (f" Right, time per answer less the local server's wait: grey dots, questions (mean of {nd} draws); black, "
+           f"strategy mean." if vp_wait else "")
+        + f" **b**, The {nn} {fn.OUT_OF_SCOPE_QUESTIONS}, by strategy; tile colour, draws refused "
+        f"(refusal score {REFUSAL_T} or more). Right, refusal rate with two-sided 95% interval, question bootstrap, "
+        f"n = {nn} {fn.OUT_OF_SCOPE_QUESTIONS}"
+        + ("; dashed, one-sided 95% bound at 0 or 100%" if dashed else "")
+        + ("; open diamond, a person's reading of draw 1" if person_drawn else "") + "."
+        + f" **c**, Answerable questions single pass passes at score {PRIMARY} and the strategy fails (harmed, "
+        f"{fn.VERMILION}) or the reverse (helped, blue); dots, the {nd * nd} pairing{'s' if nd > 1 else ''} of "
+        f"draws; bars, their mean. "
+        f"**d**, Share of draws passing against mean model calls, per strategy; grey dots, questions; black, all "
+        f"answerable; blue, one-paper; orange, many-paper; open, score {THRESHOLDS[1]}; {fn.VERMILION} cross, "
+        f"matched budget. "
         + ("Intervals in Source Data and concept recall, not drawn. " if LEGEND_CONCEPT_RECALL else "")
-        + f"{e_t}"
-        f"**f**, Strategy minus single pass (percentage points) by core papers, draw 1, pooled over {tr} distractors per core paper: the "
-        f"questions each size covers, the same {n22} and refusal on the same {n39}. Split rows: "
-        f"one-paper n = {nlist('All in scope', 'one')}; many-paper n = {nlist('All in scope', 'many')}. Thick frame, "
-        f"interval excludes 0{past}.\n")                # FIG3F O2: no grey-row clause
+        + f"{e_t}{f_t}")                                             # FIG3F O2: no grey-row clause
 
 
 def legend_s5(stamp, draws, book):
@@ -4926,7 +4924,7 @@ def legend_s5(stamp, draws, book):
     nd = len(draws)
     return (
         f"# Supplementary Figure 16, title and legend (draft)\n\n"
-        f"Written by `scripts/S463_fig2_ranking.py rank` from the plotted numbers. Data stamp: {stamp}.\n\n"
+        f"Written by `scripts/S463_fig2_ranking.py rank` from the plotted numbers.\n\n"
         f"**Supplementary Figure 16 | Figure 3's pass tiles and flips at the relaxed threshold.** As Figure 3a and 3c, at "
         f"judge score 3 or more. **a**, The n = {n1 + n2} answerable questions by strategy (n = {n1} one-paper, "
         f"n = {n2} many-paper, an exploratory split), in Figure 3a's order; tile colour, draws passing of n = {nd}. "
@@ -4941,7 +4939,7 @@ def caption_text(stamp, n_read, with_cr=False, command=None, vp_wait=None, with_
     ng = Counter(key_groups().values())
     na, nn, nq = ng["answerable"], ng["not_answerable"], sum(ng.values())
     return (f"# Source Data Fig. 3, caption\n\n"
-            f"**Source Data Fig. 3 | Numerical values plotted in Figure 3.** Provisional: {n_read:,} of the "
+            f"**Source Data Fig. 3 | Numerical values plotted in Figure 3.** {n_read:,} of the "
             f"{PLANNED:,} answers read from their final-key row. Data stamp: {stamp}. One sheet per panel; the row_kind "
             f"column names each row's kind. The pass rate is the share of answers the judge scores 4 or more; 3 or more "
             f"is the relaxed threshold, given beside it (threshold column, 4 first). Sheet Fig. 3a, the {na} answerable "
@@ -4984,8 +4982,7 @@ def caption_text(stamp, n_read, with_cr=False, command=None, vp_wait=None, with_
             f"of changed outcomes and the share of single pass's correct answers degraded with their intervals, the exact "
             f"two-sided sign-flip P value and the same-draw totals; rows '{PAIR_KIND}', per strategy and pairing the "
             f"questions harmed and helped; rows 'draw against the same draw' (not drawn); rows '{NOISE_KIND}', per ordered "
-            f"pair of draws the questions that pass on one run and fail on another (not drawn here; Supplementary Figure "
-            f"16b draws the same rows at score 3); verified pass without the answers whose verifier was not ok (not "
+            f"pair of draws the questions that pass on one run and fail on another (not drawn); verified pass without the answers whose verifier was not ok (not "
             f"drawn). Sheet "
             f"Fig. 3d: rows '{CQ_KIND}', per strategy and answerable question its question type, its model calls per "
             f"answer (the mean over its draws) and its share of draws passing at score 4 or more (the plate moves each dot "
@@ -5020,7 +5017,7 @@ def caption_text(stamp, n_read, with_cr=False, command=None, vp_wait=None, with_
 
 def caption_s5(stamp, n_read, command=None):
     return (f"# Supplementary Figure 16 data, caption\n\n"
-            f"**Supplementary Figure 16 data | Numerical values plotted in Supplementary Figure 16.** Provisional: {n_read:,} "
+            f"**Supplementary Figure 16 data | Numerical values plotted in Supplementary Figure 16.** {n_read:,} "
             f"of the {PLANNED_S5:,} G1 answers read from their final-key row. Data stamp: {stamp}. Sheet {S5_SHEET['a']}: "
             f"rows '{ORDER_KIND}' as Figure 3a; rows '{TILE_KIND}', per strategy and question at score 3 the draws passed "
             f"and the draws scored; rows 'strategy', each strategy's pass rate at score 3 with its interval. Sheet "
@@ -5169,7 +5166,7 @@ def rank(args, *, out_dir: Path | None = None, quiet=False) -> dict:
     kx = extra["final_key"] if extra else 0
     kg = fe["tables"]["g4_answers_final_key"] if fe else 0
     k_all = k1 + kx + kg
-    head = f"{'PROVISIONAL FIXTURE, NOT DATA' if fixture else 'PROVISIONAL'}: {dtext} (D82, D88), "
+    head = f"{'FIXTURE, NOT DATA: ' if fixture else ''}{dtext} (D82, D88), "     # Q9 (11 Nov): no PROVISIONAL
     tail = (f"{read['rows_read'] - nf:,} G1 answers judged ({JUDGE}, plain call), collect of {when}, run_sha256 "
             f"{str(read['run_sha256'])[:12]}")
     stamp = (head + f"{k_all:,} of {PLANNED:,} answers read from their final-key row (G1 {k1:,}, G2 and G6 {kx:,}, G4 "
@@ -5177,8 +5174,7 @@ def rank(args, *, out_dir: Path | None = None, quiet=False) -> dict:
              + (f"; concept recall: D181's reading on key v2.5, L3_d181 rows of {crx['info']['written_utc']}" if crx
                 else ""))
     stamp5 = head + f"{k1:,} of {PLANNED_S5:,} G1 answers read from their final-key row, " + tail
-    tag = f" (provisional, {k_all} of {PLANNED})"
-    tag5 = f" (provisional, {k1} of {PLANNED_S5})"
+    tag = tag5 = ""                     # Q9 (Valerio, 11 Nov): no "(provisional, ...)" in any name
     s4 = res["answerable"][4]["summary"]
     if not quiet:
         print(f"reproduce: {'; '.join(rep)}")
@@ -5209,7 +5205,11 @@ def rank(args, *, out_dir: Path | None = None, quiet=False) -> dict:
     try:
         write_report(stage / "ranking_report.md", res, res_out, read, out_t, draws, stamp, order,
                      collect if fixture else collect.name, q78, cost, crx)
-        (stage / "claims.md").write_text(claims_md(res, read, draws, stamp, cost, crx))
+        if CLAIMS_OUT == "beside":
+            (stage / "claims.md").write_text(claims_md(res, read, draws, stamp, cost, crx))
+        elif CLAIMS_OUT is not None:                    # D2: the editorial step's folder, never the plate's
+            Path(CLAIMS_OUT).mkdir(parents=True, exist_ok=True)
+            (Path(CLAIMS_OUT) / "claims.md").write_text(claims_md(res, read, draws, stamp, cost, crx))
         tr = trace(res, read, out_t)
         jres = {"stamp": stamp, "draws": draws, "reproduced": rep,
                 "what": "every number of the ranking with the answer keys it is counted from (S463 rank)",
@@ -5234,7 +5234,7 @@ def rank(args, *, out_dir: Path | None = None, quiet=False) -> dict:
                     "read": crx["info"], "rule6": crx["res"]["value"]["rule6"],
                     "failed_scored_0": crx["res"]["failed"], "anchor_v24_loose": crx["anchor"]}}
         (stage / "ranking.json").write_text(record_text(jres, args))
-        names = ["ranking.json", "ranking_report.md", "claims.md"]
+        names = ["ranking.json", "ranking_report.md"] + (["claims.md"] if CLAIMS_OUT == "beside" else [])
         if not args.no_plate:
             paths = {x: stage / f"Figure 3{tag}.{x}" for x in ("pdf", "svg", "png")}
             sheet_list = [(nm, *table(rows)) for nm, rows in book.items() if nm.startswith("Fig. 3")]
@@ -6095,6 +6095,8 @@ def selftest(args, quiet=False):
     """Offline checks (module docstring, selftest). Each check computes its expected value apart from the code it
     checks; a check whose code raises reports the exception as its failure. Returns 0 when every check passes."""
     import numpy as np
+    global CLAIMS_OUT
+    CLAIMS_OUT = "beside"                               # D2: the claims checks read claims.md beside the ranking
     results = []
 
     def check(name, ok, detail=""):
@@ -6620,14 +6622,27 @@ def selftest(args, quiet=False):
         check("S448 passes the three-draw plate", s448.returncode == 0 and not fails,
               "; ".join(fails)[:600] or s448.stderr[-400:])
         legend = (plate / "legend_draft.md").read_text()
-        check("the legend reads its counts from the rows: 60 and 26, the split's n, nine pairings",
-              "n = 60 one-paper, n = 26 many-paper" in legend and "n = 15, 30, 60, 60" in legend
-              and "n = 7, 14, 26, 26" in legend and "n = 9 pairings" in legend and "reruns" not in legend)
+        # Valerio, 8 Nov ("too long"): the split rows' n and the no-text count leave the legend for Source Data
         book3_ = read_book(next(plate.glob("Source Data Fig. 3*.xlsx")))
+        n_split = {g: [r["n_questions"] for r in sorted(
+            (r for r in book3_["Fig. 3f"] if r["row_kind"] == "n" and r["block"] == "All in scope"
+             and r["question_group"] == g), key=lambda r: r["core_papers"])] for g in ("one", "many")}
+        # Valerio, 8 Nov 20:45Z (editor row 45): n only where a panel draws an interval (b, e, f), as "n = X <unit>";
+        # elsewhere the counts are plain words and no panel says "as a"
+        check("the legend reads its counts from the rows: 60 and 26, nine pairings, the split's n (15, 30, 60, 60 and "
+              "7, 14, 26, 26) from sheet 3f; n stated in b, e and f only, and no panel points to another",
+              "(60 one-paper, 26 many-paper)" in legend and "the 9 pairings of draws" in legend
+              and n_split == {"one": [15, 30, 60, 60], "many": [7, 14, 26, 26]}
+              and "n = 15, 30, 60 and 60 one-paper and 7, 14, 26 and 26 many-paper" in legend
+              and "n = 39 out-of-scope questions" in legend and "n = 60 one-paper and 26 many-paper" in legend
+              and "n, the questions printed under each column" in legend
+              and not re.search(r"\b[Aa]s \*\*a\*\*|n as \*\*|in Source Data", legend.split("**Figure 3")[1])
+              and "reruns" not in legend, str(n_split))
         n_x = sum(r["answers_failed_counted_as_fail"] for r in book3_["Fig. 3a"]
                   if r["row_kind"] == "strategy" and r["threshold"] == 4)
-        check("the legend's count of answers with no text is the sum of sheet 3a's eight rows at score 4",
-              f"Answers with no text count as fails (n = {n_x}," in legend, legend[:200])
+        check("the legend gives no count of answers with no text (Methods states the rule); sheet 3a's eight rows at "
+              "score 4 hold it",
+              "count as fails" not in legend and n_x >= 0, legend[:200])
         # Zhang RLM-10's stream failures, on made-up rows: the fixture's G6 has no failed answer
         b4_ = json.loads(json.dumps(Rc["book"], default=str))
         for r in b4_["Fig. 3a"]:
@@ -6637,8 +6652,8 @@ def selftest(args, quiet=False):
                                "outcome": "root call root turn 5: status error: the stream ended without a finishReason"})
         leg4 = legend_text(Rc["res"], Rc["read"], [1, 2, 3], "x", Rc["out_t"], Rc["cost"], Rc["q78"], Rc["crx"], Rc["extra"],
                            b4_, read_fig3e(f3c.parent / "fig3e"))
-        check("the legend counts Zhang RLM-10's failed answers on a",
-              f"count as fails (n = {n_x + 2}," in leg4, leg4[300:500])
+        check("a legend over rows with Zhang RLM-10's failed answers still gives no count of them (Source Data holds it)",
+              "count as fails" not in leg4, leg4[300:500])
         check("the legend says out-of-scope, vermilion and two-sided, names judge correctness (S456's regex), and names "
               "concept recall only as not drawn while S456 asks for it",
               fn.OUT_OF_SCOPE_QUESTIONS in legend and fn.VERMILION in legend and "two-sided 95%" in legend
@@ -6682,7 +6697,13 @@ def selftest(args, quiet=False):
                   (e["artist"].get_markerfacecolor() == hs.WHITE) == (e["t"] == 3) for e in gm3)
               and not [e for e in drawn3 if e["kind"] in ("mean", "calls bar", "pass bar", "cross bar")]
               and [t.get_text() for t in (e["text"] for e in drawn3 if e["kind"] == "key text" and e["panel"] == "d")]
-              == ["All 86", "One paper 60", "Many papers 26", "score 3", fn.MATCHED_BUDGET])
+              == ["All", "One paper", "Many papers", "score 3", fn.MATCHED_BUDGET])
+        check("11 November (figure files hold only the figure): 3b's key names the series only ('judge', 'person'), "
+              "3f draws no 'Questions (n)' row",
+              "Questions (n)" not in [t.get_text() for t in Rc["drawn"]["fig_texts"]]
+              and not [e for e in drawn3 if e["panel"] == "f" and e["kind"] == "n"]
+              and not [t for t in Rc["drawn"]["fig_texts"] if "draw" in t.get_text() and t.get_text() not in
+                       ("Draws passed:", "Share of draws passing (%)", "one pairing of draws")])
         check("3c: no rerun dots, no band, no 'single pass rerun' row",
               not [e for e in drawn3 if e["panel"] == "c" and e["kind"] in ("rerun dots", "band")]
               and "single_pass" not in [e["c"] for e in drawn3 if e["panel"] == "c" and e["kind"] == "row label"])
@@ -6949,10 +6970,10 @@ def selftest(args, quiet=False):
         check("the tiles lighten with draws passed: 3 of 3 yellow (D171 (1)), 0 of 3 the dark end",
               tile_colours(3)[3] == hs.cividis_levels(4)[3].upper() and tile_colours(3)[0] == hs.cividis_levels(4)[0].upper()
               and tile_colours(3)[0] != tile_colours(3)[3])
-        check("the stamp counts answers read from a final-key row, and the file name and the stamp agree: G1's 1,350 on "
+        check("the stamp counts answers read from a final-key row, and the file name is 'Figure 3' (Q9): G1's 1,350 on "
               "unchanged questions here, and the fixture's G2, G6 and G4",
               "1,350" in Rc["stamp"] and "of 21,402 answers" in Rc["stamp"]
-              and next(plate.glob("Figure 3 *.pdf")).name.split(", ")[1].split(" of ")[1].startswith("21402"))
+              and next(plate.glob("Figure 3*.pdf")).name == "Figure 3.pdf")
         # D154: the pass rate is score 4 (PRIMARY), 3 the relaxed threshold, 4 first wherever both appear
         st_ = [r for r in book3["Fig. 3a"] if r["row_kind"] == "strategy"]
         s4_ = Rc["res"]["answerable"][4]["summary"]
@@ -7979,9 +8000,6 @@ MUTANTS = [
      'book, X + LAB, Y + 8.0, WC - LAB, 35.2, X + LAB - 1.0, nd, nd > 1)'),
     ("3d: a name on another scatter", '"text": P.text(x0 + cw / 2, y0 - 0.9, LABEL[c], ha="center"',
      '"text": P.text(x0 + cw / 2, y0 - 0.9, LABEL[CONFIGS[-1 - j]], ha="center"'),
-    ("the legend's no-text count from G1 only",
-     '    nfa = sum(r["answers_failed_counted_as_fail"] for r in a4)\n',
-     '    nfa = sum(r["answers_failed_counted_as_fail"] for r in a4 if r["strategy"] in CONFIGS)\n'),
     ("the v2.5 units keep the folders as read", 'out["units_v25"] = {k: ({in_repo(p): x for p, x',
      'out["units_v25"] = {k: ({str(p): x for p, x'),
     ("FIG3F O2 undone: sheet Fig. 3f carries S522's run-to-run rows again",
@@ -8052,6 +8070,8 @@ def main(argv=None):
     b = sub.add_parser("rebuild", help="the committed plate from the frozen inputs (D155)")
     b.add_argument("--out", help=f"default {OUT.relative_to(ROOT)}")
     b.add_argument("--out-s5", help=f"Supplementary Figure 16's folder; default {OUT_S5_NAME} beside --out")
+    b.add_argument("--claims-out", help="D2: also write the claims list (claims.md, read from the documents) into "
+                                        "this folder; the editorial step, never the figure build")
     p = sub.add_parser("pull")
     p.add_argument("--to", required=True)
     r = sub.add_parser("rank")
@@ -8063,6 +8083,7 @@ def main(argv=None):
                                          "the first out)")
     r.add_argument("--out", help=f"default {OUT.relative_to(ROOT)}")
     r.add_argument("--no-plate", action="store_true")
+    r.add_argument("--claims-out", help="D2: also write claims.md into this folder (the editorial step)")
     r.add_argument("--concept-recall-d181", help="D188: the D181 reading of the same answers drawn in panel b "
                                                  "(S471 --d181; default findings/recompute/L3_d181, pinned); read "
                                                  "after --concept-recall, which it is held to")
@@ -8090,6 +8111,9 @@ def main(argv=None):
     mu.add_argument("--only", help="the mutants whose name holds these words")
     mu.add_argument("--shard", help="k/n: the k-th of n parts of the list")
     a = ap.parse_args(argv)
+    global CLAIMS_OUT
+    if getattr(a, "claims_out", None):
+        CLAIMS_OUT = Path(a.claims_out).resolve()
     try:
         if a.cmd == "rebuild":
             rebuild(a)

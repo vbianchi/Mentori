@@ -46,9 +46,9 @@ and no --replace:
   - key v2.4: out_g2 or out_g6 (s3_guard SETS "G2", "G6");
   - key v2.5, the 132 changed questions: out_s6_g2 or out_s6_g6 ("S6G2", "S6G6"), S512's default mode at draws 1, 2, 3.
 
-WHAT IT DOES. Reads; writes nothing; sends no model call. The only process it starts is git (log --format=%H and
-show <commit>:<path>, both read-only and on fig_read_audit's GIT_READ list), to read S512's and the judge's files at
-past commits of HEAD's history.
+WHAT IT DOES. Reads; writes nothing; sends no model call; starts no process. S512's and the judge's files at past
+commits of HEAD's history are read from their copies pinned in the tree (O3, scripts/pinned_history.py), each held to
+the blob id git gave it.
   sources(outs_root, set_name)  the out folders of a set (G1, G2, G3, G4, G5 or G6 only; any other set is refused): each
                                 with its kind, its s3_guard set name, the draws its rows may hold, and whether it is
                                 present under outs_root (for G1's S6 source: out_s6_g1 and out_s6_g1r15 both; "missing"
@@ -70,7 +70,7 @@ past commits of HEAD's history.
                                 of D98's 45 (S512.g7_subset()). Every header: key_version and S512's pins (KEY25_SHA256,
                                 KEY24_SHA256, CHANGED_SHA256, and for "all" G7_SUBSET_SHA256), the mode's question
                                 scope, an S6 check kind of the main judge, code.s512_py and code.judge_passages equal to
-                                the files at one commit of HEAD's history (git), run_sha256 recomputed by S512's formula
+                                the files at one commit of HEAD's history (pinned, O3), run_sha256 recomputed by S512's formula
                                 (S512.run_identity over judge_passages.run_identity) and equal to the rows' one value.
   check_replace(loaded, src, keys)  every row whose answer key is in keys equals the latest row of that answer in the
                                 source's replace out, and the replace out holds no answer outside keys.
@@ -111,7 +111,6 @@ import hashlib
 import importlib.util
 import json
 import re
-import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -124,6 +123,7 @@ for _p in (str(ROOT / "scripts"), str(ROOT)):
 import S373_rejudge_v2 as S373  # noqa: E402
 import S512_s6_rejudge_v25 as S512  # noqa: E402
 from experiments.scorers import judge_passages as JP  # noqa: E402
+import pinned_history as PH  # noqa: E402
 
 GUARD = ROOT / "findings/recompute/S3_runs/s3_guard.py"
 LOCK_WANT = "d66daa28596bf3b70ff90e0fb89b1353eab023eba699427cb05ebb3376105c12"   # D88; S463 LOCK_WANT; run_s3.sh:89
@@ -375,43 +375,56 @@ def s512_run_sha(h: dict, mode: str) -> str:
     return sha(json.dumps(d, sort_keys=True))
 
 
-def _git(*args: str) -> subprocess.CompletedProcess:
-    return subprocess.run(["git", "-C", str(ROOT), *args], capture_output=True)
-
-
 @functools.lru_cache(maxsize=1)
 def main_identities() -> frozenset:
     """(sha256 of S512's file, judge_passages code identity as sorted JSON) at every commit of HEAD's history that
     touched S512 or one of judge_passages' code files, back to S512's first commit. A file's state between two such
     commits is its state at the earlier one, so these are all the pairs a clone of a commit could have run. Each file's
-    sha256 is of its bytes at the commit (git show); template_file is the V4_COMMON_SHA256 constant in
-    S141_runner/judge.py at that commit, as judge_passages.code_identity reads it."""
+    sha256 is of its bytes at the commit; template_file is the V4_COMMON_SHA256 constant in S141_runner/judge.py at
+    that commit, as judge_passages.code_identity reads it.
+    O3 (8 Nov): no git. The walk (`git log --format=%H -- S512 + JP_PATHS`, newest first, to the first commit with no
+    S512) and every file of every commit it visits are pinned in the tree (scripts/S617_pin_history.py, walk
+    "judge_rows_v25.main_identities"), and pinned_history.show holds each copy to the blob id git gave <commit>:<path>.
+    The pairs are computed from those bytes exactly as from git show. What the pin cannot prove in a tree with no
+    history: that the walk lists every such commit of HEAD's history (S617 verify checks that against git here)."""
     if set(JP.code_identity()) != set(JP_PATHS) | {"template_file"}:
         raise Refused("code_layout", f"judge_passages.code_identity's keys {sorted(JP.code_identity())} are not "
                                      f"{sorted(JP_PATHS)} + template_file")
-    r = _git("log", "--format=%H", "--", S512_PATH, *JP_PATHS.values())
-    if r.returncode:
-        raise Refused("git", f"git log: {r.stderr.decode(errors='replace')[:200]}")
+    try:
+        walk = PH.log_paths("judge_rows_v25.main_identities")
+    except PH.PinError as e:
+        raise Refused("git", f"pinned walk: {e}") from None
+    if walk["paths"] != [S512_PATH, *JP_PATHS.values()]:
+        raise Refused("git", f"the pinned walk is over {walk['paths']}, not S512 and judge_passages' code files")
+
+    def show(c: str, p: str):
+        if not PH.has(c, p):
+            return None                              # git show failed at that commit (the file was not there)
+        try:
+            return PH.show(c, p)
+        except PH.PinError as e:
+            raise Refused("git", str(e)) from None
+
     out = set()
-    for c in r.stdout.decode().split():
-        s = _git("show", f"{c}:{S512_PATH}")
-        if s.returncode:
+    for c in walk["commits"]:
+        s = show(c, S512_PATH)
+        if s is None:
             break                                    # before S512's first commit
         ci, judge_py = {}, b""
         for k, p in JP_PATHS.items():
-            f = _git("show", f"{c}:{p}")
-            if f.returncode:
+            f = show(c, p)
+            if f is None:
                 ci = None
                 break
-            ci[k] = sha(f.stdout)
-            judge_py = f.stdout if k == "s141_judge_py" else judge_py
+            ci[k] = sha(f)
+            judge_py = f if k == "s141_judge_py" else judge_py
         if ci is None:
             continue
         m = re.search(rb'^V4_COMMON_SHA256 = "([0-9a-f]{64})"', judge_py, re.M)
         if m is None:
             continue                                 # no template pin in judge.py at that commit
         ci["template_file"] = m.group(1).decode()    # the constant judge.py held at that commit
-        out.add((sha(s.stdout), json.dumps(ci, sort_keys=True)))
+        out.add((sha(s), json.dumps(ci, sort_keys=True)))
     return frozenset(out)
 
 

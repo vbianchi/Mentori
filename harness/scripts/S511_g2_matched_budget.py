@@ -50,7 +50,9 @@ INPUTS, each checked by sha256 before it is read further:
   Concept recall: findings/recompute/L3/concept_recall.jsonl (G1, D12's loose matcher, key v2.4, provisional) and
       S471.score() for G2's answers.
   Passage to paper: the paper store's chroma.sqlite3 (metadata file_name), the copy in ~/l1_inputs/store, sha256
-      332a587a (its MANIFEST.sha256 and COPY.json), read only.
+      332a587a (its MANIFEST.sha256 and COPY.json), read only. Env MENTORI_L1_STORE names another folder holding it
+      (RELEASE_DESIGN.md Q5 O1, 11 Nov: reproduce.py points it at the data root); the provenance key stays
+      STORE_KEY whatever the folder, so no output changes.
 
 REPRODUCE FIRST (README.md:75-79). Before any G2 number is computed, the same code recomputes from the same G1 rows
 and refuses (exit 1, nothing written) unless each of these equals its committed value:
@@ -67,7 +69,7 @@ and refuses (exit 1, nothing written) unless each of these equals its committed 
 
 THE GATE'S FIGURE 3 VALUES ARE PINNED. Parts (2), (3) and (5) compare with key v2.4 numbers. Figure 3 moved to key v2.5
 (D186 (3)) and its sheets moved (old e to 3c), so the gate reads the ranking.json of commit RANKING_V24_AT, the last one
-on key v2.4 (git show, read only), in place of the plate's current file. What it compares is unchanged: 120 values, 10
+on key v2.4 (pinned in the tree, O3, held to its git blob id), in place of the plate's current file. What it compares is unchanged: 120 values, 10
 P values, 18 values.
 
 KEY v2.5 (D188-R1, fig3.md R8). The numbers above stay on key v2.4 under the gate. Beside them, results.json "v25" and
@@ -97,6 +99,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import os
 import re
 import sqlite3
 import statistics
@@ -111,6 +114,7 @@ ROOT = Path(__file__).resolve().parents[1]
 for p in (str(ROOT / "scripts"), str(ROOT)):
     if p not in sys.path:
         sys.path.insert(0, p)
+import pinned_history as PH  # noqa: E402
 
 SCRIPT = "scripts/S511_g2_matched_budget.py"
 RECOMPUTE = ROOT / "findings" / "recompute"
@@ -120,7 +124,9 @@ G2_COLLECT_SHA = "b31508d05557290d0791ba686117ea379397deee0a9df7bc5cc04e725c4cc2
 G2_SIDE_SHA = "313b947dc7ebcf62da6cbf62742cee932186ef96e812f011e0a1f0d0de23212c"
 G1_COLLECT_SHA = "f5ff75bc244cda492a48e7e11f54f2007ed7d586a8f49e78921edd7244b28965"      # figure3_provenance.json
 G2_ANSWERS_SHA = "6b4c46531eca233b1bd73a5cb56819874e1807e9ee6c80152e9ce904a2d32728"      # S3_runs/README.md:77
-STORE = Path.home() / "l1_inputs" / "store" / "chroma.sqlite3"
+STORE_DIR_DEFAULT = Path.home() / "l1_inputs" / "store"
+STORE = Path(os.environ.get("MENTORI_L1_STORE") or STORE_DIR_DEFAULT).expanduser() / "chroma.sqlite3"   # Q5 O1
+STORE_KEY = "~/l1_inputs/store/chroma.sqlite3"          # its name in inputs_sha256, the same wherever STORE is
 STORE_SHA = "332a587a932d62af5af59497b29dd990d127191b6fe8318b16615cd874937d4b"           # its MANIFEST.sha256
 RANKING = ROOT / "findings" / "figures_provisional" / "fig3_strategies" / "ranking.json"
 RANKING_V24_AT = "94262a0e"                           # the last commit whose ranking.json is on key v2.4 with old sheets
@@ -548,11 +554,11 @@ def check_m01(g1: dict, qs: dict, report: dict) -> str:
 
 def ranking_v24() -> tuple[dict, str]:
     """ranking.json at RANKING_V24_AT (the module docstring, THE GATE'S FIGURE 3 VALUES ARE PINNED) and its sha256."""
-    r = subprocess.run(["git", "-C", str(ROOT), "show", f"{RANKING_V24_AT}:{RANKING.relative_to(ROOT)}"],
-                       capture_output=True)
-    if r.returncode:
-        raise Refused(f"git show {RANKING_V24_AT} ranking.json: {r.stderr.decode(errors='replace')[:200]}")
-    return json.loads(r.stdout), hashlib.sha256(r.stdout).hexdigest()
+    try:   # O3: ranking.json as committed at RANKING_V24_AT, pinned in the tree, held to its git blob id
+        b = PH.show(RANKING_V24_AT, str(RANKING.relative_to(ROOT)))
+    except PH.PinError as e:
+        raise Refused(f"git show {RANKING_V24_AT} ranking.json: {str(e)[:200]}") from None
+    return json.loads(b), hashlib.sha256(b).hexdigest()
 
 
 def gate(g1: dict, qs: dict, recs: dict) -> dict:
@@ -1163,7 +1169,7 @@ def main(argv=None) -> int:
               "findings/recompute/fig3_s6_inputs/SHA256SUMS": sha256_file(FROZEN_S6 / "SHA256SUMS"),
               "data/ground_truth_v2/ground_truth_v2_4_as_v1.json":
                   sha256_file(ROOT / "data/ground_truth_v2/ground_truth_v2_4_as_v1.json"),
-              rel(STORE): STORE_SHA, "experiments/LOCK.toml": sha256_file(ROOT / "experiments/LOCK.toml"),
+              STORE_KEY: STORE_SHA, "experiments/LOCK.toml": sha256_file(ROOT / "experiments/LOCK.toml"),
               **info["sha256"]}
     head = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
     R = {"_provenance": {"script": SCRIPT, "script_sha256": sha256_file(Path(__file__)), "at": t0, "git_head": head,
