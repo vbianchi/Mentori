@@ -1,7 +1,7 @@
 {
  "stamp": "two raters, 49 of 49 answers drawn",
  "script": "scripts/S531_fig2_s3_plates.py",
- "script_sha256": "4ede08413dba0461a05cf1ba41812255b342e38f3b76e39f23e1e2309dd8d3e7",
+ "script_sha256": "d8072ea1c4a23f1c604c13457bcd4e22589c5714bb5c1340f6984aca6bc13739",
  "command": "uv run --frozen python scripts/S531_fig2_s3_plates.py --raters 2",
  "raters": 2,
  "inputs": {

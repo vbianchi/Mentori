@@ -5,9 +5,10 @@ released data and holds every output to the released copy.
 
     uv run --frozen python reproduce.py --data DIR [--work DIR] [--only STAGE ...] [--keep]
     uv run --frozen python reproduce.py --data DIR --download [--zenodo-url URL]
+    uv run --frozen python reproduce.py --selftest     # the D316 mapping, hash module and held judgement; runs nothing
 
-  --data DIR        the data root (env MENTORI_DATA): DIR/frozen/<the 14 frozen tars> and DIR/analysis_inputs.tar, the
-                    names, sizes and sha256 DATA_FILES.tsv lists. Every file is checked against DATA_FILES.tsv first;
+  --data DIR        the data root (env MENTORI_DATA): DIR/frozen/<the frozen tars>, DIR/analysis_inputs.tar and
+                    DIR/stripped_records.tsv (D316), the names, sizes and sha256 DATA_FILES.tsv lists. Every file is checked against DATA_FILES.tsv first;
                     any file missing or with another sha256 stops the run before anything is built. One row is
                     optional (folder "optional"): DIR/ratings.tar, the anonymised rating rows (D313 R-Q1 O1). Absent,
                     Figure 2 and Supplementary Figure 3 are held by sha256; present with another sha256, the run stops.
@@ -56,6 +57,30 @@ WHAT IT DOES
      MENTORI_L1_STORE; a store read would show as an audit violation.
   6. One pass table, and the platform record (Python, the Helvetica the plates were drawn with). Exit 0 only when
      every stage passes.
+
+THE PAPERS' TEXT (D316, Valerio 11 Nov: "we don't ship the papers"). The data record's frozen tars and its
+analysis_inputs.tar are stripped (Mentori-reanalysis scripts/S627_strip_records.py): text sent to a model that carried
+passages, and the retrieved passages and citation quotes, are each replaced by {"stripped": true, "sha256", "chars",
+"passage_ids"}; model-written text stays. DATA_FILES.tsv pins the stripped files by their own sha256 and pins
+stripped_records.tsv, one row per tar (empty member: the tar itself) and per member: original sha256, stripped sha256,
+fields replaced. The analysis code is unchanged and pins the originals in many places (fig_repro.frozen(), the
+members lists, committed manifests and provenance files, the tars' own checksum lists), so:
+  - STRIPPED MEMBERS STAND FOR THEIR ORIGINALS IN HASH CHECKS. After the work copy is made, reproduce.py runs
+    `uv sync --frozen` there and writes one module and one .pth file into the work copy's .venv site-packages
+    (STRIP_MODULE). In every Python process of that venv, hashlib's sha256 then reports, for bytes whose sha256 is a
+    stripped sha256 of stripped_records.tsv, the original's sha256 from the same row; every other input hashes as it
+    is. Only these exact values are mapped, so any other change to a member still fails every pin. The venv is
+    reproduce.py's own work copy; the analysis tree is not edited. A run without stripped_records.tsv in
+    DATA_FILES.tsv (the originals) installs nothing.
+  - OUTPUTS COMPUTED FROM A REPLACED FIELD ARE HELD, NOT REBUILT (D316). STRIPPED_HELD lists each, with the field it
+    reads and the reason (measured by running every producer but S565 on the stripped and on the original data:
+    resubmission/08_reproducibility/stripped_reads.json in Mentori-reanalysis). Such a file is checked by its sha256 in
+    expected/MANIFEST.sha256 in the stage held. Where S494 rebuilds it, S494 runs once with every step (its rows show
+    the difference in that file, never masked) and the rows whose only differences are STRIPPED_HELD files pass with
+    the note "held (D316)"; the steps S494 then reported blocked by such a row are run again in a second S494 pass with
+    --only (the held step left out, so its committed outputs stand, as S494 does for any step not run), and their rows
+    are taken from that pass. A producer of the numbers stage whose only differences are STRIPPED_HELD files passes
+    the same way; every other difference fails as before.
 
 THE FIDELITY RULE (README.md, "What 100% means"). Numbers, tables and Source Data: byte-equal. Plates: byte-equal
 with the font the plates were made with (PLATE_FONT); with another font or none, a plate row that differs is
@@ -249,6 +274,35 @@ HELD = [
 ]
 RATED_HELD = {"findings/figures_provisional/fig2_human", "findings/figures_provisional/supp_fig3"}   # RATED rebuilds
 
+# ---------------------------------------------------------------------------------------------------------------
+# D316: the stripped data. STRIPPED_TSV is the mapping DATA_FILES.tsv pins; STRIPPED_HELD the outputs that read a
+# replaced field: (label, path, step or producer that writes it, reason). Each is checked by its sha256 in
+# expected/MANIFEST.sha256 (stage held) and its difference, where a stage rebuilds it, is shown and not failed.
+# ---------------------------------------------------------------------------------------------------------------
+STRIPPED_TSV = "stripped_records.tsv"
+ACTIVE_HELD: list[dict] = []      # STRIPPED_HELD when the data root is stripped (main sets it), else nothing is held
+STRIP_MODULE = "_d316_stripped_sha256"
+# Measured 12 Nov (Mentori-reanalysis resubmission/08_reproducibility/stripped_reads.json): every producer but S565
+# (not run: its 10,000-refit run takes 12.5 h; it reads judge scores and committed numbers) run on the stripped and on the original data, in a
+# work copy made as below; these files, and only these, differ.
+_RAW = ("answers.json .results[].generation.steps[].raw_content, a pipeline step's tool output, replaced by the "
+        "stripped object: the script takes its len(), which is 4 (the object's keys), not the text's length")
+STRIPPED_HELD: list[dict] = [
+    {"label": "Supplementary Figure 12a step rows", "path": "findings/recompute/S472_supp12a_steps.json",
+     "stage": "s494", "step": "fig4", "by": "S494 step fig4 (scripts/S472_fig4_panels.py)", "field": _RAW,
+     "reason": "each step row's output length (rows[][5]) and the totals after it are computed from the replaced "
+               "text; the stripped object's chars field holds that length, which the script does not read"},
+    {"label": "Figure 5 provenance", "path": "findings/figures_provisional/fig4/figure5_provenance.json",
+     "stage": "s494", "step": "fig4", "by": "S494 step fig4 (scripts/S472_fig4_panels.py)", "field": _RAW,
+     "reason": "q82.<setup>.largest_chars and the largest step output it reproduces are computed from the replaced "
+               "text; the plate and Source Data Fig. 5 rebuild byte-equal"},
+    {"label": "distiller firing count, draw 1", "path": "findings/recompute/distiller_count_g3_d1/distiller_count_g3_d1.json",
+     "stage": "s494", "step": "numbers", "by": "S494 step numbers (scripts/distiller_count_g3_d1.py)", "field": _RAW,
+     "reason": "largest_step_output.chars and the check against RUNNING.md's 26 Oct count are computed from the "
+               "replaced text"},
+]
+
+
 
 # ---------------------------------------------------------------------------------------------------------------
 def sha256_file(p: Path) -> str:
@@ -315,6 +369,122 @@ def check_data(data: Path, fetch: bool, base_url: str) -> tuple[list[str], set[s
     if bad:
         raise SystemExit("REFUSED: the data root does not match DATA_FILES.tsv:\n  " + "\n  ".join(bad))
     return lines, optional
+
+
+def strip_map(data: Path) -> dict[str, str]:
+    """D316: stripped sha256 -> original sha256, from the data root's stripped_records.tsv (checked by sha256 in
+    check_data). Empty when DATA_FILES.tsv lists no STRIPPED_TSV (a data root of originals). Each tar row's stripped
+    sha256 must be the sha256 DATA_FILES.tsv pins for that tar, so the mapping is the one for these very files."""
+    rows = {r["name"]: r for r in data_files()}
+    if STRIPPED_TSV not in rows:
+        return {}
+    lines = where(data, rows[STRIPPED_TSV]).read_text(encoding="utf-8").splitlines()
+    if not lines or lines[0].split("\t") != ["tar", "member", "original_sha256", "stripped_sha256", "fields_stripped"]:
+        raise SystemExit(f"REFUSED: {STRIPPED_TSV} has not the columns tar, member, original_sha256, stripped_sha256, "
+                         "fields_stripped")
+    out, tars, bad = {}, set(), []
+    hexa = re.compile(r"[0-9a-f]{64}")
+    for ln in lines[1:]:
+        if not ln.strip():
+            continue
+        tar, member, orig, stripped, _ = ln.split("\t", 4)
+        if not (hexa.fullmatch(orig) and hexa.fullmatch(stripped)):
+            bad.append(f"{tar}!{member}: not two sha256 values")
+            continue
+        if not member:
+            tars.add(tar)
+            if tar not in rows or rows[tar]["sha256"] != stripped:
+                bad.append(f"{tar}: its stripped sha256 {stripped[:12]} is not DATA_FILES.tsv's pin")
+        if orig != stripped:
+            if out.get(stripped, orig) != orig:
+                bad.append(f"{tar}!{member}: one stripped sha256 stands for two originals")
+            out[stripped] = orig
+    missing = [n for n, r in rows.items() if r["name"].endswith(".tar") and r["folder"] != "optional"
+               and n not in tars]
+    if missing:
+        bad.append(f"{STRIPPED_TSV} has no row for {missing}")
+    if bad:
+        raise SystemExit("REFUSED: " + STRIPPED_TSV + ":\n  " + "\n  ".join(bad[:10]))
+    return out
+
+
+STRIP_SHIM = '''# Written by reproduce.py (D316) into its work copy's venv only; see reproduce.py "THE PAPERS' TEXT".
+# hashlib.sha256 reports a stripped member's (or tar's) original sha256, from the data root's stripped_records.tsv;
+# every other input hashes as it is.
+import hashlib as _h
+
+_JSON = %r
+_MAP = None
+_raw = _h.sha256
+_new = _h.new
+
+
+def _m():
+    global _MAP
+    if _MAP is None:
+        import json
+        _MAP = json.loads(_JSON)
+    return _MAP
+
+
+class _Sha256:
+    name, digest_size, block_size = "sha256", 32, 64
+
+    def __init__(self, data=b"", **kw):
+        self._o = _raw(data, **kw)
+
+    def update(self, data):
+        self._o.update(data)
+
+    def hexdigest(self):
+        x = self._o.hexdigest()
+        return _m().get(x, x)
+
+    def digest(self):
+        return bytes.fromhex(self.hexdigest())
+
+    def copy(self):
+        c = _Sha256.__new__(_Sha256)
+        c._o = self._o.copy()
+        return c
+
+
+def _sha256(data=b"", **kw):
+    return _Sha256(data, **kw)
+
+
+def _hnew(name, data=b"", **kw):
+    if str(name).lower().replace("-", "").replace("_", "") == "sha256":
+        return _Sha256(data, **kw)
+    return _new(name, data, **kw)
+
+
+_h.sha256 = _sha256
+_h.new = _hnew
+'''
+
+
+def install_strip_map(work: Path, mapping: dict[str, str], log: Path) -> str:
+    """D316: `uv sync --frozen` in the work copy, then STRIP_MODULE.py and STRIP_MODULE.pth into its venv's
+    site-packages. Returns a line for the run's log."""
+    env = {k: v for k, v in os.environ.items() if k != "VIRTUAL_ENV"}
+    with open(log, "w") as fh:
+        rc = subprocess.run(["uv", "sync", "--frozen"], cwd=work, env=env, stdout=fh, stderr=subprocess.STDOUT).returncode
+    if rc:
+        raise SystemExit(f"REFUSED: `uv sync --frozen` in the work copy exited {rc} (log {log})")
+    r = subprocess.run([*UV, "-c", "import sysconfig; print(sysconfig.get_paths()['purelib'])"], cwd=work, env=env,
+                       capture_output=True, text=True, check=True)
+    site = Path(r.stdout.strip().splitlines()[-1]).resolve()
+    if work.resolve() not in site.parents:
+        raise SystemExit(f"REFUSED: the work copy's site-packages {site} is not inside the work copy")
+    (site / f"{STRIP_MODULE}.py").write_text(STRIP_SHIM % json.dumps(mapping, sort_keys=True), encoding="utf-8")
+    (site / f"{STRIP_MODULE}.pth").write_text(f"import {STRIP_MODULE}\n", encoding="utf-8")
+    code = (f"import sys, hashlib; print('{STRIP_MODULE}' in sys.modules, hashlib.sha256(b'').hexdigest() == "
+            "'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')")
+    got = subprocess.run([*UV, "-c", code], cwd=work, env=env, capture_output=True, text=True).stdout.split()
+    if got != ["True", "True"]:
+        raise SystemExit(f"REFUSED: the stripped-sha256 module did not load in the work copy's venv ({site})")
+    return f"{len(mapping):,} stripped sha256 values stand for their originals in the work copy's venv ({site.name})"
 
 
 def unpack_ratings(work: Path, tar: Path) -> list[str]:
@@ -404,6 +574,87 @@ def row_ok(r: dict) -> bool:
     return good and r["audit"] in ("0", "")
 
 
+def parse_s494_problems(text: str) -> dict[str, list[str]]:
+    """S494's DIFFERENCES AND FAILURES: block label ("* <label>") -> its lines, the block's 4-space indent removed."""
+    out, cur = {}, None
+    lines = text.splitlines()
+    try:
+        i = lines.index("DIFFERENCES AND FAILURES")
+    except ValueError:
+        return out
+    for ln in lines[i + 1:]:
+        if ln.startswith("* "):
+            cur = ln[2:].strip()
+            out[cur] = []
+        elif cur is not None and ln.startswith("    "):
+            out[cur].append(ln[4:])
+        elif cur is not None and not ln.strip():
+            continue
+        elif cur is not None:
+            break
+    return out
+
+
+_PROBLEM = re.compile(r"^(?:(?P<pre>.+?): )?(?:differs: (?P<f>.+)|(?P<note>\s{4}\S.*))$")
+
+
+def held_in_s494(problems: dict[str, list[str]], held: list[dict]) -> dict[str, list[str]]:
+    """D316: row label -> the STRIPPED_HELD paths that differ in it, for every problem block whose lines are only
+    "differs: <file>" (each file a STRIPPED_HELD output), the key or line notes under them, and "note: reads ..."
+    lines (a step not run in an --only pass). Any other line (an exit, an audit read, a file not rebuilt or new, S448,
+    a block) leaves the block failed."""
+    out: dict[str, list[str]] = {}
+    for block, lines in problems.items():
+        found, ok = {}, bool(lines)
+        for ln in lines:
+            if ln.startswith("note: reads "):
+                continue
+            m = _PROBLEM.match(ln)
+            if not m:
+                ok = False
+                break
+            if m.group("f") is None:
+                continue
+            f = m.group("f").strip()
+            hit = [h["path"] for h in held if h["stage"] == "s494" and (h["path"] == f or h["path"].endswith("/" + f))]
+            if not hit:
+                ok = False
+                break
+            found.setdefault((m.group("pre") or block).strip(), []).extend(hit)
+        if ok and found:
+            out.update(found)
+    return out
+
+
+def judge_s494(text: str, held: list[dict]) -> tuple[list[dict], dict[str, list[str]]]:
+    """S494's table rows, each with "ok" and "note"; a row whose only differences are STRIPPED_HELD files passes,
+    noted "held (D316)". Returns (rows, the held paths by row label)."""
+    hmap = held_in_s494(parse_s494_problems(text), held)
+    rows = []
+    for r in parse_s494_table(text):
+        ok = row_ok(r)
+        note = r["equal"] + (f"; S448 {r['s448']}" if r["s448"] else "")
+        hp = hmap.get(r["figure"])
+        m = re.match(r"(\d+) of (\d+)", r["equal"])
+        if not ok and hp and m and int(m.group(2)) - int(m.group(1)) == len(hp) and r["audit"] in ("0", "") \
+                and not any(x in r["s448"] for x in ("FAIL", "not", "exit")):
+            ok = True
+            note += "; held (D316), computed from a replaced field, checked by sha256 in stage held: " + ", ".join(hp)
+        rows.append({**r, "ok": ok, "note": note})
+    return rows, hmap
+
+
+def s494_steps(work: Path, env: dict) -> list[str]:
+    """S494's step names, in its order, from the work copy's own S494 (steps() of an --out run)."""
+    code = ("import sys; sys.path.insert(0, 'scripts'); import S494_all_figures as S; "
+            "from pathlib import Path; print(' '.join(s['name'] for s in S.steps(Path('/nonexistent/out'))))")   # an --out
+    # run: steps(None) is the --write list, which leaves out d181
+    r = subprocess.run([*UV, "-c", code], cwd=work, env=env, capture_output=True, text=True)
+    if r.returncode or not r.stdout.strip():
+        raise SystemExit("REFUSED: could not list S494's steps in the work copy: " + (r.stderr.strip()[-300:]))
+    return r.stdout.split()
+
+
 def stage_s494(work: Path, data: Path, font_ok: bool) -> list[dict]:
     out = work.parent / (work.name + "_s494")              # outside the work copy: S494 judges writes into it
     log = work.parent / (work.name + "_s494.log")
@@ -414,17 +665,50 @@ def stage_s494(work: Path, data: Path, font_ok: bool) -> list[dict]:
         rc = subprocess.run(cmd, cwd=work, stdout=fh, stderr=subprocess.STDOUT, env=env).returncode
     text = log.read_text(errors="replace")
     print(text, flush=True)
+    parsed, hmap = judge_s494(text, ACTIVE_HELD)
+    second = None
+    # D316: the steps S494 reported blocked by a step whose only differences are held files run again without that
+    # step, so its committed outputs stand (S494 notes them "held to git HEAD only"); their rows replace the blocked ones
+    held_rows = set(hmap)
+    blocked = [r for r in parsed if r["equal"].startswith("blocked by")]
+    if held_rows and blocked:
+        held_steps = {h["step"] for h in ACTIVE_HELD if h["stage"] == "s494"}
+        blockers = {b.strip() for r in blocked for b in r["equal"][len("blocked by "):].split(",")}
+        # a held step that blocked other steps is left out of the second pass; only the blocked rows are taken from
+        # that pass, so a row of the held step itself that failed in pass 1 for any other reason stays failed
+        names = s494_steps(work, env)
+        leave_out = {s for s in held_steps if s in blockers and s in names}
+        only = [s for s in names if s not in leave_out and s not in ("frozen", "text")]
+        out2, log2 = work.parent / (work.name + "_s494_pass2"), work.parent / (work.name + "_s494_pass2.log")
+        cmd2 = [*UV, "scripts/S494_all_figures.py", "--out", str(out2), "--tars", str((data / "frozen").resolve())]
+        for s_ in only:
+            cmd2 += ["--only", s_]
+        print("$ " + " ".join(cmd2) + "   # D316: second pass, held steps left out: " + ", ".join(sorted(leave_out)),
+              flush=True)
+        with open(log2, "w") as fh:
+            rc2 = subprocess.run(cmd2, cwd=work, stdout=fh, stderr=subprocess.STDOUT, env=env).returncode
+        text2 = log2.read_text(errors="replace")
+        print(text2, flush=True)
+        p2, h2 = judge_s494(text2, ACTIVE_HELD)
+        second = {"rc": rc2, "rows": {r["figure"]: r for r in p2}, "left_out": leave_out, "log": log2}
     rows = []
-    for r in parse_s494_table(text):
-        ok = row_ok(r)
-        note = r["equal"] + (f"; S448 {r['s448']}" if r["s448"] else "")
+    for r in parsed:
+        if second and r["equal"].startswith("blocked by") and r["figure"] in second["rows"]:
+            r2 = second["rows"][r["figure"]]
+            r = {**r2, "note": r2["note"] + f"; from the second S494 pass (pass 1: {r['equal']}; "
+                                            f"left out: {', '.join(sorted(second['left_out']))})"}
+        ok, note = r["ok"], r["note"]
         if not ok and not font_ok and r["figure"].startswith(("Figure", "Supplementary Figure")):
             note += "; font differs from the plates' font (fidelity rule 2): not reproduced, check visually"
         rows.append({"stage": "s494", "item": r["figure"], "files": r["files"], "ok": ok, "note": note})
     if not rows:
         rows.append({"stage": "s494", "item": "S494", "files": "", "ok": False, "note": f"no table; exit {rc}"})
-    rows.append({"stage": "s494", "item": "S494 exit code", "files": "", "ok": rc == 0,
-                 "note": f"exit {rc} (log {log})"})
+    others_ok = bool(parsed) and all(x["ok"] for x in rows)
+    rows.append({"stage": "s494", "item": "S494 exit code", "files": "", "ok": rc == 0 or (bool(hmap) and others_ok),
+                 "note": f"exit {rc} (log {log})" + (
+                     f"; every difference is a held (D316) file, shown in its row" if rc and hmap and others_ok else "")
+                 + (f"; second pass exit {second['rc']} (log {second['log']}; a pass with --only and without the "
+                    "frozen check ends PARTIAL, exit 1)" if second else "")})
     return rows
 
 
@@ -647,7 +931,10 @@ def run_producer(work: Path, spec: dict, logs: Path, tars: Path | None) -> dict:
         subprocess.run(["git", "checkout", "--", "."], cwd=work, check=True)
         subprocess.run(["git", "clean", "-fdq"], cwd=work, check=True)
     compared = len(equal) + len(same_content) + len(differ) + len(missing)
-    ok = rc == 0 and not viol and not differ and not new and not missing and compared > 0
+    held_d = [d for d in differ if d in {h["path"] for h in ACTIVE_HELD}]        # D316: shown, not failed
+    for d in held_d:
+        notes.append(f"{d}: held (D316), computed from a replaced field, checked by sha256 in stage held")
+    ok = rc == 0 and not viol and not (set(differ) - set(held_d)) and not new and not missing and compared > 0
     if not compared:
         notes.append("compared no file: a producer must rebuild at least one released file to pass (S612)")
     if env_note:
@@ -659,6 +946,7 @@ def run_producer(work: Path, spec: dict, logs: Path, tars: Path | None) -> dict:
             "files": str(compared), "ok": ok,
             "note": ("compared no file, " if not compared else "") + (f"{len(equal)} byte-equal" + (f", {len(same_content)} content-equal" if same_content else "")
                      + (f", {len(differ)} differ" if differ else "")
+                     + (f" ({len(held_d)} held, D316)" if held_d else "")
                      + (f", {len(missing)} not rebuilt" if missing else "") + (f", {len(new)} new" if new else "")
                      + (f", {len(viol)} audit violations" if viol else "") + f", {secs:.0f} s"),
             "details": viol + notes + [f"new: {x}" for x in new] + [f"not rebuilt: {x}" for x in missing],
@@ -700,10 +988,17 @@ def expected_manifest() -> dict[str, str]:
     return rows
 
 
-def stage_held(work: Path, rated: bool = False) -> list[dict]:
-    """HELD by sha256; with rated, RATED_HELD's entries are left to RATED (rebuilt in the numbers stage)."""
+def stage_held(work: Path, rated: bool = False, strip: bool = False) -> list[dict]:
+    """HELD by sha256; with rated, RATED_HELD's entries are left to RATED (rebuilt in the numbers stage); with strip
+    (a stripped data root, D316), STRIPPED_HELD's outputs too."""
     exp = expected_manifest()
     rows = []
+    for h in ACTIVE_HELD if strip else []:
+        k = h["path"]
+        good = k in exp and (work / k).is_file() and sha256_file(work / k) == exp[k]
+        rows.append({"stage": "held", "item": f"{h['label']}: {k}", "files": "1", "ok": good,
+                     "note": ("sha256 equal" if good else "not in expected/MANIFEST.sha256 or sha256 differs")
+                     + f"; not rebuilt (D316): written by {h['by']}, which reads {h['field']}; {h['reason']}"})
     for label, path, reason in HELD:
         if rated and path in RATED_HELD:
             continue
@@ -737,7 +1032,88 @@ def table(rows: list[dict]) -> str:
     return "\n".join(out)
 
 
+def selftest() -> int:
+    """D316 pieces on made-up data, nothing run: the mapping read from stripped_records.tsv, the hash module in a
+    Python child, and the held judgement of S494 rows."""
+    import tempfile
+    fails = []
+
+    def check(name, cond):
+        print(("PASS " if cond else "FAIL ") + name)
+        if not cond:
+            fails.append(name)
+
+    global DATA_FILES
+    h = lambda b: hashlib.sha256(b).hexdigest()
+    orig_m, strip_m, orig_t, strip_t = h(b"original member"), h(b"stripped member"), h(b"orig tar"), h(b"strip tar")
+    with tempfile.TemporaryDirectory() as td:
+        td = Path(td)
+        tsv = ("tar\tmember\toriginal_sha256\tstripped_sha256\tfields_stripped\n"
+               f"a.tar\t\t{orig_t}\t{strip_t}\t\n"
+               f"a.tar\tr/calls.jsonl\t{orig_m}\t{strip_m}\tcalls.jsonl:.prompt_sent=1\n"
+               f"a.tar\tr/notes.txt\t{h(b'n')}\t{h(b'n')}\t\n")
+        (td / STRIPPED_TSV).write_text(tsv)
+        keep = DATA_FILES
+        try:
+            DATA_FILES = td / "DATA_FILES.tsv"
+            DATA_FILES.write_text("name\tbytes\tsha256\tfolder\tdescription\n"
+                                  f"a.tar\t1\t{strip_t}\tfrozen\tx\n{STRIPPED_TSV}\t1\t{h(tsv.encode())}\t.\tx\n")
+            m = strip_map(td)
+            check("mapping: the stripped member and tar stand for their originals, an unchanged member is not listed",
+                  m == {strip_m: orig_m, strip_t: orig_t})
+            DATA_FILES.write_text("name\tbytes\tsha256\tfolder\tdescription\n"
+                                  f"a.tar\t1\t{h(b'other')}\tfrozen\tx\n{STRIPPED_TSV}\t1\tx\t.\tx\n")
+            try:
+                strip_map(td)
+                check("mapping: a tar row whose stripped sha256 is not DATA_FILES.tsv's pin is refused", False)
+            except SystemExit:
+                check("mapping: a tar row whose stripped sha256 is not DATA_FILES.tsv's pin is refused", True)
+            DATA_FILES.write_text("name\tbytes\tsha256\tfolder\tdescription\na.tar\t1\tx\tfrozen\tx\n")
+            check("mapping: a data root of originals (no stripped_records.tsv row) maps nothing", strip_map(td) == {})
+        finally:
+            DATA_FILES = keep
+        (td / "shim.py").write_text(STRIP_SHIM % json.dumps({strip_m: orig_m}))
+        code = ("import sys; sys.path.insert(0, sys.argv[1]); import shim, hashlib, io; "
+                "print(hashlib.sha256(b'stripped member').hexdigest(), hashlib.new('sha256', b'stripped member').hexdigest(),"
+                " hashlib.file_digest(io.BytesIO(b'stripped member'), 'sha256').hexdigest(),"
+                " hashlib.sha256(b'other').hexdigest())")
+        out = subprocess.run([sys.executable, "-c", code, str(td)], capture_output=True, text=True).stdout.split()
+        check("hash module: sha256, new('sha256') and file_digest report the original for a stripped member",
+              out[:3] == [orig_m] * 3)
+        check("hash module: any other input hashes as it is", out[3:] == [h(b"other")])
+    held = [{"path": "findings/recompute/x_steps.json", "stage": "s494", "step": "figX"},
+            {"path": "findings/figures_provisional/figX/figure9_provenance.json", "stage": "s494", "step": "figX"}]
+    dash = "-" * 40 + "  -----  ---------------  -------  -----  -------"
+    text = "\n".join([
+        "figure                                    files  byte-equal       S448     audit  seconds", dash,
+        "  x_steps.json                                1  0 of 1                    0            9",
+        "Figure 9                                      9  8 of 9           12 PASS  0      (above)",
+        "Figure 8                                      8  7 of 8           12 PASS  0            2",
+        "Figure 1                                      8  blocked by figX  12 PASS  0            2", "",
+        "DIFFERENCES AND FAILURES",
+        "* Figure 9 (folder figX)",
+        "    x_steps.json: differs: x_steps.json",
+        "    x_steps.json:     keys /rows[0][5]",
+        "    Figure 9: differs: figure9_provenance.json",
+        "* Figure 8",
+        "    differs: figure8_numbers.json",
+        "* Figure 1",
+        "    blocked by figX: reads findings/figures_provisional/figX/legend_draft.md, an output of a step that failed",
+        ""])
+    rows, hmap = judge_s494(text, held)
+    ok = {r["figure"]: r["ok"] for r in rows}
+    check("S494: rows whose only differences are held files pass, noted held",
+          ok["x_steps.json"] and ok["Figure 9"] and "held (D316)" in rows[1]["note"])
+    check("S494: a difference in a file not held fails", not ok["Figure 8"])
+    check("S494: a blocked row is not passed by the first pass", not ok["Figure 1"])
+    check("S494: nothing held without a held list", not any(r["ok"] for r in judge_s494(text, [])[0]))
+    print(f"selftest: {'PASS' if not fails else 'FAIL'} ({len(fails)} failed)")
+    return 1 if fails else 0
+
+
 def main(argv=None) -> int:
+    if "--selftest" in (sys.argv[1:] if argv is None else argv):
+        return selftest()
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--data", default=os.environ.get("MENTORI_DATA"))
     ap.add_argument("--download", action="store_true")
@@ -762,7 +1138,11 @@ def main(argv=None) -> int:
         print(f"REFUSED: the work folder {work} is not empty: give a new or empty --work")
         return 2
     print(f"making the work copy {work}", flush=True)
+    mapping = strip_map(data)
     unpacked = make_work(work, data, (data / RATINGS_TAR) if rated else None)
+    if mapping:
+        ACTIVE_HELD[:] = STRIPPED_HELD
+        print("  " + install_strip_map(work, mapping, work.parent / (work.name + "_uv_sync.log")), flush=True)
     plat, font_ok = platform_lines()
     for x in plat:
         print("  " + x, flush=True)
@@ -773,7 +1153,7 @@ def main(argv=None) -> int:
     if "numbers" in stages:
         rows += stage_numbers(work, data, skip=a.skip_producer, rated=unpacked if rated else None)
     if "held" in stages:
-        rows += stage_held(work, rated=rated and "numbers" in stages)
+        rows += stage_held(work, rated=rated and "numbers" in stages, strip=bool(mapping))
     print("\nPASS TABLE")
     print(table(rows))
     for x in plat:

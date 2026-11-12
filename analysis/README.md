@@ -1,12 +1,12 @@
 # Mentori analysis: the scripts that make the paper's figures, tables and numbers
 
-Built by `scripts/S608_release_analysis.py` from Mentori-reanalysis commit `d40237595b`, copied from that commit
+Built by `scripts/S608_release_analysis.py` from Mentori-reanalysis commit `7c02e422b1`, copied from that commit
 (git cat-file), never from a working tree. `RELEASE_PROVENANCE.json` lists every file and where it went.
 
 ## What is here
 
 - `reproduce.py`: the one command (below).
-- `scripts/`: 123 of the 794 scripts tracked in Mentori-reanalysis, the ones the stages run or
+- `scripts/`: 123 of the 796 scripts tracked in Mentori-reanalysis, the ones the stages run or
   import (measured by the read audit, `scripts/fig_read_audit.py`).
 - `experiments/`: `LOCK.toml` (every model call's settings), `FIGURE_LOCK.toml` (every figure's rules), the runner,
   scorer and Mentori files the scripts import, and `rlm_ref/` (its own `pyproject.toml` and `uv.lock`).
@@ -17,9 +17,30 @@ Built by `scripts/S608_release_analysis.py` from Mentori-reanalysis commit `d402
 - `DATA_FILES.tsv`: the files the data root must hold, with size and sha256.
 - `pyproject.toml`, `uv.lock`, `.python-version` (Python 3.13.11): the environment, as the analysis ran.
 
-792 files in git (101,712,084 bytes). The inputs the stages read (2198 files) are data and live in the
-Zenodo record as `analysis_inputs.tar` (927,846,400 bytes, sha256 `27d93b99b37a1b3332c01bbe55dd3420cc3b426554b7fb49842f28696636e561`), beside the 14 frozen tars of
-per-call records.
+792 files in git (101,734,702 bytes). The inputs the stages read (2198 files) are data and live in the
+Zenodo record as `analysis_inputs.tar` (782,397,440 bytes, sha256 `d4407692af27bfa48ffe32795fa2fef60713654f79747370238a749ff62d621c`), beside the
+15 frozen tars of per-call records and `stripped_records.tsv` (sha256 `df5c2ab0369ca10befd794926aed8038833ef436eff605d17df4b133a295b260`).
+
+## The papers' text in the data (D316)
+
+The corpus papers are not redistributed. In the frozen tars and in `analysis_inputs.tar`, the text sent to a model
+that carried passages of the papers, the retrieved passages, the pipeline steps' tool outputs, the outputs of code a
+model ran and the citation quotes are each replaced by
+`{"stripped": true, "sha256": <sha256 of the replaced text>, "chars": <its length>, "passage_ids": [<chunk ids>]}`;
+model-written text (answers, replies, code, judges' text) stays, as D316 decides, even where it quotes a paper, so
+some kept answers still hold passages of the papers (the data record's README gives the count). `analysis_inputs.tar` before stripping had sha256
+`27d93b99b37a1b3332c01bbe55dd3420cc3b426554b7fb49842f28696636e561`. `DATA_FILES.tsv` pins the stripped files by their own sha256, and `stripped_records.tsv` gives, per tar
+and per member, the original's sha256 and the stripped one's.
+
+The scripts are unchanged and check the originals' sha256 in many places. `reproduce.py` therefore lets a stripped
+member stand for its original in every sha256 check, exactly as `stripped_records.tsv` maps it and nothing else (a
+module it writes into the work copy's own environment; "THE PAPERS' TEXT" in its docstring). An output computed from
+a replaced field cannot come out the same, so it is held, checked by its sha256, with the field it reads; where a
+stage rebuilds it, the difference is shown in that stage's row, not hidden. The held outputs:
+
+- `findings/recompute/S472_supp12a_steps.json` (Supplementary Figure 12a step rows; written by S494 step fig4 (scripts/S472_fig4_panels.py); reads answers.json .results[].generation.steps[].raw_content, a pipeline step's tool output, replaced by the stripped object: the script takes its len(), which is 4 (the object's keys), not the text's length): each step row's output length (rows[][5]) and the totals after it are computed from the replaced text; the stripped object's chars field holds that length, which the script does not read
+- `findings/figures_provisional/fig4/figure5_provenance.json` (Figure 5 provenance; written by S494 step fig4 (scripts/S472_fig4_panels.py); reads answers.json .results[].generation.steps[].raw_content, a pipeline step's tool output, replaced by the stripped object: the script takes its len(), which is 4 (the object's keys), not the text's length): q82.<setup>.largest_chars and the largest step output it reproduces are computed from the replaced text; the plate and Source Data Fig. 5 rebuild byte-equal
+- `findings/recompute/distiller_count_g3_d1/distiller_count_g3_d1.json` (distiller firing count, draw 1; written by S494 step numbers (scripts/distiller_count_g3_d1.py); reads answers.json .results[].generation.steps[].raw_content, a pipeline step's tool output, replaced by the stripped object: the script takes its len(), which is 4 (the object's keys), not the text's length): largest_step_output.chars and the check against RUNNING.md's 26 Oct count are computed from the replaced text
 
 ## The one command
 
@@ -29,8 +50,9 @@ uv run --frozen python reproduce.py --data DIR [--work DIR] [--only s494|numbers
 uv run --frozen python reproduce.py --data DIR --download [--zenodo-url https://zenodo.org/records/<id>]
 ```
 
-`DIR` is one data root: `DIR/frozen/<the 14 tars>`, `DIR/analysis_inputs.tar` and, optionally, `DIR/ratings.tar`
-(the anonymised rating rows; ratings.tar pinned (sha256 f0ae63f00c51)). With `--download`, each file
+`DIR` is one data root: `DIR/frozen/<the 15 tars>`, `DIR/analysis_inputs.tar`, `DIR/stripped_records.tsv`
+and, optionally, `DIR/ratings.tar`
+(the anonymised rating rows; no ratings.tar row: /Users/valeriobianchi/Mentori_release_stage/ratings.tar is not a file; Figure 2 and Supplementary Figure 3 held). With `--download`, each file
 `DATA_FILES.tsv` lists and `DIR` lacks is fetched from `<zenodo-url>/files/<name>?download=1`. The record id in
 `ZENODO_URL` is a placeholder until the deposit exists (TO FILL AFTER DEPOSIT); give `--zenodo-url` meanwhile. Every
 file is checked by sha256 before anything runs. Then:
@@ -77,7 +99,7 @@ in all on 8 cores (`boot_seconds` in `findings/recompute/S565_corpus_interaction
 
 ## What did not pass when this tree was built
 
-The build measured the stages in a fresh clone of `d40237595b` (S494 exit 1). The producers' results then:
+The build measured the stages in a fresh clone of `7c02e422b1` (S494 exit 1). The producers' results then:
 see `RELEASE_PROVENANCE.json` `producers`. Known today:
 
 - Several producers' committed outputs were written before later commits to their scripts and carry the older

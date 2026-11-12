@@ -1,19 +1,169 @@
 {
  "what": "S608 build of Mentori-paper analysis/ from Mentori-reanalysis git HEAD",
  "script": "scripts/S608_release_analysis.py",
- "commit": "d40237595ba11bbe1cbf3e856fd0e50dc9156e5f",
- "commit10": "d40237595b",
+ "commit": "7c02e422b195ebb8668d8a9f98633369f3f4a734",
+ "commit10": "7c02e422b1",
  "n_git": 792,
  "n_tar": 2198,
- "git_bytes": 101712084,
+ "git_bytes": 101734702,
  "tar_bytes": 927846400,
  "tar_sha256": "27d93b99b37a1b3332c01bbe55dd3420cc3b426554b7fb49842f28696636e561",
+ "stripped_tar_bytes": 782397440,
+ "stripped_tar_sha256": "d4407692af27bfa48ffe32795fa2fef60713654f79747370238a749ff62d621c",
+ "stripped_records_sha256": "df5c2ab0369ca10befd794926aed8038833ef436eff605d17df4b133a295b260",
+ "n_frozen": 15,
+ "stripped": {
+  "frozen": {
+   "answer_lengths_20261020.tar": {
+    "bytes": 579246080,
+    "sha256": "9e0542b3ef36762e35ac50c62ac12c64265552390678bef240db142f46fd2e0f",
+    "original_sha256": "adb177a692451d3331b5c1463a90e40b480ed07bbdb7b9741092f3adcdfb3902",
+    "members_changed": 49
+   },
+   "count_records_20261106.tar": {
+    "bytes": 269506560,
+    "sha256": "23ee988eac835e22a84d0b71359691219606cdd7672a545df093e21853960e1f",
+    "original_sha256": "b6f334760dfc837bdde9d3b965cf50a12aac589a000d86ee58bcf9a1e8f4a1bb",
+    "members_changed": 57
+   },
+   "count_records_20261108.tar": {
+    "bytes": 80035840,
+    "sha256": "e9ba44eb02cbcf9dc86e63e16dacd798ac7e82091c101ecba30b7a4dd633f62a",
+    "original_sha256": "a43a504f0a6fe73a40cb388a4aec9dec77ade8201fd54bd69788264a0981ae11",
+    "members_changed": 12
+   },
+   "count_records_20261109.tar": {
+    "bytes": 18196480,
+    "sha256": "10ac80f849d35274534c21ed465e1ef5fef74d7cb1c9044eee9291db17c953b5",
+    "original_sha256": "4112e345bc498dccd165a9194f4fb80cafbb1d4a6d8946dab8e88057bc1c8e38",
+    "members_changed": 3
+   },
+   "fig2_g1r15_inputs.tar": {
+    "bytes": 41154560,
+    "sha256": "5dce5e8325e158a337b14b43113d2c341f02c6ab4855a6df19e7a9e64e7f0cd0",
+    "original_sha256": "d849b5aebc59f4d0ae17bfe7ba5d02782c89d278a957b130e1f2585f44c24bf2",
+    "members_changed": 3
+   },
+   "fig3_g4_inputs.tar": {
+    "bytes": 408494080,
+    "sha256": "8599f5638b3194ff98b1dde6cc9519697ea78724fc93277f7216556b6c8884fe",
+    "original_sha256": "7f8481440b0ce74123dd0f5f037b21190070ae932614c20dc8af86d180bbf601",
+    "members_changed": 36
+   },
+   "fig3_t1.tar": {
+    "bytes": 477358080,
+    "sha256": "685aeedbb276df2fc239c84500fb2e10f0023a3ae4f2044ce7cc37f8fdb4c6ff",
+    "original_sha256": "0b0326de1814167de5663e68f28738b427c3e0df8ac80301a03bdbc31a92e950",
+    "members_changed": 362
+   },
+   "fig4_records_1023.tar": {
+    "bytes": 40232960,
+    "sha256": "b4d42b4e3135987d7c8a21367961ab229cf064c3f645a0c17fa5ef656bb7844d",
+    "original_sha256": "7283205a989ba66179c78bb36b7add786a45f224f38fdf7a45af52a351fa5e72",
+    "members_changed": 6
+   },
+   "g4_draws_20261101.tar": {
+    "bytes": 640942080,
+    "sha256": "549add375b1cd403cc525f158a67b4fba94effba8c55744e95364862fdaf4644",
+    "original_sha256": "c02cef9c048786dfa7cbcf2c4827af35741b56cea6e4a05c04679169cf3aaf19",
+    "members_changed": 36
+   },
+   "g6_calls_after_d135.tar": {
+    "bytes": 440545280,
+    "sha256": "816c72f753005eff1a76f6e78185c7d516b493be5ab05df30ab728652fc298e1",
+    "original_sha256": "50600722d382b05d7ab89777595cc009dc36e1864c8e782a1c59d7f142f1a3c2",
+    "members_changed": 3
+   },
+   "g6_calls_before_d89.tar": {
+    "bytes": 431073280,
+    "sha256": "8e67b4b4215833990bdcb8491d43415959fffe314d6748e2e3296b694eea691c",
+    "original_sha256": "6608a18448a9a5d7418ac7a5abbd1dbea372df2afffd7e0d9c1246b6ac08f06f",
+    "members_changed": 3
+   },
+   "k1_inputs_runs.tar": {
+    "bytes": 48107520,
+    "sha256": "c74609af09fe9b48d6b43fb847a5ed61860dd76e496d4d08b34bb2499cc86f6d",
+    "original_sha256": "10551bc6a9a8ce8f62e606a78aefe81f28501c73410d0ebdda5fe1ee8c63bb57",
+    "members_changed": 3
+   },
+   "s2_after_s4_20261105.tar": {
+    "bytes": 390707200,
+    "sha256": "a38856bf3e740ea864a0f1361d8a1bcc0031b2b7fcefee800da49480fae416e1",
+    "original_sha256": "f879ea24f6398634f65d09d468e08210b9044a408822e45a52a0c1249182354d",
+    "members_changed": 139
+   },
+   "s2_length_retries_20261021.tar": {
+    "bytes": 332349440,
+    "sha256": "9706c6b029f14d74ebdc3ee1bcbd44f05cad72994174fb41df253f77027c4eb0",
+    "original_sha256": "0085b2926f2ba8c442d1fa6c6ccceb54eb6fbc9d82fab581318b74662ace5ecf",
+    "members_changed": 139
+   },
+   "s457_mirror_20261022.tar": {
+    "bytes": 52869120,
+    "sha256": "80cae39d33214ee30664aa4790a0652295014fe90862aef42e2b38fc8681ca39",
+    "original_sha256": "b8d4b175eb42e25cbeeb1277a8fad3ad7f4cd9bf67cfa66c5a31017aa6fdbc98",
+    "members_changed": 3
+   }
+  },
+  "analysis_inputs": {
+   "bytes": 782397440,
+   "sha256": "d4407692af27bfa48ffe32795fa2fef60713654f79747370238a749ff62d621c",
+   "original_sha256": "27d93b99b37a1b3332c01bbe55dd3420cc3b426554b7fb49842f28696636e561",
+   "original_bytes": 927846400,
+   "members_changed": 40,
+   "fields": {
+    "*.json:.per_question_results[].per_turn[].execution_outputs[]": 658,
+    "*.json:.results[].rlm.citations[].quote": 76290,
+    "*.json:[].raw_content": 97,
+    "*.json:[].step_result_content": 100,
+    "answers.json:.results[].generation.steps[].content": 327,
+    "answers.json:.results[].generation.steps[].raw_content": 327,
+    "answers.jsonl:.generation.rlm.metadata.citations[].quote": 14380,
+    "calls.jsonl:.prompt_sent": 15
+   }
+  },
+  "values_replaced": {
+   "frozen": 1374434,
+   "analysis_inputs": 92194
+  },
+  "stripped_records": "df5c2ab0369ca10befd794926aed8038833ef436eff605d17df4b133a295b260",
+  "held": [
+   {
+    "label": "Supplementary Figure 12a step rows",
+    "path": "findings/recompute/S472_supp12a_steps.json",
+    "stage": "s494",
+    "step": "fig4",
+    "by": "S494 step fig4 (scripts/S472_fig4_panels.py)",
+    "field": "answers.json .results[].generation.steps[].raw_content, a pipeline step's tool output, replaced by the stripped object: the script takes its len(), which is 4 (the object's keys), not the text's length",
+    "reason": "each step row's output length (rows[][5]) and the totals after it are computed from the replaced text; the stripped object's chars field holds that length, which the script does not read"
+   },
+   {
+    "label": "Figure 5 provenance",
+    "path": "findings/figures_provisional/fig4/figure5_provenance.json",
+    "stage": "s494",
+    "step": "fig4",
+    "by": "S494 step fig4 (scripts/S472_fig4_panels.py)",
+    "field": "answers.json .results[].generation.steps[].raw_content, a pipeline step's tool output, replaced by the stripped object: the script takes its len(), which is 4 (the object's keys), not the text's length",
+    "reason": "q82.<setup>.largest_chars and the largest step output it reproduces are computed from the replaced text; the plate and Source Data Fig. 5 rebuild byte-equal"
+   },
+   {
+    "label": "distiller firing count, draw 1",
+    "path": "findings/recompute/distiller_count_g3_d1/distiller_count_g3_d1.json",
+    "stage": "s494",
+    "step": "numbers",
+    "by": "S494 step numbers (scripts/distiller_count_g3_d1.py)",
+    "field": "answers.json .results[].generation.steps[].raw_content, a pipeline step's tool output, replaced by the stripped object: the script takes its len(), which is 4 (the object's keys), not the text's length",
+    "reason": "largest_step_output.chars and the check against RUNNING.md's 26 Oct count are computed from the replaced text"
+   }
+  ]
+ },
+ "held_stripped_md": "- `findings/recompute/S472_supp12a_steps.json` (Supplementary Figure 12a step rows; written by S494 step fig4 (scripts/S472_fig4_panels.py); reads answers.json .results[].generation.steps[].raw_content, a pipeline step's tool output, replaced by the stripped object: the script takes its len(), which is 4 (the object's keys), not the text's length): each step row's output length (rows[][5]) and the totals after it are computed from the replaced text; the stripped object's chars field holds that length, which the script does not read\n- `findings/figures_provisional/fig4/figure5_provenance.json` (Figure 5 provenance; written by S494 step fig4 (scripts/S472_fig4_panels.py); reads answers.json .results[].generation.steps[].raw_content, a pipeline step's tool output, replaced by the stripped object: the script takes its len(), which is 4 (the object's keys), not the text's length): q82.<setup>.largest_chars and the largest step output it reproduces are computed from the replaced text; the plate and Source Data Fig. 5 rebuild byte-equal\n- `findings/recompute/distiller_count_g3_d1/distiller_count_g3_d1.json` (distiller firing count, draw 1; written by S494 step numbers (scripts/distiller_count_g3_d1.py); reads answers.json .results[].generation.steps[].raw_content, a pipeline step's tool output, replaced by the stripped object: the script takes its len(), which is 4 (the object's keys), not the text's length): largest_step_output.chars and the check against RUNNING.md's 26 Oct count are computed from the replaced text",
  "n_outputs": 393,
- "n_head": 11751,
+ "n_head": 11754,
  "font_sha256": "25eceb458d4baf628ee0b6a135a9f8ac5ec7b2826646720834bd2bf00dfc825a",
  "n_scripts": 123,
- "n_head_scripts": 794,
- "measured_seconds": 884,
+ "n_head_scripts": 796,
+ "measured_seconds": 888,
  "s494_exit": 1,
  "producers": {
   "S543": {
@@ -90,7 +240,7 @@
   },
   "S581": {
    "ok": true,
-   "note": "3 byte-equal, 227 s"
+   "note": "3 byte-equal, 228 s"
   },
   "S591": {
    "ok": true,
@@ -106,7 +256,7 @@
   },
   "S596": {
    "ok": false,
-   "note": "3 byte-equal, 10 audit violations, 216 s"
+   "note": "3 byte-equal, 10 audit violations, 218 s"
   },
   "S530+S531": {
    "ok": true,
@@ -119,8 +269,8 @@
    "20"
   ]
  },
- "ratings": "ratings.tar pinned (sha256 f0ae63f00c51)",
- "rated_source": "/private/tmp/claude-501/-Users-valeriobianchi-projects-Mentori-reanalysis/c31ac869-01aa-4c3e-8951-c5a5cc7167ea/scratchpad/rt/ratings.tar (sha256 f0ae63f00c51)",
+ "ratings": "no ratings.tar row: /Users/valeriobianchi/Mentori_release_stage/ratings.tar is not a file; Figure 2 and Supplementary Figure 3 held",
+ "rated_source": "this repository's git-ignored files, sha256 equal to findings/recompute/S530_human_signals/results.json _provenance",
  "git_by_folder": {
   ".python-version": 1,
   "data/ground_truth_v2": 142,

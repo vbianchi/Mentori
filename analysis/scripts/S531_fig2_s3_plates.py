@@ -22,9 +22,9 @@ gone (D274): the rating window closed with no claim mark returned (D273), so the
 
 RELEASE. Every mode 2 build prints its release tag, S531-release-<12 hex>: a hash of the two numbers files, so a tag names
 exactly the cells that build holds. --released copies the two folders to findings/figures_provisional/ only in mode 2,
-and only when the decision --on-word D<nnn> names holds that tag. Rater 2's per-answer columns need Dirkjan's yes after his
-packet is back (fig2.md section 2), so --released also needs one of two things:
-  --rater2-yes D<nnn>  a decision line that holds the same tag and the word Dirkjan;
+and only when the decision --on-word D<nnn> names holds that tag. Rater 2's per-answer columns need the second rater's yes
+after their packet is back (fig2.md section 2), so --released also needs one of two things:
+  --rater2-yes D<nnn>  a decision line that holds the same tag and the words "rater 2" or "second rater";
   --without-rater2     the workbooks leave out rater 2's per-answer columns, and the two kinds of cell that would give them
                        back: the raters' per-answer means (rater 2 = 2 x mean - rater 1), and rater 1's per-answer
                        faithfulness, which with the band in sheet 2c bounds rater 2's. The plates do not change, and the
@@ -1062,10 +1062,13 @@ def decision_line(decision, readme=None) -> str:
                       f"the release tag") from None
 
 
+RATER2_WORD = re.compile(r"\b(rater 2|second rater)\b", re.I)   # a --rater2-yes line names rater 2
+
+
 def release(draft: Path, target: Path, on_word: str, rater2_yes: str = None, readme=None) -> list:
     """Copies the two mode 2 folders to target, replacing the frames (fig2:31). Refuses anything but a complete two-rater
-    draft; a decision that does not hold this draft's tag; and rater 2's cells without a line that holds the tag and the
-    word Dirkjan."""
+    draft; a decision that does not hold this draft's tag; and rater 2's cells without a line that holds the tag and
+    names rater 2 (RATER2_WORD)."""
     for name in FOLDERS:
         src = Path(draft) / name
         prov = next(iter(src.glob("*_provenance.json")), None) if src.is_dir() else None
@@ -1076,12 +1079,12 @@ def release(draft: Path, target: Path, on_word: str, rater2_yes: str = None, rea
         raise Refused(f"{on_word} does not name this release: its line must hold {tag}. Nothing moved")
     if holds_rater2(draft):
         if rater2_yes is None:
-            raise Refused(f"this draft holds rater 2's per-answer columns: record Dirkjan's yes in a decision line that "
+            raise Refused(f"this draft holds rater 2's per-answer columns: record the second rater's yes in a decision line that "
                           f"holds {tag} and pass --rater2-yes D<nnn>, or rebuild with --without-rater2. Nothing moved")
         yes = decision_line(rater2_yes, readme)
-        if tag not in yes or "Dirkjan" not in yes:
-            raise Refused(f"{rater2_yes} is not Dirkjan's yes to this release: its line must hold {tag} and the word "
-                          f"Dirkjan. Nothing moved")
+        if tag not in yes or not RATER2_WORD.search(yes):
+            raise Refused(f"{rater2_yes} is not the second rater's yes to this release: its line must hold {tag} "
+                          f"and name rater 2. Nothing moved")
     moved = []
     for name in FOLDERS:
         dst = Path(target) / name
@@ -1100,7 +1103,7 @@ def main(argv=None) -> int:
                                              "modes 1 and 2 refuse any other folder inside the repository")
     ap.add_argument("--released", action="store_true", help="mode 2: copy the draft to figures_provisional")
     ap.add_argument("--on-word", help="--released: the decision that records Valerio's word and holds the release tag")
-    ap.add_argument("--rater2-yes", help="--released: the decision that records Dirkjan's yes and holds the release tag")
+    ap.add_argument("--rater2-yes", help="--released: the decision that records the second rater's yes and holds the release tag")
     ap.add_argument("--without-rater2", action="store_true", help="mode 2: leave rater 2's per-answer columns out")
     a = ap.parse_args(argv)
     import logging
@@ -1115,7 +1118,7 @@ def main(argv=None) -> int:
                 raise Refused("--released is for mode 2 only: mode 1 stays in the git-ignored folder (fig2:29)")
             decision_line(a.on_word)
             if a.rater2_yes is None and not a.without_rater2:
-                raise Refused("--released needs --rater2-yes D<nnn>, Dirkjan's yes, or --without-rater2")
+                raise Refused("--released needs --rater2-yes D<nnn>, the second rater's yes, or --without-rater2")
             if a.rater2_yes:
                 decision_line(a.rater2_yes)
         out = a.out or (FIGURES if a.raters == 0 else DRAFT)
